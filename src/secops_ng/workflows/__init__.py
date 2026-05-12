@@ -1,9 +1,11 @@
-"""Temporal workflow templates.
+"""LangGraph workflow templates.
 
-This package holds the durable, replayable workflow definitions that orchestrate
-SecOps activities. Workflows here must remain deterministic: all side effects
-belong in `secops_ng.activities`, all type contracts in `secops_ng.contracts`.
+This package holds the ``StateGraph`` definitions that orchestrate SecOps
+reasoning. Every node receives and returns an immutable
+:class:`secops_ng.tool_io.ToolIO` subclass; LLM-facing steps are implemented
+as DSPy modules so the prompts are versioned, testable code rather than
+opaque strings.
 
-Workflows declared with `@workflow.defn` survive process restarts and can be
-replayed from history — keep them pure.
+Side-effecting integrations (SIEM lookups, ticketing, etc.) live in
+``secops_ng.activities`` and are invoked from graph nodes.
 """

@@ -57,7 +57,7 @@ and submission rehearsal**.
 
 <!-- coder:wire — incident-evidence emitters not yet implemented. The
      `secops_ng.evidence.incidents` module will own these. Schemas live
-     in `src/secops_ng/contracts.py`. -->
+     in `src/secops_ng/tool_io.py`. -->
 
 ## Gaps
 

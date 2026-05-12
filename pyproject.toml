@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "secops-ng"
 version = "0.0.1"
-description = "Durable agentic SecOps workflows on Temporal, LangGraph, Pydantic, and DSPy."
+description = "Agentic SecOps workflows on LangGraph, Pydantic v2, and DSPy."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
@@ -16,8 +16,8 @@ keywords = [
     "security",
     "secops",
     "soar",
-    "temporal",
     "langgraph",
+    "dspy",
     "agents",
     "nis2",
     "sovereignty",
@@ -33,10 +33,9 @@ classifiers = [
     "Topic :: Security",
 ]
 dependencies = [
-    "temporalio>=1.7",
     "langgraph>=0.2",
     "langchain-core>=0.3",
-    "pydantic>=2.6",
+    "pydantic>=2.5",
     "pydantic-settings>=2.2",
     "dspy-ai>=2.4",
     "python-dotenv>=1.0",
@@ -63,6 +62,7 @@ packages = ["src/secops_ng"]
 include = [
     "src/secops_ng",
     "workflows",
+    "docs",
     "README.md",
     "LICENSE",
     "CONTRIBUTING.md",
@@ -72,6 +72,7 @@ include = [
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+extend-exclude = [".venv"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "N", "S", "ASYNC"]

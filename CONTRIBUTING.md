@@ -31,7 +31,7 @@ CI runs the same set. Please make sure each is clean before opening a PR.
 - Ruff is the source of truth for formatting and lint rules
   (configured in `pyproject.toml`).
 - Type hints are required on all public functions and methods.
-- `secops_ng.contracts.ToolIO` (strict Pydantic) is the canonical I/O type
+- `secops_ng.tool_io.ToolIO` (strict Pydantic) is the canonical I/O type
   at every workflow / activity / tool boundary.
 
 ## Commit messages

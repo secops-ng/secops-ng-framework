@@ -1,9 +1,9 @@
-"""Temporal activities — the side-effecting units.
+"""Side-effecting tool / integration adapters.
 
-Activities are where SecOps-NG touches the outside world: calling vulnerability
-scanners, querying SIEMs, posting to ticketing systems, invoking LLMs. They
-may fail, retry, time out, and run on heterogeneous workers.
+Activities are where SecOps-NG touches the outside world: calling
+vulnerability scanners, querying SIEMs, posting to ticketing systems,
+invoking LLM backends. They may fail, retry, and time out.
 
-Anything non-deterministic, network-bound, or stateful belongs here — never in
-`secops_ng.workflows`.
+LangGraph nodes call into this package; the node itself stays thin and the
+side effect is encapsulated here so it can be mocked in tests.
 """

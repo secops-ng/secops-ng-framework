@@ -13,8 +13,8 @@ These files are deliberately separate from the library code under
 Each template here should be:
 
 1. Self-contained and runnable (after configuring `.env`).
-2. Heavily commented — assume the reader is learning Temporal and SecOps-NG
-   at the same time.
+2. Heavily commented — assume the reader is learning LangGraph, DSPy, and
+   SecOps-NG at the same time.
 3. Safe by default — no destructive actions without explicit confirmation.
 4. Sovereignty-aware — no hardcoded calls to non-EU endpoints; everything
    pluggable through `secops_ng.config`.
@@ -23,6 +23,6 @@ Each template here should be:
 
 | File | Status | Purpose |
 |------|--------|---------|
-| `vulnerability_triage.py` | stub | Durable triage of incoming vuln findings |
+| `vulnerability_triage.py` | example | LangGraph triage of a single finding, with DSPy severity classification |
 
 Contributions of new templates are very welcome — see `../CONTRIBUTING.md`.
