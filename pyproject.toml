@@ -1,0 +1,91 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "secops-ng"
+version = "0.0.1"
+description = "Durable agentic SecOps workflows on Temporal, LangGraph, Pydantic, and DSPy."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [
+    { name = "SecOps-NG Contributors" },
+]
+keywords = [
+    "security",
+    "secops",
+    "soar",
+    "temporal",
+    "langgraph",
+    "agents",
+    "nis2",
+    "sovereignty",
+]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+]
+dependencies = [
+    "temporalio>=1.7",
+    "langgraph>=0.2",
+    "langchain-core>=0.3",
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+    "dspy-ai>=2.4",
+    "python-dotenv>=1.0",
+    "structlog>=24.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.5",
+    "mypy>=1.10",
+]
+
+[project.urls]
+Homepage = "https://github.com/secops-ng/secops-ng-framework"
+Issues = "https://github.com/secops-ng/secops-ng-framework/issues"
+Source = "https://github.com/secops-ng/secops-ng-framework"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/secops_ng"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/secops_ng",
+    "workflows",
+    "README.md",
+    "LICENSE",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N", "S", "ASYNC"]
+ignore = ["S101"]  # allow asserts in tests
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unused_ignores = true
+warn_return_any = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
