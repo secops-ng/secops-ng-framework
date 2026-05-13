@@ -4,11 +4,10 @@ This file is auto-loaded for any Hermes session opened in `~/secops-ng/`.
 It is the single source of truth for project context, repo architecture,
 agent personas, and core directives.
 
-> Strategy, commercial intent, NIS2 deadline framing as a business
-> driver, and any consulting-pivot planning live in
-> `secops-ng-business/MEMORY.md` (private, permanent). They are
-> deliberately absent from this file because this file's content is
-> mirrored into a will-be-public repo.
+> Operational details, governance decisions, and any internal planning
+> live in private sibling repositories. They are deliberately absent
+> from this file because this file's content is mirrored into a
+> will-be-public repo.
 
 ---
 
@@ -33,7 +32,7 @@ that need to meet European regulatory baselines.
 | secops-ng-framework     | private  | PUBLIC   | Treat every commit as future-public  |
 | secops-ng-website       | private  | PUBLIC   | Treat every commit as future-public  |
 | secops-ng-deployment    | private  | private  | Infra, KB, sovereign provider data   |
-| secops-ng-business      | private  | private  | Strategy, governance, decisions log  |
+| secops-ng-business      | private  | private  | Governance and decisions log         |
 
 Git history is permanent. The Custodian audits every PR to the
 will-be-public repos against the NGO-mask and sovereignty language
