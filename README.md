@@ -64,6 +64,43 @@ durable-execution patterns have been validated against real NIS2-relevant use
 cases by more than one operator. If you are running security operations under
 NIS2 and want to help shape this, please open a discussion.
 
+## Running the skeleton
+
+The canonical durable workflow lives at
+`src/secops_ng/workflows/skeleton.py`. It is the template every future
+agentic workflow descends from: signal-driven, deterministic body,
+side effects pushed into activities, replay-clean.
+
+To run it against a local Temporal dev server:
+
+```bash
+# Terminal 1 — start a local Temporal server (install the CLI from
+# https://docs.temporal.io/cli once; nothing else is required).
+temporal server start-dev
+
+# Terminal 2 — run the worker. TEMPORAL_ADDRESS and TEMPORAL_TASK_QUEUE
+# are both optional; defaults are localhost:7233 and secops-ng-default.
+python -m secops_ng.worker
+```
+
+Drive the workflow with the `temporal` CLI (or the Python client):
+
+```bash
+temporal workflow start \
+  --task-queue secops-ng-default \
+  --type SkeletonWorkflow \
+  --workflow-id demo-run-1
+
+temporal workflow signal --workflow-id demo-run-1 --name add_item --input '"alpha"'
+temporal workflow signal --workflow-id demo-run-1 --name add_item --input '"bravo"'
+temporal workflow signal --workflow-id demo-run-1 --name finish
+temporal workflow result --workflow-id demo-run-1
+```
+
+The replay-based tests in `tests/test_skeleton_replay.py` exercise the
+same workflow without needing a live server — they use Temporal's
+time-skipping test environment.
+
 ## Quickstart
 
 > Full docs are pending. Expect rough edges.
