@@ -61,9 +61,19 @@ Apache-2.0. PRs without DCO sign-off cannot be merged.
 
 ## Code of conduct
 
-A formal `CODE_OF_CONDUCT.md` is in preparation. Until then: be kind, be
-patient, assume good faith, and remember that contributors are
-volunteers. Harassment of any kind is not tolerated.
+All participation is governed by the project
+[Code of Conduct](CODE_OF_CONDUCT.md), adapted from the
+[Contributor Covenant, version 2.1][cc-2.1]. Reports of unacceptable
+behaviour go to the stewards at **conduct@secops-ng.com**.
+
+[cc-2.1]: https://www.contributor-covenant.org/version/2/1/code_of_conduct.html
+
+## Governance
+
+How decisions get made, who has merge rights, and how that is expected
+to evolve is documented in [GOVERNANCE.md](GOVERNANCE.md). The short
+version: lazy consensus among maintainers, with the Code of Conduct
+enforced by a steward group.
 
 ## Reporting security issues
 
