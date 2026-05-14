@@ -1,0 +1,29 @@
+# Sample CloudFootprintManifest used by the audit tests.
+#
+# Three illustrative workloads spanning the sovereign / mixed / non-sovereign
+# spectrum. Names are deliberately generic placeholders — no real
+# organisation, customer, or prospect is referenced.
+version: 1
+workloads:
+  # Sovereign case: EU-origin provider, EU region, sensitive data.
+  - name: workload-a
+    kind: service
+    declared_provider: nebul
+    region: eu-nl-1
+    data_classification: restricted
+
+  # Mixed case: EU-origin provider but for a less sensitive tier — used
+  # by the audit to verify it does not over-flag low-sensitivity data.
+  - name: workload-b
+    kind: object_store
+    declared_provider: ovh
+    region: eu-fr-gra
+    data_classification: internal
+
+  # Non-sovereign case: hyperscaler region holding confidential data —
+  # the audit should surface this as a sovereignty finding.
+  - name: workload-c
+    kind: database
+    declared_provider: aws
+    region: us-east-1
+    data_classification: confidential
