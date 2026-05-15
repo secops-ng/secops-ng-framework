@@ -118,13 +118,24 @@ Documentation will live at `docs/` (TBD) and at the project site once the
 community settles on hosting. Until then, the source — particularly the
 `workflows/` examples — is the documentation.
 
-## Contributing
+## Contributing & governance
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). All contributions require a DCO
-sign-off (`git commit -s`). We follow conventional commits.
+This is a community project. Four documents describe how to take part:
 
-Security issues: see [SECURITY.md](SECURITY.md). Please do **not** open public
-issues for vulnerabilities.
+- [CONTRIBUTING.md](CONTRIBUTING.md) — dev setup, commit style, DCO
+  sign-off, and the PR process.
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — what we expect of one
+  another, adapted from the Contributor Covenant 2.1.
+- [GOVERNANCE.md](GOVERNANCE.md) — how decisions get made, who has
+  merge rights, and how that will evolve as the project grows.
+- [SECURITY.md](SECURITY.md) — vulnerability disclosure policy and
+  contact.
+
+All contributions require a DCO sign-off (`git commit -s`). We follow
+conventional commits.
+
+Security issues: see [SECURITY.md](SECURITY.md). Please do **not** open
+public issues for vulnerabilities.
 
 ## License
 

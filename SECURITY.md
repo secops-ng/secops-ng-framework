@@ -5,7 +5,7 @@ seriously.
 
 ## Reporting a vulnerability
 
-Please email **security@secops-ng.example** with:
+Please email **security@secops-ng.com** with:
 
 - A description of the issue and its impact.
 - Steps to reproduce, or a proof of concept.
@@ -15,7 +15,9 @@ Please email **security@secops-ng.example** with:
 Do **not** open a public GitHub issue for security reports.
 
 If you require encrypted communication, request a PGP key in your first
-message and we will respond with one before you share details.
+message and we will respond with one before you share details. A
+published project PGP key is on the roadmap; until it lands here, the
+request-and-respond flow above is the supported path.
 
 ## Our commitments
 
