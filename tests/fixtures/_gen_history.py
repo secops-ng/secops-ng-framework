@@ -17,6 +17,7 @@ e2e test, so the replay test exercises the realistic codepath.
 from __future__ import annotations
 
 import asyncio
+import json
 import uuid
 from pathlib import Path
 
@@ -30,6 +31,13 @@ from secops_ng.workflows.posture_audit import PostureAuditWorkflow
 
 FIXTURES = Path(__file__).resolve().parent
 TASK_QUEUE = "posture-audit-history-capture"
+
+# Generic, non-host-identifying identity stamped into every captured event.
+# The Temporal SDK default identity is "<pid>@<hostname>", which would leak
+# the capture host into a will-be-public fixture (directive #7 — forward-
+# public hygiene). The replay codepath is identity-agnostic, so we post-
+# process the serialised history to use a fixed constant instead.
+CAPTURE_IDENTITY = "secops-ng-capture"
 
 
 async def _capture() -> str:
@@ -58,11 +66,34 @@ async def _capture() -> str:
             return history.to_json()
 
 
+def _sanitize_identity(payload: str) -> str:
+    """Replace every ``identity`` field in the serialised history with a
+    generic constant so the captured host name does not leak into the
+    will-be-public fixture. Replay is identity-agnostic, so this is safe.
+    """
+    history = json.loads(payload)
+
+    def _walk(node: object) -> None:
+        if isinstance(node, dict):
+            for key, value in node.items():
+                if key == "identity" and isinstance(value, str):
+                    node[key] = CAPTURE_IDENTITY
+                else:
+                    _walk(value)
+        elif isinstance(node, list):
+            for item in node:
+                _walk(item)
+
+    _walk(history)
+    return json.dumps(history, indent=2)
+
+
 def main() -> None:
     payload = asyncio.run(_capture())
+    sanitized = _sanitize_identity(payload)
     out = FIXTURES / "posture_audit_history.json"
-    out.write_text(payload, encoding="utf-8")
-    print(f"wrote {out} ({len(payload)} bytes)")
+    out.write_text(sanitized, encoding="utf-8")
+    print(f"wrote {out} ({len(sanitized)} bytes)")
 
 
 if __name__ == "__main__":
