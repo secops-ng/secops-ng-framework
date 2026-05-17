@@ -14,7 +14,7 @@ by default.
 |--------------------------------------------------|-------------------------------------------------------------------------|
 | [`evidence_collector`](./evidence_collector/)    | Durable, restartable evidence gathering against a declared control set. |
 | [`provider_attestation`](./provider_attestation/) | Periodic verification that a declared sovereign provider still meets its declared criteria. |
-| `incident_timeline` _(planned, see #16)_         | Durable append-only incident timeline builder.                          |
+| [`incident_timeline`](./incident_timeline/)      | Durable append-only incident timeline builder.                          |
 
 ## Contribution rules
 
