@@ -13,7 +13,7 @@ by default.
 | Pattern                                          | What it does                                                            |
 |--------------------------------------------------|-------------------------------------------------------------------------|
 | [`evidence_collector`](./evidence_collector/)    | Durable, restartable evidence gathering against a declared control set. |
-| `provider_attestation` _(planned, see #16)_      | Periodic verification that a declared sovereign provider still meets KB criteria. |
+| [`provider_attestation`](./provider_attestation/) | Periodic verification that a declared sovereign provider still meets its declared criteria. |
 | `incident_timeline` _(planned, see #16)_         | Durable append-only incident timeline builder.                          |
 
 ## Contribution rules
