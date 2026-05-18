@@ -1,0 +1,34 @@
+# Sample incident timeline seed events for the incident-timeline pattern.
+#
+# Labels are deliberately generic — `incident-0001`, `detector-alpha`,
+# `workload-a` — to keep this fixture safe in the will-be-public repo.
+# Replace with your real detector feed when you adopt this pattern
+# downstream.
+#
+# Schema:
+#   incident_id: stable identifier for the incident under response
+#   events:     list of TimelineEvent payloads to seed the workflow
+#               with via the append_event signal.
+#     event_id:    deduplication key (later signals with same id overwrite)
+#     observed_at: ISO-8601 wall-clock timestamp
+#     source:      short label for the upstream detector
+#     kind:        short category of the event
+#     detail:      free-form human description
+
+incident_id: incident-0001
+events:
+  - event_id: ev-001
+    observed_at: "2026-01-01T08:00:00+00:00"
+    source: detector-alpha
+    kind: anomaly-detected
+    detail: unusual outbound traffic spike on workload-a
+  - event_id: ev-002
+    observed_at: "2026-01-01T08:05:00+00:00"
+    source: operator
+    kind: triage-started
+    detail: on-call paged, beginning investigation
+  - event_id: ev-003
+    observed_at: "2026-01-01T08:30:00+00:00"
+    source: detector-beta
+    kind: containment-applied
+    detail: workload-a isolated at the network boundary
