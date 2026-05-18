@@ -61,6 +61,7 @@ code that happens to implement it.
 | Workflow | One-liner |
 |----------|-----------|
 | [`vulnerability_triage/`](vulnerability_triage/README.md) | LangGraph triage of a single finding with DSPy severity classification and a NIS2-aligned audit trail. |
+| `vulnscan/` (planned) | End-user template for the multi-engine dynamic scan workflow — see [`../docs/vulnscan/README.md`](../docs/vulnscan/README.md). |
 
 Contributions of new templates are very welcome — see
 [`../CONTRIBUTING.md`](../CONTRIBUTING.md).

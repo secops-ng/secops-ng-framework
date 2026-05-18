@@ -114,6 +114,23 @@ and the `scripts/submit_audit.py` operator client — see
 lives at [`tests/fixtures/sample_report.md`](tests/fixtures/sample_report.md)
 and the round-trip is a one-line diff.
 
+## Multi-engine vulnerability scanning workflow
+
+The `vulnscan` workflow is a containment-first, multi-engine dynamic
+scanner for small-office and home-office estates (cameras, printers,
+IoT, network devices, web endpoints). It runs five engines in two
+stages (Nessus/OpenVAS for infrastructure, Nikto/Wapiti/ZAP for web),
+streams findings to DefectDojo, and emits a stamped PDF report — all
+durable through a Temporal workflow that survives engine crashes and
+host restarts.
+
+Documentation lives at [docs/vulnscan/README.md](docs/vulnscan/README.md):
+
+- [ARCHITECTURE.md](docs/vulnscan/ARCHITECTURE.md) — network topology and component responsibilities.
+- [RUNBOOK.md](docs/vulnscan/RUNBOOK.md) — operator steps from `compose up` to PDF retrieval.
+- [THREAT-MODEL.md](docs/vulnscan/THREAT-MODEL.md) — STRIDE on the Scan Engine network with containment guarantees.
+- [DEPLOYMENT.md](docs/vulnscan/DEPLOYMENT.md) — Nebul (and other EU-hosted) deployment notes.
+
 ## Quickstart
 
 > Full docs are pending. Expect rough edges.
