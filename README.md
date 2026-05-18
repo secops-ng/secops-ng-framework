@@ -101,6 +101,29 @@ The replay-based tests in `tests/test_skeleton_replay.py` exercise the
 same workflow without needing a live server — they use Temporal's
 time-skipping test environment.
 
+## Running the sovereign posture audit
+
+The posture audit (`src/secops_ng/workflows/posture_audit.py`) is the
+first non-skeleton workflow. It cross-references a declared cloud
+footprint manifest against a sovereign-provider knowledge base and
+emits a markdown report. The worker opts into serving it when
+`POSTURE_AUDIT_KB_PATH` points at a KB JSON file — when the variable is
+unset, the worker behaves exactly as before. A thin operator client at
+`scripts/submit_audit.py` loads a manifest, signals each workload to a
+`PostureAuditWorkflow`, finalizes the run, and prints the rendered
+report to stdout. End-to-end with the committed sample fixtures:
+
+```bash
+# Terminal 1 — Temporal dev server.
+temporal server start-dev
+
+# Terminal 2 — worker with the audit surface enabled.
+POSTURE_AUDIT_KB_PATH=tests/fixtures/audit_kb.json python -m secops_ng.worker
+
+# Terminal 3 — submit the sample manifest, render the report.
+python scripts/submit_audit.py tests/fixtures/sample_manifest.yaml
+```
+
 ## Quickstart
 
 > Full docs are pending. Expect rough edges.

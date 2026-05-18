@@ -16,11 +16,26 @@ Environment variables
     Task queue this worker subscribes to. Defaults to
     ``secops-ng-default``.
 
+``POSTURE_AUDIT_KB_PATH``
+    Optional. When set to a readable path of a sovereign-provider KB JSON
+    file, the worker additionally registers
+    :class:`~secops_ng.workflows.posture_audit.PostureAuditWorkflow` and
+    its two activities (``evaluate_workload`` and ``render_report``),
+    backed by a :class:`~secops_ng.audit.kb_adapter.FileBackedKBAdapter`
+    over that file. When unset, the worker behaves exactly as before:
+    only the skeleton workflow is served.
+
 Run locally with::
 
     python -m secops_ng.worker
 
 …after starting a Temporal dev server (``temporal server start-dev``).
+
+Drive a posture audit run with::
+
+    POSTURE_AUDIT_KB_PATH=tests/fixtures/audit_kb.json python -m secops_ng.worker
+    # then, in another terminal:
+    python scripts/submit_audit.py tests/fixtures/sample_manifest.yaml
 """
 
 from __future__ import annotations
@@ -43,18 +58,41 @@ logger = logging.getLogger(__name__)
 
 
 async def run_worker() -> None:
-    """Connect to Temporal and serve the skeleton workflow + activity."""
+    """Connect to Temporal and serve the registered workflows + activities.
+
+    Always serves :class:`SkeletonWorkflow` and its ``process_item``
+    activity. When ``POSTURE_AUDIT_KB_PATH`` is set in the environment,
+    additionally serves :class:`PostureAuditWorkflow` and its two
+    activities, backed by a file-backed KB adapter pointed at that path.
+    """
     address = os.environ.get("TEMPORAL_ADDRESS", DEFAULT_ADDRESS)
     task_queue = os.environ.get("TEMPORAL_TASK_QUEUE", DEFAULT_TASK_QUEUE)
 
     logger.info("connecting to Temporal at %s", address)
     client = await Client.connect(address)
 
+    workflows: list[type] = [SkeletonWorkflow]
+    activities: list = [process_item]
+
+    kb_path = os.environ.get("POSTURE_AUDIT_KB_PATH")
+    if kb_path:
+        # Import lazily so the posture-audit dependency graph (pydantic
+        # models, KB adapter, yaml) only loads when the operator opts
+        # into the audit surface.
+        from secops_ng.activities.posture_audit import PostureAuditActivities
+        from secops_ng.audit.kb_adapter import FileBackedKBAdapter
+        from secops_ng.workflows.posture_audit import PostureAuditWorkflow
+
+        logger.info("posture-audit surface enabled (KB path: %s)", kb_path)
+        audit_acts = PostureAuditActivities(FileBackedKBAdapter(kb_path))
+        workflows.append(PostureAuditWorkflow)
+        activities.extend([audit_acts.evaluate_workload, audit_acts.render_report])
+
     worker = Worker(
         client,
         task_queue=task_queue,
-        workflows=[SkeletonWorkflow],
-        activities=[process_item],
+        workflows=workflows,
+        activities=activities,
     )
 
     logger.info("worker listening on task queue %r", task_queue)
