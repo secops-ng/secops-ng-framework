@@ -1,31 +1,57 @@
 """Replay-based tests for the skeleton workflow.
 
-These tests use ``WorkflowEnvironment`` — Temporal's time-skipping, in-process
-test harness. They prove two things:
+These tests cover three layers:
 
-1. The workflow accepts signals, dispatches activities, and returns the
-   accumulated results.
-2. The workflow body is deterministic: a recorded history replays without
-   raising ``NondeterminismError``.
+1. **Live behaviour** — ``WorkflowEnvironment`` runs the workflow end to
+   end via signals and asserts on its result and query surface.
+2. **Explicit replay against a recorded history** — a captured fixture
+   is fed to :class:`temporalio.worker.Replayer` to prove the workflow
+   body is deterministic across runs. Any future change that introduces
+   non-determinism (rearranged signals, conditional imports, clock
+   reads, random IDs in the workflow body, …) surfaces here as a
+   ``NondeterminismError``.
+3. **Negative replay** — a deliberately mutated variant of the workflow
+   is registered under the same workflow type name and replayed against
+   the same fixture. The mutation changes the command sequence
+   (executes ``process_item`` twice per item), so Replayer must raise
+   ``NondeterminismError``. This proves the determinism guard actually
+   bites — a clean replay above is meaningful only because the negative
+   case fails.
 
-If you change the workflow body in a way that breaks replay, the second test
-fails immediately — that is the point.
+If the workflow body legitimately changes shape, regenerate the
+fixture:
+
+    python tests/fixtures/_gen_skeleton_history.py
 """
 
 from __future__ import annotations
 
 import uuid
+from datetime import timedelta
+from pathlib import Path
 
 import pytest
-from temporalio.client import WorkflowHandle
+from temporalio import workflow
+from temporalio.client import WorkflowHandle, WorkflowHistory
 from temporalio.testing import WorkflowEnvironment
-from temporalio.worker import Worker
+from temporalio.worker import Replayer, Worker
+from temporalio.workflow import NondeterminismError
 
 from secops_ng.activities.skeleton import process_item
 from secops_ng.workflows.skeleton import SkeletonWorkflow
 
 
 TASK_QUEUE = "skeleton-test-queue"
+
+
+def _history_path() -> Path:
+    """Resolve the fixture path lazily.
+
+    ``Path.resolve`` is restricted inside Temporal's workflow sandbox, so
+    we must avoid computing this at module import time — the test module
+    is re-imported under the sandbox when registering workflow classes
+    defined here (see ``_MutatedSkeletonWorkflow`` below)."""
+    return Path(__file__).parent / "fixtures" / "skeleton_history.json"
 
 
 @pytest.mark.asyncio
@@ -100,3 +126,89 @@ async def test_skeleton_query_returns_processed_so_far() -> None:
                 "processed:alpha",
                 "processed:bravo",
             ]
+
+
+@pytest.mark.asyncio
+async def test_skeleton_workflow_replays_without_non_determinism() -> None:
+    """Replay a captured history; pass means the workflow body is deterministic."""
+    history_json = _history_path().read_text(encoding="utf-8")
+    history = WorkflowHistory.from_json(
+        "skeleton-replay-fixture", history_json
+    )
+
+    replayer = Replayer(workflows=[SkeletonWorkflow])
+    # ``replay_workflow`` raises on non-determinism / workflow errors
+    # when ``raise_on_replay_failure`` is left at its default ``True``;
+    # a clean return is the assertion.
+    await replayer.replay_workflow(history)
+
+
+# ---------------------------------------------------------------------------
+# Negative replay: a mutated workflow registered under the same workflow
+# type name must fail replay against the unmutated history.
+# ---------------------------------------------------------------------------
+
+
+@workflow.defn(name="SkeletonWorkflow")
+class _MutatedSkeletonWorkflow:
+    """Deliberately divergent variant used only to prove the determinism guard.
+
+    The body executes ``process_item`` **twice** for every signalled item,
+    changing the command sequence vs the recorded history. Replay must
+    raise ``NondeterminismError``.
+    """
+
+    def __init__(self) -> None:
+        self._pending: list[str] = []
+        self._processed: list[str] = []
+        self._finished: bool = False
+
+    @workflow.run
+    async def run(self) -> list[str]:
+        while True:
+            await workflow.wait_condition(
+                lambda: bool(self._pending) or self._finished
+            )
+            batch = list(self._pending)
+            self._pending.clear()
+            for item in batch:
+                # Mutation: extra activity call per item.
+                await workflow.execute_activity(
+                    process_item,
+                    item,
+                    start_to_close_timeout=timedelta(seconds=30),
+                )
+                result = await workflow.execute_activity(
+                    process_item,
+                    item,
+                    start_to_close_timeout=timedelta(seconds=30),
+                )
+                self._processed.append(result)
+            if self._finished and not self._pending:
+                return list(self._processed)
+
+    @workflow.signal
+    def add_item(self, item: str) -> None:
+        self._pending.append(item)
+
+    @workflow.signal
+    def finish(self) -> None:
+        self._finished = True
+
+    @workflow.query
+    def processed(self) -> list[str]:
+        return list(self._processed)
+
+
+@pytest.mark.asyncio
+async def test_skeleton_replay_rejects_mutated_workflow() -> None:
+    """Replaying the recorded history against a mutated workflow body
+    must raise ``NondeterminismError`` — proving the replay guard bites."""
+    history_json = _history_path().read_text(encoding="utf-8")
+    history = WorkflowHistory.from_json(
+        "skeleton-replay-fixture", history_json
+    )
+
+    replayer = Replayer(workflows=[_MutatedSkeletonWorkflow])
+    with pytest.raises(NondeterminismError):
+        await replayer.replay_workflow(history)
