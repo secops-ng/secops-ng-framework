@@ -298,7 +298,7 @@ In a second terminal on the same VM:
 ```bash
 cd ~/secops-ng
 . .venv/bin/activate
-python workflows/vulnerability_triage.py
+python workflows/vulnerability_triage/example.py
 ```
 
 A successful run prints something like:
