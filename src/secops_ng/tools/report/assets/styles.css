@@ -1,0 +1,316 @@
+/* SecOps-NG vulnscan report — dark theme, EU palette.
+ * Designed for WeasyPrint (CSS Paged Media). Single column.
+ */
+
+@page {
+  size: A4;
+  margin: 18mm 16mm 18mm 16mm;
+  background: #0b1220;
+  @top-right {
+    content: "SecOps-NG · Posture Report";
+    color: #6a82b7;
+    font-size: 9pt;
+    font-family: "Helvetica", "Arial", sans-serif;
+  }
+  @bottom-right {
+    content: "Page " counter(page) " / " counter(pages);
+    color: #6a82b7;
+    font-size: 9pt;
+    font-family: "Helvetica", "Arial", sans-serif;
+  }
+}
+
+@page :first {
+  margin: 0;
+  background: #0b1220;
+  @top-right { content: ""; }
+  @bottom-right { content: ""; }
+}
+
+:root {
+  --bg: #0b1220;
+  --bg-card: #121b32;
+  --bg-card-2: #18223d;
+  --fg: #e6ecff;
+  --fg-muted: #9aa8c9;
+  --accent: #003399;      /* EU blue */
+  --accent-2: #ffcc00;    /* EU gold */
+  --line: #25324f;
+  --sev-critical: #ff4757;
+  --sev-high: #ff7849;
+  --sev-medium: #ffb84d;
+  --sev-low: #4dbef7;
+  --sev-info: #7e8aaa;
+  --diff-new: #ff4757;
+  --diff-resolved: #2ecc71;
+  --diff-persistent: #ffb84d;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  font-size: 10pt;
+  line-height: 1.45;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 600;
+  color: var(--fg);
+  letter-spacing: 0.01em;
+}
+h1 { font-size: 28pt; margin: 0 0 8pt; }
+h2 { font-size: 18pt; margin: 18pt 0 8pt; border-bottom: 1px solid var(--line); padding-bottom: 4pt; }
+h3 { font-size: 13pt; margin: 14pt 0 6pt; color: var(--accent-2); }
+h4 { font-size: 11pt; margin: 0; }
+
+p { margin: 6pt 0; }
+.muted { color: var(--fg-muted); font-size: 9pt; }
+.narrative { font-size: 10.5pt; line-height: 1.55; }
+
+a { color: var(--sev-low); text-decoration: none; }
+code { font-family: "Menlo", "Consolas", monospace; font-size: 8.5pt; color: var(--accent-2); }
+
+/* ===================== Cover ===================== */
+.cover {
+  page: cover;
+  page-break-after: always;
+  height: 297mm;
+  width: 210mm;
+  position: relative;
+  overflow: hidden;
+}
+.cover-art { position: absolute; inset: 0; z-index: 0; opacity: 0.85; }
+.cover-art svg { width: 100%; height: 100%; }
+.cover-header {
+  position: absolute; top: 22mm; left: 18mm; z-index: 1;
+}
+.brand { font-size: 16pt; font-weight: 700; color: var(--accent-2); letter-spacing: 0.06em; }
+.brand-tag { font-size: 9pt; color: var(--fg-muted); margin-top: 2pt; }
+.cover-body {
+  position: absolute; top: 110mm; left: 18mm; right: 18mm; z-index: 1;
+}
+.cover-body h1 {
+  font-size: 30pt;
+  color: var(--fg);
+  text-shadow: 0 2pt 12pt rgba(0,0,0,0.6);
+}
+.cover-meta {
+  display: grid;
+  grid-template-columns: 32mm 1fr;
+  gap: 4pt 10pt;
+  margin-top: 14pt;
+  font-size: 10.5pt;
+}
+.cover-meta dt { color: var(--fg-muted); }
+.cover-meta dd { margin: 0; color: var(--fg); }
+.cover-footer {
+  position: absolute; bottom: 18mm; left: 18mm; right: 18mm; z-index: 1;
+  font-size: 8.5pt; color: var(--fg-muted); line-height: 1.4;
+  border-top: 1px solid var(--line); padding-top: 6pt;
+}
+
+/* ===================== Sections ===================== */
+.section { page-break-inside: auto; margin-top: 6pt; }
+.section h2 { color: var(--fg); }
+
+/* ===================== Diff section ===================== */
+.diff .headline {
+  font-size: 13pt;
+  background: var(--bg-card);
+  padding: 8pt 12pt;
+  border-left: 3pt solid var(--accent-2);
+  border-radius: 2pt;
+}
+.diff-new       { color: var(--diff-new); }
+.diff-resolved  { color: var(--diff-resolved); }
+.diff-persistent{ color: var(--diff-persistent); }
+
+/* ===================== Tables ===================== */
+.findings-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 6pt 0 12pt;
+  font-size: 9pt;
+  background: var(--bg-card);
+}
+.findings-table th, .findings-table td {
+  text-align: left;
+  padding: 5pt 7pt;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.findings-table thead th {
+  background: var(--bg-card-2);
+  color: var(--fg-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 8pt;
+  letter-spacing: 0.05em;
+}
+.findings-table.tag-new       thead th { border-top: 2pt solid var(--diff-new); }
+.findings-table.tag-resolved  thead th { border-top: 2pt solid var(--diff-resolved); }
+.findings-table.tag-persistent thead th { border-top: 2pt solid var(--diff-persistent); }
+
+/* ===================== Severity pills ===================== */
+.sev-pill {
+  display: inline-block;
+  padding: 1pt 6pt;
+  border-radius: 8pt;
+  font-size: 8pt;
+  font-weight: 600;
+  color: #0b1220;
+}
+.sev-critical { color: var(--sev-critical); }
+.sev-high     { color: var(--sev-high); }
+.sev-medium   { color: var(--sev-medium); }
+.sev-low      { color: var(--sev-low); }
+.sev-info     { color: var(--sev-info); }
+.sev-pill.sev-critical { background: var(--sev-critical); }
+.sev-pill.sev-high     { background: var(--sev-high); }
+.sev-pill.sev-medium   { background: var(--sev-medium); color: #1a1304; }
+.sev-pill.sev-low      { background: var(--sev-low); color: #04121e; }
+.sev-pill.sev-info     { background: var(--sev-info); color: #fff; }
+
+/* ===================== Exec summary ===================== */
+.exec-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8pt;
+  margin: 8pt 0 12pt;
+}
+.exec-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 3pt;
+  padding: 10pt 12pt;
+}
+.exec-label { color: var(--fg-muted); font-size: 8.5pt; text-transform: uppercase; letter-spacing: 0.06em; }
+.exec-value { color: var(--accent-2); font-size: 18pt; font-weight: 700; margin-top: 2pt; }
+
+.priorities { padding-left: 18pt; }
+.priorities li { margin-bottom: 2pt; }
+
+/* ===================== Methodology / architecture ===================== */
+.arch-diagram {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 3pt;
+  padding: 12pt;
+  margin: 8pt 0;
+  text-align: center;
+}
+.net {
+  display: inline-block;
+  padding: 8pt 12pt;
+  border-radius: 4pt;
+  margin: 4pt 0;
+  border: 1px dashed var(--line);
+}
+.net-orchestration { border-color: var(--accent); }
+.net-scanner      { border-color: var(--accent-2); }
+.net-label {
+  display: block;
+  font-size: 8pt;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+  margin-bottom: 6pt;
+}
+.node {
+  display: inline-block;
+  background: var(--bg-card-2);
+  padding: 4pt 8pt;
+  border-radius: 2pt;
+  margin: 2pt;
+  font-size: 9pt;
+}
+.arrow { font-size: 16pt; color: var(--fg-muted); margin: 4pt 0; }
+
+.stages { padding-left: 18pt; }
+.stages li { margin-bottom: 3pt; }
+
+/* ===================== Findings summary bars ===================== */
+.severity-bars { margin: 8pt 0; }
+.bar-row {
+  display: grid;
+  grid-template-columns: 60pt 1fr 30pt;
+  align-items: center;
+  gap: 6pt;
+  margin: 3pt 0;
+}
+.bar-label { font-size: 9.5pt; }
+.bar {
+  display: block;
+  height: 10pt;
+  background: var(--bg-card-2);
+  border-radius: 5pt;
+  overflow: hidden;
+}
+.bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+.sev-critical .bar-fill { background: var(--sev-critical); }
+.sev-high     .bar-fill { background: var(--sev-high); }
+.sev-medium   .bar-fill { background: var(--sev-medium); }
+.sev-low      .bar-fill { background: var(--sev-low); }
+.sev-info     .bar-fill { background: var(--sev-info); }
+.bar-count { text-align: right; font-weight: 600; }
+
+/* ===================== Active findings cards ===================== */
+.finding {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-left-width: 3pt;
+  border-radius: 3pt;
+  padding: 8pt 10pt;
+  margin: 6pt 0;
+  page-break-inside: avoid;
+}
+.finding.sev-critical { border-left-color: var(--sev-critical); }
+.finding.sev-high     { border-left-color: var(--sev-high); }
+.finding.sev-medium   { border-left-color: var(--sev-medium); }
+.finding.sev-low      { border-left-color: var(--sev-low); }
+.finding.sev-info     { border-left-color: var(--sev-info); }
+.finding header { display: flex; align-items: center; gap: 8pt; margin-bottom: 4pt; }
+.finding-meta {
+  display: grid;
+  grid-template-columns: 25mm 1fr 25mm 1fr;
+  gap: 2pt 8pt;
+  font-size: 9pt;
+  margin: 4pt 0 6pt;
+}
+.finding-meta dt { color: var(--fg-muted); }
+.finding-meta dd { margin: 0; }
+.refs { font-size: 8.5pt; }
+.attestation {
+  margin-top: 6pt;
+  padding-top: 4pt;
+  border-top: 1px dashed var(--line);
+  font-size: 8.5pt;
+  color: var(--fg-muted);
+  display: flex;
+  gap: 8pt;
+  align-items: baseline;
+}
+.att-line { color: var(--line); letter-spacing: 0.5pt; }
+
+/* ===================== Appendix ===================== */
+.repro {
+  display: grid;
+  grid-template-columns: 38mm 1fr;
+  gap: 3pt 10pt;
+  font-size: 9.5pt;
+  background: var(--bg-card);
+  padding: 8pt 10pt;
+  border-radius: 3pt;
+}
+.repro dt { color: var(--fg-muted); }
+.repro dd { margin: 0; }
+.artifacts { padding-left: 16pt; }
+.artifacts li { margin: 2pt 0; }
+.artifacts .sha { display: block; color: var(--fg-muted); font-size: 8pt; }

@@ -1,0 +1,287 @@
+{# SecOps-NG vulnscan posture report — Digital Commons branding.
+
+   Sections:
+     1. Cover
+     2. Diff-at-start (omitted when ctx.is_first_run)
+     3. Executive summary
+     4. Methodology + two-network architecture
+     5. Engines
+     6. Findings summary (charts & counts)
+     7. Active findings (grouped by severity)
+     8. Appendix (artifacts + reproducibility footer)
+#}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SecOps-NG Security Posture Report — {{ ctx.meta.target }}</title>
+<style>{{ css_text|safe }}</style>
+</head>
+<body>
+
+{# =================== 1. COVER =================== #}
+<section class="cover">
+  <div class="cover-art">{{ cover_svg|safe }}</div>
+  <header class="cover-header">
+    <div class="brand">SecOps-NG</div>
+    <div class="brand-tag">Digital Commons · Sovereign Security · EU</div>
+  </header>
+  <div class="cover-body">
+    <h1>Security Posture Report</h1>
+    <dl class="cover-meta">
+      <dt>Target</dt><dd>{{ ctx.meta.target }}</dd>
+      {% if ctx.meta.target_ip %}<dt>IP</dt><dd>{{ ctx.meta.target_ip }}</dd>{% endif %}
+      {% if ctx.meta.target_fqdn %}<dt>FQDN</dt><dd>{{ ctx.meta.target_fqdn }}</dd>{% endif %}
+      <dt>Scan window</dt><dd>{{ ctx.meta.scan_window_start }} → {{ ctx.meta.scan_window_end }}</dd>
+      <dt>Report version</dt><dd>{{ ctx.meta.report_version }}</dd>
+      <dt>Methodology</dt><dd>{{ ctx.meta.methodology_version }}</dd>
+    </dl>
+  </div>
+  <footer class="cover-footer">
+    Produced by the SecOps-NG community pipeline. This document is part
+    of a Digital Commons effort to make European security operations
+    auditable, repeatable, and sovereign. No commercial supplier is
+    implied by its issuance.
+  </footer>
+</section>
+
+{# =================== 2. DIFF-AT-START =================== #}
+{% if not ctx.is_first_run %}
+<section class="section diff">
+  <h2>Changes since the previous engagement</h2>
+  <p class="headline">{{ ctx.diff.headline }}</p>
+  <p class="muted">Previous engagement: {{ ctx.diff.previous_run_at }}</p>
+
+  {% if ctx.diff.analyst_narrative %}
+  <p class="narrative">{{ ctx.diff.analyst_narrative }}</p>
+  {% endif %}
+
+  {% if ctx.diff.new_findings %}
+  <h3 class="diff-new">New findings ({{ ctx.diff.new_findings|length }})</h3>
+  <table class="findings-table tag-new">
+    <thead><tr><th>Severity</th><th>Title</th><th>Host</th><th>CVE / CWE</th></tr></thead>
+    <tbody>
+    {% for f in ctx.diff.new_findings %}
+      <tr class="{{ f.severity|sev_class }}">
+        <td><span class="sev-pill {{ f.severity|sev_class }}">{{ f.severity }}</span></td>
+        <td>{{ f.title }}</td>
+        <td>{{ f.host }}{% if f.port %}:{{ f.port }}{% endif %}</td>
+        <td>{{ f.cve or f.cwe or '—' }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  {% if ctx.diff.resolved_findings %}
+  <h3 class="diff-resolved">Resolved findings ({{ ctx.diff.resolved_findings|length }})</h3>
+  <table class="findings-table tag-resolved">
+    <thead><tr><th>Severity</th><th>Title</th><th>Host</th><th>CVE / CWE</th></tr></thead>
+    <tbody>
+    {% for f in ctx.diff.resolved_findings %}
+      <tr class="{{ f.severity|sev_class }}">
+        <td><span class="sev-pill {{ f.severity|sev_class }}">{{ f.severity }}</span></td>
+        <td>{{ f.title }}</td>
+        <td>{{ f.host }}{% if f.port %}:{{ f.port }}{% endif %}</td>
+        <td>{{ f.cve or f.cwe or '—' }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  {% if ctx.diff.persistent_findings %}
+  <h3 class="diff-persistent">Persistent findings ({{ ctx.diff.persistent_findings|length }})</h3>
+  <table class="findings-table tag-persistent">
+    <thead><tr><th>Severity</th><th>Title</th><th>Host</th><th>Age (days)</th></tr></thead>
+    <tbody>
+    {% for f in ctx.diff.persistent_findings %}
+      <tr class="{{ f.severity|sev_class }}">
+        <td><span class="sev-pill {{ f.severity|sev_class }}">{{ f.severity }}</span></td>
+        <td>{{ f.title }}</td>
+        <td>{{ f.host }}{% if f.port %}:{{ f.port }}{% endif %}</td>
+        <td>{{ f.age_days if f.age_days is not none else '—' }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</section>
+{% endif %}
+
+{# =================== 3. EXECUTIVE SUMMARY =================== #}
+<section class="section exec">
+  <h2>Executive summary</h2>
+  <div class="exec-grid">
+    <div class="exec-card">
+      <div class="exec-label">Aggregate risk score</div>
+      <div class="exec-value">{{ '%.1f' % ctx.risk_score }} / 100</div>
+    </div>
+    <div class="exec-card">
+      <div class="exec-label">Active findings</div>
+      <div class="exec-value">{{ ctx.active_findings|length }}</div>
+    </div>
+    <div class="exec-card">
+      <div class="exec-label">Remediation ETA</div>
+      <div class="exec-value">{{ ctx.remediation_eta or '—' }}</div>
+    </div>
+  </div>
+  {% if ctx.executive_summary %}
+  <p class="narrative">{{ ctx.executive_summary }}</p>
+  {% endif %}
+  {% if ctx.top_priorities %}
+  <h3>Top priorities</h3>
+  <ol class="priorities">
+    {% for p in ctx.top_priorities %}<li>{{ p }}</li>{% endfor %}
+  </ol>
+  {% endif %}
+</section>
+
+{# =================== 4. METHODOLOGY =================== #}
+<section class="section methodology">
+  <h2>Methodology</h2>
+  <p>
+    The pipeline runs as a durable Temporal workflow. Each stage is an
+    activity, so an interrupted scan resumes from the last completed
+    step rather than restarting. Network segmentation isolates scanner
+    traffic from the orchestration plane.
+  </p>
+  <div class="arch-diagram">
+    <div class="net net-orchestration">
+      <div class="net-label">Orchestration network</div>
+      <div class="node">Temporal server</div>
+      <div class="node">Worker</div>
+      <div class="node">DefectDojo</div>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="net net-scanner">
+      <div class="net-label">Scanner network (isolated)</div>
+      <div class="node">OpenVAS</div>
+      <div class="node">Nessus</div>
+      <div class="node">Nikto</div>
+      <div class="node">Wapiti</div>
+    </div>
+  </div>
+  <ol class="stages">
+    <li><strong>Port scan</strong> — discover open services on the target.</li>
+    <li><strong>HTTP discovery</strong> — promote HTTP/HTTPS endpoints for app-layer scanning.</li>
+    <li><strong>App scan</strong> — run Nikto and Wapiti against discovered endpoints.</li>
+    <li><strong>Aggregation</strong> — reimport all engine artifacts into DefectDojo, dedupe across tools.</li>
+    <li><strong>Report</strong> — render this document; signed hash recorded in the appendix.</li>
+  </ol>
+</section>
+
+{# =================== 5. ENGINES =================== #}
+<section class="section engines">
+  <h2>Scan engines</h2>
+  <p class="muted">
+    Engines in this report: OpenVAS, Nessus, Nikto, Wapiti. (OWASP ZAP
+    was evaluated and dropped from scope; see project documentation.)
+  </p>
+  <table class="findings-table">
+    <thead>
+      <tr>
+        <th>Engine</th>
+        {% for s in ['Critical', 'High', 'Medium', 'Low', 'Info'] %}
+          <th>{{ s }}</th>
+        {% endfor %}
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for e in ctx.engines %}
+      <tr>
+        <td>{{ e.name }}</td>
+        {% for s in ['Critical', 'High', 'Medium', 'Low', 'Info'] %}
+          <td>{{ e.counts.get(s, 0) }}</td>
+        {% endfor %}
+        <td><strong>{{ e.total }}</strong></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+{# =================== 6. FINDINGS SUMMARY =================== #}
+<section class="section summary">
+  <h2>Findings summary</h2>
+  <div class="severity-bars">
+    {% set totals = ctx.severity_totals %}
+    {% set maxv = ([totals.values()|max, 1]|max) %}
+    {% for s in ['Critical', 'High', 'Medium', 'Low', 'Info'] %}
+      <div class="bar-row {{ s|sev_class }}">
+        <span class="bar-label">{{ s }}</span>
+        <span class="bar"><span class="bar-fill" style="width: {{ (totals[s] * 100 / maxv)|round(1) }}%;"></span></span>
+        <span class="bar-count">{{ totals[s] }}</span>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+{# =================== 7. ACTIVE FINDINGS =================== #}
+<section class="section findings">
+  <h2>Active findings</h2>
+  {% set grouped = {'Critical': [], 'High': [], 'Medium': [], 'Low': [], 'Info': []} %}
+  {% for f in ctx.active_findings %}{% set _ = grouped[f.severity].append(f) %}{% endfor %}
+  {% for sev in ['Critical', 'High', 'Medium', 'Low', 'Info'] %}
+    {% if grouped[sev] %}
+    <h3 class="{{ sev|sev_class }}">{{ sev }} ({{ grouped[sev]|length }})</h3>
+    {% for f in grouped[sev] %}
+    <article class="finding {{ sev|sev_class }}">
+      <header>
+        <span class="sev-pill {{ sev|sev_class }}">{{ sev }}</span>
+        <h4>{{ f.title }}</h4>
+      </header>
+      <dl class="finding-meta">
+        {% if f.cvss is not none %}<dt>CVSS</dt><dd>{{ '%.1f' % f.cvss }}</dd>{% endif %}
+        {% if f.cve %}<dt>CVE</dt><dd>{{ f.cve }}</dd>{% endif %}
+        {% if f.cwe %}<dt>CWE</dt><dd>{{ f.cwe }}</dd>{% endif %}
+        <dt>Host</dt><dd>{{ f.host }}{% if f.port %}:{{ f.port }}{% endif %}</dd>
+        {% if f.endpoint %}<dt>Endpoint</dt><dd>{{ f.endpoint }}</dd>{% endif %}
+        {% if f.detected_by %}<dt>Detected by</dt><dd>{{ f.detected_by|join(', ') }}</dd>{% endif %}
+        {% if f.first_seen %}<dt>First seen</dt><dd>{{ f.first_seen }}</dd>{% endif %}
+        {% if f.last_seen %}<dt>Last seen</dt><dd>{{ f.last_seen }}</dd>{% endif %}
+      </dl>
+      {% if f.description %}<p><strong>Evidence.</strong> {{ f.description }}</p>{% endif %}
+      {% if f.remediation %}<p><strong>Remediation.</strong> {{ f.remediation }}</p>{% endif %}
+      {% if f.references %}
+      <p class="refs"><strong>References:</strong>
+        {% for r in f.references %}<a href="{{ r }}">{{ r }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+      </p>
+      {% endif %}
+      <div class="attestation">
+        <span>Owner attestation:</span>
+        <span class="att-line">_______________________________</span>
+        <span>Date: ________</span>
+      </div>
+    </article>
+    {% endfor %}
+    {% endif %}
+  {% endfor %}
+</section>
+
+{# =================== 8. APPENDIX =================== #}
+<section class="section appendix">
+  <h2>Appendix — reproducibility</h2>
+  <dl class="repro">
+    {% if ctx.meta.engagement_id is not none %}<dt>Engagement id</dt><dd>{{ ctx.meta.engagement_id }}</dd>{% endif %}
+    {% if ctx.meta.test_ids %}<dt>Test ids</dt><dd>{{ ctx.meta.test_ids|join(', ') }}</dd>{% endif %}
+    {% if ctx.meta.feed_bundle_sha %}<dt>Feed bundle SHA</dt><dd><code>{{ ctx.meta.feed_bundle_sha }}</code></dd>{% endif %}
+    {% if ctx.meta.run_hash %}<dt>Run hash</dt><dd><code>{{ ctx.meta.run_hash }}</code></dd>{% endif %}
+    <dt>Methodology version</dt><dd>{{ ctx.meta.methodology_version }}</dd>
+  </dl>
+  {% if ctx.artifact_links %}
+  <h3>Raw scan artifacts</h3>
+  <ul class="artifacts">
+    {% for a in ctx.artifact_links %}
+      <li>
+        <a href="{{ a.url }}">{{ a.name }}</a>
+        {% if a.sha256 %}<code class="sha">sha256:{{ a.sha256 }}</code>{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</section>
+
+</body>
+</html>
