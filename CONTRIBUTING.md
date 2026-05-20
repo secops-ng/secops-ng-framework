@@ -127,6 +127,23 @@ When the change is approved, a maintainer merges it. You will see your
 name in the commit history and, if the change is user-visible, in the
 release notes for the next version.
 
+## Adding or editing a workflow
+
+Workflows under `workflows/` follow a fixed per-directory layout —
+`README.md`, `PROMPT.md`, `primitives.py`, `example.py`, and
+`config.example.yaml`. New workflows MUST start by copying
+`workflows/_template/`:
+
+```bash
+cp -r workflows/_template workflows/<new-workflow-name>
+```
+
+The full structure spec and the rationale for `PROMPT.md` (the
+single-shot reproduction prompt every workflow ships) live in
+[`workflows/README.md`](workflows/README.md). Workflow pull requests
+that are missing any required file, or that leave required files as
+`TODO` stubs, are rejected.
+
 ## Reporting security issues
 
 Please do **not** open public issues for vulnerabilities. See
