@@ -1,0 +1,120 @@
+{
+  "active_findings": [
+    {
+      "age_days": null,
+      "cve": null,
+      "cvss": 3.1,
+      "cwe": "200",
+      "description": "The remote SSH server advertises its version string in the banner. This aids reconnaissance against known-vulnerable versions.",
+      "detected_by": [
+        "OpenVAS"
+      ],
+      "endpoint": null,
+      "first_seen": "2026-04-01",
+      "host": "192.0.2.10",
+      "last_seen": null,
+      "port": 22,
+      "references": [],
+      "remediation": "Set DebianBanner no in sshd_config and rebuild the package banner.",
+      "severity": "Low",
+      "status": "active",
+      "title": "OpenSSH server detected \u2014 banner exposes version"
+    },
+    {
+      "age_days": null,
+      "cve": null,
+      "cvss": 4.3,
+      "cwe": "693",
+      "description": "The web application response does not set X-Content-Type-Options: nosniff. Detected by Nikto and confirmed by Wapiti.",
+      "detected_by": [
+        "Nikto",
+        "Wapiti"
+      ],
+      "endpoint": "https://192.0.2.10/",
+      "first_seen": "2026-05-01",
+      "host": "192.0.2.10",
+      "last_seen": null,
+      "port": 443,
+      "references": [],
+      "remediation": "Add X-Content-Type-Options: nosniff at the reverse proxy.",
+      "severity": "Medium",
+      "status": "active",
+      "title": "Missing security headers \u2014 X-Content-Type-Options"
+    }
+  ],
+  "artifact_links": [
+    {
+      "name": "openvas-report.xml",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "url": "artifacts/openvas-report.xml"
+    },
+    {
+      "name": "nikto.json",
+      "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "url": "artifacts/nikto.json"
+    },
+    {
+      "name": "wapiti.json",
+      "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "url": "artifacts/wapiti.json"
+    }
+  ],
+  "diff": null,
+  "engines": [
+    {
+      "artifact_url": null,
+      "counts": {
+        "Critical": 0,
+        "High": 0,
+        "Info": 0,
+        "Low": 0,
+        "Medium": 1
+      },
+      "name": "Nikto"
+    },
+    {
+      "artifact_url": null,
+      "counts": {
+        "Critical": 0,
+        "High": 0,
+        "Info": 0,
+        "Low": 1,
+        "Medium": 0
+      },
+      "name": "OpenVAS"
+    },
+    {
+      "artifact_url": null,
+      "counts": {
+        "Critical": 0,
+        "High": 0,
+        "Info": 0,
+        "Low": 0,
+        "Medium": 1
+      },
+      "name": "Wapiti"
+    }
+  ],
+  "executive_summary": "First posture report for example.org. Two active findings detected across OpenVAS, Nikto, and Wapiti \u2014 both are low-effort hardening items.",
+  "meta": {
+    "engagement_id": 101,
+    "feed_bundle_sha": "ab12cd34ef560000000000000000000000000000000000000000000000000000",
+    "methodology_version": "v1.0",
+    "report_version": "v1.0",
+    "run_hash": "e72d0c5ac0428108b2208244805665af5123373d21f62a0676157d1bffe7fe91",
+    "scan_window_end": "2026-05-18T03:30:00Z",
+    "scan_window_start": "2026-05-17T00:00:00Z",
+    "target": "example.org",
+    "target_fqdn": "example.org",
+    "target_ip": "192.0.2.10",
+    "test_ids": [
+      201,
+      202
+    ]
+  },
+  "remediation_eta": "Medium: 30 days. Low: 90 days.",
+  "top_priorities": [
+    "Add X-Content-Type-Options: nosniff at the reverse proxy.",
+    "Tighten the SSH banner to drop the package version."
+  ]
+}
