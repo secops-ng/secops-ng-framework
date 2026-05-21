@@ -1,8 +1,8 @@
 # SecOps-NG framework — make targets
 
-.PHONY: roadmap test
+.PHONY: roadmap-status test
 
-roadmap:
+roadmap-status:
 	python scripts/render_roadmap.py
 
 test:
