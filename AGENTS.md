@@ -20,7 +20,7 @@ that need to meet European regulatory baselines.
 
 Output is portable content — CACAO playbooks, OSCAL/D3FEND control
 mappings, OCSF data shapes, KPI/KRI catalog — plus reference compilers
-into the orchestrator the customer already runs.
+into the orchestrator the operator already runs.
 
 ## 2. Stack
 
