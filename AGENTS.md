@@ -18,15 +18,15 @@ EU** — Digital Commons for security operations. Output is community
 infrastructure, shared playbooks, and durable workflows for organisations
 that need to meet European regulatory baselines.
 
+Output is portable content — CACAO playbooks, OSCAL/D3FEND control
+mappings, OCSF data shapes, KPI/KRI catalog — plus reference compilers
+into the orchestrator the operator already runs.
+
 ## 2. Stack
 
-SecOps-NG's primary output is **portable content artifacts** —
-YAML / JSON / Markdown — not a runtime. The content layer sits above the
-existing open standards (CACAO for response, Sigma for detection,
-OSCAL + D3FEND for controls, OCSF for telemetry) and is compiled into
-whatever orchestrator the operator already runs.
-
-- **Launch compile targets:** n8n, Temporal.io, LangGraph
+- **Reference compile targets:** n8n (no-code), Temporal (durable code),
+  LangGraph (agentic). Temporal is one of three targets, not the engine
+  — content is framework-agnostic.
 - **Out of launch scope (community-contributed):** MindStudio, Make,
   Zapier, StackAI, CrewAI
 - **Sovereign cloud bias:** EU-hostable runtimes (Nebul, OVHcloud,
@@ -50,9 +50,10 @@ standard **before merge**, not just at publish time.
 
 ## 4. Agent Crew (all on Claude until per-role overrides are configured)
 
-> **Note:** Verbatim persona prompts are pending — to be paste-locked at
-> swarm registration (workspace UI). Descriptions below are working
-> summaries.
+> **Note:** Verbatim persona prompts are live at
+> `~/.hermes/profiles/{coder,custodian,researcher,promoter}/SOUL.md`.
+> Descriptions below are working summaries; the SOUL files are the
+> authoritative source for each worker's charter.
 
 - **Aurora — Orchestrator / Chief of Staff.** Owns dispatch, checkpoints,
   governance escalation, and durable plan state. Reports to the Director.
@@ -64,7 +65,10 @@ standard **before merge**, not just at publish time.
 - **The Researcher — Custom lane.** Sovereign provider KB curation,
   regulatory landscape monitoring. Writes only to private repos.
 - **The Promoter — Custom lane.** External communications, community
-  voice. Operates under the SOUL guardrails.
+  voice. Authorised to post on any channel they judge appropriate,
+  at any time — no Custodian pre-approval required for outbound
+  promotion. Operates under the SOUL guardrails and owns their own
+  quality bar.
 
 The human counterpart is **the Director**. Form of address: Director.
 
@@ -87,6 +91,8 @@ The human counterpart is **the Director**. Form of address: Director.
    pass the public-release bar: community language, no internal
    strategy, no contact/lead names, no credentials, no internal infra
    details. If in doubt, it goes in `secops-ng-business` instead.
+8. **Framework-agnostic** — we do not ship our own runtime, agent
+   framework, or SOAR. We ship content + structure + metrics + compilers.
 
 ## 6. Handoff Contract — SwarmBrief
 

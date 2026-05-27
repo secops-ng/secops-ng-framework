@@ -1,0 +1,325 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/content-model/playbook.schema.json",
+  "title": "SecOps-NG Playbook (CACAO v2 superset)",
+  "description": "JSON Schema for response playbooks expressed as OASIS CACAO v2 documents, extended with SecOps-NG stable identifiers that join the playbook to the detection, control, telemetry, and metrics layers of the content model. This schema is a superset: every required CACAO v2 field is required here, and SecOps-NG extensions live under the reserved `x_secops_ng` namespace so a SecOps-NG playbook remains a valid CACAO v2 playbook for any compliant consumer.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "type",
+    "spec_version",
+    "id",
+    "name",
+    "created_by",
+    "created",
+    "modified",
+    "playbook_types",
+    "workflow_start",
+    "workflow",
+    "x_secops_ng"
+  ],
+  "properties": {
+    "type": {
+      "description": "MUST be `playbook` per CACAO v2 §3.1.",
+      "type": "string",
+      "const": "playbook"
+    },
+    "spec_version": {
+      "description": "CACAO specification version. SecOps-NG targets CACAO v2.0.",
+      "type": "string",
+      "pattern": "^2\\.[0-9]+$"
+    },
+    "id": {
+      "description": "CACAO playbook identifier (UUIDv4 as a URN), e.g. `playbook--<uuid>`. Globally unique. Distinct from `x_secops_ng.stable_id` which is the human-curated join key.",
+      "type": "string",
+      "pattern": "^playbook--[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "description": {
+      "type": "string"
+    },
+    "playbook_types": {
+      "description": "CACAO `playbook-type-ov`. Restricted here to the values SecOps-NG ships content for.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "notification",
+          "detection",
+          "investigation",
+          "prevention",
+          "mitigation",
+          "remediation",
+          "attack",
+          "engagement"
+        ]
+      }
+    },
+    "created_by": {
+      "description": "Identifier of the authoring identity per CACAO. Use `identity--<uuid>` for individuals or organisations.",
+      "type": "string",
+      "pattern": "^identity--[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "created": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "modified": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "valid_from": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "derived_from": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^playbook--[0-9a-f-]{36}$" }
+    },
+    "priority": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "severity": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "impact":   { "type": "integer", "minimum": 0, "maximum": 100 },
+    "industry_sectors": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "labels": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "external_references": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/external_reference" }
+    },
+    "features": {
+      "type": "object",
+      "additionalProperties": { "type": "boolean" }
+    },
+    "markings": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "playbook_variables": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/variable" }
+    },
+    "workflow_start": {
+      "description": "ID of the workflow step that begins execution. MUST exist as a key in `workflow`.",
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_.-]+--[0-9a-f-]{36}$"
+    },
+    "workflow_exception": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_.-]+--[0-9a-f-]{36}$"
+    },
+    "workflow": {
+      "description": "Map of workflow step id → step object. CACAO step types: start, end, action, playbook-action, parallel, if-condition, while-condition, switch-condition.",
+      "type": "object",
+      "minProperties": 2,
+      "patternProperties": {
+        "^[a-zA-Z0-9_.-]+--[0-9a-f-]{36}$": { "$ref": "#/$defs/workflow_step" }
+      },
+      "additionalProperties": false
+    },
+    "agent_definitions": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "target_definitions": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "authentication_info_definitions": {
+      "description": "Authentication definitions referenced by agents/targets. Per directive #6 these MUST NOT carry secret values; secrets are injected by the compile-target runtime.",
+      "type": "object",
+      "additionalProperties": true
+    },
+    "extension_definitions": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "data_marking_definitions": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "signatures": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+
+    "x_secops_ng": { "$ref": "#/$defs/x_secops_ng" }
+  },
+
+  "$defs": {
+    "stable_id": {
+      "description": "SecOps-NG stable identifier. Lowercase, dot-segmented namespace plus version suffix. Stable across renames of the human-readable `name` and across re-issues of the CACAO `id`. Format: `<namespace>.<slug>@<semver>`. The join keys for the rest of the content model use this shape across every layer (playbook/detection/control/telemetry/metric).",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+    },
+    "stable_id_ref": {
+      "description": "Reference to a stable_id elsewhere in the content model. Same lexical shape; semantic check (target exists) is performed by the linter, not the schema.",
+      "$ref": "#/$defs/stable_id"
+    },
+    "external_reference": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name":        { "type": "string" },
+        "description": { "type": "string" },
+        "source":      { "type": "string" },
+        "url":         { "type": "string", "format": "uri" },
+        "external_id": { "type": "string" },
+        "reference_id":{ "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "variable": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "string", "integer", "long", "mac-addr", "ipv4-addr", "ipv6-addr",
+            "uri", "uuid", "hexstring", "dictionary", "boolean", "date-time",
+            "ipv4-net", "ipv6-net"
+          ]
+        },
+        "description": { "type": "string" },
+        "value":       {},
+        "constant":    { "type": "boolean" },
+        "external":    { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "workflow_step": {
+      "type": "object",
+      "required": ["type", "name"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "start", "end", "action", "playbook-action",
+            "parallel", "if-condition", "while-condition", "switch-condition"
+          ]
+        },
+        "name":        { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "on_completion":{ "type": "string", "pattern": "^[a-zA-Z0-9_.-]+--[0-9a-f-]{36}$" },
+        "on_success":  { "type": "string", "pattern": "^[a-zA-Z0-9_.-]+--[0-9a-f-]{36}$" },
+        "on_failure":  { "type": "string", "pattern": "^[a-zA-Z0-9_.-]+--[0-9a-f-]{36}$" },
+        "next_steps":  {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-zA-Z0-9_.-]+--[0-9a-f-]{36}$" }
+        },
+        "commands":    { "type": "array", "items": { "type": "object" } },
+        "agent":       { "type": "string" },
+        "targets":     { "type": "array", "items": { "type": "string" } },
+        "in_args":     { "type": "array", "items": { "type": "string" } },
+        "out_args":    { "type": "array", "items": { "type": "string" } },
+        "step_variables": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/variable" }
+        },
+        "x_secops_ng": {
+          "description": "Per-step SecOps-NG extensions. Optional. When present, each entry binds this step to a stable_id in another layer of the content model.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "detection_refs": {
+              "description": "Stable IDs of detection content (Sigma rule references) whose firing motivates this step.",
+              "type": "array",
+              "items": { "$ref": "#/$defs/stable_id_ref" },
+              "uniqueItems": true
+            },
+            "control_refs": {
+              "description": "Stable IDs of OSCAL/D3FEND control mappings this step satisfies.",
+              "type": "array",
+              "items": { "$ref": "#/$defs/stable_id_ref" },
+              "uniqueItems": true
+            },
+            "telemetry_refs": {
+              "description": "Stable IDs of OCSF event classes this step reads or emits.",
+              "type": "array",
+              "items": { "$ref": "#/$defs/stable_id_ref" },
+              "uniqueItems": true
+            },
+            "metric_refs": {
+              "description": "Stable IDs of KPI/KRI metrics this step contributes a measurement to.",
+              "type": "array",
+              "items": { "$ref": "#/$defs/stable_id_ref" },
+              "uniqueItems": true
+            }
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "x_secops_ng": {
+      "description": "Playbook-level SecOps-NG extensions. Required so every artifact in the content model exposes a stable join key, even when the CACAO `id` is regenerated.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stable_id", "content_version", "maturity"],
+      "properties": {
+        "stable_id": {
+          "description": "Stable join key for this playbook. Namespace convention: `playbook.<slug>@v<semver>` — for example `playbook.vuln_intake@v1`.",
+          "allOf": [
+            { "$ref": "#/$defs/stable_id" },
+            { "pattern": "^playbook\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$" }
+          ]
+        },
+        "content_version": {
+          "description": "Semantic version of the content artifact itself (NOT the CACAO spec_version).",
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.-]+)?$"
+        },
+        "maturity": {
+          "description": "Content maturity tier per ROADMAP. `draft` and `experimental` are not compiled by default in production targets.",
+          "type": "string",
+          "enum": ["draft", "experimental", "stable", "deprecated"]
+        },
+        "compile_targets": {
+          "description": "Which reference compilers the authors have validated this playbook against. Informational; compilers run their own gates.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "enum": ["n8n", "temporal", "langgraph"] }
+        },
+        "detection_refs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/stable_id_ref" },
+          "uniqueItems": true
+        },
+        "control_refs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/stable_id_ref" },
+          "uniqueItems": true
+        },
+        "telemetry_refs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/stable_id_ref" },
+          "uniqueItems": true
+        },
+        "metric_refs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/stable_id_ref" },
+          "uniqueItems": true
+        },
+        "sources": {
+          "description": "Free-form provenance pointers — upstream playbook fragments, regulatory clauses, vendor advisories — that motivated this playbook. Plain text only; no internal infra references per directive #7.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

@@ -94,15 +94,15 @@ compliant architectures cheaper to build.
 
 ## Repository layout
 
-| Path             | What lives there                                              |
-|------------------|---------------------------------------------------------------|
-| `workflows/`     | Canonical playbook artifacts (the source of truth)            |
-| `patterns/`      | Reference Temporal-Python implementations of common patterns  |
-| `compliance/`    | OSCAL-aligned control mappings (NIS2, GDPR)                   |
-| `src/`           | Reference compiler implementations                            |
-| `tools/`         | CLI helpers (hygiene linter, render scripts)                  |
-| `docs/`          | Long-form documentation                                       |
-| `tests/`         | Replay tests, fixture round-trips, compiler tests             |
+| Path             | What lives there                                                       |
+|------------------|------------------------------------------------------------------------|
+| `content/`       | Canonical artifacts — playbooks, detections, controls, telemetry, metrics, mappings |
+| `compilers/`     | Reference compilers that emit orchestrator-native definitions          |
+| `schemas/`       | JSON Schema for every portable artifact shape                          |
+| `tools/`         | CLI helpers (hygiene linter, validate, compile wrapper)                |
+| `docs/`          | Long-form documentation (quickstart, concepts, compilers, sovereignty) |
+| `examples/`      | End-to-end demos: one playbook compiled to all three reference targets |
+| `tests/`         | Schema validation, compiler tests, hygiene-linter tests                |
 
 ## Status
 
@@ -116,6 +116,23 @@ until each target has been validated against real operator use.
 If you are running security operations and want to help shape this, open
 a discussion.
 
+## Multi-engine vulnerability scanning workflow
+
+The `vulnscan` workflow is a containment-first, multi-engine dynamic
+scanner for small-office and home-office estates (cameras, printers,
+IoT, network devices, web endpoints). It runs five engines in two
+stages (Nessus/OpenVAS for infrastructure, Nikto/Wapiti/ZAP for web),
+streams findings to DefectDojo, and emits a stamped PDF report — all
+durable through a Temporal workflow that survives engine crashes and
+host restarts.
+
+Documentation lives at [docs/vulnscan/README.md](docs/vulnscan/README.md):
+
+- [ARCHITECTURE.md](docs/vulnscan/ARCHITECTURE.md) — network topology and component responsibilities.
+- [RUNBOOK.md](docs/vulnscan/RUNBOOK.md) — operator steps from `compose up` to PDF retrieval.
+- [THREAT-MODEL.md](docs/vulnscan/THREAT-MODEL.md) — STRIDE on the Scan Engine network with containment guarantees.
+- [DEPLOYMENT.md](docs/vulnscan/DEPLOYMENT.md) — Nebul (and other EU-hosted) deployment notes.
+
 ## Quickstart
 
 ```bash
@@ -127,9 +144,8 @@ cp .env.example .env  # then edit
 pytest
 ```
 
-The reference Temporal-Python pattern implementations and replay tests
-exercise the content artifacts end-to-end without needing live cloud
-services.
+See `docs/quickstart/` once the launch compilers land for the
+end-to-end walkthrough ("clone, pick orchestrator, ship in days").
 
 ## Contributing & governance
 

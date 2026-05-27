@@ -1,5 +1,12 @@
 # SecOps-NG — Architecture
 
+> **Stale notice (restructure landing):** This document describes the
+> previous runtime-oriented layout. The repo no longer ships a runtime —
+> it ships portable content plus reference compilers. A content-first
+> rewrite is queued; until it lands, treat the layer descriptions below
+> as historical context only. See `../README.md` and
+> `concepts/content-model.md` for the current shape.
+
 This document describes the four layers of the SecOps-NG runtime. Each layer
 is independently swappable, but the combination below is the supported
 default and the one used by the cookbook examples in `workflows/`.
