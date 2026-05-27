@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/content-model/detection.schema.json",
+  "title": "SecOps-NG Detection Pointer",
+  "description": "A pointer to an upstream Sigma detection rule. SecOps-NG does NOT fork or re-author Sigma; we reference rules by ID + repo + commit pin and overlay metadata that joins the rule to the playbook, control, and telemetry layers via the shared `stable_id` shape defined by the playbook schema.",
+  "type": "object",
+  "required": ["stable_id", "content_version", "maturity", "sigma"],
+  "additionalProperties": false,
+  "properties": {
+    "stable_id": {
+      "description": "SecOps-NG stable identifier for this detection. Namespace convention: `detection.<slug>@v<semver>` — for example `detection.powershell_encoded_cmd@v1`. Same lexical shape as the playbook schema's stable_id so any layer can cross-reference any other.",
+      "allOf": [
+        { "$ref": "#/$defs/stable_id" },
+        { "pattern": "^detection\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$" }
+      ]
+    },
+    "content_version": {
+      "description": "Semantic version of this detection content artifact (independent of upstream Sigma versioning).",
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.-]+)?$"
+    },
+    "maturity": {
+      "description": "Content maturity tier. `draft` and `experimental` are not compiled by default in production targets.",
+      "type": "string",
+      "enum": ["draft", "experimental", "stable", "deprecated"]
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "Human-readable label. Mirrors the upstream Sigma title for findability; not authoritative."
+    },
+    "summary": {
+      "type": "string",
+      "description": "One-paragraph operator-facing summary of what the upstream rule detects and why we reference it."
+    },
+    "sigma": {
+      "type": "object",
+      "description": "Upstream Sigma rule pointer. We do not duplicate the rule body; consumers MUST resolve via repo + rule_id.",
+      "required": ["rule_id", "repo"],
+      "additionalProperties": false,
+      "properties": {
+        "rule_id": {
+          "type": "string",
+          "description": "Upstream Sigma rule UUID (the `id:` field in the rule YAML)."
+        },
+        "repo": {
+          "type": "string",
+          "format": "uri",
+          "description": "Git URL of the upstream Sigma rule repository (e.g. https://github.com/SigmaHQ/sigma)."
+        },
+        "path": {
+          "type": "string",
+          "description": "Path to the rule file inside the repo, e.g. rules/windows/process_creation/proc_creation_win_powershell_encoded_b64.yml."
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,40}$",
+          "description": "Commit SHA pin. Recommended for reproducibility. If omitted, the rule is tracked at the repo's default branch (volatile)."
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true,
+          "description": "Mirror of upstream Sigma tags relevant for routing (e.g. attack.t1059, tlp.amber)."
+        }
+      }
+    },
+    "logsource": {
+      "type": "object",
+      "description": "Operator-facing summary of the Sigma logsource block, so consumers can route without fetching the rule.",
+      "additionalProperties": false,
+      "properties": {
+        "product":  { "type": "string" },
+        "service":  { "type": "string" },
+        "category": { "type": "string" }
+      }
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["informational", "low", "medium", "high", "critical"],
+      "description": "Operator-facing severity overlay. Independent of upstream Sigma `level` so a community can re-prioritise without forking the rule."
+    },
+    "control_refs": {
+      "description": "Stable IDs of controls this detection contributes evidence to. Joins to control.schema.json#stable_id.",
+      "type": "array",
+      "items": {
+        "allOf": [
+          { "$ref": "#/$defs/stable_id" },
+          { "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$" }
+        ]
+      },
+      "uniqueItems": true
+    },
+    "telemetry_refs": {
+      "description": "Stable IDs of telemetry bindings whose payloads this detection consumes. Joins to telemetry.schema.json#stable_id.",
+      "type": "array",
+      "items": {
+        "allOf": [
+          { "$ref": "#/$defs/stable_id" },
+          { "pattern": "^telemetry\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$" }
+        ]
+      },
+      "uniqueItems": true
+    },
+    "playbook_refs": {
+      "description": "Playbooks (and optionally specific CACAO step names) that fire on this detection.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["playbook_id"],
+        "additionalProperties": false,
+        "properties": {
+          "playbook_id": {
+            "description": "Stable playbook ID. Joins to playbook.schema.json#x_secops_ng.stable_id.",
+            "allOf": [
+              { "$ref": "#/$defs/stable_id" },
+              { "pattern": "^playbook\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$" }
+            ]
+          },
+          "step_id": {
+            "type": "string",
+            "description": "Optional CACAO step name within the playbook (e.g. enrich_host_context)."
+          }
+        }
+      },
+      "uniqueItems": true
+    },
+    "maintainer": {
+      "type": "string",
+      "description": "Email, handle, or working-group name responsible for keeping the pointer current."
+    },
+    "sources": {
+      "description": "Free-form provenance pointers — upstream rule lineage, advisories, threat reports — that motivated this pointer. Plain text only; no internal infra references.",
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "stable_id": {
+      "description": "SecOps-NG stable identifier (shared shape across all content-model layers). Format: `<namespace>.<slug>@v<semver>`.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+    }
+  }
+}
