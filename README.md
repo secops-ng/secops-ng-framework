@@ -94,15 +94,15 @@ compliant architectures cheaper to build.
 
 ## Repository layout
 
-| Path             | What lives there                                              |
-|------------------|---------------------------------------------------------------|
-| `workflows/`     | Canonical playbook artifacts (the source of truth)            |
-| `patterns/`      | Reference Temporal-Python implementations of common patterns  |
-| `compliance/`    | OSCAL-aligned control mappings (NIS2, GDPR)                   |
-| `src/`           | Reference compiler implementations                            |
-| `tools/`         | CLI helpers (hygiene linter, render scripts)                  |
-| `docs/`          | Long-form documentation                                       |
-| `tests/`         | Replay tests, fixture round-trips, compiler tests             |
+| Path             | What lives there                                                       |
+|------------------|------------------------------------------------------------------------|
+| `content/`       | Canonical artifacts — playbooks, detections, controls, telemetry, metrics, mappings |
+| `compilers/`     | Reference compilers that emit orchestrator-native definitions          |
+| `schemas/`       | JSON Schema for every portable artifact shape                          |
+| `tools/`         | CLI helpers (hygiene linter, validate, compile wrapper)                |
+| `docs/`          | Long-form documentation (quickstart, concepts, compilers, sovereignty) |
+| `examples/`      | End-to-end demos: one playbook compiled to all three reference targets |
+| `tests/`         | Schema validation, compiler tests, hygiene-linter tests                |
 
 ## Status
 
@@ -127,9 +127,8 @@ cp .env.example .env  # then edit
 pytest
 ```
 
-The reference Temporal-Python pattern implementations and replay tests
-exercise the content artifacts end-to-end without needing live cloud
-services.
+See `docs/quickstart/` once the launch compilers land for the
+end-to-end walkthrough ("clone, pick orchestrator, ship in days").
 
 ## Contributing & governance
 
