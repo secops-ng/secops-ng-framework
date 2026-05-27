@@ -1,0 +1,172 @@
+# CRA — vulnerability handling (Annex I §2) and Article 14 reporting.
+regime: cra
+entries:
+  - id: cra:annex-i-2-sbom
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §2(1)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Identify and document vulnerabilities and components contained in
+      the product with digital elements, including by drawing up a
+      software bill of materials in a commonly used and machine-readable
+      format that covers at the very least the top-level dependencies.
+    status: draft
+    control_refs:
+      - ctl:sbom-capture
+    playbook_refs:
+      - pb:vuln-intake
+    metric_refs:
+      - kri:releases-without-sbom
+
+  - id: cra:annex-i-2-vuln-handling
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §2(2)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Address and remediate vulnerabilities without delay, including by
+      providing security updates, and document the vulnerability-handling
+      process throughout the support period.
+    status: draft
+    control_refs:
+      - ctl:vuln-disclosure-intake
+    playbook_refs:
+      - pb:vuln-intake
+    metric_refs:
+      - kpi:vuln-disclosure-sla
+
+  - id: cra:annex-i-2-cvd-policy
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §2(5)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Put in place and enforce a coordinated vulnerability disclosure
+      policy, including a single point of contact for the receipt of
+      information on vulnerabilities from any source.
+    status: draft
+    control_refs:
+      - ctl:vuln-disclosure-intake
+    playbook_refs:
+      - pb:vuln-intake
+    metric_refs:
+      - kri:cvd-intake-aging
+
+  - id: cra:annex-i-2-security-updates
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §2(7)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Ensure that, where technically feasible, security updates are
+      disseminated without delay and free of charge for the duration of
+      the support period, accompanied by advisory messages providing
+      users with the relevant information.
+    status: draft
+    control_refs:
+      - ctl:patch-evidence
+    playbook_refs:
+      - pb:vuln-intake
+    metric_refs:
+      - kpi:patch-disseminated-on-time
+
+  - id: cra:art-14-early-warning
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: "14(1)"
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Notify the CSIRT designated as coordinator and ENISA of any
+      actively exploited vulnerability contained in the product without
+      undue delay, and in any event within 24 hours of becoming aware
+      of it (early-warning notification).
+    status: draft
+    control_refs:
+      - ctl:incident-timeline-signals
+      - ctl:cra-submission-templates
+    playbook_refs:
+      - pb:vuln-intake
+    metric_refs:
+      - kpi:cra-early-warning-on-time
+
+  - id: cra:art-14-notification-72h
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: "14(2)"
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Submit a vulnerability notification to the coordinator CSIRT and
+      ENISA within 72 hours of becoming aware of the actively exploited
+      vulnerability, including general information about the product
+      concerned, the nature of the exploitation, and any corrective or
+      mitigating measures the manufacturer has taken or recommended.
+    status: draft
+    control_refs:
+      - ctl:incident-timeline-signals
+      - ctl:cra-submission-templates
+    playbook_refs:
+      - pb:vuln-intake
+    metric_refs:
+      - kpi:cra-notification-72h-on-time
+
+  - id: cra:art-14-final-report
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: "14(2)"
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Submit a final report no later than 14 days after a corrective or
+      mitigating measure becomes available, providing a description of
+      the vulnerability, the severity and impact, information on actors
+      that have exploited or could exploit the vulnerability, and
+      details of the corrective measures.
+    status: draft
+    control_refs:
+      - ctl:incident-timeline-signals
+      - ctl:cra-submission-templates
+    playbook_refs:
+      - pb:post-incident-review
+    metric_refs:
+      - kpi:cra-final-report-on-time
+
+  - id: cra:art-14-severe-incident
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: "14(3)"
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Notify the coordinator CSIRT and ENISA of any severe incident
+      having an impact on the security of the product with digital
+      elements, with early-warning (24h), notification (72h), and final
+      report (1 month) timing analogous to Art. 14(1)–(2).
+    status: draft
+    control_refs:
+      - ctl:incident-timeline-signals
+      - ctl:cra-submission-templates
+    playbook_refs:
+      - pb:ransomware-containment
+      - pb:data-exfil
+    metric_refs:
+      - kpi:cra-severe-incident-on-time
+    notes: >-
+      Severe-incident reporting under Art. 14(3) layers on top of the
+      same incident-timeline signal set used for NIS2 Art. 23 and DORA
+      Art. 19, with a CRA-specific submission template under
+      ctl:cra-submission-templates.

@@ -1,0 +1,182 @@
+# DORA — Article 19 major-ICT-incident reporting milestones.
+# Cross-ref: research brief 2026-05-15-dora-incident-reporting.md §4.
+regime: dora
+entries:
+  - id: dora:art-18-classification
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "18(1)"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Classify ICT-related incidents and determine their impact based on
+      the criteria specified in Article 18(1) and operationalised by the
+      Commission Delegated Regulation (EU) 2024/1772 (seven primary
+      criteria plus materiality thresholds; recurring-incident rule).
+    status: draft
+    control_refs:
+      - ctl:dora-major-classifier
+    playbook_refs:
+      - pb:ransomware-containment
+      - pb:data-exfil
+      - pb:identity-compromise
+    metric_refs:
+      - kri:incidents-classified-major
+    notes: >-
+      Reference to the classification RTS is Commission Delegated
+      Regulation (EU) 2024/1772 of 13 March 2024. The classifier is a
+      deterministic rules engine (an activity), not a workflow.
+
+  - id: dora:art-19-initial-4h
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "19(4)(a)"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Submit an initial notification of a major ICT-related incident to
+      the competent authority within the deadlines set by the
+      Commission ITS — as soon as possible, within 4 hours of
+      classification as major, and no later than 24 hours from awareness.
+    status: draft
+    control_refs:
+      - ctl:incident-timeline-signals
+      - ctl:dora-submission-templates
+    playbook_refs:
+      - pb:ransomware-containment
+      - pb:data-exfil
+      - pb:identity-compromise
+    metric_refs:
+      - kpi:dora-initial-4h-on-time
+      - kri:dora-initial-missed
+    notes: >-
+      Submission content shape is Commission Implementing Regulation
+      (EU) 2024/2956 (ITS). The framework provides Pydantic-validated
+      schemas mirroring the ITS templates; submission transport is
+      operator-owned.
+
+  - id: dora:art-19-intermediate-72h
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "19(4)(b)"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Submit an intermediate report within 72 hours of classification of
+      the incident as major (or earlier if regular activities have
+      recovered), updating timestamps, affected functions and clients,
+      indicators of compromise, and mitigation actions in flight.
+    status: draft
+    control_refs:
+      - ctl:incident-timeline-signals
+      - ctl:dora-submission-templates
+    playbook_refs:
+      - pb:ransomware-containment
+      - pb:data-exfil
+      - pb:identity-compromise
+    metric_refs:
+      - kpi:dora-intermediate-72h-on-time
+
+  - id: dora:art-19-final-one-month
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "19(4)(c)"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Submit a final report no later than one month after submission of
+      the intermediate report, containing the full root-cause analysis,
+      final impact figures, completed remediation actions, lessons
+      learned, action plan, and residual-risk statement.
+    status: draft
+    control_refs:
+      - ctl:incident-timeline-signals
+      - ctl:dora-submission-templates
+    playbook_refs:
+      - pb:post-incident-review
+    metric_refs:
+      - kpi:dora-final-on-time
+
+  - id: dora:art-19-cyber-threat-voluntary
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "19(2)"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Voluntary notification of significant cyber threats to the
+      competent authority, with content shape defined by the relevant
+      ESAs RTS/ITS. No mandatory clock; lighter content schema than a
+      major-incident notification.
+    status: draft
+    control_refs:
+      - ctl:dora-submission-templates
+    playbook_refs:
+      - pb:threat-intel-ingest
+    metric_refs: []
+
+  - id: dora:art-18-recurring-incident
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "18(2)"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Treat as a major incident any series of recurring incidents that
+      share the same apparent root cause across a six-month rolling
+      window and, in aggregate, exceed the materiality thresholds.
+    status: draft
+    control_refs:
+      - ctl:recurring-incident-correlator
+    playbook_refs:
+      - pb:post-incident-review
+    metric_refs:
+      - kri:recurring-incident-clusters
+
+  - id: dora:art-28-third-party-register
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "28"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Maintain a register of information in relation to all contractual
+      arrangements with ICT third-party service providers, including the
+      function supported, criticality assessment, sub-contracting chain,
+      and data-location indicators.
+    status: draft
+    control_refs:
+      - ctl:supplier-inventory
+      - ctl:provider-attestation
+    playbook_refs: []
+    metric_refs:
+      - kri:suppliers-attestation-stale
+
+  - id: dora:art-30-contractual-clauses
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "30(2)"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Ensure that contractual arrangements with ICT third-party service
+      providers include the elements specified in Article 30(2) and (3)
+      — including service description, data-processing locations,
+      exit-strategy obligations, audit rights, and termination rights.
+    status: draft
+    control_refs:
+      - ctl:provider-attestation
+    playbook_refs: []
+    metric_refs: []
+    notes: >-
+      Contract clauses themselves are documentary; the agentic slice is
+      periodic re-attestation that the provider continues to meet the
+      declared clauses (provider_attestation pattern).
