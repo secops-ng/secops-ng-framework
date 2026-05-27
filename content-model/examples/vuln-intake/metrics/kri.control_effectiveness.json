@@ -1,0 +1,33 @@
+{
+  "stable_id": "kri.control_effectiveness@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kri",
+  "title": "Control effectiveness — EDR script-block logging",
+  "summary": "Share of detections that fire against telemetry actually emitted under the script-block logging control. Drops when endpoints regress out of the control's intended configuration, exposing the playbook to blind spots. Lower-bounded by detection true-positive rate and upper-bounded by control deployment coverage.",
+  "unit": "ratio",
+  "direction": "higher_is_better",
+  "target": { "value": 0.9, "comparator": ">=", "rationale": "Below 0.9 indicates configuration drift on protected endpoints." },
+  "thresholds": [
+    { "name": "warn",   "comparator": "<", "value": 0.85, "severity": "warn" },
+    { "name": "breach", "comparator": "<", "value": 0.70, "severity": "high" }
+  ],
+  "measurement": {
+    "source": "composite",
+    "aggregation": "ratio",
+    "formula": "count(detection firings on endpoints attesting control compliant) / count(detection firings) over window.",
+    "inputs": [
+      { "name": "fires",    "detection_ref": "detection.powershell_encoded_cmd@v1" },
+      { "name": "attested", "control_ref":   "control.edr_script_block_logging@v1", "description": "endpoint attestation state for the control" },
+      { "name": "events",   "telemetry_ref": "telemetry.host_process_create@v1" }
+    ],
+    "window": { "duration": "P30D", "sliding": true }
+  },
+  "playbook_refs": [
+    { "playbook_id": "playbook.vuln_intake@v1", "step_id": "triage_finding" }
+  ],
+  "detection_refs": ["detection.powershell_encoded_cmd@v1"],
+  "control_refs":   ["control.edr_script_block_logging@v1"],
+  "telemetry_refs": ["telemetry.host_process_create@v1"],
+  "maintainer": "metrics-wg@secops-ng.org"
+}

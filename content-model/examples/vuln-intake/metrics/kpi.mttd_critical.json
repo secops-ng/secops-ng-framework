@@ -1,0 +1,34 @@
+{
+  "stable_id": "kpi.mttd_critical@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Mean time to detect — critical findings",
+  "summary": "Time between the earliest available evidence of a critical finding in telemetry and the moment a SecOps-NG detection fires on it. Lower is better.",
+  "unit": "minutes",
+  "direction": "lower_is_better",
+  "target": { "value": 15, "comparator": "<=", "rationale": "ENISA good-practice baseline for critical-severity findings." },
+  "thresholds": [
+    { "name": "warn",   "comparator": ">",  "value": 30, "severity": "warn" },
+    { "name": "breach", "comparator": ">",  "value": 60, "severity": "critical" }
+  ],
+  "measurement": {
+    "source": "composite",
+    "aggregation": "p95",
+    "formula": "p95( detection.first_fire_time - telemetry.first_event_time ) over findings of severity in {critical} within window.",
+    "inputs": [
+      { "name": "first_event", "telemetry_ref": "telemetry.host_process_create@v1", "field": "time", "description": "earliest OCSF event time for the affected host" },
+      { "name": "first_fire",  "detection_ref": "detection.powershell_encoded_cmd@v1", "description": "earliest detection firing time correlated to the finding" }
+    ],
+    "window": { "duration": "P30D", "sliding": true }
+  },
+  "playbook_refs": [
+    { "playbook_id": "playbook.vuln_intake@v1", "step_id": "enrich_host_context" }
+  ],
+  "detection_refs": ["detection.powershell_encoded_cmd@v1"],
+  "telemetry_refs": ["telemetry.host_process_create@v1"],
+  "external_refs": [
+    { "name": "ENISA Threat Landscape", "source": "ENISA", "url": "https://www.enisa.europa.eu/topics/threat-risk-management" }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}

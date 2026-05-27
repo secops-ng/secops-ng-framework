@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/content-model/metrics.schema.json",
+  "title": "SecOps-NG Metric (KPI / KRI)",
+  "description": "A metric entry in the SecOps-NG metrics catalog. Each entry defines a single KPI (key performance indicator) or KRI (key risk indicator) that can be computed deterministically from the lower layers of the content model — playbook step transitions, detection firings, telemetry events, and/or control attestations. SecOps-NG does NOT define a new metrics standard; the catalog is a thin overlay that names common operator metrics (MTTD, MTTR, coverage, control-effectiveness) and binds each one to the content artifacts it measures via the shared `stable_id` shape used by the playbook / detection / control / telemetry layers.",
+  "type": "object",
+  "required": [
+    "stable_id",
+    "content_version",
+    "maturity",
+    "kind",
+    "title",
+    "unit",
+    "direction",
+    "measurement"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "stable_id": {
+      "description": "SecOps-NG stable identifier for this metric. Namespace convention: `kpi.<slug>@v<semver>` for KPIs, `kri.<slug>@v<semver>` for KRIs. Same lexical shape as every other layer of the content model so any layer can cross-reference any other without translation.",
+      "allOf": [
+        { "$ref": "#/$defs/stable_id" },
+        { "pattern": "^(kpi|kri)\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$" }
+      ]
+    },
+    "content_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.-]+)?$",
+      "description": "Semantic version of this metric content artifact."
+    },
+    "maturity": {
+      "type": "string",
+      "enum": ["draft", "experimental", "stable", "deprecated"]
+    },
+    "kind": {
+      "description": "KPI = performance indicator (how well operations are running). KRI = risk indicator (how much residual exposure remains). The namespace prefix MUST agree with this field.",
+      "type": "string",
+      "enum": ["kpi", "kri"]
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "summary": {
+      "type": "string",
+      "description": "One-paragraph operator-facing description of what this metric expresses and why it matters."
+    },
+    "unit": {
+      "description": "Unit of measure. Use the smallest natural unit (seconds, count) and let the consumer rescale for display. `ratio` is dimensionless 0..1; `percent` is 0..100; `count` is a non-negative integer.",
+      "type": "string",
+      "enum": [
+        "seconds",
+        "minutes",
+        "hours",
+        "days",
+        "count",
+        "ratio",
+        "percent"
+      ]
+    },
+    "direction": {
+      "description": "Whether lower values or higher values represent a better outcome. Required so dashboards can colour deltas consistently.",
+      "type": "string",
+      "enum": ["lower_is_better", "higher_is_better"]
+    },
+    "target": {
+      "description": "Optional operator target for this metric. Compilers may emit this to a dashboard threshold or an alert rule.",
+      "type": "object",
+      "required": ["value", "comparator"],
+      "additionalProperties": false,
+      "properties": {
+        "value":      { "type": "number" },
+        "comparator": { "type": "string", "enum": ["<=", "<", ">=", ">", "==", "!="] },
+        "rationale":  { "type": "string" }
+      }
+    },
+    "thresholds": {
+      "description": "Optional banded thresholds (e.g. warn / breach). Evaluated in order; the first matching band wins.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "comparator", "value", "severity"],
+        "additionalProperties": false,
+        "properties": {
+          "name":       { "type": "string", "minLength": 1 },
+          "comparator": { "type": "string", "enum": ["<=", "<", ">=", ">", "==", "!="] },
+          "value":      { "type": "number" },
+          "severity":   { "type": "string", "enum": ["info", "warn", "high", "critical"] }
+        }
+      }
+    },
+    "measurement": {
+      "description": "How a consumer computes the value of this metric. The catalog entry is the contract — the actual computation lives in the compile target.",
+      "type": "object",
+      "required": ["source", "aggregation"],
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "description": "Where the inputs come from. `workflow` = playbook step transitions (durations, completions). `telemetry` = OCSF event stream. `detection` = detection firings / suppressions. `control` = control attestation state. `composite` = combination, see `inputs`.",
+          "type": "string",
+          "enum": ["workflow", "telemetry", "detection", "control", "composite", "manual"]
+        },
+        "aggregation": {
+          "description": "How individual observations roll up to a single metric value over the evaluation window.",
+          "type": "string",
+          "enum": ["p50", "p90", "p95", "p99", "mean", "median", "min", "max", "sum", "count", "ratio", "percent"]
+        },
+        "formula": {
+          "description": "Human-readable formula in plain text. Free-form so authors can describe nuance (e.g. 'exclude duplicate alerts merged within 5 minutes'). The compile target is the source of truth for executable form.",
+          "type": "string"
+        },
+        "inputs": {
+          "description": "Named inputs the formula consumes. Each input MAY bind to a stable_id elsewhere in the content model (telemetry class, detection rule, control, playbook step). The shape is documentation; the linter checks target existence.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "additionalProperties": false,
+            "properties": {
+              "name":           { "type": "string", "minLength": 1 },
+              "description":    { "type": "string" },
+              "telemetry_ref":  { "$ref": "#/$defs/stable_id_ref" },
+              "detection_ref":  { "$ref": "#/$defs/stable_id_ref" },
+              "control_ref":    { "$ref": "#/$defs/stable_id_ref" },
+              "playbook_ref":   { "$ref": "#/$defs/stable_id_ref" },
+              "playbook_step":  { "type": "string", "minLength": 1 },
+              "field":          { "type": "string", "description": "Dot-path into the bound artifact (e.g. an OCSF field path) when applicable." }
+            }
+          }
+        },
+        "window": {
+          "description": "Evaluation window. Duration is ISO-8601 (e.g. P30D, PT24H). `sliding` = window slides per evaluation; otherwise the window is tumbling.",
+          "type": "object",
+          "required": ["duration"],
+          "additionalProperties": false,
+          "properties": {
+            "duration": { "type": "string", "pattern": "^P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+S)?)?$" },
+            "sliding":  { "type": "boolean", "default": false }
+          }
+        }
+      }
+    },
+    "playbook_refs": {
+      "description": "Stable IDs of playbooks this metric is associated with. Each entry MAY pin a specific CACAO step.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "required": ["playbook_id"],
+        "additionalProperties": false,
+        "properties": {
+          "playbook_id": { "$ref": "#/$defs/stable_id_ref" },
+          "step_id":     { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "detection_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/stable_id_ref" }
+    },
+    "control_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/stable_id_ref" }
+    },
+    "telemetry_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/stable_id_ref" }
+    },
+    "external_refs": {
+      "description": "Pointers to upstream regulatory or framework references that motivate this metric (NIS2 Articles, ENISA guidance, ISO 27004, CIS measures). Plain text + URL only; no internal infra references per forward-public hygiene.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "additionalProperties": false,
+        "properties": {
+          "name":        { "type": "string", "minLength": 1 },
+          "source":      { "type": "string" },
+          "url":         { "type": "string", "format": "uri" },
+          "external_id": { "type": "string" }
+        }
+      }
+    },
+    "maintainer": {
+      "description": "Working-group mailbox or community handle. Generic role addresses only; no individual lead names per directive #7.",
+      "type": "string"
+    }
+  },
+  "allOf": [
+    {
+      "description": "stable_id namespace prefix MUST agree with kind: kpi.* for kpi, kri.* for kri.",
+      "oneOf": [
+        {
+          "properties": {
+            "kind":      { "const": "kpi" },
+            "stable_id": { "pattern": "^kpi\\." }
+          }
+        },
+        {
+          "properties": {
+            "kind":      { "const": "kri" },
+            "stable_id": { "pattern": "^kri\\." }
+          }
+        }
+      ]
+    }
+  ],
+  "$defs": {
+    "stable_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+    },
+    "stable_id_ref": { "$ref": "#/$defs/stable_id" }
+  }
+}
