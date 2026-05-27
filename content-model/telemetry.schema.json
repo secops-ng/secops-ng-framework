@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/content-model/telemetry.schema.json",
+  "title": "SecOps-NG Telemetry Binding",
+  "description": "A telemetry binding declares an OCSF event class our content layer expects to consume or emit, and points to a sample payload that compilers and tests can validate against. SecOps-NG does NOT fork OCSF; we bind to upstream class UIDs and version, and join to the playbook, detection, and control layers via the shared `stable_id` shape.",
+  "type": "object",
+  "required": ["stable_id", "content_version", "maturity", "ocsf"],
+  "additionalProperties": false,
+  "properties": {
+    "stable_id": {
+      "description": "SecOps-NG stable identifier for this telemetry binding. Namespace convention: `telemetry.<slug>@v<semver>` — for example `telemetry.host_process_create@v1`. Same lexical shape as the playbook schema's stable_id so any layer can cross-reference any other.",
+      "allOf": [
+        { "$ref": "#/$defs/stable_id" },
+        { "pattern": "^telemetry\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$" }
+      ]
+    },
+    "content_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.-]+)?$",
+      "description": "Semantic version of this telemetry content artifact (independent of OCSF version)."
+    },
+    "maturity": {
+      "type": "string",
+      "enum": ["draft", "experimental", "stable", "deprecated"]
+    },
+    "title":   { "type": "string", "maxLength": 200 },
+    "summary": {
+      "type": "string",
+      "description": "Operator-facing description of what this telemetry represents and where it originates."
+    },
+    "ocsf": {
+      "type": "object",
+      "description": "OCSF (Open Cybersecurity Schema Framework) class binding.",
+      "required": ["version", "class_uid", "class_name", "category_uid"],
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+          "description": "OCSF schema version, e.g. 1.3.0."
+        },
+        "category_uid": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "OCSF category UID (e.g. 1 = System Activity, 2 = Findings, 3 = IAM, 4 = Network Activity, 6 = Application Activity)."
+        },
+        "category_name": { "type": "string" },
+        "class_uid": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "OCSF class UID (e.g. 1007 = Process Activity, 2001 = Security Finding)."
+        },
+        "class_name": {
+          "type": "string",
+          "description": "Human-readable class name from the OCSF schema."
+        },
+        "activity_id": {
+          "type": "integer",
+          "description": "Optional OCSF activity_id when this binding narrows the class to a single activity."
+        },
+        "profiles": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true,
+          "description": "OCSF profiles overlaid on the event, e.g. [\"cloud\", \"host\"]."
+        }
+      }
+    },
+    "direction": {
+      "type": "string",
+      "enum": ["ingest", "emit", "both"],
+      "default": "ingest",
+      "description": "Whether SecOps-NG content consumes events of this shape (ingest), produces them (emit), or both (typical for orchestrator hand-offs)."
+    },
+    "sample": {
+      "type": "object",
+      "description": "Pointer to a canonical sample payload that conforms to the bound OCSF class. The payload is stored alongside this binding, not inline, to keep schema files small and reviewable.",
+      "required": ["path"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Repo-relative path to the sample JSON payload, e.g. content-model/examples/telemetry.sample.json."
+        },
+        "media_type": {
+          "type": "string",
+          "default": "application/json",
+          "enum": ["application/json", "application/x-ndjson", "application/yaml"]
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Optional integrity pin on the sample payload contents."
+        }
+      }
+    },
+    "fields_used": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Dot-path into the OCSF event the content layer actually reads or writes, e.g. process.cmd_line, finding.uid."
+      },
+      "uniqueItems": true,
+      "description": "Subset of OCSF fields our content layer commits to. Lets reviewers reason about compatibility without diffing the whole OCSF schema."
+    },
+    "detection_refs": {
+      "description": "Detection stable IDs that consume this telemetry. Joins to detection.schema.json#stable_id.",
+      "type": "array",
+      "items": {
+        "allOf": [
+          { "$ref": "#/$defs/stable_id" },
+          { "pattern": "^detection\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$" }
+        ]
+      },
+      "uniqueItems": true
+    },
+    "control_refs": {
+      "description": "Control stable IDs that draw attestation evidence from this telemetry. Joins to control.schema.json#stable_id.",
+      "type": "array",
+      "items": {
+        "allOf": [
+          { "$ref": "#/$defs/stable_id" },
+          { "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$" }
+        ]
+      },
+      "uniqueItems": true
+    },
+    "playbook_refs": {
+      "description": "Playbooks (optionally specific CACAO step names) that read or emit this telemetry.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["playbook_id"],
+        "additionalProperties": false,
+        "properties": {
+          "playbook_id": {
+            "allOf": [
+              { "$ref": "#/$defs/stable_id" },
+              { "pattern": "^playbook\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$" }
+            ]
+          },
+          "step_id": { "type": "string" }
+        }
+      },
+      "uniqueItems": true
+    },
+    "maintainer": { "type": "string" },
+    "sources": {
+      "description": "Free-form provenance pointers — OCSF working-group notes, vendor schemas, advisories — that motivated this binding. Plain text only; no internal infra references.",
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "stable_id": {
+      "description": "SecOps-NG stable identifier (shared shape across all content-model layers).",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+    }
+  }
+}

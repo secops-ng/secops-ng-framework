@@ -1,0 +1,36 @@
+{
+  "stable_id": "telemetry.host_process_create@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Host process-creation event",
+  "summary": "Endpoint process-creation telemetry, bound to OCSF Process Activity. Consumed by the encoded-PowerShell detection and feeds the vuln-intake host-context step.",
+  "ocsf": {
+    "version": "1.3.0",
+    "category_uid": 1,
+    "category_name": "System Activity",
+    "class_uid": 1007,
+    "class_name": "Process Activity",
+    "activity_id": 1,
+    "profiles": ["host"]
+  },
+  "direction": "ingest",
+  "sample": {
+    "path": "content-model/examples/telemetry.sample.json",
+    "media_type": "application/json"
+  },
+  "fields_used": [
+    "time",
+    "actor.process.cmd_line",
+    "actor.process.file.path",
+    "process.cmd_line",
+    "process.file.path",
+    "process.parent_process.file.path",
+    "device.hostname"
+  ],
+  "detection_refs": ["detection.powershell_encoded_cmd@v1"],
+  "control_refs": ["control.edr_script_block_logging@v1"],
+  "playbook_refs": [
+    { "playbook_id": "playbook.vuln_intake@v1", "step_id": "enrich_host_context" }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org"
+}
