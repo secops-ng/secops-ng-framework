@@ -1,0 +1,284 @@
+# NIS2 — Article 21(2) risk-management measures + Article 23 incident notification.
+# Cross-ref: research brief 2026-05-15-nis2-baseline-mapping.md.
+regime: nis2
+entries:
+  - id: nis2:art-21-2-a
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 21(2)(a)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Adopt and maintain policies on risk analysis and information system
+      security, including periodic re-assessment with dated ownership.
+    status: draft
+    control_refs:
+      - ctl:risk-management-policy
+    playbook_refs: []
+    metric_refs:
+      - kri:risk-register-staleness
+    notes: >-
+      Most of (a) is governance (policy text, board approval) and lives in
+      docs templates rather than workflow content. The agentic slice is the
+      re-assessment cadence enforcement, exercised by the evidence-collector
+      pattern; that slice is mapped under (f) (effectiveness assessment).
+
+  - id: nis2:art-21-2-b
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 21(2)(b)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Operate an incident-handling capability: detect, triage, contain,
+      remediate, and capture lessons learned for each incident.
+    status: draft
+    control_refs:
+      - ctl:incident-handling-capability
+    playbook_refs:
+      - pb:phishing-triage
+      - pb:identity-compromise
+      - pb:ransomware-containment
+      - pb:data-exfil
+      - pb:post-incident-review
+    metric_refs:
+      - kpi:mttd
+      - kpi:mttr
+      - kri:incidents-without-closeout
+
+  - id: nis2:art-21-2-c
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 21(2)(c)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Operate business continuity arrangements (backup management, disaster
+      recovery, crisis management) with evidence of execution and tested
+      restore drills.
+    status: draft
+    control_refs:
+      - ctl:backup-attestation
+      - ctl:restore-drill
+    playbook_refs: []
+    metric_refs:
+      - kpi:restore-drill-cadence
+      - kri:backup-integrity-failures
+
+  - id: nis2:art-21-2-d
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 21(2)(d)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Address supply-chain security including the security characteristics
+      of direct suppliers and service providers, with periodic
+      re-attestation.
+    status: draft
+    control_refs:
+      - ctl:supplier-inventory
+      - ctl:provider-attestation
+    playbook_refs:
+      - pb:threat-intel-ingest
+    metric_refs:
+      - kri:suppliers-attestation-stale
+    notes: >-
+      Sovereign-provider classification (residency, ownership, sub-processor
+      chain) reads from a private KB via a file-fixture interface; the
+      framework repo never ingests KB contents.
+
+  - id: nis2:art-21-2-e
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 21(2)(e)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Security in network and information systems acquisition, development,
+      and maintenance — including vulnerability handling and disclosure, and
+      SBOM production for releases.
+    status: draft
+    control_refs:
+      - ctl:sbom-capture
+      - ctl:vuln-disclosure-intake
+    playbook_refs:
+      - pb:vuln-intake
+    metric_refs:
+      - kpi:vuln-disclosure-sla
+      - kri:releases-without-sbom
+    notes: >-
+      Overlaps the CRA scope on SBOM production and on coordinated
+      vulnerability disclosure; mappings/cra/ entries point at the same
+      artifacts.
+
+  - id: nis2:art-21-2-f
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 21(2)(f)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Policies and procedures to assess the effectiveness of cybersecurity
+      risk-management measures, with results archived.
+    status: draft
+    control_refs:
+      - ctl:control-effectiveness-test
+    playbook_refs: []
+    metric_refs:
+      - kpi:control-effectiveness-coverage
+      - kri:overdue-effectiveness-tests
+
+  - id: nis2:art-21-2-g
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 21(2)(g)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Basic cyber-hygiene practices and cybersecurity training for staff,
+      including phishing-simulation exercises, with completion tracked.
+    status: draft
+    control_refs:
+      - ctl:training-attestation
+      - ctl:phishing-simulation
+    playbook_refs:
+      - pb:phishing-triage
+    metric_refs:
+      - kpi:training-completion-rate
+      - kpi:phishing-sim-click-rate
+
+  - id: nis2:art-21-2-h
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 21(2)(h)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Policies and procedures regarding the use of cryptography and, where
+      appropriate, encryption — including key rotation and TLS posture of
+      declared endpoints.
+    status: draft
+    control_refs:
+      - ctl:crypto-policy-inventory
+      - ctl:key-rotation-evidence
+      - ctl:cert-posture-scan
+    playbook_refs: []
+    metric_refs:
+      - kri:expiring-tls-certs
+      - kri:overdue-key-rotations
+
+  - id: nis2:art-21-2-i
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 21(2)(i)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Human resources security, access-control policies, and asset
+      management — including joiner-mover-leaver evidence,
+      privileged-access review cadence, and asset inventory delta capture.
+    status: draft
+    control_refs:
+      - ctl:jml-evidence
+      - ctl:privileged-access-review
+      - ctl:asset-inventory-delta
+    playbook_refs:
+      - pb:identity-compromise
+    metric_refs:
+      - kri:orphaned-privileged-accounts
+      - kri:asset-inventory-drift
+
+  - id: nis2:art-21-2-j
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 21(2)(j)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Use of multi-factor or continuous authentication, secured voice/video
+      and text communications, and secured emergency communications systems
+      inside the entity where appropriate.
+    status: draft
+    control_refs:
+      - ctl:mfa-state-probe
+      - ctl:oob-channel-probe
+    playbook_refs: []
+    metric_refs:
+      - kri:mfa-coverage-gaps
+
+  - id: nis2:art-23-early-warning
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 23(4)(a)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Submit an early-warning notification to the CSIRT or competent
+      authority without undue delay and in any event within 24 hours of
+      becoming aware of a significant incident, indicating whether the
+      incident is suspected of being caused by unlawful or malicious acts
+      or could have a cross-border impact.
+    status: draft
+    control_refs:
+      - ctl:incident-timeline-signals
+    playbook_refs:
+      - pb:ransomware-containment
+      - pb:data-exfil
+      - pb:identity-compromise
+    metric_refs:
+      - kpi:early-warning-on-time
+      - kri:early-warning-missed
+
+  - id: nis2:art-23-notification-72h
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 23(4)(b)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Submit an incident notification within 72 hours of becoming aware of
+      the significant incident, updating the early-warning information and
+      providing an initial assessment of the incident's severity, impact,
+      and where available indicators of compromise.
+    status: draft
+    control_refs:
+      - ctl:incident-timeline-signals
+    playbook_refs:
+      - pb:ransomware-containment
+      - pb:data-exfil
+      - pb:identity-compromise
+    metric_refs:
+      - kpi:notification-72h-on-time
+
+  - id: nis2:art-23-final-report
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 23(4)(d)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Submit a final report no later than one month after the incident
+      notification, containing a detailed description of the incident,
+      the type of threat or root cause, applied and ongoing mitigation
+      measures, and where applicable the cross-border impact.
+    status: draft
+    control_refs:
+      - ctl:incident-timeline-signals
+    playbook_refs:
+      - pb:post-incident-review
+    metric_refs:
+      - kpi:final-report-on-time
