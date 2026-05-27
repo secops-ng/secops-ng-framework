@@ -1,12 +1,22 @@
 # Pattern Library
 
-Short, named, copy-pastable durable Temporal workflow patterns for sovereign
-operations. Each pattern is self-contained: one workflow file, one activities
-file, fixtures, README, and tests. No cross-pattern imports.
+Reference Temporal-Python implementations of recurring SecOps content
+patterns. Each pattern is self-contained: one workflow file, one
+activities file, fixtures, README, and tests. No cross-pattern imports.
 
-The pattern library is the framework's "copy this" surface — small enough to
-read in one sitting, durable enough to run in production, sovereignty-native
-by default.
+These patterns serve two purposes:
+
+1. They are **reference implementations** for the Temporal compile target
+   — concrete proof that a given content pattern can be executed
+   durably end-to-end.
+2. They are a **community copy-this surface** — small enough to read in
+   one sitting, durable enough to run in production, sovereignty-native
+   by default.
+
+Equivalent implementations for the other launch compile targets (n8n,
+LangGraph) will land alongside these as the compilers mature. The
+canonical artifact for each pattern is the content definition; the
+Python here is one of several emitted forms.
 
 ## Patterns
 

@@ -1,122 +1,122 @@
 # SecOps-NG
 
-**Durable, auditable, sovereignty-respecting security operations agents.**
+**Portable SecOps content, structure, and metrics — compile to the
+orchestrator you already run.**
 
-SecOps-NG is a community-driven framework for building next-generation security
-operations workflows on top of open, durable execution primitives. It is
-maintained as a digital commons — built in the open, owned by no single vendor,
-and designed for organisations that need to operate security workflows under
-European data sovereignty and regulatory constraints.
+SecOps-NG is a community-driven project that publishes the *content* layer
+of security operations — playbooks, detections, control mappings, telemetry
+shapes, and operational metrics — as portable, vendor-neutral artifacts.
+Reference compilers translate those artifacts into runnable form for the
+orchestrators teams already operate.
+
+It is maintained as a digital commons: built in the open, owned by no single
+vendor, and designed for organisations that need to meet European
+regulatory baselines without locking their playbooks to one runtime.
 
 ## What is SecOps-NG
 
-SecOps-NG provides reusable building blocks for *agentic* security workflows
-(vulnerability triage, incident enrichment, evidence collection, alert
-deduplication, response orchestration) that survive process restarts, host
-failures, and partial cloud outages.
+SecOps-NG is **not** a SOAR, not a workflow runtime, and not an agent
+framework. It is a **content and structure layer that sits above the
+existing open standards**, plus reference compilers that emit ready-to-run
+definitions for three launch orchestrator targets.
 
-Where traditional SOAR platforms encode workflows as fragile, vendor-specific
-playbooks, SecOps-NG treats each workflow as a **durable state machine** —
-deterministic, replayable, and inspectable end-to-end.
+The content model is built on standards that already exist:
 
-## Why Sovereignty
+| Layer        | Standard                | What we contribute                                  |
+|--------------|-------------------------|-----------------------------------------------------|
+| Response     | CACAO v2 (OASIS)        | A growing library of portable response playbooks    |
+| Detection    | Sigma                   | Curated references — we author no detection rules   |
+| Controls     | OSCAL + D3FEND          | Control mappings to NIS2 / GDPR / ISO 27001         |
+| Telemetry    | OCSF                    | The canonical event shape every playbook expects in |
+| Measurement  | KPI / KRI catalog       | Operational and risk metrics, defined once          |
 
-The EU NIS2 Directive raises the bar on incident reporting, supply-chain
-hygiene, and operational resilience for essential and important entities.
-Meeting that bar means knowing — and being able to prove — where your security
-telemetry lives, which models touched it, and what an agent decided on your
-behalf.
+Every artifact in this repository is plain YAML / JSON / Markdown. The
+primary output of SecOps-NG is **content**, not a runtime.
 
-SecOps-NG is designed from day one to run on **sovereign infrastructure**:
+## Compile targets
 
-- On-premises or EU-resident clouds (e.g. Nebul, OVHcloud, Scaleway, Hetzner)
-- Self-hosted Temporal clusters — no managed-SaaS lock-in required
-- Pluggable LLM backends (local, EU-hosted, or hyperscaler) selected at
-  runtime, never baked into the workflow definition
-- All credentials injected at runtime via environment variables or vault —
-  never committed, never embedded
+A response playbook should be writeable once and runnable wherever the
+operator already runs workflows. SecOps-NG ships reference compilers for
+three launch targets:
 
-This is not a compliance product. It is a toolkit that makes compliant
-architectures cheaper to build.
+- **n8n** — for teams that already run n8n for automation.
+- **Temporal** — for teams that need durable, replayable, deterministic
+  execution.
+- **LangGraph** — for teams building agentic response loops with explicit
+  graph state.
 
-## Architecture
+Compilers for **MindStudio, Make, Zapier, StackAI, and CrewAI** are out of
+launch scope and expected to land as community contributions over time.
 
-Four pillars, each chosen for a specific reason:
+The compilers consume the same canonical artifact and emit
+orchestrator-native definitions. The artifact is the source of truth; the
+emitted definition is the build output.
 
-| Layer        | Tool          | Why                                                  |
-|--------------|---------------|------------------------------------------------------|
-| Durability   | Temporal.io   | Workflows survive restarts, replays are deterministic|
-| Reasoning    | LangGraph     | Explicit graph state — auditable agent transitions   |
-| Contracts    | Pydantic v2   | Strict, typed I/O at every tool boundary             |
-| Optimisation | DSPy          | Prompts and policies are *programs*, not strings     |
+## Why this shape
 
-The split is deliberate: **Temporal owns time and state**, **LangGraph owns
-control flow**, **Pydantic owns the type system**, and **DSPy owns the
-learnable bits**. None of them is forced to do another's job.
+Security operations content has been trapped in vendor playbook formats
+for two decades. Every migration between SOAR vendors, every move from
+on-prem to cloud, every rebuild after an acquisition rewrites the same
+playbooks in a new dialect.
+
+SecOps-NG bets on the standards that already exist (CACAO for response,
+Sigma for detection, OSCAL/D3FEND for controls, OCSF for telemetry) and
+fills the gap above them with a coherent content library plus the
+glue to compile that content into whatever runtime an operator chose for
+unrelated reasons.
+
+The split is deliberate:
+
+- **Sigma** is detection only. We *reference* Sigma rules; we do not
+  rewrite detection logic.
+- **CACAO** is the portable response standard. Playbooks live here.
+- **OSCAL + D3FEND** carry the control and technique mappings.
+- **OCSF** is the telemetry shape every playbook reads.
+
+## Sovereign deployment
+
+The content layer is runtime-neutral, but most operators reading this work
+under European regulatory baselines (NIS2, GDPR, DORA). The deployment
+guidance section is therefore opinionated:
+
+- The reference compile targets all have EU-hostable runtimes:
+  self-hosted n8n, self-hosted Temporal clusters, and LangGraph executed
+  inside any EU-resident process.
+- The content artifacts are AI-provider neutral — model choice belongs at
+  the runtime layer, never baked into a playbook.
+- All credentials are injected at runtime by the executing orchestrator —
+  never embedded in a published playbook, never committed.
+- Recommended hosting bias: on-premises or EU-resident clouds
+  (e.g. Nebul, OVHcloud, Scaleway, Hetzner).
+
+This is not a compliance product. It is a content commons that makes
+compliant architectures cheaper to build.
+
+## Repository layout
+
+| Path             | What lives there                                              |
+|------------------|---------------------------------------------------------------|
+| `workflows/`     | Canonical playbook artifacts (the source of truth)            |
+| `patterns/`      | Reference Temporal-Python implementations of common patterns  |
+| `compliance/`    | OSCAL-aligned control mappings (NIS2, GDPR)                   |
+| `src/`           | Reference compiler implementations                            |
+| `tools/`         | CLI helpers (hygiene linter, render scripts)                  |
+| `docs/`          | Long-form documentation                                       |
+| `tests/`         | Replay tests, fixture round-trips, compiler tests             |
 
 ## Status
 
 **Early. Community-driven. Pre-1.0.**
 
-The scaffold is in place; the interesting workflow templates are landing
-incrementally. We are deliberately holding off on a stable API until the
-durable-execution patterns have been validated against real NIS2-relevant use
-cases by more than one operator. If you are running security operations under
-NIS2 and want to help shape this, please open a discussion.
+The content scaffold is in place; the compile targets are landing
+incrementally. We are deliberately holding the API stable only at the
+artifact layer (YAML/JSON shapes) and treating the compilers as evolving
+until each target has been validated against real operator use.
 
-## Running the skeleton
-
-The canonical durable workflow lives at
-`src/secops_ng/workflows/skeleton.py`. It is the template every future
-agentic workflow descends from: signal-driven, deterministic body,
-side effects pushed into activities, replay-clean.
-
-To run it against a local Temporal dev server:
-
-```bash
-# Terminal 1 — start a local Temporal server (install the CLI from
-# https://docs.temporal.io/cli once; nothing else is required).
-temporal server start-dev
-
-# Terminal 2 — run the worker. TEMPORAL_ADDRESS and TEMPORAL_TASK_QUEUE
-# are both optional; defaults are localhost:7233 and secops-ng-default.
-python -m secops_ng.worker
-```
-
-Drive the workflow with the `temporal` CLI (or the Python client):
-
-```bash
-temporal workflow start \
-  --task-queue secops-ng-default \
-  --type SkeletonWorkflow \
-  --workflow-id demo-run-1
-
-temporal workflow signal --workflow-id demo-run-1 --name add_item --input '"alpha"'
-temporal workflow signal --workflow-id demo-run-1 --name add_item --input '"bravo"'
-temporal workflow signal --workflow-id demo-run-1 --name finish
-temporal workflow result --workflow-id demo-run-1
-```
-
-The replay-based tests in `tests/test_skeleton_replay.py` exercise the
-same workflow without needing a live server — they use Temporal's
-time-skipping test environment.
-
-## Running the sovereign posture audit
-
-The posture audit (`src/secops_ng/workflows/posture_audit.py`) is the
-first non-skeleton workflow. It cross-references a declared cloud
-footprint manifest against a sovereign-provider knowledge base and
-emits a markdown report. For a single-page walkthrough that takes you
-from clone through a rendered report against the committed sample
-fixtures — Temporal dev server, worker with the audit surface enabled,
-and the `scripts/submit_audit.py` operator client — see
-[docs/posture-audit.md](docs/posture-audit.md). The expected output
-lives at [`tests/fixtures/sample_report.md`](tests/fixtures/sample_report.md)
-and the round-trip is a one-line diff.
+If you are running security operations and want to help shape this, open
+a discussion.
 
 ## Quickstart
-
-> Full docs are pending. Expect rough edges.
 
 ```bash
 git clone https://github.com/secops-ng/secops-ng-framework.git
@@ -127,9 +127,9 @@ cp .env.example .env  # then edit
 pytest
 ```
 
-Documentation will live at `docs/` (TBD) and at the project site once the
-community settles on hosting. Until then, the source — particularly the
-`workflows/` examples — is the documentation.
+The reference Temporal-Python pattern implementations and replay tests
+exercise the content artifacts end-to-end without needing live cloud
+services.
 
 ## Contributing & governance
 
@@ -154,6 +154,6 @@ public issues for vulnerabilities.
 
 Apache License 2.0 — see [LICENSE](LICENSE).
 
-SecOps-NG is open core. The framework, contracts, and reference workflows are
-and will remain Apache-2.0. The project has no commercial offering and is not
-operated as a business.
+SecOps-NG is open core. The content artifacts, control mappings, and
+reference compilers are and will remain Apache-2.0. The project has no
+commercial offering and is not operated as a business.
