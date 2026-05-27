@@ -1,5 +1,12 @@
 # Sovereign Quickstart — Nebul + Mistral + Temporal
 
+> **Stale notice (restructure landing):** This guide assumes the previous
+> runtime-shipping layout (the `src/secops_ng/` package, `workflows/`,
+> `patterns/`). After the content-first restructure the repo no longer
+> ships those trees. A content-aware sovereign-deployment guide is
+> queued; until it lands, treat this document as historical reference
+> for sovereign-hosting topology only.
+
 > **Audience.** Security engineers who already read Terraform and Docker
 > Compose without help, but who have not yet operated an agentic stack
 > in production. The goal of this guide is to get a single

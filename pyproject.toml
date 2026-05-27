@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "secops-ng"
 version = "0.0.1"
-description = "Agentic SecOps workflows on LangGraph, Pydantic v2, and DSPy."
+description = "Portable SecOps content (CACAO/OSCAL/D3FEND/OCSF) plus reference compilers to n8n, Temporal, and LangGraph."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
@@ -15,10 +15,10 @@ authors = [
 keywords = [
     "security",
     "secops",
-    "soar",
-    "langgraph",
-    "dspy",
-    "agents",
+    "cacao",
+    "oscal",
+    "ocsf",
+    "sigma",
     "nis2",
     "sovereignty",
 ]
@@ -33,15 +33,8 @@ classifiers = [
     "Topic :: Security",
 ]
 dependencies = [
-    "langgraph>=0.2",
-    "langchain-core>=0.3",
-    "pydantic>=2.5",
-    "pydantic-settings>=2.2",
-    "dspy-ai>=2.4",
-    "python-dotenv>=1.0",
-    "structlog>=24.1",
-    "temporalio>=1.7,<2",
     "pyyaml>=6.0",
+    "jsonschema>=4.21",
 ]
 
 [project.optional-dependencies]
@@ -58,13 +51,19 @@ Issues = "https://github.com/secops-ng/secops-ng-framework/issues"
 Source = "https://github.com/secops-ng/secops-ng-framework"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/secops_ng"]
+# No installable Python package yet — content layer ships flat.
+# Compiler CLIs will register here as they land.
+bypass-selection = true
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "src/secops_ng",
-    "workflows",
+    "content",
+    "compilers",
+    "schemas",
+    "tools",
     "docs",
+    "examples",
+    "scripts",
     "README.md",
     "LICENSE",
     "CONTRIBUTING.md",
@@ -91,4 +90,4 @@ warn_return_any = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-testpaths = ["tests", "patterns"]
+testpaths = ["tests"]
