@@ -20,10 +20,20 @@ that need to meet European regulatory baselines.
 
 ## 2. Stack
 
-- **Workflow engine:** Temporal.io (durable, restartable state machines)
-- **Sovereign cloud:** Nebul
-- **Pattern:** Agentic workflows — humans set intent, durable workers execute
-- **Bias:** EU-hosted services and EU-origin libraries first
+SecOps-NG's primary output is **portable content artifacts** —
+YAML / JSON / Markdown — not a runtime. The content layer sits above the
+existing open standards (CACAO for response, Sigma for detection,
+OSCAL + D3FEND for controls, OCSF for telemetry) and is compiled into
+whatever orchestrator the operator already runs.
+
+- **Launch compile targets:** n8n, Temporal.io, LangGraph
+- **Out of launch scope (community-contributed):** MindStudio, Make,
+  Zapier, StackAI, CrewAI
+- **Sovereign cloud bias:** EU-hostable runtimes (Nebul, OVHcloud,
+  Scaleway, Hetzner); AI-provider neutrality enforced at the artifact
+  layer
+- **Pattern:** Operators set intent in a portable artifact, then the
+  compile target executes it durably
 
 ## 3. Repositories
 

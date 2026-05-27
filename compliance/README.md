@@ -1,8 +1,14 @@
 # Compliance Evidence Commons
 
 This directory is where SecOps-NG operators and the wider community collect,
-shape, and publish **evidence of compliant operation** for regulatory regimes
-that matter to security workflows running on European sovereign infrastructure.
+shape, and publish **portable control mappings and evidence** for regulatory
+regimes that matter to security workflows running on European sovereign
+infrastructure.
+
+The mappings here are OSCAL-aligned and orchestrator-neutral: they describe
+which SecOps-NG content artifacts (CACAO playbooks, OCSF event shapes,
+KPI/KRI definitions) satisfy which regulatory obligation, independent of
+the runtime that ultimately executes the content.
 
 It is not a checklist generator. It is not an audit-as-a-service.
 It is a **shared scaffold** that any community member can adopt, fork, and
