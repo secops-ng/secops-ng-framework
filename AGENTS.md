@@ -50,9 +50,10 @@ standard **before merge**, not just at publish time.
 
 ## 4. Agent Crew (all on Claude until per-role overrides are configured)
 
-> **Note:** Verbatim persona prompts are pending — to be paste-locked at
-> swarm registration (workspace UI). Descriptions below are working
-> summaries.
+> **Note:** Verbatim persona prompts are live at
+> `~/.hermes/profiles/{coder,custodian,researcher,promoter}/SOUL.md`.
+> Descriptions below are working summaries; the SOUL files are the
+> authoritative source for each worker's charter.
 
 - **Aurora — Orchestrator / Chief of Staff.** Owns dispatch, checkpoints,
   governance escalation, and durable plan state. Reports to the Director.
@@ -64,7 +65,10 @@ standard **before merge**, not just at publish time.
 - **The Researcher — Custom lane.** Sovereign provider KB curation,
   regulatory landscape monitoring. Writes only to private repos.
 - **The Promoter — Custom lane.** External communications, community
-  voice. Operates under the SOUL guardrails.
+  voice. Authorised to post on any channel they judge appropriate,
+  at any time — no Custodian pre-approval required for outbound
+  promotion. Operates under the SOUL guardrails and owns their own
+  quality bar.
 
 The human counterpart is **the Director**. Form of address: Director.
 
