@@ -1,0 +1,133 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--7c1e2b3a-4d5f-4a8b-9c0d-1e2f3a4b5c6d",
+  "name": "Threat intelligence ingest",
+  "description": "End-to-end ingest of external cyber threat intelligence: pull an upstream feed (STIX 2.1 / TAXII or OCSF Threat Intelligence), normalise indicators into the OCSF event surface, and propagate the result to detection (Sigma rule activation) and blocking (network/EDR blocklist) controls. The playbook is the portable response per OASIS CACAO v2; runtime is the operator's choice (n8n, Temporal, LangGraph).",
+  "playbook_types": ["detection", "prevention", "investigation"],
+  "created_by": "identity--c0c0c0c0-c0c0-4c0c-8c0c-c0c0c0c0c0c0",
+  "created": "2026-05-29T00:00:00Z",
+  "modified": "2026-05-29T00:00:00Z",
+  "labels": ["threat-intelligence", "ioc", "ingest", "stix", "ocsf"],
+  "playbook_variables": {
+    "__feed_url__": {
+      "type": "uri",
+      "description": "TAXII collection URL or STIX 2.1 bundle endpoint to poll. Credentials are injected at compile-target runtime (directive 6); never inline here.",
+      "external": true
+    },
+    "__feed_id__": {
+      "type": "string",
+      "description": "Stable identifier of the upstream feed (e.g. AbuseIPDB, MISP community, ENISA EU-CSIRTs network feed).",
+      "external": true
+    },
+    "__confidence_threshold__": {
+      "type": "integer",
+      "description": "Minimum confidence score (0-100) at which an indicator is propagated to blocking controls; lower-confidence indicators are kept for detection only.",
+      "external": true,
+      "value": 70
+    },
+    "__indicator_count__": {
+      "type": "integer",
+      "description": "Number of indicators normalised from the upstream bundle.",
+      "external": false
+    }
+  },
+  "workflow_start": "start--10000000-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--10000000-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "intake-start",
+      "on_completion": "action--20000000-0000-4000-8000-000000000002"
+    },
+    "action--20000000-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "pull upstream feed",
+      "description": "Poll the configured TAXII collection or STIX 2.1 endpoint and capture the raw bundle. The endpoint is operator-supplied; we do not embed feed URLs in the content model.",
+      "on_completion": "action--30000000-0000-4000-8000-000000000003",
+      "in_args": ["__feed_url__", "__feed_id__"],
+      "x_secops_ng": {
+        "control_refs": ["control.threat_intel.feed_ingest@v1"],
+        "telemetry_refs": ["telemetry.ocsf.threat_intelligence_inference@v1"],
+        "metric_refs": ["kpi.telemetry_coverage@v1"]
+      }
+    },
+    "action--30000000-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "normalise STIX to OCSF",
+      "description": "Map STIX 2.1 SDOs (Indicator, Malware, Threat-Actor) to the OCSF Threat Intelligence Inference (5005) event class. Persist normalised records keyed by indicator value; deduplicate against any record seen within the last 24 hours.",
+      "on_completion": "if-condition--40000000-0000-4000-8000-000000000004",
+      "out_args": ["__indicator_count__"],
+      "x_secops_ng": {
+        "telemetry_refs": ["telemetry.ocsf.threat_intelligence_inference@v1"],
+        "control_refs": ["control.threat_intel.normalisation@v1"]
+      }
+    },
+    "if-condition--40000000-0000-4000-8000-000000000004": {
+      "type": "if-condition",
+      "name": "above confidence threshold?",
+      "description": "Branch on whether the normalised indicator clears the operator-set confidence threshold. High-confidence indicators are pushed to blocking controls; the rest activate detection rules only.",
+      "on_success": "action--50000000-0000-4000-8000-000000000005",
+      "on_failure": "action--60000000-0000-4000-8000-000000000006"
+    },
+    "action--50000000-0000-4000-8000-000000000005": {
+      "type": "action",
+      "name": "propagate to blocklist",
+      "description": "Push high-confidence indicators (IPs, domains, file hashes) to the operator's enforcement plane: perimeter firewall, DNS sinkhole, EDR allow/deny list. Records the propagation event so MTTR-to-block can be measured.",
+      "on_completion": "action--60000000-0000-4000-8000-000000000006",
+      "x_secops_ng": {
+        "control_refs": ["control.blocklist.propagation@v1"],
+        "detection_refs": ["detection.sigma.threat_intel.ioc_match@v1"],
+        "telemetry_refs": ["telemetry.ocsf.security_finding@v1"],
+        "metric_refs": ["kpi.mttr_blocklist_propagation@v1"]
+      }
+    },
+    "action--60000000-0000-4000-8000-000000000006": {
+      "type": "action",
+      "name": "activate detection rule",
+      "description": "Activate or refresh the corresponding Sigma rule(s) in the operator's SIEM so subsequent telemetry matching the indicator generates an alert. Sigma rule IDs are pinned upstream (SigmaHQ); the framework does not re-author rule bodies.",
+      "on_completion": "end--70000000-0000-4000-8000-000000000007",
+      "x_secops_ng": {
+        "detection_refs": ["detection.sigma.threat_intel.ioc_match@v1"],
+        "control_refs": ["control.detection.sigma_deployment@v1"],
+        "metric_refs": ["kpi.mttd_critical@v1"]
+      }
+    },
+    "end--70000000-0000-4000-8000-000000000007": {
+      "type": "end",
+      "name": "intake-end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.threat_intelligence_ingest@v1",
+    "content_version": "0.1.0",
+    "maturity": "experimental",
+    "compile_targets": ["n8n", "temporal", "langgraph"],
+    "detection_refs": ["detection.sigma.threat_intel.ioc_match@v1"],
+    "control_refs": [
+      "control.threat_intel.feed_ingest@v1",
+      "control.threat_intel.normalisation@v1",
+      "control.blocklist.propagation@v1",
+      "control.detection.sigma_deployment@v1"
+    ],
+    "telemetry_refs": [
+      "telemetry.ocsf.threat_intelligence_inference@v1",
+      "telemetry.ocsf.security_finding@v1"
+    ],
+    "metric_refs": [
+      "kpi.mttd_critical@v1",
+      "kpi.mttr_blocklist_propagation@v1",
+      "kpi.telemetry_coverage@v1"
+    ],
+    "sources": [
+      "OASIS CACAO v2.0 specification",
+      "OASIS STIX 2.1 specification",
+      "OCSF v1.3 — Findings and Threat Intelligence categories",
+      "SigmaHQ rule catalog (rule IDs only; rule bodies remain upstream)",
+      "OSCAL 1.1.2 control catalog references",
+      "MITRE D3FEND v0.16 (defensive technique tagging)",
+      "NIS2 Directive (EU) 2022/2555, Article 21(2)(d) — supply-chain security",
+      "DORA Regulation (EU) 2022/2554, Article 19(2) — voluntary cyber-threat notification",
+      "ENISA — EU CSIRTs network operational guidance"
+    ]
+  }
+}

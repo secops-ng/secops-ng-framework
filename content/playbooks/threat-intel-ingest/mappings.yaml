@@ -1,0 +1,144 @@
+# Cross-references for the threat-intelligence-ingest playbook.
+#
+# This file is the playbook's outbound view of the content model: it pins
+# Sigma rule IDs (upstream — bodies live at SigmaHQ), OSCAL controls,
+# MITRE D3FEND defensive techniques, OCSF event classes consumed/emitted,
+# KPI/KRI metrics, and the EU regulatory clauses this playbook helps
+# operationalise. Inbound references (NIS2 article 21(2)(d), DORA article
+# 19(2)) are mirrored in `content/mappings/{nis2,dora}/` so the graph is
+# closed in both directions.
+playbook: playbook.threat_intelligence_ingest@v1
+
+sigma_rules:
+  # Sigma rule IDs only — bodies are pinned upstream at SigmaHQ and
+  # follow upstream renames by pointer, never by vendoring (see content
+  # model README).
+  - id: detection.sigma.threat_intel.ioc_match@v1
+    upstream:
+      project: SigmaHQ/sigma
+      # Generic IOC-match scaffolding lives under threat_intel/. We point
+      # at the project root; the specific rule filenames are operator-
+      # scoped (one per IOC type) and resolved by the activate-detection
+      # step at runtime.
+      path: rules-threat-hunting/threat_intel/
+      url: https://github.com/SigmaHQ/sigma/tree/master/rules-threat-hunting/threat_intel
+    notes: >-
+      We deliberately do not pin a single Sigma rule UUID here. The
+      activate-detection step iterates the normalised indicator types
+      (ip-v4, ip-v6, domain, sha256, url) and toggles the matching
+      upstream rule for each. Operators bring their own rule pack.
+
+oscal_controls:
+  - id: control.threat_intel.feed_ingest@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: RA-3(2)
+    title: Risk Assessment | Threat Awareness Program
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=RA-3
+  - id: control.threat_intel.normalisation@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SI-5
+    title: Security Alerts, Advisories, and Directives
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-5
+  - id: control.blocklist.propagation@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SC-7(10)
+    title: Boundary Protection | Prevent Exfiltration
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SC-7
+  - id: control.detection.sigma_deployment@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SI-4(2)
+    title: System Monitoring | Automated Tools for Real-Time Analysis
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-4
+
+d3fend_techniques:
+  # MITRE D3FEND v0.16 — defensive technique tagging. Tracks which
+  # defensive primitives each step exercises so a reviewer can see the
+  # countermeasure shape without reading runtime code.
+  - step: action--20000000-0000-4000-8000-000000000002  # pull upstream feed
+    d3fend_id: D3-OSM
+    d3fend_name: Operating System Monitoring (Threat Intelligence consumption)
+    url: https://d3fend.mitre.org/technique/d3f:OperatingSystemMonitoring/
+  - step: action--30000000-0000-4000-8000-000000000003  # normalise STIX to OCSF
+    d3fend_id: D3-IAA
+    d3fend_name: Identifier Activity Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IdentifierActivityAnalysis/
+  - step: action--50000000-0000-4000-8000-000000000005  # propagate to blocklist
+    d3fend_id: D3-ITF
+    d3fend_name: Inbound Traffic Filtering
+    url: https://d3fend.mitre.org/technique/d3f:InboundTrafficFiltering/
+  - step: action--60000000-0000-4000-8000-000000000006  # activate detection rule
+    d3fend_id: D3-NTA
+    d3fend_name: Network Traffic Analysis
+    url: https://d3fend.mitre.org/technique/d3f:NetworkTrafficAnalysis/
+
+ocsf_event_classes:
+  - id: telemetry.ocsf.threat_intelligence_inference@v1
+    category_uid: 5
+    category_name: Findings
+    class_uid: 5005
+    class_name: Threat Intelligence Inference
+    ocsf_version: 1.3.0
+    url: https://schema.ocsf.io/1.3.0/classes/threat_intel_inference
+    direction: in_and_out
+    notes: >-
+      Input: normalised representation of upstream STIX 2.1 Indicator
+      SDOs. Output: the same class, persisted with operator-scoped
+      identifiers and confidence preserved.
+  - id: telemetry.ocsf.security_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2001
+    class_name: Security Finding
+    ocsf_version: 1.3.0
+    url: https://schema.ocsf.io/1.3.0/classes/security_finding
+    direction: out
+    notes: >-
+      Emitted by the propagate-to-blocklist step when an indicator is
+      pushed to an enforcement plane (firewall / DNS sinkhole / EDR).
+      Carries the indicator value plus the action_id taken.
+
+metrics:
+  - id: kpi.mttd_critical@v1
+    layer: kpi
+    measured_at: action--60000000-0000-4000-8000-000000000006
+    description: >-
+      Mean time between first feed publication and detection-rule
+      activation for critical-severity indicators.
+  - id: kpi.mttr_blocklist_propagation@v1
+    layer: kpi
+    measured_at: action--50000000-0000-4000-8000-000000000005
+    description: >-
+      Mean time between confidence-threshold breach and successful
+      blocklist propagation on the enforcement plane.
+  - id: kpi.telemetry_coverage@v1
+    layer: kpi
+    measured_at: action--20000000-0000-4000-8000-000000000002
+    description: >-
+      Fraction of operator-declared upstream feeds that produced a
+      bundle in the most recent polling window.
+
+regulatory:
+  - regime: nis2
+    article: "21(2)(d)"
+    instrument: Directive (EU) 2022/2555
+    celex: 32022L2555
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    inbound_ref: nis2:art-21-2-d  # mirrored in content/mappings/nis2/article-21-and-23.yaml
+    relevance: >-
+      Threat-intel ingest is a supply-chain security primitive: the
+      enrichment data feeding the playbook arrives from third-party
+      providers (ENISA EU-CSIRTs network, commercial feeds, ISAC
+      sharing). Sovereign-provider classification reads from a private
+      KB at compile-target runtime; this repo never embeds KB content.
+  - regime: dora
+    article: "19(2)"
+    instrument: Regulation (EU) 2022/2554
+    celex: 32022R2554
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    inbound_ref: dora:art-19-cyber-threat-voluntary
+    relevance: >-
+      DORA Article 19(2) provides for voluntary notification of
+      significant cyber threats. The normalisation step produces the
+      content shape (OCSF Threat Intelligence Inference) that the
+      submission-templates control transforms into the ESAs RTS/ITS
+      reporting payload.

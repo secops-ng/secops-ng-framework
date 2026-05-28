@@ -1,0 +1,76 @@
+{
+  "conditional_edges": [
+    {
+      "branches": {
+        "failure": "action--60000000-0000-4000-8000-000000000006",
+        "success": "action--50000000-0000-4000-8000-000000000005"
+      },
+      "default": null,
+      "src": "if-condition--40000000-0000-4000-8000-000000000004"
+    }
+  ],
+  "edges": [
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--30000000-0000-4000-8000-000000000003",
+      "src": "action--20000000-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "if-condition--40000000-0000-4000-8000-000000000004",
+      "src": "action--30000000-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--60000000-0000-4000-8000-000000000006",
+      "src": "action--50000000-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--60000000-0000-4000-8000-000000000006"
+    }
+  ],
+  "end_sentinel": "__END__",
+  "entry": "action--20000000-0000-4000-8000-000000000002",
+  "name": "Threat intelligence ingest",
+  "nodes": [
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "pull upstream feed",
+      "name": "action--20000000-0000-4000-8000-000000000002",
+      "step_id": "action--20000000-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "normalise STIX to OCSF",
+      "name": "action--30000000-0000-4000-8000-000000000003",
+      "step_id": "action--30000000-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "if-condition",
+      "kind": "condition",
+      "label": "above confidence threshold?",
+      "name": "if-condition--40000000-0000-4000-8000-000000000004",
+      "step_id": "if-condition--40000000-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "propagate to blocklist",
+      "name": "action--50000000-0000-4000-8000-000000000005",
+      "step_id": "action--50000000-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "activate detection rule",
+      "name": "action--60000000-0000-4000-8000-000000000006",
+      "step_id": "action--60000000-0000-4000-8000-000000000006"
+    }
+  ],
+  "playbook_id": "playbook--7c1e2b3a-4d5f-4a8b-9c0d-1e2f3a4b5c6d",
+  "stable_id": "playbook.threat_intelligence_ingest@v1"
+}

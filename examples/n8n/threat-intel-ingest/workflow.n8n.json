@@ -1,0 +1,249 @@
+{
+  "name": "Threat intelligence ingest",
+  "nodes": [
+    {
+      "id": "start--10000000-0000-4000-8000-000000000001",
+      "name": "intake-start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__feed_url__",
+              "type": "string",
+              "value": "",
+              "description": "TAXII collection URL or STIX 2.1 bundle endpoint to poll. Credentials are injected at compile-target runtime (directive 6); never inline here."
+            },
+            {
+              "name": "__feed_id__",
+              "type": "string",
+              "value": "",
+              "description": "Stable identifier of the upstream feed (e.g. AbuseIPDB, MISP community, ENISA EU-CSIRTs network feed)."
+            },
+            {
+              "name": "__confidence_threshold__",
+              "type": "number",
+              "value": 70,
+              "description": "Minimum confidence score (0-100) at which an indicator is propagated to blocking controls; lower-confidence indicators are kept for detection only."
+            },
+            {
+              "name": "__indicator_count__",
+              "type": "number",
+              "value": "",
+              "description": "Number of indicators normalised from the upstream bundle."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--20000000-0000-4000-8000-000000000002",
+      "name": "pull upstream feed",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {},
+      "notes": "Poll the configured TAXII collection or STIX 2.1 endpoint and capture the raw bundle. The endpoint is operator-supplied; we do not embed feed URLs in the content model.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--30000000-0000-4000-8000-000000000003",
+      "name": "normalise STIX to OCSF",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {},
+      "notes": "Map STIX 2.1 SDOs (Indicator, Malware, Threat-Actor) to the OCSF Threat Intelligence Inference (5005) event class. Persist normalised records keyed by indicator value; deduplicate against any record seen within the last 24 hours.",
+      "notesInFlow": true
+    },
+    {
+      "id": "if-condition--40000000-0000-4000-8000-000000000004",
+      "name": "above confidence threshold?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "secops_ng_condition",
+              "leftValue": "",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "notes": "Branch on whether the normalised indicator clears the operator-set confidence threshold. High-confidence indicators are pushed to blocking controls; the rest activate detection rules only.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--50000000-0000-4000-8000-000000000005",
+      "name": "propagate to blocklist",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {},
+      "notes": "Push high-confidence indicators (IPs, domains, file hashes) to the operator's enforcement plane: perimeter firewall, DNS sinkhole, EDR allow/deny list. Records the propagation event so MTTR-to-block can be measured.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--60000000-0000-4000-8000-000000000006",
+      "name": "activate detection rule",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {},
+      "notes": "Activate or refresh the corresponding Sigma rule(s) in the operator's SIEM so subsequent telemetry matching the indicator generates an alert. Sigma rule IDs are pinned upstream (SigmaHQ); the framework does not re-author rule bodies.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--70000000-0000-4000-8000-000000000007",
+      "name": "intake-end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "intake-start": {
+      "main": [
+        [
+          {
+            "node": "pull upstream feed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pull upstream feed": {
+      "main": [
+        [
+          {
+            "node": "normalise STIX to OCSF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "normalise STIX to OCSF": {
+      "main": [
+        [
+          {
+            "node": "above confidence threshold?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "above confidence threshold?": {
+      "main": [
+        [
+          {
+            "node": "propagate to blocklist",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "activate detection rule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "propagate to blocklist": {
+      "main": [
+        [
+          {
+            "node": "activate detection rule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "activate detection rule": {
+      "main": [
+        [
+          {
+            "node": "intake-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "threat-intelligence",
+    "ioc",
+    "ingest",
+    "stix",
+    "ocsf"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.threat_intelligence_ingest@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--7c1e2b3a-4d5f-4a8b-9c0d-1e2f3a4b5c6d"
+    },
+    "secops_ng_notes": [
+      "step 'action--20000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'if-condition--40000000-0000-4000-8000-000000000004' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
+      "step 'action--50000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--60000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n."
+    ]
+  }
+}
