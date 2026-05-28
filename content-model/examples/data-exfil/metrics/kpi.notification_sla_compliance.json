@@ -1,0 +1,84 @@
+{
+  "stable_id": "kpi.notification_sla_compliance@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Notification SLA compliance \u2014 regulator and customer coverage",
+  "summary": "Share of confirmed-exfil incidents whose regulator and customer notifications were completed within the applicable statutory window (NIS2 Art. 23 early warning at 24h, DORA Art. 19 initial at 4h after classification as major). Higher is better.",
+  "unit": "ratio",
+  "direction": "higher_is_better",
+  "target": {
+    "value": 1.0,
+    "comparator": ">=",
+    "rationale": "Statutory windows admit no partial-credit miss."
+  },
+  "thresholds": [
+    {
+      "name": "warn",
+      "comparator": "<",
+      "value": 0.98,
+      "severity": "warn"
+    },
+    {
+      "name": "breach",
+      "comparator": "<",
+      "value": 0.95,
+      "severity": "high"
+    }
+  ],
+  "measurement": {
+    "source": "workflow",
+    "aggregation": "ratio",
+    "formula": "count(notifications completed within statutory window) / count(notifications required) over window.",
+    "inputs": [
+      {
+        "name": "required",
+        "playbook_ref": "playbook.data_exfil@v1",
+        "playbook_step": "notification_gate",
+        "description": "incidents where __regulator_required__ or customer-notification policy applied"
+      },
+      {
+        "name": "on_time",
+        "playbook_ref": "playbook.data_exfil@v1",
+        "playbook_step": "notify_regulator",
+        "description": "notifications whose emission timestamp is within the statutory window"
+      },
+      {
+        "name": "on_time_cx",
+        "playbook_ref": "playbook.data_exfil@v1",
+        "playbook_step": "notify_customer",
+        "description": "customer notifications meeting the policy window"
+      }
+    ],
+    "window": {
+      "duration": "P90D",
+      "sliding": true
+    }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.data_exfil@v1",
+      "step_id": "notify_regulator"
+    },
+    {
+      "playbook_id": "playbook.data_exfil@v1",
+      "step_id": "notify_customer"
+    }
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.incident_finding@v1"
+  ],
+  "external_refs": [
+    {
+      "name": "NIS2 Directive Article 23 \u2014 incident reporting",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj"
+    },
+    {
+      "name": "DORA Regulation Article 19 \u2014 reporting of major ICT-related incidents",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}

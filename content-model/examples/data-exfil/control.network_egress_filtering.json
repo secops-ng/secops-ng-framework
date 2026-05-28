@@ -1,0 +1,52 @@
+{
+  "stable_id": "control.network_egress_filtering@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Network egress filtering",
+  "summary": "Boundary-network egress filtering restricts outbound destinations and protocols to a policy-approved set, denying everything else. Pairs with DLP enforcement: egress filtering controls WHERE traffic may go, DLP controls WHAT may go there.",
+  "oscal": {
+    "component": {
+      "uuid": "7e6d5c4b-3a2f-4019-8a7b-6c5d4e3f2a1b",
+      "type": "service",
+      "title": "Egress network filter",
+      "description": "Boundary firewall / proxy enforcing an allow-list egress policy.",
+      "control-implementations": [
+        {
+          "uuid": "4a5b6c7d-8e9f-40a1-92b3-c4d5e6f7a8b9",
+          "source": "https://doi.org/10.6028/NIST.SP.800-53r5",
+          "description": "Implements boundary protection on outbound traffic.",
+          "implemented-requirements": [
+            {
+              "uuid": "defa0001-0001-0001-0001-000000000001",
+              "control-id": "sc-7",
+              "description": "Boundary protection: allow-list egress filtering at the network boundary."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "d3fend": {
+    "technique_id": "D3-NTF",
+    "technique_name": "Network Traffic Filtering",
+    "url": "https://d3fend.mitre.org/technique/d3f:NetworkTrafficFiltering/"
+  },
+  "attack_counters": [
+    "T1071",
+    "T1041"
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.dlp_alert@v1"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.data_exfil@v1",
+      "step_id": "containment"
+    }
+  ],
+  "maintainer": "controls-wg@secops-ng.org",
+  "sources": [
+    "NIS2 Directive (EU) 2022/2555, Article 21(2)(e) \u2014 security in network and information systems",
+    "ENISA \u2014 Good practices for boundary network security"
+  ]
+}

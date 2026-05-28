@@ -1,0 +1,44 @@
+{
+  "stable_id": "telemetry.ocsf.dlp_alert@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "DLP activity event (ingest)",
+  "summary": "Egress DLP signal bound to OCSF Data Security Finding. Consumed by the data-exfil playbook's triage and scope-assessment steps as the originating signal.",
+  "ocsf": {
+    "version": "1.3.0",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2006,
+    "class_name": "Data Security Finding",
+    "profiles": [
+      "data_classification"
+    ]
+  },
+  "direction": "ingest",
+  "fields_used": [
+    "time",
+    "activity_id",
+    "severity_id",
+    "data.classification_ids",
+    "src_endpoint.ip",
+    "dst_endpoint.ip",
+    "actor.user.uid",
+    "finding_info.uid"
+  ],
+  "detection_refs": [
+    "detection.sigma.dlp_egress_alert@v1",
+    "detection.sigma.data_staging_archive_created@v1"
+  ],
+  "control_refs": [
+    "control.dlp_enforcement@v1",
+    "control.network_egress_filtering@v1",
+    "control.data_classification_baseline@v1"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.data_exfil@v1",
+      "step_id": "triage_signal"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org"
+}

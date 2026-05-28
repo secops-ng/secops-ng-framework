@@ -1,0 +1,53 @@
+{
+  "stable_id": "control.data_classification_baseline@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Data classification baseline",
+  "summary": "Operator-maintained classification scheme that labels data assets (public, internal, confidential, restricted, special-category) so downstream controls \u2014 DLP enforcement, egress filtering, regulator-notification routing \u2014 can act on classification rather than inferring sensitivity at runtime.",
+  "oscal": {
+    "component": {
+      "uuid": "5d4c3b2a-1f0e-4a9b-8c7d-6e5f4a3b2c1d",
+      "type": "policy",
+      "title": "Data classification policy",
+      "description": "Policy and labelling scheme classifying data assets by sensitivity tier.",
+      "control-implementations": [
+        {
+          "uuid": "3a4b5c6d-7e8f-4091-92a3-b4c5d6e7f8a9",
+          "source": "https://doi.org/10.6028/NIST.SP.800-53r5",
+          "description": "Implements asset inventory and information-handling categorisation.",
+          "implemented-requirements": [
+            {
+              "uuid": "cdef0001-0001-0001-0001-000000000001",
+              "control-id": "ra-2",
+              "description": "Security categorisation: assets are classified per the operator's labelling scheme."
+            },
+            {
+              "uuid": "cdef0001-0001-0001-0001-000000000002",
+              "control-id": "mp-3",
+              "description": "Media marking: classification labels are applied to data at rest and in transit."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "d3fend": {
+    "technique_id": "D3-AI",
+    "technique_name": "Asset Inventory",
+    "url": "https://d3fend.mitre.org/technique/d3f:AssetInventory/"
+  },
+  "telemetry_refs": [
+    "telemetry.ocsf.dlp_alert@v1"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.data_exfil@v1",
+      "step_id": "scope_assessment"
+    }
+  ],
+  "maintainer": "controls-wg@secops-ng.org",
+  "sources": [
+    "NIS2 Directive (EU) 2022/2555, Article 21(2)(i) \u2014 asset management",
+    "ISO/IEC 27001:2022 Annex A.5.12 \u2014 Classification of information"
+  ]
+}

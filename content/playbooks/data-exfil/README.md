@@ -1,9 +1,32 @@
 # data-exfil
 
-Placeholder for the `data-exfil` playbook. Authoring is tracked on a separate card.
+CACAO v2 starter playbook for responding to a confirmed-or-suspected
+data-exfiltration signal: DLP / egress signal → scope assessment →
+containment → regulator / customer notification gate.
 
-Expected contents once authored:
+## Contents
 
-- `playbook.cacao.json`  the CACAO v2 artifact
-- `fixtures/`            sample input / output
-- `mappings.yaml`        links into `../../mappings/`, `../../controls/`, `../../metrics/`
+- `playbook.cacao.json` — the CACAO v2 artifact (`playbook.data_exfil@v1`).
+
+## Worked example
+
+The cross-layer worked example — detection, control, telemetry, and
+metrics artifacts that bind to this playbook — lives at
+`../../../content-model/examples/data-exfil/`. Start with the README
+there for the cross-reference graph and per-artifact stable IDs.
+
+## Compile targets
+
+`compile_targets` declares `["n8n", "temporal", "langgraph"]`. Emitted
+artifacts under `examples/{n8n,temporal,langgraph}/data-exfil/` are
+authored by the CORE card (`t_41811424`); this directory ships the
+portable content only.
+
+## Sources
+
+- OASIS CACAO v2.0 specification
+- ENISA — Threat Landscape and Good Practices for Incident Notification
+- NIS2 Directive (EU) 2022/2555, Article 23 — incident reporting obligations
+- DORA Regulation (EU) 2022/2554, Article 19 — reporting of major ICT-related incidents
+- OCSF — DLP Activity and Security Finding event classes
+- SigmaHQ — upstream rule IDs referenced in the detection layer

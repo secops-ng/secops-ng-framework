@@ -1,0 +1,61 @@
+{
+  "stable_id": "control.dlp_enforcement@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Data-loss-prevention enforcement at the egress boundary",
+  "summary": "In-line DLP enforcement at the egress boundary (web proxy, mail gateway, cloud-storage broker) inspects payloads against the operator's data-classification policy and blocks, quarantines, or alerts on sensitive-data movement out of the protected boundary.",
+  "oscal": {
+    "component": {
+      "uuid": "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d",
+      "type": "service",
+      "title": "DLP enforcement service (egress)",
+      "description": "Egress DLP broker enforcing data-classification policy on outbound traffic.",
+      "control-implementations": [
+        {
+          "uuid": "2a3b4c5d-6e7f-4081-9293-a4b5c6d7e8f9",
+          "source": "https://doi.org/10.6028/NIST.SP.800-53r5",
+          "description": "Implements information-flow enforcement at the egress boundary.",
+          "implemented-requirements": [
+            {
+              "uuid": "bcde0001-0001-0001-0001-000000000001",
+              "control-id": "ac-4",
+              "description": "Information flow enforcement: egress DLP blocks unauthorised flows by classification."
+            },
+            {
+              "uuid": "bcde0001-0001-0001-0001-000000000002",
+              "control-id": "sc-7",
+              "description": "Boundary protection: DLP enforcement is one of the boundary controls applied to outbound traffic."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "d3fend": {
+    "technique_id": "D3-OE",
+    "technique_name": "Outbound Traffic Filtering",
+    "url": "https://d3fend.mitre.org/technique/d3f:OutboundTrafficFiltering/"
+  },
+  "attack_counters": [
+    "T1567",
+    "T1041"
+  ],
+  "detected_by": [
+    "detection.sigma.dlp_egress_alert@v1",
+    "detection.sigma.data_staging_archive_created@v1"
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.dlp_alert@v1"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.data_exfil@v1",
+      "step_id": "containment"
+    }
+  ],
+  "maintainer": "controls-wg@secops-ng.org",
+  "sources": [
+    "NIS2 Directive (EU) 2022/2555, Article 21(2)(d) \u2014 supply-chain and information-flow controls",
+    "ENISA \u2014 Threat Landscape, data-exfiltration mitigation guidance"
+  ]
+}

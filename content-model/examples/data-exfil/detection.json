@@ -1,0 +1,37 @@
+{
+  "stable_id": "detection.sigma.dlp_egress_alert@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "DLP egress alert (sensitive-data exfiltration signal)",
+  "summary": "Composite reference to upstream Sigma rules that flag sensitive-data egress over cloud-storage, mail, or web channels. The vuln-intake parallel here: SecOps-NG does not re-author Sigma; the detection.json points at upstream rule IDs and the data-exfil playbook resolves them at compile time.",
+  "sigma": {
+    "rule_id": "8e8b4f2e-2e8b-4f2e-8e8b-4f2e8e8b4f2e",
+    "repo": "https://github.com/SigmaHQ/sigma",
+    "path": "rules/cloud/aws/aws_s3_data_management_tampering.yml",
+    "commit": "9f3a1b2",
+    "tags": [
+      "attack.exfiltration",
+      "attack.t1567"
+    ]
+  },
+  "logsource": {
+    "product": "aws",
+    "service": "cloudtrail",
+    "category": "data"
+  },
+  "severity": "high",
+  "control_refs": [
+    "control.network_egress_filtering@v1",
+    "control.dlp_enforcement@v1"
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.dlp_alert@v1"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.data_exfil@v1",
+      "step_id": "triage_signal"
+    }
+  ],
+  "maintainer": "detections-wg@secops-ng.org"
+}

@@ -1,0 +1,35 @@
+{
+  "stable_id": "detection.sigma.data_staging_archive_created@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Data staging \u2014 archive creation prior to egress",
+  "summary": "Reference to the upstream Sigma rule that flags creation of large compressed archives in user-writable paths shortly before an outbound network burst \u2014 the classic data-staging precursor to exfiltration.",
+  "sigma": {
+    "rule_id": "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+    "repo": "https://github.com/SigmaHQ/sigma",
+    "path": "rules/windows/process_creation/proc_creation_win_susp_compression_tool_archive.yml",
+    "commit": "9f3a1b2",
+    "tags": [
+      "attack.exfiltration",
+      "attack.t1560.001"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+  },
+  "severity": "medium",
+  "control_refs": [
+    "control.dlp_enforcement@v1"
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.dlp_alert@v1"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.data_exfil@v1",
+      "step_id": "triage_signal"
+    }
+  ],
+  "maintainer": "detections-wg@secops-ng.org"
+}
