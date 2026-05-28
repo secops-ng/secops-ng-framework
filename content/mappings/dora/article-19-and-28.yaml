@@ -16,13 +16,13 @@ entries:
       criteria plus materiality thresholds; recurring-incident rule).
     status: draft
     control_refs:
-      - ctl:dora-major-classifier
+      - control.dora_major_classifier@v1
     playbook_refs:
-      - pb:ransomware-containment
-      - pb:data-exfil
-      - pb:identity-compromise
+      - playbook.ransomware_containment@v1
+      - playbook.data_exfil@v1
+      - playbook.identity_compromise@v1
     metric_refs:
-      - kri:incidents-classified-major
+      - kri.incidents_classified_major@v1
     notes: >-
       Reference to the classification RTS is Commission Delegated
       Regulation (EU) 2024/1772 of 13 March 2024. The classifier is a
@@ -42,15 +42,15 @@ entries:
       classification as major, and no later than 24 hours from awareness.
     status: draft
     control_refs:
-      - ctl:incident-timeline-signals
-      - ctl:dora-submission-templates
+      - control.incident_timeline_signals@v1
+      - control.dora_submission_templates@v1
     playbook_refs:
-      - pb:ransomware-containment
-      - pb:data-exfil
-      - pb:identity-compromise
+      - playbook.ransomware_containment@v1
+      - playbook.data_exfil@v1
+      - playbook.identity_compromise@v1
     metric_refs:
-      - kpi:dora-initial-4h-on-time
-      - kri:dora-initial-missed
+      - kpi.dora_initial_4h_on_time@v1
+      - kri.dora_initial_missed@v1
     notes: >-
       Submission content shape is Commission Implementing Regulation
       (EU) 2024/2956 (ITS). The framework provides Pydantic-validated
@@ -71,14 +71,14 @@ entries:
       indicators of compromise, and mitigation actions in flight.
     status: draft
     control_refs:
-      - ctl:incident-timeline-signals
-      - ctl:dora-submission-templates
+      - control.incident_timeline_signals@v1
+      - control.dora_submission_templates@v1
     playbook_refs:
-      - pb:ransomware-containment
-      - pb:data-exfil
-      - pb:identity-compromise
+      - playbook.ransomware_containment@v1
+      - playbook.data_exfil@v1
+      - playbook.identity_compromise@v1
     metric_refs:
-      - kpi:dora-intermediate-72h-on-time
+      - kpi.dora_intermediate_72h_on_time@v1
 
   - id: dora:art-19-final-one-month
     regulation:
@@ -94,12 +94,12 @@ entries:
       learned, action plan, and residual-risk statement.
     status: draft
     control_refs:
-      - ctl:incident-timeline-signals
-      - ctl:dora-submission-templates
+      - control.incident_timeline_signals@v1
+      - control.dora_submission_templates@v1
     playbook_refs:
-      - pb:post-incident-review
+      - playbook.post_incident_review@v1
     metric_refs:
-      - kpi:dora-final-on-time
+      - kpi.dora_final_on_time@v1
 
   - id: dora:art-19-cyber-threat-voluntary
     regulation:
@@ -115,9 +115,9 @@ entries:
       major-incident notification.
     status: draft
     control_refs:
-      - ctl:dora-submission-templates
+      - control.dora_submission_templates@v1
     playbook_refs:
-      - pb:threat-intel-ingest
+      - playbook.threat_intel_ingest@v1
     metric_refs: []
 
   - id: dora:art-18-recurring-incident
@@ -133,11 +133,11 @@ entries:
       window and, in aggregate, exceed the materiality thresholds.
     status: draft
     control_refs:
-      - ctl:recurring-incident-correlator
+      - control.recurring_incident_correlator@v1
     playbook_refs:
-      - pb:post-incident-review
+      - playbook.post_incident_review@v1
     metric_refs:
-      - kri:recurring-incident-clusters
+      - kri.recurring_incident_clusters@v1
 
   - id: dora:art-28-third-party-register
     regulation:
@@ -153,11 +153,11 @@ entries:
       and data-location indicators.
     status: draft
     control_refs:
-      - ctl:supplier-inventory
-      - ctl:provider-attestation
+      - control.supplier_inventory@v1
+      - control.provider_attestation@v1
     playbook_refs: []
     metric_refs:
-      - kri:suppliers-attestation-stale
+      - kri.suppliers_attestation_stale@v1
 
   - id: dora:art-30-contractual-clauses
     regulation:
@@ -173,7 +173,7 @@ entries:
       exit-strategy obligations, audit rights, and termination rights.
     status: draft
     control_refs:
-      - ctl:provider-attestation
+      - control.provider_attestation@v1
     playbook_refs: []
     metric_refs: []
     notes: >-

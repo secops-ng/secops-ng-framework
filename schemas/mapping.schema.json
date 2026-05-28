@@ -84,52 +84,52 @@
       "enum": ["draft", "provisional", "live"]
     },
     "control_refs": {
-      "description": "OSCAL/D3FEND control component IDs in the SecOps-NG `ctl:` namespace that implement this obligation. Compilers and reviewers join into content/controls/ via these IDs.",
+      "description": "Control stable IDs (long-form URN `control.<slug>@v<semver>`) that implement this obligation. Compilers and reviewers join into content-model/control.schema.json instances via these IDs. Short-form `ctl:` refs are rejected — see content-model/README.md § 'Canonical URN scheme'.",
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^ctl:[a-z0-9][a-z0-9-]*$",
-        "maxLength": 120
+        "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$",
+        "maxLength": 200
       },
       "uniqueItems": true
     },
     "playbook_refs": {
-      "description": "CACAO playbook stable IDs in the SecOps-NG `pb:` namespace that exercise this obligation. Slugs match content/playbooks/<slug>/ directory names.",
+      "description": "CACAO playbook stable IDs (long-form URN `playbook.<slug>@v<semver>`) that exercise this obligation. Joins to content-model/playbook.schema.json#x_secops_ng.stable_id. Short-form `pb:` refs are rejected.",
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^pb:[a-z0-9][a-z0-9-]*$",
-        "maxLength": 120
+        "pattern": "^playbook\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$",
+        "maxLength": 200
       },
       "uniqueItems": true
     },
     "metric_refs": {
-      "description": "KPI / KRI catalog IDs in the SecOps-NG `kpi:` / `kri:` namespace that measure performance against this obligation.",
+      "description": "KPI / KRI catalog IDs (long-form URN `kpi.<slug>@v<semver>` or `kri.<slug>@v<semver>`) that measure performance against this obligation. Short-form `kpi:` / `kri:` refs are rejected.",
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^(kpi|kri):[a-z0-9][a-z0-9-]*$",
-        "maxLength": 120
+        "pattern": "^(kpi|kri)\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$",
+        "maxLength": 200
       },
       "uniqueItems": true
     },
     "detection_refs": {
-      "description": "Sigma rule pointers in the SecOps-NG `det:` namespace that produce signal relevant to this obligation. Rarely populated — most regulatory obligations are evidence/process obligations rather than detection obligations.",
+      "description": "Sigma rule pointers (long-form URN `detection.<slug>@v<semver>`) that produce signal relevant to this obligation. Rarely populated — most regulatory obligations are evidence/process obligations rather than detection obligations. Short-form `det:` refs are rejected.",
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^det:[a-z0-9][a-z0-9-]*$",
-        "maxLength": 120
+        "pattern": "^detection\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$",
+        "maxLength": 200
       },
       "uniqueItems": true
     },
     "telemetry_refs": {
-      "description": "OCSF telemetry binding IDs in the SecOps-NG `tlm:` namespace that this obligation reads from.",
+      "description": "OCSF telemetry binding IDs (long-form URN `telemetry.<slug>@v<semver>`) that this obligation reads from. Short-form `tlm:` refs are rejected.",
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^tlm:[a-z0-9][a-z0-9-]*$",
-        "maxLength": 120
+        "pattern": "^telemetry\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$",
+        "maxLength": 200
       },
       "uniqueItems": true
     },

@@ -15,11 +15,11 @@ entries:
       format that covers at the very least the top-level dependencies.
     status: draft
     control_refs:
-      - ctl:sbom-capture
+      - control.sbom_capture@v1
     playbook_refs:
-      - pb:vuln-intake
+      - playbook.vuln_intake@v1
     metric_refs:
-      - kri:releases-without-sbom
+      - kri.releases_without_sbom@v1
 
   - id: cra:annex-i-2-vuln-handling
     regulation:
@@ -34,11 +34,11 @@ entries:
       process throughout the support period.
     status: draft
     control_refs:
-      - ctl:vuln-disclosure-intake
+      - control.vuln_disclosure_intake@v1
     playbook_refs:
-      - pb:vuln-intake
+      - playbook.vuln_intake@v1
     metric_refs:
-      - kpi:vuln-disclosure-sla
+      - kpi.vuln_disclosure_sla@v1
 
   - id: cra:annex-i-2-cvd-policy
     regulation:
@@ -53,11 +53,11 @@ entries:
       information on vulnerabilities from any source.
     status: draft
     control_refs:
-      - ctl:vuln-disclosure-intake
+      - control.vuln_disclosure_intake@v1
     playbook_refs:
-      - pb:vuln-intake
+      - playbook.vuln_intake@v1
     metric_refs:
-      - kri:cvd-intake-aging
+      - kri.cvd_intake_aging@v1
 
   - id: cra:annex-i-2-security-updates
     regulation:
@@ -73,11 +73,11 @@ entries:
       users with the relevant information.
     status: draft
     control_refs:
-      - ctl:patch-evidence
+      - control.patch_evidence@v1
     playbook_refs:
-      - pb:vuln-intake
+      - playbook.vuln_intake@v1
     metric_refs:
-      - kpi:patch-disseminated-on-time
+      - kpi.patch_disseminated_on_time@v1
 
   - id: cra:art-14-early-warning
     regulation:
@@ -93,12 +93,12 @@ entries:
       of it (early-warning notification).
     status: draft
     control_refs:
-      - ctl:incident-timeline-signals
-      - ctl:cra-submission-templates
+      - control.incident_timeline_signals@v1
+      - control.cra_submission_templates@v1
     playbook_refs:
-      - pb:vuln-intake
+      - playbook.vuln_intake@v1
     metric_refs:
-      - kpi:cra-early-warning-on-time
+      - kpi.cra_early_warning_on_time@v1
 
   - id: cra:art-14-notification-72h
     regulation:
@@ -115,12 +115,12 @@ entries:
       mitigating measures the manufacturer has taken or recommended.
     status: draft
     control_refs:
-      - ctl:incident-timeline-signals
-      - ctl:cra-submission-templates
+      - control.incident_timeline_signals@v1
+      - control.cra_submission_templates@v1
     playbook_refs:
-      - pb:vuln-intake
+      - playbook.vuln_intake@v1
     metric_refs:
-      - kpi:cra-notification-72h-on-time
+      - kpi.cra_notification_72h_on_time@v1
 
   - id: cra:art-14-final-report
     regulation:
@@ -137,12 +137,12 @@ entries:
       details of the corrective measures.
     status: draft
     control_refs:
-      - ctl:incident-timeline-signals
-      - ctl:cra-submission-templates
+      - control.incident_timeline_signals@v1
+      - control.cra_submission_templates@v1
     playbook_refs:
-      - pb:post-incident-review
+      - playbook.post_incident_review@v1
     metric_refs:
-      - kpi:cra-final-report-on-time
+      - kpi.cra_final_report_on_time@v1
 
   - id: cra:art-14-severe-incident
     regulation:
@@ -158,15 +158,15 @@ entries:
       report (1 month) timing analogous to Art. 14(1)–(2).
     status: draft
     control_refs:
-      - ctl:incident-timeline-signals
-      - ctl:cra-submission-templates
+      - control.incident_timeline_signals@v1
+      - control.cra_submission_templates@v1
     playbook_refs:
-      - pb:ransomware-containment
-      - pb:data-exfil
+      - playbook.ransomware_containment@v1
+      - playbook.data_exfil@v1
     metric_refs:
-      - kpi:cra-severe-incident-on-time
+      - kpi.cra_severe_incident_on_time@v1
     notes: >-
       Severe-incident reporting under Art. 14(3) layers on top of the
       same incident-timeline signal set used for NIS2 Art. 23 and DORA
       Art. 19, with a CRA-specific submission template under
-      ctl:cra-submission-templates.
+      control.cra_submission_templates@v1.
