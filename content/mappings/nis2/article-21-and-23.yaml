@@ -14,10 +14,10 @@ entries:
       security, including periodic re-assessment with dated ownership.
     status: draft
     control_refs:
-      - ctl:risk-management-policy
+      - control.risk_management_policy@v1
     playbook_refs: []
     metric_refs:
-      - kri:risk-register-staleness
+      - kri.risk_register_staleness@v1
     notes: >-
       Most of (a) is governance (policy text, board approval) and lives in
       docs templates rather than workflow content. The agentic slice is the
@@ -36,17 +36,17 @@ entries:
       remediate, and capture lessons learned for each incident.
     status: draft
     control_refs:
-      - ctl:incident-handling-capability
+      - control.incident_handling_capability@v1
     playbook_refs:
-      - pb:phishing-triage
-      - pb:identity-compromise
-      - pb:ransomware-containment
-      - pb:data-exfil
-      - pb:post-incident-review
+      - playbook.phishing_triage@v1
+      - playbook.identity_compromise@v1
+      - playbook.ransomware_containment@v1
+      - playbook.data_exfil@v1
+      - playbook.post_incident_review@v1
     metric_refs:
-      - kpi:mttd
-      - kpi:mttr
-      - kri:incidents-without-closeout
+      - kpi.mttd@v1
+      - kpi.mttr@v1
+      - kri.incidents_without_closeout@v1
 
   - id: nis2:art-21-2-c
     regulation:
@@ -61,12 +61,12 @@ entries:
       restore drills.
     status: draft
     control_refs:
-      - ctl:backup-attestation
-      - ctl:restore-drill
+      - control.backup_attestation@v1
+      - control.restore_drill@v1
     playbook_refs: []
     metric_refs:
-      - kpi:restore-drill-cadence
-      - kri:backup-integrity-failures
+      - kpi.restore_drill_cadence@v1
+      - kri.backup_integrity_failures@v1
 
   - id: nis2:art-21-2-d
     regulation:
@@ -81,12 +81,12 @@ entries:
       re-attestation.
     status: draft
     control_refs:
-      - ctl:supplier-inventory
-      - ctl:provider-attestation
+      - control.supplier_inventory@v1
+      - control.provider_attestation@v1
     playbook_refs:
-      - pb:threat-intel-ingest
+      - playbook.threat_intel_ingest@v1
     metric_refs:
-      - kri:suppliers-attestation-stale
+      - kri.suppliers_attestation_stale@v1
     notes: >-
       Sovereign-provider classification (residency, ownership, sub-processor
       chain) reads from a private KB via a file-fixture interface; the
@@ -105,13 +105,13 @@ entries:
       SBOM production for releases.
     status: draft
     control_refs:
-      - ctl:sbom-capture
-      - ctl:vuln-disclosure-intake
+      - control.sbom_capture@v1
+      - control.vuln_disclosure_intake@v1
     playbook_refs:
-      - pb:vuln-intake
+      - playbook.vuln_intake@v1
     metric_refs:
-      - kpi:vuln-disclosure-sla
-      - kri:releases-without-sbom
+      - kpi.vuln_disclosure_sla@v1
+      - kri.releases_without_sbom@v1
     notes: >-
       Overlaps the CRA scope on SBOM production and on coordinated
       vulnerability disclosure; mappings/cra/ entries point at the same
@@ -129,11 +129,11 @@ entries:
       risk-management measures, with results archived.
     status: draft
     control_refs:
-      - ctl:control-effectiveness-test
+      - control.control_effectiveness_test@v1
     playbook_refs: []
     metric_refs:
-      - kpi:control-effectiveness-coverage
-      - kri:overdue-effectiveness-tests
+      - kpi.control_effectiveness_coverage@v1
+      - kri.overdue_effectiveness_tests@v1
 
   - id: nis2:art-21-2-g
     regulation:
@@ -147,13 +147,13 @@ entries:
       including phishing-simulation exercises, with completion tracked.
     status: draft
     control_refs:
-      - ctl:training-attestation
-      - ctl:phishing-simulation
+      - control.training_attestation@v1
+      - control.phishing_simulation@v1
     playbook_refs:
-      - pb:phishing-triage
+      - playbook.phishing_triage@v1
     metric_refs:
-      - kpi:training-completion-rate
-      - kpi:phishing-sim-click-rate
+      - kpi.training_completion_rate@v1
+      - kpi.phishing_sim_click_rate@v1
 
   - id: nis2:art-21-2-h
     regulation:
@@ -168,13 +168,13 @@ entries:
       declared endpoints.
     status: draft
     control_refs:
-      - ctl:crypto-policy-inventory
-      - ctl:key-rotation-evidence
-      - ctl:cert-posture-scan
+      - control.crypto_policy_inventory@v1
+      - control.key_rotation_evidence@v1
+      - control.cert_posture_scan@v1
     playbook_refs: []
     metric_refs:
-      - kri:expiring-tls-certs
-      - kri:overdue-key-rotations
+      - kri.expiring_tls_certs@v1
+      - kri.overdue_key_rotations@v1
 
   - id: nis2:art-21-2-i
     regulation:
@@ -189,14 +189,14 @@ entries:
       privileged-access review cadence, and asset inventory delta capture.
     status: draft
     control_refs:
-      - ctl:jml-evidence
-      - ctl:privileged-access-review
-      - ctl:asset-inventory-delta
+      - control.jml_evidence@v1
+      - control.privileged_access_review@v1
+      - control.asset_inventory_delta@v1
     playbook_refs:
-      - pb:identity-compromise
+      - playbook.identity_compromise@v1
     metric_refs:
-      - kri:orphaned-privileged-accounts
-      - kri:asset-inventory-drift
+      - kri.orphaned_privileged_accounts@v1
+      - kri.asset_inventory_drift@v1
 
   - id: nis2:art-21-2-j
     regulation:
@@ -211,11 +211,11 @@ entries:
       inside the entity where appropriate.
     status: draft
     control_refs:
-      - ctl:mfa-state-probe
-      - ctl:oob-channel-probe
+      - control.mfa_state_probe@v1
+      - control.oob_channel_probe@v1
     playbook_refs: []
     metric_refs:
-      - kri:mfa-coverage-gaps
+      - kri.mfa_coverage_gaps@v1
 
   - id: nis2:art-23-early-warning
     regulation:
@@ -232,14 +232,14 @@ entries:
       or could have a cross-border impact.
     status: draft
     control_refs:
-      - ctl:incident-timeline-signals
+      - control.incident_timeline_signals@v1
     playbook_refs:
-      - pb:ransomware-containment
-      - pb:data-exfil
-      - pb:identity-compromise
+      - playbook.ransomware_containment@v1
+      - playbook.data_exfil@v1
+      - playbook.identity_compromise@v1
     metric_refs:
-      - kpi:early-warning-on-time
-      - kri:early-warning-missed
+      - kpi.early_warning_on_time@v1
+      - kri.early_warning_missed@v1
 
   - id: nis2:art-23-notification-72h
     regulation:
@@ -255,13 +255,13 @@ entries:
       and where available indicators of compromise.
     status: draft
     control_refs:
-      - ctl:incident-timeline-signals
+      - control.incident_timeline_signals@v1
     playbook_refs:
-      - pb:ransomware-containment
-      - pb:data-exfil
-      - pb:identity-compromise
+      - playbook.ransomware_containment@v1
+      - playbook.data_exfil@v1
+      - playbook.identity_compromise@v1
     metric_refs:
-      - kpi:notification-72h-on-time
+      - kpi.notification_72h_on_time@v1
 
   - id: nis2:art-23-final-report
     regulation:
@@ -277,8 +277,8 @@ entries:
       measures, and where applicable the cross-border impact.
     status: draft
     control_refs:
-      - ctl:incident-timeline-signals
+      - control.incident_timeline_signals@v1
     playbook_refs:
-      - pb:post-incident-review
+      - playbook.post_incident_review@v1
     metric_refs:
-      - kpi:final-report-on-time
+      - kpi.final_report_on_time@v1

@@ -27,16 +27,29 @@ entries:
     obligation: >-
       Operate an incident-handling capability …
     status: draft
-    control_refs:    [ctl:incident-handling-capability]
-    playbook_refs:   [pb:phishing-triage, pb:identity-compromise]
-    metric_refs:     [kpi:mttd, kpi:mttr]
+    control_refs:    [control.incident_handling_capability@v1]
+    playbook_refs:   [playbook.phishing_triage@v1, playbook.identity_compromise@v1]
+    metric_refs:     [kpi.mttd@v1, kpi.mttr@v1]
 ```
 
 Mapping IDs use the regime as a prefix (`nis2:`, `dora:`, `cra:`,
-`gdpr:`, `iso27001:`, `soc2:`). Artifact references use the
-content-model stable-ID namespaces: `ctl:` (controls), `pb:`
-(playbooks), `kpi:` / `kri:` (metrics), `det:` (detections),
-`tlm:` (telemetry).
+`gdpr:`, `iso27001:`, `soc2:`). Artifact references use the canonical
+content-model **long-form stable-ID URN**:
+
+```
+<namespace>.<slug>@v<semver>
+```
+
+where `<namespace>` is one of `control`, `playbook`, `detection`,
+`telemetry`, `kpi`, `kri`, and `<slug>` is `[a-z][a-z0-9_]*` (dotted
+segments allowed). This is the same shape the content-model schemas
+(`content-model/*.schema.json`) define for their own `stable_id`
+fields, so cross-layer joins are lexical.
+
+> Short-form refs (`ctl:foo`, `pb:foo`, `kpi:foo`, …) are **rejected
+> by the schema**. They were a transitional shape in early PRs and
+> have been fully reconciled with the content-model long-form. See
+> `../../content-model/README.md` § "Canonical URN scheme".
 
 ## Status field
 
@@ -48,7 +61,7 @@ Most current entries are `draft` because the artifact stubs (controls,
 metrics, several playbooks) are still landing on separate sibling
 cards. Cross-layer referential integrity is enforced at compile time,
 not at the JSON Schema layer — a draft entry that points at an as-yet
-non-existent `ctl:…` is intentional.
+non-existent `control.…@v1` is intentional.
 
 ## Scope
 
@@ -61,5 +74,6 @@ They are not a substitute for reading the cited regulation.
 
 Validated by `tests/content/test_mappings.py` against
 `schemas/mapping.schema.json` (JSON Schema Draft 2020-12). The test
-also enforces id-uniqueness across the tree and regime/directory
-consistency.
+also enforces id-uniqueness across the tree, regime/directory
+consistency, and that every artifact ref uses the canonical long-form
+URN.
