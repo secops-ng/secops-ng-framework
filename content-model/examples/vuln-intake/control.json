@@ -1,0 +1,46 @@
+{
+  "stable_id": "control.edr_script_block_logging@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "EDR script-block and command-line logging",
+  "summary": "Endpoint detection agents must record full script-block and process command-line content so downstream detections can reason about encoded payloads.",
+  "oscal": {
+    "component": {
+      "uuid": "8e3a1c2d-4b5f-4a6b-9c7d-1e2f3a4b5c6d",
+      "type": "software",
+      "title": "Endpoint Detection Agent (script-block logging profile)",
+      "description": "Endpoint agent configured to emit script-block and verbose process telemetry to the central data plane.",
+      "control-implementations": [
+        {
+          "uuid": "1a2b3c4d-5e6f-7081-9293-a4b5c6d7e8f9",
+          "source": "https://doi.org/10.6028/NIST.SP.800-53r5",
+          "description": "Implements audit-logging requirements via verbose endpoint telemetry.",
+          "implemented-requirements": [
+            {
+              "uuid": "abcd0001-0001-0001-0001-000000000001",
+              "control-id": "au-2",
+              "description": "Endpoint agent captures every process_creation event with full command-line and parent context."
+            },
+            {
+              "uuid": "abcd0001-0001-0001-0001-000000000002",
+              "control-id": "au-12",
+              "description": "Telemetry is generated continuously and forwarded to the operator-controlled data plane."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "d3fend": {
+    "technique_id": "D3-PSA",
+    "technique_name": "Process Spawn Analysis",
+    "url": "https://d3fend.mitre.org/technique/d3f:ProcessSpawnAnalysis/"
+  },
+  "attack_counters": ["T1059.001"],
+  "detected_by": ["detection.powershell_encoded_cmd@v1"],
+  "telemetry_refs": ["telemetry.host_process_create@v1"],
+  "playbook_refs": [
+    { "playbook_id": "playbook.vuln_intake@v1", "step_id": "enrich_host_context" }
+  ],
+  "maintainer": "controls-wg@secops-ng.org"
+}

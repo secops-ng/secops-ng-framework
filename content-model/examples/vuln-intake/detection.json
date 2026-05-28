@@ -1,0 +1,25 @@
+{
+  "stable_id": "detection.powershell_encoded_cmd@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "PowerShell encoded command execution",
+  "summary": "Pointer to the upstream Sigma rule that flags PowerShell processes launched with -EncodedCommand. Used by the vuln-intake host-context step.",
+  "sigma": {
+    "rule_id": "5b1d6c5e-1d6f-4f5b-9c3e-9a2b6d4e1f2a",
+    "repo": "https://github.com/SigmaHQ/sigma",
+    "path": "rules/windows/process_creation/proc_creation_win_powershell_encoded_b64.yml",
+    "commit": "9f3a1b2",
+    "tags": ["attack.execution", "attack.t1059.001"]
+  },
+  "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+  },
+  "severity": "high",
+  "control_refs": ["control.edr_script_block_logging@v1"],
+  "telemetry_refs": ["telemetry.host_process_create@v1"],
+  "playbook_refs": [
+    { "playbook_id": "playbook.vuln_intake@v1", "step_id": "enrich_host_context" }
+  ],
+  "maintainer": "detections-wg@secops-ng.org"
+}

@@ -65,11 +65,27 @@ telemetry_refs:  [telemetry.host_process_create@v1]
 * `examples/control.example.json` — `control.edr_script_block_logging@v1`
 * `examples/telemetry.example.json` — `telemetry.host_process_create@v1` plus `examples/telemetry.sample.json` (OCSF Process Activity payload)
 
-The end-to-end worked example that ties all five layers together lands in the metrics branch (`content-model/examples/vuln-intake/`).
+The end-to-end worked example that ties all five layers — playbook + detection + control + telemetry + metrics — together lives in `content-model/examples/vuln-intake/`. See its README for the cross-reference graph and the contract the tests enforce.
+
+## Metrics layer
+
+`metrics.schema.json` defines the KPI/KRI catalog entry shape. Each entry names one operator metric (MTTD, MTTR, coverage, control-effectiveness), declares its unit / direction / window, and pins the lower-layer artifacts (playbook step, detection rule, control, telemetry class) it measures via the shared `stable_id`. SecOps-NG does not define a new metrics standard; the catalog is a thin overlay over the upstream content layers.
+
+| Layer       | Namespace prefix     | Example                                  |
+|-------------|----------------------|------------------------------------------|
+| Metric      | `kpi.` / `kri.`      | `kpi.mttd_critical@v1`                   |
+
+A playbook step references the metrics it contributes a measurement to via:
+
+```yaml
+metric_refs: [kpi.mttd_critical@v1, kri.control_effectiveness@v1]
+```
+
+…and each metric pins back at the playbook step it observes through `playbook_refs[].step_id`, so any dashboard compiler can render a metric beside the step it measures without inferring topology.
 
 ## Validation
 
-Each schema is JSON Schema 2020-12 and is checked by `tests/content_model/test_schemas.py`. The tests also assert the bundled examples validate against their schemas, that the cross-reference graph is closed, and that all three mid-layer schemas share the canonical stable_id pattern with the playbook schema.
+Each schema is JSON Schema 2020-12. `tests/content_model/test_schemas.py` covers the mid-layer schemas and their bundled examples; `tests/content_model/test_metrics_schema.py` covers the metrics schema in isolation; `tests/content_model/test_vuln_intake_example.py` validates every artifact in the worked example, asserts the five-layer cross-reference graph is closed, and checks that each metric input resolves to a sibling artifact.
 
 ## Out of scope
 
