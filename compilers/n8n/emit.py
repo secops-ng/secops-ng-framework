@@ -1,0 +1,584 @@
+"""CACAO → n8n workflow JSON emitter.
+
+The emitter walks the AST returned by ``compilers._shared.cacao_parser`` and
+builds an n8n workflow JSON object — the same shape n8n produces when you
+export a workflow from the UI. Output is import-ready: pipe to
+``n8n import:workflow`` or upload via the n8n REST API.
+
+Translation table
+-----------------
+
+CACAO step type            n8n node type
+-------------------------  -------------------------------------------------
+start                      n8n-nodes-base.manualTrigger
+end                        n8n-nodes-base.noOp           (terminal marker)
+action                     n8n-nodes-base.httpRequest    (if a command of
+                              type http-api/openc2-http is present)
+                           n8n-nodes-base.executeCommand (if a bash command
+                              is present)
+                           n8n-nodes-base.noOp           (otherwise — manual
+                              action placeholder)
+playbook-action            n8n-nodes-base.executeWorkflow
+parallel                   n8n-nodes-base.merge          (fan-out by
+                              connecting all outgoing edges; merge node
+                              fans-in downstream)
+if-condition               n8n-nodes-base.if             (true branch =
+                              on_success, false branch = on_failure)
+while-condition            n8n-nodes-base.if + back-edge (lossy)
+switch-condition           n8n-nodes-base.switch         (mode=rules)
+
+Variables
+---------
+CACAO playbook variables become initial values on the manual trigger node.
+References to ``__variable__`` in command bodies are rewritten as n8n
+expressions ``{{$workflow.variables.variable}}`` so the operator can edit
+them in the n8n UI without re-importing.
+
+Lossy notes
+-----------
+n8n cannot model every CACAO concept. The emitter records each lossy
+translation on ``workflow.meta.secops_ng_notes`` so reviewers can see what
+was simplified without diffing the source playbook.
+
+This module is pure: no I/O beyond the optional ``emit_file`` convenience.
+"""
+
+from __future__ import annotations
+
+import json
+import re
+from collections.abc import Mapping
+from pathlib import Path
+from typing import Any
+
+from compilers._shared.cacao_parser import (
+    Playbook,
+    StepType,
+    WorkflowStep,
+    parse_file,
+)
+
+# --------------------------------------------------------------------------- #
+# Constants                                                                   #
+# --------------------------------------------------------------------------- #
+
+# Node type slugs. Centralised so a future n8n version bump or community
+# node swap is a one-line change.
+_TRIGGER_MANUAL = "n8n-nodes-base.manualTrigger"
+_NOOP = "n8n-nodes-base.noOp"
+_HTTP_REQUEST = "n8n-nodes-base.httpRequest"
+_EXECUTE_COMMAND = "n8n-nodes-base.executeCommand"
+_EXECUTE_WORKFLOW = "n8n-nodes-base.executeWorkflow"
+_IF = "n8n-nodes-base.if"
+_SWITCH = "n8n-nodes-base.switch"
+_MERGE = "n8n-nodes-base.merge"
+
+# typeVersion pinned to the versions stable since n8n 1.0. Emitter ships
+# importable JSON across n8n 1.x; users on older lines can re-pin if needed.
+_TV_TRIGGER = 1
+_TV_NOOP = 1
+_TV_HTTP = 4
+_TV_EXEC = 1
+_TV_EXEC_WORKFLOW = 1
+_TV_IF = 2
+_TV_SWITCH = 3
+_TV_MERGE = 2
+
+# Variable-token pattern in command bodies / argument lists: ``__name__``.
+# Mirrors the convention used in the worked-example playbooks.
+_VAR_TOKEN_RE = re.compile(r"__([A-Za-z_][A-Za-z0-9_]*)__")
+
+# Canvas layout knobs — n8n uses pixel coordinates for the editor canvas.
+# Reference compilers don't need a pretty layout, but n8n refuses to render
+# overlapping nodes well, so we space them out predictably.
+_X_STEP = 260
+_Y_STEP = 180
+_X_ORIGIN = 240
+_Y_ORIGIN = 240
+
+
+# --------------------------------------------------------------------------- #
+# Public API                                                                  #
+# --------------------------------------------------------------------------- #
+
+
+def emit(playbook: Playbook) -> dict[str, Any]:
+    """Emit an n8n workflow JSON object from a parsed CACAO playbook.
+
+    The returned dict is the same shape n8n produces on workflow export.
+    Caller can ``json.dumps`` it directly into a ``.json`` file or POST it
+    to the n8n REST API.
+
+    The output is deterministic — same AST in, byte-identical JSON out (when
+    serialised with ``sort_keys=False`` and ``indent=2``). Determinism is a
+    soft guarantee used by the golden test that lands on the sibling card.
+    """
+    builder = _WorkflowBuilder(playbook)
+    return builder.build()
+
+
+def emit_file(playbook_path: str | Path, out_path: str | Path) -> dict[str, Any]:
+    """Parse a CACAO playbook file and write the n8n workflow JSON to disk.
+
+    Returns the emitted dict for callers that want to inspect or post-process.
+    """
+    playbook = parse_file(playbook_path)
+    workflow = emit(playbook)
+    Path(out_path).write_text(json.dumps(workflow, indent=2) + "\n", encoding="utf-8")
+    return workflow
+
+
+# --------------------------------------------------------------------------- #
+# Builder                                                                     #
+# --------------------------------------------------------------------------- #
+
+
+class _WorkflowBuilder:
+    """Encapsulates the AST → n8n workflow translation.
+
+    Kept as an internal class so the public ``emit()`` surface stays
+    single-call and the per-build state (id maps, lossy notes) doesn't leak
+    across invocations.
+    """
+
+    def __init__(self, playbook: Playbook) -> None:
+        self.playbook = playbook
+        # Stable mapping CACAO step_id → n8n node name. n8n connections are
+        # keyed by node *name*, not by id, so we use the CACAO step name when
+        # it's unique and fall back to the step_id otherwise.
+        self._node_names: dict[str, str] = {}
+        self._notes: list[str] = []
+
+    # -- entrypoint --------------------------------------------------------- #
+
+    def build(self) -> dict[str, Any]:
+        self._assign_node_names()
+
+        nodes: list[dict[str, Any]] = []
+        connections: dict[str, dict[str, Any]] = {}
+
+        for index, (step_id, step) in enumerate(self.playbook.workflow.items()):
+            position = self._layout(index)
+            nodes.append(self._emit_node(step_id, step, position))
+            self._emit_connections(step_id, step, connections)
+
+        meta = {
+            "secops_ng": {
+                "stable_id": self.playbook.x_secops_ng.stable_id,
+                "content_version": self.playbook.x_secops_ng.content_version,
+                "maturity": self.playbook.x_secops_ng.maturity,
+                "source_playbook_id": self.playbook.id,
+            },
+            "secops_ng_notes": list(self._notes),
+        }
+
+        return {
+            "name": self.playbook.name,
+            "nodes": nodes,
+            "connections": connections,
+            "active": False,
+            "settings": {
+                "executionOrder": "v1",
+            },
+            "staticData": None,
+            "tags": list(self.playbook.labels),
+            "pinData": {},
+            "meta": meta,
+        }
+
+    # -- naming ------------------------------------------------------------- #
+
+    def _assign_node_names(self) -> None:
+        """Resolve a unique n8n node name for every CACAO step.
+
+        Strategy: prefer the human-readable ``step.name``; on collision,
+        suffix with ``" (<short-id>)"``. n8n requires globally unique node
+        names within a workflow.
+        """
+        used: set[str] = set()
+        for step_id, step in self.playbook.workflow.items():
+            base = (step.name or step_id).strip() or step_id
+            candidate = base
+            if candidate in used:
+                # short-id is the segment after the first '--' if present
+                short = step_id.split("--", 1)[-1][:8]
+                candidate = f"{base} ({short})"
+                disambig = 1
+                while candidate in used:
+                    disambig += 1
+                    candidate = f"{base} ({short}-{disambig})"
+            used.add(candidate)
+            self._node_names[step_id] = candidate
+
+    def _name_of(self, step_id: str) -> str:
+        return self._node_names[step_id]
+
+    # -- layout ------------------------------------------------------------- #
+
+    def _layout(self, index: int) -> list[int]:
+        # Simple staircase: x grows with index, y oscillates so chains stay
+        # readable in the n8n canvas without a graph-layout dependency.
+        x = _X_ORIGIN + index * _X_STEP
+        y = _Y_ORIGIN + (index % 2) * _Y_STEP
+        return [x, y]
+
+    # -- node emission ------------------------------------------------------ #
+
+    def _emit_node(
+        self,
+        step_id: str,
+        step: WorkflowStep,
+        position: list[int],
+    ) -> dict[str, Any]:
+        node_type, type_version, parameters = self._map_step(step_id, step)
+        return {
+            "id": step_id,
+            "name": self._name_of(step_id),
+            "type": node_type,
+            "typeVersion": type_version,
+            "position": position,
+            "parameters": parameters,
+            "notes": step.description or "",
+            "notesInFlow": bool(step.description),
+        }
+
+    def _map_step(
+        self,
+        step_id: str,
+        step: WorkflowStep,
+    ) -> tuple[str, int, dict[str, Any]]:
+        match step.type:
+            case StepType.START:
+                params: dict[str, Any] = {}
+                # Surface playbook variables on the trigger so operators can
+                # edit them in the n8n UI without re-importing.
+                if self.playbook.playbook_variables:
+                    params["values"] = self._variables_payload()
+                return _TRIGGER_MANUAL, _TV_TRIGGER, params
+
+            case StepType.END:
+                return _NOOP, _TV_NOOP, {}
+
+            case StepType.ACTION:
+                return self._map_action(step)
+
+            case StepType.PLAYBOOK_ACTION:
+                target = ""
+                if step.commands:
+                    cmd0 = step.commands[0]
+                    target = str(
+                        cmd0.get("playbook_id") or cmd0.get("playbook") or ""
+                    )
+                self._notes.append(
+                    f"step {step_id!r} (playbook-action): emits executeWorkflow "
+                    f"with target={target!r}. Sub-playbook compilation is the "
+                    f"operator's responsibility — n8n will not auto-compile it."
+                )
+                return _EXECUTE_WORKFLOW, _TV_EXEC_WORKFLOW, {
+                    "workflowId": target,
+                    "options": {},
+                }
+
+            case StepType.IF_CONDITION:
+                # CACAO if-condition does not carry an explicit expression in
+                # the schema — branching is delegated to the runtime evaluator
+                # via x_secops_ng or extra. The emitter inserts a placeholder
+                # condition so the operator can fill it in n8n. We surface
+                # this as a lossy note.
+                expr = self._extract_condition_expression(step)
+                if not expr:
+                    self._notes.append(
+                        f"step {step_id!r} (if-condition): no machine-readable "
+                        "expression in CACAO source — emitted IF node with "
+                        "placeholder; operator must fill the condition in n8n."
+                    )
+                return _IF, _TV_IF, self._if_parameters(expr)
+
+            case StepType.WHILE_CONDITION:
+                self._notes.append(
+                    f"step {step_id!r} (while-condition): n8n has no native "
+                    "while node. Emitted IF + back-edge approximation; complex "
+                    "loops may require manual rework in n8n."
+                )
+                expr = self._extract_condition_expression(step)
+                return _IF, _TV_IF, self._if_parameters(expr)
+
+            case StepType.SWITCH_CONDITION:
+                cases = self._extract_switch_cases(step)
+                if not cases:
+                    self._notes.append(
+                        f"step {step_id!r} (switch-condition): no cases parsed "
+                        "from CACAO source — emitted Switch node with empty "
+                        "rule set; operator must populate cases in n8n."
+                    )
+                return _SWITCH, _TV_SWITCH, {
+                    "mode": "rules",
+                    "rules": {"values": cases},
+                    "options": {},
+                }
+
+            case StepType.PARALLEL:
+                self._notes.append(
+                    f"step {step_id!r} (parallel): n8n parallelism is implicit "
+                    "(multiple outgoing edges from a node fan out). Emitted "
+                    "Merge node downstream; verify the merge mode in n8n."
+                )
+                return _MERGE, _TV_MERGE, {"mode": "combine", "options": {}}
+
+        # Mypy/exhaustiveness — parser rejects unknown StepType already.
+        raise AssertionError(f"unhandled StepType: {step.type!r}")  # pragma: no cover
+
+    # -- action ------------------------------------------------------------- #
+
+    def _map_action(self, step: WorkflowStep) -> tuple[str, int, dict[str, Any]]:
+        """Pick an n8n node for a CACAO action step.
+
+        Heuristic: first command type wins. Most action steps have one
+        command; multi-command actions are rare in practice and we log a
+        note when we see one.
+        """
+        if not step.commands:
+            self._notes.append(
+                f"step {step.step_id!r}: action with no commands — emitted "
+                "as no-op placeholder. Operator must wire the work in n8n."
+            )
+            return _NOOP, _TV_NOOP, {}
+
+        if len(step.commands) > 1:
+            self._notes.append(
+                f"step {step.step_id!r}: action with {len(step.commands)} "
+                "commands. Only the first is mapped; subsequent commands "
+                "should be split into separate steps."
+            )
+
+        cmd = step.commands[0]
+        cmd_type = str(cmd.get("type", "")).lower()
+
+        if cmd_type in {"http-api", "openc2-http"}:
+            return _HTTP_REQUEST, _TV_HTTP, self._http_parameters(cmd)
+        if cmd_type in {"bash", "sh", "shell"}:
+            command_text = self._interpolate(str(cmd.get("command", "")))
+            return _EXECUTE_COMMAND, _TV_EXEC, {"command": command_text}
+
+        self._notes.append(
+            f"step {step.step_id!r}: command type {cmd_type!r} has no native "
+            "n8n equivalent — emitted as no-op placeholder."
+        )
+        return _NOOP, _TV_NOOP, {}
+
+    def _http_parameters(self, cmd: Mapping[str, Any]) -> dict[str, Any]:
+        url = self._interpolate(str(cmd.get("url", cmd.get("target", ""))))
+        method = str(cmd.get("method", "GET")).upper()
+        headers_raw = cmd.get("headers") or {}
+        body = cmd.get("body")
+
+        params: dict[str, Any] = {
+            "url": url,
+            "method": method,
+            "sendHeaders": bool(headers_raw),
+            "options": {},
+        }
+        if headers_raw:
+            params["headerParameters"] = {
+                "parameters": [
+                    {"name": k, "value": self._interpolate(str(v))}
+                    for k, v in headers_raw.items()
+                ],
+            }
+        if body is not None:
+            params["sendBody"] = True
+            params["bodyContentType"] = "json"
+            params["jsonBody"] = self._interpolate(
+                body if isinstance(body, str) else json.dumps(body)
+            )
+        return params
+
+    # -- conditions --------------------------------------------------------- #
+
+    def _extract_condition_expression(self, step: WorkflowStep) -> str:
+        """Pull a string condition out of CACAO ``extra`` if the playbook
+        author put one there. CACAO v2's IF/WHILE step shape does not require
+        a machine-readable expression, so this is best-effort.
+        """
+        for key in ("condition", "expression", "predicate"):
+            value = step.extra.get(key)
+            if isinstance(value, str) and value.strip():
+                return self._interpolate(value)
+        return ""
+
+    def _if_parameters(self, expression: str) -> dict[str, Any]:
+        # n8n's IF v2 uses a "conditions" object. Without a real CACAO
+        # expression grammar to target, we emit a single string-equality
+        # comparator the operator can edit.
+        return {
+            "conditions": {
+                "options": {
+                    "caseSensitive": True,
+                    "leftValue": "",
+                    "typeValidation": "loose",
+                },
+                "conditions": [
+                    {
+                        "id": "secops_ng_condition",
+                        "leftValue": expression,
+                        "rightValue": "true",
+                        "operator": {
+                            "type": "string",
+                            "operation": "equals",
+                        },
+                    }
+                ],
+                "combinator": "and",
+            },
+            "options": {},
+        }
+
+    def _extract_switch_cases(self, step: WorkflowStep) -> list[dict[str, Any]]:
+        raw = step.extra.get("cases")
+        if not isinstance(raw, list):
+            return []
+        out: list[dict[str, Any]] = []
+        for i, entry in enumerate(raw):
+            if not isinstance(entry, Mapping):
+                continue
+            out.append(
+                {
+                    "conditions": {
+                        "options": {
+                            "caseSensitive": True,
+                            "leftValue": "",
+                            "typeValidation": "loose",
+                        },
+                        "conditions": [
+                            {
+                                "id": f"secops_ng_case_{i}",
+                                "leftValue": self._interpolate(
+                                    str(entry.get("when", ""))
+                                ),
+                                "rightValue": "true",
+                                "operator": {
+                                    "type": "string",
+                                    "operation": "equals",
+                                },
+                            }
+                        ],
+                        "combinator": "and",
+                    },
+                    "renameOutput": True,
+                    "outputKey": str(entry.get("label", f"case_{i}")),
+                }
+            )
+        return out
+
+    # -- connections -------------------------------------------------------- #
+
+    def _emit_connections(
+        self,
+        step_id: str,
+        step: WorkflowStep,
+        connections: dict[str, dict[str, Any]],
+    ) -> None:
+        """Wire one step's outgoing edges into the n8n ``connections`` map.
+
+        n8n shape:
+            connections = {
+              "<source node name>": {
+                "main": [
+                  [ {"node": "<target>", "type": "main", "index": 0}, ... ],
+                  ...
+                ]
+              }
+            }
+
+        Each inner list slot corresponds to an output port (IF: [true, false],
+        SWITCH: per case, everything else: single main port).
+        """
+        src = self._name_of(step_id)
+        ports: list[list[dict[str, Any]]] = []
+
+        if step.type is StepType.IF_CONDITION or step.type is StepType.WHILE_CONDITION:
+            true_targets = self._edge(step.on_success)
+            false_targets = self._edge(step.on_failure)
+            ports = [true_targets, false_targets]
+        elif step.type is StepType.SWITCH_CONDITION:
+            for target in step.next_step_ids():
+                ports.append(self._edge(target))
+            if not ports:
+                ports = [[]]
+        else:
+            targets: list[dict[str, Any]] = []
+            for target_id in step.next_step_ids():
+                targets.extend(self._edge(target_id))
+            ports = [targets] if targets else []
+
+        if not ports:
+            return
+        connections[src] = {"main": ports}
+
+    def _edge(self, target_id: str | None) -> list[dict[str, Any]]:
+        if not target_id:
+            return []
+        if target_id not in self._node_names:
+            # Parser guarantees no dangling refs, but defend against future
+            # parser regressions surfacing here as silent drops.
+            self._notes.append(
+                f"dangling transition target {target_id!r} — dropped from emitted "
+                "workflow. This indicates a parser/AST inconsistency."
+            )
+            return []
+        return [{"node": self._name_of(target_id), "type": "main", "index": 0}]
+
+    # -- variables ---------------------------------------------------------- #
+
+    def _variables_payload(self) -> dict[str, Any]:
+        """Build the manual trigger's ``values`` block from CACAO variables.
+
+        n8n manual triggers can carry an initial assignment dict; we map each
+        CACAO ``playbook_variable`` to an entry of the right primitive type.
+        """
+        entries: list[dict[str, Any]] = []
+        for name, var in self.playbook.playbook_variables.items():
+            entries.append(
+                {
+                    "name": name,
+                    "type": _n8n_type_for(var.type_),
+                    "value": var.value if var.value is not None else "",
+                    "description": var.description or "",
+                }
+            )
+        return {"values": entries}
+
+    def _interpolate(self, text: str) -> str:
+        """Rewrite ``__var__`` references to n8n expression syntax.
+
+        Example: ``"GET /api/v1/findings/__finding_id__"`` becomes
+        ``"GET /api/v1/findings/{{$workflow.variables.finding_id}}"``.
+        Untouched if no token is present.
+        """
+        if not text:
+            return text
+
+        def _sub(match: re.Match[str]) -> str:
+            name = match.group(1)
+            return f"{{{{$workflow.variables.{name}}}}}"
+
+        return _VAR_TOKEN_RE.sub(_sub, text)
+
+
+# --------------------------------------------------------------------------- #
+# helpers                                                                     #
+# --------------------------------------------------------------------------- #
+
+
+def _n8n_type_for(cacao_type: str) -> str:
+    """Map a CACAO variable ``type`` to n8n's set initial-value type slug."""
+    t = cacao_type.lower()
+    if t in {"integer", "long"}:
+        return "number"
+    if t in {"float", "double", "number"}:
+        return "number"
+    if t == "boolean":
+        return "boolean"
+    if t in {"dictionary", "object"}:
+        return "object"
+    return "string"
