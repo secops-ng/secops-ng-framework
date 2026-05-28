@@ -9,10 +9,12 @@ source code that compiles against the ``temporalio`` SDK. It emits:
   stable_id — compile lowering (transitions, branching, parallel) is tracked
   on a separate card.
 - One ``@activity.defn`` async function per CACAO ``action`` /
-  ``playbook-action`` step. Each activity body raises
-  ``NotImplementedError`` carrying the CACAO step_id, so a Temporal worker
-  registering these stubs will fail loudly with a deterministic message
-  pointing at the source step.
+  ``playbook-action`` step. Each activity is typed against the playbook's
+  variable schema (see :mod:`compilers.temporal.bindings`) and carries a
+  module-level ``RetryPolicy`` template constant.
+- Per-step ``@workflow.signal`` and ``@workflow.query`` handlers on the
+  workflow class for any action step whose CACAO ``commands`` list marks
+  it as human-in-the-loop (``type == "manual"``).
 
 No business logic is emitted. The output is a scaffold an integrator fills
 in; the CACAO playbook is the source of truth, not this file.
@@ -37,6 +39,14 @@ from compilers._shared.cacao_parser import (
     StepType,
     WorkflowStep,
     parse_file,
+)
+
+from .bindings import (
+    RetryPolicySpec,
+    activity_signature,
+    is_hitl_step,
+    retry_policy_for,
+    signal_query_handlers,
 )
 
 __all__ = ["DEFAULT_HEADER", "emit", "emit_file"]
@@ -127,28 +137,79 @@ def _py_repr(value: str) -> str:
     return repr(value)
 
 
-def _render_activity(step: WorkflowStep, fn_name: str) -> str:
-    """Render one ``@activity.defn`` async function stub for an action step."""
+def _render_retry_constant(fn_name: str, spec: RetryPolicySpec) -> str:
+    """Emit a module-level ``<FN_NAME>_RETRY_POLICY`` constant for an activity.
+
+    The integrator imports this alongside the activity function when
+    registering the workflow, so retry behaviour is colocated with the
+    activity it governs.
+    """
+    return (
+        f"{fn_name.upper()}_RETRY_POLICY = RetryPolicy(\n"
+        f"    initial_interval=timedelta(seconds={spec.initial_interval_seconds}),\n"
+        f"    maximum_interval=timedelta(seconds={spec.maximum_interval_seconds}),\n"
+        f"    backoff_coefficient={spec.backoff_coefficient},\n"
+        f"    maximum_attempts={spec.maximum_attempts},\n"
+        f")\n"
+    )
+
+
+def _render_activity(step: WorkflowStep, fn_name: str, playbook: Playbook) -> str:
+    """Render one ``@activity.defn`` async function stub for an action step.
+
+    The signature is derived from the step's ``in_args`` / ``out_args`` via
+    :func:`compilers.temporal.bindings.activity_signature` so an integrator
+    sees the typed contract immediately and a type-checker can flag
+    drifting playbooks before runtime.
+    """
+    sig = activity_signature(step, playbook)
     description = (step.description or step.name or "").strip()
     docline = description.replace('"""', '\\"\\"\\"')
+    hitl_note = ""
+    if is_hitl_step(step):
+        hitl_note = (
+            "    # CACAO `manual` command — this activity is the side-effect half of\n"
+            "    # a human-in-the-loop step. The workflow class above carries the\n"
+            "    # matching @workflow.signal and @workflow.query handlers.\n"
+        )
     return (
         f"@activity.defn\n"
-        f"async def {fn_name}() -> None:\n"
+        f"async def {fn_name}({sig.params}) -> {sig.return_type}:\n"
         f'    """{docline}\n\n'
         f"    CACAO step_id: {step.step_id}\n"
         f'    """\n'
+        f"{hitl_note}"
         f"    raise NotImplementedError(\n"
         f"        f\"CACAO action stub not implemented: step_id={_py_repr(step.step_id)}\"\n"
         f"    )\n"
     )
 
 
-def _render_workflow_class(playbook: Playbook, class_name: str, activity_names: dict[str, str]) -> str:
+def _render_workflow_class(
+    playbook: Playbook,
+    class_name: str,
+    activity_names: dict[str, str],
+) -> str:
     """Render the single ``@workflow.defn`` class for the playbook."""
     x = playbook.x_secops_ng
     activity_refs = ", ".join(activity_names.values()) or "(none)"
     description = (playbook.description or playbook.name or "").strip()
     docline = description.replace('"""', '\\"\\"\\"')
+
+    # HITL signal/query handlers come first so the run() entry point sits
+    # at the bottom of the class — easier to spot when integrators open the
+    # generated file.
+    handler_blocks: list[str] = []
+    for step_id, fn_name in activity_names.items():
+        step = playbook.workflow[step_id]
+        if is_hitl_step(step):
+            handler_blocks.append(signal_query_handlers(step, fn_name))
+
+    handlers = "\n".join(handler_blocks)
+    if handlers:
+        # Ensure exactly one blank line between handler block and @workflow.run.
+        handlers = handlers.rstrip() + "\n\n"
+
     return (
         f"@workflow.defn\n"
         f"class {class_name}:\n"
@@ -160,6 +221,7 @@ def _render_workflow_class(playbook: Playbook, class_name: str, activity_names: 
         f"    workflow_start    : {playbook.workflow_start}\n"
         f"    activities        : {activity_refs}\n"
         f'    """\n\n'
+        f"{handlers}"
         f"    @workflow.run\n"
         f"    async def run(self) -> None:\n"
         f"        raise NotImplementedError(\n"
@@ -183,12 +245,18 @@ def emit(playbook: Playbook, *, header: str = DEFAULT_HEADER) -> str:
     parts.append('"""Generated Temporal stub. See module-level metadata in the workflow docstring."""\n')
     parts.append("from __future__ import annotations\n")
     parts.append("\n")
+    parts.append("from datetime import timedelta\n")
+    parts.append("\n")
     parts.append("from temporalio import activity, workflow\n")
+    parts.append("from temporalio.common import RetryPolicy\n")
     parts.append("\n")
     parts.append("\n")
 
     for step_id, fn_name in activity_names.items():
-        parts.append(_render_activity(playbook.workflow[step_id], fn_name))
+        step = playbook.workflow[step_id]
+        parts.append(_render_activity(step, fn_name, playbook))
+        parts.append("\n")
+        parts.append(_render_retry_constant(fn_name, retry_policy_for(step)))
         parts.append("\n")
 
     parts.append(_render_workflow_class(playbook, class_name, activity_names))
@@ -201,6 +269,13 @@ def emit(playbook: Playbook, *, header: str = DEFAULT_HEADER) -> str:
         activity_tuple = activity_tuple + ","
     parts.append(f"WORKFLOW = {class_name}\n")
     parts.append(f"ACTIVITIES = ({activity_tuple})\n")
+
+    # Retry-policy registry — same iteration order as ACTIVITIES so the
+    # integrator can zip them when registering with a Temporal worker.
+    retry_tuple = ", ".join(f"{fn.upper()}_RETRY_POLICY" for fn in activity_names.values())
+    if retry_tuple:
+        retry_tuple = retry_tuple + ","
+    parts.append(f"RETRY_POLICIES = ({retry_tuple})\n")
 
     return "".join(parts)
 

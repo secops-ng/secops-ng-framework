@@ -57,18 +57,30 @@ def _temporalio_stub() -> types.ModuleType:
         return fn
 
     activity = types.SimpleNamespace(defn=passthrough)
-    workflow = types.SimpleNamespace(defn=passthrough, run=passthrough)
+    workflow = types.SimpleNamespace(
+        defn=passthrough, run=passthrough, signal=passthrough, query=passthrough
+    )
+
+    class RetryPolicy:
+        def __init__(self, **kwargs):
+            for k, v in kwargs.items():
+                setattr(self, k, v)
+
+    common = types.SimpleNamespace(RetryPolicy=RetryPolicy)
     pkg = types.ModuleType("temporalio")
     pkg.activity = activity  # type: ignore[attr-defined]
     pkg.workflow = workflow  # type: ignore[attr-defined]
+    pkg.common = common  # type: ignore[attr-defined]
     return pkg
 
 
 def _load_module(source: str, name: str = "_temporal_stub_under_test") -> types.ModuleType:
     """Import a string of source as a fresh module with temporalio stubbed."""
-    sys.modules.setdefault("temporalio", _temporalio_stub())
-    sys.modules["temporalio.activity"] = sys.modules["temporalio"].activity  # type: ignore[assignment]
-    sys.modules["temporalio.workflow"] = sys.modules["temporalio"].workflow  # type: ignore[assignment]
+    pkg = _temporalio_stub()
+    sys.modules["temporalio"] = pkg
+    sys.modules["temporalio.activity"] = pkg.activity  # type: ignore[assignment]
+    sys.modules["temporalio.workflow"] = pkg.workflow  # type: ignore[assignment]
+    sys.modules["temporalio.common"] = pkg.common  # type: ignore[assignment]
     spec = importlib.util.spec_from_loader(name, loader=None)
     assert spec is not None
     module = importlib.util.module_from_spec(spec)
@@ -125,6 +137,7 @@ def test_one_activity_per_action_step(playbook):
 
 def test_activities_raise_not_implemented_with_step_id(playbook):
     import asyncio
+    import inspect
 
     mod = _load_module(emit_str(playbook))
     action_step_ids = [
@@ -132,8 +145,12 @@ def test_activities_raise_not_implemented_with_step_id(playbook):
     ]
     seen_ids: set[str] = set()
     for fn in mod.ACTIVITIES:
+        # Activities are now typed; pass placeholder positionals derived from
+        # the resolved signature so we exercise the NotImplementedError body.
+        sig = inspect.signature(fn)
+        kwargs = {name: None for name in sig.parameters}
         with pytest.raises(NotImplementedError) as exc:
-            asyncio.run(fn())
+            asyncio.run(fn(**kwargs))
         msg = str(exc.value)
         # Exactly one action step_id appears in each error message.
         matches = [sid for sid in action_step_ids if sid in msg]

@@ -1,0 +1,85 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+  "name": "Incident escalation with human approval (bindings fixture)",
+  "description": "CACAO playbook fixture exercising the Temporal compiler's activity-binding + signal-hook generator. Contains a HITL action (CACAO `manual` command) and a playbook-action with typed in/out arguments derived from the playbook variable schema.",
+  "playbook_types": ["mitigation"],
+  "created_by": "identity--dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+  "created": "2026-05-28T00:00:00Z",
+  "modified": "2026-05-28T00:00:00Z",
+  "labels": ["incident-response", "hitl", "fixture"],
+  "playbook_variables": {
+    "__incident_id__": {
+      "type": "string",
+      "description": "Identifier of the incident under escalation.",
+      "external": true
+    },
+    "__owner_email__": {
+      "type": "string",
+      "description": "Email of the on-call owner the approval is routed to.",
+      "external": true
+    },
+    "__approved__": {
+      "type": "boolean",
+      "description": "Human approval decision."
+    },
+    "__ticket_url__": {
+      "type": "uri",
+      "description": "URL of the ticket opened downstream."
+    },
+    "__retry_count__": {
+      "type": "integer",
+      "description": "Number of times escalation has been retried."
+    }
+  },
+  "workflow_start": "start--11111111-1111-4111-8111-111111111111",
+  "workflow": {
+    "start--11111111-1111-4111-8111-111111111111": {
+      "type": "start",
+      "name": "escalation-start",
+      "on_completion": "action--22222222-2222-4222-8222-222222222222"
+    },
+    "action--22222222-2222-4222-8222-222222222222": {
+      "type": "action",
+      "name": "request human approval",
+      "description": "Page the on-call owner and wait for an approve/deny decision.",
+      "on_completion": "if-condition--33333333-3333-4333-8333-333333333333",
+      "in_args": ["__incident_id__", "__owner_email__"],
+      "out_args": ["__approved__"],
+      "commands": [
+        {
+          "type": "manual",
+          "description": "Operator confirms or denies escalation in the on-call UI."
+        }
+      ]
+    },
+    "if-condition--33333333-3333-4333-8333-333333333333": {
+      "type": "if-condition",
+      "name": "approved?",
+      "on_success": "playbook-action--44444444-4444-4444-8444-444444444444",
+      "on_failure": "end--66666666-6666-4666-8666-666666666666"
+    },
+    "playbook-action--44444444-4444-4444-8444-444444444444": {
+      "type": "playbook-action",
+      "name": "open mitigation ticket",
+      "description": "Invoke the canonical ticketing sub-playbook to record the mitigation.",
+      "on_completion": "end--66666666-6666-4666-8666-666666666666",
+      "in_args": ["__incident_id__"],
+      "out_args": ["__ticket_url__", "__retry_count__"]
+    },
+    "end--66666666-6666-4666-8666-666666666666": {
+      "type": "end",
+      "name": "escalation-end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.incident_escalation_hitl@v1",
+    "content_version": "0.1.0",
+    "maturity": "draft",
+    "compile_targets": ["temporal"],
+    "sources": [
+      "OASIS CACAO v2.0 specification — `manual` command type"
+    ]
+  }
+}
