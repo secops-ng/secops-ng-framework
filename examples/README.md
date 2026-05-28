@@ -1,6 +1,12 @@
-# examples/
+# Examples
 
-End-to-end demos. One canonical playbook compiled to all three reference
-targets, with the inputs, generated outputs, and a short walkthrough.
+Worked examples that show end-to-end use of SecOps-NG content artifacts
+(CACAO playbooks, mappings, OCSF shapes, KPI/KRI catalog) through the
+reference compilers into the orchestrator targets.
 
-First example lands alongside the first compiler.
+## Index
+
+- `langgraph/` — agentic reference target. Worked example of a CACAO
+  playbook compiled to a runnable LangGraph agent graph.
+
+Additional targets (n8n, Temporal) will land alongside their compilers.
