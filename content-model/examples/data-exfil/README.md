@@ -85,7 +85,7 @@ parser fixture suite when CORE wires the compilers against this skeleton.
 
 - Not a runnable playbook. Compile targets (n8n / Temporal / LangGraph)
   are the SKELETON's downstream consumers; runnable artifacts are
-  authored by the CORE card (`t_41811424`).
+  authored by the CORE card.
 - Not authoritative for upstream rule IDs (Sigma), control catalog
   control-ids (OSCAL / NIST 800-53 / ISO 27001), event class UIDs (OCSF),
   or D3FEND technique IDs. Upstream sources are pinned by URL plus a
@@ -96,7 +96,7 @@ parser fixture suite when CORE wires the compilers against this skeleton.
   The `__regulator_required__` variable is evaluated against the
   operator's regulator-routing policy — itself bound at compile time by
   the mapping pack the operator selects (NIS2 Art. 23 / DORA Art. 19 /
-  GDPR Art. 33). The EXTEND card (`t_9635932c`) cross-references those
+  GDPR Art. 33). The EXTEND card cross-references those
   mapping packs against this playbook.
 
 ## Out of scope here

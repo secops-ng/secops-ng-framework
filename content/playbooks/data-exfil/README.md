@@ -19,7 +19,7 @@ there for the cross-reference graph and per-artifact stable IDs.
 
 `compile_targets` declares `["n8n", "temporal", "langgraph"]`. Emitted
 artifacts under `examples/{n8n,temporal,langgraph}/data-exfil/` are
-authored by the CORE card (`t_41811424`); this directory ships the
+authored by the CORE card; this directory ships the
 portable content only.
 
 ## Sources
