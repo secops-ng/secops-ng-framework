@@ -129,8 +129,7 @@ Article 23 is an event-driven obligation owned by
 
 - **Article 6** — *ICT risk-management framework, including periodic
   review*. The rollup is the workflow that produces the periodic
-  review artifact. The mapping pack for Article 6 is not yet wired —
-  see `needs_review` below.
+  review artifact. The mapping pack for Article 6 is not yet wired.
 - **Article 19** is the incident-reporting obligation surface and is
   owned by the response playbooks, not by this rollup.
 
