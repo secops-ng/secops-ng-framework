@@ -1,0 +1,68 @@
+{
+  "stable_id": "kri.recurring_cloud_misconfig@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kri",
+  "title": "Recurring cloud misconfiguration — same resource, same control, repeated deviation",
+  "summary": "Count of cloud resources flagged with the same control deviation more than once in a rolling 30-day window. A non-zero value signals that guided-remediation closed the symptom but the deviation-source (IaC drift, missing guardrail, owner gap) was not addressed. DORA Article 18(2) treats recurring incidents sharing a root cause as major; this KRI is the cloud-posture analogue at the control-effectiveness layer.",
+  "unit": "count",
+  "direction": "lower_is_better",
+  "target": {
+    "value": 0,
+    "comparator": "<=",
+    "rationale": "Zero recurrence is the steady-state target: a remediation should hold."
+  },
+  "thresholds": [
+    { "name": "warn",   "comparator": ">", "value": 0,  "severity": "warn" },
+    { "name": "breach", "comparator": ">", "value": 5,  "severity": "high" }
+  ],
+  "measurement": {
+    "source": "workflow",
+    "aggregation": "count",
+    "formula": "count( resource_uid where same (resource_uid, deviation_class) appears in >1 distinct playbook run within window ).",
+    "inputs": [
+      {
+        "name": "runs",
+        "playbook_ref": "playbook.cloud_misconfiguration@v1",
+        "playbook_step": "action--30000000-0000-4000-8000-000000000002",
+        "description": "ingest-finding step executions in window, keyed by (resource_uid, deviation_class)"
+      },
+      {
+        "name": "verified_close",
+        "playbook_ref": "playbook.cloud_misconfiguration@v1",
+        "playbook_step": "action--30000000-0000-4000-8000-000000000008",
+        "description": "re-scan step verifying remediation; recurrence is measured against verified-closed prior runs"
+      }
+    ],
+    "window": { "duration": "P30D", "sliding": true }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.cloud_misconfiguration@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000002"
+    }
+  ],
+  "control_refs": [
+    "control.cspm_baseline@v1",
+    "control.iac_policy_guardrail@v1",
+    "control.cloud_identity_least_privilege@v1"
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.compliance_finding@v1"
+  ],
+  "external_refs": [
+    {
+      "name": "DORA Regulation (EU) 2022/2554, Article 18(2) — recurring incidents",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+      "external_id": "32022R2554"
+    },
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 21(2)(f) — assessing effectiveness",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+      "external_id": "32022L2555"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}

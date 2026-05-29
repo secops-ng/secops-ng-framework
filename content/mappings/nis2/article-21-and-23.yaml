@@ -113,11 +113,17 @@ entries:
     control_refs:
       - control.sbom_capture@v1
       - control.vuln_disclosure_intake@v1
+      - control.cspm_baseline@v1
+      - control.iac_policy_guardrail@v1
     playbook_refs:
       - playbook.vuln_intake@v1
+      - playbook.cloud_misconfiguration@v1
     metric_refs:
       - kpi.vuln_disclosure_sla@v1
       - kri.releases_without_sbom@v1
+      - kpi.mttd_cloud_misconfig@v1
+      - kpi.mttr_cloud_misconfig@v1
+      - kri.recurring_cloud_misconfig@v1
     notes: >-
       Overlaps the CRA scope on SBOM production and on coordinated
       vulnerability disclosure; mappings/cra/ entries point at the same
@@ -202,11 +208,14 @@ entries:
       - control.jml_evidence@v1
       - control.privileged_access_review@v1
       - control.asset_inventory_delta@v1
+      - control.cloud_identity_least_privilege@v1
     playbook_refs:
       - playbook.identity_compromise@v1
+      - playbook.cloud_misconfiguration@v1
     metric_refs:
       - kri.orphaned_privileged_accounts@v1
       - kri.asset_inventory_drift@v1
+      - kpi.cloud_posture_coverage@v1
 
   - id: nis2:art-21-2-j
     regulation:

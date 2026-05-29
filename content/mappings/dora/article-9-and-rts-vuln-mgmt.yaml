@@ -25,11 +25,18 @@ entries:
     status: draft
     control_refs:
       - control.vuln_disclosure_intake@v1
+      - control.cspm_baseline@v1
+      - control.iac_policy_guardrail@v1
     playbook_refs:
       - playbook.vuln_intake@v1
+      - playbook.cloud_misconfiguration@v1
     metric_refs:
       - kpi.vuln_disclosure_sla@v1
       - kri.cvd_intake_aging@v1
+      - kpi.mttd_cloud_misconfig@v1
+      - kpi.mttr_cloud_misconfig@v1
+      - kpi.cloud_posture_coverage@v1
+      - kri.recurring_cloud_misconfig@v1
     notes: >-
       Level 1 anchor is DORA Art 9(4)(a) (information security policy);
       the operative detail is in the Level 2 RTS — Commission Delegated

@@ -1,0 +1,55 @@
+{
+  "stable_id": "control.iac_policy_guardrail@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Infrastructure-as-code policy guardrail",
+  "summary": "Pre-deployment policy-as-code guardrail (Open Policy Agent / Checkov / Conftest / provider-native equivalent) that evaluates IaC changes against the operator's posture policy before they reach the control plane. Pairs with the CSPM baseline: the guardrail prevents deviations from landing, the CSPM baseline catches what slipped through.",
+  "oscal": {
+    "component": {
+      "uuid": "7b8c9d0e-1f2a-4b3c-9d4e-5f6a7b8c9d0e",
+      "type": "service",
+      "title": "IaC policy guardrail",
+      "description": "Pre-merge / pre-apply policy enforcement on infrastructure-as-code changes.",
+      "control-implementations": [
+        {
+          "uuid": "6a7b8c9d-0e1f-4022-9314-b5c6d7e8f0a1",
+          "source": "https://doi.org/10.6028/NIST.SP.800-53r5",
+          "description": "Implements configuration management gating at change-introduction time.",
+          "implemented-requirements": [
+            {
+              "uuid": "ef020001-0001-0001-0001-000000000001",
+              "control-id": "cm-3",
+              "description": "Configuration change control: changes are reviewed against the configured baseline before approval."
+            },
+            {
+              "uuid": "ef020001-0001-0001-0001-000000000002",
+              "control-id": "cm-7",
+              "description": "Least functionality: guardrail blocks resource types and configurations not on the allow-list."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "d3fend": {
+    "technique_id": "D3-SCP",
+    "technique_name": "System Configuration Permissions",
+    "url": "https://d3fend.mitre.org/technique/d3f:SystemConfigurationPermissions/"
+  },
+  "attack_counters": [],
+  "telemetry_refs": [
+    "telemetry.ocsf.compliance_finding@v1"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.cloud_misconfiguration@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000007"
+    }
+  ],
+  "maintainer": "controls-wg@secops-ng.org",
+  "sources": [
+    "NIST SP 800-53 Rev. 5 — CM-3 Configuration Change Control, CM-7 Least Functionality",
+    "ENISA — Cloud Security: posture-management guidance",
+    "MITRE D3FEND v1.0.0 — D3-SCP System Configuration Permissions"
+  ]
+}
