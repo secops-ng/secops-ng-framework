@@ -1,0 +1,333 @@
+{
+  "name": "Data exfiltration response",
+  "nodes": [
+    {
+      "id": "start--20000000-0000-4000-8000-000000000001",
+      "name": "exfil-start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__signal_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the originating DLP / egress signal supplied by the detection layer."
+            },
+            {
+              "name": "__data_classification__",
+              "type": "string",
+              "value": "",
+              "description": "Resolved data classification of the affected payload (e.g. public, internal, confidential, restricted, special-category). Drives both containment and notification routing."
+            },
+            {
+              "name": "__affected_subjects_count__",
+              "type": "number",
+              "value": "",
+              "description": "Estimated count of data subjects whose data is in scope after assessment. Feeds the regulator-threshold gate."
+            },
+            {
+              "name": "__exfil_confirmed__",
+              "type": "boolean",
+              "value": "",
+              "description": "Whether scope assessment confirmed actual exfiltration. False signals trigger close-out, not containment."
+            },
+            {
+              "name": "__regulator_required__",
+              "type": "boolean",
+              "value": "",
+              "description": "Whether the affected-subjects count and data classification together cross the regulator-notification threshold (NIS2 Art. 23 / DORA Art. 19 / GDPR Art. 33 routing)."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--20000000-0000-4000-8000-000000000002",
+      "name": "triage signal",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {},
+      "notes": "Receive the DLP / egress signal, hydrate it with originating user / asset / destination context, and decide whether the signal warrants scope assessment or is a known benign egress pattern.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--20000000-0000-4000-8000-000000000003",
+      "name": "scope assessment",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {},
+      "notes": "Determine the volume and classification of data observed leaving the boundary, the count of distinct data subjects affected, and whether actual exfiltration occurred or was prevented by an in-line control. Produces __data_classification__, __affected_subjects_count__, and __exfil_confirmed__.",
+      "notesInFlow": true
+    },
+    {
+      "id": "if-condition--20000000-0000-4000-8000-000000000004",
+      "name": "exfil confirmed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "secops_ng_condition",
+              "leftValue": "",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "notes": "Branch on __exfil_confirmed__. True paths into containment; false closes the incident out with no regulator-facing action (the close-out itself is logged for the false-positive KPI by an out-of-scope card).",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--20000000-0000-4000-8000-000000000005",
+      "name": "containment",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {},
+      "notes": "Apply containment proportionate to data classification and scope: revoke session tokens, isolate the originating identity / host, force a credential rotation, and tighten the egress policy on the destination(s) named in the signal. Bounded by the operator-supplied authorisation policy.",
+      "notesInFlow": true
+    },
+    {
+      "id": "if-condition--20000000-0000-4000-8000-000000000006",
+      "name": "regulator notification threshold met?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "secops_ng_condition",
+              "leftValue": "",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "notes": "Evaluate __regulator_required__ against the affected-subjects count and data classification per the operator's regulator-routing policy (NIS2 Art. 23, DORA Art. 19, GDPR Art. 33). True branches into regulator notification; in either branch the customer notification path is reached.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--20000000-0000-4000-8000-000000000007",
+      "name": "notify regulator",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {},
+      "notes": "Compose and send the regulator notification along the operator's pre-bound channel (national CSIRT for NIS2, competent authority for DORA, supervisory authority for GDPR). The notification payload is a structured incident finding sourced from the scope-assessment outputs.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--20000000-0000-4000-8000-000000000008",
+      "name": "notify customer",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2060,
+        420
+      ],
+      "parameters": {},
+      "notes": "Notify affected customers / data subjects via the operator's pre-bound channel. Tracked separately from regulator notification so the SLA-compliance KPI can report the two timelines independently.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--20000000-0000-4000-8000-000000000009",
+      "name": "exfil-end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2320,
+        240
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "exfil-start": {
+      "main": [
+        [
+          {
+            "node": "triage signal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "triage signal": {
+      "main": [
+        [
+          {
+            "node": "scope assessment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "scope assessment": {
+      "main": [
+        [
+          {
+            "node": "exfil confirmed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "exfil confirmed?": {
+      "main": [
+        [
+          {
+            "node": "containment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "exfil-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "containment": {
+      "main": [
+        [
+          {
+            "node": "regulator notification threshold met?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "regulator notification threshold met?": {
+      "main": [
+        [
+          {
+            "node": "notify regulator",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "notify customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "notify regulator": {
+      "main": [
+        [
+          {
+            "node": "notify customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "notify customer": {
+      "main": [
+        [
+          {
+            "node": "exfil-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "data-exfiltration",
+    "dlp",
+    "nis2",
+    "dora",
+    "notification-gate"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.data_exfil@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7"
+    },
+    "secops_ng_notes": [
+      "step 'action--20000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--20000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'if-condition--20000000-0000-4000-8000-000000000004' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
+      "step 'action--20000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'if-condition--20000000-0000-4000-8000-000000000006' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
+      "step 'action--20000000-0000-4000-8000-000000000007': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--20000000-0000-4000-8000-000000000008': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n."
+    ]
+  }
+}
