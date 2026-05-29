@@ -1,0 +1,61 @@
+{
+  "stable_id": "control.corrective_action_register@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Corrective-action register and close-out tracking",
+  "summary": "Operator-owned register that captures every corrective action raised by a post-incident review with a unique identifier, owner, due date, and status. The control is satisfied when each open action is reviewed against its due date in every reporting window and overdue items are escalated. The register is the durable persistence surface behind the post-incident-review playbook's corrective-action-tracking step.",
+  "oscal": {
+    "component": {
+      "uuid": "8f2a1b3c-4d5e-4f6a-9b8c-0d1e2f3a4b5c",
+      "type": "process",
+      "title": "Corrective-action programme",
+      "description": "Operator-owned process that registers, owns, and closes corrective actions raised by post-incident reviews, control-effectiveness tests, and audit findings.",
+      "control-implementations": [
+        {
+          "uuid": "2a3b4c5d-6e7f-4081-9293-a4b5c6d7e8fa",
+          "source": "https://doi.org/10.6028/NIST.SP.800-53r5",
+          "description": "Implements the lessons-learned, plan-of-action-and-milestones, and continuous-improvement requirements.",
+          "implemented-requirements": [
+            {
+              "uuid": "cdef0002-0002-0002-0002-000000000001",
+              "control-id": "ca-5",
+              "description": "Plan of action and milestones: corrective actions raised by post-incident review are tracked to closure with owner and due date."
+            },
+            {
+              "uuid": "cdef0002-0002-0002-0002-000000000002",
+              "control-id": "ir-4",
+              "description": "Incident handling: corrective actions feed back into incident-response procedures, training, and testing."
+            },
+            {
+              "uuid": "cdef0002-0002-0002-0002-000000000003",
+              "control-id": "pm-4",
+              "description": "Plan of action and milestones process: organisation-wide programme management of corrective actions."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "d3fend": {
+    "technique_id": "D3-OAM",
+    "technique_name": "Operational Activity Mapping",
+    "url": "https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/"
+  },
+  "attack_counters": [],
+  "detected_by": [],
+  "telemetry_refs": [
+    "telemetry.ocsf.incident_finding@v1"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.post_incident_review@v1",
+      "step_id": "action--40000000-0000-4000-8000-000000000004"
+    }
+  ],
+  "maintainer": "controls-wg@secops-ng.org",
+  "sources": [
+    "NIST SP 800-53 Rev. 5 \u2014 CA-5 Plan of Action and Milestones, IR-4 Incident Handling, PM-4 Plan of Action and Milestones Process",
+    "ENISA \u2014 Good Practices for Supply Chain Cybersecurity (corrective action follow-through)",
+    "MITRE D3FEND v1.0.0 \u2014 D3-OAM Operational Activity Mapping"
+  ]
+}

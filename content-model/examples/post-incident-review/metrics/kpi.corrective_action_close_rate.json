@@ -1,0 +1,72 @@
+{
+  "stable_id": "kpi.corrective_action_close_rate@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Corrective-action close rate",
+  "summary": "Share of corrective actions registered by the post-incident-review playbook that reach a closed status before their due date in the reporting window. The corrective-action register is the persistence surface behind the corrective-action-tracking step; this KPI is the close-rate side of the same register that the overdue KRI watches as a risk signal. Higher is better.",
+  "unit": "ratio",
+  "direction": "higher_is_better",
+  "target": {
+    "value": 0.9,
+    "comparator": ">=",
+    "rationale": "Programme target on top of NIS2 Art. 21(2)(b) and DORA Art. 19(4)(c) lessons-learned obligations."
+  },
+  "thresholds": [
+    {
+      "name": "warn",
+      "comparator": "<",
+      "value": 0.8,
+      "severity": "warn"
+    },
+    {
+      "name": "breach",
+      "comparator": "<",
+      "value": 0.6,
+      "severity": "high"
+    }
+  ],
+  "measurement": {
+    "source": "control",
+    "aggregation": "ratio",
+    "formula": "count( actions where status=='closed' AND closed_at <= due_date ) / count( actions in window )",
+    "inputs": [
+      {
+        "name": "register",
+        "control_ref": "control.corrective_action_register@v1",
+        "description": "operator-owned corrective-action register read at window close"
+      }
+    ],
+    "window": {
+      "duration": "P90D",
+      "sliding": true
+    }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.post_incident_review@v1",
+      "step_id": "action--40000000-0000-4000-8000-000000000004"
+    }
+  ],
+  "control_refs": [
+    "control.corrective_action_register@v1"
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.incident_finding@v1"
+  ],
+  "external_refs": [
+    {
+      "name": "NIS2 Article 21(2)(b) \u2014 incident handling (lessons learned)",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+      "external_id": "32022L2555"
+    },
+    {
+      "name": "DORA Article 19(4)(c) \u2014 final report lessons learned and action plan",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+      "external_id": "32022R2554"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}
