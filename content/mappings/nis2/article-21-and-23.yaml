@@ -43,6 +43,7 @@ entries:
       - playbook.ransomware_containment@v1
       - playbook.data_exfil@v1
       - playbook.post_incident_review@v1
+      - playbook.on_call_rotation@v1
     metric_refs:
       - kpi.mttd@v1
       - kpi.mttr@v1
@@ -50,6 +51,10 @@ entries:
       - kpi.mttd_phishing@v1
       - kpi.mttr_phishing_triage@v1
       - kri.phishing_suppression_rate@v1
+      - kpi.coverage_on_call_schedule@v1
+      - kpi.mttr_on_call_ack@v1
+      - kpi.handoff_brief_delivery_sla@v1
+      - kri.escalation_tier_breach@v1
       - kpi.timeline_completeness@v1
       - kpi.corrective_action_close_rate@v1
       - kri.corrective_action_overdue@v1
@@ -247,11 +252,20 @@ entries:
       - playbook.ransomware_containment@v1
       - playbook.data_exfil@v1
       - playbook.identity_compromise@v1
+      - playbook.on_call_rotation@v1
     metric_refs:
       - kpi.early_warning_on_time@v1
       - kri.early_warning_missed@v1
       - kpi.notification_sla_compliance@v1
       - kri.regulator_notification_overrun@v1
+      - kpi.mttr_on_call_ack@v1
+      - kpi.coverage_on_call_schedule@v1
+      - kri.escalation_tier_breach@v1
+    notes: >-
+      On-call rotation is listed here because the page-to-ack latency
+      and rotation coverage are the head of the early-warning clock:
+      an unbound primary slot or a slow ack delays the 24h window
+      regardless of how fast the downstream notification step runs.
 
   - id: nis2:art-23-notification-72h
     regulation:

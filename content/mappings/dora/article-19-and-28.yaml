@@ -55,11 +55,15 @@ entries:
       - playbook.ransomware_containment@v1
       - playbook.data_exfil@v1
       - playbook.identity_compromise@v1
+      - playbook.on_call_rotation@v1
     metric_refs:
       - kpi.dora_initial_4h_on_time@v1
       - kri.dora_initial_missed@v1
       - kpi.notification_sla_compliance@v1
       - kri.regulator_notification_overrun@v1
+      - kpi.mttr_on_call_ack@v1
+      - kpi.coverage_on_call_schedule@v1
+      - kri.escalation_tier_breach@v1
     notes: >-
       Submission content shape is Commission Implementing Regulation
       (EU) 2024/2956 (ITS). The framework provides Pydantic-validated
@@ -69,6 +73,11 @@ entries:
       decision step (if-condition--20000000-0000-4000-8000-000000000006)
       feeding the `notify regulator` action; the same gate pattern is
       reused by ransomware-containment and identity-compromise.
+      On-call rotation is listed here because the 4-hour
+      post-classification clock starts at the responder's first
+      acknowledgement; a slow ack or an unbound roster slot delays the
+      whole notification chain regardless of the submission step's own
+      latency.
 
   - id: dora:art-19-intermediate-72h
     regulation:
