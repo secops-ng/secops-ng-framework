@@ -9,5 +9,11 @@ reference compilers into the orchestrator targets.
 - [`langgraph/`](langgraph/) — agentic reference target. Worked
   examples of CACAO playbooks compiled to runnable LangGraph agent
   graphs.
+- [`temporal/`](temporal/) — durable-code reference target. Worked
+  examples of CACAO playbooks compiled to Temporal workflow stubs.
 
-Additional targets (n8n, Temporal) will land alongside their compilers.
+| Playbook              | Temporal                                                              |
+|-----------------------|-----------------------------------------------------------------------|
+| threat-intel-ingest   | [`temporal/threat-intel-ingest/`](temporal/threat-intel-ingest/)      |
+
+Additional targets (n8n) will land alongside their compilers.
