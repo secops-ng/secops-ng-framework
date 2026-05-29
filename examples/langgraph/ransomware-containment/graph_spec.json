@@ -1,0 +1,115 @@
+{
+  "conditional_edges": [
+    {
+      "branches": {
+        "failure": "__END__",
+        "success": "if-condition--30000000-0000-4000-8000-000000000004"
+      },
+      "default": null,
+      "src": "if-condition--30000000-0000-4000-8000-000000000003"
+    },
+    {
+      "branches": {
+        "failure": "action--30000000-0000-4000-8000-000000000006",
+        "success": "action--30000000-0000-4000-8000-000000000005"
+      },
+      "default": null,
+      "src": "if-condition--30000000-0000-4000-8000-000000000004"
+    }
+  ],
+  "edges": [
+    {
+      "cacao_edge": "on_completion",
+      "dst": "if-condition--30000000-0000-4000-8000-000000000003",
+      "src": "action--30000000-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--30000000-0000-4000-8000-000000000007",
+      "src": "action--30000000-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--30000000-0000-4000-8000-000000000007",
+      "src": "action--30000000-0000-4000-8000-000000000006"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--30000000-0000-4000-8000-000000000008",
+      "src": "action--30000000-0000-4000-8000-000000000007"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--30000000-0000-4000-8000-000000000009",
+      "src": "action--30000000-0000-4000-8000-000000000008"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--30000000-0000-4000-8000-000000000009"
+    }
+  ],
+  "end_sentinel": "__END__",
+  "entry": "action--30000000-0000-4000-8000-000000000002",
+  "name": "Ransomware containment",
+  "nodes": [
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "triage signal",
+      "name": "action--30000000-0000-4000-8000-000000000002",
+      "step_id": "action--30000000-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "if-condition",
+      "kind": "condition",
+      "label": "ransomware confirmed?",
+      "name": "if-condition--30000000-0000-4000-8000-000000000003",
+      "step_id": "if-condition--30000000-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "if-condition",
+      "kind": "condition",
+      "label": "EDR available?",
+      "name": "if-condition--30000000-0000-4000-8000-000000000004",
+      "step_id": "if-condition--30000000-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "endpoint isolation \u2014 EDR isolate",
+      "name": "action--30000000-0000-4000-8000-000000000005",
+      "step_id": "action--30000000-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "endpoint isolation \u2014 network ACL deny (fallback)",
+      "name": "action--30000000-0000-4000-8000-000000000006",
+      "step_id": "action--30000000-0000-4000-8000-000000000006"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "identity revocation",
+      "name": "action--30000000-0000-4000-8000-000000000007",
+      "step_id": "action--30000000-0000-4000-8000-000000000007"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "backup verification",
+      "name": "action--30000000-0000-4000-8000-000000000008",
+      "step_id": "action--30000000-0000-4000-8000-000000000008"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "comms plan",
+      "name": "action--30000000-0000-4000-8000-000000000009",
+      "step_id": "action--30000000-0000-4000-8000-000000000009"
+    }
+  ],
+  "playbook_id": "playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8",
+  "stable_id": "playbook.ransomware_containment@v1"
+}
