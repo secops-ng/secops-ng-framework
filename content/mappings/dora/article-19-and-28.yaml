@@ -58,11 +58,17 @@ entries:
     metric_refs:
       - kpi.dora_initial_4h_on_time@v1
       - kri.dora_initial_missed@v1
+      - kpi.notification_sla_compliance@v1
+      - kri.regulator_notification_overrun@v1
     notes: >-
       Submission content shape is Commission Implementing Regulation
       (EU) 2024/2956 (ITS). The framework provides Pydantic-validated
       schemas mirroring the ITS templates; submission transport is
-      operator-owned.
+      operator-owned. The data-exfil CACAO playbook gates regulator
+      notification through the `regulator notification threshold met?`
+      decision step (if-condition--20000000-0000-4000-8000-000000000006)
+      feeding the `notify regulator` action; the same gate pattern is
+      reused by ransomware-containment and identity-compromise.
 
   - id: dora:art-19-intermediate-72h
     regulation:
@@ -86,6 +92,8 @@ entries:
       - playbook.identity_compromise@v1
     metric_refs:
       - kpi.dora_intermediate_72h_on_time@v1
+      - kpi.notification_sla_compliance@v1
+      - kri.regulator_notification_overrun@v1
 
   - id: dora:art-19-final-one-month
     regulation:
