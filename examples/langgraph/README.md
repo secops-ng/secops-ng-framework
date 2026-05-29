@@ -12,6 +12,9 @@ runtime.
   GraphSpec JSON → generated state + `@tool` bindings → reference
   assembly. Includes a regeneration script and a drift test so the
   artifacts stay in lockstep with the compiler.
+- [`threat-intel-ingest/`](threat-intel-ingest/) — threat-intelligence
+  ingest playbook. Pull → normalise → confidence-threshold branch into
+  blocklist propagation or detection-only activation.
 
 More worked examples land here as additional playbooks ship under
 `content/playbooks/`. Each follows the same shape — playbook,
