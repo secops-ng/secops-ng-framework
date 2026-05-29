@@ -1,0 +1,72 @@
+{
+  "stable_id": "control.iam.mfa_enforcement@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "MFA enforcement and session revocation",
+  "summary": "Identity provider enforces multi-factor authentication on the principal and supports administrator-initiated revocation of all live sessions, refresh tokens, and persistent device grants. The control couples preventive MFA hardening (D3-MFA) with reactive session-revocation capability so an operator can both raise the bar and evict an active attacker.",
+  "oscal": {
+    "component": {
+      "uuid": "8e3a1c2d-4b5f-4a6b-9c7d-1e2f3a4b5c70",
+      "type": "service",
+      "title": "Identity provider — MFA + session revocation profile",
+      "description": "IdP configuration that enforces phishing-resistant MFA for the principal and exposes an admin API for blanket session revocation across IdP-issued tokens and downstream SaaS sessions.",
+      "control-implementations": [
+        {
+          "uuid": "1a2b3c4d-5e6f-7081-9293-a4b5c6d7e8fa",
+          "source": "https://doi.org/10.6028/NIST.SP.800-53r5",
+          "description": "Implements identification, authentication, and account-management requirements via enforced MFA and administrator session control.",
+          "implemented-requirements": [
+            {
+              "uuid": "abcd0002-0001-0001-0001-000000000001",
+              "control-id": "ia-2",
+              "description": "Identification and authentication (organisational users) — phishing-resistant MFA required for the principal across IdP and downstream SaaS."
+            },
+            {
+              "uuid": "abcd0002-0001-0001-0001-000000000002",
+              "control-id": "ia-5",
+              "description": "Authenticator management — MFA factor enrolment, rotation, and revocation are administered through the IdP."
+            },
+            {
+              "uuid": "abcd0002-0001-0001-0001-000000000003",
+              "control-id": "ac-2",
+              "description": "Account management — administrator can revoke all live sessions and refresh tokens for the principal."
+            },
+            {
+              "uuid": "abcd0002-0001-0001-0001-000000000004",
+              "control-id": "ac-7",
+              "description": "Unsuccessful logon attempts — IdP enforces lockout / risk-based step-up on repeated failures, including password-spray patterns."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "d3fend": {
+    "technique_id": "D3-MFA",
+    "technique_name": "Multi-factor Authentication",
+    "url": "https://d3fend.mitre.org/technique/d3f:Multi-factorAuthentication/"
+  },
+  "attack_counters": [
+    "T1078.004",
+    "T1110.003",
+    "T1556.006"
+  ],
+  "detected_by": [
+    "detection.sigma.azure_identity_protection_impossible_travel@v1"
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.authentication@v1"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.identity_compromise@v1",
+      "step_id": "reset_mfa_and_revoke_sessions"
+    }
+  ],
+  "sources": [
+    "NIST SP 800-53 Rev. 5 — IA-2, IA-5, AC-2, AC-7",
+    "MITRE D3FEND — D3-MFA (Multi-factor Authentication)",
+    "ENISA Threat Landscape — identity and access management"
+  ],
+  "maintainer": "controls-wg@secops-ng.org"
+}

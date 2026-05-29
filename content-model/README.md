@@ -65,7 +65,7 @@ telemetry_refs:  [telemetry.host_process_create@v1]
 * `examples/control.example.json` — `control.edr_script_block_logging@v1`
 * `examples/telemetry.example.json` — `telemetry.host_process_create@v1` plus `examples/telemetry.sample.json` (OCSF Process Activity payload)
 
-The end-to-end worked example that ties all five layers — playbook + detection + control + telemetry + metrics — together lives in `content-model/examples/vuln-intake/`. See its README for the cross-reference graph and the contract the tests enforce.
+The end-to-end worked example that ties all five layers — playbook + detection + control + telemetry + metrics — together lives in `content-model/examples/vuln-intake/`. See its README for the cross-reference graph and the contract the tests enforce. Sibling worked examples follow the same shape: `content-model/examples/data-exfil/` (regulator-notification half), `content-model/examples/identity-compromise/` (IAM-containment half), and `content-model/examples/phishing-triage/`.
 
 ## Metrics layer
 

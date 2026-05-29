@@ -1,0 +1,81 @@
+{
+  "stable_id": "kri.mfa_control_effectiveness@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kri",
+  "title": "MFA enforcement — control effectiveness",
+  "summary": "Share of detection firings that occur against principals attesting compliance with the MFA-enforcement control. Drops when principals regress out of MFA (legacy-auth exceptions, conditional-access bypass), exposing the playbook to credential-access blind spots. Higher is better.",
+  "unit": "ratio",
+  "direction": "higher_is_better",
+  "target": {
+    "value": 0.9,
+    "comparator": ">=",
+    "rationale": "Below 0.9 indicates MFA-enforcement drift on protected principals."
+  },
+  "thresholds": [
+    {
+      "name": "warn",
+      "comparator": "<",
+      "value": 0.85,
+      "severity": "warn"
+    },
+    {
+      "name": "breach",
+      "comparator": "<",
+      "value": 0.7,
+      "severity": "high"
+    }
+  ],
+  "measurement": {
+    "source": "composite",
+    "aggregation": "ratio",
+    "formula": "count(detection firings on principals attesting control compliant) / count(detection firings) over window.",
+    "inputs": [
+      {
+        "name": "fires",
+        "detection_ref": "detection.sigma.azure_identity_protection_impossible_travel@v1"
+      },
+      {
+        "name": "attested",
+        "control_ref": "control.iam.mfa_enforcement@v1",
+        "description": "principal attestation state for MFA enforcement"
+      },
+      {
+        "name": "events",
+        "telemetry_ref": "telemetry.ocsf.authentication@v1"
+      }
+    ],
+    "window": {
+      "duration": "P30D",
+      "sliding": true
+    }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.identity_compromise@v1",
+      "step_id": "reset_mfa_and_revoke_sessions"
+    }
+  ],
+  "detection_refs": [
+    "detection.sigma.azure_identity_protection_impossible_travel@v1"
+  ],
+  "control_refs": [
+    "control.iam.mfa_enforcement@v1"
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.authentication@v1"
+  ],
+  "external_refs": [
+    {
+      "name": "NIS2 Directive Article 21(2)(d) — identity management and authentication",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj"
+    },
+    {
+      "name": "DORA Regulation Article 17 — ICT-related incident management",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}

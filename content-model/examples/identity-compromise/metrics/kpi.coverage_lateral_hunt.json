@@ -1,0 +1,73 @@
+{
+  "stable_id": "kpi.coverage_lateral_hunt@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Lateral-hunt coverage — identity compromise",
+  "summary": "Share of identity-compromise incidents where the lateral-movement hunt was performed against authentication telemetry within the configured lookback window. Higher is better — drops when the hunt step is skipped or fails to observe enough authentication evidence.",
+  "unit": "ratio",
+  "direction": "higher_is_better",
+  "target": {
+    "value": 0.95,
+    "comparator": ">=",
+    "rationale": "A skipped lateral hunt leaves residual persistence; coverage below 0.95 is treated as an investigation gap."
+  },
+  "thresholds": [
+    {
+      "name": "warn",
+      "comparator": "<",
+      "value": 0.9,
+      "severity": "warn"
+    },
+    {
+      "name": "breach",
+      "comparator": "<",
+      "value": 0.8,
+      "severity": "high"
+    }
+  ],
+  "measurement": {
+    "source": "composite",
+    "aggregation": "ratio",
+    "formula": "count(incidents whose lateral_hunt_and_iam_audit step queried authentication telemetry) / count(incidents reaching the hunt step) over window.",
+    "inputs": [
+      {
+        "name": "hunts_run",
+        "playbook_ref": "playbook.identity_compromise@v1",
+        "playbook_step": "lateral_hunt_and_iam_audit",
+        "description": "completions of the lateral-hunt + IAM-audit step"
+      },
+      {
+        "name": "events",
+        "telemetry_ref": "telemetry.ocsf.authentication@v1",
+        "description": "authentication events observed during the hunt window"
+      }
+    ],
+    "window": {
+      "duration": "P30D",
+      "sliding": true
+    }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.identity_compromise@v1",
+      "step_id": "lateral_hunt_and_iam_audit"
+    }
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.authentication@v1"
+  ],
+  "external_refs": [
+    {
+      "name": "NIS2 Directive Article 21 — risk-management measures",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj"
+    },
+    {
+      "name": "DORA Regulation Article 17 — ICT-related incident management",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}
