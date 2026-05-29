@@ -1,0 +1,72 @@
+{
+  "stable_id": "kpi.mttr_containment@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Mean time to respond — containment (isolation MTTR)",
+  "summary": "Time between playbook ingest of a confirmed ransomware signal and successful endpoint containment (EDR isolate succeeded, or the network-ACL fallback dropped). Measures the containment loop end-to-end — the operational hinge most ransomware playbooks rise or fall on. Lower is better.",
+  "unit": "minutes",
+  "direction": "lower_is_better",
+  "target": {
+    "value": 30,
+    "comparator": "<=",
+    "rationale": "Internal goal: confirmed-event-to-isolation under 30 minutes, before encryption typically completes."
+  },
+  "thresholds": [
+    { "name": "warn",   "comparator": ">", "value": 60,  "severity": "warn" },
+    { "name": "breach", "comparator": ">", "value": 240, "severity": "critical" }
+  ],
+  "measurement": {
+    "source": "workflow",
+    "aggregation": "p95",
+    "formula": "p95( isolation.succeeded_at - triage_signal.started_at ) over confirmed ransomware events in window, where isolation.succeeded_at is taken from whichever branch (EDR isolate or network-ACL fallback) terminated successfully.",
+    "inputs": [
+      {
+        "name": "triage_started",
+        "playbook_ref": "playbook.ransomware_containment@v1",
+        "playbook_step": "action--30000000-0000-4000-8000-000000000002",
+        "description": "start time of the triage-signal step"
+      },
+      {
+        "name": "isolation_edr",
+        "playbook_ref": "playbook.ransomware_containment@v1",
+        "playbook_step": "action--30000000-0000-4000-8000-000000000005",
+        "description": "completion time of the EDR-isolate branch"
+      },
+      {
+        "name": "isolation_fallback",
+        "playbook_ref": "playbook.ransomware_containment@v1",
+        "playbook_step": "action--30000000-0000-4000-8000-000000000006",
+        "description": "completion time of the network-ACL deny fallback branch"
+      }
+    ],
+    "window": { "duration": "P30D", "sliding": true }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.ransomware_containment@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000005"
+    },
+    {
+      "playbook_id": "playbook.ransomware_containment@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000006"
+    }
+  ],
+  "control_refs": [
+    "control.endpoint_isolation@v1"
+  ],
+  "external_refs": [
+    {
+      "name": "ENISA — Incident response good practice",
+      "source": "ENISA",
+      "url": "https://www.enisa.europa.eu/topics/incident-response"
+    },
+    {
+      "name": "DORA Regulation (EU) 2022/2554, Article 17 — ICT-related incident management",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+      "external_id": "32022R2554"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}

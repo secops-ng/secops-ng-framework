@@ -1,0 +1,57 @@
+{
+  "stable_id": "kri.regulator_notification_overrun@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kri",
+  "title": "Regulator notification overrun — count of statutory-window breaches (ransomware)",
+  "summary": "Count of confirmed-ransomware events in window whose regulator notification was emitted after the applicable statutory deadline (NIS2 Article 23 24-hour early warning; DORA Article 19 4-hour initial report). A non-zero value is a residual-risk signal: even one overrun is a regulatory-exposure event for the operator, independent of how well the operational containment loop performed.",
+  "unit": "count",
+  "direction": "lower_is_better",
+  "target": {
+    "value": 0,
+    "comparator": "<=",
+    "rationale": "Zero tolerance: any overrun is a regulatory-exposure event."
+  },
+  "thresholds": [
+    { "name": "warn",   "comparator": ">", "value": 0, "severity": "warn" },
+    { "name": "breach", "comparator": ">", "value": 1, "severity": "high" }
+  ],
+  "measurement": {
+    "source": "workflow",
+    "aggregation": "count",
+    "formula": "count( incidents where comms_plan.notification.dispatched_at > statutory_deadline(incident.classified_at) ) over window.",
+    "inputs": [
+      {
+        "name": "notifications",
+        "playbook_ref": "playbook.ransomware_containment@v1",
+        "playbook_step": "action--30000000-0000-4000-8000-000000000009",
+        "description": "comms-plan step executions in window"
+      }
+    ],
+    "window": { "duration": "P90D", "sliding": true }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.ransomware_containment@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000009"
+    }
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.process_activity@v1"
+  ],
+  "external_refs": [
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 23 — incident reporting obligations",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+      "external_id": "32022L2555"
+    },
+    {
+      "name": "DORA Regulation (EU) 2022/2554, Article 19 — reporting of major ICT-related incidents",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+      "external_id": "32022R2554"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}

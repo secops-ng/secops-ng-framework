@@ -1,0 +1,78 @@
+{
+  "stable_id": "control.endpoint_isolation@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Endpoint isolation — EDR isolate with network-ACL fallback",
+  "summary": "Containment control that severs an implicated endpoint from the production network as the first concrete mitigation in a ransomware response. Primary path issues an EDR-native isolate action (host quarantine: kernel-level network gate, only EDR management plane reachable). Fallback path drops a network-ACL deny at the access switch / SDN policy plane when the EDR agent is unreachable or unhealthy. The control couples preventive boundary protection (D3-NTF Network Traffic Filtering) with reactive host quarantine and is the single feature most ransomware-response playbooks pivot on once triage confirms the event.",
+  "oscal": {
+    "component": {
+      "uuid": "8a1b2c3d-4e5f-4a6b-9c7d-1e2f3a4b5c6d",
+      "type": "service",
+      "title": "Endpoint isolation control",
+      "description": "EDR-administered host isolation with network-ACL fallback at the access boundary.",
+      "control-implementations": [
+        {
+          "uuid": "2a3b4c5d-6e7f-4081-9293-a4b5c6d7e8fa",
+          "source": "https://doi.org/10.6028/NIST.SP.800-53r5",
+          "description": "Implements incident-response containment, boundary protection, and information-flow restriction during a confirmed event.",
+          "implemented-requirements": [
+            {
+              "uuid": "fade0001-0001-0001-0001-000000000001",
+              "control-id": "ir-4",
+              "description": "Incident handling — containment via host quarantine on confirmed events."
+            },
+            {
+              "uuid": "fade0001-0001-0001-0001-000000000002",
+              "control-id": "ir-4(1)",
+              "description": "Incident handling | automated incident handling processes — EDR-driven isolate action."
+            },
+            {
+              "uuid": "fade0001-0001-0001-0001-000000000003",
+              "control-id": "sc-7",
+              "description": "Boundary protection — network-ACL fallback at the access boundary when the EDR isolate path is unavailable."
+            },
+            {
+              "uuid": "fade0001-0001-0001-0001-000000000004",
+              "control-id": "ac-4",
+              "description": "Information flow enforcement — only management-plane flows are permitted to and from the quarantined host."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "d3fend": {
+    "technique_id": "D3-NTF",
+    "technique_name": "Network Traffic Filtering",
+    "url": "https://d3fend.mitre.org/technique/d3f:NetworkTrafficFiltering/"
+  },
+  "attack_counters": [
+    "T1486",
+    "T1490",
+    "T1021"
+  ],
+  "detected_by": [
+    "detection.sigma.shadow_copies_deletion@v1",
+    "detection.sigma.wbadmin_backup_deletion@v1",
+    "detection.sigma.ransomware_file_extension_rename@v1"
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.process_activity@v1"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.ransomware_containment@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000005"
+    },
+    {
+      "playbook_id": "playbook.ransomware_containment@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000006"
+    }
+  ],
+  "sources": [
+    "NIST SP 800-53 Rev. 5 — IR-4 Incident Handling, IR-4(1), SC-7 Boundary Protection, AC-4 Information Flow Enforcement",
+    "MITRE D3FEND v1.0.0 — D3-NTF Network Traffic Filtering",
+    "ENISA — Threat Landscape: ransomware mitigation guidance"
+  ],
+  "maintainer": "controls-wg@secops-ng.org"
+}

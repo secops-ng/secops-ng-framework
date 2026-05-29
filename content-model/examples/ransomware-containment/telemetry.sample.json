@@ -1,0 +1,43 @@
+{
+  "metadata": {
+    "version": "1.4.0",
+    "extensions": []
+  },
+  "time": 1779912000,
+  "category_uid": 1,
+  "category_name": "System Activity",
+  "class_uid": 1007,
+  "class_name": "Process Activity",
+  "activity_id": 1,
+  "activity_name": "Launch",
+  "type_uid": 100701,
+  "severity_id": 4,
+  "actor": {
+    "process": {
+      "name": "powershell.exe",
+      "cmd_line": "powershell -nop -w hidden -c \"Get-WmiObject Win32_ShadowCopy | ForEach-Object { $_.Delete() }\"",
+      "uid": "proc-a1b2c3d4",
+      "parent_process": {
+        "name": "explorer.exe",
+        "uid": "proc-deadbeef"
+      }
+    },
+    "user": {
+      "uid": "user-7f3c1a2b",
+      "name": "alice.example"
+    }
+  },
+  "process": {
+    "name": "wmic.exe",
+    "cmd_line": "wmic.exe shadowcopy delete",
+    "uid": "proc-99c0ffee"
+  },
+  "device": {
+    "uid": "host-0042",
+    "hostname": "ws-finance-12.example.local",
+    "os": {
+      "name": "Windows",
+      "type_id": 100
+    }
+  }
+}
