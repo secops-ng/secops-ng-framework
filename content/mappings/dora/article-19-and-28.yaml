@@ -27,6 +27,13 @@ entries:
       Reference to the classification RTS is Commission Delegated
       Regulation (EU) 2024/1772 of 13 March 2024. The classifier is a
       deterministic rules engine (an activity), not a workflow.
+      `playbook.phishing_triage@v1` is intentionally NOT listed here:
+      phishing triage on its own is sub-threshold for DORA major
+      classification. Its BEC and credential-harvest branches hand off
+      to `playbook.identity_compromise@v1` and (where exfil follows)
+      `playbook.data_exfil@v1`, both already in playbook_refs, so the
+      escalation path is already covered without inflating the
+      classification surface.
 
   - id: dora:art-19-initial-4h
     regulation:

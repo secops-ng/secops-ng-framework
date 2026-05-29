@@ -1,0 +1,36 @@
+{
+  "stable_id": "kpi.mttr_phishing_triage@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Mean time to triage — phishing report",
+  "summary": "Time between a phishing-triage playbook run starting and the case being closed via one of the terminal branches — either suppress-and-close in the suppression branch or one of the intent-routed response actions. Measures responsiveness of the triage workflow itself, independent of any downstream response-playbook duration.",
+  "unit": "hours",
+  "direction": "lower_is_better",
+  "target": { "value": 2, "comparator": "<=", "rationale": "Operator target for business-hours phishing triage SLA." },
+  "thresholds": [
+    { "name": "warn",   "comparator": ">", "value": 4,  "severity": "warn" },
+    { "name": "breach", "comparator": ">", "value": 12, "severity": "high" }
+  ],
+  "measurement": {
+    "source": "workflow",
+    "aggregation": "mean",
+    "formula": "mean( terminal_step.completed_at - start.completed_at ) over phishing-triage runs in window. Terminal step is the suppression close, any intent-routed response, or the manual-review route — whichever was reached.",
+    "inputs": [
+      {
+        "name": "playbook_run",
+        "playbook_ref": "playbook.phishing_triage@v1",
+        "playbook_step": "start--c0a17a01-0000-4000-8000-000000000001",
+        "description": "wall-clock duration from workflow start to the end step"
+      }
+    ],
+    "window": { "duration": "P7D", "sliding": true }
+  },
+  "playbook_refs": [
+    { "playbook_id": "playbook.phishing_triage@v1", "step_id": "end--c0a17a01-0000-4000-8000-00000000000d" }
+  ],
+  "external_refs": [
+    { "name": "NIS2 Article 21(2)(b) — incident handling", "source": "EUR-Lex", "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj", "external_id": "32022L2555" }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}
