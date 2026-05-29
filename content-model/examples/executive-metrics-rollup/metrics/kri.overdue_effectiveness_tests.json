@@ -1,0 +1,40 @@
+{
+  "stable_id": "kri.overdue_effectiveness_tests@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kri",
+  "title": "Overdue control-effectiveness tests",
+  "summary": "Count of controls whose last effectiveness-test evaluation is older than the operator's pinned re-test cadence at the end of the rollup window. Surfaces the backlog NIS2 Article 21(2)(f) and DORA Article 6 expect the operator to be working down, independent of programme-level effectiveness score.",
+  "unit": "count",
+  "direction": "lower_is_better",
+  "target": { "value": 0, "comparator": "==", "rationale": "Any overdue effectiveness test is a governance backlog item." },
+  "thresholds": [
+    { "name": "warn",   "comparator": ">", "value": 3,  "severity": "warn" },
+    { "name": "breach", "comparator": ">", "value": 10, "severity": "high" }
+  ],
+  "measurement": {
+    "source": "control",
+    "aggregation": "sum",
+    "formula": "count(distinct control_ref where (window_end - last_effectiveness_test_time) > catalog_entry.retest_cadence).",
+    "inputs": [
+      { "name": "tests",   "control_ref": "control.control_effectiveness_test@v1", "description": "control-effectiveness test attestations" },
+      { "name": "cadence", "control_ref": "control.metrics_catalog_governance@v1", "description": "catalog governance entry carrying the pinned re-test cadence for each in-scope control" }
+    ],
+    "window": { "duration": "P30D", "sliding": true }
+  },
+  "playbook_refs": [
+    { "playbook_id": "playbook.executive_metrics_rollup@v1", "step_id": "evaluate metrics over window" },
+    { "playbook_id": "playbook.executive_metrics_rollup@v1", "step_id": "score control effectiveness" },
+    { "playbook_id": "playbook.executive_metrics_rollup@v1", "step_id": "raise board-attention flag" }
+  ],
+  "control_refs": [
+    "control.control_effectiveness_test@v1",
+    "control.metrics_catalog_governance@v1"
+  ],
+  "external_refs": [
+    { "name": "NIS2 Article 21(2)(f)", "source": "NIS2", "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj" },
+    { "name": "DORA Article 6", "source": "DORA", "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj" },
+    { "name": "NIST SP 800-53 CA-2 Control Assessments", "source": "OSCAL", "url": "https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CA-2" }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}

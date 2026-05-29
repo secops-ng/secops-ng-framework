@@ -1,0 +1,36 @@
+{
+  "stable_id": "kri.metrics_catalog_staleness@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kri",
+  "title": "KPI/KRI catalog staleness",
+  "summary": "Count of catalog entries that either fail content-model/metrics.schema.json validation or have not been re-attested by the catalog governance owner within the operator's pinned review cadence at the end of the rollup window. Surfaces silent erosion of the catalog itself — a malformed or unreviewed entry cannot be allowed to inflate or deflate the effectiveness score.",
+  "unit": "count",
+  "direction": "lower_is_better",
+  "target": { "value": 0, "comparator": "==", "rationale": "Catalog entries that fail validation or miss governance review must be excluded from the rollup until corrected." },
+  "thresholds": [
+    { "name": "warn",   "comparator": ">", "value": 0, "severity": "warn" },
+    { "name": "breach", "comparator": ">", "value": 5, "severity": "high" }
+  ],
+  "measurement": {
+    "source": "control",
+    "aggregation": "sum",
+    "formula": "count(catalog entries where validation_state != 'valid' OR (window_end - last_governance_review_time) > governance.review_cadence).",
+    "inputs": [
+      { "name": "governance", "control_ref": "control.metrics_catalog_governance@v1", "description": "catalog governance attestations, schema-validation outcomes, and review-cadence pins" }
+    ],
+    "window": { "duration": "P30D", "sliding": true }
+  },
+  "playbook_refs": [
+    { "playbook_id": "playbook.executive_metrics_rollup@v1", "step_id": "resolve KPI/KRI catalog" }
+  ],
+  "control_refs": [
+    "control.metrics_catalog_governance@v1"
+  ],
+  "external_refs": [
+    { "name": "NIS2 Article 21(2)(f)", "source": "NIS2", "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj" },
+    { "name": "DORA Article 6", "source": "DORA", "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj" },
+    { "name": "NIST SP 800-53 PM-6 Measures of Performance", "source": "OSCAL", "url": "https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=PM-6" }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}
