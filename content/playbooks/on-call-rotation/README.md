@@ -52,8 +52,8 @@ starts at the responder's first acknowledgement.
 - ENISA — Good practices for incident response and on-call readiness
 - NIS2 Directive (EU) 2022/2555, Article 21(2)(b) and Article 23(4)(a)
 - DORA Regulation (EU) 2022/2554, Article 6 and Article 19(4)(a)
-- OCSF v1.3.0 — Account Change (class_uid 3001) and Application
-  Activity (class_uid 6002) event classes
+- OCSF v1.3.0 — Account Change (class_uid 3001) and API Activity
+  (class_uid 6003) event classes
 - MITRE D3FEND — Account Monitoring (D3-AM)
 - SigmaHQ — upstream off-hours-authentication and privileged-account-
   modification rule references (named, not vendored)

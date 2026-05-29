@@ -52,7 +52,8 @@ responder readiness without crossing into detection or response.
 |--------------|-------------------------------------------------------|-------------------------------------------------|
 | Playbook     | `../../../content/playbooks/on-call-rotation/playbook.cacao.json` | `playbook.on_call_rotation@v1`                  |
 | Control      | `control.json`                                        | `control.on_call_roster_governance@v1`          |
-| Telemetry    | `telemetry.json`                                      | `telemetry.ocsf.account_change@v1`              |
+| Telemetry    | `telemetry.account_change.json`                       | `telemetry.ocsf.account_change@v1`              |
+| Telemetry    | `telemetry.api_activity.json`                         | `telemetry.ocsf.api_activity@v1`                |
 | Metric (KPI) | `metrics/kpi.coverage_on_call_schedule.json`          | `kpi.coverage_on_call_schedule@v1`              |
 | Metric (KPI) | `metrics/kpi.mttr_on_call_ack.json`                   | `kpi.mttr_on_call_ack@v1`                       |
 | Metric (KPI) | `metrics/kpi.handoff_brief_delivery_sla.json`         | `kpi.handoff_brief_delivery_sla@v1`             |
@@ -98,7 +99,7 @@ no-invented-IDs bar.
   upstream Sigma          control.              telemetry.ocsf.
   off-hours-auth /        on_call_roster_       account_change@v1
   privileged-account-     governance@v1         telemetry.ocsf.
-  modification refs              │              application_activity@v1
+  modification refs              │              api_activity@v1
   (external_references)          │                     │
                                  ▼                     ▼
                 kpi.coverage_on_call_schedule@v1
@@ -124,8 +125,8 @@ the cross-layer pointer table.
 | OSCAL       | NIST SP 800-53 Rev. 5 — IR-7                | `control.json` (response assistance)  |
 | OSCAL       | NIST SP 800-53 Rev. 5 — AC-2                | `control.json` (account management of rotation handoffs) |
 | MITRE D3FEND| D3-AM Account Monitoring                    | `control.json`                        |
-| OCSF        | class_uid 3001 — Account Change             | `telemetry.json`                      |
-| OCSF        | class_uid 6002 — Application Activity       | metrics (handoff-delivery, ack)       |
+| OCSF        | class_uid 3001 — Account Change             | `telemetry.account_change.json`       |
+| OCSF        | class_uid 6003 — API Activity               | `telemetry.api_activity.json` (metrics: handoff-delivery, ack) |
 
 D3FEND is cited for the rotation-handoff monitoring side; ATT&CK
 counter-techniques are intentionally empty on `control.on_call_roster_governance@v1`
