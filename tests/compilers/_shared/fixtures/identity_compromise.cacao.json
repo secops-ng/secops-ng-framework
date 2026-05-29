@@ -1,0 +1,277 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701",
+  "name": "Identity compromise response",
+  "description": "Respond to a detected account compromise (credential theft, MFA bypass, anomalous sign-in, suspicious OAuth grant, or impossible-travel signal). The playbook drives the operator through MFA reset, session revocation across IdP / SaaS, a lateral-movement hunt scoped to the compromised principal's blast radius, and a final IAM audit to remove residual persistence (rogue OAuth grants, app passwords, conditional-access exceptions). CACAO v2 + SecOps-NG content-model extensions; Sigma rule IDs are referenced under external_references — detection authoring stays upstream at SigmaHQ.",
+  "playbook_types": [
+    "investigation",
+    "mitigation",
+    "remediation"
+  ],
+  "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+  "created": "2026-05-29T00:00:00Z",
+  "modified": "2026-05-29T00:00:00Z",
+  "labels": [
+    "identity-compromise",
+    "account-takeover",
+    "iam",
+    "session-revocation",
+    "lateral-movement"
+  ],
+  "external_references": [
+    {
+      "name": "SigmaHQ — Impossible Travel (Azure AD Identity Protection)",
+      "source": "SigmaHQ",
+      "external_id": "b2572bf9-e20a-4594-b528-40bde666525a",
+      "url": "https://github.com/SigmaHQ/sigma/blob/master/rules/cloud/azure/identity_protection/azure_identity_protection_impossible_travel.yml",
+      "description": "Impossible-travel signal from Azure AD Identity Protection. Upstream Sigma rule referenced — not re-authored."
+    },
+    {
+      "name": "SigmaHQ — Microsoft 365 Impossible Travel Activity",
+      "source": "SigmaHQ",
+      "external_id": "d7eab125-5f94-43df-8710-795b80fa1189",
+      "url": "https://github.com/SigmaHQ/sigma/blob/master/rules/cloud/m365/threat_management/microsoft365_impossible_travel_activity.yml",
+      "description": "Impossible-travel activity over Microsoft 365 audit logs."
+    },
+    {
+      "name": "SigmaHQ — Password Spray (Azure AD Identity Protection)",
+      "source": "SigmaHQ",
+      "external_id": "28ecba0a-c743-4690-ad29-9a8f6f25a6f9",
+      "url": "https://github.com/SigmaHQ/sigma/blob/master/rules/cloud/azure/identity_protection/azure_identity_protection_password_spray.yml",
+      "description": "Password-spray credential-access signal (MITRE ATT&CK T1110.003)."
+    },
+    {
+      "name": "SigmaHQ — Potential MFA Bypass Using Legacy Client Authentication",
+      "source": "SigmaHQ",
+      "external_id": "53bb4f7f-48a8-4475-ac30-5a82ddfdf6fc",
+      "url": "https://github.com/SigmaHQ/sigma/blob/master/rules/cloud/azure/signin_logs/azure_ad_suspicious_signin_bypassing_mfa.yml",
+      "description": "Legacy-auth flow used to sidestep conditional access / MFA."
+    },
+    {
+      "name": "SigmaHQ — Disabled MFA to Bypass Authentication Mechanisms",
+      "source": "SigmaHQ",
+      "external_id": "7ea78478-a4f9-42a6-9dcd-f861816122bf",
+      "url": "https://github.com/SigmaHQ/sigma/blob/master/rules/cloud/azure/activity_logs/azure_mfa_disabled.yml",
+      "description": "Azure activity-log signal for MFA being disabled — IAM-audit input."
+    },
+    {
+      "name": "SigmaHQ — AWS STS AssumeRole Misuse",
+      "source": "SigmaHQ",
+      "external_id": "905d389b-b853-46d0-9d3d-dea0d3a3cd49",
+      "url": "https://github.com/SigmaHQ/sigma/blob/master/rules/cloud/aws/cloudtrail/aws_sts_assumerole_misuse.yml",
+      "description": "Lateral-movement signal: STS AssumeRole pattern indicating role-chaining (MITRE ATT&CK T1078.004)."
+    },
+    {
+      "name": "MITRE ATT&CK — Valid Accounts (T1078)",
+      "source": "MITRE ATT&CK",
+      "external_id": "T1078",
+      "url": "https://attack.mitre.org/techniques/T1078/",
+      "description": "Adversary use of valid accounts; lateral-movement hunt scope."
+    },
+    {
+      "name": "MITRE ATT&CK — Brute Force (T1110)",
+      "source": "MITRE ATT&CK",
+      "external_id": "T1110",
+      "url": "https://attack.mitre.org/techniques/T1110/",
+      "description": "Credential-access category for the originating signal."
+    }
+  ],
+  "playbook_variables": {
+    "__principal_id__": {
+      "type": "string",
+      "description": "Identity provider subject of the suspected-compromised principal (user, service principal, or workload identity).",
+      "external": true
+    },
+    "__signal_id__": {
+      "type": "string",
+      "description": "Identifier of the originating identity-protection / sign-in signal (e.g. Azure AD Identity Protection risk event, Okta ThreatInsight finding).",
+      "external": true
+    },
+    "__compromise_confirmed__": {
+      "type": "boolean",
+      "description": "Set by initial triage. False signals branch to a false-positive close-out path; true signals proceed to containment.",
+      "external": false
+    },
+    "__sessions_revoked_count__": {
+      "type": "integer",
+      "description": "Number of active sessions revoked across IdP / SaaS tenants for the principal. Feeds the containment KPI.",
+      "external": false
+    },
+    "__lateral_findings_count__": {
+      "type": "integer",
+      "description": "Distinct downstream resources or principals the compromised identity touched within the hunt window.",
+      "external": false
+    }
+  },
+  "workflow_start": "start--30000000-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--30000000-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "identity-compromise-start",
+      "on_completion": "action--30000000-0000-4000-8000-000000000002"
+    },
+    "action--30000000-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "triage identity signal",
+      "description": "Hydrate the originating identity-protection signal with principal context (role, group memberships, recent sign-ins, conditional-access posture). Decide whether the signal warrants containment or is a known benign pattern (planned travel, sanctioned automation).",
+      "on_completion": "if-condition--30000000-0000-4000-8000-000000000003",
+      "in_args": [
+        "__signal_id__",
+        "__principal_id__"
+      ],
+      "out_args": [
+        "__compromise_confirmed__"
+      ],
+      "x_secops_ng": {
+        "detection_refs": [
+          "detection.sigma.azure_identity_protection_impossible_travel@v1",
+          "detection.sigma.azure_identity_protection_password_spray@v1",
+          "detection.sigma.azure_ad_suspicious_signin_bypassing_mfa@v1",
+          "detection.sigma.microsoft365_impossible_travel_activity@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.authentication@v1"
+        ],
+        "metric_refs": [
+          "kpi.mttd_identity_compromise@v1"
+        ]
+      }
+    },
+    "if-condition--30000000-0000-4000-8000-000000000003": {
+      "type": "if-condition",
+      "name": "compromise confirmed?",
+      "on_success": "action--30000000-0000-4000-8000-000000000004",
+      "on_failure": "end--30000000-0000-4000-8000-000000000009"
+    },
+    "action--30000000-0000-4000-8000-000000000004": {
+      "type": "action",
+      "name": "reset MFA factors",
+      "description": "Force re-enrollment of MFA factors for the principal: revoke existing TOTP / WebAuthn registrations, invalidate app passwords, and require step-up at next sign-in. Document factor list pre / post reset.",
+      "on_completion": "action--30000000-0000-4000-8000-000000000005",
+      "in_args": [
+        "__principal_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.iam.mfa_enforcement@v1"
+        ],
+        "metric_refs": [
+          "kpi.mttc_identity_compromise@v1"
+        ]
+      }
+    },
+    "action--30000000-0000-4000-8000-000000000005": {
+      "type": "action",
+      "name": "revoke active sessions",
+      "description": "Revoke all live sessions, refresh tokens, and persistent device grants for the principal across the IdP and downstream SaaS tenants. Produces __sessions_revoked_count__ for the containment KPI.",
+      "on_completion": "action--30000000-0000-4000-8000-000000000006",
+      "in_args": [
+        "__principal_id__"
+      ],
+      "out_args": [
+        "__sessions_revoked_count__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.iam.session_revocation@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.authentication@v1"
+        ],
+        "metric_refs": [
+          "kpi.mttc_identity_compromise@v1"
+        ]
+      }
+    },
+    "action--30000000-0000-4000-8000-000000000006": {
+      "type": "action",
+      "name": "lateral-movement hunt",
+      "description": "Hunt for downstream activity attributable to the compromised principal within the configured lookback window: STS / AssumeRole chains, cross-tenant access, API-token reuse, OAuth-grant escalation, host logons. Produces __lateral_findings_count__.",
+      "on_completion": "action--30000000-0000-4000-8000-000000000007",
+      "in_args": [
+        "__principal_id__"
+      ],
+      "out_args": [
+        "__lateral_findings_count__"
+      ],
+      "x_secops_ng": {
+        "detection_refs": [
+          "detection.sigma.aws_sts_assumerole_misuse@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.authentication@v1",
+          "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kpi.lateral_hunt_coverage@v1"
+        ]
+      }
+    },
+    "action--30000000-0000-4000-8000-000000000007": {
+      "type": "action",
+      "name": "IAM audit and persistence removal",
+      "description": "Audit the principal's IAM surface for residual persistence: rogue OAuth consents, third-party app grants, conditional-access exceptions, inbox rules, new device registrations, and standing-privilege role assignments. Remove anything the principal could not authorise legitimately during the compromise window.",
+      "on_completion": "end--30000000-0000-4000-8000-000000000008",
+      "in_args": [
+        "__principal_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.iam.standing_privilege_review@v1",
+          "control.iam.oauth_consent_review@v1"
+        ],
+        "detection_refs": [
+          "detection.sigma.azure_mfa_disabled@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.account_change@v1"
+        ]
+      }
+    },
+    "end--30000000-0000-4000-8000-000000000008": {
+      "type": "end",
+      "name": "identity-compromise-end"
+    },
+    "end--30000000-0000-4000-8000-000000000009": {
+      "type": "end",
+      "name": "identity-compromise-false-positive-end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.identity_compromise@v1",
+    "content_version": "0.1.0",
+    "maturity": "draft",
+    "compile_targets": ["n8n", "temporal", "langgraph"],
+    "detection_refs": [
+      "detection.sigma.azure_identity_protection_impossible_travel@v1",
+      "detection.sigma.azure_identity_protection_password_spray@v1",
+      "detection.sigma.azure_ad_suspicious_signin_bypassing_mfa@v1",
+      "detection.sigma.microsoft365_impossible_travel_activity@v1",
+      "detection.sigma.aws_sts_assumerole_misuse@v1",
+      "detection.sigma.azure_mfa_disabled@v1"
+    ],
+    "control_refs": [
+      "control.iam.mfa_enforcement@v1",
+      "control.iam.session_revocation@v1",
+      "control.iam.standing_privilege_review@v1",
+      "control.iam.oauth_consent_review@v1"
+    ],
+    "telemetry_refs": [
+      "telemetry.ocsf.authentication@v1",
+      "telemetry.ocsf.api_activity@v1",
+      "telemetry.ocsf.account_change@v1"
+    ],
+    "metric_refs": [
+      "kpi.mttd_identity_compromise@v1",
+      "kpi.mttc_identity_compromise@v1",
+      "kpi.lateral_hunt_coverage@v1"
+    ],
+    "sources": [
+      "OASIS CACAO v2.0 specification",
+      "SigmaHQ — upstream identity-protection rules (referenced, not re-authored)",
+      "MITRE ATT&CK — Credential Access (TA0006), Lateral Movement (TA0008)",
+      "ENISA threat landscape — identity and access management"
+    ]
+  }
+}
