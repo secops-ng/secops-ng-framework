@@ -161,3 +161,9 @@ integration time — the playbook never mentions a vendor.
   `StateSchemaSpec`, `ToolBindingsSpec`) are JSON-serialisable and
   consumable by any LangGraph builder — we ship the structure, not a
   runtime.
+
+## See also
+
+- [`examples/langgraph/vuln-intake/`](../../examples/langgraph/vuln-intake/) —
+  end-to-end worked example: playbook, regenerated artifacts, and a
+  reference `StateGraph` assembly.
