@@ -55,7 +55,7 @@ The playbook is named in the regulatory mapping packs under
 - ENISA — Cloud Security: posture-management and misconfiguration guidance
 - NIS2 Directive (EU) 2022/2555, Article 21(2)(e) and (i)
 - DORA Regulation (EU) 2022/2554, Articles 9 and 19
-- OCSF — Compliance Finding (2003) and Cloud Resource Inventory Info (5001)
+- OCSF — Compliance Finding (2003) and Cloud Resources Inventory Info (5023)
 - NIST SP 800-53 Rev. 5 — CM-2/CM-6/CM-8, AC-3/AC-6, SC-7/SC-8/SC-28
 - MITRE D3FEND — System Configuration Permissions (D3-SCP),
   Resource Access Pattern Analysis (D3-RAPA)

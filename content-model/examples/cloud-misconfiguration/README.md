@@ -22,8 +22,8 @@ live in the operator's compile target.
 Cloud-posture deviations are the smallest realistic workflow that
 exercises the *control-plane-as-telemetry* half of the content model.
 A CSPM emits an OCSF Compliance Finding (2003), the playbook enriches
-the affected resource against the cloud inventory (OCSF Cloud Resource
-Inventory Info, 5001), false-positive-screens it, notifies the owner,
+the affected resource against the cloud inventory (OCSF Cloud Resources
+Inventory Info, 5023), false-positive-screens it, notifies the owner,
 guides remediation, re-scans, and escalates if the re-scan still
 reports the deviation. The metrics layer reports ingest latency,
 end-to-end remediation latency, posture coverage, and the
@@ -34,8 +34,8 @@ recurring-deviation risk indicator over a rolling window.
 1. CSPM emits a posture finding (OCSF Compliance Finding 2003) on a
    resource that violates the operator's baseline.
 2. `ingest finding` lifts the finding into the playbook state.
-3. `enrich resource and owner` joins against OCSF Cloud Resource
-   Inventory Info (5001) to attach owner, tags, and account context.
+3. `enrich resource and owner` joins against OCSF Cloud Resources
+   Inventory Info (5023) to attach owner, tags, and account context.
 4. `known false positive?` checks the operator's suppression list;
    true → `suppress and close` (terminal).
 5. `notify owner` opens the remediation handoff to the resource owner.
@@ -146,7 +146,7 @@ The remediation action, the resource-owner notification, and the
 re-scan artifact are emitted by the operator's compile target into the
 operator's data plane. There is no SecOps-NG-hosted plane that sees an
 operator's cloud-control-plane events. The same sovereignty boundary
-holds for the OCSF Compliance Finding and Cloud Resource Inventory
+holds for the OCSF Compliance Finding and Cloud Resources Inventory
 events consumed at ingest — both are read from the operator's cloud
 provider, into the operator's environment, by the operator's compile
 target.
