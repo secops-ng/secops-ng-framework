@@ -1,0 +1,48 @@
+{
+  "stable_id": "telemetry.ocsf.process_activity@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Process activity event (ingest)",
+  "summary": "Endpoint process-execution telemetry bound to OCSF System Activity / Process Activity (class 1007). Carries the shadow-copy-deletion, ransomware-extension-rename, and overpass-the-hash signals consumed by the ransomware-containment playbook's triage step. Read by the SOC's EDR/XDR pipe; the playbook never reaches into the operator's endpoint plane directly.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 1,
+    "category_name": "System Activity",
+    "class_uid": 1007,
+    "class_name": "Process Activity"
+  },
+  "direction": "ingest",
+  "sample": {
+    "path": "content-model/examples/ransomware-containment/telemetry.sample.json",
+    "media_type": "application/json"
+  },
+  "fields_used": [
+    "time",
+    "activity_id",
+    "actor.process.name",
+    "actor.process.cmd_line",
+    "actor.process.uid",
+    "process.name",
+    "process.cmd_line",
+    "process.uid",
+    "device.uid",
+    "device.hostname",
+    "actor.user.uid"
+  ],
+  "detection_refs": [
+    "detection.sigma.shadow_copies_deletion@v1"
+  ],
+  "control_refs": [
+    "control.endpoint_isolation@v1"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.ransomware_containment@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000002"
+    }
+  ],
+  "sources": [
+    "OCSF v1.4.0 — System Activity category (1), Process Activity class (1007)"
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org"
+}

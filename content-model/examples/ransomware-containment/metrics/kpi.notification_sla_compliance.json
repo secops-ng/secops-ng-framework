@@ -1,0 +1,63 @@
+{
+  "stable_id": "kpi.notification_sla_compliance@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Notification SLA compliance — regulator coverage (ransomware)",
+  "summary": "Share of confirmed-ransomware events whose regulator early-warning notification was drafted and dispatched within the statutory window (NIS2 Article 23 — 24-hour early warning; DORA Article 19 — 4-hour initial report after classification as major). The ransomware-containment playbook's comms-plan step stages the notification for human sign-off; this KPI counts whether that staging-and-dispatch loop closes inside the regulatory clock. Higher is better.",
+  "unit": "ratio",
+  "direction": "higher_is_better",
+  "target": {
+    "value": 1.0,
+    "comparator": ">=",
+    "rationale": "Statutory windows admit no partial-credit miss."
+  },
+  "thresholds": [
+    { "name": "warn",   "comparator": "<", "value": 0.98, "severity": "warn" },
+    { "name": "breach", "comparator": "<", "value": 0.95, "severity": "high" }
+  ],
+  "measurement": {
+    "source": "workflow",
+    "aggregation": "ratio",
+    "formula": "count(comms_plan.notification.dispatched_at <= statutory_deadline(incident.classified_at)) / count(confirmed ransomware events requiring notification) over window.",
+    "inputs": [
+      {
+        "name": "required",
+        "playbook_ref": "playbook.ransomware_containment@v1",
+        "playbook_step": "action--30000000-0000-4000-8000-000000000009",
+        "description": "confirmed ransomware events reaching the comms-plan step"
+      },
+      {
+        "name": "on_time",
+        "playbook_ref": "playbook.ransomware_containment@v1",
+        "playbook_step": "action--30000000-0000-4000-8000-000000000009",
+        "description": "notifications whose dispatch timestamp is within the statutory window"
+      }
+    ],
+    "window": { "duration": "P90D", "sliding": true }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.ransomware_containment@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000009"
+    }
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.process_activity@v1"
+  ],
+  "external_refs": [
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 23 — incident reporting obligations",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+      "external_id": "32022L2555"
+    },
+    {
+      "name": "DORA Regulation (EU) 2022/2554, Article 19 — reporting of major ICT-related incidents",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+      "external_id": "32022R2554"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}

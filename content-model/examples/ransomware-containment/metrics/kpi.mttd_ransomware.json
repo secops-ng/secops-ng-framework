@@ -1,0 +1,65 @@
+{
+  "stable_id": "kpi.mttd_ransomware@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Mean time to detect — ransomware (MTTD)",
+  "summary": "Time between the earliest endpoint-telemetry evidence of a ransomware precursor (shadow-copy deletion, backup-tool abuse, mass file rename) and the moment the ransomware-containment playbook ingests it via its triage step. Lower is better. Anchored on ENISA threat-landscape guidance for ransomware-class signals and on the NIS2 Article 21 risk-management baseline.",
+  "unit": "minutes",
+  "direction": "lower_is_better",
+  "target": {
+    "value": 15,
+    "comparator": "<=",
+    "rationale": "ENISA good-practice baseline: ransomware encryption windows are measured in minutes; ingest latency must be tighter."
+  },
+  "thresholds": [
+    { "name": "warn",   "comparator": ">", "value": 30,  "severity": "warn" },
+    { "name": "breach", "comparator": ">", "value": 120, "severity": "critical" }
+  ],
+  "measurement": {
+    "source": "composite",
+    "aggregation": "p95",
+    "formula": "p95( playbook.triage_signal.started_at - telemetry.process_activity.time ) over confirmed ransomware events in window.",
+    "inputs": [
+      {
+        "name": "first_event",
+        "telemetry_ref": "telemetry.ocsf.process_activity@v1",
+        "field": "time",
+        "description": "earliest OCSF Process Activity event carrying the ransomware precursor"
+      },
+      {
+        "name": "triage_started",
+        "playbook_ref": "playbook.ransomware_containment@v1",
+        "playbook_step": "action--30000000-0000-4000-8000-000000000002",
+        "description": "start time of the playbook's triage-signal step"
+      }
+    ],
+    "window": { "duration": "P30D", "sliding": true }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.ransomware_containment@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000002"
+    }
+  ],
+  "detection_refs": [
+    "detection.sigma.shadow_copies_deletion@v1"
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.process_activity@v1"
+  ],
+  "external_refs": [
+    {
+      "name": "ENISA — Threat Landscape: ransomware",
+      "source": "ENISA",
+      "url": "https://www.enisa.europa.eu/topics/threat-risk-management"
+    },
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 21 — cybersecurity risk-management measures",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+      "external_id": "32022L2555"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}

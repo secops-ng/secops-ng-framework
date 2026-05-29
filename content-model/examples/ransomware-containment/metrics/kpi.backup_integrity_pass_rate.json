@@ -1,0 +1,59 @@
+{
+  "stable_id": "kpi.backup_integrity_pass_rate@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Backup integrity pass rate — verifiable known-good snapshots",
+  "summary": "Share of ransomware-containment playbook runs in which the backup-verification step located a snapshot pre-dating the event window AND its integrity hash matched the value in the backup catalogue. Higher is better. The metric is the operational analogue of NIS2 Article 21(2)(c) (business continuity and backup management) and DORA Article 11 (ICT business-continuity policy); a failing pass rate means the operator's recovery posture is degraded before any ransomware event actually fires.",
+  "unit": "ratio",
+  "direction": "higher_is_better",
+  "target": {
+    "value": 1.0,
+    "comparator": ">=",
+    "rationale": "Every ransomware response should find a verifiable known-good snapshot; anything less is a recovery-readiness gap."
+  },
+  "thresholds": [
+    { "name": "warn",   "comparator": "<", "value": 0.98, "severity": "warn" },
+    { "name": "breach", "comparator": "<", "value": 0.90, "severity": "high" }
+  ],
+  "measurement": {
+    "source": "workflow",
+    "aggregation": "ratio",
+    "formula": "count(runs where backup_verification.snapshot_integrity_ok = true) / count(runs reaching backup_verification) over window.",
+    "inputs": [
+      {
+        "name": "verifications",
+        "playbook_ref": "playbook.ransomware_containment@v1",
+        "playbook_step": "action--30000000-0000-4000-8000-000000000008",
+        "description": "backup-verification step executions in window"
+      }
+    ],
+    "window": { "duration": "P90D", "sliding": true }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.ransomware_containment@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000008"
+    }
+  ],
+  "external_refs": [
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 21(2)(c) — business continuity and backup management",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+      "external_id": "32022L2555"
+    },
+    {
+      "name": "DORA Regulation (EU) 2022/2554, Article 11 — ICT business continuity policy",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+      "external_id": "32022R2554"
+    },
+    {
+      "name": "ENISA — Backup, restore and continuity good practice",
+      "source": "ENISA",
+      "url": "https://www.enisa.europa.eu/topics/incident-response"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}
