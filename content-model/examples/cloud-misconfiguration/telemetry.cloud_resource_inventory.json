@@ -1,0 +1,40 @@
+{
+  "stable_id": "telemetry.ocsf.cloud_resource_inventory@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Cloud resources inventory event (ingest)",
+  "summary": "Cloud resources inventory snapshot bound to OCSF Cloud Resources Inventory Info (class 5023). Consumed by the cloud-misconfiguration playbook's enrich-resource-and-owner step to attach owner, tags, and account context to the inbound posture finding.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 5,
+    "category_name": "Discovery",
+    "class_uid": 5023,
+    "class_name": "Cloud Resources Inventory Info"
+  },
+  "direction": "ingest",
+  "fields_used": [
+    "time",
+    "metadata",
+    "cloud.provider",
+    "cloud.account.uid",
+    "cloud.region",
+    "resources[].uid",
+    "resources[].type",
+    "resources[].owner",
+    "resources[].tags"
+  ],
+  "control_refs": [
+    "control.cspm_baseline@v1",
+    "control.cloud_identity_least_privilege@v1"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.cloud_misconfiguration@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000003"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org",
+  "sources": [
+    "OCSF v1.4.0 — Discovery category (5), Cloud Resources Inventory Info class (5023)"
+  ]
+}

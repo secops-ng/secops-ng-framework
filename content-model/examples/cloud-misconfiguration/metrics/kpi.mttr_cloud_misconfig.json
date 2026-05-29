@@ -1,0 +1,68 @@
+{
+  "stable_id": "kpi.mttr_cloud_misconfig@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Mean time to respond — cloud misconfiguration (MTTR)",
+  "summary": "Duration between playbook ingest of a posture finding and a verified re-scan that confirms remediation closed the deviation. Measures the guided-remediation loop end-to-end, not the technology in isolation. Lower is better.",
+  "unit": "minutes",
+  "direction": "lower_is_better",
+  "target": {
+    "value": 1440,
+    "comparator": "<=",
+    "rationale": "Internal goal: posture deviations remediated and verified within 24 hours of ingest."
+  },
+  "thresholds": [
+    { "name": "warn",   "comparator": ">", "value": 2880, "severity": "warn" },
+    { "name": "breach", "comparator": ">", "value": 10080, "severity": "high" }
+  ],
+  "measurement": {
+    "source": "workflow",
+    "aggregation": "p95",
+    "formula": "p95( re_scan.verified_at - ingest_finding.started_at ) over confirmed posture findings in window.",
+    "inputs": [
+      {
+        "name": "ingest_started",
+        "playbook_ref": "playbook.cloud_misconfiguration@v1",
+        "playbook_step": "action--30000000-0000-4000-8000-000000000002",
+        "description": "start time of ingest-finding step"
+      },
+      {
+        "name": "rescan_verified",
+        "playbook_ref": "playbook.cloud_misconfiguration@v1",
+        "playbook_step": "action--30000000-0000-4000-8000-000000000008",
+        "description": "completion time of re-scan step on the verified-true branch"
+      }
+    ],
+    "window": { "duration": "P30D", "sliding": true }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.cloud_misconfiguration@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000007"
+    },
+    {
+      "playbook_id": "playbook.cloud_misconfiguration@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000008"
+    }
+  ],
+  "control_refs": [
+    "control.cspm_baseline@v1",
+    "control.iac_policy_guardrail@v1",
+    "control.cloud_identity_least_privilege@v1"
+  ],
+  "external_refs": [
+    {
+      "name": "ENISA — Incident response good practice",
+      "source": "ENISA",
+      "url": "https://www.enisa.europa.eu/topics/incident-response"
+    },
+    {
+      "name": "DORA Regulation (EU) 2022/2554, Article 9 — protection and prevention",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+      "external_id": "32022R2554"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}

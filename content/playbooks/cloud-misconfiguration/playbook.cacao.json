@@ -22,6 +22,76 @@
   ],
   "external_references": [
     {
+      "name": "OASIS CACAO v2.0",
+      "description": "Workflow step types, variable conventions, and the x_ extension namespace used to carry SecOps-NG content-model refs.",
+      "source": "OASIS Open"
+    },
+    {
+      "name": "ENISA — Cloud Security: cloud-misconfiguration and posture-management guidance",
+      "source": "ENISA",
+      "url": "https://www.enisa.europa.eu/topics/cloud-and-big-data"
+    },
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 21(2)(e) — security in network and information systems acquisition, development and maintenance",
+      "description": "Operative basis for the baseline-deviation, IaC guardrail, and remediation surface exercised by this playbook.",
+      "source": "Official Journal of the European Union",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj"
+    },
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 21(2)(i) — human-resources security, access-control and asset management",
+      "description": "Operative basis for the resource-ownership and least-privilege identity surface enriched in this playbook.",
+      "source": "Official Journal of the European Union",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj"
+    },
+    {
+      "name": "DORA Regulation (EU) 2022/2554, Article 6 — ICT risk management framework",
+      "description": "Governance anchor for documented ICT systems hygiene including cloud-posture baselines and recurring-deviation handling.",
+      "source": "Official Journal of the European Union",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+    },
+    {
+      "name": "DORA Regulation (EU) 2022/2554, Article 9 — protection and prevention",
+      "description": "Operative basis for ICT systems hygiene, secure configuration baselines, and continuous-monitoring duties exercised by this playbook.",
+      "source": "Official Journal of the European Union",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+    },
+    {
+      "name": "OCSF v1.4.0 — Compliance Finding (2003) and Cloud Resources Inventory Info (5023) event classes",
+      "description": "OCSF event-class shapes used by the telemetry layer feeding this playbook: posture findings (2003) for the inbound signal, cloud resources inventory (5023) for ownership enrichment.",
+      "source": "OCSF",
+      "url": "https://schema.ocsf.io/"
+    },
+    {
+      "name": "MITRE D3FEND — System Configuration Permissions (D3-SCP)",
+      "description": "D3FEND Harden tactic technique cited by the IaC-guardrail and identity-least-privilege controls bound to this playbook.",
+      "source": "MITRE",
+      "url": "https://d3fend.mitre.org/technique/d3f:SystemConfigurationPermissions/"
+    },
+    {
+      "name": "MITRE D3FEND — Resource Access Pattern Analysis (D3-RAPA)",
+      "description": "D3FEND Detect tactic technique cited by the CSPM baseline / posture-finding detection class feeding this playbook.",
+      "source": "MITRE",
+      "url": "https://d3fend.mitre.org/technique/d3f:ResourceAccessPatternAnalysis/"
+    },
+    {
+      "name": "NIST SP 800-53 Rev. 5 — CM-2 (Baseline Configuration), CM-6 (Configuration Settings), CM-8 (System Component Inventory)",
+      "description": "OSCAL-published control family CM (Configuration Management) anchoring the CSPM baseline, IaC guardrail, and cloud-inventory enrichment used by this playbook.",
+      "source": "NIST",
+      "url": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+    },
+    {
+      "name": "NIST SP 800-53 Rev. 5 — AC-3 (Access Enforcement), AC-6 (Least Privilege)",
+      "description": "OSCAL-published control family AC (Access Control) anchoring the cloud-identity least-privilege control bound to this playbook.",
+      "source": "NIST",
+      "url": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+    },
+    {
+      "name": "NIST SP 800-53 Rev. 5 — SC-7 (Boundary Protection), SC-8 (Transmission Confidentiality), SC-28 (Protection of Information at Rest)",
+      "description": "OSCAL-published control family SC (System and Communications Protection) anchoring the missing-encryption / over-permissive-egress posture findings remediated by this playbook.",
+      "source": "NIST",
+      "url": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+    },
+    {
       "name": "SigmaHQ — AWS CloudTrail Important Change",
       "description": "Upstream Sigma detection for disabling, deleting or modifying a CloudTrail trail — canonical CSPM-relevant posture finding on AWS.",
       "source": "SigmaHQ",
@@ -305,9 +375,12 @@
       "NIS2 Directive (EU) 2022/2555, Article 21(2)(i) — human-resources security, access-control and asset-management policies",
       "DORA Regulation (EU) 2022/2554, Article 9 — ICT risk-management framework (protection and prevention)",
       "DORA Regulation (EU) 2022/2554, Article 19 — reporting of major ICT-related incidents (escalation path when a posture exception becomes incident-grade)",
-      "OCSF v1.3.0 — Compliance Finding (class 2003) and Cloud Resource Inventory Info (class 5001) event classes",
+      "OCSF v1.4.0 — Compliance Finding (class 2003) and Cloud Resources Inventory Info (class 5023) event classes",
       "MITRE D3FEND — System Configuration Permissions (d3f:SystemConfigurationPermissions), Resource Access Pattern Analysis (d3f:ResourceAccessPatternAnalysis)",
-      "SigmaHQ — upstream rule provenance for the CSPM-finding and public-storage-bucket detection pointers (no Sigma rules authored here)"
+      "SigmaHQ — upstream rule provenance for the CSPM-finding and public-storage-bucket detection pointers (no Sigma rules authored here)",
+      "NIST SP 800-53 Rev. 5 — CM-2/CM-6/CM-8, AC-3/AC-6, SC-7/SC-8/SC-28 (OSCAL-published control families anchoring this playbook)",
+      "MITRE D3FEND — D3-SCP (System Configuration Permissions), D3-RAPA (Resource Access Pattern Analysis)",
+      "OCSF v1.4.0 — Compliance Finding (2003), Cloud Resources Inventory Info (5023)"
     ]
   }
 }
