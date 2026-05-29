@@ -1,0 +1,35 @@
+{
+  "stable_id": "kpi.mttd_identity_compromise@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Mean time to detect — identity compromise",
+  "summary": "Time between the earliest authentication-event evidence on the principal and the moment the impossible-travel detection fires. Lower is better.",
+  "unit": "minutes",
+  "direction": "lower_is_better",
+  "target": { "value": 15, "comparator": "<=", "rationale": "ENISA good-practice baseline for credential-access detections." },
+  "thresholds": [
+    { "name": "warn",   "comparator": ">", "value": 30, "severity": "warn" },
+    { "name": "breach", "comparator": ">", "value": 60, "severity": "critical" }
+  ],
+  "measurement": {
+    "source": "composite",
+    "aggregation": "p95",
+    "formula": "p95( detection.first_fire_time - telemetry.first_event_time ) over identity-compromise incidents within window.",
+    "inputs": [
+      { "name": "first_event", "telemetry_ref": "telemetry.ocsf.authentication@v1", "field": "time", "description": "earliest OCSF authentication event for the principal" },
+      { "name": "first_fire",  "detection_ref": "detection.sigma.azure_identity_protection_impossible_travel@v1", "description": "earliest detection firing correlated to the principal" }
+    ],
+    "window": { "duration": "P30D", "sliding": true }
+  },
+  "playbook_refs": [
+    { "playbook_id": "playbook.identity_compromise@v1", "step_id": "triage_identity_signal" }
+  ],
+  "detection_refs": ["detection.sigma.azure_identity_protection_impossible_travel@v1"],
+  "telemetry_refs": ["telemetry.ocsf.authentication@v1"],
+  "external_refs": [
+    { "name": "ENISA Threat Landscape — IAM", "source": "ENISA", "url": "https://www.enisa.europa.eu/topics/threat-risk-management" },
+    { "name": "NIS2 Directive Article 23 — incident reporting", "source": "EUR-Lex", "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj" }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}
