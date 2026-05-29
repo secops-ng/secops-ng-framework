@@ -1,0 +1,372 @@
+{
+  "name": "Ransomware containment",
+  "nodes": [
+    {
+      "id": "start--30000000-0000-4000-8000-000000000001",
+      "name": "ransomware-start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__signal_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the originating detection signal (EDR alert, Sigma match, or SOC-raised ticket)."
+            },
+            {
+              "name": "__affected_host__",
+              "type": "string",
+              "value": "",
+              "description": "Host identifier (hostname or asset id) implicated by the signal; consumed by isolation."
+            },
+            {
+              "name": "__affected_identity__",
+              "type": "string",
+              "value": "",
+              "description": "Identity principal (user or service account) implicated by the signal; consumed by identity revocation."
+            },
+            {
+              "name": "__ransomware_confirmed__",
+              "type": "boolean",
+              "value": "",
+              "description": "Whether triage promoted the signal to a confirmed ransomware event. False routes to close-out without containment."
+            },
+            {
+              "name": "__edr_available__",
+              "type": "boolean",
+              "value": "",
+              "description": "Whether the EDR agent on the affected host is reachable and capable of issuing an isolate action. False triggers the network-ACL fallback."
+            },
+            {
+              "name": "__latest_known_good_snapshot__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the most recent backup snapshot that pre-dates the event window. Produced by the backup-verification step."
+            },
+            {
+              "name": "__snapshot_integrity_ok__",
+              "type": "boolean",
+              "value": "",
+              "description": "Whether the located snapshot's integrity hash matches the value recorded in the backup catalogue."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--30000000-0000-4000-8000-000000000002",
+      "name": "triage signal",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {},
+      "notes": "Receive the originating detection signal and hydrate it with host, identity, and process context. Decide whether the signal is a confirmed ransomware event or a benign / out-of-scope alert. Produces __affected_host__, __affected_identity__, and __ransomware_confirmed__.",
+      "notesInFlow": true
+    },
+    {
+      "id": "if-condition--30000000-0000-4000-8000-000000000003",
+      "name": "ransomware confirmed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "secops_ng_condition",
+              "leftValue": "",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "notes": "Branch on __ransomware_confirmed__. True paths into containment; false closes the incident out with no further action (the close-out itself is logged for the false-positive KPI by an out-of-scope card).",
+      "notesInFlow": true
+    },
+    {
+      "id": "if-condition--30000000-0000-4000-8000-000000000004",
+      "name": "EDR available?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "secops_ng_condition",
+              "leftValue": "",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "notes": "Branch on __edr_available__. True uses the EDR isolate action; false falls back to a network ACL deny at the operator's egress chokepoint. Both branches converge on identity revocation.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--30000000-0000-4000-8000-000000000005",
+      "name": "endpoint isolation \u2014 EDR isolate",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {},
+      "notes": "Issue the EDR-vendor isolate action against __affected_host__ via the operator's pre-bound EDR agent. Bounded by the operator-supplied authorisation policy. Primary path.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--30000000-0000-4000-8000-000000000006",
+      "name": "endpoint isolation \u2014 network ACL deny (fallback)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {},
+      "notes": "EDR fallback: deny all ingress/egress for __affected_host__ at the operator's network chokepoint (firewall rule, switchport disable, or SDN policy). Used when the EDR agent is unreachable or absent.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--30000000-0000-4000-8000-000000000007",
+      "name": "identity revocation",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {},
+      "notes": "Disable the implicated user account, revoke active sessions, and invalidate refresh/access tokens at the operator's IdP. Includes Kerberos TGT invalidation where supported. Targets __affected_identity__.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--30000000-0000-4000-8000-000000000008",
+      "name": "backup verification",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2060,
+        420
+      ],
+      "parameters": {},
+      "notes": "Locate the most recent known-good backup snapshot that pre-dates the event window and verify its integrity hash against the backup-catalogue record. Produces __latest_known_good_snapshot__ and __snapshot_integrity_ok__. Does NOT restore \u2014 restore is a separate, out-of-scope recovery playbook.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--30000000-0000-4000-8000-000000000009",
+      "name": "comms plan",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2320,
+        240
+      ],
+      "parameters": {},
+      "notes": "Notify the IR lead and comms officer along the operator's pre-bound channels, and draft the regulator early-warning pre-notification per NIS2 Article 23 within the 24-hour clock from initial detection. The drafted notification is staged for human sign-off, not auto-sent.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--30000000-0000-4000-8000-00000000000a",
+      "name": "ransomware-end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2580,
+        420
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "ransomware-start": {
+      "main": [
+        [
+          {
+            "node": "triage signal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "triage signal": {
+      "main": [
+        [
+          {
+            "node": "ransomware confirmed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ransomware confirmed?": {
+      "main": [
+        [
+          {
+            "node": "EDR available?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ransomware-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EDR available?": {
+      "main": [
+        [
+          {
+            "node": "endpoint isolation \u2014 EDR isolate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "endpoint isolation \u2014 network ACL deny (fallback)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "endpoint isolation \u2014 EDR isolate": {
+      "main": [
+        [
+          {
+            "node": "identity revocation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "endpoint isolation \u2014 network ACL deny (fallback)": {
+      "main": [
+        [
+          {
+            "node": "identity revocation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "identity revocation": {
+      "main": [
+        [
+          {
+            "node": "backup verification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "backup verification": {
+      "main": [
+        [
+          {
+            "node": "comms plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "comms plan": {
+      "main": [
+        [
+          {
+            "node": "ransomware-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "ransomware",
+    "containment",
+    "edr",
+    "identity-revocation",
+    "backup-verification",
+    "nis2",
+    "dora"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.ransomware_containment@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8"
+    },
+    "secops_ng_notes": [
+      "step 'action--30000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'if-condition--30000000-0000-4000-8000-000000000003' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
+      "step 'if-condition--30000000-0000-4000-8000-000000000004' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000007': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000008': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000009': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n."
+    ]
+  }
+}
