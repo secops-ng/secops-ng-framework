@@ -1,0 +1,48 @@
+{
+  "conditional_edges": [],
+  "edges": [
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--40000000-0000-4000-8000-000000000003",
+      "src": "action--40000000-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--40000000-0000-4000-8000-000000000004",
+      "src": "action--40000000-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--40000000-0000-4000-8000-000000000004"
+    }
+  ],
+  "end_sentinel": "__END__",
+  "entry": "action--40000000-0000-4000-8000-000000000002",
+  "name": "Post-incident review",
+  "nodes": [
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "timeline collation",
+      "name": "action--40000000-0000-4000-8000-000000000002",
+      "step_id": "action--40000000-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "blameless review template",
+      "name": "action--40000000-0000-4000-8000-000000000003",
+      "step_id": "action--40000000-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "corrective-action tracking",
+      "name": "action--40000000-0000-4000-8000-000000000004",
+      "step_id": "action--40000000-0000-4000-8000-000000000004"
+    }
+  ],
+  "playbook_id": "playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9",
+  "stable_id": "playbook.post_incident_review@v1"
+}
