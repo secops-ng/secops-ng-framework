@@ -223,10 +223,21 @@ both diffs in the same PR.
   the emitted module — these are runtime concerns the integrator
   applies in their own assembly code.
 
+## Worked example
+
+A regenerable, end-to-end worked example lives under
+[`examples/langgraph/vuln-intake/`](../../examples/langgraph/vuln-intake/):
+the portable CACAO playbook, the emitted GraphSpec JSON, the generated
+state + `@tool` bindings module, and a hand-written reference assembly
+that wires everything into a `langgraph.graph.StateGraph`. Start there
+for the canonical demonstration; this document covers the compiler
+surface, the example covers the integration shape.
+
 ## See also
 
 - `compilers/langgraph/README.md` — module-level engineering notes
   (translation tables, design rationale, internals).
 - `tests/compilers/langgraph/` — golden tests and regeneration recipe.
+- `examples/langgraph/vuln-intake/` — end-to-end worked example.
 - `docs/compilers/README.md` — index of all reference compilers.
 - `docs/sovereignty/` — sovereignty posture for the framework.
