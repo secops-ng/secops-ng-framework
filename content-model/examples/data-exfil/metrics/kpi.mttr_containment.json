@@ -1,0 +1,70 @@
+{
+  "stable_id": "kpi.mttr_containment@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Mean time to respond \u2014 containment after detection (MTTR)",
+  "summary": "Duration between detection firing and completion of the containment step in the data-exfil playbook. Measures the responder loop, not the technology. Lower is better.",
+  "unit": "minutes",
+  "direction": "lower_is_better",
+  "target": {
+    "value": 60,
+    "comparator": "<=",
+    "rationale": "Internal goal: containment within one hour for confirmed exfil."
+  },
+  "thresholds": [
+    {
+      "name": "warn",
+      "comparator": ">",
+      "value": 120,
+      "severity": "warn"
+    },
+    {
+      "name": "breach",
+      "comparator": ">",
+      "value": 360,
+      "severity": "high"
+    }
+  ],
+  "measurement": {
+    "source": "workflow",
+    "aggregation": "p95",
+    "formula": "p95( containment.completed_at - triage_signal.started_at ) over confirmed-exfil playbook runs within window.",
+    "inputs": [
+      {
+        "name": "triage_started",
+        "playbook_ref": "playbook.data_exfil@v1",
+        "playbook_step": "triage_signal",
+        "description": "start time of triage step"
+      },
+      {
+        "name": "containment_done",
+        "playbook_ref": "playbook.data_exfil@v1",
+        "playbook_step": "containment",
+        "description": "completion time of containment step"
+      }
+    ],
+    "window": {
+      "duration": "P30D",
+      "sliding": true
+    }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.data_exfil@v1",
+      "step_id": "containment"
+    }
+  ],
+  "control_refs": [
+    "control.dlp_enforcement@v1",
+    "control.network_egress_filtering@v1"
+  ],
+  "external_refs": [
+    {
+      "name": "ENISA \u2014 Incident response good practice",
+      "source": "ENISA",
+      "url": "https://www.enisa.europa.eu/topics/incident-response"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}
