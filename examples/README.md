@@ -9,5 +9,11 @@ reference compilers into the orchestrator targets.
 - [`langgraph/`](langgraph/) — agentic reference target. Worked
   examples of CACAO playbooks compiled to runnable LangGraph agent
   graphs.
+- [`n8n/`](n8n/) — no-code reference target. Worked examples of CACAO
+  playbooks compiled to n8n workflow JSON.
 
-Additional targets (n8n, Temporal) will land alongside their compilers.
+| Playbook              | n8n                                                              |
+|-----------------------|------------------------------------------------------------------|
+| threat-intel-ingest   | [`n8n/threat-intel-ingest/`](n8n/threat-intel-ingest/)           |
+
+Additional targets (Temporal) will land alongside their compilers.
