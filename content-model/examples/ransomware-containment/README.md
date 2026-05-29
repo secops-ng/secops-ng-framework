@@ -72,8 +72,8 @@ beside the step it observes without inferring topology. The playbook
 references additional control and telemetry artifacts that are *not*
 materialised in this directory (network-egress filtering, identity
 revocation, session-token revocation, backup-integrity verification,
-incident notification; OCSF File Activity, Network Activity,
-Authentication, Security Finding) — those bind into sibling worked
+incident notification; OCSF File System Activity, Network Activity,
+Authentication, Incident Finding) — those bind into sibling worked
 examples (`identity-compromise/`, `data-exfil/`) and stay there to
 avoid duplicating mid-layer artifacts.
 
