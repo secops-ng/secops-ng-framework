@@ -1,0 +1,83 @@
+{
+  "stable_id": "kri.escalation_tier_breach@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kri",
+  "title": "Escalation-tier breach — pages reaching the manager tier",
+  "summary": "Count of pages in the window whose acknowledgement was only obtained after the bound escalation chain reached the manager tier (i.e. neither primary nor secondary responders acknowledged within their tier policy). A non-zero value is a residual-risk signal on the rotation programme: either tier policy is too tight against the responders' actual availability, or a coverage gap that the on-call schedule coverage KPI did not catch has shifted load up the chain. Persistent escalation-tier breaches put NIS2 Article 23 early-warning windows at risk because the page-to-ack clock is the head of the notification-window clock.",
+  "unit": "count",
+  "direction": "lower_is_better",
+  "target": {
+    "value": 0,
+    "comparator": "<=",
+    "rationale": "Manager-tier escalations are by design exceptional; a non-zero rolling count is a programme-level signal, not background noise."
+  },
+  "thresholds": [
+    {
+      "name": "warn",
+      "comparator": ">",
+      "value": 1,
+      "severity": "warn"
+    },
+    {
+      "name": "breach",
+      "comparator": ">",
+      "value": 3,
+      "severity": "high"
+    }
+  ],
+  "measurement": {
+    "source": "workflow",
+    "aggregation": "count",
+    "formula": "count( pages where first_ack.tier == 'manager' ) over rolling window.",
+    "inputs": [
+      {
+        "name": "pages",
+        "playbook_ref": "playbook.on_call_rotation@v1",
+        "playbook_step": "action--30000000-0000-4000-8000-000000000003",
+        "description": "bind-escalation-tiers step emissions and downstream page outcomes correlated to the bound chain"
+      },
+      {
+        "name": "ack_evidence",
+        "telemetry_ref": "telemetry.ocsf.api_activity@v1",
+        "field": "actor.user.uid",
+        "description": "first responder acknowledgement event observed in the paging-system application-activity stream, correlated against the bound chain's tier composition"
+      }
+    ],
+    "window": {
+      "duration": "P30D",
+      "sliding": true
+    }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.on_call_rotation@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000003"
+    }
+  ],
+  "control_refs": [
+    "control.on_call_roster_governance@v1"
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.api_activity@v1",
+    "telemetry.ocsf.account_change@v1"
+  ],
+  "external_refs": [
+    {
+      "name": "NIS2 Directive Article 23 — incident notification windows",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj"
+    },
+    {
+      "name": "DORA Regulation Article 19 — reporting of major ICT-related incidents",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+    },
+    {
+      "name": "ENISA — Good practices for incident response and on-call readiness",
+      "source": "ENISA",
+      "url": "https://www.enisa.europa.eu/topics/threat-risk-management"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}

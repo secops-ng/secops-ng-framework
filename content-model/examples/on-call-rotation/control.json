@@ -1,0 +1,69 @@
+{
+  "stable_id": "control.on_call_roster_governance@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "On-call roster governance",
+  "summary": "Operator-owned governance of the on-call roster: who holds primary / secondary / manager tiers per shift window, how rotation handoffs are scheduled, and the binding the paging system reads at page time. The control is satisfied when every shift window has a non-empty roster resolution and a bound escalation chain prior to the window opening. Evidence is the bound chain emitted by the on-call-rotation playbook's bind-escalation-tiers step.",
+  "oscal": {
+    "component": {
+      "uuid": "7a8b9c0d-1e2f-4a3b-8c4d-5e6f7a8b9c0d",
+      "type": "process-procedure",
+      "title": "On-call rotation programme",
+      "description": "Operator-managed rotation programme that schedules responder coverage, resolves the active escalation chain per shift window, and publishes the binding to the paging system before the window opens.",
+      "control-implementations": [
+        {
+          "uuid": "8d9e0f10-2a3b-4c4d-9e5f-6a7b8c9d0e1f",
+          "source": "https://doi.org/10.6028/NIST.SP.800-53r5",
+          "description": "Implements the responder-readiness slice of the incident-response control family and the account-management slice of access control.",
+          "implemented-requirements": [
+            {
+              "uuid": "abcd0002-0001-0001-0001-000000000001",
+              "control-id": "ir-4",
+              "description": "Incident handling capability: maintain a documented responder roster with defined escalation tiers so an incident is assigned to a responsible owner without delay."
+            },
+            {
+              "uuid": "abcd0002-0001-0001-0001-000000000002",
+              "control-id": "ir-7",
+              "description": "Incident response assistance: secondary and manager escalation tiers provide guaranteed reach-back when the primary responder cannot acknowledge within policy."
+            },
+            {
+              "uuid": "abcd0002-0001-0001-0001-000000000003",
+              "control-id": "ac-2",
+              "description": "Account management: rotation handoffs are tracked as account-state changes against the responder identities so role transitions remain auditable."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "d3fend": {
+    "technique_id": "D3-AM",
+    "technique_name": "Account Monitoring",
+    "url": "https://d3fend.mitre.org/technique/d3f:AccountMonitoring/"
+  },
+  "attack_counters": [],
+  "detected_by": [
+    "detection.sigma.privileged_account_modification@v1"
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.account_change@v1",
+    "telemetry.ocsf.api_activity@v1"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.on_call_rotation@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000002"
+    },
+    {
+      "playbook_id": "playbook.on_call_rotation@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000003"
+    }
+  ],
+  "maintainer": "controls-wg@secops-ng.org",
+  "sources": [
+    "NIST SP 800-53 Rev. 5 \u2014 IR-4 Incident Handling, IR-7 Incident Response Assistance, AC-2 Account Management",
+    "ENISA \u2014 Good practices for incident response and on-call readiness",
+    "MITRE D3FEND v1.0.0 \u2014 D3-AM Account Monitoring",
+    "NIS2 Directive (EU) 2022/2555, Article 21(2)(b) \u2014 incident-handling capability"
+  ]
+}

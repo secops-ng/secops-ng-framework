@@ -1,0 +1,82 @@
+{
+  "stable_id": "kpi.mttr_on_call_ack@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Mean time to acknowledge — on-call page (MTTR-ack)",
+  "summary": "Time between a page being dispatched along the bound escalation chain and the first responder acknowledgement. Lower is better. The bind-escalation-tiers step of the on-call-rotation playbook publishes the chain the operator's paging system reads at page time, so a slow ack reflects either an escalation-tier composition that fails to reach an awake responder or a roster gap that the coverage KPI did not catch in advance.",
+  "unit": "minutes",
+  "direction": "lower_is_better",
+  "target": {
+    "value": 5,
+    "comparator": "<=",
+    "rationale": "ENISA good-practice baseline for primary on-call acknowledgement on a paged incident."
+  },
+  "thresholds": [
+    {
+      "name": "warn",
+      "comparator": ">",
+      "value": 10,
+      "severity": "warn"
+    },
+    {
+      "name": "breach",
+      "comparator": ">",
+      "value": 30,
+      "severity": "high"
+    }
+  ],
+  "measurement": {
+    "source": "workflow",
+    "aggregation": "p95",
+    "formula": "p95( first_ack_time - page_dispatch_time ) over paged incidents in window.",
+    "inputs": [
+      {
+        "name": "page_dispatched",
+        "playbook_ref": "playbook.on_call_rotation@v1",
+        "playbook_step": "action--30000000-0000-4000-8000-000000000003",
+        "description": "bind-escalation-tiers step emission of the chain the paging system fans out through"
+      },
+      {
+        "name": "page_ack",
+        "telemetry_ref": "telemetry.ocsf.api_activity@v1",
+        "field": "time",
+        "description": "first responder acknowledgement event observed in the paging-system application-activity stream"
+      }
+    ],
+    "window": {
+      "duration": "P30D",
+      "sliding": true
+    }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.on_call_rotation@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000003"
+    }
+  ],
+  "control_refs": [
+    "control.on_call_roster_governance@v1"
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.api_activity@v1"
+  ],
+  "external_refs": [
+    {
+      "name": "NIS2 Directive Article 23 — incident notification windows",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj"
+    },
+    {
+      "name": "DORA Regulation Article 19 — reporting of major ICT-related incidents",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+    },
+    {
+      "name": "ENISA — Good practices for incident response and on-call readiness",
+      "source": "ENISA",
+      "url": "https://www.enisa.europa.eu/topics/threat-risk-management"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}
