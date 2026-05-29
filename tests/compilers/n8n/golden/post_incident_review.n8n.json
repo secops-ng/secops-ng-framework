@@ -1,0 +1,177 @@
+{
+  "name": "Post-incident review",
+  "nodes": [
+    {
+      "id": "start--40000000-0000-4000-8000-000000000001",
+      "name": "post-incident-review-start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__incident_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the closed/contained incident this review is being run against. External input."
+            },
+            {
+              "name": "__timeline_artifact__",
+              "type": "string",
+              "value": "",
+              "description": "Reference to the collated timeline artifact (path, document ID, or URI) produced by the timeline-collation step."
+            },
+            {
+              "name": "__evidence_gaps_present__",
+              "type": "boolean",
+              "value": "",
+              "description": "Whether the timeline collation step detected gaps in the evidence record \u2014 cleared eventlogs, disabled audit policy, timestomped files, or any of the anti-forensics signals enumerated in external_references. Gaps are recorded in the review without blocking it; the review template explicitly addresses how decisions were made under partial evidence."
+            },
+            {
+              "name": "__review_artifact__",
+              "type": "string",
+              "value": "",
+              "description": "Reference to the completed blameless-review document (path, document ID, or URI) produced by the review-template step."
+            },
+            {
+              "name": "__corrective_action_register__",
+              "type": "string",
+              "value": "",
+              "description": "Reference to the corrective-action register entry (path, ticket ID, or URI) produced by the corrective-action-tracking step. Holds owner, due-date, and verification clause for each action item."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--40000000-0000-4000-8000-000000000002",
+      "name": "timeline collation",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {},
+      "notes": "Collate a chronological timeline of the incident from the artifacts the responders left behind: ticket comments, chat transcripts, EDR / SIEM exports, network captures, and operator-supplied evidence packages. The step must flag gaps in the evidence record where anti-forensics signals (cleared eventlogs, disabled audit policy, timestomped files) are present \u2014 these are recorded in __evidence_gaps_present__ rather than silently smoothed over, so the review template can address decisions made under partial evidence. Produces __timeline_artifact__ and __evidence_gaps_present__.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--40000000-0000-4000-8000-000000000003",
+      "name": "blameless review template",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {},
+      "notes": "Walk the operator's blameless review template against the collated timeline. The template separates contributing factors (process, tooling, staffing, training, environment) from individual error, and explicitly captures decisions that were reasonable given the evidence available at the time. If __evidence_gaps_present__ is true the template's evidence-gaps section is mandatory rather than optional. Produces __review_artifact__.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--40000000-0000-4000-8000-000000000004",
+      "name": "corrective-action tracking",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {},
+      "notes": "Extract corrective actions from the review artifact and register each one with owner, due-date, and verification clause. Registration is the deliverable here \u2014 execution and verification of each action are out of scope for this playbook (they live on the operator's existing change / ticketing system). Produces __corrective_action_register__.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--40000000-0000-4000-8000-000000000005",
+      "name": "post-incident-review-end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "post-incident-review-start": {
+      "main": [
+        [
+          {
+            "node": "timeline collation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "timeline collation": {
+      "main": [
+        [
+          {
+            "node": "blameless review template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "blameless review template": {
+      "main": [
+        [
+          {
+            "node": "corrective-action tracking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "corrective-action tracking": {
+      "main": [
+        [
+          {
+            "node": "post-incident-review-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "post-incident-review",
+    "blameless",
+    "timeline",
+    "corrective-actions",
+    "lessons-learned"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.post_incident_review@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9"
+    },
+    "secops_ng_notes": [
+      "step 'action--40000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--40000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--40000000-0000-4000-8000-000000000004': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n."
+    ]
+  }
+}
