@@ -1,0 +1,78 @@
+{
+  "stable_id": "kpi.timeline_completeness@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Post-incident timeline completeness",
+  "summary": "Share of closed incidents whose post-incident review timeline artifact carries no flagged evidence gap. A timeline-collation step that consumes the upstream anti-forensics / audit-tampering Sigma references and finds no gap signal in the incident window sets `__evidence_gaps_present__` to false; the metric tracks the rolling proportion of such runs. Lower-quality evidence (Sigma references triggered in the incident window) is not a failure of the review \u2014 the review template still records the decisions taken under partial evidence \u2014 but the KPI lets the programme watch how often it operates with full vs. partial evidence.",
+  "unit": "ratio",
+  "direction": "higher_is_better",
+  "target": {
+    "value": 0.9,
+    "comparator": ">=",
+    "rationale": "ENISA good-practice baseline for evidence-completeness on post-incident reviews."
+  },
+  "thresholds": [
+    {
+      "name": "warn",
+      "comparator": "<",
+      "value": 0.8,
+      "severity": "warn"
+    },
+    {
+      "name": "breach",
+      "comparator": "<",
+      "value": 0.6,
+      "severity": "high"
+    }
+  ],
+  "measurement": {
+    "source": "workflow",
+    "aggregation": "ratio",
+    "formula": "count( runs where __evidence_gaps_present__ == false ) / count( runs in window )",
+    "inputs": [
+      {
+        "name": "playbook_run",
+        "playbook_ref": "playbook.post_incident_review@v1",
+        "playbook_step": "action--40000000-0000-4000-8000-000000000002",
+        "description": "timeline-collation step records evidence-gap flag at completion"
+      }
+    ],
+    "window": {
+      "duration": "P90D",
+      "sliding": true
+    }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.post_incident_review@v1",
+      "step_id": "action--40000000-0000-4000-8000-000000000002"
+    }
+  ],
+  "detection_refs": [
+    "detection.sigma.eventlog_cleared@v1",
+    "detection.sigma.security_eventlog_cleared@v1",
+    "detection.sigma.important_eventlog_cleared@v1",
+    "detection.sigma.eventlog_clear_configuration_change@v1",
+    "detection.sigma.event_auditing_disabled@v1",
+    "detection.sigma.auditpol_tampering@v1",
+    "detection.sigma.timestomp_powershell@v1"
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.incident_finding@v1"
+  ],
+  "external_refs": [
+    {
+      "name": "NIS2 Article 21(2)(b) \u2014 incident handling",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+      "external_id": "32022L2555"
+    },
+    {
+      "name": "ENISA \u2014 Good Practices for Supply Chain Cybersecurity",
+      "source": "ENISA",
+      "url": "https://www.enisa.europa.eu/publications/good-practices-for-supply-chain-cybersecurity"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}

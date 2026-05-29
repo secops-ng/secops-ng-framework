@@ -36,15 +36,22 @@ portability. Spot-checkable rule IDs:
 ## Compile targets
 
 `compile_targets` declares `["n8n", "temporal", "langgraph"]`. Emitted
-artifacts under `examples/{n8n,temporal,langgraph}/post-incident-review/`
-are authored by the CORE card; this directory ships the portable
-content only.
+artifacts and golden tests live under
+`tests/compilers/{n8n,temporal,langgraph}/test_post_incident_review.py`
+(plus `examples/langgraph/post-incident-review/` for the LangGraph
+worked example); they were authored by the three CORE cards (PRs #74,
+#79, #86) against the shared CACAO fixture at
+`tests/compilers/_shared/fixtures/post_incident_review.cacao.json`.
+This directory ships the portable content only.
 
 ## Worked example
 
-The cross-layer worked example — detection, control, telemetry, and
-metrics artifacts that bind to this playbook — is authored by the EXTEND
-card under `../../../content-model/examples/post-incident-review/`.
+The cross-layer worked example — control, telemetry, metrics, and
+regulatory cross-references that bind to this playbook — lives at
+`../../../content-model/examples/post-incident-review/`. The metrics
+shipped there are pinned by `x_secops_ng.metric_refs` above; the
+regulatory cross-references wire the metrics into NIS2 / DORA / CRA
+mapping packs under `../../mappings/`.
 
 ## Sources
 
