@@ -2,3 +2,19 @@
 
 OCSF event schema bindings and sample payloads. Every playbook expects its
 input events to conform to one of the bindings defined here.
+
+Each binding is a JSON document validated by
+`content-model/telemetry.schema.json`. Files are named
+`<stable_id>.json` (the `@` in `stable_id` is preserved in the filename).
+
+## Bindings
+
+| Stable ID                              | OCSF version | Class UID | Class name           | Consumers                  |
+|----------------------------------------|--------------|-----------|----------------------|----------------------------|
+| `telemetry.ocsf.email_activity@v1`     | 1.4.0        | 4009      | Email Activity       | `playbook.phishing_triage@v1` |
+| `telemetry.ocsf.email_url_activity@v1` | 1.4.0        | 4012      | Email URL Activity   | `playbook.phishing_triage@v1` |
+| `telemetry.ocsf.file_activity@v1`      | 1.4.0        | 1001      | File System Activity | `playbook.phishing_triage@v1` |
+
+Class UIDs are pinned to OCSF v1.4.0; do not introduce a binding without
+verifying its class UID against the upstream schema at
+<https://schema.ocsf.io/1.4.0/>.

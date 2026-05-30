@@ -1,0 +1,38 @@
+{
+  "stable_id": "telemetry.ocsf.email_activity@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Email Activity event (inbound message ingest for phishing triage)",
+  "summary": "OCSF Email Activity events the phishing-triage playbook consumes when a reported or swept message lands at the secure email gateway. Carries the envelope, headers, and authentication outcomes (SPF/DKIM/DMARC) used by header-enrichment, suppression, and intent-classification steps.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 4,
+    "category_name": "Network Activity",
+    "class_uid": 4009,
+    "class_name": "Email Activity"
+  },
+  "direction": "ingest",
+  "fields_used": [
+    "time",
+    "activity_id",
+    "email.from",
+    "email.to",
+    "email.reply_to",
+    "email.subject",
+    "email.message_uid",
+    "email.smtp_hello",
+    "email_auth.spf",
+    "email_auth.dkim",
+    "email_auth.dmarc",
+    "src_endpoint.ip"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.phishing_triage@v1"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org",
+  "sources": [
+    "OCSF v1.4.0 Network Activity category — Email Activity class (uid 4009)"
+  ]
+}

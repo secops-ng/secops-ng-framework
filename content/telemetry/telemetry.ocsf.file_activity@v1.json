@@ -1,0 +1,34 @@
+{
+  "stable_id": "telemetry.ocsf.file_activity@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "File System Activity event (attachment + dropped-file telemetry for phishing triage)",
+  "summary": "OCSF File System Activity events the phishing-triage playbook consumes for attachment evaluation (sandbox verdicts, hash reputation) and, in the malware-attached branch, endpoint observations of artifacts written by a clicked attachment so the endpoint-isolation step can be scoped to affected hosts.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 1,
+    "category_name": "System Activity",
+    "class_uid": 1001,
+    "class_name": "File System Activity"
+  },
+  "direction": "ingest",
+  "fields_used": [
+    "time",
+    "activity_id",
+    "file.name",
+    "file.path",
+    "file.hashes",
+    "file.mime_type",
+    "actor.process.file.path",
+    "device.uid"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.phishing_triage@v1"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org",
+  "sources": [
+    "OCSF v1.4.0 System Activity category — File System Activity class (uid 1001)"
+  ]
+}
