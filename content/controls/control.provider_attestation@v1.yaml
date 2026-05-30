@@ -1,0 +1,37 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.provider_attestation@v1
+title: ICT third-party provider attestation
+summary: >-
+  Operator collects and refreshes attestations from ICT third-party
+  service providers covering the security characteristics relied on
+  under the contractual arrangement, on the declared cadence.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "SR-3"
+    title: "Supply Chain Controls and Processes"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "SR-6"
+    title: "Supplier Assessments and Reviews"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.5.19"
+    title: "Information security in supplier relationships"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.5.22"
+    title: "Monitoring, review and change management of supplier services"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-d"
+    title: "Supply-chain security"
+  - catalog: "DORA Article 5"
+    control_id: "art-28"
+    title: "General principles for ICT third-party risk"
+
+d3fend_refs:
+  - d3f_id: D3-OAM
+    technique_name: "Operational Activity Mapping"
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+  captured_at: '2026-05-30'

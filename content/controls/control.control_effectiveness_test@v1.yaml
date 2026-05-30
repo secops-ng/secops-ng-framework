@@ -1,0 +1,31 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.control_effectiveness_test@v1
+title: Control effectiveness test
+summary: >-
+  Operator runs scheduled effectiveness tests on declared controls
+  (walkthrough, sample, or instrumented probe) and archives the result
+  so coverage and pass-rate trends are auditable.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "CA-2"
+    title: "Control Assessments"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "CA-7"
+    title: "Continuous Monitoring"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.5.36"
+    title: "Compliance with policies, rules and standards for information security"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-f"
+    title: "Effectiveness assessment"
+
+d3fend_refs:
+  - d3f_id: D3-OAM
+    technique_name: "Operational Activity Mapping"
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+  captured_at: '2026-05-30'

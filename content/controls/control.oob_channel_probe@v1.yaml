@@ -1,0 +1,31 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.oob_channel_probe@v1
+title: Out-of-band emergency channel probe
+summary: >-
+  Operator periodically tests the out-of-band emergency communications
+  channel (voice, secure messaging, paging) to confirm it is reachable
+  independently of the primary information-system path.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "IR-3"
+    title: "Incident Response Testing"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "CP-2(2)"
+    title: "Capacity Planning"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.5.24"
+    title: "Information security incident management planning and preparation"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-j"
+    title: "Secured emergency communications"
+
+d3fend_refs:
+  - d3f_id: D3-IRA
+    technique_name: "Incident Response Analysis"
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+  captured_at: '2026-05-30'

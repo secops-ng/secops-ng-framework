@@ -1,0 +1,36 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.training_attestation@v1
+title: Security training attestation
+summary: >-
+  Operator tracks completion of mandatory security-awareness and role-
+  specific training for in-scope staff, producing attestation evidence
+  on the declared cadence.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "AT-2"
+    title: "Literacy Training and Awareness"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "AT-3"
+    title: "Role-based Training"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "AT-4"
+    title: "Training Records"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.6.3"
+    title: "Information security awareness, education and training"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-g"
+    title: "Cyber hygiene and training"
+
+d3fend_refs:
+  - d3f_id: D3-UA
+    technique_name: "User Behavior Analysis"
+    url: https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/
+    offensive_techniques_attack:
+      - T1566
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/
+  captured_at: '2026-05-30'

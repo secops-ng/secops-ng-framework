@@ -1,0 +1,39 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.asset_inventory_delta@v1
+title: Asset inventory delta capture
+summary: >-
+  Operator maintains an authoritative inventory of information and ICT
+  assets and captures the delta between scheduled snapshots so that
+  unmanaged or undocumented assets surface as exceptions.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "CM-8"
+    title: "System Component Inventory"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "CM-8(2)"
+    title: "Automated Maintenance"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.5.9"
+    title: "Inventory of information and other associated assets"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-i"
+    title: "Asset management"
+
+d3fend_refs:
+  - d3f_id: D3-AI
+    technique_name: "Asset Inventory"
+    url: https://d3fend.mitre.org/technique/d3f:AssetInventory/
+    offensive_techniques_attack:
+      - T1078
+      - T1190
+  - d3f_id: D3-SWI
+    technique_name: "Software Inventory"
+    url: https://d3fend.mitre.org/technique/d3f:SoftwareInventory/
+    offensive_techniques_attack:
+      - T1195
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:AssetInventory/
+  captured_at: '2026-05-30'

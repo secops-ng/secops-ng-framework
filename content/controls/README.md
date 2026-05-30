@@ -3,7 +3,7 @@
 OSCAL component definitions and D3FEND tactic mappings. These are the
 control-side anchors that playbooks and mappings reference.
 
-## Cross-reference layer (SKELETON)
+## Cross-reference layer (CORE)
 
 The mapping YAMLs under `content/mappings/{nis2,dora,cra}/` carry
 `control_refs` of the form `control.<slug>@v1`. To make those bindings
@@ -35,24 +35,50 @@ control. The cross-reference layer is the **thin joining table** the
 mapping layer needs first; the full component-definition shape will land
 alongside the control implementations themselves.
 
-### Seed (worked example)
+### Inventory (CORE)
 
-The SKELETON ships one populated cross-reference file:
+CORE ships cross-reference files for every `control_ref` referenced by
+`content/mappings/{nis2,dora,cra}` — 28 stable IDs covering the full M0
+regulatory surface. Each file anchors the SecOps-NG control to at least
+one OSCAL catalog control (NIST 800-53 Rev5 and/or ISO/IEC 27001:2022
+Annex A) and at least one MITRE D3FEND defensive technique, with the
+offensive ATT&CK techniques the D3FEND tactic addresses captured where
+applicable.
 
-- `control.incident_handling_capability@v1.yaml` — anchors the control
-  referenced by `nis2:art-21-2-b` (NIS2 Article 21(2)(b) — incident
-  handling) to NIST 800-53 Rev5 IR-4 / IR-8, ISO/IEC 27001:2022 A.5.24
-  / A.5.26, and MITRE D3FEND D3-IRA (Incident Response Analysis) /
-  D3-FA (Forensic Analysis).
+| Stable ID | Purpose |
+|---|---|
+| `control.asset_inventory_delta@v1` | Asset inventory delta capture |
+| `control.backup_attestation@v1` | Backup attestation |
+| `control.cert_posture_scan@v1` | TLS certificate posture scan |
+| `control.cloud_identity_least_privilege@v1` | Cloud identity least-privilege posture |
+| `control.control_effectiveness_test@v1` | Control effectiveness test |
+| `control.cra_submission_templates@v1` | CRA notification submission templates |
+| `control.crypto_policy_inventory@v1` | Cryptography policy inventory |
+| `control.cspm_baseline@v1` | Cloud security posture baseline |
+| `control.dora_major_classifier@v1` | DORA major incident classifier |
+| `control.dora_submission_templates@v1` | DORA notification submission templates |
+| `control.iac_policy_guardrail@v1` | Infrastructure-as-code policy guardrail |
+| `control.incident_handling_capability@v1` | Incident-handling capability (seed) |
+| `control.incident_timeline_signals@v1` | Incident timeline signal capture |
+| `control.jml_evidence@v1` | Joiner-mover-leaver evidence |
+| `control.key_rotation_evidence@v1` | Key rotation evidence |
+| `control.mfa_state_probe@v1` | MFA state probe |
+| `control.oob_channel_probe@v1` | Out-of-band emergency channel probe |
+| `control.patch_evidence@v1` | Security update / patch evidence |
+| `control.phishing_simulation@v1` | Phishing simulation |
+| `control.privileged_access_review@v1` | Privileged access review |
+| `control.provider_attestation@v1` | ICT third-party provider attestation |
+| `control.recurring_incident_correlator@v1` | Recurring-incident correlator |
+| `control.restore_drill@v1` | Restore drill |
+| `control.risk_management_policy@v1` | Risk management policy |
+| `control.sbom_capture@v1` | SBOM capture |
+| `control.supplier_inventory@v1` | Supplier inventory |
+| `control.training_attestation@v1` | Security training attestation |
+| `control.vuln_disclosure_intake@v1` | Coordinated vulnerability disclosure intake |
 
-### What CORE and EXTEND will follow up on
+### What EXTEND will follow up on
 
-- **CORE** — populate cross-reference files for *every* `control_ref`
-  referenced by `content/mappings/{nis2,dora,cra}` so the substrate
-  covers the full M0 regulatory surface.
 - **EXTEND** — add a linter under `tests/content/` that asserts each
   mappings entry's `control_ref` resolves to a control file with at
-  least one `oscal_ref` and one `d3fend_ref`.
-
-Until EXTEND lands, the absence of a cross-reference file for a given
-`control_ref` is not an error — it's an unfilled cell in the substrate.
+  least one `oscal_ref` and one `d3fend_ref` (preventing silent
+  regressions when new mapping entries are added).

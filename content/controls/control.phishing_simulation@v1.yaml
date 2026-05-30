@@ -1,0 +1,32 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.phishing_simulation@v1
+title: Phishing simulation
+summary: >-
+  Operator runs scheduled phishing-simulation exercises against in-scope
+  staff and tracks completion, click-through, and report-rate metrics
+  over time.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "AT-2(3)"
+    title: "Social Engineering and Mining"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.6.3"
+    title: "Information security awareness, education and training"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-g"
+    title: "Cyber hygiene and training"
+
+d3fend_refs:
+  - d3f_id: D3-UA
+    technique_name: "User Behavior Analysis"
+    url: https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/
+    offensive_techniques_attack:
+      - T1566
+      - T1566.001
+      - T1566.002
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/
+  captured_at: '2026-05-30'

@@ -1,0 +1,39 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.vuln_disclosure_intake@v1
+title: Coordinated vulnerability disclosure intake
+summary: >-
+  Operator operates a coordinated vulnerability disclosure intake with a
+  single point of contact, acknowledgement SLA, and a tracked queue from
+  receipt through remediation.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "SI-5"
+    title: "Security Alerts, Advisories, and Directives"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "RA-5"
+    title: "Vulnerability Monitoring and Scanning"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.8.8"
+    title: "Management of technical vulnerabilities"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.6.8"
+    title: "Information security event reporting"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-e"
+    title: "Vulnerability handling and disclosure"
+  - catalog: "CRA Annex I"
+    control_id: "annex-i-2-cvd-policy"
+    title: "Coordinated vulnerability disclosure policy"
+
+d3fend_refs:
+  - d3f_id: D3-IRA
+    technique_name: "Incident Response Analysis"
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    offensive_techniques_attack:
+      - T1190
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+  captured_at: '2026-05-30'

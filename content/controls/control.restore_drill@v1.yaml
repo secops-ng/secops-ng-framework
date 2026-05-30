@@ -1,0 +1,37 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.restore_drill@v1
+title: Restore drill
+summary: >-
+  Operator periodically restores backups into an isolated target and
+  validates the recovered system meets the declared recovery objectives,
+  archiving the drill result.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "CP-4"
+    title: "Contingency Plan Testing"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "CP-10"
+    title: "System Recovery and Reconstitution"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.5.30"
+    title: "ICT readiness for business continuity"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.8.13"
+    title: "Information backup"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-c"
+    title: "Business continuity"
+
+d3fend_refs:
+  - d3f_id: D3-SRA
+    technique_name: "System Recovery Analysis"
+    url: https://d3fend.mitre.org/technique/d3f:SystemRecoveryAnalysis/
+    offensive_techniques_attack:
+      - T1486
+      - T1490
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:SystemRecoveryAnalysis/
+  captured_at: '2026-05-30'

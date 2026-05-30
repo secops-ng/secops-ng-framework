@@ -1,0 +1,31 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.recurring_incident_correlator@v1
+title: Recurring-incident correlator
+summary: >-
+  Operator correlates ICT-related incidents over a six-month rolling
+  window on apparent root cause so a recurring pattern that aggregates
+  over the major-incident threshold is detected and escalated.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "IR-4(4)"
+    title: "Information Correlation"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "AU-6"
+    title: "Audit Record Review, Analysis, and Reporting"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.5.27"
+    title: "Learning from information security incidents"
+  - catalog: "DORA Article 5"
+    control_id: "art-18"
+    title: "Classification of ICT-related incidents"
+
+d3fend_refs:
+  - d3f_id: D3-IRA
+    technique_name: "Incident Response Analysis"
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+  captured_at: '2026-05-30'

@@ -1,0 +1,35 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.privileged_access_review@v1
+title: Privileged access review
+summary: >-
+  Operator runs a periodic review of privileged accounts and elevated
+  entitlements, recertifying or revoking each binding on the declared
+  cadence.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "AC-2(7)"
+    title: "Privileged User Accounts"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "AC-6(7)"
+    title: "Review of User Privileges"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.8.2"
+    title: "Privileged access rights"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-i"
+    title: "Access control"
+
+d3fend_refs:
+  - d3f_id: D3-AM
+    technique_name: "Account Monitoring"
+    url: https://d3fend.mitre.org/technique/d3f:AccountMonitoring/
+    offensive_techniques_attack:
+      - T1078
+      - T1078.004
+      - T1098
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:AccountMonitoring/
+  captured_at: '2026-05-30'

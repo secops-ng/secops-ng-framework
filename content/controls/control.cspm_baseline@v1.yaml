@@ -1,0 +1,37 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.cspm_baseline@v1
+title: Cloud security posture baseline
+summary: >-
+  Operator runs a Cloud Security Posture Management baseline scan
+  against declared cloud accounts, with findings classified, owned, and
+  tracked against a target SLA.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "CM-2"
+    title: "Baseline Configuration"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "CM-6"
+    title: "Configuration Settings"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "RA-5"
+    title: "Vulnerability Monitoring and Scanning"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.8.9"
+    title: "Configuration management"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.8.8"
+    title: "Management of technical vulnerabilities"
+
+d3fend_refs:
+  - d3f_id: D3-SCP
+    technique_name: "System Configuration Permissions"
+    url: https://d3fend.mitre.org/technique/d3f:SystemConfigurationPermissions/
+    offensive_techniques_attack:
+      - T1578
+      - T1098.001
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:SystemConfigurationPermissions/
+  captured_at: '2026-05-30'

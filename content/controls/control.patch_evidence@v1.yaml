@@ -1,0 +1,33 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.patch_evidence@v1
+title: Security update / patch evidence
+summary: >-
+  Operator produces dated evidence that security updates are available,
+  disseminated to in-scope deployments, and accompanied by advisory
+  information for the duration of the declared support period.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "SI-2"
+    title: "Flaw Remediation"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "SI-2(2)"
+    title: "Automated Flaw Remediation Status"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.8.8"
+    title: "Management of technical vulnerabilities"
+  - catalog: "CRA Annex I"
+    control_id: "annex-i-2-security-updates"
+    title: "Security updates"
+
+d3fend_refs:
+  - d3f_id: D3-SU
+    technique_name: "Software Update"
+    url: https://d3fend.mitre.org/technique/d3f:SoftwareUpdate/
+    offensive_techniques_attack:
+      - T1195
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:SoftwareUpdate/
+  captured_at: '2026-05-30'
