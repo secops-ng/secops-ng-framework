@@ -68,7 +68,7 @@ d3fend:
   # CACAO step UUIDs are pinned where the technique applies to a
   # single step; otherwise the step field is omitted.
   - step: action--10000000-0000-4000-8000-000000000002
-    d3fend_id: D3-OSM
+    d3fend_id: D3-OAM
     d3fend_name: Operational Activity Mapping
     url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
     notes: >-
@@ -116,23 +116,17 @@ d3fend:
       subsequent network telemetry against the activated rule set.
 
 ocsf:
-  # OCSF v1.3.0 telemetry bindings. The playbook consumes a Threat
-  # Intelligence Inference bundle from the upstream feed, re-emits
-  # the normalised records (so downstream consumers can subscribe),
-  # and emits a Detection Finding when the activated rule fires.
-  - id: telemetry.threat_intelligence_inference@v1
-    category_uid: 5
-    category_name: Discovery
-    class_uid: 5005
-    class_name: Threat Intelligence Inference
-    ocsf_version: "1.3.0"
-    direction: both
-    notes: >-
-      Consumed at the normalise step (STIX 2.1 bundle mapped into
-      OCSF) and emitted to downstream subscribers as the canonical
-      normalised record. Schema:
-      https://schema.ocsf.io/1.3.0/classes/threat_intel_inference
-
+  # OCSF v1.3.0 telemetry bindings. Note on the consumed side: the
+  # upstream input is a STIX 2.1 bundle delivered over TAXII (or an
+  # equivalent STIX 2.1 endpoint), NOT an OCSF event. STIX SDOs
+  # (Indicator, Malware, Threat-Actor) are mapped into the operator's
+  # canonical normalised-indicator record at the normalise step; the
+  # released OCSF v1.3.0 catalogue does not contain a dedicated
+  # threat-intel ingest class to pin against, so no consumed OCSF
+  # entry is asserted here. The only OCSF binding this playbook
+  # commits to is the Detection Finding (class_uid 2004) it emits
+  # when the activated upstream Sigma rule matches subsequent
+  # telemetry.
   - id: telemetry.detection_finding@v1
     category_uid: 2
     category_name: Findings

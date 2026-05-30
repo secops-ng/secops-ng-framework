@@ -36,7 +36,7 @@ card adds KPI metric files and the hooks block in this README.
 
 | Step | Technique | Identifier |
 |---|---|---|
-| pull upstream feed | Operational Activity Mapping | D3-OSM |
+| pull upstream feed | Operational Activity Mapping | D3-OAM |
 | normalise STIX to OCSF | Identifier Activity Analysis | D3-IAA |
 | propagate to blocklist | Inbound Traffic Filtering | D3-ITF |
 | propagate to blocklist | Outbound Traffic Filtering | D3-OTF |
@@ -45,9 +45,17 @@ card adds KPI metric files and the hooks block in this README.
 
 ### OCSF v1.3.0
 
+The playbook's input contract is a STIX 2.1 bundle delivered over
+TAXII (or an equivalent STIX 2.1 endpoint), not an OCSF event — the
+released OCSF v1.3.0 catalogue does not contain a dedicated
+threat-intel ingest class, so the consumed side is asserted in
+STIX-native terms (Indicator, Malware, Threat-Actor SDOs) rather
+than pinned to an OCSF class. The only OCSF binding this playbook
+commits to is the Detection Finding emitted when the activated
+upstream Sigma rule matches subsequent telemetry.
+
 | Event class | class_uid | Direction |
 |---|---|---|
-| Threat Intelligence Inference | 5005 | consumes + emits |
 | Detection Finding | 2004 | emits |
 
 ### NIS2 Art. 21(2)(d) — supply-chain security
@@ -124,6 +132,6 @@ a CI failure.
 
 - OASIS CACAO v2.0 specification
 - OASIS STIX 2.1 specification
-- OCSF v1.3 — Threat Intelligence Inference (5005) and Security Finding (2001)
+- OCSF v1.3 — Detection Finding (2004)
 - SigmaHQ — upstream rule IDs referenced above
 - ENISA — EU CSIRTs network operational guidance
