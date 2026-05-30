@@ -1,0 +1,38 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.incident_timeline_signals@v1
+title: Incident timeline signal capture
+summary: >-
+  Operator captures the regulated clock signals — discovery,
+  classification, containment, recovery, notification — on every in-
+  scope incident so NIS2 / DORA / CRA notification SLAs can be computed
+  and audited from a single source.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "IR-4"
+    title: "Incident Handling"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "IR-6"
+    title: "Incident Reporting"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.5.24"
+    title: "Information security incident management planning and preparation"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.5.25"
+    title: "Assessment and decision on information security events"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art-23"
+    title: "Reporting obligations"
+
+d3fend_refs:
+  - d3f_id: D3-IRA
+    technique_name: "Incident Response Analysis"
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    offensive_techniques_attack:
+      - T1486
+      - T1190
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+  captured_at: '2026-05-30'

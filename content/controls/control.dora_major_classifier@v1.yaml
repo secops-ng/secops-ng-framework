@@ -1,0 +1,32 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.dora_major_classifier@v1
+title: DORA major incident classifier
+summary: >-
+  Operator applies the DORA Article 18 classification criteria (clients
+  affected, reputational impact, duration, geographical spread, data
+  losses, criticality, economic impact) on every ICT-related incident so
+  the major-incident threshold is evaluated consistently.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "IR-4"
+    title: "Incident Handling"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "IR-8"
+    title: "Incident Response Plan"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.5.25"
+    title: "Assessment and decision on information security events"
+  - catalog: "DORA Article 5"
+    control_id: "art-18"
+    title: "Classification of ICT-related incidents"
+
+d3fend_refs:
+  - d3f_id: D3-IRA
+    technique_name: "Incident Response Analysis"
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+  captured_at: '2026-05-30'

@@ -1,0 +1,33 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.key_rotation_evidence@v1
+title: Key rotation evidence
+summary: >-
+  Operator produces dated evidence that cryptographic keys, secrets, and
+  service credentials are rotated within the cadence declared in the
+  crypto policy.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "SC-12"
+    title: "Cryptographic Key Establishment and Management"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "SC-28"
+    title: "Protection of Information at Rest"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.8.24"
+    title: "Use of cryptography"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-h"
+    title: "Cryptography"
+
+d3fend_refs:
+  - d3f_id: D3-KM
+    technique_name: "Key Management"
+    url: https://d3fend.mitre.org/technique/d3f:KeyManagement/
+    offensive_techniques_attack:
+      - T1552.004
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:KeyManagement/
+  captured_at: '2026-05-30'

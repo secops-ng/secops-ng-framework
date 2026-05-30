@@ -1,0 +1,35 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.sbom_capture@v1
+title: SBOM capture
+summary: >-
+  Operator produces a Software Bill of Materials in a machine-readable
+  format (CycloneDX or SPDX) for every release of an in-scope product
+  and retains it for the declared support period.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "SR-4"
+    title: "Provenance"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "SR-11"
+    title: "Component Authenticity"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.8.30"
+    title: "Outsourced development"
+  - catalog: "CRA Annex I"
+    control_id: "annex-i-2-sbom"
+    title: "Software bill of materials"
+
+d3fend_refs:
+  - d3f_id: D3-SWI
+    technique_name: "Software Inventory"
+    url: https://d3fend.mitre.org/technique/d3f:SoftwareInventory/
+    offensive_techniques_attack:
+      - T1195
+      - T1195.001
+      - T1195.002
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:SoftwareInventory/
+  captured_at: '2026-05-30'

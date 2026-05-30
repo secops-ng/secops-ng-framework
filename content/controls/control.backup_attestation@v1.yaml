@@ -1,0 +1,36 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.backup_attestation@v1
+title: Backup attestation
+summary: >-
+  Operator produces dated evidence that backups for in-scope assets run
+  on schedule, complete successfully, and are stored with the integrity
+  controls declared in the backup policy.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "CP-9"
+    title: "System Backup"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "CP-9(1)"
+    title: "Testing for Reliability and Integrity"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.8.13"
+    title: "Information backup"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-c"
+    title: "Business continuity"
+
+d3fend_refs:
+  - d3f_id: D3-DENCR
+    technique_name: "Disk Encryption"
+    url: https://d3fend.mitre.org/technique/d3f:DiskEncryption/
+    offensive_techniques_attack:
+      - T1486
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:DiskEncryption/
+  captured_at: '2026-05-30'
+  notes: >-
+    Backup attestation is the evidence step; the recovery exercise is
+    anchored separately under control.restore_drill@v1.

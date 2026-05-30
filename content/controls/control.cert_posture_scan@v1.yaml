@@ -1,0 +1,33 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.cert_posture_scan@v1
+title: TLS certificate posture scan
+summary: >-
+  Operator periodically scans declared endpoints to confirm TLS
+  certificate validity, expiry windows, and conformance to the crypto
+  policy (algorithm, key length, issuer trust).
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "SC-12"
+    title: "Cryptographic Key Establishment and Management"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "SC-17"
+    title: "Public Key Infrastructure Certificates"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.8.24"
+    title: "Use of cryptography"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-h"
+    title: "Cryptography"
+
+d3fend_refs:
+  - d3f_id: D3-CH
+    technique_name: "Certificate Analysis"
+    url: https://d3fend.mitre.org/technique/d3f:CertificateAnalysis/
+    offensive_techniques_attack:
+      - T1573
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:CertificateAnalysis/
+  captured_at: '2026-05-30'

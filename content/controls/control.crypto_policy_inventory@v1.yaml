@@ -1,0 +1,33 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.crypto_policy_inventory@v1
+title: Cryptography policy inventory
+summary: >-
+  Operator maintains an inventory of cryptographic uses (TLS, data at
+  rest, signing keys, secrets vaults) bound to the controlling policy
+  and the responsible owner.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "SC-13"
+    title: "Cryptographic Protection"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "SC-12"
+    title: "Cryptographic Key Establishment and Management"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.8.24"
+    title: "Use of cryptography"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-h"
+    title: "Cryptography"
+
+d3fend_refs:
+  - d3f_id: D3-KM
+    technique_name: "Key Management"
+    url: https://d3fend.mitre.org/technique/d3f:KeyManagement/
+    offensive_techniques_attack:
+      - T1552.004
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:KeyManagement/
+  captured_at: '2026-05-30'

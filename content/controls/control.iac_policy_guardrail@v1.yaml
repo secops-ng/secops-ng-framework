@@ -1,0 +1,33 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.iac_policy_guardrail@v1
+title: Infrastructure-as-code policy guardrail
+summary: >-
+  Operator enforces policy-as-code checks on infrastructure definitions
+  (Terraform, Pulumi, Kubernetes manifests) so non-conformant
+  configurations are blocked or flagged before deployment.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "CM-3"
+    title: "Configuration Change Control"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "CM-7"
+    title: "Least Functionality"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.8.9"
+    title: "Configuration management"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.8.32"
+    title: "Change management"
+
+d3fend_refs:
+  - d3f_id: D3-SCP
+    technique_name: "System Configuration Permissions"
+    url: https://d3fend.mitre.org/technique/d3f:SystemConfigurationPermissions/
+    offensive_techniques_attack:
+      - T1578
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:SystemConfigurationPermissions/
+  captured_at: '2026-05-30'
