@@ -1,0 +1,66 @@
+stable_id: kpi.cra_severe_incident_on_time@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: CRA severe-incident notification on-time rate
+summary: >
+  Ratio of CRA Article 14(3) severe-incident notifications dispatched within their per-stage clocks (24h / 72h / 1 month) to total in-scope notifications in the evaluation window. Measures whether the CRA Article 14(3) severe-incident regulator-notification
+  clock is held by the operator's submission pipeline end-to-end, including
+  the orchestration step latency between awareness and dispatch.
+unit: ratio
+direction: higher_is_better
+target:
+  value: 1.00
+  comparator: ">="
+  rationale: >
+    Regulator-notification clocks under CRA Article 14 are hard
+    obligations: the on-time rate target is 100% and any miss is a
+    reportable compliance exception.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 1.00
+    severity: warn
+  - name: breach
+    comparator: "<"
+    value: 0.95
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: ratio
+  formula: >
+    For each Article 14(3) notification dispatched within the evaluation
+    window, compute whether the dispatch timestamp is earlier than
+    (awareness_timestamp + clock). Ratio = on_time_count /
+    dispatched_count. Exclude in-scope cases whose dispatch step never
+    fired so the indicator does not silently improve when the
+    notification pipeline stalls.
+  inputs:
+    - name: awareness_timestamp
+      description: >
+        Operator-awareness timestamp recorded by the CRA reporting
+        trigger assessment step, used as the start of the severe-incident clock.
+      playbook_step: action--01a17a01-0000-4000-8000-000000000004
+    - name: notification_dispatch
+      description: >
+        Regulator-notification chain step transition that dispatches the
+        severe-incident notification chain (24h / 72h / 1 month) for incidents impacting product security.
+      playbook_step: action--01a17a01-0000-4000-8000-000000000006
+  window:
+    duration: P30D
+    sliding: true
+playbook_refs:
+  - playbook_id: playbook.vuln_intake@v1
+    step_id: action--01a17a01-0000-4000-8000-000000000006
+external_refs:
+  - name: CRA — Article 14(3) reporting obligation
+    source: EU
+    external_id: Regulation (EU) 2024/2847, Art. 14
+    url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+  - name: ENISA — single reporting platform for CRA Article 14 submissions
+    source: ENISA
+    url: https://www.enisa.europa.eu/
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org

@@ -1,0 +1,65 @@
+stable_id: kri.cvd_intake_aging@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: CVD intake backlog aging
+summary: >
+  Count of open coordinated-vulnerability-disclosure cases whose age on
+  the operator's intake queue exceeds the documented CVD policy
+  acknowledgement / triage window. A residual-risk indicator that
+  surfaces a stalled disclosure channel (CRA Annex I §2(5)) before it
+  becomes a reportable-incident exposure.
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: "=="
+  rationale: >
+    Open backlog of overdue disclosures should be zero in steady state;
+    any non-zero value is an open exposure on the CVD channel.
+thresholds:
+  - name: warn
+    comparator: ">="
+    value: 1
+    severity: warn
+  - name: breach
+    comparator: ">="
+    value: 5
+    severity: high
+measurement:
+  source: workflow
+  aggregation: count
+  formula: >
+    Snapshot count of disclosure cases that are still open at the end of
+    the evaluation window and whose elapsed time since intake exceeds the
+    operator's documented CVD acknowledgement / triage window. Closed
+    cases drop out of the count regardless of how long they took.
+  inputs:
+    - name: intake_disclosure
+      description: >
+        First playbook step transition that registers an inbound
+        disclosure on the case ledger.
+      playbook_step: action--01a17a01-0000-4000-8000-000000000002
+    - name: case_closed
+      description: >
+        Terminal step transition that closes the disclosure case on any
+        response branch (patch, scheduled remediation, accept-risk).
+  window:
+    duration: P30D
+    sliding: true
+playbook_refs:
+  - playbook_id: playbook.vuln_intake@v1
+    step_id: action--01a17a01-0000-4000-8000-000000000002
+external_refs:
+  - name: CRA — Annex I §2(5) coordinated vulnerability disclosure policy
+    source: EU
+    external_id: Regulation (EU) 2024/2847, Annex I §2(5)
+    url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+  - name: DORA — Article 9(4)(a) ICT risk management (vulnerability management)
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 9(4)(a)
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: ISO/IEC 30111:2019 — Vulnerability handling processes
+    source: ISO
+    external_id: ISO/IEC 30111:2019
+maintainer: metrics-wg@secops-ng.org

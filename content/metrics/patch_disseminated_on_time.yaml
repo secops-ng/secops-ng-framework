@@ -1,0 +1,73 @@
+stable_id: kpi.patch_disseminated_on_time@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Security-update dissemination on-time rate
+summary: >
+  Ratio of security updates dispatched within the operator's documented
+  dissemination SLA (per severity band) to total dispatches in the
+  evaluation window. Measures whether the CRA Annex I §2(7) "without
+  undue delay" obligation is held by the operator's release cadence
+  end-to-end, including advisory emission to affected users.
+unit: ratio
+direction: higher_is_better
+target:
+  value: 0.95
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point for the unscoped baseline. The
+    operator's per-severity dissemination SLA is the source of truth for
+    individual dispatches; this catalog target reflects the share of
+    dispatches that hit that SLA.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 0.95
+    severity: warn
+  - name: breach
+    comparator: "<"
+    value: 0.80
+    severity: high
+measurement:
+  source: workflow
+  aggregation: ratio
+  formula: >
+    For each patch / advisory dissemination step transition closed within
+    the evaluation window, compute whether the dissemination timestamp
+    is earlier than (case_open_timestamp + per-severity SLA). Ratio =
+    on_time_count / dispatched_count. Exclude cases whose dissemination
+    step never fired so the indicator does not silently improve when the
+    release pipeline stalls.
+  inputs:
+    - name: case_open
+      description: >
+        First playbook step transition that registers the disclosure on
+        the case ledger.
+      playbook_step: action--01a17a01-0000-4000-8000-000000000002
+    - name: dissemination
+      description: >
+        Per-severity response step transition that dispatches the
+        security update and advisory.
+  window:
+    duration: P30D
+    sliding: true
+playbook_refs:
+  - playbook_id: playbook.vuln_intake@v1
+    step_id: action--01a17a01-0000-4000-8000-000000000008
+  - playbook_id: playbook.vuln_intake@v1
+    step_id: action--01a17a01-0000-4000-8000-000000000009
+  - playbook_id: playbook.vuln_intake@v1
+    step_id: action--01a17a01-0000-4000-8000-00000000000a
+external_refs:
+  - name: CRA — Annex I §2(7) security-update dissemination obligation
+    source: EU
+    external_id: Regulation (EU) 2024/2847, Annex I §2(7)
+    url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+  - name: NIS2 — Article 21(2)(e) vulnerability handling and disclosure
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(e)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ISO/IEC 30111:2019 — Vulnerability handling processes
+    source: ISO
+    external_id: ISO/IEC 30111:2019
+maintainer: metrics-wg@secops-ng.org
