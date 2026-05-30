@@ -4,11 +4,20 @@
   "id": "playbook--7e51c1a6-7e51-4ab1-9ed0-aabbccddeeff",
   "name": "Phishing triage",
   "description": "Inbound suspicious-email triage. Ingests a user-reported or mailbox-sweep email, enriches headers / URLs / attachments against upstream Sigma references and OCSF Email/URL/File activity classes, suppresses already-seen or known-benign reports, classifies the intent of the remaining cases, and routes the case to a response branch keyed on intent. Portable CACAO v2 + SecOps-NG content-model extensions so operators compile to the orchestrator they already run (n8n, Temporal, LangGraph, or community targets).",
-  "playbook_types": ["investigation", "mitigation", "remediation"],
+  "playbook_types": [
+    "investigation",
+    "mitigation",
+    "remediation"
+  ],
   "created_by": "identity--c0c0c0c0-c0c0-4c0c-8c0c-c0c0c0c0c0c0",
   "created": "2026-05-29T00:00:00Z",
-  "modified": "2026-05-29T00:00:00Z",
-  "labels": ["phishing", "email-security", "triage", "intent-routing"],
+  "modified": "2026-05-30T00:00:00Z",
+  "labels": [
+    "phishing",
+    "email-security",
+    "triage",
+    "intent-routing"
+  ],
   "playbook_variables": {
     "__email_id__": {
       "type": "string",
@@ -43,10 +52,18 @@
       "name": "ingest report",
       "description": "Fetch the reported email envelope, headers, body, and attachment metadata from the email-security platform. Accepts both user-reported messages and mailbox-sweep hits; the source is carried in __report_source__ for downstream accounting against the simulation click-rate and suppression-rate metrics.",
       "on_completion": "action--c0a17a01-0000-4000-8000-000000000003",
-      "in_args": ["__email_id__", "__report_source__"],
+      "in_args": [
+        "__email_id__",
+        "__report_source__"
+      ],
       "x_secops_ng": {
-        "telemetry_refs": ["telemetry.ocsf.email_activity@v1"],
-        "control_refs": ["control.oscal.email_filtering@v1"]
+        "telemetry_refs": [
+          "telemetry.ocsf.email_activity@v1"
+        ],
+        "control_refs": [
+          "control.training_attestation@v1",
+          "control.phishing_simulation@v1"
+        ]
       }
     },
     "action--c0a17a01-0000-4000-8000-000000000003": {
@@ -54,20 +71,26 @@
       "name": "enrich headers, URLs, attachments",
       "description": "Run sender-domain authentication (SPF / DKIM / DMARC), URL reputation against the operator's allow/deny posture, and attachment static analysis. Emits OCSF Email Activity, URL Activity, and File Activity records per indicator; correlates against the Sigma email-related rule references pinned in mappings.yaml.",
       "on_completion": "if-condition--c0a17a01-0000-4000-8000-000000000004",
-      "out_args": ["__benign_or_seen__"],
+      "out_args": [
+        "__benign_or_seen__"
+      ],
       "x_secops_ng": {
         "detection_refs": [
           "detection.sigma.email.suspicious_sender_domain@v1",
           "detection.sigma.email.url_shortener_in_body@v1",
           "detection.sigma.email.attachment_double_extension@v1"
         ],
-        "control_refs": ["control.oscal.email_filtering@v1"],
+        "control_refs": [
+          "control.incident_handling_capability@v1"
+        ],
         "telemetry_refs": [
           "telemetry.ocsf.email_activity@v1",
           "telemetry.ocsf.url_activity@v1",
           "telemetry.ocsf.file_activity@v1"
         ],
-        "metric_refs": ["kpi.mttd_phishing@v1"]
+        "metric_refs": [
+          "kpi.mttd_phishing@v1"
+        ]
       }
     },
     "if-condition--c0a17a01-0000-4000-8000-000000000004": {
@@ -83,7 +106,12 @@
       "description": "Link this report onto the existing case (or onto the known-benign sender record), close it without paging, and account the suppression against the suppression-rate KRI. Reporter receives the acknowledgement they already opted into; no further notifications fan out.",
       "on_completion": "end--c0a17a01-0000-4000-8000-00000000000d",
       "x_secops_ng": {
-        "metric_refs": ["kri.phishing_suppression_rate@v1"]
+        "metric_refs": [
+          "kri.phishing_suppression_rate@v1"
+        ],
+        "control_refs": [
+          "control.incident_handling_capability@v1"
+        ]
       }
     },
     "action--c0a17a01-0000-4000-8000-000000000006": {
@@ -91,12 +119,17 @@
       "name": "classify intent",
       "description": "Apply the operator's intent classifier (rule-based heuristics, ML model, or analyst review per maturity) to the enriched evidence. Emits one of: phishing, credential_harvest, malware_attached, business_email_compromise, unknown. The classifier itself is operator-bound; only the output contract is fixed by this playbook.",
       "on_completion": "switch-condition--c0a17a01-0000-4000-8000-000000000007",
-      "out_args": ["__intent__"],
+      "out_args": [
+        "__intent__"
+      ],
       "x_secops_ng": {
         "telemetry_refs": [
           "telemetry.ocsf.email_activity@v1",
           "telemetry.ocsf.url_activity@v1",
           "telemetry.ocsf.file_activity@v1"
+        ],
+        "control_refs": [
+          "control.incident_handling_capability@v1"
         ]
       }
     },
@@ -106,11 +139,21 @@
       "description": "Route to the response branch keyed on the classifier output. Each branch is a single response-routing action that hands off to the appropriate downstream playbook or owner team; the bodies of those downstream playbooks are out of scope here.",
       "switch": "__intent__",
       "cases": {
-        "phishing":                    ["action--c0a17a01-0000-4000-8000-000000000008"],
-        "credential_harvest":          ["action--c0a17a01-0000-4000-8000-000000000009"],
-        "malware_attached":            ["action--c0a17a01-0000-4000-8000-00000000000a"],
-        "business_email_compromise":   ["action--c0a17a01-0000-4000-8000-00000000000b"],
-        "unknown":                     ["action--c0a17a01-0000-4000-8000-00000000000c"]
+        "phishing": [
+          "action--c0a17a01-0000-4000-8000-000000000008"
+        ],
+        "credential_harvest": [
+          "action--c0a17a01-0000-4000-8000-000000000009"
+        ],
+        "malware_attached": [
+          "action--c0a17a01-0000-4000-8000-00000000000a"
+        ],
+        "business_email_compromise": [
+          "action--c0a17a01-0000-4000-8000-00000000000b"
+        ],
+        "unknown": [
+          "action--c0a17a01-0000-4000-8000-00000000000c"
+        ]
       }
     },
     "action--c0a17a01-0000-4000-8000-000000000008": {
@@ -119,8 +162,13 @@
       "description": "Generic phishing response: quarantine / purge the message across mailboxes that received it, block sender + URL hashes at the email-security gateway, and notify the responsible response team. Records the response action against the phishing MTTR clock.",
       "on_completion": "end--c0a17a01-0000-4000-8000-00000000000d",
       "x_secops_ng": {
-        "control_refs": ["control.oscal.email_filtering@v1"],
-        "metric_refs": ["kpi.mttr_phishing_triage@v1"]
+        "control_refs": [
+          "control.incident_handling_capability@v1",
+          "control.incident_timeline_signals@v1"
+        ],
+        "metric_refs": [
+          "kpi.mttr_phishing_triage@v1"
+        ]
       }
     },
     "action--c0a17a01-0000-4000-8000-000000000009": {
@@ -129,8 +177,13 @@
       "description": "Credential-harvest response: quarantine, block landing-page URLs, identify clickers from URL Activity telemetry and force credential reset / step-up on those identities, notify identity team. Feeds the simulation click-rate KPI when the source is a sanctioned phishing simulation.",
       "on_completion": "end--c0a17a01-0000-4000-8000-00000000000d",
       "x_secops_ng": {
-        "control_refs": ["control.oscal.email_filtering@v1"],
-        "telemetry_refs": ["telemetry.ocsf.url_activity@v1"],
+        "control_refs": [
+          "control.incident_handling_capability@v1",
+          "control.incident_timeline_signals@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.url_activity@v1"
+        ],
         "metric_refs": [
           "kpi.mttr_phishing_triage@v1",
           "kpi.phishing_sim_click_rate@v1"
@@ -143,9 +196,16 @@
       "description": "Malware-attachment response: quarantine, block attachment SHA-256 at the gateway, hand the host-side investigation off to the endpoint owner playbook for any recipient who opened the file (correlated via OCSF File Activity).",
       "on_completion": "end--c0a17a01-0000-4000-8000-00000000000d",
       "x_secops_ng": {
-        "control_refs": ["control.oscal.email_filtering@v1"],
-        "telemetry_refs": ["telemetry.ocsf.file_activity@v1"],
-        "metric_refs": ["kpi.mttr_phishing_triage@v1"]
+        "control_refs": [
+          "control.incident_handling_capability@v1",
+          "control.incident_timeline_signals@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.file_activity@v1"
+        ],
+        "metric_refs": [
+          "kpi.mttr_phishing_triage@v1"
+        ]
       }
     },
     "action--c0a17a01-0000-4000-8000-00000000000b": {
@@ -154,7 +214,14 @@
       "description": "BEC response: escalate to the fraud / finance liaison, freeze any pending payment instruction tied to the message, and open an identity-compromise sub-investigation for the impersonated or compromised sender account. Distinguished from generic phishing because the response chain leaves email-security and enters finance and identity.",
       "on_completion": "end--c0a17a01-0000-4000-8000-00000000000d",
       "x_secops_ng": {
-        "metric_refs": ["kpi.mttr_phishing_triage@v1"]
+        "metric_refs": [
+          "kpi.mttr_phishing_triage@v1"
+        ],
+        "control_refs": [
+          "control.incident_handling_capability@v1",
+          "control.incident_timeline_signals@v1",
+          "control.recurring_incident_correlator@v1"
+        ]
       }
     },
     "action--c0a17a01-0000-4000-8000-00000000000c": {
@@ -163,7 +230,12 @@
       "description": "Unknown-intent branch: route to a human analyst queue with the enriched evidence packet. Manual outcome is fed back as labelled data for the classifier and recorded for telemetry-coverage accounting.",
       "on_completion": "end--c0a17a01-0000-4000-8000-00000000000d",
       "x_secops_ng": {
-        "metric_refs": ["kpi.mttr_phishing_triage@v1"]
+        "metric_refs": [
+          "kpi.mttr_phishing_triage@v1"
+        ],
+        "control_refs": [
+          "control.incident_handling_capability@v1"
+        ]
       }
     },
     "end--c0a17a01-0000-4000-8000-00000000000d": {
@@ -173,16 +245,24 @@
   },
   "x_secops_ng": {
     "stable_id": "playbook.phishing_triage@v1",
-    "content_version": "0.1.0",
+    "content_version": "0.2.0",
     "maturity": "experimental",
-    "compile_targets": ["n8n", "temporal", "langgraph"],
+    "compile_targets": [
+      "n8n",
+      "temporal",
+      "langgraph"
+    ],
     "detection_refs": [
       "detection.sigma.email.suspicious_sender_domain@v1",
       "detection.sigma.email.url_shortener_in_body@v1",
       "detection.sigma.email.attachment_double_extension@v1"
     ],
     "control_refs": [
-      "control.oscal.email_filtering@v1"
+      "control.incident_handling_capability@v1",
+      "control.incident_timeline_signals@v1",
+      "control.training_attestation@v1",
+      "control.phishing_simulation@v1",
+      "control.recurring_incident_correlator@v1"
     ],
     "telemetry_refs": [
       "telemetry.ocsf.email_activity@v1",
@@ -196,16 +276,17 @@
       "kri.phishing_suppression_rate@v1"
     ],
     "sources": [
-      "OASIS CACAO v2.0 specification — workflow step types (start, action, if-condition, switch-condition, end), variable conventions, x_ extension namespace",
-      "ENISA — Threat Landscape, phishing and social engineering",
-      "NIS2 Directive (EU) 2022/2555, Article 21(2)(b) — incident handling capability",
-      "NIS2 Directive (EU) 2022/2555, Article 21(2)(g) — basic cyber-hygiene practices and training",
-      "DORA Regulation (EU) 2022/2554, Article 18 — classification of ICT-related incidents",
-      "DORA Regulation (EU) 2022/2554, Article 19 — reporting of major ICT-related incidents",
-      "MITRE D3FEND — Message Authentication (d3f:MessageAuthentication), Sender Reputation Analysis (d3f:SenderReputationAnalysis)",
-      "OSCAL controls — SC-44 (Detonation Chambers) and AC-22 (Publicly Accessible Content) as the anchors for control.oscal.email_filtering@v1",
-      "OCSF v1.3.0 — Email Activity (class 4009), URL Activity (class 4002), File Activity (class 1001)",
-      "SigmaHQ — upstream rule provenance for the detection.sigma.email.* references pinned in mappings.yaml (no Sigma rules authored here)"
+      "OASIS CACAO v2.0 specification \u2014 workflow step types (start, action, if-condition, switch-condition, end), variable conventions, x_ extension namespace",
+      "ENISA \u2014 Threat Landscape, phishing and social engineering",
+      "NIS2 Directive (EU) 2022/2555, Article 21(2)(b) \u2014 incident handling capability",
+      "NIS2 Directive (EU) 2022/2555, Article 21(2)(g) \u2014 basic cyber-hygiene practices and training",
+      "DORA Regulation (EU) 2022/2554, Article 18 \u2014 classification of ICT-related incidents",
+      "DORA Regulation (EU) 2022/2554, Article 19 \u2014 reporting of major ICT-related incidents",
+      "MITRE D3FEND \u2014 Message Authentication (d3f:MessageAuthentication), Sender Reputation Analysis (d3f:SenderReputationAnalysis)",
+      "OSCAL anchors: NIST 800-53 IR-4 / IR-6 / IR-8 (incident handling, reporting, plan) and AT-2 / AT-3 / AT-4 (awareness, role-based training, training records) \u2014 wired through content/controls/ entries control.incident_handling_capability@v1, control.incident_timeline_signals@v1, control.training_attestation@v1, control.phishing_simulation@v1, control.recurring_incident_correlator@v1",
+      "OCSF v1.3.0 \u2014 Email Activity (class 4009), URL Activity (class 4002), File Activity (class 1001)",
+      "SigmaHQ \u2014 upstream rule provenance for the detection.sigma.email.* references pinned in mappings.yaml (no Sigma rules authored here)",
+      "DORA Regulation (EU) 2022/2554, Article 17 \u2014 ICT-related incident management process (detect, manage, notify); clock signals captured via control.incident_timeline_signals@v1"
     ]
   }
 }

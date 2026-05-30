@@ -173,7 +173,7 @@ class PlaybookPhishingTriageV1Workflow:
 
     CACAO playbook id : playbook--7e51c1a6-7e51-4ab1-9ed0-aabbccddeeff
     stable_id         : playbook.phishing_triage@v1
-    content_version   : 0.1.0
+    content_version   : 0.2.0
     maturity          : experimental
     workflow_start    : start--c0a17a01-0000-4000-8000-000000000001
     activities        : ingest_report, enrich_headers_urls_attachments, suppress_and_close, classify_intent, response_phishing, response_credential_harvest, response_malware_attached, response_business_email_compromise, response_manual_review

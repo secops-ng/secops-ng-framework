@@ -32,7 +32,7 @@ pack on the EXTEND sub-card.
                       │
        ┌──────────────▼──────────────┐
        │ enrich headers / URLs /     │   sigma email refs, OCSF email/url/file
-       │ attachments                 │   activity, control.oscal.email_filtering@v1
+       │ attachments                 │   activity, control.incident_handling_capability@v1
        └──────────────┬──────────────┘
                       │
             known-benign / already-seen?
@@ -86,7 +86,7 @@ of `phishing`, `credential_harvest`, `malware_attached`,
 | Layer | References |
 |-------|------------|
 | Detection (Sigma) | Upstream SigmaHQ email-related rules. We pin stable IDs `detection.sigma.email.suspicious_sender_domain@v1`, `detection.sigma.email.url_shortener_in_body@v1`, `detection.sigma.email.attachment_double_extension@v1` and point at SigmaHQ — no Sigma rules are authored here. Rule UUIDs land in `mappings.yaml`. |
-| Control (OSCAL / D3FEND) | `control.oscal.email_filtering@v1`, anchored to OSCAL **SC-44** (Detonation Chambers) and **AC-22** (Publicly Accessible Content). D3FEND techniques `d3f:MessageAuthentication` and `d3f:SenderReputationAnalysis` are listed under `sources` and carried in `mappings.yaml` under `x_secops_ng.d3fend_refs[]`. |
+| Control (OSCAL / D3FEND) | Anchored against the SecOps-NG control cross-reference layer under `content/controls/`: `control.incident_handling_capability@v1` (NIS2 Art.21(2)(b) — NIST 800-53 IR-4 / IR-8, ISO 27001 A.5.24), `control.incident_timeline_signals@v1` (DORA Art.17 / NIS2 Art.23 clock signals — IR-4 / IR-6), `control.training_attestation@v1` and `control.phishing_simulation@v1` (NIS2 Art.21(2)(g) — AT-2 / AT-3 / AT-4, ISO 27001 A.6.3), and `control.recurring_incident_correlator@v1` (DORA Art.18 aggregation — IR-4(4) / AU-6). D3FEND techniques `d3f:MessageAuthentication` and `d3f:SenderReputationAnalysis` are listed under `sources` and carried in `mappings.yaml` under `x_secops_ng.d3fend_refs[]`. |
 | Telemetry (OCSF) | `telemetry.ocsf.email_activity@v1` (class **4009**), `telemetry.ocsf.url_activity@v1` (class **4002**), `telemetry.ocsf.file_activity@v1` (class **1001**). |
 | Metrics (KPI / KRI) | `kpi.mttd_phishing@v1`, `kpi.mttr_phishing_triage@v1`, `kpi.phishing_sim_click_rate@v1`, `kri.phishing_suppression_rate@v1`. Bodies on the EXTEND sub-card. |
 
