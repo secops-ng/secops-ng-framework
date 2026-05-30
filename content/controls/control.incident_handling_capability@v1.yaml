@@ -1,0 +1,58 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+#
+# This seed is the SKELETON worked example for the OSCAL/D3FEND control
+# cross-reference layer. It anchors the stable_id
+# `control.incident_handling_capability@v1` (referenced from
+# content/mappings/nis2/article-21-and-23.yaml entry nis2:art-21-2-b) to
+# upstream NIST 800-53 Rev5, ISO/IEC 27001:2022 Annex A, and MITRE D3FEND
+# identifiers. CORE will populate every other control_ref the regimes
+# reference; EXTEND will add a linter.
+stable_id: control.incident_handling_capability@v1
+title: Incident-handling capability
+summary: >-
+  Operator maintains a standing incident-handling capability that
+  detects, triages, contains, remediates, and captures lessons from each
+  security incident, with clear ownership across the lifecycle.
+
+oscal_refs:
+  - catalog: NIST 800-53 rev5
+    control_id: IR-4
+    title: Incident Handling
+  - catalog: NIST 800-53 rev5
+    control_id: IR-8
+    title: Incident Response Plan
+  - catalog: ISO/IEC 27001:2022
+    control_id: A.5.24
+    title: Information security incident management planning and preparation
+  - catalog: ISO/IEC 27001:2022
+    control_id: A.5.26
+    title: Response to information security incidents
+  - catalog: NIS2 Article 21(2)
+    control_id: art21-2-b
+    title: Incident handling
+
+d3fend_refs:
+  - d3f_id: D3-IRA
+    technique_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    offensive_techniques_attack:
+      - T1566
+      - T1078
+      - T1486
+  - d3f_id: D3-FA
+    technique_name: Forensic Analysis
+    url: https://d3fend.mitre.org/technique/d3f:ForensicAnalysis/
+    offensive_techniques_attack:
+      - T1486
+      - T1003
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+  captured_at: '2026-05-30'
+  notes: >-
+    Seed entry for the SKELETON cross-reference layer. OSCAL anchors
+    cite the published NIST SP 800-53 Rev5 catalog and ISO/IEC
+    27001:2022 Annex A; D3FEND anchors cite the public MITRE D3FEND
+    matrix. CORE will widen this to every control_ref referenced by
+    content/mappings/{nis2,dora,cra}.
