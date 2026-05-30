@@ -1,0 +1,75 @@
+stable_id: kpi.false_positive_rate@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Detection false-positive rate
+summary: >
+  Fraction of detection firings that are adjudicated as false positives
+  over a 30-day rolling window, computed per detection class. A firing
+  is a false positive when the post-triage disposition is benign /
+  expected / known-good; it is a true positive when it is adjudicated
+  malicious or suspicious-warranting-response. Firings that are still
+  open at evaluation time are excluded so the indicator does not flap
+  during triage backlogs.
+
+unit: ratio
+direction: lower_is_better
+
+target:
+  value: 0.2
+  comparator: "<="
+  rationale: >
+    Community-recommended starting point for the unscoped catalog
+    baseline. Operators MAY scope tighter targets per detection class
+    (e.g. authentication-anomaly detections typically tolerate higher
+    rates than endpoint-quarantine detections) and ship those as
+    separate catalog entries.
+
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 0.2
+    severity: warn
+  - name: breach
+    comparator: ">"
+    value: 0.5
+    severity: high
+
+measurement:
+  source: detection
+  aggregation: ratio
+  formula: >
+    For each detection class C and the evaluation window, let FP_C be
+    the count of firings adjudicated false positive and TP_C the count
+    adjudicated true positive. Report FP_C / (FP_C + TP_C). Exclude
+    firings whose adjudication is still pending at evaluation time so
+    the indicator reflects closed dispositions only. Report per class;
+    aggregate across classes is left to the dashboard.
+  inputs:
+    - name: detection_firings
+      description: >
+        Stream of detection firings within the evaluation window,
+        bound to their detection-class stable_id. Catalog entry is
+        detection-vendor neutral.
+    - name: triage_dispositions
+      description: >
+        Closed triage dispositions tagging each firing as false
+        positive, true positive, or benign / expected. Sourced from
+        the operator's case-management system; the catalog entry does
+        not name a specific tool.
+  window:
+    duration: P30D
+    sliding: true
+
+external_refs:
+  - name: ENISA — Detection engineering guidance
+    source: ENISA
+    url: https://www.enisa.europa.eu/publications/enisa-threat-landscape
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+  - name: NIST SP 800-92 — Guide to computer security log management
+    source: NIST
+    external_id: NIST SP 800-92
+
+maintainer: metrics-wg@secops-ng.org

@@ -1,0 +1,82 @@
+stable_id: kri.control_effectiveness@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Control effectiveness — residual exposure from attestation state
+summary: >
+  Residual exposure indicator derived from the operator's control
+  attestation state. For each in-scope control, the most recent
+  attestation places it in one of four states: effective, partially
+  effective, ineffective, or overdue (no current attestation within the
+  control's review cadence). The indicator is the share of in-scope
+  controls NOT in the effective state, weighted equally across controls.
+  Higher values mean more residual exposure from the control catalog's
+  own self-assessment, before any compensating-control credit.
+
+unit: ratio
+direction: lower_is_better
+
+target:
+  value: 0.1
+  comparator: "<="
+  rationale: >
+    Community-recommended starting point for the unscoped catalog
+    baseline. Operators under DORA or NIS2 essential-entity scope
+    typically set this lower in their own scoped variants and split it
+    per control family.
+
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 0.1
+    severity: warn
+  - name: breach
+    comparator: ">"
+    value: 0.25
+    severity: high
+  - name: critical
+    comparator: ">"
+    value: 0.5
+    severity: critical
+
+measurement:
+  source: control
+  aggregation: ratio
+  formula: >
+    Let K = set of in-scope controls. For each control k in K, take its
+    most recent attestation as of the evaluation timestamp. Let
+    E = subset of K whose latest attestation is `effective`. Report
+    (|K| - |E|) / |K|. Controls without any attestation, or whose
+    latest attestation predates the control's declared review cadence,
+    count as overdue (i.e. NOT effective). Compensating-control credit
+    is out of scope of this indicator and lives in a separate KRI.
+  inputs:
+    - name: in_scope_controls
+      description: >
+        Set of controls the operator has declared in scope. Sourced
+        from the operator's control catalog (typically an OSCAL system
+        security plan or equivalent); the catalog entry does not name
+        a specific artifact.
+    - name: latest_attestation
+      description: >
+        Most recent attestation per control as of the evaluation
+        timestamp, with effectiveness state and attestation date.
+  window:
+    duration: P1D
+    sliding: false
+
+external_refs:
+  - name: NIS2 — Article 21 risk-management measures
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21
+  - name: DORA — ICT risk-management framework
+    source: EU
+    external_id: Regulation (EU) 2022/2554
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+  - name: ENISA — Risk management methodology
+    source: ENISA
+    url: https://www.enisa.europa.eu/topics/risk-management
+
+maintainer: metrics-wg@secops-ng.org

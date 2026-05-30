@@ -1,0 +1,76 @@
+stable_id: kpi.detection_coverage@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Detection coverage of in-scope ATT&CK techniques
+summary: >
+  Fraction of in-scope MITRE ATT&CK techniques that have at least one
+  production detection bound to them in the operator's deployment. The
+  in-scope set is defined per operator (typically the techniques judged
+  relevant for the operator's threat model, sector, or regulatory
+  perimeter); the catalog entry does not pick that set. A technique
+  counts as covered when at least one detection in production status is
+  bound to it via the shared stable_id shape, regardless of the
+  detection's confidence score.
+
+unit: ratio
+direction: higher_is_better
+
+target:
+  value: 0.6
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point for the unscoped catalog
+    baseline. Operators with tighter sector obligations (e.g. essential
+    entities under NIS2) typically set this higher in their own scoped
+    variants.
+
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 0.6
+    severity: warn
+  - name: breach
+    comparator: "<"
+    value: 0.3
+    severity: high
+
+measurement:
+  source: detection
+  aggregation: ratio
+  formula: >
+    Let T = set of in-scope ATT&CK techniques as declared by the
+    operator's scoping artifact. Let C = subset of T for which at least
+    one detection with maturity=production is bound. Report |C| / |T|.
+    Re-evaluate on every detection catalog change. Exclude techniques
+    flagged out-of-scope from both numerator and denominator so the
+    indicator reflects the operator's declared perimeter, not the full
+    ATT&CK matrix.
+  inputs:
+    - name: in_scope_techniques
+      description: >
+        Set of ATT&CK technique identifiers (T-codes / sub-techniques)
+        that the operator has declared in scope for their detection
+        program. Sourced from the operator's scoping artifact; the
+        catalog entry does not name a specific scoping file.
+    - name: production_detections
+      description: >
+        Detections in production maturity bound to one or more
+        techniques via the shared stable_id shape. Catalog entry is
+        detection-vendor neutral.
+  window:
+    duration: P1D
+    sliding: false
+
+external_refs:
+  - name: MITRE ATT&CK — Enterprise techniques
+    source: MITRE
+    url: https://attack.mitre.org/
+  - name: ENISA — Detection engineering guidance
+    source: ENISA
+    url: https://www.enisa.europa.eu/publications/enisa-threat-landscape
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+
+maintainer: metrics-wg@secops-ng.org

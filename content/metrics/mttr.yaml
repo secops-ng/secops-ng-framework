@@ -1,0 +1,77 @@
+stable_id: kpi.mttr_critical@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Mean time to respond — critical severity
+summary: >
+  Time elapsed between the first authoritative detection firing that opens
+  an incident record and the first containment action recorded in the
+  response playbook, scoped to incidents classified at critical severity.
+  Measured end-to-end across the response pipeline so that triage latency,
+  analyst handoffs, and orchestration step latency all contribute.
+  SecOps-NG does not pick a response vendor; the catalog entry is
+  vendor-neutral and the compile target is the source of truth for the
+  executable form.
+
+unit: minutes
+direction: lower_is_better
+
+target:
+  value: 60
+  comparator: "<="
+  rationale: >
+    Community-recommended starting point for the unscoped catalog
+    baseline at critical severity. Lower-severity variants (for example
+    kpi.mttr_high@v1) loosen this target and live as separate catalog
+    entries.
+
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 60
+    severity: warn
+  - name: breach
+    comparator: ">"
+    value: 240
+    severity: high
+
+measurement:
+  source: workflow
+  aggregation: p95
+  formula: >
+    For each critical-severity incident closed within the evaluation
+    window, compute (first_containment_action_timestamp -
+    first_detection_fire_timestamp) in minutes. Aggregate as p95 across
+    incidents. Exclude incidents where the containment step never fired
+    (record-keeping gap) so the indicator does not silently improve when
+    the response pipeline stalls.
+  inputs:
+    - name: first_detection_fire
+      description: >
+        First authoritative detection firing that opened the incident
+        record at critical severity. Catalog entry is detection-vendor
+        neutral; the compile target resolves the concrete detection
+        identifier.
+    - name: first_containment_action
+      description: >
+        First playbook step transition in the response workflow whose
+        purpose is to limit blast radius (isolate, block, revoke,
+        quarantine). Bound to the canonical containment step of the
+        compiled response playbook.
+      playbook_step: containment
+  window:
+    duration: P30D
+    sliding: true
+
+external_refs:
+  - name: ENISA — Threat Landscape methodology, response-latency discussion
+    source: ENISA
+    url: https://www.enisa.europa.eu/publications/enisa-threat-landscape
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+  - name: NIS2 — Article 23 incident reporting timelines (motivating context)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 23
+
+maintainer: metrics-wg@secops-ng.org
