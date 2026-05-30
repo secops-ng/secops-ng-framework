@@ -124,6 +124,11 @@
         "__compromise_confirmed__"
       ],
       "x_secops_ng": {
+        "control_refs": [
+          "control.incident_handling_capability@v1",
+          "control.incident_timeline_signals@v1",
+          "control.mfa_state_probe@v1"
+        ],
         "detection_refs": [
           "detection.sigma.azure_identity_protection_impossible_travel@v1",
           "detection.sigma.azure_identity_protection_password_spray@v1",
@@ -154,7 +159,8 @@
       ],
       "x_secops_ng": {
         "control_refs": [
-          "control.iam.mfa_enforcement@v1"
+          "control.incident_handling_capability@v1",
+          "control.mfa_state_probe@v1"
         ],
         "metric_refs": [
           "kpi.mttc_identity_compromise@v1"
@@ -174,7 +180,8 @@
       ],
       "x_secops_ng": {
         "control_refs": [
-          "control.iam.session_revocation@v1"
+          "control.incident_handling_capability@v1",
+          "control.incident_timeline_signals@v1"
         ],
         "telemetry_refs": [
           "telemetry.ocsf.authentication@v1"
@@ -196,6 +203,10 @@
         "__lateral_findings_count__"
       ],
       "x_secops_ng": {
+        "control_refs": [
+          "control.incident_handling_capability@v1",
+          "control.incident_timeline_signals@v1"
+        ],
         "detection_refs": [
           "detection.sigma.aws_sts_assumerole_misuse@v1"
         ],
@@ -218,8 +229,9 @@
       ],
       "x_secops_ng": {
         "control_refs": [
-          "control.iam.standing_privilege_review@v1",
-          "control.iam.oauth_consent_review@v1"
+          "control.privileged_access_review@v1",
+          "control.jml_evidence@v1",
+          "control.cloud_identity_least_privilege@v1"
         ],
         "detection_refs": [
           "detection.sigma.azure_mfa_disabled@v1"
@@ -252,10 +264,12 @@
       "detection.sigma.azure_mfa_disabled@v1"
     ],
     "control_refs": [
-      "control.iam.mfa_enforcement@v1",
-      "control.iam.session_revocation@v1",
-      "control.iam.standing_privilege_review@v1",
-      "control.iam.oauth_consent_review@v1"
+      "control.incident_handling_capability@v1",
+      "control.incident_timeline_signals@v1",
+      "control.mfa_state_probe@v1",
+      "control.privileged_access_review@v1",
+      "control.jml_evidence@v1",
+      "control.cloud_identity_least_privilege@v1"
     ],
     "telemetry_refs": [
       "telemetry.ocsf.authentication@v1",
