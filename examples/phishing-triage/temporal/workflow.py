@@ -135,7 +135,7 @@ RESPONSE_MALWARE_ATTACHED_RETRY_POLICY = RetryPolicy(
 
 @activity.defn
 async def response_business_email_compromise() -> None:
-    """BEC response: escalate to the fraud / finance liaison, freeze any pending payment instruction tied to the message, and open an identity-compromise sub-investigation for the impersonated or compromised sender account. Distinguished from generic phishing because the response chain leaves email-security and enters finance and identity.
+    """BEC response: escalate to the fraud / finance liaison, freeze any pending payment instruction tied to the message, and open an identity-compromise sub-investigation for the impersonated or compromised sender account. Distinguished from generic phishing because the response chain leaves email-security and enters finance and identity; a BEC case routinely trips the NIS2 / DORA reporting clocks, so the response stamps the regulator-notification-overrun KRI and the timeline-completeness KPI alongside the phishing MTTR clock.
 
     CACAO step_id: action--c0a17a01-0000-4000-8000-00000000000b
     """
