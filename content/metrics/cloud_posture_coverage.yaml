@@ -39,7 +39,11 @@ measurement:
   window:
     duration: P30D
     sliding: true
-playbook_refs: []
+playbook_refs:
+- playbook_id: playbook.cloud_misconfiguration@v1
+  step_id: action--30000000-0000-4000-8000-000000000003
+- playbook_id: playbook.cloud_misconfiguration@v1
+  step_id: action--30000000-0000-4000-8000-000000000008
 external_refs:
 - name: NIS2 — Article 21(2)(b) incident-handling capability
   source: EU
