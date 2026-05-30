@@ -198,6 +198,10 @@
         ],
         "metric_refs": [
           "kpi.mttd_cloud_misconfig@v1"
+        ],
+        "control_refs": [
+          "control.cspm_baseline@v1",
+          "control.incident_timeline_signals@v1"
         ]
       }
     },
@@ -217,7 +221,8 @@
       "x_secops_ng": {
         "control_refs": [
           "control.cspm_baseline@v1",
-          "control.cloud_identity_least_privilege@v1"
+          "control.cloud_identity_least_privilege@v1",
+          "control.asset_inventory_delta@v1"
         ],
         "telemetry_refs": [
           "telemetry.ocsf.cloud_resource_inventory@v1"
@@ -242,6 +247,10 @@
       "x_secops_ng": {
         "metric_refs": [
           "kri.recurring_cloud_misconfig@v1"
+        ],
+        "control_refs": [
+          "control.cspm_baseline@v1",
+          "control.control_effectiveness_test@v1"
         ]
       }
     },
@@ -261,6 +270,10 @@
         ],
         "metric_refs": [
           "kpi.mttr_cloud_misconfig@v1"
+        ],
+        "control_refs": [
+          "control.incident_handling_capability@v1",
+          "control.oob_channel_probe@v1"
         ]
       }
     },
@@ -277,7 +290,8 @@
         "control_refs": [
           "control.cspm_baseline@v1",
           "control.iac_policy_guardrail@v1",
-          "control.cloud_identity_least_privilege@v1"
+          "control.cloud_identity_least_privilege@v1",
+          "control.patch_evidence@v1"
         ],
         "metric_refs": [
           "kpi.mttr_cloud_misconfig@v1"
@@ -306,6 +320,10 @@
         "metric_refs": [
           "kpi.mttr_cloud_misconfig@v1",
           "kpi.cloud_posture_coverage@v1"
+        ],
+        "control_refs": [
+          "control.cspm_baseline@v1",
+          "control.control_effectiveness_test@v1"
         ]
       }
     },
@@ -332,6 +350,11 @@
         ],
         "metric_refs": [
           "kri.recurring_cloud_misconfig@v1"
+        ],
+        "control_refs": [
+          "control.recurring_incident_correlator@v1",
+          "control.incident_handling_capability@v1",
+          "control.incident_timeline_signals@v1"
         ]
       }
     },
