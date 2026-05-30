@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/content-model/control_xref.schema.json",
+  "title": "SecOps-NG Control Cross-Reference",
+  "description": "Lightweight joining substrate that resolves a SecOps-NG stable control identifier (the shape used by `control_refs` in content/mappings/*) to upstream standard identifiers — OSCAL catalog control IDs and MITRE D3FEND defensive technique IDs — together with the offensive ATT&CK techniques each D3FEND tactic addresses. This schema is intentionally orthogonal to content-model/control.schema.json: that schema models the full OSCAL component-definition for a SecOps-NG control; this one is the thin cross-reference table that the NIS2 / DORA / CRA mapping YAMLs join against. CORE will populate the table for every control_ref used by the three regimes; EXTEND will add a linter that fails when a mapping references a control_ref with no entry here.",
+  "type": "object",
+  "required": ["stable_id", "title", "oscal_refs", "d3fend_refs", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "stable_id": {
+      "type": "string",
+      "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$",
+      "description": "SecOps-NG stable identifier for the control. Same shape as content-model/control.schema.json#stable_id so a future tool can resolve either schema from the same string."
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "Human-readable name of the control. Keep neutral, community-facing language; no vendor or operator branding."
+    },
+    "summary": {
+      "type": "string",
+      "description": "Optional one-paragraph description of the control intent. Mirrors `summary` in content-model/control.schema.json."
+    },
+    "oscal_refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Back-references into recognised control catalogs (NIST 800-53 Rev5, CIS Controls v8, ISO/IEC 27001 Annex A, etc.). At least one entry is required — a control with zero upstream catalog anchors is not yet cross-referenced.",
+      "items": {
+        "type": "object",
+        "required": ["catalog", "control_id"],
+        "additionalProperties": false,
+        "properties": {
+          "catalog": {
+            "type": "string",
+            "description": "Catalog identifier. Use the canonical short form: \"NIST 800-53 rev5\", \"CIS Controls v8\", \"ISO/IEC 27001:2022\", \"NIS2 Article 21(2)\", \"DORA Article 5\", \"CRA Annex I\"."
+          },
+          "control_id": {
+            "type": "string",
+            "description": "Catalog-local control identifier, e.g. \"IR-4\" (NIST), \"17.1\" (CIS), \"A.5.24\" (ISO 27001), \"art21-2-b\" (NIS2)."
+          },
+          "title": {
+            "type": "string",
+            "description": "Optional catalog title for the referenced control, copied verbatim for cross-walk readability."
+          }
+        }
+      }
+    },
+    "d3fend_refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "MITRE D3FEND defensive technique anchors. At least one entry is required.",
+      "items": {
+        "type": "object",
+        "required": ["d3f_id"],
+        "additionalProperties": false,
+        "properties": {
+          "d3f_id": {
+            "type": "string",
+            "pattern": "^D3-[A-Z0-9]+$",
+            "description": "D3FEND technique ID, e.g. D3-IRA (Incident Response Analysis)."
+          },
+          "technique_name": {
+            "type": "string",
+            "description": "Optional human-readable name copied from D3FEND for cross-walk readability."
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Canonical D3FEND URL for the technique."
+          },
+          "offensive_techniques_attack": {
+            "type": "array",
+            "uniqueItems": true,
+            "description": "MITRE ATT&CK technique IDs this D3FEND technique is designed to counter.",
+            "items": {
+              "type": "string",
+              "pattern": "^T[0-9]{4}(\\.[0-9]{3})?$"
+            }
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["source_url", "captured_at"],
+      "additionalProperties": false,
+      "description": "Where these cross-references were captured from, and when. Provenance is required so consumers can re-check upstream drift.",
+      "properties": {
+        "source_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Primary source URL (e.g. https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/, https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final)."
+        },
+        "captured_at": {
+          "type": "string",
+          "format": "date",
+          "description": "ISO-8601 date (YYYY-MM-DD) when these cross-references were captured."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional free-form provenance notes. Community language only — no operator or contract references."
+        }
+      }
+    }
+  }
+}
