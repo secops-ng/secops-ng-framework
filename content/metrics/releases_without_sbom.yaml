@@ -1,0 +1,64 @@
+stable_id: kri.releases_without_sbom@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Releases shipped without an SBOM record
+summary: >
+  Count of releases observed by the vulnerability-intake SBOM correlation
+  step that do not have an attached software bill of materials covering
+  at least the top-level dependencies. Residual-risk indicator against
+  the CRA Annex I §2(1) SBOM obligation. A non-zero value means the
+  intake playbook hit a release it cannot map to component identifiers,
+  reducing the operator's ability to trace exploitation impact.
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: "=="
+  rationale: >
+    CRA Annex I §2(1) requires an SBOM covering at the very least the
+    top-level dependencies for every release of a product with digital
+    elements within scope. Any release seen without one is an open
+    exposure.
+thresholds:
+  - name: warn
+    comparator: ">="
+    value: 1
+    severity: warn
+  - name: breach
+    comparator: ">="
+    value: 5
+    severity: high
+measurement:
+  source: workflow
+  aggregation: count
+  formula: >
+    For each triage step transition recorded within the evaluation
+    window, increment when the SBOM PURL lookup against the affected
+    release returns no record. Distinct releases are counted once per
+    window.
+  inputs:
+    - name: triage_step
+      description: >
+        Triage playbook step transition that performs the SBOM PURL
+        lookup against the affected release.
+      playbook_step: action--01a17a01-0000-4000-8000-000000000003
+  window:
+    duration: P30D
+    sliding: true
+playbook_refs:
+  - playbook_id: playbook.vuln_intake@v1
+    step_id: action--01a17a01-0000-4000-8000-000000000003
+external_refs:
+  - name: CRA — Annex I §2(1) SBOM obligation
+    source: EU
+    external_id: Regulation (EU) 2024/2847, Annex I §2(1)
+    url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+  - name: NIS2 — Article 21(2)(e) vulnerability handling and disclosure
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(e)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: CISA — Minimum Elements for a Software Bill of Materials
+    source: CISA
+    url: https://www.cisa.gov/sbom
+maintainer: metrics-wg@secops-ng.org

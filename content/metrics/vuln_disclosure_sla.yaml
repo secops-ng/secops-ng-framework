@@ -1,0 +1,78 @@
+stable_id: kpi.vuln_disclosure_sla@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Vulnerability-disclosure intake SLA compliance
+summary: >
+  Ratio of inbound vulnerability disclosures whose first reporter
+  acknowledgement is sent within the operator's documented CVD policy SLA
+  (CRA Annex I §2(5) single-point-of-contact obligation). Measures whether
+  the coordinated-vulnerability-disclosure channel is meeting its
+  acknowledgement contract end-to-end, including the orchestration step
+  latency between disclosure receipt and reporter notification.
+unit: ratio
+direction: higher_is_better
+target:
+  value: 0.95
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point for the unscoped baseline. The
+    operator's CVD policy is the source of truth for the per-disclosure
+    SLA threshold; this catalog target reflects the share of disclosures
+    that hit that threshold.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 0.95
+    severity: warn
+  - name: breach
+    comparator: "<"
+    value: 0.80
+    severity: high
+measurement:
+  source: workflow
+  aggregation: ratio
+  formula: >
+    For each disclosure intake step transition closed within the
+    evaluation window, compute whether the reporter acknowledgement
+    timestamp is earlier than (disclosure_received_timestamp + SLA).
+    Ratio = compliant_count / in_scope_count. Exclude disclosures whose
+    intake step never fired (record-keeping gap) so the indicator does
+    not silently improve when the intake channel stalls.
+  inputs:
+    - name: intake_disclosure
+      description: >
+        First playbook step transition that registers an inbound
+        disclosure on the case ledger.
+      playbook_step: action--01a17a01-0000-4000-8000-000000000002
+    - name: reporter_acknowledgement
+      description: >
+        Acknowledgement send-event recorded against the disclosure on the
+        case ledger. The compile target binds the concrete delivery
+        channel.
+  window:
+    duration: P30D
+    sliding: true
+playbook_refs:
+  - playbook_id: playbook.vuln_intake@v1
+    step_id: action--01a17a01-0000-4000-8000-000000000002
+external_refs:
+  - name: CRA — Annex I §2(5) coordinated vulnerability disclosure policy
+    source: EU
+    external_id: Regulation (EU) 2024/2847, Annex I §2(5)
+    url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+  - name: NIS2 — Article 21(2)(e) vulnerability handling and disclosure
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(e)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 9(4)(a) ICT risk management (vulnerability management)
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 9(4)(a)
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: ISO/IEC 29147:2018 — Vulnerability disclosure
+    source: ISO
+    external_id: ISO/IEC 29147:2018
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
