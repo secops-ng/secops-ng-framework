@@ -249,7 +249,7 @@
     "action--30000000-0000-4000-8000-000000000009": {
       "type": "action",
       "name": "comms plan",
-      "description": "Notify the IR lead and comms officer along the operator's pre-bound channels, and draft the regulator early-warning pre-notification per NIS2 Article 23 within the 24-hour clock from initial detection. The drafted notification is staged for human sign-off, not auto-sent.",
+      "description": "Notify the IR lead and comms officer along the operator's pre-bound channels, and draft the regulator early-warning pre-notification per NIS2 Article 23 within the 24-hour clock from initial detection. The drafted notification is staged for human sign-off, not auto-sent. Because this step is the handoff point that closes the incident timeline and trips the statutory reporting clocks, it stamps the timeline-completeness KPI alongside the notification-SLA KPI and the regulator-notification-overrun KRI.",
       "on_completion": "end--30000000-0000-4000-8000-00000000000a",
       "in_args": [
         "__affected_host__",
@@ -266,6 +266,7 @@
         ],
         "metric_refs": [
           "kpi.notification_sla_compliance@v1",
+          "kpi.timeline_completeness@v1",
           "kri.regulator_notification_overrun@v1"
         ]
       }
@@ -311,6 +312,7 @@
       "kpi.mttr_containment@v1",
       "kpi.backup_integrity_pass_rate@v1",
       "kpi.notification_sla_compliance@v1",
+      "kpi.timeline_completeness@v1",
       "kri.regulator_notification_overrun@v1"
     ],
     "sources": [
