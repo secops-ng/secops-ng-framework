@@ -46,7 +46,10 @@ entries:
       - playbook.on_call_rotation@v1
     metric_refs:
       - kpi.mttd@v1
+      - kpi.mttr_critical@v1
       - kpi.mttr@v1
+      - kpi.detection_coverage@v1
+      - kpi.false_positive_rate@v1
       - kri.incidents_without_closeout@v1
       - kpi.mttd_phishing@v1
       - kpi.mttr_phishing_triage@v1
@@ -153,6 +156,7 @@ entries:
       - control.control_effectiveness_test@v1
     playbook_refs: []
     metric_refs:
+      - kri.control_effectiveness@v1
       - kpi.control_effectiveness_coverage@v1
       - kri.overdue_effectiveness_tests@v1
 

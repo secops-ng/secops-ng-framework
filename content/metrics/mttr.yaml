@@ -64,14 +64,25 @@ measurement:
     sliding: true
 
 external_refs:
+  # Primary regulatory anchors. Only IDs already named in
+  # content/mappings/{nis2,dora}/*.yaml are listed.
+  - name: NIS2 — Article 21(2)(b) incident-handling capability (respond)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(b)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: NIS2 — Article 23 incident reporting timelines (motivating context)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 23
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 19(4)(a) initial-4h major-incident notification (motivating context)
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 19(4)(a)
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
   - name: ENISA — Threat Landscape methodology, response-latency discussion
     source: ENISA
     url: https://www.enisa.europa.eu/publications/enisa-threat-landscape
   - name: ISO/IEC 27004 — Information security measurement guidance
     source: ISO
     external_id: ISO/IEC 27004:2016
-  - name: NIS2 — Article 23 incident reporting timelines (motivating context)
-    source: EU
-    external_id: Directive (EU) 2022/2555, Art. 23
 
 maintainer: metrics-wg@secops-ng.org
