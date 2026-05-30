@@ -76,9 +76,38 @@ applicable.
 | `control.training_attestation@v1` | Security training attestation |
 | `control.vuln_disclosure_intake@v1` | Coordinated vulnerability disclosure intake |
 
-### What EXTEND will follow up on
+### Resolution linter (EXTEND)
 
-- **EXTEND** — add a linter under `tests/content/` that asserts each
-  mappings entry's `control_ref` resolves to a control file with at
-  least one `oscal_ref` and one `d3fend_ref` (preventing silent
-  regressions when new mapping entries are added).
+A standalone resolution linter walks every
+`content/mappings/<regime>/*.yaml`, extracts each `control_ref`, and
+asserts that the referenced cross-reference file exists, validates
+against `content-model/control_xref.schema.json`, and is populated with
+at least one `oscal_refs` entry, at least one `d3fend_refs` entry, and
+`provenance.source_url` + `provenance.captured_at`.
+
+Run it locally:
+
+```bash
+# Human-readable
+python -m tools.lint_control_xref
+
+# Machine-readable (CI / dashboards)
+python -m tools.lint_control_xref --json
+```
+
+Exit code is non-zero whenever a finding is emitted. Finding codes
+(stable surface for downstream consumers):
+
+- `missing_xref_file` — a mapping `control_ref` has no
+  `content/controls/<ref>.yaml`.
+- `schema_violation` — the cross-reference file fails JSON Schema
+  validation.
+- `missing_oscal_refs` / `missing_d3fend_refs` — the file is present
+  but carries no upstream catalog or D3FEND anchors.
+- `missing_provenance_source_url` / `missing_provenance_captured_at`
+  — provenance fields are absent.
+
+The linter is wired into pytest at
+`tests/content/test_control_xref_lint.py`, so CI fails whenever a new
+mapping entry references a control that has not yet been populated
+here.
