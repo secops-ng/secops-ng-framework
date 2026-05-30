@@ -1,0 +1,87 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--01a17a01-0000-4000-8000-000000000001",
+  "name": "Vulnerability intake (SKELETON)",
+  "description": "Minimal SKELETON of the coordinated vulnerability disclosure (CVD) intake playbook for CRA-aligned operators. Receives an inbound disclosure (researcher report, vendor advisory, CVE feed hit, or internal scan finding), performs initial triage against the operator's asset inventory and severity policy, routes the case to the appropriate response track, and closes. CORE / EXTEND tiers will layer in detailed enrichment, SBOM correlation, compiler emission goldens, KPI metric_refs, and the full OSCAL/D3FEND cross-reference set; this tier exists so M0 has all five reference playbooks represented end-to-end and parsable by the shared CACAO parser.",
+  "playbook_types": ["notification", "investigation"],
+  "created_by": "identity--c0c0c0c0-c0c0-4c0c-8c0c-c0c0c0c0c0c0",
+  "created": "2026-05-30T00:00:00Z",
+  "modified": "2026-05-30T00:00:00Z",
+  "valid_from": "2026-05-30T00:00:00Z",
+  "labels": ["cra", "vuln-disclosure"],
+  "playbook_variables": {
+    "__cve_id__": {
+      "type": "string",
+      "description": "Vulnerability identifier carried by this case. Canonical form is a CVE id (e.g. CVE-2026-12345); operators MAY substitute a vendor advisory id or internal tracker id when no CVE has been assigned yet.",
+      "external": true
+    },
+    "__severity__": {
+      "type": "string",
+      "description": "Triage severity. SKELETON contract is one of: critical, high, medium, low, info. CORE will refine to a CVSS / EPSS-derived band.",
+      "external": false
+    },
+    "__asset_ref__": {
+      "type": "string",
+      "description": "Reference into the operator's asset inventory for the affected component (asset id, SBOM component PURL, or repository path). Populated by the triage step against the operator's CMDB / SBOM service.",
+      "external": false
+    }
+  },
+  "workflow_start": "start--01a17a01-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--01a17a01-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "vuln-intake-start",
+      "on_completion": "action--01a17a01-0000-4000-8000-000000000002"
+    },
+    "action--01a17a01-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "intake disclosure",
+      "description": "Receive an inbound vulnerability disclosure through the operator's coordinated disclosure channel (security.txt mailbox, advisory feed, CVE webhook, or internal scanner finding). Acknowledge the reporter where applicable per the operator's CVD policy, persist the raw submission, and stamp __cve_id__ on the case. SKELETON: contract only; CORE will add reporter-acknowledgement timing for the CRA single-point-of-contact SLA.",
+      "on_completion": "action--01a17a01-0000-4000-8000-000000000003",
+      "in_args": ["__cve_id__"],
+      "x_secops_ng": {
+        "control_refs": ["control.vuln_disclosure_intake@v1"]
+      }
+    },
+    "action--01a17a01-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "triage and asset correlation",
+      "description": "Score the disclosure for severity and correlate the affected component against the operator's asset inventory and SBOM. Outputs __severity__ and __asset_ref__. SKELETON: contract only; CORE will wire CVSS / EPSS scoring, SBOM PURL lookup, and the patch-evidence feedback loop.",
+      "on_completion": "action--01a17a01-0000-4000-8000-000000000004",
+      "out_args": ["__severity__", "__asset_ref__"],
+      "x_secops_ng": {
+        "control_refs": ["control.sbom_capture@v1"]
+      }
+    },
+    "action--01a17a01-0000-4000-8000-000000000004": {
+      "type": "action",
+      "name": "route to response track",
+      "description": "Hand the case to the response track keyed on __severity__ and the affected __asset_ref__. SKELETON keeps this as a single routing action so the topology stays minimal; CORE will lift it to a switch-condition with explicit per-severity branches (patch evidence, vendor escalation, public advisory, accept-risk).",
+      "on_completion": "end--01a17a01-0000-4000-8000-000000000005",
+      "in_args": ["__severity__", "__asset_ref__"]
+    },
+    "end--01a17a01-0000-4000-8000-000000000005": {
+      "type": "end",
+      "name": "vuln-intake-end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.vuln_intake@v1",
+    "content_version": "0.1.0",
+    "maturity": "experimental",
+    "compile_targets": ["n8n", "temporal", "langgraph"],
+    "control_refs": [
+      "control.vuln_disclosure_intake@v1",
+      "control.sbom_capture@v1"
+    ],
+    "sources": [
+      "OASIS CACAO v2.0 specification — workflow step types (start, action, end), variable conventions, x_ extension namespace",
+      "Cyber Resilience Act (EU) 2024/2847, Annex I §2 — coordinated vulnerability disclosure policy obligations for products with digital elements",
+      "Cyber Resilience Act (EU) 2024/2847, Article 14 — reporting obligations for actively exploited vulnerabilities and severe incidents",
+      "NIS2 Directive (EU) 2022/2555, Article 21(2)(e) — vulnerability handling and disclosure",
+      "ISO/IEC 29147:2018 — Vulnerability disclosure",
+      "ISO/IEC 30111:2019 — Vulnerability handling processes"
+    ]
+  }
+}
