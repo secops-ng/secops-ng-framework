@@ -1,0 +1,391 @@
+{
+  "name": "Vulnerability intake",
+  "nodes": [
+    {
+      "id": "start--01a17a01-0000-4000-8000-000000000001",
+      "name": "vuln-intake-start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__cve_id__",
+              "type": "string",
+              "value": "",
+              "description": "Vulnerability identifier carried by this case. Canonical form is a CVE id (e.g. CVE-2026-12345); operators MAY substitute a vendor advisory id or internal tracker id when no CVE has been assigned yet."
+            },
+            {
+              "name": "__report_source__",
+              "type": "string",
+              "value": "",
+              "description": "Where the disclosure originated. One of: researcher_report, vendor_advisory, cve_feed, internal_scanner."
+            },
+            {
+              "name": "__severity__",
+              "type": "string",
+              "value": "",
+              "description": "Triage severity derived from CVSS base / temporal score and EPSS exploit-probability band. One of: critical, high, medium, low, info."
+            },
+            {
+              "name": "__cvss_vector__",
+              "type": "string",
+              "value": "",
+              "description": "CVSS v3.1 / v4.0 vector string for the case (e.g. CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H). Populated by the triage step; carried into telemetry as part of the OCSF Vulnerability Finding payload."
+            },
+            {
+              "name": "__epss_score__",
+              "type": "string",
+              "value": "",
+              "description": "EPSS exploit-probability score (0.0 to 1.0, two decimal places) for the case at intake time. Populated by the triage step alongside the CVSS vector."
+            },
+            {
+              "name": "__asset_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Reference into the operator's asset inventory for the affected component (asset id, SBOM component PURL, or repository path). Populated by the triage step against the operator's CMDB / SBOM service."
+            },
+            {
+              "name": "__actively_exploited__",
+              "type": "boolean",
+              "value": "",
+              "description": "Set by the CRA reporting-trigger step: true when the disclosure meets the CRA Article 14(1) actively-exploited definition (in-the-wild exploitation evidence) or the Article 14(3) severe-incident definition, in which case the regulator-notification chain fires ahead of the severity-keyed response so the 24h / 72h / 14d submission timing starts at the same instant the operator becomes aware."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--01a17a01-0000-4000-8000-000000000002",
+      "name": "intake disclosure",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {},
+      "notes": "Receive an inbound vulnerability disclosure through the operator's coordinated disclosure channel (security.txt mailbox, advisory feed, CVE webhook, or internal scanner finding). Acknowledge the reporter where applicable per the operator's CVD policy and the CRA single-point-of-contact obligation, persist the raw submission, stamp __cve_id__ on the case, and emit an OCSF Vulnerability Finding event so downstream consumers (metrics, SIEM, ticketing) can pick the case up off a single telemetry channel.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--01a17a01-0000-4000-8000-000000000003",
+      "name": "triage and asset correlation",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {},
+      "notes": "Score the disclosure with CVSS (v3.1 / v4.0) and EPSS, derive the __severity__ band, and correlate the affected component against the operator's asset inventory and SBOM (PURL lookup). Outputs __severity__, __cvss_vector__, __epss_score__, and __asset_ref__. The SBOM lookup is the link between this playbook and the CRA Annex I \u00a72(1) SBOM obligation \u2014 cases on releases that lack an SBOM record are counted against the releases-without-SBOM KRI so the gap is visible to the operator.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--01a17a01-0000-4000-8000-000000000004",
+      "name": "assess CRA reporting trigger",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {},
+      "notes": "Determine whether the disclosure trips the CRA Article 14(1) actively-exploited clock (in-the-wild exploitation evidence \u2014 public PoC, observed activity, vendor confirmation) or the Article 14(3) severe-incident clock. Sets __actively_exploited__. The incident-timeline-signals control is the contract for the timestamp set the regulator submissions consume.",
+      "notesInFlow": true
+    },
+    {
+      "id": "if-condition--01a17a01-0000-4000-8000-000000000005",
+      "name": "actively exploited?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "secops_ng_condition",
+              "leftValue": "",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "notes": "Branch the case on the CRA reporting trigger. on_success: __actively_exploited__ is true and the regulator-notification chain fires ahead of the severity-keyed response so the CRA Article 14 24h / 72h / 14d clocks start at the operator's awareness timestamp. on_failure: the disclosure stays an internal-only case and routes directly to the severity switch.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--01a17a01-0000-4000-8000-000000000006",
+      "name": "regulator-notification chain (CRA Art. 14)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {},
+      "notes": "Emit the CRA Article 14 regulator-notification chain: the 24-hour early-warning notification to the coordinator CSIRT + ENISA, the 72-hour notification with the corrective / mitigating measures the operator has taken or recommended, and the 14-day final report after a corrective measure becomes available. The submission-template control is the contract for the payload shape; the timeline-signals control is the contract for the timestamp set the submissions consume. Hands control to the severity switch so the technical response runs in series after the regulator notifications are dispatched.",
+      "notesInFlow": true
+    },
+    {
+      "id": "switch-condition--01a17a01-0000-4000-8000-000000000007",
+      "name": "route on severity",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "values": []
+        },
+        "options": {}
+      },
+      "notes": "Route to the technical-response branch keyed on __severity__. Each branch is a single response-routing action that ships the security update on the operator's SLA for that band, emits an advisory where applicable, and closes the case. The accept-risk branch documents the disposition without paging or scheduling a release.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--01a17a01-0000-4000-8000-000000000008",
+      "name": "response: critical \u2014 patch and advisory",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2060,
+        420
+      ],
+      "parameters": {},
+      "notes": "Critical-severity response: page the response team, ship the security update across affected releases for the duration of the support period free of charge per CRA Annex I \u00a72(7), and emit a public advisory to users. Records the dissemination event against the patch-dissemination KPI and the critical-MTTR clock.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--01a17a01-0000-4000-8000-000000000009",
+      "name": "response: high \u2014 patch and advisory",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2320,
+        240
+      ],
+      "parameters": {},
+      "notes": "High-severity response: ship the security update on the operator's high-severity SLA and emit an advisory through the same dissemination channel as the critical branch. Same dissemination KPI; the response latency is measured against the patch-dissemination clock rather than the critical-band MTTR.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--01a17a01-0000-4000-8000-00000000000a",
+      "name": "response: scheduled remediation",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2580,
+        420
+      ],
+      "parameters": {},
+      "notes": "Medium / low-severity response: schedule the security update on the operator's standard release cadence and roll the advisory into the next scheduled release note. The CRA Annex I \u00a72(7) obligation to disseminate updates without undue delay is met by the operator's documented release SLA; the patch-dissemination clock measures whether that SLA is held.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--01a17a01-0000-4000-8000-00000000000b",
+      "name": "response: accept risk",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2840,
+        240
+      ],
+      "parameters": {},
+      "notes": "Informational-severity response: record the disclosure on the case ledger with a documented accept-risk decision and close without paging or scheduling a release. The case still emits an OCSF Vulnerability Finding so the intake-aging KRI sees a closed disposition rather than an open backlog item.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--01a17a01-0000-4000-8000-00000000000c",
+      "name": "vuln-intake-end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3100,
+        420
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "vuln-intake-start": {
+      "main": [
+        [
+          {
+            "node": "intake disclosure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "intake disclosure": {
+      "main": [
+        [
+          {
+            "node": "triage and asset correlation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "triage and asset correlation": {
+      "main": [
+        [
+          {
+            "node": "assess CRA reporting trigger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "assess CRA reporting trigger": {
+      "main": [
+        [
+          {
+            "node": "actively exploited?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "actively exploited?": {
+      "main": [
+        [
+          {
+            "node": "regulator-notification chain (CRA Art. 14)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "route on severity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "regulator-notification chain (CRA Art. 14)": {
+      "main": [
+        [
+          {
+            "node": "route on severity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "route on severity": {
+      "main": [
+        []
+      ]
+    },
+    "response: critical \u2014 patch and advisory": {
+      "main": [
+        [
+          {
+            "node": "vuln-intake-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "response: high \u2014 patch and advisory": {
+      "main": [
+        [
+          {
+            "node": "vuln-intake-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "response: scheduled remediation": {
+      "main": [
+        [
+          {
+            "node": "vuln-intake-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "response: accept risk": {
+      "main": [
+        [
+          {
+            "node": "vuln-intake-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "cra",
+    "vuln-disclosure",
+    "cvd",
+    "sbom"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.vuln_intake@v1",
+      "content_version": "0.2.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--01a17a01-0000-4000-8000-000000000001"
+    },
+    "secops_ng_notes": [
+      "step 'action--01a17a01-0000-4000-8000-000000000002': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--01a17a01-0000-4000-8000-000000000003': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--01a17a01-0000-4000-8000-000000000004': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'if-condition--01a17a01-0000-4000-8000-000000000005' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
+      "step 'action--01a17a01-0000-4000-8000-000000000006': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'switch-condition--01a17a01-0000-4000-8000-000000000007' (switch-condition): no cases parsed from CACAO source \u2014 emitted Switch node with empty rule set; operator must populate cases in n8n.",
+      "step 'action--01a17a01-0000-4000-8000-000000000008': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--01a17a01-0000-4000-8000-000000000009': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--01a17a01-0000-4000-8000-00000000000a': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--01a17a01-0000-4000-8000-00000000000b': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n."
+    ]
+  }
+}
