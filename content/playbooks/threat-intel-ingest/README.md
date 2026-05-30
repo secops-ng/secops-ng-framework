@@ -81,6 +81,24 @@ mapping at `content/mappings/dora/article-19-and-28.yaml` under
 `dora:art-19-cyber-threat-voluntary` closes the graph in the
 regulator-side direction.
 
+## KPI hooks
+
+The metric catalog entries below bind to this playbook and ship in
+[`content-model/examples/threat-intel-ingest/metrics/`](../../../content-model/examples/threat-intel-ingest/metrics/).
+The shapes are validated against `content-model/metrics.schema.json`
+in `tests/content_model/test_threat_intel_ingest_metrics.py`.
+
+| Stable ID | Kind | One-line definition | File |
+|---|---|---|---|
+| `kpi.mttd_threat_intel_indicator@v1` | KPI — MTTD | Time from upstream feed publish to the Sigma rule firing on a matching event — the intel-to-detection latency this playbook is built to compress. | [`metrics/kpi.mttd_threat_intel_indicator.json`](../../../content-model/examples/threat-intel-ingest/metrics/kpi.mttd_threat_intel_indicator.json) |
+| `kpi.mttr_blocklist_propagation@v1` | KPI — MTTR | Time from confidence-gate pass to blocklist-propagation completion across the operator's enforcement points (network / DNS / EDR). | [`metrics/kpi.mttr_blocklist_propagation.json`](../../../content-model/examples/threat-intel-ingest/metrics/kpi.mttr_blocklist_propagation.json) |
+| `kpi.coverage_threat_intel_feed@v1` | KPI — coverage | Share of scheduled upstream poll batches successfully ingested and normalised in the window. | [`metrics/kpi.coverage_threat_intel_feed.json`](../../../content-model/examples/threat-intel-ingest/metrics/kpi.coverage_threat_intel_feed.json) |
+
+These bind back to the playbook stable ID `playbook.threat_intel_ingest@v1`
+and pin the CACAO step IDs they measure. The regulatory hooks in
+`mappings.yaml` (NIS2 Art. 21(2)(d), DORA Art. 19(2)) reference these
+metric IDs as the catalog-side anchors for evidence collection.
+
 ## Worked example, mappings, and compile-target emissions
 
 This directory ships the **portable response only**. Cross-layer
