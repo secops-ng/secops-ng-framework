@@ -1,0 +1,34 @@
+{
+  "stable_id": "telemetry.ocsf.email_url_activity@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Email URL Activity event (URL detonation + click telemetry for phishing triage)",
+  "summary": "OCSF Email URL Activity events the phishing-triage playbook reads to evaluate URLs extracted from a reported message: gateway detonation verdicts, threat-intel hits on the destination, and (post-delivery) click telemetry used to identify responders for the credential-harvest branch and the simulation click-rate KPI.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 4,
+    "category_name": "Network Activity",
+    "class_uid": 4012,
+    "class_name": "Email URL Activity"
+  },
+  "direction": "ingest",
+  "fields_used": [
+    "time",
+    "activity_id",
+    "email.message_uid",
+    "url.url_string",
+    "url.hostname",
+    "url.category_ids",
+    "actor.user.uid",
+    "disposition_id"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.phishing_triage@v1"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org",
+  "sources": [
+    "OCSF v1.4.0 Network Activity category — Email URL Activity class (uid 4012)"
+  ]
+}
