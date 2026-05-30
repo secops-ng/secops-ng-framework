@@ -104,6 +104,10 @@ content/metrics/
 ├── _schema/
 │   └── metric.schema.json      # pointer to content-model/metrics.schema.json
 ├── mttd.yaml                   # seed KPI entry (SKELETON exemplar)
+├── mttr.yaml                   # KPI: mean time to respond (critical)
+├── detection_coverage.yaml     # KPI: ATT&CK technique coverage
+├── false_positive_rate.yaml    # KPI: FP/(FP+TP) per detection class
+├── control_effectiveness.yaml  # KRI: residual exposure from attestations
 └── …                           # one YAML per catalog entry
 ```
 
