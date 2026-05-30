@@ -1,0 +1,66 @@
+{
+  "stable_id": "kpi.mttr_blocklist_propagation@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Mean time to remediate \u2014 blocklist propagation",
+  "summary": "Time between the playbook accepting a normalised indicator above the confidence threshold and the blocklist-propagation step completing across the operator's enforcement points (network / DNS / EDR). Measures the response loop the playbook owns end-to-end, independent of upstream feed delay. Lower is better.",
+  "unit": "minutes",
+  "direction": "lower_is_better",
+  "target": {
+    "value": 15,
+    "comparator": "<=",
+    "rationale": "Operator target derived from D3FEND D3-ITF / D3-OTF / D3-DNSDL guidance \u2014 perimeter and DNS denylisting are typically reload-or-API-call workloads completable inside fifteen minutes."
+  },
+  "thresholds": [
+    {
+      "name": "warn",
+      "comparator": ">",
+      "value": 30,
+      "severity": "warn"
+    },
+    {
+      "name": "breach",
+      "comparator": ">",
+      "value": 120,
+      "severity": "high"
+    }
+  ],
+  "measurement": {
+    "source": "workflow",
+    "aggregation": "mean",
+    "formula": "mean( propagate_to_blocklist.completed_at - if_above_confidence.completed_at ) over playbook runs where the if-condition evaluated true, within the window.",
+    "inputs": [
+      {
+        "name": "playbook_run",
+        "playbook_ref": "playbook.threat_intel_ingest@v1",
+        "playbook_step": "action--10000000-0000-4000-8000-000000000005",
+        "description": "duration from confidence-gate completion to blocklist-propagation completion"
+      }
+    ],
+    "window": {
+      "duration": "P7D",
+      "sliding": true
+    }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.threat_intel_ingest@v1",
+      "step_id": "action--10000000-0000-4000-8000-000000000005"
+    }
+  ],
+  "control_refs": [
+    "control.blocklist.propagation@v1"
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.security_finding@v1"
+  ],
+  "external_refs": [
+    {
+      "name": "MITRE D3FEND v1.0.0 \u2014 D3-ITF / D3-OTF / D3-DNSDL",
+      "source": "MITRE",
+      "url": "https://d3fend.mitre.org/"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}

@@ -1,0 +1,72 @@
+{
+  "stable_id": "kpi.coverage_threat_intel_feed@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Threat-intel feed coverage \u2014 expected vs. ingested batches",
+  "summary": "Share of scheduled upstream STIX 2.1 / TAXII poll batches that the playbook successfully pulled and normalised into the OCSF Threat Intelligence Inference event class within the evaluation window. A direct measure of how reliably the operator is seeing the upstream feed that downstream detection and blocklist activation depend on. Higher is better.",
+  "unit": "percent",
+  "direction": "higher_is_better",
+  "target": {
+    "value": 98,
+    "comparator": ">=",
+    "rationale": "Coverage floor below which downstream MTTD degrades materially; aligned with ENISA EU CSIRTs network operational guidance on intel-sharing pipeline availability."
+  },
+  "thresholds": [
+    {
+      "name": "warn",
+      "comparator": "<",
+      "value": 95,
+      "severity": "warn"
+    },
+    {
+      "name": "breach",
+      "comparator": "<",
+      "value": 85,
+      "severity": "high"
+    }
+  ],
+  "measurement": {
+    "source": "composite",
+    "aggregation": "percent",
+    "formula": "100 * count(scheduled batches with at least one normalised threat-intel-inference record emitted) / count(scheduled batches) over window.",
+    "inputs": [
+      {
+        "name": "events",
+        "telemetry_ref": "telemetry.ocsf.threat_intelligence_inference@v1",
+        "field": "time",
+        "description": "OCSF threat-intel-inference event time, bucketed against the schedule"
+      },
+      {
+        "name": "playbook_run",
+        "playbook_ref": "playbook.threat_intel_ingest@v1",
+        "playbook_step": "action--10000000-0000-4000-8000-000000000002",
+        "description": "scheduled feed-pull invocations of the upstream-ingest step"
+      }
+    ],
+    "window": {
+      "duration": "P1D",
+      "sliding": true
+    }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.threat_intel_ingest@v1",
+      "step_id": "action--10000000-0000-4000-8000-000000000002"
+    }
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.threat_intelligence_inference@v1"
+  ],
+  "control_refs": [
+    "control.threat_intel.feed_ingest@v1"
+  ],
+  "external_refs": [
+    {
+      "name": "ENISA \u2014 EU CSIRTs network operational guidance",
+      "source": "ENISA",
+      "url": "https://www.enisa.europa.eu/topics/incident-response/csirts-network"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}
