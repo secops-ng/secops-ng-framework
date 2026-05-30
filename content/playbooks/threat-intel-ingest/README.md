@@ -10,19 +10,68 @@ Intelligence Inference event class → propagate the result to detection
 
 - `playbook.cacao.json` — the CACAO v2 artifact
   (`playbook.threat_intel_ingest@v1`).
-- `mappings.yaml` — regulatory/metrics overlay (SKELETON: placeholder
-  OSCAL / D3FEND / OCSF entries; NIS2 Art. 21(2)(d) and DORA Art. 19(2)
-  cross-refs populated). Schema:
-  `../../../schemas/playbook-mappings.schema.json`.
+- `mappings.yaml` — regulatory/metrics overlay (real OSCAL / D3FEND /
+  OCSF IDs plus NIS2 Art. 21(2)(d) and DORA Art. 19(2) cross-refs).
+  Schema: `../../../schemas/playbook-mappings.schema.json`.
 
 ## Mappings
 
-See [`mappings.yaml`](mappings.yaml) for the outbound view of the
-content model: OSCAL controls exercised, MITRE D3FEND defensive
-techniques per step, OCSF event classes consumed/emitted, and NIS2 /
-DORA cross-references. SKELETON ships structural pointers only; the
-sibling CORE card populates real catalog IDs and the EXTEND card adds
-KPI metric files plus the hooks block in this README.
+See [`mappings.yaml`](mappings.yaml) for the full outbound view of
+the content model: OSCAL controls exercised, MITRE D3FEND defensive
+techniques per step, OCSF event classes consumed/emitted, and the
+NIS2 / DORA cross-references summarised below. The sibling EXTEND
+card adds KPI metric files and the hooks block in this README.
+
+### OSCAL — NIST SP 800-53 Rev. 5
+
+| Control | Title | Role in this playbook |
+|---|---|---|
+| PM-16 | Threat Awareness Program | Anchors the playbook in an ongoing threat-awareness programme. |
+| PM-16(1) | Automated Means for Sharing Threat Intelligence | Covers automated STIX 2.1 / TAXII ingest, the playbook's input contract. |
+| SI-5 | Security Alerts, Advisories, and Directives | Receipt of external alerts and onward dissemination to detection. |
+| SI-4 | System Monitoring | Detection-rule activation so subsequent telemetry generates alerts. |
+| SC-7 | Boundary Protection | Blocklist propagation to perimeter / DNS / EDR enforcement. |
+
+### MITRE D3FEND v1.0.0
+
+| Step | Technique | Identifier |
+|---|---|---|
+| pull upstream feed | Operational Activity Mapping | D3-OSM |
+| normalise STIX to OCSF | Identifier Activity Analysis | D3-IAA |
+| propagate to blocklist | Inbound Traffic Filtering | D3-ITF |
+| propagate to blocklist | Outbound Traffic Filtering | D3-OTF |
+| propagate to blocklist | DNS Denylisting | D3-DNSDL |
+| activate detection rule | Network Traffic Analysis | D3-NTA |
+
+### OCSF v1.3.0
+
+| Event class | class_uid | Direction |
+|---|---|---|
+| Threat Intelligence Inference | 5005 | consumes + emits |
+| Detection Finding | 2004 | emits |
+
+### NIS2 Art. 21(2)(d) — supply-chain security
+
+NIS2 Article 21(2)(d) obliges essential and important entities to
+address the security characteristics of direct suppliers and service
+providers, including periodic re-attestation of those characteristics.
+Threat-intel ingest contributes the IOC-driven signal that lets an
+operator detect when a known-bad indicator touches a supplier-adjacent
+surface — feeding the supplier-attestation and re-attestation cadence
+captured at `content/mappings/nis2/article-21-and-23.yaml` under
+`nis2:art-21-2-d`.
+
+### DORA Art. 19(2) — voluntary cyber-threat notification
+
+DORA Article 19(2) of Regulation (EU) 2022/2554 permits voluntary
+notification of significant cyber threats to the competent authority,
+on a lighter content schema than a major-incident notification and
+with no mandatory clock. The normalised indicator records and
+Detection Finding events emitted by this playbook are the artefacts
+an operator lifts into a voluntary notification payload; the inbound
+mapping at `content/mappings/dora/article-19-and-28.yaml` under
+`dora:art-19-cyber-threat-voluntary` closes the graph in the
+regulator-side direction.
 
 ## Worked example, mappings, and compile-target emissions
 
