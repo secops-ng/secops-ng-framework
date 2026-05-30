@@ -21,6 +21,21 @@ SCHEMA_PATH = REPO_ROOT / "content-model" / "telemetry.schema.json"
 
 # Pinned OCSF v1.4.0 class UIDs. Verified against schema.ocsf.io 2026-05-30.
 EXPECTED_BINDINGS = {
+    "telemetry.ocsf.account_change@v1": {
+        "class_uid": 3001,
+        "class_name": "Account Change",
+        "category_uid": 3,
+    },
+    "telemetry.ocsf.api_activity@v1": {
+        "class_uid": 6003,
+        "class_name": "API Activity",
+        "category_uid": 6,
+    },
+    "telemetry.ocsf.authentication@v1": {
+        "class_uid": 3002,
+        "class_name": "Authentication",
+        "category_uid": 3,
+    },
     "telemetry.ocsf.email_activity@v1": {
         "class_uid": 4009,
         "class_name": "Email Activity",

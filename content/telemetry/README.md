@@ -9,11 +9,14 @@ Each binding is a JSON document validated by
 
 ## Bindings
 
-| Stable ID                              | OCSF version | Class UID | Class name           | Consumers                  |
-|----------------------------------------|--------------|-----------|----------------------|----------------------------|
-| `telemetry.ocsf.email_activity@v1`     | 1.4.0        | 4009      | Email Activity       | `playbook.phishing_triage@v1` |
-| `telemetry.ocsf.email_url_activity@v1` | 1.4.0        | 4012      | Email URL Activity   | `playbook.phishing_triage@v1` |
-| `telemetry.ocsf.file_activity@v1`      | 1.4.0        | 1001      | File System Activity | `playbook.phishing_triage@v1` |
+| Stable ID                              | OCSF version | Class UID | Class name           | Consumers                              |
+|----------------------------------------|--------------|-----------|----------------------|----------------------------------------|
+| `telemetry.ocsf.account_change@v1`     | 1.4.0        | 3001      | Account Change       | `playbook.identity_compromise@v1`      |
+| `telemetry.ocsf.api_activity@v1`       | 1.4.0        | 6003      | API Activity         | `playbook.identity_compromise@v1`      |
+| `telemetry.ocsf.authentication@v1`     | 1.4.0        | 3002      | Authentication       | `playbook.identity_compromise@v1`      |
+| `telemetry.ocsf.email_activity@v1`     | 1.4.0        | 4009      | Email Activity       | `playbook.phishing_triage@v1`          |
+| `telemetry.ocsf.email_url_activity@v1` | 1.4.0        | 4012      | Email URL Activity   | `playbook.phishing_triage@v1`          |
+| `telemetry.ocsf.file_activity@v1`      | 1.4.0        | 1001      | File System Activity | `playbook.phishing_triage@v1`          |
 
 Class UIDs are pinned to OCSF v1.4.0; do not introduce a binding without
 verifying its class UID against the upstream schema at
