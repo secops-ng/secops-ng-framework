@@ -1,0 +1,45 @@
+stable_id: kpi.mttc_identity_compromise@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Mean time to contain — identity compromise
+summary: Time elapsed between the first authoritative detection firing of a compromised
+  identity and the first recorded containment action (credential revocation, session
+  termination, MFA reset, role removal). Measured end-to-end across the response pipeline.
+  SecOps-NG does not pick an IAM vendor; the catalog entry is vendor-neutral and the
+  compile target is the source of truth for the executable form.
+unit: minutes
+direction: lower_is_better
+measurement:
+  source: workflow
+  aggregation: p95
+  formula: For each identity-compromise incident closed within the evaluation window,
+    compute (first_containment_action_timestamp - first_detection_fire_timestamp)
+    in minutes and aggregate as p95. Exclude incidents where containment never fired.
+  inputs:
+  - name: first_detection_fire
+    description: First authoritative detection firing of identity compromise.
+  - name: first_containment_action
+    description: First playbook step transition that revokes credentials, terminates
+      sessions, resets MFA, or removes role bindings.
+    playbook_step: containment
+  window:
+    duration: P30D
+    sliding: true
+playbook_refs: []
+external_refs:
+- name: NIS2 — Article 21(2)(b) incident-handling capability
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 21(2)(b)
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+- name: NIS2 — Article 21(2)(e) supply-chain and access control
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 21(2)(e)
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+- name: ENISA — Threat Landscape methodology
+  source: ENISA
+  url: https://www.enisa.europa.eu/publications/enisa-threat-landscape
+- name: ISO/IEC 27004 — Information security measurement guidance
+  source: ISO
+  external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org

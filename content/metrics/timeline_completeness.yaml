@@ -1,0 +1,43 @@
+stable_id: kpi.timeline_completeness@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Incident-timeline completeness
+summary: Ratio of incidents whose post-incident timeline carries all mandatory milestones
+  (first observation, detection, triage, containment, eradication, recovery, closeout)
+  to total incidents closed in the evaluation window. Rising values indicate durable
+  record-keeping.
+unit: ratio
+direction: higher_is_better
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: Computed from the lower content layers per the inputs below. The catalog
+    entry is the contract; the compile target is the source of truth for the executable
+    form.
+  inputs:
+  - name: numerator
+    description: Population matching the indicator's success (or, for lower-is-better,
+      failure) condition.
+  - name: denominator
+    description: Reference population the numerator is normalised against.
+  window:
+    duration: P30D
+    sliding: true
+playbook_refs: []
+external_refs:
+- name: NIS2 — Article 21(2)(b) incident-handling capability
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 21(2)(b)
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+- name: NIS2 — Article 23 incident reporting timelines
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 23
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+- name: ENISA — Threat Landscape methodology
+  source: ENISA
+  url: https://www.enisa.europa.eu/publications/enisa-threat-landscape
+- name: ISO/IEC 27004 — Information security measurement guidance
+  source: ISO
+  external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org

@@ -1,0 +1,48 @@
+stable_id: kpi.mttr_cloud_misconfig@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Mean time to respond — cloud misconfiguration remediation
+summary: Time elapsed between the first authoritative detection firing and the first
+  recorded response action in the playbook, scoped to cloud-misconfiguration findings,
+  measuring time to remediation action. Measured end-to-end across the response pipeline
+  so that triage latency, analyst handoffs, and orchestration step latency all contribute.
+  SecOps-NG does not pick a response vendor; the catalog entry is vendor-neutral and
+  the compile target is the source of truth for the executable form.
+unit: minutes
+direction: lower_is_better
+measurement:
+  source: workflow
+  aggregation: p95
+  formula: For each incident in scope closed within the evaluation window, compute
+    (first_response_action_timestamp - first_detection_fire_timestamp) in minutes
+    and aggregate as p95. Exclude incidents where the scoped response step never fired
+    so the indicator does not silently improve when the response pipeline stalls.
+  inputs:
+  - name: first_detection_fire
+    description: First authoritative detection firing that opened the incident record
+      at the scoped class.
+  - name: first_response_action
+    description: First playbook step transition whose purpose matches the scoped response
+      class (remediation). Bound to the canonical step of the compiled response playbook.
+    playbook_step: remediation
+  window:
+    duration: P30D
+    sliding: true
+playbook_refs: []
+external_refs:
+- name: NIS2 — Article 21(2)(b) incident-handling capability
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 21(2)(b)
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+- name: NIS2 — Article 21(2)(e) supply-chain and access control
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 21(2)(e)
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+- name: ENISA — Threat Landscape methodology
+  source: ENISA
+  url: https://www.enisa.europa.eu/publications/enisa-threat-landscape
+- name: ISO/IEC 27004 — Information security measurement guidance
+  source: ISO
+  external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org

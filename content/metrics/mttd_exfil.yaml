@@ -1,0 +1,48 @@
+stable_id: kpi.mttd_exfil@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Mean time to detect — data exfiltration
+summary: Time elapsed between the earliest observable evidence in the operator's telemetry
+  stream and the first authoritative detection firing that opens an incident record,
+  scoped to incidents that involve confirmed or suspected exfiltration of operator-controlled
+  data. Measured end-to-end across the detection pipeline so that ingestion, enrichment,
+  and rule-evaluation latency all contribute. SecOps-NG does not pick a detection
+  vendor; the catalog entry is vendor-neutral and the compile target is the source
+  of truth for the executable form.
+unit: minutes
+direction: lower_is_better
+measurement:
+  source: composite
+  aggregation: p95
+  formula: For each incident in scope closed within the evaluation window, compute
+    (first_detection_fire_timestamp - earliest_telemetry_event_timestamp) in minutes
+    and aggregate as p95. Exclude incidents where the earliest telemetry timestamp
+    is unknown so the indicator does not silently improve when ingestion breaks.
+  inputs:
+  - name: earliest_telemetry_event
+    description: Earliest event in the telemetry stream that, in hindsight, was part
+      of the incident's causal chain.
+  - name: first_detection_fire
+    description: First authoritative detection firing that opened the incident record.
+      Catalog entry is detection-vendor-neutral.
+  window:
+    duration: P30D
+    sliding: true
+playbook_refs: []
+external_refs:
+- name: NIS2 — Article 21(2)(b) incident-handling capability
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 21(2)(b)
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+- name: NIS2 — Article 23 incident reporting timelines
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 23
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+- name: ENISA — Threat Landscape methodology
+  source: ENISA
+  url: https://www.enisa.europa.eu/publications/enisa-threat-landscape
+- name: ISO/IEC 27004 — Information security measurement guidance
+  source: ISO
+  external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org

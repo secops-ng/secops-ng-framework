@@ -150,11 +150,27 @@ pass the public-release bar: community-neutral language, no commercial
 framing, no individual contact names (generic role mailboxes only), no
 internal infra references, no credentials.
 
-## Current state (v0 SKELETON)
+## Current state (v0 EXTEND-2)
 
-This is the SKELETON layer. It scaffolds the directory, the schema
-pointer, the validation test harness, and one canonical seed entry
-(`mttd.yaml`). CORE and EXTEND follow-on tasks populate the rest of
-the catalog (MTTR, coverage %, false-positive %, dwell-time,
-control-effectiveness, risk metrics) and cross-link every shipped
-playbook's KPI hooks to a catalog entry.
+SKELETON scaffolded the directory and seed (`mttd.yaml`). CORE added
+the unscoped baseline KPIs (MTTR, coverage, false-positive) and the
+control-effectiveness KRI. EXTEND closed regulatory back-refs into
+`content/mappings/{nis2,dora}/` and added the catalog cross-reference
+table above.
+
+EXTEND-2 (this layer) ships 28 additional granular catalog entries to
+back the `metric_ref`s already encoded in shipped playbooks — MTTD
+family (phishing, ransomware, exfil, cloud misconfig, identity
+compromise, threat-intel indicator), MTTR/MTTC family (containment,
+phishing triage, cloud-misconfig remediation, blocklist propagation,
+on-call ack, identity-compromise containment), coverage family (cloud
+posture, on-call schedule, threat-intel feed, lateral-hunt), five
+KRIs (recurring cloud misconfig, regulator-notification overrun,
+phishing suppression, escalation-tier breach, corrective-action
+overdue), and a no-clean-home set (backup integrity, notification SLA,
+handoff-brief SLA, timeline completeness, review completion SLA,
+corrective-action close rate, phishing-sim click rate).
+
+Each EXTEND-2 entry ships with an empty `playbook_refs: []`. The CORE
+link-closure follow-on task populates back-refs from catalog entries
+to the shipped playbooks that reference them.
