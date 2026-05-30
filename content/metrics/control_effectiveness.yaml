@@ -66,12 +66,26 @@ measurement:
     sliding: false
 
 external_refs:
-  - name: NIS2 — Article 21 risk-management measures
+  # Primary regulatory anchors. Only IDs already named in
+  # content/mappings/{nis2,dora}/*.yaml are listed.
+  - name: NIS2 — Article 21(2)(f) effectiveness assessment of risk-management measures
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(f)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: NIS2 — Article 21 risk-management measures (umbrella)
     source: EU
     external_id: Directive (EU) 2022/2555, Art. 21
-  - name: DORA — ICT risk-management framework
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  # DORA: no natural anchor in content/mappings/dora/*.yaml — the
+  # files we ship cover Art. 18/19/28/30 (incident classification +
+  # reporting, third-party register, contractual clauses) and
+  # Art. 9 vulnerability management. The umbrella ICT
+  # risk-management-framework article (Art. 6) is not yet in the
+  # mappings tree; leave unanchored on the DORA side until it lands.
+  - name: DORA — ICT risk-management framework (umbrella context)
     source: EU
     external_id: Regulation (EU) 2022/2554
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
   - name: ISO/IEC 27004 — Information security measurement guidance
     source: ISO
     external_id: ISO/IEC 27004:2016

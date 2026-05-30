@@ -62,6 +62,17 @@ measurement:
     sliding: true
 
 external_refs:
+  # Primary regulatory anchors. Only IDs already named in
+  # content/mappings/{nis2,dora}/*.yaml are listed; see those files for
+  # the full obligation text and cross-references.
+  - name: NIS2 — Article 21(2)(b) incident-handling capability (detect)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(b)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  # DORA: no natural primary anchor for the unscoped baseline MTTD —
+  # the DORA Art. 19 clocks start at classification-as-major, not at
+  # first detection. Severity-scoped variants (e.g. critical) carry
+  # the DORA anchor; see mttr.yaml.
   - name: ENISA — Threat Landscape methodology, detection-latency discussion
     source: ENISA
     url: https://www.enisa.europa.eu/publications/enisa-threat-landscape

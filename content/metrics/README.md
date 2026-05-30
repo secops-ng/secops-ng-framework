@@ -85,6 +85,32 @@ reference catalog metrics when a control's effectiveness is defined in
 terms of a KPI or KRI; the link direction is the same — by
 `stable_id`, never by inlined definition.
 
+## Catalog index
+
+The current catalog at a glance. The `primary regulatory anchors`
+column is derived from each entry's `external_refs` (regulator-level
+anchors, not the full list); the `mapping back-refs` column points to
+the `metric_refs:` entries under `content/mappings/{nis2,dora}/` that
+list this catalog id, so the cross-reference is closed in both
+directions.
+
+| stable_id                       | kind | unit    | direction          | primary regulatory anchors                  | mapping back-refs                                                |
+|---------------------------------|------|---------|--------------------|---------------------------------------------|------------------------------------------------------------------|
+| `kpi.mttd@v1`                   | kpi  | minutes | lower_is_better    | NIS2 Art. 21(2)(b)                          | `nis2:art-21-2-b`                                                |
+| `kpi.mttr_critical@v1`          | kpi  | minutes | lower_is_better    | NIS2 Art. 21(2)(b); NIS2 Art. 23; DORA Art. 19(4)(a) | `nis2:art-21-2-b`; `dora:art-19-initial-4h`             |
+| `kpi.detection_coverage@v1`     | kpi  | ratio   | higher_is_better   | NIS2 Art. 21(2)(b)                          | `nis2:art-21-2-b`                                                |
+| `kpi.false_positive_rate@v1`    | kpi  | ratio   | lower_is_better    | NIS2 Art. 21(2)(b)                          | `nis2:art-21-2-b`                                                |
+| `kri.control_effectiveness@v1`  | kri  | ratio   | lower_is_better    | NIS2 Art. 21(2)(f); NIS2 Art. 21            | `nis2:art-21-2-f`                                                |
+
+DORA-side anchors on the unscoped detect-pillar baselines (MTTD,
+detection coverage, FP rate) are intentionally absent because the
+DORA Art. 19 clocks start at classification-as-major, not at first
+detection; the per-metric YAML's `external_refs` block carries a
+one-line comment explaining why each empty slot is empty, and points
+at the natural follow-on (severity-scoped variants, vulnerability
+management, supplier register) that does carry a DORA anchor in the
+mappings tree.
+
 ## Schema location
 
 The canonical schema for catalog entries lives at:

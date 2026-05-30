@@ -63,6 +63,16 @@ measurement:
     sliding: false
 
 external_refs:
+  # Primary regulatory anchors. Only IDs already named in
+  # content/mappings/{nis2,dora}/*.yaml are listed.
+  - name: NIS2 — Article 21(2)(b) incident-handling capability (detection coverage as detect-pillar evidence)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(b)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  # DORA: no direct article-level anchor for ATT&CK-style detection
+  # coverage in content/mappings/dora/. Cross-cuts the Art. 6 ICT
+  # risk-management framework rather than a specific notification
+  # clock; not listed here to avoid fabrication.
   - name: MITRE ATT&CK — Enterprise techniques
     source: MITRE
     url: https://attack.mitre.org/
