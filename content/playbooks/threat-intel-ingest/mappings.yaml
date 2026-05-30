@@ -1,0 +1,64 @@
+# Cross-references for the threat-intel-ingest playbook (SKELETON).
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed/emitted, and the EU regulatory clauses (NIS2 /
+# DORA) this playbook helps operationalise. Inbound references
+# (NIS2 article 21(2)(d), DORA article 19(2)) live in
+# content/mappings/{nis2,dora}/ so the graph is closed in both
+# directions.
+#
+# SKELETON SCOPE: structural pointers only. Every `oscal`, `d3fend`,
+# and `ocsf` entry is a placeholder marked `todo: true` and will be
+# replaced with real catalog IDs by the sibling CORE card. The NIS2 /
+# DORA cross-refs below ARE populated because the inbound mapping
+# entries already exist on main.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.threat_intel_ingest@v1
+
+oscal:
+  # TODO(CORE): replace with real NIST SP 800-53 Rev. 5 control IDs
+  # exercised by the feed-pull, normalisation, blocklist propagation,
+  # and detection-activation steps (likely RA-3, SI-5, SC-7, SI-4).
+  - id: control.todo_threat_intel_feed_ingest@v0
+    todo: true
+    notes: SKELETON placeholder; CORE card populates oscal_catalog, control_id, title, url.
+
+d3fend:
+  # TODO(CORE): replace with real MITRE D3FEND v0.16+ technique tags
+  # per playbook step.
+  - d3fend_id: D3-TODO
+    todo: true
+    notes: SKELETON placeholder; CORE card pins per-step D3FEND techniques.
+
+ocsf:
+  # TODO(CORE): replace with real OCSF telemetry bindings — at minimum
+  # Threat Intelligence Inference (class_uid 5005) consumed and a
+  # Security Finding emitted on activation.
+  - id: telemetry.todo_threat_intelligence_inference@v0
+    todo: true
+    notes: SKELETON placeholder; CORE card pins OCSF class_uid, version, direction.
+
+nis2:
+  # Inbound entry already exists at
+  # content/mappings/nis2/article-21-and-23.yaml (id nis2:art-21-2-d),
+  # which backlinks to playbook.threat_intel_ingest@v1. Populated, not
+  # a placeholder.
+  - mapping_id: nis2:art-21-2-d
+    article: 21(2)(d)
+    notes: >-
+      Supply-chain security: threat-intel ingest contributes IOC-driven
+      signal for direct suppliers and service providers.
+
+dora:
+  # Inbound entry already exists at
+  # content/mappings/dora/article-19-and-28.yaml
+  # (id dora:art-19-cyber-threat-voluntary), which backlinks to
+  # playbook.threat_intel_ingest@v1. Populated, not a placeholder.
+  - mapping_id: dora:art-19-cyber-threat-voluntary
+    article: "19(2)"
+    notes: >-
+      Voluntary notification of significant cyber threats — threat-intel
+      ingest produces the signal that feeds the voluntary notification
+      path.

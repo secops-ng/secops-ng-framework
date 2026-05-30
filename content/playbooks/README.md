@@ -9,3 +9,15 @@ CACAO v2 response playbooks. One directory per scenario, each containing:
 
 Starter scenarios are placeholder directories; playbook authoring is tracked
 by separate cards.
+
+## Catalog
+
+| Slug                      | Stable ID                              | Mappings overlay                                            |
+|---------------------------|----------------------------------------|-------------------------------------------------------------|
+| `data-exfil`              | `playbook.data_exfil@v1`               | _pending_                                                   |
+| `threat-intel-ingest`     | `playbook.threat_intel_ingest@v1`      | [`mappings.yaml`](threat-intel-ingest/mappings.yaml) (SKELETON — placeholders) |
+
+The mappings overlay column links to the per-playbook `mappings.yaml`
+(see `schemas/playbook-mappings.schema.json`). SKELETON rows ship
+structural pointers only; sibling CORE / EXTEND cards populate real
+OSCAL / D3FEND / OCSF IDs and KPI hooks.

@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/playbook-mappings.schema.json",
+  "title": "SecOps-NG Playbook Mappings Overlay",
+  "description": "Per-playbook outbound view of the content model: pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event classes, and the EU regulatory clauses (NIS2, DORA) this playbook helps operationalise. One file lives at content/playbooks/<slug>/mappings.yaml. Each top-level key holds an array of structural pointers; siblings in content/mappings/<regime>/ hold the inbound regulator-side view so the graph is closed in both directions. Placeholder IDs marked with `todo: true` are permitted while a playbook is still in SKELETON / CORE / EXTEND build-out.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["playbook", "oscal", "d3fend", "ocsf", "nis2", "dora"],
+  "properties": {
+    "playbook": {
+      "description": "Long-form URN of the playbook this overlay belongs to. Must match the playbook artifact's x_secops_ng.stable_id.",
+      "type": "string",
+      "pattern": "^playbook\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$",
+      "maxLength": 200
+    },
+    "oscal": {
+      "description": "OSCAL control pointers exercised by this playbook. Each entry pins a control catalog (typically NIST SP 800-53 Rev. 5) and a control_id. SKELETON entries may use placeholder control IDs with todo: true.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/oscal_entry" }
+    },
+    "d3fend": {
+      "description": "MITRE D3FEND defensive technique tags for individual playbook steps. Lets a reviewer see the countermeasure shape without reading runtime code. SKELETON entries may use placeholder d3fend_id with todo: true.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/d3fend_entry" }
+    },
+    "ocsf": {
+      "description": "OCSF event classes consumed or emitted by this playbook. SKELETON entries may use placeholder class_uid with todo: true.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/ocsf_entry" }
+    },
+    "nis2": {
+      "description": "NIS2 cross-references this playbook helps operationalise. Each entry pins a mapping id from content/mappings/nis2/*.yaml so the graph is closed in both directions. SKELETON entries may use todo: true and a placeholder mapping_id while the inbound side is being populated.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/regulatory_entry_nis2" }
+    },
+    "dora": {
+      "description": "DORA cross-references this playbook helps operationalise. Each entry pins a mapping id from content/mappings/dora/*.yaml so the graph is closed in both directions. SKELETON entries may use todo: true and a placeholder mapping_id while the inbound side is being populated.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/regulatory_entry_dora" }
+    }
+  },
+  "$defs": {
+    "todo_flag": {
+      "description": "Marks the entry as a SKELETON placeholder. Sibling CORE / EXTEND cards replace placeholder fields with real IDs and clear this flag.",
+      "type": "boolean"
+    },
+    "oscal_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": {
+          "description": "Long-form control URN: `control.<slug>@v<semver>`. SKELETON placeholders use `control.todo_<slug>@v0`.",
+          "type": "string",
+          "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$",
+          "maxLength": 200
+        },
+        "oscal_catalog": {
+          "description": "Catalog name, e.g. 'NIST SP 800-53 Rev. 5'.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "control_id": {
+          "description": "Catalog-native control identifier, e.g. 'RA-3(2)'.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "url": { "type": "string", "format": "uri" },
+        "todo": { "$ref": "#/$defs/todo_flag" },
+        "notes": { "type": "string", "maxLength": 2000 }
+      }
+    },
+    "d3fend_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["d3fend_id"],
+      "properties": {
+        "step": {
+          "description": "Optional CACAO step/action UUID this technique applies to.",
+          "type": "string",
+          "maxLength": 80
+        },
+        "d3fend_id": {
+          "description": "MITRE D3FEND technique identifier, e.g. 'D3-OSM'. SKELETON placeholder: 'D3-TODO'.",
+          "type": "string",
+          "pattern": "^D3-[A-Z0-9_-]+$",
+          "maxLength": 40
+        },
+        "d3fend_name": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "url": { "type": "string", "format": "uri" },
+        "todo": { "$ref": "#/$defs/todo_flag" },
+        "notes": { "type": "string", "maxLength": 2000 }
+      }
+    },
+    "ocsf_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": {
+          "description": "Long-form telemetry URN: `telemetry.<slug>@v<semver>`. SKELETON placeholders use `telemetry.todo_<slug>@v0`.",
+          "type": "string",
+          "pattern": "^telemetry\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$",
+          "maxLength": 200
+        },
+        "category_uid": { "type": "integer", "minimum": 0 },
+        "category_name": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "class_uid": { "type": "integer", "minimum": 0 },
+        "class_name": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "ocsf_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
+          "maxLength": 20
+        },
+        "direction": {
+          "description": "Whether this playbook consumes or emits the class.",
+          "type": "string",
+          "enum": ["consumes", "emits", "both"]
+        },
+        "todo": { "$ref": "#/$defs/todo_flag" },
+        "notes": { "type": "string", "maxLength": 2000 }
+      }
+    },
+    "regulatory_entry_nis2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mapping_id"],
+      "properties": {
+        "mapping_id": {
+          "description": "Mapping id from content/mappings/nis2/*.yaml that this playbook backlinks to.",
+          "type": "string",
+          "pattern": "^nis2:[a-z0-9][a-z0-9.-]*$",
+          "minLength": 3,
+          "maxLength": 120
+        },
+        "article": {
+          "description": "Article reference shorthand, e.g. '21(2)(d)'. Informational; the authoritative citation lives on the inbound mapping entry.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "todo": { "$ref": "#/$defs/todo_flag" },
+        "notes": { "type": "string", "maxLength": 2000 }
+      }
+    },
+    "regulatory_entry_dora": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mapping_id"],
+      "properties": {
+        "mapping_id": {
+          "description": "Mapping id from content/mappings/dora/*.yaml that this playbook backlinks to.",
+          "type": "string",
+          "pattern": "^dora:[a-z0-9][a-z0-9.-]*$",
+          "minLength": 3,
+          "maxLength": 120
+        },
+        "article": {
+          "description": "Article reference shorthand, e.g. '19(2)'. Informational; the authoritative citation lives on the inbound mapping entry.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "todo": { "$ref": "#/$defs/todo_flag" },
+        "notes": { "type": "string", "maxLength": 2000 }
+      }
+    }
+  }
+}

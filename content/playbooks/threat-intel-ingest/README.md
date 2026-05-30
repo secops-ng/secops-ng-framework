@@ -10,6 +10,19 @@ Intelligence Inference event class → propagate the result to detection
 
 - `playbook.cacao.json` — the CACAO v2 artifact
   (`playbook.threat_intel_ingest@v1`).
+- `mappings.yaml` — regulatory/metrics overlay (SKELETON: placeholder
+  OSCAL / D3FEND / OCSF entries; NIS2 Art. 21(2)(d) and DORA Art. 19(2)
+  cross-refs populated). Schema:
+  `../../../schemas/playbook-mappings.schema.json`.
+
+## Mappings
+
+See [`mappings.yaml`](mappings.yaml) for the outbound view of the
+content model: OSCAL controls exercised, MITRE D3FEND defensive
+techniques per step, OCSF event classes consumed/emitted, and NIS2 /
+DORA cross-references. SKELETON ships structural pointers only; the
+sibling CORE card populates real catalog IDs and the EXTEND card adds
+KPI metric files plus the hooks block in this README.
 
 ## Worked example, mappings, and compile-target emissions
 
