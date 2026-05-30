@@ -1,0 +1,36 @@
+{
+  "stable_id": "telemetry.ocsf.api_activity@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "API Activity event (cloud control-plane and SaaS API telemetry for identity-compromise lateral hunt)",
+  "summary": "OCSF API Activity events the identity-compromise playbook reads during the lateral-movement hunt: cloud control-plane calls (STS / AssumeRole chains, cross-tenant access), SaaS API token reuse, and OAuth-grant escalation attributable to the compromised principal within the configured lookback window.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 6,
+    "category_name": "Application Activity",
+    "class_uid": 6003,
+    "class_name": "API Activity"
+  },
+  "direction": "ingest",
+  "fields_used": [
+    "time",
+    "activity_id",
+    "actor.user.uid",
+    "actor.session.uid",
+    "api.operation",
+    "api.service.name",
+    "api.request.uid",
+    "src_endpoint.ip",
+    "resources",
+    "status_id"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.identity_compromise@v1"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org",
+  "sources": [
+    "OCSF v1.4.0 Application Activity category — API Activity class (uid 6003)"
+  ]
+}

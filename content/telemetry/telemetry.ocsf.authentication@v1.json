@@ -1,0 +1,40 @@
+{
+  "stable_id": "telemetry.ocsf.authentication@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Authentication event (identity-provider sign-in telemetry for identity-compromise response)",
+  "summary": "OCSF Authentication events the identity-compromise playbook consumes when an identity-protection signal lands. Carries principal identity, source endpoint and geolocation, MFA outcome, logon type, and session identifiers used by triage (impossible-travel / MFA-bypass interpretation) and by session-revocation accounting.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 3,
+    "category_name": "Identity & Access Management",
+    "class_uid": 3002,
+    "class_name": "Authentication",
+    "profiles": [
+      "cloud"
+    ]
+  },
+  "direction": "ingest",
+  "fields_used": [
+    "time",
+    "activity_id",
+    "user.uid",
+    "user.name",
+    "src_endpoint.ip",
+    "src_endpoint.location.country",
+    "auth_protocol",
+    "logon_type",
+    "mfa",
+    "status_id",
+    "session.uid"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.identity_compromise@v1"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org",
+  "sources": [
+    "OCSF v1.4.0 Identity & Access Management category — Authentication class (uid 3002)"
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "stable_id": "telemetry.ocsf.account_change@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Account Change event (IAM account mutation telemetry for identity-compromise persistence removal)",
+  "summary": "OCSF Account Change events the identity-compromise playbook consumes during the IAM-audit and persistence-removal step. Surfaces account state changes performed against (or by) the compromised principal: MFA disablement, app-password creation, conditional-access exception edits, OAuth consent grants, new device registrations, and standing-privilege role assignments.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 3,
+    "category_name": "Identity & Access Management",
+    "class_uid": 3001,
+    "class_name": "Account Change"
+  },
+  "direction": "ingest",
+  "fields_used": [
+    "time",
+    "activity_id",
+    "user.uid",
+    "user.name",
+    "actor.user.uid",
+    "src_endpoint.ip",
+    "status_id"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.identity_compromise@v1"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org",
+  "sources": [
+    "OCSF v1.4.0 Identity & Access Management category — Account Change class (uid 3001)"
+  ]
+}
