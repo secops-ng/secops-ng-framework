@@ -58,26 +58,104 @@
     {
       "id": "action--30000000-0000-4000-8000-000000000002",
       "name": "ingest finding",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         500,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.finding_id",
+              "name": "in.finding_id",
+              "value": "={{$workflow.variables.finding_id}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.detection_refs",
+              "name": "x_secops_ng.detection_refs",
+              "value": "detection.sigma.cspm_finding_critical@v1, detection.sigma.public_storage_bucket@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.mttd_cloud_misconfig@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Fetch the CSPM / posture finding from the operator's posture-management platform: rule fingerprint, affected resource, evaluated baseline, first-observed timestamp. Source is identified by __finding_id__ and may originate from continuous CSPM scans or from an IaC policy guardrail emitting the same OCSF shape at deploy time.",
       "notesInFlow": true
     },
     {
       "id": "action--30000000-0000-4000-8000-000000000003",
       "name": "enrich resource and owner",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         760,
         240
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.finding_id",
+              "name": "in.finding_id",
+              "value": "={{$workflow.variables.finding_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.resource_id",
+              "name": "out.resource_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.owner_id",
+              "name": "out.owner_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.severity",
+              "name": "out.severity",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.cspm_baseline@v1, control.cloud_identity_least_privilege@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.cloud_resource_inventory@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.cloud_posture_coverage@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Resolve the affected resource against the cloud inventory and ownership graph: tenant, project / account, region, resource type, tags, accountable owner, classification. Produces __resource_id__, __owner_id__, and __severity__ (severity is resolved here rather than ingested raw because the operator's classification can lift or lower the upstream CSPM severity).",
       "notesInFlow": true
     },
@@ -118,52 +196,172 @@
     {
       "id": "action--30000000-0000-4000-8000-000000000005",
       "name": "suppress and close",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         1280,
         240
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.recurring_cloud_misconfig@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Link the finding to its existing exception or known-deviation record, close the case without paging, and account the suppression against the recurring-misconfiguration KRI so a chronically suppressed posture rule surfaces in the metrics layer.",
       "notesInFlow": true
     },
     {
       "id": "action--30000000-0000-4000-8000-000000000006",
       "name": "notify owner",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         1540,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.owner_id",
+              "name": "in.owner_id",
+              "value": "={{$workflow.variables.owner_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.resource_id",
+              "name": "in.resource_id",
+              "value": "={{$workflow.variables.resource_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.severity",
+              "name": "in.severity",
+              "value": "={{$workflow.variables.severity}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.mttr_cloud_misconfig@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Notify the resource owner along the operator's pre-bound channel (ticketing / chat / paging, per __severity__). The notification carries the finding, the affected resource, the violated baseline, and a link to the guided-remediation runbook the next step references.",
       "notesInFlow": true
     },
     {
       "id": "action--30000000-0000-4000-8000-000000000007",
       "name": "guided remediation",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         1800,
         240
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.resource_id",
+              "name": "in.resource_id",
+              "value": "={{$workflow.variables.resource_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.owner_id",
+              "name": "in.owner_id",
+              "value": "={{$workflow.variables.owner_id}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.cspm_baseline@v1, control.iac_policy_guardrail@v1, control.cloud_identity_least_privilege@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.mttr_cloud_misconfig@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Apply the remediation bound to the violated baseline rule, with change-management attestation: either an operator-approved auto-remediation hand-off (IaC pull request, runbook execution) or an owner-driven manual change captured against the change record. The action body is operator-bound; only the contract (a remediation attempt is recorded against the finding) is fixed by this playbook.",
       "notesInFlow": true
     },
     {
       "id": "action--30000000-0000-4000-8000-000000000008",
       "name": "re-scan",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         2060,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.resource_id",
+              "name": "in.resource_id",
+              "value": "={{$workflow.variables.resource_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.finding_id",
+              "name": "in.finding_id",
+              "value": "={{$workflow.variables.finding_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.remediation_verified",
+              "name": "out.remediation_verified",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.detection_refs",
+              "name": "x_secops_ng.detection_refs",
+              "value": "detection.sigma.cspm_finding_critical@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.mttr_cloud_misconfig@v1, kpi.cloud_posture_coverage@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Trigger a targeted re-scan against the same baseline rule and resource. Emits __remediation_verified__ based on whether the rule still fires. The re-scan is a deterministic verification step, not a fresh posture sweep.",
       "notesInFlow": true
     },
@@ -204,13 +402,49 @@
     {
       "id": "action--30000000-0000-4000-8000-00000000000b",
       "name": "escalate",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         2580,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.finding_id",
+              "name": "in.finding_id",
+              "value": "={{$workflow.variables.finding_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.resource_id",
+              "name": "in.resource_id",
+              "value": "={{$workflow.variables.resource_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.severity",
+              "name": "in.severity",
+              "value": "={{$workflow.variables.severity}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.recurring_cloud_misconfig@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Escalate to the security-engineering on-call along the operator's pre-bound paging channel. The escalation payload carries the finding, the attempted remediation, and the failing re-scan evidence. Tracked against the recurring-misconfiguration KRI so chronic unremediated posture exceptions surface in the metrics layer.",
       "notesInFlow": true
     },
@@ -376,15 +610,15 @@
       "source_playbook_id": "playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8"
     },
     "secops_ng_notes": [
-      "step 'action--30000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--30000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'if-condition--30000000-0000-4000-8000-000000000004' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
-      "step 'action--30000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--30000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--30000000-0000-4000-8000-000000000007': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--30000000-0000-4000-8000-000000000008': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000007': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000008': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'if-condition--30000000-0000-4000-8000-000000000009' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
-      "step 'action--30000000-0000-4000-8000-00000000000b': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n."
+      "step 'action--30000000-0000-4000-8000-00000000000b': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
     ]
   }
 }

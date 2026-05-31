@@ -46,26 +46,92 @@
     {
       "id": "action--c0a17a01-0000-4000-8000-000000000002",
       "name": "ingest report",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         500,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.email_id",
+              "name": "in.email_id",
+              "value": "={{$workflow.variables.email_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.report_source",
+              "name": "in.report_source",
+              "value": "={{$workflow.variables.report_source}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.training_attestation@v1, control.phishing_simulation@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.email_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Fetch the reported email envelope, headers, body, and attachment metadata from the email-security platform. Accepts both user-reported messages and mailbox-sweep hits; the source is carried in __report_source__ for downstream accounting against the simulation click-rate and suppression-rate metrics.",
       "notesInFlow": true
     },
     {
       "id": "action--c0a17a01-0000-4000-8000-000000000003",
       "name": "enrich headers, URLs, attachments",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         760,
         240
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "out.benign_or_seen",
+              "name": "out.benign_or_seen",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.detection_refs",
+              "name": "x_secops_ng.detection_refs",
+              "value": "detection.sigma.email.suspicious_sender_domain@v1, detection.sigma.email.url_shortener_in_body@v1, detection.sigma.email.attachment_double_extension@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_handling_capability@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.email_activity@v1, telemetry.ocsf.email_url_activity@v1, telemetry.ocsf.file_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.mttd_phishing@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Run sender-domain authentication (SPF / DKIM / DMARC), URL reputation against the operator's allow/deny posture, and attachment static analysis. Emits OCSF Email Activity, URL Activity, and File Activity records per indicator; correlates against the Sigma email-related rule references pinned in mappings.yaml.",
       "notesInFlow": true
     },
@@ -106,26 +172,68 @@
     {
       "id": "action--c0a17a01-0000-4000-8000-000000000005",
       "name": "suppress and close",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         1280,
         240
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_handling_capability@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.phishing_suppression_rate@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Link this report onto the existing case (or onto the known-benign sender record), close it without paging, and account the suppression against the suppression-rate KRI. Reporter receives the acknowledgement they already opted into; no further notifications fan out.",
       "notesInFlow": true
     },
     {
       "id": "action--c0a17a01-0000-4000-8000-000000000006",
       "name": "classify intent",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         1540,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "out.intent",
+              "name": "out.intent",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_handling_capability@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.email_activity@v1, telemetry.ocsf.email_url_activity@v1, telemetry.ocsf.file_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Apply the operator's intent classifier (rule-based heuristics, ML model, or analyst review per maturity) to the enriched evidence. Emits one of: phishing, credential_harvest, malware_attached, business_email_compromise, unknown. The classifier itself is operator-bound; only the output contract is fixed by this playbook.",
       "notesInFlow": true
     },
@@ -151,65 +259,167 @@
     {
       "id": "action--c0a17a01-0000-4000-8000-000000000008",
       "name": "response: phishing",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         2060,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_handling_capability@v1, control.incident_timeline_signals@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.mttr_phishing_triage@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Generic phishing response: quarantine / purge the message across mailboxes that received it, block sender + URL hashes at the email-security gateway, and notify the responsible response team. Records the response action against the phishing MTTR clock.",
       "notesInFlow": true
     },
     {
       "id": "action--c0a17a01-0000-4000-8000-000000000009",
       "name": "response: credential harvest",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         2320,
         240
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_handling_capability@v1, control.incident_timeline_signals@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.email_url_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.mttr_phishing_triage@v1, kpi.phishing_sim_click_rate@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Credential-harvest response: quarantine, block landing-page URLs, identify clickers from URL Activity telemetry and force credential reset / step-up on those identities, notify identity team. Feeds the simulation click-rate KPI when the source is a sanctioned phishing simulation.",
       "notesInFlow": true
     },
     {
       "id": "action--c0a17a01-0000-4000-8000-00000000000a",
       "name": "response: malware attached",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         2580,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_handling_capability@v1, control.incident_timeline_signals@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.file_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.mttr_phishing_triage@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Malware-attachment response: quarantine, block attachment SHA-256 at the gateway, hand the host-side investigation off to the endpoint owner playbook for any recipient who opened the file (correlated via OCSF File Activity).",
       "notesInFlow": true
     },
     {
       "id": "action--c0a17a01-0000-4000-8000-00000000000b",
       "name": "response: business email compromise",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         2840,
         240
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_handling_capability@v1, control.incident_timeline_signals@v1, control.recurring_incident_correlator@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.mttr_phishing_triage@v1, kpi.timeline_completeness@v1, kri.regulator_notification_overrun@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "BEC response: escalate to the fraud / finance liaison, freeze any pending payment instruction tied to the message, and open an identity-compromise sub-investigation for the impersonated or compromised sender account. Distinguished from generic phishing because the response chain leaves email-security and enters finance and identity; a BEC case routinely trips the NIS2 / DORA reporting clocks, so the response stamps the regulator-notification-overrun KRI and the timeline-completeness KPI alongside the phishing MTTR clock.",
       "notesInFlow": true
     },
     {
       "id": "action--c0a17a01-0000-4000-8000-00000000000c",
       "name": "response: manual review",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         3100,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_handling_capability@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.mttr_phishing_triage@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Unknown-intent branch: route to a human analyst queue with the enriched evidence packet. Manual outcome is fed back as labelled data for the classifier and recorded for telemetry-coverage accounting.",
       "notesInFlow": true
     },
@@ -382,17 +592,17 @@
       "source_playbook_id": "playbook--7e51c1a6-7e51-4ab1-9ed0-aabbccddeeff"
     },
     "secops_ng_notes": [
-      "step 'action--c0a17a01-0000-4000-8000-000000000002': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--c0a17a01-0000-4000-8000-000000000003': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--c0a17a01-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--c0a17a01-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'if-condition--c0a17a01-0000-4000-8000-000000000004' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
-      "step 'action--c0a17a01-0000-4000-8000-000000000005': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--c0a17a01-0000-4000-8000-000000000006': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--c0a17a01-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--c0a17a01-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'switch-condition--c0a17a01-0000-4000-8000-000000000007' (switch-condition): no cases parsed from CACAO source \u2014 emitted Switch node with empty rule set; operator must populate cases in n8n.",
-      "step 'action--c0a17a01-0000-4000-8000-000000000008': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--c0a17a01-0000-4000-8000-000000000009': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--c0a17a01-0000-4000-8000-00000000000a': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--c0a17a01-0000-4000-8000-00000000000b': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--c0a17a01-0000-4000-8000-00000000000c': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n."
+      "step 'action--c0a17a01-0000-4000-8000-000000000008': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--c0a17a01-0000-4000-8000-000000000009': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--c0a17a01-0000-4000-8000-00000000000a': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--c0a17a01-0000-4000-8000-00000000000b': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--c0a17a01-0000-4000-8000-00000000000c': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
     ]
   }
 }

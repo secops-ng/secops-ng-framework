@@ -52,39 +52,171 @@
     {
       "id": "action--40000000-0000-4000-8000-000000000002",
       "name": "timeline collation",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         500,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.incident_id",
+              "name": "in.incident_id",
+              "value": "={{$workflow.variables.incident_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.timeline_artifact",
+              "name": "out.timeline_artifact",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.evidence_gaps_present",
+              "name": "out.evidence_gaps_present",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.detection_refs",
+              "name": "x_secops_ng.detection_refs",
+              "value": "detection.sigma.eventlog_cleared@v1, detection.sigma.security_eventlog_cleared@v1, detection.sigma.important_eventlog_cleared@v1, detection.sigma.eventlog_clear_configuration_change@v1, detection.sigma.event_auditing_disabled@v1, detection.sigma.auditpol_tampering@v1, detection.sigma.timestomp_powershell@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.incident_finding@v1, telemetry.ocsf.process_activity@v1, telemetry.ocsf.file_activity@v1, telemetry.ocsf.authentication@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.timeline_completeness@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Collate a chronological timeline of the incident from the artifacts the responders left behind: ticket comments, chat transcripts, EDR / SIEM exports, network captures, and operator-supplied evidence packages. The step must flag gaps in the evidence record where anti-forensics signals (cleared eventlogs, disabled audit policy, timestomped files) are present \u2014 these are recorded in __evidence_gaps_present__ rather than silently smoothed over, so the review template can address decisions made under partial evidence. Produces __timeline_artifact__ and __evidence_gaps_present__.",
       "notesInFlow": true
     },
     {
       "id": "action--40000000-0000-4000-8000-000000000003",
       "name": "blameless review template",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         760,
         240
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.incident_id",
+              "name": "in.incident_id",
+              "value": "={{$workflow.variables.incident_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.timeline_artifact",
+              "name": "in.timeline_artifact",
+              "value": "={{$workflow.variables.timeline_artifact}}",
+              "type": "string"
+            },
+            {
+              "id": "in.evidence_gaps_present",
+              "name": "in.evidence_gaps_present",
+              "value": "={{$workflow.variables.evidence_gaps_present}}",
+              "type": "string"
+            },
+            {
+              "id": "out.review_artifact",
+              "name": "out.review_artifact",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.blameless_review@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.incident_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.review_completion_sla@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Walk the operator's blameless review template against the collated timeline. The template separates contributing factors (process, tooling, staffing, training, environment) from individual error, and explicitly captures decisions that were reasonable given the evidence available at the time. If __evidence_gaps_present__ is true the template's evidence-gaps section is mandatory rather than optional. Produces __review_artifact__.",
       "notesInFlow": true
     },
     {
       "id": "action--40000000-0000-4000-8000-000000000004",
       "name": "corrective-action tracking",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         1020,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.incident_id",
+              "name": "in.incident_id",
+              "value": "={{$workflow.variables.incident_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.review_artifact",
+              "name": "in.review_artifact",
+              "value": "={{$workflow.variables.review_artifact}}",
+              "type": "string"
+            },
+            {
+              "id": "out.corrective_action_register",
+              "name": "out.corrective_action_register",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.corrective_action_register@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.incident_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.corrective_action_close_rate@v1, kri.corrective_action_overdue@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Extract corrective actions from the review artifact and register each one with owner, due-date, and verification clause. Registration is the deliverable here \u2014 execution and verification of each action are out of scope for this playbook (they live on the operator's existing change / ticketing system). Produces __corrective_action_register__.",
       "notesInFlow": true
     },
@@ -169,9 +301,9 @@
       "source_playbook_id": "playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9"
     },
     "secops_ng_notes": [
-      "step 'action--40000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--40000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--40000000-0000-4000-8000-000000000004': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n."
+      "step 'action--40000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--40000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--40000000-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
     ]
   }
 }
