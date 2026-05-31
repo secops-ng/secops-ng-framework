@@ -17,9 +17,9 @@ import json
 import sys
 from pathlib import Path
 
-# Targets registered here. Adding temporal/langgraph is a single-line change
-# once those emitters land on their own cards.
-_TARGETS = {"n8n"}
+# Targets registered here. Adding langgraph is a single-line change once that
+# emitter lands on its own card.
+_TARGETS = {"n8n", "temporal"}
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -35,7 +35,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "--target",
         required=True,
         choices=sorted(_TARGETS),
-        help="compile target (currently: n8n)",
+        help="compile target (currently: n8n, temporal)",
     )
     p.add_argument(
         "--out",
@@ -56,6 +56,11 @@ def main(argv: list[str] | None = None) -> int:
 
             playbook = parse_file(args.playbook)
             workflow = emit_n8n(playbook)
+            rendered = json.dumps(workflow, indent=2) + "\n"
+        elif args.target == "temporal":
+            from compilers.temporal.emit import emit_file as emit_temporal_file
+
+            rendered = emit_temporal_file(args.playbook)
         else:  # pragma: no cover — argparse choices guards this
             print(f"error: unknown target {args.target!r}", file=sys.stderr)
             return 2
@@ -63,7 +68,6 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: {type(exc).__name__}: {exc}", file=sys.stderr)
         return 1
 
-    rendered = json.dumps(workflow, indent=2) + "\n"
     if args.out:
         Path(args.out).write_text(rendered, encoding="utf-8")
     else:
