@@ -1,0 +1,217 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8",
+  "name": "Executive metrics rollup",
+  "description": "Recurring rollup of the operator's KPI/KRI catalog into a board-ready summary plus a control-effectiveness score. Aggregates metric bodies from the SecOps-NG content-model metrics layer, evaluates each entry against its target and thresholds, joins those evaluations to the control catalog by stable_id, and emits a structured summary artifact the operator can route to their downstream board pack pipeline. CACAO v2 + SecOps-NG content-model extensions. Anchors NIS2 Article 21(2)(f) (effectiveness assessment) and DORA Article 6 (ICT risk-management framework periodic review) without prescribing a specific board template or distribution channel. SKELETON: workflow shape and content-model joins only; fixtures, mappings overlay, and compile-target worked examples land in CORE / EXTEND siblings.",
+  "playbook_types": [
+    "investigation",
+    "notification"
+  ],
+  "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+  "created": "2026-05-31T00:00:00Z",
+  "modified": "2026-05-31T00:00:00Z",
+  "labels": [
+    "executive-reporting",
+    "metrics-rollup",
+    "control-effectiveness",
+    "nis2",
+    "dora",
+    "board-summary"
+  ],
+  "external_references": [
+    {
+      "name": "OASIS CACAO v2.0",
+      "description": "Workflow step types, variable conventions, and the x_ extension namespace used to carry SecOps-NG content-model refs.",
+      "source": "OASIS Open"
+    },
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 21(2)(f) \u2014 policies and procedures to assess the effectiveness of cybersecurity risk-management measures",
+      "source": "Official Journal of the European Union"
+    },
+    {
+      "name": "DORA Regulation (EU) 2022/2554, Article 6 \u2014 ICT risk-management framework, periodic review",
+      "source": "Official Journal of the European Union"
+    },
+    {
+      "name": "ENISA \u2014 Good practices for incident reporting and metrics",
+      "source": "ENISA"
+    },
+    {
+      "name": "OSCAL \u2014 CA-2 (Control Assessments) and PM-6 (Measures of Performance)",
+      "description": "Anchor the control-effectiveness scoring shape.",
+      "source": "NIST"
+    }
+  ],
+  "playbook_variables": {
+    "__rollup_window__": {
+      "type": "string",
+      "description": "ISO 8601 window the rollup covers (e.g. `2026-05-01/2026-05-31`). Externally supplied by the scheduler so multiple cadences (monthly, quarterly) reuse the same playbook.",
+      "external": true
+    },
+    "__catalog_ref__": {
+      "type": "string",
+      "description": "Pointer to the operator's resolved KPI/KRI catalog (path or registry URI). Externally supplied so the operator can pin a catalog version per run.",
+      "external": true
+    },
+    "__metric_evaluations__": {
+      "type": "string",
+      "description": "Serialised list of per-metric evaluations produced by the evaluation step. Each entry carries the metric stable_id, the observed value, the matched threshold band, and the lower-layer artifacts (control, telemetry, playbook step) the metric is bound to.",
+      "external": false
+    },
+    "__control_effectiveness_score__": {
+      "type": "string",
+      "description": "Composite control-effectiveness score for the window, derived from the KPI/KRI evaluations grouped by control_ref. Bounded `0.0..1.0`. The scoring policy itself is operator-supplied; the playbook only pins the inputs and the output contract.",
+      "external": false
+    },
+    "__board_summary_id__": {
+      "type": "string",
+      "description": "Identifier of the emitted board-ready summary artifact in the operator's downstream system (board pack pipeline, GRC tool, document store). Captured for audit-trail purposes.",
+      "external": false
+    }
+  },
+  "workflow_start": "start--e0000000-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--e0000000-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "rollup-start",
+      "on_completion": "action--e0000000-0000-4000-8000-000000000002"
+    },
+    "action--e0000000-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "resolve KPI/KRI catalog",
+      "description": "Load the operator's pinned KPI/KRI catalog version from `__catalog_ref__`. Each entry MUST validate against `content-model/metrics.schema.json` before it enters the rollup; entries that fail validation are recorded for the corrective-action register and excluded from the score so a malformed entry cannot inflate or deflate effectiveness.",
+      "on_completion": "action--e0000000-0000-4000-8000-000000000003",
+      "in_args": [
+        "__rollup_window__",
+        "__catalog_ref__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.control_effectiveness_test@v1"
+        ],
+        "metric_refs": [
+          "kri.corrective_action_overdue@v1"
+        ]
+      }
+    },
+    "action--e0000000-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "evaluate metrics over window",
+      "description": "For each catalog entry, compute the value defined by the metric's `measurement.formula` over `__rollup_window__` against the operator's telemetry / workflow / control attestation source. Each evaluation carries the matched threshold band (target / warn / breach) and references the lower-layer artifacts (playbook step, detection, control, telemetry) the metric is bound to via its `inputs[]`. Emits `__metric_evaluations__`.",
+      "on_completion": "action--e0000000-0000-4000-8000-000000000004",
+      "in_args": [
+        "__rollup_window__",
+        "__catalog_ref__"
+      ],
+      "out_args": [
+        "__metric_evaluations__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.control_effectiveness_test@v1"
+        ],
+        "metric_refs": [
+          "kpi.review_completion_sla@v1",
+          "kpi.corrective_action_close_rate@v1"
+        ]
+      }
+    },
+    "action--e0000000-0000-4000-8000-000000000004": {
+      "type": "action",
+      "name": "score control effectiveness",
+      "description": "Group the evaluations by `control_refs[]` and compute a composite control-effectiveness score per control, then aggregate to a programme-level score in `0.0..1.0`. The scoring policy (per-control weighting, KRI penalty function, missing-evidence treatment) is operator-supplied. The playbook only pins the input contract and the output shape so the score is reproducible from the same evaluations.",
+      "on_completion": "if-condition--e0000000-0000-4000-8000-000000000005",
+      "in_args": [
+        "__metric_evaluations__"
+      ],
+      "out_args": [
+        "__control_effectiveness_score__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.control_effectiveness_test@v1"
+        ],
+        "metric_refs": [
+          "kri.control_effectiveness@v1"
+        ]
+      }
+    },
+    "if-condition--e0000000-0000-4000-8000-000000000005": {
+      "type": "if-condition",
+      "name": "any breach band hit?",
+      "description": "Branch on whether any metric evaluation matched its `breach` threshold band. `on_success` (true): annotate the in-flight summary with a board-attention flag before emit. `on_failure` (false): emit the summary without the attention flag. Both branches converge on the same emit step so the rollup is single-output.",
+      "on_success": "action--e0000000-0000-4000-8000-000000000006",
+      "on_failure": "action--e0000000-0000-4000-8000-000000000007"
+    },
+    "action--e0000000-0000-4000-8000-000000000006": {
+      "type": "action",
+      "name": "raise board-attention flag",
+      "description": "Annotate the in-flight summary with a board-attention flag so the downstream pack pipeline surfaces the breach band on the cover page. Pure annotation step \u2014 no notification is sent here; the board pack pipeline owns the distribution channel and cadence.",
+      "on_completion": "action--e0000000-0000-4000-8000-000000000007",
+      "in_args": [
+        "__control_effectiveness_score__",
+        "__metric_evaluations__"
+      ],
+      "x_secops_ng": {
+        "metric_refs": [
+          "kri.corrective_action_overdue@v1"
+        ]
+      }
+    },
+    "action--e0000000-0000-4000-8000-000000000007": {
+      "type": "action",
+      "name": "emit board summary",
+      "description": "Render the structured board-ready summary artifact and hand it off to the operator's board pack pipeline. The artifact carries: window, per-metric evaluations with threshold bands, per-control effectiveness scores, programme-level score, and (if set) the board-attention flag. Output is content-only \u2014 distribution, signing, and archival are out of scope of the playbook.",
+      "on_completion": "end--e0000000-0000-4000-8000-000000000008",
+      "in_args": [
+        "__rollup_window__",
+        "__metric_evaluations__",
+        "__control_effectiveness_score__"
+      ],
+      "out_args": [
+        "__board_summary_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.control_effectiveness_test@v1"
+        ],
+        "metric_refs": [
+          "kpi.review_completion_sla@v1"
+        ]
+      }
+    },
+    "end--e0000000-0000-4000-8000-000000000008": {
+      "type": "end",
+      "name": "rollup-end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.executive_metrics@v1",
+    "content_version": "0.1.0",
+    "maturity": "experimental",
+    "compile_targets": [
+      "n8n",
+      "temporal",
+      "langgraph"
+    ],
+    "control_refs": [
+      "control.control_effectiveness_test@v1"
+    ],
+    "metric_refs": [
+      "kri.control_effectiveness@v1",
+      "kpi.corrective_action_close_rate@v1",
+      "kri.corrective_action_overdue@v1",
+      "kpi.review_completion_sla@v1"
+    ],
+    "sources": [
+      "OASIS CACAO v2.0 specification \u2014 workflow step types, variable conventions, x_ extension namespace",
+      "NIS2 Directive (EU) 2022/2555, Article 21(2)(f) \u2014 effectiveness assessment of cybersecurity risk-management measures",
+      "DORA Regulation (EU) 2022/2554, Article 6 \u2014 ICT risk-management framework, periodic review",
+      "ENISA \u2014 Good practices for incident reporting and metrics",
+      "OSCAL \u2014 CA-2 (Control Assessments) and PM-6 (Measures of Performance) anchor the control-effectiveness scoring shape",
+      "SigmaHQ \u2014 intentionally not referenced; an executive rollup is a reporting workflow, not a detection workflow, so no Sigma rule IDs are pinned",
+      "MITRE D3FEND \u2014 intentionally not referenced; no D3FEND technique applies because no attack is being defended against in this workflow"
+    ]
+  }
+}
