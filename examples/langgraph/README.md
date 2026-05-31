@@ -20,6 +20,10 @@ runtime.
   gateway, URL sandbox, attachment sandbox → suppression-cache check →
   intent classification → response branch (containment + ticketing or
   user-feedback close).
+- [`identity-compromise/`](identity-compromise/) — identity-compromise
+  response playbook. Triage identity signal → confirmation branch →
+  MFA reset → session revocation → lateral-movement hunt → IAM audit
+  and persistence removal.
 
 More worked examples land here as additional playbooks ship under
 `content/playbooks/`. Each follows the same shape — playbook,
