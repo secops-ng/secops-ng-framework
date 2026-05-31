@@ -80,12 +80,6 @@
               "type": "string"
             },
             {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.threat_intelligence_inference@v1",
-              "type": "string"
-            },
-            {
               "id": "x_secops_ng.metric_refs",
               "name": "x_secops_ng.metric_refs",
               "value": "kpi.coverage_threat_intel_feed@v1",
@@ -127,18 +121,12 @@
               "name": "x_secops_ng.control_refs",
               "value": "control.threat_intel.normalisation@v1",
               "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.threat_intelligence_inference@v1",
-              "type": "string"
             }
           ]
         },
         "options": {}
       },
-      "notes": "Map STIX 2.1 SDOs (Indicator, Malware, Threat-Actor) to the OCSF Threat Intelligence Inference event class. Persist normalised records keyed by indicator value; deduplicate against records seen within the last 24 hours.",
+      "notes": "Map STIX 2.1 SDOs (Indicator, Malware, Threat-Actor) into the playbook's canonical normalised-indicator record. The released OCSF v1.3.0 catalogue does not contain a dedicated threat-intel ingest event class, so no OCSF class is asserted here on the consumed side (see mappings.yaml \u2014 ocsf section). Persist normalised records keyed by indicator value; deduplicate against records seen within the last 24 hours.",
       "notesInFlow": true
     },
     {
@@ -202,7 +190,7 @@
             {
               "id": "x_secops_ng.telemetry_refs",
               "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.security_finding@v1",
+              "value": "telemetry.ocsf.detection_finding@v1",
               "type": "string"
             },
             {
@@ -239,7 +227,7 @@
             {
               "id": "x_secops_ng.telemetry_refs",
               "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.security_finding@v1",
+              "value": "telemetry.ocsf.detection_finding@v1",
               "type": "string"
             },
             {
