@@ -1,0 +1,405 @@
+{
+  "name": "On-call rotation handoff",
+  "nodes": [
+    {
+      "id": "start--30000000-0000-4000-8000-000000000001",
+      "name": "rotation-start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__shift_window__",
+              "type": "string",
+              "value": "",
+              "description": "ISO 8601 interval describing the shift window being evaluated. Supplied by the scheduler that triggers this playbook (cron, Temporal schedule, or n8n trigger)."
+            },
+            {
+              "name": "__current_on_call__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the responder holding the primary on-call slot for the evaluated shift window. Resolved from the roster against the shift window."
+            },
+            {
+              "name": "__next_on_call__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the responder receiving the next shift. Used by the handoff branch; empty when the playbook runs mid-shift."
+            },
+            {
+              "name": "__escalation_chain__",
+              "type": "string",
+              "value": "",
+              "description": "Ordered, comma-separated chain of responders the paging system will escalate through (primary, secondary, manager). Bound from the roster + tier policy and read by the operator's paging system at page time."
+            },
+            {
+              "name": "__handoff_window__",
+              "type": "boolean",
+              "value": "",
+              "description": "True when the evaluated shift window crosses a rotation boundary and a handoff brief is due. False during steady-state shifts."
+            },
+            {
+              "name": "__brief_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the generated handoff brief artifact (open incidents, recent alerts, ack-latency snapshot). Empty when no brief is produced."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--30000000-0000-4000-8000-000000000002",
+      "name": "load rotation roster",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.shift_window",
+              "name": "in.shift_window",
+              "value": "={{$workflow.variables.shift_window}}",
+              "type": "string"
+            },
+            {
+              "id": "out.current_on_call",
+              "name": "out.current_on_call",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.next_on_call",
+              "name": "out.next_on_call",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.on_call_roster_governance@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.account_change@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.coverage_on_call_schedule@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Read the rotation roster from the operator's source of truth (paging system schedule, calendar feed, or roster file) and resolve who holds the primary slot and who receives the next shift for the evaluated window. The roster source itself is operator-bound; this step normalises its output into __current_on_call__ and __next_on_call__.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--30000000-0000-4000-8000-000000000003",
+      "name": "bind escalation tiers",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.current_on_call",
+              "name": "in.current_on_call",
+              "value": "={{$workflow.variables.current_on_call}}",
+              "type": "string"
+            },
+            {
+              "id": "out.escalation_chain",
+              "name": "out.escalation_chain",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.handoff_window",
+              "name": "out.handoff_window",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.on_call_roster_governance@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.mttr_on_call_ack@v1, kri.escalation_tier_breach@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Resolve the escalation chain the paging system will fan through when an alert is not acknowledged: primary (current_on_call), secondary (back-up slot from the roster), then manager. The bound chain is published to the paging system's runtime configuration so the next page uses it. Detection coverage for unusual-hours authentication anomalies during off-hours rotation handoff and for suspicious privileged-account modification during rotation gaps is wired by the CORE-layer mapping; upstream SigmaHQ rule ids are referenced from the playbook-level external_references (TODO entries until pinned).",
+      "notesInFlow": true
+    },
+    {
+      "id": "if-condition--30000000-0000-4000-8000-000000000004",
+      "name": "shift handoff window?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "secops_ng_condition",
+              "leftValue": "",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "notes": "Branch on __handoff_window__. True branches into handoff-brief generation and notification of the incoming responder; false closes the run with the escalation chain bound but no handoff side effects (steady-state mid-shift execution).",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--30000000-0000-4000-8000-000000000005",
+      "name": "generate handoff brief",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.current_on_call",
+              "name": "in.current_on_call",
+              "value": "={{$workflow.variables.current_on_call}}",
+              "type": "string"
+            },
+            {
+              "id": "in.next_on_call",
+              "name": "in.next_on_call",
+              "value": "={{$workflow.variables.next_on_call}}",
+              "type": "string"
+            },
+            {
+              "id": "out.brief_id",
+              "name": "out.brief_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.handoff_brief_delivery_sla@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Compose a structured handoff brief covering open incidents, recent alerts within the configured lookback, outstanding escalations, and ack-latency snapshot for the prior shift. The brief is delivered as a structured artifact (markdown + a JSON payload), not free-form prose, so the next on-call ingests it deterministically.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--30000000-0000-4000-8000-000000000006",
+      "name": "notify incoming on-call",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.next_on_call",
+              "name": "in.next_on_call",
+              "value": "={{$workflow.variables.next_on_call}}",
+              "type": "string"
+            },
+            {
+              "id": "in.brief_id",
+              "name": "in.brief_id",
+              "value": "={{$workflow.variables.brief_id}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.handoff_brief_delivery_sla@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Deliver the handoff brief to the incoming on-call along the operator's pre-bound channel (paging system DM, chat thread, email). Tracked separately from brief generation so the delivery-SLA KPI can report compose-time and deliver-time independently.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--30000000-0000-4000-8000-000000000007",
+      "name": "rotation-end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "rotation-start": {
+      "main": [
+        [
+          {
+            "node": "load rotation roster",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "load rotation roster": {
+      "main": [
+        [
+          {
+            "node": "bind escalation tiers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "bind escalation tiers": {
+      "main": [
+        [
+          {
+            "node": "shift handoff window?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "shift handoff window?": {
+      "main": [
+        [
+          {
+            "node": "generate handoff brief",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "rotation-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate handoff brief": {
+      "main": [
+        [
+          {
+            "node": "notify incoming on-call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "notify incoming on-call": {
+      "main": [
+        [
+          {
+            "node": "rotation-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "on-call",
+    "rotation",
+    "handoff",
+    "escalation",
+    "operational-readiness"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.on_call_rotation@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7"
+    },
+    "secops_ng_notes": [
+      "step 'action--30000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'if-condition--30000000-0000-4000-8000-000000000004' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}
