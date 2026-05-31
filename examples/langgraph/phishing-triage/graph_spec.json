@@ -1,0 +1,154 @@
+{
+  "conditional_edges": [
+    {
+      "branches": {
+        "failure": "action--c0a17a01-0000-4000-8000-000000000006",
+        "success": "action--c0a17a01-0000-4000-8000-000000000005"
+      },
+      "default": null,
+      "src": "if-condition--c0a17a01-0000-4000-8000-000000000004"
+    },
+    {
+      "branches": {
+        "business_email_compromise": "action--c0a17a01-0000-4000-8000-00000000000b",
+        "credential_harvest": "action--c0a17a01-0000-4000-8000-000000000009",
+        "malware_attached": "action--c0a17a01-0000-4000-8000-00000000000a",
+        "phishing": "action--c0a17a01-0000-4000-8000-000000000008",
+        "unknown": "action--c0a17a01-0000-4000-8000-00000000000c"
+      },
+      "default": null,
+      "src": "switch-condition--c0a17a01-0000-4000-8000-000000000007"
+    }
+  ],
+  "edges": [
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--c0a17a01-0000-4000-8000-000000000003",
+      "src": "action--c0a17a01-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "if-condition--c0a17a01-0000-4000-8000-000000000004",
+      "src": "action--c0a17a01-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--c0a17a01-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "switch-condition--c0a17a01-0000-4000-8000-000000000007",
+      "src": "action--c0a17a01-0000-4000-8000-000000000006"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--c0a17a01-0000-4000-8000-000000000008"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--c0a17a01-0000-4000-8000-000000000009"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--c0a17a01-0000-4000-8000-00000000000a"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--c0a17a01-0000-4000-8000-00000000000b"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--c0a17a01-0000-4000-8000-00000000000c"
+    }
+  ],
+  "end_sentinel": "__END__",
+  "entry": "action--c0a17a01-0000-4000-8000-000000000002",
+  "name": "Phishing triage",
+  "nodes": [
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "ingest report",
+      "name": "action--c0a17a01-0000-4000-8000-000000000002",
+      "step_id": "action--c0a17a01-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "enrich headers, URLs, attachments",
+      "name": "action--c0a17a01-0000-4000-8000-000000000003",
+      "step_id": "action--c0a17a01-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "if-condition",
+      "kind": "condition",
+      "label": "known-benign sender or already seen?",
+      "name": "if-condition--c0a17a01-0000-4000-8000-000000000004",
+      "step_id": "if-condition--c0a17a01-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "suppress and close",
+      "name": "action--c0a17a01-0000-4000-8000-000000000005",
+      "step_id": "action--c0a17a01-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "classify intent",
+      "name": "action--c0a17a01-0000-4000-8000-000000000006",
+      "step_id": "action--c0a17a01-0000-4000-8000-000000000006"
+    },
+    {
+      "cacao_type": "switch-condition",
+      "kind": "condition",
+      "label": "route on intent",
+      "name": "switch-condition--c0a17a01-0000-4000-8000-000000000007",
+      "step_id": "switch-condition--c0a17a01-0000-4000-8000-000000000007"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "response: phishing",
+      "name": "action--c0a17a01-0000-4000-8000-000000000008",
+      "step_id": "action--c0a17a01-0000-4000-8000-000000000008"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "response: credential harvest",
+      "name": "action--c0a17a01-0000-4000-8000-000000000009",
+      "step_id": "action--c0a17a01-0000-4000-8000-000000000009"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "response: malware attached",
+      "name": "action--c0a17a01-0000-4000-8000-00000000000a",
+      "step_id": "action--c0a17a01-0000-4000-8000-00000000000a"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "response: business email compromise",
+      "name": "action--c0a17a01-0000-4000-8000-00000000000b",
+      "step_id": "action--c0a17a01-0000-4000-8000-00000000000b"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "response: manual review",
+      "name": "action--c0a17a01-0000-4000-8000-00000000000c",
+      "step_id": "action--c0a17a01-0000-4000-8000-00000000000c"
+    }
+  ],
+  "playbook_id": "playbook--7e51c1a6-7e51-4ab1-9ed0-aabbccddeeff",
+  "stable_id": "playbook.phishing_triage@v1"
+}

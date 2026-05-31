@@ -15,6 +15,11 @@ runtime.
 - [`threat-intel-ingest/`](threat-intel-ingest/) — threat-intelligence
   ingest playbook. Pull → normalise → confidence-threshold branch into
   blocklist propagation or detection-only activation.
+- [`phishing-triage/`](phishing-triage/) — phishing-triage playbook.
+  Ingest reported / mailbox-sweep email → enrich with email-security
+  gateway, URL sandbox, attachment sandbox → suppression-cache check →
+  intent classification → response branch (containment + ticketing or
+  user-feedback close).
 
 More worked examples land here as additional playbooks ship under
 `content/playbooks/`. Each follows the same shape — playbook,
