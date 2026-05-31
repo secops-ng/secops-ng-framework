@@ -1,0 +1,293 @@
+{
+  "$schema": "http://csrc.nist.gov/ns/oscal/1.1.2/oscal-component-definition-schema.json",
+  "component-definition": {
+    "uuid": "887c786e-5651-55a0-84d9-dd125a54b21f",
+    "metadata": {
+      "title": "SecOps-NG \u2014 DORA ICT Risk Management & Incident Reporting Component Definition (SKELETON)",
+      "last-modified": "2026-05-31T00:00:00Z",
+      "version": "0.1.0",
+      "oscal-version": "1.1.2"
+    },
+    "components": [
+      {
+        "uuid": "08cd3077-b5ab-511e-aedd-ac510f47b754",
+        "type": "process-procedure",
+        "title": "SecOps-NG",
+        "description": "SecOps-NG is a community-driven Digital Commons of portable security operations content (CACAO playbooks, OSCAL/D3FEND control mappings, OCSF data shapes, KPI/KRI catalog) plus reference compilers to n8n, Temporal, and LangGraph. This component definition exposes how the SecOps-NG content set addresses the DORA ICT risk-management framework (Chapter II) and ICT-related incident management, classification, and reporting (Chapter III) obligations.",
+        "control-implementations": [
+          {
+            "uuid": "f2b1f61f-8172-543d-8bf5-81f831d9ae2a",
+            "source": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+            "description": "Coverage of DORA (Regulation (EU) 2022/2554) Article 9 vulnerability and patch management obligations and Articles 18\u201319 ICT-related incident classification and reporting obligations, as mapped in content/mappings/dora/article-9-and-rts-vuln-mgmt.yaml and content/mappings/dora/article-19-and-28.yaml. Third-party-risk obligations (Articles 28+) are out of scope for this skeleton.",
+            "implemented-requirements": [
+              {
+                "uuid": "84c49ac3-bcdc-5f4e-b74a-0ec47ad8a803",
+                "control-id": "control.vuln_disclosure_intake-v1",
+                "description": "Develop, document and implement vulnerability and patch management procedures covering identification of vulnerabilities in ICT assets (including automated vulnerability scanning where appropriate), monitoring of third-party vendor and library disclosures and CVE feeds, risk-based prioritisation and remediation deadlines, tracking of remediation status to closure, and a patch management procedure including testing and rollback.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.vuln_disclosure_intake@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-9-vuln-mgmt"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "9(4)(a)"
+                  }
+                ]
+              },
+              {
+                "uuid": "1f7b87d1-8765-5130-a55f-46c5b325710b",
+                "control-id": "control.cspm_baseline-v1",
+                "description": "Develop, document and implement vulnerability and patch management procedures covering identification of vulnerabilities in ICT assets (including automated vulnerability scanning where appropriate), monitoring of third-party vendor and library disclosures and CVE feeds, risk-based prioritisation and remediation deadlines, tracking of remediation status to closure, and a patch management procedure including testing and rollback.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cspm_baseline@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-9-vuln-mgmt"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "9(4)(a)"
+                  }
+                ]
+              },
+              {
+                "uuid": "ca26b4e8-ed08-5aae-a4b7-13f6b131fe84",
+                "control-id": "control.iac_policy_guardrail-v1",
+                "description": "Develop, document and implement vulnerability and patch management procedures covering identification of vulnerabilities in ICT assets (including automated vulnerability scanning where appropriate), monitoring of third-party vendor and library disclosures and CVE feeds, risk-based prioritisation and remediation deadlines, tracking of remediation status to closure, and a patch management procedure including testing and rollback.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.iac_policy_guardrail@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-9-vuln-mgmt"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "9(4)(a)"
+                  }
+                ]
+              },
+              {
+                "uuid": "284e2d7f-ef22-531d-95f3-274221e9db2d",
+                "control-id": "control.dora_major_classifier-v1",
+                "description": "Classify ICT-related incidents and determine their impact based on the criteria specified in Article 18(1) and operationalised by the Commission Delegated Regulation (EU) 2024/1772 (seven primary criteria plus materiality thresholds; recurring-incident rule).",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.dora_major_classifier@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-18-classification"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "18(1)"
+                  }
+                ]
+              },
+              {
+                "uuid": "1b924be2-4ffa-595b-9fff-b92934b99de5",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Submit an initial notification of a major ICT-related incident to the competent authority within the deadlines set by the Commission ITS \u2014 as soon as possible, within 4 hours of classification as major, and no later than 24 hours from awareness.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-19-initial-4h"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "19(4)(a)"
+                  }
+                ]
+              },
+              {
+                "uuid": "36379b5a-0436-5468-abbd-ae3ba580e67c",
+                "control-id": "control.dora_submission_templates-v1",
+                "description": "Submit an initial notification of a major ICT-related incident to the competent authority within the deadlines set by the Commission ITS \u2014 as soon as possible, within 4 hours of classification as major, and no later than 24 hours from awareness.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.dora_submission_templates@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-19-initial-4h"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "19(4)(a)"
+                  }
+                ]
+              },
+              {
+                "uuid": "e757d3de-ef71-5f45-9002-c1caa96d07ef",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Submit an intermediate report within 72 hours of classification of the incident as major (or earlier if regular activities have recovered), updating timestamps, affected functions and clients, indicators of compromise, and mitigation actions in flight.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-19-intermediate-72h"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "19(4)(b)"
+                  }
+                ]
+              },
+              {
+                "uuid": "d2a311b1-2f07-5b81-9043-f8af946af713",
+                "control-id": "control.dora_submission_templates-v1",
+                "description": "Submit an intermediate report within 72 hours of classification of the incident as major (or earlier if regular activities have recovered), updating timestamps, affected functions and clients, indicators of compromise, and mitigation actions in flight.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.dora_submission_templates@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-19-intermediate-72h"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "19(4)(b)"
+                  }
+                ]
+              },
+              {
+                "uuid": "7a3272ba-8f1f-57fe-bbe0-ff99af84928e",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Submit a final report no later than one month after submission of the intermediate report, containing the full root-cause analysis, final impact figures, completed remediation actions, lessons learned, action plan, and residual-risk statement.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-19-final-one-month"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "19(4)(c)"
+                  }
+                ]
+              },
+              {
+                "uuid": "8332b59a-6324-5643-9743-a6b1607906ea",
+                "control-id": "control.dora_submission_templates-v1",
+                "description": "Submit a final report no later than one month after submission of the intermediate report, containing the full root-cause analysis, final impact figures, completed remediation actions, lessons learned, action plan, and residual-risk statement.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.dora_submission_templates@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-19-final-one-month"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "19(4)(c)"
+                  }
+                ]
+              },
+              {
+                "uuid": "b6541a96-fa02-569c-9b3f-9b5b64ecce41",
+                "control-id": "control.dora_submission_templates-v1",
+                "description": "Voluntary notification of significant cyber threats to the competent authority, with content shape defined by the relevant ESAs RTS/ITS. No mandatory clock; lighter content schema than a major-incident notification.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.dora_submission_templates@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-19-cyber-threat-voluntary"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "19(2)"
+                  }
+                ]
+              },
+              {
+                "uuid": "f693d7fc-5a04-5f70-961f-f44798030ac2",
+                "control-id": "control.recurring_incident_correlator-v1",
+                "description": "Treat as a major incident any series of recurring incidents that share the same apparent root cause across a six-month rolling window and, in aggregate, exceed the materiality thresholds.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.recurring_incident_correlator@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-18-recurring-incident"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "18(2)"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
