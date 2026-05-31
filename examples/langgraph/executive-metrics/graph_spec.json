@@ -1,0 +1,88 @@
+{
+  "conditional_edges": [
+    {
+      "branches": {
+        "failure": "action--e0000000-0000-4000-8000-000000000007",
+        "success": "action--e0000000-0000-4000-8000-000000000006"
+      },
+      "default": null,
+      "src": "if-condition--e0000000-0000-4000-8000-000000000005"
+    }
+  ],
+  "edges": [
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--e0000000-0000-4000-8000-000000000003",
+      "src": "action--e0000000-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--e0000000-0000-4000-8000-000000000004",
+      "src": "action--e0000000-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "if-condition--e0000000-0000-4000-8000-000000000005",
+      "src": "action--e0000000-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--e0000000-0000-4000-8000-000000000007",
+      "src": "action--e0000000-0000-4000-8000-000000000006"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--e0000000-0000-4000-8000-000000000007"
+    }
+  ],
+  "end_sentinel": "__END__",
+  "entry": "action--e0000000-0000-4000-8000-000000000002",
+  "name": "Executive metrics rollup",
+  "nodes": [
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "resolve KPI/KRI catalog",
+      "name": "action--e0000000-0000-4000-8000-000000000002",
+      "step_id": "action--e0000000-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "evaluate metrics over window",
+      "name": "action--e0000000-0000-4000-8000-000000000003",
+      "step_id": "action--e0000000-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "score control effectiveness",
+      "name": "action--e0000000-0000-4000-8000-000000000004",
+      "step_id": "action--e0000000-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_type": "if-condition",
+      "kind": "condition",
+      "label": "any breach band hit?",
+      "name": "if-condition--e0000000-0000-4000-8000-000000000005",
+      "step_id": "if-condition--e0000000-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "raise board-attention flag",
+      "name": "action--e0000000-0000-4000-8000-000000000006",
+      "step_id": "action--e0000000-0000-4000-8000-000000000006"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "emit board summary",
+      "name": "action--e0000000-0000-4000-8000-000000000007",
+      "step_id": "action--e0000000-0000-4000-8000-000000000007"
+    }
+  ],
+  "playbook_id": "playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8",
+  "stable_id": "playbook.executive_metrics@v1"
+}
