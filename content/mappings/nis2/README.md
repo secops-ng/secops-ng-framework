@@ -28,3 +28,18 @@ addressable scheme is in `schemas/mapping.schema.json`.
 
 Validated by `tests/content/test_mappings.py` against
 `schemas/mapping.schema.json` (JSON Schema Draft 2020-12).
+
+## OSCAL component-definition (SKELETON)
+
+`oscal-component-definition.json` is a minimal OSCAL 1.1.2
+component-definition document that exposes the same control coverage in
+the NIST OSCAL serialization. One component (SecOps-NG) carries one
+control-implementation set whose `implemented-requirements` mirror the
+`control_refs` entries in `article-21-and-23.yaml`, with statement text
+borrowed verbatim from each entry's `obligation` field. Schema-validation
+and YAML-coverage parity are enforced by
+`tests/content/test_oscal_nis2_component_definition.py` against the
+OSCAL component schema vendored under
+`tests/fixtures/oscal/oscal_component_schema-v1.1.2.json`. The DORA and
+CRA OSCAL component-definitions are follow-on siblings tracked
+separately.
