@@ -110,7 +110,7 @@ def test_emit_is_deterministic() -> None:
 
 
 # ---------------------------------------------------------------------------
-# CORE semantic checks — Set-node uplift (post t_bc3050a1 / PR #122).
+# CORE semantic checks — Set-node uplift (post PR #122).
 #
 # These pin the contract that every action-without-commands step in the
 # CACAO source surfaces as an n8n Set node whose assignments carry the
