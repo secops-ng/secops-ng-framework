@@ -107,3 +107,110 @@ def test_emit_is_deterministic() -> None:
     first = _serialise(emit(playbook))
     second = _serialise(emit(playbook))
     assert first == second
+
+
+# ---------------------------------------------------------------------------
+# CORE semantic checks — Set-node uplift (post t_bc3050a1 / PR #122).
+#
+# These pin the contract that every action-without-commands step in the
+# CACAO source surfaces as an n8n Set node whose assignments carry the
+# CACAO I/O contract (in_args / out_args) and the x_secops_ng reference
+# bundles (control_refs / detection_refs / telemetry_refs / metric_refs /
+# any KPI hooks). The byte-identical drift guard above keeps the artifact
+# stable; these tests keep the *intent* stable so a future emitter change
+# that quietly drops a reference bundle fails the suite instead of
+# leaking past review.
+# ---------------------------------------------------------------------------
+
+
+def _action_without_commands_steps() -> dict[str, dict]:
+    raw = json.loads(SOURCE.read_text(encoding="utf-8"))
+    return {
+        step_id: step
+        for step_id, step in raw["workflow"].items()
+        if step.get("type") == "action" and not step.get("commands")
+    }
+
+
+def _nodes_by_id() -> dict[str, dict]:
+    workflow = json.loads(WORKED_EXAMPLE.read_text(encoding="utf-8"))
+    return {node["id"]: node for node in workflow["nodes"]}
+
+
+def test_action_without_commands_steps_emit_set_nodes() -> None:
+    """No `noOp` placeholders left for steps that should carry intent."""
+    nodes_by_id = _nodes_by_id()
+    for step_id in _action_without_commands_steps():
+        node = nodes_by_id[step_id]
+        assert node["type"] == "n8n-nodes-base.set", (
+            f"step {step_id!r} is an action-without-commands and must emit "
+            f"an n8n Set node carrying the CACAO contract, "
+            f"not {node['type']!r}"
+        )
+
+
+def test_set_nodes_surface_cacao_in_and_out_args() -> None:
+    """`in_args` and `out_args` from the CACAO step appear as Set rows."""
+    nodes_by_id = _nodes_by_id()
+    for step_id, step in _action_without_commands_steps().items():
+        node = nodes_by_id[step_id]
+        assignments = node["parameters"]["assignments"]["assignments"]
+        names = {row["name"] for row in assignments}
+
+        for raw_in in step.get("in_args", []) or []:
+            expected = f"in.{raw_in.strip('_')}"
+            assert expected in names, (
+                f"step {step_id!r}: expected Set assignment {expected!r} "
+                f"for CACAO in_arg {raw_in!r}, got {sorted(names)}"
+            )
+
+        for raw_out in step.get("out_args", []) or []:
+            expected = f"out.{raw_out.strip('_')}"
+            assert expected in names, (
+                f"step {step_id!r}: expected Set assignment {expected!r} "
+                f"for CACAO out_arg {raw_out!r}, got {sorted(names)}"
+            )
+
+
+def test_set_nodes_surface_x_secops_ng_refs() -> None:
+    """Every `x_secops_ng.<key>` bundle on the CACAO step appears as a Set row."""
+    nodes_by_id = _nodes_by_id()
+    for step_id, step in _action_without_commands_steps().items():
+        x = step.get("x_secops_ng") or {}
+        if not x:
+            continue
+        node = nodes_by_id[step_id]
+        assignments = node["parameters"]["assignments"]["assignments"]
+        names = {row["name"] for row in assignments}
+        for key in x.keys():
+            expected = f"x_secops_ng.{key}"
+            assert expected in names, (
+                f"step {step_id!r}: x_secops_ng.{key} dropped from Set node; "
+                f"present assignments: {sorted(names)}"
+            )
+
+
+def test_set_nodes_have_no_empty_assignments_block() -> None:
+    """A Set node with zero rows is the old noOp-in-disguise; reject it."""
+    nodes_by_id = _nodes_by_id()
+    for step_id in _action_without_commands_steps():
+        node = nodes_by_id[step_id]
+        rows = node["parameters"]["assignments"]["assignments"]
+        assert rows, (
+            f"step {step_id!r} emitted a Set node with no assignments — "
+            f"the CACAO contract was dropped"
+        )
+
+
+def test_only_end_step_emits_noop() -> None:
+    """Post Set-node uplift, the only `noOp` left is the end sentinel."""
+    raw = json.loads(SOURCE.read_text(encoding="utf-8"))
+    workflow = json.loads(WORKED_EXAMPLE.read_text(encoding="utf-8"))
+    for node in workflow["nodes"]:
+        if node["type"] != "n8n-nodes-base.noOp":
+            continue
+        step_type = raw["workflow"][node["id"]]["type"]
+        assert step_type == "end", (
+            f"node {node['id']!r} is a noOp but its CACAO step type is "
+            f"{step_type!r}; only `end` steps may emit noOp post-uplift"
+        )
