@@ -2,63 +2,141 @@
   "conditional_edges": [
     {
       "branches": {
-        "failure": "action--55555555-5555-4555-8555-555555555555",
-        "success": "action--44444444-4444-4444-8444-444444444444"
+        "failure": "switch-condition--01a17a01-0000-4000-8000-000000000007",
+        "success": "action--01a17a01-0000-4000-8000-000000000006"
       },
       "default": null,
-      "src": "if-condition--33333333-3333-4333-8333-333333333333"
+      "src": "if-condition--01a17a01-0000-4000-8000-000000000005"
+    },
+    {
+      "branches": {
+        "critical": "action--01a17a01-0000-4000-8000-000000000008",
+        "high": "action--01a17a01-0000-4000-8000-000000000009",
+        "info": "action--01a17a01-0000-4000-8000-00000000000b",
+        "low": "action--01a17a01-0000-4000-8000-00000000000a",
+        "medium": "action--01a17a01-0000-4000-8000-00000000000a"
+      },
+      "default": null,
+      "src": "switch-condition--01a17a01-0000-4000-8000-000000000007"
     }
   ],
   "edges": [
     {
       "cacao_edge": "on_completion",
-      "dst": "if-condition--33333333-3333-4333-8333-333333333333",
-      "src": "action--22222222-2222-4222-8222-222222222222"
+      "dst": "action--01a17a01-0000-4000-8000-000000000003",
+      "src": "action--01a17a01-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--01a17a01-0000-4000-8000-000000000004",
+      "src": "action--01a17a01-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "if-condition--01a17a01-0000-4000-8000-000000000005",
+      "src": "action--01a17a01-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "switch-condition--01a17a01-0000-4000-8000-000000000007",
+      "src": "action--01a17a01-0000-4000-8000-000000000006"
     },
     {
       "cacao_edge": "on_completion",
       "dst": "__END__",
-      "src": "action--44444444-4444-4444-8444-444444444444"
+      "src": "action--01a17a01-0000-4000-8000-000000000008"
     },
     {
       "cacao_edge": "on_completion",
       "dst": "__END__",
-      "src": "action--55555555-5555-4555-8555-555555555555"
+      "src": "action--01a17a01-0000-4000-8000-000000000009"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--01a17a01-0000-4000-8000-00000000000a"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--01a17a01-0000-4000-8000-00000000000b"
     }
   ],
   "end_sentinel": "__END__",
-  "entry": "action--22222222-2222-4222-8222-222222222222",
-  "name": "Vulnerability intake (parser fixture)",
+  "entry": "action--01a17a01-0000-4000-8000-000000000002",
+  "name": "Vulnerability intake",
   "nodes": [
     {
       "cacao_type": "action",
       "kind": "action",
-      "label": "enrich finding",
-      "name": "action--22222222-2222-4222-8222-222222222222",
-      "step_id": "action--22222222-2222-4222-8222-222222222222"
+      "label": "intake disclosure",
+      "name": "action--01a17a01-0000-4000-8000-000000000002",
+      "step_id": "action--01a17a01-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "triage and asset correlation",
+      "name": "action--01a17a01-0000-4000-8000-000000000003",
+      "step_id": "action--01a17a01-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "assess CRA reporting trigger",
+      "name": "action--01a17a01-0000-4000-8000-000000000004",
+      "step_id": "action--01a17a01-0000-4000-8000-000000000004"
     },
     {
       "cacao_type": "if-condition",
       "kind": "condition",
-      "label": "critical severity?",
-      "name": "if-condition--33333333-3333-4333-8333-333333333333",
-      "step_id": "if-condition--33333333-3333-4333-8333-333333333333"
+      "label": "actively exploited?",
+      "name": "if-condition--01a17a01-0000-4000-8000-000000000005",
+      "step_id": "if-condition--01a17a01-0000-4000-8000-000000000005"
     },
     {
       "cacao_type": "action",
       "kind": "action",
-      "label": "open critical ticket",
-      "name": "action--44444444-4444-4444-8444-444444444444",
-      "step_id": "action--44444444-4444-4444-8444-444444444444"
+      "label": "regulator-notification chain (CRA Art. 14)",
+      "name": "action--01a17a01-0000-4000-8000-000000000006",
+      "step_id": "action--01a17a01-0000-4000-8000-000000000006"
+    },
+    {
+      "cacao_type": "switch-condition",
+      "kind": "condition",
+      "label": "route on severity",
+      "name": "switch-condition--01a17a01-0000-4000-8000-000000000007",
+      "step_id": "switch-condition--01a17a01-0000-4000-8000-000000000007"
     },
     {
       "cacao_type": "action",
       "kind": "action",
-      "label": "queue routine ticket",
-      "name": "action--55555555-5555-4555-8555-555555555555",
-      "step_id": "action--55555555-5555-4555-8555-555555555555"
+      "label": "response: critical \u2014 patch and advisory",
+      "name": "action--01a17a01-0000-4000-8000-000000000008",
+      "step_id": "action--01a17a01-0000-4000-8000-000000000008"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "response: high \u2014 patch and advisory",
+      "name": "action--01a17a01-0000-4000-8000-000000000009",
+      "step_id": "action--01a17a01-0000-4000-8000-000000000009"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "response: scheduled remediation",
+      "name": "action--01a17a01-0000-4000-8000-00000000000a",
+      "step_id": "action--01a17a01-0000-4000-8000-00000000000a"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "response: accept risk",
+      "name": "action--01a17a01-0000-4000-8000-00000000000b",
+      "step_id": "action--01a17a01-0000-4000-8000-00000000000b"
     }
   ],
-  "playbook_id": "playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "playbook_id": "playbook--01a17a01-0000-4000-8000-000000000001",
   "stable_id": "playbook.vuln_intake@v1"
 }
