@@ -209,6 +209,33 @@ def test_set_nodes_have_no_empty_assignments_block() -> None:
         )
 
 
+def test_co_located_cacao_mirror_matches_canonical() -> None:
+    """The co-located ``playbook.cacao.json`` is a byte-identical mirror.
+
+    The ``regenerate.sh`` script in this example folder copies the
+    canonical CACAO source into the example directory so the worked
+    example is self-contained for operator diff-inspection. Pin that
+    invariant so accidental edits to the mirror (or stale copies)
+    surface in CI instead of in a confused operator.
+    """
+    mirror = (
+        REPO_ROOT
+        / "examples"
+        / "n8n"
+        / "cloud-misconfiguration"
+        / "playbook.cacao.json"
+    )
+    assert mirror.exists(), (
+        "examples/n8n/cloud-misconfiguration/playbook.cacao.json missing — "
+        "run ./examples/n8n/cloud-misconfiguration/regenerate.sh"
+    )
+    assert mirror.read_bytes() == SOURCE.read_bytes(), (
+        "examples/n8n/cloud-misconfiguration/playbook.cacao.json drifted "
+        "from the canonical CACAO source. Re-run "
+        "./examples/n8n/cloud-misconfiguration/regenerate.sh and commit."
+    )
+
+
 def test_only_end_step_emits_noop() -> None:
     """Post Set-node uplift, the only `noOp` left is the end sentinel."""
     raw = json.loads(SOURCE.read_text(encoding="utf-8"))
