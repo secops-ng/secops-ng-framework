@@ -89,8 +89,8 @@ def test_data_exfil_emit_is_deterministic() -> None:
 
 
 def test_worked_example_stub_matches_golden() -> None:
-    """The committed `examples/temporal/data-exfil/workflow_stub.py` is
-    the emitter's output for the data-exfil fixture; any drift between
+    """The committed `examples/temporal/data-exfil/workflow.temporal.py`
+    is the emitter's output for the data-exfil fixture; any drift between
     the worked example and the golden indicates the example was edited
     by hand instead of regenerated.
     """
@@ -99,7 +99,7 @@ def test_worked_example_stub_matches_golden() -> None:
         / "examples"
         / "temporal"
         / "data-exfil"
-        / "workflow_stub.py"
+        / "workflow.temporal.py"
     )
     assert stub.exists(), f"missing worked-example stub: {stub}"
     assert stub.read_text(encoding="utf-8") == DATA_EXFIL_GOLDEN.read_text(
