@@ -1,0 +1,327 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8",
+  "name": "Ransomware containment",
+  "description": "Contain an in-progress or just-detected ransomware event on an endpoint or identity. Triage the originating signal; if confirmed, isolate the affected host (EDR primary, network ACL fallback), revoke the implicated identity and its active sessions, verify the latest known-good backup snapshot, and drive a notification step that pages the IR lead, the comms officer, and drafts the NIS2 Article 23 early-warning pre-notification within the 24-hour clock. CACAO v2 + SecOps-NG content-model extensions. Forward-public artifact: detection bindings reference upstream SigmaHQ rule IDs only; SecOps-NG does not re-author Sigma rules.",
+  "playbook_types": [
+    "investigation",
+    "mitigation",
+    "remediation",
+    "notification"
+  ],
+  "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+  "created": "2026-05-29T00:00:00Z",
+  "modified": "2026-05-29T00:00:00Z",
+  "labels": [
+    "ransomware",
+    "containment",
+    "edr",
+    "identity-revocation",
+    "backup-verification",
+    "nis2",
+    "dora"
+  ],
+  "external_references": [
+    {
+      "name": "SigmaHQ — Shadow Copies Deletion Using Operating Systems Utilities",
+      "source": "SigmaHQ",
+      "url": "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_shadow_copies_deletion.yml",
+      "external_id": "c947b146-0abc-4c87-9c64-b17e9d7274a2"
+    },
+    {
+      "name": "SigmaHQ — Deletion of Volume Shadow Copies via WMI with PowerShell",
+      "source": "SigmaHQ",
+      "url": "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_shadowcopy_deletion.yml",
+      "external_id": "21ff4ca9-f13a-41ad-b828-0077b2af2e40"
+    },
+    {
+      "name": "SigmaHQ — Windows Backup Deleted Via Wbadmin.EXE",
+      "source": "SigmaHQ",
+      "url": "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wbadmin_delete_backups.yml",
+      "external_id": "89f75308-5b1b-4390-b2d8-d6b2340efaf8"
+    },
+    {
+      "name": "SigmaHQ — Suspicious Appended Extension (ransomware file rename)",
+      "source": "SigmaHQ",
+      "url": "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/file/file_rename/file_rename_win_ransomware.yml",
+      "external_id": "e3f673b3-65d1-4d80-9146-466f8b63fa99"
+    },
+    {
+      "name": "SigmaHQ — Successful Overpass the Hash Attempt",
+      "source": "SigmaHQ",
+      "url": "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/security/account_management/win_security_overpass_the_hash.yml",
+      "external_id": "192a0330-c20b-4356-90b6-7b7049ae0b87"
+    },
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 23 — incident reporting obligations (24h early warning)",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj"
+    },
+    {
+      "name": "OASIS CACAO v2.0 specification",
+      "source": "OASIS",
+      "url": "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
+    }
+  ],
+  "playbook_variables": {
+    "__signal_id__": {
+      "type": "string",
+      "description": "Identifier of the originating detection signal (EDR alert, Sigma match, or SOC-raised ticket).",
+      "external": true
+    },
+    "__affected_host__": {
+      "type": "string",
+      "description": "Host identifier (hostname or asset id) implicated by the signal; consumed by isolation.",
+      "external": false
+    },
+    "__affected_identity__": {
+      "type": "string",
+      "description": "Identity principal (user or service account) implicated by the signal; consumed by identity revocation.",
+      "external": false
+    },
+    "__ransomware_confirmed__": {
+      "type": "boolean",
+      "description": "Whether triage promoted the signal to a confirmed ransomware event. False routes to close-out without containment.",
+      "external": false
+    },
+    "__edr_available__": {
+      "type": "boolean",
+      "description": "Whether the EDR agent on the affected host is reachable and capable of issuing an isolate action. False triggers the network-ACL fallback.",
+      "external": false
+    },
+    "__latest_known_good_snapshot__": {
+      "type": "string",
+      "description": "Identifier of the most recent backup snapshot that pre-dates the event window. Produced by the backup-verification step.",
+      "external": false
+    },
+    "__snapshot_integrity_ok__": {
+      "type": "boolean",
+      "description": "Whether the located snapshot's integrity hash matches the value recorded in the backup catalogue.",
+      "external": false
+    }
+  },
+  "workflow_start": "start--30000000-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--30000000-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "ransomware-start",
+      "on_completion": "action--30000000-0000-4000-8000-000000000002"
+    },
+    "action--30000000-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "triage signal",
+      "description": "Receive the originating detection signal and hydrate it with host, identity, and process context. Decide whether the signal is a confirmed ransomware event or a benign / out-of-scope alert. Produces __affected_host__, __affected_identity__, and __ransomware_confirmed__.",
+      "on_completion": "if-condition--30000000-0000-4000-8000-000000000003",
+      "in_args": [
+        "__signal_id__"
+      ],
+      "out_args": [
+        "__affected_host__",
+        "__affected_identity__",
+        "__ransomware_confirmed__",
+        "__edr_available__"
+      ],
+      "x_secops_ng": {
+        "detection_refs": [
+          "detection.sigma.shadow_copies_deletion@v1",
+          "detection.sigma.shadow_copy_deletion_wmi_powershell@v1",
+          "detection.sigma.ransomware_file_extension_rename@v1",
+          "detection.sigma.wbadmin_backup_deletion@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.process_activity@v1",
+          "telemetry.ocsf.file_activity@v1"
+        ],
+        "metric_refs": [
+          "kpi.mttd_ransomware@v1"
+        ]
+      }
+    },
+    "if-condition--30000000-0000-4000-8000-000000000003": {
+      "type": "if-condition",
+      "name": "ransomware confirmed?",
+      "description": "Branch on __ransomware_confirmed__. True paths into containment; false closes the incident out with no further action (the close-out itself is logged for the false-positive KPI by an out-of-scope card).",
+      "on_success": "if-condition--30000000-0000-4000-8000-000000000004",
+      "on_failure": "end--30000000-0000-4000-8000-00000000000a"
+    },
+    "if-condition--30000000-0000-4000-8000-000000000004": {
+      "type": "if-condition",
+      "name": "EDR available?",
+      "description": "Branch on __edr_available__. True uses the EDR isolate action; false falls back to a network ACL deny at the operator's egress chokepoint. Both branches converge on identity revocation.",
+      "on_success": "action--30000000-0000-4000-8000-000000000005",
+      "on_failure": "action--30000000-0000-4000-8000-000000000006"
+    },
+    "action--30000000-0000-4000-8000-000000000005": {
+      "type": "action",
+      "name": "endpoint isolation — EDR isolate",
+      "description": "Issue the EDR-vendor isolate action against __affected_host__ via the operator's pre-bound EDR agent. Bounded by the operator-supplied authorisation policy. Primary path.",
+      "on_completion": "action--30000000-0000-4000-8000-000000000007",
+      "in_args": [
+        "__affected_host__"
+      ],
+      "x_secops_ng": {
+        "detection_refs": [
+          "detection.sigma.shadow_copies_deletion@v1",
+          "detection.sigma.ransomware_file_extension_rename@v1"
+        ],
+        "control_refs": [
+          "control.endpoint_isolation@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.process_activity@v1"
+        ],
+        "metric_refs": [
+          "kpi.mttr_containment@v1"
+        ]
+      }
+    },
+    "action--30000000-0000-4000-8000-000000000006": {
+      "type": "action",
+      "name": "endpoint isolation — network ACL deny (fallback)",
+      "description": "EDR fallback: deny all ingress/egress for __affected_host__ at the operator's network chokepoint (firewall rule, switchport disable, or SDN policy). Used when the EDR agent is unreachable or absent.",
+      "on_completion": "action--30000000-0000-4000-8000-000000000007",
+      "in_args": [
+        "__affected_host__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.network_egress_filtering@v1",
+          "control.endpoint_isolation@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.network_activity@v1"
+        ],
+        "metric_refs": [
+          "kpi.mttr_containment@v1"
+        ]
+      }
+    },
+    "action--30000000-0000-4000-8000-000000000007": {
+      "type": "action",
+      "name": "identity revocation",
+      "description": "Disable the implicated user account, revoke active sessions, and invalidate refresh/access tokens at the operator's IdP. Includes Kerberos TGT invalidation where supported. Targets __affected_identity__.",
+      "on_completion": "action--30000000-0000-4000-8000-000000000008",
+      "in_args": [
+        "__affected_identity__"
+      ],
+      "x_secops_ng": {
+        "detection_refs": [
+          "detection.sigma.overpass_the_hash@v1"
+        ],
+        "control_refs": [
+          "control.identity_revocation@v1",
+          "control.session_token_revocation@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.authentication@v1"
+        ],
+        "metric_refs": [
+          "kpi.mttr_containment@v1"
+        ]
+      }
+    },
+    "action--30000000-0000-4000-8000-000000000008": {
+      "type": "action",
+      "name": "backup verification",
+      "description": "Locate the most recent known-good backup snapshot that pre-dates the event window and verify its integrity hash against the backup-catalogue record. Produces __latest_known_good_snapshot__ and __snapshot_integrity_ok__. Does NOT restore — restore is a separate, out-of-scope recovery playbook.",
+      "on_completion": "action--30000000-0000-4000-8000-000000000009",
+      "out_args": [
+        "__latest_known_good_snapshot__",
+        "__snapshot_integrity_ok__"
+      ],
+      "x_secops_ng": {
+        "detection_refs": [
+          "detection.sigma.wbadmin_backup_deletion@v1",
+          "detection.sigma.shadow_copies_deletion@v1"
+        ],
+        "control_refs": [
+          "control.backup_integrity_verification@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.file_activity@v1"
+        ],
+        "metric_refs": [
+          "kpi.backup_integrity_pass_rate@v1"
+        ]
+      }
+    },
+    "action--30000000-0000-4000-8000-000000000009": {
+      "type": "action",
+      "name": "comms plan",
+      "description": "Notify the IR lead and comms officer along the operator's pre-bound channels, and draft the regulator early-warning pre-notification per NIS2 Article 23 within the 24-hour clock from initial detection. The drafted notification is staged for human sign-off, not auto-sent. Because this step is the handoff point that closes the incident timeline and trips the statutory reporting clocks, it stamps the timeline-completeness KPI alongside the notification-SLA KPI and the regulator-notification-overrun KRI.",
+      "on_completion": "end--30000000-0000-4000-8000-00000000000a",
+      "in_args": [
+        "__affected_host__",
+        "__affected_identity__",
+        "__latest_known_good_snapshot__",
+        "__snapshot_integrity_ok__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.incident_notification@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.incident_finding@v1"
+        ],
+        "metric_refs": [
+          "kpi.notification_sla_compliance@v1",
+          "kpi.timeline_completeness@v1",
+          "kri.regulator_notification_overrun@v1"
+        ]
+      }
+    },
+    "end--30000000-0000-4000-8000-00000000000a": {
+      "type": "end",
+      "name": "ransomware-end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.ransomware_containment@v1",
+    "content_version": "0.1.0",
+    "maturity": "experimental",
+    "compile_targets": [
+      "n8n",
+      "temporal",
+      "langgraph"
+    ],
+    "detection_refs": [
+      "detection.sigma.shadow_copies_deletion@v1",
+      "detection.sigma.shadow_copy_deletion_wmi_powershell@v1",
+      "detection.sigma.wbadmin_backup_deletion@v1",
+      "detection.sigma.ransomware_file_extension_rename@v1",
+      "detection.sigma.overpass_the_hash@v1"
+    ],
+    "control_refs": [
+      "control.endpoint_isolation@v1",
+      "control.network_egress_filtering@v1",
+      "control.identity_revocation@v1",
+      "control.session_token_revocation@v1",
+      "control.backup_integrity_verification@v1",
+      "control.incident_notification@v1"
+    ],
+    "telemetry_refs": [
+      "telemetry.ocsf.process_activity@v1",
+      "telemetry.ocsf.file_activity@v1",
+      "telemetry.ocsf.network_activity@v1",
+      "telemetry.ocsf.authentication@v1",
+      "telemetry.ocsf.incident_finding@v1"
+    ],
+    "metric_refs": [
+      "kpi.mttd_ransomware@v1",
+      "kpi.mttr_containment@v1",
+      "kpi.backup_integrity_pass_rate@v1",
+      "kpi.notification_sla_compliance@v1",
+      "kpi.timeline_completeness@v1",
+      "kri.regulator_notification_overrun@v1"
+    ],
+    "sources": [
+      "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
+      "ENISA — Threat Landscape and Good Practices for Incident Notification",
+      "NIS2 Directive (EU) 2022/2555, Article 23 — incident reporting obligations and 24-hour early-warning clock",
+      "DORA Regulation (EU) 2022/2554, Article 19 — reporting of major ICT-related incidents",
+      "OCSF — Process Activity (1007), File Activity (1001), Network Activity (4001), Authentication (3002), Security Finding (2001) event classes",
+      "SigmaHQ — upstream ransomware-adjacent rule IDs referenced via external_references"
+    ]
+  }
+}

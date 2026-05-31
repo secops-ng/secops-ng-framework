@@ -1,19 +1,21 @@
 """Drift guard for the ``examples/temporal/ransomware-containment/`` worked example.
 
-Mirrors the vuln-intake and cloud-misconfiguration temporal example
-tests: re-emits the Temporal workflow stub from the canonical CACAO
-playbook and pins the result byte-for-byte against the committed
-``examples/temporal/ransomware-containment/workflow_stub.py``. Adds an
-activity-name ↔ CACAO action-id parity check so the one-to-one
+Mirrors the data-exfil temporal example test: re-emits the Temporal
+workflow stub from the canonical CACAO playbook and pins the result
+byte-for-byte against the committed
+``examples/temporal/ransomware-containment/workflow.temporal.py``. Adds
+an activity-name \u2194 CACAO action-id parity check so the one-to-one
 mirroring contract documented in
 ``examples/temporal/ransomware-containment/README.md`` is enforced by
 tests, not by convention.
 
+Also pins the co-located ``playbook.cacao.json`` mirror byte-for-byte
+against the canonical CACAO source, so the regenerate.sh contract
+(mirror + emit) cannot drift unnoticed.
+
 Regenerate via::
 
-    python -m compilers.temporal \\
-        content/playbooks/ransomware-containment/playbook.cacao.json \\
-        --out examples/temporal/ransomware-containment/workflow_stub.py
+    ./examples/temporal/ransomware-containment/regenerate.sh
 """
 from __future__ import annotations
 
@@ -24,10 +26,12 @@ from pathlib import Path
 from compilers.temporal.emit import emit_file
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-SOURCE = REPO_ROOT / "content" / "playbooks" / "ransomware-containment" / "playbook.cacao.json"
-WORKED_EXAMPLE = (
-    REPO_ROOT / "examples" / "temporal" / "ransomware-containment" / "workflow_stub.py"
+SOURCE = (
+    REPO_ROOT / "content" / "playbooks" / "ransomware-containment" / "playbook.cacao.json"
 )
+EXAMPLE_DIR = REPO_ROOT / "examples" / "temporal" / "ransomware-containment"
+WORKED_EXAMPLE = EXAMPLE_DIR / "workflow.temporal.py"
+MIRRORED_CACAO = EXAMPLE_DIR / "playbook.cacao.json"
 
 _ACTIVITY_STEP_TYPES = {"action"}
 _ACTIVITY_DEFN_RE = re.compile(
@@ -43,11 +47,18 @@ def test_worked_example_matches_emitter_output() -> None:
     rendered = emit_file(SOURCE)
     expected = WORKED_EXAMPLE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/temporal/ransomware-containment/workflow_stub.py drifted from "
-        "the Temporal emitter output. Regenerate via `python -m "
-        "compilers.temporal content/playbooks/ransomware-containment/playbook.cacao.json "
-        "--out examples/temporal/ransomware-containment/workflow_stub.py` and "
-        "commit the new bytes."
+        "examples/temporal/ransomware-containment/workflow.temporal.py drifted "
+        "from the Temporal emitter output. Regenerate via "
+        "`./examples/temporal/ransomware-containment/regenerate.sh` and commit "
+        "the new bytes."
+    )
+
+
+def test_mirrored_cacao_matches_canonical_source() -> None:
+    assert MIRRORED_CACAO.read_bytes() == SOURCE.read_bytes(), (
+        "examples/temporal/ransomware-containment/playbook.cacao.json drifted "
+        "from the canonical content/playbooks/ransomware-containment/playbook.cacao.json. "
+        "Regenerate via `./examples/temporal/ransomware-containment/regenerate.sh`."
     )
 
 
