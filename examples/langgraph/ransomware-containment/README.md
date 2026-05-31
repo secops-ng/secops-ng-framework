@@ -11,26 +11,35 @@ the integrator owns the seams.
 
 | File | Role |
 |------|------|
-| `playbook.cacao.json` | Portable CACAO v2 playbook — the input to the compiler. |
+| `playbook.cacao.json` | Portable CACAO v2 playbook — byte-identical mirror of `content/playbooks/ransomware-containment/playbook.cacao.json`, the input to the compiler. |
 | `graph_spec.json` | Target-neutral GraphSpec (nodes, edges, conditional edges) emitted by `compilers.langgraph.emit`. |
 | `state_bindings.py` | Generated `TypedDict` state + `@tool`-decorated action wrappers + agentic-extension hook, emitted by `compilers.langgraph.state`. |
 | `assemble.py` | Hand-written reference assembly that wires the GraphSpec + bindings into a `langgraph.graph.StateGraph`. |
-| `regenerate.sh` | Re-runs both emitters from the playbook and overwrites the two generated artifacts. |
+| `regenerate.sh` | Re-runs both emitters from the canonical playbook and overwrites the mirrored CACAO + the two generated artifacts. |
 
 ## How to regenerate
 
-After any change to the playbook or to `compilers/langgraph/*`, refresh
-the committed artifacts from the repo root:
+After any change to the canonical playbook or to `compilers/langgraph/*`,
+refresh the committed artifacts from the repo root:
 
 ```bash
 ./examples/langgraph/ransomware-containment/regenerate.sh
 ```
 
-The script re-emits `graph_spec.json` and `state_bindings.py` from
-`playbook.cacao.json` using `compilers.langgraph.emit` and
-`compilers.langgraph.state`. A drift test in `tests/examples/` fails
-the suite if the committed artifacts diverge from a fresh regeneration,
-so the worked example stays honest as the compiler evolves.
+The script mirrors the canonical CACAO source into this folder and
+re-emits `graph_spec.json` and `state_bindings.py` from it using
+`compilers.langgraph.emit` and `compilers.langgraph.state`. A drift
+test in `tests/examples/ransomware_containment/` fails the suite if the
+committed artifacts diverge from a fresh regeneration, so the worked
+example stays honest as the compiler evolves.
+
+## Cross-target pointers
+
+The same canonical playbook ships under the other two reference compile
+targets so an integrator can compare lowerings side by side:
+
+- [`examples/n8n/ransomware-containment/`](../../n8n/ransomware-containment/) — n8n no-code workflow.
+- [`examples/temporal/ransomware-containment/`](../../temporal/ransomware-containment/) — Temporal durable workflow stub.
 
 ## Topology
 

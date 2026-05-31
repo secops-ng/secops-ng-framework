@@ -1,4 +1,4 @@
-"""Runnable assembly for the vuln-intake LangGraph worked example.
+"""Runnable assembly for the ransomware-containment LangGraph worked example.
 
 Wires the GraphSpec (``graph_spec.json``) and generated state bindings
 (``state_bindings.py``) into a ``langgraph.graph.StateGraph`` ready to

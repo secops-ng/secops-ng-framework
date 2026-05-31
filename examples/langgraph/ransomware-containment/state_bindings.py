@@ -113,7 +113,7 @@ async def backup_verification() -> dict[str, object]:
 
 @tool
 async def comms_plan(affected_host: str, affected_identity: str, latest_known_good_snapshot: str, snapshot_integrity_ok: bool) -> None:
-    """Notify the IR lead and comms officer along the operator's pre-bound channels, and draft the regulator early-warning pre-notification per NIS2 Article 23 within the 24-hour clock from initial detection. The drafted notification is staged for human sign-off, not auto-sent.
+    """Notify the IR lead and comms officer along the operator's pre-bound channels, and draft the regulator early-warning pre-notification per NIS2 Article 23 within the 24-hour clock from initial detection. The drafted notification is staged for human sign-off, not auto-sent. Because this step is the handoff point that closes the incident timeline and trips the statutory reporting clocks, it stamps the timeline-completeness KPI alongside the notification-SLA KPI and the regulator-notification-overrun KRI.
 
     CACAO step_id : action--30000000-0000-4000-8000-000000000009
     CACAO type    : action
