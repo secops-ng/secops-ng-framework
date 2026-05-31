@@ -1,0 +1,409 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8",
+  "name": "Cloud misconfiguration remediation",
+  "description": "Respond to a cloud-posture (CSPM) finding that flags a sensitive misconfiguration: public storage exposure, over-permissive identity, missing encryption, or a deviating baseline. The playbook enriches the finding with resource ownership, notifies the responsible owner via the operator's pre-bound channel, guides the remediation through an attested change, and re-scans to verify the fix. Failed re-scans escalate so a recurring misconfiguration cannot quietly persist. CACAO v2 + SecOps-NG content-model extensions.",
+  "playbook_types": [
+    "investigation",
+    "remediation",
+    "notification"
+  ],
+  "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+  "created": "2026-05-29T00:00:00Z",
+  "modified": "2026-05-29T00:00:00Z",
+  "labels": [
+    "cloud-misconfiguration",
+    "cspm",
+    "posture",
+    "guided-remediation",
+    "nis2",
+    "dora"
+  ],
+  "external_references": [
+    {
+      "name": "OASIS CACAO v2.0",
+      "description": "Workflow step types, variable conventions, and the x_ extension namespace used to carry SecOps-NG content-model refs.",
+      "source": "OASIS Open"
+    },
+    {
+      "name": "ENISA — Cloud Security: cloud-misconfiguration and posture-management guidance",
+      "source": "ENISA",
+      "url": "https://www.enisa.europa.eu/topics/cloud-and-big-data"
+    },
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 21(2)(e) — security in network and information systems acquisition, development and maintenance",
+      "description": "Operative basis for the baseline-deviation, IaC guardrail, and remediation surface exercised by this playbook.",
+      "source": "Official Journal of the European Union",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj"
+    },
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 21(2)(i) — human-resources security, access-control and asset management",
+      "description": "Operative basis for the resource-ownership and least-privilege identity surface enriched in this playbook.",
+      "source": "Official Journal of the European Union",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj"
+    },
+    {
+      "name": "DORA Regulation (EU) 2022/2554, Article 6 — ICT risk management framework",
+      "description": "Governance anchor for documented ICT systems hygiene including cloud-posture baselines and recurring-deviation handling.",
+      "source": "Official Journal of the European Union",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+    },
+    {
+      "name": "DORA Regulation (EU) 2022/2554, Article 9 — protection and prevention",
+      "description": "Operative basis for ICT systems hygiene, secure configuration baselines, and continuous-monitoring duties exercised by this playbook.",
+      "source": "Official Journal of the European Union",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+    },
+    {
+      "name": "OCSF v1.4.0 — Compliance Finding (2003) and Cloud Resources Inventory Info (5023) event classes",
+      "description": "OCSF event-class shapes used by the telemetry layer feeding this playbook: posture findings (2003) for the inbound signal, cloud resources inventory (5023) for ownership enrichment.",
+      "source": "OCSF",
+      "url": "https://schema.ocsf.io/"
+    },
+    {
+      "name": "MITRE D3FEND — System Configuration Permissions (D3-SCP)",
+      "description": "D3FEND Harden tactic technique cited by the IaC-guardrail and identity-least-privilege controls bound to this playbook.",
+      "source": "MITRE",
+      "url": "https://d3fend.mitre.org/technique/d3f:SystemConfigurationPermissions/"
+    },
+    {
+      "name": "MITRE D3FEND — Resource Access Pattern Analysis (D3-RAPA)",
+      "description": "D3FEND Detect tactic technique cited by the CSPM baseline / posture-finding detection class feeding this playbook.",
+      "source": "MITRE",
+      "url": "https://d3fend.mitre.org/technique/d3f:ResourceAccessPatternAnalysis/"
+    },
+    {
+      "name": "NIST SP 800-53 Rev. 5 — CM-2 (Baseline Configuration), CM-6 (Configuration Settings), CM-8 (System Component Inventory)",
+      "description": "OSCAL-published control family CM (Configuration Management) anchoring the CSPM baseline, IaC guardrail, and cloud-inventory enrichment used by this playbook.",
+      "source": "NIST",
+      "url": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+    },
+    {
+      "name": "NIST SP 800-53 Rev. 5 — AC-3 (Access Enforcement), AC-6 (Least Privilege)",
+      "description": "OSCAL-published control family AC (Access Control) anchoring the cloud-identity least-privilege control bound to this playbook.",
+      "source": "NIST",
+      "url": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+    },
+    {
+      "name": "NIST SP 800-53 Rev. 5 — SC-7 (Boundary Protection), SC-8 (Transmission Confidentiality), SC-28 (Protection of Information at Rest)",
+      "description": "OSCAL-published control family SC (System and Communications Protection) anchoring the missing-encryption / over-permissive-egress posture findings remediated by this playbook.",
+      "source": "NIST",
+      "url": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+    },
+    {
+      "name": "SigmaHQ — AWS CloudTrail Important Change",
+      "description": "Upstream Sigma detection for disabling, deleting or modifying a CloudTrail trail — canonical CSPM-relevant posture finding on AWS.",
+      "source": "SigmaHQ",
+      "url": "https://github.com/SigmaHQ/sigma/blob/master/rules/cloud/aws/cloudtrail/aws_cloudtrail_disable_logging.yml",
+      "external_id": "4db60cc0-36fb-42b7-9b58-a5b53019fb74"
+    },
+    {
+      "name": "SigmaHQ — AWS Config Disabling Channel/Recorder",
+      "description": "Upstream Sigma detection for AWS Config delivery-channel or configuration-recorder disablement; a baseline-deviation finding the CSPM layer surfaces as a posture violation.",
+      "source": "SigmaHQ",
+      "url": "https://github.com/SigmaHQ/sigma/blob/master/rules/cloud/aws/cloudtrail/aws_config_disable_recording.yml",
+      "external_id": "07330162-dba1-4746-8121-a9647d49d297"
+    },
+    {
+      "name": "SigmaHQ — AWS S3 Data Management Tampering",
+      "description": "Upstream Sigma detection for tampering with S3 data-management settings (lifecycle, public-access block, bucket policy). Maps to public-storage-exposure posture rules.",
+      "source": "SigmaHQ",
+      "url": "https://github.com/SigmaHQ/sigma/blob/master/rules/cloud/aws/cloudtrail/aws_s3_data_management_tampering.yml",
+      "external_id": "78b3756a-7804-4ef7-8555-7b9024a02e2d"
+    },
+    {
+      "name": "SigmaHQ — Azure Network Security Configuration Modified or Deleted",
+      "description": "Upstream Sigma detection for Azure NSG / network-security-configuration modification or deletion; the Azure equivalent of an over-permissive-baseline posture finding.",
+      "source": "SigmaHQ",
+      "url": "https://github.com/SigmaHQ/sigma/blob/master/rules/cloud/azure/activity_logs/azure_network_security_modified_or_deleted.yml",
+      "external_id": "d22b4df4-5a67-4859-a578-8c9a0b5af9df"
+    },
+    {
+      "name": "SigmaHQ — Azure Key Vault Modified or Deleted",
+      "description": "Upstream Sigma detection for Azure Key Vault modification or deletion; secrets / encryption-management posture finding (missing-encryption / over-permissive-identity branch).",
+      "source": "SigmaHQ",
+      "url": "https://github.com/SigmaHQ/sigma/blob/master/rules/cloud/azure/activity_logs/azure_keyvault_modified_or_deleted.yml",
+      "external_id": "459a2970-bb84-4e6a-a32e-ff0fbd99448d"
+    },
+    {
+      "name": "SigmaHQ — Google Cloud Firewall Modified or Deleted",
+      "description": "Upstream Sigma detection for GCP firewall-rule modification or deletion; the GCP equivalent of an over-permissive-baseline posture finding emitted via Cloud Audit Logs.",
+      "source": "SigmaHQ",
+      "url": "https://github.com/SigmaHQ/sigma/blob/master/rules/cloud/gcp/audit/gcp_firewall_rule_modified_or_deleted.yml",
+      "external_id": "fe513c69-734c-4d4a-8548-ac5f609be82b"
+    },
+    {
+      "name": "SigmaHQ — Google Cloud Storage Buckets Modified or Deleted",
+      "description": "Upstream Sigma detection for GCS bucket modification or deletion; public-storage-exposure posture finding equivalent for GCP.",
+      "source": "SigmaHQ",
+      "url": "https://github.com/SigmaHQ/sigma/blob/master/rules/cloud/gcp/audit/gcp_bucket_modified_or_deleted.yml",
+      "external_id": "4d9f2ee2-c903-48ab-b9c1-8c0f474913d0"
+    }
+  ],
+  "playbook_variables": {
+    "__finding_id__": {
+      "type": "string",
+      "description": "Identifier of the originating CSPM / posture finding supplied by the detection layer.",
+      "external": true
+    },
+    "__resource_id__": {
+      "type": "string",
+      "description": "Cloud resource identifier (URN / ARN / resource-id) the finding is bound to. Resolved during enrichment.",
+      "external": false
+    },
+    "__owner_id__": {
+      "type": "string",
+      "description": "Identity (team or individual) accountable for the resource per the operator's ownership graph. Drives owner notification.",
+      "external": false
+    },
+    "__severity__": {
+      "type": "string",
+      "description": "Resolved severity of the finding after enrichment (informational, low, medium, high, critical). Drives SLA timers via the metrics layer.",
+      "external": false
+    },
+    "__known_false_positive__": {
+      "type": "boolean",
+      "description": "True when the finding matches a documented exception or a known-benign baseline-deviation record within the suppression window. False routes into owner notification.",
+      "external": false
+    },
+    "__remediation_verified__": {
+      "type": "boolean",
+      "description": "Outcome of the post-remediation re-scan. True closes the case; false branches into escalation.",
+      "external": false
+    }
+  },
+  "workflow_start": "start--30000000-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--30000000-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "cloud-misconfig-start",
+      "on_completion": "action--30000000-0000-4000-8000-000000000002"
+    },
+    "action--30000000-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "ingest finding",
+      "description": "Fetch the CSPM / posture finding from the operator's posture-management platform: rule fingerprint, affected resource, evaluated baseline, first-observed timestamp. Source is identified by __finding_id__ and may originate from continuous CSPM scans or from an IaC policy guardrail emitting the same OCSF shape at deploy time.",
+      "on_completion": "action--30000000-0000-4000-8000-000000000003",
+      "in_args": [
+        "__finding_id__"
+      ],
+      "x_secops_ng": {
+        "detection_refs": [
+          "detection.sigma.cspm_finding_critical@v1",
+          "detection.sigma.public_storage_bucket@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.compliance_finding@v1"
+        ],
+        "metric_refs": [
+          "kpi.mttd_cloud_misconfig@v1"
+        ],
+        "control_refs": [
+          "control.cspm_baseline@v1",
+          "control.incident_timeline_signals@v1"
+        ]
+      }
+    },
+    "action--30000000-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "enrich resource and owner",
+      "description": "Resolve the affected resource against the cloud inventory and ownership graph: tenant, project / account, region, resource type, tags, accountable owner, classification. Produces __resource_id__, __owner_id__, and __severity__ (severity is resolved here rather than ingested raw because the operator's classification can lift or lower the upstream CSPM severity).",
+      "on_completion": "if-condition--30000000-0000-4000-8000-000000000004",
+      "in_args": [
+        "__finding_id__"
+      ],
+      "out_args": [
+        "__resource_id__",
+        "__owner_id__",
+        "__severity__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.cspm_baseline@v1",
+          "control.cloud_identity_least_privilege@v1",
+          "control.asset_inventory_delta@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.cloud_resource_inventory@v1"
+        ],
+        "metric_refs": [
+          "kpi.cloud_posture_coverage@v1"
+        ]
+      }
+    },
+    "if-condition--30000000-0000-4000-8000-000000000004": {
+      "type": "if-condition",
+      "name": "known false positive?",
+      "description": "Suppression branch. on_success: the finding matches a documented exception (compensating-control attestation, time-boxed exception record) or an already-seen baseline-deviation fingerprint within the suppression window; suppress-and-close. on_failure: continue into owner notification.",
+      "on_success": "action--30000000-0000-4000-8000-000000000005",
+      "on_failure": "action--30000000-0000-4000-8000-000000000006"
+    },
+    "action--30000000-0000-4000-8000-000000000005": {
+      "type": "action",
+      "name": "suppress and close",
+      "description": "Link the finding to its existing exception or known-deviation record, close the case without paging, and account the suppression against the recurring-misconfiguration KRI so a chronically suppressed posture rule surfaces in the metrics layer.",
+      "on_completion": "end--30000000-0000-4000-8000-00000000000a",
+      "x_secops_ng": {
+        "metric_refs": [
+          "kri.recurring_cloud_misconfig@v1"
+        ],
+        "control_refs": [
+          "control.cspm_baseline@v1",
+          "control.control_effectiveness_test@v1"
+        ]
+      }
+    },
+    "action--30000000-0000-4000-8000-000000000006": {
+      "type": "action",
+      "name": "notify owner",
+      "description": "Notify the resource owner along the operator's pre-bound channel (ticketing / chat / paging, per __severity__). The notification carries the finding, the affected resource, the violated baseline, and a link to the guided-remediation runbook the next step references.",
+      "on_completion": "action--30000000-0000-4000-8000-000000000007",
+      "in_args": [
+        "__owner_id__",
+        "__resource_id__",
+        "__severity__"
+      ],
+      "x_secops_ng": {
+        "telemetry_refs": [
+          "telemetry.ocsf.compliance_finding@v1"
+        ],
+        "metric_refs": [
+          "kpi.mttr_cloud_misconfig@v1"
+        ],
+        "control_refs": [
+          "control.incident_handling_capability@v1",
+          "control.oob_channel_probe@v1"
+        ]
+      }
+    },
+    "action--30000000-0000-4000-8000-000000000007": {
+      "type": "action",
+      "name": "guided remediation",
+      "description": "Apply the remediation bound to the violated baseline rule, with change-management attestation: either an operator-approved auto-remediation hand-off (IaC pull request, runbook execution) or an owner-driven manual change captured against the change record. The action body is operator-bound; only the contract (a remediation attempt is recorded against the finding) is fixed by this playbook.",
+      "on_completion": "action--30000000-0000-4000-8000-000000000008",
+      "in_args": [
+        "__resource_id__",
+        "__owner_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.cspm_baseline@v1",
+          "control.iac_policy_guardrail@v1",
+          "control.cloud_identity_least_privilege@v1",
+          "control.patch_evidence@v1"
+        ],
+        "metric_refs": [
+          "kpi.mttr_cloud_misconfig@v1"
+        ]
+      }
+    },
+    "action--30000000-0000-4000-8000-000000000008": {
+      "type": "action",
+      "name": "re-scan",
+      "description": "Trigger a targeted re-scan against the same baseline rule and resource. Emits __remediation_verified__ based on whether the rule still fires. The re-scan is a deterministic verification step, not a fresh posture sweep.",
+      "on_completion": "if-condition--30000000-0000-4000-8000-000000000009",
+      "in_args": [
+        "__resource_id__",
+        "__finding_id__"
+      ],
+      "out_args": [
+        "__remediation_verified__"
+      ],
+      "x_secops_ng": {
+        "detection_refs": [
+          "detection.sigma.cspm_finding_critical@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.compliance_finding@v1"
+        ],
+        "metric_refs": [
+          "kpi.mttr_cloud_misconfig@v1",
+          "kpi.cloud_posture_coverage@v1"
+        ],
+        "control_refs": [
+          "control.cspm_baseline@v1",
+          "control.control_effectiveness_test@v1"
+        ]
+      }
+    },
+    "if-condition--30000000-0000-4000-8000-000000000009": {
+      "type": "if-condition",
+      "name": "remediation verified?",
+      "description": "Branch on __remediation_verified__. on_success: re-scan confirms the rule no longer fires; close the case. on_failure: remediation did not stick — escalate so the recurring-misconfiguration KRI captures the residual exposure rather than closing on an unverified attempt.",
+      "on_success": "end--30000000-0000-4000-8000-00000000000a",
+      "on_failure": "action--30000000-0000-4000-8000-00000000000b"
+    },
+    "action--30000000-0000-4000-8000-00000000000b": {
+      "type": "action",
+      "name": "escalate",
+      "description": "Escalate to the security-engineering on-call along the operator's pre-bound paging channel. The escalation payload carries the finding, the attempted remediation, and the failing re-scan evidence. Tracked against the recurring-misconfiguration KRI so chronic unremediated posture exceptions surface in the metrics layer.",
+      "on_completion": "end--30000000-0000-4000-8000-00000000000a",
+      "in_args": [
+        "__finding_id__",
+        "__resource_id__",
+        "__severity__"
+      ],
+      "x_secops_ng": {
+        "telemetry_refs": [
+          "telemetry.ocsf.compliance_finding@v1"
+        ],
+        "metric_refs": [
+          "kri.recurring_cloud_misconfig@v1"
+        ],
+        "control_refs": [
+          "control.recurring_incident_correlator@v1",
+          "control.incident_handling_capability@v1",
+          "control.incident_timeline_signals@v1"
+        ]
+      }
+    },
+    "end--30000000-0000-4000-8000-00000000000a": {
+      "type": "end",
+      "name": "cloud-misconfig-end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.cloud_misconfiguration@v1",
+    "content_version": "0.1.0",
+    "maturity": "experimental",
+    "compile_targets": [
+      "n8n",
+      "temporal",
+      "langgraph"
+    ],
+    "detection_refs": [
+      "detection.sigma.cspm_finding_critical@v1",
+      "detection.sigma.public_storage_bucket@v1"
+    ],
+    "control_refs": [
+      "control.cspm_baseline@v1",
+      "control.iac_policy_guardrail@v1",
+      "control.cloud_identity_least_privilege@v1"
+    ],
+    "telemetry_refs": [
+      "telemetry.ocsf.compliance_finding@v1",
+      "telemetry.ocsf.cloud_resource_inventory@v1"
+    ],
+    "metric_refs": [
+      "kpi.mttd_cloud_misconfig@v1",
+      "kpi.mttr_cloud_misconfig@v1",
+      "kpi.cloud_posture_coverage@v1",
+      "kri.recurring_cloud_misconfig@v1"
+    ],
+    "sources": [
+      "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
+      "ENISA — Cloud Security: cloud-misconfiguration and posture-management guidance",
+      "NIS2 Directive (EU) 2022/2555, Article 21(2)(e) — security in network and information systems acquisition, development and maintenance, including vulnerability handling and disclosure",
+      "NIS2 Directive (EU) 2022/2555, Article 21(2)(i) — human-resources security, access-control and asset-management policies",
+      "DORA Regulation (EU) 2022/2554, Article 9 — ICT risk-management framework (protection and prevention)",
+      "DORA Regulation (EU) 2022/2554, Article 19 — reporting of major ICT-related incidents (escalation path when a posture exception becomes incident-grade)",
+      "OCSF v1.4.0 — Compliance Finding (class 2003) and Cloud Resources Inventory Info (class 5023) event classes",
+      "MITRE D3FEND — System Configuration Permissions (d3f:SystemConfigurationPermissions), Resource Access Pattern Analysis (d3f:ResourceAccessPatternAnalysis)",
+      "SigmaHQ — upstream rule provenance for the CSPM-finding and public-storage-bucket detection pointers (no Sigma rules authored here)",
+      "NIST SP 800-53 Rev. 5 — CM-2/CM-6/CM-8, AC-3/AC-6, SC-7/SC-8/SC-28 (OSCAL-published control families anchoring this playbook)",
+      "MITRE D3FEND — D3-SCP (System Configuration Permissions), D3-RAPA (Resource Access Pattern Analysis)",
+      "OCSF v1.4.0 — Compliance Finding (2003), Cloud Resources Inventory Info (5023)"
+    ]
+  }
+}

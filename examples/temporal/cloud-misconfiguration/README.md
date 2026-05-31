@@ -2,7 +2,7 @@
 
 Worked example: the `playbook.cloud_misconfiguration@v1` CACAO v2
 playbook compiled by the Temporal reference compiler. Operators who
-already run Temporal can import `workflow_stub.py` into their worker
+already run Temporal can import `workflow.temporal.py` into their worker
 module to see the topology the emitter produces; binding the activity
 bodies to real connectors (CSPM / posture-management platform, cloud
 inventory and ownership graph, ticketing / chat / paging channel,
@@ -17,37 +17,25 @@ Canonical CACAO playbook:
 Scenario, workflow, regulatory anchors (NIS2 Article 21(2)(e) / 21(2)(i),
 DORA Articles 6 and 9), control / metric / telemetry bindings, and the
 operator-supplied bindings are documented in that folder's `README.md`.
-This folder holds only the *emitted* artifact and the command used to
-produce it.
+This folder holds only the emitted artifact, a co-located copy of the
+CACAO source, and the regeneration command.
 
 ## Layout
 
-| Path                | Source compiler      | Format                |
-|---------------------|----------------------|-----------------------|
-| `workflow_stub.py`  | `compilers.temporal` | Python (`temporalio`) |
+| Path                    | Source compiler      | Format                |
+|-------------------------|----------------------|-----------------------|
+| `playbook.cacao.json`   | (input)              | CACAO v2 JSON         |
+| `workflow.temporal.py`  | `compilers.temporal` | Python (`temporalio`) |
 
 ## Regeneration
 
-The Temporal emitter is deterministic: same input bytes in, same output
-bytes out. To regenerate this folder from a clean checkout:
+Deterministic emitter; re-running yields byte-identical output. From
+the repo root:
 
-    python -m compilers.temporal \
-        content/playbooks/cloud-misconfiguration/playbook.cacao.json \
-        --out examples/temporal/cloud-misconfiguration/workflow_stub.py
+    ./examples/temporal/cloud-misconfiguration/regenerate.sh
 
-The entry point is `python -m compilers.temporal` (see
-`compilers/temporal/__main__.py`); the underlying function is
-`compilers.temporal.emit.emit_file`. The canonical playbook under
-`content/playbooks/cloud-misconfiguration/playbook.cacao.json` is the
-single source; this example is a hand-checked snapshot of the emitter
-output that mirrors its structure one-to-one (one `@activity.defn` per
-CACAO action, activity names derived from the CACAO action ids).
-
-Re-running the command yields byte-identical output. The
-`tests/examples/cloud_misconfiguration/test_temporal_workflow.py` suite
-pins this invariant alongside an activity-name ↔ CACAO action-id parity
-check so accidental drift surfaces in review, not in an operator's
-runtime.
+The script mirrors the canonical CACAO source into this folder and
+re-emits `workflow.temporal.py` via `tools.compile --target temporal`.
 
 ## Mirroring policy
 
@@ -99,17 +87,6 @@ the activity bodies and workflow control flow are intentionally
 - It does not pick a Temporal deployment posture. Self-hosted
   (Temporal OSS on EU sovereign infrastructure) and managed
   (Temporal Cloud) are both supported by the same emitted source.
-
-## Future compiler-driven emission
-
-Today this example is produced by `python -m compilers.temporal`,
-which calls into `compilers/temporal/emit.py`. Future work will fold
-this example into the same compiler-driven emission contract as the
-other worked examples — regenerated from the canonical CACAO source on
-every test run rather than maintained as a checked-in snapshot. Until
-that lands, the drift guard in
-`tests/examples/cloud_misconfiguration/test_temporal_workflow.py`
-plays the role.
 
 ## Sovereignty note
 
