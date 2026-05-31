@@ -133,21 +133,12 @@ def test_threat_intel_ingest_emit_is_deterministic() -> None:
     )
 
 
-def test_threat_intel_ingest_worked_example_stub_matches_golden() -> None:
-    """The committed
-    `examples/temporal/threat-intel-ingest/workflow_stub.py` is the
-    emitter's output for the threat-intel-ingest fixture; any drift
-    between the worked example and the golden indicates the example
-    was edited by hand instead of regenerated.
-    """
-    stub = (
-        Path(__file__).resolve().parents[3]
-        / "examples"
-        / "temporal"
-        / "threat-intel-ingest"
-        / "workflow_stub.py"
-    )
-    assert stub.exists(), f"missing worked-example stub: {stub}"
-    assert stub.read_text(encoding="utf-8") == THREAT_INTEL_INGEST_GOLDEN.read_text(
-        encoding="utf-8"
-    )
+# The threat-intel-ingest worked-example drift guard lives in
+# tests/examples/threat_intel_ingest/test_temporal_workflow.py — it
+# pins examples/temporal/threat-intel-ingest/workflow.temporal.py
+# against the emitter output for the *canonical* CACAO playbook
+# (content/playbooks/threat-intel-ingest/playbook.cacao.json), which
+# is what regenerate.sh actually consumes. The fixture under
+# tests/compilers/_shared/fixtures/ is a separate compiler unit-test
+# input and diverges from the canonical source; do not pin the worked
+# example against it.
