@@ -1,0 +1,443 @@
+{
+  "name": "Executive metrics rollup",
+  "nodes": [
+    {
+      "id": "start--e0000000-0000-4000-8000-000000000001",
+      "name": "rollup-start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__rollup_window__",
+              "type": "string",
+              "value": "",
+              "description": "ISO 8601 window the rollup covers (e.g. `2026-05-01/2026-05-31`). Externally supplied by the scheduler so multiple cadences (monthly, quarterly) reuse the same playbook."
+            },
+            {
+              "name": "__catalog_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Pointer to the operator's resolved KPI/KRI catalog (path or registry URI). Externally supplied so the operator can pin a catalog version per run."
+            },
+            {
+              "name": "__metric_evaluations__",
+              "type": "string",
+              "value": "",
+              "description": "Serialised list of per-metric evaluations produced by the evaluation step. Each entry carries the metric stable_id, the observed value, the matched threshold band, and the lower-layer artifacts (control, telemetry, playbook step) the metric is bound to."
+            },
+            {
+              "name": "__control_effectiveness_score__",
+              "type": "string",
+              "value": "",
+              "description": "Composite control-effectiveness score for the window, derived from the KPI/KRI evaluations grouped by control_ref. Bounded `0.0..1.0`. The scoring policy itself is operator-supplied; the playbook only pins the inputs and the output contract."
+            },
+            {
+              "name": "__board_summary_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the emitted board-ready summary artifact in the operator's downstream system (board pack pipeline, GRC tool, document store). Captured for audit-trail purposes."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--e0000000-0000-4000-8000-000000000002",
+      "name": "resolve KPI/KRI catalog",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.rollup_window",
+              "name": "in.rollup_window",
+              "value": "={{$workflow.variables.rollup_window}}",
+              "type": "string"
+            },
+            {
+              "id": "in.catalog_ref",
+              "name": "in.catalog_ref",
+              "value": "={{$workflow.variables.catalog_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.control_effectiveness_test@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.corrective_action_overdue@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Load the operator's pinned KPI/KRI catalog version from `__catalog_ref__`. Each entry MUST validate against `content-model/metrics.schema.json` before it enters the rollup; entries that fail validation are recorded for the corrective-action register and excluded from the score so a malformed entry cannot inflate or deflate effectiveness.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--e0000000-0000-4000-8000-000000000003",
+      "name": "evaluate metrics over window",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.rollup_window",
+              "name": "in.rollup_window",
+              "value": "={{$workflow.variables.rollup_window}}",
+              "type": "string"
+            },
+            {
+              "id": "in.catalog_ref",
+              "name": "in.catalog_ref",
+              "value": "={{$workflow.variables.catalog_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "out.metric_evaluations",
+              "name": "out.metric_evaluations",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.control_effectiveness_test@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.review_completion_sla@v1, kpi.corrective_action_close_rate@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "For each catalog entry, compute the value defined by the metric's `measurement.formula` over `__rollup_window__` against the operator's telemetry / workflow / control attestation source. Each evaluation carries the matched threshold band (target / warn / breach) and references the lower-layer artifacts (playbook step, detection, control, telemetry) the metric is bound to via its `inputs[]`. Emits `__metric_evaluations__`.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--e0000000-0000-4000-8000-000000000004",
+      "name": "score control effectiveness",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.metric_evaluations",
+              "name": "in.metric_evaluations",
+              "value": "={{$workflow.variables.metric_evaluations}}",
+              "type": "string"
+            },
+            {
+              "id": "out.control_effectiveness_score",
+              "name": "out.control_effectiveness_score",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.control_effectiveness_test@v1, control.risk_management_policy@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.control_effectiveness@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Group the evaluations by `control_refs[]` and compute a composite control-effectiveness score per control, then aggregate to a programme-level score in `0.0..1.0`. The scoring policy (per-control weighting, KRI penalty function, missing-evidence treatment) is operator-supplied. The playbook only pins the input contract and the output shape so the score is reproducible from the same evaluations.",
+      "notesInFlow": true
+    },
+    {
+      "id": "if-condition--e0000000-0000-4000-8000-000000000005",
+      "name": "any breach band hit?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "secops_ng_condition",
+              "leftValue": "",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "notes": "Branch on whether any metric evaluation matched its `breach` threshold band. `on_success` (true): annotate the in-flight summary with a board-attention flag before emit. `on_failure` (false): emit the summary without the attention flag. Both branches converge on the same emit step so the rollup is single-output.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--e0000000-0000-4000-8000-000000000006",
+      "name": "raise board-attention flag",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.control_effectiveness_score",
+              "name": "in.control_effectiveness_score",
+              "value": "={{$workflow.variables.control_effectiveness_score}}",
+              "type": "string"
+            },
+            {
+              "id": "in.metric_evaluations",
+              "name": "in.metric_evaluations",
+              "value": "={{$workflow.variables.metric_evaluations}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.corrective_action_overdue@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Annotate the in-flight summary with a board-attention flag so the downstream pack pipeline surfaces the breach band on the cover page. Pure annotation step \u2014 no notification is sent here; the board pack pipeline owns the distribution channel and cadence.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--e0000000-0000-4000-8000-000000000007",
+      "name": "emit board summary",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.rollup_window",
+              "name": "in.rollup_window",
+              "value": "={{$workflow.variables.rollup_window}}",
+              "type": "string"
+            },
+            {
+              "id": "in.metric_evaluations",
+              "name": "in.metric_evaluations",
+              "value": "={{$workflow.variables.metric_evaluations}}",
+              "type": "string"
+            },
+            {
+              "id": "in.control_effectiveness_score",
+              "name": "in.control_effectiveness_score",
+              "value": "={{$workflow.variables.control_effectiveness_score}}",
+              "type": "string"
+            },
+            {
+              "id": "out.board_summary_id",
+              "name": "out.board_summary_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.control_effectiveness_test@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.review_completion_sla@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Render the structured board-ready summary artifact and hand it off to the operator's board pack pipeline. The artifact carries: window, per-metric evaluations with threshold bands, per-control effectiveness scores, programme-level score, and (if set) the board-attention flag. Output is content-only \u2014 distribution, signing, and archival are out of scope of the playbook.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--e0000000-0000-4000-8000-000000000008",
+      "name": "rollup-end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2060,
+        420
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "rollup-start": {
+      "main": [
+        [
+          {
+            "node": "resolve KPI/KRI catalog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "resolve KPI/KRI catalog": {
+      "main": [
+        [
+          {
+            "node": "evaluate metrics over window",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "evaluate metrics over window": {
+      "main": [
+        [
+          {
+            "node": "score control effectiveness",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "score control effectiveness": {
+      "main": [
+        [
+          {
+            "node": "any breach band hit?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "any breach band hit?": {
+      "main": [
+        [
+          {
+            "node": "raise board-attention flag",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "emit board summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "raise board-attention flag": {
+      "main": [
+        [
+          {
+            "node": "emit board summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "emit board summary": {
+      "main": [
+        [
+          {
+            "node": "rollup-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "executive-reporting",
+    "metrics-rollup",
+    "control-effectiveness",
+    "nis2",
+    "dora",
+    "board-summary"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.executive_metrics@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8"
+    },
+    "secops_ng_notes": [
+      "step 'action--e0000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--e0000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--e0000000-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'if-condition--e0000000-0000-4000-8000-000000000005' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
+      "step 'action--e0000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--e0000000-0000-4000-8000-000000000007': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}
