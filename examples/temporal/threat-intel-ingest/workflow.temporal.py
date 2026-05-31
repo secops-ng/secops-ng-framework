@@ -33,7 +33,7 @@ PULL_UPSTREAM_FEED_RETRY_POLICY = RetryPolicy(
 
 @activity.defn
 async def normalise_stix_to_ocsf() -> dict[str, object]:
-    """Map STIX 2.1 SDOs (Indicator, Malware, Threat-Actor) to the OCSF Threat Intelligence Inference event class. Persist normalised records keyed by indicator value; deduplicate against records seen within the last 24 hours.
+    """Map STIX 2.1 SDOs (Indicator, Malware, Threat-Actor) into the playbook's canonical normalised-indicator record. The released OCSF v1.3.0 catalogue does not contain a dedicated threat-intel ingest event class, so no OCSF class is asserted here on the consumed side (see mappings.yaml — ocsf section). Persist normalised records keyed by indicator value; deduplicate against records seen within the last 24 hours.
 
     CACAO step_id: action--10000000-0000-4000-8000-000000000003
     """
@@ -84,7 +84,7 @@ ACTIVATE_DETECTION_RULE_RETRY_POLICY = RetryPolicy(
 
 @workflow.defn
 class PlaybookThreatIntelIngestV1Workflow:
-    """Portable response for ingesting external cyber threat intelligence. Pulls an upstream feed (STIX 2.1 / TAXII or OCSF Threat Intelligence), normalises indicators against the OCSF Threat Intelligence Inference event class, and propagates the result to detection (Sigma rule activation in the operator's SIEM) and blocking (perimeter / DNS / EDR blocklist) controls. CACAO v2 portable artifact; runtime is the operator's choice — n8n, Temporal, or LangGraph.
+    """Portable response for ingesting external cyber threat intelligence. Pulls an upstream STIX 2.1 / TAXII feed, normalises indicators into a canonical record (cross-references in mappings.yaml; the released OCSF v1.3.0 catalogue has no dedicated threat-intel ingest class), and propagates the result to detection (Sigma rule activation in the operator's SIEM, emitting OCSF Detection Finding class_uid 2004 on match) and blocking (perimeter / DNS / EDR blocklist) controls. CACAO v2 portable artifact; runtime is the operator's choice — n8n, Temporal, or LangGraph.
 
     CACAO playbook id : playbook--7c1e2b3a-4d5f-4a8b-9c0d-1e2f3a4b5c6d
     stable_id         : playbook.threat_intel_ingest@v1

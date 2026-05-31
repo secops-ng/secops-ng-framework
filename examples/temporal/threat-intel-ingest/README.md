@@ -1,87 +1,47 @@
-# threat-intel-ingest — Temporal worked example
+# examples/temporal/threat-intel-ingest
 
-End-to-end demonstration of the SecOps-NG Temporal reference compiler
-on the threat-intel-ingest CACAO playbook. It is aimed at an integrator
-who already runs Temporal and wants to adopt a portable SecOps-NG
-playbook without re-platforming: the example shows exactly which
-artifact the compiler produces, how to regenerate it, and where the
-integrator owns the seams.
+Worked example: the `playbook.threat_intel_ingest@v1` CACAO v2 playbook
+compiled by the Temporal reference compiler. Operators who already run
+Temporal can import `workflow.temporal.py` into their worker module to
+see the topology the emitter produces; binding the activity bodies to
+real connectors (STIX 2.1 / TAXII feed source, OCSF Threat Intelligence
+normaliser, SIEM Sigma rule activation, perimeter / DNS / EDR blocklist
+enforcement) is the operator's job.
 
-## Files in this directory
+## Source
 
-| File | Role |
-|------|------|
-| `workflow_stub.py` | Generated Temporal workflow stub — `@activity.defn` wrappers + a single `@workflow.defn` class with retry policies, emitted by `compilers.temporal.emit`. |
-| `README.md` | This walkthrough. |
+Canonical CACAO playbook:
 
-The canonical source playbook lives at
-`content/playbooks/threat-intel-ingest/playbook.cacao.json`; this
-folder holds only the *emitted* artifact and the command used to
-produce it.
+    ../../../content/playbooks/threat-intel-ingest/playbook.cacao.json
 
-## How to regenerate
+Scenario, workflow, regulatory anchors, control / metric / telemetry
+bindings, and the operator-supplied bindings are documented in that
+folder's `README.md`. This folder holds only the emitted artifact, a
+co-located copy of the CACAO source, and the regeneration command.
 
-After any change to the playbook or to `compilers/temporal/*`, refresh
-the committed stub from the repo root:
+## Layout
 
-```bash
-python -m compilers.temporal \
-    tests/compilers/_shared/fixtures/threat_intel_ingest.cacao.json \
-    --out examples/temporal/threat-intel-ingest/workflow_stub.py
-```
+| Path                    | Source compiler      | Format                |
+|-------------------------|----------------------|-----------------------|
+| `playbook.cacao.json`   | (input)              | CACAO v2 JSON         |
+| `workflow.temporal.py`  | `compilers.temporal` | Python (`temporalio`) |
 
-The emitter is deterministic: same input bytes in, same output bytes
-out. A golden test in
-`tests/compilers/temporal/test_golden.py` re-emits from the shared
-fixture on every run and asserts byte-equality against
-`tests/compilers/temporal/golden/threat_intel_ingest.expected.py`, so
-drift in the compiler surfaces in code review rather than landing
-silently on main.
+## Regeneration
 
-The entry point is `python -m compilers.temporal` (see
-`compilers/temporal/__main__.py`); the underlying function is
-`compilers.temporal.emit.emit_file`.
+Deterministic emitter; re-running yields byte-identical output. From
+the repo root:
 
-## Topology
+    ./examples/temporal/threat-intel-ingest/regenerate.sh
 
-The threat-intel-ingest playbook ingests external cyber threat
-intelligence end-to-end: it pulls an upstream feed (STIX 2.1 / TAXII
-or OCSF Threat Intelligence), normalises indicators against the OCSF
-Threat Intelligence Inference event class, gates on confidence, and
-propagates the result to both detection (Sigma rule activation in the
-operator's SIEM) and blocking (perimeter / DNS / EDR blocklist)
-controls. The emitted stub mirrors that shape one-for-one — each
-CACAO action becomes an `@activity.defn` with a retry policy, and the
-workflow class exposes the playbook's `stable_id` and ordered activity
-tuple in its docstring.
-
-See the CACAO playbook and
-`content/playbooks/threat-intel-ingest/README.md` for the upstream
-feed shape, the OCSF mapping, and the operator-supplied bindings.
-
-## What this example deliberately doesn't do
-
-- It does not execute the workflow. The activity bodies raise
-  `NotImplementedError`; integrators wire them to their own runtime
-  (TAXII client, OCSF normaliser, SIEM API, blocklist appliance).
-- It does not ship operator credentials, endpoints, or environment.
-  Secrets stay with the operator and are injected at activity-worker
-  startup, not embedded in the artifact.
-- It does not bind a specific runtime topology (task queue,
-  concurrency, persistence backend, namespace). Those are runtime
-  concerns the integrator applies in their own worker bootstrap.
-- It does not pick a Temporal deployment posture. Self-hosted
-  (Temporal OSS on EU sovereign infrastructure) and managed
-  (Temporal Cloud) are both supported by the same emitted source;
-  see the sovereignty note below.
+The script mirrors the canonical CACAO source into this folder and
+re-emits `workflow.temporal.py` via `tools.compile --target temporal`.
 
 ## Sovereignty note
 
 Temporal is open source (MIT) and runs as a server + worker process
 pair: hosting it on EU sovereign infrastructure (Nebul, OVHcloud,
-Scaleway, Hetzner) is a deployment choice, not a vendor decision. The
-emitter never embeds a connection string, task-queue name, or
-credential, so the operator can target a self-hosted cluster or an
-EU-region managed namespace without regenerating the artifact. See
-[docs/compilers/temporal.md](../../../docs/compilers/temporal.md) and
-[docs/sovereignty/](../../../docs/sovereignty/) for the full posture.
+Scaleway, Hetzner) is a deployment choice, not a vendor decision. No
+telemetry, no execution traces, no identifying data flows reach this
+repository or the SecOps-NG project. The operator runs Temporal on
+infrastructure they control — we ship the structure, they own the
+data plane.
