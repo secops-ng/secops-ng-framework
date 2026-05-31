@@ -52,26 +52,92 @@
     {
       "id": "action--10000000-0000-4000-8000-000000000002",
       "name": "pull upstream feed",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         500,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.feed_url",
+              "name": "in.feed_url",
+              "value": "={{$workflow.variables.feed_url}}",
+              "type": "string"
+            },
+            {
+              "id": "in.feed_id",
+              "name": "in.feed_id",
+              "value": "={{$workflow.variables.feed_id}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.threat_intel.feed_ingest@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.threat_intelligence_inference@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.coverage_threat_intel_feed@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Poll the configured TAXII collection or STIX 2.1 endpoint and capture the raw bundle. The endpoint is operator-supplied; the content model does not embed feed URLs.",
       "notesInFlow": true
     },
     {
       "id": "action--10000000-0000-4000-8000-000000000003",
       "name": "normalise STIX to OCSF",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         760,
         240
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "out.indicator_count",
+              "name": "out.indicator_count",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.high_confidence",
+              "name": "out.high_confidence",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.threat_intel.normalisation@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.threat_intelligence_inference@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Map STIX 2.1 SDOs (Indicator, Malware, Threat-Actor) to the OCSF Threat Intelligence Inference event class. Persist normalised records keyed by indicator value; deduplicate against records seen within the last 24 hours.",
       "notesInFlow": true
     },
@@ -112,26 +178,80 @@
     {
       "id": "action--10000000-0000-4000-8000-000000000005",
       "name": "propagate to blocklist",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         1280,
         240
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.indicator_count",
+              "name": "in.indicator_count",
+              "value": "={{$workflow.variables.indicator_count}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.blocklist.propagation@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.security_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.mttr_blocklist_propagation@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Push high-confidence indicators (IPs, domains, file hashes) to the operator's enforcement plane: perimeter firewall, DNS sinkhole, EDR allow/deny list. Records the propagation event so MTTR-to-block can be measured.",
       "notesInFlow": true
     },
     {
       "id": "action--10000000-0000-4000-8000-000000000006",
       "name": "activate detection rule",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         1540,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.detection.sigma_deployment@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.security_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.mttd_threat_intel_indicator@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Activate or refresh the corresponding upstream Sigma rule(s) in the operator's SIEM so subsequent telemetry matching the indicator generates an alert. Sigma rule IDs are pinned to upstream SigmaHQ \u2014 the framework does not re-author rule bodies (see README for the upstream rule ID list).",
       "notesInFlow": true
     },
@@ -245,11 +365,11 @@
       "source_playbook_id": "playbook--7c1e2b3a-4d5f-4a8b-9c0d-1e2f3a4b5c6d"
     },
     "secops_ng_notes": [
-      "step 'action--10000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--10000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--10000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--10000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'if-condition--10000000-0000-4000-8000-000000000004' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
-      "step 'action--10000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--10000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n."
+      "step 'action--10000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--10000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
     ]
   }
 }

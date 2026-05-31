@@ -72,6 +72,7 @@ _EXECUTE_WORKFLOW = "n8n-nodes-base.executeWorkflow"
 _IF = "n8n-nodes-base.if"
 _SWITCH = "n8n-nodes-base.switch"
 _MERGE = "n8n-nodes-base.merge"
+_SET = "n8n-nodes-base.set"
 
 # typeVersion pinned to the versions stable since n8n 1.0. Emitter ships
 # importable JSON across n8n 1.x; users on older lines can re-pin if needed.
@@ -83,6 +84,17 @@ _TV_EXEC_WORKFLOW = 1
 _TV_IF = 2
 _TV_SWITCH = 3
 _TV_MERGE = 2
+# Set node "assignments" mode landed in 3.4 and is stable across n8n 1.x.
+_TV_SET = 3.4
+
+# x_secops_ng ref categories surfaced as Set-node assignment rows for action
+# steps without commands. Order is fixed so emitted JSON is deterministic.
+_X_SECOPS_NG_REF_CATEGORIES: tuple[str, ...] = (
+    "detection_refs",
+    "control_refs",
+    "telemetry_refs",
+    "metric_refs",
+)
 
 # Variable-token pattern in command bodies / argument lists: ``__name__``.
 # Mirrors the convention used in the worked-example playbooks.
@@ -246,7 +258,7 @@ class _WorkflowBuilder:
         self,
         step_id: str,
         step: WorkflowStep,
-    ) -> tuple[str, int, dict[str, Any]]:
+    ) -> tuple[str, int | float, dict[str, Any]]:
         match step.type:
             case StepType.START:
                 params: dict[str, Any] = {}
@@ -330,7 +342,7 @@ class _WorkflowBuilder:
 
     # -- action ------------------------------------------------------------- #
 
-    def _map_action(self, step: WorkflowStep) -> tuple[str, int, dict[str, Any]]:
+    def _map_action(self, step: WorkflowStep) -> tuple[str, int | float, dict[str, Any]]:
         """Pick an n8n node for a CACAO action step.
 
         Heuristic: first command type wins. Most action steps have one
@@ -338,11 +350,7 @@ class _WorkflowBuilder:
         note when we see one.
         """
         if not step.commands:
-            self._notes.append(
-                f"step {step.step_id!r}: action with no commands — emitted "
-                "as no-op placeholder. Operator must wire the work in n8n."
-            )
-            return _NOOP, _TV_NOOP, {}
+            return self._map_action_without_commands(step)
 
         if len(step.commands) > 1:
             self._notes.append(
@@ -365,6 +373,110 @@ class _WorkflowBuilder:
             "n8n equivalent — emitted as no-op placeholder."
         )
         return _NOOP, _TV_NOOP, {}
+
+    def _map_action_without_commands(
+        self, step: WorkflowStep
+    ) -> tuple[str, int | float, dict[str, Any]]:
+        """Render an action step that carries no CACAO commands.
+
+        CACAO action steps without ``commands`` typically encode work that
+        an operator wires manually — but the playbook author may still
+        have declared the I/O contract via ``in_args`` / ``out_args`` and
+        annotated the step with ``x_secops_ng`` references (detection,
+        control, telemetry, metric refs).
+
+        When at least one of those signals is present we emit an
+        ``n8n-nodes-base.set`` node whose ``assignments`` expose every
+        declared input, output, and reference category as an editable row.
+        Operators then fill the values in n8n without losing the CACAO
+        contract. Steps with no signals at all degrade to ``noOp`` so
+        behaviour for truly empty actions is preserved.
+        """
+        assignments = self._build_set_assignments(step)
+        if not assignments:
+            self._notes.append(
+                f"step {step.step_id!r}: action with no commands — emitted "
+                "as no-op placeholder. Operator must wire the work in n8n."
+            )
+            return _NOOP, _TV_NOOP, {}
+
+        self._notes.append(
+            f"step {step.step_id!r}: action with no commands — emitted "
+            "Set node carrying the CACAO I/O contract (in_args / out_args / "
+            "x_secops_ng refs). Operator fills the values in n8n."
+        )
+        return _SET, _TV_SET, {
+            "assignments": {"assignments": assignments},
+            "options": {},
+        }
+
+    def _build_set_assignments(
+        self, step: WorkflowStep
+    ) -> list[dict[str, Any]]:
+        """Build the ordered Set-node assignment rows for an action step.
+
+        Ordering is fixed (in → out → x_secops_ng categories in declared
+        category order) so emitted JSON is byte-stable across runs.
+        """
+        rows: list[dict[str, Any]] = []
+
+        for var_name in step.in_args:
+            rows.append(self._set_row_for_arg(step, var_name, direction="in"))
+        for var_name in step.out_args:
+            rows.append(self._set_row_for_arg(step, var_name, direction="out"))
+
+        x = step.x_secops_ng
+        for category in _X_SECOPS_NG_REF_CATEGORIES:
+            refs = getattr(x, category, ())
+            if not refs:
+                continue
+            rows.append(
+                {
+                    "id": f"x_secops_ng.{category}",
+                    "name": f"x_secops_ng.{category}",
+                    "value": ", ".join(refs),
+                    "type": "string",
+                }
+            )
+
+        return rows
+
+    def _set_row_for_arg(
+        self, step: WorkflowStep, var_name: str, *, direction: str
+    ) -> dict[str, Any]:
+        """Render a single Set-node assignment for an in_arg or out_arg.
+
+        The row id / name namespace ``in.<var>`` and ``out.<var>`` so the
+        CACAO direction survives into the n8n canvas. Inputs are
+        pre-populated with the n8n expression that reads the playbook
+        variable; outputs are left empty for the operator to assign.
+        """
+        # Strip the ``__name__`` token wrapping if the playbook authored
+        # in_args / out_args with the variable-token form. The bare name
+        # is what shows up in the n8n UI and in $workflow.variables.
+        bare = _VAR_TOKEN_RE.match(var_name)
+        var_key = bare.group(1) if bare else var_name
+        cacao_type = self._variable_type(var_key)
+        n8n_type = _n8n_type_for(cacao_type)
+
+        if direction == "in":
+            value: Any = f"={{{{$workflow.variables.{var_key}}}}}"
+        else:
+            value = "" if n8n_type == "string" else None
+
+        return {
+            "id": f"{direction}.{var_key}",
+            "name": f"{direction}.{var_key}",
+            "value": value,
+            "type": n8n_type,
+        }
+
+    def _variable_type(self, var_name: str) -> str:
+        """Resolve the CACAO type of a playbook variable, defaulting to string."""
+        var = self.playbook.playbook_variables.get(var_name)
+        if var is not None:
+            return var.type_
+        return "string"
 
     def _http_parameters(self, cmd: Mapping[str, Any]) -> dict[str, Any]:
         url = self._interpolate(str(cmd.get("url", cmd.get("target", ""))))

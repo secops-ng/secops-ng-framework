@@ -64,39 +64,165 @@
     {
       "id": "action--01a17a01-0000-4000-8000-000000000002",
       "name": "intake disclosure",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         500,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.cve_id",
+              "name": "in.cve_id",
+              "value": "={{$workflow.variables.cve_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.report_source",
+              "name": "in.report_source",
+              "value": "={{$workflow.variables.report_source}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.vuln_disclosure_intake@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.vulnerability_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.vuln_disclosure_sla@v1, kri.cvd_intake_aging@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Receive an inbound vulnerability disclosure through the operator's coordinated disclosure channel (security.txt mailbox, advisory feed, CVE webhook, or internal scanner finding). Acknowledge the reporter where applicable per the operator's CVD policy and the CRA single-point-of-contact obligation, persist the raw submission, stamp __cve_id__ on the case, and emit an OCSF Vulnerability Finding event so downstream consumers (metrics, SIEM, ticketing) can pick the case up off a single telemetry channel.",
       "notesInFlow": true
     },
     {
       "id": "action--01a17a01-0000-4000-8000-000000000003",
       "name": "triage and asset correlation",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         760,
         240
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "out.severity",
+              "name": "out.severity",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.cvss_vector",
+              "name": "out.cvss_vector",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.epss_score",
+              "name": "out.epss_score",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.asset_ref",
+              "name": "out.asset_ref",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.sbom_capture@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.vulnerability_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.releases_without_sbom@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Score the disclosure with CVSS (v3.1 / v4.0) and EPSS, derive the __severity__ band, and correlate the affected component against the operator's asset inventory and SBOM (PURL lookup). Outputs __severity__, __cvss_vector__, __epss_score__, and __asset_ref__. The SBOM lookup is the link between this playbook and the CRA Annex I \u00a72(1) SBOM obligation \u2014 cases on releases that lack an SBOM record are counted against the releases-without-SBOM KRI so the gap is visible to the operator.",
       "notesInFlow": true
     },
     {
       "id": "action--01a17a01-0000-4000-8000-000000000004",
       "name": "assess CRA reporting trigger",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         1020,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.cve_id",
+              "name": "in.cve_id",
+              "value": "={{$workflow.variables.cve_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.cvss_vector",
+              "name": "in.cvss_vector",
+              "value": "={{$workflow.variables.cvss_vector}}",
+              "type": "string"
+            },
+            {
+              "id": "in.epss_score",
+              "name": "in.epss_score",
+              "value": "={{$workflow.variables.epss_score}}",
+              "type": "string"
+            },
+            {
+              "id": "out.actively_exploited",
+              "name": "out.actively_exploited",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_timeline_signals@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.vulnerability_finding@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Determine whether the disclosure trips the CRA Article 14(1) actively-exploited clock (in-the-wild exploitation evidence \u2014 public PoC, observed activity, vendor confirmation) or the Article 14(3) severe-incident clock. Sets __actively_exploited__. The incident-timeline-signals control is the contract for the timestamp set the regulator submissions consume.",
       "notesInFlow": true
     },
@@ -137,13 +263,55 @@
     {
       "id": "action--01a17a01-0000-4000-8000-000000000006",
       "name": "regulator-notification chain (CRA Art. 14)",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         1540,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.actively_exploited",
+              "name": "in.actively_exploited",
+              "value": "={{$workflow.variables.actively_exploited}}",
+              "type": "string"
+            },
+            {
+              "id": "in.cve_id",
+              "name": "in.cve_id",
+              "value": "={{$workflow.variables.cve_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.severity",
+              "name": "in.severity",
+              "value": "={{$workflow.variables.severity}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.cra_submission_templates@v1, control.incident_timeline_signals@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.vulnerability_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.cra_early_warning_on_time@v1, kpi.cra_notification_72h_on_time@v1, kpi.cra_final_report_on_time@v1, kpi.cra_severe_incident_on_time@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Emit the CRA Article 14 regulator-notification chain: the 24-hour early-warning notification to the coordinator CSIRT + ENISA, the 72-hour notification with the corrective / mitigating measures the operator has taken or recommended, and the 14-day final report after a corrective measure becomes available. The submission-template control is the contract for the payload shape; the timeline-signals control is the contract for the timestamp set the submissions consume. Hands control to the severity switch so the technical response runs in series after the regulator notifications are dispatched.",
       "notesInFlow": true
     },
@@ -169,52 +337,136 @@
     {
       "id": "action--01a17a01-0000-4000-8000-000000000008",
       "name": "response: critical \u2014 patch and advisory",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         2060,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.patch_evidence@v1, control.vuln_disclosure_intake@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.vulnerability_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.patch_disseminated_on_time@v1, kpi.mttr_critical@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Critical-severity response: page the response team, ship the security update across affected releases for the duration of the support period free of charge per CRA Annex I \u00a72(7), and emit a public advisory to users. Records the dissemination event against the patch-dissemination KPI and the critical-MTTR clock.",
       "notesInFlow": true
     },
     {
       "id": "action--01a17a01-0000-4000-8000-000000000009",
       "name": "response: high \u2014 patch and advisory",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         2320,
         240
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.patch_evidence@v1, control.vuln_disclosure_intake@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.vulnerability_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.patch_disseminated_on_time@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "High-severity response: ship the security update on the operator's high-severity SLA and emit an advisory through the same dissemination channel as the critical branch. Same dissemination KPI; the response latency is measured against the patch-dissemination clock rather than the critical-band MTTR.",
       "notesInFlow": true
     },
     {
       "id": "action--01a17a01-0000-4000-8000-00000000000a",
       "name": "response: scheduled remediation",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         2580,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.patch_evidence@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.vulnerability_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.patch_disseminated_on_time@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Medium / low-severity response: schedule the security update on the operator's standard release cadence and roll the advisory into the next scheduled release note. The CRA Annex I \u00a72(7) obligation to disseminate updates without undue delay is met by the operator's documented release SLA; the patch-dissemination clock measures whether that SLA is held.",
       "notesInFlow": true
     },
     {
       "id": "action--01a17a01-0000-4000-8000-00000000000b",
       "name": "response: accept risk",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         2840,
         240
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.vulnerability_finding@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Informational-severity response: record the disclosure on the case ledger with a documented accept-risk decision and close without paging or scheduling a release. The case still emits an OCSF Vulnerability Finding so the intake-aging KRI sees a closed disposition rather than an open backlog item.",
       "notesInFlow": true
     },
@@ -376,16 +628,16 @@
       "source_playbook_id": "playbook--01a17a01-0000-4000-8000-000000000001"
     },
     "secops_ng_notes": [
-      "step 'action--01a17a01-0000-4000-8000-000000000002': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--01a17a01-0000-4000-8000-000000000003': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--01a17a01-0000-4000-8000-000000000004': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--01a17a01-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--01a17a01-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--01a17a01-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'if-condition--01a17a01-0000-4000-8000-000000000005' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
-      "step 'action--01a17a01-0000-4000-8000-000000000006': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--01a17a01-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'switch-condition--01a17a01-0000-4000-8000-000000000007' (switch-condition): no cases parsed from CACAO source \u2014 emitted Switch node with empty rule set; operator must populate cases in n8n.",
-      "step 'action--01a17a01-0000-4000-8000-000000000008': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--01a17a01-0000-4000-8000-000000000009': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--01a17a01-0000-4000-8000-00000000000a': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--01a17a01-0000-4000-8000-00000000000b': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n."
+      "step 'action--01a17a01-0000-4000-8000-000000000008': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--01a17a01-0000-4000-8000-000000000009': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--01a17a01-0000-4000-8000-00000000000a': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--01a17a01-0000-4000-8000-00000000000b': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
     ]
   }
 }

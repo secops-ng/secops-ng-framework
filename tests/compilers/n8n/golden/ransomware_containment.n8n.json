@@ -64,13 +64,67 @@
     {
       "id": "action--30000000-0000-4000-8000-000000000002",
       "name": "triage signal",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         500,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.signal_id",
+              "name": "in.signal_id",
+              "value": "={{$workflow.variables.signal_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.affected_host",
+              "name": "out.affected_host",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.affected_identity",
+              "name": "out.affected_identity",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.ransomware_confirmed",
+              "name": "out.ransomware_confirmed",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.edr_available",
+              "name": "out.edr_available",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.detection_refs",
+              "name": "x_secops_ng.detection_refs",
+              "value": "detection.sigma.shadow_copies_deletion@v1, detection.sigma.shadow_copy_deletion_wmi_powershell@v1, detection.sigma.ransomware_file_extension_rename@v1, detection.sigma.wbadmin_backup_deletion@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.process_activity@v1, telemetry.ocsf.file_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.mttd_ransomware@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Receive the originating detection signal and hydrate it with host, identity, and process context. Decide whether the signal is a confirmed ransomware event or a benign / out-of-scope alert. Produces __affected_host__, __affected_identity__, and __ransomware_confirmed__.",
       "notesInFlow": true
     },
@@ -145,65 +199,257 @@
     {
       "id": "action--30000000-0000-4000-8000-000000000005",
       "name": "endpoint isolation \u2014 EDR isolate",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         1280,
         240
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.affected_host",
+              "name": "in.affected_host",
+              "value": "={{$workflow.variables.affected_host}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.detection_refs",
+              "name": "x_secops_ng.detection_refs",
+              "value": "detection.sigma.shadow_copies_deletion@v1, detection.sigma.ransomware_file_extension_rename@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.endpoint_isolation@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.process_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.mttr_containment@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Issue the EDR-vendor isolate action against __affected_host__ via the operator's pre-bound EDR agent. Bounded by the operator-supplied authorisation policy. Primary path.",
       "notesInFlow": true
     },
     {
       "id": "action--30000000-0000-4000-8000-000000000006",
       "name": "endpoint isolation \u2014 network ACL deny (fallback)",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         1540,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.affected_host",
+              "name": "in.affected_host",
+              "value": "={{$workflow.variables.affected_host}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.network_egress_filtering@v1, control.endpoint_isolation@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.network_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.mttr_containment@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "EDR fallback: deny all ingress/egress for __affected_host__ at the operator's network chokepoint (firewall rule, switchport disable, or SDN policy). Used when the EDR agent is unreachable or absent.",
       "notesInFlow": true
     },
     {
       "id": "action--30000000-0000-4000-8000-000000000007",
       "name": "identity revocation",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         1800,
         240
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.affected_identity",
+              "name": "in.affected_identity",
+              "value": "={{$workflow.variables.affected_identity}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.detection_refs",
+              "name": "x_secops_ng.detection_refs",
+              "value": "detection.sigma.overpass_the_hash@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.identity_revocation@v1, control.session_token_revocation@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.authentication@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.mttr_containment@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Disable the implicated user account, revoke active sessions, and invalidate refresh/access tokens at the operator's IdP. Includes Kerberos TGT invalidation where supported. Targets __affected_identity__.",
       "notesInFlow": true
     },
     {
       "id": "action--30000000-0000-4000-8000-000000000008",
       "name": "backup verification",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         2060,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "out.latest_known_good_snapshot",
+              "name": "out.latest_known_good_snapshot",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.snapshot_integrity_ok",
+              "name": "out.snapshot_integrity_ok",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.detection_refs",
+              "name": "x_secops_ng.detection_refs",
+              "value": "detection.sigma.wbadmin_backup_deletion@v1, detection.sigma.shadow_copies_deletion@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.backup_integrity_verification@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.file_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.backup_integrity_pass_rate@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Locate the most recent known-good backup snapshot that pre-dates the event window and verify its integrity hash against the backup-catalogue record. Produces __latest_known_good_snapshot__ and __snapshot_integrity_ok__. Does NOT restore \u2014 restore is a separate, out-of-scope recovery playbook.",
       "notesInFlow": true
     },
     {
       "id": "action--30000000-0000-4000-8000-000000000009",
       "name": "comms plan",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         2320,
         240
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.affected_host",
+              "name": "in.affected_host",
+              "value": "={{$workflow.variables.affected_host}}",
+              "type": "string"
+            },
+            {
+              "id": "in.affected_identity",
+              "name": "in.affected_identity",
+              "value": "={{$workflow.variables.affected_identity}}",
+              "type": "string"
+            },
+            {
+              "id": "in.latest_known_good_snapshot",
+              "name": "in.latest_known_good_snapshot",
+              "value": "={{$workflow.variables.latest_known_good_snapshot}}",
+              "type": "string"
+            },
+            {
+              "id": "in.snapshot_integrity_ok",
+              "name": "in.snapshot_integrity_ok",
+              "value": "={{$workflow.variables.snapshot_integrity_ok}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_notification@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.incident_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.notification_sla_compliance@v1, kri.regulator_notification_overrun@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Notify the IR lead and comms officer along the operator's pre-bound channels, and draft the regulator early-warning pre-notification per NIS2 Article 23 within the 24-hour clock from initial detection. The drafted notification is staged for human sign-off, not auto-sent.",
       "notesInFlow": true
     },
@@ -359,14 +605,14 @@
       "source_playbook_id": "playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8"
     },
     "secops_ng_notes": [
-      "step 'action--30000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'if-condition--30000000-0000-4000-8000-000000000003' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
       "step 'if-condition--30000000-0000-4000-8000-000000000004' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
-      "step 'action--30000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--30000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--30000000-0000-4000-8000-000000000007': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--30000000-0000-4000-8000-000000000008': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
-      "step 'action--30000000-0000-4000-8000-000000000009': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n."
+      "step 'action--30000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000007': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000008': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000009': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
     ]
   }
 }

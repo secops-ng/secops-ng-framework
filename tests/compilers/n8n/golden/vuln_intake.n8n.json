@@ -34,13 +34,43 @@
     {
       "id": "action--22222222-2222-4222-8222-222222222222",
       "name": "enrich finding",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         500,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.finding_id",
+              "name": "in.finding_id",
+              "value": "={{$workflow.variables.finding_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.severity",
+              "name": "out.severity",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.detection_refs",
+              "name": "x_secops_ng.detection_refs",
+              "value": "detection.sigma.vuln.cve_advisory_seen@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.vulnerability_finding@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Pull asset, owner, and exposure context for the finding.",
       "notesInFlow": true
     },
@@ -81,13 +111,31 @@
     {
       "id": "action--44444444-4444-4444-8444-444444444444",
       "name": "open critical ticket",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         1020,
         420
       ],
-      "parameters": {},
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.nis2.art21.risk_management@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "metric.mttr.vuln_critical@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
       "notes": "Open a P1 ticket with the asset owner and link the advisory.",
       "notesInFlow": true
     },
@@ -200,9 +248,9 @@
       "source_playbook_id": "playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
     },
     "secops_ng_notes": [
-      "step 'action--22222222-2222-4222-8222-222222222222': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--22222222-2222-4222-8222-222222222222': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'if-condition--33333333-3333-4333-8333-333333333333' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
-      "step 'action--44444444-4444-4444-8444-444444444444': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n.",
+      "step 'action--44444444-4444-4444-8444-444444444444': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--55555555-5555-4555-8555-555555555555': action with no commands \u2014 emitted as no-op placeholder. Operator must wire the work in n8n."
     ]
   }
