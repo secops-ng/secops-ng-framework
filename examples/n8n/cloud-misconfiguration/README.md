@@ -17,48 +17,70 @@ Canonical CACAO playbook:
 Scenario, workflow, regulatory anchors (NIS2 Article 21(2)(e) / 21(2)(i),
 DORA Articles 6 and 9), control / metric / telemetry bindings, and the
 operator-supplied bindings are documented in that folder's `README.md`.
-This folder holds only the *emitted* artifact and the command used to
-produce it.
+This folder holds the *emitted* artifact, a co-located byte-identical
+copy of the CACAO source for easy diff inspection, and the regeneration
+script.
 
 ## Layout
 
-| Path             | Source compiler | Format            |
-|------------------|-----------------|-------------------|
-| `workflow.json`  | `compilers.n8n` | n8n workflow JSON |
+| Path                  | Source compiler | Format            |
+|-----------------------|-----------------|-------------------|
+| `playbook.cacao.json` | (input mirror)  | CACAO v2 JSON     |
+| `workflow.json`       | `compilers.n8n` | n8n workflow JSON |
+| `regenerate.sh`       | (tooling)       | bash script       |
+
+## How to import
+
+1. In your own n8n instance, open the workflows list and choose
+   **Import from File**.
+2. Select `workflow.json` from this directory.
+3. n8n loads the nodes wired into the topology described in the
+   canonical playbook. The workflow is **inactive** by default —
+   review and bind it to your own connectors before activating.
+
+The emitted workflow is a *snapshot of intent*, not a runnable
+playbook. The Set nodes carry the CACAO I/O contract (`in_args` /
+`out_args`) plus the `x_secops_ng` reference bundles (control,
+detection, telemetry, metric) as editable assignments; binding those
+rows to real connectors is the operator's job.
 
 ## Regeneration
 
 The n8n emitter is deterministic: same input bytes in, same output
-bytes out. To regenerate this folder from a clean checkout:
+bytes out. From the repo root:
+
+    ./examples/n8n/cloud-misconfiguration/regenerate.sh
+
+The script mirrors the canonical CACAO source into this folder and
+re-emits `workflow.json` via `tools.compile --target n8n`. Equivalent
+direct invocation:
 
     PYTHONPATH=. python -m tools.compile \
         content/playbooks/cloud-misconfiguration/playbook.cacao.json \
         --target n8n \
         --out examples/n8n/cloud-misconfiguration/workflow.json
 
-The entry point is the unified `tools.compile` CLI with
-`--target n8n`. The canonical playbook under
+The canonical playbook under
 `content/playbooks/cloud-misconfiguration/playbook.cacao.json` is the
-single source; this example is a hand-checked snapshot of the emitter
-output that mirrors its structure one-to-one (one n8n node per CACAO
-action, node ids and labels copied from the CACAO source).
-
-Re-running the command yields byte-identical output. The
-`tests/examples/cloud_misconfiguration/test_n8n_workflow.py` suite pins
-this invariant alongside a node-id ↔ CACAO-action-id parity check so
-accidental drift surfaces in review, not in an operator's runtime.
+single source. The
+`tests/examples/cloud_misconfiguration/test_n8n_workflow.py` suite
+pins the byte-identical drift guard, the node-id ↔ CACAO-action-id
+parity check, and the post Set-node-uplift semantic checks
+(`in_args` / `out_args` surfacing, `x_secops_ng` reference
+pass-through, no empty-assignment Set nodes, `noOp` reserved for the
+`end` sentinel).
 
 ## Mirroring policy
 
 The mapping from CACAO to n8n is the same one the compiler implements:
 
-| CACAO step type    | n8n node type                        |
-|--------------------|--------------------------------------|
-| `start`            | `n8n-nodes-base.manualTrigger`       |
-| `action`           | `n8n-nodes-base.noOp` (placeholder)  |
-| `if-condition`     | `n8n-nodes-base.if`                  |
-| `switch-condition` | `n8n-nodes-base.switch`              |
-| `end`              | `n8n-nodes-base.noOp`                |
+| CACAO step type    | n8n node type                                       |
+|--------------------|-----------------------------------------------------|
+| `start`            | `n8n-nodes-base.manualTrigger`                      |
+| `action` (no cmds) | `n8n-nodes-base.set` (carries CACAO I/O + refs)     |
+| `if-condition`     | `n8n-nodes-base.if`                                 |
+| `switch-condition` | `n8n-nodes-base.switch`                             |
+| `end`              | `n8n-nodes-base.noOp`                               |
 
 Node ids preserve the CACAO step id verbatim so the two artifacts can
 be cross-referenced by id alone. Node labels mirror the CACAO step
@@ -67,11 +89,12 @@ becomes n8n `connections` edges.
 
 ## What this example does not do
 
-The n8n reference compiler translates **structure**, not **business
-logic**. The emitted workflow carries the topology of the playbook
-(steps, transitions, conditional routing) plus the lossy-translation
-notes recorded by the compiler under `meta.secops_ng_notes`. It does
-not carry:
+The n8n reference compiler translates **structure** and the
+**CACAO I/O contract**, not **business logic**. The emitted workflow
+carries the topology of the playbook (steps, transitions, conditional
+routing), the per-step `in_args` / `out_args` and the `x_secops_ng`
+reference bundles as Set rows, plus the lossy-translation notes
+recorded under `meta.secops_ng_notes`. It does not carry:
 
 - Operator-bound bindings (CSPM / posture-management platform, cloud
   inventory and ownership graph, ticketing / chat / paging channel,
@@ -86,22 +109,9 @@ not carry:
   carries only the steps that emit against it, not the metric itself.
 
 Where a CACAO step expresses intent the target runtime cannot encode
-(an `action` with no machine-readable `commands`, an `if-condition`
-with no machine-readable expression, etc.), the emitter inserts an
-explicit placeholder node and records the gap in
-`meta.secops_ng_notes` so a human integrator sees exactly what they
-still need to wire.
-
-## Future compiler-driven emission
-
-Today this example is produced by the unified `tools.compile` CLI
-(`--target n8n`), which calls into `compilers/n8n/emit.py`. Future
-work will fold this example into the same compiler-driven emission
-contract as the other worked examples — regenerated from the canonical
-CACAO source on every test run rather than maintained as a checked-in
-snapshot. Until that lands, the drift guard in
-`tests/examples/cloud_misconfiguration/test_n8n_workflow.py` plays
-the role.
+(an `if-condition` with no machine-readable expression, etc.), the
+emitter records the gap in `meta.secops_ng_notes` so a human
+integrator sees exactly what they still need to wire.
 
 ## Sovereignty note
 
