@@ -29,7 +29,7 @@ SOURCE = (
     / "playbook.cacao.json"
 )
 N8N_GOLDEN = (
-    REPO_ROOT / "examples" / "n8n" / "identity-compromise" / "workflow.json"
+    REPO_ROOT / "examples" / "n8n" / "identity-compromise" / "workflow.n8n.json"
 )
 TEMPORAL_GOLDEN = (
     REPO_ROOT
