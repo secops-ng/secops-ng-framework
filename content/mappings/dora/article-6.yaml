@@ -1,0 +1,37 @@
+# DORA — Article 6 (ICT risk-management framework), Chapter II.
+# Companion to article-5.yaml (governance and organisation),
+# article-9-and-rts-vuln-mgmt.yaml (Art.9(4)(a) vulnerability and patch
+# management), and article-19-and-28.yaml (Art.17–19 incident reporting
+# + Art.28/30 third-party risk). Articles 7, 8, 10, 11 land in the
+# follow-on CORE-systems file; Articles 12–14 land in the EXTEND-recovery
+# file. Out of scope for this file: Art.15+ digital operational
+# resilience testing, Art.17+ incident classification and reporting,
+# Art.28+ third-party risk.
+regime: dora
+entries:
+  - id: dora:art-6-framework
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "6"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Establish, document and maintain a sound, comprehensive and
+      well-documented ICT risk-management framework that is part of the
+      overall risk-management system, is reviewed at least annually and
+      upon the occurrence of major ICT-related incidents, and is subject
+      to audit by ICT auditors on a regular basis.
+    status: draft
+    control_refs:
+      - control.ict_risk_framework_review@v1
+      - control.control_effectiveness_test@v1
+    playbook_refs: []
+    metric_refs:
+      - kri.control_effectiveness@v1
+      - kpi.control_effectiveness_coverage@v1
+      - kri.overdue_effectiveness_tests@v1
+    notes: >-
+      Audit-by-ICT-auditors is documentary. The agentic slice is
+      capturing dated evidence that the annual review actually ran and
+      that material findings were tracked to closure.

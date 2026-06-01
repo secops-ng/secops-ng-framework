@@ -1,0 +1,35 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.ict_risk_governance@v1
+title: ICT risk governance
+summary: >-
+  Operator establishes an internal governance and control framework for
+  ICT risk with the management body bearing ultimate responsibility,
+  clear roles for ICT functions, and an approved review cadence.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "PM-2"
+    title: "Information Security Program Leadership Role"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "PM-29"
+    title: "Risk Management Program Leadership Roles"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.5.2"
+    title: "Information security roles and responsibilities"
+  - catalog: "DORA Article 5"
+    control_id: "art-5"
+    title: "Governance and organisation"
+
+d3fend_refs:
+  - d3f_id: D3-OAM
+    technique_name: "Operational Activity Mapping"
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+  captured_at: '2026-06-01'
+  notes: >-
+    Governance text is documentary; the cross-reference layer anchors
+    the management-body responsibility model to the published OSCAL
+    leadership-role controls.

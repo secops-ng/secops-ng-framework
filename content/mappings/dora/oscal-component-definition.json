@@ -4,8 +4,8 @@
     "uuid": "887c786e-5651-55a0-84d9-dd125a54b21f",
     "metadata": {
       "title": "SecOps-NG \u2014 DORA ICT Risk Management & Incident Reporting Component Definition (SKELETON)",
-      "last-modified": "2026-05-31T00:00:00Z",
-      "version": "0.1.0",
+      "last-modified": "2026-06-01T00:00:00Z",
+      "version": "0.2.0-pre",
       "oscal-version": "1.1.2"
     },
     "components": [
@@ -18,8 +18,96 @@
           {
             "uuid": "f2b1f61f-8172-543d-8bf5-81f831d9ae2a",
             "source": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
-            "description": "Coverage of DORA (Regulation (EU) 2022/2554) Article 9 vulnerability and patch management obligations and Articles 18\u201319 ICT-related incident classification and reporting obligations, as mapped in content/mappings/dora/article-9-and-rts-vuln-mgmt.yaml and content/mappings/dora/article-19-and-28.yaml. Third-party-risk obligations (Articles 28+) are out of scope for this skeleton.",
+            "description": "Coverage of DORA (Regulation (EU) 2022/2554) Article 5 governance and organisation, Article 6 ICT risk-management framework, Article 9 vulnerability and patch management obligations, and Articles 18\u201319 ICT-related incident classification and reporting obligations, as mapped in content/mappings/dora/article-5.yaml, article-6.yaml, article-9-and-rts-vuln-mgmt.yaml, and article-19-and-28.yaml. Third-party-risk obligations (Articles 28+) are out of scope for this skeleton.",
             "implemented-requirements": [
+              {
+                "uuid": "bf11bced-760e-516b-9adb-b0d379f06f8d",
+                "control-id": "control.ict_risk_governance-v1",
+                "description": "Establish an internal governance and control framework that ensures effective and prudent management of ICT risk, with the management body bearing ultimate responsibility for the ICT risk-management framework, setting roles and responsibilities for ICT functions, and approving and reviewing the framework at least annually.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.ict_risk_governance@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-5-governance"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "5"
+                  }
+                ]
+              },
+              {
+                "uuid": "eed336c3-b730-588d-9824-7269f1fd79cf",
+                "control-id": "control.risk_management_policy-v1",
+                "description": "Establish an internal governance and control framework that ensures effective and prudent management of ICT risk, with the management body bearing ultimate responsibility for the ICT risk-management framework, setting roles and responsibilities for ICT functions, and approving and reviewing the framework at least annually.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.risk_management_policy@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-5-governance"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "5"
+                  }
+                ]
+              },
+              {
+                "uuid": "5cae2363-7bdd-57e1-b014-3d5766e648f7",
+                "control-id": "control.ict_risk_framework_review-v1",
+                "description": "Establish, document and maintain a sound, comprehensive and well-documented ICT risk-management framework that is part of the overall risk-management system, is reviewed at least annually and upon the occurrence of major ICT-related incidents, and is subject to audit by ICT auditors on a regular basis.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.ict_risk_framework_review@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-6-framework"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "6"
+                  }
+                ]
+              },
+              {
+                "uuid": "d769853f-32ba-5e20-b1b2-a2db55fc5313",
+                "control-id": "control.control_effectiveness_test-v1",
+                "description": "Establish, document and maintain a sound, comprehensive and well-documented ICT risk-management framework that is part of the overall risk-management system, is reviewed at least annually and upon the occurrence of major ICT-related incidents, and is subject to audit by ICT auditors on a regular basis.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.control_effectiveness_test@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-6-framework"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "6"
+                  }
+                ]
+              },
               {
                 "uuid": "84c49ac3-bcdc-5f4e-b74a-0ec47ad8a803",
                 "control-id": "control.vuln_disclosure_intake-v1",
