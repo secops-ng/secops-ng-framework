@@ -42,24 +42,29 @@ cover the in-scope CRA obligations:
   integrity, availability, attack-surface limitation, logging and
   monitoring, and security-update capability;
 - **Annex I §2 vulnerability-handling essential requirements**
-  (SKELETON layer) — SBOM, vulnerability handling, coordinated
+  (CORE layer) — SBOM, vulnerability handling, coordinated
   vulnerability disclosure policy, security update dissemination;
 - **Article 13 manufacturer obligations** (CORE layer) —
   risk assessment (Art.13(2)–(3)), component due diligence
   (Art.13(4)), vulnerability-handling process (Art.13(6)),
   security-update dissemination (Art.13(8)), and single point of
   contact (Art.13(12));
-- **Article 14 reporting obligations** (SKELETON layer) — early-warning
+- **Article 14 reporting obligations** (CORE layer) — early-warning
   (24h), 72-hour notification, final report, severe-incident
   notification to the coordinator CSIRT and ENISA.
 
 Statement text is borrowed verbatim from each YAML entry's `obligation`
 field; `source-entry-id`, `source-control-ref`, and `source-article`
-props preserve the round-trip back to the YAML. D3FEND enrichment and
-EXTEND coverage of additional CRA articles (Art.13(9)–(11) support
-period and labelling, Art.13(16) authorised representative, Annex I §3
-conformance assessment, Art.10 importer and distributor obligations,
-Annex II technical documentation) land in follow-on layers. Schema-validation and YAML-coverage parity are enforced by
+props preserve the round-trip back to the YAML. CORE-tier
+implemented-requirements for Annex I §2 and Article 14 also carry
+`source-d3fend-technique` and `source-d3fend-entry-id` props anchoring
+each obligation to a defensive technique in
+`content/mappings/d3fend/cra.yaml`. EXTEND coverage of additional CRA
+articles (Art.13(9)–(11) support period and labelling, Art.13(16)
+authorised representative, Annex I §3 conformance assessment, Art.10
+importer and distributor obligations, Annex II technical documentation)
+lands in follow-on layers. Schema-validation and YAML-coverage parity
+are enforced by
 `tests/content/test_oscal_cra_component_definition.py` against the
 OSCAL component schema vendored under
 `tests/fixtures/oscal/oscal_component_schema-v1.1.2.json`.

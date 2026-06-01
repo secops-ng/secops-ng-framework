@@ -3,9 +3,9 @@
   "component-definition": {
     "uuid": "a4e76f92-3af9-5347-87ee-8922b702254a",
     "metadata": {
-      "title": "SecOps-NG \u2014 CRA Essential Cybersecurity, Vulnerability Handling & Reporting Component Definition",
-      "last-modified": "2026-06-01T00:00:00Z",
-      "version": "0.2.1",
+      "title": "SecOps-NG — CRA Essential Cybersecurity, Vulnerability Handling & Reporting Component Definition",
+      "last-modified": "2026-06-01T06:45:00Z",
+      "version": "0.2.2",
       "oscal-version": "1.1.2"
     },
     "components": [
@@ -13,12 +13,12 @@
         "uuid": "087ee99e-81b6-5cb3-ab3e-eb688e2bc11d",
         "type": "process-procedure",
         "title": "SecOps-NG",
-        "description": "SecOps-NG is a community-driven Digital Commons of portable security operations content (CACAO playbooks, OSCAL/D3FEND control mappings, OCSF data shapes, KPI/KRI catalog) plus reference compilers to n8n, Temporal, and LangGraph. This component definition exposes how the SecOps-NG content set addresses the CRA essential cybersecurity requirements: Annex I \u00a71 (secure-by-design and secure-by-default product properties), Annex I \u00a72 (vulnerability handling), and the manufacturer obligations of Article 13 (risk assessment, component due diligence, vulnerability-handling process, security-update dissemination, single point of contact), together with the manufacturer reporting obligations to the coordinator CSIRT and ENISA (Article 14).",
+        "description": "SecOps-NG is a community-driven Digital Commons of portable security operations content (CACAO playbooks, OSCAL/D3FEND control mappings, OCSF data shapes, KPI/KRI catalog) plus reference compilers to n8n, Temporal, and LangGraph. This component definition exposes how the SecOps-NG content set addresses the CRA essential cybersecurity requirements: Annex I §1 (secure-by-design and secure-by-default product properties), Annex I §2 (vulnerability handling), and the manufacturer obligations of Article 13 (risk assessment, component due diligence, vulnerability-handling process, security-update dissemination, single point of contact), together with the manufacturer reporting obligations to the coordinator CSIRT and ENISA (Article 14).",
         "control-implementations": [
           {
             "uuid": "89952745-7122-5bb4-bf12-88a64c47a7c6",
             "source": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj",
-            "description": "Coverage of CRA (Regulation (EU) 2024/2847) Annex I \u00a71 essential cybersecurity requirements (secure-by-default configuration, access control, confidentiality, integrity, availability, attack-surface limitation, logging and monitoring, and security-update capability), Annex I \u00a72 vulnerability-handling essential requirements (SBOM, vulnerability handling, coordinated vulnerability disclosure policy, security update dissemination), Article 13 manufacturer obligations (risk assessment, component due diligence, vulnerability-handling process, security-update dissemination, and single point of contact), and Article 14 reporting obligations to the coordinator CSIRT and ENISA (early-warning, 72-hour notification, final report, severe-incident notification), as mapped in content/mappings/cra/annex-i-1-essential-cybersecurity.yaml, content/mappings/cra/article-13.yaml, and content/mappings/cra/article-14-and-annex-i.yaml.",
+            "description": "Coverage of CRA (Regulation (EU) 2024/2847) Annex I §1 essential cybersecurity requirements (secure-by-default configuration, access control, confidentiality, integrity, availability, attack-surface limitation, logging and monitoring, and security-update capability), Annex I §2 vulnerability-handling essential requirements (SBOM, vulnerability handling, coordinated vulnerability disclosure policy, security update dissemination), Article 13 manufacturer obligations (risk assessment, component due diligence, vulnerability-handling process, security-update dissemination, and single point of contact), and Article 14 reporting obligations to the coordinator CSIRT and ENISA (early-warning, 72-hour notification, final report, severe-incident notification), as mapped in content/mappings/cra/annex-i-1-essential-cybersecurity.yaml, content/mappings/cra/article-13.yaml, and content/mappings/cra/article-14-and-annex-i.yaml.",
             "implemented-requirements": [
               {
                 "uuid": "0f737ee9-bb31-56b6-9b7d-1b46ffb682b4",
@@ -38,7 +38,17 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "Annex I \u00a72(1)"
+                    "value": "Annex I §2(1)"
+                  },
+                  {
+                    "name": "source-d3fend-technique",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3f:SoftwareInventory"
+                  },
+                  {
+                    "name": "source-d3fend-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3fend:cra:annex-i-2-sbom:software-inventory"
                   }
                 ]
               },
@@ -60,7 +70,17 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "Annex I \u00a72(2)"
+                    "value": "Annex I §2(2)"
+                  },
+                  {
+                    "name": "source-d3fend-technique",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3f:IncidentResponseAnalysis"
+                  },
+                  {
+                    "name": "source-d3fend-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3fend:cra:annex-i-2-vuln-handling:incident-response-analysis"
                   }
                 ]
               },
@@ -82,7 +102,17 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "Annex I \u00a72(5)"
+                    "value": "Annex I §2(5)"
+                  },
+                  {
+                    "name": "source-d3fend-technique",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3f:IncidentResponseAnalysis"
+                  },
+                  {
+                    "name": "source-d3fend-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3fend:cra:annex-i-2-cvd-policy:incident-response-analysis"
                   }
                 ]
               },
@@ -104,7 +134,17 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "Annex I \u00a72(7)"
+                    "value": "Annex I §2(7)"
+                  },
+                  {
+                    "name": "source-d3fend-technique",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3f:SoftwareUpdate"
+                  },
+                  {
+                    "name": "source-d3fend-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3fend:cra:annex-i-2-security-updates:software-update"
                   }
                 ]
               },
@@ -127,6 +167,16 @@
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "14(1)"
+                  },
+                  {
+                    "name": "source-d3fend-technique",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3f:IncidentResponseAnalysis"
+                  },
+                  {
+                    "name": "source-d3fend-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3fend:cra:art-14-early-warning:incident-response-analysis"
                   }
                 ]
               },
@@ -149,6 +199,16 @@
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "14(1)"
+                  },
+                  {
+                    "name": "source-d3fend-technique",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3f:IncidentResponseAnalysis"
+                  },
+                  {
+                    "name": "source-d3fend-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3fend:cra:art-14-early-warning:incident-response-analysis"
                   }
                 ]
               },
@@ -171,6 +231,16 @@
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "14(2)"
+                  },
+                  {
+                    "name": "source-d3fend-technique",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3f:IncidentResponseAnalysis"
+                  },
+                  {
+                    "name": "source-d3fend-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3fend:cra:art-14-notification-72h:incident-response-analysis"
                   }
                 ]
               },
@@ -193,6 +263,16 @@
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "14(2)"
+                  },
+                  {
+                    "name": "source-d3fend-technique",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3f:IncidentResponseAnalysis"
+                  },
+                  {
+                    "name": "source-d3fend-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3fend:cra:art-14-notification-72h:incident-response-analysis"
                   }
                 ]
               },
@@ -215,6 +295,16 @@
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "14(2)"
+                  },
+                  {
+                    "name": "source-d3fend-technique",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3f:IncidentResponseAnalysis"
+                  },
+                  {
+                    "name": "source-d3fend-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3fend:cra:art-14-final-report:incident-response-analysis"
                   }
                 ]
               },
@@ -237,13 +327,23 @@
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "14(2)"
+                  },
+                  {
+                    "name": "source-d3fend-technique",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3f:IncidentResponseAnalysis"
+                  },
+                  {
+                    "name": "source-d3fend-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3fend:cra:art-14-final-report:incident-response-analysis"
                   }
                 ]
               },
               {
                 "uuid": "1057f64e-c900-561e-af8c-aa77bf3f73e7",
                 "control-id": "control.incident_timeline_signals-v1",
-                "description": "Notify the coordinator CSIRT and ENISA of any severe incident having an impact on the security of the product with digital elements, with early-warning (24h), notification (72h), and final report (1 month) timing analogous to Art. 14(1)\u2013(2).",
+                "description": "Notify the coordinator CSIRT and ENISA of any severe incident having an impact on the security of the product with digital elements, with early-warning (24h), notification (72h), and final report (1 month) timing analogous to Art. 14(1)–(2).",
                 "props": [
                   {
                     "name": "source-control-ref",
@@ -259,13 +359,23 @@
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "14(3)"
+                  },
+                  {
+                    "name": "source-d3fend-technique",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3f:IncidentResponseAnalysis"
+                  },
+                  {
+                    "name": "source-d3fend-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3fend:cra:art-14-severe-incident:incident-response-analysis"
                   }
                 ]
               },
               {
                 "uuid": "c3649df0-9c67-5aed-aff1-c5f453f6782e",
                 "control-id": "control.cra_submission_templates-v1",
-                "description": "Notify the coordinator CSIRT and ENISA of any severe incident having an impact on the security of the product with digital elements, with early-warning (24h), notification (72h), and final report (1 month) timing analogous to Art. 14(1)\u2013(2).",
+                "description": "Notify the coordinator CSIRT and ENISA of any severe incident having an impact on the security of the product with digital elements, with early-warning (24h), notification (72h), and final report (1 month) timing analogous to Art. 14(1)–(2).",
                 "props": [
                   {
                     "name": "source-control-ref",
@@ -281,6 +391,16 @@
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "14(3)"
+                  },
+                  {
+                    "name": "source-d3fend-technique",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3f:IncidentResponseAnalysis"
+                  },
+                  {
+                    "name": "source-d3fend-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "d3fend:cra:art-14-severe-incident:incident-response-analysis"
                   }
                 ]
               },
@@ -302,7 +422,7 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "Annex I \u00a71(b)"
+                    "value": "Annex I §1(b)"
                   }
                 ]
               },
@@ -324,7 +444,7 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "Annex I \u00a71(b)"
+                    "value": "Annex I §1(b)"
                   }
                 ]
               },
@@ -346,7 +466,7 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "Annex I \u00a71(d)"
+                    "value": "Annex I §1(d)"
                   }
                 ]
               },
@@ -368,7 +488,7 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "Annex I \u00a71(d)"
+                    "value": "Annex I §1(d)"
                   }
                 ]
               },
@@ -390,7 +510,7 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "Annex I \u00a71(e)"
+                    "value": "Annex I §1(e)"
                   }
                 ]
               },
@@ -412,7 +532,7 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "Annex I \u00a71(e)"
+                    "value": "Annex I §1(e)"
                   }
                 ]
               },
@@ -434,7 +554,7 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "Annex I \u00a71(f)"
+                    "value": "Annex I §1(f)"
                   }
                 ]
               },
@@ -456,7 +576,7 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "Annex I \u00a71(f)"
+                    "value": "Annex I §1(f)"
                   }
                 ]
               },
@@ -478,7 +598,7 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "Annex I \u00a71(h)"
+                    "value": "Annex I §1(h)"
                   }
                 ]
               },
@@ -500,7 +620,7 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "Annex I \u00a71(h)"
+                    "value": "Annex I §1(h)"
                   }
                 ]
               },
@@ -522,7 +642,7 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "Annex I \u00a71(j)"
+                    "value": "Annex I §1(j)"
                   }
                 ]
               },
@@ -544,7 +664,7 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "Annex I \u00a71(j)"
+                    "value": "Annex I §1(j)"
                   }
                 ]
               },
@@ -566,7 +686,7 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "Annex I \u00a71(l)"
+                    "value": "Annex I §1(l)"
                   }
                 ]
               },
@@ -588,7 +708,7 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "Annex I \u00a71(l)"
+                    "value": "Annex I §1(l)"
                   }
                 ]
               },
@@ -610,7 +730,7 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "Annex I \u00a71(m)"
+                    "value": "Annex I §1(m)"
                   }
                 ]
               },
@@ -632,7 +752,7 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "13(2)\u2013(3)"
+                    "value": "13(2)–(3)"
                   }
                 ]
               },
@@ -654,7 +774,7 @@
                   {
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "13(2)\u2013(3)"
+                    "value": "13(2)–(3)"
                   }
                 ]
               },
