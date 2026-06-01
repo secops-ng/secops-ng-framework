@@ -1,9 +1,12 @@
-"""Schema + coverage tests for the CRA OSCAL component-definition stub.
+"""Schema + coverage tests for the CRA OSCAL component-definition.
 
 Mirrors ``test_oscal_dora_component_definition.py`` and
-``test_oscal_nis2_component_definition.py``. The CRA component covers a
-single source YAML (``article-14-and-annex-i.yaml``). Full coverage of
-that YAML is in scope; there are no deferred entries for this skeleton.
+``test_oscal_nis2_component_definition.py``. The CRA component now
+covers two source YAMLs: ``article-14-and-annex-i.yaml`` (Annex I \u00a72
+vulnerability handling + Art.14 reporting) and
+``annex-i-1-essential-cybersecurity.yaml`` (Annex I \u00a71 secure-by-design
+and secure-by-default product properties). Full coverage of both YAMLs
+is in scope; there are no deferred entries.
 """
 
 from __future__ import annotations
@@ -27,6 +30,7 @@ SCHEMA_PATH = (
 COMPONENT_DEF_PATH = CRA_DIR / "oscal-component-definition.json"
 YAML_PATHS = [
     CRA_DIR / "article-14-and-annex-i.yaml",
+    CRA_DIR / "annex-i-1-essential-cybersecurity.yaml",
 ]
 
 # No entries deferred for the CRA skeleton.
