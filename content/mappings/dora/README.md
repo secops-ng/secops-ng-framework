@@ -52,25 +52,41 @@ Delegated/Implementing Regulations (2024/1772, 2024/1774, 2024/2955,
 Mapping IDs are `dora:art-<n>[-<sub>]` (e.g. `dora:art-19-initial-4h`,
 `dora:art-28-third-party-register`). Slug parts use kebab-case.
 
-## OSCAL component-definition (EXTEND)
+## OSCAL component-definition
 
 `oscal-component-definition.json` is an OSCAL 1.1.2 component-definition
-document mirroring the NIS2 layout. One component (SecOps-NG) carries
-one control-implementation set whose `implemented-requirements` cover
-the in-scope DORA articles for this layer — Article 5 governance,
-Article 6 ICT risk-management framework, Article 7 ICT systems,
-Article 8 identification, Article 9(4)(a) vulnerability and patch
-management, Article 10 detection, Article 11 response and recovery,
-Article 12 backup policies and restoration, Article 13 learning and
-evolving (post-incident review), Article 14 crisis communication, and
-Articles 18–19 (ICT-related incident classification and reporting).
+document mirroring the NIS2 and CRA siblings. One component (SecOps-NG)
+carries one control-implementation set whose `implemented-requirements`
+cover the in-scope DORA articles:
+
+- **Article 5 governance and organisation** (CORE layer) — internal
+  governance and control framework, management-body responsibility,
+  approved review cadence;
+- **Article 6 ICT risk-management framework** (CORE layer) — documented
+  framework with annual review and ICT-auditor cycle;
+- **Article 7 ICT systems, protocols and tools** (CORE layer);
+- **Article 8 identification** (CORE layer);
+- **Article 9(4)(a) vulnerability and patch management** (CORE layer);
+- **Article 10 detection** (CORE layer);
+- **Article 11 response and recovery** (CORE layer);
+- **Article 12 backup policies and restoration** (EXTEND layer);
+- **Article 13 learning and evolving (post-incident review)** (EXTEND
+  layer);
+- **Article 14 crisis communication** (EXTEND layer);
+- **Articles 18–19** (ICT-related incident classification and
+  reporting).
+
 Statement text is borrowed verbatim from each YAML entry's
 `obligation` field; `source-entry-id`, `source-control-ref`, and
 `source-article` props preserve the round-trip back to the YAML.
-Third-party-risk entries (Art. 28+) and a CRA component land in
-follow-on SKELETONs. Schema-validation and YAML-coverage parity are
-enforced by `tests/content/test_oscal_dora_component_definition.py`
-against the OSCAL component schema vendored under
+CORE-tier implemented-requirements for Art.5 and Art.6 also carry
+`source-d3fend-technique` and `source-d3fend-entry-id` props anchoring
+each obligation to a defensive technique in
+`content/mappings/d3fend/dora.yaml`. Third-party-risk entries (Art. 28+)
+land in a follow-on SKELETON. Schema-validation and YAML-coverage
+parity are enforced by
+`tests/content/test_oscal_dora_component_definition.py` against the
+OSCAL component schema vendored under
 `tests/fixtures/oscal/oscal_component_schema-v1.1.2.json`.
 
 ## Companion research

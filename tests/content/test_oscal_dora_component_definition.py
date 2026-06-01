@@ -260,13 +260,91 @@ def test_art5_and_art6_control_refs_resolve_to_control_files(
 
 
 def test_component_definition_version_is_core_release() -> None:
-    """EXTEND layer bumps component-definition version to 0.2.1."""
+    """CORE Art.5/6 D3FEND-prop layer bumps component-definition version to 0.2.2."""
 
     cd = json.loads(COMPONENT_DEF_PATH.read_text())["component-definition"]
-    assert cd["metadata"]["version"] == "0.2.1", (
-        "Art.12/13/14 EXTEND layer must set component-definition version "
-        f"to 0.2.1; got {cd['metadata']['version']!r}"
+    assert cd["metadata"]["version"] == "0.2.2", (
+        "CORE Art.5/6 D3FEND-prop layer must set component-definition version "
+        f"to 0.2.2; got {cd['metadata']['version']!r}"
     )
+
+
+# --- CORE-Art.5/6 D3FEND-prop expansion -------------------------------------
+
+ART_5_6_D3FEND_EXPECTED: dict[tuple[str, str], tuple[str, str]] = {
+    (
+        "dora:art-5-governance",
+        "control.ict_risk_governance@v1",
+    ): (
+        "d3f:OperationalActivityMapping",
+        "d3fend:art-5-governance:operational-activity-mapping",
+    ),
+    (
+        "dora:art-5-governance",
+        "control.risk_management_policy@v1",
+    ): (
+        "d3f:OperationalActivityMapping",
+        "d3fend:art-5-governance:operational-activity-mapping",
+    ),
+    (
+        "dora:art-6-framework",
+        "control.ict_risk_framework_review@v1",
+    ): (
+        "d3f:OperationalActivityMapping",
+        "d3fend:art-6-framework:operational-activity-mapping",
+    ),
+    (
+        "dora:art-6-framework",
+        "control.control_effectiveness_test@v1",
+    ): (
+        "d3f:OperationalActivityMapping",
+        "d3fend:art-6-framework:operational-activity-mapping",
+    ),
+}
+
+
+def test_art5_and_art6_irs_carry_d3fend_props(
+    component_definition: dict,
+) -> None:
+    """Each Art.5/6 IR carries source-d3fend-technique + source-d3fend-entry-id."""
+
+    seen: dict[tuple[str, str], dict[str, str]] = {}
+    components = component_definition["component-definition"]["components"]
+    for component in components:
+        for ci in component.get("control-implementations", []):
+            for ir in ci.get("implemented-requirements", []):
+                props = {p["name"]: p["value"] for p in ir.get("props", []) or []}
+                eid = props.get("source-entry-id")
+                cref = props.get("source-control-ref")
+                key = (eid, cref)
+                if key in ART_5_6_D3FEND_EXPECTED:
+                    seen[key] = props
+
+    for key, (tech, d3eid) in ART_5_6_D3FEND_EXPECTED.items():
+        assert key in seen, f"missing Art.5/6 IR for {key}"
+        props = seen[key]
+        assert props.get("source-d3fend-technique") == tech, (
+            f"d3fend-technique drift for {key}: "
+            f"expected {tech!r}, got {props.get('source-d3fend-technique')!r}"
+        )
+        assert props.get("source-d3fend-entry-id") == d3eid, (
+            f"d3fend-entry-id drift for {key}: "
+            f"expected {d3eid!r}, got {props.get('source-d3fend-entry-id')!r}"
+        )
+
+
+def test_art5_and_art6_d3fend_entry_ids_resolve_to_d3fend_yaml() -> None:
+    """Each referenced D3FEND entry-id appears in content/mappings/d3fend/dora.yaml."""
+
+    d3fend_path = REPO_ROOT / "content" / "mappings" / "d3fend" / "dora.yaml"
+    d3fend_yaml = yaml.safe_load(d3fend_path.read_text())
+    d3fend_entry_ids = {e["id"] for e in d3fend_yaml.get("entries", [])}
+
+    for (_eid, _cref), (_tech, d3eid) in ART_5_6_D3FEND_EXPECTED.items():
+        assert d3eid in d3fend_entry_ids, (
+            f"D3FEND entry-id {d3eid!r} referenced by DORA Art.5/6 OSCAL IR "
+            f"not found in {d3fend_path}"
+        )
 
 
 # --- CORE-Art.7/8/10/11 expansion tests -------------------------------------
