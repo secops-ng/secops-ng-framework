@@ -1,0 +1,149 @@
+# CRA — Article 13 obligations of manufacturers.
+# Companion to annex-i-1-essential-cybersecurity.yaml (Annex I §1 secure-by-
+# design/default product properties) and article-14-and-annex-i.yaml
+# (Annex I §2 vulnerability handling + Art.14 reporting). Scope for this
+# file is the risk-assessment and vulnerability-handling tie-in inside
+# Article 13. Out of scope (deferred to later EXTEND layers): Art.13(9)
+# support-period determination, Art.13(10) labelling and user information,
+# Art.13(11) ten-year record retention, Art.13(16) authorised
+# representative, Art.13(19)–(20) market-surveillance cooperation.
+regime: cra
+entries:
+  - id: cra:art-13-risk-assessment
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: 13(2)–(3)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Manufacturers shall undertake an assessment of the cybersecurity
+      risks associated with the product with digital elements and take
+      the outcome of that assessment into account during the planning,
+      design, development, production, delivery and maintenance phases
+      of the product, with a view to minimising cybersecurity risks,
+      preventing security incidents and minimising the impacts of such
+      incidents, including in relation to the health and safety of
+      users.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+      - control.ict_risk_framework_review@v1
+    playbook_refs: []
+    metric_refs: []
+    notes: >-
+      The Art.13(2)–(3) risk assessment is the upstream artefact that
+      Annex I §1 secure-by-default (`cra:annex-i-1-secure-by-default`)
+      already cites as the basis for shipped configuration. The agentic
+      slice is a dated risk-management policy paired with a recurring
+      framework review that shows the assessment remains live across
+      the product lifecycle.
+
+  - id: cra:art-13-component-due-diligence
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: 13(4)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      When placing a product with digital elements on the market,
+      manufacturers shall exercise due diligence when integrating
+      components sourced from third parties so that those components do
+      not compromise the cybersecurity of the product, including when
+      integrating components of free and open-source software that have
+      not been made available on the market in the course of a
+      commercial activity.
+    status: draft
+    control_refs:
+      - control.supplier_inventory@v1
+      - control.provider_attestation@v1
+    playbook_refs: []
+    metric_refs: []
+    notes: >-
+      Component due diligence is operationalised through a dated
+      supplier inventory paired with provider-attestation evidence
+      covering the third-party components — including open-source
+      dependencies — that the product integrates.
+
+  - id: cra:art-13-vuln-handling-process
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: 13(6)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Manufacturers shall systematically document, in a manner that is
+      proportionate to the nature and the cybersecurity risks of the
+      product, relevant cybersecurity aspects concerning the product
+      with digital elements, including vulnerabilities of which they
+      become aware and any relevant information provided by third
+      parties.
+    status: draft
+    control_refs:
+      - control.vuln_disclosure_intake@v1
+    playbook_refs:
+      - playbook.vuln_intake@v1
+    metric_refs:
+      - kpi.vuln_disclosure_sla@v1
+    notes: >-
+      Art.13(6) is the procedural shell around the Annex I §2
+      vulnerability-handling essential requirements; the vuln-disclosure
+      intake control plus the vulnerability-intake playbook provide the
+      dated record that the process is in place and being exercised.
+
+  - id: cra:art-13-security-updates-distribution
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: 13(8)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Once a security update is available, manufacturers shall
+      disseminate, in particular in cases of incidents resulting from
+      the exploitation of a vulnerability, the available security
+      updates without delay and, except for tailor-made products with
+      digital elements, free of charge, accompanied by advisory
+      messages providing users with the relevant information, including
+      on potential action to be taken.
+    status: draft
+    control_refs:
+      - control.patch_evidence@v1
+    playbook_refs:
+      - playbook.vuln_intake@v1
+    metric_refs:
+      - kpi.patch_disseminated_on_time@v1
+    notes: >-
+      The Art.13(8) dissemination obligation is the manufacturer-side
+      twin of Annex I §2(7) (already captured under
+      `cra:annex-i-2-security-updates`); the dated patch-evidence
+      record plus the on-time dissemination KPI surface whether
+      advisory-accompanied updates are reaching users on the clock.
+
+  - id: cra:art-13-spoc
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: 13(12)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Manufacturers shall provide a single point of contact to enable
+      users to communicate directly and rapidly with them, including in
+      order to facilitate the reporting of vulnerabilities of the
+      product with digital elements, and shall ensure that that single
+      point of contact is easy to identify by users and available in
+      one of the official languages of the Member States understandable
+      to users.
+    status: draft
+    control_refs:
+      - control.vuln_disclosure_intake@v1
+    playbook_refs: []
+    metric_refs: []
+    notes: >-
+      The Art.13(12) single point of contact reuses the same
+      vulnerability-disclosure intake control as the Annex I §2(5)
+      coordinated-disclosure policy — the agentic slice is the dated
+      record that the public contact channel is live and reachable.

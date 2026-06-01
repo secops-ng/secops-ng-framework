@@ -2,11 +2,14 @@
 
 Mirrors ``test_oscal_dora_component_definition.py`` and
 ``test_oscal_nis2_component_definition.py``. The CRA component now
-covers two source YAMLs: ``article-14-and-annex-i.yaml`` (Annex I \u00a72
-vulnerability handling + Art.14 reporting) and
+covers three source YAMLs: ``article-14-and-annex-i.yaml`` (Annex I \u00a72
+vulnerability handling + Art.14 reporting),
 ``annex-i-1-essential-cybersecurity.yaml`` (Annex I \u00a71 secure-by-design
-and secure-by-default product properties). Full coverage of both YAMLs
-is in scope; there are no deferred entries.
+and secure-by-default product properties), and ``article-13.yaml``
+(manufacturer obligations: risk assessment, component due diligence,
+vulnerability-handling process, security-update dissemination, and
+single point of contact). Full coverage of all three YAMLs is in scope;
+there are no deferred entries.
 """
 
 from __future__ import annotations
@@ -31,6 +34,7 @@ COMPONENT_DEF_PATH = CRA_DIR / "oscal-component-definition.json"
 YAML_PATHS = [
     CRA_DIR / "article-14-and-annex-i.yaml",
     CRA_DIR / "annex-i-1-essential-cybersecurity.yaml",
+    CRA_DIR / "article-13.yaml",
 ]
 
 # No entries deferred for the CRA skeleton.

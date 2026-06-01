@@ -5,7 +5,7 @@
     "metadata": {
       "title": "SecOps-NG \u2014 CRA Essential Cybersecurity, Vulnerability Handling & Reporting Component Definition",
       "last-modified": "2026-06-01T00:00:00Z",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "oscal-version": "1.1.2"
     },
     "components": [
@@ -13,12 +13,12 @@
         "uuid": "087ee99e-81b6-5cb3-ab3e-eb688e2bc11d",
         "type": "process-procedure",
         "title": "SecOps-NG",
-        "description": "SecOps-NG is a community-driven Digital Commons of portable security operations content (CACAO playbooks, OSCAL/D3FEND control mappings, OCSF data shapes, KPI/KRI catalog) plus reference compilers to n8n, Temporal, and LangGraph. This component definition exposes how the SecOps-NG content set addresses the CRA essential cybersecurity requirements: Annex I \u00a71 (secure-by-design and secure-by-default product properties) and Annex I \u00a72 (vulnerability handling), together with the manufacturer reporting obligations to the coordinator CSIRT and ENISA (Article 14).",
+        "description": "SecOps-NG is a community-driven Digital Commons of portable security operations content (CACAO playbooks, OSCAL/D3FEND control mappings, OCSF data shapes, KPI/KRI catalog) plus reference compilers to n8n, Temporal, and LangGraph. This component definition exposes how the SecOps-NG content set addresses the CRA essential cybersecurity requirements: Annex I \u00a71 (secure-by-design and secure-by-default product properties), Annex I \u00a72 (vulnerability handling), and the manufacturer obligations of Article 13 (risk assessment, component due diligence, vulnerability-handling process, security-update dissemination, single point of contact), together with the manufacturer reporting obligations to the coordinator CSIRT and ENISA (Article 14).",
         "control-implementations": [
           {
             "uuid": "89952745-7122-5bb4-bf12-88a64c47a7c6",
             "source": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj",
-            "description": "Coverage of CRA (Regulation (EU) 2024/2847) Annex I \u00a71 essential cybersecurity requirements (secure-by-default configuration, access control, confidentiality, integrity, availability, attack-surface limitation, logging and monitoring, and security-update capability), Annex I \u00a72 vulnerability-handling essential requirements (SBOM, vulnerability handling, coordinated vulnerability disclosure policy, security update dissemination), and Article 14 reporting obligations to the coordinator CSIRT and ENISA (early-warning, 72-hour notification, final report, severe-incident notification), as mapped in content/mappings/cra/annex-i-1-essential-cybersecurity.yaml and content/mappings/cra/article-14-and-annex-i.yaml.",
+            "description": "Coverage of CRA (Regulation (EU) 2024/2847) Annex I \u00a71 essential cybersecurity requirements (secure-by-default configuration, access control, confidentiality, integrity, availability, attack-surface limitation, logging and monitoring, and security-update capability), Annex I \u00a72 vulnerability-handling essential requirements (SBOM, vulnerability handling, coordinated vulnerability disclosure policy, security update dissemination), Article 13 manufacturer obligations (risk assessment, component due diligence, vulnerability-handling process, security-update dissemination, and single point of contact), and Article 14 reporting obligations to the coordinator CSIRT and ENISA (early-warning, 72-hour notification, final report, severe-incident notification), as mapped in content/mappings/cra/annex-i-1-essential-cybersecurity.yaml, content/mappings/cra/article-13.yaml, and content/mappings/cra/article-14-and-annex-i.yaml.",
             "implemented-requirements": [
               {
                 "uuid": "0f737ee9-bb31-56b6-9b7d-1b46ffb682b4",
@@ -611,6 +611,160 @@
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "Annex I \u00a71(m)"
+                  }
+                ]
+              },
+              {
+                "uuid": "44973a2a-f998-5576-a7a2-b0e145ac2dbd",
+                "control-id": "control.risk_management_policy-v1",
+                "description": "Manufacturers shall undertake an assessment of the cybersecurity risks associated with the product with digital elements and take the outcome of that assessment into account during the planning, design, development, production, delivery and maintenance phases of the product, with a view to minimising cybersecurity risks, preventing security incidents and minimising the impacts of such incidents, including in relation to the health and safety of users.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.risk_management_policy@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:art-13-risk-assessment"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "13(2)\u2013(3)"
+                  }
+                ]
+              },
+              {
+                "uuid": "f29b6b7c-a5f1-5272-961b-9b3a4a0404f6",
+                "control-id": "control.ict_risk_framework_review-v1",
+                "description": "Manufacturers shall undertake an assessment of the cybersecurity risks associated with the product with digital elements and take the outcome of that assessment into account during the planning, design, development, production, delivery and maintenance phases of the product, with a view to minimising cybersecurity risks, preventing security incidents and minimising the impacts of such incidents, including in relation to the health and safety of users.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.ict_risk_framework_review@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:art-13-risk-assessment"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "13(2)\u2013(3)"
+                  }
+                ]
+              },
+              {
+                "uuid": "c2a9256b-3be1-5fe1-8d75-e5a128806db3",
+                "control-id": "control.supplier_inventory-v1",
+                "description": "When placing a product with digital elements on the market, manufacturers shall exercise due diligence when integrating components sourced from third parties so that those components do not compromise the cybersecurity of the product, including when integrating components of free and open-source software that have not been made available on the market in the course of a commercial activity.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.supplier_inventory@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:art-13-component-due-diligence"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "13(4)"
+                  }
+                ]
+              },
+              {
+                "uuid": "16266a25-f97d-5695-84c7-35e62367fa65",
+                "control-id": "control.provider_attestation-v1",
+                "description": "When placing a product with digital elements on the market, manufacturers shall exercise due diligence when integrating components sourced from third parties so that those components do not compromise the cybersecurity of the product, including when integrating components of free and open-source software that have not been made available on the market in the course of a commercial activity.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.provider_attestation@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:art-13-component-due-diligence"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "13(4)"
+                  }
+                ]
+              },
+              {
+                "uuid": "a6c2bfb5-d5fb-5553-a6e6-1d83991332af",
+                "control-id": "control.vuln_disclosure_intake-v1",
+                "description": "Manufacturers shall systematically document, in a manner that is proportionate to the nature and the cybersecurity risks of the product, relevant cybersecurity aspects concerning the product with digital elements, including vulnerabilities of which they become aware and any relevant information provided by third parties.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.vuln_disclosure_intake@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:art-13-vuln-handling-process"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "13(6)"
+                  }
+                ]
+              },
+              {
+                "uuid": "42652c00-4e1a-5106-884d-65d6adce509a",
+                "control-id": "control.patch_evidence-v1",
+                "description": "Once a security update is available, manufacturers shall disseminate, in particular in cases of incidents resulting from the exploitation of a vulnerability, the available security updates without delay and, except for tailor-made products with digital elements, free of charge, accompanied by advisory messages providing users with the relevant information, including on potential action to be taken.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.patch_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:art-13-security-updates-distribution"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "13(8)"
+                  }
+                ]
+              },
+              {
+                "uuid": "c872937e-ccb2-529a-985d-13ef7ede41a9",
+                "control-id": "control.vuln_disclosure_intake-v1",
+                "description": "Manufacturers shall provide a single point of contact to enable users to communicate directly and rapidly with them, including in order to facilitate the reporting of vulnerabilities of the product with digital elements, and shall ensure that that single point of contact is easy to identify by users and available in one of the official languages of the Member States understandable to users.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.vuln_disclosure_intake@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:art-13-spoc"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "13(12)"
                   }
                 ]
               }
