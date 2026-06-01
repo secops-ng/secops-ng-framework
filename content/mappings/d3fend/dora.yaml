@@ -1,0 +1,69 @@
+# D3FEND techniques anchored to DORA obligations.
+#
+# SKELETON — 3 representative entries pulled from the existing
+# content/controls/*.yaml `defensive_techniques_d3fend` blocks. Each entry
+# round-trips through `regulation_refs.entry_id` to a real entry under
+# content/mappings/dora/.
+regime: d3fend
+entries:
+  - id: d3fend:dora:software-update
+    technique:
+      d3fend_id: d3f:SoftwareUpdate
+      technique_name: Software Update
+      url: https://d3fend.mitre.org/technique/d3f:SoftwareUpdate/
+    control_refs:
+      - control.patch_evidence@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: 9(4)(a)
+        entry_id: dora:art-9-vuln-mgmt
+    status: draft
+    notes: >-
+      DORA Art. 9(4)(a) — anchored to the JC RTS on ICT risk management
+      framework (Commission Delegated Regulation (EU) 2024/1774) Art. 10
+      on vulnerability and patch management — relies on dated
+      patch-application evidence. The D3FEND `SoftwareUpdate` technique
+      named in `control.patch_evidence@v1` is the defensive anchor.
+
+  - id: d3fend:dora:system-recovery-analysis
+    technique:
+      d3fend_id: d3f:SystemRecoveryAnalysis
+      technique_name: System Recovery Analysis
+      url: https://d3fend.mitre.org/technique/d3f:SystemRecoveryAnalysis/
+    control_refs:
+      - control.restore_drill@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "12"
+        entry_id: dora:art-12-backup-restore
+    status: draft
+    notes: >-
+      DORA Art. 12 requires backup policies and restoration procedures
+      that are exercised. D3FEND `SystemRecoveryAnalysis` is the
+      defensive technique named in `control.restore_drill@v1`, the
+      periodic restore-drill evidence record.
+
+  - id: d3fend:dora:network-traffic-analysis
+    technique:
+      d3fend_id: d3f:NetworkTrafficAnalysis
+      technique_name: Network Traffic Analysis
+      url: https://d3fend.mitre.org/technique/d3f:NetworkTrafficAnalysis/
+    control_refs:
+      - control.detection_coverage_evidence@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "10"
+        entry_id: dora:art-10-detection
+    status: draft
+    notes: >-
+      DORA Art. 10 requires mechanisms to promptly detect anomalous
+      activities. D3FEND `NetworkTrafficAnalysis` is the defensive
+      anchor named in `control.detection_coverage_evidence@v1` — the
+      dated record that the detection stack is producing the expected
+      signal classes.
