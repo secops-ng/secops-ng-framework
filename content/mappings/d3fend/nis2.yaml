@@ -1,0 +1,69 @@
+# D3FEND techniques anchored to NIS2 obligations.
+#
+# SKELETON — 3 representative entries pulled from the existing
+# content/controls/*.yaml `defensive_techniques_d3fend` blocks. Each entry
+# round-trips through `regulation_refs.entry_id` to a real entry in
+# content/mappings/nis2/article-21-and-23.yaml.
+regime: d3fend
+entries:
+  - id: d3fend:nis2:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.incident_handling_capability@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: 21(2)(b)
+        entry_id: nis2:art-21-2-b
+    status: draft
+    notes: >-
+      NIS2 Art. 21(2)(b) requires an incident-handling capability; the
+      D3FEND `IncidentResponseAnalysis` technique is the defensive
+      anchor named by `control.incident_handling_capability@v1` and
+      exercised across the response playbooks.
+
+  - id: d3fend:nis2:multi-factor-authentication
+    technique:
+      d3fend_id: d3f:Multi-factorAuthentication
+      technique_name: Multi-factor Authentication
+      url: https://d3fend.mitre.org/technique/d3f:Multi-factorAuthentication/
+    control_refs:
+      - control.mfa_state_probe@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: 21(2)(j)
+        entry_id: nis2:art-21-2-j
+    status: draft
+    notes: >-
+      NIS2 Art. 21(2)(j) calls out multi-factor authentication among the
+      authentication and secured-communications measures. D3FEND
+      `Multi-factorAuthentication` is the defensive technique named in
+      `control.mfa_state_probe@v1` (dated MFA-state evidence).
+
+  - id: d3fend:nis2:software-inventory
+    technique:
+      d3fend_id: d3f:SoftwareInventory
+      technique_name: Software Inventory
+      url: https://d3fend.mitre.org/technique/d3f:SoftwareInventory/
+    control_refs:
+      - control.sbom_capture@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: 21(2)(e)
+        entry_id: nis2:art-21-2-e
+    status: draft
+    notes: >-
+      NIS2 Art. 21(2)(e) covers security in network and information
+      systems acquisition, development and maintenance — including
+      vulnerability handling and disclosure. D3FEND `SoftwareInventory`
+      is the defensive anchor named in `control.sbom_capture@v1`, the
+      dated SBOM record on which downstream vulnerability handling
+      depends.

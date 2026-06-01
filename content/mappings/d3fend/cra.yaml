@@ -1,0 +1,68 @@
+# D3FEND techniques anchored to CRA obligations.
+#
+# SKELETON — 3 representative entries pulled from the existing
+# content/controls/*.yaml `defensive_techniques_d3fend` blocks. Each entry
+# round-trips through `regulation_refs.entry_id` to a real entry under
+# content/mappings/cra/.
+regime: d3fend
+entries:
+  - id: d3fend:cra:software-inventory
+    technique:
+      d3fend_id: d3f:SoftwareInventory
+      technique_name: Software Inventory
+      url: https://d3fend.mitre.org/technique/d3f:SoftwareInventory/
+    control_refs:
+      - control.sbom_capture@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: Annex I §2(1)
+        entry_id: cra:annex-i-2-sbom
+    status: draft
+    notes: >-
+      CRA Annex I §2(1) requires manufacturers to identify and document
+      vulnerabilities and components of the product, including by
+      drawing up an SBOM. D3FEND `SoftwareInventory` is the defensive
+      anchor named in `control.sbom_capture@v1`.
+
+  - id: d3fend:cra:software-update
+    technique:
+      d3fend_id: d3f:SoftwareUpdate
+      technique_name: Software Update
+      url: https://d3fend.mitre.org/technique/d3f:SoftwareUpdate/
+    control_refs:
+      - control.patch_evidence@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: 13(8)
+        entry_id: cra:art-13-security-updates-distribution
+    status: draft
+    notes: >-
+      CRA Art. 13(8) requires manufacturers to disseminate available
+      security updates without delay. D3FEND `SoftwareUpdate` is the
+      defensive technique named in `control.patch_evidence@v1`, the
+      dated patch-dissemination evidence record.
+
+  - id: d3fend:cra:system-configuration-permissions
+    technique:
+      d3fend_id: d3f:SystemConfigurationPermissions
+      technique_name: System Configuration Permissions
+      url: https://d3fend.mitre.org/technique/d3f:SystemConfigurationPermissions/
+    control_refs:
+      - control.cspm_baseline@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: Annex I §1
+        entry_id: cra:annex-i-1-secure-by-default
+    status: draft
+    notes: >-
+      CRA Annex I §1 secure-by-default requires products to be delivered
+      with a secure-by-default configuration. D3FEND
+      `SystemConfigurationPermissions` is the defensive anchor named in
+      `control.cspm_baseline@v1` — the dated baseline-configuration
+      evidence record.
