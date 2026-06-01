@@ -1,0 +1,293 @@
+{
+  "$schema": "http://csrc.nist.gov/ns/oscal/1.1.2/oscal-component-definition-schema.json",
+  "component-definition": {
+    "uuid": "a4e76f92-3af9-5347-87ee-8922b702254a",
+    "metadata": {
+      "title": "SecOps-NG \u2014 CRA Vulnerability Handling & Reporting Component Definition (SKELETON)",
+      "last-modified": "2026-06-01T00:00:00Z",
+      "version": "0.1.0",
+      "oscal-version": "1.1.2"
+    },
+    "components": [
+      {
+        "uuid": "087ee99e-81b6-5cb3-ab3e-eb688e2bc11d",
+        "type": "process-procedure",
+        "title": "SecOps-NG",
+        "description": "SecOps-NG is a community-driven Digital Commons of portable security operations content (CACAO playbooks, OSCAL/D3FEND control mappings, OCSF data shapes, KPI/KRI catalog) plus reference compilers to n8n, Temporal, and LangGraph. This component definition exposes how the SecOps-NG content set addresses the CRA essential cybersecurity requirements for vulnerability handling (Annex I \u00a72) and the manufacturer reporting obligations to the coordinator CSIRT and ENISA (Article 14).",
+        "control-implementations": [
+          {
+            "uuid": "89952745-7122-5bb4-bf12-88a64c47a7c6",
+            "source": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj",
+            "description": "Coverage of CRA (Regulation (EU) 2024/2847) Annex I \u00a72 vulnerability-handling essential requirements (SBOM, vulnerability handling, coordinated vulnerability disclosure policy, security update dissemination) and Article 14 reporting obligations to the coordinator CSIRT and ENISA (early-warning, 72-hour notification, final report, severe-incident notification), as mapped in content/mappings/cra/article-14-and-annex-i.yaml.",
+            "implemented-requirements": [
+              {
+                "uuid": "0f737ee9-bb31-56b6-9b7d-1b46ffb682b4",
+                "control-id": "control.sbom_capture-v1",
+                "description": "Identify and document vulnerabilities and components contained in the product with digital elements, including by drawing up a software bill of materials in a commonly used and machine-readable format that covers at the very least the top-level dependencies.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.sbom_capture@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:annex-i-2-sbom"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "Annex I \u00a72(1)"
+                  }
+                ]
+              },
+              {
+                "uuid": "3aaf1395-83f9-5164-800f-70a62bf66625",
+                "control-id": "control.vuln_disclosure_intake-v1",
+                "description": "Address and remediate vulnerabilities without delay, including by providing security updates, and document the vulnerability-handling process throughout the support period.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.vuln_disclosure_intake@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:annex-i-2-vuln-handling"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "Annex I \u00a72(2)"
+                  }
+                ]
+              },
+              {
+                "uuid": "c553315c-3359-5abb-b22f-d776f61d79d0",
+                "control-id": "control.vuln_disclosure_intake-v1",
+                "description": "Put in place and enforce a coordinated vulnerability disclosure policy, including a single point of contact for the receipt of information on vulnerabilities from any source.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.vuln_disclosure_intake@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:annex-i-2-cvd-policy"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "Annex I \u00a72(5)"
+                  }
+                ]
+              },
+              {
+                "uuid": "ab5b93c1-5e3c-5bf8-b7b2-8d9915f914e7",
+                "control-id": "control.patch_evidence-v1",
+                "description": "Ensure that, where technically feasible, security updates are disseminated without delay and free of charge for the duration of the support period, accompanied by advisory messages providing users with the relevant information.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.patch_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:annex-i-2-security-updates"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "Annex I \u00a72(7)"
+                  }
+                ]
+              },
+              {
+                "uuid": "473bc184-9e54-56d0-b784-00b483346fb9",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Notify the CSIRT designated as coordinator and ENISA of any actively exploited vulnerability contained in the product without undue delay, and in any event within 24 hours of becoming aware of it (early-warning notification).",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:art-14-early-warning"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "14(1)"
+                  }
+                ]
+              },
+              {
+                "uuid": "e2c720ca-0a47-56c2-9c97-1bb518524071",
+                "control-id": "control.cra_submission_templates-v1",
+                "description": "Notify the CSIRT designated as coordinator and ENISA of any actively exploited vulnerability contained in the product without undue delay, and in any event within 24 hours of becoming aware of it (early-warning notification).",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cra_submission_templates@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:art-14-early-warning"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "14(1)"
+                  }
+                ]
+              },
+              {
+                "uuid": "0682c02c-37f5-5ab2-8df3-d6c5f4226cf6",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Submit a vulnerability notification to the coordinator CSIRT and ENISA within 72 hours of becoming aware of the actively exploited vulnerability, including general information about the product concerned, the nature of the exploitation, and any corrective or mitigating measures the manufacturer has taken or recommended.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:art-14-notification-72h"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "14(2)"
+                  }
+                ]
+              },
+              {
+                "uuid": "1535f33d-969a-51c0-b4dd-002ef705ce8f",
+                "control-id": "control.cra_submission_templates-v1",
+                "description": "Submit a vulnerability notification to the coordinator CSIRT and ENISA within 72 hours of becoming aware of the actively exploited vulnerability, including general information about the product concerned, the nature of the exploitation, and any corrective or mitigating measures the manufacturer has taken or recommended.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cra_submission_templates@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:art-14-notification-72h"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "14(2)"
+                  }
+                ]
+              },
+              {
+                "uuid": "57b1e76a-e7a7-51d9-9966-1371a7f70ae8",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Submit a final report no later than 14 days after a corrective or mitigating measure becomes available, providing a description of the vulnerability, the severity and impact, information on actors that have exploited or could exploit the vulnerability, and details of the corrective measures.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:art-14-final-report"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "14(2)"
+                  }
+                ]
+              },
+              {
+                "uuid": "7b67b930-e4d4-571b-a2ee-5f9420ae7000",
+                "control-id": "control.cra_submission_templates-v1",
+                "description": "Submit a final report no later than 14 days after a corrective or mitigating measure becomes available, providing a description of the vulnerability, the severity and impact, information on actors that have exploited or could exploit the vulnerability, and details of the corrective measures.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cra_submission_templates@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:art-14-final-report"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "14(2)"
+                  }
+                ]
+              },
+              {
+                "uuid": "1057f64e-c900-561e-af8c-aa77bf3f73e7",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Notify the coordinator CSIRT and ENISA of any severe incident having an impact on the security of the product with digital elements, with early-warning (24h), notification (72h), and final report (1 month) timing analogous to Art. 14(1)\u2013(2).",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:art-14-severe-incident"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "14(3)"
+                  }
+                ]
+              },
+              {
+                "uuid": "c3649df0-9c67-5aed-aff1-c5f453f6782e",
+                "control-id": "control.cra_submission_templates-v1",
+                "description": "Notify the coordinator CSIRT and ENISA of any severe incident having an impact on the security of the product with digital elements, with early-warning (24h), notification (72h), and final report (1 month) timing analogous to Art. 14(1)\u2013(2).",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cra_submission_templates@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:art-14-severe-incident"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "14(3)"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

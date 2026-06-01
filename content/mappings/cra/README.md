@@ -29,3 +29,23 @@ per Art. 71).
 ## ID conventions
 
 Mapping IDs are `cra:<slug>` (e.g. `cra:annex-i-1-h`, `cra:art-14-early-warning`).
+
+## OSCAL component-definition (SKELETON)
+
+`oscal-component-definition.json` is a minimal OSCAL 1.1.2
+component-definition document mirroring the NIS2 and DORA siblings. One
+component (SecOps-NG) carries one control-implementation set whose
+`implemented-requirements` cover the in-scope CRA obligations for this
+skeleton — Annex I §2 vulnerability-handling essential requirements
+(SBOM, vulnerability handling, coordinated vulnerability disclosure
+policy, security update dissemination) and Article 14 reporting
+obligations to the coordinator CSIRT and ENISA (early-warning,
+72-hour notification, final report, severe-incident notification).
+Statement text is borrowed verbatim from each YAML entry's `obligation`
+field; `source-entry-id`, `source-control-ref`, and `source-article`
+props preserve the round-trip back to the YAML. D3FEND enrichment and
+CORE/EXTEND coverage of additional CRA articles land in follow-on
+SKELETONs. Schema-validation and YAML-coverage parity are enforced by
+`tests/content/test_oscal_cra_component_definition.py` against the
+OSCAL component schema vendored under
+`tests/fixtures/oscal/oscal_component_schema-v1.1.2.json`.
