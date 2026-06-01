@@ -3,9 +3,9 @@
   "component-definition": {
     "uuid": "60291f68-fd19-5530-9536-2dfcc128db3f",
     "metadata": {
-      "title": "SecOps-NG \u2014 NIS2 Article 21 and 23 Component Definition (SKELETON)",
-      "last-modified": "2026-05-31T00:00:00Z",
-      "version": "0.1.0",
+      "title": "SecOps-NG — NIS2 Article 21 and 23 Component Definition",
+      "last-modified": "2026-06-01T00:00:00Z",
+      "version": "0.2.0",
       "oscal-version": "1.1.2"
     },
     "components": [
@@ -18,10 +18,10 @@
           {
             "uuid": "5cc9ff77-19f6-5021-8615-3b85f30023a7",
             "source": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
-            "description": "Coverage of NIS2 Article 21(2)(a)\u2013(j) risk-management measures and Article 23(4) incident-notification timeline obligations, as mapped in content/mappings/nis2/article-21-and-23.yaml.",
+            "description": "Coverage of NIS2 Article 21(2)(a)–(j) risk-management measures and Article 23(4) incident-notification timeline obligations, as mapped in content/mappings/nis2/article-21-and-23.yaml. One implemented-requirement per mapping entry; multiple control_refs per entry are exposed as repeated source-control-ref props.",
             "implemented-requirements": [
               {
-                "uuid": "6497a286-1302-5320-a02a-31edaa1dca78",
+                "uuid": "164d9252-56bb-512f-992a-677f76d3b7f9",
                 "control-id": "control.risk_management_policy-v1",
                 "description": "Adopt and maintain policies on risk analysis and information system security, including periodic re-assessment with dated ownership.",
                 "props": [
@@ -43,7 +43,7 @@
                 ]
               },
               {
-                "uuid": "914a60ba-8023-54f0-9a6e-aaea27196acc",
+                "uuid": "c70d3f67-e33f-5e56-8d84-8c7437e6962c",
                 "control-id": "control.incident_handling_capability-v1",
                 "description": "Operate an incident-handling capability: detect, triage, contain, remediate, and capture lessons learned for each incident.",
                 "props": [
@@ -65,7 +65,7 @@
                 ]
               },
               {
-                "uuid": "7b03e7eb-28f0-5b39-8256-30f77d54663d",
+                "uuid": "56ce7f1a-2257-5e31-995d-e2667aa16169",
                 "control-id": "control.backup_attestation-v1",
                 "description": "Operate business continuity arrangements (backup management, disaster recovery, crisis management) with evidence of execution and tested restore drills.",
                 "props": [
@@ -74,23 +74,6 @@
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "control.backup_attestation@v1"
                   },
-                  {
-                    "name": "source-entry-id",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "nis2:art-21-2-c"
-                  },
-                  {
-                    "name": "source-article",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "21(2)(c)"
-                  }
-                ]
-              },
-              {
-                "uuid": "ff575e05-87c8-5fa1-a5f6-3708ecb6a1ff",
-                "control-id": "control.restore_drill-v1",
-                "description": "Operate business continuity arrangements (backup management, disaster recovery, crisis management) with evidence of execution and tested restore drills.",
-                "props": [
                   {
                     "name": "source-control-ref",
                     "ns": "https://secops-ng.org/ns/oscal",
@@ -109,7 +92,7 @@
                 ]
               },
               {
-                "uuid": "7220a4dd-01ba-53b9-9bac-611540c671fa",
+                "uuid": "a7e3249b-de89-5e31-8f5f-7460e50edb4e",
                 "control-id": "control.supplier_inventory-v1",
                 "description": "Address supply-chain security including the security characteristics of direct suppliers and service providers, with periodic re-attestation.",
                 "props": [
@@ -118,23 +101,6 @@
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "control.supplier_inventory@v1"
                   },
-                  {
-                    "name": "source-entry-id",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "nis2:art-21-2-d"
-                  },
-                  {
-                    "name": "source-article",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "21(2)(d)"
-                  }
-                ]
-              },
-              {
-                "uuid": "a8c55114-1665-58fa-a0c1-24c873e8df15",
-                "control-id": "control.provider_attestation-v1",
-                "description": "Address supply-chain security including the security characteristics of direct suppliers and service providers, with periodic re-attestation.",
-                "props": [
                   {
                     "name": "source-control-ref",
                     "ns": "https://secops-ng.org/ns/oscal",
@@ -153,9 +119,9 @@
                 ]
               },
               {
-                "uuid": "a113f0c7-71a9-5e4b-9538-f807ac3c76b2",
+                "uuid": "2dc6a2f5-44f1-5414-aeb7-6bbd9963679f",
                 "control-id": "control.sbom_capture-v1",
-                "description": "Security in network and information systems acquisition, development, and maintenance \u2014 including vulnerability handling and disclosure, and SBOM production for releases.",
+                "description": "Security in network and information systems acquisition, development, and maintenance — including vulnerability handling and disclosure, and SBOM production for releases.",
                 "props": [
                   {
                     "name": "source-control-ref",
@@ -163,66 +129,15 @@
                     "value": "control.sbom_capture@v1"
                   },
                   {
-                    "name": "source-entry-id",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "nis2:art-21-2-e"
-                  },
-                  {
-                    "name": "source-article",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "21(2)(e)"
-                  }
-                ]
-              },
-              {
-                "uuid": "1a573fb0-3b71-5a64-a3b8-e2d5461c0440",
-                "control-id": "control.vuln_disclosure_intake-v1",
-                "description": "Security in network and information systems acquisition, development, and maintenance \u2014 including vulnerability handling and disclosure, and SBOM production for releases.",
-                "props": [
-                  {
                     "name": "source-control-ref",
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "control.vuln_disclosure_intake@v1"
                   },
                   {
-                    "name": "source-entry-id",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "nis2:art-21-2-e"
-                  },
-                  {
-                    "name": "source-article",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "21(2)(e)"
-                  }
-                ]
-              },
-              {
-                "uuid": "5fc849cb-413a-5b9b-8c9f-be9f56128fcb",
-                "control-id": "control.cspm_baseline-v1",
-                "description": "Security in network and information systems acquisition, development, and maintenance \u2014 including vulnerability handling and disclosure, and SBOM production for releases.",
-                "props": [
-                  {
                     "name": "source-control-ref",
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "control.cspm_baseline@v1"
                   },
-                  {
-                    "name": "source-entry-id",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "nis2:art-21-2-e"
-                  },
-                  {
-                    "name": "source-article",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "21(2)(e)"
-                  }
-                ]
-              },
-              {
-                "uuid": "6ea37094-9b9c-5165-bd2a-8aefbb3d133e",
-                "control-id": "control.iac_policy_guardrail-v1",
-                "description": "Security in network and information systems acquisition, development, and maintenance \u2014 including vulnerability handling and disclosure, and SBOM production for releases.",
-                "props": [
                   {
                     "name": "source-control-ref",
                     "ns": "https://secops-ng.org/ns/oscal",
@@ -241,7 +156,7 @@
                 ]
               },
               {
-                "uuid": "4c006306-1d51-5be2-8e5a-9ce9989ffa97",
+                "uuid": "1be9d760-d6c0-5e40-85af-74eda6b4964d",
                 "control-id": "control.control_effectiveness_test-v1",
                 "description": "Policies and procedures to assess the effectiveness of cybersecurity risk-management measures, with results archived.",
                 "props": [
@@ -263,7 +178,7 @@
                 ]
               },
               {
-                "uuid": "06a06e58-5d33-5032-8e02-a9056c06cf71",
+                "uuid": "fc5e50f5-6ed7-5075-989e-e04f232b927b",
                 "control-id": "control.training_attestation-v1",
                 "description": "Basic cyber-hygiene practices and cybersecurity training for staff, including phishing-simulation exercises, with completion tracked.",
                 "props": [
@@ -272,23 +187,6 @@
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "control.training_attestation@v1"
                   },
-                  {
-                    "name": "source-entry-id",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "nis2:art-21-2-g"
-                  },
-                  {
-                    "name": "source-article",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "21(2)(g)"
-                  }
-                ]
-              },
-              {
-                "uuid": "10fb41c5-dbd1-55ee-8208-ca81df171a19",
-                "control-id": "control.phishing_simulation-v1",
-                "description": "Basic cyber-hygiene practices and cybersecurity training for staff, including phishing-simulation exercises, with completion tracked.",
-                "props": [
                   {
                     "name": "source-control-ref",
                     "ns": "https://secops-ng.org/ns/oscal",
@@ -307,9 +205,9 @@
                 ]
               },
               {
-                "uuid": "9e7ab040-687e-58e9-b380-7d50d91195bf",
+                "uuid": "36bd3c72-2e35-5108-8a09-eff7edbe1789",
                 "control-id": "control.crypto_policy_inventory-v1",
-                "description": "Policies and procedures regarding the use of cryptography and, where appropriate, encryption \u2014 including key rotation and TLS posture of declared endpoints.",
+                "description": "Policies and procedures regarding the use of cryptography and, where appropriate, encryption — including key rotation and TLS posture of declared endpoints.",
                 "props": [
                   {
                     "name": "source-control-ref",
@@ -317,44 +215,10 @@
                     "value": "control.crypto_policy_inventory@v1"
                   },
                   {
-                    "name": "source-entry-id",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "nis2:art-21-2-h"
-                  },
-                  {
-                    "name": "source-article",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "21(2)(h)"
-                  }
-                ]
-              },
-              {
-                "uuid": "4b507dc9-f47e-58f4-8d61-a696575e960a",
-                "control-id": "control.key_rotation_evidence-v1",
-                "description": "Policies and procedures regarding the use of cryptography and, where appropriate, encryption \u2014 including key rotation and TLS posture of declared endpoints.",
-                "props": [
-                  {
                     "name": "source-control-ref",
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "control.key_rotation_evidence@v1"
                   },
-                  {
-                    "name": "source-entry-id",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "nis2:art-21-2-h"
-                  },
-                  {
-                    "name": "source-article",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "21(2)(h)"
-                  }
-                ]
-              },
-              {
-                "uuid": "3f9ec75f-dcb1-5c50-addd-25c5e62f0714",
-                "control-id": "control.cert_posture_scan-v1",
-                "description": "Policies and procedures regarding the use of cryptography and, where appropriate, encryption \u2014 including key rotation and TLS posture of declared endpoints.",
-                "props": [
                   {
                     "name": "source-control-ref",
                     "ns": "https://secops-ng.org/ns/oscal",
@@ -373,9 +237,9 @@
                 ]
               },
               {
-                "uuid": "50955594-acca-5f63-b13e-8329c209c2d8",
+                "uuid": "e7c9fc42-1090-51d1-929b-73a516e05f14",
                 "control-id": "control.jml_evidence-v1",
-                "description": "Human resources security, access-control policies, and asset management \u2014 including joiner-mover-leaver evidence, privileged-access review cadence, and asset inventory delta capture.",
+                "description": "Human resources security, access-control policies, and asset management — including joiner-mover-leaver evidence, privileged-access review cadence, and asset inventory delta capture.",
                 "props": [
                   {
                     "name": "source-control-ref",
@@ -383,66 +247,15 @@
                     "value": "control.jml_evidence@v1"
                   },
                   {
-                    "name": "source-entry-id",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "nis2:art-21-2-i"
-                  },
-                  {
-                    "name": "source-article",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "21(2)(i)"
-                  }
-                ]
-              },
-              {
-                "uuid": "a95bb32c-6336-5d37-85bf-bd7f0d5011a6",
-                "control-id": "control.privileged_access_review-v1",
-                "description": "Human resources security, access-control policies, and asset management \u2014 including joiner-mover-leaver evidence, privileged-access review cadence, and asset inventory delta capture.",
-                "props": [
-                  {
                     "name": "source-control-ref",
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "control.privileged_access_review@v1"
                   },
                   {
-                    "name": "source-entry-id",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "nis2:art-21-2-i"
-                  },
-                  {
-                    "name": "source-article",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "21(2)(i)"
-                  }
-                ]
-              },
-              {
-                "uuid": "9fbe5a53-f3fc-517f-9cd5-c97d0d13bbf4",
-                "control-id": "control.asset_inventory_delta-v1",
-                "description": "Human resources security, access-control policies, and asset management \u2014 including joiner-mover-leaver evidence, privileged-access review cadence, and asset inventory delta capture.",
-                "props": [
-                  {
                     "name": "source-control-ref",
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "control.asset_inventory_delta@v1"
                   },
-                  {
-                    "name": "source-entry-id",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "nis2:art-21-2-i"
-                  },
-                  {
-                    "name": "source-article",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "21(2)(i)"
-                  }
-                ]
-              },
-              {
-                "uuid": "e4c0f736-8d9f-5291-aa2b-ce07fa7a0f66",
-                "control-id": "control.cloud_identity_least_privilege-v1",
-                "description": "Human resources security, access-control policies, and asset management \u2014 including joiner-mover-leaver evidence, privileged-access review cadence, and asset inventory delta capture.",
-                "props": [
                   {
                     "name": "source-control-ref",
                     "ns": "https://secops-ng.org/ns/oscal",
@@ -461,7 +274,7 @@
                 ]
               },
               {
-                "uuid": "d7dbf287-ae4d-52e4-a2ad-8ff85f60912f",
+                "uuid": "d76fd1d1-a7ae-5727-9398-e13cc70c466a",
                 "control-id": "control.mfa_state_probe-v1",
                 "description": "Use of multi-factor or continuous authentication, secured voice/video and text communications, and secured emergency communications systems inside the entity where appropriate.",
                 "props": [
@@ -470,23 +283,6 @@
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "control.mfa_state_probe@v1"
                   },
-                  {
-                    "name": "source-entry-id",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "nis2:art-21-2-j"
-                  },
-                  {
-                    "name": "source-article",
-                    "ns": "https://secops-ng.org/ns/oscal",
-                    "value": "21(2)(j)"
-                  }
-                ]
-              },
-              {
-                "uuid": "c16e70df-6123-5709-901b-2b301ef4f807",
-                "control-id": "control.oob_channel_probe-v1",
-                "description": "Use of multi-factor or continuous authentication, secured voice/video and text communications, and secured emergency communications systems inside the entity where appropriate.",
-                "props": [
                   {
                     "name": "source-control-ref",
                     "ns": "https://secops-ng.org/ns/oscal",
@@ -505,7 +301,7 @@
                 ]
               },
               {
-                "uuid": "12502945-20a7-51c1-82a6-424429b646ee",
+                "uuid": "5a6ca4bf-7ad6-505f-8805-11cd074f2748",
                 "control-id": "control.incident_timeline_signals-v1",
                 "description": "Submit an early-warning notification to the CSIRT or competent authority without undue delay and in any event within 24 hours of becoming aware of a significant incident, indicating whether the incident is suspected of being caused by unlawful or malicious acts or could have a cross-border impact.",
                 "props": [
@@ -527,7 +323,7 @@
                 ]
               },
               {
-                "uuid": "cb9dab7c-7fed-5f5b-bb01-70e67ae22569",
+                "uuid": "f6ff3ed3-94da-5cb1-8de9-7936f76f80d8",
                 "control-id": "control.incident_timeline_signals-v1",
                 "description": "Submit an incident notification within 72 hours of becoming aware of the significant incident, updating the early-warning information and providing an initial assessment of the incident's severity, impact, and where available indicators of compromise.",
                 "props": [
@@ -549,7 +345,7 @@
                 ]
               },
               {
-                "uuid": "0d0ee3ba-7629-5a4b-bc08-3099b7adf81d",
+                "uuid": "51c7ceb0-1375-50cf-893f-a7cdc03d1b2a",
                 "control-id": "control.incident_timeline_signals-v1",
                 "description": "Submit a final report no later than one month after the incident notification, containing a detailed description of the incident, the type of threat or root cause, applied and ongoing mitigation measures, and where applicable the cross-border impact.",
                 "props": [
