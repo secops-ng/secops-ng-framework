@@ -1,0 +1,38 @@
+# DORA — Article 12 (Backup policies and procedures, restoration and
+# recovery procedures and methods), Chapter II.
+# Companion to article-5.yaml, article-6.yaml, article-7.yaml,
+# article-8.yaml, article-9-and-rts-vuln-mgmt.yaml, article-10.yaml,
+# article-11.yaml, article-13.yaml (learning and evolving),
+# article-14.yaml (crisis communication), and article-19-and-28.yaml.
+# Out of scope for this file: Art.15+ digital operational resilience
+# testing, Art.17+ incident classification and reporting, Art.28+
+# third-party risk.
+regime: dora
+entries:
+  - id: dora:art-12-backup-restore
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "12"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Develop and document backup policies and procedures specifying the
+      scope of the data subject to backup and the minimum frequency,
+      together with restoration and recovery procedures and methods that
+      ensure restoration of ICT systems and data with minimum downtime
+      and limited disruption, with periodic testing of those backup,
+      restoration, and recovery procedures.
+    status: draft
+    control_refs:
+      - control.backup_attestation@v1
+      - control.restore_drill@v1
+    playbook_refs: []
+    metric_refs:
+      - kpi.backup_integrity_pass_rate@v1
+    notes: >-
+      Article 12 is the backup-and-restoration anchor for Chapter II.
+      The agentic slice is the dated backup-attestation record paired
+      with recurring restore-drill evidence showing that the documented
+      RTO/RPO objectives from Article 11 are not just declared but
+      exercised on the data covered by the backup policy.

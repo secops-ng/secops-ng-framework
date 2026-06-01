@@ -21,12 +21,25 @@ in the private repos).
 
 ## Files
 
-- `article-19-and-28.yaml` — Art. 17–19 reporting milestones, Art. 28/30
-  third-party risk register and contractual clauses.
+- `article-5.yaml` — Art. 5 governance and organisation.
+- `article-6.yaml` — Art. 6 ICT risk-management framework.
+- `article-7.yaml` — Art. 7 ICT systems, protocols and tools.
+- `article-8.yaml` — Art. 8 identification (assets, functions,
+  dependencies).
 - `article-9-and-rts-vuln-mgmt.yaml` — Art. 9(4)(a) protection and
   prevention, anchored to the JC RTS on ICT risk management framework
   (Commission Delegated Regulation (EU) 2024/1774) Art. 10
   (Vulnerability and patch management procedures).
+- `article-10.yaml` — Art. 10 detection.
+- `article-11.yaml` — Art. 11 response and recovery.
+- `article-12.yaml` — Art. 12 backup policies and procedures,
+  restoration and recovery procedures and methods.
+- `article-13.yaml` — Art. 13 learning and evolving (post-incident
+  review).
+- `article-14.yaml` — Art. 14 communication (crisis communication
+  plans).
+- `article-19-and-28.yaml` — Art. 17–19 reporting milestones, Art. 28/30
+  third-party risk register and contractual clauses.
 
 ## Citation policy
 
@@ -39,22 +52,25 @@ Delegated/Implementing Regulations (2024/1772, 2024/1774, 2024/2955,
 Mapping IDs are `dora:art-<n>[-<sub>]` (e.g. `dora:art-19-initial-4h`,
 `dora:art-28-third-party-register`). Slug parts use kebab-case.
 
-## OSCAL component-definition (SKELETON)
+## OSCAL component-definition (EXTEND)
 
-`oscal-component-definition.json` is a minimal OSCAL 1.1.2
-component-definition document mirroring the NIS2 layout. One component
-(SecOps-NG) carries one control-implementation set whose
-`implemented-requirements` cover the in-scope DORA articles for this
-skeleton — Article 9(4)(a) (vulnerability and patch management) and
+`oscal-component-definition.json` is an OSCAL 1.1.2 component-definition
+document mirroring the NIS2 layout. One component (SecOps-NG) carries
+one control-implementation set whose `implemented-requirements` cover
+the in-scope DORA articles for this layer — Article 5 governance,
+Article 6 ICT risk-management framework, Article 7 ICT systems,
+Article 8 identification, Article 9(4)(a) vulnerability and patch
+management, Article 10 detection, Article 11 response and recovery,
+Article 12 backup policies and restoration, Article 13 learning and
+evolving (post-incident review), Article 14 crisis communication, and
 Articles 18–19 (ICT-related incident classification and reporting).
 Statement text is borrowed verbatim from each YAML entry's
 `obligation` field; `source-entry-id`, `source-control-ref`, and
 `source-article` props preserve the round-trip back to the YAML.
-Third-party-risk entries (Art. 28+), D3FEND enrichment, and a CRA
-component land in follow-on SKELETONs. Schema-validation and
-YAML-coverage parity are enforced by
-`tests/content/test_oscal_dora_component_definition.py` against the
-OSCAL component schema vendored under
+Third-party-risk entries (Art. 28+) and a CRA component land in
+follow-on SKELETONs. Schema-validation and YAML-coverage parity are
+enforced by `tests/content/test_oscal_dora_component_definition.py`
+against the OSCAL component schema vendored under
 `tests/fixtures/oscal/oscal_component_schema-v1.1.2.json`.
 
 ## Companion research

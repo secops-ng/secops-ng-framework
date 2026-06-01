@@ -3,9 +3,9 @@
   "component-definition": {
     "uuid": "887c786e-5651-55a0-84d9-dd125a54b21f",
     "metadata": {
-      "title": "SecOps-NG \u2014 DORA ICT Risk Management & Incident Reporting Component Definition (CORE)",
+      "title": "SecOps-NG \u2014 DORA ICT Risk Management & Incident Reporting Component Definition (EXTEND)",
       "last-modified": "2026-06-01T00:00:00Z",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "oscal-version": "1.1.2"
     },
     "components": [
@@ -18,7 +18,7 @@
           {
             "uuid": "f2b1f61f-8172-543d-8bf5-81f831d9ae2a",
             "source": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
-            "description": "Coverage of DORA (Regulation (EU) 2022/2554) Chapter II ICT risk-management framework obligations \u2014 Article 5 governance and organisation, Article 6 ICT risk-management framework, Article 7 ICT systems, protocols and tools, Article 8 identification, Article 9 vulnerability and patch management, Article 10 detection, and Article 11 response and recovery \u2014 together with Chapter III ICT-related incident classification and reporting obligations (Articles 18\u201319), as mapped in content/mappings/dora/article-5.yaml, article-6.yaml, article-7.yaml, article-8.yaml, article-9-and-rts-vuln-mgmt.yaml, article-10.yaml, article-11.yaml, and article-19-and-28.yaml. Articles 12\u201314 (further response/recovery, learning, communication) and third-party-risk obligations (Articles 28+) are out of scope for this layer.",
+            "description": "Coverage of DORA (Regulation (EU) 2022/2554) Chapter II ICT risk-management framework obligations \u2014 Article 5 governance and organisation, Article 6 ICT risk-management framework, Article 7 ICT systems, protocols and tools, Article 8 identification, Article 9 vulnerability and patch management, Article 10 detection, Article 11 response and recovery, Article 12 backup policies and restoration, Article 13 learning and evolving (post-incident review), and Article 14 crisis communication \u2014 together with Chapter III ICT-related incident classification and reporting obligations (Articles 18\u201319), as mapped in content/mappings/dora/article-5.yaml, article-6.yaml, article-7.yaml, article-8.yaml, article-9-and-rts-vuln-mgmt.yaml, article-10.yaml, article-11.yaml, article-12.yaml, article-13.yaml, article-14.yaml, and article-19-and-28.yaml. Third-party-risk obligations (Articles 28+) remain out of scope for this layer.",
             "implemented-requirements": [
               {
                 "uuid": "bf11bced-760e-516b-9adb-b0d379f06f8d",
@@ -325,6 +325,94 @@
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "11"
+                  }
+                ]
+              },
+              {
+                "uuid": "57ac653d-d412-58b0-b6b8-f987fec94c3d",
+                "control-id": "control.backup_attestation-v1",
+                "description": "Develop and document backup policies and procedures specifying the scope of the data subject to backup and the minimum frequency, together with restoration and recovery procedures and methods that ensure restoration of ICT systems and data with minimum downtime and limited disruption, with periodic testing of those backup, restoration, and recovery procedures.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.backup_attestation@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-12-backup-restore"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "12"
+                  }
+                ]
+              },
+              {
+                "uuid": "9c27f874-3928-5fcd-a699-ae32ac8e2faa",
+                "control-id": "control.restore_drill-v1",
+                "description": "Develop and document backup policies and procedures specifying the scope of the data subject to backup and the minimum frequency, together with restoration and recovery procedures and methods that ensure restoration of ICT systems and data with minimum downtime and limited disruption, with periodic testing of those backup, restoration, and recovery procedures.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.restore_drill@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-12-backup-restore"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "12"
+                  }
+                ]
+              },
+              {
+                "uuid": "a461eec8-6c73-593e-86b1-3cb263a3edf1",
+                "control-id": "control.post_incident_learning-v1",
+                "description": "Have in place capabilities and staff to gather information on vulnerabilities and cyber threats, ICT-related incidents (in particular cyber-attacks), and analyse their likely impacts on digital operational resilience; conduct post-ICT-related incident reviews after a major ICT-related incident disrupts core activities, analysing the causes of disruption and identifying required improvements to the ICT operations or to the ICT business continuity policy.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.post_incident_learning@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-13-learning-evolving"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "13"
+                  }
+                ]
+              },
+              {
+                "uuid": "666d10d3-78ef-52c2-8940-b167b26d5a45",
+                "control-id": "control.crisis_communication_plan-v1",
+                "description": "Have in place crisis communication plans enabling a responsible disclosure of, at least, major ICT-related incidents or vulnerabilities to clients, counterparts, and the public as appropriate, and implement communication policies for staff and external stakeholders that distinguish between those responsible for managing ICT-related incidents externally and internally, with at least one person tasked with implementing the communication strategy for ICT-related incidents and fulfilling the public and media function for that purpose.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.crisis_communication_plan@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-14-crisis-communication"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "14"
                   }
                 ]
               },
