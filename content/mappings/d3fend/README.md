@@ -27,8 +27,9 @@ the M0 milestone: OSCAL is covered by the per-regulation
 
 - `nis2.yaml` — D3FEND techniques anchored to NIS2 Art. 21(2) /
   Art. 23 entries.
-- `dora.yaml` — D3FEND techniques anchored to DORA Art. 5–14 / Art. 18–19
-  entries.
+- `dora.yaml` — D3FEND techniques anchored to DORA Art. 5–14, Art. 18–19
+  and Art. 28–30 entries (CORE coverage, see file header for the
+  Art. 15–16 / Art. 20–23 / Art. 24–27 / Art. 29 omissions).
 - `cra.yaml` — D3FEND techniques anchored to CRA Annex I §1 / Annex I §2
   / Art. 13 entries.
 
