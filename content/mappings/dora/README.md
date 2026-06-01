@@ -39,6 +39,24 @@ Delegated/Implementing Regulations (2024/1772, 2024/1774, 2024/2955,
 Mapping IDs are `dora:art-<n>[-<sub>]` (e.g. `dora:art-19-initial-4h`,
 `dora:art-28-third-party-register`). Slug parts use kebab-case.
 
+## OSCAL component-definition (SKELETON)
+
+`oscal-component-definition.json` is a minimal OSCAL 1.1.2
+component-definition document mirroring the NIS2 layout. One component
+(SecOps-NG) carries one control-implementation set whose
+`implemented-requirements` cover the in-scope DORA articles for this
+skeleton — Article 9(4)(a) (vulnerability and patch management) and
+Articles 18–19 (ICT-related incident classification and reporting).
+Statement text is borrowed verbatim from each YAML entry's
+`obligation` field; `source-entry-id`, `source-control-ref`, and
+`source-article` props preserve the round-trip back to the YAML.
+Third-party-risk entries (Art. 28+), D3FEND enrichment, and a CRA
+component land in follow-on SKELETONs. Schema-validation and
+YAML-coverage parity are enforced by
+`tests/content/test_oscal_dora_component_definition.py` against the
+OSCAL component schema vendored under
+`tests/fixtures/oscal/oscal_component_schema-v1.1.2.json`.
+
 ## Companion research
 
 See research brief 2026-05-15-dora-incident-reporting.md for the
