@@ -116,7 +116,7 @@ def test_finding_format_includes_referenced_from() -> None:
         control_ref="control.example@v1",
         code="missing_xref_file",
         message="example",
-        referenced_from=("nis2/article-21-and-23.yaml#nis2:art-21-2-a",),
+        referenced_from=("nis2/article-21-2-a.yaml#nis2:art-21-2-a",),
     )
     rendered = f.format()
     assert "control.example@v1" in rendered

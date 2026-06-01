@@ -1,0 +1,28 @@
+# NIS2 — Article 21(2)(i) HR security, access control and asset management.
+# Cross-ref: research brief 2026-05-15-nis2-baseline-mapping.md.
+regime: nis2
+entries:
+  - id: nis2:art-21-2-i
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 21(2)(i)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Human resources security, access-control policies, and asset
+      management — including joiner-mover-leaver evidence,
+      privileged-access review cadence, and asset inventory delta capture.
+    status: draft
+    control_refs:
+      - control.jml_evidence@v1
+      - control.privileged_access_review@v1
+      - control.asset_inventory_delta@v1
+      - control.cloud_identity_least_privilege@v1
+    playbook_refs:
+      - playbook.identity_compromise@v1
+      - playbook.cloud_misconfiguration@v1
+    metric_refs:
+      - kri.orphaned_privileged_accounts@v1
+      - kri.asset_inventory_drift@v1
+      - kpi.cloud_posture_coverage@v1

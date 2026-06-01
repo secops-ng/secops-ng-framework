@@ -1,0 +1,22 @@
+# NIS2 — Article 21(2)(j) authentication and secured communications.
+# Cross-ref: research brief 2026-05-15-nis2-baseline-mapping.md.
+regime: nis2
+entries:
+  - id: nis2:art-21-2-j
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 21(2)(j)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Use of multi-factor or continuous authentication, secured voice/video
+      and text communications, and secured emergency communications systems
+      inside the entity where appropriate.
+    status: draft
+    control_refs:
+      - control.mfa_state_probe@v1
+      - control.oob_channel_probe@v1
+    playbook_refs: []
+    metric_refs:
+      - kri.mfa_coverage_gaps@v1

@@ -1,0 +1,83 @@
+# NIS2 — Article 23 incident-notification timeline (early-warning, 72h notification, final report).
+# Cross-ref: research brief 2026-05-15-nis2-baseline-mapping.md.
+regime: nis2
+entries:
+  - id: nis2:art-23-early-warning
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 23(4)(a)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Submit an early-warning notification to the CSIRT or competent
+      authority without undue delay and in any event within 24 hours of
+      becoming aware of a significant incident, indicating whether the
+      incident is suspected of being caused by unlawful or malicious acts
+      or could have a cross-border impact.
+    status: draft
+    control_refs:
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.ransomware_containment@v1
+      - playbook.data_exfil@v1
+      - playbook.identity_compromise@v1
+      - playbook.on_call_rotation@v1
+    metric_refs:
+      - kpi.early_warning_on_time@v1
+      - kri.early_warning_missed@v1
+      - kpi.notification_sla_compliance@v1
+      - kri.regulator_notification_overrun@v1
+      - kpi.mttr_on_call_ack@v1
+      - kpi.coverage_on_call_schedule@v1
+      - kri.escalation_tier_breach@v1
+    notes: >-
+      On-call rotation is listed here because the page-to-ack latency
+      and rotation coverage are the head of the early-warning clock:
+      an unbound primary slot or a slow ack delays the 24h window
+      regardless of how fast the downstream notification step runs.
+
+  - id: nis2:art-23-notification-72h
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 23(4)(b)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Submit an incident notification within 72 hours of becoming aware of
+      the significant incident, updating the early-warning information and
+      providing an initial assessment of the incident's severity, impact,
+      and where available indicators of compromise.
+    status: draft
+    control_refs:
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.ransomware_containment@v1
+      - playbook.data_exfil@v1
+      - playbook.identity_compromise@v1
+    metric_refs:
+      - kpi.notification_72h_on_time@v1
+      - kpi.notification_sla_compliance@v1
+      - kri.regulator_notification_overrun@v1
+
+  - id: nis2:art-23-final-report
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 23(4)(d)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Submit a final report no later than one month after the incident
+      notification, containing a detailed description of the incident,
+      the type of threat or root cause, applied and ongoing mitigation
+      measures, and where applicable the cross-border impact.
+    status: draft
+    control_refs:
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.post_incident_review@v1
+    metric_refs:
+      - kpi.final_report_on_time@v1
+      - kpi.review_completion_sla@v1

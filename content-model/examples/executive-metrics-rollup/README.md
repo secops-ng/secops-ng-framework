@@ -111,7 +111,7 @@ the documentation cross-link.
   effectiveness of cybersecurity risk-management measures*. The
   rollup is the durable workflow that produces those assessment
   results on a pinned cadence. Wired in
-  `content/mappings/nis2/article-21-and-23.yaml` under
+  `content/mappings/nis2/article-21-2-f.yaml` under
   `nis2:art-21-2-f` with `control_refs: [control.control_effectiveness_test@v1]`
   and `metric_refs: [kpi.control_effectiveness_coverage@v1,
   kri.overdue_effectiveness_tests@v1]`.

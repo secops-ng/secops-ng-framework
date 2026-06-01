@@ -67,7 +67,7 @@ SecOps-NG content model.
   chain. Tracked by `kpi.cra_severe_incident_on_time@v1`.
 - **NIS2 (EU) 2022/2555, Article 21(2)(e)** — vulnerability handling
   and disclosure. Cross-referenced from
-  `content/mappings/nis2/article-21-and-23.yaml`.
+  `content/mappings/nis2/article-21-2-e.yaml`.
 - **DORA (EU) 2022/2554, Article 9** and **Commission Delegated
   Regulation (EU) 2024/1774, Article 10** — ICT risk management
   framework and JC RTS on vulnerability management. Cross-referenced

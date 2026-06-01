@@ -74,7 +74,7 @@ being short-circuited by suppression rules.
 | `kpi.phishing_sim_click_rate@v1`   | NIS2 Article 21(2)(g) — cyber hygiene and training                      |
 | `kri.phishing_suppression_rate@v1` | NIS2 Article 21(2)(b) — false-positive funnel watch                     |
 
-The mapping yaml at `content/mappings/nis2/article-21-and-23.yaml`
+The mapping yaml at `content/mappings/nis2/article-21-2-b.yaml`
 carries these metric IDs in the entries that already point at
 `playbook.phishing_triage@v1` (lines ~41 and ~153). DORA Articles 18 /
 19 are intentionally not folded in here — phishing triage on its own

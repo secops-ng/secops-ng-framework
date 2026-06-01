@@ -27,7 +27,7 @@ SCHEMA_PATH = (
     / "oscal_component_schema-v1.1.2.json"
 )
 COMPONENT_DEF_PATH = NIS2_DIR / "oscal-component-definition.json"
-YAML_PATH = NIS2_DIR / "article-21-and-23.yaml"
+YAML_PATHS = sorted(NIS2_DIR.glob("article-*.yaml"))
 
 
 def _translate_unicode_property_escapes(pattern: str) -> str:
@@ -71,7 +71,13 @@ def component_definition() -> dict:
 
 @pytest.fixture(scope="module")
 def mapping_yaml() -> dict:
-    return yaml.safe_load(YAML_PATH.read_text())
+    """Concatenate per-clause YAMLs into a single doc for coverage assertions."""
+
+    entries: list = []
+    for path in YAML_PATHS:
+        doc = yaml.safe_load(path.read_text()) or {}
+        entries.extend(doc.get("entries", []) or [])
+    return {"regime": "nis2", "entries": entries}
 
 
 def test_schema_validates(schema: dict, component_definition: dict) -> None:
@@ -107,7 +113,7 @@ def test_every_yaml_control_appears_as_implemented_requirement(
 
     missing = expected - seen
     assert not missing, (
-        "control_refs from article-21-and-23.yaml missing from "
+        "control_refs from content/mappings/nis2/article-*.yaml missing from "
         "OSCAL implemented-requirements: " + ", ".join(sorted(missing))
     )
 

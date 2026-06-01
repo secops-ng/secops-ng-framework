@@ -66,7 +66,7 @@ providers, including periodic re-attestation of those characteristics.
 Threat-intel ingest contributes the IOC-driven signal that lets an
 operator detect when a known-bad indicator touches a supplier-adjacent
 surface — feeding the supplier-attestation and re-attestation cadence
-captured at `content/mappings/nis2/article-21-and-23.yaml` under
+captured at `content/mappings/nis2/article-21-2-d.yaml` under
 `nis2:art-21-2-d`.
 
 ### DORA Art. 19(2) — voluntary cyber-threat notification
