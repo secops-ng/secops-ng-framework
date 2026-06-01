@@ -3,9 +3,9 @@
   "component-definition": {
     "uuid": "a4e76f92-3af9-5347-87ee-8922b702254a",
     "metadata": {
-      "title": "SecOps-NG \u2014 CRA Vulnerability Handling & Reporting Component Definition (SKELETON)",
+      "title": "SecOps-NG \u2014 CRA Essential Cybersecurity, Vulnerability Handling & Reporting Component Definition",
       "last-modified": "2026-06-01T00:00:00Z",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "oscal-version": "1.1.2"
     },
     "components": [
@@ -13,12 +13,12 @@
         "uuid": "087ee99e-81b6-5cb3-ab3e-eb688e2bc11d",
         "type": "process-procedure",
         "title": "SecOps-NG",
-        "description": "SecOps-NG is a community-driven Digital Commons of portable security operations content (CACAO playbooks, OSCAL/D3FEND control mappings, OCSF data shapes, KPI/KRI catalog) plus reference compilers to n8n, Temporal, and LangGraph. This component definition exposes how the SecOps-NG content set addresses the CRA essential cybersecurity requirements for vulnerability handling (Annex I \u00a72) and the manufacturer reporting obligations to the coordinator CSIRT and ENISA (Article 14).",
+        "description": "SecOps-NG is a community-driven Digital Commons of portable security operations content (CACAO playbooks, OSCAL/D3FEND control mappings, OCSF data shapes, KPI/KRI catalog) plus reference compilers to n8n, Temporal, and LangGraph. This component definition exposes how the SecOps-NG content set addresses the CRA essential cybersecurity requirements: Annex I \u00a71 (secure-by-design and secure-by-default product properties) and Annex I \u00a72 (vulnerability handling), together with the manufacturer reporting obligations to the coordinator CSIRT and ENISA (Article 14).",
         "control-implementations": [
           {
             "uuid": "89952745-7122-5bb4-bf12-88a64c47a7c6",
             "source": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj",
-            "description": "Coverage of CRA (Regulation (EU) 2024/2847) Annex I \u00a72 vulnerability-handling essential requirements (SBOM, vulnerability handling, coordinated vulnerability disclosure policy, security update dissemination) and Article 14 reporting obligations to the coordinator CSIRT and ENISA (early-warning, 72-hour notification, final report, severe-incident notification), as mapped in content/mappings/cra/article-14-and-annex-i.yaml.",
+            "description": "Coverage of CRA (Regulation (EU) 2024/2847) Annex I \u00a71 essential cybersecurity requirements (secure-by-default configuration, access control, confidentiality, integrity, availability, attack-surface limitation, logging and monitoring, and security-update capability), Annex I \u00a72 vulnerability-handling essential requirements (SBOM, vulnerability handling, coordinated vulnerability disclosure policy, security update dissemination), and Article 14 reporting obligations to the coordinator CSIRT and ENISA (early-warning, 72-hour notification, final report, severe-incident notification), as mapped in content/mappings/cra/annex-i-1-essential-cybersecurity.yaml and content/mappings/cra/article-14-and-annex-i.yaml.",
             "implemented-requirements": [
               {
                 "uuid": "0f737ee9-bb31-56b6-9b7d-1b46ffb682b4",
@@ -281,6 +281,336 @@
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "14(3)"
+                  }
+                ]
+              },
+              {
+                "uuid": "4f37c1e7-e939-57bd-ab44-2f3aa613cdc6",
+                "control-id": "control.cspm_baseline-v1",
+                "description": "Products with digital elements shall be made available on the market with a secure-by-default configuration, including the possibility to reset the product to its original state, on the basis of the risk assessment referred to in Article 13(3).",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cspm_baseline@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:annex-i-1-secure-by-default"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "Annex I \u00a71(b)"
+                  }
+                ]
+              },
+              {
+                "uuid": "8fb82454-6cc3-5bdf-a28b-fb6c7882a7ae",
+                "control-id": "control.iac_policy_guardrail-v1",
+                "description": "Products with digital elements shall be made available on the market with a secure-by-default configuration, including the possibility to reset the product to its original state, on the basis of the risk assessment referred to in Article 13(3).",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.iac_policy_guardrail@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:annex-i-1-secure-by-default"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "Annex I \u00a71(b)"
+                  }
+                ]
+              },
+              {
+                "uuid": "9fda07c6-c918-554f-b7b9-bd568d62ba73",
+                "control-id": "control.cloud_identity_least_privilege-v1",
+                "description": "Products with digital elements shall ensure protection from unauthorised access by appropriate control mechanisms, including but not limited to authentication, identity or access-management systems, and shall report on possible unauthorised access.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cloud_identity_least_privilege@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:annex-i-1-access-control"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "Annex I \u00a71(d)"
+                  }
+                ]
+              },
+              {
+                "uuid": "be96c65f-5392-5a72-8eae-c3c075e734d9",
+                "control-id": "control.mfa_state_probe-v1",
+                "description": "Products with digital elements shall ensure protection from unauthorised access by appropriate control mechanisms, including but not limited to authentication, identity or access-management systems, and shall report on possible unauthorised access.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.mfa_state_probe@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:annex-i-1-access-control"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "Annex I \u00a71(d)"
+                  }
+                ]
+              },
+              {
+                "uuid": "8bfb2c21-163d-5619-9a5f-4f9530581c61",
+                "control-id": "control.crypto_policy_inventory-v1",
+                "description": "Products with digital elements shall protect the confidentiality of stored, transmitted or otherwise processed data, personal or other, including by encrypting relevant data at rest or in transit by state-of-the-art mechanisms, and by using other technical means.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.crypto_policy_inventory@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:annex-i-1-confidentiality"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "Annex I \u00a71(e)"
+                  }
+                ]
+              },
+              {
+                "uuid": "9ec626b7-5960-5b74-bf93-ecb93063cbba",
+                "control-id": "control.key_rotation_evidence-v1",
+                "description": "Products with digital elements shall protect the confidentiality of stored, transmitted or otherwise processed data, personal or other, including by encrypting relevant data at rest or in transit by state-of-the-art mechanisms, and by using other technical means.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.key_rotation_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:annex-i-1-confidentiality"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "Annex I \u00a71(e)"
+                  }
+                ]
+              },
+              {
+                "uuid": "c68e0c2e-3e8c-5bc8-9580-14e6b920b25d",
+                "control-id": "control.cert_posture_scan-v1",
+                "description": "Products with digital elements shall protect the integrity of stored, transmitted or otherwise processed data, personal or other, commands, programs and configuration against any manipulation or modification not authorised by the user, and report on corruptions.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cert_posture_scan@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:annex-i-1-integrity"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "Annex I \u00a71(f)"
+                  }
+                ]
+              },
+              {
+                "uuid": "9bfb4653-6462-5ad7-8829-b0cba83660d9",
+                "control-id": "control.iac_policy_guardrail-v1",
+                "description": "Products with digital elements shall protect the integrity of stored, transmitted or otherwise processed data, personal or other, commands, programs and configuration against any manipulation or modification not authorised by the user, and report on corruptions.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.iac_policy_guardrail@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:annex-i-1-integrity"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "Annex I \u00a71(f)"
+                  }
+                ]
+              },
+              {
+                "uuid": "d029477b-953a-5353-85bb-91338cd589e1",
+                "control-id": "control.backup_attestation-v1",
+                "description": "Products with digital elements shall protect the availability of essential and basic functions, also after an incident, including through resilience and mitigation measures against denial-of- service attacks.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.backup_attestation@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:annex-i-1-availability"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "Annex I \u00a71(h)"
+                  }
+                ]
+              },
+              {
+                "uuid": "aef8a055-b9b6-5526-8dc8-da918e0482b0",
+                "control-id": "control.restore_drill-v1",
+                "description": "Products with digital elements shall protect the availability of essential and basic functions, also after an incident, including through resilience and mitigation measures against denial-of- service attacks.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.restore_drill@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:annex-i-1-availability"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "Annex I \u00a71(h)"
+                  }
+                ]
+              },
+              {
+                "uuid": "10a8899b-166d-5e18-ae08-5fb6b47be137",
+                "control-id": "control.cspm_baseline-v1",
+                "description": "Products with digital elements shall be designed, developed and produced to limit attack surfaces, including external interfaces.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cspm_baseline@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:annex-i-1-attack-surface"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "Annex I \u00a71(j)"
+                  }
+                ]
+              },
+              {
+                "uuid": "f1695e3b-4452-523a-b874-201d4169b237",
+                "control-id": "control.asset_inventory_delta-v1",
+                "description": "Products with digital elements shall be designed, developed and produced to limit attack surfaces, including external interfaces.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.asset_inventory_delta@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:annex-i-1-attack-surface"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "Annex I \u00a71(j)"
+                  }
+                ]
+              },
+              {
+                "uuid": "20923813-d1f8-5f2e-828a-c11e7bcdf75e",
+                "control-id": "control.detection_coverage_evidence-v1",
+                "description": "Products with digital elements shall provide security-related information by recording and monitoring relevant internal activity, including the access to or modification of data, services or functions, with an opt-out mechanism for the user.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.detection_coverage_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:annex-i-1-logging-monitoring"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "Annex I \u00a71(l)"
+                  }
+                ]
+              },
+              {
+                "uuid": "76741b15-e0dd-5a8d-8d5b-8b09978dcae2",
+                "control-id": "control.recurring_incident_correlator-v1",
+                "description": "Products with digital elements shall provide security-related information by recording and monitoring relevant internal activity, including the access to or modification of data, services or functions, with an opt-out mechanism for the user.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.recurring_incident_correlator@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:annex-i-1-logging-monitoring"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "Annex I \u00a71(l)"
+                  }
+                ]
+              },
+              {
+                "uuid": "281f3ff0-99e0-555c-953d-00855cbcbe34",
+                "control-id": "control.patch_evidence-v1",
+                "description": "Products with digital elements shall ensure that vulnerabilities can be addressed through security updates, including, where applicable, through automatic security updates that are installed within an appropriate timeframe enabled as a default setting, with a clear and easy-to-use opt-out mechanism, through the notification of available updates to users, and the option to temporarily postpone them.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.patch_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "cra:annex-i-1-security-updates-capability"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "Annex I \u00a71(m)"
                   }
                 ]
               }

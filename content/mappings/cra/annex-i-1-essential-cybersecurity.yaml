@@ -1,0 +1,204 @@
+# CRA — Annex I Section 1 essential cybersecurity requirements.
+# Companion to article-14-and-annex-i.yaml (Annex I §2 vulnerability
+# handling + Art.14 reporting) and article-13.yaml (manufacturer
+# obligations). Out of scope for this file: Annex I §3 conformance
+# assessment, Art.10 importer/distributor obligations, Annex II
+# technical documentation.
+regime: cra
+entries:
+  - id: cra:annex-i-1-secure-by-default
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §1(b)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Products with digital elements shall be made available on the
+      market with a secure-by-default configuration, including the
+      possibility to reset the product to its original state, on the
+      basis of the risk assessment referred to in Article 13(3).
+    status: draft
+    control_refs:
+      - control.cspm_baseline@v1
+      - control.iac_policy_guardrail@v1
+    playbook_refs:
+      - playbook.cloud_misconfiguration@v1
+    metric_refs: []
+    notes: >-
+      Secure-by-default is operationalised through a documented baseline
+      configuration plus policy-as-code guardrails that show the shipped
+      configuration matches the baseline.
+
+  - id: cra:annex-i-1-access-control
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §1(d)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Products with digital elements shall ensure protection from
+      unauthorised access by appropriate control mechanisms, including
+      but not limited to authentication, identity or access-management
+      systems, and shall report on possible unauthorised access.
+    status: draft
+    control_refs:
+      - control.cloud_identity_least_privilege@v1
+      - control.mfa_state_probe@v1
+    playbook_refs:
+      - playbook.identity_compromise@v1
+    metric_refs: []
+    notes: >-
+      Authentication and least-privilege are the agentic anchors for
+      Annex I §1(d); the JML evidence and privileged-access review tie
+      in via the identity-compromise playbook.
+
+  - id: cra:annex-i-1-confidentiality
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §1(e)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Products with digital elements shall protect the confidentiality
+      of stored, transmitted or otherwise processed data, personal or
+      other, including by encrypting relevant data at rest or in transit
+      by state-of-the-art mechanisms, and by using other technical
+      means.
+    status: draft
+    control_refs:
+      - control.crypto_policy_inventory@v1
+      - control.key_rotation_evidence@v1
+    playbook_refs: []
+    metric_refs: []
+    notes: >-
+      Confidentiality is operationalised through a dated cryptographic
+      protocol inventory paired with key-rotation evidence demonstrating
+      that the declared crypto remains live in production.
+
+  - id: cra:annex-i-1-integrity
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §1(f)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Products with digital elements shall protect the integrity of
+      stored, transmitted or otherwise processed data, personal or
+      other, commands, programs and configuration against any
+      manipulation or modification not authorised by the user, and
+      report on corruptions.
+    status: draft
+    control_refs:
+      - control.cert_posture_scan@v1
+      - control.iac_policy_guardrail@v1
+    playbook_refs: []
+    metric_refs: []
+    notes: >-
+      Integrity is operationalised through certificate-posture evidence
+      (for transmitted data) plus infrastructure-as-code guardrails (for
+      configuration drift) that show unauthorised modification would be
+      detected.
+
+  - id: cra:annex-i-1-availability
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §1(h)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Products with digital elements shall protect the availability of
+      essential and basic functions, also after an incident, including
+      through resilience and mitigation measures against denial-of-
+      service attacks.
+    status: draft
+    control_refs:
+      - control.backup_attestation@v1
+      - control.restore_drill@v1
+    playbook_refs:
+      - playbook.ransomware_containment@v1
+    metric_refs:
+      - kpi.backup_integrity_pass_rate@v1
+    notes: >-
+      Availability of essential functions after an incident is
+      operationalised through dated backup attestations and recurring
+      restore-drill records — the same evidence set used for DORA
+      Art.12.
+
+  - id: cra:annex-i-1-attack-surface
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §1(j)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Products with digital elements shall be designed, developed and
+      produced to limit attack surfaces, including external interfaces.
+    status: draft
+    control_refs:
+      - control.cspm_baseline@v1
+      - control.asset_inventory_delta@v1
+    playbook_refs:
+      - playbook.cloud_misconfiguration@v1
+    metric_refs: []
+    notes: >-
+      Attack-surface limitation is operationalised through a documented
+      cloud-posture baseline plus a dated asset/interface inventory
+      delta showing only the declared external surfaces are exposed.
+
+  - id: cra:annex-i-1-logging-monitoring
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §1(l)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Products with digital elements shall provide security-related
+      information by recording and monitoring relevant internal
+      activity, including the access to or modification of data,
+      services or functions, with an opt-out mechanism for the user.
+    status: draft
+    control_refs:
+      - control.detection_coverage_evidence@v1
+      - control.recurring_incident_correlator@v1
+    playbook_refs: []
+    metric_refs: []
+    notes: >-
+      Logging and monitoring under Annex I §1(l) is operationalised
+      through documented detection-coverage evidence paired with the
+      recurring-incident correlator that confirms recording remains live
+      and useful across the declared data, services and functions.
+
+  - id: cra:annex-i-1-security-updates-capability
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §1(m)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Products with digital elements shall ensure that vulnerabilities
+      can be addressed through security updates, including, where
+      applicable, through automatic security updates that are installed
+      within an appropriate timeframe enabled as a default setting, with
+      a clear and easy-to-use opt-out mechanism, through the
+      notification of available updates to users, and the option to
+      temporarily postpone them.
+    status: draft
+    control_refs:
+      - control.patch_evidence@v1
+    playbook_refs:
+      - playbook.vuln_intake@v1
+    metric_refs:
+      - kpi.patch_disseminated_on_time@v1
+    notes: >-
+      The security-update capability under Annex I §1(m) sits upstream
+      of Annex I §2(7) dissemination — the agentic slice is the dated
+      patch-evidence record that the update mechanism remains live and
+      reachable on the support-period clock.
