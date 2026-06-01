@@ -3,9 +3,9 @@
   "component-definition": {
     "uuid": "887c786e-5651-55a0-84d9-dd125a54b21f",
     "metadata": {
-      "title": "SecOps-NG \u2014 DORA ICT Risk Management & Incident Reporting Component Definition (SKELETON)",
+      "title": "SecOps-NG \u2014 DORA ICT Risk Management & Incident Reporting Component Definition (CORE)",
       "last-modified": "2026-06-01T00:00:00Z",
-      "version": "0.2.0-pre",
+      "version": "0.2.0",
       "oscal-version": "1.1.2"
     },
     "components": [
@@ -18,7 +18,7 @@
           {
             "uuid": "f2b1f61f-8172-543d-8bf5-81f831d9ae2a",
             "source": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
-            "description": "Coverage of DORA (Regulation (EU) 2022/2554) Article 5 governance and organisation, Article 6 ICT risk-management framework, Article 9 vulnerability and patch management obligations, and Articles 18\u201319 ICT-related incident classification and reporting obligations, as mapped in content/mappings/dora/article-5.yaml, article-6.yaml, article-9-and-rts-vuln-mgmt.yaml, and article-19-and-28.yaml. Third-party-risk obligations (Articles 28+) are out of scope for this skeleton.",
+            "description": "Coverage of DORA (Regulation (EU) 2022/2554) Chapter II ICT risk-management framework obligations \u2014 Article 5 governance and organisation, Article 6 ICT risk-management framework, Article 7 ICT systems, protocols and tools, Article 8 identification, Article 9 vulnerability and patch management, Article 10 detection, and Article 11 response and recovery \u2014 together with Chapter III ICT-related incident classification and reporting obligations (Articles 18\u201319), as mapped in content/mappings/dora/article-5.yaml, article-6.yaml, article-7.yaml, article-8.yaml, article-9-and-rts-vuln-mgmt.yaml, article-10.yaml, article-11.yaml, and article-19-and-28.yaml. Articles 12\u201314 (further response/recovery, learning, communication) and third-party-risk obligations (Articles 28+) are out of scope for this layer.",
             "implemented-requirements": [
               {
                 "uuid": "bf11bced-760e-516b-9adb-b0d379f06f8d",
@@ -105,6 +105,226 @@
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "6"
+                  }
+                ]
+              },
+              {
+                "uuid": "b1de73e6-8e54-5c8b-af26-e0a9228077d8",
+                "control-id": "control.crypto_policy_inventory-v1",
+                "description": "Use ICT systems, protocols and tools that are appropriate to the magnitude of operations supporting the conduct of activities, reliable, equipped with sufficient capacity to accurately process data, and technologically resilient so as to adequately deal with additional information processing needs required by stressed market conditions or other adverse situations.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.crypto_policy_inventory@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-7-systems-protocols-tools"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "7"
+                  }
+                ]
+              },
+              {
+                "uuid": "f3e11a44-47d7-5ffa-9bb4-af0151785f4e",
+                "control-id": "control.cert_posture_scan-v1",
+                "description": "Use ICT systems, protocols and tools that are appropriate to the magnitude of operations supporting the conduct of activities, reliable, equipped with sufficient capacity to accurately process data, and technologically resilient so as to adequately deal with additional information processing needs required by stressed market conditions or other adverse situations.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cert_posture_scan@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-7-systems-protocols-tools"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "7"
+                  }
+                ]
+              },
+              {
+                "uuid": "feb611d3-b28b-543a-be9d-c71f24ab24c1",
+                "control-id": "control.asset_inventory_delta-v1",
+                "description": "Identify, classify and adequately document all ICT-supported business functions, roles and responsibilities, information assets and ICT assets supporting those functions, and their interdependencies, including with third-party ICT service providers, and review the inventory at least annually and upon every major change.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.asset_inventory_delta@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-8-identification"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "8"
+                  }
+                ]
+              },
+              {
+                "uuid": "fe32a98c-a0bb-54c8-8540-a7176e7d9834",
+                "control-id": "control.supplier_inventory-v1",
+                "description": "Identify, classify and adequately document all ICT-supported business functions, roles and responsibilities, information assets and ICT assets supporting those functions, and their interdependencies, including with third-party ICT service providers, and review the inventory at least annually and upon every major change.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.supplier_inventory@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-8-identification"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "8"
+                  }
+                ]
+              },
+              {
+                "uuid": "2643ebd7-5545-52f6-83db-5ca8cc8fe671",
+                "control-id": "control.sbom_capture-v1",
+                "description": "Identify, classify and adequately document all ICT-supported business functions, roles and responsibilities, information assets and ICT assets supporting those functions, and their interdependencies, including with third-party ICT service providers, and review the inventory at least annually and upon every major change.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.sbom_capture@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-8-identification"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "8"
+                  }
+                ]
+              },
+              {
+                "uuid": "b3950ac8-a162-5f88-8584-64d3b8133e53",
+                "control-id": "control.detection_coverage_evidence-v1",
+                "description": "Have in place mechanisms to promptly detect anomalous activities, including ICT network performance issues and ICT-related incidents, and to identify potential material single points of failure, with multiple layers of control, defined alert thresholds and criteria to trigger ICT-related incident detection and response processes, including automatic alert mechanisms for relevant staff.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.detection_coverage_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-10-detection"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "10"
+                  }
+                ]
+              },
+              {
+                "uuid": "6c102851-56b1-5626-9c30-4b4049f427e4",
+                "control-id": "control.cspm_baseline-v1",
+                "description": "Have in place mechanisms to promptly detect anomalous activities, including ICT network performance issues and ICT-related incidents, and to identify potential material single points of failure, with multiple layers of control, defined alert thresholds and criteria to trigger ICT-related incident detection and response processes, including automatic alert mechanisms for relevant staff.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cspm_baseline@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-10-detection"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "10"
+                  }
+                ]
+              },
+              {
+                "uuid": "ffce264c-f5cd-56f1-8d83-c6646695ab23",
+                "control-id": "control.incident_handling_capability-v1",
+                "description": "Establish a comprehensive ICT business continuity policy and response-and-recovery plans, including for ICT-related incidents, that minimise the impact, ensure the continuity of critical or important functions, restore operations within stated recovery time and recovery point objectives, and preserve data integrity and the availability of information during and after the incident.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_handling_capability@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-11-response-recovery"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "11"
+                  }
+                ]
+              },
+              {
+                "uuid": "134d20e4-8b8b-5606-9481-e0e9cd5865be",
+                "control-id": "control.backup_attestation-v1",
+                "description": "Establish a comprehensive ICT business continuity policy and response-and-recovery plans, including for ICT-related incidents, that minimise the impact, ensure the continuity of critical or important functions, restore operations within stated recovery time and recovery point objectives, and preserve data integrity and the availability of information during and after the incident.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.backup_attestation@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-11-response-recovery"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "11"
+                  }
+                ]
+              },
+              {
+                "uuid": "10187395-cbe9-5567-8278-f79a02bad786",
+                "control-id": "control.restore_drill-v1",
+                "description": "Establish a comprehensive ICT business continuity policy and response-and-recovery plans, including for ICT-related incidents, that minimise the impact, ensure the continuity of critical or important functions, restore operations within stated recovery time and recovery point objectives, and preserve data integrity and the availability of information during and after the incident.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.restore_drill@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "dora:art-11-response-recovery"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "11"
                   }
                 ]
               },

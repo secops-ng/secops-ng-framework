@@ -1,0 +1,39 @@
+# DORA — Article 11 (Response and recovery), Chapter II.
+# Companion to article-5.yaml, article-6.yaml, article-7.yaml,
+# article-8.yaml, article-9-and-rts-vuln-mgmt.yaml, article-10.yaml,
+# and article-19-and-28.yaml. Articles 12–14 land in the
+# EXTEND-recovery file. Out of scope for this file: Art.15+ digital
+# operational resilience testing, Art.17+ incident classification and
+# reporting, Art.28+ third-party risk.
+regime: dora
+entries:
+  - id: dora:art-11-response-recovery
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "11"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Establish a comprehensive ICT business continuity policy and
+      response-and-recovery plans, including for ICT-related incidents,
+      that minimise the impact, ensure the continuity of critical or
+      important functions, restore operations within stated recovery
+      time and recovery point objectives, and preserve data integrity
+      and the availability of information during and after the
+      incident.
+    status: draft
+    control_refs:
+      - control.incident_handling_capability@v1
+      - control.backup_attestation@v1
+      - control.restore_drill@v1
+    playbook_refs: []
+    metric_refs:
+      - kpi.mttr_containment@v1
+      - kpi.backup_integrity_pass_rate@v1
+    notes: >-
+      Article 11 is the response-and-recovery anchor for Chapter II.
+      The agentic slice is the documented incident-handling capability
+      paired with dated backup attestations and recurring restore-
+      drill records that show the recovery objectives are not just
+      declared but exercised.
