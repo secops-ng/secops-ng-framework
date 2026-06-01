@@ -1,12 +1,59 @@
 # D3FEND techniques anchored to NIS2 obligations.
 #
-# SKELETON — 3 representative entries pulled from the existing
-# content/controls/*.yaml `defensive_techniques_d3fend` blocks. Each entry
-# round-trips through `regulation_refs.entry_id` to a real entry in
-# content/mappings/nis2/article-21-and-23.yaml.
+# CORE — near-complete crosswalk of D3FEND defensive techniques against
+# NIS2 Art. 21(2)(a)-(j) risk-management measures and Art. 23(4) incident
+# notification timeline. One entry per (NIS2 article entry, D3FEND
+# technique) pair. Each entry round-trips through
+# `regulation_refs.entry_id` to a real entry in
+# content/mappings/nis2/article-21-and-23.yaml, and each
+# `control_refs[*]` to a real file under content/controls/.
+#
+# Technique anchors are sourced from the `defensive_techniques_d3fend`
+# blocks under content/controls/. Entries are ordered by NIS2 article
+# entry id, then D3FEND technique slug.
 regime: d3fend
 entries:
-  - id: d3fend:nis2:incident-response-analysis
+  - id: d3fend:nis2:art-21-2-a:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.risk_management_policy@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: "21(2)(a)"
+        entry_id: nis2:art-21-2-a
+    status: draft
+    notes: >-
+      NIS2 Art. 21(2)(a) mandates a documented risk-management policy with
+      dated review. D3FEND `OperationalActivityMapping` is the defensive
+      anchor named by `control.risk_management_policy@v1`, modelling the
+      policy's coverage of organisational activities.
+
+  - id: d3fend:nis2:art-21-2-b:forensic-analysis
+    technique:
+      d3fend_id: d3f:ForensicAnalysis
+      technique_name: Forensic Analysis
+      url: https://d3fend.mitre.org/technique/d3f:ForensicAnalysis/
+    control_refs:
+      - control.incident_handling_capability@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: "21(2)(b)"
+        entry_id: nis2:art-21-2-b
+    status: draft
+    notes: >-
+      Art. 21(2)(b) also covers the lessons-learned arm of incident handling.
+      `ForensicAnalysis` is the second D3FEND anchor on
+      `control.incident_handling_capability@v1`, used during post-incident
+      review.
+
+  - id: d3fend:nis2:art-21-2-b:incident-response-analysis
     technique:
       d3fend_id: d3f:IncidentResponseAnalysis
       technique_name: Incident Response Analysis
@@ -17,36 +64,97 @@ entries:
       - regime: nis2
         instrument: Directive (EU) 2022/2555
         celex: 32022L2555
-        article: 21(2)(b)
+        article: "21(2)(b)"
         entry_id: nis2:art-21-2-b
     status: draft
     notes: >-
-      NIS2 Art. 21(2)(b) requires an incident-handling capability; the
-      D3FEND `IncidentResponseAnalysis` technique is the defensive
-      anchor named by `control.incident_handling_capability@v1` and
-      exercised across the response playbooks.
+      NIS2 Art. 21(2)(b) requires an operational incident-handling capability.
+      `IncidentResponseAnalysis` is the primary D3FEND anchor named by
+      `control.incident_handling_capability@v1` and exercised by every
+      response playbook.
 
-  - id: d3fend:nis2:multi-factor-authentication
+  - id: d3fend:nis2:art-21-2-c:disk-encryption
     technique:
-      d3fend_id: d3f:Multi-factorAuthentication
-      technique_name: Multi-factor Authentication
-      url: https://d3fend.mitre.org/technique/d3f:Multi-factorAuthentication/
+      d3fend_id: d3f:DiskEncryption
+      technique_name: Disk Encryption
+      url: https://d3fend.mitre.org/technique/d3f:DiskEncryption/
     control_refs:
-      - control.mfa_state_probe@v1
+      - control.backup_attestation@v1
     regulation_refs:
       - regime: nis2
         instrument: Directive (EU) 2022/2555
         celex: 32022L2555
-        article: 21(2)(j)
-        entry_id: nis2:art-21-2-j
+        article: "21(2)(c)"
+        entry_id: nis2:art-21-2-c
     status: draft
     notes: >-
-      NIS2 Art. 21(2)(j) calls out multi-factor authentication among the
-      authentication and secured-communications measures. D3FEND
-      `Multi-factorAuthentication` is the defensive technique named in
-      `control.mfa_state_probe@v1` (dated MFA-state evidence).
+      NIS2 Art. 21(2)(c) covers business-continuity arrangements including
+      backup management. `DiskEncryption` is the D3FEND anchor named by
+      `control.backup_attestation@v1`, modelling the at-rest protection of
+      backup media that the attestation verifies.
 
-  - id: d3fend:nis2:software-inventory
+  - id: d3fend:nis2:art-21-2-c:system-recovery-analysis
+    technique:
+      d3fend_id: d3f:SystemRecoveryAnalysis
+      technique_name: System Recovery Analysis
+      url: https://d3fend.mitre.org/technique/d3f:SystemRecoveryAnalysis/
+    control_refs:
+      - control.restore_drill@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: "21(2)(c)"
+        entry_id: nis2:art-21-2-c
+    status: draft
+    notes: >-
+      Art. 21(2)(c) also requires tested restore drills.
+      `SystemRecoveryAnalysis` is the D3FEND anchor named by
+      `control.restore_drill@v1`.
+
+  - id: d3fend:nis2:art-21-2-d:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.supplier_inventory@v1
+      - control.provider_attestation@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: "21(2)(d)"
+        entry_id: nis2:art-21-2-d
+    status: draft
+    notes: >-
+      NIS2 Art. 21(2)(d) requires supply-chain security with periodic
+      re-attestation. `OperationalActivityMapping` is the D3FEND anchor shared
+      by `control.supplier_inventory@v1` and
+      `control.provider_attestation@v1`, modelling supplier relationships as a
+      mapped activity surface.
+
+  - id: d3fend:nis2:art-21-2-e:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.vuln_disclosure_intake@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: "21(2)(e)"
+        entry_id: nis2:art-21-2-e
+    status: draft
+    notes: >-
+      Art. 21(2)(e) also covers coordinated vulnerability disclosure.
+      `IncidentResponseAnalysis` is the D3FEND anchor on
+      `control.vuln_disclosure_intake@v1`, modelling the intake-and-triage arm
+      of CVD.
+
+  - id: d3fend:nis2:art-21-2-e:software-inventory
     technique:
       d3fend_id: d3f:SoftwareInventory
       technique_name: Software Inventory
@@ -57,13 +165,293 @@ entries:
       - regime: nis2
         instrument: Directive (EU) 2022/2555
         celex: 32022L2555
-        article: 21(2)(e)
+        article: "21(2)(e)"
         entry_id: nis2:art-21-2-e
     status: draft
     notes: >-
-      NIS2 Art. 21(2)(e) covers security in network and information
-      systems acquisition, development and maintenance — including
-      vulnerability handling and disclosure. D3FEND `SoftwareInventory`
-      is the defensive anchor named in `control.sbom_capture@v1`, the
-      dated SBOM record on which downstream vulnerability handling
-      depends.
+      NIS2 Art. 21(2)(e) requires vulnerability handling and SBOM production.
+      `SoftwareInventory` is the D3FEND anchor named by
+      `control.sbom_capture@v1`, the dated SBOM record on which downstream
+      vulnerability handling depends.
+
+  - id: d3fend:nis2:art-21-2-e:system-configuration-permissions
+    technique:
+      d3fend_id: d3f:SystemConfigurationPermissions
+      technique_name: System Configuration Permissions
+      url: https://d3fend.mitre.org/technique/d3f:SystemConfigurationPermissions/
+    control_refs:
+      - control.cspm_baseline@v1
+      - control.iac_policy_guardrail@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: "21(2)(e)"
+        entry_id: nis2:art-21-2-e
+    status: draft
+    notes: >-
+      Art. 21(2)(e) extends to secure development and maintenance of cloud
+      configuration. `SystemConfigurationPermissions` is the shared D3FEND
+      anchor on `control.cspm_baseline@v1` and
+      `control.iac_policy_guardrail@v1`, modelling drift between declared and
+      observed configuration.
+
+  - id: d3fend:nis2:art-21-2-f:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.control_effectiveness_test@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: "21(2)(f)"
+        entry_id: nis2:art-21-2-f
+    status: draft
+    notes: >-
+      NIS2 Art. 21(2)(f) requires policies and procedures to assess control
+      effectiveness. `OperationalActivityMapping` is the D3FEND anchor named
+      by `control.control_effectiveness_test@v1`, modelling the periodic test
+      cadence as a mapped activity.
+
+  - id: d3fend:nis2:art-21-2-g:user-behavior-analysis
+    technique:
+      d3fend_id: d3f:UserBehaviorAnalysis
+      technique_name: User Behavior Analysis
+      url: https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/
+    control_refs:
+      - control.training_attestation@v1
+      - control.phishing_simulation@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: "21(2)(g)"
+        entry_id: nis2:art-21-2-g
+    status: draft
+    notes: >-
+      NIS2 Art. 21(2)(g) requires cyber-hygiene training and phishing
+      simulation. `UserBehaviorAnalysis` is the shared D3FEND anchor on
+      `control.training_attestation@v1` and `control.phishing_simulation@v1`.
+
+  - id: d3fend:nis2:art-21-2-h:certificate-analysis
+    technique:
+      d3fend_id: d3f:CertificateAnalysis
+      technique_name: Certificate Analysis
+      url: https://d3fend.mitre.org/technique/d3f:CertificateAnalysis/
+    control_refs:
+      - control.cert_posture_scan@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: "21(2)(h)"
+        entry_id: nis2:art-21-2-h
+    status: draft
+    notes: >-
+      Art. 21(2)(h) also covers TLS posture of declared endpoints.
+      `CertificateAnalysis` is the D3FEND anchor named by
+      `control.cert_posture_scan@v1`.
+
+  - id: d3fend:nis2:art-21-2-h:key-management
+    technique:
+      d3fend_id: d3f:KeyManagement
+      technique_name: Key Management
+      url: https://d3fend.mitre.org/technique/d3f:KeyManagement/
+    control_refs:
+      - control.crypto_policy_inventory@v1
+      - control.key_rotation_evidence@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: "21(2)(h)"
+        entry_id: nis2:art-21-2-h
+    status: draft
+    notes: >-
+      NIS2 Art. 21(2)(h) covers cryptography policy and key rotation.
+      `KeyManagement` is the shared D3FEND anchor on
+      `control.crypto_policy_inventory@v1` and
+      `control.key_rotation_evidence@v1`.
+
+  - id: d3fend:nis2:art-21-2-i:account-monitoring
+    technique:
+      d3fend_id: d3f:AccountMonitoring
+      technique_name: Account Monitoring
+      url: https://d3fend.mitre.org/technique/d3f:AccountMonitoring/
+    control_refs:
+      - control.jml_evidence@v1
+      - control.privileged_access_review@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: "21(2)(i)"
+        entry_id: nis2:art-21-2-i
+    status: draft
+    notes: >-
+      NIS2 Art. 21(2)(i) covers HR security and access-control with
+      joiner-mover-leaver and privileged-access review evidence.
+      `AccountMonitoring` is the shared D3FEND anchor on
+      `control.jml_evidence@v1` and `control.privileged_access_review@v1`.
+
+  - id: d3fend:nis2:art-21-2-i:asset-inventory
+    technique:
+      d3fend_id: d3f:AssetInventory
+      technique_name: Asset Inventory
+      url: https://d3fend.mitre.org/technique/d3f:AssetInventory/
+    control_refs:
+      - control.asset_inventory_delta@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: "21(2)(i)"
+        entry_id: nis2:art-21-2-i
+    status: draft
+    notes: >-
+      Art. 21(2)(i) also requires asset management evidence. `AssetInventory`
+      is the primary D3FEND anchor on `control.asset_inventory_delta@v1`,
+      capturing dated delta against the declared inventory.
+
+  - id: d3fend:nis2:art-21-2-i:local-account-monitoring
+    technique:
+      d3fend_id: d3f:LocalAccountMonitoring
+      technique_name: Local Account Monitoring
+      url: https://d3fend.mitre.org/technique/d3f:LocalAccountMonitoring/
+    control_refs:
+      - control.cloud_identity_least_privilege@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: "21(2)(i)"
+        entry_id: nis2:art-21-2-i
+    status: draft
+    notes: >-
+      Art. 21(2)(i) further covers cloud identity hygiene.
+      `LocalAccountMonitoring` is the D3FEND anchor on
+      `control.cloud_identity_least_privilege@v1`, modelling least-privilege
+      evidence against cloud IAM principals.
+
+  - id: d3fend:nis2:art-21-2-i:software-inventory
+    technique:
+      d3fend_id: d3f:SoftwareInventory
+      technique_name: Software Inventory
+      url: https://d3fend.mitre.org/technique/d3f:SoftwareInventory/
+    control_refs:
+      - control.asset_inventory_delta@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: "21(2)(i)"
+        entry_id: nis2:art-21-2-i
+    status: draft
+    notes: >-
+      Art. 21(2)(i) extends asset management to declared software.
+      `SoftwareInventory` is the secondary D3FEND anchor on
+      `control.asset_inventory_delta@v1`, paired with `AssetInventory` for the
+      host/software split.
+
+  - id: d3fend:nis2:art-21-2-j:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.oob_channel_probe@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: "21(2)(j)"
+        entry_id: nis2:art-21-2-j
+    status: draft
+    notes: >-
+      Art. 21(2)(j) also requires secured emergency communications.
+      `IncidentResponseAnalysis` is the D3FEND anchor on
+      `control.oob_channel_probe@v1`, modelling readiness of the out-of-band
+      channel that an active incident would force the entity onto.
+
+  - id: d3fend:nis2:art-21-2-j:multi-factor-authentication
+    technique:
+      d3fend_id: d3f:Multi-factorAuthentication
+      technique_name: Multi-factor Authentication
+      url: https://d3fend.mitre.org/technique/d3f:Multi-factorAuthentication/
+    control_refs:
+      - control.mfa_state_probe@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: "21(2)(j)"
+        entry_id: nis2:art-21-2-j
+    status: draft
+    notes: >-
+      NIS2 Art. 21(2)(j) calls out multi-factor or continuous authentication.
+      `Multi-factorAuthentication` is the D3FEND anchor on
+      `control.mfa_state_probe@v1` (dated MFA-state evidence).
+
+  - id: d3fend:nis2:art-23-early-warning:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.incident_timeline_signals@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: "23(4)(a)"
+        entry_id: nis2:art-23-early-warning
+    status: draft
+    notes: >-
+      NIS2 Art. 23(4)(a) requires an early-warning notification within 24
+      hours of awareness. `IncidentResponseAnalysis` is the D3FEND anchor on
+      `control.incident_timeline_signals@v1`, which captures the awareness
+      timestamp and the early-warning emission.
+
+  - id: d3fend:nis2:art-23-notification-72h:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.incident_timeline_signals@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: "23(4)(b)"
+        entry_id: nis2:art-23-notification-72h
+    status: draft
+    notes: >-
+      NIS2 Art. 23(4)(b) requires a 72-hour incident notification updating the
+      early warning. `IncidentResponseAnalysis` is the same D3FEND anchor on
+      `control.incident_timeline_signals@v1`, here driving the 72h update
+      step.
+
+  - id: d3fend:nis2:art-23-final-report:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.incident_timeline_signals@v1
+    regulation_refs:
+      - regime: nis2
+        instrument: Directive (EU) 2022/2555
+        celex: 32022L2555
+        article: "23(4)(d)"
+        entry_id: nis2:art-23-final-report
+    status: draft
+    notes: >-
+      NIS2 Art. 23(4)(d) requires a final report within one month.
+      `IncidentResponseAnalysis` on `control.incident_timeline_signals@v1` is
+      the D3FEND anchor; `control.post_incident_learning@v1`
+      (ForensicAnalysis) feeds the root-cause section but is mapped under Art.
+      21(2)(b) where the lessons-learned obligation lives.
