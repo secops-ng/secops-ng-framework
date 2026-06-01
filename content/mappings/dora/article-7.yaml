@@ -1,0 +1,38 @@
+# DORA — Article 7 (ICT systems, protocols and tools), Chapter II.
+# Companion to article-5.yaml (governance), article-6.yaml (ICT
+# risk-management framework), article-8.yaml (identification),
+# article-9-and-rts-vuln-mgmt.yaml (Art.9(4)(a) vulnerability and patch
+# management), article-10.yaml (detection), article-11.yaml (response
+# and recovery), and article-19-and-28.yaml (Art.17–19 incident
+# reporting + Art.28/30 third-party risk). Articles 12–14 land in the
+# EXTEND-recovery file. Out of scope for this file: Art.15+ digital
+# operational resilience testing, Art.17+ incident classification and
+# reporting, Art.28+ third-party risk.
+regime: dora
+entries:
+  - id: dora:art-7-systems-protocols-tools
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "7"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Use ICT systems, protocols and tools that are appropriate to the
+      magnitude of operations supporting the conduct of activities,
+      reliable, equipped with sufficient capacity to accurately process
+      data, and technologically resilient so as to adequately deal with
+      additional information processing needs required by stressed
+      market conditions or other adverse situations.
+    status: draft
+    control_refs:
+      - control.crypto_policy_inventory@v1
+      - control.cert_posture_scan@v1
+    playbook_refs: []
+    metric_refs: []
+    notes: >-
+      Article 7 is mostly architectural ("appropriate, reliable,
+      sufficient capacity, technologically resilient"). The agentic
+      slice is keeping the inventory of cryptographic protocol use and
+      the dated certificate-posture probes that show the declared
+      protocols remain valid in production.

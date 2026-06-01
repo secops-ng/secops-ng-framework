@@ -1,0 +1,38 @@
+# DORA — Article 10 (Detection), Chapter II.
+# Companion to article-5.yaml, article-6.yaml, article-7.yaml,
+# article-8.yaml, article-9-and-rts-vuln-mgmt.yaml, article-11.yaml,
+# and article-19-and-28.yaml. Articles 12–14 land in the
+# EXTEND-recovery file. Out of scope for this file: Art.15+ digital
+# operational resilience testing, Art.17+ incident classification and
+# reporting, Art.28+ third-party risk.
+regime: dora
+entries:
+  - id: dora:art-10-detection
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "10"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Have in place mechanisms to promptly detect anomalous activities,
+      including ICT network performance issues and ICT-related
+      incidents, and to identify potential material single points of
+      failure, with multiple layers of control, defined alert
+      thresholds and criteria to trigger ICT-related incident detection
+      and response processes, including automatic alert mechanisms for
+      relevant staff.
+    status: draft
+    control_refs:
+      - control.detection_coverage_evidence@v1
+      - control.cspm_baseline@v1
+    playbook_refs: []
+    metric_refs:
+      - kpi.detection_coverage@v1
+      - kpi.mttd@v1
+    notes: >-
+      Article 10 turns detection from a tooling claim into an
+      evidenced control. The agentic slice is the dated detection-
+      coverage attestation against the declared scope (logs, identity,
+      cloud posture) plus the time-to-detect metric stream that proves
+      the alerting actually fires.

@@ -1,0 +1,39 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.detection_coverage_evidence@v1
+title: Detection coverage evidence
+summary: >-
+  Operator captures dated evidence that detection mechanisms cover the
+  declared scope (logs, identity events, network performance, cloud
+  posture) with named alert thresholds and a routed responder, so that
+  anomalous activity is surfaced promptly to the right humans.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "SI-4"
+    title: "System Monitoring"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "AU-6"
+    title: "Audit Record Review, Analysis, and Reporting"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.8.16"
+    title: "Monitoring activities"
+  - catalog: "DORA Article 10"
+    control_id: "art-10"
+    title: "Detection"
+
+d3fend_refs:
+  - d3f_id: D3-NTA
+    technique_name: "Network Traffic Analysis"
+    url: https://d3fend.mitre.org/technique/d3f:NetworkTrafficAnalysis/
+  - d3f_id: D3-UBA
+    technique_name: "User Behavior Analysis"
+    url: https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:NetworkTrafficAnalysis/
+  captured_at: '2026-06-01'
+  notes: >-
+    Detection scope evidence pairs the published D3FEND analysis
+    techniques with the audit-monitoring controls from NIST 800-53 SI-4
+    / AU-6 and ISO/IEC 27001 A.8.16, anchored to DORA Article 10.
