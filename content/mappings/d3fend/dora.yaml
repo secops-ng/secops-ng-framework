@@ -1,53 +1,30 @@
 # D3FEND techniques anchored to DORA obligations.
 #
-# SKELETON — 3 representative entries pulled from the existing
-# content/controls/*.yaml `defensive_techniques_d3fend` blocks. Each entry
-# round-trips through `regulation_refs.entry_id` to a real entry under
-# content/mappings/dora/.
+# CORE — near-complete crosswalk of D3FEND defensive techniques against
+# DORA Chapter II (Art.5-14 ICT risk-management framework), Chapter III
+# (Art.17-19 ICT-related incident management and reporting) and
+# Chapter V (Art.28-30 third-party ICT risk). One entry per
+# (DORA article entry, D3FEND technique) pair. Each entry round-trips
+# through `regulation_refs.entry_id` to a real entry under
+# content/mappings/dora/, and each `control_refs[*]` to a real file
+# under content/controls/.
+#
+# Technique anchors are sourced from the `d3fend_refs` blocks under
+# content/controls/. Entries are ordered by DORA article entry id, then
+# D3FEND technique slug.
+#
+# Coverage notes:
+# - Art.15-16 (digital operational resilience testing programme,
+#   TLPT prep) and Art.24-27 (TLPT execution) have no upstream control
+#   with a D3FEND anchor yet and are therefore not indexed here.
+# - Art.20-23 (financial-supervisory aggregation / inter-agency
+#   reporting) are infrastructure-level obligations on competent
+#   authorities; no operator-facing control / D3FEND anchor applies.
+# - Art.29 (concentration-risk assessment) is a supervisory analysis
+#   layer above the third-party register and is similarly not indexed.
 regime: d3fend
 entries:
-  - id: d3fend:dora:software-update
-    technique:
-      d3fend_id: d3f:SoftwareUpdate
-      technique_name: Software Update
-      url: https://d3fend.mitre.org/technique/d3f:SoftwareUpdate/
-    control_refs:
-      - control.patch_evidence@v1
-    regulation_refs:
-      - regime: dora
-        instrument: Regulation (EU) 2022/2554
-        celex: 32022R2554
-        article: 9(4)(a)
-        entry_id: dora:art-9-vuln-mgmt
-    status: draft
-    notes: >-
-      DORA Art. 9(4)(a) — anchored to the JC RTS on ICT risk management
-      framework (Commission Delegated Regulation (EU) 2024/1774) Art. 10
-      on vulnerability and patch management — relies on dated
-      patch-application evidence. The D3FEND `SoftwareUpdate` technique
-      named in `control.patch_evidence@v1` is the defensive anchor.
-
-  - id: d3fend:dora:system-recovery-analysis
-    technique:
-      d3fend_id: d3f:SystemRecoveryAnalysis
-      technique_name: System Recovery Analysis
-      url: https://d3fend.mitre.org/technique/d3f:SystemRecoveryAnalysis/
-    control_refs:
-      - control.restore_drill@v1
-    regulation_refs:
-      - regime: dora
-        instrument: Regulation (EU) 2022/2554
-        celex: 32022R2554
-        article: "12"
-        entry_id: dora:art-12-backup-restore
-    status: draft
-    notes: >-
-      DORA Art. 12 requires backup policies and restoration procedures
-      that are exercised. D3FEND `SystemRecoveryAnalysis` is the
-      defensive technique named in `control.restore_drill@v1`, the
-      periodic restore-drill evidence record.
-
-  - id: d3fend:dora:network-traffic-analysis
+  - id: d3fend:art-10-detection:network-traffic-analysis
     technique:
       d3fend_id: d3f:NetworkTrafficAnalysis
       technique_name: Network Traffic Analysis
@@ -63,7 +40,589 @@ entries:
     status: draft
     notes: >-
       DORA Art. 10 requires mechanisms to promptly detect anomalous
-      activities. D3FEND `NetworkTrafficAnalysis` is the defensive
-      anchor named in `control.detection_coverage_evidence@v1` — the
-      dated record that the detection stack is producing the expected
-      signal classes.
+      activities, including ICT network-performance and
+      ICT-related-incident detection. D3FEND `Network Traffic Analysis` is
+      the detection-side defensive anchor the obligation rests on, named
+      in `control.detection_coverage_evidence@v1`.
+
+  - id: d3fend:art-10-detection:system-configuration-permissions
+    technique:
+      d3fend_id: d3f:SystemConfigurationPermissions
+      technique_name: System Configuration Permissions
+      url: https://d3fend.mitre.org/technique/d3f:SystemConfigurationPermissions/
+    control_refs:
+      - control.cspm_baseline@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "10"
+        entry_id: dora:art-10-detection
+    status: draft
+    notes: >-
+      DORA Art. 10 requires mechanisms to promptly detect anomalous
+      activities, including ICT network-performance and
+      ICT-related-incident detection. D3FEND `System Configuration
+      Permissions` exercises the cloud / IaC posture evidence the
+      obligation rests on, named in `control.cspm_baseline@v1`.
+
+  - id: d3fend:art-10-detection:user-behavior-analysis
+    technique:
+      d3fend_id: d3f:UserBehaviorAnalysis
+      technique_name: User Behavior Analysis
+      url: https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/
+    control_refs:
+      - control.detection_coverage_evidence@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "10"
+        entry_id: dora:art-10-detection
+    status: draft
+    notes: >-
+      DORA Art. 10 requires mechanisms to promptly detect anomalous
+      activities, including ICT network-performance and
+      ICT-related-incident detection. D3FEND `User Behavior Analysis` is
+      the second detection-side defensive anchor the obligation rests on,
+      named in `control.detection_coverage_evidence@v1`.
+
+  - id: d3fend:art-11-response-recovery:disk-encryption
+    technique:
+      d3fend_id: d3f:DiskEncryption
+      technique_name: Disk Encryption
+      url: https://d3fend.mitre.org/technique/d3f:DiskEncryption/
+    control_refs:
+      - control.backup_attestation@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "11"
+        entry_id: dora:art-11-response-recovery
+    status: draft
+    notes: >-
+      DORA Art. 11 requires an ICT response and recovery capability with
+      restoration objectives, dedicated procedures and tested
+      arrangements. D3FEND `Disk Encryption` is the at-rest /
+      backup-confidentiality defensive anchor, named in
+      `control.backup_attestation@v1`.
+
+  - id: d3fend:art-11-response-recovery:forensic-analysis
+    technique:
+      d3fend_id: d3f:ForensicAnalysis
+      technique_name: Forensic Analysis
+      url: https://d3fend.mitre.org/technique/d3f:ForensicAnalysis/
+    control_refs:
+      - control.incident_handling_capability@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "11"
+        entry_id: dora:art-11-response-recovery
+    status: draft
+    notes: >-
+      DORA Art. 11 requires an ICT response and recovery capability with
+      restoration objectives, dedicated procedures and tested
+      arrangements. D3FEND `Forensic Analysis` is the post-incident
+      review-side defensive anchor, named in
+      `control.incident_handling_capability@v1`.
+
+  - id: d3fend:art-11-response-recovery:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.incident_handling_capability@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "11"
+        entry_id: dora:art-11-response-recovery
+    status: draft
+    notes: >-
+      DORA Art. 11 requires an ICT response and recovery capability with
+      restoration objectives, dedicated procedures and tested
+      arrangements. D3FEND `Incident Response Analysis` is the primary
+      defensive anchor for the response / classification / submission
+      workflow, named in `control.incident_handling_capability@v1`.
+
+  - id: d3fend:art-11-response-recovery:system-recovery-analysis
+    technique:
+      d3fend_id: d3f:SystemRecoveryAnalysis
+      technique_name: System Recovery Analysis
+      url: https://d3fend.mitre.org/technique/d3f:SystemRecoveryAnalysis/
+    control_refs:
+      - control.restore_drill@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "11"
+        entry_id: dora:art-11-response-recovery
+    status: draft
+    notes: >-
+      DORA Art. 11 requires an ICT response and recovery capability with
+      restoration objectives, dedicated procedures and tested
+      arrangements. D3FEND `System Recovery Analysis` is the restore-drill
+      defensive anchor, named in `control.restore_drill@v1`.
+
+  - id: d3fend:art-12-backup-restore:disk-encryption
+    technique:
+      d3fend_id: d3f:DiskEncryption
+      technique_name: Disk Encryption
+      url: https://d3fend.mitre.org/technique/d3f:DiskEncryption/
+    control_refs:
+      - control.backup_attestation@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "12"
+        entry_id: dora:art-12-backup-restore
+    status: draft
+    notes: >-
+      DORA Art. 12 requires backup policies and restoration procedures
+      that are exercised and isolated from the primary environment. D3FEND
+      `Disk Encryption` is the at-rest / backup-confidentiality defensive
+      anchor, named in `control.backup_attestation@v1`.
+
+  - id: d3fend:art-12-backup-restore:system-recovery-analysis
+    technique:
+      d3fend_id: d3f:SystemRecoveryAnalysis
+      technique_name: System Recovery Analysis
+      url: https://d3fend.mitre.org/technique/d3f:SystemRecoveryAnalysis/
+    control_refs:
+      - control.restore_drill@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "12"
+        entry_id: dora:art-12-backup-restore
+    status: draft
+    notes: >-
+      DORA Art. 12 requires backup policies and restoration procedures
+      that are exercised and isolated from the primary environment. D3FEND
+      `System Recovery Analysis` is the restore-drill defensive anchor,
+      named in `control.restore_drill@v1`.
+
+  - id: d3fend:art-13-learning-evolving:forensic-analysis
+    technique:
+      d3fend_id: d3f:ForensicAnalysis
+      technique_name: Forensic Analysis
+      url: https://d3fend.mitre.org/technique/d3f:ForensicAnalysis/
+    control_refs:
+      - control.post_incident_learning@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "13"
+        entry_id: dora:art-13-learning-evolving
+    status: draft
+    notes: >-
+      DORA Art. 13 requires post-incident review and continuous learning,
+      feeding lessons back into the ICT risk-management framework. D3FEND
+      `Forensic Analysis` is the post-incident review-side defensive
+      anchor, named in `control.post_incident_learning@v1`.
+
+  - id: d3fend:art-14-crisis-communication:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.crisis_communication_plan@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "14"
+        entry_id: dora:art-14-crisis-communication
+    status: draft
+    notes: >-
+      DORA Art. 14 requires a crisis-communication plan covering internal
+      staff, external stakeholders and competent authorities. D3FEND
+      `Operational Activity Mapping` models the in-scope activities,
+      third-party dependencies, or stakeholder set that the obligation
+      operates over, named in `control.crisis_communication_plan@v1`.
+
+  - id: d3fend:art-18-classification:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.dora_major_classifier@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "18(1)"
+        entry_id: dora:art-18-classification
+    status: draft
+    notes: >-
+      DORA Art. 18(1) requires classification of ICT-related incidents
+      against the major-incident criteria laid down in the JC RTS. D3FEND
+      `Incident Response Analysis` is the primary defensive anchor for the
+      response / classification / submission workflow, named in
+      `control.dora_major_classifier@v1`.
+
+  - id: d3fend:art-18-recurring-incident:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.recurring_incident_correlator@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "18(2)"
+        entry_id: dora:art-18-recurring-incident
+    status: draft
+    notes: >-
+      DORA Art. 18(2) requires recurring-incident detection so that
+      aggregated impact is captured against the major-incident threshold.
+      D3FEND `Incident Response Analysis` is the primary defensive anchor
+      for the response / classification / submission workflow, named in
+      `control.recurring_incident_correlator@v1`.
+
+  - id: d3fend:art-19-cyber-threat-voluntary:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.dora_submission_templates@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "19(2)"
+        entry_id: dora:art-19-cyber-threat-voluntary
+    status: draft
+    notes: >-
+      DORA Art. 19(2) covers voluntary notification of significant cyber
+      threats to the competent authority. D3FEND `Incident Response
+      Analysis` is the primary defensive anchor for the response /
+      classification / submission workflow, named in
+      `control.dora_submission_templates@v1`.
+
+  - id: d3fend:art-19-final-one-month:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.incident_timeline_signals@v1
+      - control.dora_submission_templates@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "19(4)(c)"
+        entry_id: dora:art-19-final-one-month
+    status: draft
+    notes: >-
+      DORA Art. 19(4)(c) sets the final-report deadline of one month after
+      the intermediate report. D3FEND `Incident Response Analysis` is the
+      primary defensive anchor for the response / classification /
+      submission workflow, named in
+      `control.incident_timeline_signals@v1`,
+      `control.dora_submission_templates@v1`.
+
+  - id: d3fend:art-19-initial-4h:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.incident_timeline_signals@v1
+      - control.dora_submission_templates@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "19(4)(a)"
+        entry_id: dora:art-19-initial-4h
+    status: draft
+    notes: >-
+      DORA Art. 19(4)(a) sets the initial notification deadline of 4 hours
+      after major-incident classification (and no later than 24h after
+      detection). D3FEND `Incident Response Analysis` is the primary
+      defensive anchor for the response / classification / submission
+      workflow, named in `control.incident_timeline_signals@v1`,
+      `control.dora_submission_templates@v1`.
+
+  - id: d3fend:art-19-intermediate-72h:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.incident_timeline_signals@v1
+      - control.dora_submission_templates@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "19(4)(b)"
+        entry_id: dora:art-19-intermediate-72h
+    status: draft
+    notes: >-
+      DORA Art. 19(4)(b) sets the intermediate-report deadline of 72 hours
+      after classification. D3FEND `Incident Response Analysis` is the
+      primary defensive anchor for the response / classification /
+      submission workflow, named in
+      `control.incident_timeline_signals@v1`,
+      `control.dora_submission_templates@v1`.
+
+  - id: d3fend:art-28-third-party-register:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.supplier_inventory@v1
+      - control.provider_attestation@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "28"
+        entry_id: dora:art-28-third-party-register
+    status: draft
+    notes: >-
+      DORA Art. 28 requires a register of contractual arrangements with
+      ICT third-party service providers, kept up to date. D3FEND
+      `Operational Activity Mapping` models the in-scope activities,
+      third-party dependencies, or stakeholder set that the obligation
+      operates over, named in `control.supplier_inventory@v1`,
+      `control.provider_attestation@v1`.
+
+  - id: d3fend:art-30-contractual-clauses:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.provider_attestation@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "30(2)"
+        entry_id: dora:art-30-contractual-clauses
+    status: draft
+    notes: >-
+      DORA Art. 30(2) sets the mandatory contractual clauses for ICT
+      third-party arrangements supporting critical or important functions.
+      D3FEND `Operational Activity Mapping` models the in-scope
+      activities, third-party dependencies, or stakeholder set that the
+      obligation operates over, named in
+      `control.provider_attestation@v1`.
+
+  - id: d3fend:art-5-governance:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.ict_risk_governance@v1
+      - control.risk_management_policy@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "5"
+        entry_id: dora:art-5-governance
+    status: draft
+    notes: >-
+      DORA Art. 5 places ultimate ICT-risk responsibility with the
+      management body and mandates an internal governance/control
+      framework with annual review. D3FEND `Operational Activity Mapping`
+      models the in-scope activities, third-party dependencies, or
+      stakeholder set that the obligation operates over, named in
+      `control.ict_risk_governance@v1`,
+      `control.risk_management_policy@v1`.
+
+  - id: d3fend:art-6-framework:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.ict_risk_framework_review@v1
+      - control.control_effectiveness_test@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "6"
+        entry_id: dora:art-6-framework
+    status: draft
+    notes: >-
+      DORA Art. 6 requires a documented ICT risk-management framework with
+      periodic review and control effectiveness testing. D3FEND
+      `Operational Activity Mapping` models the in-scope activities,
+      third-party dependencies, or stakeholder set that the obligation
+      operates over, named in `control.ict_risk_framework_review@v1`,
+      `control.control_effectiveness_test@v1`.
+
+  - id: d3fend:art-7-systems-protocols-tools:certificate-analysis
+    technique:
+      d3fend_id: d3f:CertificateAnalysis
+      technique_name: Certificate Analysis
+      url: https://d3fend.mitre.org/technique/d3f:CertificateAnalysis/
+    control_refs:
+      - control.cert_posture_scan@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "7"
+        entry_id: dora:art-7-systems-protocols-tools
+    status: draft
+    notes: >-
+      DORA Art. 7 requires up-to-date ICT systems, protocols and tools —
+      including reliable cryptography, certificate hygiene and secure
+      transport. D3FEND `Certificate Analysis` exercises the dated
+      certificate-posture evidence the obligation rests on, named in
+      `control.cert_posture_scan@v1`.
+
+  - id: d3fend:art-7-systems-protocols-tools:key-management
+    technique:
+      d3fend_id: d3f:KeyManagement
+      technique_name: Key Management
+      url: https://d3fend.mitre.org/technique/d3f:KeyManagement/
+    control_refs:
+      - control.crypto_policy_inventory@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "7"
+        entry_id: dora:art-7-systems-protocols-tools
+    status: draft
+    notes: >-
+      DORA Art. 7 requires up-to-date ICT systems, protocols and tools —
+      including reliable cryptography, certificate hygiene and secure
+      transport. D3FEND `Key Management` exercises the cryptographic
+      key-rotation / inventory evidence the obligation rests on, named in
+      `control.crypto_policy_inventory@v1`.
+
+  - id: d3fend:art-8-identification:asset-inventory
+    technique:
+      d3fend_id: d3f:AssetInventory
+      technique_name: Asset Inventory
+      url: https://d3fend.mitre.org/technique/d3f:AssetInventory/
+    control_refs:
+      - control.asset_inventory_delta@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "8"
+        entry_id: dora:art-8-identification
+    status: draft
+    notes: >-
+      DORA Art. 8 requires identification and classification of
+      ICT-supported business functions, information assets and ICT
+      third-party dependencies. D3FEND `Asset Inventory` provides the
+      asset-side identification surface the obligation rests on, named in
+      `control.asset_inventory_delta@v1`.
+
+  - id: d3fend:art-8-identification:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.supplier_inventory@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "8"
+        entry_id: dora:art-8-identification
+    status: draft
+    notes: >-
+      DORA Art. 8 requires identification and classification of
+      ICT-supported business functions, information assets and ICT
+      third-party dependencies. D3FEND `Operational Activity Mapping`
+      models the in-scope activities, third-party dependencies, or
+      stakeholder set that the obligation operates over, named in
+      `control.supplier_inventory@v1`.
+
+  - id: d3fend:art-8-identification:software-inventory
+    technique:
+      d3fend_id: d3f:SoftwareInventory
+      technique_name: Software Inventory
+      url: https://d3fend.mitre.org/technique/d3f:SoftwareInventory/
+    control_refs:
+      - control.asset_inventory_delta@v1
+      - control.sbom_capture@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "8"
+        entry_id: dora:art-8-identification
+    status: draft
+    notes: >-
+      DORA Art. 8 requires identification and classification of
+      ICT-supported business functions, information assets and ICT
+      third-party dependencies. D3FEND `Software Inventory` provides the
+      software / SBOM surface the obligation rests on, named in
+      `control.asset_inventory_delta@v1`, `control.sbom_capture@v1`.
+
+  - id: d3fend:art-9-vuln-mgmt:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.vuln_disclosure_intake@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "9(4)(a)"
+        entry_id: dora:art-9-vuln-mgmt
+    status: draft
+    notes: >-
+      DORA Art. 9(4)(a) — anchored to Commission Delegated Regulation (EU)
+      2024/1774 Art. 10 on vulnerability and patch management — requires
+      identification, assessment and remediation of vulnerabilities with
+      dated evidence. D3FEND `Incident Response Analysis` is the primary
+      defensive anchor for the response / classification / submission
+      workflow, named in `control.vuln_disclosure_intake@v1`.
+
+  - id: d3fend:art-9-vuln-mgmt:system-configuration-permissions
+    technique:
+      d3fend_id: d3f:SystemConfigurationPermissions
+      technique_name: System Configuration Permissions
+      url: https://d3fend.mitre.org/technique/d3f:SystemConfigurationPermissions/
+    control_refs:
+      - control.cspm_baseline@v1
+      - control.iac_policy_guardrail@v1
+    regulation_refs:
+      - regime: dora
+        instrument: Regulation (EU) 2022/2554
+        celex: 32022R2554
+        article: "9(4)(a)"
+        entry_id: dora:art-9-vuln-mgmt
+    status: draft
+    notes: >-
+      DORA Art. 9(4)(a) — anchored to Commission Delegated Regulation (EU)
+      2024/1774 Art. 10 on vulnerability and patch management — requires
+      identification, assessment and remediation of vulnerabilities with
+      dated evidence. D3FEND `System Configuration Permissions` exercises
+      the cloud / IaC posture evidence the obligation rests on, named in
+      `control.cspm_baseline@v1`, `control.iac_policy_guardrail@v1`.
