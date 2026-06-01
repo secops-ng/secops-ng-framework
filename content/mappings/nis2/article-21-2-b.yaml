@@ -1,0 +1,41 @@
+# NIS2 — Article 21(2)(b) incident-handling capability.
+# Cross-ref: research brief 2026-05-15-nis2-baseline-mapping.md.
+regime: nis2
+entries:
+  - id: nis2:art-21-2-b
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 21(2)(b)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Operate an incident-handling capability: detect, triage, contain,
+      remediate, and capture lessons learned for each incident.
+    status: draft
+    control_refs:
+      - control.incident_handling_capability@v1
+    playbook_refs:
+      - playbook.phishing_triage@v1
+      - playbook.identity_compromise@v1
+      - playbook.ransomware_containment@v1
+      - playbook.data_exfil@v1
+      - playbook.post_incident_review@v1
+      - playbook.on_call_rotation@v1
+    metric_refs:
+      - kpi.mttd@v1
+      - kpi.mttr_critical@v1
+      - kpi.mttr@v1
+      - kpi.detection_coverage@v1
+      - kpi.false_positive_rate@v1
+      - kri.incidents_without_closeout@v1
+      - kpi.mttd_phishing@v1
+      - kpi.mttr_phishing_triage@v1
+      - kri.phishing_suppression_rate@v1
+      - kpi.coverage_on_call_schedule@v1
+      - kpi.mttr_on_call_ack@v1
+      - kpi.handoff_brief_delivery_sla@v1
+      - kri.escalation_tier_breach@v1
+      - kpi.timeline_completeness@v1
+      - kpi.corrective_action_close_rate@v1
+      - kri.corrective_action_overdue@v1

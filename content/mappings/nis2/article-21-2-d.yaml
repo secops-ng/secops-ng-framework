@@ -1,0 +1,27 @@
+# NIS2 — Article 21(2)(d) supply-chain security.
+# Cross-ref: research brief 2026-05-15-nis2-baseline-mapping.md.
+regime: nis2
+entries:
+  - id: nis2:art-21-2-d
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 21(2)(d)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Address supply-chain security including the security characteristics
+      of direct suppliers and service providers, with periodic
+      re-attestation.
+    status: draft
+    control_refs:
+      - control.supplier_inventory@v1
+      - control.provider_attestation@v1
+    playbook_refs:
+      - playbook.threat_intel_ingest@v1
+    metric_refs:
+      - kri.suppliers_attestation_stale@v1
+    notes: >-
+      Sovereign-provider classification (residency, ownership, sub-processor
+      chain) reads from a private KB via a file-fixture interface; the
+      framework repo never ingests KB contents.

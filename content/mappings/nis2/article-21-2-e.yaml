@@ -1,0 +1,38 @@
+# NIS2 — Article 21(2)(e) security in acquisition, development and maintenance.
+# Cross-ref: research brief 2026-05-15-nis2-baseline-mapping.md.
+regime: nis2
+entries:
+  - id: nis2:art-21-2-e
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 21(2)(e)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Security in network and information systems acquisition, development,
+      and maintenance — including vulnerability handling and disclosure, and
+      SBOM production for releases.
+    status: draft
+    control_refs:
+      - control.sbom_capture@v1
+      - control.vuln_disclosure_intake@v1
+      - control.cspm_baseline@v1
+      - control.iac_policy_guardrail@v1
+    playbook_refs:
+      - playbook.vuln_intake@v1
+      - playbook.cloud_misconfiguration@v1
+    metric_refs:
+      - kpi.vuln_disclosure_sla@v1
+      - kri.releases_without_sbom@v1
+      - kpi.mttd_cloud_misconfig@v1
+      - kpi.mttr_cloud_misconfig@v1
+      - kri.recurring_cloud_misconfig@v1
+    notes: >-
+      Overlaps the CRA scope on SBOM production and on coordinated
+      vulnerability disclosure; mappings/cra/ entries point at the same
+      artifacts. The same `playbook.vuln_intake@v1` is anchored on the
+      DORA side under Art 9(4)(a) plus the JC RTS on ICT risk management
+      framework (Commission Delegated Regulation (EU) 2024/1774) Art 10
+      — see mappings/dora/article-9-and-rts-vuln-mgmt.yaml entry
+      `dora:art-9-vuln-mgmt`.

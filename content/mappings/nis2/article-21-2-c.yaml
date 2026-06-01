@@ -1,0 +1,23 @@
+# NIS2 — Article 21(2)(c) business-continuity, backup, and disaster recovery.
+# Cross-ref: research brief 2026-05-15-nis2-baseline-mapping.md.
+regime: nis2
+entries:
+  - id: nis2:art-21-2-c
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 21(2)(c)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Operate business continuity arrangements (backup management, disaster
+      recovery, crisis management) with evidence of execution and tested
+      restore drills.
+    status: draft
+    control_refs:
+      - control.backup_attestation@v1
+      - control.restore_drill@v1
+    playbook_refs: []
+    metric_refs:
+      - kpi.restore_drill_cadence@v1
+      - kri.backup_integrity_failures@v1
