@@ -1,52 +1,99 @@
 # D3FEND techniques anchored to CRA obligations.
 #
-# SKELETON — 3 representative entries pulled from the existing
-# content/controls/*.yaml `defensive_techniques_d3fend` blocks. Each entry
-# round-trips through `regulation_refs.entry_id` to a real entry under
-# content/mappings/cra/.
+# CORE — near-complete crosswalk of D3FEND defensive techniques against
+# CRA Annex I §1 (essential cybersecurity), Annex I §2 (vulnerability
+# handling), Art. 13 (manufacturer obligations), and Art. 14 (incident
+# and vulnerability reporting). One entry per (CRA article entry,
+# D3FEND technique) pair. Each entry round-trips through
+# `regulation_refs.entry_id` to a real entry under
+# content/mappings/cra/, and each `control_refs[*]` to a real file
+# under content/controls/.
+#
+# Technique anchors are sourced from the `d3fend_refs` blocks under
+# content/controls/. Entries are ordered by CRA article entry id, then
+# D3FEND technique slug.
 regime: d3fend
 entries:
-  - id: d3fend:cra:software-inventory
+  - id: d3fend:cra:annex-i-1-access-control:local-account-monitoring
+    technique:
+      d3fend_id: d3f:LocalAccountMonitoring
+      technique_name: Local Account Monitoring
+      url: https://d3fend.mitre.org/technique/d3f:LocalAccountMonitoring/
+    control_refs:
+      - control.cloud_identity_least_privilege@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "Annex I §1(d)"
+        entry_id: cra:annex-i-1-access-control
+    status: draft
+    notes: >-
+      CRA Annex I §1(d) requires identity and access management with least-
+      privilege defaults. `LocalAccountMonitoring` is the D3FEND anchor on
+      `control.cloud_identity_least_privilege@v1`, modelling least-privilege
+      evidence against the product's IAM principals.
+
+  - id: d3fend:cra:annex-i-1-access-control:multi-factor-authentication
+    technique:
+      d3fend_id: d3f:Multi-factorAuthentication
+      technique_name: Multi-factor Authentication
+      url: https://d3fend.mitre.org/technique/d3f:Multi-factorAuthentication/
+    control_refs:
+      - control.mfa_state_probe@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "Annex I §1(d)"
+        entry_id: cra:annex-i-1-access-control
+    status: draft
+    notes: >-
+      Annex I §1(d) also covers strong authentication on privileged paths.
+      `Multi-factorAuthentication` is the D3FEND anchor on
+      `control.mfa_state_probe@v1`, the dated MFA-state evidence record.
+
+  - id: d3fend:cra:annex-i-1-attack-surface:asset-inventory
+    technique:
+      d3fend_id: d3f:AssetInventory
+      technique_name: Asset Inventory
+      url: https://d3fend.mitre.org/technique/d3f:AssetInventory/
+    control_refs:
+      - control.asset_inventory_delta@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "Annex I §1(j)"
+        entry_id: cra:annex-i-1-attack-surface
+    status: draft
+    notes: >-
+      CRA Annex I §1(j) requires shipping the product with attack surface
+      limited to what is necessary. `AssetInventory` is the primary D3FEND
+      anchor on `control.asset_inventory_delta@v1`, capturing dated delta
+      against the declared inventory of exposed components.
+
+  - id: d3fend:cra:annex-i-1-attack-surface:software-inventory
     technique:
       d3fend_id: d3f:SoftwareInventory
       technique_name: Software Inventory
       url: https://d3fend.mitre.org/technique/d3f:SoftwareInventory/
     control_refs:
-      - control.sbom_capture@v1
+      - control.asset_inventory_delta@v1
     regulation_refs:
       - regime: cra
         instrument: Regulation (EU) 2024/2847
         celex: 32024R2847
-        article: Annex I §2(1)
-        entry_id: cra:annex-i-2-sbom
+        article: "Annex I §1(j)"
+        entry_id: cra:annex-i-1-attack-surface
     status: draft
     notes: >-
-      CRA Annex I §2(1) requires manufacturers to identify and document
-      vulnerabilities and components of the product, including by
-      drawing up an SBOM. D3FEND `SoftwareInventory` is the defensive
-      anchor named in `control.sbom_capture@v1`.
+      Annex I §1(j) extends the attack-surface obligation to declared software
+      components. `SoftwareInventory` is the secondary D3FEND anchor on
+      `control.asset_inventory_delta@v1`, paired with `AssetInventory` for the
+      host/software split.
 
-  - id: d3fend:cra:software-update
-    technique:
-      d3fend_id: d3f:SoftwareUpdate
-      technique_name: Software Update
-      url: https://d3fend.mitre.org/technique/d3f:SoftwareUpdate/
-    control_refs:
-      - control.patch_evidence@v1
-    regulation_refs:
-      - regime: cra
-        instrument: Regulation (EU) 2024/2847
-        celex: 32024R2847
-        article: 13(8)
-        entry_id: cra:art-13-security-updates-distribution
-    status: draft
-    notes: >-
-      CRA Art. 13(8) requires manufacturers to disseminate available
-      security updates without delay. D3FEND `SoftwareUpdate` is the
-      defensive technique named in `control.patch_evidence@v1`, the
-      dated patch-dissemination evidence record.
-
-  - id: d3fend:cra:system-configuration-permissions
+  - id: d3fend:cra:annex-i-1-attack-surface:system-configuration-permissions
     technique:
       d3fend_id: d3f:SystemConfigurationPermissions
       technique_name: System Configuration Permissions
@@ -57,12 +104,491 @@ entries:
       - regime: cra
         instrument: Regulation (EU) 2024/2847
         celex: 32024R2847
-        article: Annex I §1
+        article: "Annex I §1(j)"
+        entry_id: cra:annex-i-1-attack-surface
+    status: draft
+    notes: >-
+      Annex I §1(j) also requires that declared configuration does not enlarge
+      the attack surface. `SystemConfigurationPermissions` is the D3FEND
+      anchor on `control.cspm_baseline@v1`, modelling drift between declared
+      and observed configuration.
+
+  - id: d3fend:cra:annex-i-1-availability:disk-encryption
+    technique:
+      d3fend_id: d3f:DiskEncryption
+      technique_name: Disk Encryption
+      url: https://d3fend.mitre.org/technique/d3f:DiskEncryption/
+    control_refs:
+      - control.backup_attestation@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "Annex I §1(h)"
+        entry_id: cra:annex-i-1-availability
+    status: draft
+    notes: >-
+      CRA Annex I §1(h) requires protection of availability of essential
+      functions including via backup arrangements. `DiskEncryption` is the
+      D3FEND anchor on `control.backup_attestation@v1`, modelling the at-rest
+      protection of backup media that the attestation verifies.
+
+  - id: d3fend:cra:annex-i-1-availability:system-recovery-analysis
+    technique:
+      d3fend_id: d3f:SystemRecoveryAnalysis
+      technique_name: System Recovery Analysis
+      url: https://d3fend.mitre.org/technique/d3f:SystemRecoveryAnalysis/
+    control_refs:
+      - control.restore_drill@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "Annex I §1(h)"
+        entry_id: cra:annex-i-1-availability
+    status: draft
+    notes: >-
+      Annex I §1(h) also requires tested restoration of essential functions.
+      `SystemRecoveryAnalysis` is the D3FEND anchor on
+      `control.restore_drill@v1`.
+
+  - id: d3fend:cra:annex-i-1-confidentiality:key-management
+    technique:
+      d3fend_id: d3f:KeyManagement
+      technique_name: Key Management
+      url: https://d3fend.mitre.org/technique/d3f:KeyManagement/
+    control_refs:
+      - control.crypto_policy_inventory@v1
+      - control.key_rotation_evidence@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "Annex I §1(e)"
+        entry_id: cra:annex-i-1-confidentiality
+    status: draft
+    notes: >-
+      CRA Annex I §1(e) requires protection of confidentiality of stored,
+      transmitted, or otherwise processed data through state-of-the-art
+      mechanisms including encryption. `KeyManagement` is the shared D3FEND
+      anchor on `control.crypto_policy_inventory@v1` and
+      `control.key_rotation_evidence@v1`.
+
+  - id: d3fend:cra:annex-i-1-integrity:certificate-analysis
+    technique:
+      d3fend_id: d3f:CertificateAnalysis
+      technique_name: Certificate Analysis
+      url: https://d3fend.mitre.org/technique/d3f:CertificateAnalysis/
+    control_refs:
+      - control.cert_posture_scan@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "Annex I §1(f)"
+        entry_id: cra:annex-i-1-integrity
+    status: draft
+    notes: >-
+      CRA Annex I §1(f) requires protection of integrity of stored,
+      transmitted, or otherwise processed data, commands, programs,
+      configuration, and the network. `CertificateAnalysis` is the D3FEND
+      anchor on `control.cert_posture_scan@v1`, modelling TLS posture of
+      declared endpoints.
+
+  - id: d3fend:cra:annex-i-1-integrity:system-configuration-permissions
+    technique:
+      d3fend_id: d3f:SystemConfigurationPermissions
+      technique_name: System Configuration Permissions
+      url: https://d3fend.mitre.org/technique/d3f:SystemConfigurationPermissions/
+    control_refs:
+      - control.iac_policy_guardrail@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "Annex I §1(f)"
+        entry_id: cra:annex-i-1-integrity
+    status: draft
+    notes: >-
+      Annex I §1(f) also covers integrity of declared configuration and
+      infrastructure-as-code. `SystemConfigurationPermissions` is the D3FEND
+      anchor on `control.iac_policy_guardrail@v1`, modelling drift between
+      declared and observed configuration.
+
+  - id: d3fend:cra:annex-i-1-logging-monitoring:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.recurring_incident_correlator@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "Annex I §1(l)"
+        entry_id: cra:annex-i-1-logging-monitoring
+    status: draft
+    notes: >-
+      CRA Annex I §1(l) requires monitoring of activity and detection of
+      attacks. `IncidentResponseAnalysis` is the D3FEND anchor on
+      `control.recurring_incident_correlator@v1`, modelling recurring-incident
+      correlation across the monitored surface.
+
+  - id: d3fend:cra:annex-i-1-logging-monitoring:network-traffic-analysis
+    technique:
+      d3fend_id: d3f:NetworkTrafficAnalysis
+      technique_name: Network Traffic Analysis
+      url: https://d3fend.mitre.org/technique/d3f:NetworkTrafficAnalysis/
+    control_refs:
+      - control.detection_coverage_evidence@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "Annex I §1(l)"
+        entry_id: cra:annex-i-1-logging-monitoring
+    status: draft
+    notes: >-
+      Annex I §1(l) also covers detection coverage on network paths.
+      `NetworkTrafficAnalysis` is the primary D3FEND anchor on
+      `control.detection_coverage_evidence@v1`.
+
+  - id: d3fend:cra:annex-i-1-logging-monitoring:user-behavior-analysis
+    technique:
+      d3fend_id: d3f:UserBehaviorAnalysis
+      technique_name: User Behavior Analysis
+      url: https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/
+    control_refs:
+      - control.detection_coverage_evidence@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "Annex I §1(l)"
+        entry_id: cra:annex-i-1-logging-monitoring
+    status: draft
+    notes: >-
+      Annex I §1(l) further extends detection coverage to user activity.
+      `UserBehaviorAnalysis` is the secondary D3FEND anchor on
+      `control.detection_coverage_evidence@v1`, paired with
+      `NetworkTrafficAnalysis` for the host/user split.
+
+  - id: d3fend:cra:annex-i-1-secure-by-default:system-configuration-permissions
+    technique:
+      d3fend_id: d3f:SystemConfigurationPermissions
+      technique_name: System Configuration Permissions
+      url: https://d3fend.mitre.org/technique/d3f:SystemConfigurationPermissions/
+    control_refs:
+      - control.cspm_baseline@v1
+      - control.iac_policy_guardrail@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "Annex I §1(b)"
         entry_id: cra:annex-i-1-secure-by-default
     status: draft
     notes: >-
-      CRA Annex I §1 secure-by-default requires products to be delivered
-      with a secure-by-default configuration. D3FEND
-      `SystemConfigurationPermissions` is the defensive anchor named in
-      `control.cspm_baseline@v1` — the dated baseline-configuration
-      evidence record.
+      CRA Annex I §1(b) secure-by-default requires products to be delivered
+      with a secure-by-default configuration. `SystemConfigurationPermissions`
+      is the shared D3FEND anchor on `control.cspm_baseline@v1` and
+      `control.iac_policy_guardrail@v1`, modelling drift between declared and
+      observed configuration.
+
+  - id: d3fend:cra:annex-i-1-security-updates-capability:software-update
+    technique:
+      d3fend_id: d3f:SoftwareUpdate
+      technique_name: Software Update
+      url: https://d3fend.mitre.org/technique/d3f:SoftwareUpdate/
+    control_refs:
+      - control.patch_evidence@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "Annex I §1(m)"
+        entry_id: cra:annex-i-1-security-updates-capability
+    status: draft
+    notes: >-
+      CRA Annex I §1(m) requires that products be designed, developed, and
+      produced to provide security update mechanisms including automatic
+      updates where appropriate. `SoftwareUpdate` is the D3FEND anchor on
+      `control.patch_evidence@v1`, the dated patch-dissemination evidence
+      record.
+
+  - id: d3fend:cra:annex-i-2-cvd-policy:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.vuln_disclosure_intake@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "Annex I §2(5)"
+        entry_id: cra:annex-i-2-cvd-policy
+    status: draft
+    notes: >-
+      CRA Annex I §2(5) requires manufacturers to put in place and enforce a
+      policy on coordinated vulnerability disclosure.
+      `IncidentResponseAnalysis` is the D3FEND anchor on
+      `control.vuln_disclosure_intake@v1`, modelling the intake-and-triage arm
+      of CVD.
+
+  - id: d3fend:cra:annex-i-2-sbom:software-inventory
+    technique:
+      d3fend_id: d3f:SoftwareInventory
+      technique_name: Software Inventory
+      url: https://d3fend.mitre.org/technique/d3f:SoftwareInventory/
+    control_refs:
+      - control.sbom_capture@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "Annex I §2(1)"
+        entry_id: cra:annex-i-2-sbom
+    status: draft
+    notes: >-
+      CRA Annex I §2(1) requires manufacturers to identify and document
+      vulnerabilities and components of the product, including by drawing up
+      an SBOM. `SoftwareInventory` is the D3FEND anchor on
+      `control.sbom_capture@v1`.
+
+  - id: d3fend:cra:annex-i-2-security-updates:software-update
+    technique:
+      d3fend_id: d3f:SoftwareUpdate
+      technique_name: Software Update
+      url: https://d3fend.mitre.org/technique/d3f:SoftwareUpdate/
+    control_refs:
+      - control.patch_evidence@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "Annex I §2(7)"
+        entry_id: cra:annex-i-2-security-updates
+    status: draft
+    notes: >-
+      CRA Annex I §2(7) requires that security patches and updates be made
+      available without delay and free of charge. `SoftwareUpdate` is the
+      D3FEND anchor on `control.patch_evidence@v1`, the dated patch-
+      dissemination evidence record.
+
+  - id: d3fend:cra:annex-i-2-vuln-handling:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.vuln_disclosure_intake@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "Annex I §2(2)"
+        entry_id: cra:annex-i-2-vuln-handling
+    status: draft
+    notes: >-
+      CRA Annex I §2(2) requires manufacturers to address and remediate
+      vulnerabilities without delay. `IncidentResponseAnalysis` is the D3FEND
+      anchor on `control.vuln_disclosure_intake@v1`, modelling the triage path
+      from disclosed vulnerability to remediation ticket.
+
+  - id: d3fend:cra:art-13-component-due-diligence:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.provider_attestation@v1
+      - control.supplier_inventory@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "13(4)"
+        entry_id: cra:art-13-component-due-diligence
+    status: draft
+    notes: >-
+      CRA Art. 13(4) requires manufacturers to exercise due diligence when
+      integrating components sourced from third parties.
+      `OperationalActivityMapping` is the shared D3FEND anchor on
+      `control.supplier_inventory@v1` and `control.provider_attestation@v1`,
+      modelling supplier relationships as a mapped activity surface with
+      periodic re-attestation.
+
+  - id: d3fend:cra:art-13-risk-assessment:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.ict_risk_framework_review@v1
+      - control.risk_management_policy@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "13(2)–(3)"
+        entry_id: cra:art-13-risk-assessment
+    status: draft
+    notes: >-
+      CRA Art. 13(2)–(3) requires manufacturers to undertake a cybersecurity
+      risk assessment and account for it across the product lifecycle.
+      `OperationalActivityMapping` is the shared D3FEND anchor on
+      `control.risk_management_policy@v1` and
+      `control.ict_risk_framework_review@v1`, modelling the dated risk-
+      management policy plus its recurring framework review.
+
+  - id: d3fend:cra:art-13-security-updates-distribution:software-update
+    technique:
+      d3fend_id: d3f:SoftwareUpdate
+      technique_name: Software Update
+      url: https://d3fend.mitre.org/technique/d3f:SoftwareUpdate/
+    control_refs:
+      - control.patch_evidence@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "13(8)"
+        entry_id: cra:art-13-security-updates-distribution
+    status: draft
+    notes: >-
+      CRA Art. 13(8) requires manufacturers to disseminate available security
+      updates without delay. `SoftwareUpdate` is the D3FEND anchor on
+      `control.patch_evidence@v1`, the dated patch-dissemination evidence
+      record.
+
+  - id: d3fend:cra:art-13-spoc:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.vuln_disclosure_intake@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "13(12)"
+        entry_id: cra:art-13-spoc
+    status: draft
+    notes: >-
+      CRA Art. 13(12) requires manufacturers to designate a single point of
+      contact for the reporting of vulnerabilities. `IncidentResponseAnalysis`
+      is the D3FEND anchor on `control.vuln_disclosure_intake@v1`, the intake
+      control behind the disclosed SPoC endpoint.
+
+  - id: d3fend:cra:art-13-vuln-handling-process:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.vuln_disclosure_intake@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "13(6)"
+        entry_id: cra:art-13-vuln-handling-process
+    status: draft
+    notes: >-
+      CRA Art. 13(6) requires manufacturers to establish processes for
+      handling vulnerabilities through the support period.
+      `IncidentResponseAnalysis` is the D3FEND anchor on
+      `control.vuln_disclosure_intake@v1`, modelling the intake-and-triage arm
+      of the vulnerability handling process.
+
+  - id: d3fend:cra:art-14-early-warning:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.cra_submission_templates@v1
+      - control.incident_timeline_signals@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "14(1)"
+        entry_id: cra:art-14-early-warning
+    status: draft
+    notes: >-
+      CRA Art. 14(1) requires an early-warning notification of a severe
+      incident having impact on the security of the product.
+      `IncidentResponseAnalysis` is the shared D3FEND anchor on
+      `control.incident_timeline_signals@v1` (which captures the awareness
+      timestamp and the early-warning emission) and
+      `control.cra_submission_templates@v1` (which carries the CRA-shaped
+      submission body).
+
+  - id: d3fend:cra:art-14-final-report:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.cra_submission_templates@v1
+      - control.incident_timeline_signals@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "14(2)"
+        entry_id: cra:art-14-final-report
+    status: draft
+    notes: >-
+      CRA Art. 14(2) also requires a final report. `IncidentResponseAnalysis`
+      on `control.incident_timeline_signals@v1` is the D3FEND anchor for the
+      final report step; `control.cra_submission_templates@v1` carries the
+      submission body.
+
+  - id: d3fend:cra:art-14-notification-72h:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.cra_submission_templates@v1
+      - control.incident_timeline_signals@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "14(2)"
+        entry_id: cra:art-14-notification-72h
+    status: draft
+    notes: >-
+      CRA Art. 14(2) requires an incident notification updating the early
+      warning within 72 hours. `IncidentResponseAnalysis` on
+      `control.incident_timeline_signals@v1` drives the 72h update step;
+      `control.cra_submission_templates@v1` carries the submission body.
+
+  - id: d3fend:cra:art-14-severe-incident:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.cra_submission_templates@v1
+      - control.incident_timeline_signals@v1
+    regulation_refs:
+      - regime: cra
+        instrument: Regulation (EU) 2024/2847
+        celex: 32024R2847
+        article: "14(3)"
+        entry_id: cra:art-14-severe-incident
+    status: draft
+    notes: >-
+      CRA Art. 14(3) further covers severe-incident reporting when the
+      incident itself has impact on the manufacturer's product.
+      `IncidentResponseAnalysis` is the shared D3FEND anchor on
+      `control.incident_timeline_signals@v1` and
+      `control.cra_submission_templates@v1`.
