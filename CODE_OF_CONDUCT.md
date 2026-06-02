@@ -67,9 +67,10 @@ commits, code, wiki edits, issues, and other contributions that are
 not aligned with this Code of Conduct, and will communicate reasons
 for moderation decisions when appropriate.
 
-> The roster of current stewards is published separately under
-> `GOVERNANCE.md` once that document lands. Until then, enforcement
-> requests reach the stewards through the contact channel below.
+> The steward role is defined in [`GOVERNANCE.md`](GOVERNANCE.md §3.5).
+> The current steward roster is published in `MAINTAINERS.md` once
+> that file exists; until then, the active stewards are reachable
+> through the contact channel below.
 
 ## 5. Reporting
 
@@ -80,7 +81,10 @@ Conduct, you can report it to the stewards at:
 
 All reports are reviewed and investigated promptly and fairly. All
 stewards are obligated to respect the privacy and security of the
-reporter of any incident.
+reporter of any incident. Reports are retained only as long as is
+needed to act on them and are not used for any purpose other than
+enforcement of this Code of Conduct, in line with GDPR data
+minimisation.
 
 If you are unsure whether something is in scope, send the report
 anyway. It is better for the stewards to look at a situation that

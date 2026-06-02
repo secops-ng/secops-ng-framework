@@ -49,7 +49,36 @@ If a phrasing question comes up while you work, `SOUL.md` is the
 reference. When in doubt, ask in the pull request — that conversation
 itself is part of how the commons learns its own voice.
 
-## 3. Find a good-first card on the public roadmap
+## 3. Licensing in plain terms
+
+SecOps-NG separates the licence on *code* from the licence on *content*,
+the same split the [secops-ng-website][website-repo] uses. In practice
+that means:
+
+- **Code** — compilers, schemas-as-code, primitives, tests, CLI tooling
+  — is licensed under **Apache-2.0**. See [LICENSE](LICENSE).
+- **Content** — playbooks, control mappings, telemetry shapes, the
+  KPI/KRI catalogue, documentation — is intended to ship under
+  **CC BY-SA 4.0** once the split lands on this repository as a
+  cross-cutting change of its own. Until then, the whole tree is
+  Apache-2.0; nothing you contribute now becomes harder to relicense
+  later because Apache-2.0 → CC BY-SA 4.0 only requires forward consent,
+  not retroactive rewriting.
+
+Contributions are **inbound under the same licence as outbound** for
+the path they touch: a change to code paths is offered under
+Apache-2.0; a change to content paths is offered under the content
+licence as it stands when the change is merged. Your DCO sign-off
+(see §5) is your affirmation that you have the right to make that
+offer.
+
+If you are unsure which licence applies to a path you are editing,
+ask in the pull request before you do the work — that conversation
+is cheap and the answer is durable.
+
+[website-repo]: https://github.com/secops-ng/secops-ng-website
+
+## 4. Find a good-first card on the public roadmap
 
 The public roadmap is rendered from the open kanban board and lives in
 the repository as `ROADMAP.md`. Cards tagged `good-first` are scoped to
@@ -64,7 +93,7 @@ If nothing on the board fits, opening an issue to propose your own
 change is equally welcome. Smaller, sharper proposals merge faster than
 large undirected ones.
 
-## 4. Open a pull request
+## 5. Open a pull request
 
 Branch from `main`, keep the scope tight, and commit with sign-off:
 
@@ -82,19 +111,54 @@ Conventions worth knowing:
   parentheses names the surface you touched.
 - **DCO sign-off (`-s`) is required on every commit.** It appends
   `Signed-off-by: Your Name <you@example.org>` and certifies that you
-  wrote the contribution, or have the right to submit it, under
-  Apache-2.0. Pull requests without sign-off cannot be merged.
+  wrote the contribution, or have the right to submit it, under the
+  licence that applies to the path. Pull requests without sign-off
+  cannot be merged. There is no exception for AI-assisted commits:
+  the human committer's sign-off is what counts.
+- **Signed commits** (`git commit -S`, GPG/SSH) are required only on
+  pull requests that touch a *security-critical surface*. The current
+  enumeration of those surfaces lives in [SECURITY.md](SECURITY.md);
+  if a CI check rejects your push, that is what it is checking for.
 - **Squash noisy fix-up commits** before requesting review.
 - **Type hints on all public functions and methods.** `ToolIO` (strict
   Pydantic) is the canonical I/O type at every workflow, activity, and
   tool boundary.
 
-In the pull request description, link the issue you are closing and say
-in two or three sentences what changed and why. If you are uncertain
-about an approach, mark the PR as draft and ask — early questions are
-cheaper than late rewrites.
+### 5.1 Typed pull-request templates
 
-## 5. What review looks like
+The PR template asks you to pick a type. Picking the right one sets the
+reviewer's expectations and shortens the round-trip:
+
+| Type | When to use it | What the template asks |
+|---|---|---|
+| **bug-fix** | A behaviour does not match a documented contract, a test catches it, the fix is local. | Failing test or repro; smallest possible diff. |
+| **new-content** | A new playbook, control mapping, telemetry shape, KPI/KRI entry, or any other content artifact. | Schema validates; standards lineage cited; example included. |
+| **new-feature** | A new primitive, compiler emitter, or public API surface. | Design motivation; alternatives considered; backward-compatibility note. |
+| **documentation** | Prose-only changes: clarifications, examples, fixed links. | One-line rationale; affected pages listed. |
+
+If your change does not fit cleanly into one type, that is usually a
+sign it should be split into separate PRs.
+
+### 5.2 Conflict-of-interest and funded-contribution disclosure
+
+If a person or organisation paying you would materially benefit from
+the change being merged, the PR description must include:
+
+- **`Funded by:`** a one-line note when the contribution originates
+  from grant or contract work. The line is informational — funded
+  work does not get accelerated review and does not enter a separate
+  tree.
+- **A COI flag.** If your employer or a client has a material interest
+  in the change (a feature they need, a competitor they want
+  disadvantaged), say so in two sentences in the PR description. A
+  flagged change is reviewed the same way as any other change; the
+  flag is for the public record, not for gatekeeping.
+
+A funded contributor may not be the sole approver of a deliverable they
+were funded to produce. Routine for grant-supported work; uncommon for
+contract work.
+
+## 6. What review looks like
 
 Every pull request to this repository is read by a reviewer in the
 **Custodian** role before it can merge. The Custodian is not a
@@ -106,10 +170,10 @@ Custodian's job is to make sure nothing lands that we will regret later.
 In plain terms, the Custodian checks:
 
 - **Forward-public hygiene.** No credentials, secrets, internal
-  hostnames, or contact names. No commercial or consulting framing. No
-  named organisations described as prospects or partners. If something
-  reads like it belongs in a private operational note, it goes there
-  instead.
+  hostnames, or contact names. No commercial framing, no vendor or
+  services-firm voice. No named organisations described as prospects
+  or partners. If something reads like it belongs in a private
+  operational note, it goes there instead.
 - **Voice.** Consistent with `SOUL.md`. Community language, calm and
   technical, no marketing verbs.
 - **Code quality.** Tests cover the change, types are honest,
@@ -127,7 +191,7 @@ When the change is approved, a maintainer merges it. You will see your
 name in the commit history and, if the change is user-visible, in the
 release notes for the next version.
 
-## Adding or editing a workflow
+## 7. Adding or editing a workflow
 
 Workflows under `workflows/` follow a fixed per-directory layout —
 `README.md`, `PROMPT.md`, `primitives.py`, `example.py`, and
@@ -144,16 +208,33 @@ single-shot reproduction prompt every workflow ships) live in
 that are missing any required file, or that leave required files as
 `TODO` stubs, are rejected.
 
-## Reporting security issues
+## 8. Proposing larger changes
+
+Most changes do not need a formal proposal — an issue plus a PR is
+enough. When a change is *cross-cutting* — touching public APIs,
+breaking artifact shapes, the sovereignty posture, the licence
+structure, this document, `GOVERNANCE.md`, or `CODE_OF_CONDUCT.md` —
+open an issue first that describes the motivation, alternatives
+considered, and the impact on existing users. The pull request links
+to that issue.
+
+A heavyweight RFC document type may be introduced in `docs/rfcs/` once
+the project's scale justifies the ceremony. It does not exist yet
+because the project does not need it yet. The trigger for introducing
+it is documented in [GOVERNANCE.md §4](GOVERNANCE.md).
+
+## 9. Reporting security issues
 
 Please do **not** open public issues for vulnerabilities. See
-`SECURITY.md` for the disclosure process.
+[SECURITY.md](SECURITY.md) for the disclosure process.
 
-## Code of conduct and governance
+## 10. Code of conduct and governance
 
-Participation in this project is governed by `CODE_OF_CONDUCT.md`. How
-decisions are made — proposals, consent, escalation — is documented in
-`GOVERNANCE.md`. Both are short. Reading them now means you will not be
-surprised later.
+Participation in this project is governed by
+[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). How decisions are made —
+proposals, consent, chapter leads, escalation, and the threshold at
+which a steering group is constituted — is documented in
+[GOVERNANCE.md](GOVERNANCE.md). Both are short. Reading them now
+means you will not be surprised later.
 
 Welcome to the commons. We are glad you are here.

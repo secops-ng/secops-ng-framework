@@ -13,6 +13,24 @@ It is maintained as a digital commons: built in the open, owned by no single
 vendor, and designed for organisations that need to meet European
 regulatory baselines without locking their playbooks to one runtime.
 
+## Community
+
+This is a community project. If you are here to contribute, four
+documents are the whole substrate:
+
+- [CONTRIBUTING.md](CONTRIBUTING.md) — clone, build, DCO sign-off,
+  typed pull-request templates, the licensing-split explainer, and
+  the review process.
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — what we expect of one
+  another, adapted from the Contributor Covenant 2.1.
+- [GOVERNANCE.md](GOVERNANCE.md) — lazy consensus, chapter leads, the
+  threshold at which a formal steering group is constituted, and the
+  cross-cutting-change process.
+- [SECURITY.md](SECURITY.md) — coordinated disclosure, response SLOs,
+  the security-critical surface enumeration, and NIS2/DORA alignment.
+
+A roadmap of `good-first` cards lives in `ROADMAP.md`.
+
 ## What is SecOps-NG
 
 SecOps-NG is **not** a SOAR, not a workflow runtime, and not an agent
