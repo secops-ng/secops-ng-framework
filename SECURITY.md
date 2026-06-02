@@ -70,7 +70,8 @@ In scope for this policy:
 - The `secops_ng` Python package and its public APIs.
 - The reference compilers under `compilers/` and the content artifacts
   they consume from `content/`.
-- The workflow templates under `workflows/` and `examples/`.
+- The portable playbooks under `content/playbooks/` and the compiled
+  workflow examples under `examples/`.
 - The build, packaging, and CI configuration in this repository.
 - The hygiene linter and other tooling under `tools/` to the extent
   that a vulnerability there could harm an operator running the

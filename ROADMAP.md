@@ -1,9 +1,9 @@
 # SecOps-NG — Roadmap
 
 This is the **source-of-truth roadmap** for the SecOps-NG framework. It is
-hand-curated and reviewed by the community. It is **not** a status board —
-the live, per-task status of public work is rendered separately to
-[`docs/kanban-status.md`](docs/kanban-status.md) from the project kanban.
+hand-curated and reviewed by the community. Each entry is a feature
+definition; live shipping work shows up in repository activity (merged
+PRs, release notes) rather than a separate status mirror.
 
 ## How this document is used
 
@@ -12,26 +12,23 @@ Each entry below is a **feature definition**. Features are derived from:
 - [`docs/FOUNDATION.md`](docs/FOUNDATION.md) — the four non-negotiable
   properties (auditability, determinism, sovereignty, operability).
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — the four-layer runtime.
-- [`compliance/nis2/`](compliance/nis2/) — NIS2 Articles 20–23 mappings.
-- [`compliance/gdpr/`](compliance/gdpr/) — GDPR data-flow templates.
+- [`content/mappings/nis2/`](content/mappings/nis2/) — NIS2 Articles
+  20–23 mappings.
+- [`content/mappings/gdpr/`](content/mappings/gdpr/) — GDPR data-flow
+  templates.
 - Community input (issues, PRs, contributor field notes).
 
-A feature graduates from this document into shipped code via the public
-kanban. The convention:
+A feature graduates from this document into shipped code via contributor
+PRs. The convention:
 
-1. A feature here gets one or more kanban cards. Cards reference the
-   feature id (e.g. `F-CR-03`) in their body so the link is explicit.
-2. Card status is rendered to `docs/kanban-status.md` daily.
-3. When every card for a feature reaches `done`, the **Status** line on
-   the feature flips to `Shipped` in the next ROADMAP revision.
+1. A feature here gets one or more PRs against the affected surface.
+   PRs reference the feature id (e.g. `F-CR-03`) in their description
+   so the link is explicit.
+2. When every PR for a feature has merged, the **Status** line on the
+   feature flips to `Shipped` in the next ROADMAP revision.
 
-This document is revised:
-
-- **After every market or regulatory brief** lands at
-  `docs/research/*-market-brief.md`. The Coder lane re-reads the brief
-  and updates affected features (priorities, acceptance criteria,
-  sovereign-stack constraints).
-- **On contributor request** via a PR that amends the feature table.
+This document is revised on contributor request, via a PR that amends
+the feature table.
 
 ## Schema
 
@@ -258,7 +255,7 @@ named operator use-case. Each cookbook workflow lives under
     only used for free-text fields.
   - Cookbook entry + replay test + walkthrough docs.
 - **Sovereign-stack constraints:** Payload shapes must validate as
-  GDPR data-flow `data-flow-alert-triage.md` (see `compliance/gdpr/`).
+  GDPR data-flow `data-flow-alert-triage.md` (see `content/mappings/gdpr/`).
 - **Depends on:** F-WF-01
 - **Source:** NIS2 Art. 21(2)(b).
 
@@ -380,7 +377,7 @@ workflows. Each pattern lives under `patterns/<name>/`.
 - **Priority:** P0
 - **Acceptance criteria:**
   - `patterns/evidence_collector/` exists with usage docs and a test.
-  - Pattern emits to a configurable `compliance/evidence/<stream>/`
+  - Pattern emits to a configurable `content/evidence/<stream>/`
     location.
 - **Sovereign-stack constraints:** —
 - **Depends on:** F-CR-01
@@ -425,9 +422,9 @@ workflows. Each pattern lives under `patterns/<name>/`.
 
 ## Epic CP — Compliance Evidence Pipeline
 
-Wire each `<!-- coder:wire -->` marker in `compliance/nis2/` to a real
+Wire each `<!-- coder:wire -->` marker in `content/mappings/nis2/` to a real
 evidence stream emitted by framework workflows. Each stream is a
-directory under `compliance/evidence/<stream>/` whose schema is
+directory under `content/evidence/<stream>/` whose schema is
 documented in the corresponding NIS2 article file.
 
 ### F-CP-01 — Risk-analysis stream
@@ -435,9 +432,9 @@ documented in the corresponding NIS2 article file.
 - **Status:** Proposed
 - **Priority:** P1
 - **Acceptance criteria:**
-  - `compliance/evidence/risk-analysis/` populated by at least one
+  - `content/evidence/risk-analysis/` populated by at least one
     workflow with policy versions and risk-analysis outputs.
-  - Schema documented in `compliance/nis2/article-21-risk-management.md`
+  - Schema documented in `content/mappings/nis2/article-21-risk-management.md`
     §21(2)(a).
 - **Sovereign-stack constraints:** —
 - **Depends on:** F-PT-01
@@ -448,7 +445,7 @@ documented in the corresponding NIS2 article file.
 - **Status:** Proposed
 - **Priority:** P1
 - **Acceptance criteria:**
-  - `compliance/evidence/incidents/<workflow-id>/` populated by the
+  - `content/evidence/incidents/<workflow-id>/` populated by the
     incident-management workflow.
 - **Sovereign-stack constraints:** —
 - **Depends on:** F-PT-02, F-WF-05
@@ -459,7 +456,7 @@ documented in the corresponding NIS2 article file.
 - **Status:** Proposed
 - **Priority:** P1
 - **Acceptance criteria:**
-  - `compliance/evidence/supply-chain/dependencies-snapshot.json`
+  - `content/evidence/supply-chain/dependencies-snapshot.json`
     emitted per workflow execution that calls an external provider.
 - **Sovereign-stack constraints:** Snapshot includes provider
   sovereignty classification.
@@ -471,7 +468,7 @@ documented in the corresponding NIS2 article file.
 - **Status:** Proposed
 - **Priority:** P1
 - **Acceptance criteria:**
-  - `compliance/evidence/vulns/` populated by `vulnerability_triage`
+  - `content/evidence/vulns/` populated by `vulnerability_triage`
     with triage decisions and disclosure timelines.
 - **Sovereign-stack constraints:** —
 - **Depends on:** F-WF-01, F-PT-01
@@ -482,7 +479,7 @@ documented in the corresponding NIS2 article file.
 - **Status:** Proposed
 - **Priority:** P2
 - **Acceptance criteria:**
-  - `compliance/evidence/crypto/secret-handling-attestation.json`
+  - `content/evidence/crypto/secret-handling-attestation.json`
     emitted per workflow execution, asserting no secret was baked into
     workflow code (env-only injection).
 - **Sovereign-stack constraints:** Hard rule: any workflow that fails
@@ -495,7 +492,7 @@ documented in the corresponding NIS2 article file.
 - **Status:** Proposed
 - **Priority:** P2
 - **Acceptance criteria:**
-  - `compliance/evidence/effectiveness/` populated with metric
+  - `content/evidence/effectiveness/` populated with metric
     snapshots per policy / prompt version.
 - **Sovereign-stack constraints:** Metrics are DSPy-evaluatable.
 - **Depends on:** F-CR-03, F-PT-01
@@ -506,7 +503,7 @@ documented in the corresponding NIS2 article file.
 - **Status:** Proposed
 - **Priority:** P2
 - **Acceptance criteria:**
-  - `compliance/evidence/access/` populated with per-execution caller
+  - `content/evidence/access/` populated with per-execution caller
     identity and capability list.
 - **Sovereign-stack constraints:** —
 - **Depends on:** F-PT-01
@@ -525,7 +522,7 @@ not a separate documentation chore.
 - **Priority:** P1
 - **Acceptance criteria:**
   - Every cookbook workflow under `workflows/` ships a populated
-    `compliance/gdpr/data-flow-<workflow>.md` derived from the
+    `content/mappings/gdpr/data-flow-<workflow>.md` derived from the
     canonical template.
   - The seven required sections (purpose, lawful basis, categories,
     recipients, retention, cross-border, rights) are non-empty.
@@ -544,7 +541,7 @@ not a separate documentation chore.
     document, or if the lawful-basis section is empty.
 - **Sovereign-stack constraints:** —
 - **Depends on:** F-GD-01
-- **Source:** GDPR Art. 6(1), `compliance/gdpr/lawful-basis-notes.md`.
+- **Source:** GDPR Art. 6(1), `content/mappings/gdpr/lawful-basis-notes.md`.
 
 ---
 
@@ -577,8 +574,7 @@ manual configuration.
 - **Sovereign-stack constraints:** Uses Regulation (EU) 2024/1183
   reference schemas only.
 - **Depends on:** F-PT-03
-- **Source:** Research `2026-05-16-eidas2-wallet-patterns.md` (private;
-  surface to public when scoped).
+- **Source:** Research `2026-05-16-eidas2-wallet-patterns.md` (private; available on request).
 
 ### F-SV-03 — DORA technical-incident reporting alignment
 
@@ -591,13 +587,12 @@ manual configuration.
 - **Sovereign-stack constraints:** —
 - **Depends on:** F-WF-05
 - **Source:** Research `2026-05-15-dora-incident-reporting.md`
-  (private; surface to public when scoped).
+  (private; available on request).
 
 ---
 
 ## Revision history
 
 - **v0 (2026-05-21).** Initial seed from FOUNDATION.md, ARCHITECTURE.md,
-  and the NIS2 / GDPR compliance scaffolds. No market brief yet
-  consumed; subsequent revisions will follow the standing cadence
-  ("after each new market brief").
+  and the NIS2 / GDPR mappings under `content/mappings/`. Subsequent
+  revisions land via contributor PRs.
