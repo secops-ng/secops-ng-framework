@@ -70,9 +70,10 @@ no internal infrastructure detail, no contact names, no credentials.
 > F-CR-03, and F-CR-05 are therefore marked **Removed (superseded
 > by content-first refactor)** below; their acceptance criteria are
 > preserved for historical reference but no longer track in-repo
-> work. F-CR-04 (OpenTelemetry) remains **In Progress** because it
-> is a cross-target concern that the content layer still needs to
-> express portably; its scope is the subject of an open decision.
+> work. F-CR-04 (OpenTelemetry) remains **In Progress** and has been
+> reshaped to a compiler-emitted scope: each reference compiler emits
+> artifacts already wrapped in OTel instrumentation, governed by a
+> shared attribute-schema helper — see the F-CR-04 entry below.
 
 ### F-CR-01 — Frozen Pydantic v2 `ToolIO` contract
 
@@ -142,22 +143,49 @@ no internal infrastructure detail, no contact names, no credentials.
 - **Source:** FOUNDATION (sovereignty), ARCHITECTURE (LLM reasoning layer),
   NIS2 Art. 21(2)(f).
 
-### F-CR-04 — OpenTelemetry spans on every node and tool call
+### F-CR-04 — OpenTelemetry instrumentation emitted by every reference compiler
 
 - **Status:** In Progress
 - **Priority:** P0
+- **Rationale:** After the content-first refactor (PR #34), SecOps-NG
+  ships portable content and reference compilers, not an in-repo
+  runtime. Observability therefore lives in the compile targets: each
+  reference compiler (`compilers/n8n/`, `compilers/temporal/`,
+  `compilers/langgraph/`) emits artifacts that are already wrapped in
+  OpenTelemetry instrumentation, and a shared helper module defines the
+  common attribute schema so the three targets stay span-compatible.
+  The previous acceptance criteria (which assumed a single in-repo
+  `StateGraph` and a `TriageState.audit_trail` field) are obsolete and
+  are replaced by the compiler-emitted criteria below.
 - **Acceptance criteria:**
-  - Every graph node emits an OTel span with structured attributes
-    (workflow id, node name, input/output schema names, duration).
-  - Every tool call emits a child span with finding id, severity, and
-    recommended action where applicable.
-  - Spans are exported via the operator's OTLP collector; no vendor
-    SDK is bundled.
-  - An in-band audit trail (e.g. `TriageState.audit_trail`) mirrors the
-    OTel events so the trail survives an OTLP outage.
-- **Sovereign-stack constraints:** OTLP endpoint is operator-configured;
-  default points to localhost.
-- **Depends on:** F-CR-02
+  - Each reference compiler under `compilers/{n8n,temporal,langgraph}/`
+    emits artifacts whose every workflow step (n8n node, Temporal
+    activity, LangGraph node) opens an OpenTelemetry span with
+    structured attributes: workflow id, step name, input and output
+    content-artifact ids, and step duration.
+  - Each emitted tool or sub-workflow call opens a child span carrying
+    finding id, severity, and recommended-action attributes when the
+    underlying content artifact declares them.
+  - A shared helper module (e.g. `compilers/_shared/observability/`)
+    documents the span and attribute schema and is referenced — not
+    duplicated — by each per-target emitter.
+  - Emitted artifacts target the operator's OTLP collector via
+    environment-variable configuration; no vendor SDK (Datadog,
+    Honeycomb, New Relic, etc.) is bundled, and no default endpoint
+    outside the operator's control is set.
+  - Emitted artifacts also record an in-band audit-trail entry per
+    step — mirroring the span's structured attributes — in a
+    target-appropriate location (workflow state object on LangGraph,
+    activity heartbeat / search attributes on Temporal, execution
+    metadata on n8n) so the audit property holds when OTLP is offline.
+  - Per-target byte-parity golden tests under `tests/examples/` cover
+    the emitted instrumentation, so any regression in the OTel wrapping
+    flips a test red.
+- **Sovereign-stack constraints:** OTLP endpoint is operator-configured
+  via environment variable; no default points outside the operator's
+  collector. The shared helper imports only upstream OpenTelemetry SDK
+  packages.
+- **Depends on:** —
 - **Source:** ARCHITECTURE (Observability layer), NIS2 Art. 23.
 
 ### F-CR-05 — Deterministic replay test for every workflow
