@@ -55,14 +55,37 @@ no internal infrastructure detail, no contact names, no credentials.
 
 ## Epic CR — Core Runtime
 
-The minimum viable LangGraph + Pydantic v2 + DSPy + OpenTelemetry surface
-that every SecOps-NG workflow runs on.
+> **Note (content-first refactor, PR #34, `a78ea7f`):** The original
+> F-CR-* features described a single in-repo Python runtime
+> (`src/secops_ng/{tool_io,config,workflows}/`) that bundled a
+> Pydantic v2 contract layer, a LangGraph `StateGraph` baseline, a
+> DSPy reasoning layer, and a deterministic replayer. That runtime
+> tree was deliberately removed when the repository pivoted to a
+> framework-agnostic, content-first layout: portable artifacts under
+> `content/`, reference compilers under `compilers/{n8n,temporal,langgraph,community}/`,
+> and per-target example projects under `examples/<target>/<workflow>/`.
+> The contract, orchestration, reasoning, and replay concerns now
+> belong to the compile target the operator already runs (n8n,
+> Temporal, LangGraph), not to a runtime we ship. F-CR-01, F-CR-02,
+> F-CR-03, and F-CR-05 are therefore marked **Removed (superseded
+> by content-first refactor)** below; their acceptance criteria are
+> preserved for historical reference but no longer track in-repo
+> work. F-CR-04 (OpenTelemetry) remains **In Progress** because it
+> is a cross-target concern that the content layer still needs to
+> express portably; its scope is the subject of an open decision.
 
 ### F-CR-01 — Frozen Pydantic v2 `ToolIO` contract
 
-- **Status:** Shipped
+- **Status:** Removed (superseded by content-first refactor)
 - **Priority:** P0
-- **Acceptance criteria:**
+- **Rationale:** PR #34 (`a78ea7f`) dropped the `src/secops_ng/`
+  runtime tree, including `secops_ng.tool_io.ToolIO`. Boundary
+  contracts are now expressed in portable artifacts under `content/`
+  and `schemas/`, and each compile target enforces them in its own
+  idiom (Pydantic models in the LangGraph reference compiler, JSON
+  Schema for n8n, dataclasses for Temporal). A single in-repo
+  `ToolIO` base class no longer fits the framework-agnostic posture.
+- **Acceptance criteria (historical):**
   - `secops_ng.tool_io.ToolIO` is a `pydantic.BaseModel` with
     `model_config = ConfigDict(extra="forbid", frozen=True)`.
   - Every workflow / activity / agent input and output subclasses
@@ -76,9 +99,16 @@ that every SecOps-NG workflow runs on.
 
 ### F-CR-02 — LangGraph `StateGraph` baseline
 
-- **Status:** Shipped
+- **Status:** Removed (superseded by content-first refactor)
 - **Priority:** P0
-- **Acceptance criteria:**
+- **Rationale:** PR #34 (`a78ea7f`) removed the in-repo LangGraph
+  baseline (`src/secops_ng/workflows/`, `TriageState`, etc.). The
+  LangGraph surface is now one of three reference compile targets
+  under `compilers/langgraph/`, with per-workflow examples at
+  `examples/langgraph/<workflow>/`. Operators who want a LangGraph
+  baseline compile content into it; the framework no longer
+  privileges LangGraph as *the* orchestrator.
+- **Acceptance criteria (historical):**
   - Workflows are expressed as `langgraph.graph.StateGraph` instances.
   - State is a single frozen `ToolIO` subclass; transitions are
     `model_copy(update=...)` returns.
@@ -91,9 +121,15 @@ that every SecOps-NG workflow runs on.
 
 ### F-CR-03 — DSPy-mediated LLM reasoning
 
-- **Status:** Shipped
+- **Status:** Removed (superseded by content-first refactor)
 - **Priority:** P0
-- **Acceptance criteria:**
+- **Rationale:** PR #34 (`a78ea7f`) removed `src/secops_ng/config/`
+  and the shared DSPy reasoning layer. Reasoning is now expressed in
+  the portable PROMPT artifacts under `content/` and realised by each
+  compile target (the LangGraph reference compiler can still use DSPy;
+  n8n and Temporal targets do not). A single in-repo DSPy layer is
+  not framework-agnostic and so cannot remain a Core Runtime feature.
+- **Acceptance criteria (historical):**
   - All LLM-facing reasoning is expressed as a DSPy signature + module.
   - A `DummyLM` test double exists and is used by the test suite so
     LLM-using nodes are testable without a network call.
@@ -126,9 +162,18 @@ that every SecOps-NG workflow runs on.
 
 ### F-CR-05 — Deterministic replay test for every workflow
 
-- **Status:** Shipped
+- **Status:** Removed (superseded by content-first refactor)
 - **Priority:** P0
-- **Acceptance criteria:**
+- **Rationale:** PR #34 (`a78ea7f`) removed the in-repo workflow tree
+  the LangGraph replayer was wired against. Determinism is now
+  asserted per compile target: the per-example **byte-parity golden
+  tests** under `tests/examples/` (see e.g. `executive-metrics`,
+  `on-call-rotation`, `post-incident-review`) compile each portable
+  artifact into n8n, Temporal, and LangGraph and assert the rendered
+  output is byte-identical across runs. That assertion does the work
+  the LangGraph replayer used to do, but at the content layer where
+  it is framework-agnostic.
+- **Acceptance criteria (historical):**
   - Each cookbook workflow ships a replay test that invokes the
     LangGraph replayer (or equivalent) and asserts identical state
     transitions on a fixed transcript.
