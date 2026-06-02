@@ -42,6 +42,6 @@ regulatory baseline. Not a vendor. Not a consultancy. A commons.
 
 ## When in doubt
 
-It goes in `secops-ng-business` (private). The Custodian rejects on
+It goes in a private repo, not this one. The Custodian rejects on
 ambiguity — the will-be-public repos are append-only public history
 from day one.
