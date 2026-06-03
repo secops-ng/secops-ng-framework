@@ -52,6 +52,7 @@ from compilers._shared.observability import (
     SPAN_ATTR_STEP_ID,
     SPAN_ATTR_STEP_NAME,
     SPAN_ATTR_TOOL_NAME,
+    SPAN_ATTR_WORKFLOW_RUN_ID,
     SpanSpec,
     emit_tool_span_block,
     render_audit_mirror_imports,
@@ -471,6 +472,14 @@ def render_tool_bindings(spec: ToolBindingsSpec) -> str:
             SPAN_ATTR_PLAYBOOK_ID: spec.playbook_id,
             SPAN_ATTR_STEP_ID: b.step_id,
             SPAN_ATTR_TOOL_NAME: b.function_name,
+            # Empty-string compile-time placeholder. LangGraph does not bind a
+            # workflow-run identifier until invocation; emitting the attribute
+            # at compile time with an empty value keeps the audit envelope's
+            # key set structurally identical across the temporal and
+            # langgraph reference compilers (the cross-target parity contract
+            # in tests/compilers/_shared/test_audit_mirror_cross_target_parity.py).
+            # Integrators rebind at the call site.
+            SPAN_ATTR_WORKFLOW_RUN_ID: "",
         }
         if b.step_name:
             attrs[SPAN_ATTR_STEP_NAME] = b.step_name
