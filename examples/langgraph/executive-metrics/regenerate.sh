@@ -14,3 +14,8 @@ cp "${CANON}" "${HERE}/playbook.cacao.json"
 # Emit GraphSpec + generated state bindings from the canonical playbook.
 PYTHONPATH="${REPO_ROOT}" python -m compilers.langgraph.emit  "${CANON}" > "${HERE}/graph_spec.json"
 PYTHONPATH="${REPO_ROOT}" python -m compilers.langgraph.state "${CANON}" > "${HERE}/state_bindings.py"
+
+# Materialise the dependency-free audit-mirror sibling. See
+# docs/observability/audit-mirror.md for the co-location rationale.
+PYTHONPATH="${REPO_ROOT}" python -m compilers._shared.audit_mirror_cli \
+    --out "${HERE}/_audit_mirror.py"
