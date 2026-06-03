@@ -6,6 +6,9 @@ replay-friendly helpers that the per-target CORE action bodies
 its own module so the per-target compilers depend only on what they
 need:
 
+* :mod:`.dedup` — case idempotency key built from the canonicalised
+  ``cve_id`` + ``asset_ref`` pair, SHA-256 lower-hex. Two replays of the
+  same disclosure against the same asset collapse to the same key.
 * :mod:`.signatures` — DSPy signatures for **free-text fields only**
   (reporter narrative summarisation, advisory excerpt synthesis). See
   ``docs/FOUNDATION.md`` §LLM determinism: severity rating is
@@ -13,17 +16,20 @@ need:
   reserved for fields where free-text-in / structured-out is the only
   sensible shape.
 
-Sibling primitives (CVSS, EPSS, severity policy, deterministic dedup)
-land via their own cards in the F-WF-01 CORE-PRIM wave and are exposed
-through this ``__init__`` as they merge. To keep the per-card PRs
-parallel-safe and the diffs reviewable, this file only re-exports the
-slice owned by the PR shipping it.
+Sibling primitives (CVSS, EPSS, severity policy) land via their own
+cards in the F-WF-01 CORE-PRIM wave and are exposed through this
+``__init__`` as they merge. To keep the per-card PRs parallel-safe and
+the diffs reviewable, this file only re-exports the slice owned by the
+PRs shipping it.
 """
 
 from __future__ import annotations
 
+from .dedup import canonicalize_case_field, case_idempotency_key
 from .signatures import signature_schema
 
 __all__ = [
+    "canonicalize_case_field",
+    "case_idempotency_key",
     "signature_schema",
 ]
