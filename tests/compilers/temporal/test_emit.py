@@ -74,6 +74,60 @@ def _temporalio_stub() -> types.ModuleType:
     return pkg
 
 
+def _opentelemetry_stub() -> types.ModuleType:
+    """Build a minimal ``opentelemetry`` stub for emitted-source import tests.
+
+    The emitter wraps activity bodies in ``_TRACER.start_as_current_span(...)``
+    context managers (F-CR-04 CORE-B1). The test environment doesn't carry the
+    real OTel SDK, so we expose a no-op tracer whose span context manager
+    accepts the keyword args the emitter uses (``name=``, ``attributes=``).
+    """
+
+    class _NoopSpan:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+    class _NoopTracer:
+        def start_as_current_span(self, *args, **kwargs):
+            return _NoopSpan()
+
+    trace_mod = types.SimpleNamespace(get_tracer=lambda *_a, **_kw: _NoopTracer())
+    pkg = types.ModuleType("opentelemetry")
+    pkg.trace = trace_mod  # type: ignore[attr-defined]
+    return pkg
+
+
+def _audit_mirror_stub(parent_pkg_name: str) -> types.ModuleType:
+    """Stub the sibling ``_audit_mirror`` module the emitted code imports.
+
+    Generated artifacts emit ``from ._audit_mirror import AuditRecord, AuditTrail``;
+    in tests we splice a no-op pair under the synthetic parent package so
+    relative-import resolution succeeds.
+    """
+
+    class AuditRecord:
+        def __init__(self, **kwargs):
+            for k, v in kwargs.items():
+                setattr(self, k, v)
+
+    class _Trail:
+        def append(self, _record):
+            return None
+
+    class AuditTrail:
+        @classmethod
+        def current(cls):
+            return _Trail()
+
+    mod = types.ModuleType(f"{parent_pkg_name}._audit_mirror")
+    mod.AuditRecord = AuditRecord  # type: ignore[attr-defined]
+    mod.AuditTrail = AuditTrail  # type: ignore[attr-defined]
+    return mod
+
+
 def _load_module(source: str, name: str = "_temporal_stub_under_test") -> types.ModuleType:
     """Import a string of source as a fresh module with temporalio stubbed."""
     pkg = _temporalio_stub()
@@ -81,10 +135,23 @@ def _load_module(source: str, name: str = "_temporal_stub_under_test") -> types.
     sys.modules["temporalio.activity"] = pkg.activity  # type: ignore[assignment]
     sys.modules["temporalio.workflow"] = pkg.workflow  # type: ignore[assignment]
     sys.modules["temporalio.common"] = pkg.common  # type: ignore[assignment]
-    spec = importlib.util.spec_from_loader(name, loader=None)
+    otel = _opentelemetry_stub()
+    sys.modules["opentelemetry"] = otel
+    sys.modules["opentelemetry.trace"] = otel.trace  # type: ignore[assignment]
+    # The emitted source does `from ._audit_mirror import ...`, so the module
+    # must live in a package. Synthesise a tiny parent package and bind the
+    # stub _audit_mirror inside it.
+    parent_name = f"{name}_pkg"
+    parent = types.ModuleType(parent_name)
+    parent.__path__ = []  # type: ignore[attr-defined]
+    sys.modules[parent_name] = parent
+    sys.modules[f"{parent_name}._audit_mirror"] = _audit_mirror_stub(parent_name)
+    full_name = f"{parent_name}.{name}"
+    spec = importlib.util.spec_from_loader(full_name, loader=None)
     assert spec is not None
     module = importlib.util.module_from_spec(spec)
-    exec(compile(source, f"<{name}>", "exec"), module.__dict__)
+    module.__package__ = parent_name
+    exec(compile(source, f"<{full_name}>", "exec"), module.__dict__)
     return module
 
 
