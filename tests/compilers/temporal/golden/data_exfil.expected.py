@@ -13,6 +13,11 @@ from datetime import timedelta
 from temporalio import activity, workflow
 from temporalio.common import RetryPolicy
 
+from opentelemetry import trace
+
+_TRACER = trace.get_tracer(__name__)
+
+from ._audit_mirror import AuditRecord, AuditTrail
 
 @activity.defn
 async def triage_signal(signal_id: str) -> None:
@@ -20,9 +25,16 @@ async def triage_signal(signal_id: str) -> None:
 
     CACAO step_id: action--20000000-0000-4000-8000-000000000002
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--20000000-0000-4000-8000-000000000002'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--20000000-0000-4000-8000-000000000002',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--20000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'triage signal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'triage_signal'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--20000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--20000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'triage signal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'triage_signal'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--20000000-0000-4000-8000-000000000002'"
+        )
 
 TRIAGE_SIGNAL_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -37,9 +49,16 @@ async def scope_assessment(signal_id: str) -> dict[str, object]:
 
     CACAO step_id: action--20000000-0000-4000-8000-000000000003
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--20000000-0000-4000-8000-000000000003'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--20000000-0000-4000-8000-000000000003',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--20000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'scope assessment', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'scope_assessment'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--20000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--20000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'scope assessment', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'scope_assessment'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--20000000-0000-4000-8000-000000000003'"
+        )
 
 SCOPE_ASSESSMENT_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -54,9 +73,16 @@ async def containment(data_classification: str, affected_subjects_count: int) ->
 
     CACAO step_id: action--20000000-0000-4000-8000-000000000005
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--20000000-0000-4000-8000-000000000005'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--20000000-0000-4000-8000-000000000005',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--20000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'containment', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'containment'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--20000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--20000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'containment', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'containment'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--20000000-0000-4000-8000-000000000005'"
+        )
 
 CONTAINMENT_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -71,9 +97,16 @@ async def notify_regulator(data_classification: str, affected_subjects_count: in
 
     CACAO step_id: action--20000000-0000-4000-8000-000000000007
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--20000000-0000-4000-8000-000000000007'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--20000000-0000-4000-8000-000000000007',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--20000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'notify regulator', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_regulator'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--20000000-0000-4000-8000-000000000007', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--20000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'notify regulator', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_regulator'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--20000000-0000-4000-8000-000000000007'"
+        )
 
 NOTIFY_REGULATOR_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -88,9 +121,16 @@ async def notify_customer(data_classification: str, affected_subjects_count: int
 
     CACAO step_id: action--20000000-0000-4000-8000-000000000008
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--20000000-0000-4000-8000-000000000008'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--20000000-0000-4000-8000-000000000008',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--20000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'notify customer', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_customer'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--20000000-0000-4000-8000-000000000008', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--20000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'notify customer', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_customer'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--20000000-0000-4000-8000-000000000008'"
+        )
 
 NOTIFY_CUSTOMER_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -113,9 +153,16 @@ class PlaybookDataExfilV1Workflow:
 
     @workflow.run
     async def run(self) -> None:
-        raise NotImplementedError(
-            f"CACAO workflow lowering not implemented: stable_id='playbook.data_exfil@v1'"
-        )
+        with _TRACER.start_as_current_span(
+            name='workflow.playbook.data_exfil@v1',
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0'},
+        ):
+            AuditTrail.current().append(
+                AuditRecord(span_name='workflow.playbook.data_exfil@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0'})
+            )
+            raise NotImplementedError(
+                f"CACAO workflow lowering not implemented: stable_id='playbook.data_exfil@v1'"
+            )
 
 WORKFLOW = PlaybookDataExfilV1Workflow
 ACTIVITIES = (triage_signal, scope_assessment, containment, notify_regulator, notify_customer,)

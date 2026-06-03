@@ -13,6 +13,11 @@ from datetime import timedelta
 from temporalio import activity, workflow
 from temporalio.common import RetryPolicy
 
+from opentelemetry import trace
+
+_TRACER = trace.get_tracer(__name__)
+
+from ._audit_mirror import AuditRecord, AuditTrail
 
 @activity.defn
 async def pull_upstream_feed(feed_url: str, feed_id: str) -> None:
@@ -20,9 +25,16 @@ async def pull_upstream_feed(feed_url: str, feed_id: str) -> None:
 
     CACAO step_id: action--10000000-0000-4000-8000-000000000002
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--10000000-0000-4000-8000-000000000002'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--10000000-0000-4000-8000-000000000002',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7c1e2b3a-4d5f-4a8b-9c0d-1e2f3a4b5c6d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--10000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'pull upstream feed', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'pull_upstream_feed'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--10000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7c1e2b3a-4d5f-4a8b-9c0d-1e2f3a4b5c6d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--10000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'pull upstream feed', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'pull_upstream_feed'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--10000000-0000-4000-8000-000000000002'"
+        )
 
 PULL_UPSTREAM_FEED_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -37,9 +49,16 @@ async def normalise_stix_to_ocsf() -> dict[str, object]:
 
     CACAO step_id: action--10000000-0000-4000-8000-000000000003
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--10000000-0000-4000-8000-000000000003'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--10000000-0000-4000-8000-000000000003',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7c1e2b3a-4d5f-4a8b-9c0d-1e2f3a4b5c6d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--10000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'normalise STIX to OCSF', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'normalise_stix_to_ocsf'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--10000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7c1e2b3a-4d5f-4a8b-9c0d-1e2f3a4b5c6d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--10000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'normalise STIX to OCSF', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'normalise_stix_to_ocsf'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--10000000-0000-4000-8000-000000000003'"
+        )
 
 NORMALISE_STIX_TO_OCSF_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -54,9 +73,16 @@ async def propagate_to_blocklist(indicator_count: int) -> None:
 
     CACAO step_id: action--10000000-0000-4000-8000-000000000005
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--10000000-0000-4000-8000-000000000005'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--10000000-0000-4000-8000-000000000005',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7c1e2b3a-4d5f-4a8b-9c0d-1e2f3a4b5c6d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--10000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'propagate to blocklist', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'propagate_to_blocklist'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--10000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7c1e2b3a-4d5f-4a8b-9c0d-1e2f3a4b5c6d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--10000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'propagate to blocklist', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'propagate_to_blocklist'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--10000000-0000-4000-8000-000000000005'"
+        )
 
 PROPAGATE_TO_BLOCKLIST_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -71,9 +97,16 @@ async def activate_detection_rule() -> None:
 
     CACAO step_id: action--10000000-0000-4000-8000-000000000006
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--10000000-0000-4000-8000-000000000006'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--10000000-0000-4000-8000-000000000006',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7c1e2b3a-4d5f-4a8b-9c0d-1e2f3a4b5c6d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--10000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'activate detection rule', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'activate_detection_rule'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--10000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7c1e2b3a-4d5f-4a8b-9c0d-1e2f3a4b5c6d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--10000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'activate detection rule', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'activate_detection_rule'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--10000000-0000-4000-8000-000000000006'"
+        )
 
 ACTIVATE_DETECTION_RULE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -96,9 +129,16 @@ class PlaybookThreatIntelIngestV1Workflow:
 
     @workflow.run
     async def run(self) -> None:
-        raise NotImplementedError(
-            f"CACAO workflow lowering not implemented: stable_id='playbook.threat_intel_ingest@v1'"
-        )
+        with _TRACER.start_as_current_span(
+            name='workflow.playbook.threat_intel_ingest@v1',
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7c1e2b3a-4d5f-4a8b-9c0d-1e2f3a4b5c6d', 'secops_ng.playbook.version': '0.1.0'},
+        ):
+            AuditTrail.current().append(
+                AuditRecord(span_name='workflow.playbook.threat_intel_ingest@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7c1e2b3a-4d5f-4a8b-9c0d-1e2f3a4b5c6d', 'secops_ng.playbook.version': '0.1.0'})
+            )
+            raise NotImplementedError(
+                f"CACAO workflow lowering not implemented: stable_id='playbook.threat_intel_ingest@v1'"
+            )
 
 WORKFLOW = PlaybookThreatIntelIngestV1Workflow
 ACTIVITIES = (pull_upstream_feed, normalise_stix_to_ocsf, propagate_to_blocklist, activate_detection_rule,)
