@@ -23,7 +23,7 @@ regulatory baseline. Not a vendor. Not a consultancy. A commons.
 - Prefer concrete primitives (workflows, playbooks, KB entries) over
   abstract value claims.
 
-## Forbidden in any will-be-public surface
+## Forbidden in any public surface
 
 - Consulting language: "engagement," "offering," "service tier,"
   "client," "lead," "pricing," "SLA contract."
@@ -43,5 +43,5 @@ regulatory baseline. Not a vendor. Not a consultancy. A commons.
 ## When in doubt
 
 It goes in a private repo, not this one. The Custodian rejects on
-ambiguity — the will-be-public repos are append-only public history
+ambiguity — the public repos are append-only public history
 from day one.

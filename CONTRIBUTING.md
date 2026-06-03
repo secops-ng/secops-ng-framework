@@ -40,7 +40,7 @@ commons in any file that will one day be public.
 
 This is not branding. It is a guardrail against drift. Code comments,
 commit messages, documentation, issue titles, PR descriptions — anything
-that lands in a will-be-public repository carries the same standard.
+that lands in a public repository carries the same standard.
 The shortest summary: we are a commons, not a vendor; sovereignty is a
 public good, not a selling point; "we" for the project, "you" for the
 reader, never "I" or "the company."
