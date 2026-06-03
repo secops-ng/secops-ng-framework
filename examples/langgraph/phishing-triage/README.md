@@ -85,3 +85,18 @@ or to an EU-hosted managed endpoint without regenerating the artifact.
 See [docs/compilers/langgraph.md](../../../docs/compilers/langgraph.md)
 and [docs/sovereignty/](../../../docs/sovereignty/) for the full
 posture.
+
+## EU-resident LM endpoint guard
+
+This worked example inherits the framework-wide default that any LM
+endpoint reachable from the compiled artifact lives in the European
+Union. The check runs both at compile time (the reference compiler
+fails fast on a non-EU endpoint when emitting this example) and at
+runtime (a generated `_lm_endpoint_guard.py` sibling re-applies the
+check at process startup). An operator who deliberately wires a non-EU
+endpoint must set `SECOPS_NG_LM_ENDPOINT_NON_EU_ACK=1` in the
+environment to acknowledge the trade-off; the workflow then loses its
+EU-residency posture and should document that fact in the operator's
+own deployment notes. See
+[docs/sovereignty/eu-resident-lm-guard.md](../../../docs/sovereignty/eu-resident-lm-guard.md)
+for the heuristic, the override, and the EU allowlist.

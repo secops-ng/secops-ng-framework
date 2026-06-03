@@ -1,49 +1,105 @@
-"""Drift guard for the ``examples/n8n/ransomware-containment/`` worked example.
+"""Drift guard for the ``examples/n8n/alert-triage/`` worked example.
 
-Mirrors the vuln-intake and cloud-misconfiguration n8n example tests:
-parses the canonical CACAO playbook, emits the n8n workflow JSON, and
-pins the result byte-for-byte against the committed
-``examples/n8n/ransomware-containment/workflow.n8n.json``. Adds a node-id ↔
-CACAO action-id parity check so the one-to-one mirroring contract
-documented in ``examples/n8n/ransomware-containment/README.md`` is enforced
-by tests, not by convention.
+Mirrors the other n8n example tests (``tests/examples/phishing_triage/
+test_n8n_workflow.py`` etc.): parses the worked-example CACAO mirror,
+emits the n8n workflow JSON, and pins the result byte-for-byte against
+the committed ``examples/n8n/alert-triage/workflow.n8n.json``.
+
+Unlike phishing-triage / vuln-intake the canonical alert-triage source
+lives one level up at ``content/playbooks/alert-triage.cacao.yaml``
+(YAML), so this test additionally verifies the byte-deterministic
+JSON mirror committed alongside the n8n example is in sync with that
+YAML — same contract the LangGraph alert-triage drift guard enforces
+for its mirror. The pattern follows
+``tests/examples/test_langgraph_alert_triage.py`` for the mirror check
+and the n8n CORE assertions (node-id / Set-node uplift) follow
+``tests/examples/phishing_triage/test_n8n_workflow.py``.
 
 Regenerate via::
 
-    ./examples/n8n/ransomware-containment/regenerate.sh
+    ./examples/n8n/alert-triage/regenerate.sh
 """
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
+import yaml
+
 from compilers._shared.cacao_parser import parse_file
 from compilers.n8n.emit import emit
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
-SOURCE = REPO_ROOT / "content" / "playbooks" / "ransomware-containment" / "playbook.cacao.json"
-WORKED_EXAMPLE = REPO_ROOT / "examples" / "n8n" / "ransomware-containment" / "workflow.n8n.json"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+EXAMPLE_DIR = REPO_ROOT / "examples" / "n8n" / "alert-triage"
+CANON_YAML = REPO_ROOT / "content" / "playbooks" / "alert-triage.cacao.yaml"
+MIRROR_JSON = EXAMPLE_DIR / "playbook.cacao.json"
+WORKED_EXAMPLE = EXAMPLE_DIR / "workflow.n8n.json"
 
 
-def _serialise(payload: dict) -> str:
+def _serialise_workflow(payload: dict) -> str:
+    """Canonical serialisation matching ``tools.compile`` for the n8n target."""
     return json.dumps(payload, indent=2) + "\n"
 
 
+def _serialise_json_mirror(data) -> str:
+    """Canonical YAML→JSON mirror serialisation used by ``regenerate.sh``."""
+    return json.dumps(data, indent=2, sort_keys=True) + "\n"
+
+
+# --------------------------------------------------------------------------- #
+# Sanity                                                                      #
+# --------------------------------------------------------------------------- #
+
+
+def test_committed_artefacts_exist() -> None:
+    for path in (CANON_YAML, MIRROR_JSON, WORKED_EXAMPLE):
+        assert path.exists(), f"missing worked-example artefact: {path}"
+        assert path.stat().st_size > 0, f"empty worked-example artefact: {path}"
+
+
+# --------------------------------------------------------------------------- #
+# Drift guards                                                                #
+# --------------------------------------------------------------------------- #
+
+
+def test_json_mirror_matches_yaml_source() -> None:
+    """``playbook.cacao.json`` must round-trip from the canonical YAML."""
+    data = yaml.safe_load(CANON_YAML.read_text(encoding="utf-8"))
+    rendered = _serialise_json_mirror(data)
+    expected = MIRROR_JSON.read_text(encoding="utf-8")
+    assert rendered == expected, (
+        "examples/n8n/alert-triage/playbook.cacao.json drift from the "
+        "canonical YAML source. Regenerate via "
+        "`bash examples/n8n/alert-triage/regenerate.sh` and commit the result."
+    )
+
+
 def test_worked_example_matches_emitter_output() -> None:
-    playbook = parse_file(SOURCE)
-    rendered = _serialise(emit(playbook))
+    playbook = parse_file(MIRROR_JSON)
+    rendered = _serialise_workflow(emit(playbook))
     expected = WORKED_EXAMPLE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/n8n/ransomware-containment/workflow.n8n.json drifted from the n8n "
-        "emitter output. Regenerate via "
-        "`./examples/n8n/ransomware-containment/regenerate.sh` and "
-        "commit the new bytes."
+        "examples/n8n/alert-triage/workflow.n8n.json drifted from the "
+        "n8n emitter output. Regenerate via "
+        "`./examples/n8n/alert-triage/regenerate.sh` and commit the new bytes."
     )
+
+
+def test_emit_is_deterministic() -> None:
+    playbook = parse_file(MIRROR_JSON)
+    first = _serialise_workflow(emit(playbook))
+    second = _serialise_workflow(emit(playbook))
+    assert first == second
+
+
+# --------------------------------------------------------------------------- #
+# Parity: CACAO step ids ↔ n8n node ids / labels                              #
+# --------------------------------------------------------------------------- #
 
 
 def test_node_ids_mirror_cacao_action_ids() -> None:
     """Every CACAO step id appears once as an n8n node id, and vice versa."""
-    playbook_raw = json.loads(SOURCE.read_text(encoding="utf-8"))
+    playbook_raw = json.loads(MIRROR_JSON.read_text(encoding="utf-8"))
     cacao_step_ids = set(playbook_raw["workflow"].keys())
 
     workflow = json.loads(WORKED_EXAMPLE.read_text(encoding="utf-8"))
@@ -64,7 +120,7 @@ def test_node_ids_mirror_cacao_action_ids() -> None:
 
 def test_node_labels_mirror_cacao_action_names() -> None:
     """Each n8n node's label is the corresponding CACAO step ``name``."""
-    playbook_raw = json.loads(SOURCE.read_text(encoding="utf-8"))
+    playbook_raw = json.loads(MIRROR_JSON.read_text(encoding="utf-8"))
     cacao_names = {
         step_id: step["name"]
         for step_id, step in playbook_raw["workflow"].items()
@@ -77,6 +133,11 @@ def test_node_labels_mirror_cacao_action_names() -> None:
             f"n8n node {node['id']} label {node['name']!r} does not "
             f"match CACAO step name {expected!r}"
         )
+
+
+# --------------------------------------------------------------------------- #
+# n8n shape sanity                                                            #
+# --------------------------------------------------------------------------- #
 
 
 def test_worked_example_has_valid_n8n_shape() -> None:
@@ -98,29 +159,13 @@ def test_worked_example_has_valid_n8n_shape() -> None:
     )
 
 
-def test_emit_is_deterministic() -> None:
-    playbook = parse_file(SOURCE)
-    first = _serialise(emit(playbook))
-    second = _serialise(emit(playbook))
-    assert first == second
-
-
-# ---------------------------------------------------------------------------
-# CORE semantic checks — Set-node uplift (post PR #122).
-#
-# These pin the contract that every action-without-commands step in the
-# CACAO source surfaces as an n8n Set node whose assignments carry the
-# CACAO I/O contract (in_args / out_args) and the x_secops_ng reference
-# bundles (control_refs / detection_refs / telemetry_refs / metric_refs /
-# any KPI hooks). The byte-identical drift guard above keeps the artifact
-# stable; these tests keep the *intent* stable so a future emitter change
-# that quietly drops a reference bundle fails the suite instead of
-# leaking past review.
-# ---------------------------------------------------------------------------
+# --------------------------------------------------------------------------- #
+# CORE semantic checks — Set-node uplift                                      #
+# --------------------------------------------------------------------------- #
 
 
 def _action_without_commands_steps() -> dict[str, dict]:
-    raw = json.loads(SOURCE.read_text(encoding="utf-8"))
+    raw = json.loads(MIRROR_JSON.read_text(encoding="utf-8"))
     return {
         step_id: step
         for step_id, step in raw["workflow"].items()
@@ -200,7 +245,7 @@ def test_set_nodes_have_no_empty_assignments_block() -> None:
 
 def test_only_end_step_emits_noop() -> None:
     """Post Set-node uplift, the only `noOp` left is the end sentinel."""
-    raw = json.loads(SOURCE.read_text(encoding="utf-8"))
+    raw = json.loads(MIRROR_JSON.read_text(encoding="utf-8"))
     workflow = json.loads(WORKED_EXAMPLE.read_text(encoding="utf-8"))
     for node in workflow["nodes"]:
         if node["type"] != "n8n-nodes-base.noOp":

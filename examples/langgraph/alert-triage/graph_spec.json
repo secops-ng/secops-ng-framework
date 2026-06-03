@@ -1,0 +1,141 @@
+{
+  "conditional_edges": [
+    {
+      "branches": {
+        "failure": "action--a1e47431-0000-4000-8000-000000000006",
+        "success": "action--a1e47431-0000-4000-8000-000000000005"
+      },
+      "default": null,
+      "src": "if-condition--a1e47431-0000-4000-8000-000000000004"
+    },
+    {
+      "branches": {
+        "p1_severe": "action--a1e47431-0000-4000-8000-000000000008",
+        "p2_high": "action--a1e47431-0000-4000-8000-000000000009",
+        "p3_routine": "action--a1e47431-0000-4000-8000-00000000000a",
+        "p4_informational": "action--a1e47431-0000-4000-8000-00000000000b"
+      },
+      "default": null,
+      "src": "switch-condition--a1e47431-0000-4000-8000-000000000007"
+    }
+  ],
+  "edges": [
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--a1e47431-0000-4000-8000-000000000003",
+      "src": "action--a1e47431-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "if-condition--a1e47431-0000-4000-8000-000000000004",
+      "src": "action--a1e47431-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--a1e47431-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "switch-condition--a1e47431-0000-4000-8000-000000000007",
+      "src": "action--a1e47431-0000-4000-8000-000000000006"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--a1e47431-0000-4000-8000-000000000008"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--a1e47431-0000-4000-8000-000000000009"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--a1e47431-0000-4000-8000-00000000000a"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--a1e47431-0000-4000-8000-00000000000b"
+    }
+  ],
+  "end_sentinel": "__END__",
+  "entry": "action--a1e47431-0000-4000-8000-000000000002",
+  "name": "Alert triage",
+  "nodes": [
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "ingest typed alert payload",
+      "name": "action--a1e47431-0000-4000-8000-000000000002",
+      "step_id": "action--a1e47431-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "enrich with telemetry context",
+      "name": "action--a1e47431-0000-4000-8000-000000000003",
+      "step_id": "action--a1e47431-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "suppress and close",
+      "name": "action--a1e47431-0000-4000-8000-000000000005",
+      "step_id": "action--a1e47431-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "classify and prioritise (deterministic policy)",
+      "name": "action--a1e47431-0000-4000-8000-000000000006",
+      "step_id": "action--a1e47431-0000-4000-8000-000000000006"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "response: p1 severe \u2014 page and escalate",
+      "name": "action--a1e47431-0000-4000-8000-000000000008",
+      "step_id": "action--a1e47431-0000-4000-8000-000000000008"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "response: p2 high \u2014 queue for primary analyst",
+      "name": "action--a1e47431-0000-4000-8000-000000000009",
+      "step_id": "action--a1e47431-0000-4000-8000-000000000009"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "response: p3 routine \u2014 queue for review",
+      "name": "action--a1e47431-0000-4000-8000-00000000000a",
+      "step_id": "action--a1e47431-0000-4000-8000-00000000000a"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "response: p4 informational \u2014 log and close",
+      "name": "action--a1e47431-0000-4000-8000-00000000000b",
+      "step_id": "action--a1e47431-0000-4000-8000-00000000000b"
+    },
+    {
+      "cacao_type": "if-condition",
+      "kind": "condition",
+      "label": "already-seen or known-benign?",
+      "name": "if-condition--a1e47431-0000-4000-8000-000000000004",
+      "step_id": "if-condition--a1e47431-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_type": "switch-condition",
+      "kind": "condition",
+      "label": "route on priority",
+      "name": "switch-condition--a1e47431-0000-4000-8000-000000000007",
+      "step_id": "switch-condition--a1e47431-0000-4000-8000-000000000007"
+    }
+  ],
+  "playbook_id": "playbook--a1e47431-0000-4000-8000-000000000000",
+  "stable_id": "playbook.alert_triage@v1"
+}
