@@ -178,15 +178,15 @@ the body:
     item = $input.item.json
     cvss = primitives.compute_cvss(item['cvss_vector'])
     epss = primitives.parse_epss(
-        score=item['epss_score'], as_of=item['epss_as_of'], source=item['epss_source'],
+        raw=item['epss_score'], source=item['epss_source'], as_of=item['epss_as_of'],
     )
     context = primitives.BusinessContext(
-        asset_criticality=primitives.AssetCriticality(item['asset_criticality']),
+        asset_criticality=item['asset_criticality'],
         internet_exposed=bool(item.get('internet_exposed', False)),
         regulated_data=bool(item.get('regulated_data', False)),
     )
     verdict = primitives.severity_policy(cvss=cvss, epss=epss, context=context)
-    return {'json': {**item, 'severity': verdict.band.value}}
+    return {'json': {**item, 'severity': verdict.severity}}
 
 The runner is operator-configured (Python interpreter, PYTHONPATH
 pointing at the operator's deployment of `content/playbooks/vuln-intake/`,
