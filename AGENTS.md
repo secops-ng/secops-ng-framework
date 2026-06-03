@@ -54,10 +54,9 @@ the four-layer runtime that the content compiles into.
 
 ## 3. Public-bar hygiene (read before committing)
 
-Every commit, comment, and file in this repository is treated as
-already public. The project is currently developed in a private
-mirror, but the working assumption — and the rule the linter and
-reviewers enforce — is that anything you write here may be read by an
+Every commit, comment, and file in this repository is public the
+moment it lands. The linter and reviewers enforce the same bar a
+contributor would expect — anything you write here may be read by an
 operator, a journalist, or a regulator tomorrow.
 
 Concretely, **do not** include:
