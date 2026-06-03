@@ -14,6 +14,11 @@ from langchain_core.messages import AnyMessage
 from langchain_core.tools import tool
 from langgraph.graph.message import add_messages
 
+from opentelemetry import trace
+
+_TRACER = trace.get_tracer(__name__)
+
+from ._audit_mirror import AuditRecord, AuditTrail
 
 class PlaybookVulnIntakeV1State(TypedDict, total=False):
     """LangGraph state for CACAO playbook playbook.vuln_intake@v1.
@@ -48,9 +53,16 @@ async def enrich_finding(finding_id: str) -> str:
     CACAO step_id : action--22222222-2222-4222-8222-222222222222
     CACAO type    : action
     """
-    raise NotImplementedError(
-        f"CACAO action tool not implemented: step_id='action--22222222-2222-4222-8222-222222222222'"
-    )
+    with _TRACER.start_as_current_span(
+        name='tool.action--22222222-2222-4222-8222-222222222222',
+        attributes={'secops_ng.playbook.id': 'playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'secops_ng.step.id': 'action--22222222-2222-4222-8222-222222222222', 'secops_ng.step.name': 'enrich finding', 'secops_ng.tool.name': 'enrich_finding'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='tool.action--22222222-2222-4222-8222-222222222222', attributes={'secops_ng.playbook.id': 'playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'secops_ng.step.id': 'action--22222222-2222-4222-8222-222222222222', 'secops_ng.step.name': 'enrich finding', 'secops_ng.tool.name': 'enrich_finding'})
+        )
+        raise NotImplementedError(
+            f"CACAO action tool not implemented: step_id='action--22222222-2222-4222-8222-222222222222'"
+        )
 
 @tool
 async def open_critical_ticket() -> None:
@@ -59,9 +71,16 @@ async def open_critical_ticket() -> None:
     CACAO step_id : action--44444444-4444-4444-8444-444444444444
     CACAO type    : action
     """
-    raise NotImplementedError(
-        f"CACAO action tool not implemented: step_id='action--44444444-4444-4444-8444-444444444444'"
-    )
+    with _TRACER.start_as_current_span(
+        name='tool.action--44444444-4444-4444-8444-444444444444',
+        attributes={'secops_ng.playbook.id': 'playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'secops_ng.step.id': 'action--44444444-4444-4444-8444-444444444444', 'secops_ng.step.name': 'open critical ticket', 'secops_ng.tool.name': 'open_critical_ticket'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='tool.action--44444444-4444-4444-8444-444444444444', attributes={'secops_ng.playbook.id': 'playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'secops_ng.step.id': 'action--44444444-4444-4444-8444-444444444444', 'secops_ng.step.name': 'open critical ticket', 'secops_ng.tool.name': 'open_critical_ticket'})
+        )
+        raise NotImplementedError(
+            f"CACAO action tool not implemented: step_id='action--44444444-4444-4444-8444-444444444444'"
+        )
 
 @tool
 async def queue_routine_ticket() -> None:
@@ -70,9 +89,16 @@ async def queue_routine_ticket() -> None:
     CACAO step_id : action--55555555-5555-4555-8555-555555555555
     CACAO type    : action
     """
-    raise NotImplementedError(
-        f"CACAO action tool not implemented: step_id='action--55555555-5555-4555-8555-555555555555'"
-    )
+    with _TRACER.start_as_current_span(
+        name='tool.action--55555555-5555-4555-8555-555555555555',
+        attributes={'secops_ng.playbook.id': 'playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'secops_ng.step.id': 'action--55555555-5555-4555-8555-555555555555', 'secops_ng.step.name': 'queue routine ticket', 'secops_ng.tool.name': 'queue_routine_ticket'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='tool.action--55555555-5555-4555-8555-555555555555', attributes={'secops_ng.playbook.id': 'playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'secops_ng.step.id': 'action--55555555-5555-4555-8555-555555555555', 'secops_ng.step.name': 'queue routine ticket', 'secops_ng.tool.name': 'queue_routine_ticket'})
+        )
+        raise NotImplementedError(
+            f"CACAO action tool not implemented: step_id='action--55555555-5555-4555-8555-555555555555'"
+        )
 
 async def llm_step(state: PlaybookVulnIntakeV1State) -> dict:
     """Agentic-extension hook.
