@@ -1,1 +1,1 @@
-"""Tests for ``vuln-intake`` primitives."""
+"""Tests for the vulnerability-intake primitives package."""
