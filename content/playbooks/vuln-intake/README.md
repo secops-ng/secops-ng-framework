@@ -92,6 +92,38 @@ pick the case up off a single telemetry channel.
   Prediction Scoring System. The triage step records the EPSS score
   at intake time alongside the CVSS vector.
 
+## Configuration contract
+
+This playbook does **not** ship a separate operator-facing `config.yaml`.
+The per-case, operator-supplied inputs are declared in the CACAO
+`playbook_variables` block on `playbook.cacao.json` and bound at compile
+time by every reference target (n8n, Temporal, LangGraph) via the
+standard CACAO `__double_underscore__` substitution mechanism
+(OASIS CACAO v2.0).
+
+Operator-supplied per-case variables (seven):
+
+| Variable | Type | Description |
+|---|---|---|
+| `__cve_id__` | string | Vulnerability identifier carried by this case (canonical CVE id). |
+| `__report_source__` | string | Where the disclosure originated (`researcher_report`, `vendor_advisory`, `cve_feed`, `internal_scan`). |
+| `__severity__` | string | Triage severity derived from CVSS + EPSS via `primitives/severity.py`. |
+| `__cvss_vector__` | string | CVSS v3.1 / v4.0 vector string for the case. |
+| `__epss_score__` | string | EPSS exploit-probability score (0.0–1.0) at intake time. |
+| `__asset_ref__` | string | Reference into the operator's asset inventory for the affected component. |
+| `__actively_exploited__` | boolean | Set by the CRA reporting-trigger step when the case meets CRA Article 14(1). |
+
+Deterministic policy (severity bands, CVSS / EPSS thresholds, dedup key
+shape, signature extraction) is **code, not configuration**: it lives
+under `content/playbooks/vuln-intake/primitives/` (`cvss.py`, `epss.py`,
+`severity.py`, `dedup.py`, `signatures.py`) and is reviewed under the
+same public-bar as the rest of the framework. Operators who need to
+diverge from the shipped policy fork the primitive module; they do not
+override it via runtime config.
+
+This convention matches the F-WF-02 (`alert-triage`) playbook, which
+also ships no separate operator YAML.
+
 ## Compile targets
 
 `compile_targets` declares `["n8n", "temporal", "langgraph"]`. Emitted
