@@ -1,7 +1,7 @@
 # Forward-public hygiene linter
 
 The hygiene linter is the cheap first gate for content shipping to a
-will-be-public repo. It scans staged files for the syntactic class of
+public repo. It scans staged files for the syntactic class of
 leaks — credential shapes, `.env`-style assignments, high-entropy
 tokens — and a defensive subset of commercial-intent / strategy
 language patterns. Semantic and tone review remains with the human

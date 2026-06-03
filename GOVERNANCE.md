@@ -132,11 +132,11 @@ in repository metadata.
 
 ### 3.4 Custodians
 
-A reviewer role that audits every pull request to a will-be-public
-repository against the forward-public hygiene bar before merge — no
+A reviewer role that audits every pull request to a public
+repository against the public-bar hygiene standard before merge — no
 credentials, no internal hostnames or contact names, no commercial
 framing, no named organisations described as prospects or partners,
-voice consistent with `SOUL.md`. A Custodian holds a **forward-public
+voice consistent with `SOUL.md`. A Custodian holds a **public-bar
 hygiene veto** on any pull request: a Custodian objection blocks merge
 until the hygiene issue is addressed, regardless of maintainer
 consensus on the technical change. The veto is not a substitute for
