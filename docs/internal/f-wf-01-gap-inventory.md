@@ -97,23 +97,22 @@ edge back to it) so they sit flat on the board. Cross-card
 dependencies are expressed via `parents=[…]` between siblings so the
 dispatcher only promotes cards whose upstreams are done.
 
-| # | Card | Assignee | Parents (other siblings) | Public-bar |
-|---|---|---|---|---|
-| 1 | F-WF-01 CORE-PRIM — shared primitives (severity policy, CVSS+EPSS helpers, deterministic dedup, DSPy signature for free-text fields) under `content/playbooks/vuln-intake/primitives/` | coder | — | yes |
-| 2 | F-WF-01 CORE-N8N — wire 7 CORE action bodies in `examples/n8n/vuln-intake/workflow.n8n.json` against the primitives contract; regen via `regenerate.sh`; golden byte-parity green | coder | 1 | yes |
-| 3 | F-WF-01 CORE-TMPRL — wire 7 CORE action bodies in `examples/temporal/vuln-intake/workflow.temporal.py` against the primitives contract; regen; golden byte-parity green | coder | 1 | yes |
-| 4 | F-WF-01 CORE-LG — wire 7 CORE action bodies in `examples/langgraph/vuln-intake/state_bindings.py` against the primitives contract; regen; golden byte-parity green | coder | 1 | yes |
-| 5 | F-WF-01 EXTEND-tests-happy — happy-path golden replay test across all three targets in `tests/examples/vuln_intake/` | coder | 2, 3, 4 | yes |
-| 6 | F-WF-01 EXTEND-tests-dedup — dedup-collision test (same CVE × same asset_ref → single case) across all three targets | coder | 2, 3, 4 | yes |
-| 7 | F-WF-01 EXTEND-tests-replay — deterministic-replay test (same input twice → byte-identical AuditTrail) across all three targets | coder | 2, 3, 4 | yes |
-| 8 | F-WF-01 EXTEND-docs-cookbook — cookbook walkthrough under `docs/cookbook/vuln-intake.md` + worked-example README polish across all three targets | coder | 2, 3, 4 | yes |
-| 9 | F-WF-01 EXTEND-config — answer the `config.yaml` question (CACAO `playbook_variables` vs separate operator YAML) and ship whichever is approved | coder | 1 | yes |
-| 10 | F-WF-01 CLOSEOUT — ROADMAP.md status flip In Progress → Shipped + MEMORY.md log via `scripts/log.py` | coder | 1–9 | yes |
+| # | Card | Parents (other siblings) | Public-bar |
+|---|---|---|---|
+| 1 | F-WF-01 CORE-PRIM — shared primitives (severity policy, CVSS+EPSS helpers, deterministic dedup, DSPy signature for free-text fields) under `content/playbooks/vuln-intake/primitives/` | — | yes |
+| 2 | F-WF-01 CORE-N8N — wire 7 CORE action bodies in `examples/n8n/vuln-intake/workflow.n8n.json` against the primitives contract; regen via `regenerate.sh`; golden byte-parity green | 1 | yes |
+| 3 | F-WF-01 CORE-TMPRL — wire 7 CORE action bodies in `examples/temporal/vuln-intake/workflow.temporal.py` against the primitives contract; regen; golden byte-parity green | 1 | yes |
+| 4 | F-WF-01 CORE-LG — wire 7 CORE action bodies in `examples/langgraph/vuln-intake/state_bindings.py` against the primitives contract; regen; golden byte-parity green | 1 | yes |
+| 5 | F-WF-01 EXTEND-tests-happy — happy-path golden replay test across all three targets in `tests/examples/vuln_intake/` | 2, 3, 4 | yes |
+| 6 | F-WF-01 EXTEND-tests-dedup — dedup-collision test (same CVE × same asset_ref → single case) across all three targets | 2, 3, 4 | yes |
+| 7 | F-WF-01 EXTEND-tests-replay — deterministic-replay test (same input twice → byte-identical AuditTrail) across all three targets | 2, 3, 4 | yes |
+| 8 | F-WF-01 EXTEND-docs-cookbook — cookbook walkthrough under `docs/cookbook/vuln-intake.md` + worked-example README polish across all three targets | 2, 3, 4 | yes |
+| 9 | F-WF-01 EXTEND-config — answer the `config.yaml` question (CACAO `playbook_variables` vs separate operator YAML) and ship whichever is approved | 1 | yes |
+| 10 | F-WF-01 CLOSEOUT — ROADMAP.md status flip In Progress → Shipped + decisions log update | 1–9 | yes |
 
 Cards 2/3/4 fan out from card 1; tests/docs fan in on 2/3/4; the
-closeout card fans in on everything. Custodian review of each PR is
-spawned by the corresponding `Coder merge:` card when the PR is open,
-matching the F-CR-04 cadence.
+closeout card fans in on everything. Each PR is reviewed against the
+public-bar before merge, following the same cadence used for F-CR-04.
 
 ## 4. Open questions for maintainers
 
