@@ -45,14 +45,25 @@ from .epss import (
     canonicalize_epss,
     parse_epss,
 )
+from .severity import (
+    AssetCriticality,
+    BusinessContext,
+    Severity,
+    SeverityVerdict,
+    severity_policy,
+)
 from .signatures import signature_schema
 
 __all__ = [
+    "AssetCriticality",
+    "BusinessContext",
     "CVSSParseError",
     "CVSSScore",
     "CVSSv31Vector",
     "DEFAULT_FRESHNESS_WINDOW",
     "EPSSScore",
+    "Severity",
+    "SeverityVerdict",
     "StaleEPSSWarning",
     "base_score",
     "canonicalize_case_field",
@@ -61,6 +72,7 @@ __all__ = [
     "compute_cvss",
     "parse_cvss_vector",
     "parse_epss",
+    "severity_policy",
     "severity_rating",
     "signature_schema",
 ]
