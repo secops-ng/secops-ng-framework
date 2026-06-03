@@ -12,10 +12,12 @@ honour:
   byte-identical output — the helper layer is pure, and running the
   per-example ``regenerate.sh`` twice in a row produces no diff.
 
-The LangGraph half ships with F-CR-04 CORE-A3 (this module). The Temporal
-half ships with F-CR-04 CORE-B and will append its own assertions to this
-file when it lands; until then, the Temporal block is a placeholder marked
-``pytest.skip``.
+The LangGraph half shipped with F-CR-04 CORE-A3. The Temporal half ships
+with F-CR-04 CORE-B3: per-step ``activity.<step_id>`` spans + a
+``workflow.<stable_id>`` workflow-boundary span. Shared negatives at the
+bottom of the file apply to both targets — no vendor SDK substrings, no
+hard-coded ``http(s)://`` endpoints in the emitted OTel block, idempotent
+emit on a second invocation.
 
 Sovereign-stack guard
 ---------------------
@@ -35,6 +37,8 @@ import pytest
 
 from compilers._shared.cacao_parser import StepType, parse_file
 from compilers.langgraph.state import render_module, render_module_from_file
+from compilers.temporal import emit as render_temporal_module
+from compilers.temporal import emit_file as render_temporal_module_from_file
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 LG_EXAMPLES = REPO_ROOT / "examples" / "langgraph"
@@ -46,6 +50,8 @@ LG_FIXTURE = (
     / "fixtures"
     / "vuln_intake.cacao.json"
 )
+TEMPORAL_EXAMPLES = REPO_ROOT / "examples" / "temporal"
+TEMPORAL_FIXTURE = LG_FIXTURE  # same canonical CACAO source reused per A3 fixtures
 
 
 # --------------------------------------------------------------------------- #
@@ -68,8 +74,16 @@ def _count_tool_spans(source: str, step_id: str) -> int:
     AST-based so whitespace / indentation drift in the emitter does not
     silently break the assertion.
     """
+    return _count_spans_by_name(source, f"tool.{step_id}")
+
+
+def _count_spans_by_name(source: str, expected: str) -> int:
+    """Count ``with <tracer>.start_as_current_span(name=<expected>, ...)`` blocks.
+
+    Generic AST helper used by both LangGraph (``tool.<step_id>``) and
+    Temporal (``activity.<step_id>`` / ``workflow.<stable_id>``) assertions.
+    """
     tree = ast.parse(source)
-    expected = f"tool.{step_id}"
     n = 0
     for node in ast.walk(tree):
         if not isinstance(node, ast.With):
@@ -79,9 +93,6 @@ def _count_tool_spans(source: str, step_id: str) -> int:
             if not isinstance(call, ast.Call):
                 continue
             func = call.func
-            # Match ``<something>.start_as_current_span(...)`` — we don't pin
-            # the receiver name so this test still works if the emitter
-            # renames ``_TRACER`` to something else later.
             if not (isinstance(func, ast.Attribute) and func.attr == "start_as_current_span"):
                 continue
             for kw in call.keywords:
@@ -341,10 +352,193 @@ def test_langgraph_regenerate_sh_uses_only_opentelemetry_api() -> None:
 
 
 # --------------------------------------------------------------------------- #
-# Temporal half — placeholder, lands with CORE-B                              #
+# Temporal: per-activity span + workflow-boundary span cardinality            #
 # --------------------------------------------------------------------------- #
 
 
-def test_temporal_observability_assertions_land_with_core_b() -> None:
-    """Placeholder: F-CR-04 CORE-B will append Temporal-side assertions here."""
-    pytest.skip("Temporal observability assertions ship with F-CR-04 CORE-B")
+def test_temporal_fixture_emits_one_span_per_action_step() -> None:
+    """Each action step shows up as exactly one ``activity.<step_id>`` span."""
+    playbook = parse_file(TEMPORAL_FIXTURE)
+    source = render_temporal_module(playbook)
+    step_ids = _action_step_ids(playbook)
+    assert step_ids, "fixture has no action steps to assert against"
+    for step_id in step_ids:
+        n = _count_spans_by_name(source, f"activity.{step_id}")
+        assert n == 1, f"expected 1 activity span for {step_id!r}, found {n}"
+
+
+def test_temporal_fixture_emits_one_audit_record_per_activity_span() -> None:
+    """Each activity span pairs with exactly one ``AuditTrail.current().append(...)``."""
+    playbook = parse_file(TEMPORAL_FIXTURE)
+    source = render_temporal_module(playbook)
+    step_ids = _action_step_ids(playbook)
+    assert step_ids
+    for step_id in step_ids:
+        expected = f"activity.{step_id}"
+        # Reuse the LangGraph audit AST walker by counting AuditRecord(span_name=...)
+        # entries — the contract is the same string identity per emitted span.
+        tree = ast.parse(source)
+        n = 0
+        for node in ast.walk(tree):
+            if not (isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "AuditRecord"):
+                continue
+            for kw in node.keywords:
+                if kw.arg == "span_name" and isinstance(kw.value, ast.Constant) and kw.value.value == expected:
+                    n += 1
+                    break
+        assert n == 1, f"expected 1 audit record for {expected!r}, found {n}"
+
+
+def test_temporal_fixture_emits_workflow_boundary_span() -> None:
+    """The workflow ``run`` method wraps its body in a single
+    ``workflow.<stable_id>`` span — the workflow-boundary scaffold.
+    """
+    playbook = parse_file(TEMPORAL_FIXTURE)
+    source = render_temporal_module(playbook)
+    expected = f"workflow.{playbook.x_secops_ng.stable_id}"
+    n = _count_spans_by_name(source, expected)
+    assert n == 1, f"expected exactly 1 workflow-boundary span {expected!r}, found {n}"
+
+
+def _count_spans_by_prefix(source: str, prefix: str) -> int:
+    """Count ``with <tracer>.start_as_current_span(name=<prefix>...)`` blocks.
+
+    AST-based; used for cardinality assertions over a span-name namespace
+    (e.g. all ``activity.*`` spans).
+    """
+    tree = ast.parse(source)
+    n = 0
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.With):
+            continue
+        for item in node.items:
+            call = item.context_expr
+            if not isinstance(call, ast.Call):
+                continue
+            func = call.func
+            if not (isinstance(func, ast.Attribute) and func.attr == "start_as_current_span"):
+                continue
+            for kw in call.keywords:
+                if (
+                    kw.arg == "name"
+                    and isinstance(kw.value, ast.Constant)
+                    and isinstance(kw.value.value, str)
+                    and kw.value.value.startswith(prefix)
+                ):
+                    n += 1
+                    break
+    return n
+
+
+def test_temporal_total_activity_span_count_matches_action_count() -> None:
+    """Defence in depth: total ``activity.*`` span count = action-step count."""
+    playbook = parse_file(TEMPORAL_FIXTURE)
+    source = render_temporal_module(playbook)
+    expected = len(_action_step_ids(playbook))
+    actual = _count_spans_by_prefix(source, "activity.")
+    assert actual == expected, (
+        f"expected {expected} activity.* spans, found {actual}"
+    )
+
+
+def test_temporal_total_workflow_boundary_span_count_is_one() -> None:
+    """Exactly one ``workflow.<stable_id>`` span across the emitted module."""
+    source = render_temporal_module(parse_file(TEMPORAL_FIXTURE))
+    workflow_spans = _count_spans_by_prefix(source, "workflow.")
+    assert workflow_spans == 1, (
+        f"expected exactly 1 workflow.* boundary span, found {workflow_spans}"
+    )
+
+
+# --------------------------------------------------------------------------- #
+# Idempotent emit — Temporal                                                  #
+# --------------------------------------------------------------------------- #
+
+
+def test_temporal_render_module_is_idempotent() -> None:
+    """Re-running the Temporal emitter produces byte-identical output."""
+    playbook = parse_file(TEMPORAL_FIXTURE)
+    first = render_temporal_module(playbook)
+    second = render_temporal_module(playbook)
+    third = render_temporal_module(parse_file(TEMPORAL_FIXTURE))  # reparse to defeat caching
+    assert first == second
+    assert first == third
+
+
+def test_temporal_render_module_does_not_accumulate_spans() -> None:
+    """A second Temporal render does not double the activity / workflow spans."""
+    playbook = parse_file(TEMPORAL_FIXTURE)
+    expected_activity = len(_action_step_ids(playbook))
+    for _ in range(3):
+        source = render_temporal_module(playbook)
+        assert _count_spans_by_prefix(source, "activity.") == expected_activity
+        assert _count_spans_by_prefix(source, "workflow.") == 1
+
+
+# --------------------------------------------------------------------------- #
+# Shared negatives — apply to BOTH langgraph + temporal emitters              #
+# --------------------------------------------------------------------------- #
+
+
+_VENDOR_CASE_INSENSITIVE = ("datadog", "honeycomb", "newrelic", "new_relic")
+_VENDOR_CASE_SENSITIVE = ("DD_",)  # Datadog env-var prefix; uppercase only to avoid `add_messages` false-positive
+
+
+def _emit_both_targets() -> dict[str, str]:
+    """Render both reference compiler outputs from the shared CACAO fixture."""
+    playbook = parse_file(TEMPORAL_FIXTURE)  # same canonical source as LG_FIXTURE
+    return {
+        "langgraph": render_module(playbook),
+        "temporal": render_temporal_module(playbook),
+    }
+
+
+@pytest.mark.parametrize("target", ["langgraph", "temporal"])
+def test_emitted_output_has_no_vendor_sdk_substrings(target: str) -> None:
+    """No ``datadog|honeycomb|newrelic|DD_`` substrings in either emitter's output.
+
+    The compile-target layer is sovereign-stack neutral: it speaks the OTel
+    API, not any vendor SDK. Vendor names are matched case-insensitively;
+    the ``DD_`` env-var prefix is uppercase-only so legitimate identifiers
+    like ``add_messages`` are not flagged.
+    """
+    source = _emit_both_targets()[target]
+    lowered = source.lower()
+    for needle in _VENDOR_CASE_INSENSITIVE:
+        assert needle not in lowered, (
+            f"{target}: forbidden vendor substring {needle!r} leaked into emitted output"
+        )
+    for needle in _VENDOR_CASE_SENSITIVE:
+        assert needle not in source, (
+            f"{target}: forbidden vendor env-var prefix {needle!r} leaked into emitted output"
+        )
+
+
+@pytest.mark.parametrize("target", ["langgraph", "temporal"])
+def test_emitted_output_has_no_hardcoded_http_endpoint(target: str) -> None:
+    """No hard-coded ``http(s)://`` URL in the emitted OTel block.
+
+    The OTel endpoint MUST be env-var driven (``OTEL_EXPORTER_OTLP_ENDPOINT``
+    or operator equivalent) so the same artifact runs against any backend
+    the operator has chosen.
+    """
+    source = _emit_both_targets()[target]
+    assert not re.search(r"https?://", source), (
+        f"{target}: hard-coded http(s):// URL found in emitted output — "
+        f"OTel endpoint must be env-var driven, not baked into the artifact"
+    )
+
+
+@pytest.mark.parametrize("target", ["langgraph", "temporal"])
+def test_emitted_output_is_idempotent_across_targets(target: str) -> None:
+    """Both emitters are pure: a second invocation produces identical bytes."""
+    playbook = parse_file(TEMPORAL_FIXTURE)
+    renderer = {
+        "langgraph": render_module,
+        "temporal": render_temporal_module,
+    }[target]
+    first = renderer(playbook)
+    second = renderer(playbook)
+    third = renderer(parse_file(TEMPORAL_FIXTURE))
+    assert first == second, f"{target}: second emit drifted from first"
+    assert first == third, f"{target}: emit after reparse drifted"
