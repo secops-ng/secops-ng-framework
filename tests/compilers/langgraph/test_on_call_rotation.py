@@ -101,10 +101,6 @@ def test_module_golden_file_is_committed() -> None:
     assert GOLDEN_MODULE.stat().st_size > 0, f"empty golden file: {GOLDEN_MODULE}"
 
 
-@pytest.mark.xfail(
-    reason="unblocks-in: CORE-LG-GOLDENS sibling \u2014 state.py now emits SPAN_ATTR_WORKFLOW_RUN_ID placeholder per F-CR-04 envelope contract; goldens regenerate in next sibling",
-    strict=False,
-)
 def test_module_matches_golden() -> None:
     playbook = parse_file(FIXTURE)
     rendered = render_module(playbook)
@@ -117,10 +113,6 @@ def test_module_matches_golden() -> None:
     )
 
 
-@pytest.mark.xfail(
-    reason="unblocks-in: CORE-LG-GOLDENS sibling \u2014 state.py now emits SPAN_ATTR_WORKFLOW_RUN_ID placeholder per F-CR-04 envelope contract; goldens regenerate in next sibling",
-    strict=False,
-)
 def test_module_render_from_file_matches_golden() -> None:
     rendered = render_module_from_file(FIXTURE)
     assert rendered == GOLDEN_MODULE.read_text(encoding="utf-8")
@@ -145,10 +137,6 @@ def test_module_golden_exposes_registry_symbols() -> None:
     ) in src
 
 
-@pytest.mark.xfail(
-    reason="unblocks-in: CORE-LG-GOLDENS sibling \u2014 state.py now emits SPAN_ATTR_WORKFLOW_RUN_ID placeholder per F-CR-04 envelope contract; goldens regenerate in next sibling",
-    strict=False,
-)
 def test_fixture_and_goldens_are_in_sync() -> None:
     playbook = parse_file(FIXTURE)
     graph_rendered = _serialise_graph(emit(playbook))
