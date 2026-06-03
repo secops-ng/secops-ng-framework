@@ -40,6 +40,20 @@ from compilers._shared.cacao_parser import (
     WorkflowStep,
     parse_file,
 )
+from compilers._shared.observability import (
+    SPAN_ATTR_COMPILE_TARGET,
+    SPAN_ATTR_PLAYBOOK_ID,
+    SPAN_ATTR_PLAYBOOK_VERSION,
+    SPAN_ATTR_STEP_ID,
+    SPAN_ATTR_STEP_NAME,
+    SPAN_ATTR_STEP_TYPE,
+    SPAN_ATTR_TOOL_NAME,
+    SpanSpec,
+    emit_node_span_block,
+    emit_tool_span_block,
+    render_audit_mirror_imports,
+    render_otel_imports,
+)
 
 from .bindings import (
     RetryPolicySpec,
@@ -161,6 +175,14 @@ def _render_activity(step: WorkflowStep, fn_name: str, playbook: Playbook) -> st
     :func:`compilers.temporal.bindings.activity_signature` so an integrator
     sees the typed contract immediately and a type-checker can flag
     drifting playbooks before runtime.
+
+    The activity body is wrapped in an OpenTelemetry ``activity.<step_id>``
+    span carrying stable ``secops_ng.*`` attributes (playbook id, step id,
+    step name, step type, tool function name, compile target) plus a
+    parallel :class:`AuditRecord` append so audit holds even when no OTel
+    exporter is configured. Span name + attributes match the LangGraph
+    compile target's ``tool.<step_id>`` contract so an OTel consumer sees
+    structurally compatible telemetry across both reference compilers.
     """
     sig = activity_signature(step, playbook)
     description = (step.description or step.name or "").strip()
@@ -172,6 +194,26 @@ def _render_activity(step: WorkflowStep, fn_name: str, playbook: Playbook) -> st
             "    # a human-in-the-loop step. The workflow class above carries the\n"
             "    # matching @workflow.signal and @workflow.query handlers.\n"
         )
+    attrs: dict[str, str | int | float | bool | None] = {
+        SPAN_ATTR_PLAYBOOK_ID: playbook.id,
+        SPAN_ATTR_PLAYBOOK_VERSION: playbook.x_secops_ng.content_version,
+        SPAN_ATTR_STEP_ID: step.step_id,
+        SPAN_ATTR_STEP_TYPE: str(step.type),
+        SPAN_ATTR_TOOL_NAME: fn_name,
+        SPAN_ATTR_COMPILE_TARGET: "temporal",
+    }
+    if step.name:
+        attrs[SPAN_ATTR_STEP_NAME] = step.name
+    body_source = (
+        "raise NotImplementedError(\n"
+        f"    f\"CACAO action stub not implemented: step_id={_py_repr(step.step_id)}\"\n"
+        ")"
+    )
+    span_block = emit_tool_span_block(
+        SpanSpec(span_name=f"activity.{step.step_id}", attributes=attrs),
+        body_source,
+        indent="    ",
+    )
     return (
         f"@activity.defn\n"
         f"async def {fn_name}({sig.params}) -> {sig.return_type}:\n"
@@ -179,9 +221,7 @@ def _render_activity(step: WorkflowStep, fn_name: str, playbook: Playbook) -> st
         f"    CACAO step_id: {step.step_id}\n"
         f'    """\n'
         f"{hitl_note}"
-        f"    raise NotImplementedError(\n"
-        f"        f\"CACAO action stub not implemented: step_id={_py_repr(step.step_id)}\"\n"
-        f"    )\n"
+        f"{span_block}"
     )
 
 
@@ -210,6 +250,29 @@ def _render_workflow_class(
         # Ensure exactly one blank line between handler block and @workflow.run.
         handlers = handlers.rstrip() + "\n\n"
 
+    # Workflow-boundary span scaffold: one ``workflow.<stable_id>`` span
+    # opens for the whole run() invocation, sitting one level above the
+    # ``activity.<step_id>`` spans the per-activity wrappers open. Stable
+    # ``secops_ng.*`` attributes match the LangGraph compile target's node
+    # span contract so OTel consumers see structurally compatible
+    # cross-target telemetry. AuditTrail.current() append parallels the
+    # span so audit holds even when no OTel exporter is configured.
+    workflow_attrs: dict[str, str | int | float | bool | None] = {
+        SPAN_ATTR_PLAYBOOK_ID: playbook.id,
+        SPAN_ATTR_PLAYBOOK_VERSION: x.content_version,
+        SPAN_ATTR_COMPILE_TARGET: "temporal",
+    }
+    workflow_body = (
+        "raise NotImplementedError(\n"
+        f"    f\"CACAO workflow lowering not implemented: stable_id={_py_repr(x.stable_id)}\"\n"
+        ")"
+    )
+    workflow_span = emit_node_span_block(
+        SpanSpec(span_name=f"workflow.{x.stable_id}", attributes=workflow_attrs),
+        workflow_body,
+        indent="        ",
+    )
+
     return (
         f"@workflow.defn\n"
         f"class {class_name}:\n"
@@ -224,9 +287,7 @@ def _render_workflow_class(
         f"{handlers}"
         f"    @workflow.run\n"
         f"    async def run(self) -> None:\n"
-        f"        raise NotImplementedError(\n"
-        f"            f\"CACAO workflow lowering not implemented: stable_id={_py_repr(x.stable_id)}\"\n"
-        f"        )\n"
+        f"{workflow_span}"
     )
 
 
@@ -250,6 +311,9 @@ def emit(playbook: Playbook, *, header: str = DEFAULT_HEADER) -> str:
     parts.append("from temporalio import activity, workflow\n")
     parts.append("from temporalio.common import RetryPolicy\n")
     parts.append("\n")
+    parts.append(render_otel_imports())
+    parts.append("\n")
+    parts.append(render_audit_mirror_imports())
     parts.append("\n")
 
     for step_id, fn_name in activity_names.items():
