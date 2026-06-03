@@ -9,22 +9,26 @@ and where the integrator owns the seams.
 
 ## Files in this directory
 
-| File | Role |
-|------|------|
-| `workflow.json` | n8n workflow JSON emitted by `compilers.n8n.emit` — import this into your own n8n instance. |
-| `README.md` | This file. |
+| Path                  | Source compiler | Format            |
+|-----------------------|-----------------|-------------------|
+| `playbook.cacao.json` | (input mirror)  | CACAO v2 JSON     |
+| `workflow.n8n.json`   | `compilers.n8n` | n8n workflow JSON |
+| `regenerate.sh`       | (tooling)       | bash script       |
+| `README.md`           | —               | This file.        |
 
 The canonical input is the CACAO v2 playbook at
 `../../../content/playbooks/ransomware-containment/playbook.cacao.json`
 (frozen). Scenario, regulatory anchors, control / metric / telemetry
 bindings, and the operator-supplied bindings are documented in that
-folder's `README.md`. This folder holds only the *emitted* artifact.
+folder's `README.md`. This folder holds the emitted artifact, a
+co-located byte-identical copy of the CACAO source for easy diff
+inspection, and the regeneration script.
 
 ## How to import
 
 1. In your own n8n instance, open the workflows list and choose
    **Import from File**.
-2. Select `workflow.json` from this directory.
+2. Select `workflow.n8n.json` from this directory.
 3. n8n loads ten nodes wired into the topology described below. The
    workflow is **inactive** by default — review and bind it to your own
    connectors before activating.
@@ -39,20 +43,25 @@ job.
 
 ## How to regenerate
 
-After any change to the playbook or to `compilers/n8n/*`, refresh the
-committed artifact from the repo root:
+The n8n emitter is deterministic: same input bytes in, same output
+bytes out. From the repo root:
+
+    ./examples/n8n/ransomware-containment/regenerate.sh
+
+The script mirrors the canonical CACAO source into this folder and
+re-emits `workflow.n8n.json` via `tools.compile --target n8n`.
+Equivalent direct invocation:
 
 ```bash
 PYTHONPATH=. python -m tools.compile \
     content/playbooks/ransomware-containment/playbook.cacao.json \
     --target n8n \
-    --out examples/n8n/ransomware-containment/workflow.json
+    --out examples/n8n/ransomware-containment/workflow.n8n.json
 ```
 
-The n8n emitter is deterministic: same input bytes in, same output
-bytes out. The drift guard in
+The drift guard in
 `tests/examples/ransomware_containment/test_n8n_workflow.py` fails the
-suite if the committed `workflow.json` diverges from a fresh
+suite if the committed `workflow.n8n.json` diverges from a fresh
 regeneration, so the worked example stays honest as the compiler
 evolves.
 
