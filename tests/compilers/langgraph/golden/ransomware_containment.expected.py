@@ -70,10 +70,10 @@ async def triage_signal(signal_id: str) -> dict[str, object]:
     """
     with _TRACER.start_as_current_span(
         name='tool.action--30000000-0000-4000-8000-000000000002',
-        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'triage signal', 'secops_ng.tool.name': 'triage_signal'},
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'triage signal', 'secops_ng.tool.name': 'triage_signal', 'secops_ng.workflow.run_id': ''},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000002', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'triage signal', 'secops_ng.tool.name': 'triage_signal'})
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000002', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'triage signal', 'secops_ng.tool.name': 'triage_signal', 'secops_ng.workflow.run_id': ''})
         )
         raise NotImplementedError(
             f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000002'"
@@ -88,10 +88,10 @@ async def endpoint_isolation_edr_isolate(affected_host: str) -> None:
     """
     with _TRACER.start_as_current_span(
         name='tool.action--30000000-0000-4000-8000-000000000005',
-        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'endpoint isolation — EDR isolate', 'secops_ng.tool.name': 'endpoint_isolation_edr_isolate'},
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'endpoint isolation — EDR isolate', 'secops_ng.tool.name': 'endpoint_isolation_edr_isolate', 'secops_ng.workflow.run_id': ''},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000005', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'endpoint isolation — EDR isolate', 'secops_ng.tool.name': 'endpoint_isolation_edr_isolate'})
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000005', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'endpoint isolation — EDR isolate', 'secops_ng.tool.name': 'endpoint_isolation_edr_isolate', 'secops_ng.workflow.run_id': ''})
         )
         raise NotImplementedError(
             f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000005'"
@@ -106,10 +106,10 @@ async def endpoint_isolation_network_acl_deny_fallback(affected_host: str) -> No
     """
     with _TRACER.start_as_current_span(
         name='tool.action--30000000-0000-4000-8000-000000000006',
-        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'endpoint isolation — network ACL deny (fallback)', 'secops_ng.tool.name': 'endpoint_isolation_network_acl_deny_fallback'},
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'endpoint isolation — network ACL deny (fallback)', 'secops_ng.tool.name': 'endpoint_isolation_network_acl_deny_fallback', 'secops_ng.workflow.run_id': ''},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000006', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'endpoint isolation — network ACL deny (fallback)', 'secops_ng.tool.name': 'endpoint_isolation_network_acl_deny_fallback'})
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000006', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'endpoint isolation — network ACL deny (fallback)', 'secops_ng.tool.name': 'endpoint_isolation_network_acl_deny_fallback', 'secops_ng.workflow.run_id': ''})
         )
         raise NotImplementedError(
             f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000006'"
@@ -124,10 +124,10 @@ async def identity_revocation(affected_identity: str) -> None:
     """
     with _TRACER.start_as_current_span(
         name='tool.action--30000000-0000-4000-8000-000000000007',
-        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'identity revocation', 'secops_ng.tool.name': 'identity_revocation'},
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'identity revocation', 'secops_ng.tool.name': 'identity_revocation', 'secops_ng.workflow.run_id': ''},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000007', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'identity revocation', 'secops_ng.tool.name': 'identity_revocation'})
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000007', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'identity revocation', 'secops_ng.tool.name': 'identity_revocation', 'secops_ng.workflow.run_id': ''})
         )
         raise NotImplementedError(
             f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000007'"
@@ -142,10 +142,10 @@ async def backup_verification() -> dict[str, object]:
     """
     with _TRACER.start_as_current_span(
         name='tool.action--30000000-0000-4000-8000-000000000008',
-        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'backup verification', 'secops_ng.tool.name': 'backup_verification'},
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'backup verification', 'secops_ng.tool.name': 'backup_verification', 'secops_ng.workflow.run_id': ''},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000008', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'backup verification', 'secops_ng.tool.name': 'backup_verification'})
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000008', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'backup verification', 'secops_ng.tool.name': 'backup_verification', 'secops_ng.workflow.run_id': ''})
         )
         raise NotImplementedError(
             f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000008'"
@@ -160,10 +160,10 @@ async def comms_plan(affected_host: str, affected_identity: str, latest_known_go
     """
     with _TRACER.start_as_current_span(
         name='tool.action--30000000-0000-4000-8000-000000000009',
-        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000009', 'secops_ng.step.name': 'comms plan', 'secops_ng.tool.name': 'comms_plan'},
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000009', 'secops_ng.step.name': 'comms plan', 'secops_ng.tool.name': 'comms_plan', 'secops_ng.workflow.run_id': ''},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000009', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000009', 'secops_ng.step.name': 'comms plan', 'secops_ng.tool.name': 'comms_plan'})
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000009', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000009', 'secops_ng.step.name': 'comms plan', 'secops_ng.tool.name': 'comms_plan', 'secops_ng.workflow.run_id': ''})
         )
         raise NotImplementedError(
             f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000009'"

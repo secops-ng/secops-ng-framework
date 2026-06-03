@@ -64,10 +64,10 @@ async def timeline_collation(incident_id: str) -> dict[str, object]:
     """
     with _TRACER.start_as_current_span(
         name='tool.action--40000000-0000-4000-8000-000000000002',
-        attributes={'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'timeline collation', 'secops_ng.tool.name': 'timeline_collation'},
+        attributes={'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'timeline collation', 'secops_ng.tool.name': 'timeline_collation', 'secops_ng.workflow.run_id': ''},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='tool.action--40000000-0000-4000-8000-000000000002', attributes={'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'timeline collation', 'secops_ng.tool.name': 'timeline_collation'})
+            AuditRecord(span_name='tool.action--40000000-0000-4000-8000-000000000002', attributes={'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'timeline collation', 'secops_ng.tool.name': 'timeline_collation', 'secops_ng.workflow.run_id': ''})
         )
         raise NotImplementedError(
             f"CACAO action tool not implemented: step_id='action--40000000-0000-4000-8000-000000000002'"
@@ -82,10 +82,10 @@ async def blameless_review_template(incident_id: str, timeline_artifact: str, ev
     """
     with _TRACER.start_as_current_span(
         name='tool.action--40000000-0000-4000-8000-000000000003',
-        attributes={'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'blameless review template', 'secops_ng.tool.name': 'blameless_review_template'},
+        attributes={'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'blameless review template', 'secops_ng.tool.name': 'blameless_review_template', 'secops_ng.workflow.run_id': ''},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='tool.action--40000000-0000-4000-8000-000000000003', attributes={'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'blameless review template', 'secops_ng.tool.name': 'blameless_review_template'})
+            AuditRecord(span_name='tool.action--40000000-0000-4000-8000-000000000003', attributes={'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'blameless review template', 'secops_ng.tool.name': 'blameless_review_template', 'secops_ng.workflow.run_id': ''})
         )
         raise NotImplementedError(
             f"CACAO action tool not implemented: step_id='action--40000000-0000-4000-8000-000000000003'"
@@ -100,10 +100,10 @@ async def corrective_action_tracking(incident_id: str, review_artifact: str) -> 
     """
     with _TRACER.start_as_current_span(
         name='tool.action--40000000-0000-4000-8000-000000000004',
-        attributes={'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'corrective-action tracking', 'secops_ng.tool.name': 'corrective_action_tracking'},
+        attributes={'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'corrective-action tracking', 'secops_ng.tool.name': 'corrective_action_tracking', 'secops_ng.workflow.run_id': ''},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='tool.action--40000000-0000-4000-8000-000000000004', attributes={'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'corrective-action tracking', 'secops_ng.tool.name': 'corrective_action_tracking'})
+            AuditRecord(span_name='tool.action--40000000-0000-4000-8000-000000000004', attributes={'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'corrective-action tracking', 'secops_ng.tool.name': 'corrective_action_tracking', 'secops_ng.workflow.run_id': ''})
         )
         raise NotImplementedError(
             f"CACAO action tool not implemented: step_id='action--40000000-0000-4000-8000-000000000004'"

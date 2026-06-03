@@ -55,10 +55,10 @@ async def enrich_finding(finding_id: str) -> str:
     """
     with _TRACER.start_as_current_span(
         name='tool.action--22222222-2222-4222-8222-222222222222',
-        attributes={'secops_ng.playbook.id': 'playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'secops_ng.step.id': 'action--22222222-2222-4222-8222-222222222222', 'secops_ng.step.name': 'enrich finding', 'secops_ng.tool.name': 'enrich_finding'},
+        attributes={'secops_ng.playbook.id': 'playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'secops_ng.step.id': 'action--22222222-2222-4222-8222-222222222222', 'secops_ng.step.name': 'enrich finding', 'secops_ng.tool.name': 'enrich_finding', 'secops_ng.workflow.run_id': ''},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='tool.action--22222222-2222-4222-8222-222222222222', attributes={'secops_ng.playbook.id': 'playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'secops_ng.step.id': 'action--22222222-2222-4222-8222-222222222222', 'secops_ng.step.name': 'enrich finding', 'secops_ng.tool.name': 'enrich_finding'})
+            AuditRecord(span_name='tool.action--22222222-2222-4222-8222-222222222222', attributes={'secops_ng.playbook.id': 'playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'secops_ng.step.id': 'action--22222222-2222-4222-8222-222222222222', 'secops_ng.step.name': 'enrich finding', 'secops_ng.tool.name': 'enrich_finding', 'secops_ng.workflow.run_id': ''})
         )
         raise NotImplementedError(
             f"CACAO action tool not implemented: step_id='action--22222222-2222-4222-8222-222222222222'"
@@ -73,10 +73,10 @@ async def open_critical_ticket() -> None:
     """
     with _TRACER.start_as_current_span(
         name='tool.action--44444444-4444-4444-8444-444444444444',
-        attributes={'secops_ng.playbook.id': 'playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'secops_ng.step.id': 'action--44444444-4444-4444-8444-444444444444', 'secops_ng.step.name': 'open critical ticket', 'secops_ng.tool.name': 'open_critical_ticket'},
+        attributes={'secops_ng.playbook.id': 'playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'secops_ng.step.id': 'action--44444444-4444-4444-8444-444444444444', 'secops_ng.step.name': 'open critical ticket', 'secops_ng.tool.name': 'open_critical_ticket', 'secops_ng.workflow.run_id': ''},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='tool.action--44444444-4444-4444-8444-444444444444', attributes={'secops_ng.playbook.id': 'playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'secops_ng.step.id': 'action--44444444-4444-4444-8444-444444444444', 'secops_ng.step.name': 'open critical ticket', 'secops_ng.tool.name': 'open_critical_ticket'})
+            AuditRecord(span_name='tool.action--44444444-4444-4444-8444-444444444444', attributes={'secops_ng.playbook.id': 'playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'secops_ng.step.id': 'action--44444444-4444-4444-8444-444444444444', 'secops_ng.step.name': 'open critical ticket', 'secops_ng.tool.name': 'open_critical_ticket', 'secops_ng.workflow.run_id': ''})
         )
         raise NotImplementedError(
             f"CACAO action tool not implemented: step_id='action--44444444-4444-4444-8444-444444444444'"
@@ -91,10 +91,10 @@ async def queue_routine_ticket() -> None:
     """
     with _TRACER.start_as_current_span(
         name='tool.action--55555555-5555-4555-8555-555555555555',
-        attributes={'secops_ng.playbook.id': 'playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'secops_ng.step.id': 'action--55555555-5555-4555-8555-555555555555', 'secops_ng.step.name': 'queue routine ticket', 'secops_ng.tool.name': 'queue_routine_ticket'},
+        attributes={'secops_ng.playbook.id': 'playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'secops_ng.step.id': 'action--55555555-5555-4555-8555-555555555555', 'secops_ng.step.name': 'queue routine ticket', 'secops_ng.tool.name': 'queue_routine_ticket', 'secops_ng.workflow.run_id': ''},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='tool.action--55555555-5555-4555-8555-555555555555', attributes={'secops_ng.playbook.id': 'playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'secops_ng.step.id': 'action--55555555-5555-4555-8555-555555555555', 'secops_ng.step.name': 'queue routine ticket', 'secops_ng.tool.name': 'queue_routine_ticket'})
+            AuditRecord(span_name='tool.action--55555555-5555-4555-8555-555555555555', attributes={'secops_ng.playbook.id': 'playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'secops_ng.step.id': 'action--55555555-5555-4555-8555-555555555555', 'secops_ng.step.name': 'queue routine ticket', 'secops_ng.tool.name': 'queue_routine_ticket', 'secops_ng.workflow.run_id': ''})
         )
         raise NotImplementedError(
             f"CACAO action tool not implemented: step_id='action--55555555-5555-4555-8555-555555555555'"

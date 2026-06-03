@@ -64,10 +64,10 @@ async def resolve_kpi_kri_catalog(rollup_window: str, catalog_ref: str) -> None:
     """
     with _TRACER.start_as_current_span(
         name='tool.action--e0000000-0000-4000-8000-000000000002',
-        attributes={'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'resolve KPI/KRI catalog', 'secops_ng.tool.name': 'resolve_kpi_kri_catalog'},
+        attributes={'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'resolve KPI/KRI catalog', 'secops_ng.tool.name': 'resolve_kpi_kri_catalog', 'secops_ng.workflow.run_id': ''},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='tool.action--e0000000-0000-4000-8000-000000000002', attributes={'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'resolve KPI/KRI catalog', 'secops_ng.tool.name': 'resolve_kpi_kri_catalog'})
+            AuditRecord(span_name='tool.action--e0000000-0000-4000-8000-000000000002', attributes={'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'resolve KPI/KRI catalog', 'secops_ng.tool.name': 'resolve_kpi_kri_catalog', 'secops_ng.workflow.run_id': ''})
         )
         raise NotImplementedError(
             f"CACAO action tool not implemented: step_id='action--e0000000-0000-4000-8000-000000000002'"
@@ -82,10 +82,10 @@ async def evaluate_metrics_over_window(rollup_window: str, catalog_ref: str) -> 
     """
     with _TRACER.start_as_current_span(
         name='tool.action--e0000000-0000-4000-8000-000000000003',
-        attributes={'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'evaluate metrics over window', 'secops_ng.tool.name': 'evaluate_metrics_over_window'},
+        attributes={'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'evaluate metrics over window', 'secops_ng.tool.name': 'evaluate_metrics_over_window', 'secops_ng.workflow.run_id': ''},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='tool.action--e0000000-0000-4000-8000-000000000003', attributes={'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'evaluate metrics over window', 'secops_ng.tool.name': 'evaluate_metrics_over_window'})
+            AuditRecord(span_name='tool.action--e0000000-0000-4000-8000-000000000003', attributes={'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'evaluate metrics over window', 'secops_ng.tool.name': 'evaluate_metrics_over_window', 'secops_ng.workflow.run_id': ''})
         )
         raise NotImplementedError(
             f"CACAO action tool not implemented: step_id='action--e0000000-0000-4000-8000-000000000003'"
@@ -100,10 +100,10 @@ async def score_control_effectiveness(metric_evaluations: str) -> str:
     """
     with _TRACER.start_as_current_span(
         name='tool.action--e0000000-0000-4000-8000-000000000004',
-        attributes={'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'score control effectiveness', 'secops_ng.tool.name': 'score_control_effectiveness'},
+        attributes={'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'score control effectiveness', 'secops_ng.tool.name': 'score_control_effectiveness', 'secops_ng.workflow.run_id': ''},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='tool.action--e0000000-0000-4000-8000-000000000004', attributes={'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'score control effectiveness', 'secops_ng.tool.name': 'score_control_effectiveness'})
+            AuditRecord(span_name='tool.action--e0000000-0000-4000-8000-000000000004', attributes={'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'score control effectiveness', 'secops_ng.tool.name': 'score_control_effectiveness', 'secops_ng.workflow.run_id': ''})
         )
         raise NotImplementedError(
             f"CACAO action tool not implemented: step_id='action--e0000000-0000-4000-8000-000000000004'"
@@ -118,10 +118,10 @@ async def raise_board_attention_flag(control_effectiveness_score: str, metric_ev
     """
     with _TRACER.start_as_current_span(
         name='tool.action--e0000000-0000-4000-8000-000000000006',
-        attributes={'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'raise board-attention flag', 'secops_ng.tool.name': 'raise_board_attention_flag'},
+        attributes={'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'raise board-attention flag', 'secops_ng.tool.name': 'raise_board_attention_flag', 'secops_ng.workflow.run_id': ''},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='tool.action--e0000000-0000-4000-8000-000000000006', attributes={'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'raise board-attention flag', 'secops_ng.tool.name': 'raise_board_attention_flag'})
+            AuditRecord(span_name='tool.action--e0000000-0000-4000-8000-000000000006', attributes={'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'raise board-attention flag', 'secops_ng.tool.name': 'raise_board_attention_flag', 'secops_ng.workflow.run_id': ''})
         )
         raise NotImplementedError(
             f"CACAO action tool not implemented: step_id='action--e0000000-0000-4000-8000-000000000006'"
@@ -136,10 +136,10 @@ async def emit_board_summary(rollup_window: str, metric_evaluations: str, contro
     """
     with _TRACER.start_as_current_span(
         name='tool.action--e0000000-0000-4000-8000-000000000007',
-        attributes={'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'emit board summary', 'secops_ng.tool.name': 'emit_board_summary'},
+        attributes={'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'emit board summary', 'secops_ng.tool.name': 'emit_board_summary', 'secops_ng.workflow.run_id': ''},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='tool.action--e0000000-0000-4000-8000-000000000007', attributes={'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'emit board summary', 'secops_ng.tool.name': 'emit_board_summary'})
+            AuditRecord(span_name='tool.action--e0000000-0000-4000-8000-000000000007', attributes={'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'emit board summary', 'secops_ng.tool.name': 'emit_board_summary', 'secops_ng.workflow.run_id': ''})
         )
         raise NotImplementedError(
             f"CACAO action tool not implemented: step_id='action--e0000000-0000-4000-8000-000000000007'"
