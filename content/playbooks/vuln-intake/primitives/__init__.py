@@ -28,6 +28,15 @@ shipping it.
 
 from __future__ import annotations
 
+from .cvss import (
+    CVSSParseError,
+    CVSSScore,
+    CVSSv31Vector,
+    base_score,
+    compute_cvss,
+    parse_cvss_vector,
+    severity_rating,
+)
 from .dedup import canonicalize_case_field, case_idempotency_key
 from .epss import (
     DEFAULT_FRESHNESS_WINDOW,
@@ -39,12 +48,19 @@ from .epss import (
 from .signatures import signature_schema
 
 __all__ = [
+    "CVSSParseError",
+    "CVSSScore",
+    "CVSSv31Vector",
     "DEFAULT_FRESHNESS_WINDOW",
     "EPSSScore",
     "StaleEPSSWarning",
+    "base_score",
     "canonicalize_case_field",
     "canonicalize_epss",
     "case_idempotency_key",
+    "compute_cvss",
+    "parse_cvss_vector",
     "parse_epss",
+    "severity_rating",
     "signature_schema",
 ]
