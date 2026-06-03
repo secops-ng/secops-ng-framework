@@ -46,7 +46,7 @@ Shipped.
 | **Tests — dedup-collision** | ❌ missing | No dedup test exists because no dedup helper exists. |
 | **Tests — replay** | ❌ missing | No replay test (golden replay across all three targets). |
 | **Cookbook entry + walkthrough docs** | ❌ missing | `content/playbooks/vuln-intake/README.md` exists but only describes the playbook shape; there is no cookbook walkthrough doc under `docs/cookbook/` (the directory does not yet exist for vuln-intake). |
-| **`config.yaml`** | ❌ missing | F-WF-02 (Posture audit, Shipped) ships its own scaffolding without a per-workflow `config.yaml`. F-WF-01 needs a clear answer on whether the ROADMAP `config.yaml` requirement is satisfied by the CACAO `playbook_variables` block or whether a separate operator-facing YAML is expected. See § 4 — flagged for Director / Custodian. |
+| **`config.yaml`** | ❌ missing | F-WF-02 (Posture audit, Shipped) ships its own scaffolding without a per-workflow `config.yaml`. F-WF-01 needs a clear answer on whether the ROADMAP `config.yaml` requirement is satisfied by the CACAO `playbook_variables` block or whether a separate operator-facing YAML is expected. See § 4 — flagged for maintainer review. |
 | **Threat-intel feeds as Pydantic-typed supplier deps (F-CP-04)** | ❌ blocked | F-CP-04 is Status: Proposed. The intake step today carries `__report_source__` as a free string; the supplier-dependency contract cannot land until F-CP-04 ships a Pydantic shape. Tracked but not blocking F-WF-01 closeout — see § 4. |
 
 ## 2. Per-target action × body inventory
@@ -92,8 +92,8 @@ wiring after.
 
 ### 3.1 Sibling cards to spawn
 
-All cards land as **siblings** of this gap-inventory card (no
-`parents=[t_ec01446d]`) so they sit flat on the board. Cross-card
+All cards land as **siblings** of this gap-inventory card (no parent
+edge back to it) so they sit flat on the board. Cross-card
 dependencies are expressed via `parents=[…]` between siblings so the
 dispatcher only promotes cards whose upstreams are done.
 
@@ -115,7 +115,7 @@ closeout card fans in on everything. Custodian review of each PR is
 spawned by the corresponding `Coder merge:` card when the PR is open,
 matching the F-CR-04 cadence.
 
-## 4. Open questions for the Director / Custodian
+## 4. Open questions for maintainers
 
 1. **`config.yaml` semantics.** ROADMAP F-WF-01 asks for a per-workflow
    `config.yaml`. The CACAO playbook already declares
@@ -130,7 +130,7 @@ matching the F-CR-04 cadence.
    Status: Proposed. Two readings: (a) F-WF-01 can flip to Shipped
    with the current free-string `__report_source__` and the supplier
    shape lands later as part of F-CP-04; (b) F-WF-01 cannot flip until
-   F-CP-04 lands. Flag for Director — recommendation is (a), with the
+   F-CP-04 lands. Flag for maintainers — recommendation is (a), with the
    note in `__report_source__`'s description pointing forward to
    F-CP-04.
 3. **DSPy reach.** ROADMAP says "DSPy signature for severity rating"
