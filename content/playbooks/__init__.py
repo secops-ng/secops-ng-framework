@@ -1,59 +1,36 @@
-"""Playbook content tree.
+"""Playbooks namespace.
 
-Each subdirectory is one workflow. Per-workflow shared Python primitives
-(scoring, severity, dedup, etc.) live under
-``<workflow>/primitives/`` on disk; an underscore-aliased import surface
-(``content.playbooks.<workflow>_underscore.primitives``) is exposed where the
-on-disk directory uses hyphens.
+Portable CACAO playbooks live in hyphen-named directories on disk
+(``content/playbooks/vuln-intake/``) but are importable under
+Python-friendly underscore aliases (``content.playbooks.vuln_intake``).
+
+Aliases are registered as standard Python packages whose ``__path__``
+points at the hyphen-named on-disk directory. Per-target CORE bodies
+import via ``from content.playbooks.vuln_intake.primitives import ...``.
 """
 
 from __future__ import annotations
 
-import importlib
-import sys
-from pathlib import Path
+import os as _os
 
-# ---------------------------------------------------------------------------
-# Hyphen → underscore import aliasing
-# ---------------------------------------------------------------------------
-#
-# CACAO playbook directories on disk use hyphenated names because hyphens
-# are the convention in the surrounding content tree (and on the published
-# website). Python module names cannot contain hyphens, so we expose an
-# underscore-aliased package per workflow that holds shared primitives.
-#
-# This module rewrites the ``__path__`` of any ``content.playbooks.<name>``
-# import so that ``content.playbooks.vuln_intake`` resolves to the on-disk
-# ``content/playbooks/vuln-intake/`` directory transparently. Concrete
-# per-workflow aliases are declared explicitly below so static tooling
-# (mypy, ruff) sees them.
-
-_HERE = Path(__file__).resolve().parent
+_HERE = _os.path.dirname(__file__)
 
 
-def _alias_hyphen_dir(underscore_name: str, hyphen_dir: str) -> None:
-    """Bind ``content.playbooks.<underscore_name>`` to ``./<hyphen_dir>/``.
-
-    The aliased package is a *namespace* shim: its ``__path__`` points at
-    the hyphenated directory so submodule imports
-    (``content.playbooks.<underscore_name>.primitives``) resolve to files
-    under ``content/playbooks/<hyphen_dir>/primitives/``.
-    """
-    full = f"{__name__}.{underscore_name}"
-    if full in sys.modules:
-        return
-    target = _HERE / hyphen_dir
-    if not target.is_dir():
-        return
-    import types
-
-    shim = types.ModuleType(full)
-    shim.__path__ = [str(target)]  # type: ignore[attr-defined]
-    shim.__doc__ = (
-        f"Underscore alias for the on-disk ``content/playbooks/{hyphen_dir}/`` "
-        "playbook directory."
-    )
-    sys.modules[full] = shim
+# Map import-alias -> on-disk directory name. The alias directory
+# (``vuln_intake/``) is a sibling of the hyphen directory on disk; it
+# carries only an ``__init__.py`` whose ``__path__`` mirrors the hyphen
+# directory so submodule imports resolve there.
+_ALIASES = {
+    "vuln_intake": "vuln-intake",
+}
 
 
-_alias_hyphen_dir("vuln_intake", "vuln-intake")
+def _on_disk_path_for_alias(alias: str) -> str | None:
+    """Return the on-disk path the alias resolves to, or None."""
+    target = _ALIASES.get(alias)
+    if target is None:
+        return None
+    candidate = _os.path.join(_HERE, target)
+    if _os.path.isdir(candidate):
+        return candidate
+    return None
