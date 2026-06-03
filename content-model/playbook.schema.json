@@ -259,11 +259,38 @@
               "type": "array",
               "items": { "$ref": "#/$defs/stable_id_ref" },
               "uniqueItems": true
-            }
+            },
+            "core_body": { "$ref": "#/$defs/core_body" }
           }
         }
       },
       "additionalProperties": true
+    },
+    "core_body": {
+      "description": "SecOps-NG CORE primitive binding for a workflow step. When present on a step's x_secops_ng block, this declares the deterministic primitive call the step compiles to: `primitive` is a dotted `<module.callable>` reference into the SecOps-NG primitives contract, `in` maps callable argument names to expressions over the playbook's variable context (no inline secrets — directive #6), and `out` is the playbook-variable name receiving the primitive's return value. Optional on every step; absence preserves CACAO v2 semantics unchanged.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["primitive", "in", "out"],
+      "properties": {
+        "primitive": {
+          "description": "Dotted reference to a primitive: `<module>.<callable>`. Module path is lowercase dot-segmented; callable is a Python identifier. Resolution against the primitives contract is enforced by the linter, not the schema.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*\\.[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "in": {
+          "description": "Map of primitive argument name → expression. Expressions are opaque strings here; their grammar is validated by the compilers, not by this schema. Empty object is allowed for nullary primitives.",
+          "type": "object",
+          "patternProperties": {
+            "^[A-Za-z_][A-Za-z0-9_]*$": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": false
+        },
+        "out": {
+          "description": "Playbook-variable name receiving the primitive's return value.",
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        }
+      }
     },
     "x_secops_ng": {
       "description": "Playbook-level SecOps-NG extensions. Required so every artifact in the content model exposes a stable join key, even when the CACAO `id` is regenerated.",
