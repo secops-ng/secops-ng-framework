@@ -17,3 +17,8 @@ PYTHONPATH="${REPO_ROOT}" python -m tools.compile \
     "${CANON}" \
     --target temporal \
     --out "${HERE}/workflow.temporal.py"
+
+# Materialise the dependency-free audit-mirror sibling. See
+# docs/observability/audit-mirror.md for the co-location rationale.
+PYTHONPATH="${REPO_ROOT}" python -m compilers._shared.audit_mirror_cli \
+    --out "${HERE}/_audit_mirror.py"
