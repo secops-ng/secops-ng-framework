@@ -143,3 +143,110 @@ def test_playbook_types_enum_enforced(validator: Draft202012Validator) -> None:
     pb["playbook_types"] = ["definitely-not-a-cacao-type"]
     with pytest.raises(ValidationError):
         validator.validate(pb)
+
+
+# ---------------------------------------------------------------------------
+# CORE-MECH SKELETON: x_secops_ng.core_body on a workflow step.
+# Schema-only gate — no compiler/emitter is touched in this PR.
+# ---------------------------------------------------------------------------
+STEP_ID = "action--44444444-4444-4444-8444-444444444444"
+
+
+def _with_core_body(core_body: dict) -> dict:
+    pb = deepcopy(MIN_PLAYBOOK)
+    pb["workflow"][STEP_ID]["x_secops_ng"]["core_body"] = core_body
+    return pb
+
+
+def test_core_body_absent_is_backwards_compatible(
+    validator: Draft202012Validator,
+) -> None:
+    """The baseline MIN_PLAYBOOK carries no core_body and must still validate."""
+    step = MIN_PLAYBOOK["workflow"][STEP_ID]
+    assert "core_body" not in step.get("x_secops_ng", {})
+    errors = sorted(validator.iter_errors(MIN_PLAYBOOK), key=lambda e: e.path)
+    assert errors == [], [e.message for e in errors]
+
+
+def test_core_body_with_required_keys_validates(
+    validator: Draft202012Validator,
+) -> None:
+    pb = _with_core_body(
+        {
+            "primitive": "secops_ng.primitives.vuln.parse_epss",
+            "in": {"raw": "$.event.body"},
+            "out": "epss",
+        }
+    )
+    errors = sorted(validator.iter_errors(pb), key=lambda e: e.path)
+    assert errors == [], [e.message for e in errors]
+
+
+def test_core_body_with_empty_in_map_validates(
+    validator: Draft202012Validator,
+) -> None:
+    """Nullary primitives are allowed: `in` may be an empty object."""
+    pb = _with_core_body(
+        {
+            "primitive": "secops_ng.primitives.time.utc_now",
+            "in": {},
+            "out": "now",
+        }
+    )
+    errors = sorted(validator.iter_errors(pb), key=lambda e: e.path)
+    assert errors == [], [e.message for e in errors]
+
+
+@pytest.mark.parametrize(
+    "core_body",
+    [
+        # Missing required key: no `out`.
+        {"primitive": "secops_ng.primitives.vuln.parse_epss", "in": {"raw": "$x"}},
+        # Missing required key: no `in`.
+        {"primitive": "secops_ng.primitives.vuln.parse_epss", "out": "epss"},
+        # Missing required key: no `primitive`.
+        {"in": {"raw": "$x"}, "out": "epss"},
+        # `primitive` is not a dotted reference.
+        {"primitive": "not_dotted", "in": {"raw": "$x"}, "out": "epss"},
+        # `primitive` first segment must be lowercase.
+        {"primitive": "Module.callable", "in": {"raw": "$x"}, "out": "epss"},
+        # `in` must be an object, not a list.
+        {
+            "primitive": "secops_ng.primitives.vuln.parse_epss",
+            "in": ["raw"],
+            "out": "epss",
+        },
+        # `in` argument names must be valid identifiers (no leading digit).
+        {
+            "primitive": "secops_ng.primitives.vuln.parse_epss",
+            "in": {"1bad": "$x"},
+            "out": "epss",
+        },
+        # `in` argument values must be non-empty strings.
+        {
+            "primitive": "secops_ng.primitives.vuln.parse_epss",
+            "in": {"raw": ""},
+            "out": "epss",
+        },
+        # `out` must be a valid identifier (hyphens not allowed).
+        {
+            "primitive": "secops_ng.primitives.vuln.parse_epss",
+            "in": {"raw": "$x"},
+            "out": "bad-name",
+        },
+        # Unknown extra key under core_body is rejected (additionalProperties: false).
+        {
+            "primitive": "secops_ng.primitives.vuln.parse_epss",
+            "in": {"raw": "$x"},
+            "out": "epss",
+            "side_effect": "yes",
+        },
+    ],
+)
+def test_core_body_malformed_shape_rejected(
+    validator: Draft202012Validator, core_body: dict
+) -> None:
+    pb = _with_core_body(core_body)
+    with pytest.raises(ValidationError):
+        validator.validate(pb)
+
