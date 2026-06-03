@@ -47,6 +47,16 @@ from compilers._shared.cacao_parser import (
     parse,
     parse_file,
 )
+from compilers._shared.observability import (
+    SPAN_ATTR_PLAYBOOK_ID,
+    SPAN_ATTR_STEP_ID,
+    SPAN_ATTR_STEP_NAME,
+    SPAN_ATTR_TOOL_NAME,
+    SpanSpec,
+    emit_tool_span_block,
+    render_audit_mirror_imports,
+    render_otel_imports,
+)
 from compilers.temporal.bindings import (
     activity_signature,
     cacao_type_to_python,
@@ -341,6 +351,7 @@ class ToolBindingSpec:
     return_type: str
     description: str
     cacao_type: StepType
+    step_name: str = ""
 
 
 @dataclass(frozen=True)
@@ -363,6 +374,7 @@ class ToolBindingsSpec:
                     "return_type": b.return_type,
                     "description": b.description,
                     "cacao_type": str(b.cacao_type),
+                    "step_name": b.step_name,
                 }
                 for b in self.bindings
             ],
@@ -385,6 +397,7 @@ def tool_bindings(playbook: Playbook) -> ToolBindingsSpec:
                 return_type=sig.return_type,
                 description=description,
                 cacao_type=step.type,
+                step_name=step.name or "",
             )
         )
     return ToolBindingsSpec(
@@ -433,7 +446,14 @@ def render_state_schema(spec: StateSchemaSpec) -> str:
 
 
 def render_tool_bindings(spec: ToolBindingsSpec) -> str:
-    """Render ``@tool`` wrapper source for every binding in the spec."""
+    """Render ``@tool`` wrapper source for every binding in the spec.
+
+    Each generated tool function wraps its body in an OpenTelemetry span
+    keyed ``tool.<step_id>`` with stable attributes (playbook id, step id,
+    step name, tool function name). The audit-trail mirror collects a
+    parallel :class:`AuditRecord` so audit holds even with no OTel
+    exporter configured.
+    """
     if not spec.bindings:
         return (
             "# No CACAO action / playbook-action steps in this playbook —\n"
@@ -442,6 +462,23 @@ def render_tool_bindings(spec: ToolBindingsSpec) -> str:
     blocks: list[str] = []
     for b in spec.bindings:
         docline = " ".join(b.description.split()).replace('"""', '\\"\\"\\"')
+        body_lines = (
+            "raise NotImplementedError(\n"
+            f"    f\"CACAO action tool not implemented: step_id={b.step_id!r}\"\n"
+            ")"
+        )
+        attrs: dict[str, str] = {
+            SPAN_ATTR_PLAYBOOK_ID: spec.playbook_id,
+            SPAN_ATTR_STEP_ID: b.step_id,
+            SPAN_ATTR_TOOL_NAME: b.function_name,
+        }
+        if b.step_name:
+            attrs[SPAN_ATTR_STEP_NAME] = b.step_name
+        span_block = emit_tool_span_block(
+            SpanSpec(span_name=f"tool.{b.step_id}", attributes=attrs),
+            body_lines,
+            indent="    ",
+        )
         block = (
             f"@tool\n"
             f"async def {b.function_name}({b.params}) -> {b.return_type}:\n"
@@ -449,9 +486,7 @@ def render_tool_bindings(spec: ToolBindingsSpec) -> str:
             f"    CACAO step_id : {b.step_id}\n"
             f"    CACAO type    : {b.cacao_type}\n"
             f'    """\n'
-            f"    raise NotImplementedError(\n"
-            f"        f\"CACAO action tool not implemented: step_id={b.step_id!r}\"\n"
-            f"    )\n"
+            f"{span_block}"
         )
         blocks.append(block)
     return "\n".join(blocks)
@@ -518,6 +553,9 @@ def render_module(playbook: Playbook, *, header: str = DEFAULT_HEADER) -> str:
     parts.append("from langchain_core.tools import tool\n")
     parts.append("from langgraph.graph.message import add_messages\n")
     parts.append("\n")
+    parts.append(render_otel_imports())
+    parts.append("\n")
+    parts.append(render_audit_mirror_imports())
     parts.append("\n")
     parts.append(render_state_schema(schema))
     parts.append("\n")
