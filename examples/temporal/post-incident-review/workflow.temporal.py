@@ -13,6 +13,11 @@ from datetime import timedelta
 from temporalio import activity, workflow
 from temporalio.common import RetryPolicy
 
+from opentelemetry import trace
+
+_TRACER = trace.get_tracer(__name__)
+
+from ._audit_mirror import AuditRecord, AuditTrail
 
 @activity.defn
 async def timeline_collation(incident_id: str) -> dict[str, object]:
@@ -20,9 +25,16 @@ async def timeline_collation(incident_id: str) -> dict[str, object]:
 
     CACAO step_id: action--40000000-0000-4000-8000-000000000002
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--40000000-0000-4000-8000-000000000002'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--40000000-0000-4000-8000-000000000002',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'timeline collation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'timeline_collation'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--40000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'timeline collation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'timeline_collation'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--40000000-0000-4000-8000-000000000002'"
+        )
 
 TIMELINE_COLLATION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -37,9 +49,16 @@ async def blameless_review_template(incident_id: str, timeline_artifact: str, ev
 
     CACAO step_id: action--40000000-0000-4000-8000-000000000003
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--40000000-0000-4000-8000-000000000003'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--40000000-0000-4000-8000-000000000003',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'blameless review template', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'blameless_review_template'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--40000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'blameless review template', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'blameless_review_template'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--40000000-0000-4000-8000-000000000003'"
+        )
 
 BLAMELESS_REVIEW_TEMPLATE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -54,9 +73,16 @@ async def corrective_action_tracking(incident_id: str, review_artifact: str) -> 
 
     CACAO step_id: action--40000000-0000-4000-8000-000000000004
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--40000000-0000-4000-8000-000000000004'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--40000000-0000-4000-8000-000000000004',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'corrective-action tracking', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'corrective_action_tracking'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--40000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'corrective-action tracking', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'corrective_action_tracking'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--40000000-0000-4000-8000-000000000004'"
+        )
 
 CORRECTIVE_ACTION_TRACKING_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -79,9 +105,16 @@ class PlaybookPostIncidentReviewV1Workflow:
 
     @workflow.run
     async def run(self) -> None:
-        raise NotImplementedError(
-            f"CACAO workflow lowering not implemented: stable_id='playbook.post_incident_review@v1'"
-        )
+        with _TRACER.start_as_current_span(
+            name='workflow.playbook.post_incident_review@v1',
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.playbook.version': '0.1.0'},
+        ):
+            AuditTrail.current().append(
+                AuditRecord(span_name='workflow.playbook.post_incident_review@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.playbook.version': '0.1.0'})
+            )
+            raise NotImplementedError(
+                f"CACAO workflow lowering not implemented: stable_id='playbook.post_incident_review@v1'"
+            )
 
 WORKFLOW = PlaybookPostIncidentReviewV1Workflow
 ACTIVITIES = (timeline_collation, blameless_review_template, corrective_action_tracking,)

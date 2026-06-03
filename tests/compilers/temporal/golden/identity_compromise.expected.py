@@ -13,6 +13,11 @@ from datetime import timedelta
 from temporalio import activity, workflow
 from temporalio.common import RetryPolicy
 
+from opentelemetry import trace
+
+_TRACER = trace.get_tracer(__name__)
+
+from ._audit_mirror import AuditRecord, AuditTrail
 
 @activity.defn
 async def triage_identity_signal(signal_id: str, principal_id: str) -> bool:
@@ -20,9 +25,16 @@ async def triage_identity_signal(signal_id: str, principal_id: str) -> bool:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000002
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000002'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--30000000-0000-4000-8000-000000000002',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'triage identity signal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'triage_identity_signal'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'triage identity signal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'triage_identity_signal'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000002'"
+        )
 
 TRIAGE_IDENTITY_SIGNAL_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -37,9 +49,16 @@ async def reset_mfa_factors(principal_id: str) -> None:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000004
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000004'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--30000000-0000-4000-8000-000000000004',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'reset MFA factors', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'reset_mfa_factors'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'reset MFA factors', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'reset_mfa_factors'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000004'"
+        )
 
 RESET_MFA_FACTORS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -54,9 +73,16 @@ async def revoke_active_sessions(principal_id: str) -> int:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000005
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000005'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--30000000-0000-4000-8000-000000000005',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'revoke active sessions', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'revoke_active_sessions'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'revoke active sessions', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'revoke_active_sessions'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000005'"
+        )
 
 REVOKE_ACTIVE_SESSIONS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -71,9 +97,16 @@ async def lateral_movement_hunt(principal_id: str) -> int:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000006
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000006'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--30000000-0000-4000-8000-000000000006',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'lateral-movement hunt', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'lateral_movement_hunt'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'lateral-movement hunt', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'lateral_movement_hunt'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000006'"
+        )
 
 LATERAL_MOVEMENT_HUNT_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -88,9 +121,16 @@ async def iam_audit_and_persistence_removal(principal_id: str) -> None:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000007
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000007'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--30000000-0000-4000-8000-000000000007',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'IAM audit and persistence removal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'iam_audit_and_persistence_removal'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000007', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'IAM audit and persistence removal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'iam_audit_and_persistence_removal'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000007'"
+        )
 
 IAM_AUDIT_AND_PERSISTENCE_REMOVAL_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -113,9 +153,16 @@ class PlaybookIdentityCompromiseV1Workflow:
 
     @workflow.run
     async def run(self) -> None:
-        raise NotImplementedError(
-            f"CACAO workflow lowering not implemented: stable_id='playbook.identity_compromise@v1'"
-        )
+        with _TRACER.start_as_current_span(
+            name='workflow.playbook.identity_compromise@v1',
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.playbook.version': '0.1.0'},
+        ):
+            AuditTrail.current().append(
+                AuditRecord(span_name='workflow.playbook.identity_compromise@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.playbook.version': '0.1.0'})
+            )
+            raise NotImplementedError(
+                f"CACAO workflow lowering not implemented: stable_id='playbook.identity_compromise@v1'"
+            )
 
 WORKFLOW = PlaybookIdentityCompromiseV1Workflow
 ACTIVITIES = (triage_identity_signal, reset_mfa_factors, revoke_active_sessions, lateral_movement_hunt, iam_audit_and_persistence_removal,)

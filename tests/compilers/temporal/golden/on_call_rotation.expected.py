@@ -13,6 +13,11 @@ from datetime import timedelta
 from temporalio import activity, workflow
 from temporalio.common import RetryPolicy
 
+from opentelemetry import trace
+
+_TRACER = trace.get_tracer(__name__)
+
+from ._audit_mirror import AuditRecord, AuditTrail
 
 @activity.defn
 async def load_rotation_roster(shift_window: str) -> dict[str, object]:
@@ -20,9 +25,16 @@ async def load_rotation_roster(shift_window: str) -> dict[str, object]:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000002
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000002'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--30000000-0000-4000-8000-000000000002',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'load rotation roster', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'load_rotation_roster'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'load rotation roster', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'load_rotation_roster'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000002'"
+        )
 
 LOAD_ROTATION_ROSTER_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -37,9 +49,16 @@ async def bind_escalation_tiers(current_on_call: str) -> dict[str, object]:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000003
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000003'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--30000000-0000-4000-8000-000000000003',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'bind escalation tiers', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'bind_escalation_tiers'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'bind escalation tiers', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'bind_escalation_tiers'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000003'"
+        )
 
 BIND_ESCALATION_TIERS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -54,9 +73,16 @@ async def generate_handoff_brief(current_on_call: str, next_on_call: str) -> str
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000005
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000005'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--30000000-0000-4000-8000-000000000005',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'generate handoff brief', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'generate_handoff_brief'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'generate handoff brief', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'generate_handoff_brief'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000005'"
+        )
 
 GENERATE_HANDOFF_BRIEF_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -71,9 +97,16 @@ async def notify_incoming_on_call(next_on_call: str, brief_id: str) -> None:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000006
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000006'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--30000000-0000-4000-8000-000000000006',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'notify incoming on-call', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_incoming_on_call'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'notify incoming on-call', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_incoming_on_call'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000006'"
+        )
 
 NOTIFY_INCOMING_ON_CALL_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -96,9 +129,16 @@ class PlaybookOnCallRotationV1Workflow:
 
     @workflow.run
     async def run(self) -> None:
-        raise NotImplementedError(
-            f"CACAO workflow lowering not implemented: stable_id='playbook.on_call_rotation@v1'"
-        )
+        with _TRACER.start_as_current_span(
+            name='workflow.playbook.on_call_rotation@v1',
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0'},
+        ):
+            AuditTrail.current().append(
+                AuditRecord(span_name='workflow.playbook.on_call_rotation@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0'})
+            )
+            raise NotImplementedError(
+                f"CACAO workflow lowering not implemented: stable_id='playbook.on_call_rotation@v1'"
+            )
 
 WORKFLOW = PlaybookOnCallRotationV1Workflow
 ACTIVITIES = (load_rotation_roster, bind_escalation_tiers, generate_handoff_brief, notify_incoming_on_call,)

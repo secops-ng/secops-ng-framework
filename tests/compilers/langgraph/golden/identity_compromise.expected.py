@@ -14,6 +14,11 @@ from langchain_core.messages import AnyMessage
 from langchain_core.tools import tool
 from langgraph.graph.message import add_messages
 
+from opentelemetry import trace
+
+_TRACER = trace.get_tracer(__name__)
+
+from ._audit_mirror import AuditRecord, AuditTrail
 
 class PlaybookIdentityCompromiseV1State(TypedDict, total=False):
     """LangGraph state for CACAO playbook playbook.identity_compromise@v1.
@@ -57,9 +62,16 @@ async def triage_identity_signal(signal_id: str, principal_id: str) -> bool:
     CACAO step_id : action--30000000-0000-4000-8000-000000000002
     CACAO type    : action
     """
-    raise NotImplementedError(
-        f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000002'"
-    )
+    with _TRACER.start_as_current_span(
+        name='tool.action--30000000-0000-4000-8000-000000000002',
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'triage identity signal', 'secops_ng.tool.name': 'triage_identity_signal'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000002', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'triage identity signal', 'secops_ng.tool.name': 'triage_identity_signal'})
+        )
+        raise NotImplementedError(
+            f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000002'"
+        )
 
 @tool
 async def reset_mfa_factors(principal_id: str) -> None:
@@ -68,9 +80,16 @@ async def reset_mfa_factors(principal_id: str) -> None:
     CACAO step_id : action--30000000-0000-4000-8000-000000000004
     CACAO type    : action
     """
-    raise NotImplementedError(
-        f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000004'"
-    )
+    with _TRACER.start_as_current_span(
+        name='tool.action--30000000-0000-4000-8000-000000000004',
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'reset MFA factors', 'secops_ng.tool.name': 'reset_mfa_factors'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000004', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'reset MFA factors', 'secops_ng.tool.name': 'reset_mfa_factors'})
+        )
+        raise NotImplementedError(
+            f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000004'"
+        )
 
 @tool
 async def revoke_active_sessions(principal_id: str) -> int:
@@ -79,9 +98,16 @@ async def revoke_active_sessions(principal_id: str) -> int:
     CACAO step_id : action--30000000-0000-4000-8000-000000000005
     CACAO type    : action
     """
-    raise NotImplementedError(
-        f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000005'"
-    )
+    with _TRACER.start_as_current_span(
+        name='tool.action--30000000-0000-4000-8000-000000000005',
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'revoke active sessions', 'secops_ng.tool.name': 'revoke_active_sessions'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000005', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'revoke active sessions', 'secops_ng.tool.name': 'revoke_active_sessions'})
+        )
+        raise NotImplementedError(
+            f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000005'"
+        )
 
 @tool
 async def lateral_movement_hunt(principal_id: str) -> int:
@@ -90,9 +116,16 @@ async def lateral_movement_hunt(principal_id: str) -> int:
     CACAO step_id : action--30000000-0000-4000-8000-000000000006
     CACAO type    : action
     """
-    raise NotImplementedError(
-        f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000006'"
-    )
+    with _TRACER.start_as_current_span(
+        name='tool.action--30000000-0000-4000-8000-000000000006',
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'lateral-movement hunt', 'secops_ng.tool.name': 'lateral_movement_hunt'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000006', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'lateral-movement hunt', 'secops_ng.tool.name': 'lateral_movement_hunt'})
+        )
+        raise NotImplementedError(
+            f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000006'"
+        )
 
 @tool
 async def iam_audit_and_persistence_removal(principal_id: str) -> None:
@@ -101,9 +134,16 @@ async def iam_audit_and_persistence_removal(principal_id: str) -> None:
     CACAO step_id : action--30000000-0000-4000-8000-000000000007
     CACAO type    : action
     """
-    raise NotImplementedError(
-        f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000007'"
-    )
+    with _TRACER.start_as_current_span(
+        name='tool.action--30000000-0000-4000-8000-000000000007',
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'IAM audit and persistence removal', 'secops_ng.tool.name': 'iam_audit_and_persistence_removal'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000007', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'IAM audit and persistence removal', 'secops_ng.tool.name': 'iam_audit_and_persistence_removal'})
+        )
+        raise NotImplementedError(
+            f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000007'"
+        )
 
 async def llm_step(state: PlaybookIdentityCompromiseV1State) -> dict:
     """Agentic-extension hook.

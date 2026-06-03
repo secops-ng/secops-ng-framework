@@ -14,6 +14,11 @@ from langchain_core.messages import AnyMessage
 from langchain_core.tools import tool
 from langgraph.graph.message import add_messages
 
+from opentelemetry import trace
+
+_TRACER = trace.get_tracer(__name__)
+
+from ._audit_mirror import AuditRecord, AuditTrail
 
 class PlaybookOnCallRotationV1State(TypedDict, total=False):
     """LangGraph state for CACAO playbook playbook.on_call_rotation@v1.
@@ -60,9 +65,16 @@ async def load_rotation_roster(shift_window: str) -> dict[str, object]:
     CACAO step_id : action--30000000-0000-4000-8000-000000000002
     CACAO type    : action
     """
-    raise NotImplementedError(
-        f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000002'"
-    )
+    with _TRACER.start_as_current_span(
+        name='tool.action--30000000-0000-4000-8000-000000000002',
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'load rotation roster', 'secops_ng.tool.name': 'load_rotation_roster'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000002', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'load rotation roster', 'secops_ng.tool.name': 'load_rotation_roster'})
+        )
+        raise NotImplementedError(
+            f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000002'"
+        )
 
 @tool
 async def bind_escalation_tiers(current_on_call: str) -> dict[str, object]:
@@ -71,9 +83,16 @@ async def bind_escalation_tiers(current_on_call: str) -> dict[str, object]:
     CACAO step_id : action--30000000-0000-4000-8000-000000000003
     CACAO type    : action
     """
-    raise NotImplementedError(
-        f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000003'"
-    )
+    with _TRACER.start_as_current_span(
+        name='tool.action--30000000-0000-4000-8000-000000000003',
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'bind escalation tiers', 'secops_ng.tool.name': 'bind_escalation_tiers'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000003', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'bind escalation tiers', 'secops_ng.tool.name': 'bind_escalation_tiers'})
+        )
+        raise NotImplementedError(
+            f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000003'"
+        )
 
 @tool
 async def generate_handoff_brief(current_on_call: str, next_on_call: str) -> str:
@@ -82,9 +101,16 @@ async def generate_handoff_brief(current_on_call: str, next_on_call: str) -> str
     CACAO step_id : action--30000000-0000-4000-8000-000000000005
     CACAO type    : action
     """
-    raise NotImplementedError(
-        f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000005'"
-    )
+    with _TRACER.start_as_current_span(
+        name='tool.action--30000000-0000-4000-8000-000000000005',
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'generate handoff brief', 'secops_ng.tool.name': 'generate_handoff_brief'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000005', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'generate handoff brief', 'secops_ng.tool.name': 'generate_handoff_brief'})
+        )
+        raise NotImplementedError(
+            f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000005'"
+        )
 
 @tool
 async def notify_incoming_on_call(next_on_call: str, brief_id: str) -> None:
@@ -93,9 +119,16 @@ async def notify_incoming_on_call(next_on_call: str, brief_id: str) -> None:
     CACAO step_id : action--30000000-0000-4000-8000-000000000006
     CACAO type    : action
     """
-    raise NotImplementedError(
-        f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000006'"
-    )
+    with _TRACER.start_as_current_span(
+        name='tool.action--30000000-0000-4000-8000-000000000006',
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'notify incoming on-call', 'secops_ng.tool.name': 'notify_incoming_on_call'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000006', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'notify incoming on-call', 'secops_ng.tool.name': 'notify_incoming_on_call'})
+        )
+        raise NotImplementedError(
+            f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000006'"
+        )
 
 async def llm_step(state: PlaybookOnCallRotationV1State) -> dict:
     """Agentic-extension hook.
