@@ -13,6 +13,11 @@ from datetime import timedelta
 from temporalio import activity, workflow
 from temporalio.common import RetryPolicy
 
+from opentelemetry import trace
+
+_TRACER = trace.get_tracer(__name__)
+
+from ._audit_mirror import AuditRecord, AuditTrail
 
 @activity.defn
 async def resolve_kpi_kri_catalog(rollup_window: str, catalog_ref: str) -> None:
@@ -20,9 +25,16 @@ async def resolve_kpi_kri_catalog(rollup_window: str, catalog_ref: str) -> None:
 
     CACAO step_id: action--e0000000-0000-4000-8000-000000000002
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--e0000000-0000-4000-8000-000000000002'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--e0000000-0000-4000-8000-000000000002',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'resolve KPI/KRI catalog', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'resolve_kpi_kri_catalog'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--e0000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'resolve KPI/KRI catalog', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'resolve_kpi_kri_catalog'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--e0000000-0000-4000-8000-000000000002'"
+        )
 
 RESOLVE_KPI_KRI_CATALOG_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -37,9 +49,16 @@ async def evaluate_metrics_over_window(rollup_window: str, catalog_ref: str) -> 
 
     CACAO step_id: action--e0000000-0000-4000-8000-000000000003
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--e0000000-0000-4000-8000-000000000003'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--e0000000-0000-4000-8000-000000000003',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'evaluate metrics over window', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evaluate_metrics_over_window'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--e0000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'evaluate metrics over window', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evaluate_metrics_over_window'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--e0000000-0000-4000-8000-000000000003'"
+        )
 
 EVALUATE_METRICS_OVER_WINDOW_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -54,9 +73,16 @@ async def score_control_effectiveness(metric_evaluations: str) -> str:
 
     CACAO step_id: action--e0000000-0000-4000-8000-000000000004
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--e0000000-0000-4000-8000-000000000004'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--e0000000-0000-4000-8000-000000000004',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'score control effectiveness', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'score_control_effectiveness'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--e0000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'score control effectiveness', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'score_control_effectiveness'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--e0000000-0000-4000-8000-000000000004'"
+        )
 
 SCORE_CONTROL_EFFECTIVENESS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -71,9 +97,16 @@ async def raise_board_attention_flag(control_effectiveness_score: str, metric_ev
 
     CACAO step_id: action--e0000000-0000-4000-8000-000000000006
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--e0000000-0000-4000-8000-000000000006'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--e0000000-0000-4000-8000-000000000006',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'raise board-attention flag', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'raise_board_attention_flag'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--e0000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'raise board-attention flag', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'raise_board_attention_flag'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--e0000000-0000-4000-8000-000000000006'"
+        )
 
 RAISE_BOARD_ATTENTION_FLAG_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -88,9 +121,16 @@ async def emit_board_summary(rollup_window: str, metric_evaluations: str, contro
 
     CACAO step_id: action--e0000000-0000-4000-8000-000000000007
     """
-    raise NotImplementedError(
-        f"CACAO action stub not implemented: step_id='action--e0000000-0000-4000-8000-000000000007'"
-    )
+    with _TRACER.start_as_current_span(
+        name='activity.action--e0000000-0000-4000-8000-000000000007',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'emit board summary', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_board_summary'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--e0000000-0000-4000-8000-000000000007', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'emit board summary', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_board_summary'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--e0000000-0000-4000-8000-000000000007'"
+        )
 
 EMIT_BOARD_SUMMARY_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -113,9 +153,16 @@ class PlaybookExecutiveMetricsRollupV1Workflow:
 
     @workflow.run
     async def run(self) -> None:
-        raise NotImplementedError(
-            f"CACAO workflow lowering not implemented: stable_id='playbook.executive_metrics_rollup@v1'"
-        )
+        with _TRACER.start_as_current_span(
+            name='workflow.playbook.executive_metrics_rollup@v1',
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0'},
+        ):
+            AuditTrail.current().append(
+                AuditRecord(span_name='workflow.playbook.executive_metrics_rollup@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0'})
+            )
+            raise NotImplementedError(
+                f"CACAO workflow lowering not implemented: stable_id='playbook.executive_metrics_rollup@v1'"
+            )
 
 WORKFLOW = PlaybookExecutiveMetricsRollupV1Workflow
 ACTIVITIES = (resolve_kpi_kri_catalog, evaluate_metrics_over_window, score_control_effectiveness, raise_board_attention_flag, emit_board_summary,)

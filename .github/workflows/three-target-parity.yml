@@ -1,0 +1,64 @@
+name: three-target-parity
+
+# Three-target byte-parity matrix for the M0 cookbook workflows.
+#
+# The pytest suite under tests/examples/ already pins the canonical
+# vuln-intake / phishing-triage / etc. goldens. This lane catches the
+# remaining drift class: examples whose committed bytes are stale because
+# a compiler change landed without re-running the per-example
+# regenerate.sh. It runs the top-level orchestrator in --check mode,
+# which regenerates every example into the worktree, diffs it against
+# HEAD, restores HEAD on drift, and exits non-zero with a contributor-
+# friendly message naming the exact regenerate command to run locally.
+#
+# This is additive to the pytest lane; pytest stays as the fast local
+# path and CI gate for the goldens it covers.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  three-target-parity:
+    name: byte-parity matrix
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [n8n, temporal, langgraph]
+        workflow:
+          - vuln-intake
+          - identity-compromise
+          - phishing-triage
+          - threat-intel-ingest
+          - ransomware-containment
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime dependencies
+        # The compilers and per-example regenerate.sh scripts depend on a
+        # small set of runtime libraries: opentelemetry (the Temporal +
+        # LangGraph emitters import the OTel namespace at module load) and
+        # jsonschema (content/ validation).
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install opentelemetry-api opentelemetry-sdk jsonschema
+
+      - name: Check byte-parity (${{ matrix.target }} / ${{ matrix.workflow }})
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          ./regenerate.sh --check ${{ matrix.target }} ${{ matrix.workflow }}

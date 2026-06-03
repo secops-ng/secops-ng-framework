@@ -14,6 +14,11 @@ from langchain_core.messages import AnyMessage
 from langchain_core.tools import tool
 from langgraph.graph.message import add_messages
 
+from opentelemetry import trace
+
+_TRACER = trace.get_tracer(__name__)
+
+from ._audit_mirror import AuditRecord, AuditTrail
 
 class PlaybookCloudMisconfigurationV1State(TypedDict, total=False):
     """LangGraph state for CACAO playbook playbook.cloud_misconfiguration@v1.
@@ -60,9 +65,16 @@ async def ingest_finding(finding_id: str) -> None:
     CACAO step_id : action--30000000-0000-4000-8000-000000000002
     CACAO type    : action
     """
-    raise NotImplementedError(
-        f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000002'"
-    )
+    with _TRACER.start_as_current_span(
+        name='tool.action--30000000-0000-4000-8000-000000000002',
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest finding', 'secops_ng.tool.name': 'ingest_finding'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000002', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest finding', 'secops_ng.tool.name': 'ingest_finding'})
+        )
+        raise NotImplementedError(
+            f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000002'"
+        )
 
 @tool
 async def enrich_resource_and_owner(finding_id: str) -> dict[str, object]:
@@ -71,9 +83,16 @@ async def enrich_resource_and_owner(finding_id: str) -> dict[str, object]:
     CACAO step_id : action--30000000-0000-4000-8000-000000000003
     CACAO type    : action
     """
-    raise NotImplementedError(
-        f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000003'"
-    )
+    with _TRACER.start_as_current_span(
+        name='tool.action--30000000-0000-4000-8000-000000000003',
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'enrich resource and owner', 'secops_ng.tool.name': 'enrich_resource_and_owner'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000003', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'enrich resource and owner', 'secops_ng.tool.name': 'enrich_resource_and_owner'})
+        )
+        raise NotImplementedError(
+            f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000003'"
+        )
 
 @tool
 async def suppress_and_close() -> None:
@@ -82,9 +101,16 @@ async def suppress_and_close() -> None:
     CACAO step_id : action--30000000-0000-4000-8000-000000000005
     CACAO type    : action
     """
-    raise NotImplementedError(
-        f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000005'"
-    )
+    with _TRACER.start_as_current_span(
+        name='tool.action--30000000-0000-4000-8000-000000000005',
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'suppress and close', 'secops_ng.tool.name': 'suppress_and_close'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000005', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'suppress and close', 'secops_ng.tool.name': 'suppress_and_close'})
+        )
+        raise NotImplementedError(
+            f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000005'"
+        )
 
 @tool
 async def notify_owner(owner_id: str, resource_id: str, severity: str) -> None:
@@ -93,9 +119,16 @@ async def notify_owner(owner_id: str, resource_id: str, severity: str) -> None:
     CACAO step_id : action--30000000-0000-4000-8000-000000000006
     CACAO type    : action
     """
-    raise NotImplementedError(
-        f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000006'"
-    )
+    with _TRACER.start_as_current_span(
+        name='tool.action--30000000-0000-4000-8000-000000000006',
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'notify owner', 'secops_ng.tool.name': 'notify_owner'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000006', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'notify owner', 'secops_ng.tool.name': 'notify_owner'})
+        )
+        raise NotImplementedError(
+            f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000006'"
+        )
 
 @tool
 async def guided_remediation(resource_id: str, owner_id: str) -> None:
@@ -104,9 +137,16 @@ async def guided_remediation(resource_id: str, owner_id: str) -> None:
     CACAO step_id : action--30000000-0000-4000-8000-000000000007
     CACAO type    : action
     """
-    raise NotImplementedError(
-        f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000007'"
-    )
+    with _TRACER.start_as_current_span(
+        name='tool.action--30000000-0000-4000-8000-000000000007',
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'guided remediation', 'secops_ng.tool.name': 'guided_remediation'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000007', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'guided remediation', 'secops_ng.tool.name': 'guided_remediation'})
+        )
+        raise NotImplementedError(
+            f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000007'"
+        )
 
 @tool
 async def re_scan(resource_id: str, finding_id: str) -> bool:
@@ -115,9 +155,16 @@ async def re_scan(resource_id: str, finding_id: str) -> bool:
     CACAO step_id : action--30000000-0000-4000-8000-000000000008
     CACAO type    : action
     """
-    raise NotImplementedError(
-        f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000008'"
-    )
+    with _TRACER.start_as_current_span(
+        name='tool.action--30000000-0000-4000-8000-000000000008',
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 're-scan', 'secops_ng.tool.name': 're_scan'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-000000000008', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 're-scan', 'secops_ng.tool.name': 're_scan'})
+        )
+        raise NotImplementedError(
+            f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-000000000008'"
+        )
 
 @tool
 async def escalate(finding_id: str, resource_id: str, severity: str) -> None:
@@ -126,9 +173,16 @@ async def escalate(finding_id: str, resource_id: str, severity: str) -> None:
     CACAO step_id : action--30000000-0000-4000-8000-00000000000b
     CACAO type    : action
     """
-    raise NotImplementedError(
-        f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-00000000000b'"
-    )
+    with _TRACER.start_as_current_span(
+        name='tool.action--30000000-0000-4000-8000-00000000000b',
+        attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-00000000000b', 'secops_ng.step.name': 'escalate', 'secops_ng.tool.name': 'escalate'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='tool.action--30000000-0000-4000-8000-00000000000b', attributes={'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-00000000000b', 'secops_ng.step.name': 'escalate', 'secops_ng.tool.name': 'escalate'})
+        )
+        raise NotImplementedError(
+            f"CACAO action tool not implemented: step_id='action--30000000-0000-4000-8000-00000000000b'"
+        )
 
 async def llm_step(state: PlaybookCloudMisconfigurationV1State) -> dict:
     """Agentic-extension hook.
