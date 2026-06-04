@@ -108,6 +108,16 @@
         "control_refs": [
           "control.incident_handling_capability@v1"
         ],
+        "core_body": {
+          "in": {
+            "context": "__asset_context__",
+            "correlates_open_case": "__correlates_open_case__",
+            "detection_class": "__detection_class__",
+            "detection_severity": "__detection_severity__"
+          },
+          "out": "__priority_verdict__",
+          "primitive": "alert_triage.primitives.prioritisation.prioritise"
+        },
         "metric_refs": [
           "kpi.detection_coverage@v1"
         ]

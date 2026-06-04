@@ -120,9 +120,8 @@ async def classify_and_prioritise_deterministic_policy() -> str:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--a1e47431-0000-4000-8000-000000000006', attributes={'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000006', 'secops_ng.step.name': 'classify and prioritise (deterministic policy)', 'secops_ng.tool.name': 'classify_and_prioritise_deterministic_policy', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--a1e47431-0000-4000-8000-000000000006'"
-        )
+        from alert_triage.primitives.prioritisation import prioritise
+        __priority_verdict__ = prioritise(context=__asset_context__, correlates_open_case=__correlates_open_case__, detection_class=__detection_class__, detection_severity=__detection_severity__)
 
 @tool
 async def response_p1_severe_page_and_escalate() -> None:
