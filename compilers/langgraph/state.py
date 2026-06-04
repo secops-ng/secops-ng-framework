@@ -40,6 +40,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from compilers._shared.cacao_parser import (
+    CoreBody,
     Playbook,
     StepType,
     Variable,
@@ -353,6 +354,7 @@ class ToolBindingSpec:
     description: str
     cacao_type: StepType
     step_name: str = ""
+    core_body: CoreBody | None = None
 
 
 @dataclass(frozen=True)
@@ -399,6 +401,7 @@ def tool_bindings(playbook: Playbook) -> ToolBindingsSpec:
                 description=description,
                 cacao_type=step.type,
                 step_name=step.name or "",
+                core_body=step.x_secops_ng.core_body,
             )
         )
     return ToolBindingsSpec(
@@ -446,6 +449,34 @@ def render_state_schema(spec: StateSchemaSpec) -> str:
     return "\n".join(lines)
 
 
+def _render_core_body_call(core_body: CoreBody) -> str:
+    """Render the primitive call for a tool body when ``core_body`` is set.
+
+    Mirrors :func:`compilers.temporal.emit._render_core_body_call` so the
+    LangGraph and Temporal reference compilers emit the same primitive-call
+    shape for the same input:
+
+        from <module> import <callable>
+        <out> = <callable>(<arg>=<expr>, ...)
+
+    Argument order matches the parser-preserved insertion order of
+    ``core_body.in_`` so the output is byte-deterministic for a given
+    playbook. Expression strings are emitted verbatim — the playbook author
+    is responsible for them being valid Python in the tool body's scope;
+    expression grammar is the linter's surface, not this emitter's.
+
+    The surrounding OTel span + ``AuditTrail.append`` prologue is added by
+    :func:`emit_tool_span_block` at the call site so the CORE branch
+    inherits the same observability scaffold as the pre-CORE
+    NotImplementedError stub.
+    """
+    args = ", ".join(f"{name}={expr}" for name, expr in core_body.in_.items())
+    return (
+        f"from {core_body.module} import {core_body.callable_name}\n"
+        f"{core_body.out} = {core_body.callable_name}({args})"
+    )
+
+
 def render_tool_bindings(spec: ToolBindingsSpec) -> str:
     """Render ``@tool`` wrapper source for every binding in the spec.
 
@@ -463,11 +494,14 @@ def render_tool_bindings(spec: ToolBindingsSpec) -> str:
     blocks: list[str] = []
     for b in spec.bindings:
         docline = " ".join(b.description.split()).replace('"""', '\\"\\"\\"')
-        body_lines = (
-            "raise NotImplementedError(\n"
-            f"    f\"CACAO action tool not implemented: step_id={b.step_id!r}\"\n"
-            ")"
-        )
+        if b.core_body is not None:
+            body_lines = _render_core_body_call(b.core_body)
+        else:
+            body_lines = (
+                "raise NotImplementedError(\n"
+                f"    f\"CACAO action tool not implemented: step_id={b.step_id!r}\"\n"
+                ")"
+            )
         attrs: dict[str, str] = {
             SPAN_ATTR_PLAYBOOK_ID: spec.playbook_id,
             SPAN_ATTR_STEP_ID: b.step_id,
