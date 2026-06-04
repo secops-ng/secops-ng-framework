@@ -52,6 +52,7 @@ from pathlib import Path
 from typing import Any
 
 from compilers._shared.cacao_parser import (
+    CoreBody,
     Playbook,
     StepType,
     WorkflowStep,
@@ -73,6 +74,7 @@ _IF = "n8n-nodes-base.if"
 _SWITCH = "n8n-nodes-base.switch"
 _MERGE = "n8n-nodes-base.merge"
 _SET = "n8n-nodes-base.set"
+_CODE = "n8n-nodes-base.code"
 
 # typeVersion pinned to the versions stable since n8n 1.0. Emitter ships
 # importable JSON across n8n 1.x; users on older lines can re-pin if needed.
@@ -86,6 +88,9 @@ _TV_SWITCH = 3
 _TV_MERGE = 2
 # Set node "assignments" mode landed in 3.4 and is stable across n8n 1.x.
 _TV_SET = 3.4
+# Code node typeVersion 2 added the language switch (python/javascript); the
+# CORE branch uses Python so the primitive body matches the Temporal emitter.
+_TV_CODE = 2
 
 # x_secops_ng ref categories surfaced as Set-node assignment rows for action
 # steps without commands. Order is fixed so emitted JSON is deterministic.
@@ -112,6 +117,40 @@ _Y_ORIGIN = 240
 # --------------------------------------------------------------------------- #
 # Public API                                                                  #
 # --------------------------------------------------------------------------- #
+
+
+def _render_core_body_python(core_body: CoreBody) -> str:
+    """Render the n8n Code-node Python body for a CORE primitive binding.
+
+    Emits the two-line snippet::
+
+        from <module> import <callable>
+        <out> = <callable>(<arg>=<expr>, ...)
+
+    Argument order matches the parser-preserved insertion order of
+    ``core_body.in_`` so the output is byte-deterministic for a given
+    playbook. Expression strings are emitted verbatim — the playbook author
+    is responsible for them being valid Python in the n8n Code-node
+    context; expression grammar is the linter's surface, not this
+    emitter's.
+
+    The shape mirrors the Temporal emitter's ``_render_core_body_call``
+    (PR #220, ``ee69ca5``) so the same playbook produces the same
+    primitive call on both compile targets.
+    """
+    args = ", ".join(f"{name}={expr}" for name, expr in core_body.in_.items())
+    return (
+        f"from {core_body.module} import {core_body.callable_name}\n"
+        f"{core_body.out} = {core_body.callable_name}({args})"
+    )
+
+
+def _core_body_code_parameters(core_body: CoreBody) -> dict[str, Any]:
+    """n8n Code-node parameters dict for the CORE primitive branch."""
+    return {
+        "language": "python",
+        "pythonCode": _render_core_body_python(core_body),
+    }
 
 
 def emit(playbook: Playbook) -> dict[str, Any]:
@@ -349,6 +388,15 @@ class _WorkflowBuilder:
         command; multi-command actions are rare in practice and we log a
         note when we see one.
         """
+        # CORE primitive binding short-circuits the command heuristic: when
+        # ``x_secops_ng.core_body`` is set, the step's body is the deterministic
+        # primitive call rather than whatever the CACAO ``commands`` list
+        # described. Mirrors the Temporal emitter (PR #220) so the same
+        # playbook compiles to the same primitive call on both targets.
+        core_body = step.x_secops_ng.core_body
+        if core_body is not None:
+            return _CODE, _TV_CODE, _core_body_code_parameters(core_body)
+
         if not step.commands:
             return self._map_action_without_commands(step)
 
