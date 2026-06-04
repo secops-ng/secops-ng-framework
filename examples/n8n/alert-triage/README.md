@@ -91,6 +91,39 @@ be cross-referenced by id alone. Node labels mirror the CACAO step
 `name`. Sequencing (`on_completion` / `on_success` / `on_failure` /
 switch `cases`) becomes n8n `connections` edges.
 
+## Observability — OTel + AuditTrail in the n8n runtime
+
+n8n is a node-graph runtime, so OTel instrumentation is a per-node
+operator concern rather than a per-node instruction in the emitted
+JSON. The emitted workflow carries the topology and the CACAO I/O
+contract; the operator wires the OTel exporter and the audit mirror
+in their n8n host.
+
+Two patterns work today:
+
+- **Operator-side OTel wrapper.** An OpenTelemetry-instrumented n8n
+  host (community OTel community-nodes or a custom wrapper around
+  `n8n-nodes-base.code`) opens a span per executed node and tags it
+  with the shared `secops_ng.*` attribute keyspace (`playbook.id`,
+  `playbook.version`, `step.id`, `step.name`, `step.type`,
+  `tool.name`, `compile.target = "n8n"`).
+- **Python-runner AuditTrail mirror.** The eight CORE action steps
+  ship as Set-node skeletons in this worked example; an
+  operator-supplied wrapper around the prioritisation policy /
+  suppression-window / typed-payload primitives (when wired alongside
+  the Set node, typically via a downstream Python-runner Code node)
+  can append an `AuditRecord` to the shared `AuditTrail` so the
+  offline replay envelope (see
+  [`../../../docs/observability/audit-mirror.md`](../../../docs/observability/audit-mirror.md))
+  is consistent with the Temporal and LangGraph targets. The Set
+  nodes carry no audit body until the operator wires one alongside
+  their connector.
+
+The OTLP exporter endpoint, the n8n host process model, and the
+choice of community-node or custom wrapper are operator-bound. The
+sovereignty posture asks for an EU-resident collector — see
+[`../../../docs/observability/audit-mirror.md`](../../../docs/observability/audit-mirror.md).
+
 ## What this example does not do
 
 The n8n reference compiler translates **structure** and the
