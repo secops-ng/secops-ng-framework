@@ -263,3 +263,59 @@ def test_emit_file_matches_emit(playbook):
     from_file = emit_file_fn(FIXTURE)
     in_memory = emit_str(playbook)
     assert from_file == in_memory
+
+
+def test_core_body_renders_primitive_call_with_span_prologue(fixture_data):
+    """When a step carries x_secops_ng.core_body, the Temporal emitter
+    replaces the NotImplementedError stub with the deterministic
+    primitive-call snippet, while the OTel span + AuditTrail.append
+    prologue around the activity body stays intact.
+
+    Sibling-B smoke for F-WF-01 CORE-MECH-EMIT-TMPRL (PR #220). Uses an
+    in-memory mutation of the existing vuln_intake fixture so no new
+    playbook content lands on disk and no golden file is touched.
+    """
+    data = deepcopy(fixture_data)
+    target_step_id = "action--22222222-2222-4222-8222-222222222222"
+    step = data["workflow"][target_step_id]
+    step.setdefault("x_secops_ng", {})["core_body"] = {
+        "primitive": "secops_ng.primitives.enrichment.lookup_asset",
+        "in": {
+            "finding_id": "__finding_id__",
+            "lookup_mode": "'full'",
+        },
+        "out": "__severity__",
+    }
+
+    pb = parse(data)
+    source = emit_str(pb)
+
+    # Emitted source remains valid Python and importable under the stubs.
+    _ast.parse(source)
+    _load_module(source, name="_core_body_smoke")
+
+    # Locate the activity region — everything before the @workflow.defn
+    # class. The action step's body must contain the primitive import and
+    # call lines verbatim, with argument order matching insertion order
+    # of core_body.in (parser preserves dict order).
+    activity_region, _, _workflow_region = source.partition("@workflow.defn")
+    assert "from secops_ng.primitives.enrichment import lookup_asset" in activity_region
+    assert (
+        "__severity__ = lookup_asset(finding_id=__finding_id__, lookup_mode='full')"
+        in activity_region
+    )
+
+    # Pre-CORE NotImplementedError stub must NOT be emitted for the
+    # core_body-bound step. Other action steps in the fixture still stub
+    # out, so we anchor on the bound step's step_id specifically.
+    assert (
+        f"CACAO action stub not implemented: step_id='{target_step_id}'"
+        not in activity_region
+    )
+
+    # The OTel span + AuditTrail prologue (emit_tool_span_block) must
+    # still wrap the primitive call: the activity.<step_id> span name
+    # and the AuditTrail.current().append call are both present in the
+    # activity region for this step.
+    assert f"activity.{target_step_id}" in activity_region
+    assert "AuditTrail.current().append" in activity_region
