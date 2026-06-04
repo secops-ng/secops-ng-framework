@@ -36,3 +36,20 @@ This module is **stub-only**. It does not import `temporalio` itself, makes
 no I/O beyond reading the input file, and emits no business logic. An
 integrator fills the activity bodies and the `run()` orchestration against
 their own runtime.
+
+## Observability
+
+The compiler emits OpenTelemetry instrumentation by default: every
+`@activity.defn` body opens an `activity.<step_id>` span and the
+`@workflow.defn` `run()` opens a `workflow.<stable_id>` span. Span
+attributes use the shared `secops_ng.*` keyspace —
+`secops_ng.playbook.id`, `secops_ng.playbook.version`,
+`secops_ng.step.id`, `secops_ng.step.name`, `secops_ng.step.type`,
+`secops_ng.tool.name`, `secops_ng.compile.target=temporal`, and a
+`secops_ng.workflow.run_id` placeholder bound by the host runtime. A
+sibling `_audit_mirror.py` appends an `AuditRecord` per span so the
+audit property holds when OTLP is offline. See the worked example
+[`examples/temporal/vuln-intake/`](../../examples/temporal/vuln-intake/)
+and its `Observability` section for the operator-config envelope
+(`OTEL_EXPORTER_OTLP_ENDPOINT`, EU-resident collector guidance,
+provider neutrality).

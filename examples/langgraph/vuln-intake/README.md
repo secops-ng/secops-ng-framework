@@ -71,6 +71,75 @@ honest as the compiler evolves.
   concurrency, persistence backend). Those are runtime concerns the
   integrator applies in their own assembly.
 
+## Observability — OTel spans emitted by default
+
+The LangGraph reference compiler emits this worked example already
+wrapped in OpenTelemetry instrumentation; an operator who runs the
+compiled artifact gets traces without writing any glue.
+
+Two span layers are emitted for every action step:
+
+- **Tool span — `tool.<step_id>`.** Each `@tool`-decorated wrapper in
+  `state_bindings.py` opens
+  `tracer.start_as_current_span("tool.<step_id>", attributes={...})`
+  around its body. The wrapper is what runs whether the integrator
+  binds the tool directly or routes through an LLM-driven `ToolNode`,
+  so the span is opened regardless of the upstream caller.
+- **Node span — `node.<step_id>`.** Every node assembled in
+  `assemble.py` is wrapped in `node.<step_id>` via the local
+  `_wrap_node_span` helper before being handed to
+  `StateGraph.add_node`. The node span is the parent of the tool span
+  inside it, so a trace shows one `node.*` per LangGraph step with the
+  matching `tool.*` child.
+
+Span attributes use the shared `secops_ng.*` keyspace and are stable
+across reference compilers (LangGraph, Temporal, n8n):
+
+| Attribute key                | Carries                                              |
+|------------------------------|------------------------------------------------------|
+| `secops_ng.playbook.id`      | CACAO playbook id (e.g. `playbook--…`).              |
+| `secops_ng.step.id`          | CACAO step id (e.g. `action--…`).                    |
+| `secops_ng.step.name`        | Human-readable step label from the playbook.         |
+| `secops_ng.tool.name`        | Emitted tool / activity function name.               |
+| `secops_ng.workflow.run_id`  | Run-id placeholder; empty string until the host runtime binds one. |
+
+### Audit-trail mirror — offline / air-gapped
+
+Each span the compiled module opens also appends an `AuditRecord` to a
+context-local `AuditTrail` in the sibling `_audit_mirror.py`. The mirror
+runs unconditionally, *before* any OTLP exporter is involved, so the
+audit property holds even when the operator has not configured a
+collector — typical for disconnected, sovereign, or air-gapped
+deployments where OTLP egress is unavailable. See
+[../../../docs/observability/audit-mirror.md](../../../docs/observability/audit-mirror.md)
+for the co-location decision, the JSONL replay envelope, and the
+snapshot API used to drain a trail offline.
+
+### Operator configuration
+
+The compiled artifact reads the standard OpenTelemetry environment
+variables; nothing is hard-coded. The minimum the operator wires:
+
+```sh
+# OTLP collector — operator-provided. No default endpoint is set by
+# the compiled artifact; if unset, spans are dropped and the audit
+# mirror is the sole audit record.
+export OTEL_EXPORTER_OTLP_ENDPOINT="https://otel.collector.example.eu:4317"
+export OTEL_SERVICE_NAME="vuln-intake"
+```
+
+Sovereign-stack note: the collector should be EU-resident. Reference
+choices include Grafana Alloy on Hetzner, OTLP → Tempo on Scaleway, or
+an OVHcloud / Nebul-hosted collector — anything in operator-controlled
+EU infrastructure works; `us-*` regional endpoints do not meet the
+project's sovereignty posture.
+
+The compiled artifact also stays provider-neutral by construction: the
+emitter never imports a vendor SDK and never sets a default endpoint
+that routes outside the operator's control. Pointing the OTLP exporter
+at a managed APM is a downstream configuration choice the operator
+owns end-to-end.
+
 ## Sovereignty note
 
 LangGraph is open source (MIT) and runs as a Python process: hosting

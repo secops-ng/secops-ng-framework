@@ -144,6 +144,11 @@ no internal infrastructure detail, no contact names, no credentials.
 
 - **Status:** In Progress
 - **Priority:** P0
+- **Note (M0):** ships in M0 as compiler-emitted OTel — the LangGraph
+  and Temporal worked examples are wrapped by their reference compiler
+  today, with the audit-trail mirror co-located alongside the emitted
+  artifact; the operator-config envelope is documented in each worked
+  example's `Observability` section.
 - **Rationale:** After the content-first refactor (PR #34), SecOps-NG
   ships portable content and reference compilers, not an in-repo
   runtime. Observability therefore lives in the compile targets: each
