@@ -67,10 +67,10 @@ no internal infrastructure detail, no contact names, no credentials.
 > F-CR-03, and F-CR-05 are therefore marked **Removed (superseded
 > by content-first refactor)** below; their acceptance criteria are
 > preserved for historical reference but no longer track in-repo
-> work. F-CR-04 (OpenTelemetry) remains **In Progress** and has been
-> reshaped to a compiler-emitted scope: each reference compiler emits
-> artifacts already wrapped in OTel instrumentation, governed by a
-> shared attribute-schema helper — see the F-CR-04 entry below.
+> work. F-CR-04 (OpenTelemetry) is **Shipped** under a compiler-emitted
+> scope: each reference compiler emits artifacts already wrapped in OTel
+> instrumentation, governed by a shared attribute-schema helper — see
+> the F-CR-04 entry below.
 
 ### F-CR-01 — Frozen Pydantic v2 `ToolIO` contract
 
@@ -142,13 +142,14 @@ no internal infrastructure detail, no contact names, no credentials.
 
 ### F-CR-04 — OpenTelemetry instrumentation emitted by every reference compiler
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P0
-- **Note (M0):** ships in M0 as compiler-emitted OTel — the LangGraph
-  and Temporal worked examples are wrapped by their reference compiler
-  today, with the audit-trail mirror co-located alongside the emitted
-  artifact; the operator-config envelope is documented in each worked
-  example's `Observability` section.
+- **Note (M0):** shipped in M0 as compiler-emitted OTel — each reference
+  compiler (n8n, Temporal, LangGraph) wraps its emitted workflow steps
+  in OpenTelemetry spans, with the audit-trail mirror co-located
+  alongside the emitted artifact; the operator-config envelope is
+  documented in each worked example's `Observability` section, and the
+  shared attribute schema lives at `compilers/_shared/observability/`.
 - **Rationale:** After the content-first refactor (PR #34), SecOps-NG
   ships portable content and reference compilers, not an in-repo
   runtime. Observability therefore lives in the compile targets: each
