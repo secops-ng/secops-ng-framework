@@ -224,11 +224,12 @@ named operator use-case. Each cookbook workflow lives under
 
 ### F-WF-01 — Vulnerability triage
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P0
 - **Acceptance criteria:**
-  - `workflows/vulnerability_triage/` exists with library code,
-    cookbook entry, primitives, example, and config.
+  - `content/playbooks/vuln-intake/` carries the CACAO playbook,
+    primitives, and cookbook entry; compiled targets land under
+    `examples/{n8n,temporal,langgraph}/vuln-intake/`.
   - DSPy signature for severity rating; deterministic dedup; OTel spans
     on every node.
   - Tests cover happy-path, dedup-collision, replay.
