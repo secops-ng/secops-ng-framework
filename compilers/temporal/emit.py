@@ -35,6 +35,7 @@ import re
 from pathlib import Path
 
 from compilers._shared.cacao_parser import (
+    CoreBody,
     Playbook,
     StepType,
     WorkflowStep,
@@ -168,6 +169,32 @@ def _render_retry_constant(fn_name: str, spec: RetryPolicySpec) -> str:
     )
 
 
+def _render_core_body_call(core_body: CoreBody) -> str:
+    """Render the primitive call for an activity body when ``core_body`` is set.
+
+    Emits a two-line snippet:
+
+        from <module> import <callable>
+        <out> = <callable>(<arg>=<expr>, ...)
+
+    Argument order matches the parser-preserved insertion order of
+    ``core_body.in_`` so the output is byte-deterministic for a given
+    playbook. Expression strings are emitted verbatim — the playbook author
+    is responsible for them being valid Python in the activity context;
+    expression grammar is the linter's surface, not this emitter's.
+
+    The surrounding OTel span + ``AuditTrail.append`` prologue is added by
+    :func:`emit_tool_span_block` at the call site so the CORE branch
+    inherits the same observability scaffold as the pre-CORE
+    NotImplementedError stub.
+    """
+    args = ", ".join(f"{name}={expr}" for name, expr in core_body.in_.items())
+    return (
+        f"from {core_body.module} import {core_body.callable_name}\n"
+        f"{core_body.out} = {core_body.callable_name}({args})"
+    )
+
+
 def _render_activity(step: WorkflowStep, fn_name: str, playbook: Playbook) -> str:
     """Render one ``@activity.defn`` async function stub for an action step.
 
@@ -209,6 +236,9 @@ def _render_activity(step: WorkflowStep, fn_name: str, playbook: Playbook) -> st
         f"    f\"CACAO action stub not implemented: step_id={_py_repr(step.step_id)}\"\n"
         ")"
     )
+    core_body = step.x_secops_ng.core_body
+    if core_body is not None:
+        body_source = _render_core_body_call(core_body)
     span_block = emit_tool_span_block(
         SpanSpec(span_name=f"activity.{step.step_id}", attributes=attrs),
         body_source,
