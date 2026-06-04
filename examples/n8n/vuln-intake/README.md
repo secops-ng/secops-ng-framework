@@ -115,19 +115,28 @@ still need to wire.
 
 ## Per-action wiring notes — CORE bodies
 
-The seven CORE action steps in this workflow have no machine-readable
-CACAO `commands`, so the n8n emitter renders each as an
-`n8n-nodes-base.set` node carrying the CACAO I/O contract
-(`in_args` / `out_args` / `x_secops_ng` reference bundles) as editable
-assignment rows. Binding those rows to real connectors is the
-operator's job — but the *semantics* of each action are pinned by the
-shared deterministic primitives under
-`content/playbooks/vuln-intake/primitives/`. Operators who want
-deterministic, replay-friendly behaviour wire their Set rows (and any
-Code nodes they choose to insert between Set nodes) against the
-primitives listed below. Operators who diverge fork the primitive
-module rather than overriding at runtime — see the canonical README's
-"Configuration contract" section.
+The seven CORE action steps split into two emission shapes depending
+on whether the canonical CACAO step declares an `x_secops_ng.core_body`
+reference into the deterministic primitives package:
+
+- **`core_body` set (intake, triage).** The emitter renders the step
+  as an `n8n-nodes-base.code` node whose `pythonCode` is the exact
+  primitive call (e.g. `from vuln_intake.primitives.severity import
+  severity_policy ; __severity_verdict__ = severity_policy(...)`).
+  The deterministic policy is the same across n8n / Temporal /
+  LangGraph because the three targets call the same Python function.
+- **`core_body` absent (assess CRA trigger, regulator chain, 4×
+  response).** No upstream primitive exists yet for these bodies, so
+  the emitter renders them as `n8n-nodes-base.set` nodes carrying the
+  CACAO I/O contract (`in_args` / `out_args` / `x_secops_ng`
+  reference bundles) as editable assignment rows. Operator binds.
+
+Binding the Set rows to real connectors is the operator's job — but
+the *semantics* of every action are pinned by the shared deterministic
+primitives under `content/playbooks/vuln-intake/primitives/`.
+Operators who diverge fork the primitive module rather than overriding
+at runtime — see the canonical README's "Configuration contract"
+section.
 
 The cross-target semantic contract is the primitives package itself.
 n8n binds via operator-edited Set rows; Temporal binds via activity
@@ -191,6 +200,54 @@ the body:
 The runner is operator-configured (Python interpreter, PYTHONPATH
 pointing at the operator's deployment of `content/playbooks/vuln-intake/`,
 network policy) so it is not encoded in the worked example.
+
+## Observability — OTel + AuditTrail in the n8n runtime
+
+n8n is a node-graph runtime, so OTel instrumentation is a per-node
+operator concern rather than a per-node instruction in the emitted
+JSON. The emitted workflow carries the topology and the CACAO I/O
+contract; the operator wires the OTel exporter and the audit mirror
+in their n8n host.
+
+Two patterns work today:
+
+- **Operator-side OTel wrapper.** An OpenTelemetry-instrumented n8n
+  host (community OTel community-nodes or a custom wrapper around
+  `n8n-nodes-base.code`) opens a span per executed node and tags it
+  with the shared `secops_ng.*` attribute keyspace (`playbook.id`,
+  `playbook.version`, `step.id`, `step.name`, `step.type`,
+  `tool.name`, `compile.target = "n8n"`).
+- **Python-runner AuditTrail mirror.** For the two `core_body`-bound
+  Code nodes, an operator-supplied wrapper around the primitive call
+  can append an `AuditRecord` to the shared `AuditTrail` so the
+  offline replay envelope (see
+  [`../../../docs/observability/audit-mirror.md`](../../../docs/observability/audit-mirror.md))
+  is consistent with the Temporal and LangGraph targets. The Set
+  nodes for the five absent-body steps carry no audit body until the
+  operator wires one alongside their connector.
+
+The OTLP exporter endpoint, the n8n host process model, and the
+choice of community-node or custom wrapper are operator-bound. The
+sovereignty posture asks for an EU-resident collector — see
+[`../../../docs/observability/audit-mirror.md`](../../../docs/observability/audit-mirror.md).
+
+## Operator runtime hand-off contract
+
+The emitted artifact is a *snapshot of intent*, not a runnable
+playbook. The hand-off boundary the n8n reference compiler draws:
+
+| The framework ships              | The operator owns                                  |
+|----------------------------------|----------------------------------------------------|
+| CACAO topology as n8n nodes      | n8n host (self-hosted, EU-resident).               |
+| Node ids preserving CACAO ids    | Connector credentials and endpoints.               |
+| CACAO I/O contract as Set rows   | CVD intake mailbox, SBOM / asset inventory, scoring service, ticketing, advisory channel, regulator endpoint. |
+| `core_body` Code nodes for intake + triage | `PYTHONPATH` reaching `vuln_intake.primitives`, or a Python-runner Code node wrapping the call. |
+| `meta.secops_ng_notes` for every lossy translation seam | Per-node OTel instrumentation and AuditTrail wrapper. |
+| Cross-target replay determinism via shared primitives | CRA Article 14 clock binding in the operator's incident-management system. |
+
+The walkthrough in
+[`../../../docs/cookbook/vuln-intake.md`](../../../docs/cookbook/vuln-intake.md)
+reads this end-to-end alongside the Temporal and LangGraph targets.
 
 ## Sovereignty note
 
