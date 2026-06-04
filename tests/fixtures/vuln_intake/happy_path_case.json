@@ -1,0 +1,24 @@
+{
+  "_comment": "Realistic happy-path disclosure case for the vuln-intake worked example. Drives the cross-target replay test under tests/examples/vuln_intake/test_happy_path.py. Inputs are pinned so the canonical case-state JSON every target produces is deterministic byte-for-byte across replays. LM-touching steps would consume the deterministic-stub adapter (see docs/FOUNDATION.md \u00a7Determinism); this fixture exercises the CORE-bound steps only (intake dedup + triage severity policy), which are pure deterministic primitives.",
+  "disclosure": {
+    "cve_id": "CVE-2026-12345",
+    "report_source": "researcher_report",
+    "asset_ref": "pkg:pypi/requests@2.31.0"
+  },
+  "triage_inputs": {
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+    "epss": {
+      "value": "0.55",
+      "source": "first.org/epss",
+      "as_of": "2026-06-04T11:00:00+00:00"
+    },
+    "asset_context": {
+      "asset_criticality": "high",
+      "internet_exposed": true,
+      "regulated_data": false
+    }
+  },
+  "clock": {
+    "now": "2026-06-04T12:00:00+00:00"
+  }
+}
