@@ -65,13 +65,52 @@ class Variable:
 
 
 @dataclass(frozen=True)
+class CoreBody:
+    """SecOps-NG CORE primitive binding for a workflow step.
+
+    Mirrors ``#/$defs/core_body`` in ``content-model/playbook.schema.json``:
+
+    - ``primitive``: dotted ``<module>.<callable>`` reference. The trailing
+      dot-segment is the callable; everything before is the import module.
+    - ``in_``: ordered map of primitive argument name → expression string.
+      Renamed off the Python keyword. Expressions are opaque here; the
+      compilers interpret them against the playbook variable context.
+    - ``out``: playbook-variable name receiving the primitive's return value.
+
+    Optional on every step; absence preserves CACAO v2 semantics unchanged.
+    """
+
+    primitive: str
+    in_: Mapping[str, str] = field(default_factory=dict)
+    out: str = ""
+
+    @property
+    def module(self) -> str:
+        """Import module path — everything before the final dot of ``primitive``."""
+        mod, _, _ = self.primitive.rpartition(".")
+        return mod
+
+    @property
+    def callable_name(self) -> str:
+        """Callable name — the final dot-separated segment of ``primitive``."""
+        _, _, name = self.primitive.rpartition(".")
+        return name
+
+
+@dataclass(frozen=True)
 class StepSecOpsExtensions:
-    """Per-step `x_secops_ng` block — references into the rest of the content model."""
+    """Per-step `x_secops_ng` block — references into the rest of the content model.
+
+    ``core_body`` is the optional CORE primitive binding for this step (see
+    :class:`CoreBody`). ``None`` means the step has no CORE binding declared;
+    downstream emitters fall back to their pre-CORE behaviour in that case.
+    """
 
     detection_refs: tuple[str, ...] = ()
     control_refs: tuple[str, ...] = ()
     telemetry_refs: tuple[str, ...] = ()
     metric_refs: tuple[str, ...] = ()
+    core_body: CoreBody | None = None
 
 
 @dataclass(frozen=True)

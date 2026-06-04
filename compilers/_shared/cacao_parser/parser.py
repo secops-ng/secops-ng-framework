@@ -31,6 +31,7 @@ from typing import Any
 from jsonschema import Draft202012Validator
 
 from .ast import (
+    CoreBody,
     Playbook,
     SecOpsExtensions,
     StepSecOpsExtensions,
@@ -270,6 +271,25 @@ def _build_step_ext(raw: Mapping[str, Any] | None) -> StepSecOpsExtensions:
         control_refs=tuple(raw.get("control_refs", ())),
         telemetry_refs=tuple(raw.get("telemetry_refs", ())),
         metric_refs=tuple(raw.get("metric_refs", ())),
+        core_body=_build_core_body(raw.get("core_body")),
+    )
+
+
+def _build_core_body(raw: Mapping[str, Any] | None) -> CoreBody | None:
+    """Lift a step's ``x_secops_ng.core_body`` block into the AST.
+
+    The schema (``#/$defs/core_body``) already enforces the required keys,
+    the primitive dotted-pattern, the ``in`` value shape, and rejects unknown
+    keys via ``additionalProperties: false``. The parser simply freezes the
+    ``in`` mapping so the AST stays immutable. Returns ``None`` when the key
+    is absent so CACAO-only steps remain semantically unchanged.
+    """
+    if not raw:
+        return None
+    return CoreBody(
+        primitive=raw["primitive"],
+        in_=MappingProxyType(dict(raw["in"])),
+        out=raw["out"],
     )
 
 
