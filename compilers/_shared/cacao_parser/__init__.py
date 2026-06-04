@@ -28,6 +28,7 @@ Public API:
 from __future__ import annotations
 
 from .ast import (
+    CoreBody,
     Playbook,
     SecOpsExtensions,
     StepSecOpsExtensions,
@@ -42,6 +43,7 @@ __all__ = [
     "CacaoParseError",
     "CacaoSchemaError",
     "CacaoSemanticError",
+    "CoreBody",
     "Playbook",
     "SecOpsExtensions",
     "StepSecOpsExtensions",

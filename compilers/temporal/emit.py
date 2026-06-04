@@ -35,6 +35,7 @@ import re
 from pathlib import Path
 
 from compilers._shared.cacao_parser import (
+    CoreBody,
     Playbook,
     StepType,
     WorkflowStep,
@@ -204,11 +205,20 @@ def _render_activity(step: WorkflowStep, fn_name: str, playbook: Playbook) -> st
     }
     if step.name:
         attrs[SPAN_ATTR_STEP_NAME] = step.name
-    body_source = (
-        "raise NotImplementedError(\n"
-        f"    f\"CACAO action stub not implemented: step_id={_py_repr(step.step_id)}\"\n"
-        ")"
-    )
+    core_body = step.x_secops_ng.core_body
+    if core_body is not None:
+        body_source = _render_core_body_call(core_body)
+        core_note = (
+            f"    # SecOps-NG CORE primitive binding: {core_body.primitive}\n"
+            f"    # CACAO out arg                  : {core_body.out}\n"
+        )
+    else:
+        body_source = (
+            "raise NotImplementedError(\n"
+            f"    f\"CACAO action stub not implemented: step_id={_py_repr(step.step_id)}\"\n"
+            ")"
+        )
+        core_note = ""
     span_block = emit_tool_span_block(
         SpanSpec(span_name=f"activity.{step.step_id}", attributes=attrs),
         body_source,
@@ -221,7 +231,41 @@ def _render_activity(step: WorkflowStep, fn_name: str, playbook: Playbook) -> st
         f"    CACAO step_id: {step.step_id}\n"
         f'    """\n'
         f"{hitl_note}"
+        f"{core_note}"
         f"{span_block}"
+    )
+
+
+def _render_core_body_call(core_body: CoreBody) -> str:
+    """Render the activity body for a step carrying an ``x_secops_ng.core_body``.
+
+    Materialization rules (F-WF-01 CORE-MECH):
+
+    - ``primitive`` ``<module>.<callable>`` is import-bound inline so the
+      Temporal activity sandbox sees a leaf import (no module-level
+      coupling between unrelated activities).
+    - ``in`` ``{arg: expr}`` is emitted as keyword arguments, in the
+      order the parser preserved (JSON insertion order via
+      ``MappingProxyType``) so output is byte-deterministic for a given
+      playbook.
+    - Each expression string is spliced verbatim. Per directive #6, no
+      secret materialization happens here; the hygiene linter enforces
+      that ``in`` expressions do not embed credentials.
+    - The primitive's return value is returned from the activity. CACAO
+      ``out`` names the playbook variable that receives it; assignment
+      into the playbook variable context happens at workflow-lowering
+      time, not here.
+
+    Nullary primitives (``in == {}``) emit ``<callable>()`` with no
+    arguments. The module path is everything before the final dot of
+    ``primitive``; the trailing segment is the callable.
+    """
+    kwargs = ", ".join(
+        f"{arg}={expr}" for arg, expr in core_body.in_.items()
+    )
+    return (
+        f"from {core_body.module} import {core_body.callable_name}\n"
+        f"return {core_body.callable_name}({kwargs})"
     )
 
 
