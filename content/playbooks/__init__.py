@@ -29,6 +29,7 @@ _HERE = _os.path.dirname(__file__)
 # directory so submodule imports resolve there.
 _ALIASES = {
     "vuln_intake": "vuln-intake",
+    "alert_triage": "alert-triage",
 }
 
 
