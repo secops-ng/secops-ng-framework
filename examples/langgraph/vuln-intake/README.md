@@ -140,6 +140,70 @@ that routes outside the operator's control. Pointing the OTLP exporter
 at a managed APM is a downstream configuration choice the operator
 owns end-to-end.
 
+## Per-tool wiring notes — CORE bodies
+
+The seven CORE action steps split into two emission shapes depending
+on whether the canonical CACAO step declares an `x_secops_ng.core_body`
+reference into the deterministic primitives package under
+`content/playbooks/vuln-intake/primitives/`:
+
+- **`core_body` set (intake, triage).** The `@tool`-decorated wrapper
+  in `state_bindings.py` imports the primitive and produces the
+  canonical case field / severity verdict
+  (`canonicalize_case_field(value=__cve_id__)`,
+  `severity_policy(cvss=__cvss__, epss=__epss__, context=__asset_context__)`).
+  Same Python functions called from n8n and Temporal; same
+  `SeverityVerdict.inputs_digest` on every target.
+- **`core_body` absent (assess CRA trigger, regulator chain, 4×
+  response).** The `@tool` body opens the tool span, appends the
+  `AuditRecord`, and then `raise NotImplementedError`. Integrator
+  fills the body in against their connectors — the seam is visible
+  at a glance.
+
+Operators can swap any node for an LLM-driven callable that fills the
+`AGENTIC_HOOK` slot instead of using the `@tool` wrapper directly;
+the wrapper is what runs whether the integrator binds the tool or
+routes through a `ToolNode`, so the span is opened regardless of the
+upstream caller.
+
+## Primitives contract
+
+Severity bands, CVSS / EPSS thresholds, the dedup key shape, the
+freshness window for EPSS, and the DSPy signature schema for
+free-text fields are **code, not configuration**. They live under
+`content/playbooks/vuln-intake/primitives/`:
+
+| Module           | What it pins                                                                |
+|------------------|-----------------------------------------------------------------------------|
+| `dedup.py`       | `canonicalize_case_field` + `case_idempotency_key(cve_id, asset_ref)`.      |
+| `cvss.py`        | CVSS v3.1 parser, base-score computation, qualitative band.                 |
+| `epss.py`        | EPSS validator, canonical two-decimal string, freshness window.             |
+| `severity.py`    | `severity_policy(cvss, epss, context) → SeverityVerdict`.                   |
+| `signatures.py`  | DSPy signature schema for free-text fields only — never severity.           |
+
+Operators who need to diverge fork the primitive module; they do not
+override it via runtime config.
+
+## Operator runtime hand-off contract
+
+The LangGraph reference compiler emits a target-neutral GraphSpec,
+the generated `TypedDict` state + `@tool` wrappers, and a hand-written
+reference `assemble.py`. The hand-off boundary:
+
+| The framework ships                          | The operator owns                                            |
+|----------------------------------------------|--------------------------------------------------------------|
+| `graph_spec.json` topology (nodes, edges, conditional edges) | LangGraph host process (self-hosted, EU-resident). |
+| `TypedDict` state and `@tool` wrappers       | Connector credentials and endpoints.                         |
+| `core_body` bodies for intake + triage       | KEV-feed lookup, CRA Article 14 submission shape, patch + advisory dissemination. |
+| `NotImplementedError` stubs for absent-body steps | LLM provider choice for the `AGENTIC_HOOK` slot (EU-resident or open-weights). |
+| Generated `_lm_endpoint_guard.py` runtime check | Acknowledged non-EU opt-out (`SECOPS_NG_LM_ENDPOINT_NON_EU_ACK=1`) if applicable. |
+| `_audit_mirror.py` co-located AuditTrail     | OTel exporter endpoint (EU-resident collector).              |
+| Cross-target replay determinism via shared primitives | CRA Article 14 clock binding in the operator's incident-management system. |
+
+The walkthrough in
+[`../../../docs/cookbook/vuln-intake.md`](../../../docs/cookbook/vuln-intake.md)
+reads this end-to-end alongside the n8n and Temporal targets.
+
 ## Sovereignty note
 
 LangGraph is open source (MIT) and runs as a Python process: hosting

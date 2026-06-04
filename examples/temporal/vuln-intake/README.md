@@ -118,6 +118,67 @@ that routes outside the operator's control. Pointing the OTLP exporter
 at a managed APM is a downstream configuration choice the operator
 owns end-to-end.
 
+## Per-activity wiring notes — CORE bodies
+
+The seven CORE action steps split into two emission shapes depending
+on whether the canonical CACAO step declares an `x_secops_ng.core_body`
+reference into the deterministic primitives package under
+`content/playbooks/vuln-intake/primitives/`:
+
+- **`core_body` set (intake, triage).** The `@activity.defn` body
+  imports the primitive and produces the canonical case field /
+  severity verdict (`canonicalize_case_field(value=__cve_id__)`,
+  `severity_policy(cvss=__cvss__, epss=__epss__, context=__asset_context__)`).
+  Same Python functions called from n8n and LangGraph; same
+  `SeverityVerdict.inputs_digest` on every target.
+- **`core_body` absent (assess CRA trigger, regulator chain, 4×
+  response).** The `@activity.defn` body opens the span, appends the
+  `AuditRecord`, and then `raise NotImplementedError`. Integrator
+  fills the body in against their connectors — the seam is visible
+  at a glance.
+
+Per-activity retry policies are emitted alongside the activities
+(`<ACTIVITY>_RETRY_POLICY` constants) so the operator pins them on
+the `workflow.execute_activity` call sites in their own worker
+assembly.
+
+## Primitives contract
+
+Severity bands, CVSS / EPSS thresholds, the dedup key shape, the
+freshness window for EPSS, and the DSPy signature schema for
+free-text fields are **code, not configuration**. They live under
+`content/playbooks/vuln-intake/primitives/`:
+
+| Module           | What it pins                                                                |
+|------------------|-----------------------------------------------------------------------------|
+| `dedup.py`       | `canonicalize_case_field` + `case_idempotency_key(cve_id, asset_ref)`.      |
+| `cvss.py`        | CVSS v3.1 parser, base-score computation, qualitative band.                 |
+| `epss.py`        | EPSS validator, canonical two-decimal string, freshness window.             |
+| `severity.py`    | `severity_policy(cvss, epss, context) → SeverityVerdict`.                   |
+| `signatures.py`  | DSPy signature schema for free-text fields only — never severity.           |
+
+Operators who need to diverge fork the primitive module; they do not
+override it via runtime config.
+
+## Operator runtime hand-off contract
+
+The Temporal reference compiler emits a worker module the integrator
+drops next to their existing workers. The hand-off boundary:
+
+| The framework ships                          | The operator owns                                            |
+|----------------------------------------------|--------------------------------------------------------------|
+| `@workflow.defn` class wiring the topology   | Temporal cluster (self-hosted, EU-resident).                 |
+| `@activity.defn` for every CACAO action      | Worker registration, task-queue, namespace.                  |
+| `core_body` bodies for intake + triage       | Connector credentials and endpoints.                         |
+| `NotImplementedError` stubs for absent-body steps | KEV-feed lookup, CRA Article 14 submission shape, patch + advisory dissemination. |
+| Per-activity `<ACTIVITY>_RETRY_POLICY` defaults | Production retry / concurrency / persistence tuning.       |
+| `_audit_mirror.py` co-located AuditTrail     | OTel exporter endpoint (EU-resident collector).              |
+| Cross-target replay determinism via shared primitives | CRA Article 14 clock binding in the operator's incident-management system. |
+
+The walkthrough in
+[`../../../docs/cookbook/vuln-intake.md`](../../../docs/cookbook/vuln-intake.md)
+reads this end-to-end alongside the n8n and LangGraph targets.
+
 ## Sovereignty note
 
 Temporal is open source (MIT) and runs as a server + worker process
