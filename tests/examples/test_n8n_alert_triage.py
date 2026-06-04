@@ -169,7 +169,9 @@ def _action_without_commands_steps() -> dict[str, dict]:
     return {
         step_id: step
         for step_id, step in raw["workflow"].items()
-        if step.get("type") == "action" and not step.get("commands")
+        if step.get("type") == "action"
+        and not step.get("commands")
+        and not (step.get("x_secops_ng") or {}).get("core_body")
     }
 
 
