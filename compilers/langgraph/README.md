@@ -162,6 +162,22 @@ integration time — the playbook never mentions a vendor.
   consumable by any LangGraph builder — we ship the structure, not a
   runtime.
 
+## Observability
+
+The compiler emits OpenTelemetry instrumentation by default: every
+`@tool`-decorated wrapper opens a `tool.<step_id>` span, and the
+worked-example `assemble.py` wraps each LangGraph node in a
+`node.<step_id>` parent span. Span attributes use the shared
+`secops_ng.*` keyspace — `secops_ng.playbook.id`, `secops_ng.step.id`,
+`secops_ng.step.name`, `secops_ng.tool.name`, and a
+`secops_ng.workflow.run_id` placeholder bound by the host runtime. A
+sibling `_audit_mirror.py` appends an `AuditRecord` per span so the
+audit property holds when OTLP is offline. See the worked example
+[`examples/langgraph/vuln-intake/`](../../examples/langgraph/vuln-intake/)
+and its `Observability` section for the operator-config envelope
+(`OTEL_EXPORTER_OTLP_ENDPOINT`, EU-resident collector guidance,
+provider neutrality).
+
 ## See also
 
 - [`examples/langgraph/vuln-intake/`](../../examples/langgraph/vuln-intake/) —
