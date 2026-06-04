@@ -50,6 +50,12 @@
               "description": "Reference into the operator's asset inventory for the affected component (asset id, SBOM component PURL, or repository path). Populated by the triage step against the operator's CMDB / SBOM service."
             },
             {
+              "name": "__severity_verdict__",
+              "type": "string",
+              "value": "",
+              "description": "Structured severity verdict returned by the triage primitive (severity band, CVSS band, reasons trail, inputs digest). Carried verbatim on the case audit trail so a replay can be compared byte-for-byte against the original triage call."
+            },
+            {
               "name": "__actively_exploited__",
               "type": "boolean",
               "value": "",
@@ -64,48 +70,15 @@
     {
       "id": "action--01a17a01-0000-4000-8000-000000000002",
       "name": "intake disclosure",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         500,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.cve_id",
-              "name": "in.cve_id",
-              "value": "={{$workflow.variables.cve_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.report_source",
-              "name": "in.report_source",
-              "value": "={{$workflow.variables.report_source}}",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.vuln_disclosure_intake@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.vulnerability_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.vuln_disclosure_sla@v1, kri.cvd_intake_aging@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.vuln_intake.primitives.dedup import canonicalize_case_field\n__cve_id__ = canonicalize_case_field(value=__cve_id__)"
       },
       "notes": "Receive an inbound vulnerability disclosure through the operator's coordinated disclosure channel (security.txt mailbox, advisory feed, CVE webhook, or internal scanner finding). Acknowledge the reporter where applicable per the operator's CVD policy and the CRA single-point-of-contact obligation, persist the raw submission, stamp __cve_id__ on the case, and emit an OCSF Vulnerability Finding event so downstream consumers (metrics, SIEM, ticketing) can pick the case up off a single telemetry channel.",
       "notesInFlow": true
@@ -113,60 +86,15 @@
     {
       "id": "action--01a17a01-0000-4000-8000-000000000003",
       "name": "triage and asset correlation",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         760,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "out.severity",
-              "name": "out.severity",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "out.cvss_vector",
-              "name": "out.cvss_vector",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "out.epss_score",
-              "name": "out.epss_score",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "out.asset_ref",
-              "name": "out.asset_ref",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.sbom_capture@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.vulnerability_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kri.releases_without_sbom@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.vuln_intake.primitives.severity import severity_policy\n__severity_verdict__ = severity_policy(cvss=cvss, epss=epss, context=context)"
       },
       "notes": "Score the disclosure with CVSS (v3.1 / v4.0) and EPSS, derive the __severity__ band, and correlate the affected component against the operator's asset inventory and SBOM (PURL lookup). Outputs __severity__, __cvss_vector__, __epss_score__, and __asset_ref__. The SBOM lookup is the link between this playbook and the CRA Annex I \u00a72(1) SBOM obligation \u2014 cases on releases that lack an SBOM record are counted against the releases-without-SBOM KRI so the gap is visible to the operator.",
       "notesInFlow": true
@@ -628,8 +556,6 @@
       "source_playbook_id": "playbook--01a17a01-0000-4000-8000-000000000001"
     },
     "secops_ng_notes": [
-      "step 'action--01a17a01-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'action--01a17a01-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--01a17a01-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'if-condition--01a17a01-0000-4000-8000-000000000005' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
       "step 'action--01a17a01-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",

@@ -48,6 +48,9 @@ class PlaybookVulnIntakeV1State(TypedDict, total=False):
     # playbook_variable: __asset_ref__
     # Reference into the operator's asset inventory for the affected component (asset id, SBOM component PURL, or repository path). Populated by the triage step against the operator's CMDB / SBOM service.
     asset_ref: str
+    # playbook_variable: __severity_verdict__
+    # Structured severity verdict returned by the triage primitive (severity band, CVSS band, reasons trail, inputs digest). Carried verbatim on the case audit trail so a replay can be compared byte-for-byte against the original triage call.
+    severity_verdict: str
     # playbook_variable: __actively_exploited__
     # Set by the CRA reporting-trigger step: true when the disclosure meets the CRA Article 14(1) actively-exploited definition (in-the-wild exploitation evidence) or the Article 14(3) severe-incident definition, in which case the regulator-notification chain fires ahead of the severity-keyed response so the 24h / 72h / 14d submission timing starts at the same instant the operator becomes aware.
     actively_exploited: bool
@@ -75,9 +78,8 @@ async def intake_disclosure(cve_id: str, report_source: str) -> None:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--01a17a01-0000-4000-8000-000000000002', attributes={'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000002', 'secops_ng.step.name': 'intake disclosure', 'secops_ng.tool.name': 'intake_disclosure', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--01a17a01-0000-4000-8000-000000000002'"
-        )
+        from content.playbooks.vuln_intake.primitives.dedup import canonicalize_case_field
+        __cve_id__ = canonicalize_case_field(value=__cve_id__)
 
 @tool
 async def triage_and_asset_correlation() -> dict[str, object]:
@@ -93,9 +95,8 @@ async def triage_and_asset_correlation() -> dict[str, object]:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--01a17a01-0000-4000-8000-000000000003', attributes={'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000003', 'secops_ng.step.name': 'triage and asset correlation', 'secops_ng.tool.name': 'triage_and_asset_correlation', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--01a17a01-0000-4000-8000-000000000003'"
-        )
+        from content.playbooks.vuln_intake.primitives.severity import severity_policy
+        __severity_verdict__ = severity_policy(cvss=cvss, epss=epss, context=context)
 
 @tool
 async def assess_cra_reporting_trigger(cve_id: str, cvss_vector: str, epss_score: str) -> bool:

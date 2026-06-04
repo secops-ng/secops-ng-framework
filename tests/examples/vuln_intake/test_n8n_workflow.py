@@ -118,27 +118,90 @@ def _action_without_commands_steps() -> dict[str, dict]:
     }
 
 
+def _has_core_body(step: dict) -> bool:
+    return bool((step.get("x_secops_ng") or {}).get("core_body"))
+
+
+def _action_without_commands_set_steps() -> dict[str, dict]:
+    """Action-without-commands steps that do NOT carry a CORE primitive binding.
+
+    With `x_secops_ng.core_body` present the n8n emitter renders a Code node
+    that imports and calls the primitive; the Set-node uplift only applies
+    to the absent-body fallback. Tests asserting Set-node shape iterate
+    this filtered set so the two assertions remain mutually exclusive.
+    """
+    return {
+        step_id: step
+        for step_id, step in _action_without_commands_steps().items()
+        if not _has_core_body(step)
+    }
+
+
+def _action_core_body_steps() -> dict[str, dict]:
+    return {
+        step_id: step
+        for step_id, step in _action_without_commands_steps().items()
+        if _has_core_body(step)
+    }
+
+
 def _nodes_by_id() -> dict[str, dict]:
     workflow = json.loads(WORKED_EXAMPLE.read_text(encoding="utf-8"))
     return {node["id"]: node for node in workflow["nodes"]}
 
 
 def test_action_without_commands_steps_emit_set_nodes() -> None:
-    """No `noOp` placeholders left for steps that should carry intent."""
+    """No `noOp` placeholders left for steps that should carry intent.
+
+    Action-without-commands steps split on `x_secops_ng.core_body`:
+    absent-body → Set node carrying the CACAO contract; present-body →
+    Code node carrying the primitive call (covered by
+    :func:`test_core_body_steps_emit_code_nodes`).
+    """
     nodes_by_id = _nodes_by_id()
-    for step_id in _action_without_commands_steps():
+    for step_id in _action_without_commands_set_steps():
         node = nodes_by_id[step_id]
         assert node["type"] == "n8n-nodes-base.set", (
-            f"step {step_id!r} is an action-without-commands and must emit "
-            f"an n8n Set node carrying the CACAO contract, "
+            f"step {step_id!r} is an action-without-commands (no core_body) "
+            f"and must emit an n8n Set node carrying the CACAO contract, "
             f"not {node['type']!r}"
+        )
+
+
+def test_core_body_steps_emit_code_nodes() -> None:
+    """Steps carrying `x_secops_ng.core_body` compile to a Code node whose
+    body imports the bound primitive and invokes it with the declared
+    inputs, per the CORE-MECH-EMIT-N8N hook contract.
+    """
+    nodes_by_id = _nodes_by_id()
+    core_steps = _action_core_body_steps()
+    assert core_steps, (
+        "expected at least one CORE-bound action step in the vuln-intake "
+        "playbook; none found — has the CORE binding been removed?"
+    )
+    for step_id, step in core_steps.items():
+        node = nodes_by_id[step_id]
+        assert node["type"] == "n8n-nodes-base.code", (
+            f"step {step_id!r} carries x_secops_ng.core_body and must emit "
+            f"an n8n Code node, not {node['type']!r}"
+        )
+        body = node["parameters"]["pythonCode"]
+        primitive = step["x_secops_ng"]["core_body"]["primitive"]
+        module, _, callable_name = primitive.rpartition(".")
+        assert f"from {module} import {callable_name}" in body, (
+            f"step {step_id!r} Code node body missing primitive import "
+            f"`from {module} import {callable_name}`; body was:\n{body}"
+        )
+        assert f"{callable_name}(" in body, (
+            f"step {step_id!r} Code node body missing primitive call "
+            f"`{callable_name}(...)`; body was:\n{body}"
         )
 
 
 def test_set_nodes_surface_cacao_in_and_out_args() -> None:
     """`in_args` and `out_args` from the CACAO step appear as Set rows."""
     nodes_by_id = _nodes_by_id()
-    for step_id, step in _action_without_commands_steps().items():
+    for step_id, step in _action_without_commands_set_steps().items():
         node = nodes_by_id[step_id]
         assignments = node["parameters"]["assignments"]["assignments"]
         names = {row["name"] for row in assignments}
@@ -161,7 +224,7 @@ def test_set_nodes_surface_cacao_in_and_out_args() -> None:
 def test_set_nodes_surface_x_secops_ng_refs() -> None:
     """Every `x_secops_ng.<key>` bundle on the CACAO step appears as a Set row."""
     nodes_by_id = _nodes_by_id()
-    for step_id, step in _action_without_commands_steps().items():
+    for step_id, step in _action_without_commands_set_steps().items():
         x = step.get("x_secops_ng") or {}
         if not x:
             continue
@@ -179,7 +242,7 @@ def test_set_nodes_surface_x_secops_ng_refs() -> None:
 def test_set_nodes_have_no_empty_assignments_block() -> None:
     """A Set node with zero rows is the old noOp-in-disguise; reject it."""
     nodes_by_id = _nodes_by_id()
-    for step_id in _action_without_commands_steps():
+    for step_id in _action_without_commands_set_steps():
         node = nodes_by_id[step_id]
         rows = node["parameters"]["assignments"]["assignments"]
         assert rows, (

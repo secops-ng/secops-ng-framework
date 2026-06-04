@@ -41,6 +41,11 @@
       "description": "Reference into the operator's asset inventory for the affected component (asset id, SBOM component PURL, or repository path). Populated by the triage step against the operator's CMDB / SBOM service.",
       "external": false
     },
+    "__severity_verdict__": {
+      "type": "string",
+      "description": "Structured severity verdict returned by the triage primitive (severity band, CVSS band, reasons trail, inputs digest). Carried verbatim on the case audit trail so a replay can be compared byte-for-byte against the original triage call.",
+      "external": false
+    },
     "__actively_exploited__": {
       "type": "boolean",
       "description": "Set by the CRA reporting-trigger step: true when the disclosure meets the CRA Article 14(1) actively-exploited definition (in-the-wild exploitation evidence) or the Article 14(3) severe-incident definition, in which case the regulator-notification chain fires ahead of the severity-keyed response so the 24h / 72h / 14d submission timing starts at the same instant the operator becomes aware.",
@@ -66,7 +71,14 @@
         "metric_refs": [
           "kpi.vuln_disclosure_sla@v1",
           "kri.cvd_intake_aging@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.vuln_intake.primitives.dedup.canonicalize_case_field",
+          "in": {
+            "value": "__cve_id__"
+          },
+          "out": "__cve_id__"
+        }
       }
     },
     "action--01a17a01-0000-4000-8000-000000000003": {
@@ -80,7 +92,16 @@
         "telemetry_refs": ["telemetry.ocsf.vulnerability_finding@v1"],
         "metric_refs": [
           "kri.releases_without_sbom@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.vuln_intake.primitives.severity.severity_policy",
+          "in": {
+            "cvss": "cvss",
+            "epss": "epss",
+            "context": "context"
+          },
+          "out": "__severity_verdict__"
+        }
       }
     },
     "action--01a17a01-0000-4000-8000-000000000004": {
