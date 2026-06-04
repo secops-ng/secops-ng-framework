@@ -66,9 +66,8 @@ async def ingest_typed_alert_payload(alert_id: str, alert_source_shape: str) -> 
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--a1e47431-0000-4000-8000-000000000002', attributes={'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest typed alert payload', 'secops_ng.tool.name': 'ingest_typed_alert_payload', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--a1e47431-0000-4000-8000-000000000002'"
-        )
+        from alert_triage.primitives.payloads import validate_alert_payload
+        __alert_payload__ = validate_alert_payload(raw=__raw_payload__, source_shape=__alert_source_shape__)
 
 @tool
 async def enrich_with_telemetry_context() -> bool:

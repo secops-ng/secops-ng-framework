@@ -4,42 +4,15 @@
     {
       "id": "action--a1e47431-0000-4000-8000-000000000002",
       "name": "ingest typed alert payload",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         240,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.alert_id",
-              "name": "in.alert_id",
-              "value": "={{$workflow.variables.alert_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.alert_source_shape",
-              "name": "in.alert_source_shape",
-              "value": "={{$workflow.variables.alert_source_shape}}",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.incident_handling_capability@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.api_activity@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from alert_triage.primitives.payloads import validate_alert_payload\n__alert_payload__ = validate_alert_payload(raw=__raw_payload__, source_shape=__alert_source_shape__)"
       },
       "notes": "SKELETON. Normalise the inbound alert into the SecOps-NG alert envelope. Two source shapes are required by the roadmap acceptance criteria (push from detection pipeline, pull from a shared alert store); the dispatcher branches on __alert_source_shape__. Body of the normalization rules lands in the CORE-INGEST card.",
       "notesInFlow": true
@@ -531,7 +504,6 @@
       "source_playbook_id": "playbook--a1e47431-0000-4000-8000-000000000000"
     },
     "secops_ng_notes": [
-      "step 'action--a1e47431-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--a1e47431-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--a1e47431-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--a1e47431-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
