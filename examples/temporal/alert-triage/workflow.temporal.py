@@ -32,9 +32,8 @@ async def ingest_typed_alert_payload(alert_id: str, alert_source_shape: str) -> 
         AuditTrail.current().append(
             AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest typed alert payload', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_typed_alert_payload'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--a1e47431-0000-4000-8000-000000000002'"
-        )
+        from alert_triage.primitives.payloads import validate_alert_payload
+        __alert_payload__ = validate_alert_payload(raw=__raw_payload__, source_shape=__alert_source_shape__)
 
 INGEST_TYPED_ALERT_PAYLOAD_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -56,9 +55,8 @@ async def enrich_with_telemetry_context() -> bool:
         AuditTrail.current().append(
             AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000003', 'secops_ng.step.name': 'enrich with telemetry context', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enrich_with_telemetry_context'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--a1e47431-0000-4000-8000-000000000003'"
-        )
+        from alert_triage.primitives.suppression import canonical_seen_key
+        __seen_key__ = canonical_seen_key(asset_ref=__asset_ref__, classification=__classification__, detection_rule_id=__detection_rule_id__, subject_ref=__subject_ref__)
 
 ENRICH_WITH_TELEMETRY_CONTEXT_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),

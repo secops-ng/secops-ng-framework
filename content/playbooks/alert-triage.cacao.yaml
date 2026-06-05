@@ -114,6 +114,12 @@ workflow:
         # the push-pipeline shape; pull_alert_store will rebind once
         # the security_finding telemetry artifact lands.
         - "telemetry.ocsf.api_activity@v1"
+      core_body:
+        primitive: "alert_triage.primitives.payloads.validate_alert_payload"
+        in:
+          raw: "__raw_payload__"
+          source_shape: "__alert_source_shape__"
+        out: "__alert_payload__"
 
   "action--a1e47431-0000-4000-8000-000000000003":
     type: action
@@ -136,6 +142,14 @@ workflow:
         - "telemetry.ocsf.api_activity@v1"
       metric_refs:
         - "kpi.mttd@v1"
+      core_body:
+        primitive: "alert_triage.primitives.suppression.canonical_seen_key"
+        in:
+          detection_rule_id: "__detection_rule_id__"
+          subject_ref: "__subject_ref__"
+          asset_ref: "__asset_ref__"
+          classification: "__classification__"
+        out: "__seen_key__"
 
   "if-condition--a1e47431-0000-4000-8000-000000000004":
     type: if-condition
