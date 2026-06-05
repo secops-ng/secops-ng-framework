@@ -1,0 +1,27 @@
+{
+  "_comment": "Realistic happy-path alert case for the alert-triage worked example. Drives the cross-target replay test under tests/examples/alert_triage/test_happy_path.py. Inputs are pinned so the canonical case-state JSON every target produces is deterministic byte-for-byte across replays. LM-touching steps (analyst free-text summary, DSPy signature in primitives/signatures.py) are out of scope here \u2014 this fixture exercises the CORE-bound deterministic primitives only: typed-payload validation (intake), canonical seen-key derivation (suppression check), and the prioritisation policy (classify and prioritise).",
+  "alert": {
+    "alert_id": "alert-2026-06-05-000123",
+    "received_at": "2026-06-05T10:00:00+00:00",
+    "source_shape": "push_detection_pipeline",
+    "detection_rule_id": "rule.credential_access.suspicious_login@v3",
+    "subject_ref": "identity:user:eve@example.eu",
+    "asset_ref": "asset:host:eu-west-1/prod-api-07",
+    "severity_hint": "p2_high",
+    "evidence_event_uids": ["ocsf:3002:2026-06-05T09:59:51Z:a1b2c3d4"]
+  },
+  "triage_inputs": {
+    "detection_class": "exploit_attempt",
+    "detection_severity": "high",
+    "classification": "credential-access",
+    "asset_context": {
+      "asset_criticality": "high",
+      "internet_exposed": true,
+      "regulated_data": false
+    },
+    "correlates_open_case": false
+  },
+  "clock": {
+    "now": "2026-06-05T10:00:00+00:00"
+  }
+}
