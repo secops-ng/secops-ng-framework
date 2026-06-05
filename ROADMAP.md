@@ -566,7 +566,7 @@ manual configuration.
 
 ### F-SV-01 — EU-resident LM default refusal
 
-- **Status:** Proposed
+- **Status:** Shipped
 - **Priority:** P1
 - **Acceptance criteria:**
   - `configure_default_lm` refuses an unconfigured (no endpoint pinned)
