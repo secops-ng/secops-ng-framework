@@ -198,6 +198,14 @@ workflow:
         - "control.incident_handling_capability@v1"
       metric_refs:
         - "kpi.detection_coverage@v1"
+      core_body:
+        primitive: "alert_triage.primitives.prioritisation.prioritise"
+        in:
+          detection_class: "__detection_class__"
+          detection_severity: "__detection_severity__"
+          context: "__asset_context__"
+          correlates_open_case: "__correlates_open_case__"
+        out: "__priority_verdict__"
 
   "switch-condition--a1e47431-0000-4000-8000-000000000007":
     type: switch-condition

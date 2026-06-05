@@ -102,9 +102,8 @@ async def classify_and_prioritise_deterministic_policy() -> str:
         AuditTrail.current().append(
             AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000006', 'secops_ng.step.name': 'classify and prioritise (deterministic policy)', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_and_prioritise_deterministic_policy'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--a1e47431-0000-4000-8000-000000000006'"
-        )
+        from alert_triage.primitives.prioritisation import prioritise
+        __priority_verdict__ = prioritise(context=__asset_context__, correlates_open_case=__correlates_open_case__, detection_class=__detection_class__, detection_severity=__detection_severity__)
 
 CLASSIFY_AND_PRIORITISE_DETERMINISTIC_POLICY_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
