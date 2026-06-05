@@ -46,8 +46,11 @@ from .prioritisation import (
 from .response import (
     EscalationDirective,
     INCIDENT_MANAGEMENT_PLAYBOOK_REF,
+    NotificationCadence,
+    NotificationDirective,
     PagingTier,
     escalation_route,
+    notify_on_call,
 )
 from .signatures import signature_schema
 from .suppression import (
@@ -65,6 +68,8 @@ __all__ = [
     "DetectionSeverity",
     "EscalationDirective",
     "INCIDENT_MANAGEMENT_PLAYBOOK_REF",
+    "NotificationCadence",
+    "NotificationDirective",
     "PagingTier",
     "PayloadValidationError",
     "Priority",
@@ -75,6 +80,7 @@ __all__ = [
     "SuppressionWindow",
     "canonical_seen_key",
     "escalation_route",
+    "notify_on_call",
     "prioritise",
     "signature_schema",
     "validate_alert_payload",

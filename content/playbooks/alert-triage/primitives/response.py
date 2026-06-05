@@ -54,6 +54,13 @@ from .prioritisation import AssetCriticality, Priority
 # tier page.
 PagingTier = Literal["tier_primary_oncall", "tier_executive"]
 
+# Closed alphabet of notification cadences the p2 action routes onto.
+# ``paging_cadence`` is a standing on-call notification (notify, not
+# page-now); ``informational_notice`` is a non-paging awareness signal
+# reserved for crown-jewel p2 cases where an executive-tier recipient
+# should be informed without being paged out of hours.
+NotificationCadence = Literal["paging_cadence", "informational_notice"]
+
 # Stable handle for the downstream incident-management playbook. Pinned
 # here so two re-fires of the same p1 alert resolve to the same
 # downstream playbook reference (idempotency on the hand-off).
@@ -217,9 +224,176 @@ def escalation_route(
     )
 
 
+@dataclass(frozen=True)
+class NotificationDirective:
+    """Deterministic routing verdict for the p2 response action.
+
+    Sibling of :class:`EscalationDirective` — frozen so the per-target
+    compilers can pin against a single handle on the audit trail.
+
+    Attributes:
+        paging_tier: Which on-call tier receives the notification.
+            Closed alphabet — :data:`PagingTier`. p2 always reaches a
+            named recipient; ``cadence`` distinguishes a standing page
+            from an informational notice.
+        cadence: Notification cadence. ``paging_cadence`` for the
+            non-crown-jewel branch (notify on-call now); ``
+            informational_notice`` for the crown-jewel branch (executive
+            recipient receives an awareness signal, not a page).
+        incident_management_playbook_ref: Stable handle of the
+            downstream incident-management playbook the case hands off
+            to. Always :data:`INCIDENT_MANAGEMENT_PLAYBOOK_REF` for p2
+            today; the field is carried explicitly so a future
+            per-tenant override is a single-field change.
+        regulator_notification_required: True when the asset processes
+            regulated data; opens the notification-SLA clock and
+            records against ``kpi.notification_sla_compliance@v1``.
+        reasons: Ordered tuple naming every rule that fired.
+        inputs_digest: Short hex digest (16 lower-hex chars) of the
+            canonical inputs.
+    """
+
+    paging_tier: PagingTier
+    cadence: NotificationCadence
+    incident_management_playbook_ref: str
+    regulator_notification_required: bool
+    reasons: Tuple[str, ...]
+    inputs_digest: str
+
+
+def notify_on_call(
+    *,
+    priority: Priority,
+    asset_criticality: AssetCriticality,
+    regulated_data: bool,
+    internet_exposed: bool,
+) -> NotificationDirective:
+    """Resolve the p2-high notify-on-call route.
+
+    Sibling of :func:`escalation_route` — same input shape, p2 routing
+    policy.
+
+    Policy (deterministic, replay-safe):
+
+    * ``priority == "p2_high"`` is the only entry-point. p1 / p3 / p4
+      are rejected — they have their own response actions, and silently
+      degrading them through this primitive would mask a wiring bug.
+    * ``asset_criticality != "crown_jewel"`` routes to the
+      ``tier_primary_oncall`` recipient with the ``paging_cadence``
+      cadence — notify on-call now.
+    * ``asset_criticality == "crown_jewel"`` routes to the
+      ``tier_executive`` recipient with the ``informational_notice``
+      cadence — an executive-tier awareness signal at p2, *not* a
+      page-now. Crown-jewel + p1_severe is the actual page-out path;
+      p2 on a crown-jewel asset is one band below and stays
+      informational so the executive-tier rotation does not absorb a
+      false page out of hours.
+    * ``regulated_data`` opens the regulator-notification SLA clock at
+      p2 just as it does at p1 — once the asset is in scope of a
+      regulatory baseline, the clock starts on the first p2 detection.
+    * The downstream incident-management playbook reference is pinned
+      to :data:`INCIDENT_MANAGEMENT_PLAYBOOK_REF` so the hand-off is
+      idempotent across re-fires.
+    * The verdict carries every reason that fired (ordered) plus a
+      short hex digest over the canonical inputs.
+
+    Args:
+        priority: Priority band from the upstream prioritisation
+            primitive. Must be ``"p2_high"`` — this primitive is the
+            body of the p2 response action only.
+        asset_criticality: Per-asset criticality band. Closed alphabet
+            — :data:`AssetCriticality`.
+        regulated_data: True when the asset stores or processes data
+            covered by a regulatory baseline. Opens the regulator-
+            notification SLA clock.
+        internet_exposed: True when the asset is reachable from the
+            public internet. Carried into the digest so a replay
+            against a changed exposure flag is visibly a different
+            verdict, even when the routing happens to match.
+
+    Returns:
+        :class:`NotificationDirective` naming the paging tier, the
+        notification cadence, the downstream incident-management
+        playbook reference, the regulator-notification requirement,
+        every reason that fired, and a digest of the canonical inputs.
+
+    Raises:
+        ValueError: ``priority`` is not ``"p2_high"`` or
+            ``asset_criticality`` is outside the closed alphabet.
+        TypeError: ``regulated_data`` or ``internet_exposed`` is not a
+            bool. Booleans are the contract; refusing duck-typing here
+            keeps a stray ``1`` or ``"true"`` from sliding through.
+    """
+    if priority != "p2_high":
+        raise ValueError(
+            f"notify_on_call is the p2-high response body; "
+            f"got priority={priority!r}. p1 / p3 / p4 routing lives in "
+            f"sibling primitives."
+        )
+    if asset_criticality not in ("low", "medium", "high", "crown_jewel"):
+        raise ValueError(
+            f"unknown asset_criticality {asset_criticality!r}; "
+            f"expected one of ('low', 'medium', 'high', 'crown_jewel')"
+        )
+    if not isinstance(regulated_data, bool):
+        raise TypeError(
+            f"regulated_data must be bool, got {type(regulated_data).__name__}"
+        )
+    if not isinstance(internet_exposed, bool):
+        raise TypeError(
+            f"internet_exposed must be bool, "
+            f"got {type(internet_exposed).__name__}"
+        )
+
+    reasons: list[str] = [f"priority={priority} → notify-on-call"]
+
+    # Rule 1 — paging tier + cadence. Crown-jewel assets at p2 route
+    # to the executive tier with an informational cadence (awareness,
+    # not page-now); everything else routes to the primary on-call
+    # rotation with the standing paging cadence.
+    if asset_criticality == "crown_jewel":
+        paging_tier: PagingTier = "tier_executive"
+        cadence: NotificationCadence = "informational_notice"
+        reasons.append(
+            "asset_criticality=crown_jewel → tier_executive "
+            "informational_notice (p2 not page-now)"
+        )
+    else:
+        paging_tier = "tier_primary_oncall"
+        cadence = "paging_cadence"
+        reasons.append(
+            f"asset_criticality={asset_criticality} → "
+            f"tier_primary_oncall paging_cadence"
+        )
+
+    # Rule 2 — regulator-notification SLA clock. Same gate as p1: the
+    # clock opens whenever the asset processes regulated data.
+    if regulated_data:
+        reasons.append(
+            "regulated_data=true → regulator_notification_required"
+        )
+
+    return NotificationDirective(
+        paging_tier=paging_tier,
+        cadence=cadence,
+        incident_management_playbook_ref=INCIDENT_MANAGEMENT_PLAYBOOK_REF,
+        regulator_notification_required=regulated_data,
+        reasons=tuple(reasons),
+        inputs_digest=_digest(
+            priority,
+            asset_criticality,
+            regulated_data,
+            internet_exposed,
+        ),
+    )
+
+
 __all__ = [
     "EscalationDirective",
     "INCIDENT_MANAGEMENT_PLAYBOOK_REF",
+    "NotificationCadence",
+    "NotificationDirective",
     "PagingTier",
     "escalation_route",
+    "notify_on_call",
 ]

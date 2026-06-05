@@ -147,9 +147,8 @@ async def response_p2_high_queue_for_primary_analyst() -> None:
         AuditTrail.current().append(
             AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-000000000009', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000009', 'secops_ng.step.name': 'response: p2 high — queue for primary analyst', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_p2_high_queue_for_primary_analyst'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--a1e47431-0000-4000-8000-000000000009'"
-        )
+        from alert_triage.primitives.response import notify_on_call
+        __notification_directive__ = notify_on_call(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)
 
 RESPONSE_P2_HIGH_QUEUE_FOR_PRIMARY_ANALYST_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
