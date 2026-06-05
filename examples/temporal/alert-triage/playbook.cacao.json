@@ -187,6 +187,16 @@
         "control_refs": [
           "control.incident_handling_capability@v1"
         ],
+        "core_body": {
+          "in": {
+            "asset_criticality": "__asset_context__.asset_criticality",
+            "internet_exposed": "__asset_context__.internet_exposed",
+            "priority": "__priority__",
+            "regulated_data": "__asset_context__.regulated_data"
+          },
+          "out": "__notification_directive__",
+          "primitive": "alert_triage.primitives.response.notify_on_call"
+        },
         "metric_refs": [
           "kpi.mttr_critical@v1",
           "kpi.handoff_brief_delivery_sla@v1"

@@ -151,9 +151,8 @@ async def response_p2_high_queue_for_primary_analyst() -> None:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--a1e47431-0000-4000-8000-000000000009', attributes={'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000009', 'secops_ng.step.name': 'response: p2 high — queue for primary analyst', 'secops_ng.tool.name': 'response_p2_high_queue_for_primary_analyst', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--a1e47431-0000-4000-8000-000000000009'"
-        )
+        from alert_triage.primitives.response import notify_on_call
+        __notification_directive__ = notify_on_call(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)
 
 @tool
 async def response_p3_routine_queue_for_review() -> None:
