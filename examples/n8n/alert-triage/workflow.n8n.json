@@ -68,30 +68,15 @@
     {
       "id": "action--a1e47431-0000-4000-8000-000000000008",
       "name": "response: p1 severe \u2014 page and escalate",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1280,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.incident_handling_capability@v1, control.incident_timeline_signals@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.mttr_critical@v1, kri.escalation_tier_breach@v1, kpi.notification_sla_compliance@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from alert_triage.primitives.response import escalation_route\n__escalation_directive__ = escalation_route(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)"
       },
       "notes": "SKELETON. Page the on-call responder, open the incident case, stamp the timeline-start signal, and hand off to the incident management playbook. Records against the MTTR-critical clock and the regulator-notification-overrun KRI window.",
       "notesInFlow": true
@@ -441,7 +426,6 @@
       "source_playbook_id": "playbook--a1e47431-0000-4000-8000-000000000000"
     },
     "secops_ng_notes": [
-      "step 'action--a1e47431-0000-4000-8000-000000000008': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--a1e47431-0000-4000-8000-000000000009': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--a1e47431-0000-4000-8000-00000000000a': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--a1e47431-0000-4000-8000-00000000000b': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",

@@ -124,9 +124,8 @@ async def response_p1_severe_page_and_escalate() -> None:
         AuditTrail.current().append(
             AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-000000000008', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000008', 'secops_ng.step.name': 'response: p1 severe — page and escalate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_p1_severe_page_and_escalate'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--a1e47431-0000-4000-8000-000000000008'"
-        )
+        from alert_triage.primitives.response import escalation_route
+        __escalation_directive__ = escalation_route(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)
 
 RESPONSE_P1_SEVERE_PAGE_AND_ESCALATE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
