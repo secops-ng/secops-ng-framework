@@ -212,6 +212,16 @@
         "control_refs": [
           "control.incident_handling_capability@v1"
         ],
+        "core_body": {
+          "in": {
+            "asset_criticality": "__asset_context__.asset_criticality",
+            "internet_exposed": "__asset_context__.internet_exposed",
+            "priority": "__priority__",
+            "regulated_data": "__asset_context__.regulated_data"
+          },
+          "out": "__review_queue_directive__",
+          "primitive": "alert_triage.primitives.response.route_to_review_queue"
+        },
         "metric_refs": [
           "kpi.review_completion_sla@v1"
         ]

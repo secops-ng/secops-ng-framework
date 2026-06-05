@@ -296,6 +296,14 @@ workflow:
         - "control.incident_handling_capability@v1"
       metric_refs:
         - "kpi.review_completion_sla@v1"
+      core_body:
+        primitive: "alert_triage.primitives.response.route_to_review_queue"
+        in:
+          priority: "__priority__"
+          asset_criticality: "__asset_context__.asset_criticality"
+          regulated_data: "__asset_context__.regulated_data"
+          internet_exposed: "__asset_context__.internet_exposed"
+        out: "__review_queue_directive__"
 
   "action--a1e47431-0000-4000-8000-00000000000b":
     type: action

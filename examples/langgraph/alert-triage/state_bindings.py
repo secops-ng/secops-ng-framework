@@ -168,9 +168,8 @@ async def response_p3_routine_queue_for_review() -> None:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--a1e47431-0000-4000-8000-00000000000a', attributes={'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'response: p3 routine — queue for review', 'secops_ng.tool.name': 'response_p3_routine_queue_for_review', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--a1e47431-0000-4000-8000-00000000000a'"
-        )
+        from alert_triage.primitives.response import route_to_review_queue
+        __review_queue_directive__ = route_to_review_queue(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)
 
 @tool
 async def response_p4_informational_log_and_close() -> None:

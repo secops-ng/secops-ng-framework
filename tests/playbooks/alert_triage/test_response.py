@@ -52,8 +52,10 @@ from content.playbooks.alert_triage.primitives import (
     EscalationDirective,
     INCIDENT_MANAGEMENT_PLAYBOOK_REF,
     NotificationDirective,
+    ReviewQueueDirective,
     escalation_route,
     notify_on_call,
+    route_to_review_queue,
 )
 
 
@@ -349,6 +351,167 @@ class TestP2DownstreamHandoff:
         a = notify_on_call(**_HAPPY_P2)
         b = notify_on_call(
             **{**_HAPPY_P2, "asset_criticality": "crown_jewel"}
+        )
+        assert (
+            a.incident_management_playbook_ref
+            == b.incident_management_playbook_ref
+            == INCIDENT_MANAGEMENT_PLAYBOOK_REF
+        )
+
+
+_HAPPY_P3 = dict(
+    priority="p3_routine",
+    asset_criticality="high",
+    regulated_data=False,
+    internet_exposed=False,
+)
+
+
+class TestP3HappyPath:
+    def test_default_route_tier_queue_standard_sla(self) -> None:
+        verdict = route_to_review_queue(**_HAPPY_P3)
+        assert isinstance(verdict, ReviewQueueDirective)
+        assert verdict.review_tier == "tier_queue"
+        assert verdict.cadence == "review_queue_standard_sla"
+        assert verdict.regulator_notification_required is False
+        assert (
+            verdict.incident_management_playbook_ref
+            == INCIDENT_MANAGEMENT_PLAYBOOK_REF
+        )
+
+    def test_p3_reasons_carry_priority_and_route(self) -> None:
+        verdict = route_to_review_queue(**_HAPPY_P3)
+        assert verdict.reasons[0].startswith("priority=p3_routine")
+        assert any("tier_queue" in r for r in verdict.reasons)
+        assert any(
+            "review_queue_standard_sla" in r for r in verdict.reasons
+        )
+
+    def test_p3_digest_is_short_hex(self) -> None:
+        verdict = route_to_review_queue(**_HAPPY_P3)
+        assert len(verdict.inputs_digest) == 16
+        int(verdict.inputs_digest, 16)
+
+
+class TestP3ReviewTier:
+    def test_crown_jewel_routes_primary_oncall_best_effort(self) -> None:
+        verdict = route_to_review_queue(
+            **{**_HAPPY_P3, "asset_criticality": "crown_jewel"}
+        )
+        assert verdict.review_tier == "tier_primary_oncall"
+        assert verdict.cadence == "best_effort_review"
+        assert any(
+            "best_effort_review" in r for r in verdict.reasons
+        )
+
+    @pytest.mark.parametrize("criticality", ["low", "medium", "high"])
+    def test_non_crown_jewel_routes_tier_queue(
+        self, criticality: str
+    ) -> None:
+        verdict = route_to_review_queue(
+            **{**_HAPPY_P3, "asset_criticality": criticality}
+        )
+        assert verdict.review_tier == "tier_queue"
+        assert verdict.cadence == "review_queue_standard_sla"
+
+
+class TestP3RegulatorNotification:
+    def test_p3_regulated_data_opens_notification(self) -> None:
+        verdict = route_to_review_queue(
+            **{**_HAPPY_P3, "regulated_data": True}
+        )
+        assert verdict.regulator_notification_required is True
+        assert any(
+            "regulator_notification_required" in r
+            for r in verdict.reasons
+        )
+
+    def test_p3_regulated_does_not_change_tier_queue_route(self) -> None:
+        verdict = route_to_review_queue(
+            **{**_HAPPY_P3, "regulated_data": True}
+        )
+        assert verdict.review_tier == "tier_queue"
+        assert verdict.cadence == "review_queue_standard_sla"
+
+    def test_p3_crown_jewel_plus_regulated_combines(self) -> None:
+        verdict = route_to_review_queue(
+            priority="p3_routine",
+            asset_criticality="crown_jewel",
+            regulated_data=True,
+            internet_exposed=True,
+        )
+        assert verdict.review_tier == "tier_primary_oncall"
+        assert verdict.cadence == "best_effort_review"
+        assert verdict.regulator_notification_required is True
+
+
+class TestP3DigestStability:
+    def test_p3_same_inputs_same_digest(self) -> None:
+        assert (
+            route_to_review_queue(**_HAPPY_P3).inputs_digest
+            == route_to_review_queue(**_HAPPY_P3).inputs_digest
+        )
+
+    @pytest.mark.parametrize(
+        "override",
+        [
+            {"asset_criticality": "crown_jewel"},
+            {"regulated_data": True},
+            {"internet_exposed": True},
+        ],
+    )
+    def test_p3_single_input_change_changes_digest(
+        self, override: dict
+    ) -> None:
+        base = route_to_review_queue(**_HAPPY_P3).inputs_digest
+        changed = route_to_review_queue(
+            **{**_HAPPY_P3, **override}
+        ).inputs_digest
+        assert base != changed
+
+    def test_p3_digest_differs_from_p1_and_p2(self) -> None:
+        # Priority is part of the canonical inputs digest; the p3
+        # verdict and the p1 / p2 verdicts for the same asset must not
+        # collide on the digest field.
+        p1 = escalation_route(**_HAPPY)
+        p2 = notify_on_call(**_HAPPY_P2)
+        p3 = route_to_review_queue(**_HAPPY_P3)
+        assert p3.inputs_digest != p1.inputs_digest
+        assert p3.inputs_digest != p2.inputs_digest
+
+
+class TestP3Rejection:
+    @pytest.mark.parametrize(
+        "priority",
+        ["p1_severe", "p2_high", "p4_informational", "", "P3_ROUTINE"],
+    )
+    def test_non_p3_priority_rejected(self, priority: str) -> None:
+        with pytest.raises(ValueError, match="p3-routine response body"):
+            route_to_review_queue(
+                **{**_HAPPY_P3, "priority": priority}  # type: ignore[arg-type]
+            )
+
+    def test_p3_unknown_criticality_rejected(self) -> None:
+        with pytest.raises(ValueError, match="unknown asset_criticality"):
+            route_to_review_queue(
+                **{**_HAPPY_P3, "asset_criticality": "platinum"}  # type: ignore[arg-type]
+            )
+
+    @pytest.mark.parametrize(
+        "field", ["regulated_data", "internet_exposed"]
+    )
+    def test_p3_non_bool_flag_rejected(self, field: str) -> None:
+        with pytest.raises(TypeError, match="must be bool"):
+            route_to_review_queue(
+                **{**_HAPPY_P3, field: "true"}  # type: ignore[arg-type]
+            )
+
+
+class TestP3DownstreamHandoff:
+    def test_p3_playbook_ref_pinned_on_every_verdict(self) -> None:
+        a = route_to_review_queue(**_HAPPY_P3)
+        b = route_to_review_queue(
+            **{**_HAPPY_P3, "asset_criticality": "crown_jewel"}
         )
         assert (
             a.incident_management_playbook_ref
