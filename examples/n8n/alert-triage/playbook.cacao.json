@@ -161,6 +161,16 @@
           "control.incident_handling_capability@v1",
           "control.incident_timeline_signals@v1"
         ],
+        "core_body": {
+          "in": {
+            "asset_criticality": "__asset_context__.asset_criticality",
+            "internet_exposed": "__asset_context__.internet_exposed",
+            "priority": "__priority__",
+            "regulated_data": "__asset_context__.regulated_data"
+          },
+          "out": "__escalation_directive__",
+          "primitive": "alert_triage.primitives.response.escalation_route"
+        },
         "metric_refs": [
           "kpi.mttr_critical@v1",
           "kri.escalation_tier_breach@v1",

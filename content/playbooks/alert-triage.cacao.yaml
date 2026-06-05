@@ -251,6 +251,14 @@ workflow:
         - "kpi.mttr_critical@v1"
         - "kri.escalation_tier_breach@v1"
         - "kpi.notification_sla_compliance@v1"
+      core_body:
+        primitive: "alert_triage.primitives.response.escalation_route"
+        in:
+          priority: "__priority__"
+          asset_criticality: "__asset_context__.asset_criticality"
+          regulated_data: "__asset_context__.regulated_data"
+          internet_exposed: "__asset_context__.internet_exposed"
+        out: "__escalation_directive__"
 
   "action--a1e47431-0000-4000-8000-000000000009":
     type: action
