@@ -254,14 +254,7 @@ named operator use-case. Each cookbook workflow lives under
 
 ### F-WF-03 — Alert triage
 
-- **Status:** In Progress
-- **Status note:** SKELETON worked examples landed across all three
-  reference targets (n8n / Temporal / LangGraph) with byte-parity
-  golden drift guards in place; CORE action bodies, shared primitives
-  (deterministic prioritisation policy, suppression-window helper,
-  DSPy signature for free-text fields), the GDPR data-flow doc, and
-  the replay / cookbook tests remain. Gap inventory:
-  [`docs/internal/f-wf-03-gap-inventory.md`](docs/internal/f-wf-03-gap-inventory.md).
+- **Status:** Shipped
 - **Priority:** P1
 - **Acceptance criteria:**
   - Ingestion of typed alert payloads from at least two source shapes.
