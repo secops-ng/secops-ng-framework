@@ -443,7 +443,7 @@ documented in the corresponding NIS2 article file.
 
 ### F-CP-01 — Risk-analysis stream
 
-- **Status:** Proposed
+- **Status:** In Progress
 - **Priority:** P1
 - **Acceptance criteria:**
   - `content/evidence/risk-analysis/` populated by at least one
