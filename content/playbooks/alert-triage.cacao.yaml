@@ -177,6 +177,14 @@ workflow:
         - "control.recurring_incident_correlator@v1"
       metric_refs:
         - "kpi.false_positive_rate@v1"
+      core_body:
+        primitive: "alert_triage.primitives.suppression.canonical_seen_key"
+        in:
+          detection_rule_id: "__detection_rule_id__"
+          subject_ref: "__subject_ref__"
+          asset_ref: "__asset_ref__"
+          classification: "__classification__"
+        out: "__close_record_key__"
 
   "action--a1e47431-0000-4000-8000-000000000006":
     type: action

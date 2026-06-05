@@ -109,6 +109,16 @@
           "control.incident_handling_capability@v1",
           "control.recurring_incident_correlator@v1"
         ],
+        "core_body": {
+          "in": {
+            "asset_ref": "__asset_ref__",
+            "classification": "__classification__",
+            "detection_rule_id": "__detection_rule_id__",
+            "subject_ref": "__subject_ref__"
+          },
+          "out": "__close_record_key__",
+          "primitive": "alert_triage.primitives.suppression.canonical_seen_key"
+        },
         "metric_refs": [
           "kpi.false_positive_rate@v1"
         ]

@@ -78,9 +78,8 @@ async def suppress_and_close() -> None:
         AuditTrail.current().append(
             AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000005', 'secops_ng.step.name': 'suppress and close', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'suppress_and_close'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--a1e47431-0000-4000-8000-000000000005'"
-        )
+        from alert_triage.primitives.suppression import canonical_seen_key
+        __close_record_key__ = canonical_seen_key(asset_ref=__asset_ref__, classification=__classification__, detection_rule_id=__detection_rule_id__, subject_ref=__subject_ref__)
 
 SUPPRESS_AND_CLOSE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
