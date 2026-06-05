@@ -16,9 +16,10 @@ narrative.
 
 ## Entries
 
-| Workflow      | Cookbook walkthrough                            | Canonical CACAO                                       |
-|---------------|-------------------------------------------------|-------------------------------------------------------|
-| `vuln-intake` | [`vuln-intake.md`](vuln-intake.md)              | `content/playbooks/vuln-intake/`                      |
+| Workflow       | Cookbook walkthrough                            | Canonical CACAO                                       |
+|----------------|-------------------------------------------------|-------------------------------------------------------|
+| `vuln-intake`  | [`vuln-intake.md`](vuln-intake.md)              | `content/playbooks/vuln-intake/`                      |
+| `alert-triage` | [`alert-triage.md`](alert-triage.md)            | `content/playbooks/alert-triage.cacao.yaml` + `content/playbooks/alert-triage/` |
 
 Additional entries land alongside their content sources as workflows
 flip from In Progress to Shipped on
