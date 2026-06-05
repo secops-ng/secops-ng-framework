@@ -54,6 +54,14 @@
         "control_refs": [
           "control.incident_handling_capability@v1"
         ],
+        "core_body": {
+          "in": {
+            "raw": "__raw_payload__",
+            "source_shape": "__alert_source_shape__"
+          },
+          "out": "__alert_payload__",
+          "primitive": "alert_triage.primitives.payloads.validate_alert_payload"
+        },
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
         ]
