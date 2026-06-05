@@ -61,6 +61,20 @@ PagingTier = Literal["tier_primary_oncall", "tier_executive"]
 # should be informed without being paged out of hours.
 NotificationCadence = Literal["paging_cadence", "informational_notice"]
 
+# Closed alphabet of review-queue tiers the p3 action routes onto.
+# ``tier_queue`` is the shared review queue with the standard
+# review-completion SLA; ``tier_primary_oncall`` is the same on-call
+# rotation the p1 / p2 actions reach, but at p3 it receives a
+# best-effort informational review pointer — never a page-out.
+ReviewTier = Literal["tier_queue", "tier_primary_oncall"]
+
+# Closed alphabet of review cadences the p3 action routes onto.
+# ``review_queue_standard_sla`` is the routine review-completion SLA
+# that backs the shared queue; ``best_effort_review`` is the
+# non-paging crown-jewel pointer that lands in the on-call rotation
+# without opening an SLA clock beyond the regulator gate.
+ReviewCadence = Literal["review_queue_standard_sla", "best_effort_review"]
+
 # Stable handle for the downstream incident-management playbook. Pinned
 # here so two re-fires of the same p1 alert resolve to the same
 # downstream playbook reference (idempotency on the hand-off).
@@ -388,12 +402,191 @@ def notify_on_call(
     )
 
 
+@dataclass(frozen=True)
+class ReviewQueueDirective:
+    """Deterministic routing verdict for the p3 response action.
+
+    Sibling of :class:`EscalationDirective` and
+    :class:`NotificationDirective` — frozen so the per-target compilers
+    can pin against a single handle on the audit trail.
+
+    Attributes:
+        review_tier: Which review-queue tier owns the case. Closed
+            alphabet — :data:`ReviewTier`. p3 is non-paging on every
+            branch; ``tier_queue`` is the shared review queue and
+            ``tier_primary_oncall`` is the same on-call rotation that
+            p1 / p2 reach — but at p3 the on-call entry is an
+            informational pointer, never a page-out.
+        cadence: Review cadence. ``review_queue_standard_sla`` for the
+            non-crown-jewel branch (routine review-completion SLA);
+            ``best_effort_review`` for the crown-jewel branch
+            (informational pointer in the on-call rotation, no SLA
+            clock beyond the regulator gate).
+        incident_management_playbook_ref: Stable handle of the
+            downstream incident-management playbook the case hands off
+            to. Always :data:`INCIDENT_MANAGEMENT_PLAYBOOK_REF` for p3
+            today; the field is carried explicitly so a future
+            per-tenant override is a single-field change.
+        regulator_notification_required: True when the asset processes
+            regulated data; opens the notification-SLA clock and
+            records against ``kpi.notification_sla_compliance@v1``.
+            The gate is the same as p1 / p2: once an asset is in scope
+            of a regulatory baseline the clock starts on the first
+            detection at any priority.
+        reasons: Ordered tuple naming every rule that fired.
+        inputs_digest: Short hex digest (16 lower-hex chars) of the
+            canonical inputs.
+    """
+
+    review_tier: ReviewTier
+    cadence: ReviewCadence
+    incident_management_playbook_ref: str
+    regulator_notification_required: bool
+    reasons: Tuple[str, ...]
+    inputs_digest: str
+
+
+def route_to_review_queue(
+    *,
+    priority: Priority,
+    asset_criticality: AssetCriticality,
+    regulated_data: bool,
+    internet_exposed: bool,
+) -> ReviewQueueDirective:
+    """Resolve the p3-routine review-queue route.
+
+    Sibling of :func:`escalation_route` and :func:`notify_on_call` —
+    same input shape, p3 routing policy.
+
+    Policy (deterministic, replay-safe):
+
+    * ``priority == "p3_routine"`` is the only entry-point. p1 / p2 /
+      p4 are rejected — they have their own response actions, and
+      silently degrading them through this primitive would mask a
+      wiring bug.
+    * ``asset_criticality != "crown_jewel"`` routes to the shared
+      ``tier_queue`` with the ``review_queue_standard_sla`` cadence —
+      append to the review queue for batched analyst attention, no
+      page-out, standard review-completion SLA.
+    * ``asset_criticality == "crown_jewel"`` routes to the
+      ``tier_primary_oncall`` recipient with the ``best_effort_review``
+      cadence — a non-paging pointer that lets the on-call rotation
+      see the crown-jewel review item without being woken for it. At
+      p3 even a crown-jewel asset is below the paging threshold; the
+      executive-tier escalation path is reserved for the actual p1
+      page.
+    * ``regulated_data`` opens the regulator-notification SLA clock at
+      p3 just as it does at p1 / p2 — once the asset is in scope of a
+      regulatory baseline the clock starts on the first detection at
+      any priority. p3 alone does not open an internal SLA beyond the
+      routine review-completion clock.
+    * The downstream incident-management playbook reference is pinned
+      to :data:`INCIDENT_MANAGEMENT_PLAYBOOK_REF` so the hand-off is
+      idempotent across re-fires.
+    * The verdict carries every reason that fired (ordered) plus a
+      short hex digest over the canonical inputs.
+
+    Args:
+        priority: Priority band from the upstream prioritisation
+            primitive. Must be ``"p3_routine"`` — this primitive is the
+            body of the p3 response action only.
+        asset_criticality: Per-asset criticality band. Closed alphabet
+            — :data:`AssetCriticality`.
+        regulated_data: True when the asset stores or processes data
+            covered by a regulatory baseline. Opens the regulator-
+            notification SLA clock.
+        internet_exposed: True when the asset is reachable from the
+            public internet. Carried into the digest so a replay
+            against a changed exposure flag is visibly a different
+            verdict, even when the routing happens to match.
+
+    Returns:
+        :class:`ReviewQueueDirective` naming the review tier, the
+        review cadence, the downstream incident-management playbook
+        reference, the regulator-notification requirement, every
+        reason that fired, and a digest of the canonical inputs.
+
+    Raises:
+        ValueError: ``priority`` is not ``"p3_routine"`` or
+            ``asset_criticality`` is outside the closed alphabet.
+        TypeError: ``regulated_data`` or ``internet_exposed`` is not a
+            bool. Booleans are the contract; refusing duck-typing here
+            keeps a stray ``1`` or ``"true"`` from sliding through.
+    """
+    if priority != "p3_routine":
+        raise ValueError(
+            f"route_to_review_queue is the p3-routine response body; "
+            f"got priority={priority!r}. p1 / p2 / p4 routing lives in "
+            f"sibling primitives."
+        )
+    if asset_criticality not in ("low", "medium", "high", "crown_jewel"):
+        raise ValueError(
+            f"unknown asset_criticality {asset_criticality!r}; "
+            f"expected one of ('low', 'medium', 'high', 'crown_jewel')"
+        )
+    if not isinstance(regulated_data, bool):
+        raise TypeError(
+            f"regulated_data must be bool, got {type(regulated_data).__name__}"
+        )
+    if not isinstance(internet_exposed, bool):
+        raise TypeError(
+            f"internet_exposed must be bool, "
+            f"got {type(internet_exposed).__name__}"
+        )
+
+    reasons: list[str] = [f"priority={priority} → queue-for-review"]
+
+    # Rule 1 — review tier + cadence. Crown-jewel at p3 lands in the
+    # on-call rotation as an informational best-effort review pointer
+    # (no SLA, no page); everything else lands in the shared review
+    # queue with the standard review-completion SLA.
+    if asset_criticality == "crown_jewel":
+        review_tier: ReviewTier = "tier_primary_oncall"
+        cadence: ReviewCadence = "best_effort_review"
+        reasons.append(
+            "asset_criticality=crown_jewel → tier_primary_oncall "
+            "best_effort_review (p3 informational, not page-now)"
+        )
+    else:
+        review_tier = "tier_queue"
+        cadence = "review_queue_standard_sla"
+        reasons.append(
+            f"asset_criticality={asset_criticality} → "
+            f"tier_queue review_queue_standard_sla"
+        )
+
+    # Rule 2 — regulator-notification SLA clock. Same gate as p1 / p2:
+    # the clock opens whenever the asset processes regulated data.
+    if regulated_data:
+        reasons.append(
+            "regulated_data=true → regulator_notification_required"
+        )
+
+    return ReviewQueueDirective(
+        review_tier=review_tier,
+        cadence=cadence,
+        incident_management_playbook_ref=INCIDENT_MANAGEMENT_PLAYBOOK_REF,
+        regulator_notification_required=regulated_data,
+        reasons=tuple(reasons),
+        inputs_digest=_digest(
+            priority,
+            asset_criticality,
+            regulated_data,
+            internet_exposed,
+        ),
+    )
+
+
 __all__ = [
     "EscalationDirective",
     "INCIDENT_MANAGEMENT_PLAYBOOK_REF",
     "NotificationCadence",
     "NotificationDirective",
     "PagingTier",
+    "ReviewCadence",
+    "ReviewQueueDirective",
+    "ReviewTier",
     "escalation_route",
     "notify_on_call",
+    "route_to_review_queue",
 ]

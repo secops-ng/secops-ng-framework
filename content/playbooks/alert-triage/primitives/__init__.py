@@ -49,8 +49,12 @@ from .response import (
     NotificationCadence,
     NotificationDirective,
     PagingTier,
+    ReviewCadence,
+    ReviewQueueDirective,
+    ReviewTier,
     escalation_route,
     notify_on_call,
+    route_to_review_queue,
 )
 from .signatures import signature_schema
 from .suppression import (
@@ -74,6 +78,9 @@ __all__ = [
     "PayloadValidationError",
     "Priority",
     "PriorityVerdict",
+    "ReviewCadence",
+    "ReviewQueueDirective",
+    "ReviewTier",
     "SUPPORTED_SHAPES",
     "SeenRecord",
     "SuppressionVerdict",
@@ -82,6 +89,7 @@ __all__ = [
     "escalation_route",
     "notify_on_call",
     "prioritise",
+    "route_to_review_queue",
     "signature_schema",
     "validate_alert_payload",
 ]
