@@ -287,7 +287,7 @@ named operator use-case. Each cookbook workflow lives under
 
 ### F-WF-05 — Incident management
 
-- **Status:** Proposed
+- **Status:** In Progress
 - **Priority:** P1
 - **Acceptance criteria:**
   - Workflow scaffolds the NIS2 Art. 23 three-stage timeline (24 h
