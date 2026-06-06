@@ -24,6 +24,12 @@ runtime.
   response playbook. Triage identity signal → confirmation branch →
   MFA reset → session revocation → lateral-movement hunt → IAM audit
   and persistence removal.
+- [`incident-management/`](incident-management/) — incident-management
+  playbook (NIS2 Article 23 three-stage regulator timeline). Intake
+  signal → classify significance + cross-border scope → open timeline
+  → 24-hour early warning → 72-hour notification → optional one-month
+  final report → close timeline. SKELETON state — `@tool` bodies raise
+  `NotImplementedError` pending the CORE-PRIM card.
 
 More worked examples land here as additional playbooks ship under
 `content/playbooks/`. Each follows the same shape — playbook,
