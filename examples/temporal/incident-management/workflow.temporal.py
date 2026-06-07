@@ -56,9 +56,8 @@ async def classify_significance_and_cross_border_scope(incident_id: str) -> dict
         AuditTrail.current().append(
             AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify significance and cross-border scope', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_significance_and_cross_border_scope'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--50000000-0000-4000-8000-000000000003'"
-        )
+        from incident_management.primitives.classification import classify_significance
+        __classification_verdict__ = classify_significance(signals=__intake_signals__)
 
 CLASSIFY_SIGNIFICANCE_AND_CROSS_BORDER_SCOPE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -104,9 +103,8 @@ async def submit_24_hour_early_warning(incident_id: str, timeline_handle: str, s
         AuditTrail.current().append(
             AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'submit 24-hour early warning', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'submit_24_hour_early_warning'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--50000000-0000-4000-8000-000000000006'"
-        )
+        from incident_management.primitives.regulator_submission import resolve_destination
+        __early_warning_destination__ = resolve_destination(destinations=__notification_destinations__, stage='early_warning')
 
 SUBMIT_24_HOUR_EARLY_WARNING_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -128,9 +126,8 @@ async def submit_72_hour_notification(incident_id: str, timeline_handle: str, si
         AuditTrail.current().append(
             AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000007', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'submit 72-hour notification', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'submit_72_hour_notification'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--50000000-0000-4000-8000-000000000007'"
-        )
+        from incident_management.primitives.stage_clock import verdict_for_submission
+        __notification_stage_verdict__ = verdict_for_submission(stage='notification', opened_at=__timeline_opened_at__, submitted_at=__notification_submitted_at__)
 
 SUBMIT_72_HOUR_NOTIFICATION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -152,9 +149,8 @@ async def submit_1_month_final_report(incident_id: str, timeline_handle: str, si
         AuditTrail.current().append(
             AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000009', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000009', 'secops_ng.step.name': 'submit 1-month final report', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'submit_1_month_final_report'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--50000000-0000-4000-8000-000000000009'"
-        )
+        from incident_management.primitives.regulator_submission import resolve_destination
+        __final_report_destination__ = resolve_destination(destinations=__notification_destinations__, stage='final_report')
 
 SUBMIT_1_MONTH_FINAL_REPORT_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),

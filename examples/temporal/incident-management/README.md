@@ -9,10 +9,21 @@ cross-border classification, F-PT-02 incident-timeline pattern handle
 store, regulator-submission destinations for the three NIS2 Article 23
 stages, timeline JSON persistence backend) is the operator's job.
 
-This is the **SKELETON** card of the F-WF-05 wave. Action bodies are
-stub placeholders that raise `NotImplementedError` and carry only the
-CACAO I/O contract; no primitives binding is in place yet — that lands
-in the CORE-PRIM card (card 5 of the F-WF-05 wave).
+This is the **SKELETON** card of the F-WF-05 wave with the Temporal
+CORE wire-in applied. The canonical CACAO source still carries
+SKELETON stubs for every action body; the per-step
+``x_secops_ng.core_body`` bindings that drive the Temporal activity
+primitive calls (classification table, fail-closed
+regulator-destination resolver, three-stage NIS2 Article 23 stage
+clock) are layered onto this directory's CACAO mirror by
+``core_body.overlay.json`` at regeneration time. Bindings are
+cell-for-cell identical to the n8n sibling overlay so the three
+compile targets stay in lock-step across the SKELETON wave. The
+overlay collapses to empty and the divergence closes when the sibling
+CORE-WIRE-LG card lands and the canonical gains the ``core_body``
+blocks as the single source of truth — see ``core_body.overlay.json``
+and ``tests/examples/incident_management/test_temporal_workflow.py``
+for the divergence guard.
 
 ## Source
 
@@ -29,10 +40,12 @@ regeneration command.
 
 ## Layout
 
-| Path                    | Source compiler      | Format                |
-|-------------------------|----------------------|-----------------------|
-| `playbook.cacao.json`   | (input)              | CACAO v2 JSON         |
-| `workflow.temporal.py`  | `compilers.temporal` | Python (`temporalio`) |
+| Path                      | Source compiler      | Format                |
+|---------------------------|----------------------|-----------------------|
+| `playbook.cacao.json`     | (input, overlay-merged) | CACAO v2 JSON      |
+| `core_body.overlay.json`  | (SKELETON-wave seam) | JSON overlay          |
+| `apply_overlay.py`        | (regenerate helper)  | Python (stdlib)       |
+| `workflow.temporal.py`    | `compilers.temporal` | Python (`temporalio`) |
 
 ## Regeneration
 
@@ -41,8 +54,10 @@ the repo root:
 
     ./examples/temporal/incident-management/regenerate.sh
 
-The script mirrors the canonical CACAO source into this folder and
-re-emits `workflow.temporal.py` via `tools.compile --target temporal`.
+The script applies the per-step `core_body` overlay onto the canonical
+CACAO source to produce this folder's `playbook.cacao.json` mirror,
+then re-emits `workflow.temporal.py` via `tools.compile --target
+temporal`.
 
 ## What this example deliberately doesn't do
 
