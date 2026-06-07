@@ -149,7 +149,14 @@
         ],
         "metric_refs": [
           "kpi.timeline_completeness@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "incident_management.primitives.classification.classify_significance",
+          "in": {
+            "signals": "__intake_signals__"
+          },
+          "out": "__classification_verdict__"
+        }
       }
     },
     "if-condition--50000000-0000-4000-8000-000000000004": {
@@ -210,7 +217,15 @@
         "metric_refs": [
           "kpi.notification_sla_compliance@v1",
           "kri.regulator_notification_overrun@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "incident_management.primitives.regulator_submission.resolve_destination",
+          "in": {
+            "destinations": "__notification_destinations__",
+            "stage": "'early_warning'"
+          },
+          "out": "__early_warning_destination__"
+        }
       }
     },
     "action--50000000-0000-4000-8000-000000000007": {
@@ -239,7 +254,16 @@
         "metric_refs": [
           "kpi.notification_sla_compliance@v1",
           "kri.regulator_notification_overrun@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "incident_management.primitives.stage_clock.verdict_for_submission",
+          "in": {
+            "stage": "'notification'",
+            "opened_at": "__timeline_opened_at__",
+            "submitted_at": "__notification_submitted_at__"
+          },
+          "out": "__notification_stage_verdict__"
+        }
       }
     },
     "if-condition--50000000-0000-4000-8000-000000000008": {
@@ -276,7 +300,15 @@
           "kpi.notification_sla_compliance@v1",
           "kpi.timeline_completeness@v1",
           "kri.regulator_notification_overrun@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "incident_management.primitives.regulator_submission.resolve_destination",
+          "in": {
+            "destinations": "__notification_destinations__",
+            "stage": "'final_report'"
+          },
+          "out": "__final_report_destination__"
+        }
       }
     },
     "action--50000000-0000-4000-8000-00000000000a": {
