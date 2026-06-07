@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/evidence/risk-analysis.schema.json",
+  "title": "SecOps-NG Risk-Analysis Evidence Artifact",
+  "description": "Typed shape for one evidence artifact emitted by the risk-analysis evidence stream (F-CP-01). One artifact is produced per (control, cadence) pair; downstream consumers (kri.control_effectiveness@v1, the F-CP-06 effectiveness-loop stream, executive-metrics rollups) read these as the operator-side source of truth for how a risk-management control is performing against its declared review cadence. Public-bar artifact: operator-side strings (policy versions, owner labels) MUST stay role-shaped (mailbox, working-group, role title); individual names are out of scope per AGENTS.md §3.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_id",
+    "stream",
+    "control_ref",
+    "regulation_refs",
+    "policy_version",
+    "attestation_state",
+    "risk_analysis_output",
+    "owner",
+    "review_cadence",
+    "captured_at",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Pinned schema version. Lets a consumer reject artifacts produced under an older schema once breaking changes ship.",
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "artifact_id": {
+      "description": "Stable per-artifact identifier. Convention: SHA-256 hex digest of `<control_stable_id>|<captured_at>` (UTF-8, no separators around the pipe). Deterministic on those two inputs so a replay re-derives the same id.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "stream": {
+      "description": "Identifies which evidence stream produced the artifact. Constant on this schema.",
+      "type": "string",
+      "const": "risk-analysis"
+    },
+    "control_ref": {
+      "description": "Stable-id reference to the control attested by this artifact. Long-form URN; same shape every other layer of the content model uses.",
+      "type": "string",
+      "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+    },
+    "regulation_refs": {
+      "description": "Pins to the upstream regulatory mapping entries this artifact helps satisfy (e.g. nis2:art-21-2-a, dora:art-5-governance, dora:art-6-framework). At least one entry — an artifact with no regulatory anchor is not evidence in the F-CP-01 sense. Joins back into content/mappings/<regime>/*.yaml via the `id` field.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(nis2|dora|cra|gdpr|iso27001|soc2):[a-z0-9][a-z0-9.-]*$",
+        "maxLength": 120
+      }
+    },
+    "policy_version": {
+      "description": "Version pointer for the operator's policy document at the moment of attestation. Either a SemVer string (preferred when the operator maintains policies under version control) or a 64-character lowercase hex content-hash. Free-text policy titles MUST NOT be used here — the human title goes in the risk_analysis_output narrative.",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.-]+)?$"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "attestation_state": {
+      "description": "Most recent attestation state for the referenced control. Imports the shared four-state vocabulary from schemas/attestation_state.json so the stream, kri.control_effectiveness@v1, and the F-CP-06 effectiveness-loop stream agree on the enum.",
+      "$ref": "https://secops-ng.org/schemas/attestation_state.json"
+    },
+    "attestation_state_delta": {
+      "description": "Optional transition from the immediately previous artifact in the same control_ref series. Omitted on the first emission for a control. Required by F-CP-06 once a prior artifact exists; the emitter is responsible for the lookup.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["previous_state", "previous_artifact_id"],
+      "properties": {
+        "previous_state": { "$ref": "https://secops-ng.org/schemas/attestation_state.json" },
+        "previous_artifact_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "previous_captured_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "risk_analysis_output": {
+      "description": "Operator-side analysis narrative for this cadence. Free-form structured block so a reviewer can read the residual-exposure rationale, scoped scenarios, and any deviations from baseline. Fields here are intended to be filled in by a workflow step (often via a DSPy signature, per the F-WF-01 / F-WF-03 precedent for free-text fields); the deterministic state fields above stay code.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["residual_exposure_summary"],
+      "properties": {
+        "residual_exposure_summary": {
+          "description": "One-paragraph plain-language summary of the residual exposure remaining after the control's most-recent attestation. Public-bar text: no operator branding, no individual names.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "scoped_scenarios": {
+          "description": "Optional list of risk scenarios the cadence's review explicitly considered, each named in plain text.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "maxLength": 400 },
+          "uniqueItems": true
+        },
+        "deviations_from_baseline": {
+          "description": "Optional list of points where the operator's scoped variant diverges from the community baseline this artifact references.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "maxLength": 400 },
+          "uniqueItems": true
+        },
+        "compensating_controls": {
+          "description": "Optional list of control stable-ids the operator is relying on to compensate for any partially_effective / ineffective state on the primary control_ref. Compensating-control credit is NOT consumed by kri.control_effectiveness@v1 itself (which is a pre-credit indicator) — this list documents the operator's rationale for a reviewer.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "owner": {
+      "description": "Dated ownership pointer required by NIS2 Art. 21(2)(a). Role-shaped — a working-group mailbox, a generic role title, or a community handle. Individual personal names are out of scope per AGENTS.md §3 and rejected here as a matter of schema discipline.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "assigned_at"],
+      "properties": {
+        "role": {
+          "description": "Generic role or working-group identifier (e.g. 'risk-management-wg@example.org', 'security-officer', 'governance-board'). Personal names are not used.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "assigned_at": {
+          "description": "ISO-8601 date on which the role was assigned ownership of this control.",
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "review_cadence": {
+      "description": "Re-assessment cadence the artifact was produced under. ISO-8601 duration. Normally copied from the control_ref's `review_cadence` field; an artifact MAY carry a tighter cadence when the operator runs a scoped variant.",
+      "type": "string",
+      "pattern": "^P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+S)?)?$"
+    },
+    "captured_at": {
+      "description": "ISO-8601 UTC timestamp at which this attestation was captured. Stable input to artifact_id.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "provenance": {
+      "description": "Where this artifact came from. Mirrors the provenance pattern used by content/controls/*.yaml so a reviewer can re-derive the chain back to source.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_url", "captured_at"],
+      "properties": {
+        "source_url": {
+          "description": "URL of the workflow run (or workflow-content source) that produced this artifact. Compile targets may use their own run-id URLs; the URL itself is opaque to this schema.",
+          "type": "string",
+          "format": "uri"
+        },
+        "captured_at": {
+          "description": "ISO-8601 date or date-time matching the artifact-level captured_at.",
+          "type": "string"
+        },
+        "commit_sha": {
+          "description": "Optional commit SHA of the content snapshot the workflow walked.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,64}$"
+        }
+      }
+    },
+    "baseline_drift": {
+      "description": "Optional drift signal. Set by the emitter when the upstream regulatory text or OSCAL catalog version pinned on the previous artifact has changed since the previous emission. Consumed by the F-CP-01 DRIFT card's downstream alert hook (separate card; this field reserves the shape).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["changed"],
+      "properties": {
+        "changed": {
+          "type": "boolean"
+        },
+        "regulation_version_previous": {
+          "type": "string"
+        },
+        "regulation_version_current": {
+          "type": "string"
+        },
+        "oscal_catalog_version_previous": {
+          "type": "string"
+        },
+        "oscal_catalog_version_current": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 4000
+        }
+      }
+    }
+  }
+}

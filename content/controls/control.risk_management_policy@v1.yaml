@@ -26,6 +26,14 @@ d3fend_refs:
     technique_name: "Operational Activity Mapping"
     url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
 
+# Re-assessment cadence consumed by the risk-analysis evidence stream
+# (content/evidence/risk-analysis/) and by the kri.control_effectiveness@v1
+# overdue calculation. ISO-8601 duration. Annual baseline mirrors the NIS2
+# Art. 21(2)(a) periodic-re-assessment expectation and the DORA Art. 5–6
+# annual-review obligation; operators with a stricter scoped variant may
+# override locally without changing this default.
+review_cadence: P1Y
+
 provenance:
   source_url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
   captured_at: '2026-05-30'
