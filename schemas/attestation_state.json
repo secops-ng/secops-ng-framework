@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/attestation_state.json",
+  "title": "SecOps-NG Control Attestation State",
+  "description": "Shared four-state vocabulary describing the most recent attestation of a SecOps-NG control. Promoted out of kri.control_effectiveness@v1 (where it was declared in prose only) so that the risk-analysis evidence-artifact schema, the control-effectiveness KRI, and any future effectiveness-loop stream import the same enum without re-declaring it. States are mutually exclusive: a control is in exactly one state at any evaluation timestamp.",
+  "type": "string",
+  "enum": [
+    "effective",
+    "partially_effective",
+    "ineffective",
+    "overdue"
+  ],
+  "x_state_definitions": {
+    "effective": "Latest attestation places the control fully in scope and operating as designed; within the control's declared review_cadence.",
+    "partially_effective": "Latest attestation acknowledges material gaps in coverage or operation, but the control is still partially mitigating the underlying risk; within review_cadence.",
+    "ineffective": "Latest attestation finds the control not operating, or operating in a way that does not mitigate the underlying risk; within review_cadence.",
+    "overdue": "No current attestation within the control's declared review_cadence. Treated as not-effective for residual-exposure calculations."
+  }
+}

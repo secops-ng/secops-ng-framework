@@ -82,6 +82,11 @@
         }
       }
     },
+    "review_cadence": {
+      "description": "Optional declared re-assessment cadence for this control, expressed as an ISO-8601 duration (e.g. P1Y, P6M, P30D). Consumed by the F-CP-01 risk-analysis evidence stream and the F-CP-06 effectiveness-loop stream to decide when a control's most-recent attestation is overdue. Omit when the control is event-driven rather than cadence-driven.",
+      "type": "string",
+      "pattern": "^P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+S)?)?$"
+    },
     "provenance": {
       "type": "object",
       "required": ["source_url", "captured_at"],

@@ -133,6 +133,16 @@
       },
       "uniqueItems": true
     },
+    "evidence_stream_refs": {
+      "description": "Evidence-stream identifiers under content/evidence/<stream>/ that emit artifacts satisfying this obligation. Each entry is the stream slug (e.g. `risk-analysis`). Joins to schemas/evidence/<stream>.schema.json. Short slugs match the on-disk directory under content/evidence/.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*$",
+        "maxLength": 80
+      },
+      "uniqueItems": true
+    },
     "notes": {
       "description": "Optional reviewer notes — implementation guidance, scope caveats, references to ENISA / ESAs / ENISA technical guidance. Forward-public hygiene applies.",
       "type": "string",
