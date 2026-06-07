@@ -8,10 +8,18 @@ connectors (signal intake, deterministic classification, regulator
 destinations for the three NIS2 Article 23 stages, timeline pattern
 handle store) is the operator's job.
 
-This is the **SKELETON** card of the F-WF-05 wave. Action bodies are
-stub placeholders carrying only the CACAO I/O contract; no primitives
-binding is in place yet — that lands in the CORE-PRIM card (card 5 of
-the F-WF-05 wave per `docs/internal/f-wf-05-gap-inventory.md` § 3.1).
+This is the **SKELETON** card of the F-WF-05 wave with the n8n CORE
+wire-in applied. The canonical CACAO source still carries SKELETON
+stubs for every action body; the per-step ``x_secops_ng.core_body``
+bindings that drive the n8n Code-node primitive calls (classification
+table, fail-closed regulator-destination resolver, three-stage NIS2
+Article 23 stage clock) are layered onto this directory's CACAO mirror
+by ``core_body.overlay.json`` at regeneration time. The overlay
+collapses to empty and the divergence closes when the sibling
+CORE-WIRE-TMPRL and CORE-WIRE-LG cards land and the canonical gains
+the ``core_body`` blocks as the single source of truth — see
+``core_body.overlay.json`` and ``tests/examples/test_n8n_incident_management.py``
+for the divergence guard.
 
 ## Source
 
@@ -94,19 +102,22 @@ routing), the per-step `in_args` / `out_args` and the `x_secops_ng`
 reference bundles as Set rows, plus the lossy-translation notes
 recorded under `meta.secops_ng_notes`. It does not carry:
 
-- Operator-bound bindings (incident signal source, deterministic
-  classification policy implementation, regulator-submission
-  destinations for the three NIS2 stages, F-PT-02 incident-timeline
-  pattern handle store, timeline JSON persistence backend).
+- Operator-bound bindings (incident signal source, regulator-submission
+  destinations the operator wires for the three NIS2 stages,
+  notification transport between the resolved destination and the
+  regulator endpoint itself, F-PT-02 incident-timeline pattern handle
+  store, timeline JSON persistence backend). The fail-closed
+  destination resolver, classification table, and three-stage NIS2
+  Article 23 clock are wired into the n8n Code nodes by the
+  ``core_body.overlay.json`` overlay — but the operator still binds
+  concrete destinations and transports at the n8n credential layer.
 - Credentials, secrets, or environment-specific endpoints. The
   sovereign-stack constraint applies: the framework ships no default
   notification endpoint — operators wire concrete regulator
   destinations at the compile target's config layer (n8n credential).
-- The deterministic significance / cross-border classification policy
-  itself — that lands in the CORE-PRIM card.
-- Stage-clock arithmetic, the regulator-submission contract, or the
-  typed early-warning / 72h notification / final-report payload
-  shapes — these all land in CORE-PRIM.
+- DSPy reach beyond the free-text fields of the one-month final report
+  (per ``content/playbooks/incident-management/primitives/signatures.py``
+  — regulated decisions are deterministic code, not LM).
 
 Where a CACAO step expresses intent the target runtime cannot encode
 (an `action` with no machine-readable `commands`, an if-condition with

@@ -6,17 +6,27 @@ parses the worked-example CACAO mirror, emits the n8n workflow JSON,
 and pins the result byte-for-byte against the committed
 ``examples/n8n/incident-management/workflow.n8n.json``.
 
-The canonical incident-management source ships as JSON under
-``content/playbooks/incident-management/playbook.cacao.json`` (no YAML
-authored form — the playbook was sketched directly as JSON in the
-SKELETON-SRC card), so the mirror co-located with the worked example
-is a byte-identical copy of the canonical source. This test additionally
-verifies that mirror is in sync with the canonical playbook.
+F-WF-05 CORE-WIRE-N8N (SKELETON wave) seam — divergence guard.
+=============================================================
+The canonical incident-management source at
+``content/playbooks/incident-management/playbook.cacao.json`` ships
+without ``x_secops_ng.core_body`` blocks. The n8n SKELETON example
+intentionally diverges to demonstrate the primitive wire-in shape
+(classification, fail-closed destination resolver, three-stage NIS2
+Article 23 clock) ahead of the sibling Temporal and LangGraph
+CORE-WIRE cards. The divergence is bounded by an overlay JSON at
+``examples/n8n/incident-management/core_body.overlay.json`` whose
+``workflow_overlays`` block is the *only* difference permitted between
+the canonical source and the n8n mirror.
 
-SKELETON-stage scope: every CORE action body is a stub — no
-``x_secops_ng.core_body`` references exist on the source yet, so the
-Code-node assertions enforced for the alert-triage worked example do
-not apply here. They light up once the CORE-PRIM + CORE-WIRE cards land.
+The legacy invariant ``mirror == canonical`` is replaced by the
+loosened invariant ``mirror == canonical + overlay`` (see
+``test_mirror_matches_canonical_plus_overlay``). When the
+CORE-WIRE-TMPRL and CORE-WIRE-LG cards land and the canonical gains
+the core_body blocks as a single source of truth, the overlay
+collapses to empty and this divergence closes — at which point the
+test reverts to byte-parity with no behaviour change for downstream
+consumers.
 
 Regenerate via::
 
@@ -25,6 +35,7 @@ Regenerate via::
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 from compilers._shared.cacao_parser import parse_file
@@ -37,6 +48,11 @@ CANON_JSON = (
 )
 MIRROR_JSON = EXAMPLE_DIR / "playbook.cacao.json"
 WORKED_EXAMPLE = EXAMPLE_DIR / "workflow.n8n.json"
+OVERLAY_JSON = EXAMPLE_DIR / "core_body.overlay.json"
+
+# Make ``apply_overlay`` importable for the divergence-guard test below.
+sys.path.insert(0, str(EXAMPLE_DIR))
+from apply_overlay import apply_overlay as _apply_overlay  # noqa: E402
 
 
 def _serialise_workflow(payload: dict) -> str:
@@ -50,7 +66,7 @@ def _serialise_workflow(payload: dict) -> str:
 
 
 def test_committed_artefacts_exist() -> None:
-    for path in (CANON_JSON, MIRROR_JSON, WORKED_EXAMPLE):
+    for path in (CANON_JSON, MIRROR_JSON, WORKED_EXAMPLE, OVERLAY_JSON):
         assert path.exists(), f"missing worked-example artefact: {path}"
         assert path.stat().st_size > 0, f"empty worked-example artefact: {path}"
 
@@ -60,15 +76,61 @@ def test_committed_artefacts_exist() -> None:
 # --------------------------------------------------------------------------- #
 
 
-def test_mirror_matches_canonical_source() -> None:
-    """``playbook.cacao.json`` must be byte-identical to the canonical source."""
+def test_mirror_matches_canonical_plus_overlay() -> None:
+    """SKELETON-wave divergence guard: ``mirror == canonical + overlay``.
+
+    The n8n mirror diverges from the canonical CACAO source by exactly
+    the per-step ``x_secops_ng.core_body`` blocks declared in
+    ``core_body.overlay.json``; no other drift is permitted. When the
+    sibling CORE-WIRE-TMPRL and CORE-WIRE-LG cards land and the
+    canonical source gains the ``core_body`` blocks as the single source
+    of truth, the overlay collapses to empty and the mirror returns to
+    byte-parity with the canonical with no test change required.
+    """
+    canonical = json.loads(CANON_JSON.read_text(encoding="utf-8"))
+    overlay_doc = json.loads(OVERLAY_JSON.read_text(encoding="utf-8"))
+    expected = _apply_overlay(canonical, overlay_doc)
+    expected_text = json.dumps(expected, indent=2, ensure_ascii=False) + "\n"
+
     rendered = MIRROR_JSON.read_text(encoding="utf-8")
-    expected = CANON_JSON.read_text(encoding="utf-8")
-    assert rendered == expected, (
-        "examples/n8n/incident-management/playbook.cacao.json drift from the "
-        "canonical CACAO source. Regenerate via "
-        "`./examples/n8n/incident-management/regenerate.sh` and commit the result."
+    assert rendered == expected_text, (
+        "examples/n8n/incident-management/playbook.cacao.json drift from "
+        "(canonical CACAO source + core_body.overlay.json). Regenerate via "
+        "`./examples/n8n/incident-management/regenerate.sh` and commit the "
+        "result. If the canonical source itself now carries the core_body "
+        "blocks (CORE-WIRE-TMPRL + CORE-WIRE-LG have landed), the overlay "
+        "should be emptied in the same PR."
     )
+
+
+def test_overlay_only_touches_core_body_blocks() -> None:
+    """Bound the SKELETON divergence to ``x_secops_ng.core_body`` only.
+
+    Nothing else is allowed to differ between the canonical source and
+    the n8n mirror; if a contributor adds a non-``core_body`` overlay
+    key the divergence stops being a closeable seam and the wave
+    contract breaks. Fail closed here so the divergence is auditable.
+    """
+    overlay_doc = json.loads(OVERLAY_JSON.read_text(encoding="utf-8"))
+    overlays = overlay_doc.get("workflow_overlays") or {}
+    assert overlays, (
+        "core_body.overlay.json carries no workflow_overlays — if the "
+        "canonical source has been promoted to carry the core_body blocks "
+        "directly, also delete this divergence guard and re-pin the "
+        "legacy byte-parity invariant."
+    )
+    for step_id, step_overlay in overlays.items():
+        assert set(step_overlay) <= {"x_secops_ng"}, (
+            f"overlay step {step_id!r} touches keys outside x_secops_ng: "
+            f"{sorted(set(step_overlay) - {'x_secops_ng'})!r}; the SKELETON "
+            "wave only permits x_secops_ng.core_body divergence."
+        )
+        x_overlay = step_overlay["x_secops_ng"]
+        assert set(x_overlay) <= {"core_body"}, (
+            f"overlay step {step_id!r} touches x_secops_ng keys outside "
+            f"core_body: {sorted(set(x_overlay) - {'core_body'})!r}; the "
+            "SKELETON wave only permits x_secops_ng.core_body divergence."
+        )
 
 
 def test_worked_example_matches_emitter_output() -> None:
