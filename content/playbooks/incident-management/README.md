@@ -17,7 +17,12 @@ against once the CORE-PRIM card lands:
   regulator-submission contract that takes an operator-configured
   destination, the F-PT-02 incident-timeline binding layer) plus a
   DSPy signature reserved for the free-text fields on the final-report
-  submission. Not yet present on disk — lands in CORE-PRIM.
+  submission. Shipped in CORE-PRIM. The F-PT-02 binding ships as a
+  thin in-package adapter (`PT02_BINDING_STATUS = "adapter"`) per the
+  gap inventory § 4 question 1 — `patterns/incident_timeline/` is not
+  yet on `main`. When that pattern module lands, the adapter swaps
+  for the real binding without per-target CORE bodies changing
+  shape.
 - `payloads/` — workflow-local typed payload models for the four
   shapes the playbook handles: the intake event, the 24-hour early
   warning, the 72-hour notification, and the one-month final report.
