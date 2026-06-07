@@ -7,9 +7,12 @@ framework emits. Each stream is paired with a typed schema under
 and consumed by the corresponding regulatory crosswalks under
 `content/mappings/`.
 
-Streams are framework-agnostic. Reference emitters for the three
-compile targets (n8n, Temporal, LangGraph) land under `examples/` as
-each stream's EMITTER card ships.
+Streams are framework-agnostic. The shared emitter helpers live under
+[`compilers/_shared/evidence/`](../../compilers/_shared/evidence/) and
+each compile target wraps the same helper in a thin adapter
+(`compilers/<target>/evidence/`). The SKELETON for F-CP-01 wires the
+Temporal target; the n8n and LangGraph wrappers land in the F-CP-01
+CORE sibling.
 
 ## Cross-stream index
 
