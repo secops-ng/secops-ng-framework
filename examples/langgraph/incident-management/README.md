@@ -9,21 +9,35 @@ incident-management playbook without re-platforming: the example shows
 exactly which artifacts the compiler produces, how they fit together,
 and where the integrator owns the seams.
 
-This is the **SKELETON** card of the F-WF-05 wave. Action bodies are
-stub placeholders that raise `NotImplementedError` and carry only the
-CACAO I/O contract; no primitives binding is in place yet — that lands
-in the CORE-PRIM card (card 5 of the F-WF-05 wave).
+This is the **SKELETON** card of the F-WF-05 wave with the LangGraph
+CORE wire-in applied. The canonical CACAO source still carries
+SKELETON stubs for every action body; the per-step
+`x_secops_ng.core_body` bindings that drive the LangGraph tool-body
+primitive calls (classification table, fail-closed regulator-destination
+resolver, three-stage NIS2 Article 23 stage clock) are layered onto
+this directory's CACAO mirror by `core_body.overlay.json` at
+regeneration time. Bindings are cell-for-cell identical to the n8n +
+Temporal sibling overlays so the three compile targets stay in
+lock-step across the SKELETON wave. The three-target CORE-WIRE parity
+wave for incident-management completes with this card; the overlay
+collapses to empty and the divergence closes when a subsequent card
+promotes the `core_body` blocks upward into the canonical source as
+the single source of truth — see `core_body.overlay.json` and
+`tests/examples/incident_management/test_langgraph_graph.py` for the
+divergence guard.
 
 ## Files in this directory
 
 | File | Role |
 |------|------|
-| `playbook.cacao.json` | Portable CACAO v2 playbook — byte-identical mirror of `content/playbooks/incident-management/playbook.cacao.json`, the input to the compiler. |
+| `playbook.cacao.json` | Portable CACAO v2 playbook — canonical CACAO source with the SKELETON-wave `core_body` overlay applied; the input to the compiler. |
+| `core_body.overlay.json` | SKELETON-wave seam: per-step `x_secops_ng.core_body` bindings layered onto the canonical source. Cell-for-cell identical to the n8n + Temporal sibling overlays. |
+| `apply_overlay.py` | Pure-stdlib helper invoked by `regenerate.sh` to merge the overlay onto the canonical source. |
 | `graph_spec.json` | Target-neutral GraphSpec (nodes, edges, conditional edges) emitted by `compilers.langgraph.emit`. |
 | `state_bindings.py` | Generated `TypedDict` state + `@tool`-decorated action wrappers + agentic-extension hook, emitted by `compilers.langgraph.state`. |
 | `_audit_mirror.py` | Dependency-free `AuditTrail` / `AuditRecord` sibling — materialised by the compiler so the worked example is a self-contained drop-in. |
 | `assemble.py` | Hand-written reference assembly that wires the GraphSpec + bindings into a `langgraph.graph.StateGraph`. |
-| `regenerate.sh` | Re-runs both emitters from the canonical playbook and overwrites the mirrored CACAO + the two generated artifacts plus the audit-mirror sibling. |
+| `regenerate.sh` | Applies the overlay onto the canonical playbook, then re-runs both emitters and overwrites the mirrored CACAO + the two generated artifacts plus the audit-mirror sibling. |
 
 ## How to regenerate
 
@@ -34,8 +48,9 @@ refresh the committed artifacts from the repo root:
 ./examples/langgraph/incident-management/regenerate.sh
 ```
 
-The script mirrors the canonical CACAO source into this folder and
-re-emits `graph_spec.json` and `state_bindings.py` from it using
+The script applies the per-step `core_body` overlay onto the canonical
+CACAO source to produce this folder's `playbook.cacao.json` mirror,
+then re-emits `graph_spec.json` and `state_bindings.py` from it using
 `compilers.langgraph.emit` and `compilers.langgraph.state`, and
 re-materialises `_audit_mirror.py` via
 `compilers._shared.audit_mirror_cli`. A drift test in
