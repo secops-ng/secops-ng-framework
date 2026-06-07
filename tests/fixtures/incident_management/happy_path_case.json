@@ -1,0 +1,30 @@
+{
+  "_comment": "Realistic happy-path incident case for the incident-management worked example. Drives the cross-target replay test under tests/examples/test_incident_management_happy_path.py. Inputs are pinned so the canonical case-state JSON every target produces is deterministic byte-for-byte across replays. LM-touching steps (free-text fields on the final-report submission, DSPy signature in primitives/signatures.py) are out of scope here — this fixture exercises the CORE-bound deterministic primitives only: classification (significance + cross-border), the three-stage NIS2 Article 23 clock, the fail-closed regulator-destination resolver, and the F-PT-02 incident-timeline binding adapter.",
+  "incident_id": "8f3b0a30-0000-4000-8000-000000000001",
+  "intake_signals": {
+    "affected_essential_service_count": 1,
+    "member_states_affected_count": 3,
+    "disruption_severity": "severe",
+    "data_classification": "regulated",
+    "cross_border_supply_chain": true
+  },
+  "timeline": {
+    "opened_at": "2026-06-05T10:00:00+00:00",
+    "early_warning_submitted_at": "2026-06-05T18:00:00+00:00",
+    "notification_submitted_at": "2026-06-07T08:00:00+00:00",
+    "final_report_submitted_at": "2026-07-04T10:00:00+00:00",
+    "closed_at": "2026-07-04T11:00:00+00:00"
+  },
+  "notification_destinations": {
+    "early_warning": "regulator://eu-csirt/early-warning",
+    "notification": "regulator://eu-csirt/notification",
+    "final_report": "regulator://eu-csirt/final-report"
+  },
+  "final_report_ready": true,
+  "expected": {
+    "significance_rule": "sig.severe_disruption",
+    "cross_border_rule": "cb.multi_member_state",
+    "selected_post_significance_branch": "action--50000000-0000-4000-8000-000000000005",
+    "selected_final_report_branch": "action--50000000-0000-4000-8000-000000000009"
+  }
+}
