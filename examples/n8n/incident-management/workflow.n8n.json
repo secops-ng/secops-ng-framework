@@ -137,48 +137,15 @@
     {
       "id": "action--50000000-0000-4000-8000-000000000003",
       "name": "classify significance and cross-border scope",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         760,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.incident_id",
-              "name": "in.incident_id",
-              "value": "={{$workflow.variables.incident_id}}",
-              "type": "string"
-            },
-            {
-              "id": "out.significant",
-              "name": "out.significant",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "out.cross_border",
-              "name": "out.cross_border",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.incident_handling_capability@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.timeline_completeness@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from incident_management.primitives.classification import classify_significance\n__classification_verdict__ = classify_significance(signals=__intake_signals__)"
       },
       "notes": "Apply the deterministic significance + cross-border classification policy per NIS2 Article 23(3) and 23(6). No DSPy reach \u2014 regulated decisions are deterministic code. Produces __significant__ and __cross_border__.",
       "notesInFlow": true
@@ -281,72 +248,15 @@
     {
       "id": "action--50000000-0000-4000-8000-000000000006",
       "name": "submit 24-hour early warning",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1540,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.incident_id",
-              "name": "in.incident_id",
-              "value": "={{$workflow.variables.incident_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.timeline_handle",
-              "name": "in.timeline_handle",
-              "value": "={{$workflow.variables.timeline_handle}}",
-              "type": "string"
-            },
-            {
-              "id": "in.significant",
-              "name": "in.significant",
-              "value": "={{$workflow.variables.significant}}",
-              "type": "string"
-            },
-            {
-              "id": "in.cross_border",
-              "name": "in.cross_border",
-              "value": "={{$workflow.variables.cross_border}}",
-              "type": "string"
-            },
-            {
-              "id": "in.notification_destinations",
-              "name": "in.notification_destinations",
-              "value": "={{$workflow.variables.notification_destinations}}",
-              "type": "string"
-            },
-            {
-              "id": "out.early_warning_event_id",
-              "name": "out.early_warning_event_id",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.incident_notification@v1, control.incident_timeline_signals@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.incident_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.notification_sla_compliance@v1, kri.regulator_notification_overrun@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from incident_management.primitives.regulator_submission import resolve_destination\n__early_warning_destination__ = resolve_destination(destinations=__notification_destinations__, stage='early_warning')"
       },
       "notes": "Submit the NIS2 Article 23(4)(a) early warning through the operator-configured regulator destination for the 'early_warning' stage. Emits a timeline event consumed by the F-PT-02 pattern. Bounded by the stage-clock primitive that the CORE-PRIM card will land \u2014 overrun trips the regulator-notification-overrun KRI.",
       "notesInFlow": true
@@ -354,72 +264,15 @@
     {
       "id": "action--50000000-0000-4000-8000-000000000007",
       "name": "submit 72-hour notification",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1800,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.incident_id",
-              "name": "in.incident_id",
-              "value": "={{$workflow.variables.incident_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.timeline_handle",
-              "name": "in.timeline_handle",
-              "value": "={{$workflow.variables.timeline_handle}}",
-              "type": "string"
-            },
-            {
-              "id": "in.significant",
-              "name": "in.significant",
-              "value": "={{$workflow.variables.significant}}",
-              "type": "string"
-            },
-            {
-              "id": "in.cross_border",
-              "name": "in.cross_border",
-              "value": "={{$workflow.variables.cross_border}}",
-              "type": "string"
-            },
-            {
-              "id": "in.notification_destinations",
-              "name": "in.notification_destinations",
-              "value": "={{$workflow.variables.notification_destinations}}",
-              "type": "string"
-            },
-            {
-              "id": "out.notification_event_id",
-              "name": "out.notification_event_id",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.incident_notification@v1, control.incident_timeline_signals@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.incident_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.notification_sla_compliance@v1, kri.regulator_notification_overrun@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from incident_management.primitives.stage_clock import verdict_for_submission\n__notification_stage_verdict__ = verdict_for_submission(stage='notification', opened_at=__timeline_opened_at__, submitted_at=__notification_submitted_at__)"
       },
       "notes": "Submit the NIS2 Article 23(4)(b) incident notification through the operator-configured regulator destination for the 'notification' stage. Emits a timeline event consumed by the F-PT-02 pattern. Bounded by the stage-clock primitive \u2014 overrun trips the regulator-notification-overrun KRI.",
       "notesInFlow": true
@@ -461,72 +314,15 @@
     {
       "id": "action--50000000-0000-4000-8000-000000000009",
       "name": "submit 1-month final report",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         2320,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.incident_id",
-              "name": "in.incident_id",
-              "value": "={{$workflow.variables.incident_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.timeline_handle",
-              "name": "in.timeline_handle",
-              "value": "={{$workflow.variables.timeline_handle}}",
-              "type": "string"
-            },
-            {
-              "id": "in.significant",
-              "name": "in.significant",
-              "value": "={{$workflow.variables.significant}}",
-              "type": "string"
-            },
-            {
-              "id": "in.cross_border",
-              "name": "in.cross_border",
-              "value": "={{$workflow.variables.cross_border}}",
-              "type": "string"
-            },
-            {
-              "id": "in.notification_destinations",
-              "name": "in.notification_destinations",
-              "value": "={{$workflow.variables.notification_destinations}}",
-              "type": "string"
-            },
-            {
-              "id": "out.final_report_event_id",
-              "name": "out.final_report_event_id",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.incident_notification@v1, control.incident_timeline_signals@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.incident_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.notification_sla_compliance@v1, kpi.timeline_completeness@v1, kri.regulator_notification_overrun@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from incident_management.primitives.regulator_submission import resolve_destination\n__final_report_destination__ = resolve_destination(destinations=__notification_destinations__, stage='final_report')"
       },
       "notes": "Submit the NIS2 Article 23(4)(c) final report through the operator-configured regulator destination for the 'final_report' stage. The free-text fields on this submission \u2014 incident narrative, root-cause description, applied-mitigations summary \u2014 are the single DSPy-signature reach for this workflow; every other field is deterministic. Bounded by the stage-clock primitive \u2014 overrun trips the regulator-notification-overrun KRI.",
       "notesInFlow": true
@@ -750,13 +546,9 @@
     },
     "secops_ng_notes": [
       "step 'action--50000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'action--50000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'if-condition--50000000-0000-4000-8000-000000000004' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
       "step 'action--50000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'action--50000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'action--50000000-0000-4000-8000-000000000007': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'if-condition--50000000-0000-4000-8000-000000000008' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
-      "step 'action--50000000-0000-4000-8000-000000000009': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--50000000-0000-4000-8000-00000000000a': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
     ]
   }
