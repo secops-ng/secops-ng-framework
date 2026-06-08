@@ -26,8 +26,10 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from compilers._shared.evidence import (
+    DriftHook,
     RiskAnalysisContext,
     emit_risk_analysis_artifact,
+    noop_drift_hook,
 )
 
 __all__ = ["emit_risk_analysis_artifact_n8n"]
@@ -67,7 +69,9 @@ def _ctx_from_payload(payload: Mapping[str, Any]) -> RiskAnalysisContext:
 
 
 def emit_risk_analysis_artifact_n8n(
-    payload: Mapping[str, Any], output_dir: str | os.PathLike[str]
+    payload: Mapping[str, Any],
+    output_dir: str | os.PathLike[str],
+    drift_hook: DriftHook | None = None,
 ) -> dict[str, Any]:
     """Persist one risk-analysis evidence artifact from an n8n payload.
 
@@ -76,9 +80,15 @@ def emit_risk_analysis_artifact_n8n(
     Re-emission for the same ``(control_ref, captured_at)`` is
     idempotent — the shared helper writes through a sibling ``.tmp`` and
     ``os.replace`` so a concurrent reader cannot observe a partial write.
+
+    ``drift_hook`` is the F-CP-01 drift-detection surface (SKELETON);
+    defaults to :func:`noop_drift_hook` when the integrator does not
+    supply one. CORE-WIRE pins the payload contract; EXTEND-KRI and
+    EXTEND-PERSIST are separate siblings.
     """
     ctx = _ctx_from_payload(payload)
-    written: Path = emit_risk_analysis_artifact(ctx, output_dir)
+    hook = drift_hook if drift_hook is not None else noop_drift_hook
+    written: Path = emit_risk_analysis_artifact(ctx, output_dir, drift_hook=hook)
     # Re-derive the id from the path so we don't depend on a private
     # field of the shared helper. The path stem is the artifact_id by
     # contract (see compilers/_shared/evidence/risk_analysis.py).

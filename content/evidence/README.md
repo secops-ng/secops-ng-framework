@@ -92,7 +92,12 @@ and LangGraph — sharing the same emitter helper end-to-end. The
 EXTEND-tests-goldens card pins per-target byte-parity of the on-disk
 artifact against committed fixtures under
 [`tests/examples/risk_analysis_evidence/`](../../tests/examples/risk_analysis_evidence/test_golden.py).
-The drift-detection hook and KPI/KRI wiring fan out into the remaining
-sibling cards of the F-CP-01 wave; the F-CP-02..F-CP-07 streams each
-open their own SCHEMA → STREAM-ROOT → EMITTER decomposition as they
-land.
+The drift-detection hook surface now lives on the shared emitter
+([`compilers/_shared/evidence/drift_hook.py`](../../compilers/_shared/evidence/drift_hook.py)):
+all three target adapters thread an optional `drift_hook` through, the
+default is a no-op, and a real attestation-state transition between
+successive emissions on the same control fires a `DriftEvent`. The
+payload contract, KPI/KRI promotion, and durable drift history fan out
+into the remaining sibling cards of the F-CP-01 wave; the
+F-CP-02..F-CP-07 streams each open their own SCHEMA → STREAM-ROOT →
+EMITTER decomposition as they land.
