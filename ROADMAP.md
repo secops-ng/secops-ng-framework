@@ -280,14 +280,19 @@ named operator use-case. Each cookbook workflow lives under
 
 ### F-WF-05 — Incident management
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P1
 - **Acceptance criteria:**
+  - `content/playbooks/incident-management/` carries the CACAO playbook
+    and primitives; compiled targets land under
+    `examples/{n8n,temporal,langgraph}/incident-management/`.
   - Workflow scaffolds the NIS2 Art. 23 three-stage timeline (24 h
-    early warning → 72 h notification → 1 month final report).
-  - State transitions are deterministic and replay-tested.
+    early warning → 72 h notification → 1 month final report); state
+    transitions are deterministic and replay-tested across all three
+    targets.
   - Outputs include a machine-readable timeline JSON consumable by
     F-CP-02.
+  - Cookbook entry + cross-target happy-path and replay tests.
 - **Sovereign-stack constraints:** Notification destinations are
   operator-configured; the framework ships no default endpoint.
 - **Depends on:** F-CR-04, F-PT-02 (incident_timeline pattern)
