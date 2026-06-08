@@ -89,7 +89,10 @@ Cards 1–3 of the F-CP-01 wave shipped the SCHEMA, the STREAM-ROOT, and
 the EMITTER SKELETON (Temporal-only activity wrapper). The CORE-FANOUT
 card extends the SKELETON to the remaining two compile targets — n8n
 and LangGraph — sharing the same emitter helper end-to-end. The
-drift-detection hook, KPI/KRI wiring, and per-target byte-parity golden
-tests fan out into the remaining sibling cards of the F-CP-01 wave;
-the F-CP-02..F-CP-07 streams each open their own SCHEMA → STREAM-ROOT →
-EMITTER decomposition as they land.
+EXTEND-tests-goldens card pins per-target byte-parity of the on-disk
+artifact against committed fixtures under
+[`tests/examples/risk_analysis_evidence/`](../../tests/examples/risk_analysis_evidence/test_golden.py).
+The drift-detection hook and KPI/KRI wiring fan out into the remaining
+sibling cards of the F-CP-01 wave; the F-CP-02..F-CP-07 streams each
+open their own SCHEMA → STREAM-ROOT → EMITTER decomposition as they
+land.

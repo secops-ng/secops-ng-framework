@@ -1,0 +1,48 @@
+{
+  "artifact_id": "fde6532e83b9f80e62c6c1750bb59345efcd967c78f00e40967b457693c49cd7",
+  "attestation_state": "partially_effective",
+  "attestation_state_delta": {
+    "previous_artifact_id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "previous_captured_at": "2026-03-07T05:00:00Z",
+    "previous_state": "effective"
+  },
+  "baseline_drift": {
+    "changed": true,
+    "notes": "Quarterly review refreshed against the updated baseline.",
+    "regulation_version_current": "2026-04-15",
+    "regulation_version_previous": "2026-01-15"
+  },
+  "captured_at": "2026-06-07T05:00:00Z",
+  "control_ref": "control.risk_management_policy@v1",
+  "owner": {
+    "assigned_at": "2026-01-15",
+    "role": "risk-management-wg@example.org"
+  },
+  "policy_version": "1.2.0",
+  "provenance": {
+    "captured_at": "2026-06-07T05:00:00Z",
+    "commit_sha": "deadbeef0123456789",
+    "source_url": "https://example.org/runs/abc123"
+  },
+  "regulation_refs": [
+    "nis2:art-21-2-a",
+    "dora:art-5-governance",
+    "dora:art-6-framework"
+  ],
+  "review_cadence": "P3M",
+  "risk_analysis_output": {
+    "compensating_controls": [
+      "control.network_segmentation@v1"
+    ],
+    "deviations_from_baseline": [
+      "custom alerting thresholds"
+    ],
+    "residual_exposure_summary": "Control operating with declared gaps in third-party-coverage scope; residual exposure tracked under the supply-chain stream until the gap closes.",
+    "scoped_scenarios": [
+      "ransomware",
+      "supply-chain compromise"
+    ]
+  },
+  "schema_version": "1.0.0",
+  "stream": "risk-analysis"
+}
