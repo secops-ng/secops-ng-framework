@@ -18,8 +18,9 @@ narrative.
 
 | Workflow       | Cookbook walkthrough                            | Canonical CACAO                                       |
 |----------------|-------------------------------------------------|-------------------------------------------------------|
-| `vuln-intake`  | [`vuln-intake.md`](vuln-intake.md)              | `content/playbooks/vuln-intake/`                      |
-| `alert-triage` | [`alert-triage.md`](alert-triage.md)            | `content/playbooks/alert-triage.cacao.yaml` + `content/playbooks/alert-triage/` |
+| `vuln-intake`         | [`vuln-intake.md`](vuln-intake.md)                 | `content/playbooks/vuln-intake/`                      |
+| `alert-triage`        | [`alert-triage.md`](alert-triage.md)               | `content/playbooks/alert-triage.cacao.yaml` + `content/playbooks/alert-triage/` |
+| `incident-management` | [`incident-management.md`](incident-management.md) | `content/playbooks/incident-management/`              |
 
 Additional entries land alongside their content sources as workflows
 flip from In Progress to Shipped on
