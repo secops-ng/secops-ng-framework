@@ -9,10 +9,17 @@ and consumed by the corresponding regulatory crosswalks under
 
 Streams are framework-agnostic. The shared emitter helpers live under
 [`compilers/_shared/evidence/`](../../compilers/_shared/evidence/) and
-each compile target wraps the same helper in a thin adapter
-(`compilers/<target>/evidence/`). The SKELETON for F-CP-01 wires the
-Temporal target; the n8n and LangGraph wrappers land in the F-CP-01
-CORE sibling.
+each compile target wraps the same helper in a thin adapter:
+
+| Target | Adapter | Surface |
+|--------|---------|---------|
+| Temporal | [`compilers/temporal/evidence/`](../../compilers/temporal/evidence/) | `@activity.defn` async activity |
+| n8n | [`compilers/n8n/evidence/`](../../compilers/n8n/evidence/) | Python helper called from an `executeCommand` / `Code` node |
+| LangGraph | [`compilers/langgraph/evidence/`](../../compilers/langgraph/evidence/) | Plain `state → state` node function |
+
+Record assembly, deterministic `artifact_id` derivation, schema
+validation, and the atomic write live on the shared helper — adapters
+are glue only and never fork record shape per target.
 
 ## Cross-stream index
 
@@ -78,10 +85,11 @@ Before opening a PR that touches an evidence stream:
 
 ## Status
 
-Card 1 of the F-CP-01 wave (SCHEMA) shipped the typed risk-analysis
-schema, the shared `attestation_state` enum, and the
-`review_cadence` promotion. This README is card 2 (STREAM-ROOT). The
-workflow emitter, drift-detection hook, KPI/KRI wiring, and per-target
-byte-parity golden tests fan out into the remaining sibling cards of
-the F-CP-01 wave; the F-CP-02..F-CP-07 streams each open their own
-SCHEMA → STREAM-ROOT → EMITTER decomposition as they land.
+Cards 1–3 of the F-CP-01 wave shipped the SCHEMA, the STREAM-ROOT, and
+the EMITTER SKELETON (Temporal-only activity wrapper). The CORE-FANOUT
+card extends the SKELETON to the remaining two compile targets — n8n
+and LangGraph — sharing the same emitter helper end-to-end. The
+drift-detection hook, KPI/KRI wiring, and per-target byte-parity golden
+tests fan out into the remaining sibling cards of the F-CP-01 wave;
+the F-CP-02..F-CP-07 streams each open their own SCHEMA → STREAM-ROOT →
+EMITTER decomposition as they land.
