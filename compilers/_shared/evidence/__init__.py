@@ -22,10 +22,18 @@ from compilers._shared.evidence.risk_analysis import (
     emit_risk_analysis_artifact,
     render_risk_analysis_artifact,
 )
+from compilers._shared.evidence.drift_hook import (
+    DriftEvent,
+    DriftHook,
+    noop_drift_hook,
+)
 
 __all__ = [
     "RiskAnalysisContext",
     "derive_artifact_id",
     "emit_risk_analysis_artifact",
     "render_risk_analysis_artifact",
+    "DriftEvent",
+    "DriftHook",
+    "noop_drift_hook",
 ]

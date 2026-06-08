@@ -34,6 +34,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from compilers._shared.evidence.drift_hook import (
+    DriftEvent,
+    DriftHook,
+    noop_drift_hook,
+)
+
 __all__ = [
     "RiskAnalysisContext",
     "derive_artifact_id",
@@ -211,7 +217,9 @@ def render_risk_analysis_artifact(ctx: RiskAnalysisContext) -> dict[str, Any]:
 
 
 def emit_risk_analysis_artifact(
-    ctx: RiskAnalysisContext, output_dir: str | os.PathLike[str]
+    ctx: RiskAnalysisContext,
+    output_dir: str | os.PathLike[str],
+    drift_hook: DriftHook | None = None,
 ) -> Path:
     """Render the record and persist it as ``<artifact_id>.json``.
 
@@ -219,7 +227,18 @@ def emit_risk_analysis_artifact(
     created if it does not exist. Writes atomically through a sibling
     ``.tmp`` then ``os.replace`` so a partial write cannot be read by a
     concurrent consumer.
+
+    ``drift_hook`` is the F-CP-01 drift-detection surface (SKELETON).
+    When the assembled record carries an ``attestation_state_delta`` and
+    ``previous_state`` differs from the new ``attestation_state``, the
+    hook is invoked with a :class:`DriftEvent` describing the
+    transition. The default is :func:`noop_drift_hook` — adapters
+    register that when the integrator does not supply one of their own.
+    The CORE-WIRE sibling pins the event payload contract and the
+    per-target wire-up; EXTEND-KRI promotes drift to the indicator
+    catalog; EXTEND-PERSIST adds durable cross-run history.
     """
+    hook = drift_hook if drift_hook is not None else noop_drift_hook
     record = render_risk_analysis_artifact(ctx)
     out_dir = Path(output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -228,4 +247,19 @@ def emit_risk_analysis_artifact(
     serialized = json.dumps(record, indent=2, sort_keys=True) + "\n"
     tmp_path.write_text(serialized, encoding="utf-8")
     os.replace(tmp_path, out_path)
+
+    delta = record.get("attestation_state_delta")
+    if delta and delta.get("previous_state") != record["attestation_state"]:
+        hook(
+            DriftEvent(
+                control_ref=record["control_ref"],
+                workflow_id=record["provenance"]["source_url"],
+                previous_state=delta["previous_state"],
+                current_state=record["attestation_state"],
+                previous_artifact_id=delta.get("previous_artifact_id"),
+                current_artifact_id=record["artifact_id"],
+                captured_at=record["captured_at"],
+                record=record,
+            )
+        )
     return out_path.resolve()

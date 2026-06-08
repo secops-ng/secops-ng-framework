@@ -28,8 +28,10 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from compilers._shared.evidence import (
+    DriftHook,
     RiskAnalysisContext,
     emit_risk_analysis_artifact,
+    noop_drift_hook,
 )
 
 __all__ = ["emit_risk_analysis_artifact_node"]
@@ -45,6 +47,12 @@ def emit_risk_analysis_artifact_node(
     path and the deterministic ``artifact_id``. The shared helper does
     its own validation and atomic write; this function is a thin
     adapter only.
+
+    An optional ``drift_hook`` key on ``state`` carries the F-CP-01
+    drift-detection surface (SKELETON); when absent, the adapter
+    registers :func:`noop_drift_hook` so the hook is always wired.
+    CORE-WIRE pins the payload contract; EXTEND-KRI and EXTEND-PERSIST
+    are separate siblings.
     """
     try:
         ctx_value = state["risk_analysis_context"]
@@ -62,7 +70,8 @@ def emit_risk_analysis_artifact_node(
         # context without importing this module's dataclass.
         ctx = RiskAnalysisContext(**dict(ctx_value))
 
-    written: Path = emit_risk_analysis_artifact(ctx, output_dir)
+    hook: DriftHook = state.get("drift_hook") or noop_drift_hook
+    written: Path = emit_risk_analysis_artifact(ctx, output_dir, drift_hook=hook)
     return {
         "risk_analysis_artifact_path": str(written),
         "risk_analysis_artifact_id": written.stem,
