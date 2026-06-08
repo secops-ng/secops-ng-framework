@@ -33,3 +33,20 @@ Each emitter exposes three callables:
 Emitters do no network I/O and import nothing from a runtime SDK.
 Compile-target adapters under `compilers/<target>/evidence/` are
 responsible for the activity / node / workflow-step wiring.
+
+## Target bindings
+
+The risk-analysis emitter (F-CP-01) is wrapped by all three reference
+compile targets. Each adapter is glue only — record shape and
+`artifact_id` derivation never fork per target.
+
+| Target | Adapter module | Surface |
+|--------|----------------|---------|
+| Temporal | [`compilers/temporal/evidence/risk_analysis_activity.py`](../../temporal/evidence/risk_analysis_activity.py) | `@activity.defn` async activity returning the absolute path |
+| n8n | [`compilers/n8n/evidence/risk_analysis_node.py`](../../n8n/evidence/risk_analysis_node.py) | Python helper called from an `executeCommand` / `Code` node; returns `{artifact_id, artifact_path}` |
+| LangGraph | [`compilers/langgraph/evidence/risk_analysis_node.py`](../../langgraph/evidence/risk_analysis_node.py) | Plain `state → state` node function returning a partial state update |
+
+Cross-target equivalence is pinned in
+`tests/content_model/test_risk_analysis_evidence_emitter.py` —
+`test_all_three_targets_produce_byte_identical_records` asserts the
+three adapters write byte-identical JSON for the same context.
