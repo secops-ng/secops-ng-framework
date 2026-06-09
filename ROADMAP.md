@@ -477,17 +477,7 @@ documented in the corresponding NIS2 article file.
 
 ### F-CP-04 — Vulnerabilities stream
 
-- **Status:** In Progress
-- **Status note:** Upstream dependencies F-WF-01 (vulnerability triage)
-  and F-PT-01 (evidence collector) are Shipped; the shipped D3FEND ×
-  {NIS2, DORA, CRA} crosswalks and the vulnerability metric catalog
-  (`vuln_disclosure_sla`, `cvd_intake_aging`, `patch_disseminated_on_time`,
-  and the four CRA-timing KPIs) pin the control and metric sides of
-  the stream. Remaining: evidence-record schema, target-agnostic
-  emitter contract on top of F-PT-01, per-target emission wiring
-  across the three reference compile targets, KPI/KRI emission from
-  the stream, operator-facing dashboard surface as a portable
-  artifact, and the continuous-protection cookbook chapter.
+- **Status:** Shipped
 - **Priority:** P1
 - **Acceptance criteria:**
   - `content/evidence/vulns/` populated by `vulnerability_triage`
