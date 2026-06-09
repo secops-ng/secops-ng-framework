@@ -27,6 +27,16 @@ from compilers._shared.evidence.drift_hook import (
     DriftHook,
     noop_drift_hook,
 )
+from compilers._shared.evidence.vulns import (
+    DisclosureMilestone,
+    ReporterAcknowledgement,
+    ResponseBranch,
+    TriageDecision,
+    VulnsContext,
+    derive_artifact_id as derive_vulns_artifact_id,
+    emit_vulns_artifact,
+    render_vulns_artifact,
+)
 
 __all__ = [
     "RiskAnalysisContext",
@@ -36,4 +46,12 @@ __all__ = [
     "DriftEvent",
     "DriftHook",
     "noop_drift_hook",
+    "VulnsContext",
+    "TriageDecision",
+    "ResponseBranch",
+    "DisclosureMilestone",
+    "ReporterAcknowledgement",
+    "derive_vulns_artifact_id",
+    "emit_vulns_artifact",
+    "render_vulns_artifact",
 ]

@@ -12,9 +12,10 @@ deterministic `artifact_id` derivation never fork per target.
 | Stream | Module | Schema |
 |--------|--------|--------|
 | `risk-analysis` (F-CP-01) | [`risk_analysis.py`](risk_analysis.py) | [`schemas/evidence/risk-analysis.schema.json`](../../../schemas/evidence/risk-analysis.schema.json) |
+| `vulns` (F-CP-04) | [`vulns.py`](vulns.py) | [`schemas/evidence/vulns.schema.json`](../../../schemas/evidence/vulns.schema.json) |
 
-Additional streams (F-CP-02..F-CP-07) land alongside as each stream's
-EMITTER card ships.
+Additional streams (F-CP-02, F-CP-03, F-CP-05..F-CP-07) land alongside
+as each stream's EMITTER card ships.
 
 ## Contract
 
@@ -27,8 +28,9 @@ Each emitter exposes three callables:
   through their own audit channel before persisting.
 - `emit_<stream>_artifact(ctx, output_dir) -> Path` — render, then
   write `<artifact_id>.json` atomically under `output_dir`. The
-  `artifact_id` is the SHA-256 of `<control_ref>|<captured_at>` (UTF-8)
-  per the stream's schema.
+  `artifact_id` is a stream-specific SHA-256 over the stable inputs
+  the stream's schema pins (e.g. `<control_ref>|<captured_at>` for
+  `risk-analysis`; `<case_ref>|<execution_id>` for `vulns`).
 
 Emitters do no network I/O and import nothing from a runtime SDK.
 Compile-target adapters under `compilers/<target>/evidence/` are
