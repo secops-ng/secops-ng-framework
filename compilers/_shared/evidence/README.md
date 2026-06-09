@@ -38,9 +38,12 @@ responsible for the activity / node / workflow-step wiring.
 
 ## Target bindings
 
-The risk-analysis emitter (F-CP-01) is wrapped by all three reference
-compile targets. Each adapter is glue only — record shape and
-`artifact_id` derivation never fork per target.
+The risk-analysis emitter (F-CP-01) and the vulnerabilities emitter
+(F-CP-04) are wrapped by all three reference compile targets. Each
+adapter is glue only — record shape and `artifact_id` derivation never
+fork per target.
+
+### risk-analysis (F-CP-01)
 
 | Target | Adapter module | Surface |
 |--------|----------------|---------|
@@ -50,5 +53,18 @@ compile targets. Each adapter is glue only — record shape and
 
 Cross-target equivalence is pinned in
 `tests/content_model/test_risk_analysis_evidence_emitter.py` —
+`test_all_three_targets_produce_byte_identical_records` asserts the
+three adapters write byte-identical JSON for the same context.
+
+### vulns (F-CP-04)
+
+| Target | Adapter module | Surface |
+|--------|----------------|---------|
+| Temporal | [`compilers/temporal/evidence/vulns_activity.py`](../../temporal/evidence/vulns_activity.py) | `@activity.defn` async activity returning the absolute path |
+| n8n | [`compilers/n8n/evidence/vulns_node.py`](../../n8n/evidence/vulns_node.py) | Python helper called from an `executeCommand` / `Code` node; returns `{artifact_id, artifact_path}` |
+| LangGraph | [`compilers/langgraph/evidence/vulns_node.py`](../../langgraph/evidence/vulns_node.py) | Plain `state → state` node function returning a partial state update |
+
+Cross-target equivalence is pinned in
+`tests/content_model/test_vulns_evidence_emitter.py` —
 `test_all_three_targets_produce_byte_identical_records` asserts the
 three adapters write byte-identical JSON for the same context.
