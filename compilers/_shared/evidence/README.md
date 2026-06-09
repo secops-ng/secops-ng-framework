@@ -13,9 +13,10 @@ deterministic `artifact_id` derivation never fork per target.
 |--------|--------|--------|
 | `risk-analysis` (F-CP-01) | [`risk_analysis.py`](risk_analysis.py) | [`schemas/evidence/risk-analysis.schema.json`](../../../schemas/evidence/risk-analysis.schema.json) |
 | `vulns` (F-CP-04) | [`vulns.py`](vulns.py) | [`schemas/evidence/vulns.schema.json`](../../../schemas/evidence/vulns.schema.json) |
+| `incidents` (F-CP-02) | [`incidents.py`](incidents.py) | [`schemas/evidence/incidents.schema.json`](../../../schemas/evidence/incidents.schema.json) |
 
-Additional streams (F-CP-02, F-CP-03, F-CP-05..F-CP-07) land alongside
-as each stream's EMITTER card ships.
+Additional streams (F-CP-03, F-CP-05..F-CP-07) land alongside as each
+stream's EMITTER card ships.
 
 ## Contract
 
@@ -68,3 +69,17 @@ Cross-target equivalence is pinned in
 `tests/content_model/test_vulns_evidence_emitter.py` —
 `test_all_three_targets_produce_byte_identical_records` asserts the
 three adapters write byte-identical JSON for the same context.
+
+### incidents (F-CP-02)
+
+The SKELETON wires the Temporal compile target only — the n8n and
+LangGraph adapters fan out in the F-CP-02 CORE-FANOUT sibling.
+
+| Target | Adapter module | Surface |
+|--------|----------------|---------|
+| Temporal | [`compilers/temporal/evidence/incidents_activity.py`](../../temporal/evidence/incidents_activity.py) | `@activity.defn` async activity returning the absolute path |
+
+Activity-level round-trip is pinned in
+`tests/content_model/test_incidents_evidence_emitter.py` —
+`test_temporal_activity_wraps_shared_helper` asserts one well-formed
+incidents evidence record is emitted per workflow execution.

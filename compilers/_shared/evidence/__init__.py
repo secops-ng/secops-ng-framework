@@ -37,6 +37,16 @@ from compilers._shared.evidence.vulns import (
     emit_vulns_artifact,
     render_vulns_artifact,
 )
+from compilers._shared.evidence.incidents import (
+    ClassificationVerdict,
+    IncidentsContext,
+    KpiWindows,
+    Lifecycle,
+    NotificationMilestone,
+    derive_artifact_id as derive_incidents_artifact_id,
+    emit_incidents_artifact,
+    render_incidents_artifact,
+)
 
 __all__ = [
     "RiskAnalysisContext",
@@ -54,4 +64,12 @@ __all__ = [
     "derive_vulns_artifact_id",
     "emit_vulns_artifact",
     "render_vulns_artifact",
+    "IncidentsContext",
+    "ClassificationVerdict",
+    "Lifecycle",
+    "KpiWindows",
+    "NotificationMilestone",
+    "derive_incidents_artifact_id",
+    "emit_incidents_artifact",
+    "render_incidents_artifact",
 ]

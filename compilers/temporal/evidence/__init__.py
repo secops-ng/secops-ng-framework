@@ -13,8 +13,12 @@ from compilers.temporal.evidence.risk_analysis_activity import (
 from compilers.temporal.evidence.vulns_activity import (
     emit_vulns_artifact_activity,
 )
+from compilers.temporal.evidence.incidents_activity import (
+    emit_incidents_artifact_activity,
+)
 
 __all__ = [
     "emit_risk_analysis_artifact_activity",
     "emit_vulns_artifact_activity",
+    "emit_incidents_artifact_activity",
 ]
