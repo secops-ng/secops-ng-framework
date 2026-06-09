@@ -31,6 +31,8 @@ entries:
       - kpi.mttr_on_call_ack@v1
       - kpi.coverage_on_call_schedule@v1
       - kri.escalation_tier_breach@v1
+    evidence_stream_refs:
+      - incidents
     notes: >-
       On-call rotation is listed here because the page-to-ack latency
       and rotation coverage are the head of the early-warning clock:
@@ -60,6 +62,8 @@ entries:
       - kpi.notification_72h_on_time@v1
       - kpi.notification_sla_compliance@v1
       - kri.regulator_notification_overrun@v1
+    evidence_stream_refs:
+      - incidents
 
   - id: nis2:art-23-final-report
     regulation:
@@ -81,3 +85,5 @@ entries:
     metric_refs:
       - kpi.final_report_on_time@v1
       - kpi.review_completion_sla@v1
+    evidence_stream_refs:
+      - incidents
