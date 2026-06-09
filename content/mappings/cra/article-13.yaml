@@ -4,7 +4,7 @@
 # (Annex I §2 vulnerability handling + Art.14 reporting). Scope for this
 # file is the risk-assessment and vulnerability-handling tie-in inside
 # Article 13. Out of scope (deferred to later EXTEND layers): Art.13(9)
-# support-period determination, Art.13(10) labelling and user information,
+# security-update availability, Art.13(10) labelling and user information,
 # Art.13(11) ten-year record retention, Art.13(16) authorised
 # representative, Art.13(19)–(20) market-surveillance cooperation.
 regime: cra
@@ -98,7 +98,7 @@ entries:
       name: CRA
       instrument: Regulation (EU) 2024/2847
       celex: 32024R2847
-      article: 13(8)
+      article: Annex I §2(8)
       url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
     obligation: >-
       Once a security update is available, manufacturers shall
@@ -116,11 +116,37 @@ entries:
     metric_refs:
       - kpi.patch_disseminated_on_time@v1
     notes: >-
-      The Art.13(8) dissemination obligation is the manufacturer-side
-      twin of Annex I §2(7) (already captured under
+      The Annex I §2(8) dissemination obligation is the manufacturer-side
+      twin of the same requirement already captured under
       `cra:annex-i-2-security-updates`); the dated patch-evidence
       record plus the on-time dissemination KPI surface whether
       advisory-accompanied updates are reaching users on the clock.
+
+  - id: cra:art-13-support-period
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: 13(8)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Manufacturers shall determine and document a support period during
+      which vulnerabilities of the product with digital elements,
+      including its components, are handled effectively. The period
+      shall reflect the product's expected use, reasonable user
+      expectations, the nature and intended purpose of the product, and
+      the availability and support periods of its operating environment
+      and core third-party components.
+    status: draft
+    control_refs:
+      - control.patch_evidence@v1
+    playbook_refs: []
+    metric_refs: []
+    notes: >-
+      Art.13(8) ties the declared support period to effective
+      vulnerability handling. The patch-evidence control provides dated
+      proof that security updates remain available and supported across
+      that declared period.
 
   - id: cra:art-13-spoc
     regulation:
