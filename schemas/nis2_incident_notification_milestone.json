@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/nis2_incident_notification_milestone.json",
+  "title": "SecOps-NG NIS2 Article 23 Incident-Notification Milestone",
+  "description": "Identifies which milestone on the NIS2 Article 23(4) regulator-notification chain a notification-timeline event records. Promoted out of the F-WF-05 incident-management workflow (which declared the three stages in prose on its `early_warning` / `notification` / `final_report` regulator-submission steps and in code on `content/playbooks/incident-management/primitives/stage_clock.py`) so the incidents evidence stream's `notification_timeline[]` records and the downstream KPIs (`kpi.early_warning_on_time@v1`, `kpi.notification_72h_on_time@v1`, `kpi.final_report_on_time@v1`, `kpi.notification_sla_compliance@v1`) share one regulator-facing vocabulary. Schema-side names carry the duration suffix the regulator clock is measured against; the workflow-internal `StageName` alphabet (`early_warning` / `notification` / `final_report`) maps onto this enum 1:1 via the suffix.",
+  "type": "string",
+  "enum": [
+    "early_warning_24h",
+    "incident_notification_72h",
+    "final_report_1mo"
+  ],
+  "x_milestone_definitions": {
+    "early_warning_24h": "NIS2 Article 23(4)(a) early-warning notification, due to the CSIRT or competent authority without undue delay and in any event within 24h of operator awareness of a significant incident. Maps to the `early_warning` stage in `primitives/stage_clock.py`.",
+    "incident_notification_72h": "NIS2 Article 23(4)(b) incident notification, due within 72h of operator awareness, updating the early-warning information with an initial severity / impact / IoC assessment. Maps to the `notification` stage in `primitives/stage_clock.py`.",
+    "final_report_1mo": "NIS2 Article 23(4)(d) final report, due no later than one month after the incident notification, with the detailed incident description, threat / root-cause analysis, mitigation, and any cross-border impact. Maps to the `final_report` stage in `primitives/stage_clock.py` (interpreted as 30 days per the stage-clock module docstring; an operator who prefers calendar-month arithmetic swaps the helper in their compile target's adapter)."
+  }
+}

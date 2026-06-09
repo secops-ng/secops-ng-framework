@@ -1,0 +1,271 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/evidence/incidents.schema.json",
+  "title": "SecOps-NG Incidents Evidence Artifact",
+  "description": "Typed shape for one evidence artifact emitted by the incidents evidence stream (F-CP-02). One artifact is produced per (incident_id, execution_id) — one cycle of the F-WF-05 incident-management workflow over one incident case — and carries the NIS2 Article 23(3) significance classification, the lifecycle markers feeding the MTTD / MTTR / containment-window / eradication-window KPIs, and the NIS2 Article 23(4) regulator-notification milestones reached so far. Downstream consumers are `kpi.mttd@v1`, `kpi.mttr@v1`, `kpi.mttr_critical@v1`, `kpi.mttr_containment@v1`, `kpi.timeline_completeness@v1`, `kpi.notification_sla_compliance@v1`, `kri.regulator_notification_overrun@v1`, plus the NIS2 Article 23 milestone KPIs (`kpi.early_warning_on_time@v1`, `kpi.notification_72h_on_time@v1`, `kpi.final_report_on_time@v1`) once they land in `content/metrics/`. Public-bar artifact: operator-side strings (owner labels, submission references) MUST stay role-shaped or URN-shaped; individual personal names are out of scope per AGENTS.md §3.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_id",
+    "stream",
+    "incident_id",
+    "execution_id",
+    "regulation_refs",
+    "control_refs",
+    "classification",
+    "lifecycle",
+    "notification_timeline",
+    "owner",
+    "captured_at",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Pinned schema version. Lets a consumer reject artifacts produced under an older schema once breaking changes ship.",
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "artifact_id": {
+      "description": "Stable per-artifact identifier. Convention: SHA-256 hex digest of `<incident_id>|<execution_id>` (UTF-8, no separators around the pipe). Deterministic on those two inputs so a replay of the same execution re-derives the same id and dedup is trivial.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "stream": {
+      "description": "Identifies which evidence stream produced the artifact. Constant on this schema.",
+      "type": "string",
+      "const": "incidents"
+    },
+    "incident_id": {
+      "description": "Stable case identifier for the incident as a UUID (RFC 4122). Issued upstream by the F-WF-05 timeline-open primitive (`primitives/timeline_binding.open_timeline`) so every re-execution of the same incident across the lifecycle pins against one id.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "execution_id": {
+      "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Re-runs of the same incident_id produce distinct execution_ids — the regulator-notification chain treats re-emission as evidentiary signal rather than dedup waste.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "regulation_refs": {
+      "description": "Pins to the upstream regulatory mapping entries this artifact helps satisfy (e.g. nis2:art-21-2-b, nis2:art-23-early-warning, nis2:art-23-notification-72h, nis2:art-23-final-report). At least one entry — an artifact with no regulatory anchor is not evidence in the F-CP-02 sense. Joins back into content/mappings/<regime>/*.yaml via the `id` field.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(nis2|dora|cra|gdpr|iso27001|soc2):[a-z0-9][a-z0-9.-]*$",
+        "maxLength": 120
+      }
+    },
+    "control_refs": {
+      "description": "Control stable-ids attested by this artifact. Same shape every other layer of the content model uses. At least one — typically `control.incident_handling_capability@v1` and/or `control.incident_timeline_signals@v1`.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+      }
+    },
+    "classification": {
+      "description": "Deterministic outputs of the F-WF-05 classify-significance primitive (`primitives/classification.py`). The `significant` and `cross_border` booleans and the ordered `reasons` list are reproduced verbatim from the `ClassificationVerdict` dataclass; the `rule_ids` field pins the policy rows that fired so a replay-vs-original comparison is single-string-equal. Free-text narrative for the incident stays in `summary` (filled by the F-WF-05 final-report DSPy signature, per `primitives/signatures.py`).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["significant", "cross_border", "reasons", "rule_ids"],
+      "properties": {
+        "significant": {
+          "description": "NIS2 Article 23(3) significance flag. When false the workflow takes the intake-only audit-close branch and most downstream fields (notification_timeline, severity, KPI windows) will be empty or short.",
+          "type": "boolean"
+        },
+        "cross_border": {
+          "description": "NIS2 Article 23(6) cross-border-scope flag.",
+          "type": "boolean"
+        },
+        "reasons": {
+          "description": "Ordered list of human-readable rule-reason strings from the classification verdict. Public-bar text: no operator branding, no individual names.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "maxLength": 400 }
+        },
+        "rule_ids": {
+          "description": "Ordered list of policy rule ids (e.g. `sig.severe_disruption`, `cb.multi_member_state`) that fired in the classification verdict. Pins behaviour against `classification_policy.yaml` so a replay diff is a single-string check.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(sig|cb)\\.[a-z][a-z0-9_]*$",
+            "maxLength": 200
+          },
+          "uniqueItems": true
+        },
+        "severity": {
+          "description": "Optional operator-graded incident severity band the response chain reads. Closed five-band alphabet matching the CVSS qualitative vocabulary the vulns stream uses so downstream consumers consume one alphabet across streams.",
+          "type": "string",
+          "enum": ["Informational", "Low", "Medium", "High", "Critical"]
+        },
+        "summary": {
+          "description": "One-paragraph plain-language summary of the incident. Public-bar text: no operator branding, no individual names. Typically filled by the F-WF-05 final-report DSPy signature.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        }
+      }
+    },
+    "lifecycle": {
+      "description": "Lifecycle-marker timestamps the catalog KPIs measure against. Each marker is the canonical event time per `kpi.mttd@v1`, `kpi.mttr_containment@v1`, `kpi.timeline_completeness@v1`, and the post-incident review formulas. All markers ISO-8601 UTC. `detected_at` is required (the incident exists from the detection instant); the remainder are optional while the incident is open and required once the incident is closed (downstream completeness KPI reads against the present set).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["detected_at"],
+      "properties": {
+        "first_observation_at": {
+          "description": "Earliest event in the telemetry stream that, in hindsight, was part of the incident's causal chain. Bound at evaluation time by the post-incident review timeline, not at detection time. Head of the `kpi.mttd@v1` interval.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "detected_at": {
+          "description": "First authoritative detection firing that opened the incident record. Head of `kpi.mttr_critical@v1` and `kpi.mttr_containment@v1`; tail of `kpi.mttd@v1`.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "triaged_at": {
+          "description": "Triage-complete timestamp (the F-WF-05 classify-significance primitive's verdict instant). Optional; carried for analyst-handoff analyses.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "contained_at": {
+          "description": "First containment action recorded in the response playbook (the canonical `containment` step). Tail of `kpi.mttr_critical@v1` and `kpi.mttr_containment@v1`; head of the `containment_window` measurement.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "eradicated_at": {
+          "description": "Eradication-complete timestamp (the threat actor / root cause removed). Tail of the `containment_window` measurement; head of the `eradication_window` measurement.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "recovered_at": {
+          "description": "Service-recovery timestamp (operational state restored). Tail of the `eradication_window` measurement.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "closed_at": {
+          "description": "Incident-record closeout timestamp (lessons-learned captured, post-incident review filed). Read by `kpi.timeline_completeness@v1` and `kri.incidents_without_closeout@v1`.",
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "kpi_windows": {
+      "description": "Optional pre-computed KPI windows the emitter may carry so downstream rollups skip re-derivation. The catalog KPIs may compute these themselves from `lifecycle`; the fields reserve the shape for emitters that already track them. All values in minutes (matches the catalog `unit: minutes`).",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mttd_minutes": {
+          "description": "(detected_at - first_observation_at) in minutes. Consumed by `kpi.mttd@v1`. Non-negative.",
+          "type": "number",
+          "minimum": 0
+        },
+        "mttr_minutes": {
+          "description": "(contained_at - detected_at) in minutes. Consumed by `kpi.mttr@v1` and `kpi.mttr_critical@v1` (when classification.severity == 'Critical'). Non-negative.",
+          "type": "number",
+          "minimum": 0
+        },
+        "containment_window_minutes": {
+          "description": "(eradicated_at - contained_at) in minutes. Reserves the shape for the planned `kpi.containment_window@v1` catalog entry. Non-negative.",
+          "type": "number",
+          "minimum": 0
+        },
+        "eradication_window_minutes": {
+          "description": "(recovered_at - eradicated_at) in minutes. Reserves the shape for the planned `kpi.eradication_window@v1` catalog entry. Non-negative.",
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "notification_timeline": {
+      "description": "Ordered list of NIS2 Article 23(4) regulator-notification milestones the case has reached. Empty array is valid — a `classification.significant == false` case carries no milestones. Each entry is read by the per-milestone KPIs (`kpi.early_warning_on_time@v1`, `kpi.notification_72h_on_time@v1`, `kpi.final_report_on_time@v1`) to compute the on-time ratio against the milestone's declared deadline. Records are append-only across executions for the same incident_id.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["milestone", "clock_started_at", "submitted_at"],
+        "properties": {
+          "milestone": {
+            "description": "Which NIS2 Article 23(4) milestone this entry records. Imports the shared vocabulary from schemas/nis2_incident_notification_milestone.json.",
+            "$ref": "https://secops-ng.org/schemas/nis2_incident_notification_milestone.json"
+          },
+          "clock_started_at": {
+            "description": "ISO-8601 UTC timestamp at which the clock for this milestone started — the operator's awareness instant on the incident (typically `lifecycle.detected_at`, or the F-WF-05 `timeline_open` instant which the workflow pins them to).",
+            "type": "string",
+            "format": "date-time"
+          },
+          "submitted_at": {
+            "description": "ISO-8601 UTC timestamp at which the notification or report was submitted to the CSIRT / competent authority (or the closest evidentiary equivalent).",
+            "type": "string",
+            "format": "date-time"
+          },
+          "submission_ref": {
+            "description": "Operator-side opaque reference for the submission (CSIRT ticket id, regulator portal receipt id, URN). Free-text constrained — no commentary, no operator branding.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "on_time": {
+            "description": "Optional pre-computed on-time flag (clock_started_at + deadline ≥ submitted_at). The catalog KPIs may compute this themselves; the field reserves the shape for emitters that already track it.",
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "owner": {
+      "description": "Dated ownership pointer required by NIS2 Art. 21(2)(b) (`incident-handling capability`). Role-shaped — a working-group mailbox, a generic role title, or a community handle. Individual personal names are out of scope per AGENTS.md §3 and rejected here as a matter of schema discipline.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "assigned_at"],
+      "properties": {
+        "role": {
+          "description": "Generic role or working-group identifier (e.g. 'csirt@example.org', 'incident-commander', 'soc-on-call'). Personal names are not used.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "assigned_at": {
+          "description": "ISO-8601 date on which the role was assigned ownership of this incident.",
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "captured_at": {
+      "description": "ISO-8601 UTC timestamp at which this artifact was captured. Stable input to the emitter's per-execution dedup decision; not part of artifact_id (which is derived from incident_id + execution_id so re-emissions in the same execution stay byte-identical).",
+      "type": "string",
+      "format": "date-time"
+    },
+    "provenance": {
+      "description": "Where this artifact came from. Mirrors the provenance pattern used by content/controls/*.yaml so a reviewer can re-derive the chain back to source.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_url", "captured_at"],
+      "properties": {
+        "source_url": {
+          "description": "URL of the workflow run (or workflow-content source) that produced this artifact. Compile targets may use their own run-id URLs; the URL itself is opaque to this schema.",
+          "type": "string",
+          "format": "uri"
+        },
+        "captured_at": {
+          "description": "ISO-8601 date or date-time matching the artifact-level captured_at.",
+          "type": "string"
+        },
+        "commit_sha": {
+          "description": "Optional commit SHA of the content snapshot the workflow walked.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,64}$"
+        }
+      }
+    },
+    "retention": {
+      "description": "Optional retention pointer the operator declares for this evidentiary record. ISO-8601 duration, defaulted by the operator's configuration. Schema reserves the field; the community-default value is an open question to be settled with the EXTEND-NIS2-MAPPING card.",
+      "type": "string",
+      "pattern": "^P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+S)?)?$"
+    }
+  }
+}
