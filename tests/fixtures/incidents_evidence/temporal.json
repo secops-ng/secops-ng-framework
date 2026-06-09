@@ -1,0 +1,77 @@
+{
+  "artifact_id": "9f8cf6e9db6e09787e342124cf9f02a95f7bc3bdb328604cd59f8f455dbef8cc",
+  "captured_at": "2026-07-05T12:00:00Z",
+  "classification": {
+    "cross_border": false,
+    "reasons": [
+      "Severe disruption to availability of an essential service."
+    ],
+    "rule_ids": [
+      "sig.severe_disruption"
+    ],
+    "severity": "High",
+    "significant": true,
+    "summary": "Authentication-edge availability lost for 47 minutes; containment via failover to standby region; root cause scoped to misapplied configuration change."
+  },
+  "control_refs": [
+    "control.incident_handling_capability@v1",
+    "control.incident_timeline_signals@v1"
+  ],
+  "execution_id": "temporal:wf-run-incident-001",
+  "incident_id": "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+  "kpi_windows": {
+    "containment_window_minutes": 43.0,
+    "eradication_window_minutes": 30.0,
+    "mttd_minutes": 30.0,
+    "mttr_minutes": 47.0
+  },
+  "lifecycle": {
+    "closed_at": "2026-06-06T09:00:00Z",
+    "contained_at": "2026-06-05T13:17:00Z",
+    "detected_at": "2026-06-05T12:30:00Z",
+    "eradicated_at": "2026-06-05T14:00:00Z",
+    "first_observation_at": "2026-06-05T12:00:00Z",
+    "recovered_at": "2026-06-05T14:30:00Z",
+    "triaged_at": "2026-06-05T12:45:00Z"
+  },
+  "notification_timeline": [
+    {
+      "clock_started_at": "2026-06-05T12:30:00Z",
+      "milestone": "early_warning_24h",
+      "on_time": true,
+      "submission_ref": "csirt-early_warning_24h",
+      "submitted_at": "2026-06-05T18:00:00Z"
+    },
+    {
+      "clock_started_at": "2026-06-05T12:30:00Z",
+      "milestone": "incident_notification_72h",
+      "on_time": true,
+      "submission_ref": "csirt-incident_notification_72h",
+      "submitted_at": "2026-06-06T09:00:00Z"
+    },
+    {
+      "clock_started_at": "2026-06-05T12:30:00Z",
+      "milestone": "final_report_1mo",
+      "on_time": true,
+      "submission_ref": "csirt-final_report_1mo",
+      "submitted_at": "2026-07-05T12:00:00Z"
+    }
+  ],
+  "owner": {
+    "assigned_at": "2026-06-05",
+    "role": "csirt@example.org"
+  },
+  "provenance": {
+    "captured_at": "2026-07-05T12:00:00Z",
+    "commit_sha": "deadbeef0123456789",
+    "source_url": "https://example.org/runs/incident-001"
+  },
+  "regulation_refs": [
+    "nis2:art-21-2-b",
+    "nis2:art-23-early-warning",
+    "nis2:art-23-notification-72h",
+    "nis2:art-23-final-report"
+  ],
+  "schema_version": "1.0.0",
+  "stream": "incidents"
+}
