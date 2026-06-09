@@ -137,8 +137,14 @@ If you are proposing a change that touches this stream:
 ## Status
 
 The stream's schema, the promoted NIS2 incident-notification milestone
-enum, and the mapping-atom wires landed in F-CP-02 SCHEMA. The emitter
-SKELETON, the per-target CORE-FANOUT (n8n / Temporal / LangGraph), the
-byte-parity goldens, the NIS2 Art. 21(2)(b) + Art. 23 mapping doc, and
-the ROADMAP flip fan out into the remaining siblings of the F-CP-02
-wave; the pattern mirrors F-CP-01 and F-CP-04.
+enum, and the mapping-atom wires landed in F-CP-02 SCHEMA. The EMITTER
+SKELETON card adds the framework-agnostic emitter
+([`compilers/_shared/evidence/incidents.py`](../../../compilers/_shared/evidence/incidents.py))
+and one wired compile target — the Temporal-side activity
+([`compilers/temporal/evidence/incidents_activity.py`](../../../compilers/temporal/evidence/incidents_activity.py)) —
+with an activity-level happy-path test
+([`tests/content_model/test_incidents_evidence_emitter.py`](../../../tests/content_model/test_incidents_evidence_emitter.py)).
+The per-target CORE-FANOUT (n8n / LangGraph), the byte-parity
+goldens, the NIS2 Art. 21(2)(b) + Art. 23 mapping doc, and the
+ROADMAP flip fan out into the remaining siblings of the F-CP-02 wave;
+the pattern mirrors F-CP-01 and F-CP-04.
