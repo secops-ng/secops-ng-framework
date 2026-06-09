@@ -17,8 +17,10 @@ from compilers.n8n.evidence.risk_analysis_node import (
     emit_risk_analysis_artifact_n8n,
 )
 from compilers.n8n.evidence.vulns_node import emit_vulns_artifact_n8n
+from compilers.n8n.evidence.incidents_node import emit_incidents_artifact_n8n
 
 __all__ = [
     "emit_risk_analysis_artifact_n8n",
     "emit_vulns_artifact_n8n",
+    "emit_incidents_artifact_n8n",
 ]

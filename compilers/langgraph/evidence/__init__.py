@@ -16,8 +16,12 @@ from compilers.langgraph.evidence.risk_analysis_node import (
     emit_risk_analysis_artifact_node,
 )
 from compilers.langgraph.evidence.vulns_node import emit_vulns_artifact_node
+from compilers.langgraph.evidence.incidents_node import (
+    emit_incidents_artifact_node,
+)
 
 __all__ = [
     "emit_risk_analysis_artifact_node",
     "emit_vulns_artifact_node",
+    "emit_incidents_artifact_node",
 ]
