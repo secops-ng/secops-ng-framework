@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/vuln_response_band.json",
+  "title": "SecOps-NG Vulnerability Response Band",
+  "description": "Shared four-band vocabulary for the response branch a vulnerability-intake case is routed onto after triage. Promoted out of the F-WF-01 vulnerability-triage CACAO playbook (which declared the four bands in prose only on its switch-condition step) so that the vulns evidence-stream schema, the F-WF-01 severity primitive's downstream consumers, and any future effectiveness-loop stream import the same enum without re-declaring it. Bands are mutually exclusive: a triaged case is routed onto exactly one band per execution.",
+  "type": "string",
+  "enum": [
+    "critical",
+    "high",
+    "scheduled",
+    "accept"
+  ],
+  "x_band_definitions": {
+    "critical": "Severity policy resolved to Critical; the response chain emits an emergency patch / advisory + regulator-notification clock checks per CRA Article 14.",
+    "high": "Severity policy resolved to High; the response chain emits a prioritised patch / advisory inside the operator's documented High dissemination SLA.",
+    "scheduled": "Severity policy resolved to Medium or Low; the response chain schedules remediation against the next routine release cadence.",
+    "accept": "Operator has accepted residual exposure for this case (compensating controls in place, asset out of support, or risk explicitly accepted by the owning role). The acceptance rationale is captured in `response.accept_rationale` on the evidence record."
+  }
+}

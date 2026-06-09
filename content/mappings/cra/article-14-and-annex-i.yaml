@@ -39,6 +39,8 @@ entries:
       - playbook.vuln_intake@v1
     metric_refs:
       - kpi.vuln_disclosure_sla@v1
+    evidence_stream_refs:
+      - vulns
     notes: >-
       Parallel DORA anchor for the same vulnerability-handling obligation
       is Art 9(4)(a) operationalised by the JC RTS on ICT risk management
@@ -64,6 +66,8 @@ entries:
       - playbook.vuln_intake@v1
     metric_refs:
       - kri.cvd_intake_aging@v1
+    evidence_stream_refs:
+      - vulns
 
   - id: cra:annex-i-2-security-updates
     regulation:
@@ -84,6 +88,8 @@ entries:
       - playbook.vuln_intake@v1
     metric_refs:
       - kpi.patch_disseminated_on_time@v1
+    evidence_stream_refs:
+      - vulns
 
   - id: cra:art-14-early-warning
     regulation:
@@ -105,6 +111,8 @@ entries:
       - playbook.vuln_intake@v1
     metric_refs:
       - kpi.cra_early_warning_on_time@v1
+    evidence_stream_refs:
+      - vulns
 
   - id: cra:art-14-notification-72h
     regulation:
@@ -127,6 +135,8 @@ entries:
       - playbook.vuln_intake@v1
     metric_refs:
       - kpi.cra_notification_72h_on_time@v1
+    evidence_stream_refs:
+      - vulns
 
   - id: cra:art-14-final-report
     regulation:
@@ -151,6 +161,8 @@ entries:
       - kpi.cra_final_report_on_time@v1
       - kpi.review_completion_sla@v1
       - kpi.corrective_action_close_rate@v1
+    evidence_stream_refs:
+      - vulns
 
   - id: cra:art-14-severe-incident
     regulation:
@@ -173,6 +185,8 @@ entries:
       - playbook.data_exfil@v1
     metric_refs:
       - kpi.cra_severe_incident_on_time@v1
+    evidence_stream_refs:
+      - vulns
     notes: >-
       Severe-incident reporting under Art. 14(3) layers on top of the
       same incident-timeline signal set used for NIS2 Art. 23 and DORA

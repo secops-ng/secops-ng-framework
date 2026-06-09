@@ -1,0 +1,290 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/evidence/vulns.schema.json",
+  "title": "SecOps-NG Vulnerabilities Evidence Artifact",
+  "description": "Typed shape for one evidence artifact emitted by the vulnerabilities evidence stream (F-CP-04). One artifact is produced per (case_ref, execution_id) — one cycle of the F-WF-01 vulnerability-triage playbook over one inbound disclosure — and carries the triage decision plus the disclosure-timeline milestones the case has reached so far. Downstream consumers are the shipped KPIs `kpi.vuln_disclosure_sla@v1`, `kri.cvd_intake_aging@v1`, `kpi.patch_disseminated_on_time@v1`, and the four CRA-timing KPIs (`kpi.cra_early_warning_on_time@v1`, `kpi.cra_severe_incident_on_time@v1`, `kpi.cra_notification_72h_on_time@v1`, `kpi.cra_final_report_on_time@v1`). Public-bar artifact: operator-side strings (owner labels, advisory references) MUST stay role-shaped or URN-shaped; individual personal names are out of scope per AGENTS.md \u00a73.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_id",
+    "stream",
+    "case_ref",
+    "execution_id",
+    "regulation_refs",
+    "control_refs",
+    "triage_decision",
+    "response",
+    "disclosure_timeline",
+    "owner",
+    "captured_at",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Pinned schema version. Lets a consumer reject artifacts produced under an older schema once breaking changes ship.",
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "artifact_id": {
+      "description": "Stable per-artifact identifier. Convention: SHA-256 hex digest of `<case_ref>|<execution_id>` (UTF-8, no separators around the pipe). Deterministic on those two inputs so a replay of the same execution re-derives the same id and dedup is trivial.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "stream": {
+      "description": "Identifies which evidence stream produced the artifact. Constant on this schema.",
+      "type": "string",
+      "const": "vulns"
+    },
+    "case_ref": {
+      "description": "Stable case identifier derived upstream by the F-WF-01 dedup primitive as the SHA-256 of `<cve_id>|<asset_ref>` (UTF-8). One case_ref groups every re-execution of the same disclosure across the lifecycle. Opaque 64-character lowercase hex digest.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "execution_id": {
+      "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Re-runs of the same case_ref produce distinct execution_ids \u2014 the regulator-notification chain treats re-emission as evidentiary signal rather than dedup waste.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "regulation_refs": {
+      "description": "Pins to the upstream regulatory mapping entries this artifact helps satisfy (e.g. nis2:art-21-2-e, dora:art-9-vuln-mgmt, cra:annex-i-2-vuln-handling, cra:art-14-1, cra:art-14-3). At least one entry \u2014 an artifact with no regulatory anchor is not evidence in the F-CP-04 sense. Joins back into content/mappings/<regime>/*.yaml via the `id` field.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(nis2|dora|cra|gdpr|iso27001|soc2):[a-z0-9][a-z0-9.-]*$",
+        "maxLength": 120
+      }
+    },
+    "control_refs": {
+      "description": "Control stable-ids attested by this artifact. Same shape every other layer of the content model uses. At least one \u2014 typically `control.vuln_disclosure_intake@v1` and/or `control.sbom_capture@v1`.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+      }
+    },
+    "triage_decision": {
+      "description": "Deterministic outputs of the F-WF-01 triage step. Free-text narrative for the disclosure stays in `risk_summary`; severity, dedup, CVSS, EPSS, and the CRA clock are typed.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "severity",
+        "cvss_severity",
+        "cra_clock",
+        "dedup_outcome"
+      ],
+      "properties": {
+        "severity": {
+          "description": "Final severity band after the F-WF-01 severity policy applies CVSS+EPSS+context. CVSS qualitative vocabulary so n8n / Temporal / LangGraph all consume one alphabet downstream.",
+          "type": "string",
+          "enum": ["None", "Low", "Medium", "High", "Critical"]
+        },
+        "cvss_severity": {
+          "description": "Unmodified CVSS qualitative band before context bumps applied. Carried so a reviewer can replay the policy decision.",
+          "type": "string",
+          "enum": ["None", "Low", "Medium", "High", "Critical"]
+        },
+        "cvss_base_score": {
+          "description": "CVSS base score in [0.0, 10.0]. Captured to 1 decimal place per the CVSS spec.",
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 10.0
+        },
+        "cvss_vector": {
+          "description": "CVSS vector string the base score was derived from (CVSS:3.1 / CVSS:4.0 prefix).",
+          "type": "string",
+          "pattern": "^CVSS:(3\\.0|3\\.1|4\\.0)/.+$",
+          "maxLength": 400
+        },
+        "epss_probability": {
+          "description": "EPSS probability in [0.0, 1.0] at the time of triage.",
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "actively_exploited": {
+          "description": "Operator-asserted indicator that the vulnerability is known to be actively exploited (KEV-equivalent flag). Pinned at triage time; the regulator-notification chain reads this to start the CRA Article 14(1) clock.",
+          "type": "boolean"
+        },
+        "cra_clock": {
+          "description": "Which CRA Article 14 reporting clock was started by triage. Imports the shared vocabulary from schemas/cra_clock_kind.json.",
+          "$ref": "https://secops-ng.org/schemas/cra_clock_kind.json"
+        },
+        "dedup_outcome": {
+          "description": "Whether triage saw this case as new or as a duplicate of an open case. Drives whether the artifact opens a fresh disclosure_timeline or extends an existing one.",
+          "type": "string",
+          "enum": ["new", "duplicate"]
+        },
+        "dedup_collided_with": {
+          "description": "When dedup_outcome is 'duplicate', the case_ref of the open case this disclosure was folded into. Omitted otherwise.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "risk_summary": {
+          "description": "One-paragraph plain-language summary of the residual exposure remaining after triage. Public-bar text: no operator branding, no individual names. Typically filled by a DSPy signature per the F-WF-01 narrative-summary precedent.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        }
+      }
+    },
+    "response": {
+      "description": "Response branch the triaged case was routed onto, plus the dissemination timestamp once the patch / advisory ships. Feeds `kpi.patch_disseminated_on_time@v1`.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["band"],
+      "properties": {
+        "band": {
+          "description": "Response branch picked by the F-WF-01 switch step. Imports the shared vocabulary from schemas/vuln_response_band.json.",
+          "$ref": "https://secops-ng.org/schemas/vuln_response_band.json"
+        },
+        "case_opened_at": {
+          "description": "ISO-8601 UTC timestamp at which the case was opened on the operator's intake queue. Reference point the per-severity dissemination SLA is measured against.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "patch_disseminated_at": {
+          "description": "ISO-8601 UTC timestamp at which the patch or advisory was dispatched to affected users. Omitted while the case is open. Required by `kpi.patch_disseminated_on_time@v1` once present.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "advisory_ref": {
+          "description": "Stable identifier of the operator-side advisory or release the patch shipped under (CVE id, GHSA id, advisory URN, release tag). Free-text constrained to URN-shaped strings \u2014 no commentary, no commercial framing.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "accept_rationale": {
+          "description": "When band is 'accept', the operator's rationale for accepting residual exposure (asset out of support, compensating controls referenced by control_refs, risk explicitly accepted by the owning role). Required when band == 'accept', omitted otherwise. Public-bar text: no individual names.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "compensating_controls": {
+          "description": "Optional list of control stable-ids the operator is relying on to compensate for an accepted or scheduled case. Documentary for a reviewer; not consumed by the catalog KPIs directly.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "disclosure_timeline": {
+      "description": "Ordered list of CVD / CRA regulator-notification milestones the case has reached. Empty array is valid \u2014 a triage_decision.cra_clock == 'none' case may carry no milestones yet. Each entry is read by the four CRA-timing KPIs to compute the on-time ratio against the milestone's declared deadline. Records are append-only across executions for the same case_ref.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["milestone", "clock_started_at", "submitted_at"],
+        "properties": {
+          "milestone": {
+            "description": "Which CRA Article 14 milestone this entry records. Imports the shared vocabulary from schemas/cra_timing_milestone.json.",
+            "$ref": "https://secops-ng.org/schemas/cra_timing_milestone.json"
+          },
+          "clock_started_at": {
+            "description": "ISO-8601 UTC timestamp at which the clock for this milestone started \u2014 typically the operator's awareness timestamp on the case.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "submitted_at": {
+            "description": "ISO-8601 UTC timestamp at which the notification or report was submitted to the competent authority (or the closest evidentiary equivalent).",
+            "type": "string",
+            "format": "date-time"
+          },
+          "submission_ref": {
+            "description": "Operator-side opaque reference for the submission (CSIRT ticket id, regulator portal receipt id, URN). Free-text constrained \u2014 no commentary.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "on_time": {
+            "description": "Optional pre-computed on-time flag (clock_started_at + deadline \u2265 submitted_at). The catalog KPIs may compute this themselves; the field reserves the shape for emitters that already track it.",
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "reporter_acknowledgement": {
+      "description": "Reporter-acknowledgement event for the CVD intake. Feeds `kpi.vuln_disclosure_sla@v1` (acknowledgement-within-SLA ratio) and `kri.cvd_intake_aging@v1` (aging backlog count). Omitted when the case did not originate from a CVD intake (e.g. internal scanner finding).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["disclosure_received_at", "acknowledged_at"],
+      "properties": {
+        "disclosure_received_at": {
+          "description": "ISO-8601 UTC timestamp at which the disclosure was first registered on the case ledger.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "acknowledged_at": {
+          "description": "ISO-8601 UTC timestamp at which the reporter acknowledgement was sent.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "sla_duration": {
+          "description": "Operator's documented CVD acknowledgement SLA, ISO-8601 duration. Reference value `kpi.vuln_disclosure_sla@v1` reads to decide whether this case was on-time.",
+          "type": "string",
+          "pattern": "^P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+S)?)?$"
+        }
+      }
+    },
+    "owner": {
+      "description": "Dated ownership pointer required by NIS2 Art. 21(2)(e) and DORA Art. 9(4)(a). Role-shaped \u2014 a working-group mailbox, a generic role title, or a community handle. Individual personal names are out of scope per AGENTS.md \u00a73 and rejected here as a matter of schema discipline.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "assigned_at"],
+      "properties": {
+        "role": {
+          "description": "Generic role or working-group identifier (e.g. 'psirt@example.org', 'security-officer', 'product-security-wg'). Personal names are not used.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "assigned_at": {
+          "description": "ISO-8601 date on which the role was assigned ownership of this case.",
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "captured_at": {
+      "description": "ISO-8601 UTC timestamp at which this artifact was captured. Stable input to the emitter's per-execution dedup decision; not part of artifact_id (which is derived from case_ref + execution_id so re-emissions in the same execution stay byte-identical).",
+      "type": "string",
+      "format": "date-time"
+    },
+    "provenance": {
+      "description": "Where this artifact came from. Mirrors the provenance pattern used by content/controls/*.yaml so a reviewer can re-derive the chain back to source.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_url", "captured_at"],
+      "properties": {
+        "source_url": {
+          "description": "URL of the workflow run (or workflow-content source) that produced this artifact. Compile targets may use their own run-id URLs; the URL itself is opaque to this schema.",
+          "type": "string",
+          "format": "uri"
+        },
+        "captured_at": {
+          "description": "ISO-8601 date or date-time matching the artifact-level captured_at.",
+          "type": "string"
+        },
+        "commit_sha": {
+          "description": "Optional commit SHA of the content snapshot the workflow walked.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,64}$"
+        }
+      }
+    },
+    "retention": {
+      "description": "Optional retention pointer the operator declares for this evidentiary record. ISO-8601 duration, defaulted by the operator's configuration. Schema reserves the field; the default value is a community-input question (see docs/internal/f-cp-04-gap-inventory.md \u00a74 q5).",
+      "type": "string",
+      "pattern": "^P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+S)?)?$"
+    }
+  }
+}
