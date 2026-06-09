@@ -1,0 +1,75 @@
+{
+  "artifact_id": "0a157c9954007a8cf187daea2a2ada95cad30b815bbe16e3f710105801307092",
+  "captured_at": "2026-06-07T06:00:00Z",
+  "case_ref": "5b9eee7ab4730e5a1963cb6a3a1c45ce79ce141ec847e182f72b7e37e305d7cc",
+  "control_refs": [
+    "control.vuln_disclosure_intake@v1"
+  ],
+  "disclosure_timeline": [
+    {
+      "clock_started_at": "2026-06-07T05:00:00Z",
+      "milestone": "early_warning_24h",
+      "on_time": true,
+      "submission_ref": "csirt-early_warning_24h",
+      "submitted_at": "2026-06-08T05:00:00Z"
+    },
+    {
+      "clock_started_at": "2026-06-07T05:00:00Z",
+      "milestone": "severe_incident_24h",
+      "on_time": true,
+      "submission_ref": "csirt-severe_incident_24h",
+      "submitted_at": "2026-06-08T05:00:00Z"
+    },
+    {
+      "clock_started_at": "2026-06-07T05:00:00Z",
+      "milestone": "incident_notification_72h",
+      "on_time": true,
+      "submission_ref": "csirt-incident_notification_72h",
+      "submitted_at": "2026-06-08T05:00:00Z"
+    },
+    {
+      "clock_started_at": "2026-06-07T05:00:00Z",
+      "milestone": "final_report_14d",
+      "on_time": true,
+      "submission_ref": "csirt-final_report_14d",
+      "submitted_at": "2026-06-08T05:00:00Z"
+    }
+  ],
+  "execution_id": "temporal:wf-run-abc123",
+  "owner": {
+    "assigned_at": "2026-01-15",
+    "role": "psirt@example.org"
+  },
+  "provenance": {
+    "captured_at": "2026-06-07T06:00:00Z",
+    "commit_sha": "deadbeef0123456789",
+    "source_url": "https://example.org/runs/abc123"
+  },
+  "regulation_refs": [
+    "nis2:art-21-2-e",
+    "cra:art-14-1"
+  ],
+  "reporter_acknowledgement": {
+    "acknowledged_at": "2026-06-07T05:00:00Z",
+    "disclosure_received_at": "2026-06-07T04:00:00Z",
+    "sla_duration": "P1D"
+  },
+  "response": {
+    "advisory_ref": "GHSA-xxxx-xxxx-xxxx",
+    "band": "critical",
+    "case_opened_at": "2026-06-07T05:00:00Z"
+  },
+  "schema_version": "1.0.0",
+  "stream": "vulns",
+  "triage_decision": {
+    "actively_exploited": true,
+    "cra_clock": "article_14_1",
+    "cvss_base_score": 9.8,
+    "cvss_severity": "Critical",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+    "dedup_outcome": "new",
+    "epss_probability": 0.42,
+    "risk_summary": "Pre-authentication RCE on the network edge; exploitation observed in the wild. Mitigation requires the upcoming patch.",
+    "severity": "Critical"
+  }
+}
