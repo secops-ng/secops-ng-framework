@@ -10,5 +10,11 @@ have something deterministic to compare.
 from compilers.temporal.evidence.risk_analysis_activity import (
     emit_risk_analysis_artifact_activity,
 )
+from compilers.temporal.evidence.vulns_activity import (
+    emit_vulns_artifact_activity,
+)
 
-__all__ = ["emit_risk_analysis_artifact_activity"]
+__all__ = [
+    "emit_risk_analysis_artifact_activity",
+    "emit_vulns_artifact_activity",
+]

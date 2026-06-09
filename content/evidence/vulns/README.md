@@ -126,9 +126,15 @@ If you are proposing a change that touches this stream:
 ## Status
 
 The stream's schema, the three promoted enums, the mapping-atom wires,
-and the Pydantic v2 model + byte-stable JSON Schema export helper land
-in this card (F-CP-04 SCHEMA). The shared evidence-collector emitter,
-the per-target wiring (n8n / Temporal / LangGraph), the KPI/KRI
-emission, the byte-parity goldens, the NIS2 Art. 21(2)(e) mapping doc,
-and the ROADMAP flip fan out into sibling cards 2–12 of the F-CP-04
-wave; see [`docs/internal/f-cp-04-gap-inventory.md`](../../../docs/internal/f-cp-04-gap-inventory.md).
+and the Pydantic v2 model + byte-stable JSON Schema export helper
+landed in F-CP-04 SCHEMA. The EMITTER SKELETON card adds the
+framework-agnostic emitter
+([`compilers/_shared/evidence/vulns.py`](../../../compilers/_shared/evidence/vulns.py))
+and one wired compile target — the Temporal-side activity
+([`compilers/temporal/evidence/vulns_activity.py`](../../../compilers/temporal/evidence/vulns_activity.py)) —
+mirroring the F-CP-01 SKELETON pattern. CORE-FANOUT extends the
+SKELETON to n8n and LangGraph, sharing the same emitter helper
+end-to-end; byte-parity goldens, the drift-detection hook surface, the
+NIS2 Art. 21(2)(e) mapping doc, and the ROADMAP flip fan out into the
+remaining siblings of the F-CP-04 wave; see
+[`docs/internal/f-cp-04-gap-inventory.md`](../../../docs/internal/f-cp-04-gap-inventory.md).
