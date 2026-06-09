@@ -72,14 +72,13 @@ three adapters write byte-identical JSON for the same context.
 
 ### incidents (F-CP-02)
 
-The SKELETON wires the Temporal compile target only — the n8n and
-LangGraph adapters fan out in the F-CP-02 CORE-FANOUT sibling.
-
 | Target | Adapter module | Surface |
 |--------|----------------|---------|
 | Temporal | [`compilers/temporal/evidence/incidents_activity.py`](../../temporal/evidence/incidents_activity.py) | `@activity.defn` async activity returning the absolute path |
+| n8n | [`compilers/n8n/evidence/incidents_node.py`](../../n8n/evidence/incidents_node.py) | Python helper called from an `executeCommand` / `Code` node; returns `{artifact_id, artifact_path}` |
+| LangGraph | [`compilers/langgraph/evidence/incidents_node.py`](../../langgraph/evidence/incidents_node.py) | Plain `state → state` node function returning a partial state update |
 
-Activity-level round-trip is pinned in
+Cross-target equivalence is pinned in
 `tests/content_model/test_incidents_evidence_emitter.py` —
-`test_temporal_activity_wraps_shared_helper` asserts one well-formed
-incidents evidence record is emitted per workflow execution.
+`test_all_three_targets_produce_byte_identical_records` asserts the
+three adapters write byte-identical JSON for the same context.

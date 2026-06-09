@@ -138,13 +138,25 @@ If you are proposing a change that touches this stream:
 
 The stream's schema, the promoted NIS2 incident-notification milestone
 enum, and the mapping-atom wires landed in F-CP-02 SCHEMA. The EMITTER
-SKELETON card adds the framework-agnostic emitter
+SKELETON card added the framework-agnostic emitter
 ([`compilers/_shared/evidence/incidents.py`](../../../compilers/_shared/evidence/incidents.py))
-and one wired compile target — the Temporal-side activity
-([`compilers/temporal/evidence/incidents_activity.py`](../../../compilers/temporal/evidence/incidents_activity.py)) —
-with an activity-level happy-path test
-([`tests/content_model/test_incidents_evidence_emitter.py`](../../../tests/content_model/test_incidents_evidence_emitter.py)).
-The per-target CORE-FANOUT (n8n / LangGraph), the byte-parity
-goldens, the NIS2 Art. 21(2)(b) + Art. 23 mapping doc, and the
-ROADMAP flip fan out into the remaining siblings of the F-CP-02 wave;
-the pattern mirrors F-CP-01 and F-CP-04.
+and the Temporal-side activity
+([`compilers/temporal/evidence/incidents_activity.py`](../../../compilers/temporal/evidence/incidents_activity.py)).
+CORE-FANOUT extends the same shared helper to the remaining two
+reference compile targets:
+
+- n8n —
+  [`compilers/n8n/evidence/incidents_node.py`](../../../compilers/n8n/evidence/incidents_node.py)
+  (Python helper called from an `executeCommand` / `Code` node).
+- LangGraph —
+  [`compilers/langgraph/evidence/incidents_node.py`](../../../compilers/langgraph/evidence/incidents_node.py)
+  (plain `state → state` node function).
+
+Cross-target equivalence is pinned in
+[`tests/content_model/test_incidents_evidence_emitter.py`](../../../tests/content_model/test_incidents_evidence_emitter.py)
+— `test_all_three_targets_produce_byte_identical_records` asserts the
+three adapters write byte-identical JSON for the same context.
+
+The per-target byte-parity goldens, the NIS2 Art. 21(2)(b) + Art. 23
+mapping doc, and the ROADMAP flip fan out into the remaining siblings
+of the F-CP-02 wave; the pattern mirrors F-CP-01 and F-CP-04.
