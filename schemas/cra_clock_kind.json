@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/cra_clock_kind.json",
+  "title": "SecOps-NG CRA Reporting-Clock Kind",
+  "description": "Identifies which CRA Article 14 reporting clock the vulnerability-intake case has started. Promoted out of the F-WF-01 `__cra_clock__` mirror field (which declared the two kinds in prose only on the assess-CRA-reporting-trigger step) so the vulns evidence stream and the four CRA-timing KPIs (`kpi.cra_early_warning_on_time@v1`, `kpi.cra_notification_72h_on_time@v1`, `kpi.cra_final_report_on_time@v1`, `kpi.cra_severe_incident_on_time@v1`) read one canonical enum. `none` is the explicit no-clock state — recording it is required so a replay can distinguish 'clock was assessed and found not to apply' from 'assessment step did not fire'.",
+  "type": "string",
+  "enum": [
+    "none",
+    "article_14_1",
+    "article_14_3"
+  ],
+  "x_clock_definitions": {
+    "none": "Triage assessed the case and found no CRA Article 14 clock applies (no actively-exploited indicator, no severe incident on a product with digital elements within scope).",
+    "article_14_1": "CRA Article 14(1) clock started: an actively-exploited vulnerability in a product with digital elements. Drives the 24h early-warning, 72h incident-notification, and 14d final-report milestones.",
+    "article_14_3": "CRA Article 14(3) clock started: a severe incident impacting the security of a product with digital elements. Drives the 24h severe-incident-notification milestone."
+  }
+}

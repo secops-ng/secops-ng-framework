@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/cra_timing_milestone.json",
+  "title": "SecOps-NG CRA Article 14 Timing Milestone",
+  "description": "Identifies which milestone on the CRA Article 14 regulator-notification chain a disclosure-timeline event records. Promoted out of the F-WF-01 regulator-notification chain (which declared the four milestones in prose on its sub-steps) so the vulns evidence stream's `disclosure_timeline[]` records and the four CRA-timing KPIs share one vocabulary. Each milestone names the clock-start it is measured against in the KPI catalog entries.",
+  "type": "string",
+  "enum": [
+    "early_warning_24h",
+    "severe_incident_24h",
+    "incident_notification_72h",
+    "final_report_14d"
+  ],
+  "x_milestone_definitions": {
+    "early_warning_24h": "CRA Article 14(1) early warning, due within 24h of operator awareness of an actively-exploited vulnerability. Consumed by `kpi.cra_early_warning_on_time@v1`.",
+    "severe_incident_24h": "CRA Article 14(3) severe-incident notification, due within 24h of awareness of a severe incident impacting product security. Consumed by `kpi.cra_severe_incident_on_time@v1`.",
+    "incident_notification_72h": "CRA Article 14(1) incident notification, due within 72h of operator awareness. Consumed by `kpi.cra_notification_72h_on_time@v1`.",
+    "final_report_14d": "CRA Article 14(1) final report, due within 14 days of remediation or mitigation availability. Consumed by `kpi.cra_final_report_on_time@v1`."
+  }
+}
