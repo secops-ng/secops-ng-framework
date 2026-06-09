@@ -96,8 +96,12 @@ The drift-detection hook surface now lives on the shared emitter
 ([`compilers/_shared/evidence/drift_hook.py`](../../compilers/_shared/evidence/drift_hook.py)):
 all three target adapters thread an optional `drift_hook` through, the
 default is a no-op, and a real attestation-state transition between
-successive emissions on the same control fires a `DriftEvent`. The
-payload contract, KPI/KRI promotion, and durable drift history fan out
-into the remaining sibling cards of the F-CP-01 wave; the
-F-CP-02..F-CP-07 streams each open their own SCHEMA → STREAM-ROOT →
-EMITTER decomposition as they land.
+successive emissions on the same control fires a `DriftEvent`.
+The payload contract, KPI/KRI promotion, and durable drift history fan out
+into the remaining sibling cards of the F-CP-01 wave. The F-CP-04
+vulnerabilities stream has shipped its SCHEMA, EMITTER SKELETON, and
+CORE-FANOUT; per-target byte-parity goldens for that stream live
+alongside the risk-analysis goldens under
+[`tests/examples/vulnerabilities_evidence/`](../../tests/examples/vulnerabilities_evidence/test_golden.py).
+The remaining F-CP-02..F-CP-07 streams each open their own SCHEMA →
+STREAM-ROOT → EMITTER decomposition as they land.
