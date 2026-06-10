@@ -1,0 +1,49 @@
+# NIS2 — Article 22 Union-level coordinated supply-chain risk assessment.
+# Cross-ref: research brief 2026-05-15-nis2-baseline-mapping.md and the
+# companion narrative article-22-supply-chain.md.
+#
+# Per Article 22(1), the coordinated security risk assessment of specific
+# critical supply chains is carried out by the Cooperation Group, acting
+# in cooperation with the Commission and ENISA — NOT by Member States
+# directly. Member States' Article 22 role (Art. 22(2) onward) is to
+# provide the per-entity inputs that feed the Cooperation Group's
+# assessment; the framework discharges the operator-side half of that
+# input flow by emitting the supply-chain evidence-stream artifact.
+regime: nis2
+entries:
+  - id: nis2:art-22
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: "22(1)"
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      The Cooperation Group, in cooperation with the Commission and ENISA,
+      may carry out coordinated security risk assessments of specific
+      critical ICT services, ICT systems or ICT product supply chains,
+      taking into account technical and, where relevant, non-technical risk
+      factors. Member States, with the Commission and ENISA, support that
+      assessment by surfacing per-entity dependency information; entities
+      in scope must therefore make their dependency surface — by provider
+      kind, residency, beneficial ownership, and sub-processor chain —
+      visible enough that a sectoral aggregate is feasible.
+    status: draft
+    control_refs:
+      - control.supplier_inventory@v1
+      - control.provider_attestation@v1
+    metric_refs:
+      - kri.suppliers_attestation_stale@v1
+    evidence_stream_refs:
+      - supply-chain
+    notes: >-
+      Article 22(1) places the coordinated supply-chain risk-assessment
+      action with the Cooperation Group, acting in cooperation with the
+      Commission and ENISA — not with Member States directly. Member States
+      contribute the per-entity inputs (Art. 22(2)+). The framework emits
+      the per-entity supply-chain evidence artifact; it does not implement
+      the Member-State aggregation pipeline or the Cooperation-Group
+      reporting envelope. Companion narrative:
+      article-22-supply-chain.md. Sovereign-provider classification reads
+      from a private KB via a file-fixture interface; the framework repo
+      never ingests KB contents (mirrors the note on article-21-2-d.yaml).

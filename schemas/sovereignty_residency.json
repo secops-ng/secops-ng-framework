@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/sovereignty_residency.json",
+  "title": "SecOps-NG Sovereignty Residency",
+  "description": "Closed alphabet for where an external provider runs the workload that produces the data the operator's framework reads. Imported by the supply-chain evidence stream's `dependencies[].sovereignty_classification.residency` field. Residency answers the location question only; beneficial ownership is a separate axis (see `sovereignty_ownership`). The rolled-up `sovereignty_band` is a deterministic function of (residency, ownership, sub-processor chain) — see `sovereignty_band.json`.",
+  "type": "string",
+  "enum": [
+    "eu",
+    "eea",
+    "eu_adequate_third_country",
+    "non_eu",
+    "unknown"
+  ],
+  "x_residency_definitions": {
+    "eu": "Workload runs inside an EU Member State.",
+    "eea": "Workload runs inside an EEA member that is not an EU Member State (Iceland, Liechtenstein, Norway).",
+    "eu_adequate_third_country": "Workload runs in a third country covered by a standing EU adequacy decision under GDPR Article 45. The list is operator-supplied (it changes); the framework only carries the band, not the country list.",
+    "non_eu": "Workload runs in a country without a standing adequacy decision.",
+    "unknown": "The operator's supplier KB has not pinned residency for this provider yet. Treated by the band rollup as `unknown` rather than assumed worst-case."
+  }
+}

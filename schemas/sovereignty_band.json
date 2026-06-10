@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/sovereignty_band.json",
+  "title": "SecOps-NG Sovereignty Band",
+  "description": "Rolled-up sovereignty verdict for an external provider. Promoted out of the F-CP-03 supply-chain evidence stream so the per-record `dependencies[].sovereignty_classification.sovereignty_band` field, the `kpi.sovereign_provider_share@v1` / `kri.non_sovereign_call_surge@v1` catalog entries (land in the EXTEND-metrics sibling), and any future per-band rollup share one vocabulary. The band is a deterministic function of (residency, ownership, sub-processor chain); the helper that computes it lands on the shared emitter in the F-CP-03 CORE-FANOUT sibling card.",
+  "type": "string",
+  "enum": [
+    "sovereign",
+    "eu_hosted_non_sovereign",
+    "eu_adequate",
+    "non_eu",
+    "unknown"
+  ],
+  "x_band_definitions": {
+    "sovereign": "`residency` ∈ {eu, eea} AND `ownership` ∈ {eu_owned, eu_majority_owned} AND every sub-processor in the declared chain is itself `sovereign`.",
+    "eu_hosted_non_sovereign": "`residency` ∈ {eu, eea} but the ownership test or the sub-processor-chain test fails. Workload runs on EU soil; control of the provider does not.",
+    "eu_adequate": "`residency` = `eu_adequate_third_country` under a standing GDPR Article 45 adequacy decision; ownership and sub-processor chain are not load-bearing for this band.",
+    "non_eu": "`residency` = `non_eu`.",
+    "unknown": "Any of `residency`, `ownership`, or `sub_processor_chain` is `unknown` or `null`. Drift to or from `unknown` is treated by the drift hook (lands in EXTEND-drift sibling) as a first-class signal — not a free pass."
+  }
+}
