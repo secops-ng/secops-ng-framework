@@ -358,3 +358,140 @@ def test_band_rollup_unknown_when_inputs_unknown() -> None:
     )
     # None means the operator's KB has not captured the chain yet.
     assert compute_sovereignty_band("eu", "eu_owned", None) == "unknown"
+
+
+# --------------------------------------------------------------------------- #
+# n8n adapter round-trip (CORE-FANOUT-N8N)                                    #
+# --------------------------------------------------------------------------- #
+
+
+def _payload_from_ctx(ctx: SupplyChainContext) -> dict:
+    """Re-shape a context as the JSON-native payload an n8n node sends.
+
+    n8n cannot transport Python objects across the node-process
+    boundary, so datetimes serialise to ISO-8601 ``...Z`` strings and
+    nested dataclasses serialise to JSON objects / arrays. Kept in
+    lockstep with the per-target adapter contract.
+    """
+    def _cls(cls: SovereigntyClassification) -> dict:
+        out: dict = {
+            "residency": cls.residency,
+            "ownership": cls.ownership,
+            "sovereignty_band": cls.sovereignty_band,
+        }
+        if cls.sub_processor_chain is not None:
+            out["sub_processor_chain"] = list(cls.sub_processor_chain)
+        if cls.band_rationale is not None:
+            out["band_rationale"] = cls.band_rationale
+        if cls.kb_ref is not None:
+            out["kb_ref"] = cls.kb_ref
+        return out
+
+    def _att(att: Attestation) -> dict:
+        out: dict = {
+            "state": att.state,
+            "last_reattested_at": att.last_reattested_at.strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
+            "next_due_at": att.next_due_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        }
+        if att.attestation_ref is not None:
+            out["attestation_ref"] = att.attestation_ref
+        return out
+
+    def _dep(dep: Dependency) -> dict:
+        out: dict = {
+            "provider_id": dep.provider_id,
+            "kind": dep.kind,
+            "call_count": dep.call_count,
+            "sovereignty_classification": _cls(dep.sovereignty_classification),
+            "attestation": _att(dep.attestation),
+        }
+        if dep.version is not None:
+            out["version"] = dep.version
+        if dep.risk_notes is not None:
+            out["risk_notes"] = dep.risk_notes
+        return out
+
+    payload: dict = {
+        "workflow_id": ctx.workflow_id,
+        "execution_id": ctx.execution_id,
+        "regulation_refs": list(ctx.regulation_refs),
+        "control_refs": list(ctx.control_refs),
+        "dependencies": [_dep(d) for d in ctx.dependencies],
+        "owner_role": ctx.owner_role,
+        "owner_assigned_at": ctx.owner_assigned_at,
+        "captured_at": ctx.captured_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "source_url": ctx.source_url,
+    }
+    if ctx.commit_sha:
+        payload["commit_sha"] = ctx.commit_sha
+    if ctx.retention:
+        payload["retention"] = ctx.retention
+    if ctx.aggregates is not None:
+        agg = ctx.aggregates
+        agg_payload: dict = {}
+        for key in (
+            "total_providers",
+            "sovereign_count",
+            "eu_hosted_count",
+            "non_eu_count",
+            "ai_provider_count",
+        ):
+            val = getattr(agg, key)
+            if val is not None:
+                agg_payload[key] = val
+        payload["aggregates"] = agg_payload
+    return payload
+
+
+def test_n8n_adapter_wraps_shared_helper(tmp_path: Path) -> None:
+    """CORE-FANOUT-N8N pins the n8n adapter against the shared helper.
+
+    The adapter accepts the JSON-native payload an n8n
+    ``executeCommand`` / ``Code`` node would marshal, rebuilds the
+    typed context, and delegates to ``emit_supply_chain_artifact``.
+    The on-disk record must be byte-identical to what the shared
+    renderer produces, and the dict the adapter returns must name the
+    right ``artifact_id`` / ``artifact_path``.
+    """
+    from compilers.n8n.evidence import emit_supply_chain_artifact_n8n
+
+    ctx = _ctx()
+    result = emit_supply_chain_artifact_n8n(_payload_from_ctx(ctx), tmp_path)
+    written = Path(result["artifact_path"])
+    assert written.exists()
+    on_disk = json.loads(written.read_text("utf-8"))
+    _validator().validate(on_disk)
+    assert on_disk == render_supply_chain_artifact(ctx)
+    assert result["artifact_id"] == on_disk["artifact_id"]
+    assert written.name == f"{on_disk['artifact_id']}.json"
+
+
+def test_n8n_adapter_preserves_sovereignty_classification(
+    tmp_path: Path,
+) -> None:
+    """Provider sovereignty classification is forwarded verbatim.
+
+    The n8n adapter must not reclassify, coerce, or default any of the
+    classification axes (``residency``, ``ownership``,
+    ``sovereignty_band``, ``sub_processor_chain``, ``band_rationale``,
+    ``kb_ref``) — the operator's Sovereign Provider KB upstream of the
+    node is the source of truth. Pins the contract per the F-CP-03
+    CORE-FANOUT-N8N acceptance criteria.
+    """
+    from compilers.n8n.evidence import emit_supply_chain_artifact_n8n
+
+    ctx = _ctx()
+    result = emit_supply_chain_artifact_n8n(_payload_from_ctx(ctx), tmp_path)
+    on_disk = json.loads(Path(result["artifact_path"]).read_text("utf-8"))
+    # Sovereignty classification populated on every declared dependency.
+    assert on_disk["dependencies"], "fixture must exercise dependencies"
+    for emitted, source in zip(on_disk["dependencies"], ctx.dependencies):
+        cls = emitted["sovereignty_classification"]
+        src = source.sovereignty_classification
+        assert cls["residency"] == src.residency
+        assert cls["ownership"] == src.ownership
+        assert cls["sovereignty_band"] == src.sovereignty_band
+        if src.kb_ref is not None:
+            assert cls["kb_ref"] == src.kb_ref
