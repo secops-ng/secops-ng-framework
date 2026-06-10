@@ -4,11 +4,11 @@ Supply-chain evidence stream — record-schema narrative.
 
 This document is the **contributor-facing description** of the artifact
 shape the supply-chain evidence stream emits. The authoritative
-machine-readable schema (`schemas/evidence/supply-chain.schema.json`)
-lands in the CORE-FANOUT sibling card alongside the n8n / Temporal /
-LangGraph reference emitters; this SKELETON freezes the field
-inventory, regulator pins, and the sovereign-provider classification
-contract so the downstream cards can implement against a stable target.
+machine-readable schema landed alongside this narrative at
+[`schemas/evidence/supply-chain.schema.json`](../../../schemas/evidence/supply-chain.schema.json)
+(F-CP-03 SCHEMA card); the reference emitters (n8n / Temporal /
+LangGraph) land in the CORE-FANOUT sibling card against that stable
+target.
 
 ## What this stream is
 
@@ -40,7 +40,7 @@ once they land in `content/metrics/` in the EXTEND-metrics sibling.
 | Regulation | Article          | Obligation paraphrase                                                                                                            | Mapping file                                                                       |
 |------------|------------------|----------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
 | NIS2       | Art. 21(2)(d)    | Address supply-chain security including the security characteristics of direct suppliers and service providers, with periodic re-attestation. | [`content/mappings/nis2/article-21-2-d.yaml`](../../mappings/nis2/article-21-2-d.yaml) |
-| NIS2       | Art. 22          | Union-level coordinated security risk assessment of critical supply chains; entities must surface their dependency surface so a sectoral aggregate is feasible. | [`content/mappings/nis2/article-22-supply-chain.md`](../../mappings/nis2/article-22-supply-chain.md) |
+| NIS2       | Art. 22(1)       | The Cooperation Group, acting in cooperation with the Commission and ENISA, may carry out coordinated security risk assessments of specific critical supply chains; entities surface their dependency surface so a sectoral aggregate is feasible. | [`content/mappings/nis2/article-22.yaml`](../../mappings/nis2/article-22.yaml), companion narrative [`article-22-supply-chain.md`](../../mappings/nis2/article-22-supply-chain.md) |
 
 ## Artifact shape — field inventory
 
@@ -155,11 +155,10 @@ These are intentionally small. Extending any of them is a discussion,
 not a drive-by change, mirroring the F-CP-02 / F-CP-04 enum-promotion
 pattern.
 
-## What this SKELETON deliberately does **not** include
+## What this SCHEMA card deliberately does **not** include
 
-Out of scope for the SKELETON card; each lands in a sibling:
+Out of scope for the SCHEMA card; each lands in a sibling:
 
-- The JSON Schema (`schemas/evidence/supply-chain.schema.json`) — CORE-FANOUT.
 - The shared emitter (`compilers/_shared/evidence/supply_chain.py`)
   and the three target adapters (Temporal, n8n, LangGraph) — CORE-FANOUT.
 - Per-target byte-parity goldens — EXTEND-tests-goldens.
@@ -167,11 +166,6 @@ Out of scope for the SKELETON card; each lands in a sibling:
   EXTEND-drift sibling.
 - KPI / KRI catalogue entries (`kpi.sovereign_provider_share@v1`,
   `kri.non_sovereign_call_surge@v1`) — EXTEND-metrics sibling.
-- The `nis2:art-22` mapping atom in
-  `content/mappings/nis2/article-22.yaml` — the present SKELETON ships
-  only the narrative stub at
-  `content/mappings/nis2/article-22-supply-chain.md`; the YAML atom
-  lands in the EXTEND-NIS2-MAPPING sibling.
 
 ## Contributor checklist (when the JSON schema lands)
 

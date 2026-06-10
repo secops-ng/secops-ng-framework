@@ -1,0 +1,276 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/evidence/supply-chain.schema.json",
+  "title": "SecOps-NG Supply-Chain Evidence Artifact",
+  "description": "Typed shape for one evidence artifact emitted by the supply-chain evidence stream (F-CP-03). One artifact is produced per (workflow_id, execution_id) when a workflow execution that calls external providers closes; it enumerates the dependency surface that execution resolved against, classifies each dependency for sovereignty against the operator's supplier knowledge base, and pins the attestation freshness so the F-PT-03 supplier-attestation primitive set and the downstream KPI / KRI catalog entries (`kri.suppliers_attestation_stale@v1`, plus `kpi.sovereign_provider_share@v1` / `kri.non_sovereign_call_surge@v1` once they land in `content/metrics/`) consume one stable shape. Discharges the operational half of NIS2 Article 21(2)(d) (per-entity supply-chain risk management) and surfaces each entity's dependency surface in the shape Article 22 needs for the Cooperation Group's Union-level coordinated risk assessment of critical supply chains (the Cooperation Group acts in cooperation with the Commission and ENISA — the framework emits the per-entity artifact, not the Member-State aggregation envelope). Public-bar artifact: provider identifiers are opaque operator-side ids, operator-side strings (owner labels, KB refs) MUST stay role-shaped or URN-shaped, and individual personal names are out of scope per AGENTS.md §3.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_id",
+    "stream",
+    "workflow_id",
+    "execution_id",
+    "regulation_refs",
+    "control_refs",
+    "dependencies",
+    "owner",
+    "captured_at",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Pinned schema version. Lets a consumer reject artifacts produced under an older schema once breaking changes ship.",
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "artifact_id": {
+      "description": "Stable per-artifact identifier. Convention: SHA-256 hex digest of `<workflow_id>|<execution_id>|<captured_at>` (UTF-8, no separators around the pipes). Two executions of the same workflow at the same instant against the same dependency set collide deliberately; the same execution re-emitted at the same captured_at stays byte-identical.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "stream": {
+      "description": "Identifies which evidence stream produced the artifact. Constant on this schema.",
+      "type": "string",
+      "const": "supply-chain"
+    },
+    "workflow_id": {
+      "description": "Stable workflow identifier — one of the workflow ids declared under `content/playbooks/<workflow-id>/`. The F-CP-03 SKELETON anchor is `vulnerability_triage` (F-WF-01, Shipped); any workflow whose definition declares one or more external-provider calls is in scope.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[a-z][a-z0-9_-]*$"
+    },
+    "execution_id": {
+      "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Re-runs of the same workflow_id produce distinct execution_ids.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "regulation_refs": {
+      "description": "Pins to the upstream regulatory mapping entries this artifact helps satisfy (typically `nis2:art-21-2-d` plus, where applicable, `nis2:art-22` for the Union-level Cooperation-Group overlay). At least one entry — an artifact with no regulatory anchor is not evidence in the F-CP-03 sense. Joins back into content/mappings/<regime>/*.yaml via the `id` field.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(nis2|dora|cra|gdpr|iso27001|soc2):[a-z0-9][a-z0-9.-]*$",
+        "maxLength": 120
+      }
+    },
+    "control_refs": {
+      "description": "Control stable-ids attested by this artifact. At least one — typically `control.supplier_inventory@v1` and `control.provider_attestation@v1`.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+      }
+    },
+    "dependencies": {
+      "description": "One record per external dependency the execution resolved against. Empty array is invalid — a supply-chain evidence artifact for an execution with zero external dependencies should not be emitted at all (the workflow is not in scope for the stream). The shared emitter (lands in F-CP-03 CORE-FANOUT) enforces this above the schema floor.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": false,
+      "items": { "$ref": "#/$defs/dependency_record" }
+    },
+    "aggregates": {
+      "description": "Optional pre-computed counts the emitter may carry so downstream rollups skip re-derivation. Catalog metrics may compute these themselves from `dependencies[]`; the fields reserve the shape for emitters that already track them. All values are non-negative integers.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "total_providers": {
+          "description": "Distinct `provider_id` count across `dependencies[]`. Non-negative integer.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "sovereign_count": {
+          "description": "Count of distinct `provider_id`s whose `sovereignty_classification.sovereignty_band` is `sovereign`. Non-negative integer.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "eu_hosted_count": {
+          "description": "Count of distinct `provider_id`s whose `sovereignty_classification.residency` ∈ {eu, eea}. Non-negative integer.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "non_eu_count": {
+          "description": "Count of distinct `provider_id`s whose `sovereignty_classification.residency` = `non_eu`. Non-negative integer.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "ai_provider_count": {
+          "description": "Count of distinct `provider_id`s whose `kind` = `ai_provider`. Promoted as a first-class aggregate because the NIS2 supply-chain overlay and the EU AI Act both single out the AI-provider surface. Non-negative integer.",
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "owner": {
+      "description": "Dated ownership pointer for the supplier-inventory control attestation. Role-shaped — a working-group mailbox, a generic role title, or a community handle. Individual personal names are out of scope per AGENTS.md §3 and rejected here as a matter of schema discipline.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "assigned_at"],
+      "properties": {
+        "role": {
+          "description": "Generic role or working-group identifier (e.g. 'supplier-governance@example.org', 'procurement-lead', 'soc-on-call'). Personal names are not used.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "assigned_at": {
+          "description": "ISO-8601 date on which the role was assigned ownership of the supplier-inventory attestation chain.",
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "captured_at": {
+      "description": "ISO-8601 UTC timestamp at which this artifact was captured. Stable input to the artifact_id derivation so re-emissions in the same execution at the same instant stay byte-identical.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "provenance": {
+      "description": "Where this artifact came from. Mirrors the provenance pattern used by content/controls/*.yaml so a reviewer can re-derive the chain back to source.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_url", "captured_at"],
+      "properties": {
+        "source_url": {
+          "description": "URL of the workflow run (or workflow-content source) that produced this artifact. Compile targets may use their own run-id URLs; the URL itself is opaque to this schema.",
+          "type": "string",
+          "format": "uri"
+        },
+        "captured_at": {
+          "description": "ISO-8601 date or date-time matching the artifact-level captured_at.",
+          "type": "string"
+        },
+        "commit_sha": {
+          "description": "Optional commit SHA of the content snapshot the workflow walked.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,64}$"
+        }
+      }
+    },
+    "retention": {
+      "description": "Optional retention pointer the operator declares for this evidentiary record. ISO-8601 duration. The community-default value is an open question to be settled in the EXTEND sibling card, mirroring the equivalent F-CP-02 / F-CP-04 deferrals.",
+      "type": "string",
+      "pattern": "^P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+S)?)?$"
+    }
+  },
+  "$defs": {
+    "dependency_record": {
+      "type": "object",
+      "description": "One external dependency this execution resolved against.",
+      "additionalProperties": false,
+      "required": [
+        "provider_id",
+        "kind",
+        "call_count",
+        "sovereignty_classification",
+        "attestation"
+      ],
+      "properties": {
+        "provider_id": {
+          "description": "Stable operator-side identifier for the provider (e.g. `provider.cve_feed_eu@v1`). The provider catalogue is operator-supplied; the framework ships the schema, not the catalogue. Public-bar text: opaque operator id, no commercial brand names baked into the schema.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "^provider\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+        },
+        "kind": {
+          "description": "Which kind of dependency this is. Imports the shared vocabulary from schemas/supply_chain_dependency_kind.json.",
+          "$ref": "https://secops-ng.org/schemas/supply_chain_dependency_kind.json"
+        },
+        "version": {
+          "description": "Version pin or commit SHA where applicable. `null` for moving-tag hosted services (most `hosted_api` / `ai_provider` / `managed_runtime` records). String shape is intentionally permissive — semver, commit SHA, calendar version, ISO date.",
+          "type": ["string", "null"],
+          "maxLength": 200
+        },
+        "call_count": {
+          "description": "Integer count of calls this execution issued against the provider. 0 is valid and means 'linked but not called this run' — useful for the SBOM-style enumeration without traffic.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "sovereignty_classification": {
+          "description": "Per-record sovereign-provider classification. The classification source-of-truth is an operator-supplied private knowledge base; the framework repository never ingests KB contents (see `content/mappings/nis2/article-21-2-d.yaml`). The contract here is the shape the emitter writes when the KB is consulted.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["residency", "ownership", "sovereignty_band"],
+          "properties": {
+            "residency": {
+              "description": "Where the provider runs the workload that produces the data the framework reads. Imports schemas/sovereignty_residency.json.",
+              "$ref": "https://secops-ng.org/schemas/sovereignty_residency.json"
+            },
+            "ownership": {
+              "description": "Beneficial-ownership pointer for the provider (NOT registered-office country). Imports schemas/sovereignty_ownership.json.",
+              "$ref": "https://secops-ng.org/schemas/sovereignty_ownership.json"
+            },
+            "sub_processor_chain": {
+              "description": "Array of opaque provider ids of declared sub-processors. Empty array means 'provider declares no sub-processors'. `null` means 'the operator's KB has not captured the chain yet' (distinct from 'no sub-processors').",
+              "type": ["array", "null"],
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200,
+                "pattern": "^provider\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+              }
+            },
+            "sovereignty_band": {
+              "description": "Single rolled-up verdict derived deterministically from (residency, ownership, sub_processor_chain). Imports schemas/sovereignty_band.json. The helper that computes it lands on the shared emitter in CORE-FANOUT; drift between successive snapshots feeds the EXTEND-drift sibling.",
+              "$ref": "https://secops-ng.org/schemas/sovereignty_band.json"
+            },
+            "band_rationale": {
+              "description": "Short free-text explanation pinning the band to the input triple. Read by reviewers; not parsed downstream. Public-bar text: no operator branding, no individual names.",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 400
+            },
+            "kb_ref": {
+              "description": "Opaque pointer into the operator's private supplier-KB (e.g. `supplier-kb://provider-<id>/2026-Q2`). Framework never resolves this; it only carries the pointer for audit reproducibility.",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 400,
+              "pattern": "^supplier-kb://[A-Za-z0-9._~:/?#@!$&'()*+,;=%-]+$"
+            }
+          }
+        },
+        "attestation": {
+          "description": "Per-dependency attestation freshness pointer. Mirrors the cadence vocabulary in schemas/attestation_state.json. `kri.suppliers_attestation_stale@v1` reads `next_due_at` against the artifact-level `captured_at`.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state", "last_reattested_at", "next_due_at"],
+          "properties": {
+            "state": {
+              "description": "Current attestation state for the provider. Imports the shared four-state vocabulary from schemas/attestation_state.json.",
+              "$ref": "https://secops-ng.org/schemas/attestation_state.json"
+            },
+            "last_reattested_at": {
+              "description": "ISO-8601 UTC timestamp of the most recent attestation event for this provider.",
+              "type": "string",
+              "format": "date-time"
+            },
+            "next_due_at": {
+              "description": "ISO-8601 UTC timestamp at which the next attestation falls due. `kri.suppliers_attestation_stale@v1` fires when (artifact captured_at > next_due_at).",
+              "type": "string",
+              "format": "date-time"
+            },
+            "attestation_ref": {
+              "description": "Operator-side opaque reference for the attestation record (ticket id, document URN, KB pointer). No commentary, no operator branding.",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 400
+            }
+          }
+        },
+        "risk_notes": {
+          "description": "Free-text rationale field. Public-bar text: no individual contact names, provider identity only. No operator branding.",
+          "type": "string",
+          "maxLength": 1000
+        }
+      }
+    }
+  }
+}

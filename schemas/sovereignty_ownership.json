@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/sovereignty_ownership.json",
+  "title": "SecOps-NG Sovereignty Ownership",
+  "description": "Closed alphabet for the beneficial-ownership pointer of an external provider. Imported by the supply-chain evidence stream's `dependencies[].sovereignty_classification.ownership` field. Beneficial ownership, NOT registered-office country — the latter is trivially gamed and not what the NIS2 supply-chain overlay reads. The rolled-up `sovereignty_band` is a deterministic function of (residency, ownership, sub-processor chain).",
+  "type": "string",
+  "enum": [
+    "eu_owned",
+    "eu_majority_owned",
+    "non_eu_owned",
+    "unknown"
+  ],
+  "x_ownership_definitions": {
+    "eu_owned": "Beneficial ownership is wholly EU/EEA — no non-EU/EEA controlling interest at any level of the ownership chain.",
+    "eu_majority_owned": "Beneficial ownership is majority EU/EEA but includes a non-trivial non-EU/EEA minority. Promoted as a distinct band because some sovereign-procurement frameworks treat majority ownership as sufficient.",
+    "non_eu_owned": "Beneficial ownership is non-EU/EEA controlled — the operator's KB has confirmed a non-EU/EEA controlling interest.",
+    "unknown": "The operator's supplier KB has not pinned ownership for this provider yet. Treated by the band rollup as `unknown` rather than assumed worst-case."
+  }
+}

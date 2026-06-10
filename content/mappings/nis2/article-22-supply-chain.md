@@ -40,11 +40,14 @@ of that baseline; the structural crosswalk lives in
 [`article-21-2-d.yaml`](article-21-2-d.yaml).
 
 Article 22 layers an additional Union-level overlay onto the baseline:
-Member States, with the Commission and ENISA, may perform a
-**coordinated security risk assessment of critical supply chains** for
-specific ICT services, systems, or products. For that assessment to
-be feasible, each in-scope entity has to surface its dependency
-inventory — by provider kind, residency, ownership, and
+Article 22(1) places the **coordinated security risk assessment of
+specific critical supply chains** with the **Cooperation Group**,
+acting **in cooperation with the Commission and ENISA** — not with
+Member States acting on their own initiative. Member States'
+Article 22 role (Art. 22(2) onward) is to surface the per-entity
+inputs that feed the Cooperation Group's assessment. For that
+assessment to be feasible, each in-scope entity has to surface its
+dependency inventory — by provider kind, residency, ownership, and
 sub-processor chain — in a shape that aggregates across the sector.
 The supply-chain stream's snapshot artifact is designed to be that
 surface: `dependencies[]` enumerated per provider, every record
@@ -106,9 +109,9 @@ five numbers a Member-State-level rollup needs without re-walking the
 per-record array.
 
 The framework is deliberately silent on the **aggregation pipeline**:
-how an operator's snapshots reach the competent authority or the
-Cooperation Group is a Member-State-specific delivery path, out of
-scope for the per-entity artifact contract.
+how an operator's snapshots reach the competent authority or feed the
+Cooperation Group's coordinated assessment is a Member-State-specific
+delivery path, out of scope for the per-entity artifact contract.
 
 ## Sovereign-provider classification
 
@@ -121,15 +124,17 @@ consulted. Fixtures used in tests are synthetic; see
 
 ## Status
 
-SKELETON card landed: the per-stream SCHEMA narrative
-[`content/evidence/supply-chain/SCHEMA.md`](../../evidence/supply-chain/SCHEMA.md),
-the stream-root placeholder
-[`content/evidence/supply-chain/vulnerability_triage/`](../../evidence/supply-chain/vulnerability_triage/README.md)
-and this mapping stub. The structural atom `nis2:art-22` in
-`article-22.yaml` (with the `regulation_refs` / `control_refs` /
-`metric_refs` keys), the JSON Schema, the shared emitter, the
-per-target adapters, the byte-parity goldens, the drift hook, and the
-KPI / KRI promotions land in their named sibling cards under F-CP-03.
+SCHEMA card landed: the authoritative JSON Schema
+[`schemas/evidence/supply-chain.schema.json`](../../../schemas/evidence/supply-chain.schema.json),
+the four promoted shared enums (`supply_chain_dependency_kind`,
+`sovereignty_residency`, `sovereignty_ownership`, `sovereignty_band`),
+the structural `nis2:art-22` atom in
+[`article-22.yaml`](article-22.yaml) — with `evidence_stream_refs:
+[supply-chain]`, control refs, and the `kri.suppliers_attestation_stale@v1`
+metric ref — and the `evidence_stream_refs: [supply-chain]` wire on
+the existing Art. 21(2)(d) atom. The shared emitter, the per-target
+adapters, the byte-parity goldens, the drift hook, and the KPI / KRI
+promotions land in their named sibling cards under F-CP-03.
 
 ## See also
 

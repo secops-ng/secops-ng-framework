@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/supply_chain_dependency_kind.json",
+  "title": "SecOps-NG Supply-Chain Dependency Kind",
+  "description": "Closed alphabet for the kind of external dependency a supply-chain evidence snapshot enumerates. Promoted out of the F-CP-03 supply-chain evidence stream so the per-record `dependencies[].kind` field, downstream KPI / KRI catalog entries (`kpi.sovereign_provider_share@v1`, `kri.non_sovereign_call_surge@v1` — land in the EXTEND-metrics sibling), and any future per-kind rollup share one vocabulary without re-declaring it. Extending the alphabet is a discussion, not a drive-by change.",
+  "type": "string",
+  "enum": [
+    "software_dependency",
+    "hosted_api",
+    "data_feed",
+    "ai_provider",
+    "managed_runtime"
+  ],
+  "x_kind_definitions": {
+    "software_dependency": "Pinned library, package, or SBOM line the workflow links against at build or load time (PyPI / npm / crates.io / OS-package / container-image layer).",
+    "hosted_api": "External HTTP API the workflow calls at execution time (REST, GraphQL, gRPC). Includes both first-party and third-party endpoints outside the operator's sovereign boundary.",
+    "data_feed": "External subscription, threat-intel feed, indicator stream, or reference dataset the workflow ingests on cadence.",
+    "ai_provider": "LLM, embedding, classifier, or other inference endpoint the workflow calls. Carved out from `hosted_api` because the sovereignty test against AI providers is the lever the EU AI Act and NIS2 supply-chain overlays read.",
+    "managed_runtime": "PaaS, FaaS, or other managed host the workflow itself executes inside (Temporal Cloud, Modal, Lambda, Cloud Run). The runtime is itself a supply-chain dependency for the workflow it carries."
+  }
+}
