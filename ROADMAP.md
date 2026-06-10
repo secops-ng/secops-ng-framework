@@ -465,7 +465,7 @@ documented in the corresponding NIS2 article file.
 
 ### F-CP-03 — Supply-chain stream
 
-- **Status:** Proposed
+- **Status:** SKELETON in flight
 - **Priority:** P1
 - **Acceptance criteria:**
   - `content/evidence/supply-chain/dependencies-snapshot.json`
@@ -474,6 +474,13 @@ documented in the corresponding NIS2 article file.
   sovereignty classification.
 - **Depends on:** F-PT-03
 - **Source:** NIS2 Art. 21(2)(d), Art. 22.
+- **In flight:** SKELETON — record-schema narrative
+  (`content/evidence/supply-chain/SCHEMA.md`), `vulnerability_triage`
+  stream-root placeholder, and Article 22 mapping stub
+  (`content/mappings/nis2/article-22-supply-chain.md`) landed in
+  PR `feat/f-cp-03-skeleton`. CORE-FANOUT (JSON Schema, shared
+  emitter, three target adapters), EXTEND-tests-goldens, EXTEND-drift,
+  EXTEND-metrics, and EXTEND-NIS2-MAPPING fan out into sibling cards.
 
 ### F-CP-04 — Vulnerabilities stream
 
