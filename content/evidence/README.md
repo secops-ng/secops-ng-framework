@@ -34,7 +34,7 @@ column points to the typed shape the stream emits.
 | Incidents | F-CP-02 | _pending_ | Proposed | Per-incident artifact emitted by the incident-management workflow, scoped to NIS2 reporting windows (NIS2 Art. 21(2)(b), Art. 23). |
 | Supply-chain | F-CP-03 | [`supply-chain/`](supply-chain/SCHEMA.md) | SKELETON in flight | Dependencies snapshot per workflow execution that calls an external provider, including provider sovereignty classification (NIS2 Art. 21(2)(d), Art. 22). |
 | Vulnerabilities | F-CP-04 | _pending_ | In Progress | Triage decisions and disclosure timelines emitted by `vulnerability_triage`, wired to the CVD-timing KPI family (NIS2 Art. 21(2)(e), CRA Art. 11). |
-| Crypto attestation | F-CP-05 | _pending_ | Proposed | Per-execution attestation that no secret was baked into workflow code — env-only injection, hard-failed at boot otherwise (NIS2 Art. 21(2)(h), Core Directive #6). |
+| Crypto attestation | F-CP-05 | [`crypto/`](crypto/README.md) | SCHEMA in flight | Per-execution attestation that no secret was baked into workflow code — env-only injection, hard-failed at boot otherwise (NIS2 Art. 21(2)(h), Core Directive #6). |
 | Effectiveness | F-CP-06 | _pending_ | Proposed | Metric snapshots per policy / prompt version, DSPy-evaluatable, consumed by the NIS2 Art. 21(2)(f) effectiveness loop. |
 | Access | F-CP-07 | _pending_ | Proposed | Per-execution caller identity and capability list (NIS2 Art. 21(2)(i)). |
 
