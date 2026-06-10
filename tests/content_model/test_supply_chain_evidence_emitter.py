@@ -21,6 +21,7 @@ byte-parity goldens land in the EXTEND-tests sibling):
 """
 from __future__ import annotations
 
+import asyncio
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -486,6 +487,65 @@ def test_n8n_adapter_preserves_sovereignty_classification(
     result = emit_supply_chain_artifact_n8n(_payload_from_ctx(ctx), tmp_path)
     on_disk = json.loads(Path(result["artifact_path"]).read_text("utf-8"))
     # Sovereignty classification populated on every declared dependency.
+    assert on_disk["dependencies"], "fixture must exercise dependencies"
+    for emitted, source in zip(on_disk["dependencies"], ctx.dependencies):
+        cls = emitted["sovereignty_classification"]
+        src = source.sovereignty_classification
+        assert cls["residency"] == src.residency
+        assert cls["ownership"] == src.ownership
+        assert cls["sovereignty_band"] == src.sovereignty_band
+        if src.kb_ref is not None:
+            assert cls["kb_ref"] == src.kb_ref
+
+
+# --------------------------------------------------------------------------- #
+# Temporal adapter round-trip (CORE-FANOUT-TMP)                               #
+# --------------------------------------------------------------------------- #
+
+
+def test_temporal_activity_wraps_shared_helper(tmp_path: Path) -> None:
+    """CORE-FANOUT-TMP pins the Temporal activity against the shared helper.
+
+    The activity accepts the typed :class:`SupplyChainContext` a Temporal
+    workflow would hand it, delegates to ``emit_supply_chain_artifact``,
+    and returns the absolute path of the written record. The on-disk
+    record must be byte-identical to what the shared renderer produces.
+    """
+    pytest.importorskip("temporalio")
+    from compilers.temporal.evidence import emit_supply_chain_artifact_activity
+
+    ctx = _ctx()
+    written_str = asyncio.run(
+        emit_supply_chain_artifact_activity(ctx, str(tmp_path))
+    )
+    written = Path(written_str)
+    assert written.exists()
+    on_disk = json.loads(written.read_text("utf-8"))
+    _validator().validate(on_disk)
+    assert on_disk == render_supply_chain_artifact(ctx)
+    assert written.name == f"{on_disk['artifact_id']}.json"
+
+
+def test_temporal_activity_preserves_sovereignty_classification(
+    tmp_path: Path,
+) -> None:
+    """Provider sovereignty classification is forwarded verbatim.
+
+    The Temporal activity must not reclassify, coerce, or default any
+    of the classification axes (``residency``, ``ownership``,
+    ``sovereignty_band``, ``sub_processor_chain``, ``band_rationale``,
+    ``kb_ref``) — the operator's Sovereign Provider KB upstream of the
+    activity is the source of truth. Pins the contract per the F-CP-03
+    CORE-FANOUT-TMP acceptance criteria.
+    """
+    pytest.importorskip("temporalio")
+    from compilers.temporal.evidence import emit_supply_chain_artifact_activity
+
+    ctx = _ctx()
+    written_str = asyncio.run(
+        emit_supply_chain_artifact_activity(ctx, str(tmp_path))
+    )
+    on_disk = json.loads(Path(written_str).read_text("utf-8"))
     assert on_disk["dependencies"], "fixture must exercise dependencies"
     for emitted, source in zip(on_disk["dependencies"], ctx.dependencies):
         cls = emitted["sovereignty_classification"]
