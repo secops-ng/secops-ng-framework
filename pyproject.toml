@@ -91,3 +91,9 @@ warn_return_any = true
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+# ``importlib`` lets per-target golden tests share the basename
+# ``test_golden.py`` under hyphenated directories
+# (e.g. ``tests/examples/{n8n,langgraph,temporal}/vuln-intake/...``)
+# without colliding on module name. The hyphen rules out ``__init__.py``
+# packaging — those dir names are not valid Python identifiers.
+addopts = "--import-mode=importlib"
