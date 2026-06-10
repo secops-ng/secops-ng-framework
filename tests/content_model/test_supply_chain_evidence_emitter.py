@@ -555,3 +555,83 @@ def test_temporal_activity_preserves_sovereignty_classification(
         assert cls["sovereignty_band"] == src.sovereignty_band
         if src.kb_ref is not None:
             assert cls["kb_ref"] == src.kb_ref
+
+
+# --------------------------------------------------------------------------- #
+# LangGraph node round-trip (CORE-FANOUT-LG-SKELETON)                         #
+# --------------------------------------------------------------------------- #
+
+
+def test_langgraph_node_wraps_shared_helper(tmp_path: Path) -> None:
+    """CORE-FANOUT-LG pins the LangGraph node against the shared helper.
+
+    The node accepts a state mapping carrying the typed
+    :class:`SupplyChainContext` a preceding tool-call node would
+    assemble, delegates to ``emit_supply_chain_artifact``, and returns
+    a partial state update naming the absolute artifact path and the
+    deterministic ``artifact_id``. The on-disk record must be
+    byte-identical to what the shared renderer produces.
+    """
+    from compilers.langgraph.evidence import emit_supply_chain_artifact_node
+
+    ctx = _ctx()
+    update = emit_supply_chain_artifact_node(
+        {
+            "supply_chain_context": ctx,
+            "evidence_output_dir": str(tmp_path),
+        }
+    )
+    written = Path(update["supply_chain_artifact_path"])
+    assert written.exists()
+    on_disk = json.loads(written.read_text("utf-8"))
+    _validator().validate(on_disk)
+    assert on_disk == render_supply_chain_artifact(ctx)
+    assert update["supply_chain_artifact_id"] == on_disk["artifact_id"]
+    assert written.name == f"{on_disk['artifact_id']}.json"
+
+
+def test_langgraph_node_preserves_sovereignty_classification(
+    tmp_path: Path,
+) -> None:
+    """Provider sovereignty classification is forwarded verbatim.
+
+    The LangGraph node must not reclassify, coerce, or default any of
+    the classification axes — the operator's Sovereign Provider KB
+    upstream of the node is the source of truth. Pins the contract per
+    the F-CP-03 CORE-FANOUT-LG acceptance criteria.
+    """
+    from compilers.langgraph.evidence import emit_supply_chain_artifact_node
+
+    ctx = _ctx()
+    update = emit_supply_chain_artifact_node(
+        {
+            "supply_chain_context": ctx,
+            "evidence_output_dir": str(tmp_path),
+        }
+    )
+    on_disk = json.loads(
+        Path(update["supply_chain_artifact_path"]).read_text("utf-8")
+    )
+    assert on_disk["dependencies"], "fixture must exercise dependencies"
+    for emitted, source in zip(on_disk["dependencies"], ctx.dependencies):
+        cls = emitted["sovereignty_classification"]
+        src = source.sovereignty_classification
+        assert cls["residency"] == src.residency
+        assert cls["ownership"] == src.ownership
+        assert cls["sovereignty_band"] == src.sovereignty_band
+        if src.kb_ref is not None:
+            assert cls["kb_ref"] == src.kb_ref
+
+
+def test_langgraph_node_raises_on_missing_state_keys(tmp_path: Path) -> None:
+    """Missing required state keys surface a typed KeyError for the integrator."""
+    from compilers.langgraph.evidence import emit_supply_chain_artifact_node
+
+    with pytest.raises(KeyError):
+        emit_supply_chain_artifact_node(
+            {"evidence_output_dir": str(tmp_path)}
+        )
+    with pytest.raises(KeyError):
+        emit_supply_chain_artifact_node(
+            {"supply_chain_context": _ctx()}
+        )
