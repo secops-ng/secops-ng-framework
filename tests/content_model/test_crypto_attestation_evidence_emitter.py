@@ -309,6 +309,131 @@ def test_emit_rejects_bad_retention(tmp_path: Path) -> None:
 
 
 # --------------------------------------------------------------------------- #
+# n8n adapter round-trip (CORE-FANOUT-N8N)                                    #
+# --------------------------------------------------------------------------- #
+
+
+def _payload_from_ctx(ctx: CryptoAttestationContext) -> dict:
+    """Re-shape a context as the JSON-native payload an n8n node sends.
+
+    n8n cannot transport Python objects across the node-process boundary,
+    so the ``captured_at`` datetime serialises to an ISO-8601 ``...Z``
+    string and the nested ``secret_handling`` dataclass serialises to a
+    JSON sub-object. Only UPPER_SNAKE_CASE env-var *names* travel
+    through the payload — no values, no fragments. Kept in lockstep
+    with the n8n adapter contract.
+    """
+    sh = ctx.secret_handling
+    sh_payload: dict = {
+        "env_var_refs": list(sh.env_var_refs),
+        "secrets_baked_in": sh.secrets_baked_in,
+        "injection_mode": sh.injection_mode,
+    }
+    if sh.secret_count is not None:
+        sh_payload["secret_count"] = sh.secret_count
+
+    payload: dict = {
+        "workflow_id": ctx.workflow_id,
+        "execution_id": ctx.execution_id,
+        "compile_target": ctx.compile_target,
+        "regulation_refs": list(ctx.regulation_refs),
+        "control_refs": list(ctx.control_refs),
+        "secret_handling": sh_payload,
+        "captured_at": ctx.captured_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "source_url": ctx.source_url,
+    }
+    if ctx.owner_role is not None:
+        payload["owner_role"] = ctx.owner_role
+        payload["owner_assigned_at"] = ctx.owner_assigned_at
+    if ctx.commit_sha is not None:
+        payload["commit_sha"] = ctx.commit_sha
+    if ctx.retention is not None:
+        payload["retention"] = ctx.retention
+    return payload
+
+
+def test_n8n_adapter_wraps_shared_helper(tmp_path: Path) -> None:
+    """CORE-FANOUT-N8N pins the n8n adapter against the shared helper.
+
+    The adapter accepts the JSON-native payload an n8n
+    ``executeCommand`` / ``Code`` node would marshal, rebuilds the
+    typed context, and delegates to ``emit_crypto_attestation_artifact``.
+    The on-disk record must be byte-identical to what the shared
+    renderer produces, and the dict the adapter returns must name the
+    right ``artifact_id`` / ``artifact_path``.
+    """
+    from compilers.n8n.evidence import emit_crypto_attestation_artifact_n8n
+
+    ctx = _ctx(compile_target="n8n")
+    result = emit_crypto_attestation_artifact_n8n(
+        _payload_from_ctx(ctx), tmp_path
+    )
+    written = Path(result["artifact_path"])
+    assert written.exists()
+    on_disk = json.loads(written.read_text("utf-8"))
+    _validator().validate(on_disk)
+    assert on_disk == render_crypto_attestation_artifact(ctx)
+    assert result["artifact_id"] == on_disk["artifact_id"]
+    assert written.name == f"{on_disk['artifact_id']}.json"
+
+
+def test_n8n_adapter_asserts_env_only_injection(tmp_path: Path) -> None:
+    """The env-only-injection assertion is the contract this stream exists
+    to record. The n8n adapter must surface a payload that bakes secrets
+    into the workflow code path — or attempts a non-env injection mode —
+    as a rejection at the boundary; no artifact may be written. Pins the
+    F-CP-05 CORE-FANOUT-N8N acceptance criterion.
+    """
+    from compilers.n8n.evidence import emit_crypto_attestation_artifact_n8n
+
+    ctx = _ctx(compile_target="n8n")
+    payload_baked = _payload_from_ctx(ctx)
+    payload_baked["secret_handling"]["secrets_baked_in"] = True
+    with pytest.raises(ValueError):
+        emit_crypto_attestation_artifact_n8n(payload_baked, tmp_path)
+
+    payload_file = _payload_from_ctx(ctx)
+    payload_file["secret_handling"]["injection_mode"] = "file"
+    with pytest.raises(ValueError):
+        emit_crypto_attestation_artifact_n8n(payload_file, tmp_path)
+
+    # Credential-shaped strings smuggled in via env_var_refs are
+    # rejected — only UPPER_SNAKE_CASE names travel through the payload.
+    payload_value = _payload_from_ctx(ctx)
+    payload_value["secret_handling"]["env_var_refs"] = ["sk-abc123xyz"]
+    with pytest.raises(ValueError):
+        emit_crypto_attestation_artifact_n8n(payload_value, tmp_path)
+
+    # No artifact written on any rejected path.
+    assert not list(tmp_path.iterdir())
+
+
+def test_n8n_adapter_artifact_id_matches_temporal_for_same_execution(
+    tmp_path: Path,
+) -> None:
+    """The shared helper keys ``artifact_id`` on
+    ``(workflow_id, execution_id, compile_target)``; the compile-target
+    axis is what makes the n8n adapter's id distinct from the Temporal
+    one for the same execution. Pin the contract from both ends so a
+    refactor cannot silently collapse the targets.
+    """
+    from compilers.n8n.evidence import emit_crypto_attestation_artifact_n8n
+
+    ctx_n8n = _ctx(compile_target="n8n")
+    result = emit_crypto_attestation_artifact_n8n(
+        _payload_from_ctx(ctx_n8n), tmp_path
+    )
+    on_disk_n8n = json.loads(
+        Path(result["artifact_path"]).read_text("utf-8")
+    )
+    on_disk_temporal = render_crypto_attestation_artifact(
+        _ctx(compile_target="temporal")
+    )
+    assert on_disk_n8n["compile_target"] == "n8n"
+    assert on_disk_n8n["artifact_id"] != on_disk_temporal["artifact_id"]
+
+
+# --------------------------------------------------------------------------- #
 # Temporal activity wrapper                                                   #
 # --------------------------------------------------------------------------- #
 
