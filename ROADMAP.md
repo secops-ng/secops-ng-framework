@@ -500,7 +500,7 @@ documented in the corresponding NIS2 article file.
 
 ### F-CP-05 — Crypto attestation stream
 
-- **Status:** Proposed
+- **Status:** SKELETON in flight
 - **Priority:** P2
 - **Acceptance criteria:**
   - `content/evidence/crypto/secret-handling-attestation.json`
@@ -510,6 +510,24 @@ documented in the corresponding NIS2 article file.
   the env-only check is refused at boot.
 - **Depends on:** F-PT-01
 - **Source:** NIS2 Art. 21(2)(h), Core Directive #6.
+- **In flight:** SCHEMA + EMITTER SKELETON + CORE-FANOUT-N8N landed.
+  SCHEMA shipped the typed record shape at
+  `schemas/evidence/crypto-attestation.schema.json` (the three
+  mechanical assertions — `secrets_baked_in: false`, `injection_mode:
+  env`, UPPER_SNAKE_CASE `env_var_refs` only — are const-pinned at the
+  schema). EMITTER SKELETON shipped the shared framework-agnostic
+  helper at `compilers/_shared/evidence/crypto_attestation.py` and the
+  Temporal-side wrapper at
+  `compilers/temporal/evidence/crypto_attestation_activity.py`.
+  CORE-FANOUT-N8N shipped the n8n-side adapter at
+  `compilers/n8n/evidence/crypto_attestation_node.py` wired into the
+  `vulnerability_triage` workflow path with a byte-stable sample
+  emission under
+  `examples/n8n/vuln-intake/evidence/crypto/`. Remaining:
+  CORE-FANOUT-LG, EXTEND-tests-goldens, EXTEND-drift,
+  EXTEND-NIS2-MAPPING (Art. 21(2)(h) narrative), and the F-PT-01
+  refuse-at-boot enforcement fan out into sibling cards; status flip
+  to Shipped lands on EXTEND-tests-goldens.
 
 ### F-CP-06 — Effectiveness stream
 

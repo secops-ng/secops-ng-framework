@@ -21,10 +21,14 @@ from compilers.n8n.evidence.incidents_node import emit_incidents_artifact_n8n
 from compilers.n8n.evidence.supply_chain_node import (
     emit_supply_chain_artifact_n8n,
 )
+from compilers.n8n.evidence.crypto_attestation_node import (
+    emit_crypto_attestation_artifact_n8n,
+)
 
 __all__ = [
     "emit_risk_analysis_artifact_n8n",
     "emit_vulns_artifact_n8n",
     "emit_incidents_artifact_n8n",
     "emit_supply_chain_artifact_n8n",
+    "emit_crypto_attestation_artifact_n8n",
 ]
