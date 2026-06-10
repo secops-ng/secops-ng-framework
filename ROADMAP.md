@@ -474,13 +474,18 @@ documented in the corresponding NIS2 article file.
   sovereignty classification.
 - **Depends on:** F-PT-03
 - **Source:** NIS2 Art. 21(2)(d), Art. 22.
-- **In flight:** SKELETON — record-schema narrative
-  (`content/evidence/supply-chain/SCHEMA.md`), `vulnerability_triage`
-  stream-root placeholder, and Article 22 mapping stub
-  (`content/mappings/nis2/article-22-supply-chain.md`) landed in
-  PR `feat/f-cp-03-skeleton`. CORE-FANOUT (JSON Schema, shared
-  emitter, three target adapters), EXTEND-tests-goldens, EXTEND-drift,
-  EXTEND-metrics, and EXTEND-NIS2-MAPPING fan out into sibling cards.
+- **In flight:** SKELETON + CORE-FANOUT landed. SKELETON shipped the
+  record-schema narrative (`content/evidence/supply-chain/SCHEMA.md`),
+  the `vulnerability_triage` stream-root placeholder, and the Article 22
+  mapping stub (`content/mappings/nis2/article-22-supply-chain.md`).
+  CORE-FANOUT shipped the JSON Schema (SCHEMA card), the shared emitter
+  helper (`compilers/_shared/evidence/supply_chain.py`), and all three
+  target adapters (n8n, Temporal, LangGraph) wired into the
+  `vulnerability_triage` workflow path with byte-stable sample emissions
+  under `examples/{n8n,temporal,langgraph}/vuln-intake/evidence/supply-chain/`.
+  Remaining: EXTEND-tests-goldens, EXTEND-drift, EXTEND-metrics, and
+  EXTEND-NIS2-MAPPING fan out into sibling cards; status flip to Shipped
+  lands on EXTEND-tests-goldens.
 
 ### F-CP-04 — Vulnerabilities stream
 
