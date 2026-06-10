@@ -48,6 +48,13 @@ from compilers._shared.evidence.supply_chain import (
     emit_supply_chain_artifact,
     render_supply_chain_artifact,
 )
+from compilers._shared.evidence.crypto_attestation import (
+    CryptoAttestationContext,
+    SecretHandling,
+    derive_artifact_id as derive_crypto_attestation_artifact_id,
+    emit_crypto_attestation_artifact,
+    render_crypto_attestation_artifact,
+)
 from compilers._shared.evidence.incidents import (
     ClassificationVerdict,
     IncidentsContext,
@@ -92,4 +99,9 @@ __all__ = [
     "derive_supply_chain_artifact_id",
     "emit_supply_chain_artifact",
     "render_supply_chain_artifact",
+    "CryptoAttestationContext",
+    "SecretHandling",
+    "derive_crypto_attestation_artifact_id",
+    "emit_crypto_attestation_artifact",
+    "render_crypto_attestation_artifact",
 ]
