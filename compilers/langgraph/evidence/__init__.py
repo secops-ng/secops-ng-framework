@@ -22,10 +22,14 @@ from compilers.langgraph.evidence.incidents_node import (
 from compilers.langgraph.evidence.supply_chain_node import (
     emit_supply_chain_artifact_node,
 )
+from compilers.langgraph.evidence.crypto_attestation_node import (
+    emit_crypto_attestation_artifact_node,
+)
 
 __all__ = [
     "emit_risk_analysis_artifact_node",
     "emit_vulns_artifact_node",
     "emit_incidents_artifact_node",
     "emit_supply_chain_artifact_node",
+    "emit_crypto_attestation_artifact_node",
 ]
