@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_id": "78e93c92608e640fb15bd576ee39080c657a6a593665f94b434a9a9edba6faf2",
+  "stream": "crypto-attestation",
+  "workflow_id": "incident_management",
+  "execution_id": "wf-run-2026-06-09-0001",
+  "compile_target": "temporal",
+  "regulation_refs": ["nis2:art-21-2-h"],
+  "control_refs": ["control.crypto_policy_inventory@v1"],
+  "secret_handling": {
+    "secrets_baked_in": false,
+    "injection_mode": "env",
+    "env_var_refs": [
+      "INCIDENT_NOTIFIER_API_TOKEN",
+      "CSIRT_PORTAL_CLIENT_SECRET"
+    ],
+    "secret_count": 2
+  },
+  "captured_at": "2026-06-09T05:00:00Z",
+  "provenance": {
+    "source_url": "https://example.org/runs/abc123",
+    "captured_at": "2026-06-09",
+    "commit_sha": "0123456789abcdef0123456789abcdef01234567"
+  }
+}
