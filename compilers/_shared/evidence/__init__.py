@@ -37,6 +37,17 @@ from compilers._shared.evidence.vulns import (
     emit_vulns_artifact,
     render_vulns_artifact,
 )
+from compilers._shared.evidence.supply_chain import (
+    Aggregates,
+    Attestation,
+    Dependency,
+    SovereigntyClassification,
+    SupplyChainContext,
+    compute_sovereignty_band,
+    derive_artifact_id as derive_supply_chain_artifact_id,
+    emit_supply_chain_artifact,
+    render_supply_chain_artifact,
+)
 from compilers._shared.evidence.incidents import (
     ClassificationVerdict,
     IncidentsContext,
@@ -72,4 +83,13 @@ __all__ = [
     "derive_incidents_artifact_id",
     "emit_incidents_artifact",
     "render_incidents_artifact",
+    "SupplyChainContext",
+    "Dependency",
+    "SovereigntyClassification",
+    "Attestation",
+    "Aggregates",
+    "compute_sovereignty_band",
+    "derive_supply_chain_artifact_id",
+    "emit_supply_chain_artifact",
+    "render_supply_chain_artifact",
 ]
