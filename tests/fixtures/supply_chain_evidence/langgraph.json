@@ -1,0 +1,73 @@
+{
+  "aggregates": {
+    "ai_provider_count": 1,
+    "eu_hosted_count": 1,
+    "non_eu_count": 1,
+    "sovereign_count": 1,
+    "total_providers": 2
+  },
+  "artifact_id": "e1f97f44d2622b9dd70bcf2315989b7de47402ae2c276bf667c55bf6ec0ff178",
+  "captured_at": "2026-06-07T06:00:00Z",
+  "control_refs": [
+    "control.supplier_inventory@v1",
+    "control.provider_attestation@v1"
+  ],
+  "dependencies": [
+    {
+      "attestation": {
+        "attestation_ref": "atte-2026Q2-0001",
+        "last_reattested_at": "2026-04-01T00:00:00Z",
+        "next_due_at": "2027-04-01T00:00:00Z",
+        "state": "effective"
+      },
+      "call_count": 4,
+      "kind": "data_feed",
+      "provider_id": "provider.cve_feed_eu@v1",
+      "risk_notes": "EU-hosted, EU-owned vulnerability data feed; primary source for triage enrichment.",
+      "sovereignty_classification": {
+        "band_rationale": "EU-owned provider operating wholly inside an EU Member State; no declared sub-processors.",
+        "kb_ref": "supplier-kb://provider-eu-sovereign-ai/2026-Q2",
+        "ownership": "eu_owned",
+        "residency": "eu",
+        "sovereignty_band": "sovereign",
+        "sub_processor_chain": []
+      },
+      "version": "2026-06-07"
+    },
+    {
+      "attestation": {
+        "last_reattested_at": "2025-01-01T00:00:00Z",
+        "next_due_at": "2026-01-01T00:00:00Z",
+        "state": "overdue"
+      },
+      "call_count": 1,
+      "kind": "ai_provider",
+      "provider_id": "provider.llm_inference_non_eu@v1",
+      "risk_notes": "Non-EU LLM used for risk-summary generation; attestation overdue per supplier KB cadence.",
+      "sovereignty_classification": {
+        "band_rationale": "Non-EU residency; ownership chain not in scope for the sovereign band.",
+        "kb_ref": "supplier-kb://provider-non-eu-llm/2026-Q2",
+        "ownership": "non_eu_owned",
+        "residency": "non_eu",
+        "sovereignty_band": "non_eu"
+      }
+    }
+  ],
+  "execution_id": "temporal:wf-run-supply-abc123",
+  "owner": {
+    "assigned_at": "2026-01-15",
+    "role": "supplier-governance@example.org"
+  },
+  "provenance": {
+    "captured_at": "2026-06-07T06:00:00Z",
+    "commit_sha": "deadbeef0123456789",
+    "source_url": "https://example.org/runs/supply-abc123"
+  },
+  "regulation_refs": [
+    "nis2:art-21-2-d",
+    "nis2:art-22"
+  ],
+  "schema_version": "1.0.0",
+  "stream": "supply-chain",
+  "workflow_id": "vulnerability_triage"
+}
