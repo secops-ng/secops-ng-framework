@@ -454,7 +454,7 @@ documented in the corresponding NIS2 article file.
 
 ### F-CP-02 — Incidents stream
 
-- **Status:** Proposed
+- **Status:** Shipped
 - **Priority:** P1
 - **Acceptance criteria:**
   - `content/evidence/incidents/<workflow-id>/` populated by the
