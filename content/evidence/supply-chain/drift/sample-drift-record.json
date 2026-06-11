@@ -1,0 +1,44 @@
+{
+  "schema_version": "0.1.0",
+  "id": "f3c33e5b9e1904dc5879bda7b18d00ae548d8b502cabd1e48a79690ea1801afc",
+  "stream": "supply-chain",
+  "workflow_id": "vulnerability_triage",
+  "previous_snapshot_ref": "305d603565c6b89a6c0714cf7a5f6c5b85a37ef257bdaa9ab3013f89ef0f5b37",
+  "current_snapshot_ref": "845b3f38ada9edaff330fa02cf9c32a73094172da947e555008d3a07c90b674e",
+  "deltas": [
+    {
+      "kind": "added",
+      "provider_id": "provider.example_eu_threat_feed@v1",
+      "previous": null,
+      "current": {
+        "kind": "data_feed",
+        "version": null,
+        "sovereignty_band": "sovereign"
+      },
+      "note": "New data_feed dependency appeared between cadence walks; pending re-attestation under NIS2 Art. 21(2)(d)."
+    },
+    {
+      "kind": "removed",
+      "provider_id": "provider.example_legacy_runtime@v1",
+      "previous": {
+        "kind": "managed_runtime",
+        "version": "2025.09",
+        "sovereignty_band": "eu_hosted_non_sovereign"
+      },
+      "current": null,
+      "note": "Managed runtime de-listed; removal still has to be re-attested rather than disappear silently."
+    },
+    {
+      "kind": "version_bumped",
+      "provider_id": "provider.example_sbom_lib@v1",
+      "previous": {
+        "version": "1.4.2"
+      },
+      "current": {
+        "version": "1.5.0"
+      },
+      "note": "Pinned library minor bump; sub-processor chain unchanged on current side."
+    }
+  ],
+  "detected_at": "2026-06-15T00:00:00Z"
+}
