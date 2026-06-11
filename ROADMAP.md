@@ -500,7 +500,7 @@ documented in the corresponding NIS2 article file.
 
 ### F-CP-05 — Crypto attestation stream
 
-- **Status:** SKELETON in flight
+- **Status:** Shipped
 - **Priority:** P2
 - **Acceptance criteria:**
   - `content/evidence/crypto/secret-handling-attestation.json`
@@ -510,29 +510,31 @@ documented in the corresponding NIS2 article file.
   the env-only check is refused at boot.
 - **Depends on:** F-PT-01
 - **Source:** NIS2 Art. 21(2)(h), Core Directive #6.
-- **In flight:** SCHEMA + EMITTER SKELETON + CORE-FANOUT-N8N +
-  CORE-FANOUT-LG landed.
-  SCHEMA shipped the typed record shape at
-  `schemas/evidence/crypto-attestation.schema.json` (the three
-  mechanical assertions — `secrets_baked_in: false`, `injection_mode:
-  env`, UPPER_SNAKE_CASE `env_var_refs` only — are const-pinned at the
-  schema). EMITTER SKELETON shipped the shared framework-agnostic
-  helper at `compilers/_shared/evidence/crypto_attestation.py` and the
-  Temporal-side wrapper at
-  `compilers/temporal/evidence/crypto_attestation_activity.py`.
-  CORE-FANOUT-N8N shipped the n8n-side adapter at
-  `compilers/n8n/evidence/crypto_attestation_node.py` wired into the
-  `vulnerability_triage` workflow path with a byte-stable sample
-  emission under
-  `examples/n8n/vuln-intake/evidence/crypto/`.
-  CORE-FANOUT-LG shipped the LangGraph-side node adapter at
-  `compilers/langgraph/evidence/crypto_attestation_node.py` wrapping
-  the same shared helper, with a byte-stable sample emission under
-  `examples/langgraph/vuln-intake/evidence/crypto/`. Remaining:
-  EXTEND-tests-goldens, EXTEND-drift, EXTEND-NIS2-MAPPING (Art.
-  21(2)(h) narrative), and the F-PT-01 refuse-at-boot enforcement fan
-  out into sibling cards; status flip to Shipped lands on
-  EXTEND-tests-goldens.
+- **Shipped via:**
+  - SCHEMA — #292 (typed record shape at
+    `schemas/evidence/crypto-attestation.schema.json`; the three
+    mechanical assertions — `secrets_baked_in: false`,
+    `injection_mode: env`, UPPER_SNAKE_CASE `env_var_refs` only — are
+    const-pinned at the schema).
+  - EMITTER SKELETON — #293 (shared framework-agnostic helper at
+    `compilers/_shared/evidence/crypto_attestation.py` and the
+    Temporal-side activity wrapper at
+    `compilers/temporal/evidence/crypto_attestation_activity.py`).
+  - CORE-FANOUT-N8N — #296 (n8n adapter at
+    `compilers/n8n/evidence/crypto_attestation_node.py` wired into the
+    `vulnerability_triage` workflow path, with a byte-stable sample
+    emission under `examples/n8n/vuln-intake/evidence/crypto/`).
+  - CORE-FANOUT-LG — #297 (LangGraph node adapter at
+    `compilers/langgraph/evidence/crypto_attestation_node.py` wrapping
+    the same shared helper, with a byte-stable sample emission under
+    `examples/langgraph/vuln-intake/evidence/crypto/`).
+  - CORE-FANOUT-TEMPORAL-EXAMPLE — #300 (Temporal worked example
+    under `examples/temporal/vuln-intake/evidence/crypto/`).
+  - EXTEND-tests-goldens per-target byte-parity — #298 (n8n), #299
+    (LangGraph), #301 (Temporal).
+- EXTEND-drift, EXTEND-NIS2-MAPPING (Art. 21(2)(h) narrative), and
+  the F-PT-01 refuse-at-boot enforcement fan out into sibling cards
+  tracked separately.
 
 ### F-CP-06 — Effectiveness stream
 
