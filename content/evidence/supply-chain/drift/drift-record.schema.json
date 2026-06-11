@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/evidence/supply-chain/drift/drift-record.schema.json",
+  "title": "SecOps-NG Supply-Chain Drift Record (SKELETON)",
+  "description": "Typed shape for one drift record produced when the supply-chain drift detector diffs two successive `dependencies-snapshot.json` artefacts in the same `workflow_id` series. SKELETON in this card: the field inventory is pinned, but no detector implementation is shipped and no per-target compiler hook is wired — those land in the F-CP-03 EXTEND-drift CORE-FANOUT sibling. The four delta kinds (`added`, `removed`, `version_bumped`, `sovereignty_band_changed`) are the surface NIS2 Article 21(2)(d) periodic re-attestation cares about, and the per-entity record is the shape NIS2 Article 22 Cooperation-Group coordinated risk assessments aggregate against (the framework emits the per-entity drift record, not the Member-State aggregation envelope). Public-bar artefact: provider identifiers are opaque operator-side ids, free-text notes stay role-shaped or URN-shaped, and individual personal names are out of scope per AGENTS.md §3.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "stream",
+    "workflow_id",
+    "previous_snapshot_ref",
+    "current_snapshot_ref",
+    "deltas",
+    "detected_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Pinned schema version. Lets a consumer reject drift records produced under an older schema once breaking changes ship.",
+      "type": "string",
+      "const": "0.1.0"
+    },
+    "id": {
+      "description": "Stable per-record identifier. Convention: SHA-256 hex digest of `<workflow_id>|<previous_snapshot_ref>|<current_snapshot_ref>` (UTF-8, no separators around the pipes). Two detector runs against the same snapshot pair collide deliberately.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "stream": {
+      "description": "Identifies which evidence stream produced the drift record. Constant on this schema.",
+      "type": "string",
+      "const": "supply-chain"
+    },
+    "workflow_id": {
+      "description": "Stable workflow identifier — one of the workflow ids declared under `content/playbooks/<workflow-id>/`. The drift record always pins to a single workflow series; cross-workflow drift is intentionally out of scope.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[a-z][a-z0-9_-]*$"
+    },
+    "previous_snapshot_ref": {
+      "description": "`artifact_id` of the prior `dependencies-snapshot.json` artefact in this `workflow_id` series. SHA-256 hex digest (64 chars).",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "current_snapshot_ref": {
+      "description": "`artifact_id` of the current `dependencies-snapshot.json` artefact being compared against `previous_snapshot_ref`. SHA-256 hex digest (64 chars). MUST differ from `previous_snapshot_ref` — a drift record against an identical pair is not a drift record.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "deltas": {
+      "description": "One entry per detected change between the two snapshots. An empty array is permitted: a deterministic detector that runs against a stable pair and finds no drift still produces a record so downstream consumers see the cadence walk happened (cf. `attestation_state` cadence discipline on the risk-analysis stream).",
+      "type": "array",
+      "items": { "$ref": "#/$defs/delta" }
+    },
+    "detected_at": {
+      "description": "ISO-8601 UTC timestamp the detector resolved this snapshot pair. Format `YYYY-MM-DDTHH:MM:SSZ` (no sub-second precision, no offset — UTC only). Carries through to drift-aggregate rollups in the EXTEND-metrics sibling.",
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    }
+  },
+  "$defs": {
+    "delta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "provider_id", "previous", "current"],
+      "properties": {
+        "kind": {
+          "description": "Which drift surface this delta belongs to. The four-element vocabulary mirrors the surfaces NIS2 Art. 21(2)(d) periodic re-attestation cares about and is promoted into `schemas/supply_chain_drift_kind.json` alongside the detector wiring. Extending the set is a discussion, not a drive-by change.",
+          "type": "string",
+          "enum": [
+            "added",
+            "removed",
+            "version_bumped",
+            "sovereignty_band_changed"
+          ]
+        },
+        "provider_id": {
+          "description": "Stable internal id of the provider the delta is about (mirror of `dependencies[].provider_id` on the snapshot schema). Opaque operator-side id; the framework never resolves it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "^[a-z][a-z0-9._@/-]*$"
+        },
+        "previous": {
+          "description": "Minimal snapshot of the fields relevant to `kind` on the previous side of the change. `null` for `added`. Carries `{ version }` for `version_bumped` and `{ sovereignty_band }` for `sovereignty_band_changed`; carries the full dependency record's identifying triple `{ kind, version, sovereignty_band }` for `removed` so a downstream rollup can reconstruct what disappeared.",
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "description": "Dependency kind on the previous side; one of the values promoted in `schemas/supply_chain_dependency_kind.json`.",
+                  "type": "string",
+                  "enum": [
+                    "software_dependency",
+                    "hosted_api",
+                    "data_feed",
+                    "ai_provider",
+                    "managed_runtime"
+                  ]
+                },
+                "version": {
+                  "description": "Version pin or commit SHA on the previous side; `null` for moving-tag hosted services. Mirror of `dependencies[].version` on the snapshot schema.",
+                  "type": ["string", "null"],
+                  "maxLength": 200
+                },
+                "sovereignty_band": {
+                  "description": "Rolled-up sovereignty verdict on the previous side; one of the values promoted in `schemas/sovereignty_band.json`.",
+                  "type": "string",
+                  "enum": [
+                    "sovereign",
+                    "eu_hosted_non_sovereign",
+                    "eu_adequate",
+                    "non_eu",
+                    "unknown"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "current": {
+          "description": "Minimal snapshot of the fields relevant to `kind` on the current side of the change. `null` for `removed`. Carries `{ kind, version, sovereignty_band }` for `added` so a downstream rollup sees what appeared; `{ version }` for `version_bumped`; `{ sovereignty_band }` for `sovereignty_band_changed`.",
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "description": "Dependency kind on the current side; one of the values promoted in `schemas/supply_chain_dependency_kind.json`.",
+                  "type": "string",
+                  "enum": [
+                    "software_dependency",
+                    "hosted_api",
+                    "data_feed",
+                    "ai_provider",
+                    "managed_runtime"
+                  ]
+                },
+                "version": {
+                  "description": "Version pin or commit SHA on the current side; `null` for moving-tag hosted services. Mirror of `dependencies[].version` on the snapshot schema.",
+                  "type": ["string", "null"],
+                  "maxLength": 200
+                },
+                "sovereignty_band": {
+                  "description": "Rolled-up sovereignty verdict on the current side; one of the values promoted in `schemas/sovereignty_band.json`.",
+                  "type": "string",
+                  "enum": [
+                    "sovereign",
+                    "eu_hosted_non_sovereign",
+                    "eu_adequate",
+                    "non_eu",
+                    "unknown"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "note": {
+          "description": "Short free-text rationale field pinning the delta to its inputs. Read by reviewers; not parsed downstream. No individual contact names; provider identity only, mirroring the SCHEMA.md `risk_notes` discipline.",
+          "type": "string",
+          "maxLength": 500
+        }
+      }
+    }
+  }
+}

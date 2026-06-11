@@ -163,7 +163,10 @@ Out of scope for the SCHEMA card; each lands in a sibling:
   and the three target adapters (Temporal, n8n, LangGraph) — CORE-FANOUT.
 - Per-target byte-parity goldens — EXTEND-tests-goldens.
 - Drift-detection hook for `sovereignty_band` transitions —
-  EXTEND-drift sibling.
+  EXTEND-drift sibling. SKELETON drift surface (field inventory,
+  schema placeholder, byte-stable fixture) is wired under
+  [`drift/DRIFT.md`](drift/DRIFT.md); the detector and the per-target
+  compiler hooks land in EXTEND-drift CORE-FANOUT.
 - KPI / KRI catalogue entries (`kpi.sovereign_provider_share@v1`,
   `kri.non_sovereign_call_surge@v1`) — EXTEND-metrics sibling.
 
