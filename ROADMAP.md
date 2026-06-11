@@ -465,7 +465,7 @@ documented in the corresponding NIS2 article file.
 
 ### F-CP-03 — Supply-chain stream
 
-- **Status:** SKELETON in flight
+- **Status:** Shipped
 - **Priority:** P1
 - **Acceptance criteria:**
   - `content/evidence/supply-chain/dependencies-snapshot.json`
@@ -474,18 +474,35 @@ documented in the corresponding NIS2 article file.
   sovereignty classification.
 - **Depends on:** F-PT-03
 - **Source:** NIS2 Art. 21(2)(d), Art. 22.
-- **In flight:** SKELETON + CORE-FANOUT landed. SKELETON shipped the
-  record-schema narrative (`content/evidence/supply-chain/SCHEMA.md`),
-  the `vulnerability_triage` stream-root placeholder, and the Article 22
-  mapping stub (`content/mappings/nis2/article-22-supply-chain.md`).
-  CORE-FANOUT shipped the JSON Schema (SCHEMA card), the shared emitter
-  helper (`compilers/_shared/evidence/supply_chain.py`), and all three
-  target adapters (n8n, Temporal, LangGraph) wired into the
-  `vulnerability_triage` workflow path with byte-stable sample emissions
-  under `examples/{n8n,temporal,langgraph}/vuln-intake/evidence/supply-chain/`.
-  Remaining: EXTEND-tests-goldens, EXTEND-drift, EXTEND-metrics, and
-  EXTEND-NIS2-MAPPING fan out into sibling cards; status flip to Shipped
-  lands on EXTEND-tests-goldens.
+- **Shipped via:**
+  - SCHEMA — #286 (record-schema narrative at
+    `content/evidence/supply-chain/SCHEMA.md`, the
+    `vulnerability_triage` stream-root placeholder, and the Article 22
+    mapping stub at
+    `content/mappings/nis2/article-22-supply-chain.md`; JSON Schema at
+    `schemas/evidence/dependencies-snapshot.schema.json` with provider
+    sovereignty classification pinned).
+  - CORE-FANOUT shared helper — #287 (framework-agnostic emitter at
+    `compilers/_shared/evidence/supply_chain.py`).
+  - CORE-FANOUT-N8N — #288 (n8n adapter at
+    `compilers/n8n/evidence/supply_chain_node.py` wired into the
+    `vulnerability_triage` workflow path, with a byte-stable sample
+    emission under `examples/n8n/vuln-intake/evidence/supply-chain/`).
+  - CORE-FANOUT-TEMPORAL — #289 (Temporal activity at
+    `compilers/temporal/evidence/supply_chain_activity.py` wrapping
+    the same shared helper, with a byte-stable sample emission under
+    `examples/temporal/vuln-intake/evidence/supply-chain/`).
+  - CORE-FANOUT-LG SKELETON — #290 (LangGraph node adapter at
+    `compilers/langgraph/evidence/supply_chain_node.py` wrapping the
+    same shared helper).
+  - CORE-FANOUT-LG EXAMPLE — #291 (LangGraph worked example under
+    `examples/langgraph/vuln-intake/evidence/supply-chain/`).
+  - EXTEND-tests-goldens per-target byte-parity — #303 (n8n +
+    Temporal + LangGraph; 21 replay tests).
+  - EXTEND-drift SKELETON — #304 (drift-detection scaffolding for
+    `dependencies-snapshot.json` across all three targets).
+- EXTEND-metrics and EXTEND-NIS2-MAPPING (Art. 22 narrative) fan out
+  into sibling cards tracked separately.
 
 ### F-CP-04 — Vulnerabilities stream
 
