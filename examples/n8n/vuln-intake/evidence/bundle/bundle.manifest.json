@@ -1,0 +1,110 @@
+{
+  "schema_version": "1.0.0",
+  "bundle_id": "e189675e17f8e759e06cfc24149d7480cf8ffd1702dbc3192b728f3a674af074",
+  "generated_at": "2026-06-17T10:00:00Z",
+  "bundle_window_start": "2026-04-01T00:00:00Z",
+  "bundle_window_end": "2026-06-30T23:59:59Z",
+  "regulation_refs": [
+    "nis2:art-20",
+    "nis2:art-21-2-d",
+    "nis2:art-21-2-h",
+    "nis2:art-22",
+    "nis2:art-23"
+  ],
+  "streams": [
+    {
+      "stream": "risk-analysis",
+      "feature_ref": "F-CP-01",
+      "present": false,
+      "schema_ref": "schemas/evidence/risk-analysis.schema.json",
+      "artifact_paths": [],
+      "artifact_count": 0,
+      "regulation_refs": [
+        "nis2:art-21-2-a"
+      ]
+    },
+    {
+      "stream": "incidents",
+      "feature_ref": "F-CP-02",
+      "present": false,
+      "schema_ref": "schemas/evidence/incidents.schema.json",
+      "artifact_paths": [],
+      "artifact_count": 0,
+      "regulation_refs": [
+        "nis2:art-21-2-b",
+        "nis2:art-23"
+      ]
+    },
+    {
+      "stream": "supply-chain",
+      "feature_ref": "F-CP-03",
+      "present": true,
+      "schema_ref": "schemas/evidence/supply-chain.schema.json",
+      "artifact_paths": [
+        "content/evidence/supply-chain/dependencies-snapshot.json"
+      ],
+      "artifact_count": 1,
+      "regulation_refs": [
+        "nis2:art-21-2-d",
+        "nis2:art-22"
+      ]
+    },
+    {
+      "stream": "vulns",
+      "feature_ref": "F-CP-04",
+      "present": false,
+      "schema_ref": "schemas/evidence/vulns.schema.json",
+      "artifact_paths": [],
+      "artifact_count": 0,
+      "regulation_refs": [
+        "nis2:art-21-2-e"
+      ]
+    },
+    {
+      "stream": "crypto",
+      "feature_ref": "F-CP-05",
+      "present": true,
+      "schema_ref": "schemas/evidence/crypto-attestation.schema.json",
+      "artifact_paths": [
+        "content/evidence/crypto/secret-handling-attestation.json"
+      ],
+      "artifact_count": 1,
+      "regulation_refs": [
+        "nis2:art-21-2-h"
+      ]
+    },
+    {
+      "stream": "effectiveness",
+      "feature_ref": "F-CP-06",
+      "present": false,
+      "schema_ref": "schemas/evidence/effectiveness.schema.json",
+      "artifact_paths": [],
+      "artifact_count": 0,
+      "regulation_refs": [
+        "nis2:art-21-2-f"
+      ],
+      "notes": "stream gated on F-CP-06; empty slot until shipped"
+    },
+    {
+      "stream": "access",
+      "feature_ref": "F-CP-07",
+      "present": false,
+      "schema_ref": "schemas/evidence/access.schema.json",
+      "artifact_paths": [],
+      "artifact_count": 0,
+      "regulation_refs": [
+        "nis2:art-21-2-i"
+      ]
+    }
+  ],
+  "provenance": {
+    "source_url": "https://example.org/runs/vuln-intake-example-0001",
+    "captured_at": "2026-06-17T10:00:00Z",
+    "commit_sha": "322421b"
+  },
+  "owner": {
+    "role": "compliance-wg",
+    "assigned_at": "2026-01-15"
+  },
+  "retention": "P2Y"
+}
