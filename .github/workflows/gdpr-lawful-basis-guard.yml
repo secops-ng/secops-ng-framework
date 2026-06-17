@@ -1,0 +1,46 @@
+name: gdpr-lawful-basis-guard
+
+# F-GD-02 SKELETON enforcement lane.
+#
+# For every cookbook playbook under content/playbooks/, asserts that
+# a matching GDPR data-flow doc exists under content/mappings/gdpr/
+# and that its '## 2. Lawful basis' section is non-empty (heading
+# present + at least one non-whitespace content line that is not
+# pure blockquote guidance or the '<fill in>' placeholder).
+#
+# This is the enforcement half of F-GD-01's regulatory-mapping
+# coverage criterion — it stops the coverage from silently regressing
+# when a new cookbook workflow is added. Per-section semantic
+# validation of the remaining six template sections is explicitly
+# out of scope here (TODO marker in tools/lint_gdpr_lawful_basis.py).
+#
+# Mirrors the shape of hygiene-lint.yml: pure-stdlib Python guard,
+# no install step needed.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  gdpr-lawful-basis-guard:
+    name: lawful-basis CI guard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run lawful-basis guard
+        run: |
+          python -m tools.lint_gdpr_lawful_basis
