@@ -72,6 +72,14 @@ from compilers._shared.evidence.access import (
     emit_access_artifact,
     render_access_artifact,
 )
+from compilers._shared.evidence.bundle import (
+    BundleContext,
+    STREAMS,
+    StreamSlot,
+    derive_bundle_id,
+    emit_bundle_manifest,
+    render_bundle_manifest,
+)
 
 __all__ = [
     "RiskAnalysisContext",
@@ -116,4 +124,10 @@ __all__ = [
     "derive_access_artifact_id",
     "emit_access_artifact",
     "render_access_artifact",
+    "BundleContext",
+    "STREAMS",
+    "StreamSlot",
+    "derive_bundle_id",
+    "emit_bundle_manifest",
+    "render_bundle_manifest",
 ]
