@@ -25,6 +25,7 @@ from compilers.n8n.evidence.crypto_attestation_node import (
     emit_crypto_attestation_artifact_n8n,
 )
 from compilers.n8n.evidence.access_node import emit_access_artifact_n8n
+from compilers.n8n.evidence.bundle_node import emit_bundle_manifest_n8n
 
 __all__ = [
     "emit_risk_analysis_artifact_n8n",
@@ -33,4 +34,5 @@ __all__ = [
     "emit_supply_chain_artifact_n8n",
     "emit_crypto_attestation_artifact_n8n",
     "emit_access_artifact_n8n",
+    "emit_bundle_manifest_n8n",
 ]
