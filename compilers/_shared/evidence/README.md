@@ -82,3 +82,16 @@ Cross-target equivalence is pinned in
 `tests/content_model/test_incidents_evidence_emitter.py` —
 `test_all_three_targets_produce_byte_identical_records` asserts the
 three adapters write byte-identical JSON for the same context.
+
+### access (F-CP-07)
+
+| Target | Adapter module | Surface |
+|--------|----------------|---------|
+| Temporal | [`compilers/temporal/evidence/access_activity.py`](../../temporal/evidence/access_activity.py) | `@activity.defn` async activity returning the absolute path |
+| n8n | [`compilers/n8n/evidence/access_node.py`](../../n8n/evidence/access_node.py) | Python helper called from an `executeCommand` / `Code` node; returns `{artifact_id, artifact_path}` |
+| LangGraph | [`compilers/langgraph/evidence/access_node.py`](../../langgraph/evidence/access_node.py) | Plain `state → state` node function returning a partial state update |
+
+Cross-target equivalence is pinned in
+`tests/content_model/test_access_evidence_emitter.py` —
+`test_all_three_targets_produce_byte_identical_records` asserts the
+three adapters write byte-identical JSON for the same context.

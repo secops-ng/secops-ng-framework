@@ -385,3 +385,129 @@ def test_temporal_activity_wraps_shared_helper(tmp_path: Path) -> None:
     ]
     assert len(written_files) == 1
     assert written_files[0].name == f"{on_disk['artifact_id']}.json"
+
+
+# --------------------------------------------------------------------------- #
+# CORE-FANOUT — n8n + LangGraph adapters                                      #
+# --------------------------------------------------------------------------- #
+
+
+def _payload_from_ctx(ctx: AccessContext) -> dict:
+    """Render an AccessContext as the JSON-native payload an n8n node ships.
+
+    Mirrors the wire shape an ``executeCommand`` / ``Code`` node hands to
+    the Python helper: nested ``caller_identity`` as a JSON object,
+    timestamps as ISO-8601 strings, sequence fields as JSON arrays.
+    Optional fields are omitted when the source context omits them.
+    """
+    identity = ctx.caller_identity
+    identity_payload: dict = {
+        "principal_type": identity.principal_type,
+        "principal_id": identity.principal_id,
+    }
+    if identity.identity_provider is not None:
+        identity_payload["identity_provider"] = identity.identity_provider
+
+    payload: dict = {
+        "workflow_id": ctx.workflow_id,
+        "execution_id": ctx.execution_id,
+        "compile_target": ctx.compile_target,
+        "regulation_refs": list(ctx.regulation_refs),
+        "control_refs": list(ctx.control_refs),
+        "caller_identity": identity_payload,
+        "capabilities": list(ctx.capabilities),
+        "captured_at": ctx.captured_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "source_url": ctx.source_url,
+    }
+    if ctx.capability_count is not None:
+        payload["capability_count"] = ctx.capability_count
+    if ctx.owner_role is not None:
+        payload["owner_role"] = ctx.owner_role
+    if ctx.owner_assigned_at is not None:
+        payload["owner_assigned_at"] = ctx.owner_assigned_at
+    if ctx.commit_sha is not None:
+        payload["commit_sha"] = ctx.commit_sha
+    if ctx.retention is not None:
+        payload["retention"] = ctx.retention
+    return payload
+
+
+def test_n8n_adapter_wraps_shared_helper(tmp_path: Path) -> None:
+    from compilers.n8n.evidence import emit_access_artifact_n8n
+
+    ctx = _ctx()
+    result = emit_access_artifact_n8n(_payload_from_ctx(ctx), tmp_path)
+    written = Path(result["artifact_path"])
+    assert written.exists()
+    on_disk = json.loads(written.read_text("utf-8"))
+    _validator().validate(on_disk)
+    assert on_disk == render_access_artifact(ctx)
+    assert result["artifact_id"] == on_disk["artifact_id"]
+    assert written.name == f"{on_disk['artifact_id']}.json"
+    # One artifact per workflow execution.
+    written_files = [p for p in Path(tmp_path).iterdir() if p.suffix == ".json"]
+    assert len(written_files) == 1
+
+
+def test_langgraph_node_wraps_shared_helper(tmp_path: Path) -> None:
+    from compilers.langgraph.evidence import emit_access_artifact_node
+
+    ctx = _ctx()
+    state = {
+        "access_context": ctx,
+        "evidence_output_dir": str(tmp_path),
+    }
+    update = emit_access_artifact_node(state)
+    written = Path(update["access_artifact_path"])
+    assert written.exists()
+    on_disk = json.loads(written.read_text("utf-8"))
+    _validator().validate(on_disk)
+    assert on_disk == render_access_artifact(ctx)
+    assert update["access_artifact_id"] == on_disk["artifact_id"]
+    # One artifact per workflow execution.
+    written_files = [p for p in Path(tmp_path).iterdir() if p.suffix == ".json"]
+    assert len(written_files) == 1
+
+
+def test_all_three_targets_produce_byte_identical_records(tmp_path: Path) -> None:
+    """CORE-FANOUT parity pin.
+
+    The whole point of the shared emitter is that the three compile
+    targets cannot drift on record shape. Each adapter writes the same
+    context into its own subdirectory; the on-disk JSON must match byte
+    for byte across targets. Per-target byte-parity goldens against a
+    checked-in fixture land in the EXTEND-tests sibling; this test
+    pins the cross-target equivalence today.
+    """
+    pytest.importorskip("temporalio")
+    from compilers.temporal.evidence import emit_access_artifact_activity
+    from compilers.n8n.evidence import emit_access_artifact_n8n
+    from compilers.langgraph.evidence import emit_access_artifact_node
+
+    ctx = _ctx()
+
+    tmp_temporal = tmp_path / "temporal"
+    tmp_n8n = tmp_path / "n8n"
+    tmp_langgraph = tmp_path / "langgraph"
+
+    temporal_path = Path(
+        asyncio.run(emit_access_artifact_activity(ctx, str(tmp_temporal)))
+    )
+    n8n_result = emit_access_artifact_n8n(_payload_from_ctx(ctx), tmp_n8n)
+    n8n_path = Path(n8n_result["artifact_path"])
+    langgraph_update = emit_access_artifact_node(
+        {
+            "access_context": ctx,
+            "evidence_output_dir": str(tmp_langgraph),
+        }
+    )
+    langgraph_path = Path(langgraph_update["access_artifact_path"])
+
+    # Same artifact_id across all three targets.
+    assert temporal_path.stem == n8n_path.stem == langgraph_path.stem
+
+    # Byte-identical on-disk JSON.
+    bytes_temporal = temporal_path.read_bytes()
+    bytes_n8n = n8n_path.read_bytes()
+    bytes_langgraph = langgraph_path.read_bytes()
+    assert bytes_temporal == bytes_n8n == bytes_langgraph
