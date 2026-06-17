@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/evidence/access.schema.json",
+  "title": "SecOps-NG Access Evidence Artifact",
+  "description": "Typed shape for one evidence artifact emitted by the access evidence stream (F-CP-07). One artifact is produced per workflow execution and pins, mechanically, (a) the identity of the caller that invoked the running form of the workflow and (b) the capability list that identity carried at execution time. Downstream consumers are the NIS2 Article 21(2)(i) human-resources-security / access-control mapping and the joiner-mover-leaver controls in `content/controls/`. Public-bar artifact: caller-identity strings MUST stay role-shaped (service-account name, workflow-runtime principal id, automation role); individual personal names and credential-shaped strings are out of scope per AGENTS.md §3 and rejected here as a matter of schema discipline. The F-PT-01 platform-side enforcement that the caller actually held the listed capabilities at boot is downstream of this assertion — the schema captures the assertion shape, the platform guarantees it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_id",
+    "stream",
+    "workflow_id",
+    "execution_id",
+    "compile_target",
+    "regulation_refs",
+    "control_refs",
+    "caller_identity",
+    "capabilities",
+    "captured_at",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Pinned schema version. Lets a consumer reject artifacts produced under an older schema once breaking changes ship.",
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "artifact_id": {
+      "description": "Stable per-artifact identifier. Convention: SHA-256 hex digest of `<workflow_id>|<execution_id>|<compile_target>` (UTF-8, no separators around the pipes). Deterministic on those three inputs so a replay of the same execution under the same compile target re-derives the same id; re-emissions inside the same execution stay byte-identical at the path level.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "stream": {
+      "description": "Identifies which evidence stream produced the artifact. Constant on this schema.",
+      "type": "string",
+      "const": "access"
+    },
+    "workflow_id": {
+      "description": "Stable identifier of the workflow whose execution this artifact covers. Convention: lower-snake-case workflow stable-id from `content/playbooks/<workflow>/` (e.g. `incident_management`, `vulnerability_triage`). Joins back into the workflow content layer so a reviewer can re-derive which playbook was compiled into the running form.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*$",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "execution_id": {
+      "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Each execution emits its own access artifact — re-runs of the same workflow produce distinct execution_ids and distinct artifact_ids.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "compile_target": {
+      "description": "Which of the three reference compile targets produced the running form of the workflow. The artifact is target-specific because the compiled artifact and the capability surface differ per target (n8n credential bindings, Temporal worker identity, LangGraph runtime principal). Constrained to the three reference targets the project ships compilers for; community-contributed targets are out of scope for this enum.",
+      "type": "string",
+      "enum": ["n8n", "temporal", "langgraph"]
+    },
+    "regulation_refs": {
+      "description": "Pins to the upstream regulatory mapping entries this artifact helps satisfy (typically `nis2:art-21-2-i`). At least one entry — an artifact with no regulatory anchor is not evidence in the F-CP-07 sense. Joins back into content/mappings/<regime>/*.yaml via the `id` field.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(nis2|dora|cra|gdpr|iso27001|soc2):[a-z0-9][a-z0-9.-]*$",
+        "maxLength": 120
+      }
+    },
+    "control_refs": {
+      "description": "Control stable-ids attested by this artifact. Same shape every other layer of the content model uses. At least one — typically `control.jml_evidence@v1`, `control.privileged_access_review@v1`, or `control.cloud_identity_least_privilege@v1` depending on which access-control axis the workflow exercises.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+      }
+    },
+    "caller_identity": {
+      "description": "The identity that invoked the running form of the workflow. Role-shaped — a service-account name, a workflow-runtime principal id, or an automation role. Individual personal names are out of scope per AGENTS.md §3 and rejected here as a matter of schema discipline; the `principal_id` regex pins UPPER_SNAKE_CASE / lower-snake-case / hyphenated identifiers and refuses anything that looks like a credential, an email-with-personal-localpart, or free text.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["principal_type", "principal_id"],
+      "properties": {
+        "principal_type": {
+          "description": "Mechanical classification of the caller. `service_account` for a long-lived non-human identity declared in an IdP; `workflow_runtime` for the runtime's own per-execution principal (Temporal worker identity, n8n execution-runner, LangGraph runtime); `automation_role` for an operator-defined role assumed by the runtime at boot. Personal user identities are out of scope.",
+          "type": "string",
+          "enum": ["service_account", "workflow_runtime", "automation_role"]
+        },
+        "principal_id": {
+          "description": "Stable identifier for the caller. Role-shaped string: lower-snake-case, UPPER_SNAKE_CASE, or hyphenated handle; an optional `@<authority>` suffix is allowed for mailbox-style identifiers (working-group mailbox, automation-role at a known authority host). Pattern rejects whitespace, email-with-personal-localpart, and anything that looks like a credential value.",
+          "type": "string",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,127}(@[a-z0-9][a-z0-9.-]{0,127})?$",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "identity_provider": {
+          "description": "Optional identifier of the identity provider that issued or resolves the caller principal. Operator-defined short token (`keycloak`, `dex`, `temporal`, `n8n`, `langgraph`); free text is rejected.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_-]{0,63}$"
+        }
+      }
+    },
+    "capabilities": {
+      "description": "The capability list the caller held at execution time, captured as a closed set of operator-defined `verb.resource` tokens. The list is the access-control surface this artifact attests — pairing the caller identity with the capabilities it was allowed to exercise on this run. Tokens are lower-snake-case with a single dot separator between verb and resource (e.g. `secrets.read`, `workflows.execute`, `incidents.classify`); arbitrary free text, wildcards, and credential-shaped strings are rejected at the schema boundary. An empty list is invalid — a workflow execution with no declared capabilities is not the artifact this stream ships.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*\\.[a-z][a-z0-9_]*$",
+        "maxLength": 128
+      }
+    },
+    "capability_count": {
+      "description": "Optional pre-computed count of distinct capabilities the caller held (== `len(capabilities)`). Carried so downstream rollups skip re-derivation. Reviewer-side correctness check, not schema-enforced beyond the non-negative integer constraint.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "captured_at": {
+      "description": "ISO-8601 UTC timestamp at which this access attestation was captured. Not part of `artifact_id` — re-emissions inside the same execution stay byte-identical at the path level (the id keys on `workflow_id|execution_id|compile_target`).",
+      "type": "string",
+      "format": "date-time"
+    },
+    "provenance": {
+      "description": "Where this artifact came from. Mirrors the provenance pattern used by content/controls/*.yaml so a reviewer can re-derive the chain back to source.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_url", "captured_at"],
+      "properties": {
+        "source_url": {
+          "description": "URL of the workflow run (or workflow-content source) that produced this artifact. Compile targets may use their own run-id URLs; the URL itself is opaque to this schema.",
+          "type": "string",
+          "format": "uri"
+        },
+        "captured_at": {
+          "description": "ISO-8601 date or date-time matching the artifact-level captured_at.",
+          "type": "string"
+        },
+        "commit_sha": {
+          "description": "Optional commit SHA of the content snapshot the workflow walked.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,64}$"
+        }
+      }
+    },
+    "owner": {
+      "description": "Optional dated ownership pointer for the access-control posture this artifact covers. Role-shaped — a working-group mailbox, a generic role title, or a community handle. Individual personal names are out of scope per AGENTS.md §3 and rejected here as a matter of schema discipline. Optional at this layer because the F-CP-07 artifact is a per-execution mechanical assertion; the owning role typically lives on the upstream `control.jml_evidence@v1` or `control.privileged_access_review@v1` entry.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "assigned_at"],
+      "properties": {
+        "role": {
+          "description": "Generic role or working-group identifier (e.g. 'identity-wg', 'access-review-board@example.org'). Personal names are not used.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "assigned_at": {
+          "description": "ISO-8601 date on which the role was assigned ownership of the access-control posture.",
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "retention": {
+      "description": "Optional retention pointer the operator declares for this evidentiary record. ISO-8601 duration, defaulted by the operator's configuration.",
+      "type": "string",
+      "pattern": "^P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+S)?)?$"
+    }
+  }
+}

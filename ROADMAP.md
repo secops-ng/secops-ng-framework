@@ -566,7 +566,7 @@ documented in the corresponding NIS2 article file.
 
 ### F-CP-07 — Access stream
 
-- **Status:** Proposed
+- **Status:** In Progress
 - **Priority:** P2
 - **Acceptance criteria:**
   - `content/evidence/access/` populated with per-execution caller

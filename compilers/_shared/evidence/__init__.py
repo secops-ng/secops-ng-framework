@@ -65,6 +65,13 @@ from compilers._shared.evidence.incidents import (
     emit_incidents_artifact,
     render_incidents_artifact,
 )
+from compilers._shared.evidence.access import (
+    AccessContext,
+    CallerIdentity,
+    derive_artifact_id as derive_access_artifact_id,
+    emit_access_artifact,
+    render_access_artifact,
+)
 
 __all__ = [
     "RiskAnalysisContext",
@@ -104,4 +111,9 @@ __all__ = [
     "derive_crypto_attestation_artifact_id",
     "emit_crypto_attestation_artifact",
     "render_crypto_attestation_artifact",
+    "AccessContext",
+    "CallerIdentity",
+    "derive_access_artifact_id",
+    "emit_access_artifact",
+    "render_access_artifact",
 ]
