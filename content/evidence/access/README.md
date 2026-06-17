@@ -134,6 +134,21 @@ If you are proposing a change that touches this stream:
 
 The stream's SKELETON card landed the typed artifact shape, this
 contributor README, the shared emitter helper, and the Temporal-side
-activity wrapper. The CORE-FANOUT (n8n + LangGraph), per-target
-byte-parity goldens, KRI/KPI promotion, and the F-PT-01 refuse-at-boot
-platform hook fan out into the remaining siblings of the F-CP-07 wave.
+activity wrapper. CORE-FANOUT extends the same shared helper to the
+remaining two reference compile targets:
+
+- n8n —
+  [`compilers/n8n/evidence/access_node.py`](../../../compilers/n8n/evidence/access_node.py)
+  (Python helper called from an `executeCommand` / `Code` node).
+- LangGraph —
+  [`compilers/langgraph/evidence/access_node.py`](../../../compilers/langgraph/evidence/access_node.py)
+  (plain `state → state` node function).
+
+Cross-target equivalence is pinned in
+[`tests/content_model/test_access_evidence_emitter.py`](../../../tests/content_model/test_access_evidence_emitter.py)
+— `test_all_three_targets_produce_byte_identical_records` asserts the
+three adapters write byte-identical JSON for the same context.
+
+The per-target byte-parity goldens, KRI/KPI promotion, the NIS2 Art.
+21(2)(i) mapping doc, and the F-PT-01 refuse-at-boot platform hook fan
+out into the remaining siblings of the F-CP-07 wave.
