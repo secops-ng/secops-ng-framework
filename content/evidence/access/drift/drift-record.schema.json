@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/evidence/access/drift/drift-record.schema.json",
+  "title": "SecOps-NG Access Drift Record (SKELETON)",
+  "description": "Typed shape for one drift record produced when the access drift detector diffs two successive access evidence artifacts in the same `workflow_id` series. SKELETON in this card: the field inventory is pinned, but no detector implementation is shipped and no per-target compiler hook is wired — those land in the F-CP-07 EXTEND-drift CORE-FANOUT sibling. The six delta kinds (`caller_added`, `caller_removed`, `capability_added`, `capability_removed`, `capability_escalated`, `sovereignty_band_changed`) are the surface NIS2 Article 21(2)(i) human-resources / access-control periodic review cares about. Public-bar artefact: principal identifiers stay role-shaped (mirroring the access SCHEMA `caller_identity` discipline), capability tokens stay `verb.resource`-shaped, free-text notes stay role-shaped or URN-shaped, and individual personal names are out of scope per AGENTS.md §3.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "stream",
+    "workflow_id",
+    "previous_artifact_ref",
+    "current_artifact_ref",
+    "deltas",
+    "detected_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Pinned schema version. Lets a consumer reject drift records produced under an older schema once breaking changes ship.",
+      "type": "string",
+      "const": "0.1.0"
+    },
+    "id": {
+      "description": "Stable per-record identifier. Convention: SHA-256 hex digest of `<workflow_id>|<previous_artifact_ref>|<current_artifact_ref>` (UTF-8, no separators around the pipes). Two detector runs against the same artifact pair collide deliberately.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "stream": {
+      "description": "Identifies which evidence stream produced the drift record. Constant on this schema.",
+      "type": "string",
+      "const": "access"
+    },
+    "workflow_id": {
+      "description": "Stable workflow identifier — one of the workflow ids declared under `content/playbooks/<workflow-id>/`. The drift record always pins to a single workflow series; cross-workflow drift is intentionally out of scope.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*$"
+    },
+    "previous_artifact_ref": {
+      "description": "`artifact_id` of the prior access evidence artifact in this `workflow_id` series. SHA-256 hex digest (64 chars).",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "current_artifact_ref": {
+      "description": "`artifact_id` of the current access evidence artifact being compared against `previous_artifact_ref`. SHA-256 hex digest (64 chars). MUST differ from `previous_artifact_ref` — a drift record against an identical pair is not a drift record.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "deltas": {
+      "description": "One entry per detected change between the two artifacts. An empty array is permitted: a deterministic detector that runs against a stable pair and finds no drift still produces a record so downstream consumers see the periodic review walk happened.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/delta" }
+    },
+    "detected_at": {
+      "description": "ISO-8601 UTC timestamp the detector resolved this artifact pair. Format `YYYY-MM-DDTHH:MM:SSZ` (no sub-second precision, no offset — UTC only). Carries through to drift-aggregate rollups in the EXTEND-metrics sibling.",
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    }
+  },
+  "$defs": {
+    "delta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "principal_id", "previous", "current"],
+      "properties": {
+        "kind": {
+          "description": "Which drift surface this delta belongs to. The six-element vocabulary mirrors the surfaces NIS2 Art. 21(2)(i) periodic access review cares about and is promoted into `schemas/access_drift_kind.json` alongside the detector wiring. Extending the set is a discussion, not a drive-by change.",
+          "type": "string",
+          "enum": [
+            "caller_added",
+            "caller_removed",
+            "capability_added",
+            "capability_removed",
+            "capability_escalated",
+            "sovereignty_band_changed"
+          ]
+        },
+        "principal_id": {
+          "description": "Role-shaped caller identifier the delta is about (mirror of `caller_identity.principal_id` on the access schema). Individual personal names are out of scope per AGENTS.md §3 and rejected here as a matter of schema discipline; the pattern pins UPPER_SNAKE_CASE / lower-snake-case / hyphenated identifiers and refuses anything that looks like a credential, an email-with-personal-localpart, or free text.",
+          "type": "string",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,127}(@[a-z0-9][a-z0-9.-]{0,127})?$",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "capability": {
+          "description": "Optional `verb.resource` capability token the delta is about. Present on capability-shaped kinds (`capability_added`, `capability_removed`, `capability_escalated`); absent on caller-shaped (`caller_added`, `caller_removed`) and sovereignty-shaped (`sovereignty_band_changed`) kinds. Mirror of `capabilities[]` item shape on the access schema.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*\\.[a-z][a-z0-9_]*$",
+          "maxLength": 128
+        },
+        "previous": {
+          "description": "Minimal snapshot of the fields relevant to `kind` on the previous side of the change. `null` for `caller_added` and `capability_added`. Carries `{ principal_type, identity_provider? }` for `caller_removed`; `{ tier }` for `capability_escalated`; `{ sovereignty_band }` for `sovereignty_band_changed`. The operator-side `tier` vocabulary and the principal-to-band resolution table both live with the detector wiring; this schema only constrains shape, not vocabulary.",
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/sideSnapshot" }
+          ]
+        },
+        "current": {
+          "description": "Minimal snapshot of the fields relevant to `kind` on the current side of the change. `null` for `caller_removed` and `capability_removed`. Carries `{ principal_type, identity_provider? }` for `caller_added`; `{ tier }` for `capability_escalated`; `{ sovereignty_band }` for `sovereignty_band_changed`. The operator-side `tier` vocabulary and the principal-to-band resolution table both live with the detector wiring; this schema only constrains shape, not vocabulary.",
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/sideSnapshot" }
+          ]
+        },
+        "note": {
+          "description": "Short free-text rationale field pinning the delta to its inputs. Read by reviewers; not parsed downstream. No individual contact names; role-shaped principal identifiers only, mirroring the access SCHEMA `caller_identity` discipline.",
+          "type": "string",
+          "maxLength": 500
+        }
+      }
+    },
+    "sideSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "principal_type": {
+          "description": "Mechanical classification of the caller on this side; mirror of `caller_identity.principal_type` on the access schema. Carried on `caller_added` / `caller_removed` deltas.",
+          "type": "string",
+          "enum": ["service_account", "workflow_runtime", "automation_role"]
+        },
+        "identity_provider": {
+          "description": "Optional identifier of the identity provider that issued or resolves the caller principal on this side; mirror of `caller_identity.identity_provider` on the access schema. Operator-defined short token.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_-]{0,63}$"
+        },
+        "tier": {
+          "description": "Operator-defined capability privilege tier on this side. Carried on `capability_escalated` deltas. The operator's tier vocabulary lives with the detector wiring; this schema only constrains shape (short lower-snake-case token), not vocabulary.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "maxLength": 64
+        },
+        "sovereignty_band": {
+          "description": "Rolled-up sovereignty verdict on the caller's identity-provider hosting endpoint on this side; one of the values promoted in `schemas/sovereignty_band.json`. Carried on `sovereignty_band_changed` deltas.",
+          "type": "string",
+          "enum": [
+            "sovereign",
+            "eu_hosted_non_sovereign",
+            "eu_adequate",
+            "non_eu",
+            "unknown"
+          ]
+        }
+      }
+    }
+  }
+}
