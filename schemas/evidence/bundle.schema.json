@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/evidence/bundle.schema.json",
+  "title": "SecOps-NG Auditor Evidence Bundle Manifest",
+  "description": "Typed shape for the manifest index that accompanies one auditor-handover evidence bundle (F-WF-09). The bundle itself is a directory of plain files — one subdirectory per evidence stream (F-CP-01..F-CP-07), each carrying the per-execution JSON artifacts emitted under that stream's own schema. The manifest is the single index file that names every stream present in the bundle, points to each per-stream artifact relative to the bundle root, and pins the upstream regulatory anchors a reviewer needs to walk from manifest entry to NIS2 article. Format is plain JSON, never a proprietary archive — per F-WF-09 sovereign-stack constraint. SKELETON scope: the schema declares the index shape and a closed enum of the seven streams the project ships; the collector that walks `content/evidence/<stream>/` and assembles a conforming manifest is in `compilers/_shared/evidence/bundle.py`. The full three-target fan-out (n8n + Temporal + LangGraph) for the collector is a CORE-FANOUT follow-on sibling. The F-CP-06 effectiveness stream is still proposed and may be present in the manifest as an optional, empty slot — `present` is false and `artifact_paths` is empty until that stream ships.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "bundle_id",
+    "generated_at",
+    "regulation_refs",
+    "streams",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Pinned schema version. Lets a downstream auditor tool reject a bundle produced under an older manifest schema once breaking changes ship.",
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "bundle_id": {
+      "description": "Stable per-bundle identifier. Convention: SHA-256 hex digest of `<generated_at>|<bundle_window_start>|<bundle_window_end>` (UTF-8, no separators around the pipes). Deterministic on the temporal window the bundle covers so two runs that assemble the same window re-derive the same id; a different window produces a different id.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "generated_at": {
+      "description": "ISO-8601 UTC timestamp at which the bundle was assembled.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "bundle_window_start": {
+      "description": "Optional ISO-8601 UTC timestamp marking the inclusive lower bound of the artifacts collected into this bundle. When present, the collector walked `content/evidence/<stream>/` for artifacts whose `captured_at` falls within [bundle_window_start, bundle_window_end]; when absent, the bundle is open-ended at the lower bound.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "bundle_window_end": {
+      "description": "Optional ISO-8601 UTC timestamp marking the inclusive upper bound of the artifacts collected into this bundle. Pair with `bundle_window_start`; when absent the bundle is open-ended at the upper bound.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "regulation_refs": {
+      "description": "Pins to the upstream regulatory mapping entries this bundle helps an auditor walk. At least one entry — a bundle with no regulatory anchor is not the F-WF-09 artifact. Joins back into `content/mappings/<regime>/*.yaml` via the `id` field. Typical entries include `nis2:art-20` and `nis2:art-21-2-f`.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(nis2|dora|cra|gdpr|iso27001|soc2):[a-z0-9][a-z0-9.-]*$",
+        "maxLength": 120
+      }
+    },
+    "streams": {
+      "description": "Closed list of evidence streams the project ships. One entry per F-CP-* stream, in deterministic order, so two runs that assemble the same window produce byte-identical manifests up to artifact-set membership. A stream that is gated or has no artifacts in the bundle window carries `present: false` and an empty `artifact_paths` array — the slot is still present so a reviewer sees the closed surface, not a quietly-omitted stream.",
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/streamEntry"
+      }
+    },
+    "provenance": {
+      "description": "Where the bundle came from. Mirrors the provenance pattern used by `content/controls/*.yaml` and the per-stream evidence schemas so a reviewer can re-derive the chain back to source.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_url", "captured_at"],
+      "properties": {
+        "source_url": {
+          "description": "URL of the workflow run (or content snapshot) that produced this bundle. Opaque to the schema.",
+          "type": "string",
+          "format": "uri"
+        },
+        "captured_at": {
+          "description": "ISO-8601 date or date-time matching the bundle-level `generated_at`.",
+          "type": "string"
+        },
+        "commit_sha": {
+          "description": "Optional commit SHA of the content snapshot the collector walked.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,64}$"
+        }
+      }
+    },
+    "owner": {
+      "description": "Optional dated ownership pointer for the bundle. Role-shaped — a working-group mailbox, a generic role title, or a community handle. Individual personal names are out of scope per AGENTS.md §3 and rejected here as a matter of schema discipline.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "assigned_at"],
+      "properties": {
+        "role": {
+          "description": "Generic role or working-group identifier (e.g. 'compliance-wg', 'evidence-handover-board@example.org'). Personal names are not used.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "assigned_at": {
+          "description": "ISO-8601 date on which the role was assigned ownership of the bundle.",
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "retention": {
+      "description": "Optional retention pointer the operator declares for this bundle. ISO-8601 duration, defaulted by the operator's configuration.",
+      "type": "string",
+      "pattern": "^P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+S)?)?$"
+    }
+  },
+  "$defs": {
+    "streamEntry": {
+      "description": "One per-stream slot in the manifest. Names the stream, points to the artifact JSON files inside the bundle directory (relative to the bundle root, never absolute), and pins the regulatory anchors that stream attests.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stream",
+        "present",
+        "schema_ref",
+        "artifact_paths",
+        "artifact_count",
+        "regulation_refs"
+      ],
+      "properties": {
+        "stream": {
+          "description": "Stream identifier. Closed enum over the seven streams the project ships under F-CP-01..F-CP-07. New community-contributed streams are out of scope for this manifest revision; broadening the enum is a schema-versioning discussion.",
+          "type": "string",
+          "enum": [
+            "risk-analysis",
+            "incidents",
+            "supply-chain",
+            "vulns",
+            "crypto",
+            "effectiveness",
+            "access"
+          ]
+        },
+        "feature_ref": {
+          "description": "Optional pointer back to the ROADMAP feature card that ships this stream (e.g. `F-CP-01`). The auditor can read the feature definition without leaving the bundle.",
+          "type": "string",
+          "pattern": "^F-CP-[0-9]{2}$"
+        },
+        "present": {
+          "description": "Whether this stream contributed any artifacts to this bundle. `false` is legitimate for a gated or proposed stream (notably `effectiveness` until F-CP-06 ships) and for a window in which the stream produced no artifacts. A `false` slot still carries the empty `artifact_paths` array and the regulatory anchors so the reviewer sees a closed surface, not a quietly-omitted stream.",
+          "type": "boolean"
+        },
+        "schema_ref": {
+          "description": "Relative path inside the bundle to the per-artifact schema this stream's records validate against. Pinned per stream so a downstream auditor tool can validate every entry under `artifact_paths` without round-tripping to a network URL.",
+          "type": "string",
+          "pattern": "^schemas/evidence/[a-z][a-z0-9-]*\\.schema\\.json$"
+        },
+        "artifact_paths": {
+          "description": "Relative paths (POSIX, forward-slash) inside the bundle directory to every artifact JSON file produced by this stream. Sorted lexicographically so two runs that assemble the same artifact set produce byte-identical manifests. Empty when `present` is `false`; otherwise at least one entry.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^content/evidence/[a-z][a-z0-9-]*/[A-Za-z0-9._/-]+\\.json$",
+            "maxLength": 512
+          }
+        },
+        "artifact_count": {
+          "description": "Pre-computed count of distinct artifact paths in this stream (== `len(artifact_paths)`). Carried so downstream consumers skip re-derivation.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "regulation_refs": {
+          "description": "Regulatory mapping anchors this stream's artifacts satisfy. At least one entry — a stream slot with no anchor is not auditor-handover-ready. Joins back into `content/mappings/<regime>/*.yaml`.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^(nis2|dora|cra|gdpr|iso27001|soc2):[a-z0-9][a-z0-9.-]*$",
+            "maxLength": 120
+          }
+        },
+        "notes": {
+          "description": "Optional one-line note for an auditor — typically used to flag a gated stream (`effectiveness` pre-F-CP-06) or an empty window. Free text but bounded; not a free-form prose channel.",
+          "type": "string",
+          "maxLength": 280
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "present": { "const": false } } },
+          "then": {
+            "properties": {
+              "artifact_paths": { "maxItems": 0 },
+              "artifact_count": { "const": 0 }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "present": { "const": true } } },
+          "then": {
+            "properties": {
+              "artifact_paths": { "minItems": 1 }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

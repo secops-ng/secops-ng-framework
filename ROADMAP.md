@@ -333,7 +333,7 @@ named operator use-case. Each cookbook workflow lives under
 
 ### F-WF-09 — Compliance evidence collection
 
-- **Status:** Proposed
+- **Status:** In Progress
 - **Priority:** P1
 - **Acceptance criteria:**
   - Workflow consumes the seven evidence streams (F-CP-01..F-CP-07)
