@@ -25,6 +25,9 @@ from compilers.temporal.evidence.crypto_attestation_activity import (
 from compilers.temporal.evidence.access_activity import (
     emit_access_artifact_activity,
 )
+from compilers.temporal.evidence.bundle_activity import (
+    emit_bundle_manifest_activity,
+)
 
 __all__ = [
     "emit_risk_analysis_artifact_activity",
@@ -33,4 +36,5 @@ __all__ = [
     "emit_supply_chain_artifact_activity",
     "emit_crypto_attestation_artifact_activity",
     "emit_access_artifact_activity",
+    "emit_bundle_manifest_activity",
 ]
