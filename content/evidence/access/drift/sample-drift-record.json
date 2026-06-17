@@ -1,0 +1,41 @@
+{
+  "schema_version": "0.1.0",
+  "id": "ad8c2c34964f3e9c7f72ffcad693524a7f91d913d5dc98ab86537cbc2f61d4aa",
+  "stream": "access",
+  "workflow_id": "vulnerability_triage",
+  "previous_artifact_ref": "3b4db82d717262252df75dbc1e4e06fb96278d3911ebaafdd256aa9f1db5db13",
+  "current_artifact_ref": "6cfa688888203164d6a80fb9d0bd00b12917bcad1c68a856cdf3d7e0d12e573d",
+  "deltas": [
+    {
+      "kind": "caller_added",
+      "principal_id": "vuln-triage-runner",
+      "previous": null,
+      "current": {
+        "principal_type": "automation_role",
+        "identity_provider": "keycloak"
+      },
+      "note": "New automation_role principal invoking the workflow series; pending re-attestation under NIS2 Art. 21(2)(i)."
+    },
+    {
+      "kind": "capability_added",
+      "principal_id": "vuln-triage-runner",
+      "capability": "incidents.classify",
+      "previous": null,
+      "current": null,
+      "note": "Capability picked up between cadence walks; periodic access review under control.privileged_access_review@v1."
+    },
+    {
+      "kind": "capability_escalated",
+      "principal_id": "vuln-triage-runner",
+      "capability": "secrets.read",
+      "previous": {
+        "tier": "read_only"
+      },
+      "current": {
+        "tier": "read_write"
+      },
+      "note": "Same verb.resource token rotated to a higher operator-defined tier; flagged for control.cloud_identity_least_privilege@v1 review."
+    }
+  ],
+  "detected_at": "2026-06-17T00:00:00Z"
+}
