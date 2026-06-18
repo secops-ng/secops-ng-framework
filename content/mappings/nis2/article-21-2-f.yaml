@@ -20,3 +20,15 @@ entries:
       - kri.control_effectiveness@v1
       - kpi.control_effectiveness_coverage@v1
       - kri.overdue_effectiveness_tests@v1
+    evidence_stream_refs:
+      - effectiveness
+    notes: >-
+      The effectiveness evidence stream (F-CP-06) emits one snapshot per
+      (metric, policy-or-prompt-version, evaluation-window). The
+      contributor narrative lives under
+      content/mappings/nis2/article-21-2-f-effectiveness.md; the typed
+      artifact shape is schemas/evidence/effectiveness.schema.json.
+      Periodic re-assessment cadence and archival of results are
+      operator-side responsibilities discharged by the snapshot's
+      captured_at and retention fields plus the upstream control's
+      review_cadence.

@@ -555,14 +555,25 @@ documented in the corresponding NIS2 article file.
 
 ### F-CP-06 — Effectiveness stream
 
-- **Status:** Proposed
+- **Status:** SKELETON in flight
 - **Priority:** P2
 - **Acceptance criteria:**
   - `content/evidence/effectiveness/` populated with metric
     snapshots per policy / prompt version.
 - **Sovereign-stack constraints:** Metrics are DSPy-evaluatable.
-- **Depends on:** F-CR-03, F-PT-01
+- **Depends on:** F-CR-03 (Removed — superseded by content-first;
+  dependency satisfied), F-PT-01 (Shipped).
 - **Source:** NIS2 Art. 21(2)(f).
+- **In flight:**
+  - SKELETON — schema at
+    `schemas/evidence/effectiveness.schema.json`, stream-root README
+    at `content/evidence/effectiveness/README.md`, and Article 21(2)(f)
+    companion narrative at
+    `content/mappings/nis2/article-21-2-f-effectiveness.md`.
+  - CORE-FANOUT (shared helper + per-target adapters),
+    EXTEND-tests-goldens, EXTEND-drift, EXTEND-metrics, and the
+    F-WF-09 auditor-bundle `effectiveness` slot fan out into the
+    remaining siblings.
 
 ### F-CP-07 — Access stream
 
