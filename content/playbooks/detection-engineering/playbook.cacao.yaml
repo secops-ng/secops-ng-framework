@@ -1,0 +1,222 @@
+# SecOps-NG — Detection engineering (F-WF-04) — SOURCE SKELETON
+#
+# Portable CACAO v2 + SecOps-NG content-model superset expressed as
+# YAML so it doubles as the human-curated source the per-target
+# compilers (n8n / Temporal / LangGraph) will consume once
+# F-WF-04 CORE-FANOUT lands. The JSON form is reachable by
+# `yaml.safe_load` then `json.dumps`; the schema gate treats this
+# file as an object and does not care about the serialization
+# format.
+#
+# Status: SKELETON. Scope of this artifact is the four-state
+# rule lifecycle machine (propose -> review -> ship -> measure)
+# with deterministic, unconditional transitions and placeholder
+# action bodies. Gating predicates on review/ship and the
+# per-target compiler emitters land in F-WF-04 CORE-FANOUT.
+# Byte-parity goldens land in F-WF-04 EXTEND-tests-goldens.
+#
+# Source: NIS2 Article 21(2)(f) — assessment of the effectiveness of
+# cybersecurity risk-management measures. The `measure` state emits
+# the per-rule-version effectiveness-metric snapshot defined at
+# `schemas/evidence/rule-effectiveness-snapshot.schema.json`; that
+# snapshot is consumable by the F-CP-06 effectiveness evidence
+# stream.
+
+type: playbook
+spec_version: "2.0"
+id: "playbook--f0e4f404-0000-4000-8000-000000000001"
+name: "Detection engineering — rule lifecycle"
+description: >-
+  Source playbook for the detection-engineering rule lifecycle.
+  Moves a rule version deterministically through four states:
+  propose (intake the candidate rule and its rationale),
+  review (peer review against the operator's review checklist),
+  ship (promote to production status in the operator's detection
+  store), and measure (emit a per-rule-version effectiveness-metric
+  snapshot the operator's chosen metric sink consumes). SKELETON:
+  action bodies are placeholders; the workflow graph, step ids,
+  and schema references are the contract this source artifact
+  commits to. CACAO v2 + SecOps-NG content-model extensions.
+
+playbook_types:
+  - investigation
+  - notification
+
+created_by: "identity--c0c0c0c0-c0c0-4c0c-8c0c-c0c0c0c0c0c0"
+created: "2026-06-18T00:00:00Z"
+modified: "2026-06-18T00:00:00Z"
+
+labels:
+  - detection-engineering
+  - rule-lifecycle
+  - skeleton
+  - source-artifact
+
+external_references:
+  - name: NIS2 Directive (EU) 2022/2555, Article 21(2)(f) — effectiveness assessment of risk-management measures
+    source: EUR-Lex
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: OASIS CACAO v2.0 specification
+    source: OASIS
+    url: https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html
+
+playbook_variables:
+  __rule_id__:
+    type: string
+    description: >-
+      Stable identifier of the rule being lifecycled. Opaque to the
+      framework; the operator's detection store assigns it.
+    external: true
+  __rule_version__:
+    type: string
+    description: >-
+      Version label of the candidate rule. The lifecycle operates on a
+      single rule-version at a time so the effectiveness snapshot can
+      pin its measurement to the exact version that produced it.
+    external: true
+  __proposal_rationale__:
+    type: string
+    description: >-
+      Short rationale the proposer attached to the candidate rule
+      (what threat it addresses, which detection gap it closes,
+      which ATT&CK technique(s) it binds). Carried opaquely through
+      the lifecycle.
+    external: true
+  __review_verdict__:
+    type: string
+    description: >-
+      Verdict produced by the review state. One of: approved,
+      changes_requested, rejected. SKELETON: transitions are
+      unconditional; the gating predicate on `review -> ship` reads
+      this variable in CORE-FANOUT.
+    external: false
+  __ship_status__:
+    type: string
+    description: >-
+      Production status after the ship state. One of: production,
+      staged, withdrawn. SKELETON: transitions are unconditional;
+      the gating predicate on `ship -> measure` reads this variable
+      in CORE-FANOUT.
+    external: false
+  __effectiveness_snapshot_id__:
+    type: string
+    description: >-
+      Stable identifier of the per-rule-version effectiveness
+      snapshot emitted by the measure state. SHA-256 hex digest
+      shape per the snapshot schema. Persisted into the operator's
+      configured metric sink.
+    external: false
+
+workflow_start: "start--f0e4f404-0000-4000-8000-000000000001"
+
+workflow:
+
+  "start--f0e4f404-0000-4000-8000-000000000001":
+    type: start
+    name: "rule-lifecycle-start"
+    on_completion: "action--f0e4f404-0000-4000-8000-000000000002"
+
+  "action--f0e4f404-0000-4000-8000-000000000002":
+    type: action
+    name: "propose-rule-version"
+    description: >-
+      SKELETON. Intake the candidate rule version, its rationale, and
+      the ATT&CK / detection-class bindings the proposer asserts.
+      Normalise into the rule-proposal envelope. Body lands in
+      F-WF-04 CORE-FANOUT.
+    in_args:
+      - __rule_id__
+      - __rule_version__
+      - __proposal_rationale__
+    on_completion: "action--f0e4f404-0000-4000-8000-000000000003"
+    x_secops_ng:
+      lifecycle_state: "propose"
+      # TODO(F-WF-04 CORE-FANOUT): bind the rule-proposal payload
+      # primitive once `content/playbooks/detection-engineering/primitives/`
+      # lands. SKELETON has no primitive body.
+      core_body:
+        primitive: "detection_engineering.primitives.propose.intake_rule_proposal"
+        placeholder: true
+
+  "action--f0e4f404-0000-4000-8000-000000000003":
+    type: action
+    name: "review-rule-version"
+    description: >-
+      SKELETON. Peer-review the candidate rule against the operator's
+      review checklist. Produces __review_verdict__. Transitions are
+      unconditional in the SKELETON; CORE-FANOUT inserts the gating
+      predicate that branches to a `changes_requested` loop or a
+      `rejected` terminal.
+    on_completion: "action--f0e4f404-0000-4000-8000-000000000004"
+    x_secops_ng:
+      lifecycle_state: "review"
+      # TODO(F-WF-04 CORE-FANOUT): introduce a switch-condition node
+      # keyed on __review_verdict__ with three branches
+      # (approved -> ship, changes_requested -> propose, rejected -> end).
+      core_body:
+        primitive: "detection_engineering.primitives.review.evaluate_review_checklist"
+        placeholder: true
+
+  "action--f0e4f404-0000-4000-8000-000000000004":
+    type: action
+    name: "ship-rule-version"
+    description: >-
+      SKELETON. Promote the approved rule version to production
+      status in the operator's detection store. Operator-side
+      destination is resolved at the compile target's config layer
+      (sovereign-stack constraint — the framework ships no default
+      detection store). Sets __ship_status__.
+    on_completion: "action--f0e4f404-0000-4000-8000-000000000005"
+    x_secops_ng:
+      lifecycle_state: "ship"
+      # TODO(F-WF-04 CORE-FANOUT): bind the detection-store-promotion
+      # contract; SKELETON does not select an operator destination.
+      core_body:
+        primitive: "detection_engineering.primitives.ship.promote_to_production"
+        placeholder: true
+
+  "action--f0e4f404-0000-4000-8000-000000000005":
+    type: action
+    name: "measure-rule-version"
+    description: >-
+      SKELETON. Emit a per-rule-version effectiveness-metric snapshot
+      shaped per `schemas/evidence/rule-effectiveness-snapshot.schema.json`.
+      The snapshot pins the indicator value to the exact
+      (__rule_id__, __rule_version__) the lifecycle is operating on
+      and carries pointers to the OCSF source-data shape and the
+      reference visualisation hint the F-CP-06 effectiveness stream
+      consumes. Metric storage is operator-configured.
+    on_completion: "end--f0e4f404-0000-4000-8000-000000000006"
+    x_secops_ng:
+      lifecycle_state: "measure"
+      # TODO(F-WF-04 CORE-FANOUT): bind the effectiveness-snapshot
+      # emitter — the per-target reference emitters land alongside.
+      core_body:
+        primitive: "detection_engineering.primitives.measure.emit_effectiveness_snapshot"
+        placeholder: true
+      effectiveness_snapshot_schema_ref:
+        "schemas/evidence/rule-effectiveness-snapshot.schema.json"
+      metric_refs:
+        - "kpi.detection_coverage@v1"
+        - "kpi.false_positive_rate@v1"
+        - "kri.control_effectiveness@v1"
+
+  "end--f0e4f404-0000-4000-8000-000000000006":
+    type: end
+    name: "rule-lifecycle-end"
+
+# SecOps-NG content-model extensions applied to the playbook as a whole.
+x_secops_ng:
+  source_artifact: true
+  maturity: skeleton
+  feature_ref: "F-WF-04"
+  regulation_refs:
+    - "nis2:art-21-2-f"
+  control_refs:
+    - "control.control_effectiveness_test@v1"
+  evidence_stream_refs:
+    - "effectiveness"
+  pending_sibling_cards:
+    - "F-WF-04 CORE-FANOUT (n8n/Temporal/LangGraph emitters + gating predicates)"
+    - "F-WF-04 EXTEND-tests-goldens (byte-parity goldens)"
+    - "F-WF-04 EXTEND-docs (cookbook walkthrough)"

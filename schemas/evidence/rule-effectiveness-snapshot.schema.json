@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/evidence/rule-effectiveness-snapshot.schema.json",
+  "title": "SecOps-NG Per-Rule-Version Effectiveness Snapshot (F-WF-04 SKELETON stub)",
+  "description": "Per-rule-version effectiveness-metric snapshot stub emitted by the F-WF-04 detection-engineering rule lifecycle's `measure` state. One snapshot is produced per (rule_id, rule_version) per evaluation window and pins, mechanically, the value an effectiveness indicator took for that exact rule version, with pointers to the OCSF source-data shape the indicator was derived from and a reference-visualisation hint the downstream F-CP-06 effectiveness evidence stream can consume. SKELETON: this stub commits to the field shape; CORE-FANOUT tightens the value constraints (closed enums, regex patterns) and adds the per-target reference emitters. Public-bar artifact: all string fields stay role-shaped; individual personal names, credential-shaped strings, and raw measurement payloads carrying personal data are out of scope per AGENTS.md \u00a73 and rejected at the schema boundary by the hygiene linter.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "snapshot_id",
+    "rule_id",
+    "rule_version",
+    "captured_at",
+    "metric",
+    "source_data",
+    "ref_viz"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Pinned schema version. Lets a consumer reject snapshots produced under an older schema once breaking changes ship.",
+      "type": "string",
+      "const": "0.1.0-skeleton"
+    },
+    "snapshot_id": {
+      "description": "Stable per-snapshot identifier. SKELETON: any non-empty string is accepted. CORE-FANOUT pins this to a SHA-256 hex digest derived deterministically from `<rule_id>|<rule_version>|<captured_at>|<metric.stable_id>`.",
+      "type": "string",
+      "minLength": 1
+    },
+    "rule_id": {
+      "description": "Stable identifier of the detection rule the snapshot describes. Opaque to the framework; the operator's detection store assigns it.",
+      "type": "string",
+      "minLength": 1
+    },
+    "rule_version": {
+      "description": "Version label of the detection rule this snapshot pins its measurement to. One rule version produces one snapshot per evaluation window per metric.",
+      "type": "string",
+      "minLength": 1
+    },
+    "captured_at": {
+      "description": "ISO-8601 UTC timestamp at which the indicator value was evaluated. Mechanical wall-clock from the workflow runtime; not a measurement-window boundary.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "metric": {
+      "description": "The effectiveness indicator the snapshot is reporting one value of, structurally referenced rather than duplicated. Joins back into the metric catalogue at `content/metrics/<stable_id>.yaml` so the catalogue entry's `unit`, `direction`, `thresholds`, and `formula` stay canonical.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stable_id",
+        "definition",
+        "unit",
+        "calc_method"
+      ],
+      "properties": {
+        "stable_id": {
+          "description": "Stable id of the metric in the catalogue (e.g. `kpi.detection_coverage@v1`, `kpi.false_positive_rate@v1`).",
+          "type": "string",
+          "minLength": 1
+        },
+        "definition": {
+          "description": "One-sentence operator-facing definition of what the indicator measures for this rule version. Prose mirror of the catalogue entry's `summary`; carried inline so a consumer reading a single snapshot does not need to dereference the catalogue.",
+          "type": "string",
+          "minLength": 1
+        },
+        "unit": {
+          "description": "Measurement unit. SKELETON accepts any non-empty string; CORE-FANOUT pins this to the catalogue enum (`ratio`, `count`, `duration_seconds`, ...).",
+          "type": "string",
+          "minLength": 1
+        },
+        "calc_method": {
+          "description": "Calculation method used to derive the indicator value for this rule version. Prose summary of the catalogue entry's `measurement.formula`; carried inline for the same reason `definition` is.",
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "description": "Indicator value at `captured_at`. Numeric for ratio/count/duration units; SKELETON does not constrain shape beyond the JSON Schema `number` type. CORE-FANOUT keys the constraint off `unit`.",
+          "type": "number"
+        }
+      }
+    },
+    "source_data": {
+      "description": "Pointer to the OCSF source-data shape the indicator was derived from. The framework references OCSF classes by `class_uid`; it does not maintain an OCSF fork.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ocsf_class_uid"
+      ],
+      "properties": {
+        "ocsf_class_uid": {
+          "description": "OCSF class_uid the source data conforms to (e.g. 2001 for Security Finding, 4002 for Authentication Activity). Integer per the OCSF schema.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "ocsf_class_name": {
+          "description": "Optional human-readable OCSF class name carried alongside the uid for reviewer convenience. Not authoritative \u2014 the uid is.",
+          "type": "string"
+        },
+        "telemetry_ref": {
+          "description": "Optional pointer back to a SecOps-NG telemetry artifact under `content/telemetry/` when one exists (`telemetry.ocsf.<name>@v<n>` shape).",
+          "type": "string"
+        }
+      }
+    },
+    "ref_viz": {
+      "description": "Reference-visualisation hint for the indicator. Lets the downstream F-CP-06 effectiveness evidence stream and the auditor-bundle render a default chart shape without per-metric custom code. Operator-overridable.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "description": "Visualisation kind. SKELETON enum is intentionally small \u2014 CORE-FANOUT extends it as the per-target emitters land.",
+          "type": "string",
+          "enum": [
+            "line",
+            "bar",
+            "gauge",
+            "table"
+          ]
+        },
+        "x_axis": {
+          "description": "Field path to the x-axis dimension when applicable (e.g. `captured_at` for a time-series line chart).",
+          "type": "string"
+        },
+        "y_axis": {
+          "description": "Field path to the y-axis measurement (e.g. `metric.value`).",
+          "type": "string"
+        },
+        "notes": {
+          "description": "Operator-facing prose hint about how the indicator is best read \u2014 'lower is better', 'breach threshold at 0.25', etc.",
+          "type": "string"
+        }
+      }
+    }
+  }
+}
