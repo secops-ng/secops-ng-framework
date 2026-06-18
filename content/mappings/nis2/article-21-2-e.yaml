@@ -38,3 +38,39 @@ entries:
       framework (Commission Delegated Regulation (EU) 2024/1774) Art 10
       — see mappings/dora/article-9-and-rts-vuln-mgmt.yaml entry
       `dora:art-9-vuln-mgmt`.
+
+  - id: nis2:art-21-2-e-codebase
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 21(2)(e)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Security in network and information systems acquisition, development,
+      and maintenance — specifically the codebase-side dependency-review
+      and disclosure-window-tracking surface that walks the operator's
+      SBOM against advisory feeds and commits to per-finding
+      acknowledge / fix / disclose deadlines.
+    status: draft
+    control_refs:
+      - control.sbom_capture@v1
+      - control.vuln_disclosure_intake@v1
+    playbook_refs:
+      - playbook.codebase_vuln_management@v1
+    metric_refs:
+      - kpi.vuln_disclosure_sla@v1
+      - kri.cvd_intake_aging@v1
+      - kri.releases_without_sbom@v1
+    evidence_stream_refs:
+      - vulns
+    notes: >-
+      SKELETON: `playbook.codebase_vuln_management@v1` is shipped with
+      placeholder action bodies pending the F-WF-07 CORE-FANOUT sibling
+      card. This entry is the proactive codebase-side counterpart to
+      the reactive reporter-disclosed `nis2:art-21-2-e` entry above;
+      both anchor on the same NIS2 Art. 21(2)(e) obligation but key off
+      distinct inbound channels (operator's own SBOM vs. external
+      coordinated-disclosure intake). The cross-references on the CRA
+      side land under `cra:annex-i-2-codebase-vuln-mgmt` in
+      mappings/cra/article-14-and-annex-i.yaml.
