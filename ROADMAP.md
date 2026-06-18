@@ -333,7 +333,7 @@ named operator use-case. Each cookbook workflow lives under
 
 ### F-WF-09 — Compliance evidence collection
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P1
 - **Acceptance criteria:**
   - Workflow consumes the seven evidence streams (F-CP-01..F-CP-07)
@@ -555,7 +555,7 @@ documented in the corresponding NIS2 article file.
 
 ### F-CP-06 — Effectiveness stream
 
-- **Status:** SKELETON in flight
+- **Status:** Shipped
 - **Priority:** P2
 - **Acceptance criteria:**
   - `content/evidence/effectiveness/` populated with metric
@@ -564,20 +564,10 @@ documented in the corresponding NIS2 article file.
 - **Depends on:** F-CR-03 (Removed — superseded by content-first;
   dependency satisfied), F-PT-01 (Shipped).
 - **Source:** NIS2 Art. 21(2)(f).
-- **In flight:**
-  - SKELETON — schema at
-    `schemas/evidence/effectiveness.schema.json`, stream-root README
-    at `content/evidence/effectiveness/README.md`, and Article 21(2)(f)
-    companion narrative at
-    `content/mappings/nis2/article-21-2-f-effectiveness.md`.
-  - CORE-FANOUT (shared helper + per-target adapters),
-    EXTEND-tests-goldens, EXTEND-drift, EXTEND-metrics, and the
-    F-WF-09 auditor-bundle `effectiveness` slot fan out into the
-    remaining siblings.
 
 ### F-CP-07 — Access stream
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P2
 - **Acceptance criteria:**
   - `content/evidence/access/` populated with per-execution caller
