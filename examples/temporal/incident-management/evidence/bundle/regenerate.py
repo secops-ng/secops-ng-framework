@@ -50,7 +50,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from compilers._shared.evidence import (
+    AccessContext,
     BundleContext,
+    CallerIdentity,
     ClassificationVerdict,
     IncidentsContext,
     KpiWindows,
@@ -58,7 +60,10 @@ from compilers._shared.evidence import (
     NotificationMilestone,
     emit_incidents_artifact,
 )
-from compilers.temporal.evidence import emit_bundle_manifest_activity
+from compilers.temporal.evidence import (
+    emit_access_artifact_activity,
+    emit_bundle_manifest_activity,
+)
 
 HERE = Path(__file__).resolve().parent
 
@@ -155,21 +160,70 @@ def _incidents_ctx() -> IncidentsContext:
     )
 
 
+def _access_ctx() -> AccessContext:
+    """Typed access context for the F-CP-07 SKELETON Temporal write-path.
+
+    One execution of the incident-management Temporal worked example
+    invokes the workflow runtime under a role-shaped caller identity
+    holding a closed ``verb.resource`` capability list. The shared
+    helper renders that into one record conforming to
+    ``schemas/evidence/access.schema.json``. The typed shape mirrors
+    ``_ctx()`` in ``tests/examples/access_evidence/test_golden.py`` so
+    the bundle's inlined access artifact lands on the same surface a
+    reviewer cross-checks against the EXTEND-tests golden once the
+    n8n + LangGraph CORE-FANOUT-EXAMPLES sibling closes byte-parity.
+    """
+    return AccessContext(
+        workflow_id="incident_management",
+        execution_id="temporal:wf-run-access-001",
+        compile_target="temporal",
+        regulation_refs=("nis2:art-21-2-i",),
+        control_refs=(
+            "control.jml_evidence@v1",
+            "control.privileged_access_review@v1",
+        ),
+        caller_identity=CallerIdentity(
+            principal_type="workflow_runtime",
+            principal_id="temporal-worker-incident-mgmt",
+            identity_provider="temporal",
+        ),
+        capabilities=(
+            "secrets.read",
+            "workflows.execute",
+            "incidents.classify",
+        ),
+        capability_count=3,
+        captured_at=datetime(2026, 6, 9, 5, 0, 0, tzinfo=timezone.utc),
+        source_url="https://example.org/runs/access-001",
+        owner_role="identity-wg",
+        owner_assigned_at="2026-01-15",
+        commit_sha="deadbeef0123456789",
+        retention="P2Y",
+    )
+
+
 def _stage_bundle_tree() -> None:
     """Reset and re-emit the bundle's ``content/evidence/`` tree.
 
     The bundle directory is the auditor handover unit, so the inlined
-    artifact under ``content/evidence/incidents/`` is rebuilt from the
-    same typed context the per-target golden pins. A reviewer can
-    walk the manifest's ``artifact_paths`` entry to a JSON file that
-    validates against ``schemas/evidence/incidents.schema.json``
-    without leaving the bundle root.
+    artifacts under ``content/evidence/<stream>/`` are rebuilt from the
+    same typed contexts the per-target goldens pin. A reviewer can walk
+    each manifest ``artifact_paths`` entry to a JSON file that validates
+    against its stream schema without leaving the bundle root.
+
+    The access artifact is emitted via the Temporal activity wrapper
+    (``emit_access_artifact_activity``) rather than the shared helper
+    directly — this is the F-CP-07 SKELETON write-path that wires the
+    Temporal access emitter into the incident-management worked example.
+    The n8n + LangGraph fan-out is a named CORE-FANOUT sibling.
     """
     content_evidence = HERE / "content" / "evidence"
     if content_evidence.exists():
         shutil.rmtree(content_evidence)
     incidents_dir = content_evidence / "incidents"
     emit_incidents_artifact(_incidents_ctx(), incidents_dir)
+    access_dir = content_evidence / "access"
+    asyncio.run(emit_access_artifact_activity(_access_ctx(), str(access_dir)))
 
 
 # Typed context — exactly what a Temporal workflow would hand the
@@ -209,8 +263,8 @@ def main() -> None:
     # bundle-relative artifact file without leaving the directory.
     assert manifest_path == HERE / "bundle.manifest.json"
     present = {entry["stream"] for entry in record["streams"] if entry["present"]}
-    assert present == {"incidents"}, (
-        f"expected exactly incidents present, got {present}"
+    assert present == {"incidents", "access"}, (
+        f"expected incidents + access present, got {present}"
     )
     for entry in record["streams"]:
         for rel in entry["artifact_paths"]:

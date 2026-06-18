@@ -104,17 +104,18 @@ def test_bundle_manifests_are_committed() -> None:
 # --------------------------------------------------------------------------- #
 
 
-def test_manifests_are_byte_identical_across_targets() -> None:
-    """The shared collector renders the same manifest bytes for all
-    three reference compile targets. The committed manifests must
-    therefore be byte-identical; if they diverge, an adapter is
-    mutating the serialisation on its way to disk.
+def test_n8n_and_langgraph_manifests_are_byte_identical() -> None:
+    """The shared collector renders the same manifest bytes for any
+    targets that exercise the same evidence surface. The n8n and
+    LangGraph bundles for incident-management still inline only the
+    incidents artifact (the access write-path is wired on Temporal
+    first as the F-CP-07 SKELETON; the named CORE-FANOUT sibling fans
+    that wiring out to n8n and LangGraph), so the two unfanned-out
+    targets must remain byte-identical to each other. Full three-target
+    byte-parity for the access-populated bundle is the named
+    EXTEND-tests-goldens sibling.
     """
-    assert (
-        N8N_MANIFEST.read_bytes()
-        == TEMPORAL_MANIFEST.read_bytes()
-        == LANGGRAPH_MANIFEST.read_bytes()
-    )
+    assert N8N_MANIFEST.read_bytes() == LANGGRAPH_MANIFEST.read_bytes()
 
 
 # --------------------------------------------------------------------------- #
@@ -198,14 +199,23 @@ def test_manifest_artifact_paths_resolve(bundle: Path) -> None:
     resolves to a file under the bundle root. The bundle is the
     auditor handover unit; a reviewer walks the manifest's
     bundle-relative paths and must land on real files.
+
+    Temporal exercises both ``incidents`` and ``access`` once the
+    F-CP-07 SKELETON Temporal write-path is wired; n8n and LangGraph
+    still exercise only ``incidents`` pending the named CORE-FANOUT
+    sibling.
     """
     record = _load_json(bundle / "bundle.manifest.json")
     streams_present = [s for s in record["streams"] if s["present"]]
     assert streams_present, (
         f"expected at least one present stream in {bundle}, got none"
     )
-    assert {s["stream"] for s in streams_present} == {"incidents"}, (
-        f"incident-management bundle should exercise only incidents; "
+    target = bundle.parts[-4]
+    expected_present = (
+        {"incidents", "access"} if target == "temporal" else {"incidents"}
+    )
+    assert {s["stream"] for s in streams_present} == expected_present, (
+        f"{target} incident-management bundle expected {expected_present}; "
         f"got {[s['stream'] for s in streams_present]} in {bundle}"
     )
     for stream in streams_present:
@@ -250,4 +260,92 @@ def test_manifest_carries_closed_seven_stream_surface(manifest: Path) -> None:
         f"got {stream_names}"
     )
     not_present = {s["stream"] for s in record["streams"] if not s["present"]}
-    assert not_present == expected - {"incidents"}
+    target = manifest.parts[-5]
+    expected_present_for_target = (
+        {"incidents", "access"} if target == "temporal" else {"incidents"}
+    )
+    assert not_present == expected - expected_present_for_target
+
+
+# --------------------------------------------------------------------------- #
+# F-CP-07 SKELETON: Temporal access write-path happy path                     #
+# --------------------------------------------------------------------------- #
+
+
+TEMPORAL_ACCESS_GOLDEN = (
+    REPO / "tests" / "fixtures" / "access_evidence" / "temporal.json"
+)
+ACCESS_SCHEMA = SCHEMAS / "evidence" / "access.schema.json"
+
+
+def test_temporal_bundle_emits_one_access_record_per_run() -> None:
+    """F-CP-07 SKELETON Temporal write-path — happy path.
+
+    One execution of the incident-management Temporal worked example
+    drives the Temporal access activity exactly once and lands one
+    well-formed access record under
+    ``content/evidence/access/<artifact_id>.json`` inside the bundle
+    directory. The record validates against
+    ``schemas/evidence/access.schema.json``, carries one
+    ``caller_identity`` block, and a closed ``verb.resource``
+    capability list. The bundle manifest's ``access`` slot resolves to
+    that file rather than the previously-reserved empty slot.
+
+    Mirrors the SKELETON test shape used by the other streams' first-
+    target wiring: assert one artifact per run, schema-conformant,
+    surfaced through the auditor-bundle manifest.
+
+    Per-target byte-parity (n8n + LangGraph fan-out) for the populated
+    access slot is the named EXTEND-tests-goldens sibling.
+    """
+    access_dir = (
+        TEMPORAL_BUNDLE / "content" / "evidence" / "access"
+    )
+    files = sorted(access_dir.glob("*.json"))
+    assert len(files) == 1, (
+        f"expected exactly one access record under {access_dir}, "
+        f"found {[p.name for p in files]}"
+    )
+
+    record = _load_json(files[0])
+    Draft202012Validator(_load_json(ACCESS_SCHEMA)).validate(record)
+
+    # One caller-identity block: ``principal_type`` + ``principal_id``
+    # required, optional ``identity_provider``. The schema enforces
+    # closed enums on the principal type; the assertion here pins the
+    # presence and shape so an emitter that silently drops the block
+    # is caught at the worked-example surface.
+    identity = record["caller_identity"]
+    assert isinstance(identity, dict)
+    assert identity["principal_type"]
+    assert identity["principal_id"]
+
+    # One closed capability list of ``verb.resource`` tokens. The
+    # schema-level regex pins token shape; pinning length > 0 and
+    # tuple-ish shape here surfaces an empty-capabilities regression
+    # at the worked-example surface rather than at the schema boundary.
+    capabilities = record["capabilities"]
+    assert isinstance(capabilities, list) and capabilities
+
+    # The bundle manifest's access slot resolves to the emitted file.
+    manifest = _load_json(TEMPORAL_BUNDLE / "bundle.manifest.json")
+    access_entries = [s for s in manifest["streams"] if s["stream"] == "access"]
+    assert len(access_entries) == 1
+    access_slot = access_entries[0]
+    assert access_slot["present"] is True
+    assert access_slot["artifact_count"] == 1
+    assert len(access_slot["artifact_paths"]) == 1
+    on_disk = TEMPORAL_BUNDLE / access_slot["artifact_paths"][0]
+    assert on_disk.is_file()
+    assert on_disk == files[0]
+
+    # The inlined access artifact is rebuilt from the same typed
+    # ``AccessContext`` the EXTEND-tests Temporal golden pins, so the
+    # bundle's inlined file is byte-identical to the committed fixture.
+    # A reviewer can cross-check the bundle's access artifact against
+    # the canonical fixture without leaving the bundle directory.
+    assert files[0].read_bytes() == TEMPORAL_ACCESS_GOLDEN.read_bytes(), (
+        f"inlined Temporal access artifact at {files[0]} drifted from "
+        f"the EXTEND-tests golden {TEMPORAL_ACCESS_GOLDEN}. Regenerate "
+        f"via the bundle's regenerate.py and commit the new bytes."
+    )
