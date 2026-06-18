@@ -585,7 +585,7 @@ not a separate documentation chore.
 
 ### F-GD-01 — Data-flow template adoption per cookbook workflow
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P1
 - **Acceptance criteria:**
   - Every cookbook workflow under `workflows/` ships a populated
@@ -598,6 +598,27 @@ not a separate documentation chore.
   "no transfer".
 - **Depends on:** —
 - **Source:** GDPR Art. 5(1)(b), Art. 6(1), Art. 30.
+- **Shipped via:** populated per-workflow data-flow documents under
+  `content/mappings/gdpr/`, derived from
+  `content/mappings/gdpr/_data-flow-template.md`:
+  - `data-flow-alert-triage.md`
+  - `data-flow-cloud-misconfiguration.md`
+  - `data-flow-data-exfil.md`
+  - `data-flow-executive-metrics.md`
+  - `data-flow-identity-compromise.md`
+  - `data-flow-incident-management.md`
+  - `data-flow-on-call-rotation.md`
+  - `data-flow-phishing-triage.md`
+  - `data-flow-post-incident-review.md`
+  - `data-flow-ransomware-containment.md`
+  - `data-flow-threat-intel-ingest.md`
+  - `data-flow-vuln-intake.md`
+
+  Each document fills the seven required sections (purpose, lawful
+  basis, categories, recipients, retention, cross-border, rights) and
+  scores the cross-border section as "No transfer" as the
+  sovereign-stack default, with the technical controls that hold the
+  scoring named inline.
 
 ### F-GD-02 — Lawful-basis check in CI
 
