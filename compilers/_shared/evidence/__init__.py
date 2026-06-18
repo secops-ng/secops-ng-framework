@@ -72,6 +72,16 @@ from compilers._shared.evidence.access import (
     emit_access_artifact,
     render_access_artifact,
 )
+from compilers._shared.evidence.effectiveness import (
+    EffectivenessContext,
+    Measurement,
+    OcsfPointer,
+    SourceShape,
+    SubjectVersion,
+    derive_artifact_id as derive_effectiveness_artifact_id,
+    emit_effectiveness_artifact,
+    render_effectiveness_artifact,
+)
 from compilers._shared.evidence.bundle import (
     BundleContext,
     STREAMS,
@@ -124,6 +134,14 @@ __all__ = [
     "derive_access_artifact_id",
     "emit_access_artifact",
     "render_access_artifact",
+    "EffectivenessContext",
+    "Measurement",
+    "OcsfPointer",
+    "SourceShape",
+    "SubjectVersion",
+    "derive_effectiveness_artifact_id",
+    "emit_effectiveness_artifact",
+    "render_effectiveness_artifact",
     "BundleContext",
     "STREAMS",
     "StreamSlot",
