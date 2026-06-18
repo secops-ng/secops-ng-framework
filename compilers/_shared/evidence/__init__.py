@@ -82,6 +82,15 @@ from compilers._shared.evidence.effectiveness import (
     emit_effectiveness_artifact,
     render_effectiveness_artifact,
 )
+from compilers._shared.evidence.disclosure_timeline import (
+    ComponentRef,
+    DisclosureTimelineContext,
+    DisclosureWindow,
+    SourceData,
+    derive_artifact_id as derive_disclosure_timeline_artifact_id,
+    emit_disclosure_timeline_artifact,
+    render_disclosure_timeline_artifact,
+)
 from compilers._shared.evidence.bundle import (
     BundleContext,
     STREAMS,
@@ -142,6 +151,13 @@ __all__ = [
     "derive_effectiveness_artifact_id",
     "emit_effectiveness_artifact",
     "render_effectiveness_artifact",
+    "DisclosureTimelineContext",
+    "ComponentRef",
+    "DisclosureWindow",
+    "SourceData",
+    "derive_disclosure_timeline_artifact_id",
+    "emit_disclosure_timeline_artifact",
+    "render_disclosure_timeline_artifact",
     "BundleContext",
     "STREAMS",
     "StreamSlot",
