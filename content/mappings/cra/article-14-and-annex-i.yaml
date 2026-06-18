@@ -192,3 +192,41 @@ entries:
       same incident-timeline signal set used for NIS2 Art. 23 and DORA
       Art. 19, with a CRA-specific submission template under
       control.cra_submission_templates@v1.
+
+  - id: cra:annex-i-2-codebase-vuln-mgmt
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §2(1)(2)(5)(7)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Codebase-side vulnerability management for products with digital
+      elements: walk the SBOM (Annex I §2(1)) against advisory feeds,
+      remediate without delay (Annex I §2(2)), commit to a
+      coordinated-vulnerability-disclosure policy (Annex I §2(5)), and
+      disseminate security updates throughout the support period (Annex
+      I §2(7)).
+    status: draft
+    control_refs:
+      - control.sbom_capture@v1
+      - control.vuln_disclosure_intake@v1
+    playbook_refs:
+      - playbook.codebase_vuln_management@v1
+    metric_refs:
+      - kpi.vuln_disclosure_sla@v1
+      - kri.cvd_intake_aging@v1
+      - kri.releases_without_sbom@v1
+    evidence_stream_refs:
+      - vulns
+    notes: >-
+      SKELETON: `playbook.codebase_vuln_management@v1` is shipped with
+      placeholder action bodies pending the F-WF-07 CORE-FANOUT sibling
+      card. This entry is the codebase-side counterpart to the
+      reporter-disclosed `cra:annex-i-2-vuln-handling` /
+      `cra:annex-i-2-cvd-policy` entries above; the disclosure-window
+      surface lands on the per-finding records produced by
+      `track-timeline` (see
+      content/evidence/codebase-vuln-management/disclosure-timeline-record.schema.json).
+      The cross-references on the NIS2 side land under
+      `nis2:art-21-2-e-codebase` in mappings/nis2/article-21-2-e.yaml.

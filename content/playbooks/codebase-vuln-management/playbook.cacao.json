@@ -1,0 +1,194 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--01a17a07-0000-4000-8000-000000000001",
+  "name": "Codebase vulnerability management",
+  "description": "SBOM-driven codebase vulnerability management playbook for operators that build or distribute software under NIS2 Art. 21(2)(e) and CRA Annex I §2. Ingest a freshly produced or refreshed SBOM, walk its declared top-level dependencies against a vulnerability database, score each finding against the operator's coordinated-vulnerability-disclosure (CVD) policy, and emit one disclosure-timeline record per finding for the downstream metrics streams. SKELETON: action bodies are placeholders pending the CORE-FANOUT sibling card; the four-state topology (ingest-sbom -> review-deps -> assess-disclosure -> track-timeline) and the per-finding disclosure-timeline record schema are pinned at this layer.",
+  "playbook_types": [
+    "investigation",
+    "notification"
+  ],
+  "created_by": "identity--c0c0c0c0-c0c0-4c0c-8c0c-c0c0c0c0c0c0",
+  "created": "2026-06-18T00:00:00Z",
+  "modified": "2026-06-18T00:00:00Z",
+  "valid_from": "2026-06-18T00:00:00Z",
+  "labels": [
+    "nis2",
+    "cra",
+    "sbom",
+    "codebase",
+    "vuln-disclosure",
+    "skeleton"
+  ],
+  "playbook_variables": {
+    "__sbom_ref__": {
+      "type": "string",
+      "description": "Pointer to the canonical SBOM artefact for the release under review. CycloneDX or SPDX, machine-readable. Populated by the build chain upstream of this workflow.",
+      "external": true
+    },
+    "__sbom_format__": {
+      "type": "string",
+      "description": "Which SBOM format the artefact at __sbom_ref__ uses. One of: cyclonedx_json, cyclonedx_xml, spdx_json, spdx_tag_value.",
+      "external": true
+    },
+    "__sbom_content_hash__": {
+      "type": "string",
+      "description": "SHA-256 hex digest of the SBOM artefact bytes as fetched. Pinned at ingest so re-runs against a moved artefact are detectable.",
+      "external": false
+    },
+    "__findings_ref__": {
+      "type": "string",
+      "description": "Pointer to the per-finding result set produced by review-deps. One entry per (component, version, advisory) triple matched against the SBOM.",
+      "external": false
+    },
+    "__disclosure_timeline_ref__": {
+      "type": "string",
+      "description": "Pointer to the disclosure-timeline record set produced by track-timeline. One record per finding, shaped against content/evidence/codebase-vuln-management/disclosure-timeline-record.schema.json.",
+      "external": false
+    }
+  },
+  "workflow_start": "start--01a17a07-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--01a17a07-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "codebase-vuln-management-start",
+      "on_completion": "action--01a17a07-0000-4000-8000-000000000002"
+    },
+    "action--01a17a07-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "ingest-sbom",
+      "description": "Ingest the canonical SBOM artefact for the release under review, pin its content hash on the case, and stamp the workflow case for downstream evidence joins. Anchors CRA Annex I §2(1) SBOM production.",
+      "on_completion": "action--01a17a07-0000-4000-8000-000000000003",
+      "in_args": [
+        "__sbom_ref__",
+        "__sbom_format__"
+      ],
+      "out_args": [
+        "__sbom_content_hash__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.sbom_capture@v1"
+        ],
+        "telemetry_refs": [],
+        "metric_refs": [
+          "kri.releases_without_sbom@v1"
+        ],
+        "core_body": {
+          "placeholder": true,
+          "note": "SKELETON: per-target compiler wiring lands in the CORE-FANOUT sibling card."
+        }
+      }
+    },
+    "action--01a17a07-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "review-deps",
+      "description": "Walk the SBOM's top-level dependencies against a vulnerability database (NVD, OSV, GHSA) using the operator's locally-runnable scanner CLI. Default scanner is installable from an EU-hosted package index; no hosted scanner SaaS dependency. Produces one finding per (component, version, advisory) triple matched against the SBOM.",
+      "on_completion": "action--01a17a07-0000-4000-8000-000000000004",
+      "in_args": [
+        "__sbom_ref__",
+        "__sbom_content_hash__"
+      ],
+      "out_args": [
+        "__findings_ref__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.sbom_capture@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.vulnerability_finding@v1"
+        ],
+        "metric_refs": [],
+        "core_body": {
+          "placeholder": true,
+          "note": "SKELETON: scanner-CLI invocation and finding normalisation land in the CORE-FANOUT sibling card."
+        }
+      }
+    },
+    "action--01a17a07-0000-4000-8000-000000000004": {
+      "type": "action",
+      "name": "assess-disclosure",
+      "description": "Score each finding from review-deps against the operator's coordinated-vulnerability-disclosure (CVD) policy: severity tier, fixed-version availability, disclosure-window deadlines per Annex I §2(2) 'without delay' plus the published CVD policy timetable. The assessment is what the per-finding disclosure-timeline record is keyed on; the CRA Article 14 actively-exploited / severe-incident reporting trigger from playbook.vuln_intake@v1 is intentionally NOT duplicated here — that decision is taken upstream against the inbound disclosure feed, this workflow only emits the proactive codebase-side timeline.",
+      "on_completion": "action--01a17a07-0000-4000-8000-000000000005",
+      "in_args": [
+        "__findings_ref__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.vuln_disclosure_intake@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.vulnerability_finding@v1"
+        ],
+        "metric_refs": [
+          "kpi.vuln_disclosure_sla@v1"
+        ],
+        "core_body": {
+          "placeholder": true,
+          "note": "SKELETON: per-finding scoring and CVD-policy resolution land in the CORE-FANOUT sibling card."
+        }
+      }
+    },
+    "action--01a17a07-0000-4000-8000-000000000005": {
+      "type": "action",
+      "name": "track-timeline",
+      "description": "Emit one disclosure-timeline record per finding from assess-disclosure, shaped against content/evidence/codebase-vuln-management/disclosure-timeline-record.schema.json. The records carry the advisory id, the affected component and version from the SBOM, the severity tier, the disclosure-window deadlines, the OCSF source_data shape, and a ref_viz field so downstream streams and dashboards can consume them off a single typed channel.",
+      "on_completion": "end--01a17a07-0000-4000-8000-000000000006",
+      "in_args": [
+        "__findings_ref__"
+      ],
+      "out_args": [
+        "__disclosure_timeline_ref__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.vuln_disclosure_intake@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.vulnerability_finding@v1"
+        ],
+        "metric_refs": [
+          "kpi.vuln_disclosure_sla@v1",
+          "kri.cvd_intake_aging@v1"
+        ],
+        "core_body": {
+          "placeholder": true,
+          "note": "SKELETON: per-record emission and downstream evidence-stream wiring land in the CORE-FANOUT sibling card."
+        }
+      }
+    },
+    "end--01a17a07-0000-4000-8000-000000000006": {
+      "type": "end",
+      "name": "codebase-vuln-management-end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.codebase_vuln_management@v1",
+    "regulation_refs": [
+      "nis2:art-21-2-e-codebase",
+      "cra:annex-i-2-codebase-vuln-mgmt"
+    ],
+    "control_refs": [
+      "control.sbom_capture@v1",
+      "control.vuln_disclosure_intake@v1"
+    ],
+    "telemetry_refs": [
+      "telemetry.ocsf.vulnerability_finding@v1"
+    ],
+    "metric_refs": [
+      "kpi.vuln_disclosure_sla@v1",
+      "kri.cvd_intake_aging@v1",
+      "kri.releases_without_sbom@v1"
+    ],
+    "evidence_stream_refs": [
+      "vulns"
+    ],
+    "maturity": "skeleton",
+    "pending_siblings": [
+      "CORE-FANOUT (n8n / Temporal / LangGraph emitters)",
+      "EXTEND-tests-goldens (per-target byte-parity goldens + worked examples)",
+      "EXTEND-docs-cookbook (cookbook walkthrough)"
+    ]
+  }
+}
