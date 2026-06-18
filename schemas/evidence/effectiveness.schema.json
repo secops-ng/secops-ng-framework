@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/evidence/effectiveness.schema.json",
+  "title": "SecOps-NG Effectiveness Evidence Artifact",
+  "description": "Typed shape for one evidence artifact emitted by the effectiveness evidence stream (F-CP-06). One artifact is produced per (metric, policy-or-prompt-version, evaluation-window) snapshot and pins, mechanically, the value an effectiveness indicator took at evaluation time, against the specific policy version or prompt version the workflow was operating under, with a pointer to the source-data shape (typically an OCSF class_uid) the indicator was derived from. Downstream consumers are the NIS2 Article 21(2)(f) effectiveness-of-risk-management-measures mapping, kri.control_effectiveness@v1 and its KPI-family siblings, and the F-WF-09 auditor-bundle that reads effectiveness snapshots as the operator-side trail for periodic re-assessment. Public-bar artifact: operator-side strings (policy versions, prompt versions, owner labels) MUST stay role-shaped; individual personal names, credential-shaped strings, and raw measurement payloads carrying personal data are out of scope per AGENTS.md §3 and rejected at the schema boundary.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_id",
+    "stream",
+    "workflow_id",
+    "execution_id",
+    "compile_target",
+    "regulation_refs",
+    "control_refs",
+    "metric_ref",
+    "subject_version",
+    "measurement",
+    "captured_at",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Pinned schema version. Lets a consumer reject artifacts produced under an older schema once breaking changes ship.",
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "artifact_id": {
+      "description": "Stable per-artifact identifier. Convention: SHA-256 hex digest of `<workflow_id>|<execution_id>|<compile_target>|<metric_ref>|<subject_version.value>` (UTF-8, no separators around the pipes). Deterministic on those five inputs so a replay of the same evaluation under the same compile target re-derives the same id; re-emissions inside the same execution stay byte-identical at the path level.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "stream": {
+      "description": "Identifies which evidence stream produced the artifact. Constant on this schema.",
+      "type": "string",
+      "const": "effectiveness"
+    },
+    "workflow_id": {
+      "description": "Stable identifier of the workflow whose execution produced this effectiveness snapshot. Convention: lower-snake-case workflow stable-id from `content/playbooks/<workflow>/` (e.g. `incident_management`, `vulnerability_triage`). Joins back into the workflow content layer so a reviewer can re-derive which playbook was compiled into the running form.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*$",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "execution_id": {
+      "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Each evaluation emits its own snapshot — re-runs of the same workflow produce distinct execution_ids and distinct artifact_ids.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "compile_target": {
+      "description": "Which of the three reference compile targets produced the running form of the workflow. The snapshot is target-specific because the runtime that evaluated the metric is target-specific. Constrained to the three reference targets the project ships compilers for; community-contributed targets are out of scope for this enum.",
+      "type": "string",
+      "enum": ["n8n", "temporal", "langgraph"]
+    },
+    "regulation_refs": {
+      "description": "Pins to the upstream regulatory mapping entries this snapshot helps satisfy (typically `nis2:art-21-2-f`). At least one entry — a snapshot with no regulatory anchor is not evidence in the F-CP-06 sense. Joins back into content/mappings/<regime>/*.yaml via the `id` field.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(nis2|dora|cra|gdpr|iso27001|soc2):[a-z0-9][a-z0-9.-]*$",
+        "maxLength": 120
+      }
+    },
+    "control_refs": {
+      "description": "Control stable-ids attested by this snapshot. Same shape every other layer of the content model uses. At least one — typically `control.control_effectiveness_test@v1` plus whichever risk-management control the indicator measures.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+      }
+    },
+    "metric_ref": {
+      "description": "Stable id of the KPI or KRI this snapshot is a measurement of. Reuses the `kpi.<slug>@v<semver>` / `kri.<slug>@v<semver>` namespace declared by content/metrics/*.yaml — the reference shape for the F-CP-06 stream is `kri.control_effectiveness@v1`, but the artifact accepts any kpi/kri stable-id so downstream catalogue growth does not require a schema bump.",
+      "type": "string",
+      "pattern": "^(kpi|kri)\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+    },
+    "subject_version": {
+      "description": "The thing whose effectiveness this snapshot measures, pinned to a specific version. Two `kind` values are supported: `policy_version` for policy text / OSCAL component / control attestation versions (semver-shaped or content-hash), and `prompt_version` for prompt-anchored agentic workflow surfaces (semver-shaped or content-hash). A snapshot has exactly one subject version; mixed-subject rollups are out of scope at this layer.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": {
+          "description": "Mechanical classification of what is being versioned. `policy_version` is the operator-side risk-management-policy surface; `prompt_version` is the prompt-anchored agentic-workflow surface (DSPy / LangGraph prompt). The two are kept distinct because they re-version on different cadences and a reviewer needs to see which surface a movement in the indicator is attributable to.",
+          "type": "string",
+          "enum": ["policy_version", "prompt_version"]
+        },
+        "value": {
+          "description": "Semver-shaped value (e.g. `1.2.0`) or a 64-hex content-hash. The pattern accepts both shapes — the deterministic-id derivation pins on this string verbatim, so emitter conventions are reviewable at the artifact level.",
+          "type": "string",
+          "pattern": "^([0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.-]+)?|[0-9a-f]{64})$"
+        }
+      }
+    },
+    "measurement": {
+      "description": "The measured value of the indicator at evaluation time, with its unit, direction, and a pointer to the source-data shape it was derived from (typically an OCSF class_uid). The pre-computed value is the snapshot — the framework deliberately does not embed the underlying sample payload here, because the sample may carry personal data and the source-shape pointer is the public-bar-safe surface a reviewer needs.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "unit", "direction", "source_shape"],
+      "properties": {
+        "value": {
+          "description": "Numeric value the indicator took at evaluation time. Ratios are in the closed interval [0, 1] per the unit; counts are non-negative integers represented as numbers.",
+          "type": "number"
+        },
+        "unit": {
+          "description": "Unit of the value, drawn from the closed vocabulary content/metrics/*.yaml `unit` declares. `ratio` for normalised [0, 1] values, `count` for non-negative integer counts, `duration_seconds` for elapsed-time measurements, `percent` for [0, 100] percentage values. New units are a discussion at the metric-catalogue layer, not a drive-by schema change.",
+          "type": "string",
+          "enum": ["ratio", "count", "duration_seconds", "percent"]
+        },
+        "direction": {
+          "description": "Which direction is better, reused verbatim from the metric-catalogue `direction` field. Carried on the snapshot so a downstream consumer can render the indicator without re-walking the catalogue.",
+          "type": "string",
+          "enum": ["higher_is_better", "lower_is_better"]
+        },
+        "evaluation_window": {
+          "description": "Optional ISO-8601 duration the indicator was evaluated over. Mirrors the catalogue's `measurement.window.duration` for sliding evaluations; omit for point-in-time evaluations.",
+          "type": "string",
+          "pattern": "^P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+S)?)?$"
+        },
+        "threshold_crossed": {
+          "description": "Optional name of the threshold the snapshot crossed (`warn`, `breach`, `critical`), drawn from the catalogue's `thresholds[].name`. Carried so downstream rollups skip re-derivation. Reviewer-side correctness check, not schema-enforced beyond the lowercase token shape.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,31}$"
+        },
+        "source_shape": {
+          "description": "Pointer to the source-data shape the indicator was derived from. Typically an OCSF event class (`class_uid` and `class_name`); the snapshot carries the pointer, not the underlying sample. Personal data in the underlying sample is out of scope for the snapshot per AGENTS.md §3.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": {
+            "kind": {
+              "description": "Which source-shape vocabulary the pointer reads against. `ocsf` for OCSF event-class identifiers; `telemetry` for the framework's own `telemetry.<slug>@v<semver>` long-form URN; `none` for indicators derived from operator control catalogue state with no external source-data shape.",
+              "type": "string",
+              "enum": ["ocsf", "telemetry", "none"]
+            },
+            "ocsf": {
+              "description": "OCSF event-class pointer. Required when `kind == ocsf`; rejected otherwise. `class_uid` is a non-negative integer; `class_name` is human-readable; `ocsf_version` is semver-shaped.",
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["class_uid"],
+              "properties": {
+                "class_uid": { "type": "integer", "minimum": 0 },
+                "class_name": { "type": "string", "minLength": 1, "maxLength": 200 },
+                "ocsf_version": {
+                  "type": "string",
+                  "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
+                  "maxLength": 20
+                }
+              }
+            },
+            "telemetry_ref": {
+              "description": "Long-form telemetry URN. Required when `kind == telemetry`; rejected otherwise.",
+              "type": "string",
+              "pattern": "^telemetry\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$",
+              "maxLength": 200
+            }
+          }
+        }
+      }
+    },
+    "captured_at": {
+      "description": "ISO-8601 UTC timestamp at which this snapshot was captured. Not part of `artifact_id` — re-emissions inside the same execution stay byte-identical at the path level.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "provenance": {
+      "description": "Where this snapshot came from. Mirrors the provenance pattern used by content/controls/*.yaml so a reviewer can re-derive the chain back to source.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_url", "captured_at"],
+      "properties": {
+        "source_url": {
+          "description": "URL of the workflow run (or workflow-content source) that produced this snapshot. Compile targets may use their own run-id URLs; the URL itself is opaque to this schema.",
+          "type": "string",
+          "format": "uri"
+        },
+        "captured_at": {
+          "description": "ISO-8601 date or date-time matching the artifact-level captured_at.",
+          "type": "string"
+        },
+        "commit_sha": {
+          "description": "Optional commit SHA of the content snapshot the workflow walked.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,64}$"
+        }
+      }
+    },
+    "owner": {
+      "description": "Optional dated ownership pointer for the effectiveness posture this snapshot covers. Role-shaped — a working-group mailbox, a generic role title, or a community handle. Individual personal names are out of scope per AGENTS.md §3 and rejected here as a matter of schema discipline. Optional at this layer because the F-CP-06 snapshot is a per-evaluation mechanical measurement; the owning role typically lives on the upstream `control.control_effectiveness_test@v1` entry.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "assigned_at"],
+      "properties": {
+        "role": {
+          "description": "Generic role or working-group identifier (e.g. 'metrics-wg', 'effectiveness-review-board@example.org'). Personal names are not used.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "assigned_at": {
+          "description": "ISO-8601 date on which the role was assigned ownership of the effectiveness posture.",
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "retention": {
+      "description": "Optional retention pointer the operator declares for this evidentiary record. ISO-8601 duration, defaulted by the operator's configuration.",
+      "type": "string",
+      "pattern": "^P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+S)?)?$"
+    }
+  }
+}
