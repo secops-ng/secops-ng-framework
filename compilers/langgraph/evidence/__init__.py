@@ -28,6 +28,9 @@ from compilers.langgraph.evidence.crypto_attestation_node import (
 from compilers.langgraph.evidence.access_node import (
     emit_access_artifact_node,
 )
+from compilers.langgraph.evidence.effectiveness_node import (
+    emit_effectiveness_artifact_node,
+)
 from compilers.langgraph.evidence.bundle_node import (
     emit_bundle_manifest_node,
 )
@@ -39,5 +42,6 @@ __all__ = [
     "emit_supply_chain_artifact_node",
     "emit_crypto_attestation_artifact_node",
     "emit_access_artifact_node",
+    "emit_effectiveness_artifact_node",
     "emit_bundle_manifest_node",
 ]
