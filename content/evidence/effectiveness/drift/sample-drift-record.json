@@ -1,0 +1,52 @@
+{
+  "schema_version": "0.1.0",
+  "id": "52ac9fa1d69da0a9d3da0ccb91d044b4869b7cb3b04c53d78a2ec9b8b247e7d6",
+  "stream": "effectiveness",
+  "workflow_id": "vulnerability_triage",
+  "subject_version": {
+    "kind": "policy_version",
+    "value": "1.2.0"
+  },
+  "previous_artifact_ref": "3b4db82d717262252df75dbc1e4e06fb96278d3911ebaafdd256aa9f1db5db13",
+  "current_artifact_ref": "6cfa688888203164d6a80fb9d0bd00b12917bcad1c68a856cdf3d7e0d12e573d",
+  "deltas": [
+    {
+      "kind": "metric_added",
+      "metric_ref": "kpi.control_effectiveness_coverage@v1",
+      "previous": null,
+      "current": {
+        "value": 0.92,
+        "unit": "ratio",
+        "direction": "higher_is_better"
+      },
+      "note": "New coverage indicator entered the cadence walk; pending re-attestation under NIS2 Art. 21(2)(f)."
+    },
+    {
+      "kind": "value_regressed",
+      "metric_ref": "kri.control_effectiveness@v1",
+      "previous": {
+        "value": 0.08,
+        "unit": "ratio",
+        "direction": "lower_is_better"
+      },
+      "current": {
+        "value": 0.17,
+        "unit": "ratio",
+        "direction": "lower_is_better"
+      },
+      "note": "Share of in-scope controls not in the effective state moved in the wrong direction past the operator-defined regression band."
+    },
+    {
+      "kind": "threshold_crossed",
+      "metric_ref": "kri.control_effectiveness@v1",
+      "previous": {
+        "threshold": "none"
+      },
+      "current": {
+        "threshold": "warn"
+      },
+      "note": "Catalogue-defined threshold tier moved from none to warn between cadence walks; flagged for control.control_effectiveness_test@v1 review."
+    }
+  ],
+  "detected_at": "2026-06-18T00:00:00Z"
+}
