@@ -1,54 +1,64 @@
 # examples/langgraph/infra_posture_management
 
-SKELETON-FANOUT scaffold shell. This directory pins the operator-facing
-layout for the LangGraph worked example of the
-`playbook.infra_posture_management@v1` continuous posture-management
-workflow (F-WF-06). The canonical CACAO source lives at
+Worked example for the LangGraph compilation of
+`playbook.infra_posture_management@v1` — the continuous
+infrastructure-posture-management workflow (F-WF-06; NIS2 Article
+21(2)(a)). The canonical CACAO source lives at
 `../../../content/playbooks/infra_posture_management/playbook.cacao.json`
-and is mirrored here byte-identical so the diff against the eventual
-emitted artefact is easy to inspect.
+and is mirrored here byte-identical so the diff against the emitted
+artefacts is easy to inspect.
 
-## Maturity
+## Files in this directory
 
-`SKELETON-FANOUT` — scaffold only. No LangGraph workflow emitter binding,
-no representative posture-evidence artifact, and no byte-parity golden
-under `tests/examples/langgraph/infra_posture_management/` at this layer.
-The compiler emitter, the per-execution evidence artifact, and the
-byte-parity golden land in the F-WF-06 CORE-FANOUT-LG sibling card
-queued serially after this SKELETON merges (to avoid concurrent
-byte-parity golden churn across the three targets).
+| Path                              | Source compiler                                   | Notes                                                                  |
+|-----------------------------------|---------------------------------------------------|------------------------------------------------------------------------|
+| `playbook.cacao.json`             | (input mirror)                                    | Byte-identical mirror of the canonical playbook                        |
+| `graph_spec.json`                 | `compilers.langgraph.emit`                        | Target-neutral GraphSpec (nodes, edges, conditional edges) — byte-parity golden |
+| `state_bindings.py`               | `compilers.langgraph.state`                       | Generated `TypedDict` state + `@tool`-decorated action wrappers; tool bodies call the deterministic primitives in `content.playbooks.infra_posture_management.primitives` — byte-parity golden |
+| `_audit_mirror.py`                | `compilers._shared.audit_mirror_cli`              | Dependency-free `AuditTrail` / `AuditRecord` sibling materialised by the compiler |
+| `regenerate.sh`                   | (tooling)                                         | Re-mirrors playbook + emits `graph_spec.json` + `state_bindings.py` + audit-mirror |
+| `regenerate.py`                   | (tooling)                                         | Drives the LangGraph posture-evidence node adapter end-to-end          |
+| `evidence/posture-evidence-record.json` | `compilers.langgraph.evidence.posture_node`  | Representative posture-evidence artifact (byte-parity golden)         |
 
-## Layout
+## How to regenerate
 
-| Path                       | Source compiler        | Status at SKELETON                                                    |
-|----------------------------|------------------------|-----------------------------------------------------------------------|
-| `playbook.cacao.json`      | (input mirror)         | Byte-identical mirror of the canonical SKELETON playbook              |
-| `regenerate.sh`            | (tooling)              | Re-mirrors the canonical playbook into this directory                 |
-| `regenerate.py`            | (tooling)              | Placeholder; no evidence emitter bound until CORE-FANOUT-LG          |
-| `graph_spec.json`        | `compilers.langgraph`        | **Not present at SKELETON.** Emitted in CORE-FANOUT-LG.              |
-| `evidence/`                | (per-execution output) | Placeholder; representative posture-evidence artifact lands in CORE-FANOUT-LG |
-
-## How to regenerate (SKELETON)
-
-From the repository root:
+After any change to the canonical playbook or to
+`compilers/langgraph/*`, refresh the committed artifacts from the
+repository root:
 
 ```sh
-examples/langgraph/infra_posture_management/regenerate.sh
+./examples/langgraph/infra_posture_management/regenerate.sh
+PYTHONPATH=. python examples/langgraph/infra_posture_management/regenerate.py
 ```
 
-The script copies the canonical CACAO source over the local mirror so
-this directory stays in sync with `content/playbooks/infra_posture_management/`.
-It does **not** emit an LangGraph workflow artefact at this layer — the
-canonical playbook ships with declarative placeholder step bodies
-(`x_secops_ng.core_body.placeholder: true`), so there are no primitive
-bindings for the LangGraph compiler emitter to translate yet. The emitter
-and the worked-artefact emission land in F-WF-06 CORE-FANOUT-LG.
+The shell script:
+
+1. Mirrors the canonical CACAO source over `playbook.cacao.json`.
+2. Emits `graph_spec.json` via `compilers.langgraph.emit`.
+3. Emits `state_bindings.py` via `compilers.langgraph.state`.
+4. Materialises `_audit_mirror.py` via `compilers._shared.audit_mirror_cli`.
+
+The Python script drives the LangGraph posture-evidence node adapter
+against the representative context pinned in `regenerate.py` to write
+one `posture-evidence-record.json` under `evidence/`.
+
+Regeneration is deterministic and idempotent — re-running on a clean
+checkout produces byte-identical artefacts.
+
+Per the posture-schema's `artifact_id` contract the artifact id
+derives from
+`SHA-256(<workflow_id>|<execution_id>|<compile_target>|<policy_version.value>)`,
+so the LangGraph artifact and the n8n / Temporal siblings carry
+distinct `artifact_id`s and distinct `compile_target` fields by
+design; the per-target byte-parity goldens pin each target
+independently against its own adapter output.
 
 ## Source
 
 - Canonical playbook: [`content/playbooks/infra_posture_management/`](../../../content/playbooks/infra_posture_management/)
 - Posture-evidence schema: [`schemas/evidence/posture.schema.json`](../../../schemas/evidence/posture.schema.json)
-- Evidence stream contributor home: [`content/evidence/infra_posture_management/`](../../../content/evidence/infra_posture_management/)
+- Posture shared emitter: [`compilers/_shared/evidence/posture.py`](../../../compilers/_shared/evidence/posture.py)
+- LangGraph posture adapter: [`compilers/langgraph/evidence/posture_node.py`](../../../compilers/langgraph/evidence/posture_node.py)
 - Regulatory anchor (NIS2 Article 21(2)(a)): [`content/mappings/nis2/article-21-2-a.yaml`](../../../content/mappings/nis2/article-21-2-a.yaml)
 
 ## Sovereign-stack default
@@ -56,16 +66,7 @@ and the worked-artefact emission land in F-WF-06 CORE-FANOUT-LG.
 Source endpoints for `collect-posture` (cloud-account read APIs,
 identity-provider read APIs, network-baseline read APIs) and the
 artefact destination for `emit-posture-evidence` are operator-configured
-at execution time. No default non-EU endpoint, no hosted-SaaS dependency,
-no vendor SDK bundled. The reference compile targets emit to whatever
-the operator wires; the playbook commits to the artefact contract, not
-the destination.
-
-## Pending sibling
-
-- **F-WF-06 CORE-FANOUT-LG** — bind the LangGraph compiler emitter against
-  the canonical primitive set, regenerate `graph_spec.json`
-  deterministically from the canonical playbook, materialise one
-  representative posture-evidence artifact under `evidence/`, and pin
-  both with a byte-parity golden under
-  `tests/examples/langgraph/infra_posture_management/`.
+at execution time. No default non-EU endpoint, no hosted-SaaS
+dependency, no vendor SDK bundled. The reference compile targets emit
+to whatever the operator wires; the playbook commits to the artefact
+contract, not the destination.

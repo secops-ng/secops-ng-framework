@@ -1,0 +1,242 @@
+{
+  "name": "Infrastructure posture management",
+  "nodes": [
+    {
+      "id": "start--06f06f06-0000-4000-8000-000000000001",
+      "name": "infra-posture-management-start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__execution_id__",
+              "type": "string",
+              "value": "",
+              "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Pinned by the upstream runtime; the workflow reads it for the posture-evidence artifact join."
+            },
+            {
+              "name": "__workflow_id__",
+              "type": "string",
+              "value": "",
+              "description": "Stable workflow stable-id from content/playbooks/<workflow>/. Joined into the posture-evidence artifact_id derivation; constant per playbook (`infra_posture_management`) and supplied as a flat token so the CORE primitive call mirrors the F-WF-07 / F-WF-08 binding convention."
+            },
+            {
+              "name": "__compile_target__",
+              "type": "string",
+              "value": "",
+              "description": "Which of the three reference compile targets produced the running form of the workflow. Pinned by the compile target's own boot path (`n8n`, `temporal`, `langgraph`); the primitive validates it against the posture.schema enum."
+            },
+            {
+              "name": "__scope_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Pointer to the operator's in-scope infrastructure manifest (cloud accounts, identity boundaries, network baselines) under review on this execution. Operator-configured; the workflow reads it as the closed list of resources the posture evaluation walks. No default scope is shipped \u2014 the framework does not assume the operator's infrastructure shape."
+            },
+            {
+              "name": "__raw_posture__",
+              "type": "string",
+              "value": "",
+              "description": "Operator-supplied raw posture-collection snapshot. JSON-native list of `{resource_id, configuration}` entries the operator's collector produced over `__scope_ref__`; the primitive canonicalises (NFKC, sort by resource_id, dedup exact-match repeats) and hashes the canonicalised list into the snapshot_hash so re-runs of the same collection walk produce byte-identical bytes."
+            },
+            {
+              "name": "__posture_state_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Pointer to the collected posture-state snapshot produced by collect-posture. Closed shape: `{scope_ref, resource_count, snapshot_hash, resources}` keyed by canonical resource_id; consumed by evaluate-controls."
+            },
+            {
+              "name": "__posture_policy__",
+              "type": "string",
+              "value": "",
+              "description": "Operator-supplied posture policy declaring, per control, the required configuration baseline keys/values per resource. JSON-native `{controls: {control.<id>@v<n>: {required: {...}}}}`. The primitive validates control_ref shape and rejects free text."
+            },
+            {
+              "name": "__control_evaluation_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Pointer to the per-control evaluation result set produced by evaluate-controls \u2014 one entry per declared control with the attestation state (effective / partially_effective / ineffective) and the deviation list. Consumed by emit-posture-evidence."
+            },
+            {
+              "name": "__regulation_refs__",
+              "type": "string",
+              "value": "",
+              "description": "Schema-shaped regulation references the artifact attests (typically `[\"nis2:art-21-2-a\"]`). JSON-native list; pinned by the compile target's boot config so the operator can extend without re-compiling."
+            },
+            {
+              "name": "__control_refs__",
+              "type": "string",
+              "value": "",
+              "description": "Control stable-ids the artifact attests. JSON-native list; the primitive validates each entry against the `control.<id>@v<n>` shape."
+            },
+            {
+              "name": "__policy_version__",
+              "type": "string",
+              "value": "",
+              "description": "Version of the operator's posture policy in force at evaluation time. JSON-native object `{scheme: \"semver\"|\"content_hash\", value: \"...\"}`; the primitive validates the scheme/value pair against the schema and the artifact_id derivation pins it."
+            },
+            {
+              "name": "__evaluated_at__",
+              "type": "string",
+              "value": "",
+              "description": "ISO-8601 UTC second-precision timestamp (`...Z`) when the per-control evaluation ran. Carried on the artifact's top-level evaluated_at."
+            },
+            {
+              "name": "__captured_at__",
+              "type": "string",
+              "value": "",
+              "description": "ISO-8601 UTC second-precision timestamp (`...Z`) when the posture-state snapshot was captured. Carried on the artifact's top-level captured_at and on provenance.captured_at."
+            },
+            {
+              "name": "__source_url__",
+              "type": "string",
+              "value": "",
+              "description": "URL of the workflow run that produced this artifact. Compile targets supply their own run-id URLs; the URL itself is opaque to the schema."
+            },
+            {
+              "name": "__posture_artifact_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Pointer to the posture-evidence artifact emitted by emit-posture-evidence, shaped against schemas/evidence/posture.schema.json."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--06f06f06-0000-4000-8000-000000000002",
+      "name": "collect-posture",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.infra_posture_management.primitives.collect import collect_posture_state\n__posture_state_ref__ = collect_posture_state(raw_posture=__raw_posture__, scope_ref=__scope_ref__)"
+      },
+      "notes": "Walk the in-scope infrastructure manifest at __scope_ref__ and collect the current posture-state snapshot: per-resource configuration state read from the operator's posture sources (cloud account read APIs, identity-provider read APIs, network-baseline read APIs). Read-only by contract; the workflow MUST NOT mutate any resource on the collect path. Source endpoints are operator-configured \u2014 the framework ships no default non-EU endpoint and no hosted-SaaS dependency.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--06f06f06-0000-4000-8000-000000000003",
+      "name": "evaluate-controls",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.infra_posture_management.primitives.controls import evaluate_controls\n__control_evaluation_ref__ = evaluate_controls(posture_state=__posture_state_ref__, posture_policy=__posture_policy__)"
+      },
+      "notes": "Evaluate each control declared in the operator's posture policy against the collected posture state. Per (control_ref, scoped-resource-id) pair, classify the attestation state as effective, partially_effective, or ineffective; capture the deviation list (configuration values that differ from the declared baseline) on partially_effective / ineffective entries. Deterministic on the same posture snapshot and the same policy version \u2014 re-evaluation under the same inputs re-derives the same result set so a reviewer can re-derive the evaluation off the committed artifact.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--06f06f06-0000-4000-8000-000000000004",
+      "name": "emit-posture-evidence",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.infra_posture_management.primitives.artifact import build_posture_artifact\n__posture_artifact_ref__ = build_posture_artifact(workflow_id=__workflow_id__, execution_id=__execution_id__, compile_target=__compile_target__, regulation_refs=__regulation_refs__, control_refs=__control_refs__, policy_version=__policy_version__, posture_state=__posture_state_ref__, control_evaluation=__control_evaluation_ref__, evaluated_at=__evaluated_at__, captured_at=__captured_at__, source_url=__source_url__)"
+      },
+      "notes": "Combine the posture-state snapshot and the per-control evaluation result set into one posture-evidence artifact shaped against schemas/evidence/posture.schema.json (stream: posture). The artifact carries the workflow id, execution id, compile target, regulation_refs (nis2:art-21-2-a), control_refs, the evaluated_at timestamp, the policy version under which the evaluation ran, and the provenance envelope. Emission is byte-stable: same execution inputs, same compile target, same policy version re-derive the same artifact_id (SHA-256 of workflow_id|execution_id|compile_target|policy_version.value). Destination is operator-configured \u2014 no default non-EU endpoint.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--06f06f06-0000-4000-8000-000000000005",
+      "name": "infra-posture-management-end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "infra-posture-management-start": {
+      "main": [
+        [
+          {
+            "node": "collect-posture",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "collect-posture": {
+      "main": [
+        [
+          {
+            "node": "evaluate-controls",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "evaluate-controls": {
+      "main": [
+        [
+          {
+            "node": "emit-posture-evidence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "emit-posture-evidence": {
+      "main": [
+        [
+          {
+            "node": "infra-posture-management-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "posture",
+    "infrastructure",
+    "continuous",
+    "posture-evidence",
+    "nis2"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.infra_posture_management@v1",
+      "content_version": "0.2.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--06f06f06-0000-4000-8000-000000000001"
+    },
+    "secops_ng_notes": []
+  }
+}
