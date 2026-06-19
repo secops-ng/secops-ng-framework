@@ -1,0 +1,52 @@
+{
+  "classification": {
+    "cross_border": true,
+    "major": true,
+    "reasons": [
+      "significance_rule=major_disruption_two_member_states: severe service disruption across two or more Member States",
+      "cross_border_rule=multi_member_state: incident materially affected users in two or more Member States"
+    ],
+    "recurring_incident": false,
+    "rule_ids": [
+      "dora.sig.severe_disruption",
+      "dora.cb.multi_member_state"
+    ]
+  },
+  "impact_indicators": {
+    "affected_clients_count": 1200,
+    "data_loss_indicator": "availability",
+    "geographic_scope": [
+      "NL",
+      "DE",
+      "FR"
+    ],
+    "indicators_of_compromise": [
+      "ioc:hash:abc123",
+      "ioc:domain:example.invalid"
+    ]
+  },
+  "incident_id": "11111111-2222-4333-8444-555555555555",
+  "mitigation_status": {
+    "actions_in_flight": [
+      "Rotated credentials across the affected scope; monitoring detection coverage for residual exposure."
+    ],
+    "state": "partially_mitigated"
+  },
+  "provenance": {
+    "captured_at": "2026-06-11T12:00:00Z",
+    "source_url": "https://example.org/runs/dora_art19_report_example_0001"
+  },
+  "regulation_refs": [
+    "dora:art-19-intermediate-72h"
+  ],
+  "report_id": "639638d29e3f50f2877c22914a1df801419413e74b69d3e44ddce3064f37ec04",
+  "report_variant": "intermediate_72h",
+  "schema_version": "1.0.0",
+  "submitted_at": "2026-06-11T12:00:00Z",
+  "timeline_refs": {
+    "clock_started_at": "2026-06-09T05:00:00Z",
+    "previous_milestone_event_id": "0123456789abcdef",
+    "stage_event_id": "fedcba9876543210",
+    "timeline_handle": "incident-timeline/abcd1234ef567890"
+  }
+}
