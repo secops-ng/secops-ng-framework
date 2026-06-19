@@ -118,12 +118,40 @@ def _validator() -> Draft202012Validator:
 
 
 def parse_file(path: str | Path) -> Playbook:
-    """Load JSON from ``path`` and parse it. Convenience wrapper around :func:`parse`."""
-    raw = Path(path).read_text(encoding="utf-8")
-    try:
-        data = json.loads(raw)
-    except json.JSONDecodeError as exc:
-        raise CacaoSchemaError(f"Playbook at {path} is not valid JSON: {exc}") from exc
+    """Load a playbook from ``path`` and parse it.
+
+    Accepts either JSON (``.json``, default) or YAML (``.yaml`` / ``.yml``)
+    serialisations. YAML is supported so source artifacts that double as
+    human-curated content (with comments) can stay in YAML on disk while
+    still flowing through the same schema gate and AST as JSON playbooks.
+    """
+    p = Path(path)
+    raw = p.read_text(encoding="utf-8")
+    suffix = p.suffix.lower()
+    if suffix in {".yaml", ".yml"}:
+        try:
+            import yaml  # type: ignore[import-untyped]
+        except ImportError as exc:  # pragma: no cover — pyyaml is a hard dep
+            raise CacaoSchemaError(
+                f"Playbook at {path} is YAML but PyYAML is not installed."
+            ) from exc
+        try:
+            data = yaml.safe_load(raw)
+        except yaml.YAMLError as exc:
+            raise CacaoSchemaError(
+                f"Playbook at {path} is not valid YAML: {exc}"
+            ) from exc
+    else:
+        try:
+            data = json.loads(raw)
+        except json.JSONDecodeError as exc:
+            raise CacaoSchemaError(
+                f"Playbook at {path} is not valid JSON: {exc}"
+            ) from exc
+    if not isinstance(data, Mapping):
+        raise CacaoSchemaError(
+            f"Playbook at {path} is not a mapping at the top level."
+        )
     return parse(data)
 
 

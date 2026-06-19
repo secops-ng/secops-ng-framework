@@ -2,7 +2,7 @@
 
 F-WF-04 CORE-N8N — emits one effectiveness-metric snapshot per rule
 version per evaluation window. The detection-engineering rule
-lifecycle (``content/playbooks/detection-engineering/playbook.cacao.json``)
+lifecycle (``content/playbooks/detection-engineering/playbook.cacao.yaml``)
 calls this adapter from the ``measure`` action via an
 ``n8n-nodes-base.executeCommand`` node invoking
 ``python -m compilers.n8n.evidence.rule_effectiveness_node`` or a
