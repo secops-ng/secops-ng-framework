@@ -1,0 +1,60 @@
+{
+  "conditional_edges": [],
+  "edges": [
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--01a17a07-0000-4000-8000-000000000003",
+      "src": "action--01a17a07-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--01a17a07-0000-4000-8000-000000000004",
+      "src": "action--01a17a07-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--01a17a07-0000-4000-8000-000000000005",
+      "src": "action--01a17a07-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--01a17a07-0000-4000-8000-000000000005"
+    }
+  ],
+  "end_sentinel": "__END__",
+  "entry": "action--01a17a07-0000-4000-8000-000000000002",
+  "name": "Codebase vulnerability management",
+  "nodes": [
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "ingest-sbom",
+      "name": "action--01a17a07-0000-4000-8000-000000000002",
+      "step_id": "action--01a17a07-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "review-deps",
+      "name": "action--01a17a07-0000-4000-8000-000000000003",
+      "step_id": "action--01a17a07-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "assess-disclosure",
+      "name": "action--01a17a07-0000-4000-8000-000000000004",
+      "step_id": "action--01a17a07-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "track-timeline",
+      "name": "action--01a17a07-0000-4000-8000-000000000005",
+      "step_id": "action--01a17a07-0000-4000-8000-000000000005"
+    }
+  ],
+  "playbook_id": "playbook--01a17a07-0000-4000-8000-000000000001",
+  "stable_id": "playbook.codebase_vuln_management@v1"
+}

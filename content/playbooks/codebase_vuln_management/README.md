@@ -12,12 +12,12 @@ records that downstream metrics streams consume.
 
 ## Maturity
 
-`SKELETON` — scope is the four-state CACAO topology plus the
-per-finding disclosure-timeline record schema plus the NIS2 / CRA
-mapping stubs. Per-step action bodies are placeholders
-(`core_body.placeholder: true`) — no compiler emission, no primitives,
-no goldens. The remaining work lands on sibling cards (see
-[Pending siblings](#pending-siblings) below).
+`CORE` — scope is the four-state CACAO topology, the per-finding
+disclosure-timeline record schema, the NIS2 / CRA mapping stubs, and
+the per-step action bodies bound to deterministic primitives at
+`content.playbooks.codebase_vuln_management.primitives.*`. The n8n
+and Temporal compile targets emit per-target artefacts (see
+[Pending siblings](#pending-siblings) for the LangGraph slice).
 
 ## State machine
 
@@ -47,10 +47,10 @@ the scanner binary.
 
 ## Files
 
-- `playbook.cacao.json` — the CACAO v2 skeleton
-  (`playbook.codebase_vuln_management@v1`). Every action carries
-  `x_secops_ng.core_body.placeholder: true` until the
-  CORE-FANOUT sibling fills in per-target compiler bodies.
+- `playbook.cacao.json` — the CACAO v2 source
+  (`playbook.codebase_vuln_management@v1`). Per-step action bodies
+  are bound to deterministic primitives at
+  `content.playbooks.codebase_vuln_management.primitives.*`.
 
 ## GDPR scope
 
@@ -79,16 +79,19 @@ Mappings:
 
 ## Pending siblings
 
-This SKELETON intentionally stops at scaffold + schema + mapping
-stubs. The remaining work is tracked as separate sibling cards that
-land after this one merges:
+The CORE-FANOUT-N8N and CORE-FANOUT-TMP slices have landed (n8n and
+Temporal compile targets emit per-target artefacts under
+`examples/{n8n,temporal}/codebase_vuln_management/` and the
+disclosure-timeline-record evidence emitter ships under
+`compilers/_shared/evidence/disclosure_timeline.py`). The remaining
+work is tracked as separate sibling cards that land after this one:
 
-- **CORE-FANOUT** — n8n / Temporal / LangGraph compiler emitters that
-  read this CACAO and emit per-target artefacts; replaces the
-  `placeholder: true` action bodies with per-target wiring.
-- **EXTEND-tests-goldens** — per-target byte-parity goldens under
-  `tests/examples/{n8n,temporal,langgraph}/codebase_vuln_management/`
-  plus a worked example under
-  `examples/{n8n,temporal,langgraph}/codebase_vuln_management/`.
+- **CORE-FANOUT-LG** — the LangGraph compile target for this
+  workflow, mirroring the n8n / Temporal emitters and pinning the
+  per-target byte-parity golden under
+  `tests/examples/codebase_vuln_management/`.
+- **EXTEND-tests-goldens** — cross-target byte-parity test pinning
+  the n8n / Temporal / LangGraph disclosure-timeline records as
+  byte-identical against the shared emitter.
 - **EXTEND-docs-cookbook** — cookbook walkthrough (intake an SBOM,
   resolve findings, file a CVD report) under `docs/cookbook/`.
