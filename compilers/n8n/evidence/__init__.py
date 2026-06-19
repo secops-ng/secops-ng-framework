@@ -31,6 +31,9 @@ from compilers.n8n.evidence.effectiveness_node import (
 from compilers.n8n.evidence.disclosure_timeline_node import (
     emit_disclosure_timeline_artifact_n8n,
 )
+from compilers.n8n.evidence.rule_effectiveness_node import (
+    emit_rule_effectiveness_snapshot_n8n,
+)
 from compilers.n8n.evidence.bundle_node import emit_bundle_manifest_n8n
 
 __all__ = [
@@ -42,5 +45,6 @@ __all__ = [
     "emit_access_artifact_n8n",
     "emit_effectiveness_artifact_n8n",
     "emit_disclosure_timeline_artifact_n8n",
+    "emit_rule_effectiveness_snapshot_n8n",
     "emit_bundle_manifest_n8n",
 ]

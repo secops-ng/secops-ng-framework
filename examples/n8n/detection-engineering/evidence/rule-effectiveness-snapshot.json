@@ -1,0 +1,24 @@
+{
+  "captured_at": "2026-06-18T05:00:00Z",
+  "metric": {
+    "calc_method": "count(closed_benign) / count(rule_firings) over the evaluation window, evaluated against the operator's detection store and case-management system.",
+    "definition": "Share of rule firings closed as benign by the analyst at triage, over the evaluation window.",
+    "stable_id": "kpi.false_positive_rate@v1",
+    "unit": "ratio",
+    "value": 0.08
+  },
+  "ref_viz": {
+    "kind": "line",
+    "notes": "Lower is better; sustained breach above 0.25 prompts re-tune.",
+    "x_axis": "captured_at",
+    "y_axis": "metric.value"
+  },
+  "rule_id": "rule.suspicious_oauth_grant",
+  "rule_version": "1.0.0",
+  "schema_version": "0.1.0-skeleton",
+  "snapshot_id": "a1995046e26be51c196b710b2a37306d494ddd5ba766f82489638e59166f1602",
+  "source_data": {
+    "ocsf_class_name": "Security Finding",
+    "ocsf_class_uid": 2001
+  }
+}

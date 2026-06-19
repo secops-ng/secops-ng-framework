@@ -91,6 +91,15 @@ from compilers._shared.evidence.disclosure_timeline import (
     emit_disclosure_timeline_artifact,
     render_disclosure_timeline_artifact,
 )
+from compilers._shared.evidence.rule_effectiveness import (
+    MetricRef,
+    RefViz,
+    RuleEffectivenessContext,
+    SourceDataRef,
+    derive_artifact_id as derive_rule_effectiveness_artifact_id,
+    emit_rule_effectiveness_snapshot,
+    render_rule_effectiveness_snapshot,
+)
 from compilers._shared.evidence.bundle import (
     BundleContext,
     STREAMS,
@@ -158,6 +167,13 @@ __all__ = [
     "derive_disclosure_timeline_artifact_id",
     "emit_disclosure_timeline_artifact",
     "render_disclosure_timeline_artifact",
+    "RuleEffectivenessContext",
+    "MetricRef",
+    "SourceDataRef",
+    "RefViz",
+    "derive_rule_effectiveness_artifact_id",
+    "emit_rule_effectiveness_snapshot",
+    "render_rule_effectiveness_snapshot",
     "BundleContext",
     "STREAMS",
     "StreamSlot",
