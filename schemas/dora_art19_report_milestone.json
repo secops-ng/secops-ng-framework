@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/dora_art19_report_milestone.json",
+  "title": "SecOps-NG DORA Article 19 Report Milestone",
+  "description": "Identifies which milestone on the DORA Article 19(4) major-ICT-incident reporting chain a technical-incident report records. Promoted out of the content/mappings/dora/article-19-and-28.yaml regulatory mapping (entries dora:art-19-initial-4h, dora:art-19-intermediate-72h, dora:art-19-final-one-month, dora:art-19-cyber-threat-voluntary) so the DORA Art. 19 report variant schema and any downstream KPIs share one regulator-facing vocabulary. Names carry the duration suffix the regulator clock is measured against; the workflow-internal F-WF-05 StageName alphabet maps onto the three mandatory entries 1:1 by suffix (early_warning -> initial_4h, notification -> intermediate_72h, final_report -> final_1mo). The voluntary cyber-threat notification (Art. 19(2)) has no mandatory clock and is carried as a fourth enum value for the lighter content shape an operator may emit; the SKELETON layer pins the enum and leaves the per-milestone content tightening to EXTEND.",
+  "type": "string",
+  "enum": [
+    "initial_4h",
+    "intermediate_72h",
+    "final_1mo",
+    "voluntary_cyber_threat"
+  ],
+  "x_milestone_definitions": {
+    "initial_4h": "DORA Article 19(4)(a) initial notification of a major ICT-related incident, due as soon as possible and within 4 hours of classification as major (and no later than 24 hours from awareness). Maps to the F-WF-05 early_warning stage in content/playbooks/incident_management/primitives/stage_clock.py.",
+    "intermediate_72h": "DORA Article 19(4)(b) intermediate report, due within 72 hours of classification of the incident as major, updating timestamps, affected functions and clients, indicators of compromise, and mitigation actions in flight. Maps to the F-WF-05 notification stage.",
+    "final_1mo": "DORA Article 19(4)(c) final report, due no later than one month after submission of the intermediate report, containing root-cause analysis, final impact figures, completed remediation actions, lessons learned, action plan, and residual-risk statement. Maps to the F-WF-05 final_report stage (interpreted as 30 days per the stage-clock module docstring; an operator who prefers calendar-month arithmetic swaps the helper in their compile target's adapter).",
+    "voluntary_cyber_threat": "DORA Article 19(2) voluntary notification of a significant cyber threat to the competent authority, with content shape defined by the relevant ESAs RTS/ITS. No mandatory clock; lighter content shape than a major-incident notification. Carried for completeness so an operator can emit a single report-variant artifact for the voluntary lane too; SKELETON layer pins the enum value only."
+  }
+}

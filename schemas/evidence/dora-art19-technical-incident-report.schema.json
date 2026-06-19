@@ -1,0 +1,225 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/dora_art19_technical_incident_report.schema.json",
+  "title": "SecOps-NG DORA Article 19 Technical-Incident Report Variant",
+  "description": "Typed shape for the technical-incident report an in-scope financial entity must produce under Regulation (EU) 2022/2554 (DORA) Article 19(4) and the Commission Implementing Regulation (EU) 2024/2956 ITS on the standard forms, templates and procedures for reporting major ICT-related incidents. One report record is produced per (incident_id, milestone) — one of the four entries on the DORA Article 19 reporting chain (initial_4h, intermediate_72h, final_1mo, voluntary_cyber_threat). The report variant is derived deterministically from the F-WF-05 incident_management workflow's timeline records (one TimelineSession per incident_id, three RegulatorSubmissionReceipts plus a TimelineClosure per major-incident lifecycle); the variant->timeline-record field derivations are documented in content/mappings/dora/article-19-report-variant.md. SKELETON layer: required-field shape and the high-level classification / timeline_refs / impact_indicators / mitigation_status envelopes are pinned so a CORE sibling card can bind a per-target compiler against a stable contract. Inner shapes are intentionally permissive at this layer and tightened in EXTEND once the per-target emitter work lands. Public-bar artifact: no individual personal names, no operator branding, no internal infrastructure references. Out of scope: the actual ITS submission transport (operator-owned per AGENTS.md §3) and per-Member-State CSIRT routing.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_id",
+    "report_variant",
+    "incident_id",
+    "regulation_refs",
+    "classification",
+    "timeline_refs",
+    "impact_indicators",
+    "mitigation_status",
+    "submitted_at",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Pinned schema version. Lets a consumer reject reports produced under an older schema once breaking changes ship. SKELETON layer carries 0.1.0; the CORE sibling card lifts it to 1.0.0 once the per-target emitters land and the inner envelopes are tightened.",
+      "type": "string",
+      "const": "0.1.0"
+    },
+    "report_id": {
+      "description": "Stable per-report identifier. Convention: SHA-256 hex digest of `<incident_id>|<report_variant>|<submitted_at>` (UTF-8, no separators around the pipes). Two submissions of the same variant on the same incident at the same instant collide deliberately; a replay of the same submission stays byte-identical.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "report_variant": {
+      "description": "Which DORA Article 19 reporting-chain milestone this report record fills. Imports the shared vocabulary from schemas/dora_art19_report_milestone.json. The four enum values map onto entries dora:art-19-initial-4h, dora:art-19-intermediate-72h, dora:art-19-final-one-month, dora:art-19-cyber-threat-voluntary in content/mappings/dora/article-19-and-28.yaml.",
+      "$ref": "https://secops-ng.org/schemas/dora_art19_report_milestone.json"
+    },
+    "incident_id": {
+      "description": "Stable case identifier for the incident as a UUID (RFC 4122). Issued upstream by the F-WF-05 timeline-open primitive (content/playbooks/incident_management/primitives/timeline_binding.open_timeline) so every milestone report on the chain pins against one id and a replay-vs-original comparison is single-string-equal.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "regulation_refs": {
+      "description": "Pins to the upstream regulatory mapping entries this report variant helps satisfy. At least one entry — a DORA Art. 19 report with no regulatory anchor is not evidence in the F-SV-03 sense. Joins back into content/mappings/dora/article-19-and-28.yaml via the `id` field. Typical entries: dora:art-19-initial-4h, dora:art-19-intermediate-72h, dora:art-19-final-one-month, dora:art-19-cyber-threat-voluntary, optionally dora:art-18-classification.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^dora:[a-z0-9][a-z0-9.-]*$",
+        "maxLength": 120
+      }
+    },
+    "classification": {
+      "description": "Deterministic outputs of the DORA Article 18(1) major-ICT-incident classifier (Commission Delegated Regulation (EU) 2024/1772). At the SKELETON layer the inner shape mirrors the F-WF-05 ClassificationVerdict dataclass (significant + cross_border + reasons + rule_ids) plus a `major` flag that is the DORA-side equivalent of the NIS2 `significant` flag. TODO(CORE): replace the SKELETON parallel-flag arrangement with a single shared classification verdict once the F-WF-05 classifier exposes a DORA materiality-threshold rule pack.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["major", "reasons", "rule_ids"],
+      "properties": {
+        "major": {
+          "description": "DORA Article 18(1) major-classification flag (the criteria operationalised by Commission Delegated Regulation (EU) 2024/1772). When false the operator should not be emitting an Art. 19 report at all; the schema enforces the field's presence so a downstream replay can audit-trail the decision.",
+          "type": "boolean"
+        },
+        "cross_border": {
+          "description": "Optional cross-border-scope flag. Reserved for the EXTEND sibling card's tightening of the DORA cross-border materiality criteria; the SKELETON layer mirrors the NIS2 Article 23(6) shape so a CORE-FANOUT card can read the same field across both reporting chains.",
+          "type": "boolean"
+        },
+        "recurring_incident": {
+          "description": "DORA Article 18(2) recurring-incident flag. True when the report is being filed under the six-month rolling aggregation rule. SKELETON layer reserves the field; the EXTEND sibling card pins the supporting `recurring_cluster_ref` once the recurring-incident correlator lands.",
+          "type": "boolean"
+        },
+        "reasons": {
+          "description": "Ordered list of human-readable rule-reason strings from the classification verdict. Public-bar text: no operator branding, no individual names.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "maxLength": 400 }
+        },
+        "rule_ids": {
+          "description": "Ordered list of policy rule ids from the classification verdict (e.g. `dora.sig.severe_disruption`, `dora.cb.multi_member_state`). SKELETON-layer permissive pattern; the EXTEND sibling card tightens this to a shared dora.<class>.<rule> alphabet once the DORA rule pack lands.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.]*$",
+            "maxLength": 200
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "timeline_refs": {
+      "description": "Pointers into the F-WF-05 incident_management timeline that this report variant was derived from. Mirrors the (clock_started_at, submitted_at) shape used by the incidents evidence stream's notification_timeline[] entries so a downstream consumer can correlate a DORA Art. 19 report record against the same F-WF-05 TimelineSession by `timeline_handle`. SKELETON layer pins the three required pointers; EXTEND tightens the optional fields once the per-target emitters land.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timeline_handle", "clock_started_at", "stage_event_id"],
+      "properties": {
+        "timeline_handle": {
+          "description": "Opaque handle returned by the F-WF-05 open_timeline primitive (TimelineSession.handle). Carried verbatim so the regulator-side acknowledgement can be correlated back onto the timeline JSON artifact persisted at content/evidence/incidents/<incident_id>/timeline.json.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "clock_started_at": {
+          "description": "ISO-8601 UTC timestamp at which the regulator clock for this report variant started — typically the F-WF-05 TimelineSession.opened_at instant (i.e. the operator's classification-as-major instant for the 4h/72h variants, or the intermediate-submission instant for the 1mo variant).",
+          "type": "string",
+          "format": "date-time"
+        },
+        "stage_event_id": {
+          "description": "F-WF-05 TimelineEvent.event_id (a 16-hex-digit digest) of the regulator-submission timeline event the report record corresponds to. Lets a replay-vs-original comparison resolve to a single string-equal check.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{16}$"
+        },
+        "previous_milestone_event_id": {
+          "description": "Optional F-WF-05 TimelineEvent.event_id of the prior milestone on the chain (e.g. the intermediate_72h event_id when this is the final_1mo report). SKELETON layer reserves the field; the CORE sibling card pins it required for intermediate_72h and final_1mo once the cross-milestone derivation is exercised end-to-end.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{16}$"
+        }
+      }
+    },
+    "impact_indicators": {
+      "description": "Per-Art. 19(4) impact indicators an operator must populate at the relevant milestone. SKELETON layer carries a permissive envelope so an emitter can land a minimal initial_4h report (most fields TODO) and a richer final_1mo report (most fields populated). EXTEND-schema sibling card tightens the inner shapes — the Commission ITS (EU) 2024/2956 field-level vocabulary lands then.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "affected_functions": {
+          "description": "Operator-supplied identifiers for the critical or important functions affected. Free-text at the SKELETON layer; EXTEND-schema tightens to the operator's function-catalogue references.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "uniqueItems": true
+        },
+        "affected_clients_count": {
+          "description": "Operator-graded count of clients affected by the incident. Non-negative integer. `null` when not yet known at the milestone (typical for initial_4h).",
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "duration_minutes": {
+          "description": "Operator-graded incident duration in minutes (closed at recovery). Non-negative. `null` when the incident is still open (typical for initial_4h and intermediate_72h).",
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "geographic_scope": {
+          "description": "Member States and/or third countries affected. ISO-3166 alpha-2 country codes. Empty array allowed at SKELETON (TODO at initial_4h); EXTEND-schema tightens the minimum cardinality per milestone.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[A-Z]{2}$" },
+          "uniqueItems": true
+        },
+        "data_loss_indicator": {
+          "description": "Operator-graded indicator of whether the incident involved confidentiality, integrity, or availability impact on data. SKELETON-layer enum closely mirroring the NIS2 incidents stream's classification.severity but expressed as a CIA-triad band; the EXTEND-schema sibling card lifts this into a shared vocabulary at schemas/dora_data_impact.json.",
+          "type": "string",
+          "enum": ["none", "confidentiality", "integrity", "availability", "multiple", "unknown"]
+        },
+        "indicators_of_compromise": {
+          "description": "Stable identifiers of the IoCs the operator has at this milestone. Mirrors the NotificationSubmission.indicators_of_compromise shape on the F-WF-05 regulator-submission contract so a single emitter populates both reports. Empty array is valid (typical for initial_4h).",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "mitigation_status": {
+      "description": "Per-milestone mitigation status. At initial_4h / intermediate_72h this names actions in flight; at final_1mo it names completed remediations and any residual-risk statement. SKELETON layer reserves a permissive shape; EXTEND-schema tightens the action-record vocabulary once the per-target emitters land.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state"],
+      "properties": {
+        "state": {
+          "description": "Coarse mitigation-state band. SKELETON-layer enum; the EXTEND-schema sibling card lifts this into a shared vocabulary at schemas/dora_mitigation_state.json once the per-target emitters land.",
+          "type": "string",
+          "enum": ["in_flight", "partially_mitigated", "remediated", "unknown"]
+        },
+        "actions_in_flight": {
+          "description": "Free-text summaries of mitigation actions currently in progress. Public-bar text: no individual names, no operator branding.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "maxLength": 2000 }
+        },
+        "completed_actions": {
+          "description": "Free-text summaries of remediation actions completed by the milestone instant. Required content for final_1mo (Art. 19(4)(c)); typically empty for initial_4h.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "maxLength": 2000 }
+        },
+        "root_cause": {
+          "description": "Operator-readable root-cause description for the final_1mo variant (Art. 19(4)(c)). `null` for initial_4h and intermediate_72h. SKELETON layer treats this as optional shape; EXTEND-schema pins it required when report_variant == final_1mo via an oneOf/$conditional refinement once the per-target emitters land. Public-bar text: no operator branding, no individual names. Carried by the F-WF-05 FinalReportSubmission.root_cause DSPy-mediated free-text field (content/playbooks/incident_management/primitives/regulator_submission.py).",
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "residual_risk": {
+          "description": "Operator-readable residual-risk statement for the final_1mo variant (Art. 19(4)(c)). `null` for earlier milestones. SKELETON layer optional; EXTEND-schema pins it required when report_variant == final_1mo.",
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 4000
+        }
+      }
+    },
+    "submitted_at": {
+      "description": "ISO-8601 UTC timestamp at which the report was submitted to the competent authority (or the closest evidentiary equivalent). Stable input to the report_id derivation so re-emissions in the same submission at the same instant stay byte-identical.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "submission_ref": {
+      "description": "Operator-side opaque reference for the submission (regulator portal receipt id, CSIRT ticket id, URN). Free-text constrained — no commentary, no operator branding. Optional at SKELETON layer (a replay-from-history record may not carry a regulator receipt).",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "provenance": {
+      "description": "Where this report came from. Mirrors the provenance pattern used by content/evidence/*/schemas/* so a reviewer can re-derive the chain back to the source workflow run.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_url", "captured_at"],
+      "properties": {
+        "source_url": {
+          "description": "URL of the workflow run (or workflow-content source) that produced this report. Compile targets may use their own run-id URLs; the URL itself is opaque to this schema.",
+          "type": "string",
+          "format": "uri"
+        },
+        "captured_at": {
+          "description": "ISO-8601 date or date-time matching the report-level submitted_at.",
+          "type": "string"
+        },
+        "commit_sha": {
+          "description": "Optional commit SHA of the content snapshot the workflow walked.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,64}$"
+        }
+      }
+    }
+  }
+}
