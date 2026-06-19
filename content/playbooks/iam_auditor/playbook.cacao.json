@@ -3,7 +3,7 @@
   "spec_version": "2.0",
   "id": "playbook--08aa0d10-0000-4000-8000-000000000001",
   "name": "IAM auditor — capability inventory",
-  "description": "Per-execution capability-inventory workflow. On every run, enumerate the caller identity that invoked the compiled workflow and the closed capability list that identity held at execution time, then emit one access-evidence artifact shaped against schemas/evidence/access.schema.json. The artifact feeds the F-CP-07 access evidence stream and anchors NIS2 Article 21(2)(i) human-resources security, access-control policies, and asset management. SKELETON: workflow topology (workflow_start -> enumerate-identities -> enumerate-capabilities -> emit-access-evidence -> workflow_end) and the x_secops_ng joins are pinned at this layer; per-target compiler emitters and worked examples land in the CORE / EXTEND sibling cards.",
+  "description": "Per-execution capability-inventory workflow. On every run, enumerate the caller identity that invoked the compiled workflow and the closed capability list that identity held at execution time, then emit one access-evidence artifact shaped against schemas/evidence/access.schema.json. The artifact feeds the F-CP-07 access evidence stream and anchors NIS2 Article 21(2)(i) human-resources security, access-control policies, and asset management. CORE: the three action bodies bind to deterministic primitives in content.playbooks.iam_auditor.primitives; the per-target byte-parity goldens land alongside the worked examples.",
   "playbook_types": [
     "investigation",
     "notification"
@@ -16,8 +16,7 @@
     "iam-audit",
     "capability-inventory",
     "access-evidence",
-    "nis2",
-    "skeleton"
+    "nis2"
   ],
   "playbook_variables": {
     "__execution_id__": {
@@ -25,15 +24,65 @@
       "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Pinned by the upstream runtime; the workflow reads it for the access-evidence artifact join.",
       "external": true
     },
+    "__workflow_id__": {
+      "type": "string",
+      "description": "Stable workflow stable-id from content/playbooks/<workflow>/. Joined into the access-evidence artifact_id derivation; constant per playbook (`iam_auditor`) and supplied as a flat token so the CORE primitive call mirrors the F-WF-01 / F-WF-07 binding convention.",
+      "external": true
+    },
+    "__compile_target__": {
+      "type": "string",
+      "description": "Which of the three reference compile targets produced the running form of the workflow. Pinned by the compile target's own boot path (`n8n`, `temporal`, `langgraph`); the primitive validates it against the access.schema enum.",
+      "external": true
+    },
+    "__principal_type__": {
+      "type": "string",
+      "description": "Mechanical classification of the caller resolved by the runtime — one of `service_account`, `workflow_runtime`, `automation_role`. Personal-user principals are out of scope for F-CP-07 and rejected at the primitive boundary.",
+      "external": true
+    },
+    "__principal_id__": {
+      "type": "string",
+      "description": "Stable role-shaped handle for the caller identity (service-account name, workflow-runtime principal id, automation role). Pinned by the compile target's runtime; the primitive validates the role-shape regex pinned by the F-CP-07 schema so a personal name or credential-shaped string fails loud at this step.",
+      "external": true
+    },
+    "__identity_provider__": {
+      "type": "string",
+      "description": "Optional short operator-defined token naming the IdP that issued or resolves the caller principal (`keycloak`, `dex`, `temporal`, `n8n`, `langgraph`). Free text is rejected by the primitive.",
+      "external": true
+    },
     "__caller_identity_ref__": {
       "type": "string",
       "description": "Pointer to the caller-identity block produced by enumerate-identities — role-shaped principal id (service-account name, workflow-runtime principal, automation role) per the F-CP-07 public-bar discipline.",
       "external": false
     },
+    "__capabilities_raw__": {
+      "type": "string",
+      "description": "Operator-supplied raw capability list the runtime walked from its IAM provider. JSON-native list of verb.resource tokens; the primitive canonicalises (NFKC + lower-case) and dedups exact-match repeats so re-runs collapse to byte-identical bytes.",
+      "external": true
+    },
     "__capabilities_ref__": {
       "type": "string",
       "description": "Pointer to the closed capability list produced by enumerate-capabilities — verb.resource tokens the caller held at execution time.",
       "external": false
+    },
+    "__regulation_refs__": {
+      "type": "string",
+      "description": "Schema-shaped regulation references the artifact attests (typically `[\"nis2:art-21-2-i\"]`). JSON-native list; pinned by the compile target's boot config so the operator can extend without re-compiling.",
+      "external": true
+    },
+    "__control_refs__": {
+      "type": "string",
+      "description": "Control stable-ids the artifact attests. JSON-native list; the primitive validates each entry against the `control.<id>@v<n>` shape.",
+      "external": true
+    },
+    "__captured_at__": {
+      "type": "string",
+      "description": "ISO-8601 UTC second-precision timestamp (`...Z`) pinned at emission time by the upstream runtime; carried on the artifact's top-level captured_at and on provenance.captured_at.",
+      "external": true
+    },
+    "__source_url__": {
+      "type": "string",
+      "description": "URL of the workflow run that produced this artifact. Compile targets supply their own run-id URLs; the URL itself is opaque to the schema.",
+      "external": true
     },
     "__access_artifact_ref__": {
       "type": "string",
@@ -54,7 +103,9 @@
       "description": "Resolve the caller identity that invoked the compiled workflow on this execution. The identity is role-shaped (service-account name, workflow-runtime principal id, automation role) — never an individual personal name or a credential-shaped string. The compile target's runtime is the source of truth: n8n credential binding, Temporal worker identity, LangGraph runtime principal. Output is the caller-identity block consumed by emit-access-evidence.",
       "on_completion": "action--08aa0d10-0000-4000-8000-000000000003",
       "in_args": [
-        "__execution_id__"
+        "__principal_type__",
+        "__principal_id__",
+        "__identity_provider__"
       ],
       "out_args": [
         "__caller_identity_ref__"
@@ -67,7 +118,16 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.authentication@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.iam_auditor.primitives.identity.resolve_caller_identity",
+          "in": {
+            "principal_type": "__principal_type__",
+            "principal_id": "__principal_id__",
+            "identity_provider": "__identity_provider__"
+          },
+          "out": "__caller_identity_ref__"
+        }
       }
     },
     "action--08aa0d10-0000-4000-8000-000000000003": {
@@ -76,7 +136,7 @@
       "description": "Walk the closed capability list the resolved caller identity held at execution time. Each capability is a verb.resource token; the list is closed (no implicit grants). This is the runtime-side assertion; the F-PT-01 platform card carries the orthogonal guarantee that the caller actually held the listed capabilities at boot, which is out of scope for this workflow.",
       "on_completion": "action--08aa0d10-0000-4000-8000-000000000004",
       "in_args": [
-        "__caller_identity_ref__"
+        "__capabilities_raw__"
       ],
       "out_args": [
         "__capabilities_ref__"
@@ -90,7 +150,14 @@
         "telemetry_refs": [
           "telemetry.ocsf.account_change@v1",
           "telemetry.ocsf.api_activity@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.iam_auditor.primitives.capabilities.build_capability_list",
+          "in": {
+            "capabilities": "__capabilities_raw__"
+          },
+          "out": "__capabilities_ref__"
+        }
       }
     },
     "action--08aa0d10-0000-4000-8000-000000000004": {
@@ -99,9 +166,15 @@
       "description": "Combine the caller-identity block and the capability list into one access-evidence artifact shaped against schemas/evidence/access.schema.json (stream: access). The artifact carries the workflow id, execution id, compile target, regulation_refs (nis2:art-21-2-i), control_refs, captured_at, and provenance. Emission is byte-stable: same execution inputs and same compile target re-derive the same artifact_id (SHA-256 of workflow_id|execution_id|compile_target). Destination is operator-configured — no default non-EU endpoint.",
       "on_completion": "end--08aa0d10-0000-4000-8000-000000000005",
       "in_args": [
+        "__workflow_id__",
+        "__execution_id__",
+        "__compile_target__",
+        "__regulation_refs__",
+        "__control_refs__",
         "__caller_identity_ref__",
         "__capabilities_ref__",
-        "__execution_id__"
+        "__captured_at__",
+        "__source_url__"
       ],
       "out_args": [
         "__access_artifact_ref__"
@@ -118,7 +191,22 @@
         ],
         "metric_refs": [
           "kpi.cloud_posture_coverage@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.iam_auditor.primitives.artifact.build_access_artifact",
+          "in": {
+            "workflow_id": "__workflow_id__",
+            "execution_id": "__execution_id__",
+            "compile_target": "__compile_target__",
+            "regulation_refs": "__regulation_refs__",
+            "control_refs": "__control_refs__",
+            "caller_identity": "__caller_identity_ref__",
+            "capabilities": "__capabilities_ref__",
+            "captured_at": "__captured_at__",
+            "source_url": "__source_url__"
+          },
+          "out": "__access_artifact_ref__"
+        }
       }
     },
     "end--08aa0d10-0000-4000-8000-000000000005": {
@@ -128,9 +216,9 @@
   },
   "x_secops_ng": {
     "stable_id": "playbook.iam_auditor@v1",
-    "content_version": "0.1.0",
-    "maturity": "draft",
-    "compile_targets": [],
+    "content_version": "0.2.0",
+    "maturity": "experimental",
+    "compile_targets": ["n8n"],
     "control_refs": [
       "control.jml_evidence@v1",
       "control.privileged_access_review@v1",

@@ -20,21 +20,20 @@ _TRACER = trace.get_tracer(__name__)
 from ._audit_mirror import AuditRecord, AuditTrail
 
 @activity.defn
-async def enumerate_identities(execution_id: str) -> str:
+async def enumerate_identities(principal_type: str, principal_id: str, identity_provider: str) -> str:
     """Resolve the caller identity that invoked the compiled workflow on this execution. The identity is role-shaped (service-account name, workflow-runtime principal id, automation role) — never an individual personal name or a credential-shaped string. The compile target's runtime is the source of truth: n8n credential binding, Temporal worker identity, LangGraph runtime principal. Output is the caller-identity block consumed by emit-access-evidence.
 
     CACAO step_id: action--08aa0d10-0000-4000-8000-000000000002
     """
     with _TRACER.start_as_current_span(
         name='activity.action--08aa0d10-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000002', 'secops_ng.step.name': 'enumerate-identities', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enumerate_identities'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000002', 'secops_ng.step.name': 'enumerate-identities', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enumerate_identities'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--08aa0d10-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000002', 'secops_ng.step.name': 'enumerate-identities', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enumerate_identities'})
+            AuditRecord(span_name='activity.action--08aa0d10-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000002', 'secops_ng.step.name': 'enumerate-identities', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enumerate_identities'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--08aa0d10-0000-4000-8000-000000000002'"
-        )
+        from content.playbooks.iam_auditor.primitives.identity import resolve_caller_identity
+        __caller_identity_ref__ = resolve_caller_identity(principal_type=__principal_type__, principal_id=__principal_id__, identity_provider=__identity_provider__)
 
 ENUMERATE_IDENTITIES_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -44,21 +43,20 @@ ENUMERATE_IDENTITIES_RETRY_POLICY = RetryPolicy(
 )
 
 @activity.defn
-async def enumerate_capabilities(caller_identity_ref: str) -> str:
+async def enumerate_capabilities(capabilities_raw: str) -> str:
     """Walk the closed capability list the resolved caller identity held at execution time. Each capability is a verb.resource token; the list is closed (no implicit grants). This is the runtime-side assertion; the F-PT-01 platform card carries the orthogonal guarantee that the caller actually held the listed capabilities at boot, which is out of scope for this workflow.
 
     CACAO step_id: action--08aa0d10-0000-4000-8000-000000000003
     """
     with _TRACER.start_as_current_span(
         name='activity.action--08aa0d10-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000003', 'secops_ng.step.name': 'enumerate-capabilities', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enumerate_capabilities'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000003', 'secops_ng.step.name': 'enumerate-capabilities', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enumerate_capabilities'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--08aa0d10-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000003', 'secops_ng.step.name': 'enumerate-capabilities', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enumerate_capabilities'})
+            AuditRecord(span_name='activity.action--08aa0d10-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000003', 'secops_ng.step.name': 'enumerate-capabilities', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enumerate_capabilities'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--08aa0d10-0000-4000-8000-000000000003'"
-        )
+        from content.playbooks.iam_auditor.primitives.capabilities import build_capability_list
+        __capabilities_ref__ = build_capability_list(capabilities=__capabilities_raw__)
 
 ENUMERATE_CAPABILITIES_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -68,21 +66,20 @@ ENUMERATE_CAPABILITIES_RETRY_POLICY = RetryPolicy(
 )
 
 @activity.defn
-async def emit_access_evidence(caller_identity_ref: str, capabilities_ref: str, execution_id: str) -> str:
+async def emit_access_evidence(workflow_id: str, execution_id: str, compile_target: str, regulation_refs: str, control_refs: str, caller_identity_ref: str, capabilities_ref: str, captured_at: str, source_url: str) -> str:
     """Combine the caller-identity block and the capability list into one access-evidence artifact shaped against schemas/evidence/access.schema.json (stream: access). The artifact carries the workflow id, execution id, compile target, regulation_refs (nis2:art-21-2-i), control_refs, captured_at, and provenance. Emission is byte-stable: same execution inputs and same compile target re-derive the same artifact_id (SHA-256 of workflow_id|execution_id|compile_target). Destination is operator-configured — no default non-EU endpoint.
 
     CACAO step_id: action--08aa0d10-0000-4000-8000-000000000004
     """
     with _TRACER.start_as_current_span(
         name='activity.action--08aa0d10-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000004', 'secops_ng.step.name': 'emit-access-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_access_evidence'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000004', 'secops_ng.step.name': 'emit-access-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_access_evidence'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--08aa0d10-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000004', 'secops_ng.step.name': 'emit-access-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_access_evidence'})
+            AuditRecord(span_name='activity.action--08aa0d10-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000004', 'secops_ng.step.name': 'emit-access-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_access_evidence'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--08aa0d10-0000-4000-8000-000000000004'"
-        )
+        from content.playbooks.iam_auditor.primitives.artifact import build_access_artifact
+        __access_artifact_ref__ = build_access_artifact(workflow_id=__workflow_id__, execution_id=__execution_id__, compile_target=__compile_target__, regulation_refs=__regulation_refs__, control_refs=__control_refs__, caller_identity=__caller_identity_ref__, capabilities=__capabilities_ref__, captured_at=__captured_at__, source_url=__source_url__)
 
 EMIT_ACCESS_EVIDENCE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -93,12 +90,12 @@ EMIT_ACCESS_EVIDENCE_RETRY_POLICY = RetryPolicy(
 
 @workflow.defn
 class PlaybookIamAuditorV1Workflow:
-    """Per-execution capability-inventory workflow. On every run, enumerate the caller identity that invoked the compiled workflow and the closed capability list that identity held at execution time, then emit one access-evidence artifact shaped against schemas/evidence/access.schema.json. The artifact feeds the F-CP-07 access evidence stream and anchors NIS2 Article 21(2)(i) human-resources security, access-control policies, and asset management. SKELETON: workflow topology (workflow_start -> enumerate-identities -> enumerate-capabilities -> emit-access-evidence -> workflow_end) and the x_secops_ng joins are pinned at this layer; per-target compiler emitters and worked examples land in the CORE / EXTEND sibling cards.
+    """Per-execution capability-inventory workflow. On every run, enumerate the caller identity that invoked the compiled workflow and the closed capability list that identity held at execution time, then emit one access-evidence artifact shaped against schemas/evidence/access.schema.json. The artifact feeds the F-CP-07 access evidence stream and anchors NIS2 Article 21(2)(i) human-resources security, access-control policies, and asset management. CORE: the three action bodies bind to deterministic primitives in content.playbooks.iam_auditor.primitives; the per-target byte-parity goldens land alongside the worked examples.
 
     CACAO playbook id : playbook--08aa0d10-0000-4000-8000-000000000001
     stable_id         : playbook.iam_auditor@v1
-    content_version   : 0.1.0
-    maturity          : draft
+    content_version   : 0.2.0
+    maturity          : experimental
     workflow_start    : start--08aa0d10-0000-4000-8000-000000000001
     activities        : enumerate_identities, enumerate_capabilities, emit_access_evidence
     """
@@ -107,10 +104,10 @@ class PlaybookIamAuditorV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.iam_auditor@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.iam_auditor@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0'})
+                AuditRecord(span_name='workflow.playbook.iam_auditor@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.iam_auditor@v1'"
