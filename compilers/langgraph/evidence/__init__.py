@@ -40,6 +40,9 @@ from compilers.langgraph.evidence.bundle_node import (
 from compilers.langgraph.evidence.rule_effectiveness_node import (
     emit_rule_effectiveness_snapshot_node,
 )
+from compilers.langgraph.evidence.posture_node import (
+    emit_posture_artifact_node,
+)
 
 __all__ = [
     "emit_risk_analysis_artifact_node",
@@ -52,4 +55,5 @@ __all__ = [
     "emit_disclosure_timeline_artifact_node",
     "emit_bundle_manifest_node",
     "emit_rule_effectiveness_snapshot_node",
+    "emit_posture_artifact_node",
 ]

@@ -100,6 +100,15 @@ from compilers._shared.evidence.rule_effectiveness import (
     emit_rule_effectiveness_snapshot,
     render_rule_effectiveness_snapshot,
 )
+from compilers._shared.evidence.posture import (
+    ControlEvaluationEntry,
+    PolicyVersion,
+    PostureContext,
+    PostureState,
+    derive_artifact_id as derive_posture_artifact_id,
+    emit_posture_artifact,
+    render_posture_artifact,
+)
 from compilers._shared.evidence.bundle import (
     BundleContext,
     STREAMS,
@@ -174,6 +183,13 @@ __all__ = [
     "derive_rule_effectiveness_artifact_id",
     "emit_rule_effectiveness_snapshot",
     "render_rule_effectiveness_snapshot",
+    "PostureContext",
+    "PostureState",
+    "PolicyVersion",
+    "ControlEvaluationEntry",
+    "derive_posture_artifact_id",
+    "emit_posture_artifact",
+    "render_posture_artifact",
     "BundleContext",
     "STREAMS",
     "StreamSlot",

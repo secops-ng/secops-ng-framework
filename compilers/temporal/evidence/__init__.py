@@ -37,6 +37,9 @@ from compilers.temporal.evidence.rule_effectiveness_activity import (
 from compilers.temporal.evidence.bundle_activity import (
     emit_bundle_manifest_activity,
 )
+from compilers.temporal.evidence.posture_activity import (
+    emit_posture_artifact_activity,
+)
 
 __all__ = [
     "emit_risk_analysis_artifact_activity",
@@ -49,4 +52,5 @@ __all__ = [
     "emit_disclosure_timeline_artifact_activity",
     "emit_rule_effectiveness_snapshot_activity",
     "emit_bundle_manifest_activity",
+    "emit_posture_artifact_activity",
 ]
