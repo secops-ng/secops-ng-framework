@@ -1,0 +1,60 @@
+{
+  "conditional_edges": [],
+  "edges": [
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--f0e4f404-0000-4000-8000-000000000003",
+      "src": "action--f0e4f404-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--f0e4f404-0000-4000-8000-000000000004",
+      "src": "action--f0e4f404-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--f0e4f404-0000-4000-8000-000000000005",
+      "src": "action--f0e4f404-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--f0e4f404-0000-4000-8000-000000000005"
+    }
+  ],
+  "end_sentinel": "__END__",
+  "entry": "action--f0e4f404-0000-4000-8000-000000000002",
+  "name": "Detection engineering \u2014 rule lifecycle",
+  "nodes": [
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "propose-rule-version",
+      "name": "action--f0e4f404-0000-4000-8000-000000000002",
+      "step_id": "action--f0e4f404-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "review-rule-version",
+      "name": "action--f0e4f404-0000-4000-8000-000000000003",
+      "step_id": "action--f0e4f404-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "ship-rule-version",
+      "name": "action--f0e4f404-0000-4000-8000-000000000004",
+      "step_id": "action--f0e4f404-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "measure-rule-version",
+      "name": "action--f0e4f404-0000-4000-8000-000000000005",
+      "step_id": "action--f0e4f404-0000-4000-8000-000000000005"
+    }
+  ],
+  "playbook_id": "playbook--f0e4f404-0000-4000-8000-000000000001",
+  "stable_id": "playbook.detection_engineering@v1"
+}
