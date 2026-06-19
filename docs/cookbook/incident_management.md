@@ -328,6 +328,48 @@ the per-target overlay. If the compiler or the playbook changes,
 regenerate via the per-target `regenerate.sh` and commit the diff
 intentionally; the drift guard flips green again.
 
+## 6.1 DORA Art. 19 report variant (F-SV-03)
+
+For operators in DORA scope, the incident-management workflow also
+emits a **technical-incident report variant** consumable as a DORA
+Art. 19 submission. The variant is a per-target overlay on the same
+F-WF-05 timeline — no new playbook, no new schema beyond the variant
+record shape.
+
+- **Schema.** Report-variant record pinned at
+  [`schemas/evidence/dora-art19-technical-incident-report.schema.json`](../../schemas/evidence/dora-art19-technical-incident-report.schema.json);
+  report-milestone enum at
+  [`schemas/dora_art19_report_milestone.json`](../../schemas/dora_art19_report_milestone.json)
+  (initial / intermediate / final / deferred-final).
+- **Per-target emitters.** Each compile target has its own emitter
+  bound to the shared variant-field derivation:
+  [`compilers/n8n/evidence/dora_art19_report_node.py`](../../compilers/n8n/evidence/dora_art19_report_node.py),
+  [`compilers/temporal/evidence/dora_art19_report_activity.py`](../../compilers/temporal/evidence/dora_art19_report_activity.py),
+  and
+  [`compilers/langgraph/evidence/dora_art19_report_node.py`](../../compilers/langgraph/evidence/dora_art19_report_node.py).
+  Shared derivation lives at
+  [`compilers/_shared/evidence/dora_art19_report.py`](../../compilers/_shared/evidence/dora_art19_report.py).
+- **Worked examples.** Per-target compiled examples land under
+  `examples/{n8n,temporal,langgraph}/dora_art19_report/`.
+- **Byte-parity goldens.** Drift guards under
+  `tests/examples/dora_art19_report/` pin each target's emitter output
+  to a committed golden so the report variant survives regulator diff.
+  Variant-schema contract is pinned in
+  `tests/content_model/test_dora_art19_report_variant_schema.py`.
+- **Submission templates and major-incident classifier.** The
+  operator-bound submission templates and the DORA major-incident
+  classifier live as policy in
+  [`content/controls/control.dora_submission_templates@v1.yaml`](../../content/controls/control.dora_submission_templates@v1.yaml)
+  and
+  [`content/controls/control.dora_major_classifier@v1.yaml`](../../content/controls/control.dora_major_classifier@v1.yaml).
+- **Sovereign-stack note.** Submission destinations (the operator's
+  competent authority endpoint) remain operator-configured at runtime;
+  the framework ships no default endpoint and no submission transport.
+
+The report variant is a downstream rendering — it does not change the
+F-WF-05 timeline or the F-CR-04 incident-evidence record, and operators
+outside DORA scope can ignore the emitters entirely.
+
 ## 7. What this cookbook does not cover
 
 - **Credentials.** No API keys, no tokens, no private keys, no
