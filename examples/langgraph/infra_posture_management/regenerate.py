@@ -1,40 +1,134 @@
-"""Regenerate scaffold for examples/langgraph/infra_posture_management.
+"""Regenerate the committed infra-posture-management worked example (LangGraph).
 
-F-WF-06 SKELETON-FANOUT-N8N: scaffold-only. At this layer the
-canonical infra_posture_management playbook ships with declarative
-placeholder step bodies (``x_secops_ng.core_body.placeholder: true``),
-so there is no LangGraph compiler emitter binding to drive and no
-representative posture-evidence artefact to materialise. The script
-mirrors the canonical CACAO source into this directory so the
-SKELETON example tracks the canonical playbook, and is otherwise a
-no-op pending the F-WF-06 CORE-FANOUT-LG sibling card.
+F-WF-06 CORE-LANGGRAPH — the infrastructure-posture-management workflow
+emits one posture-evidence artifact per scheduled execution. This
+script materialises one such record for one representative execution
+by driving the LangGraph node adapter at
+``compilers.langgraph.evidence.emit_posture_artifact_node`` exactly as
+a LangGraph integrator would: a state mapping carrying the typed
+:class:`PostureContext` and an ``evidence_output_dir`` is handed to
+the node function, the adapter delegates to the shared helper, and
+the partial state update returned by the node carries the absolute
+artifact path the rest of the graph attaches to its audit trail.
 
-Run from the repository root::
+The example pins one representative execution of the workflow against
+an operator-side in-scope manifest under the operator's posture policy
+``policy.cspm_baseline@v1.0.0``. Per AGENTS.md §3 the underlying
+posture snapshot bytes are *not* embedded — the
+``posture_state.snapshot_hash`` content-hash anchor and the opaque
+``posture_state.scope_ref`` back-pointer are the public-bar-safe
+surface.
+
+Inputs are kept byte-identical to the n8n and Temporal siblings at
+``examples/n8n/infra_posture_management/`` and
+``examples/temporal/infra_posture_management/`` so the per-target
+adapters write byte-identical records *per target* — the artifact_id
+intentionally differs across targets because ``compile_target`` is
+part of the schema's ``artifact_id`` derivation contract.
+
+Run from the repo root after any change to the posture shared emitter
+or the LangGraph adapter::
 
     PYTHONPATH=. python examples/langgraph/infra_posture_management/regenerate.py
 
-The committed ``evidence/`` placeholder will be replaced by one
-representative posture-evidence artifact (shape:
-``schemas/evidence/posture.schema.json``) when CORE-FANOUT-LG lands.
+The committed ``posture-evidence-record.json`` is the resulting
+artifact renamed for human-friendly diffing; the deterministic
+``<artifact_id>.json`` written by the node is the SHA-256-named
+sibling of the same bytes.
 """
 from __future__ import annotations
 
+import json
 import shutil
+from datetime import datetime, timezone
 from pathlib import Path
 
+from compilers._shared.evidence import (
+    ControlEvaluationEntry,
+    PolicyVersion,
+    PostureContext,
+    PostureState,
+)
+from compilers.langgraph.evidence import emit_posture_artifact_node
+
 HERE = Path(__file__).resolve().parent
-REPO_ROOT = HERE.parents[2]
-CANON = REPO_ROOT / "content" / "playbooks" / "infra_posture_management" / "playbook.cacao.json"
-MIRROR = HERE / "playbook.cacao.json"
+EVIDENCE_DIR = HERE / "evidence"
+SNAPSHOT = EVIDENCE_DIR / "posture-evidence-record.json"
+
+
+# Typed context — exactly what a LangGraph integrator would carry on
+# graph state. Kept byte-identical to the n8n and Temporal siblings'
+# payloads at examples/{n8n,temporal}/infra_posture_management/ so the
+# per-target adapters emit byte-identical records *per target*. The
+# underlying posture-snapshot bytes are intentionally not embedded —
+# the ``posture_state.snapshot_hash`` content-hash anchor and the
+# opaque ``posture_state.scope_ref`` pointer are the public-bar-safe
+# surface.
+CTX = PostureContext(
+    workflow_id="infra_posture_management",
+    execution_id="exec-2026-06-19T05:00:00Z-0001",
+    compile_target="langgraph",
+    regulation_refs=("nis2:art-21-2-a",),
+    control_refs=(
+        "control.cspm_baseline@v1",
+        "control.risk_management_policy@v1",
+        "control.asset_inventory_delta@v1",
+    ),
+    policy_version=PolicyVersion(scheme="semver", value="1.0.0"),
+    posture_state=PostureState(
+        scope_ref="scope.infra_baseline@v1",
+        resource_count=128,
+        snapshot_hash=(
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ),
+    ),
+    control_evaluation=(
+        ControlEvaluationEntry(
+            control_ref="control.cspm_baseline@v1",
+            attestation_state="effective",
+            deviation_count=0,
+        ),
+        ControlEvaluationEntry(
+            control_ref="control.risk_management_policy@v1",
+            attestation_state="partially_effective",
+            deviation_count=3,
+        ),
+        ControlEvaluationEntry(
+            control_ref="control.asset_inventory_delta@v1",
+            attestation_state="ineffective",
+            deviation_count=12,
+        ),
+    ),
+    evaluated_at=datetime(2026, 6, 19, 5, 0, 0, tzinfo=timezone.utc),
+    captured_at=datetime(2026, 6, 19, 5, 0, 0, tzinfo=timezone.utc),
+    source_url="https://secops-ng.org/playbooks/infra_posture_management",
+)
 
 
 def main() -> None:
-    shutil.copyfile(CANON, MIRROR)
-    print(
-        f"infra_posture_management (langgraph): mirrored canonical CACAO source -> "
-        f"{MIRROR.relative_to(REPO_ROOT)}."
+    EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
+    update = emit_posture_artifact_node(
+        {
+            "posture_context": CTX,
+            "evidence_output_dir": EVIDENCE_DIR,
+        }
     )
-    print("Workflow emission and posture-evidence artefact deferred to F-WF-06 CORE-FANOUT-LG.")
+    written = Path(update["posture_artifact_path"])
+    # The node writes <artifact_id>.json; copy to the stable
+    # human-friendly filename the example commits for diffing.
+    shutil.copyfile(written, SNAPSHOT)
+    # Drop the sha-named twin so the committed tree only carries the
+    # human-friendly snapshot.
+    written.unlink()
+    record = json.loads(SNAPSHOT.read_text("utf-8"))
+    # Sanity check — execution-anchor shape carried through.
+    assert record["stream"] == "posture"
+    assert record["workflow_id"] == "infra_posture_management"
+    assert record["compile_target"] == "langgraph"
+    assert record["policy_version"]["scheme"] == "semver"
+    assert len(record["control_evaluation"]) == 3
+    assert update["posture_artifact_id"] == record["artifact_id"]
+    print(f"wrote {SNAPSHOT} (artifact_id={record['artifact_id']})")
 
 
 if __name__ == "__main__":

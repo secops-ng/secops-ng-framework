@@ -1,0 +1,48 @@
+{
+  "artifact_id": "cfceaaa895a8e21d040eecd0763c2adca394cf73c8028667af83b2abaa647a36",
+  "captured_at": "2026-06-19T05:00:00Z",
+  "compile_target": "langgraph",
+  "control_evaluation": [
+    {
+      "attestation_state": "effective",
+      "control_ref": "control.cspm_baseline@v1",
+      "deviation_count": 0
+    },
+    {
+      "attestation_state": "partially_effective",
+      "control_ref": "control.risk_management_policy@v1",
+      "deviation_count": 3
+    },
+    {
+      "attestation_state": "ineffective",
+      "control_ref": "control.asset_inventory_delta@v1",
+      "deviation_count": 12
+    }
+  ],
+  "control_refs": [
+    "control.cspm_baseline@v1",
+    "control.risk_management_policy@v1",
+    "control.asset_inventory_delta@v1"
+  ],
+  "evaluated_at": "2026-06-19T05:00:00Z",
+  "execution_id": "exec-2026-06-19T05:00:00Z-0001",
+  "policy_version": {
+    "scheme": "semver",
+    "value": "1.0.0"
+  },
+  "posture_state": {
+    "resource_count": 128,
+    "scope_ref": "scope.infra_baseline@v1",
+    "snapshot_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "provenance": {
+    "captured_at": "2026-06-19T05:00:00Z",
+    "source_url": "https://secops-ng.org/playbooks/infra_posture_management"
+  },
+  "regulation_refs": [
+    "nis2:art-21-2-a"
+  ],
+  "schema_version": "0.1.0",
+  "stream": "posture",
+  "workflow_id": "infra_posture_management"
+}
