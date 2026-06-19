@@ -22,6 +22,7 @@ narrative.
 | `alert_triage`        | [`alert_triage.md`](alert_triage.md)               | `content/playbooks/alert_triage.cacao.yaml` + `content/playbooks/alert_triage/` |
 | `incident_management` | [`incident_management.md`](incident_management.md) | `content/playbooks/incident_management/`              |
 | `codebase_vuln_management` | [`codebase_vuln_management.md`](codebase_vuln_management.md) | `content/playbooks/codebase_vuln_management/`    |
+| `iam_auditor`         | [`iam_auditor.md`](iam_auditor.md)                 | `content/playbooks/iam_auditor/`                      |
 
 Additional entries land alongside their content sources as workflows
 flip from In Progress to Shipped on
