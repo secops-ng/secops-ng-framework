@@ -1,4 +1,4 @@
-"""Same-target deterministic-replay contract for the alert-triage example.
+"""Same-target deterministic-replay contract for the alert_triage example.
 
 F-WF-03 EXTEND-tests-replay. Mirror of F-WF-01 EXTEND-tests-replay
 (tests/examples/vuln_intake/test_replay.py). Cross-target byte-parity of
@@ -25,11 +25,11 @@ that two independent runs in fresh ``contextvars`` contexts — one per
 compile targets the worked example ships for: n8n, Temporal, LangGraph.
 
 The emitter-shaped call patterns mirror the traversal order each target
-produces for the alert-triage CACAO playbook
+produces for the alert_triage CACAO playbook
 (intake → classify-and-prioritise → response-route). They are
 intentionally synthetic so this test does not depend on the optional
 ``langgraph`` / ``temporalio`` / n8n runtimes — same precedent as the
-cross-target parity suite and the vuln-intake replay suite.
+cross-target parity suite and the vuln_intake replay suite.
 """
 from __future__ import annotations
 
@@ -88,14 +88,14 @@ def mirror_mod(tmp_path: Path):
 # ---------------------------------------------------------------------------
 
 _TS_PLACEHOLDER = "2026-06-05T00:00:00Z"
-_PLAYBOOK_ID = "alert-triage"
+_PLAYBOOK_ID = "alert_triage"
 _PLAYBOOK_VERSION = "0.1.0"
 _WORKFLOW_RUN_ID = "replay-run-001"
 
-# Three semantic events shaped after the CACAO alert-triage playbook's
+# Three semantic events shaped after the CACAO alert_triage playbook's
 # action-typed steps (intake → classify-and-prioritise → response-route).
 # Step ids match the canonical playbook
-# (content/playbooks/alert-triage.cacao.yaml). Tool-name presence
+# (content/playbooks/alert_triage.cacao.yaml). Tool-name presence
 # follows the existing parity-suite convention: tool steps surface a
 # tool_name, orchestration / node steps do not.
 _EVENT_INTAKE = {
@@ -142,7 +142,7 @@ def _canonical_attrs(event: dict, *, compile_target: str) -> dict:
 # ---------------------------------------------------------------------------
 # Per-target traversal-shaped emits.
 #
-# Each helper walks the three alert-triage events in the order the
+# Each helper walks the three alert_triage events in the order the
 # matching emitter would, feeding each into the AuditTrail. The
 # differences between helpers are intentional: they encode the per-target
 # traversal shape so a future regression that breaks one emitter's

@@ -135,7 +135,7 @@ the primitives module itself lands in CORE-PRIM.
 
 ## 4. Worked snippet
 
-A vuln-intake `triage_and_correlate` step that binds to the CVSS+EPSS
+A vuln_intake `triage_and_correlate` step that binds to the CVSS+EPSS
 severity scorer in the (forthcoming) primitives module:
 
 ```jsonc

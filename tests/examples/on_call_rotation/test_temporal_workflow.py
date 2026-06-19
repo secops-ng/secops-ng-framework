@@ -1,12 +1,12 @@
-"""Drift guard for the ``examples/temporal/on-call-rotation/`` worked example.
+"""Drift guard for the ``examples/temporal/on_call_rotation/`` worked example.
 
-Mirrors the ransomware-containment temporal example test: re-emits the
+Mirrors the ransomware_containment temporal example test: re-emits the
 Temporal workflow stub from the canonical CACAO playbook and pins the
 result byte-for-byte against the committed
-``examples/temporal/on-call-rotation/workflow.temporal.py``. Adds an
+``examples/temporal/on_call_rotation/workflow.temporal.py``. Adds an
 activity-name \u2194 CACAO action-id parity check so the one-to-one
 mirroring contract documented in
-``examples/temporal/on-call-rotation/README.md`` is enforced by
+``examples/temporal/on_call_rotation/README.md`` is enforced by
 tests, not by convention.
 
 Also pins the co-located ``playbook.cacao.json`` mirror byte-for-byte
@@ -15,7 +15,7 @@ against the canonical CACAO source, so the regenerate.sh contract
 
 Regenerate via::
 
-    ./examples/temporal/on-call-rotation/regenerate.sh
+    ./examples/temporal/on_call_rotation/regenerate.sh
 """
 from __future__ import annotations
 
@@ -27,9 +27,9 @@ from compilers.temporal.emit import emit_file
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SOURCE = (
-    REPO_ROOT / "content" / "playbooks" / "on-call-rotation" / "playbook.cacao.json"
+    REPO_ROOT / "content" / "playbooks" / "on_call_rotation" / "playbook.cacao.json"
 )
-EXAMPLE_DIR = REPO_ROOT / "examples" / "temporal" / "on-call-rotation"
+EXAMPLE_DIR = REPO_ROOT / "examples" / "temporal" / "on_call_rotation"
 WORKED_EXAMPLE = EXAMPLE_DIR / "workflow.temporal.py"
 MIRRORED_CACAO = EXAMPLE_DIR / "playbook.cacao.json"
 
@@ -47,18 +47,18 @@ def test_worked_example_matches_emitter_output() -> None:
     rendered = emit_file(SOURCE)
     expected = WORKED_EXAMPLE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/temporal/on-call-rotation/workflow.temporal.py drifted "
+        "examples/temporal/on_call_rotation/workflow.temporal.py drifted "
         "from the Temporal emitter output. Regenerate via "
-        "`./examples/temporal/on-call-rotation/regenerate.sh` and commit "
+        "`./examples/temporal/on_call_rotation/regenerate.sh` and commit "
         "the new bytes."
     )
 
 
 def test_mirrored_cacao_matches_canonical_source() -> None:
     assert MIRRORED_CACAO.read_bytes() == SOURCE.read_bytes(), (
-        "examples/temporal/on-call-rotation/playbook.cacao.json drifted "
-        "from the canonical content/playbooks/on-call-rotation/playbook.cacao.json. "
-        "Regenerate via `./examples/temporal/on-call-rotation/regenerate.sh`."
+        "examples/temporal/on_call_rotation/playbook.cacao.json drifted "
+        "from the canonical content/playbooks/on_call_rotation/playbook.cacao.json. "
+        "Regenerate via `./examples/temporal/on_call_rotation/regenerate.sh`."
     )
 
 

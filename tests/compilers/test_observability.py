@@ -332,7 +332,7 @@ def test_langgraph_regenerate_sh_is_idempotent(example_dir: Path) -> None:
 def test_langgraph_regenerate_sh_uses_only_opentelemetry_api() -> None:
     """Sovereign-stack guard: emitted state module imports ``opentelemetry``\
     (the API), never a vendor SDK or hard-coded OTLP endpoint."""
-    example_dir = LG_EXAMPLES / "vuln-intake"
+    example_dir = LG_EXAMPLES / "vuln_intake"
     pristine = _snapshot_outputs(example_dir)
     try:
         _run_regenerate(example_dir)

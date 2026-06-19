@@ -1,16 +1,16 @@
-"""Drift guard for the ``examples/n8n/post-incident-review/`` worked example.
+"""Drift guard for the ``examples/n8n/post_incident_review/`` worked example.
 
-Mirrors the vuln-intake / data-exfil / threat-intel-ingest n8n example
+Mirrors the vuln_intake / data_exfil / threat_intel_ingest n8n example
 tests: parses the canonical CACAO playbook, emits the n8n workflow JSON,
 and pins the result byte-for-byte against the committed
-``examples/n8n/post-incident-review/workflow.n8n.json``. Adds a node-id
+``examples/n8n/post_incident_review/workflow.n8n.json``. Adds a node-id
 \u2194 CACAO action-id parity check so the one-to-one mirroring contract
-documented in ``examples/n8n/post-incident-review/README.md`` is enforced
+documented in ``examples/n8n/post_incident_review/README.md`` is enforced
 by tests, not by convention.
 
 Regenerate via::
 
-    ./examples/n8n/post-incident-review/regenerate.sh
+    ./examples/n8n/post_incident_review/regenerate.sh
 """
 from __future__ import annotations
 
@@ -25,14 +25,14 @@ SOURCE = (
     REPO_ROOT
     / "content"
     / "playbooks"
-    / "post-incident-review"
+    / "post_incident_review"
     / "playbook.cacao.json"
 )
 WORKED_EXAMPLE = (
     REPO_ROOT
     / "examples"
     / "n8n"
-    / "post-incident-review"
+    / "post_incident_review"
     / "workflow.n8n.json"
 )
 
@@ -46,9 +46,9 @@ def test_worked_example_matches_emitter_output() -> None:
     rendered = _serialise(emit(playbook))
     expected = WORKED_EXAMPLE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/n8n/post-incident-review/workflow.n8n.json drifted "
+        "examples/n8n/post_incident_review/workflow.n8n.json drifted "
         "from the n8n emitter output. Regenerate via "
-        "`./examples/n8n/post-incident-review/regenerate.sh` and "
+        "`./examples/n8n/post_incident_review/regenerate.sh` and "
         "commit the new bytes."
     )
 
@@ -207,17 +207,17 @@ def test_co_located_cacao_mirror_matches_canonical() -> None:
         REPO_ROOT
         / "examples"
         / "n8n"
-        / "post-incident-review"
+        / "post_incident_review"
         / "playbook.cacao.json"
     )
     assert mirror.exists(), (
-        "examples/n8n/post-incident-review/playbook.cacao.json missing — "
-        "run ./examples/n8n/post-incident-review/regenerate.sh"
+        "examples/n8n/post_incident_review/playbook.cacao.json missing — "
+        "run ./examples/n8n/post_incident_review/regenerate.sh"
     )
     assert mirror.read_bytes() == SOURCE.read_bytes(), (
-        "examples/n8n/post-incident-review/playbook.cacao.json drifted "
+        "examples/n8n/post_incident_review/playbook.cacao.json drifted "
         "from the canonical CACAO source. Re-run "
-        "./examples/n8n/post-incident-review/regenerate.sh and commit."
+        "./examples/n8n/post_incident_review/regenerate.sh and commit."
     )
 
 

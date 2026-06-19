@@ -1,6 +1,6 @@
-"""Golden tests for the LangGraph reference compiler — executive-metrics-rollup.
+"""Golden tests for the LangGraph reference compiler — executive_metrics_rollup.
 
-Mirrors ``test_golden.py`` (vuln-intake) for the executive-metrics-rollup
+Mirrors ``test_golden.py`` (vuln_intake) for the executive_metrics_rollup
 fixture: pins both the GraphSpec JSON and the state + tool bindings
 module byte-for-byte.
 
@@ -62,7 +62,7 @@ def test_graph_spec_matches_golden() -> None:
     rendered = _serialise_graph(emit(playbook))
     expected = GOLDEN_GRAPH.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "LangGraph graph-spec golden drift (executive-metrics-rollup). "
+        "LangGraph graph-spec golden drift (executive_metrics_rollup). "
         "Regenerate via `python -m compilers.langgraph.emit "
         f"{FIXTURE.relative_to(REPO_ROOT)} > "
         f"{GOLDEN_GRAPH.relative_to(REPO_ROOT)}` and commit in the same PR."
@@ -80,7 +80,7 @@ def test_graph_spec_emit_is_deterministic() -> None:
 
 
 def test_graph_spec_golden_has_expected_shape() -> None:
-    """Sanity-check the golden carries the executive-metrics-rollup topology."""
+    """Sanity-check the golden carries the executive_metrics_rollup topology."""
     payload = json.loads(GOLDEN_GRAPH.read_text(encoding="utf-8"))
     assert payload["stable_id"] == "playbook.executive_metrics_rollup@v1"
     assert payload["end_sentinel"] == "__END__"
@@ -106,7 +106,7 @@ def test_module_matches_golden() -> None:
     rendered = render_module(playbook)
     expected = GOLDEN_MODULE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "LangGraph state-module golden drift (executive-metrics-rollup). "
+        "LangGraph state-module golden drift (executive_metrics_rollup). "
         "Regenerate via `python -m compilers.langgraph.state "
         f"{FIXTURE.relative_to(REPO_ROOT)} > "
         f"{GOLDEN_MODULE.relative_to(REPO_ROOT)}` and commit in the same PR."

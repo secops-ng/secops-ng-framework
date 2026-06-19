@@ -1,7 +1,7 @@
-"""Golden tests for the LangGraph reference compiler — data-exfil.
+"""Golden tests for the LangGraph reference compiler — data_exfil.
 
-Mirrors ``test_golden.py`` (vuln-intake) and
-``test_identity_compromise.py`` for the data-exfil fixture: pins both
+Mirrors ``test_golden.py`` (vuln_intake) and
+``test_identity_compromise.py`` for the data_exfil fixture: pins both
 the GraphSpec JSON and the state + tool bindings module byte-for-byte.
 
 Regenerate via::
@@ -62,7 +62,7 @@ def test_graph_spec_matches_golden() -> None:
     rendered = _serialise_graph(emit(playbook))
     expected = GOLDEN_GRAPH.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "LangGraph graph-spec golden drift (data-exfil). "
+        "LangGraph graph-spec golden drift (data_exfil). "
         "Regenerate via `python -m compilers.langgraph.emit "
         f"{FIXTURE.relative_to(REPO_ROOT)} > "
         f"{GOLDEN_GRAPH.relative_to(REPO_ROOT)}` and commit in the same PR."
@@ -80,7 +80,7 @@ def test_graph_spec_emit_is_deterministic() -> None:
 
 
 def test_graph_spec_golden_has_expected_shape() -> None:
-    """Sanity-check the golden carries the data-exfil topology."""
+    """Sanity-check the golden carries the data_exfil topology."""
     payload = json.loads(GOLDEN_GRAPH.read_text(encoding="utf-8"))
     assert payload["stable_id"] == "playbook.data_exfil@v1"
     assert payload["end_sentinel"] == "__END__"
@@ -106,7 +106,7 @@ def test_module_matches_golden() -> None:
     rendered = render_module(playbook)
     expected = GOLDEN_MODULE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "LangGraph state-module golden drift (data-exfil). "
+        "LangGraph state-module golden drift (data_exfil). "
         "Regenerate via `python -m compilers.langgraph.state "
         f"{FIXTURE.relative_to(REPO_ROOT)} > "
         f"{GOLDEN_MODULE.relative_to(REPO_ROOT)}` and commit in the same PR."

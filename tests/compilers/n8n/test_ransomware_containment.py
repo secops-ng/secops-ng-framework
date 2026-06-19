@@ -1,6 +1,6 @@
-"""Golden test for the n8n reference compiler — ransomware-containment.
+"""Golden test for the n8n reference compiler — ransomware_containment.
 
-Mirrors ``test_golden.py`` (vuln-intake) for the
+Mirrors ``test_golden.py`` (vuln_intake) for the
 ``ransomware_containment`` fixture: parses the CACAO v2 playbook, emits
 the n8n workflow JSON, and pins it byte-for-byte against a checked-in
 golden so any emitter drift is caught in review.
@@ -44,7 +44,7 @@ def test_ransomware_containment_golden_matches() -> None:
     rendered = _serialise(workflow)
     expected = GOLDEN.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "n8n golden drift (ransomware-containment). Regenerate via "
+        "n8n golden drift (ransomware_containment). Regenerate via "
         "`python -m tools.compile tests/compilers/_shared/fixtures/"
         "ransomware_containment.cacao.json --target n8n --out "
         f"{GOLDEN.relative_to(REPO_ROOT)}` and commit in the same PR."

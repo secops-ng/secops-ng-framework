@@ -1,7 +1,7 @@
-"""Golden test for the Temporal compiler — identity-compromise.
+"""Golden test for the Temporal compiler — identity_compromise.
 
-Pins the emitted Temporal workflow stub for the identity-compromise
-fixture; mirrors ``test_golden.py`` (vuln-intake) so any drift surfaces
+Pins the emitted Temporal workflow stub for the identity_compromise
+fixture; mirrors ``test_golden.py`` (vuln_intake) so any drift surfaces
 in review.
 
 Regenerate via::

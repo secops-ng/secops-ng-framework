@@ -17,15 +17,15 @@ From the framework repo root:
 
 ```bash
 python -m tools.compile \
-    content/playbooks/vuln-intake/playbook.cacao.json \
+    content/playbooks/vuln_intake/playbook.cacao.json \
     --target n8n \
-    --out /tmp/vuln-intake.n8n.json
+    --out /tmp/vuln_intake.n8n.json
 ```
 
 That produces a `.json` file you can import into n8n:
 
 ```bash
-n8n import:workflow --input=/tmp/vuln-intake.n8n.json
+n8n import:workflow --input=/tmp/vuln_intake.n8n.json
 ```
 
 …or upload via the REST API:
@@ -34,7 +34,7 @@ n8n import:workflow --input=/tmp/vuln-intake.n8n.json
 curl -X POST "$N8N_URL/rest/workflows" \
     -H "X-N8N-API-KEY: $N8N_API_KEY" \
     -H "content-type: application/json" \
-    --data @/tmp/vuln-intake.n8n.json
+    --data @/tmp/vuln_intake.n8n.json
 ```
 
 Credentials, schedules, and runtime secrets stay in n8n. The compiled

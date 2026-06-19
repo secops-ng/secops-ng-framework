@@ -1,8 +1,8 @@
-"""Drift guard for the ``examples/langgraph/phishing-triage/`` worked example.
+"""Drift guard for the ``examples/langgraph/phishing_triage/`` worked example.
 
-Mirrors the vuln-intake and threat-intel-ingest LangGraph example tests:
+Mirrors the vuln_intake and threat_intel_ingest LangGraph example tests:
 re-runs ``compilers.langgraph.emit`` and ``compilers.langgraph.state``
-against the canonical phishing-triage CACAO playbook and pins the
+against the canonical phishing_triage CACAO playbook and pins the
 committed ``graph_spec.json`` + ``state_bindings.py`` byte-for-byte.
 
 Also pins the co-located ``playbook.cacao.json`` mirror byte-for-byte
@@ -12,7 +12,7 @@ drift guards already present in this directory.
 
 Regenerate via::
 
-    ./examples/langgraph/phishing-triage/regenerate.sh
+    ./examples/langgraph/phishing_triage/regenerate.sh
 """
 from __future__ import annotations
 import pytest
@@ -26,9 +26,9 @@ from compilers.langgraph.state import render_module
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SOURCE = (
-    REPO_ROOT / "content" / "playbooks" / "phishing-triage" / "playbook.cacao.json"
+    REPO_ROOT / "content" / "playbooks" / "phishing_triage" / "playbook.cacao.json"
 )
-EXAMPLE_DIR = REPO_ROOT / "examples" / "langgraph" / "phishing-triage"
+EXAMPLE_DIR = REPO_ROOT / "examples" / "langgraph" / "phishing_triage"
 MIRRORED_CACAO = EXAMPLE_DIR / "playbook.cacao.json"
 COMMITTED_GRAPH = EXAMPLE_DIR / "graph_spec.json"
 COMMITTED_MODULE = EXAMPLE_DIR / "state_bindings.py"
@@ -57,9 +57,9 @@ def test_committed_artefacts_exist() -> None:
 
 def test_mirrored_cacao_matches_canonical_source() -> None:
     assert MIRRORED_CACAO.read_bytes() == SOURCE.read_bytes(), (
-        "examples/langgraph/phishing-triage/playbook.cacao.json drifted "
-        "from the canonical content/playbooks/phishing-triage/playbook.cacao.json. "
-        "Regenerate via `./examples/langgraph/phishing-triage/regenerate.sh`."
+        "examples/langgraph/phishing_triage/playbook.cacao.json drifted "
+        "from the canonical content/playbooks/phishing_triage/playbook.cacao.json. "
+        "Regenerate via `./examples/langgraph/phishing_triage/regenerate.sh`."
     )
 
 
@@ -68,8 +68,8 @@ def test_graph_spec_matches_emitter_output() -> None:
     rendered = _serialise_graph(emit(playbook))
     expected = COMMITTED_GRAPH.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/langgraph/phishing-triage/graph_spec.json drift. "
-        "Regenerate via `./examples/langgraph/phishing-triage/regenerate.sh` "
+        "examples/langgraph/phishing_triage/graph_spec.json drift. "
+        "Regenerate via `./examples/langgraph/phishing_triage/regenerate.sh` "
         "and commit the result."
     )
 
@@ -86,8 +86,8 @@ def test_state_bindings_matches_state_emitter_output() -> None:
     rendered = render_module(playbook) + "\n"
     expected = COMMITTED_MODULE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/langgraph/phishing-triage/state_bindings.py drift. "
-        "Regenerate via `./examples/langgraph/phishing-triage/regenerate.sh` "
+        "examples/langgraph/phishing_triage/state_bindings.py drift. "
+        "Regenerate via `./examples/langgraph/phishing_triage/regenerate.sh` "
         "and commit the result."
     )
 

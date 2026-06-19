@@ -1,13 +1,13 @@
-"""Golden tests for the data-exfil worked example.
+"""Golden tests for the data_exfil worked example.
 
 Pins the three reference-compiler outputs against the bytes that ship
-under ``examples/{n8n,temporal,langgraph}/data-exfil/``.
+under ``examples/{n8n,temporal,langgraph}/data_exfil/``.
 Together with the per-compiler golden suites under ``tests/compilers/``,
 this guarantees that the worked example is a byte-deterministic
 regeneration of the canonical CACAO source, not a hand-edited copy.
 
 If an emitter change is intentional, regenerate the artifacts with the
-commands documented in each ``examples/<target>/data-exfil/README.md``
+commands documented in each ``examples/<target>/data_exfil/README.md``
 and commit the new bytes alongside the emitter change.
 """
 from __future__ import annotations
@@ -25,24 +25,24 @@ SOURCE = (
     REPO_ROOT
     / "content"
     / "playbooks"
-    / "data-exfil"
+    / "data_exfil"
     / "playbook.cacao.json"
 )
 N8N_GOLDEN = (
-    REPO_ROOT / "examples" / "n8n" / "data-exfil" / "workflow.n8n.json"
+    REPO_ROOT / "examples" / "n8n" / "data_exfil" / "workflow.n8n.json"
 )
 TEMPORAL_GOLDEN = (
     REPO_ROOT
     / "examples"
     / "temporal"
-    / "data-exfil"
+    / "data_exfil"
     / "workflow.temporal.py"
 )
 LANGGRAPH_GOLDEN = (
     REPO_ROOT
     / "examples"
     / "langgraph"
-    / "data-exfil"
+    / "data_exfil"
     / "graph_spec.json"
 )
 
@@ -67,7 +67,7 @@ def test_n8n_workflow_matches_golden() -> None:
     rendered = _serialise_n8n(emit_n8n(playbook))
     expected = N8N_GOLDEN.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "data-exfil n8n example drifted. Regenerate via "
+        "data_exfil n8n example drifted. Regenerate via "
         "`PYTHONPATH=. python -m tools.compile "
         f"{SOURCE.relative_to(REPO_ROOT)} --target n8n --out "
         f"{N8N_GOLDEN.relative_to(REPO_ROOT)}` and commit alongside the change."
@@ -83,7 +83,7 @@ def test_temporal_workflow_matches_golden() -> None:
     rendered = emit_temporal_file(SOURCE)
     expected = TEMPORAL_GOLDEN.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "data-exfil Temporal example drifted. Regenerate via "
+        "data_exfil Temporal example drifted. Regenerate via "
         "`PYTHONPATH=. python -m compilers.temporal "
         f"{SOURCE.relative_to(REPO_ROOT)} --out "
         f"{TEMPORAL_GOLDEN.relative_to(REPO_ROOT)}` and commit alongside the change."
@@ -100,7 +100,7 @@ def test_langgraph_graph_spec_matches_golden() -> None:
     rendered = _serialise_langgraph(emit_langgraph(playbook).to_dict())
     expected = LANGGRAPH_GOLDEN.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "data-exfil LangGraph example drifted. Regenerate via "
+        "data_exfil LangGraph example drifted. Regenerate via "
         "`PYTHONPATH=. python -m compilers.langgraph.emit "
         f"{SOURCE.relative_to(REPO_ROOT)} > "
         f"{LANGGRAPH_GOLDEN.relative_to(REPO_ROOT)}` and commit alongside the change."

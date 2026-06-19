@@ -13,7 +13,7 @@ Quick start::
 
     from compilers._shared.cacao_parser import parse, parse_file
 
-    playbook = parse_file("content/playbooks/vuln-intake/playbook.cacao.json")
+    playbook = parse_file("content/playbooks/vuln_intake/playbook.cacao.json")
     for step_id, step in playbook.workflow.items():
         ...
 

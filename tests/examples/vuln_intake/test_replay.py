@@ -1,4 +1,4 @@
-"""Same-target deterministic-replay contract for the vuln-intake example.
+"""Same-target deterministic-replay contract for the vuln_intake example.
 
 F-WF-01 EXTEND-tests-replay. Cross-target byte-parity of the AuditTrail is
 already covered by ``tests/compilers/_shared/test_audit_mirror_cross_target_parity.py``;
@@ -23,7 +23,7 @@ that two independent runs in fresh ``contextvars`` contexts — one per
 compile targets the worked example ships for: n8n, Temporal, LangGraph.
 
 The emitter-shaped call patterns mirror the traversal order each target
-produces for the vuln-intake CACAO playbook (intake → triage → assemble).
+produces for the vuln_intake CACAO playbook (intake → triage → assemble).
 They are intentionally synthetic so this test does not depend on the
 optional ``langgraph`` / ``temporalio`` / n8n runtimes — same precedent
 as the cross-target parity suite.
@@ -85,11 +85,11 @@ def mirror_mod(tmp_path: Path):
 # ---------------------------------------------------------------------------
 
 _TS_PLACEHOLDER = "2026-06-04T00:00:00Z"
-_PLAYBOOK_ID = "vuln-intake"
+_PLAYBOOK_ID = "vuln_intake"
 _PLAYBOOK_VERSION = "0.1.0"
 _WORKFLOW_RUN_ID = "replay-run-001"
 
-# Three semantic events shaped after the CACAO vuln-intake playbook's
+# Three semantic events shaped after the CACAO vuln_intake playbook's
 # action-typed steps (intake → triage → assemble). Tool-name presence
 # follows the existing parity-suite convention: tool steps surface a
 # tool_name, orchestration steps do not.
@@ -137,7 +137,7 @@ def _canonical_attrs(event: dict, *, compile_target: str) -> dict:
 # ---------------------------------------------------------------------------
 # Per-target traversal-shaped emits.
 #
-# Each helper walks the three vuln-intake events in the order the
+# Each helper walks the three vuln_intake events in the order the
 # matching emitter would, feeding each into the AuditTrail. The
 # differences between helpers are intentional: they encode the per-target
 # traversal shape so a future regression that breaks one emitter's

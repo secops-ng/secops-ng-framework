@@ -1,6 +1,6 @@
-"""Golden tests for the LangGraph reference compiler — cloud-misconfiguration.
+"""Golden tests for the LangGraph reference compiler — cloud_misconfiguration.
 
-Mirrors ``test_identity_compromise.py`` for the cloud-misconfiguration
+Mirrors ``test_identity_compromise.py`` for the cloud_misconfiguration
 fixture: pins both the GraphSpec JSON and the state + tool bindings
 module byte-for-byte.
 
@@ -62,7 +62,7 @@ def test_graph_spec_matches_golden() -> None:
     rendered = _serialise_graph(emit(playbook))
     expected = GOLDEN_GRAPH.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "LangGraph graph-spec golden drift (cloud-misconfiguration). "
+        "LangGraph graph-spec golden drift (cloud_misconfiguration). "
         "Regenerate via `python -m compilers.langgraph.emit "
         f"{FIXTURE.relative_to(REPO_ROOT)} > "
         f"{GOLDEN_GRAPH.relative_to(REPO_ROOT)}` and commit in the same PR."
@@ -80,7 +80,7 @@ def test_graph_spec_emit_is_deterministic() -> None:
 
 
 def test_graph_spec_golden_has_expected_shape() -> None:
-    """Sanity-check the golden carries the cloud-misconfiguration topology."""
+    """Sanity-check the golden carries the cloud_misconfiguration topology."""
     payload = json.loads(GOLDEN_GRAPH.read_text(encoding="utf-8"))
     assert payload["stable_id"] == "playbook.cloud_misconfiguration@v1"
     assert payload["end_sentinel"] == "__END__"
@@ -106,7 +106,7 @@ def test_module_matches_golden() -> None:
     rendered = render_module(playbook)
     expected = GOLDEN_MODULE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "LangGraph state-module golden drift (cloud-misconfiguration). "
+        "LangGraph state-module golden drift (cloud_misconfiguration). "
         "Regenerate via `python -m compilers.langgraph.state "
         f"{FIXTURE.relative_to(REPO_ROOT)} > "
         f"{GOLDEN_MODULE.relative_to(REPO_ROOT)}` and commit in the same PR."

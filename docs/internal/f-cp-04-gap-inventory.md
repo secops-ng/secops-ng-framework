@@ -60,19 +60,19 @@ reads from the evidence stream.
 
 | ROADMAP requirement | Status | Where |
 |---|---|---|
-| `content/evidence/vulns/` populated by `vuln-intake` with triage decisions and disclosure timelines | ❌ missing | `content/evidence/` directory does not exist on `main` today. No evidence stream lands from any workflow yet — F-CP-04 is the first stream to ship under this epic. |
+| `content/evidence/vulns/` populated by `vuln_intake` with triage decisions and disclosure timelines | ❌ missing | `content/evidence/` directory does not exist on `main` today. No evidence stream lands from any workflow yet — F-CP-04 is the first stream to ship under this epic. |
 | Schema documented in `content/mappings/nis2/article-21-2-e.yaml` §21(2)(e) | ⚠️ partial | `content/mappings/nis2/article-21-2-e.yaml` exists with the obligation paraphrase, control refs (`control.sbom_capture@v1`, `control.vuln_disclosure_intake@v1`, …), playbook refs (`playbook.vuln_intake@v1`), and metric refs (`kpi.vuln_disclosure_sla@v1`, `kri.releases_without_sbom@v1`, …). The **evidence-stream schema fields** (per-record shape, identity, timestamps, retention) are not pinned in that file yet. |
-| **F-WF-01 dependency** | ✅ unblocked | F-WF-01 is Shipped. The CACAO playbook at `content/playbooks/vuln-intake/playbook.cacao.json`, the primitives at `content/playbooks/vuln-intake/primitives/` (severity, CVSS, EPSS, dedup, DSPy signatures), and the worked examples at `examples/{n8n,temporal,langgraph}/vuln-intake/` are the upstream this stream subscribes to. |
-| **F-PT-01 dependency** | ✅ unblocked | F-PT-01 (Evidence collector) is Shipped. The `AuditTrail.current().append(...)` mirror that every CORE action in `vuln-intake` already calls is the per-execution emission point F-CP-04 ties into. |
+| **F-WF-01 dependency** | ✅ unblocked | F-WF-01 is Shipped. The CACAO playbook at `content/playbooks/vuln_intake/playbook.cacao.json`, the primitives at `content/playbooks/vuln_intake/primitives/` (severity, CVSS, EPSS, dedup, DSPy signatures), and the worked examples at `examples/{n8n,temporal,langgraph}/vuln_intake/` are the upstream this stream subscribes to. |
+| **F-PT-01 dependency** | ✅ unblocked | F-PT-01 (Evidence collector) is Shipped. The `AuditTrail.current().append(...)` mirror that every CORE action in `vuln_intake` already calls is the per-execution emission point F-CP-04 ties into. |
 | **Evidence-record schema** (per-record shape) | ❌ missing | No `content/evidence/_schema/vulns.yaml` (or equivalent) defines the record shape on disk. Open question (see § 4) on whether the schema lives under `content/evidence/_schema/` (peer to `content/metrics/_schema/`) or inline in the NIS2 mapping file. |
-| **Triage-decision evidence record** | ❌ missing | The triage step in `vuln-intake` sets `__severity__`, `__cve_id__`, `__asset_ref__`, `__actively_exploited__`, `__cra_clock__`, but no evidence record captures those decisions to `content/evidence/vulns/`. |
-| **Disclosure-timeline evidence record** | ❌ missing | The regulator-notification chain in `vuln-intake` (CRA Art. 14(1) actively-exploited clock, Art. 14(3) severe-incident clock, 24h / 72h / 14d milestones) emits AuditTrail entries but does not land a stream-shaped disclosure-timeline record. The four CRA-timing KPIs (`cra_early_warning_on_time`, `cra_notification_72h_on_time`, `cra_final_report_on_time`, `cra_severe_incident_on_time`) need this record to compute. |
-| **Stream emitter wiring** (vuln-intake → `content/evidence/vulns/`) | ❌ missing | All three targets (n8n, Temporal, LangGraph) call `AuditTrail.current().append(...)` but none of them call into an evidence-collector emitter that lands a per-execution record on the stream. |
+| **Triage-decision evidence record** | ❌ missing | The triage step in `vuln_intake` sets `__severity__`, `__cve_id__`, `__asset_ref__`, `__actively_exploited__`, `__cra_clock__`, but no evidence record captures those decisions to `content/evidence/vulns/`. |
+| **Disclosure-timeline evidence record** | ❌ missing | The regulator-notification chain in `vuln_intake` (CRA Art. 14(1) actively-exploited clock, Art. 14(3) severe-incident clock, 24h / 72h / 14d milestones) emits AuditTrail entries but does not land a stream-shaped disclosure-timeline record. The four CRA-timing KPIs (`cra_early_warning_on_time`, `cra_notification_72h_on_time`, `cra_final_report_on_time`, `cra_severe_incident_on_time`) need this record to compute. |
+| **Stream emitter wiring** (vuln_intake → `content/evidence/vulns/`) | ❌ missing | All three targets (n8n, Temporal, LangGraph) call `AuditTrail.current().append(...)` but none of them call into an evidence-collector emitter that lands a per-execution record on the stream. |
 | **D3FEND × NIS2/DORA/CRA control crosswalks** | ✅ shipped | `content/mappings/d3fend/nis2.yaml`, `content/mappings/d3fend/dora.yaml`, `content/mappings/d3fend/cra.yaml` already pin the control side. F-CP-04 reads these; it does not re-ship them. |
 | **KPI/KRI catalog entries** | ✅ shipped | The metric IDs the stream feeds (`kpi.vuln_disclosure_sla@v1`, `kri.cvd_intake_aging@v1`, `kpi.patch_disseminated_on_time@v1`, the four `kpi.cra_*_on_time@v1` entries) all live in `content/metrics/` today. F-CP-04 wires *emission*, not the catalog. |
 | **KPI/KRI emission from the stream** | ❌ missing | No emitter today reads `content/evidence/vulns/` and produces a metric snapshot that the catalog entries reference. The `measurement.source: workflow` field on each KPI presumes a stream the emitter can query. |
 | **Operator-facing dashboard surface** | ❌ missing | No reference dashboard view, panel spec, or query bundle exists that an operator can drop into their observability surface to read `content/evidence/vulns/` plus the KPI emissions. ROADMAP framing is portable artifact, not a hosted dashboard — see § 4 on form. |
-| **Tests — stream-emission happy path** | ❌ missing | No test exercises an end-to-end `vuln-intake` execution and asserts the resulting `content/evidence/vulns/` record shape. |
+| **Tests — stream-emission happy path** | ❌ missing | No test exercises an end-to-end `vuln_intake` execution and asserts the resulting `content/evidence/vulns/` record shape. |
 | **Tests — disclosure-timeline replay** | ❌ missing | No test asserts that two identical disclosure inputs produce byte-identical timeline records (required for determinism and CRA evidentiary use). |
 | **Tests — KPI emission against the stream** | ❌ missing | No test exercises one of the shipped KPIs (e.g. `kpi.vuln_disclosure_sla`) against a fixture stream and asserts the computed ratio. |
 | **Cookbook entry — continuous protection chapter** | ❌ missing | `docs/cookbook/` carries per-workflow walkthroughs today. The continuous-protection framing (workflow → stream → metric → dashboard) does not have a cookbook chapter yet. F-CP-04 is the first stream and is the right place to introduce it. |
@@ -84,15 +84,15 @@ target needs the same set of emission points wired against the same
 shared evidence-collector contract (so two operators on two different
 runtimes land byte-identical stream records for the same input).
 
-| `vuln-intake` step | Evidence emission | n8n | Temporal | LangGraph |
+| `vuln_intake` step | Evidence emission | n8n | Temporal | LangGraph |
 |---|---|---|---|---|
-| `start` — `vuln-intake-start` | open execution record (idempotency key = `(__cve_id__, __asset_ref__)`) | ❌ | ❌ | ❌ |
+| `start` — `vuln_intake_start` | open execution record (idempotency key = `(__cve_id__, __asset_ref__)`) | ❌ | ❌ | ❌ |
 | `action--…000002` — intake disclosure | reporter-acknowledgement event (feeds `kpi.vuln_disclosure_sla`) | ❌ | ❌ | ❌ |
 | `action--…000003` — triage and asset correlation | triage-decision record (severity, dedup outcome, asset ref, CVSS+EPSS snapshot) | ❌ | ❌ | ❌ |
 | `action--…000004` — assess CRA reporting trigger | CRA clock-start event (Art. 14(1) or 14(3)) | ❌ | ❌ | ❌ |
 | `action--…000006` — regulator-notification chain | disclosure-timeline milestone records (24h / 72h / 14d) | ❌ | ❌ | ❌ |
 | `action--…000008..00000b` — response: critical/high/scheduled/accept | response-decision record (patch-disseminated timestamp, advisory ref, accept-risk rationale shape) | ❌ | ❌ | ❌ |
-| `end` — `vuln-intake-end` | close execution record (terminal state, outcome) | ❌ | ❌ | ❌ |
+| `end` — `vuln_intake_end` | close execution record (terminal state, outcome) | ❌ | ❌ | ❌ |
 
 That is **6 emission points × 3 targets = 18 emitter call-sites**,
 plus the shared evidence-collector wiring (one contract,
@@ -124,9 +124,9 @@ dispatcher only promotes cards whose upstreams are done.
 | 1 | F-CP-04 CORE-SCHEMA — pin the evidence-record schema for `content/evidence/vulns/` (record shape, identity, timestamps, retention) under the agreed schema location (see § 4); add the schema-shape test that pins it; update `content/mappings/nis2/article-21-2-e.yaml` to reference the schema | — | yes |
 | 2 | F-CP-04 CORE-EMITTER-CONTRACT — shared evidence-collector wiring on top of F-PT-01: a target-agnostic emitter that consumes the `AuditTrail` per-action mirror events and produces stream-shaped records under `content/evidence/vulns/`; idempotency key contract; deterministic ordering guarantee | 1 | yes |
 | 3 | F-CP-04 CORE-METRICS — emit one shipped KPI (`kpi.vuln_disclosure_sla@v1`) and one shipped KRI (`kri.cvd_intake_aging@v1`) from `content/evidence/vulns/` as the reference emitter; the four CRA-timing KPIs are deferred to a follow-up card (see § 4) | 1, 2 | yes |
-| 4 | F-CP-04 EMIT-N8N — wire the six emission points (start, intake, triage, CRA clock, regulator chain, response × 4, end) in `examples/n8n/vuln-intake/workflow.n8n.json` against the emitter contract; regen via `regenerate.sh`; golden byte-parity green | 2 | yes |
-| 5 | F-CP-04 EMIT-TMPRL — wire the six emission points in `examples/temporal/vuln-intake/workflow.temporal.py` against the emitter contract; regen; golden byte-parity green | 2 | yes |
-| 6 | F-CP-04 EMIT-LG — wire the six emission points in `examples/langgraph/vuln-intake/state_bindings.py` against the emitter contract; regen; golden byte-parity green | 2 | yes |
+| 4 | F-CP-04 EMIT-N8N — wire the six emission points (start, intake, triage, CRA clock, regulator chain, response × 4, end) in `examples/n8n/vuln_intake/workflow.n8n.json` against the emitter contract; regen via `regenerate.sh`; golden byte-parity green | 2 | yes |
+| 5 | F-CP-04 EMIT-TMPRL — wire the six emission points in `examples/temporal/vuln_intake/workflow.temporal.py` against the emitter contract; regen; golden byte-parity green | 2 | yes |
+| 6 | F-CP-04 EMIT-LG — wire the six emission points in `examples/langgraph/vuln_intake/state_bindings.py` against the emitter contract; regen; golden byte-parity green | 2 | yes |
 | 7 | F-CP-04 EXTEND-tests-happy — happy-path test: one disclosure → one execution record across all three targets, byte-identical | 4, 5, 6 | yes |
 | 8 | F-CP-04 EXTEND-tests-timeline-replay — deterministic-replay test for the disclosure-timeline records (same input twice → byte-identical milestone records across all three targets) | 4, 5, 6 | yes |
 | 9 | F-CP-04 EXTEND-tests-kpi — KPI emission test: fixture stream → `kpi.vuln_disclosure_sla@v1` ratio computed and asserted | 3, 4, 5, 6 | yes |

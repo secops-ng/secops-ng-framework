@@ -70,7 +70,7 @@ def mirror_mod(tmp_path: Path):
 def _langgraph_shaped_fixture(mod) -> list:
     """Hand-crafted records as a LangGraph emitter would produce them.
 
-    Two node entries on a synthetic ``vuln-intake`` playbook. Attribute
+    Two node entries on a synthetic ``vuln_intake`` playbook. Attribute
     keys are the shared ``SPAN_ATTR_*`` constants verbatim — no compiler
     runs, this is what the emitter's wrapper would have appended.
     """
@@ -78,7 +78,7 @@ def _langgraph_shaped_fixture(mod) -> list:
         mod.AuditRecord(
             span_name="node:triage",
             attributes={
-                SPAN_ATTR_PLAYBOOK_ID: "vuln-intake",
+                SPAN_ATTR_PLAYBOOK_ID: "vuln_intake",
                 SPAN_ATTR_WORKFLOW_RUN_ID: "run-001",
                 SPAN_ATTR_STEP_ID: "step-001",
                 SPAN_ATTR_STEP_NAME: "triage",
@@ -88,7 +88,7 @@ def _langgraph_shaped_fixture(mod) -> list:
         mod.AuditRecord(
             span_name="node:enrich",
             attributes={
-                SPAN_ATTR_PLAYBOOK_ID: "vuln-intake",
+                SPAN_ATTR_PLAYBOOK_ID: "vuln_intake",
                 SPAN_ATTR_WORKFLOW_RUN_ID: "run-001",
                 SPAN_ATTR_STEP_ID: "step-002",
                 SPAN_ATTR_STEP_NAME: "enrich",
@@ -112,7 +112,7 @@ def _temporal_shaped_fixture(mod) -> list:
         mod.AuditRecord(
             span_name="activity:triage",
             attributes={
-                SPAN_ATTR_PLAYBOOK_ID: "vuln-intake",
+                SPAN_ATTR_PLAYBOOK_ID: "vuln_intake",
                 SPAN_ATTR_WORKFLOW_RUN_ID: "run-001",
                 SPAN_ATTR_STEP_ID: "step-001",
                 SPAN_ATTR_STEP_NAME: "triage",
@@ -122,7 +122,7 @@ def _temporal_shaped_fixture(mod) -> list:
         mod.AuditRecord(
             span_name="activity:enrich",
             attributes={
-                SPAN_ATTR_PLAYBOOK_ID: "vuln-intake",
+                SPAN_ATTR_PLAYBOOK_ID: "vuln_intake",
                 SPAN_ATTR_WORKFLOW_RUN_ID: "run-001",
                 SPAN_ATTR_STEP_ID: "step-002",
                 SPAN_ATTR_STEP_NAME: "enrich",
@@ -145,7 +145,7 @@ def test_envelope_is_deterministic(mirror_mod) -> None:
         for rec in _langgraph_shaped_fixture(mirror_mod):
             trail.append(rec)
         header = mirror_mod.EnvelopeHeader(
-            workflow_id="vuln-intake",
+            workflow_id="vuln_intake",
             run_id="run-001",
             compile_target="langgraph",
         )
@@ -161,7 +161,7 @@ def test_envelope_header_carries_schema_version(mirror_mod) -> None:
     def _scenario() -> bytes:
         trail = mirror_mod.AuditTrail.current()
         header = mirror_mod.EnvelopeHeader(
-            workflow_id="vuln-intake",
+            workflow_id="vuln_intake",
             run_id="run-001",
             compile_target="langgraph",
         )
@@ -182,7 +182,7 @@ def test_envelope_jsonl_line_count_matches_records(mirror_mod) -> None:
         for rec in _langgraph_shaped_fixture(mirror_mod):
             trail.append(rec)
         header = mirror_mod.EnvelopeHeader(
-            workflow_id="vuln-intake",
+            workflow_id="vuln_intake",
             run_id="run-001",
             compile_target="langgraph",
         )
@@ -221,7 +221,7 @@ def test_byte_identical_envelope_across_synthetic_call_patterns(mirror_mod) -> N
         mirror_mod.AuditRecord(
             span_name="node:triage",
             attributes={
-                SPAN_ATTR_PLAYBOOK_ID: "vuln-intake",
+                SPAN_ATTR_PLAYBOOK_ID: "vuln_intake",
                 SPAN_ATTR_WORKFLOW_RUN_ID: "run-001",
                 SPAN_ATTR_STEP_ID: "step-001",
                 SPAN_ATTR_STEP_NAME: "triage",
@@ -230,7 +230,7 @@ def test_byte_identical_envelope_across_synthetic_call_patterns(mirror_mod) -> N
     ]
 
     header = mirror_mod.EnvelopeHeader(
-        workflow_id="vuln-intake",
+        workflow_id="vuln_intake",
         run_id="run-001",
         compile_target="langgraph",
     )
@@ -266,7 +266,7 @@ def test_append_is_idempotent(mirror_mod) -> None:
         rec = mirror_mod.AuditRecord(
             span_name="node:triage",
             attributes={
-                SPAN_ATTR_PLAYBOOK_ID: "vuln-intake",
+                SPAN_ATTR_PLAYBOOK_ID: "vuln_intake",
                 SPAN_ATTR_STEP_ID: "step-001",
             },
         )
@@ -276,7 +276,7 @@ def test_append_is_idempotent(mirror_mod) -> None:
         rec_copy = mirror_mod.AuditRecord(
             span_name="node:triage",
             attributes={
-                SPAN_ATTR_PLAYBOOK_ID: "vuln-intake",
+                SPAN_ATTR_PLAYBOOK_ID: "vuln_intake",
                 SPAN_ATTR_STEP_ID: "step-001",
             },
         )

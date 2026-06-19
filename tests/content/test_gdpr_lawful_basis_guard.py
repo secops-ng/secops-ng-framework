@@ -4,7 +4,7 @@ Covers:
 
 - pass case: a fixture tree with a playbook directory and a complete
   data-flow-<workflow>.md that has all seven canonical sections filled;
-- pass case against the real shipped phishing-triage doc;
+- pass case against the real shipped phishing_triage doc;
 - fail case (missing_doc): playbook present, no data-flow doc;
 - fail cases per canonical section: each individually-missing or
   empty section flagged with its heading;
@@ -138,7 +138,7 @@ def test_pass_when_all_seven_sections_filled(tmp_path: Path) -> None:
 
 
 def test_pass_against_real_phishing_triage_doc() -> None:
-    """The shipped phishing-triage doc must satisfy the parser.
+    """The shipped phishing_triage doc must satisfy the parser.
 
     Guards against the parser drifting away from what the contributor
     convention actually writes for the lawful-basis body.
@@ -148,7 +148,7 @@ def test_pass_against_real_phishing_triage_doc() -> None:
         / "content"
         / "mappings"
         / "gdpr"
-        / "data-flow-phishing-triage.md"
+        / "data-flow-phishing_triage.md"
     ).read_text(encoding="utf-8")
     assert lawful_basis_is_non_empty(text)
 

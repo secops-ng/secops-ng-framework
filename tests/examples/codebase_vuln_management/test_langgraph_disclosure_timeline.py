@@ -1,7 +1,7 @@
 """F-WF-07 CORE-LANGGRAPH — committed worked-example pins the LangGraph adapter.
 
 The committed
-``examples/langgraph/codebase-vuln-management/evidence/disclosure-timeline-record.json``
+``examples/langgraph/codebase_vuln_management/evidence/disclosure-timeline-record.json``
 is the LangGraph node adapter's output for the context pinned in the
 example's ``regenerate.py``. This test re-drives the adapter exactly as
 a LangGraph integrator would (state mapping in, partial-state update
@@ -17,7 +17,7 @@ siblings.
 
 If the change is intentional, regenerate the example::
 
-    PYTHONPATH=. python examples/langgraph/codebase-vuln-management/regenerate.py
+    PYTHONPATH=. python examples/langgraph/codebase_vuln_management/regenerate.py
 
 and commit the updated bytes alongside the emitter change.
 """
@@ -30,7 +30,7 @@ from pathlib import Path
 from compilers.langgraph.evidence import emit_disclosure_timeline_artifact_node
 
 REPO = Path(__file__).resolve().parents[3]
-EXAMPLE = REPO / "examples" / "langgraph" / "codebase-vuln-management"
+EXAMPLE = REPO / "examples" / "langgraph" / "codebase_vuln_management"
 SNAPSHOT = EXAMPLE / "evidence" / "disclosure-timeline-record.json"
 REGEN = EXAMPLE / "regenerate.py"
 
@@ -61,10 +61,10 @@ def test_example_snapshot_matches_langgraph_adapter(tmp_path: Path) -> None:
     )
     written = Path(update["disclosure_timeline_artifact_path"])
     assert written.read_bytes() == SNAPSHOT.read_bytes(), (
-        "examples/langgraph/codebase-vuln-management/evidence/"
+        "examples/langgraph/codebase_vuln_management/evidence/"
         "disclosure-timeline-record.json drifted from the LangGraph "
         "adapter. If intentional, regenerate via "
-        "`PYTHONPATH=. python examples/langgraph/codebase-vuln-management/"
+        "`PYTHONPATH=. python examples/langgraph/codebase_vuln_management/"
         "regenerate.py` and commit the new bytes."
     )
     # The partial state update carries the deterministic id; the
@@ -94,7 +94,7 @@ def test_langgraph_replay_matches_committed_n8n_sibling() -> None:
         REPO
         / "examples"
         / "n8n"
-        / "codebase-vuln-management"
+        / "codebase_vuln_management"
         / "evidence"
         / "disclosure-timeline-record.json"
     )
@@ -111,7 +111,7 @@ def test_langgraph_replay_matches_committed_temporal_sibling() -> None:
         REPO
         / "examples"
         / "temporal"
-        / "codebase-vuln-management"
+        / "codebase_vuln_management"
         / "evidence"
         / "disclosure-timeline-record.json"
     )

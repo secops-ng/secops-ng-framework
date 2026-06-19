@@ -1,4 +1,4 @@
-"""Schema-introspection tests for the incident-management DSPy signature.
+"""Schema-introspection tests for the incident_management DSPy signature.
 
 Mirrors the F-WF-03 ``test_signatures.py`` shape — contract drift
 across the two workflows is one diff away.

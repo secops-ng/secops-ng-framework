@@ -1,0 +1,56 @@
+{
+  "stable_id": "control.cloud_identity_least_privilege@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Cloud identity — least-privilege enforcement",
+  "summary": "Periodic and event-driven review of cloud identities (IAM roles, service accounts, workload identities) against a least-privilege baseline, with permissions that exceed the baseline flagged as posture deviations. Bound to the cloud_misconfiguration playbook's enrich-resource-and-owner step so identity-class deviations carry an owner before the notify step runs.",
+  "oscal": {
+    "component": {
+      "uuid": "8c9d0e1f-2a3b-4c4d-9e5f-6a7b8c9d0e1f",
+      "type": "service",
+      "title": "Cloud identity least-privilege service",
+      "description": "Continuous and on-demand evaluation of cloud-identity permissions against a least-privilege baseline.",
+      "control-implementations": [
+        {
+          "uuid": "7b8c9d0e-1f2a-4033-9415-c6d7e8f0a1b2",
+          "source": "https://doi.org/10.6028/NIST.SP.800-53r5",
+          "description": "Implements access enforcement and least-privilege on cloud identities.",
+          "implemented-requirements": [
+            {
+              "uuid": "ef030001-0001-0001-0001-000000000001",
+              "control-id": "ac-3",
+              "description": "Access enforcement: cloud-identity permissions are enforced per the operator's policy."
+            },
+            {
+              "uuid": "ef030001-0001-0001-0001-000000000002",
+              "control-id": "ac-6",
+              "description": "Least privilege: permissions exceeding the baseline are flagged for review."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "d3fend": {
+    "technique_id": "D3-SCP",
+    "technique_name": "System Configuration Permissions",
+    "url": "https://d3fend.mitre.org/technique/d3f:SystemConfigurationPermissions/"
+  },
+  "attack_counters": [],
+  "telemetry_refs": [
+    "telemetry.ocsf.compliance_finding@v1",
+    "telemetry.ocsf.cloud_resource_inventory@v1"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.cloud_misconfiguration@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000003"
+    }
+  ],
+  "maintainer": "controls-wg@secops-ng.org",
+  "sources": [
+    "NIST SP 800-53 Rev. 5 — AC-3 Access Enforcement, AC-6 Least Privilege",
+    "ENISA — Cloud Security: identity and access management guidance",
+    "MITRE D3FEND v1.0.0 — D3-SCP System Configuration Permissions"
+  ]
+}

@@ -1,15 +1,15 @@
-"""Drift guard for the ``examples/langgraph/threat-intel-ingest/`` worked example.
+"""Drift guard for the ``examples/langgraph/threat_intel_ingest/`` worked example.
 
 The worked example commits the *real* artefacts produced by the
 LangGraph reference compiler against the playbook at
-``examples/langgraph/threat-intel-ingest/playbook.cacao.json``:
+``examples/langgraph/threat_intel_ingest/playbook.cacao.json``:
 
 * ``graph_spec.json`` — ``python -m compilers.langgraph.emit``
 * ``state_bindings.py`` — ``python -m compilers.langgraph.state``
 
 This test re-runs both emitters and asserts the committed files match
 byte-for-byte. Any intentional compiler change must be paired with a
-regeneration (``examples/langgraph/threat-intel-ingest/regenerate.sh``)
+regeneration (``examples/langgraph/threat_intel_ingest/regenerate.sh``)
 so the worked example never lies about what the live compiler produces.
 
 Pattern mirrors ``tests/examples/test_langgraph_vuln_intake.py``.
@@ -25,7 +25,7 @@ from compilers.langgraph.emit import emit
 from compilers.langgraph.state import render_module
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-EXAMPLE_DIR = REPO_ROOT / "examples" / "langgraph" / "threat-intel-ingest"
+EXAMPLE_DIR = REPO_ROOT / "examples" / "langgraph" / "threat_intel_ingest"
 PLAYBOOK = EXAMPLE_DIR / "playbook.cacao.json"
 COMMITTED_GRAPH = EXAMPLE_DIR / "graph_spec.json"
 COMMITTED_MODULE = EXAMPLE_DIR / "state_bindings.py"
@@ -47,9 +47,9 @@ def test_graph_spec_matches_emitter_output() -> None:
     rendered = _serialise_graph(emit(playbook))
     expected = COMMITTED_GRAPH.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/langgraph/threat-intel-ingest/graph_spec.json drift. "
+        "examples/langgraph/threat_intel_ingest/graph_spec.json drift. "
         "Regenerate via "
-        "`bash examples/langgraph/threat-intel-ingest/regenerate.sh` and "
+        "`bash examples/langgraph/threat_intel_ingest/regenerate.sh` and "
         "commit the result."
     )
 
@@ -65,9 +65,9 @@ def test_state_bindings_matches_state_emitter_output() -> None:
     rendered = render_module(playbook) + "\n"
     expected = COMMITTED_MODULE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/langgraph/threat-intel-ingest/state_bindings.py drift. "
+        "examples/langgraph/threat_intel_ingest/state_bindings.py drift. "
         "Regenerate via "
-        "`bash examples/langgraph/threat-intel-ingest/regenerate.sh` and "
+        "`bash examples/langgraph/threat_intel_ingest/regenerate.sh` and "
         "commit the result."
     )
 

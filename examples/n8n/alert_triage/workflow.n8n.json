@@ -1,0 +1,404 @@
+{
+  "name": "Alert triage",
+  "nodes": [
+    {
+      "id": "action--a1e47431-0000-4000-8000-000000000002",
+      "name": "ingest typed alert payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from alert_triage.primitives.payloads import validate_alert_payload\n__alert_payload__ = validate_alert_payload(raw=__raw_payload__, source_shape=__alert_source_shape__)"
+      },
+      "notes": "SKELETON. Normalise the inbound alert into the SecOps-NG alert envelope. Two source shapes are required by the roadmap acceptance criteria (push from detection pipeline, pull from a shared alert store); the dispatcher branches on __alert_source_shape__. Body of the normalization rules lands in the CORE-INGEST card.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--a1e47431-0000-4000-8000-000000000003",
+      "name": "enrich with telemetry context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from alert_triage.primitives.suppression import canonical_seen_key\n__seen_key__ = canonical_seen_key(asset_ref=__asset_ref__, classification=__classification__, detection_rule_id=__detection_rule_id__, subject_ref=__subject_ref__)"
+      },
+      "notes": "SKELETON. Pull adjacent telemetry for the entities named in the alert (subject identity, source/destination, asset) so the prioritisation policy and suppression check have evidence beyond the alert envelope itself. Stubbed; the enrichment fan-out lands in CORE-ENRICH.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--a1e47431-0000-4000-8000-000000000005",
+      "name": "suppress and close",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from alert_triage.primitives.suppression import canonical_seen_key\n__close_record_key__ = canonical_seen_key(asset_ref=__asset_ref__, classification=__classification__, detection_rule_id=__detection_rule_id__, subject_ref=__subject_ref__)"
+      },
+      "notes": "SKELETON. Link this alert onto the existing case (or onto the benign-rule record), close it without paging, and account the suppression against the false-positive-rate KPI and (when the suppression covers a re-fire of a previously closed case) the recurring-incident correlator.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--a1e47431-0000-4000-8000-000000000006",
+      "name": "classify and prioritise (deterministic policy)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from alert_triage.primitives.prioritisation import prioritise\n__priority_verdict__ = prioritise(context=__asset_context__, correlates_open_case=__correlates_open_case__, detection_class=__detection_class__, detection_severity=__detection_severity__)"
+      },
+      "notes": "SKELETON. Apply the operator's prioritisation policy. The policy itself is expressed as code (the roadmap pins this: deterministic prioritisation, DSPy used only for free-text fields like the analyst summary). Output is __priority__ \u2208 {p1_severe, p2_high, p3_routine, p4_informational}.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--a1e47431-0000-4000-8000-000000000008",
+      "name": "response: p1 severe \u2014 page and escalate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from alert_triage.primitives.response import escalation_route\n__escalation_directive__ = escalation_route(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)"
+      },
+      "notes": "SKELETON. Page the on-call responder, open the incident case, stamp the timeline-start signal, and hand off to the incident management playbook. Records against the MTTR-critical clock and the regulator-notification-overrun KRI window.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--a1e47431-0000-4000-8000-000000000009",
+      "name": "response: p2 high \u2014 queue for primary analyst",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from alert_triage.primitives.response import notify_on_call\n__notification_directive__ = notify_on_call(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)"
+      },
+      "notes": "SKELETON. Queue the case to the primary analyst queue with the enriched evidence packet, no page. Records against the MTTR clock and the handoff-brief delivery SLA.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--a1e47431-0000-4000-8000-00000000000a",
+      "name": "response: p3 routine \u2014 queue for review",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from alert_triage.primitives.response import route_to_review_queue\n__review_queue_directive__ = route_to_review_queue(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)"
+      },
+      "notes": "SKELETON. Append to the review queue for batched analyst attention; no SLA clock beyond the routine review-completion SLA.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--a1e47431-0000-4000-8000-00000000000b",
+      "name": "response: p4 informational \u2014 log and close",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2060,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_handling_capability@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.false_positive_rate@v1, kpi.detection_coverage@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON. Record the alert for telemetry-coverage accounting and close without further action. Feeds the false-positive-rate denominator and the detection-coverage view.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--a1e47431-0000-4000-8000-00000000000c",
+      "name": "triage-end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2320,
+        240
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "if-condition--a1e47431-0000-4000-8000-000000000004",
+      "name": "already-seen or known-benign?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2580,
+        420
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "secops_ng_condition",
+              "leftValue": "",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "notes": "Suppression branch. on_success: matches a known-benign rule or an already-seen case fingerprint inside the window; suppress and close. on_failure: proceed to prioritisation.",
+      "notesInFlow": true
+    },
+    {
+      "id": "start--a1e47431-0000-4000-8000-000000000001",
+      "name": "triage-start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        2840,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__alert_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the inbound alert in the operator's alert store. Carried opaquely; the source shape is asserted in __alert_source_shape__."
+            },
+            {
+              "name": "__alert_source_shape__",
+              "type": "string",
+              "value": "",
+              "description": "One of: push_detection_pipeline, pull_alert_store. Used to select the normalization path in the ingest step."
+            },
+            {
+              "name": "__benign_or_seen__",
+              "type": "boolean",
+              "value": "",
+              "description": "Set by the suppression check: true when the alert matches a known- benign rule or an already-seen case fingerprint inside the configured suppression window."
+            },
+            {
+              "name": "__priority__",
+              "type": "string",
+              "value": "",
+              "description": "Deterministic priority assigned by the prioritisation policy. One of: p1_severe, p2_high, p3_routine, p4_informational."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "switch-condition--a1e47431-0000-4000-8000-000000000007",
+      "name": "route on priority",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        3100,
+        420
+      ],
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "values": []
+        },
+        "options": {}
+      },
+      "notes": "Route to the response branch keyed on the deterministic priority. Each branch is a single response-routing action that hands off to the appropriate downstream playbook or owner queue. Bodies of downstream playbooks are out of scope here.",
+      "notesInFlow": true
+    }
+  ],
+  "connections": {
+    "ingest typed alert payload": {
+      "main": [
+        [
+          {
+            "node": "enrich with telemetry context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "enrich with telemetry context": {
+      "main": [
+        [
+          {
+            "node": "already-seen or known-benign?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "suppress and close": {
+      "main": [
+        [
+          {
+            "node": "triage-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classify and prioritise (deterministic policy)": {
+      "main": [
+        [
+          {
+            "node": "route on priority",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "response: p1 severe \u2014 page and escalate": {
+      "main": [
+        [
+          {
+            "node": "triage-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "response: p2 high \u2014 queue for primary analyst": {
+      "main": [
+        [
+          {
+            "node": "triage-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "response: p3 routine \u2014 queue for review": {
+      "main": [
+        [
+          {
+            "node": "triage-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "response: p4 informational \u2014 log and close": {
+      "main": [
+        [
+          {
+            "node": "triage-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "already-seen or known-benign?": {
+      "main": [
+        [
+          {
+            "node": "suppress and close",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "classify and prioritise (deterministic policy)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "triage-start": {
+      "main": [
+        [
+          {
+            "node": "ingest typed alert payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "route on priority": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "alert_triage",
+    "skeleton",
+    "source-artifact"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.alert_triage@v1",
+      "content_version": "0.1.0",
+      "maturity": "draft",
+      "source_playbook_id": "playbook--a1e47431-0000-4000-8000-000000000000"
+    },
+    "secops_ng_notes": [
+      "step 'action--a1e47431-0000-4000-8000-00000000000b': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'if-condition--a1e47431-0000-4000-8000-000000000004' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
+      "step 'switch-condition--a1e47431-0000-4000-8000-000000000007' (switch-condition): no cases parsed from CACAO source \u2014 emitted Switch node with empty rule set; operator must populate cases in n8n."
+    ]
+  }
+}

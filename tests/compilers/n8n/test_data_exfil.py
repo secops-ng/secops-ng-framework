@@ -1,4 +1,4 @@
-"""Golden test for the n8n reference compiler — data-exfil.
+"""Golden test for the n8n reference compiler — data_exfil.
 
 Mirrors ``test_identity_compromise.py`` for the ``data_exfil`` fixture:
 parses the CACAO v2 playbook, emits the n8n workflow JSON, and pins it
@@ -44,7 +44,7 @@ def test_data_exfil_golden_matches() -> None:
     rendered = _serialise(workflow)
     expected = GOLDEN.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "n8n golden drift (data-exfil). Regenerate via "
+        "n8n golden drift (data_exfil). Regenerate via "
         "`python -m tools.compile tests/compilers/_shared/fixtures/"
         "data_exfil.cacao.json --target n8n --out "
         f"{GOLDEN.relative_to(REPO_ROOT)}` and commit in the same PR."
@@ -98,10 +98,10 @@ def test_fixture_and_golden_are_in_sync() -> None:
 
 def test_worked_example_matches_golden() -> None:
     """The committed examples/ artefact must equal the golden byte-for-byte."""
-    worked = REPO_ROOT / "examples" / "n8n" / "data-exfil" / "workflow.n8n.json"
+    worked = REPO_ROOT / "examples" / "n8n" / "data_exfil" / "workflow.n8n.json"
     assert worked.read_text(encoding="utf-8") == GOLDEN.read_text(
         encoding="utf-8"
     ), (
-        "examples/n8n/data-exfil/workflow.n8n.json drifted from the golden — "
-        "run `./examples/n8n/data-exfil/regenerate.sh` and commit the result."
+        "examples/n8n/data_exfil/workflow.n8n.json drifted from the golden — "
+        "run `./examples/n8n/data_exfil/regenerate.sh` and commit the result."
     )

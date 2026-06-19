@@ -45,7 +45,7 @@ The `--check` form is what CI uses. It:
 4. On any drift, prints a contributor-friendly line and exits non-zero:
 
 ```
-BYTE-PARITY DRIFT in temporal/vuln-intake — run: ./regenerate.sh temporal vuln-intake
+BYTE-PARITY DRIFT in temporal/vuln_intake — run: ./regenerate.sh temporal vuln_intake
 ```
 
 The CI lane (`.github/workflows/three-target-parity.yml`) fan-outs this

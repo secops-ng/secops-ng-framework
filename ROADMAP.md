@@ -198,8 +198,8 @@ no internal infrastructure detail, no contact names, no credentials.
 - **Rationale:** PR #34 (`a78ea7f`) removed the in-repo workflow tree
   the LangGraph replayer was wired against. Determinism is now
   asserted per compile target: the per-example **byte-parity golden
-  tests** under `tests/examples/` (see e.g. `executive-metrics`,
-  `on-call-rotation`, `post-incident-review`) compile each portable
+  tests** under `tests/examples/` (see e.g. `executive_metrics`,
+  `on_call_rotation`, `post_incident_review`) compile each portable
   artifact into n8n, Temporal, and LangGraph and assert the rendered
   output is byte-identical across runs. That assertion does the work
   the LangGraph replayer used to do, but at the content layer where
@@ -228,9 +228,9 @@ named operator use-case. Each cookbook workflow lives under
 - **Status:** Shipped
 - **Priority:** P0
 - **Acceptance criteria:**
-  - `content/playbooks/vuln-intake/` carries the CACAO playbook,
+  - `content/playbooks/vuln_intake/` carries the CACAO playbook,
     primitives, and cookbook entry; compiled targets land under
-    `examples/{n8n,temporal,langgraph}/vuln-intake/`.
+    `examples/{n8n,temporal,langgraph}/vuln_intake/`.
   - DSPy signature for severity rating; deterministic dedup; OTel spans
     on every node.
   - Tests cover happy-path, dedup-collision, replay.
@@ -262,7 +262,7 @@ named operator use-case. Each cookbook workflow lives under
     only used for free-text fields.
   - Cookbook entry + replay test + walkthrough docs.
 - **Sovereign-stack constraints:** Payload shapes must validate as
-  GDPR data-flow `data-flow-alert-triage.md` (see `content/mappings/gdpr/`).
+  GDPR data-flow `data-flow-alert_triage.md` (see `content/mappings/gdpr/`).
 - **Depends on:** F-WF-01
 - **Source:** NIS2 Art. 21(2)(b).
 
@@ -283,9 +283,9 @@ named operator use-case. Each cookbook workflow lives under
 - **Status:** Shipped
 - **Priority:** P1
 - **Acceptance criteria:**
-  - `content/playbooks/incident-management/` carries the CACAO playbook
+  - `content/playbooks/incident_management/` carries the CACAO playbook
     and primitives; compiled targets land under
-    `examples/{n8n,temporal,langgraph}/incident-management/`.
+    `examples/{n8n,temporal,langgraph}/incident_management/`.
   - Workflow scaffolds the NIS2 Art. 23 three-stage timeline (24 h
     early warning → 72 h notification → 1 month final report); state
     transitions are deterministic and replay-tested across all three
@@ -458,7 +458,7 @@ documented in the corresponding NIS2 article file.
 - **Priority:** P1
 - **Acceptance criteria:**
   - `content/evidence/incidents/<workflow-id>/` populated by the
-    incident-management workflow.
+    incident_management workflow.
 - **Sovereign-stack constraints:** —
 - **Depends on:** F-PT-02, F-WF-05
 - **Source:** NIS2 Art. 21(2)(b), Art. 23.
@@ -487,16 +487,16 @@ documented in the corresponding NIS2 article file.
   - CORE-FANOUT-N8N — #288 (n8n adapter at
     `compilers/n8n/evidence/supply_chain_node.py` wired into the
     `vulnerability_triage` workflow path, with a byte-stable sample
-    emission under `examples/n8n/vuln-intake/evidence/supply-chain/`).
+    emission under `examples/n8n/vuln_intake/evidence/supply-chain/`).
   - CORE-FANOUT-TEMPORAL — #289 (Temporal activity at
     `compilers/temporal/evidence/supply_chain_activity.py` wrapping
     the same shared helper, with a byte-stable sample emission under
-    `examples/temporal/vuln-intake/evidence/supply-chain/`).
+    `examples/temporal/vuln_intake/evidence/supply-chain/`).
   - CORE-FANOUT-LG SKELETON — #290 (LangGraph node adapter at
     `compilers/langgraph/evidence/supply_chain_node.py` wrapping the
     same shared helper).
   - CORE-FANOUT-LG EXAMPLE — #291 (LangGraph worked example under
-    `examples/langgraph/vuln-intake/evidence/supply-chain/`).
+    `examples/langgraph/vuln_intake/evidence/supply-chain/`).
   - EXTEND-tests-goldens per-target byte-parity — #303 (n8n +
     Temporal + LangGraph; 21 replay tests).
   - EXTEND-drift SKELETON — #304 (drift-detection scaffolding for
@@ -540,13 +540,13 @@ documented in the corresponding NIS2 article file.
   - CORE-FANOUT-N8N — #296 (n8n adapter at
     `compilers/n8n/evidence/crypto_attestation_node.py` wired into the
     `vulnerability_triage` workflow path, with a byte-stable sample
-    emission under `examples/n8n/vuln-intake/evidence/crypto/`).
+    emission under `examples/n8n/vuln_intake/evidence/crypto/`).
   - CORE-FANOUT-LG — #297 (LangGraph node adapter at
     `compilers/langgraph/evidence/crypto_attestation_node.py` wrapping
     the same shared helper, with a byte-stable sample emission under
-    `examples/langgraph/vuln-intake/evidence/crypto/`).
+    `examples/langgraph/vuln_intake/evidence/crypto/`).
   - CORE-FANOUT-TEMPORAL-EXAMPLE — #300 (Temporal worked example
-    under `examples/temporal/vuln-intake/evidence/crypto/`).
+    under `examples/temporal/vuln_intake/evidence/crypto/`).
   - EXTEND-tests-goldens per-target byte-parity — #298 (n8n), #299
     (LangGraph), #301 (Temporal).
 - EXTEND-drift, EXTEND-NIS2-MAPPING (Art. 21(2)(h) narrative), and
@@ -601,18 +601,18 @@ not a separate documentation chore.
 - **Shipped via:** populated per-workflow data-flow documents under
   `content/mappings/gdpr/`, derived from
   `content/mappings/gdpr/_data-flow-template.md`:
-  - `data-flow-alert-triage.md`
-  - `data-flow-cloud-misconfiguration.md`
-  - `data-flow-data-exfil.md`
-  - `data-flow-executive-metrics.md`
-  - `data-flow-identity-compromise.md`
-  - `data-flow-incident-management.md`
-  - `data-flow-on-call-rotation.md`
-  - `data-flow-phishing-triage.md`
-  - `data-flow-post-incident-review.md`
-  - `data-flow-ransomware-containment.md`
-  - `data-flow-threat-intel-ingest.md`
-  - `data-flow-vuln-intake.md`
+  - `data-flow-alert_triage.md`
+  - `data-flow-cloud_misconfiguration.md`
+  - `data-flow-data_exfil.md`
+  - `data-flow-executive_metrics.md`
+  - `data-flow-identity_compromise.md`
+  - `data-flow-incident_management.md`
+  - `data-flow-on_call_rotation.md`
+  - `data-flow-phishing_triage.md`
+  - `data-flow-post_incident_review.md`
+  - `data-flow-ransomware_containment.md`
+  - `data-flow-threat_intel_ingest.md`
+  - `data-flow-vuln_intake.md`
 
   Each document fills the seven required sections (purpose, lawful
   basis, categories, recipients, retention, cross-border, rights) and

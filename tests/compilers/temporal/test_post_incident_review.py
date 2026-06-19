@@ -1,7 +1,7 @@
-"""Golden test for the Temporal compiler — post-incident-review.
+"""Golden test for the Temporal compiler — post_incident_review.
 
-Pins the emitted Temporal workflow stub for the post-incident-review
-fixture; mirrors ``test_golden.py`` (vuln-intake) so any drift surfaces
+Pins the emitted Temporal workflow stub for the post_incident_review
+fixture; mirrors ``test_golden.py`` (vuln_intake) so any drift surfaces
 in review.
 
 Regenerate via::

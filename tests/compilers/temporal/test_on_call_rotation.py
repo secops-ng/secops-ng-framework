@@ -1,7 +1,7 @@
-"""Golden test for the Temporal compiler — on-call-rotation.
+"""Golden test for the Temporal compiler — on_call_rotation.
 
-Pins the emitted Temporal workflow stub for the on-call-rotation
-fixture; mirrors ``test_golden.py`` (vuln-intake) so any drift surfaces
+Pins the emitted Temporal workflow stub for the on_call_rotation
+fixture; mirrors ``test_golden.py`` (vuln_intake) so any drift surfaces
 in review.
 
 Regenerate via::

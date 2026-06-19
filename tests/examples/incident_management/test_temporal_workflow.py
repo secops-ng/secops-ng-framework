@@ -1,12 +1,12 @@
-"""Drift guard for the ``examples/temporal/incident-management/`` worked example.
+"""Drift guard for the ``examples/temporal/incident_management/`` worked example.
 
-Mirrors the phishing-triage temporal example test: re-emits the Temporal
+Mirrors the phishing_triage temporal example test: re-emits the Temporal
 workflow stub from the canonical CACAO playbook and pins the result
 byte-for-byte against the committed
-``examples/temporal/incident-management/workflow.temporal.py``. Adds an
+``examples/temporal/incident_management/workflow.temporal.py``. Adds an
 activity-name \u2194 CACAO action-id parity check so the one-to-one
 mirroring contract documented in
-``examples/temporal/incident-management/README.md`` is enforced by
+``examples/temporal/incident_management/README.md`` is enforced by
 tests, not by convention.
 
 Also pins the co-located ``playbook.cacao.json`` mirror against the
@@ -15,14 +15,14 @@ below.
 
 F-WF-05 CORE-WIRE-TMPRL (SKELETON wave) seam \u2014 divergence guard.
 ==================================================================
-The canonical incident-management source at
-``content/playbooks/incident-management/playbook.cacao.json`` ships
+The canonical incident_management source at
+``content/playbooks/incident_management/playbook.cacao.json`` ships
 without ``x_secops_ng.core_body`` blocks. The Temporal SKELETON example
 intentionally diverges to demonstrate the primitive wire-in shape
 (classification, fail-closed destination resolver, three-stage NIS2
 Article 23 clock) ahead of the sibling LangGraph CORE-WIRE card. The
 divergence is bounded by an overlay JSON at
-``examples/temporal/incident-management/core_body.overlay.json`` whose
+``examples/temporal/incident_management/core_body.overlay.json`` whose
 ``workflow_overlays`` block is the *only* difference permitted between
 the canonical source and the Temporal mirror. The bindings are
 cell-for-cell identical to the n8n sibling overlay so the three compile
@@ -38,7 +38,7 @@ with no behaviour change for downstream consumers.
 
 Regenerate via::
 
-    ./examples/temporal/incident-management/regenerate.sh
+    ./examples/temporal/incident_management/regenerate.sh
 """
 from __future__ import annotations
 
@@ -51,9 +51,9 @@ from compilers.temporal.emit import emit_file
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SOURCE = (
-    REPO_ROOT / "content" / "playbooks" / "incident-management" / "playbook.cacao.json"
+    REPO_ROOT / "content" / "playbooks" / "incident_management" / "playbook.cacao.json"
 )
-EXAMPLE_DIR = REPO_ROOT / "examples" / "temporal" / "incident-management"
+EXAMPLE_DIR = REPO_ROOT / "examples" / "temporal" / "incident_management"
 WORKED_EXAMPLE = EXAMPLE_DIR / "workflow.temporal.py"
 MIRRORED_CACAO = EXAMPLE_DIR / "playbook.cacao.json"
 OVERLAY_JSON = EXAMPLE_DIR / "core_body.overlay.json"
@@ -82,9 +82,9 @@ def test_worked_example_matches_emitter_output() -> None:
     rendered = emit_file(MIRRORED_CACAO)
     expected = WORKED_EXAMPLE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/temporal/incident-management/workflow.temporal.py drifted "
+        "examples/temporal/incident_management/workflow.temporal.py drifted "
         "from the Temporal emitter output. Regenerate via "
-        "`./examples/temporal/incident-management/regenerate.sh` and commit "
+        "`./examples/temporal/incident_management/regenerate.sh` and commit "
         "the new bytes."
     )
 
@@ -107,9 +107,9 @@ def test_mirror_matches_canonical_plus_overlay() -> None:
 
     rendered = MIRRORED_CACAO.read_text(encoding="utf-8")
     assert rendered == expected_text, (
-        "examples/temporal/incident-management/playbook.cacao.json drift from "
+        "examples/temporal/incident_management/playbook.cacao.json drift from "
         "(canonical CACAO source + core_body.overlay.json). Regenerate via "
-        "`./examples/temporal/incident-management/regenerate.sh` and commit "
+        "`./examples/temporal/incident_management/regenerate.sh` and commit "
         "the result. If the canonical source itself now carries the core_body "
         "blocks (CORE-WIRE-LG has landed), the overlay should be emptied in "
         "the same PR."

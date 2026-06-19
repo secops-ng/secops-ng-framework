@@ -1,9 +1,9 @@
 """F-WF-07 CORE-FANOUT-TMP — byte-parity golden for the temporal workflow.
 
 The committed
-``examples/temporal/codebase-vuln-management/workflow.temporal.py``
+``examples/temporal/codebase_vuln_management/workflow.temporal.py``
 is the Temporal compiler's output for the canonical CACAO playbook at
-``content/playbooks/codebase-vuln-management/playbook.cacao.json``.
+``content/playbooks/codebase_vuln_management/playbook.cacao.json``.
 
 This module pins the workflow stub against the emitter so a refactor
 of the Temporal compiler that silently changes serialisation (or a
@@ -14,7 +14,7 @@ parity is verified too — every CACAO action step gets exactly one
 
 If the change is intentional, regenerate the example::
 
-    ./examples/temporal/codebase-vuln-management/regenerate.sh
+    ./examples/temporal/codebase_vuln_management/regenerate.sh
 
 and commit the updated bytes alongside the emitter change.
 """
@@ -27,9 +27,9 @@ from pathlib import Path
 from compilers.temporal.emit import emit_file
 
 REPO = Path(__file__).resolve().parents[3]
-EXAMPLE = REPO / "examples" / "temporal" / "codebase-vuln-management"
+EXAMPLE = REPO / "examples" / "temporal" / "codebase_vuln_management"
 SOURCE = (
-    REPO / "content" / "playbooks" / "codebase-vuln-management" / "playbook.cacao.json"
+    REPO / "content" / "playbooks" / "codebase_vuln_management" / "playbook.cacao.json"
 )
 WORKFLOW_GOLDEN = EXAMPLE / "workflow.temporal.py"
 MIRRORED_CACAO = EXAMPLE / "playbook.cacao.json"
@@ -54,19 +54,19 @@ def test_worked_example_matches_emitter_output() -> None:
     rendered = emit_file(SOURCE)
     expected = WORKFLOW_GOLDEN.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/temporal/codebase-vuln-management/workflow.temporal.py "
+        "examples/temporal/codebase_vuln_management/workflow.temporal.py "
         "drifted from the Temporal emitter output. Regenerate via "
-        "`./examples/temporal/codebase-vuln-management/regenerate.sh` "
+        "`./examples/temporal/codebase_vuln_management/regenerate.sh` "
         "and commit the new bytes."
     )
 
 
 def test_mirrored_cacao_matches_canonical_source() -> None:
     assert MIRRORED_CACAO.read_bytes() == SOURCE.read_bytes(), (
-        "examples/temporal/codebase-vuln-management/playbook.cacao.json "
-        "drifted from the canonical content/playbooks/codebase-vuln-management/"
+        "examples/temporal/codebase_vuln_management/playbook.cacao.json "
+        "drifted from the canonical content/playbooks/codebase_vuln_management/"
         "playbook.cacao.json. Regenerate via "
-        "`./examples/temporal/codebase-vuln-management/regenerate.sh`."
+        "`./examples/temporal/codebase_vuln_management/regenerate.sh`."
     )
 
 

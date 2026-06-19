@@ -1,0 +1,79 @@
+{
+  "stable_id": "kpi.handoff_brief_delivery_sla@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Handoff-brief delivery SLA — generation-to-delivery latency",
+  "summary": "Time between the on_call_rotation playbook composing a structured handoff brief and the brief being delivered to the incoming responder along the pre-bound channel. Lower is better. Brief generation and brief delivery are deliberately separated as adjacent steps in the playbook so this KPI can report compose-time and deliver-time independently and a stuck delivery channel surfaces as a delivery-time regression rather than disappearing into total step latency.",
+  "unit": "minutes",
+  "direction": "lower_is_better",
+  "target": {
+    "value": 5,
+    "comparator": "<=",
+    "rationale": "Handoff briefs must reach the incoming responder before the shift opens to honour the rotation-handoff window."
+  },
+  "thresholds": [
+    {
+      "name": "warn",
+      "comparator": ">",
+      "value": 10,
+      "severity": "warn"
+    },
+    {
+      "name": "breach",
+      "comparator": ">",
+      "value": 30,
+      "severity": "high"
+    }
+  ],
+  "measurement": {
+    "source": "workflow",
+    "aggregation": "p95",
+    "formula": "p95( notify_step_completion_time - generate_step_completion_time ) over rotation-handoff windows in window.",
+    "inputs": [
+      {
+        "name": "brief_generated",
+        "playbook_ref": "playbook.on_call_rotation@v1",
+        "playbook_step": "action--30000000-0000-4000-8000-000000000005",
+        "description": "generate-handoff-brief step completion time"
+      },
+      {
+        "name": "brief_delivered",
+        "playbook_ref": "playbook.on_call_rotation@v1",
+        "playbook_step": "action--30000000-0000-4000-8000-000000000006",
+        "description": "notify-incoming-on-call step completion time"
+      },
+      {
+        "name": "delivery_evidence",
+        "telemetry_ref": "telemetry.ocsf.api_activity@v1",
+        "field": "time",
+        "description": "delivery confirmation observed in the bound channel's application-activity stream"
+      }
+    ],
+    "window": {
+      "duration": "P90D",
+      "sliding": true
+    }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.on_call_rotation@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000005"
+    },
+    {
+      "playbook_id": "playbook.on_call_rotation@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000006"
+    }
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.api_activity@v1"
+  ],
+  "external_refs": [
+    {
+      "name": "ENISA — Good practices for incident response and on-call readiness",
+      "source": "ENISA",
+      "url": "https://www.enisa.europa.eu/topics/threat-risk-management"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}

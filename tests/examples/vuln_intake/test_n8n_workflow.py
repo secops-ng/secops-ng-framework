@@ -1,16 +1,16 @@
-"""Drift guard for the ``examples/n8n/vuln-intake/`` worked example.
+"""Drift guard for the ``examples/n8n/vuln_intake/`` worked example.
 
-Mirrors the data-exfil and threat-intel-ingest n8n example tests: parses
+Mirrors the data_exfil and threat_intel_ingest n8n example tests: parses
 the canonical CACAO playbook, emits the n8n workflow JSON, and pins the
 result byte-for-byte against the committed
-``examples/n8n/vuln-intake/workflow.n8n.json``. Adds a node-id ↔ CACAO
+``examples/n8n/vuln_intake/workflow.n8n.json``. Adds a node-id ↔ CACAO
 action-id parity check so the one-to-one mirroring contract documented
-in ``examples/n8n/vuln-intake/README.md`` is enforced by tests, not by
+in ``examples/n8n/vuln_intake/README.md`` is enforced by tests, not by
 convention.
 
 Regenerate via::
 
-    ./examples/n8n/vuln-intake/regenerate.sh
+    ./examples/n8n/vuln_intake/regenerate.sh
 """
 from __future__ import annotations
 
@@ -21,8 +21,8 @@ from compilers._shared.cacao_parser import parse_file
 from compilers.n8n.emit import emit
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-SOURCE = REPO_ROOT / "content" / "playbooks" / "vuln-intake" / "playbook.cacao.json"
-WORKED_EXAMPLE = REPO_ROOT / "examples" / "n8n" / "vuln-intake" / "workflow.n8n.json"
+SOURCE = REPO_ROOT / "content" / "playbooks" / "vuln_intake" / "playbook.cacao.json"
+WORKED_EXAMPLE = REPO_ROOT / "examples" / "n8n" / "vuln_intake" / "workflow.n8n.json"
 
 
 def _serialise(payload: dict) -> str:
@@ -34,9 +34,9 @@ def test_worked_example_matches_emitter_output() -> None:
     rendered = _serialise(emit(playbook))
     expected = WORKED_EXAMPLE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/n8n/vuln-intake/workflow.n8n.json drifted from the n8n "
+        "examples/n8n/vuln_intake/workflow.n8n.json drifted from the n8n "
         "emitter output. Regenerate via "
-        "`./examples/n8n/vuln-intake/regenerate.sh` and commit the new bytes."
+        "`./examples/n8n/vuln_intake/regenerate.sh` and commit the new bytes."
     )
 
 
@@ -141,7 +141,7 @@ def test_core_body_steps_emit_code_nodes() -> None:
     rendering the primitive call (per CORE-MECH-EMIT-N8N)."""
     nodes_by_id = _nodes_by_id()
     core_steps = _core_body_steps()
-    assert core_steps, "expected at least one CORE-bound step in vuln-intake"
+    assert core_steps, "expected at least one CORE-bound step in vuln_intake"
     for step_id, step in core_steps.items():
         node = nodes_by_id[step_id]
         assert node["type"] == "n8n-nodes-base.code", (
@@ -238,17 +238,17 @@ def test_co_located_cacao_mirror_matches_canonical() -> None:
         REPO_ROOT
         / "examples"
         / "n8n"
-        / "vuln-intake"
+        / "vuln_intake"
         / "playbook.cacao.json"
     )
     assert mirror.exists(), (
-        "examples/n8n/vuln-intake/playbook.cacao.json missing — "
-        "run ./examples/n8n/vuln-intake/regenerate.sh"
+        "examples/n8n/vuln_intake/playbook.cacao.json missing — "
+        "run ./examples/n8n/vuln_intake/regenerate.sh"
     )
     assert mirror.read_bytes() == SOURCE.read_bytes(), (
-        "examples/n8n/vuln-intake/playbook.cacao.json drifted from the "
+        "examples/n8n/vuln_intake/playbook.cacao.json drifted from the "
         "canonical CACAO source. Re-run "
-        "./examples/n8n/vuln-intake/regenerate.sh and commit."
+        "./examples/n8n/vuln_intake/regenerate.sh and commit."
     )
 
 

@@ -137,7 +137,7 @@ def test_span_block_parses(emitter) -> None:
     spec = SpanSpec(
         span_name="node:enrich",
         attributes={
-            "secops_ng.playbook.id": "vuln-intake",
+            "secops_ng.playbook.id": "vuln_intake",
             "secops_ng.step.id": "step-002",
             "secops_ng.step.name": "enrich",
         },

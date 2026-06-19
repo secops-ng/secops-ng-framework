@@ -1,0 +1,64 @@
+{
+  "stable_id": "control.blameless_review@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Blameless post-incident review template and cadence",
+  "summary": "Programmatic incident-response control that mandates a structured, blameless review record for every closed incident: timeline, decisions taken under partial evidence, contributing factors, and learnings. The control's evidence shape is the review artifact emitted by the post_incident_review playbook's blameless-review-template step; the control is satisfied when a non-empty artifact exists for every incident closed within the window.",
+  "oscal": {
+    "component": {
+      "uuid": "5d9a3b2c-4e1f-4a8b-9c0d-7e6f5a4b3c2d",
+      "type": "process",
+      "title": "Blameless post-incident review programme",
+      "description": "Operator-owned programme that schedules and captures a blameless post-incident review for every closed incident, with the review record attached to the case before final closure.",
+      "control-implementations": [
+        {
+          "uuid": "1f2e3d4c-5b6a-4798-8081-92a3b4c5d6e7",
+          "source": "https://doi.org/10.6028/NIST.SP.800-53r5",
+          "description": "Implements the lessons-learned and post-incident analysis requirements of the incident-response control family.",
+          "implemented-requirements": [
+            {
+              "uuid": "cdef0001-0001-0001-0001-000000000001",
+              "control-id": "ir-4",
+              "description": "Incident handling: post-incident analysis is performed and the results are incorporated into incident-response procedures, training, and testing."
+            },
+            {
+              "uuid": "cdef0001-0001-0001-0001-000000000002",
+              "control-id": "ir-8",
+              "description": "Incident response plan: the plan addresses the post-incident review process and is updated to reflect lessons learned."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "d3fend": {
+    "technique_id": "D3-OAM",
+    "technique_name": "Operational Activity Mapping",
+    "url": "https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/"
+  },
+  "attack_counters": [],
+  "detected_by": [
+    "detection.sigma.eventlog_cleared@v1",
+    "detection.sigma.security_eventlog_cleared@v1",
+    "detection.sigma.important_eventlog_cleared@v1",
+    "detection.sigma.eventlog_clear_configuration_change@v1",
+    "detection.sigma.event_auditing_disabled@v1",
+    "detection.sigma.auditpol_tampering@v1",
+    "detection.sigma.timestomp_powershell@v1"
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.incident_finding@v1"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.post_incident_review@v1",
+      "step_id": "action--40000000-0000-4000-8000-000000000003"
+    }
+  ],
+  "maintainer": "controls-wg@secops-ng.org",
+  "sources": [
+    "NIST SP 800-53 Rev. 5 \u2014 IR-4 Incident Handling, IR-8 Incident Response Plan",
+    "ENISA \u2014 Good Practices for Supply Chain Cybersecurity (post-incident learning patterns)",
+    "MITRE D3FEND v1.0.0 \u2014 D3-OAM Operational Activity Mapping"
+  ]
+}

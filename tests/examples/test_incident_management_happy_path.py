@@ -1,7 +1,7 @@
 """Happy-path golden replay test across n8n + Temporal + LangGraph targets.
 
 F-WF-05 EXTEND-tests-happy. The three reference compile targets each
-bind the CORE action bodies of the incident-management playbook to the
+bind the CORE action bodies of the incident_management playbook to the
 same shared deterministic primitives shipped under
 ``content.playbooks.incident_management.primitives``:
 
@@ -47,7 +47,7 @@ activity declaration order, state-bindings tool order) while
 invoking the same shared primitives the artefacts import.
 
 Mirror of ``tests/examples/alert_triage/test_happy_path.py``
-(F-WF-03 EXTEND-tests-happy) — same shape, incident-management
+(F-WF-03 EXTEND-tests-happy) — same shape, incident_management
 contract.
 """
 from __future__ import annotations
@@ -87,7 +87,7 @@ FIXTURE = (
 
 # CACAO step ids the canonical playbook pins for the two if-condition
 # branches. Mirrors
-# content/playbooks/incident-management/playbook.cacao.json §
+# content/playbooks/incident_management/playbook.cacao.json §
 # if-condition--...0004 (significant?) and ...0008 (final-report material
 # complete?).
 _POST_SIGNIFICANCE_TRUE = "action--50000000-0000-4000-8000-000000000005"
@@ -331,7 +331,7 @@ def _drive_target(case: dict) -> dict:
 def _drive_n8n(case: dict) -> dict:
     """n8n traversal: Code-node bodies fire in linear playbook order.
 
-    Mirrors ``examples/n8n/incident-management/workflow.n8n.json`` —
+    Mirrors ``examples/n8n/incident_management/workflow.n8n.json`` —
     the SKELETON-wave per-step ``core_body`` bindings declared in
     ``core_body.overlay.json`` invoke the same primitive functions
     this driver does, in the same playbook-declaration order.
@@ -342,7 +342,7 @@ def _drive_n8n(case: dict) -> dict:
 def _drive_temporal(case: dict) -> dict:
     """Temporal traversal: activity calls in workflow declaration order.
 
-    Mirrors ``examples/temporal/incident-management/workflow.temporal.py``
+    Mirrors ``examples/temporal/incident_management/workflow.temporal.py``
     — the CORE-bound ``@activity.defn`` bodies invoke the same
     primitives the n8n target imports.
     """
@@ -352,7 +352,7 @@ def _drive_temporal(case: dict) -> dict:
 def _drive_langgraph(case: dict) -> dict:
     """LangGraph traversal: tools fire in GraphSpec edge order.
 
-    Mirrors ``examples/langgraph/incident-management/state_bindings.py``
+    Mirrors ``examples/langgraph/incident_management/state_bindings.py``
     — the CORE-bound ``@tool`` bodies invoke the same primitives the
     n8n and Temporal targets import.
     """

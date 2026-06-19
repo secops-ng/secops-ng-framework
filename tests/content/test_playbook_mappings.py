@@ -7,7 +7,7 @@ Validates:
   content/playbooks/<slug>/mappings.yaml parses and validates against
   the schema;
 - the document's `playbook` URN slug aligns with the directory it
-  lives in (e.g. content/playbooks/threat-intel-ingest/mappings.yaml
+  lives in (e.g. content/playbooks/threat_intel_ingest/mappings.yaml
   must declare playbook.threat_intel_ingest@v<n>).
 
 Pure stdlib + PyYAML + jsonschema. No network.

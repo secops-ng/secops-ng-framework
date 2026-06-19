@@ -51,7 +51,7 @@ Each `dependencies-snapshot.json` artifact carries:
   same workflow at the same instant against the same dependency set
   collide deliberately; same execution re-emitted does not.
 - `workflow_id` — the workflow whose run produced the snapshot
-  (`vulnerability_triage`, `incident-management`, …). One of the stable
+  (`vulnerability_triage`, `incident_management`, …). One of the stable
   workflow ids declared in `content/playbooks/<workflow-id>/`.
 - `execution_id` — per-execution id issued by the compile target's
   runtime. Re-runs of the same workflow_id produce distinct executions.

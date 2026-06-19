@@ -18,25 +18,25 @@
 
 ## 0. Layout note
 
-ROADMAP F-WF-05 talks about an incident-management workflow. F-WF-05 is
-**greenfield** — unlike F-WF-01 (vuln-intake) and F-WF-03 (alert-triage),
+ROADMAP F-WF-05 talks about an incident_management workflow. F-WF-05 is
+**greenfield** — unlike F-WF-01 (vuln_intake) and F-WF-03 (alert_triage),
 the canonical CACAO source does not yet exist on `main`. There is no
-`content/playbooks/incident-management/`, no
-`examples/{n8n,temporal,langgraph}/incident-management/`, and no
+`content/playbooks/incident_management/`, no
+`examples/{n8n,temporal,langgraph}/incident_management/`, and no
 per-workflow tests. The expected on-disk layout, mirroring every other
 cookbook workflow, is
 
 ```
-content/playbooks/incident-management/                  # canonical CACAO source + primitives + payloads
-examples/{n8n,temporal,langgraph}/incident-management/  # compiled worked examples
+content/playbooks/incident_management/                  # canonical CACAO source + primitives + payloads
+examples/{n8n,temporal,langgraph}/incident_management/  # compiled worked examples
 tests/examples/incident_management/                     # per-target byte-parity guards
 tests/examples/test_{n8n,langgraph}_incident_management.py
 tests/content_model/test_incident_management_source.py
 ```
 
 A ROADMAP wording fix (`workflows/incident_management/` →
-`incident-management`) is out of scope and will be picked up when
-F-WF-05 flips to Shipped. This inventory treats `incident-management` as
+`incident_management`) is out of scope and will be picked up when
+F-WF-05 flips to Shipped. This inventory treats `incident_management` as
 the canonical name throughout.
 
 The two named upstream dependencies are both Shipped: F-CR-04 supplies
@@ -50,17 +50,17 @@ the F-PT-02 pattern module.
 
 | ROADMAP requirement | Status | Where |
 |---|---|---|
-| **Canonical CACAO source for the workflow** | ❌ missing | No `content/playbooks/incident-management/playbook.cacao.json` (or `.cacao.yaml`) exists. The three-stage NIS2 Art-23 state machine has not been sketched as a CACAO playbook yet. |
-| **Worked example — n8n** | ❌ missing | No `examples/n8n/incident-management/`. |
-| **Worked example — Temporal** | ❌ missing | No `examples/temporal/incident-management/`. Temporal is the natural primary target for this workflow because the three-stage timeline is a long-running durable state machine with timer-driven escalations — see § 4. |
-| **Worked example — LangGraph** | ❌ missing | No `examples/langgraph/incident-management/`. |
+| **Canonical CACAO source for the workflow** | ❌ missing | No `content/playbooks/incident_management/playbook.cacao.json` (or `.cacao.yaml`) exists. The three-stage NIS2 Art-23 state machine has not been sketched as a CACAO playbook yet. |
+| **Worked example — n8n** | ❌ missing | No `examples/n8n/incident_management/`. |
+| **Worked example — Temporal** | ❌ missing | No `examples/temporal/incident_management/`. Temporal is the natural primary target for this workflow because the three-stage timeline is a long-running durable state machine with timer-driven escalations — see § 4. |
+| **Worked example — LangGraph** | ❌ missing | No `examples/langgraph/incident_management/`. |
 | **Byte-parity golden tests (drift guards)** | ❌ missing | No `tests/examples/incident_management/`, no source-shape guard. |
 | **OTel spans on every node** | ❌ missing | Inherits the same per-target story as F-WF-01 / F-WF-03 once SKELETON stubs land. |
-| **`AuditTrail` mirror integration** | ❌ missing | F-CR-04 contract is Shipped and stable; SKELETON stubs will bind against it the same way the alert-triage SKELETON does. |
+| **`AuditTrail` mirror integration** | ❌ missing | F-CR-04 contract is Shipped and stable; SKELETON stubs will bind against it the same way the alert_triage SKELETON does. |
 | **NIS2 Art. 23 three-stage timeline: 24h early warning → 72h notification → 1 month final report** | ❌ missing | No state machine, no clock-tracking primitive, no per-stage submission action. The regulated clock signals are already declared by `content/controls/control.incident_timeline_signals@v1.yaml` and the obligation text per stage already lives in `content/mappings/nis2/article-23.yaml` — both are inputs to CORE-PRIM, not gaps in their own right. |
 | **State transitions are deterministic and replay-tested** | ❌ missing | Requires (a) the state machine encoded in the CACAO source, (b) a deterministic transition primitive, (c) a replay test in `tests/examples/incident_management/`. |
 | **Machine-readable timeline JSON consumable by F-CP-02** | ❌ missing | F-PT-02 produces a NIS2-Art-23-shaped JSON timeline; the workflow needs to wire its three submission actions through the pattern so the emitted artefact lands at a configurable `content/evidence/incidents/<workflow-id>/timeline.json` location (consumed by F-CP-02). |
-| **Library code / primitives directory** | ❌ missing | No `content/playbooks/incident-management/primitives/`. Stage-clock arithmetic, the regulator-submission contract, the typed early-warning / notification / final-report payload shapes, and the DSPy signature for free-text fields all need a home. |
+| **Library code / primitives directory** | ❌ missing | No `content/playbooks/incident_management/primitives/`. Stage-clock arithmetic, the regulator-submission contract, the typed early-warning / notification / final-report payload shapes, and the DSPy signature for free-text fields all need a home. |
 | **Typed payload shapes** | ❌ missing | The three regulator submissions each have a distinct typed shape (early-warning ≠ 72h notification ≠ final report). Two placement readings — see § 4. |
 | **DSPy signature for free-text fields only** | ❌ missing | No DSPy import or `dspy.Signature` exists for this workflow. Free-text fields cluster on the final report (narrative, root cause, applied mitigations); the regulated decisions (stage clock, classification, cross-border flag) are deterministic code. |
 | **Notification-destination configuration is operator-supplied** | ❌ missing | Sovereign-stack constraint: the framework ships no default endpoint. The destination contract belongs in the operator-facing config (CACAO `playbook_variables` vs separate YAML — see § 4) and the action body must read it through that contract. |
@@ -69,8 +69,8 @@ the F-PT-02 pattern module.
 | **Tests — late-arrival / re-classification** | ❌ missing | Needs a test that exercises (a) a late event arriving inside an already-open stage, (b) a re-classification that promotes / demotes the incident across the 24h boundary. Both must replay byte-identical against the timeline JSON. |
 | **Tests — replay** | ❌ missing | Needs the deterministic-replay test (same incident event stream twice → byte-identical timeline JSON + AuditTrail). |
 | **Tests — F-CP-02 consumability** | ❌ missing | The emitted timeline JSON must validate against whatever shape F-CP-02 declares. F-CP-02 status (see § 4) determines whether this lands inside F-WF-05 or moves to F-CP-02's closeout. |
-| **GDPR data-flow `data-flow-incident-management.md`** | ❌ missing | `content/mappings/gdpr/` today carries only a `README.md` placeholder. The structural decision raised by F-WF-03 (per-workflow doc vs single per-mapping schema) is still open; F-WF-05 inherits it. See § 4. |
-| **Cookbook entry + walkthrough docs** | ❌ missing | No `docs/cookbook/incident-management.md`. |
+| **GDPR data-flow `data-flow-incident_management.md`** | ❌ missing | `content/mappings/gdpr/` today carries only a `README.md` placeholder. The structural decision raised by F-WF-03 (per-workflow doc vs single per-mapping schema) is still open; F-WF-05 inherits it. See § 4. |
+| **Cookbook entry + walkthrough docs** | ❌ missing | No `docs/cookbook/incident_management.md`. |
 | **`config.yaml`** | ⚠️ pending decision | Same open question as F-WF-01 and F-WF-03: is the CACAO `playbook_variables` block the operator-facing config, or is a separate YAML expected? F-WF-02 (Shipped) does not ship a per-workflow YAML; precedent points at the CACAO block. The operator-supplied notification destination contract sharpens the question for F-WF-05. See § 4. |
 | **F-CR-04 dependency** | ✅ unblocked | Shipped. The `AuditTrail` mirror contract that CORE actions will bind against is stable. |
 | **F-PT-02 dependency** | ⚠️ flagged | ROADMAP marks F-PT-02 Shipped. The `incident_timeline` pattern is not currently present under `patterns/` on `main`; the whole `patterns/` tree is absent on disk despite multiple shipped pattern entries (F-PT-01..F-PT-03+) in the ROADMAP. CORE-PRIM cannot bind to a module that is not on disk. See § 4 — this is a maintainer call to make before card 1 starts. |
@@ -129,19 +129,19 @@ promotes cards whose upstreams are done.
 
 | # | Card | Parents (other siblings) | Public-bar |
 |---|---|---|---|
-| 1 | F-WF-05 CORE-SKEL-SRC — sketch the canonical CACAO source under `content/playbooks/incident-management/playbook.cacao.json` per the step shape in § 2; add `README.md`; add `content/playbooks/incident-management/__init__.py`; source-shape guard under `tests/content_model/test_incident_management_source.py` | — | yes |
-| 2 | F-WF-05 CORE-SKEL-N8N — SKELETON `examples/n8n/incident-management/workflow.n8n.json` (8 stub action bodies + 1 if-condition cell + the trigger / end cells); regen via `regenerate.sh`; byte-parity drift guard under `tests/examples/test_n8n_incident_management.py` | 1 | yes |
-| 3 | F-WF-05 CORE-SKEL-TMPRL — SKELETON `examples/temporal/incident-management/workflow.temporal.py` (span + AuditTrail mirror + NotImplementedError per action); regen; byte-parity drift guard under `tests/examples/incident_management/test_temporal_workflow.py` | 1 | yes |
-| 4 | F-WF-05 CORE-SKEL-LG — SKELETON `examples/langgraph/incident-management/{graph_spec.json,state_bindings.py}` (span + AuditTrail mirror + NotImplementedError per action); regen; byte-parity drift guard under `tests/examples/test_langgraph_incident_management.py` | 1 | yes |
-| 5 | F-WF-05 CORE-PRIM — shared primitives under `content/playbooks/incident-management/primitives/` (stage-clock arithmetic, deterministic significance + cross-border classification policy, regulator-submission contract with operator-configured destination, F-PT-02 binding layer, DSPy signature for free-text fields on the final report) | 1 | yes |
-| 6 | F-WF-05 CORE-WIRE-N8N — wire 7 CORE action bodies in `examples/n8n/incident-management/workflow.n8n.json` against the primitives contract; regen; golden byte-parity green; bring the n8n audit-mirror node uplift to parity with the F-CR-04 cookbook | 2, 5 | yes |
-| 7 | F-WF-05 CORE-WIRE-TMPRL — wire 7 CORE action bodies in `examples/temporal/incident-management/workflow.temporal.py` against the primitives contract; regen; golden byte-parity green | 3, 5 | yes |
-| 8 | F-WF-05 CORE-WIRE-LG — wire 7 CORE action bodies in `examples/langgraph/incident-management/state_bindings.py` against the primitives contract; regen; golden byte-parity green | 4, 5 | yes |
-| 9 | F-WF-05 CORE-MECH-GDPR — ship `content/mappings/gdpr/data-flow-incident-management.md` to satisfy the sovereign-stack constraint, plus a content-model test that pins the incident-management payload shapes against that doc | 5 | yes |
+| 1 | F-WF-05 CORE-SKEL-SRC — sketch the canonical CACAO source under `content/playbooks/incident_management/playbook.cacao.json` per the step shape in § 2; add `README.md`; add `content/playbooks/incident_management/__init__.py`; source-shape guard under `tests/content_model/test_incident_management_source.py` | — | yes |
+| 2 | F-WF-05 CORE-SKEL-N8N — SKELETON `examples/n8n/incident_management/workflow.n8n.json` (8 stub action bodies + 1 if-condition cell + the trigger / end cells); regen via `regenerate.sh`; byte-parity drift guard under `tests/examples/test_n8n_incident_management.py` | 1 | yes |
+| 3 | F-WF-05 CORE-SKEL-TMPRL — SKELETON `examples/temporal/incident_management/workflow.temporal.py` (span + AuditTrail mirror + NotImplementedError per action); regen; byte-parity drift guard under `tests/examples/incident_management/test_temporal_workflow.py` | 1 | yes |
+| 4 | F-WF-05 CORE-SKEL-LG — SKELETON `examples/langgraph/incident_management/{graph_spec.json,state_bindings.py}` (span + AuditTrail mirror + NotImplementedError per action); regen; byte-parity drift guard under `tests/examples/test_langgraph_incident_management.py` | 1 | yes |
+| 5 | F-WF-05 CORE-PRIM — shared primitives under `content/playbooks/incident_management/primitives/` (stage-clock arithmetic, deterministic significance + cross-border classification policy, regulator-submission contract with operator-configured destination, F-PT-02 binding layer, DSPy signature for free-text fields on the final report) | 1 | yes |
+| 6 | F-WF-05 CORE-WIRE-N8N — wire 7 CORE action bodies in `examples/n8n/incident_management/workflow.n8n.json` against the primitives contract; regen; golden byte-parity green; bring the n8n audit-mirror node uplift to parity with the F-CR-04 cookbook | 2, 5 | yes |
+| 7 | F-WF-05 CORE-WIRE-TMPRL — wire 7 CORE action bodies in `examples/temporal/incident_management/workflow.temporal.py` against the primitives contract; regen; golden byte-parity green | 3, 5 | yes |
+| 8 | F-WF-05 CORE-WIRE-LG — wire 7 CORE action bodies in `examples/langgraph/incident_management/state_bindings.py` against the primitives contract; regen; golden byte-parity green | 4, 5 | yes |
+| 9 | F-WF-05 CORE-MECH-GDPR — ship `content/mappings/gdpr/data-flow-incident_management.md` to satisfy the sovereign-stack constraint, plus a content-model test that pins the incident_management payload shapes against that doc | 5 | yes |
 | 10 | F-WF-05 EXTEND-tests-happy — happy-path golden replay test across all three targets in `tests/examples/incident_management/` | 6, 7, 8 | yes |
 | 11 | F-WF-05 EXTEND-tests-late-arrival — late-event / re-classification test across all three targets | 6, 7, 8 | yes |
 | 12 | F-WF-05 EXTEND-tests-replay — deterministic-replay test (same event stream twice → byte-identical timeline JSON + AuditTrail) across all three targets | 6, 7, 8 | yes |
-| 13 | F-WF-05 EXTEND-docs-cookbook — cookbook walkthrough under `docs/cookbook/incident-management.md` + worked-example README polish across all three targets | 6, 7, 8 | yes |
+| 13 | F-WF-05 EXTEND-docs-cookbook — cookbook walkthrough under `docs/cookbook/incident_management.md` + worked-example README polish across all three targets | 6, 7, 8 | yes |
 | 14 | F-WF-05 EXTEND-config — answer the `config.yaml` question (CACAO `playbook_variables` vs separate operator YAML, sharpened by the operator-supplied notification destination contract) and ship whichever is approved | 5 | yes |
 | 15 | F-WF-05 CLOSEOUT — ROADMAP.md status flip In Progress → Shipped + decisions log update | 1–14 | yes |
 
@@ -170,13 +170,13 @@ same cadence used for F-WF-01 and F-WF-03.
    harness is in place when F-CP-02 lands.
 3. **Primitives directory location.** Mirror of the F-WF-03 open
    question. F-WF-05 is greenfield, so the subdirectory layout
-   (`content/playbooks/incident-management/primitives/`) is the
+   (`content/playbooks/incident_management/primitives/`) is the
    uncontested default — but the same call about whether the source
-   playbook lives flat (`incident-management.cacao.yaml`) or under a
-   subdirectory (`incident-management/playbook.cacao.json`) needs a
+   playbook lives flat (`incident_management.cacao.yaml`) or under a
+   subdirectory (`incident_management/playbook.cacao.json`) needs a
    one-line direction for card 1. Recommendation: subdirectory, both
    because every other multi-artifact playbook
-   (ransomware-containment, post-incident-review, …) ships that way
+   (ransomware_containment, post_incident_review, …) ships that way
    and because the workflow needs the subdirectory anyway for
    primitives, payloads, and the regulator-submission contract.
 4. **GDPR data-flow doc as a workflow-local artifact.** Mirror of the
@@ -203,7 +203,7 @@ same cadence used for F-WF-01 and F-WF-03.
 7. **Typed payload shapes — placement.** Three regulator submissions
    have three distinct typed shapes plus the event-intake shape.
    Mirror of the F-WF-03 open question about placement under
-   `content/telemetry/` vs `content/playbooks/incident-management/payloads/`.
+   `content/telemetry/` vs `content/playbooks/incident_management/payloads/`.
    Card 1 / card 5 need a one-line direction.
 
 ## 5. Out of scope for this card

@@ -93,7 +93,7 @@ def test_graph_spec_emit_is_deterministic() -> None:
 
 
 def test_graph_spec_golden_has_expected_shape() -> None:
-    """Sanity-check the golden carries the topology vuln-intake describes."""
+    """Sanity-check the golden carries the topology vuln_intake describes."""
     payload = json.loads(GOLDEN_GRAPH.read_text(encoding="utf-8"))
     assert payload["stable_id"] == "playbook.vuln_intake@v1"
     assert payload["end_sentinel"] == "__END__"

@@ -1,14 +1,14 @@
-"""F-WF-09 EXTEND — byte-parity golden for the incident-management bundle.
+"""F-WF-09 EXTEND — byte-parity golden for the incident_management bundle.
 
 Pins the on-disk bytes of the auditor-handover bundle assembled for the
 ``playbook.incident_management@v1`` workflow against the committed
 worked-example artifacts under
-``examples/{n8n,temporal,langgraph}/incident-management/evidence/bundle/``.
+``examples/{n8n,temporal,langgraph}/incident_management/evidence/bundle/``.
 
 The cross-target round-trip in
 ``tests/content_model/test_bundle_evidence_collector.py`` already pins
 cross-target equivalence of the shared collector under one execution.
-This test is the EXTEND complement for the incident-management bundle:
+This test is the EXTEND complement for the incident_management bundle:
 each target's bundle directory is exercised against the committed
 bytes so a refactor of the shared collector, an adapter, or the
 inlined incidents emitter that silently changes serialisation gets
@@ -41,7 +41,7 @@ Coverage axes (adapted to the bundle surface):
 If the shared collector, an adapter, or the inlined incidents emitter
 changes the on-disk serialisation intentionally, regenerate the
 bundles via the three ``regenerate.py`` scripts under
-``examples/{n8n,temporal,langgraph}/incident-management/evidence/bundle/``
+``examples/{n8n,temporal,langgraph}/incident_management/evidence/bundle/``
 and commit the new bytes alongside the change.
 """
 from __future__ import annotations
@@ -58,12 +58,12 @@ SCHEMAS = REPO / "schemas"
 BUNDLE_SCHEMA = SCHEMAS / "evidence" / "bundle.schema.json"
 
 EXAMPLES = REPO / "examples"
-N8N_BUNDLE = EXAMPLES / "n8n" / "incident-management" / "evidence" / "bundle"
+N8N_BUNDLE = EXAMPLES / "n8n" / "incident_management" / "evidence" / "bundle"
 TEMPORAL_BUNDLE = (
-    EXAMPLES / "temporal" / "incident-management" / "evidence" / "bundle"
+    EXAMPLES / "temporal" / "incident_management" / "evidence" / "bundle"
 )
 LANGGRAPH_BUNDLE = (
-    EXAMPLES / "langgraph" / "incident-management" / "evidence" / "bundle"
+    EXAMPLES / "langgraph" / "incident_management" / "evidence" / "bundle"
 )
 BUNDLES = (N8N_BUNDLE, TEMPORAL_BUNDLE, LANGGRAPH_BUNDLE)
 TARGET_IDS = ("n8n", "temporal", "langgraph")
@@ -107,7 +107,7 @@ def test_bundle_manifests_are_committed() -> None:
 def test_n8n_and_langgraph_manifests_are_byte_identical() -> None:
     """The shared collector renders the same manifest bytes for any
     targets that exercise the same evidence surface. The n8n and
-    LangGraph bundles for incident-management still inline only the
+    LangGraph bundles for incident_management still inline only the
     incidents artifact (the access write-path is wired on Temporal
     first as the F-CP-07 SKELETON; the named CORE-FANOUT sibling fans
     that wiring out to n8n and LangGraph), so the two unfanned-out
@@ -215,7 +215,7 @@ def test_manifest_artifact_paths_resolve(bundle: Path) -> None:
         {"incidents", "access"} if target == "temporal" else {"incidents"}
     )
     assert {s["stream"] for s in streams_present} == expected_present, (
-        f"{target} incident-management bundle expected {expected_present}; "
+        f"{target} incident_management bundle expected {expected_present}; "
         f"got {[s['stream'] for s in streams_present]} in {bundle}"
     )
     for stream in streams_present:
@@ -239,7 +239,7 @@ def test_manifest_artifact_paths_resolve(bundle: Path) -> None:
 @pytest.mark.parametrize("manifest", MANIFESTS, ids=TARGET_IDS)
 def test_manifest_carries_closed_seven_stream_surface(manifest: Path) -> None:
     """The manifest carries an entry for every shipped evidence stream,
-    with ``present: false`` for the streams the incident-management
+    with ``present: false`` for the streams the incident_management
     workflow does not exercise. The seven-stream surface is closed so
     a reviewer sees an explicit empty slot rather than a quietly
     omitted stream.
@@ -281,7 +281,7 @@ ACCESS_SCHEMA = SCHEMAS / "evidence" / "access.schema.json"
 def test_temporal_bundle_emits_one_access_record_per_run() -> None:
     """F-CP-07 SKELETON Temporal write-path — happy path.
 
-    One execution of the incident-management Temporal worked example
+    One execution of the incident_management Temporal worked example
     drives the Temporal access activity exactly once and lands one
     well-formed access record under
     ``content/evidence/access/<artifact_id>.json`` inside the bundle

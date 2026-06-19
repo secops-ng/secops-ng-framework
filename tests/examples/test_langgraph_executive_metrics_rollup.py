@@ -1,8 +1,8 @@
-"""Drift guard for ``content-model/examples/executive-metrics-rollup/langgraph/``.
+"""Drift guard for ``content-model/examples/executive_metrics_rollup/langgraph/``.
 
 The worked example commits the *real* artefacts produced by the
 LangGraph reference compiler against the playbook at
-``content-model/examples/executive-metrics-rollup/langgraph/playbook.cacao.json``:
+``content-model/examples/executive_metrics_rollup/langgraph/playbook.cacao.json``:
 
 * ``graph_spec.json`` — ``python -m compilers.langgraph.emit``
 * ``state_bindings.py`` — ``python -m compilers.langgraph.state``
@@ -24,7 +24,7 @@ EXAMPLE_DIR = (
     REPO_ROOT
     / "content-model"
     / "examples"
-    / "executive-metrics-rollup"
+    / "executive_metrics_rollup"
     / "langgraph"
 )
 PLAYBOOK = EXAMPLE_DIR / "playbook.cacao.json"
@@ -47,9 +47,9 @@ def test_graph_spec_matches_emitter_output() -> None:
     rendered = _serialise_graph(emit(playbook))
     expected = COMMITTED_GRAPH.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "content-model/examples/executive-metrics-rollup/langgraph/"
+        "content-model/examples/executive_metrics_rollup/langgraph/"
         "graph_spec.json drift. Regenerate via "
-        "`bash content-model/examples/executive-metrics-rollup/langgraph/"
+        "`bash content-model/examples/executive_metrics_rollup/langgraph/"
         "regenerate.sh` and commit the result."
     )
 
@@ -65,9 +65,9 @@ def test_state_bindings_matches_state_emitter_output() -> None:
     rendered = render_module(playbook) + "\n"
     expected = COMMITTED_MODULE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "content-model/examples/executive-metrics-rollup/langgraph/"
+        "content-model/examples/executive_metrics_rollup/langgraph/"
         "state_bindings.py drift. Regenerate via "
-        "`bash content-model/examples/executive-metrics-rollup/langgraph/"
+        "`bash content-model/examples/executive_metrics_rollup/langgraph/"
         "regenerate.sh` and commit the result."
     )
 

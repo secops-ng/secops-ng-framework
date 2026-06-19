@@ -1,0 +1,39 @@
+{
+  "artifact_id": "df6f21b6a4a7a2c65e984e15ea48535f7d48a91d52f68767fb5f80b45cd2ea58",
+  "caller_identity": {
+    "identity_provider": "langgraph",
+    "principal_id": "langgraph-runtime-iam-auditor",
+    "principal_type": "workflow_runtime"
+  },
+  "capabilities": [
+    "identities.read",
+    "capabilities.read",
+    "evidence.write"
+  ],
+  "capability_count": 3,
+  "captured_at": "2026-06-19T05:00:00Z",
+  "compile_target": "langgraph",
+  "control_refs": [
+    "control.jml_evidence@v1",
+    "control.privileged_access_review@v1",
+    "control.asset_inventory_delta@v1",
+    "control.cloud_identity_least_privilege@v1"
+  ],
+  "execution_id": "langgraph:exec-iam-auditor-001",
+  "owner": {
+    "assigned_at": "2026-01-15",
+    "role": "identity-wg"
+  },
+  "provenance": {
+    "captured_at": "2026-06-19T05:00:00Z",
+    "commit_sha": "deadbeef0123456789",
+    "source_url": "https://example.org/runs/iam_auditor_001"
+  },
+  "regulation_refs": [
+    "nis2:art-21-2-i"
+  ],
+  "retention": "P2Y",
+  "schema_version": "1.0.0",
+  "stream": "access",
+  "workflow_id": "iam_auditor"
+}

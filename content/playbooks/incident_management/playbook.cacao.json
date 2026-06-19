@@ -1,0 +1,341 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0",
+  "name": "Incident management",
+  "description": "Manage a significant security incident through the NIS2 Article 23 three-stage regulator timeline: intake the originating signal, classify significance and cross-border scope, open a deterministic incident timeline, submit the 24-hour early warning, submit the 72-hour notification, submit the one-month final report (free-text fields scoped to narrative, root cause, and applied mitigations only), and close the timeline so the regulator-shaped JSON artefact is persisted. CACAO v2 + SecOps-NG content-model extensions. Forward-public artifact: regulator destinations are operator-supplied through playbook variables (sovereign-stack constraint — the framework ships no default endpoint) and the timeline binding consumes the F-PT-02 incident-timeline pattern.",
+  "playbook_types": [
+    "investigation",
+    "notification",
+    "remediation"
+  ],
+  "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+  "created": "2026-06-06T00:00:00Z",
+  "modified": "2026-06-06T00:00:00Z",
+  "labels": [
+    "incident_management",
+    "incident-timeline",
+    "regulator-notification",
+    "nis2",
+    "nis2-article-23",
+    "dora",
+    "three-stage-timeline"
+  ],
+  "external_references": [
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 23 — incident reporting obligations (24h early warning, 72h notification, 1 month final report)",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj"
+    },
+    {
+      "name": "DORA Regulation (EU) 2022/2554, Article 19 — reporting of major ICT-related incidents",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+    },
+    {
+      "name": "ENISA — Technical Guideline on Incident Reporting under the NIS Directive",
+      "source": "ENISA",
+      "url": "https://www.enisa.europa.eu/topics/cybersecurity-policy/nis-directive-new/incident-reporting"
+    },
+    {
+      "name": "OASIS CACAO v2.0 specification",
+      "source": "OASIS",
+      "url": "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
+    }
+  ],
+  "playbook_variables": {
+    "__signal_id__": {
+      "type": "string",
+      "description": "Identifier of the originating incident signal handed in by the upstream triage workflow (alert_triage close-out, ransomware_containment close-out, or an operator-raised ticket).",
+      "external": true
+    },
+    "__notification_destinations__": {
+      "type": "dictionary",
+      "description": "Operator-supplied dictionary of regulator-notification destinations. Keys are the three regulator-submission stages ('early_warning', 'notification', 'final_report'); values are opaque destination handles resolved at the compile target's config layer (n8n credential, Temporal worker env, LangGraph runtime config). The framework ships no default endpoint per the sovereign-stack constraint; absent or empty entries fail the corresponding submit action by contract.",
+      "external": true
+    },
+    "__incident_id__": {
+      "type": "uuid",
+      "description": "Workflow-assigned incident identifier. Joined into the timeline JSON artefact path at `content/evidence/incidents/<incident-id>/timeline.json` (consumed downstream by F-CP-02).",
+      "external": false
+    },
+    "__significant__": {
+      "type": "boolean",
+      "description": "Whether the intake event meets the NIS2 Article 23(3) significance threshold. Deterministic classification — produced by the classify-significance action.",
+      "external": false
+    },
+    "__cross_border__": {
+      "type": "boolean",
+      "description": "Whether the incident has cross-border impact under NIS2 Article 23(6). Deterministic classification — produced by the classify-significance action.",
+      "external": false
+    },
+    "__timeline_handle__": {
+      "type": "string",
+      "description": "Opaque handle returned by the F-PT-02 incident-timeline pattern's open-timeline call. Consumed by every subsequent timeline-event submission and by the close-timeline action.",
+      "external": false
+    },
+    "__early_warning_event_id__": {
+      "type": "string",
+      "description": "Timeline-event identifier returned by the 24-hour early-warning submission. Persisted into the timeline JSON.",
+      "external": false
+    },
+    "__notification_event_id__": {
+      "type": "string",
+      "description": "Timeline-event identifier returned by the 72-hour notification submission. Persisted into the timeline JSON.",
+      "external": false
+    },
+    "__final_report_ready__": {
+      "type": "boolean",
+      "description": "Whether the root-cause analysis and applied-mitigations narrative for the final report are complete before the one-month boundary. Determines whether the workflow submits the final report or closes out with a deferred-final-report marker on the timeline (the deferred case is closed under the same timeline; the late final-report submission ships through a separate operator-driven re-entry that is out of scope for this card).",
+      "external": false
+    },
+    "__final_report_event_id__": {
+      "type": "string",
+      "description": "Timeline-event identifier returned by the one-month final-report submission. Persisted into the timeline JSON.",
+      "external": false
+    },
+    "__timeline_artefact_path__": {
+      "type": "string",
+      "description": "Repository-relative path where the canonical timeline JSON artefact was persisted by the close-timeline action.",
+      "external": false
+    }
+  },
+  "workflow_start": "start--50000000-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--50000000-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "incident-mgmt-start",
+      "on_completion": "action--50000000-0000-4000-8000-000000000002"
+    },
+    "action--50000000-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "intake significant-incident signal",
+      "description": "Receive the originating incident signal and hydrate it with the typed intake-event payload shape consumed by the F-PT-02 incident-timeline pattern. Produces __incident_id__. CORE body lands in CORE-PRIM (card 5); SKELETON stub raises NotImplementedError against the named contract.",
+      "on_completion": "action--50000000-0000-4000-8000-000000000003",
+      "in_args": [
+        "__signal_id__"
+      ],
+      "out_args": [
+        "__incident_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.incident_handling_capability@v1",
+          "control.incident_timeline_signals@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.incident_finding@v1"
+        ],
+        "metric_refs": [
+          "kpi.timeline_completeness@v1"
+        ]
+      }
+    },
+    "action--50000000-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "classify significance and cross-border scope",
+      "description": "Apply the deterministic significance + cross-border classification policy per NIS2 Article 23(3) and 23(6). No DSPy reach — regulated decisions are deterministic code. Produces __significant__ and __cross_border__.",
+      "on_completion": "if-condition--50000000-0000-4000-8000-000000000004",
+      "in_args": [
+        "__incident_id__"
+      ],
+      "out_args": [
+        "__significant__",
+        "__cross_border__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.incident_handling_capability@v1"
+        ],
+        "metric_refs": [
+          "kpi.timeline_completeness@v1"
+        ]
+      }
+    },
+    "if-condition--50000000-0000-4000-8000-000000000004": {
+      "type": "if-condition",
+      "name": "significant?",
+      "description": "Branch on __significant__. True paths into the regulator-timeline three-stage submission flow. False routes directly to the end step (the audit-only close-out for non-significant events is logged for the false-positive KPI by an out-of-scope downstream card).",
+      "on_success": "action--50000000-0000-4000-8000-000000000005",
+      "on_failure": "end--50000000-0000-4000-8000-00000000000b"
+    },
+    "action--50000000-0000-4000-8000-000000000005": {
+      "type": "action",
+      "name": "open incident timeline",
+      "description": "Signal the F-PT-02 incident-timeline pattern's start: stage clock 0 begins, the timeline-state machine moves into the early-warning window. Produces __timeline_handle__ — the opaque pattern handle every subsequent submission threads through.",
+      "on_completion": "action--50000000-0000-4000-8000-000000000006",
+      "in_args": [
+        "__incident_id__",
+        "__significant__",
+        "__cross_border__"
+      ],
+      "out_args": [
+        "__timeline_handle__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.incident_timeline_signals@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.incident_finding@v1"
+        ],
+        "metric_refs": [
+          "kpi.timeline_completeness@v1"
+        ]
+      }
+    },
+    "action--50000000-0000-4000-8000-000000000006": {
+      "type": "action",
+      "name": "submit 24-hour early warning",
+      "description": "Submit the NIS2 Article 23(4)(a) early warning through the operator-configured regulator destination for the 'early_warning' stage. Emits a timeline event consumed by the F-PT-02 pattern. Bounded by the stage-clock primitive that the CORE-PRIM card will land — overrun trips the regulator-notification-overrun KRI.",
+      "on_completion": "action--50000000-0000-4000-8000-000000000007",
+      "in_args": [
+        "__incident_id__",
+        "__timeline_handle__",
+        "__significant__",
+        "__cross_border__",
+        "__notification_destinations__"
+      ],
+      "out_args": [
+        "__early_warning_event_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.incident_notification@v1",
+          "control.incident_timeline_signals@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.incident_finding@v1"
+        ],
+        "metric_refs": [
+          "kpi.notification_sla_compliance@v1",
+          "kri.regulator_notification_overrun@v1"
+        ]
+      }
+    },
+    "action--50000000-0000-4000-8000-000000000007": {
+      "type": "action",
+      "name": "submit 72-hour notification",
+      "description": "Submit the NIS2 Article 23(4)(b) incident notification through the operator-configured regulator destination for the 'notification' stage. Emits a timeline event consumed by the F-PT-02 pattern. Bounded by the stage-clock primitive — overrun trips the regulator-notification-overrun KRI.",
+      "on_completion": "if-condition--50000000-0000-4000-8000-000000000008",
+      "in_args": [
+        "__incident_id__",
+        "__timeline_handle__",
+        "__significant__",
+        "__cross_border__",
+        "__notification_destinations__"
+      ],
+      "out_args": [
+        "__notification_event_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.incident_notification@v1",
+          "control.incident_timeline_signals@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.incident_finding@v1"
+        ],
+        "metric_refs": [
+          "kpi.notification_sla_compliance@v1",
+          "kri.regulator_notification_overrun@v1"
+        ]
+      }
+    },
+    "if-condition--50000000-0000-4000-8000-000000000008": {
+      "type": "if-condition",
+      "name": "final-report material complete?",
+      "description": "Branch on __final_report_ready__. True paths into the one-month final-report submission. False paths around it: the timeline is closed with a deferred-final-report marker so the timeline JSON is well-formed and consumable downstream; a late final-report submission is operator-driven re-entry and out of scope for this card.",
+      "on_success": "action--50000000-0000-4000-8000-000000000009",
+      "on_failure": "action--50000000-0000-4000-8000-00000000000a"
+    },
+    "action--50000000-0000-4000-8000-000000000009": {
+      "type": "action",
+      "name": "submit 1-month final report",
+      "description": "Submit the NIS2 Article 23(4)(c) final report through the operator-configured regulator destination for the 'final_report' stage. The free-text fields on this submission — incident narrative, root-cause description, applied-mitigations summary — are the single DSPy-signature reach for this workflow; every other field is deterministic. Bounded by the stage-clock primitive — overrun trips the regulator-notification-overrun KRI.",
+      "on_completion": "action--50000000-0000-4000-8000-00000000000a",
+      "in_args": [
+        "__incident_id__",
+        "__timeline_handle__",
+        "__significant__",
+        "__cross_border__",
+        "__notification_destinations__"
+      ],
+      "out_args": [
+        "__final_report_event_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.incident_notification@v1",
+          "control.incident_timeline_signals@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.incident_finding@v1"
+        ],
+        "metric_refs": [
+          "kpi.notification_sla_compliance@v1",
+          "kpi.timeline_completeness@v1",
+          "kri.regulator_notification_overrun@v1"
+        ]
+      }
+    },
+    "action--50000000-0000-4000-8000-00000000000a": {
+      "type": "action",
+      "name": "close incident timeline",
+      "description": "Signal the F-PT-02 incident-timeline pattern's close: the canonical regulator-shaped timeline JSON is persisted at content/evidence/incidents/<__incident_id__>/timeline.json for downstream consumption by F-CP-02. Stamps the timeline-completeness KPI.",
+      "on_completion": "end--50000000-0000-4000-8000-00000000000b",
+      "in_args": [
+        "__incident_id__",
+        "__timeline_handle__"
+      ],
+      "out_args": [
+        "__timeline_artefact_path__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.incident_timeline_signals@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.incident_finding@v1"
+        ],
+        "metric_refs": [
+          "kpi.timeline_completeness@v1"
+        ]
+      }
+    },
+    "end--50000000-0000-4000-8000-00000000000b": {
+      "type": "end",
+      "name": "incident-mgmt-end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.incident_management@v1",
+    "content_version": "0.1.0",
+    "maturity": "experimental",
+    "compile_targets": [
+      "n8n",
+      "temporal",
+      "langgraph"
+    ],
+    "control_refs": [
+      "control.incident_handling_capability@v1",
+      "control.incident_timeline_signals@v1",
+      "control.incident_notification@v1"
+    ],
+    "telemetry_refs": [
+      "telemetry.ocsf.incident_finding@v1"
+    ],
+    "metric_refs": [
+      "kpi.notification_sla_compliance@v1",
+      "kpi.timeline_completeness@v1",
+      "kri.regulator_notification_overrun@v1"
+    ],
+    "sources": [
+      "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
+      "NIS2 Directive (EU) 2022/2555, Article 23 — three-stage incident reporting obligations (24h early warning, 72h notification, 1 month final report) and cross-border scope",
+      "DORA Regulation (EU) 2022/2554, Article 19 — reporting of major ICT-related incidents",
+      "ENISA — Technical Guideline on Incident Reporting under the NIS Directive",
+      "OCSF — Security Finding (2001) event class for the incident-finding telemetry shape"
+    ]
+  }
+}

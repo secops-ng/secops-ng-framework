@@ -1,16 +1,16 @@
-"""Drift guard for the ``examples/n8n/identity-compromise/`` worked example.
+"""Drift guard for the ``examples/n8n/identity_compromise/`` worked example.
 
-Mirrors the vuln-intake and cloud-misconfiguration n8n example tests:
+Mirrors the vuln_intake and cloud_misconfiguration n8n example tests:
 parses the canonical CACAO playbook, emits the n8n workflow JSON, and
 pins the result byte-for-byte against the committed
-``examples/n8n/identity-compromise/workflow.n8n.json``. Adds a node-id ↔
+``examples/n8n/identity_compromise/workflow.n8n.json``. Adds a node-id ↔
 CACAO action-id parity check so the one-to-one mirroring contract
-documented in ``examples/n8n/identity-compromise/README.md`` is enforced
+documented in ``examples/n8n/identity_compromise/README.md`` is enforced
 by tests, not by convention.
 
 Regenerate via::
 
-    ./examples/n8n/identity-compromise/regenerate.sh
+    ./examples/n8n/identity_compromise/regenerate.sh
 """
 from __future__ import annotations
 
@@ -21,8 +21,8 @@ from compilers._shared.cacao_parser import parse_file
 from compilers.n8n.emit import emit
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-SOURCE = REPO_ROOT / "content" / "playbooks" / "identity-compromise" / "playbook.cacao.json"
-WORKED_EXAMPLE = REPO_ROOT / "examples" / "n8n" / "identity-compromise" / "workflow.n8n.json"
+SOURCE = REPO_ROOT / "content" / "playbooks" / "identity_compromise" / "playbook.cacao.json"
+WORKED_EXAMPLE = REPO_ROOT / "examples" / "n8n" / "identity_compromise" / "workflow.n8n.json"
 
 
 def _serialise(payload: dict) -> str:
@@ -34,9 +34,9 @@ def test_worked_example_matches_emitter_output() -> None:
     rendered = _serialise(emit(playbook))
     expected = WORKED_EXAMPLE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/n8n/identity-compromise/workflow.n8n.json drifted from the "
+        "examples/n8n/identity_compromise/workflow.n8n.json drifted from the "
         "n8n emitter output. Regenerate via "
-        "`./examples/n8n/identity-compromise/regenerate.sh` and commit the new bytes."
+        "`./examples/n8n/identity_compromise/regenerate.sh` and commit the new bytes."
     )
 
 
@@ -202,17 +202,17 @@ def test_co_located_cacao_mirror_matches_canonical() -> None:
         REPO_ROOT
         / "examples"
         / "n8n"
-        / "identity-compromise"
+        / "identity_compromise"
         / "playbook.cacao.json"
     )
     assert mirror.exists(), (
-        "examples/n8n/identity-compromise/playbook.cacao.json missing — "
-        "run ./examples/n8n/identity-compromise/regenerate.sh"
+        "examples/n8n/identity_compromise/playbook.cacao.json missing — "
+        "run ./examples/n8n/identity_compromise/regenerate.sh"
     )
     assert mirror.read_bytes() == SOURCE.read_bytes(), (
-        "examples/n8n/identity-compromise/playbook.cacao.json drifted from the "
+        "examples/n8n/identity_compromise/playbook.cacao.json drifted from the "
         "canonical CACAO source. Re-run "
-        "./examples/n8n/identity-compromise/regenerate.sh and commit."
+        "./examples/n8n/identity_compromise/regenerate.sh and commit."
     )
 
 

@@ -161,7 +161,7 @@ to back the `metric_ref`s already encoded in shipped playbooks — MTTD
 family (phishing, ransomware, exfil, cloud misconfig, identity
 compromise, threat-intel indicator), MTTR/MTTC family (containment,
 phishing triage, cloud-misconfig remediation, blocklist propagation,
-on-call ack, identity-compromise containment), coverage family (cloud
+on-call ack, identity_compromise containment), coverage family (cloud
 posture, on-call schedule, threat-intel feed, lateral-hunt), five
 KRIs (recurring cloud misconfig, regulator-notification overrun,
 phishing suppression, escalation-tier breach, corrective-action

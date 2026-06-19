@@ -1,1 +1,1 @@
-"""Tests for the incident-management primitives package."""
+"""Tests for the incident_management primitives package."""

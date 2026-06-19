@@ -1,7 +1,7 @@
 """Tests for compilers/langgraph/emit.py.
 
 Covers:
-- vuln-intake fixture → GraphSpec round-trip (entry, nodes, edges,
+- vuln_intake fixture → GraphSpec round-trip (entry, nodes, edges,
   conditional edges, END collapsing).
 - Edge kind preservation in ``cacao_edge`` metadata.
 - Conditional edges keyed on success/failure for if-condition steps,
@@ -54,7 +54,7 @@ def spec(fixture_data: dict) -> GraphSpec:
 
 
 # --------------------------------------------------------------------------- #
-# Happy path — vuln-intake fixture                                            #
+# Happy path — vuln_intake fixture                                            #
 # --------------------------------------------------------------------------- #
 
 

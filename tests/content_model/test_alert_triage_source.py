@@ -1,7 +1,7 @@
-"""Schema-validation smoke test for the F-WF-03 alert-triage SOURCE playbook.
+"""Schema-validation smoke test for the F-WF-03 alert_triage SOURCE playbook.
 
-The alert-triage SOURCE artifact lives at
-``content/playbooks/alert-triage.cacao.yaml`` and is the canonical input
+The alert_triage SOURCE artifact lives at
+``content/playbooks/alert_triage.cacao.yaml`` and is the canonical input
 that the per-target SKELETON cards (n8n, Temporal, LangGraph) compile
 from. This test pins that the source file:
 
@@ -25,7 +25,7 @@ from jsonschema import Draft202012Validator
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_PATH = REPO_ROOT / "content-model" / "playbook.schema.json"
-SOURCE_PATH = REPO_ROOT / "content" / "playbooks" / "alert-triage.cacao.yaml"
+SOURCE_PATH = REPO_ROOT / "content" / "playbooks" / "alert_triage.cacao.yaml"
 
 
 @pytest.fixture(scope="module")
@@ -46,7 +46,7 @@ def playbook() -> dict:
 
 def test_source_yaml_parses() -> None:
     doc = yaml.safe_load(SOURCE_PATH.read_text(encoding="utf-8"))
-    assert isinstance(doc, dict), "alert-triage source must parse to a mapping"
+    assert isinstance(doc, dict), "alert_triage source must parse to a mapping"
 
 
 def test_source_validates_against_playbook_schema(

@@ -9,7 +9,7 @@ targets without re-implementing record assembly.
 
 Importing ``temporalio`` is required at install time; it is already a
 transitive dependency of the Temporal worked examples under
-``examples/temporal/`` (including ``examples/temporal/vuln-intake/``,
+``examples/temporal/`` (including ``examples/temporal/vuln_intake/``,
 which is the canonical write-path this activity wraps).
 """
 from __future__ import annotations

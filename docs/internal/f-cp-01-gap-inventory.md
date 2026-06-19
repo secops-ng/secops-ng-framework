@@ -85,9 +85,9 @@ the contract regardless of where F-PT-01 lands.
 | **DORA Art. 5–6 ICT-risk-framework crosswalk** | ⚠️ unverified | `content/mappings/dora/article-5.yaml` and `article-6.yaml` exist; whether they reference the same `control.risk_management_policy@v1` + `kri.control_effectiveness@v1` artifacts (so DORA scope reuses the NIS2 stream) needs a one-pass audit in card 1. |
 | **CRA scope** | ✅ out of scope | CRA applies to product-lifecycle obligations (Annex I §1 + SBOM Annex I §2(1)); risk-analysis stream is operator-side, not product-side. Card 1 confirms no CRA mapping change is required. |
 | **Continuous read cadence — periodic risk-posture re-assessment** | ❌ missing | No content-resident declaration of cadence for `control.risk_management_policy@v1`. The ROADMAP describes F-CP-01 as a **continuous** stream; the contract needs an explicit `review_cadence` field on the control (or a stream-level default with per-control override) so an operator's compile target knows when to walk. |
-| **Control-effectiveness signals — per-cadence delta** | ❌ missing | Stream artifacts need to carry the delta from the previous attestation (state transitions: effective → partially_effective → ineffective → overdue) so downstream consumers (F-CP-06, executive-metrics) can compute drift without re-deriving from the artifact archive. |
+| **Control-effectiveness signals — per-cadence delta** | ❌ missing | Stream artifacts need to carry the delta from the previous attestation (state transitions: effective → partially_effective → ineffective → overdue) so downstream consumers (F-CP-06, executive_metrics) can compute drift without re-deriving from the artifact archive. |
 | **Regulatory-baseline drift detection** | ❌ missing | No mechanism today to detect that the upstream regulatory text (NIS2 Art. 21(2)(a)) has been re-issued or that an OSCAL catalog version has bumped. Card 4 owns the drift-detection contract; the stream itself ships the metadata fields it needs (regulation version pin, captured-at, source URL hash). |
-| **Workflow emitter — at least one** | ❌ missing | Which workflow emits the risk-analysis stream is undecided. Two readings: (a) the `executive-metrics` playbook (already exists, already consumes KRIs) takes on the cadence walker; (b) a new dedicated `risk-posture-review` playbook is added under `content/playbooks/`. See § 4. |
+| **Workflow emitter — at least one** | ❌ missing | Which workflow emits the risk-analysis stream is undecided. Two readings: (a) the `executive_metrics` playbook (already exists, already consumes KRIs) takes on the cadence walker; (b) a new dedicated `risk-posture-review` playbook is added under `content/playbooks/`. See § 4. |
 | **Tests — stream schema guard** | ❌ missing | No content-model test guards the risk-analysis-stream evidence-artifact shape today. |
 | **Tests — crosswalk integrity** | ❌ missing | No test asserts that every control referenced by the stream is reachable from the NIS2 + DORA mappings (and vice-versa). |
 | **Hygiene linter clean on all artifacts** | ⚠️ pending | New files in this PR must pass `python -m tools.hygiene_linter --min-severity LOW`. |
@@ -155,11 +155,11 @@ before merge, following the same cadence used for F-WF-01 and F-WF-03.
 1. **Workflow emitter — which one.** F-CP-01 needs at least one
    workflow to walk `control.risk_management_policy@v1` on a cadence
    and emit conformant artifacts. Two readings: (a) extend the existing
-   `content/playbooks/executive-metrics/` playbook, which already
+   `content/playbooks/executive_metrics/` playbook, which already
    consumes KRIs and runs on a cadence; (b) add a dedicated
    `content/playbooks/risk-posture-review/` playbook. Card 3 needs a
    one-line direction. Recommendation is (a) for the v1 stream — the
-   executive-metrics playbook is the natural cadence walker — with a
+   executive_metrics playbook is the natural cadence walker — with a
    note that a dedicated playbook is the right home if the stream
    expands to walk dozens of controls.
 2. **Schema home — sharded YAML vs new markdown peer.** ROADMAP names

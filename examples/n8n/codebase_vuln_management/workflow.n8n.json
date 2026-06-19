@@ -1,0 +1,275 @@
+{
+  "name": "Codebase vulnerability management",
+  "nodes": [
+    {
+      "id": "start--01a17a07-0000-4000-8000-000000000001",
+      "name": "codebase_vuln_management_start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__sbom_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Pointer to the canonical SBOM artefact for the release under review. CycloneDX or SPDX, machine-readable. Populated by the build chain upstream of this workflow."
+            },
+            {
+              "name": "__sbom_bytes__",
+              "type": "string",
+              "value": "",
+              "description": "Raw SBOM artefact bytes, fetched by an operator-side upstream node from __sbom_ref__. Bound to the primitive's `sbom_bytes` argument so the SHA-256 pin is computed against the exact bytes fetched. The fetcher is operator-side (n8n HTTP Request / Temporal activity / LangGraph node) so the workflow stays sovereign-stack neutral."
+            },
+            {
+              "name": "__sbom_format__",
+              "type": "string",
+              "value": "",
+              "description": "Which SBOM format the artefact at __sbom_ref__ uses. One of: cyclonedx_json, cyclonedx_xml, spdx_json, spdx_tag_value."
+            },
+            {
+              "name": "__sbom_content_hash__",
+              "type": "string",
+              "value": "",
+              "description": "SHA-256 hex digest of the SBOM artefact bytes as fetched. Pinned at ingest so re-runs against a moved artefact are detectable."
+            },
+            {
+              "name": "__raw_findings__",
+              "type": "string",
+              "value": "",
+              "description": "Per-finding output emitted by the operator's locally-runnable scanner CLI (one entry per matched (component, version, advisory) triple). Marshalled to the workflow as a JSON-native list; the normalise-findings primitive canonicalises it against the disclosure-timeline contract."
+            },
+            {
+              "name": "__findings_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Pointer to the normalised per-finding result set produced by review-deps. One entry per (component, version, advisory) triple matched against the SBOM, sorted on (advisory_id, purl, version) so two replays of the same scan collapse to byte-identical bytes."
+            },
+            {
+              "name": "__finding__",
+              "type": "string",
+              "value": "",
+              "description": "One entry from __findings_ref__ \u2014 the per-finding view assess-disclosure and track-timeline iterate against. Operators wire the per-finding loop in their compile target's native idiom (n8n SplitInBatches, Temporal child workflow, LangGraph map); the CORE primitive call is per-finding so the byte-parity guarantee holds."
+            },
+            {
+              "name": "__finding_severity__",
+              "type": "string",
+              "value": "",
+              "description": "Severity band of __finding__ (mirror of __finding__.severity), surfaced as a flat playbook variable so the assess-disclosure primitive binding stays a flat token list per the F-WF-01 CORE convention."
+            },
+            {
+              "name": "__awareness_at__",
+              "type": "string",
+              "value": "",
+              "description": "ISO-8601 UTC second-precision timestamp marking when the operator became aware of the finding. Anchors the disclosure-window deadlines; supplied by the upstream intake-sbom step or by the build chain."
+            },
+            {
+              "name": "__cvd_policy__",
+              "type": "string",
+              "value": "",
+              "description": "Operator's coordinated-vulnerability-disclosure policy as a JSON-native object \u2014 `policy_ref` + per-severity hour-offset windows. Bound to the resolve-disclosure-window primitive so the policy revision is pinned at emission time."
+            },
+            {
+              "name": "__disclosure_window__",
+              "type": "string",
+              "value": "",
+              "description": "Per-finding disclosure-window deadlines produced by assess-disclosure (policy_ref + acknowledge_by / fix_by / disclose_by). Consumed by track-timeline."
+            },
+            {
+              "name": "__captured_at__",
+              "type": "string",
+              "value": "",
+              "description": "ISO-8601 UTC second-precision timestamp pinned by assess-disclosure at emission. Carried on every per-finding disclosure-timeline record so downstream on-time / breach computations are reproducible."
+            },
+            {
+              "name": "__ref_viz__",
+              "type": "string",
+              "value": "",
+              "description": "Stable visualisation pointer the per-finding record carries for downstream dashboards. Convention: `viz.<slug>@v<semver>`."
+            },
+            {
+              "name": "__source_data__",
+              "type": "string",
+              "value": "",
+              "description": "Public-bar-safe shape pointer for the underlying advisory payload (kind + optional ocsf_class_uid / telemetry_ref). The raw advisory payload is deliberately not embedded."
+            },
+            {
+              "name": "__disclosure_timeline_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Pointer to the disclosure-timeline record set produced by track-timeline. One record per finding, shaped against content/evidence/codebase_vuln_management/disclosure-timeline-record.schema.json."
+            },
+            {
+              "name": "__disclosure_timeline_record__",
+              "type": "string",
+              "value": "",
+              "description": "Single disclosure-timeline record stub emitted by track-timeline against one __finding__ + __disclosure_window__. Operators aggregate the per-finding records into __disclosure_timeline_ref__ in their compile target's native idiom."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--01a17a07-0000-4000-8000-000000000002",
+      "name": "ingest-sbom",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.codebase_vuln_management.primitives.sbom import pin_sbom_content_hash\n__sbom_content_hash__ = pin_sbom_content_hash(sbom_bytes=__sbom_bytes__, sbom_format=__sbom_format__)"
+      },
+      "notes": "Ingest the canonical SBOM artefact for the release under review, pin its content hash on the case, and stamp the workflow case for downstream evidence joins. Anchors CRA Annex I \u00a72(1) SBOM production.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--01a17a07-0000-4000-8000-000000000003",
+      "name": "review-deps",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.codebase_vuln_management.primitives.sbom import normalise_findings\n__findings_ref__ = normalise_findings(raw_findings=__raw_findings__, sbom_content_hash=__sbom_content_hash__)"
+      },
+      "notes": "Walk the SBOM's top-level dependencies against a vulnerability database (NVD, OSV, GHSA) using the operator's locally-runnable scanner CLI. Default scanner is installable from an EU-hosted package index; no hosted scanner SaaS dependency. The scanner emits __raw_findings__; the primitive canonicalises it to the playbook contract (one entry per (component, version, advisory) triple, sorted for byte-stability).",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--01a17a07-0000-4000-8000-000000000004",
+      "name": "assess-disclosure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.codebase_vuln_management.primitives.disclosure_window import resolve_disclosure_window\n__disclosure_window__ = resolve_disclosure_window(severity=__finding_severity__, awareness_at=__awareness_at__, cvd_policy=__cvd_policy__)"
+      },
+      "notes": "Resolve the per-finding disclosure-window deadlines from the operator's coordinated-vulnerability-disclosure (CVD) policy and the severity tier the scanner produced. Per-finding contract: the CORE primitive call computes one window from one (severity, awareness_at, cvd_policy) input; the operator's compile target loops the call over __findings_ref__ in its native idiom. The CRA Article 14 actively-exploited / severe-incident reporting trigger from playbook.vuln_intake@v1 is intentionally NOT duplicated here \u2014 that decision is taken upstream against the inbound disclosure feed; this workflow only emits the proactive codebase-side timeline.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--01a17a07-0000-4000-8000-000000000005",
+      "name": "track-timeline",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.codebase_vuln_management.primitives.timeline import build_disclosure_timeline_stub\n__disclosure_timeline_record__ = build_disclosure_timeline_stub(finding=__finding__, disclosure_window=__disclosure_window__, captured_at=__captured_at__, ref_viz=__ref_viz__, source_data=__source_data__)"
+      },
+      "notes": "Emit one disclosure-timeline record per finding, shaped against content/evidence/codebase_vuln_management/disclosure-timeline-record.schema.json. The CORE primitive call builds one record from one (finding, disclosure_window) pair; operators aggregate the per-finding records into __disclosure_timeline_ref__ in their compile target's native idiom. Records carry the advisory id, the affected component and version pinned against the SBOM hash, the severity tier, the disclosure-window deadlines, the public-bar-safe source_data shape pointer, and the ref_viz hook so downstream streams and dashboards can consume them off a single typed channel. The full durable evidence-emitter wiring is owned by the TMP sibling slice.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--01a17a07-0000-4000-8000-000000000006",
+      "name": "codebase_vuln_management_end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "codebase_vuln_management_start": {
+      "main": [
+        [
+          {
+            "node": "ingest-sbom",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ingest-sbom": {
+      "main": [
+        [
+          {
+            "node": "review-deps",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "review-deps": {
+      "main": [
+        [
+          {
+            "node": "assess-disclosure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "assess-disclosure": {
+      "main": [
+        [
+          {
+            "node": "track-timeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "track-timeline": {
+      "main": [
+        [
+          {
+            "node": "codebase_vuln_management_end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "nis2",
+    "cra",
+    "sbom",
+    "codebase",
+    "vuln-disclosure"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.codebase_vuln_management@v1",
+      "content_version": "0.2.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--01a17a07-0000-4000-8000-000000000001"
+    },
+    "secops_ng_notes": []
+  }
+}

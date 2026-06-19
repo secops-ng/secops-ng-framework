@@ -1,10 +1,10 @@
 """F-WF-07 CORE-FANOUT-LG — byte-parity golden for the LangGraph workflow.
 
 The committed
-``examples/langgraph/codebase-vuln-management/graph_spec.json`` and
-``examples/langgraph/codebase-vuln-management/state_bindings.py`` are
+``examples/langgraph/codebase_vuln_management/graph_spec.json`` and
+``examples/langgraph/codebase_vuln_management/state_bindings.py`` are
 the LangGraph compiler's output for the canonical CACAO playbook at
-``content/playbooks/codebase-vuln-management/playbook.cacao.json``.
+``content/playbooks/codebase_vuln_management/playbook.cacao.json``.
 
 This module pins both artifacts against the emitters so a refactor of
 the LangGraph compiler that silently changes serialisation (or a drift
@@ -15,7 +15,7 @@ async def whose docstring records the originating ``step_id``.
 
 If the change is intentional, regenerate the example::
 
-    ./examples/langgraph/codebase-vuln-management/regenerate.sh
+    ./examples/langgraph/codebase_vuln_management/regenerate.sh
 
 and commit the updated bytes alongside the emitter change.
 """
@@ -30,9 +30,9 @@ from compilers.langgraph.emit import emit
 from compilers.langgraph.state import render_module
 
 REPO = Path(__file__).resolve().parents[3]
-EXAMPLE = REPO / "examples" / "langgraph" / "codebase-vuln-management"
+EXAMPLE = REPO / "examples" / "langgraph" / "codebase_vuln_management"
 SOURCE = (
-    REPO / "content" / "playbooks" / "codebase-vuln-management" / "playbook.cacao.json"
+    REPO / "content" / "playbooks" / "codebase_vuln_management" / "playbook.cacao.json"
 )
 GRAPH_GOLDEN = EXAMPLE / "graph_spec.json"
 STATE_GOLDEN = EXAMPLE / "state_bindings.py"
@@ -60,10 +60,10 @@ def test_example_artifacts_are_committed() -> None:
 
 def test_mirrored_cacao_matches_canonical_source() -> None:
     assert MIRRORED_CACAO.read_bytes() == SOURCE.read_bytes(), (
-        "examples/langgraph/codebase-vuln-management/playbook.cacao.json "
-        "drifted from the canonical content/playbooks/codebase-vuln-management/"
+        "examples/langgraph/codebase_vuln_management/playbook.cacao.json "
+        "drifted from the canonical content/playbooks/codebase_vuln_management/"
         "playbook.cacao.json. Regenerate via "
-        "`./examples/langgraph/codebase-vuln-management/regenerate.sh`."
+        "`./examples/langgraph/codebase_vuln_management/regenerate.sh`."
     )
 
 
@@ -72,9 +72,9 @@ def test_graph_spec_matches_emitter_output() -> None:
     rendered = _serialise_graph(emit(playbook))
     expected = GRAPH_GOLDEN.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/langgraph/codebase-vuln-management/graph_spec.json drifted "
+        "examples/langgraph/codebase_vuln_management/graph_spec.json drifted "
         "from the LangGraph emitter output. Regenerate via "
-        "`./examples/langgraph/codebase-vuln-management/regenerate.sh` and "
+        "`./examples/langgraph/codebase_vuln_management/regenerate.sh` and "
         "commit the new bytes."
     )
 
@@ -86,9 +86,9 @@ def test_state_bindings_matches_state_emitter_output() -> None:
     rendered = render_module(playbook) + "\n"
     expected = STATE_GOLDEN.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/langgraph/codebase-vuln-management/state_bindings.py "
+        "examples/langgraph/codebase_vuln_management/state_bindings.py "
         "drifted from the LangGraph state emitter output. Regenerate via "
-        "`./examples/langgraph/codebase-vuln-management/regenerate.sh` and "
+        "`./examples/langgraph/codebase_vuln_management/regenerate.sh` and "
         "commit the new bytes."
     )
 

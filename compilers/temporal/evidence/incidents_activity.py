@@ -9,7 +9,7 @@ targets without re-implementing record assembly.
 
 Importing ``temporalio`` is required at install time; it is already a
 transitive dependency of the Temporal worked examples under
-``examples/temporal/`` (including ``examples/temporal/incident-management/``,
+``examples/temporal/`` (including ``examples/temporal/incident_management/``,
 which is the canonical write-path this activity wraps).
 """
 from __future__ import annotations
@@ -42,7 +42,7 @@ async def emit_incidents_artifact_activity(
     for the deterministic ``artifact_id``, the schema-conforming
     shape, and the atomic write.
 
-    The F-WF-05 incident-management workflow drives one emission per
+    The F-WF-05 incident_management workflow drives one emission per
     significant decision point: post-classification (carrying the
     significance verdict and the lifecycle markers reached so far),
     each NIS2 Article 23(4) regulator-submission stage (early-warning,

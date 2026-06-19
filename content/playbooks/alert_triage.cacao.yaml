@@ -1,0 +1,358 @@
+# SecOps-NG — Alert triage (F-WF-03) — SOURCE SKELETON
+#
+# Portable CACAO v2 + SecOps-NG content-model superset, expressed as YAML
+# so it doubles as the human-curated source the per-target compilers
+# (n8n / Temporal / LangGraph) consume to emit their per-orchestrator
+# artifacts. The JSON form is reachable by `yaml.safe_load` then
+# `json.dumps`; the schema validator treats this file as an object and
+# does not care about the serialization format.
+#
+# Status: SKELETON. The workflow shape, step ids, and join-key
+# references are wired so downstream compilers can be primed and so
+# the schema gate passes. Action bodies (commands, agent bindings,
+# OCSF binding maturity, prioritisation policy code) land in follow-up
+# CORE/EXTEND cards. TODO comments mark every place where a join-key
+# binding is provisional pending Researcher confirmation.
+#
+# Source brief: posture-audit-v2 Researcher brief for alert_triage
+# primitives (typed payload normalization, suppression window, intent
+# vs priority split). OCSF data shapes live in content/telemetry/.
+# Roadmap entry: ROADMAP.md § F-WF-03.
+
+type: playbook
+spec_version: "2.0"
+id: "playbook--a1e47431-0000-4000-8000-000000000000"
+name: "Alert triage"
+description: >-
+  SOC alert_triage source playbook. Ingests typed alert payloads from at
+  least two source shapes (push from detection pipeline, pull from a
+  shared alert store), enriches with telemetry context, suppresses
+  already-seen or known-benign hits inside a configurable window,
+  applies a deterministic prioritisation policy (free-text fields may
+  be routed through a DSPy module, the priority decision itself stays
+  in code), and routes the case onto a response branch keyed on the
+  disposition. SKELETON: action bodies are stubs; the workflow graph,
+  join keys, and metric/control references are the contract this
+  source artifact commits to.
+
+playbook_types:
+  - notification
+  - detection
+  - investigation
+  - mitigation
+
+created_by: "identity--c0c0c0c0-c0c0-4c0c-8c0c-c0c0c0c0c0c0"
+created: "2026-06-03T00:00:00Z"
+modified: "2026-06-03T00:00:00Z"
+
+labels:
+  - alert_triage
+  - skeleton
+  - source-artifact
+
+playbook_variables:
+  __alert_id__:
+    type: string
+    description: >-
+      Identifier of the inbound alert in the operator's alert store.
+      Carried opaquely; the source shape is asserted in __alert_source_shape__.
+    external: true
+  __alert_source_shape__:
+    type: string
+    description: >-
+      One of: push_detection_pipeline, pull_alert_store. Used to select
+      the normalization path in the ingest step.
+    external: true
+  __benign_or_seen__:
+    type: boolean
+    description: >-
+      Set by the suppression check: true when the alert matches a known-
+      benign rule or an already-seen case fingerprint inside the
+      configured suppression window.
+    external: false
+  __priority__:
+    type: string
+    description: >-
+      Deterministic priority assigned by the prioritisation policy.
+      One of: p1_severe, p2_high, p3_routine, p4_informational.
+    external: false
+
+workflow_start: "start--a1e47431-0000-4000-8000-000000000001"
+
+workflow:
+
+  "start--a1e47431-0000-4000-8000-000000000001":
+    type: start
+    name: "triage-start"
+    on_completion: "action--a1e47431-0000-4000-8000-000000000002"
+
+  "action--a1e47431-0000-4000-8000-000000000002":
+    type: action
+    name: "ingest typed alert payload"
+    description: >-
+      SKELETON. Normalise the inbound alert into the SecOps-NG alert
+      envelope. Two source shapes are required by the roadmap acceptance
+      criteria (push from detection pipeline, pull from a shared alert
+      store); the dispatcher branches on __alert_source_shape__.
+      Body of the normalization rules lands in the CORE-INGEST card.
+    on_completion: "action--a1e47431-0000-4000-8000-000000000003"
+    in_args:
+      - __alert_id__
+      - __alert_source_shape__
+    x_secops_ng:
+      # TODO(F-WF-03 CORE-INGEST): confirm whether ingestion should also
+      # bind control.detection_coverage_evidence@v1 once the upstream
+      # detection-class enumeration lands; provisional binding here is
+      # the incident-handling capability per NIS2 Art. 21(2)(b).
+      control_refs:
+        - "control.incident_handling_capability@v1"
+      telemetry_refs:
+        # TODO(F-WF-03 CORE-INGEST): an OCSF "Security Finding"
+        # (class_uid 2001) telemetry stable_id is the natural home
+        # for the alert envelope itself; not yet shipped in
+        # content/telemetry/. Provisional binding to api_activity for
+        # the push-pipeline shape; pull_alert_store will rebind once
+        # the security_finding telemetry artifact lands.
+        - "telemetry.ocsf.api_activity@v1"
+      core_body:
+        primitive: "alert_triage.primitives.payloads.validate_alert_payload"
+        in:
+          raw: "__raw_payload__"
+          source_shape: "__alert_source_shape__"
+        out: "__alert_payload__"
+
+  "action--a1e47431-0000-4000-8000-000000000003":
+    type: action
+    name: "enrich with telemetry context"
+    description: >-
+      SKELETON. Pull adjacent telemetry for the entities named in the
+      alert (subject identity, source/destination, asset) so the
+      prioritisation policy and suppression check have evidence beyond
+      the alert envelope itself. Stubbed; the enrichment fan-out lands
+      in CORE-ENRICH.
+    on_completion: "if-condition--a1e47431-0000-4000-8000-000000000004"
+    out_args:
+      - __benign_or_seen__
+    x_secops_ng:
+      control_refs:
+        - "control.incident_handling_capability@v1"
+      telemetry_refs:
+        - "telemetry.ocsf.authentication@v1"
+        - "telemetry.ocsf.account_change@v1"
+        - "telemetry.ocsf.api_activity@v1"
+      metric_refs:
+        - "kpi.mttd@v1"
+      core_body:
+        primitive: "alert_triage.primitives.suppression.canonical_seen_key"
+        in:
+          detection_rule_id: "__detection_rule_id__"
+          subject_ref: "__subject_ref__"
+          asset_ref: "__asset_ref__"
+          classification: "__classification__"
+        out: "__seen_key__"
+
+  "if-condition--a1e47431-0000-4000-8000-000000000004":
+    type: if-condition
+    name: "already-seen or known-benign?"
+    description: >-
+      Suppression branch. on_success: matches a known-benign rule or
+      an already-seen case fingerprint inside the window; suppress and
+      close. on_failure: proceed to prioritisation.
+    on_success: "action--a1e47431-0000-4000-8000-000000000005"
+    on_failure: "action--a1e47431-0000-4000-8000-000000000006"
+
+  "action--a1e47431-0000-4000-8000-000000000005":
+    type: action
+    name: "suppress and close"
+    description: >-
+      SKELETON. Link this alert onto the existing case (or onto the
+      benign-rule record), close it without paging, and account the
+      suppression against the false-positive-rate KPI and (when the
+      suppression covers a re-fire of a previously closed case) the
+      recurring-incident correlator.
+    on_completion: "end--a1e47431-0000-4000-8000-00000000000c"
+    x_secops_ng:
+      control_refs:
+        - "control.incident_handling_capability@v1"
+        - "control.recurring_incident_correlator@v1"
+      metric_refs:
+        - "kpi.false_positive_rate@v1"
+      core_body:
+        primitive: "alert_triage.primitives.suppression.canonical_seen_key"
+        in:
+          detection_rule_id: "__detection_rule_id__"
+          subject_ref: "__subject_ref__"
+          asset_ref: "__asset_ref__"
+          classification: "__classification__"
+        out: "__close_record_key__"
+
+  "action--a1e47431-0000-4000-8000-000000000006":
+    type: action
+    name: "classify and prioritise (deterministic policy)"
+    description: >-
+      SKELETON. Apply the operator's prioritisation policy. The policy
+      itself is expressed as code (the roadmap pins this: deterministic
+      prioritisation, DSPy used only for free-text fields like the
+      analyst summary). Output is __priority__ ∈
+      {p1_severe, p2_high, p3_routine, p4_informational}.
+    on_completion: "switch-condition--a1e47431-0000-4000-8000-000000000007"
+    out_args:
+      - __priority__
+    x_secops_ng:
+      # TODO(F-WF-03 CORE-CLASSIFY): once the detection-coverage
+      # evidence flow is wired, also bind control.detection_coverage_evidence@v1
+      # here so the prioritisation feedback loop is auditable.
+      control_refs:
+        - "control.incident_handling_capability@v1"
+      metric_refs:
+        - "kpi.detection_coverage@v1"
+      core_body:
+        primitive: "alert_triage.primitives.prioritisation.prioritise"
+        in:
+          detection_class: "__detection_class__"
+          detection_severity: "__detection_severity__"
+          context: "__asset_context__"
+          correlates_open_case: "__correlates_open_case__"
+        out: "__priority_verdict__"
+
+  "switch-condition--a1e47431-0000-4000-8000-000000000007":
+    type: switch-condition
+    name: "route on priority"
+    description: >-
+      Route to the response branch keyed on the deterministic priority.
+      Each branch is a single response-routing action that hands off to
+      the appropriate downstream playbook or owner queue. Bodies of
+      downstream playbooks are out of scope here.
+    switch: "__priority__"
+    cases:
+      p1_severe:
+        - "action--a1e47431-0000-4000-8000-000000000008"
+      p2_high:
+        - "action--a1e47431-0000-4000-8000-000000000009"
+      p3_routine:
+        - "action--a1e47431-0000-4000-8000-00000000000a"
+      p4_informational:
+        - "action--a1e47431-0000-4000-8000-00000000000b"
+
+  "action--a1e47431-0000-4000-8000-000000000008":
+    type: action
+    name: "response: p1 severe — page and escalate"
+    description: >-
+      SKELETON. Page the on-call responder, open the incident case,
+      stamp the timeline-start signal, and hand off to the incident
+      management playbook. Records against the MTTR-critical clock
+      and the regulator-notification-overrun KRI window.
+    on_completion: "end--a1e47431-0000-4000-8000-00000000000c"
+    x_secops_ng:
+      control_refs:
+        - "control.incident_handling_capability@v1"
+        - "control.incident_timeline_signals@v1"
+      metric_refs:
+        - "kpi.mttr_critical@v1"
+        - "kri.escalation_tier_breach@v1"
+        - "kpi.notification_sla_compliance@v1"
+      core_body:
+        primitive: "alert_triage.primitives.response.escalation_route"
+        in:
+          priority: "__priority__"
+          asset_criticality: "__asset_context__.asset_criticality"
+          regulated_data: "__asset_context__.regulated_data"
+          internet_exposed: "__asset_context__.internet_exposed"
+        out: "__escalation_directive__"
+
+  "action--a1e47431-0000-4000-8000-000000000009":
+    type: action
+    name: "response: p2 high — queue for primary analyst"
+    description: >-
+      SKELETON. Queue the case to the primary analyst queue with the
+      enriched evidence packet, no page. Records against the MTTR clock
+      and the handoff-brief delivery SLA.
+    on_completion: "end--a1e47431-0000-4000-8000-00000000000c"
+    x_secops_ng:
+      control_refs:
+        - "control.incident_handling_capability@v1"
+      metric_refs:
+        - "kpi.mttr_critical@v1"
+        - "kpi.handoff_brief_delivery_sla@v1"
+      core_body:
+        primitive: "alert_triage.primitives.response.notify_on_call"
+        in:
+          priority: "__priority__"
+          asset_criticality: "__asset_context__.asset_criticality"
+          regulated_data: "__asset_context__.regulated_data"
+          internet_exposed: "__asset_context__.internet_exposed"
+        out: "__notification_directive__"
+
+  "action--a1e47431-0000-4000-8000-00000000000a":
+    type: action
+    name: "response: p3 routine — queue for review"
+    description: >-
+      SKELETON. Append to the review queue for batched analyst
+      attention; no SLA clock beyond the routine review-completion
+      SLA.
+    on_completion: "end--a1e47431-0000-4000-8000-00000000000c"
+    x_secops_ng:
+      control_refs:
+        - "control.incident_handling_capability@v1"
+      metric_refs:
+        - "kpi.review_completion_sla@v1"
+      core_body:
+        primitive: "alert_triage.primitives.response.route_to_review_queue"
+        in:
+          priority: "__priority__"
+          asset_criticality: "__asset_context__.asset_criticality"
+          regulated_data: "__asset_context__.regulated_data"
+          internet_exposed: "__asset_context__.internet_exposed"
+        out: "__review_queue_directive__"
+
+  "action--a1e47431-0000-4000-8000-00000000000b":
+    type: action
+    name: "response: p4 informational — log and close"
+    description: >-
+      SKELETON. Record the alert for telemetry-coverage accounting and
+      close without further action. Feeds the false-positive-rate
+      denominator and the detection-coverage view.
+    on_completion: "end--a1e47431-0000-4000-8000-00000000000c"
+    x_secops_ng:
+      control_refs:
+        - "control.incident_handling_capability@v1"
+      metric_refs:
+        - "kpi.false_positive_rate@v1"
+        - "kpi.detection_coverage@v1"
+
+  "end--a1e47431-0000-4000-8000-00000000000c":
+    type: end
+    name: "triage-end"
+
+x_secops_ng:
+  stable_id: "playbook.alert_triage@v1"
+  content_version: "0.1.0"
+  maturity: "draft"
+  compile_targets:
+    - "n8n"
+    - "temporal"
+    - "langgraph"
+  control_refs:
+    - "control.incident_handling_capability@v1"
+    - "control.incident_timeline_signals@v1"
+    - "control.recurring_incident_correlator@v1"
+  telemetry_refs:
+    - "telemetry.ocsf.api_activity@v1"
+    - "telemetry.ocsf.authentication@v1"
+    - "telemetry.ocsf.account_change@v1"
+  metric_refs:
+    - "kpi.mttd@v1"
+    - "kpi.mttr_critical@v1"
+    - "kpi.false_positive_rate@v1"
+    - "kpi.detection_coverage@v1"
+    - "kpi.review_completion_sla@v1"
+    - "kpi.handoff_brief_delivery_sla@v1"
+    - "kpi.notification_sla_compliance@v1"
+    - "kri.escalation_tier_breach@v1"
+  sources:
+    - "OASIS CACAO v2.0 — workflow step types (start, action, if-condition, switch-condition, end), variable conventions, x_ extension namespace"
+    - "NIS2 Directive (EU) 2022/2555, Article 21(2)(b) — incident handling capability"
+    - "DORA Regulation (EU) 2022/2554, Article 17 — ICT-related incident management process"
+    - "MITRE D3FEND — Alert Analysis, Operational Reporting"
+    - "OSCAL anchors: NIST 800-53 IR-4 / IR-5 / IR-6 (incident handling, monitoring, reporting) wired through content/controls/ entries control.incident_handling_capability@v1, control.incident_timeline_signals@v1, control.recurring_incident_correlator@v1"
+    - "OCSF v1.4.0 — Authentication (class 3002), Account Change (class 3001), API Activity (class 6003); Security Finding (class 2001) pending a content/telemetry/ entry"

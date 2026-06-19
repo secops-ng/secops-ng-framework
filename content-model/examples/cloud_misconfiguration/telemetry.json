@@ -1,0 +1,47 @@
+{
+  "stable_id": "telemetry.ocsf.compliance_finding@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Compliance finding event (ingest)",
+  "summary": "CSPM posture-deviation signal bound to OCSF Compliance Finding (class 2003). Consumed by the cloud_misconfiguration playbook's ingest-finding step as the originating signal that opens the workflow.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2003,
+    "class_name": "Compliance Finding"
+  },
+  "direction": "ingest",
+  "fields_used": [
+    "time",
+    "activity_id",
+    "severity_id",
+    "finding_info.uid",
+    "finding_info.title",
+    "compliance.requirements",
+    "compliance.status",
+    "resource.uid",
+    "resource.type",
+    "cloud.provider",
+    "cloud.account.uid"
+  ],
+  "detection_refs": [
+    "detection.sigma.cspm_finding_critical@v1",
+    "detection.sigma.public_storage_bucket@v1"
+  ],
+  "control_refs": [
+    "control.cspm_baseline@v1",
+    "control.iac_policy_guardrail@v1",
+    "control.cloud_identity_least_privilege@v1"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.cloud_misconfiguration@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000002"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org",
+  "sources": [
+    "OCSF v1.4.0 — Findings category (2), Compliance Finding class (2003)"
+  ]
+}

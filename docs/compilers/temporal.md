@@ -15,7 +15,7 @@ From the repository root:
 
 ```bash
 python -m compilers.temporal \
-  content/playbooks/vuln-intake/playbook.cacao.json \
+  content/playbooks/vuln_intake/playbook.cacao.json \
   > vuln_intake.py
 ```
 
@@ -25,7 +25,7 @@ Or, programmatically:
 from pathlib import Path
 from compilers.temporal import emit_file
 
-source = emit_file(Path("content/playbooks/vuln-intake/playbook.cacao.json"))
+source = emit_file(Path("content/playbooks/vuln_intake/playbook.cacao.json"))
 Path("vuln_intake.py").write_text(source, encoding="utf-8")
 ```
 
@@ -66,7 +66,7 @@ activities. Lowering them into workflow code is a follow-up card.
 
 Output is deterministic: the same AST yields byte-identical source.
 A golden test (`tests/compilers/temporal/test_golden.py`) locks the
-`vuln-intake` worked example, so any emitter change has to update the
+`vuln_intake` worked example, so any emitter change has to update the
 golden in the same commit and a reviewer sees the full diff.
 
 Regenerate the golden when an intentional emitter change lands:

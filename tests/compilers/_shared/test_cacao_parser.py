@@ -1,7 +1,7 @@
 """Tests for compilers/_shared/cacao_parser.
 
 Covers:
-- Parsing the vuln-intake fixture into the AST.
+- Parsing the vuln_intake fixture into the AST.
 - AST shape — start/end discovery, edge traversal, x_secops_ng extraction.
 - Schema validation failures surface as CacaoSchemaError with messages.
 - Semantic invariants — dangling transitions, missing start, end with outgoing
