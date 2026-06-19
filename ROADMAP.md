@@ -734,7 +734,7 @@ manual configuration.
 
 ### F-SV-03 — DORA technical-incident reporting alignment
 
-- **Status:** Proposed
+- **Status:** Shipped
 - **Priority:** P2
 - **Acceptance criteria:**
   - Incident-management workflow (F-WF-05) emits a variant timeline
