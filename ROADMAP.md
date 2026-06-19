@@ -335,11 +335,31 @@ named operator use-case. Each cookbook workflow lives under
 
 ### F-WF-08 — IAM auditor
 
-- **Status:** Proposed
+- **Status:** Shipped
 - **Priority:** P2
 - **Acceptance criteria:**
-  - Capability inventory workflow that produces a per-execution caller
-    identity + capability list (the F-CP-07 evidence stream).
+  - `content/playbooks/iam_auditor/` carries the canonical CACAO
+    playbook (`playbook.iam_auditor@v1`) and deterministic primitives
+    (`identity.resolve_caller_identity`,
+    `capabilities.build_capability_list`,
+    `artifact.build_access_artifact`) with zero placeholders across
+    all three action bodies; compiled targets land under
+    `examples/{n8n,temporal,langgraph}/iam_auditor/`.
+  - Capability-inventory workflow: `enumerate-identities` →
+    `enumerate-capabilities` → `emit-access-evidence`; transitions
+    deterministic and replay-tested across all three targets.
+  - Per-execution caller-identity + closed capability-list bound onto
+    the F-CP-07 access-evidence stream
+    (`schemas/evidence/access.schema.json`); `artifact_id` derives
+    deterministically from
+    `SHA-256(workflow_id|execution_id|compile_target)`. Identity is
+    role-shaped (service-account, workflow-runtime principal,
+    automation role) — personal-user principals are rejected at the
+    primitive boundary.
+  - Cookbook entry + cross-target byte-parity goldens
+    (`tests/examples/{n8n,temporal,langgraph}/iam_auditor/test_golden.py`)
+    pin both the per-target workflow artefact and the per-target
+    access-evidence record.
 - **Sovereign-stack constraints:** —
 - **Depends on:** F-CP-07
 - **Source:** NIS2 Art. 21(2)(i).
