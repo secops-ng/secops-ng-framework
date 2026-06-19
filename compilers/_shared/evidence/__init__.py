@@ -117,6 +117,16 @@ from compilers._shared.evidence.bundle import (
     emit_bundle_manifest,
     render_bundle_manifest,
 )
+from compilers._shared.evidence.dora_art19_report import (
+    DoraArt19ReportContext,
+    DoraClassification,
+    ImpactIndicators,
+    MitigationStatus,
+    TimelineRefs,
+    derive_report_id as derive_dora_art19_report_id,
+    emit_dora_art19_report,
+    render_dora_art19_report,
+)
 
 __all__ = [
     "RiskAnalysisContext",
@@ -196,4 +206,12 @@ __all__ = [
     "derive_bundle_id",
     "emit_bundle_manifest",
     "render_bundle_manifest",
+    "DoraArt19ReportContext",
+    "DoraClassification",
+    "ImpactIndicators",
+    "MitigationStatus",
+    "TimelineRefs",
+    "derive_dora_art19_report_id",
+    "emit_dora_art19_report",
+    "render_dora_art19_report",
 ]

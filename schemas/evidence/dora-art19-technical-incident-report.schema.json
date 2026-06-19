@@ -20,9 +20,9 @@
   ],
   "properties": {
     "schema_version": {
-      "description": "Pinned schema version. Lets a consumer reject reports produced under an older schema once breaking changes ship. SKELETON layer carries 0.1.0; the CORE sibling card lifts it to 1.0.0 once the per-target emitters land and the inner envelopes are tightened.",
+      "description": "Pinned schema version. Lets a consumer reject reports produced under an older schema once breaking changes ship. CORE layer carries 1.0.0 (lifted from SKELETON's 0.1.0 once the per-target emitters landed and the inner envelopes were tightened against byte-parity goldens).",
       "type": "string",
-      "const": "0.1.0"
+      "const": "1.0.0"
     },
     "report_id": {
       "description": "Stable per-report identifier. Convention: SHA-256 hex digest of `<incident_id>|<report_variant>|<submitted_at>` (UTF-8, no separators around the pipes). Two submissions of the same variant on the same incident at the same instant collide deliberately; a replay of the same submission stays byte-identical.",

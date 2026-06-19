@@ -106,7 +106,7 @@ def test_dora_art19_milestone_schema_is_valid() -> None:
 
 def _minimal_report() -> dict:
     return {
-        "schema_version": "0.1.0",
+        "schema_version": "1.0.0",
         "report_id": "a" * 64,
         "report_variant": "initial_4h",
         "incident_id": "11111111-2222-4333-8444-555555555555",
@@ -169,7 +169,7 @@ def test_dora_art19_report_required_fields_are_required() -> None:
         ("report_id", "not-a-sha256"),
         ("incident_id", "not-a-uuid"),
         ("submitted_at", 1234567890),
-        ("schema_version", "1.0.0"),  # SKELETON pin
+        ("schema_version", "0.1.0"),  # post-CORE: only 1.0.0 is accepted
     ],
 )
 def test_dora_art19_report_rejects_bad_top_level(
@@ -324,10 +324,12 @@ def test_dora_art19_milestone_enum_maps_onto_regulatory_mapping() -> None:
 
 
 def test_dora_art19_variant_mapping_doc_exists_and_enumerates_fields() -> None:
-    """SKELETON-layer guard: the field-derivation doc must exist and
-    name every top-level schema field at least once so a CORE-WIRE
-    contributor lands on a fully-enumerated derivation table rather
-    than a stub.
+    """CORE-layer guard: the field-derivation doc must exist, name
+    every top-level schema field at least once, and carry no
+    ``TODO(CORE)`` markers — every derivation deferred at SKELETON has
+    been resolved at CORE. The EXTEND-deferred Commission ITS
+    (EU) 2024/2956 field-level vocabulary tightening is tracked with
+    explicit ``EXTEND`` references rather than ``TODO`` markers.
     """
     assert DORA_ART19_VARIANT_DOC.is_file(), (
         "Missing field-derivation mapping doc at "
@@ -339,12 +341,12 @@ def test_dora_art19_variant_mapping_doc_exists_and_enumerates_fields() -> None:
     for field in top_level_fields:
         assert re.search(rf"\b{re.escape(field)}\b", body), (
             f"mapping doc does not mention top-level schema field "
-            f"{field!r}; every derivation must be documented at the "
-            "SKELETON layer (TODO(CORE) markers are allowed)."
+            f"{field!r}; every derivation must be documented."
         )
-    # TODO(CORE) markers are allowed and expected at SKELETON; the doc
-    # must explicitly carry them so a reviewer sees the deferred work.
-    assert "TODO(CORE)" in body, (
-        "SKELETON-layer mapping doc is expected to carry TODO(CORE) "
-        "markers for the derivations the CORE sibling cards will close."
+    # CORE invariant: no TODO(CORE) markers remain. The CORE sibling
+    # card resolved every derivation deferred at SKELETON; EXTEND-
+    # deferred items are tracked by explicit ``EXTEND`` references.
+    assert "TODO(CORE)" not in body, (
+        "CORE-layer mapping doc must not carry TODO(CORE) markers — "
+        "every SKELETON-deferred derivation must be resolved at CORE."
     )
