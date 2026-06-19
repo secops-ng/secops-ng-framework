@@ -5,7 +5,7 @@
 #
 # At the SKELETON layer the per-execution posture-evidence artefact and the
 # byte-parity golden for it land in the F-WF-06 CORE-FANOUT-LG sibling card
-# Aurora queues after this SKELETON merges. The workflow graph itself is
+# queued as a follow-up after this SKELETON merges. The workflow graph itself is
 # fully emitted at the SKELETON layer because the CACAO topology is pinned
 # and the LangGraph node adapter is workflow-agnostic.
 set -euo pipefail

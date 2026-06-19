@@ -84,8 +84,8 @@ artifact contract, not the destination.
 ## Pending siblings
 
 This SKELETON intentionally stops at scaffold + control/telemetry/metric
-joins. The remaining work is tracked as separate sibling cards Aurora
-queues serially once this SKELETON merges (to avoid concurrent
+joins. The remaining work is tracked as separate sibling cards queued
+serially once this SKELETON merges (to avoid concurrent
 byte-parity golden churn):
 
 - **CORE-FANOUT-N8N** — n8n compiler emitter + byte-parity golden +

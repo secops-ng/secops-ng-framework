@@ -5,7 +5,7 @@
 # byte-identical to the canonical playbook source. The n8n workflow
 # emitter binding, the per-execution posture-evidence artefact, and
 # the byte-parity golden land in the F-WF-06 CORE-FANOUT-N8N sibling
-# card Aurora queues after this SKELETON merges.
+# card queued as a follow-up after this SKELETON merges.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"

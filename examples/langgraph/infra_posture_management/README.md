@@ -15,7 +15,7 @@ no representative posture-evidence artifact, and no byte-parity golden
 under `tests/examples/langgraph/infra_posture_management/` at this layer.
 The compiler emitter, the per-execution evidence artifact, and the
 byte-parity golden land in the F-WF-06 CORE-FANOUT-LG sibling card
-Aurora queues serially after this SKELETON merges (to avoid concurrent
+queued serially after this SKELETON merges (to avoid concurrent
 byte-parity golden churn across the three targets).
 
 ## Layout
