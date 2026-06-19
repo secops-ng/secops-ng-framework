@@ -1,7 +1,7 @@
-"""Schema-validation smoke test for the F-WF-05 incident-management SOURCE playbook.
+"""Schema-validation smoke test for the F-WF-05 incident_management SOURCE playbook.
 
-The incident-management SOURCE artifact lives at
-``content/playbooks/incident-management/playbook.cacao.json`` and is the
+The incident_management SOURCE artifact lives at
+``content/playbooks/incident_management/playbook.cacao.json`` and is the
 canonical input that the per-target SKELETON cards (n8n, Temporal,
 LangGraph) compile from. This test pins that the source file:
 
@@ -34,7 +34,7 @@ SOURCE_PATH = (
     REPO_ROOT
     / "content"
     / "playbooks"
-    / "incident-management"
+    / "incident_management"
     / "playbook.cacao.json"
 )
 
@@ -57,7 +57,7 @@ def playbook() -> dict:
 
 def test_source_json_parses() -> None:
     doc = json.loads(SOURCE_PATH.read_text(encoding="utf-8"))
-    assert isinstance(doc, dict), "incident-management source must parse to a mapping"
+    assert isinstance(doc, dict), "incident_management source must parse to a mapping"
 
 
 def test_source_validates_against_playbook_schema(

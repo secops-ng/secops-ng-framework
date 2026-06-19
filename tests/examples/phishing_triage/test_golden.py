@@ -1,13 +1,13 @@
-"""Golden tests for the phishing-triage worked example.
+"""Golden tests for the phishing_triage worked example.
 
 Pins the three reference-compiler outputs against the bytes that ship
-under ``examples/phishing-triage/``. Together with the per-compiler
+under ``examples/phishing_triage/``. Together with the per-compiler
 golden suites under ``tests/compilers/``, this guarantees that the
 worked example is a byte-deterministic regeneration of the canonical
 CACAO source, not a hand-edited copy.
 
 If an emitter change is intentional, regenerate the artifacts with the
-commands documented in ``examples/phishing-triage/README.md`` and commit
+commands documented in ``examples/phishing_triage/README.md`` and commit
 the new bytes alongside the emitter change.
 """
 from __future__ import annotations
@@ -22,9 +22,9 @@ from compilers.temporal.emit import emit_file as emit_temporal_file
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SOURCE = (
-    REPO_ROOT / "content" / "playbooks" / "phishing-triage" / "playbook.cacao.json"
+    REPO_ROOT / "content" / "playbooks" / "phishing_triage" / "playbook.cacao.json"
 )
-EXAMPLE_DIR = REPO_ROOT / "examples" / "phishing-triage"
+EXAMPLE_DIR = REPO_ROOT / "examples" / "phishing_triage"
 N8N_GOLDEN = EXAMPLE_DIR / "n8n" / "workflow.json"
 TEMPORAL_GOLDEN = EXAMPLE_DIR / "temporal" / "workflow.py"
 LANGGRAPH_GOLDEN = EXAMPLE_DIR / "langgraph" / "graph_spec.json"
@@ -50,7 +50,7 @@ def test_n8n_workflow_matches_golden() -> None:
     rendered = _serialise_n8n(emit_n8n(playbook))
     expected = N8N_GOLDEN.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "phishing-triage n8n example drifted. Regenerate via "
+        "phishing_triage n8n example drifted. Regenerate via "
         "`PYTHONPATH=. python -m tools.compile "
         f"{SOURCE.relative_to(REPO_ROOT)} --target n8n --out "
         f"{N8N_GOLDEN.relative_to(REPO_ROOT)}` and commit alongside the change."
@@ -66,7 +66,7 @@ def test_temporal_workflow_matches_golden() -> None:
     rendered = emit_temporal_file(SOURCE)
     expected = TEMPORAL_GOLDEN.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "phishing-triage Temporal example drifted. Regenerate via "
+        "phishing_triage Temporal example drifted. Regenerate via "
         "`PYTHONPATH=. python -m compilers.temporal "
         f"{SOURCE.relative_to(REPO_ROOT)} --out "
         f"{TEMPORAL_GOLDEN.relative_to(REPO_ROOT)}` and commit alongside the change."
@@ -83,7 +83,7 @@ def test_langgraph_graph_spec_matches_golden() -> None:
     rendered = _serialise_langgraph(emit_langgraph(playbook).to_dict())
     expected = LANGGRAPH_GOLDEN.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "phishing-triage LangGraph example drifted. Regenerate via "
+        "phishing_triage LangGraph example drifted. Regenerate via "
         "`PYTHONPATH=. python -m compilers.langgraph.emit "
         f"{SOURCE.relative_to(REPO_ROOT)} > "
         f"{LANGGRAPH_GOLDEN.relative_to(REPO_ROOT)}` and commit alongside the change."

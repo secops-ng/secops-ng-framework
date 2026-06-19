@@ -13,7 +13,7 @@ direction: lower_is_better
 measurement:
   source: workflow
   aggregation: p95
-  formula: For each identity-compromise incident closed within the evaluation window,
+  formula: For each identity_compromise incident closed within the evaluation window,
     compute (first_containment_action_timestamp - first_detection_fire_timestamp)
     in minutes and aggregate as p95. Exclude incidents where containment never fired.
   inputs:

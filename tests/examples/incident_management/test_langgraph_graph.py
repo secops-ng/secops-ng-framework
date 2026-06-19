@@ -1,4 +1,4 @@
-"""Drift guard for the ``examples/langgraph/incident-management/`` worked example.
+"""Drift guard for the ``examples/langgraph/incident_management/`` worked example.
 
 Mirrors the n8n + Temporal drift guards for the same workflow:
 re-runs ``compilers.langgraph.emit`` and ``compilers.langgraph.state``
@@ -12,8 +12,8 @@ below.
 
 F-WF-05 CORE-WIRE-LG (SKELETON wave) seam \u2014 divergence guard.
 ==============================================================
-The canonical incident-management source at
-``content/playbooks/incident-management/playbook.cacao.json`` ships
+The canonical incident_management source at
+``content/playbooks/incident_management/playbook.cacao.json`` ships
 without ``x_secops_ng.core_body`` blocks. The LangGraph SKELETON example
 intentionally diverges to demonstrate the primitive wire-in shape
 (classification, fail-closed destination resolver, three-stage NIS2
@@ -23,7 +23,7 @@ lock-step. The three-target CORE-WIRE parity wave completes with this
 card.
 
 The divergence is bounded by an overlay JSON at
-``examples/langgraph/incident-management/core_body.overlay.json`` whose
+``examples/langgraph/incident_management/core_body.overlay.json`` whose
 ``workflow_overlays`` block is the *only* difference permitted between
 the canonical source and the LangGraph mirror.
 
@@ -37,7 +37,7 @@ with no behaviour change for downstream consumers.
 
 Regenerate via::
 
-    ./examples/langgraph/incident-management/regenerate.sh
+    ./examples/langgraph/incident_management/regenerate.sh
 """
 from __future__ import annotations
 import pytest
@@ -52,9 +52,9 @@ from compilers.langgraph.state import render_module
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SOURCE = (
-    REPO_ROOT / "content" / "playbooks" / "incident-management" / "playbook.cacao.json"
+    REPO_ROOT / "content" / "playbooks" / "incident_management" / "playbook.cacao.json"
 )
-EXAMPLE_DIR = REPO_ROOT / "examples" / "langgraph" / "incident-management"
+EXAMPLE_DIR = REPO_ROOT / "examples" / "langgraph" / "incident_management"
 MIRRORED_CACAO = EXAMPLE_DIR / "playbook.cacao.json"
 COMMITTED_GRAPH = EXAMPLE_DIR / "graph_spec.json"
 COMMITTED_MODULE = EXAMPLE_DIR / "state_bindings.py"
@@ -104,9 +104,9 @@ def test_mirror_matches_canonical_plus_overlay() -> None:
 
     rendered = MIRRORED_CACAO.read_text(encoding="utf-8")
     assert rendered == expected_text, (
-        "examples/langgraph/incident-management/playbook.cacao.json drift from "
+        "examples/langgraph/incident_management/playbook.cacao.json drift from "
         "(canonical CACAO source + core_body.overlay.json). Regenerate via "
-        "`./examples/langgraph/incident-management/regenerate.sh` and commit "
+        "`./examples/langgraph/incident_management/regenerate.sh` and commit "
         "the result. If the canonical source itself now carries the core_body "
         "blocks (canonical promotion has landed), the overlay should be "
         "emptied in the same PR."
@@ -149,8 +149,8 @@ def test_graph_spec_matches_emitter_output() -> None:
     rendered = _serialise_graph(emit(playbook))
     expected = COMMITTED_GRAPH.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/langgraph/incident-management/graph_spec.json drift. "
-        "Regenerate via `./examples/langgraph/incident-management/regenerate.sh` "
+        "examples/langgraph/incident_management/graph_spec.json drift. "
+        "Regenerate via `./examples/langgraph/incident_management/regenerate.sh` "
         "and commit the result."
     )
 
@@ -167,8 +167,8 @@ def test_state_bindings_matches_state_emitter_output() -> None:
     rendered = render_module(playbook) + "\n"
     expected = COMMITTED_MODULE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/langgraph/incident-management/state_bindings.py drift. "
-        "Regenerate via `./examples/langgraph/incident-management/regenerate.sh` "
+        "examples/langgraph/incident_management/state_bindings.py drift. "
+        "Regenerate via `./examples/langgraph/incident_management/regenerate.sh` "
         "and commit the result."
     )
 

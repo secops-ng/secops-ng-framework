@@ -1,0 +1,350 @@
+{
+  "name": "Detection engineering \u2014 rule lifecycle",
+  "nodes": [
+    {
+      "id": "start--f0e4f404-0000-4000-8000-000000000001",
+      "name": "rule-lifecycle-start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__rule_id__",
+              "type": "string",
+              "value": "",
+              "description": "Stable identifier of the rule being lifecycled. Opaque to the framework; the operator's detection store assigns it."
+            },
+            {
+              "name": "__rule_version__",
+              "type": "string",
+              "value": "",
+              "description": "Version label of the candidate rule. The lifecycle operates on a single rule-version at a time so the effectiveness snapshot can pin its measurement to the exact version that produced it."
+            },
+            {
+              "name": "__proposal_rationale__",
+              "type": "string",
+              "value": "",
+              "description": "Short rationale the proposer attached to the candidate rule (what threat it addresses, which detection gap it closes, which ATT&CK technique(s) it binds). Carried opaquely through the lifecycle."
+            },
+            {
+              "name": "__review_verdict__",
+              "type": "string",
+              "value": "",
+              "description": "Verdict produced by the review state. One of: approved, changes_requested, rejected. Transitions are unconditional in this artifact; the gating predicate on ``review -> ship`` reads this variable in a follow-up sibling card."
+            },
+            {
+              "name": "__ship_status__",
+              "type": "string",
+              "value": "",
+              "description": "Production status after the ship state. One of: production, staged, withdrawn. Transitions are unconditional in this artifact; the gating predicate on ``ship -> measure`` reads this variable in a follow-up sibling card."
+            },
+            {
+              "name": "__effectiveness_snapshot_id__",
+              "type": "string",
+              "value": "",
+              "description": "Stable identifier of the per-rule-version effectiveness snapshot emitted by the measure state. SHA-256 hex digest shape per the snapshot schema. Persisted into the operator's configured metric sink."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--f0e4f404-0000-4000-8000-000000000002",
+      "name": "propose-rule-version",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.rule_id",
+              "name": "in.rule_id",
+              "value": "={{$workflow.variables.rule_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.rule_version",
+              "name": "in.rule_version",
+              "value": "={{$workflow.variables.rule_version}}",
+              "type": "string"
+            },
+            {
+              "id": "in.proposal_rationale",
+              "name": "in.proposal_rationale",
+              "value": "={{$workflow.variables.proposal_rationale}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.control_effectiveness_test@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Intake the candidate rule version, its rationale, and the ATT&CK / detection-class bindings the proposer asserts. Operator wires the proposal-envelope handler in n8n; the CACAO I/O contract carries the inputs and the variable the next step reads.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--f0e4f404-0000-4000-8000-000000000003",
+      "name": "review-rule-version",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.rule_id",
+              "name": "in.rule_id",
+              "value": "={{$workflow.variables.rule_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.rule_version",
+              "name": "in.rule_version",
+              "value": "={{$workflow.variables.rule_version}}",
+              "type": "string"
+            },
+            {
+              "id": "out.review_verdict",
+              "name": "out.review_verdict",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.control_effectiveness_test@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Peer-review the candidate rule against the operator's review checklist. Produces ``__review_verdict__``. Transitions are unconditional in this artifact; the follow-up sibling inserts a switch-condition keyed on the verdict with three branches (approved -> ship, changes_requested -> propose, rejected -> end).",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--f0e4f404-0000-4000-8000-000000000004",
+      "name": "ship-rule-version",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.rule_id",
+              "name": "in.rule_id",
+              "value": "={{$workflow.variables.rule_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.rule_version",
+              "name": "in.rule_version",
+              "value": "={{$workflow.variables.rule_version}}",
+              "type": "string"
+            },
+            {
+              "id": "in.review_verdict",
+              "name": "in.review_verdict",
+              "value": "={{$workflow.variables.review_verdict}}",
+              "type": "string"
+            },
+            {
+              "id": "out.ship_status",
+              "name": "out.ship_status",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.control_effectiveness_test@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Promote the approved rule version to production status in the operator's detection store. Operator-side destination is resolved at the compile target's config layer (sovereign-stack constraint \u2014 the framework ships no default detection store). Sets ``__ship_status__``.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--f0e4f404-0000-4000-8000-000000000005",
+      "name": "measure-rule-version",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.rule_id",
+              "name": "in.rule_id",
+              "value": "={{$workflow.variables.rule_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.rule_version",
+              "name": "in.rule_version",
+              "value": "={{$workflow.variables.rule_version}}",
+              "type": "string"
+            },
+            {
+              "id": "in.ship_status",
+              "name": "in.ship_status",
+              "value": "={{$workflow.variables.ship_status}}",
+              "type": "string"
+            },
+            {
+              "id": "out.effectiveness_snapshot_id",
+              "name": "out.effectiveness_snapshot_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.control_effectiveness_test@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.detection_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.detection_coverage@v1, kpi.false_positive_rate@v1, kri.control_effectiveness@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Emit a per-rule-version effectiveness-metric snapshot shaped per ``schemas/evidence/rule-effectiveness-snapshot.schema.json``. The snapshot pins the indicator value to the exact (``__rule_id__``, ``__rule_version__``) the lifecycle is operating on and carries pointers to the OCSF source-data shape and the reference visualisation hint the F-CP-06 effectiveness stream consumes. Metric storage is operator-configured; the n8n adapter at ``compilers/n8n/evidence/rule_effectiveness_node.py`` writes the snapshot to a directory the operator's chosen sink ingests from.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--f0e4f404-0000-4000-8000-000000000006",
+      "name": "rule-lifecycle-end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "rule-lifecycle-start": {
+      "main": [
+        [
+          {
+            "node": "propose-rule-version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "propose-rule-version": {
+      "main": [
+        [
+          {
+            "node": "review-rule-version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "review-rule-version": {
+      "main": [
+        [
+          {
+            "node": "ship-rule-version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ship-rule-version": {
+      "main": [
+        [
+          {
+            "node": "measure-rule-version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "measure-rule-version": {
+      "main": [
+        [
+          {
+            "node": "rule-lifecycle-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "detection_engineering",
+    "rule-lifecycle",
+    "source-artifact"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.detection_engineering@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--f0e4f404-0000-4000-8000-000000000001"
+    },
+    "secops_ng_notes": [
+      "step 'action--f0e4f404-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--f0e4f404-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--f0e4f404-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--f0e4f404-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}

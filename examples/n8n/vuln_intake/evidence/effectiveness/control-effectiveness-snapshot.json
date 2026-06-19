@@ -1,0 +1,45 @@
+{
+  "artifact_id": "9eec636b72693c0b827b034a8257d1753c4f1a4073758424c36b267bd427b1aa",
+  "captured_at": "2026-06-18T05:00:00Z",
+  "compile_target": "n8n",
+  "control_refs": [
+    "control.control_effectiveness_test@v1",
+    "control.risk_management_policy@v1"
+  ],
+  "execution_id": "n8n:vuln_intake_effectiveness_example_0001",
+  "measurement": {
+    "direction": "lower_is_better",
+    "evaluation_window": "P1D",
+    "source_shape": {
+      "kind": "ocsf",
+      "ocsf": {
+        "class_name": "Detection Finding",
+        "class_uid": 2004,
+        "ocsf_version": "1.1.0"
+      }
+    },
+    "threshold_crossed": "warn",
+    "unit": "ratio",
+    "value": 0.08
+  },
+  "metric_ref": "kri.control_effectiveness@v1",
+  "owner": {
+    "assigned_at": "2026-01-15",
+    "role": "metrics-wg"
+  },
+  "provenance": {
+    "captured_at": "2026-06-18T05:00:00Z",
+    "source_url": "https://example.org/runs/effectiveness-vuln-intake-example-0001"
+  },
+  "regulation_refs": [
+    "nis2:art-21-2-f"
+  ],
+  "retention": "P2Y",
+  "schema_version": "1.0.0",
+  "stream": "effectiveness",
+  "subject_version": {
+    "kind": "policy_version",
+    "value": "1.2.0"
+  },
+  "workflow_id": "vulnerability_triage"
+}

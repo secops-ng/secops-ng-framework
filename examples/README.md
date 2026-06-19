@@ -16,6 +16,6 @@ reference compilers into the orchestrator targets.
 
 | Playbook              | n8n                                                              | Temporal                                                                   |
 |-----------------------|------------------------------------------------------------------|----------------------------------------------------------------------------|
-| threat-intel-ingest   | [`n8n/threat-intel-ingest/`](n8n/threat-intel-ingest/)           | [`temporal/threat-intel-ingest/`](temporal/threat-intel-ingest/)           |
+| threat_intel_ingest   | [`n8n/threat_intel_ingest/`](n8n/threat_intel_ingest/)           | [`temporal/threat_intel_ingest/`](temporal/threat_intel_ingest/)           |
 
 Additional rows land alongside their compiler outputs.

@@ -9,7 +9,7 @@ the LangGraph adapter (separate sibling) wrap the same helper without
 re-implementing record assembly.
 
 Per the workflow contract, one disclosure-timeline record is emitted
-per (SBOM, advisory, component) finding the codebase-vuln-management
+per (SBOM, advisory, component) finding the codebase_vuln_management
 playbook surfaces. The activity returns the absolute artifact path as
 a string so the Temporal-side caller can attach it to subsequent
 activity inputs (the coordinated-disclosure timer, the patch-
@@ -49,7 +49,7 @@ async def emit_disclosure_timeline_artifact_activity(
     Returns the absolute path of the written record as a string. The
     shared helper is responsible for the deterministic ``id``, the
     schema-conforming shape (keyed on the schema at
-    ``content/evidence/codebase-vuln-management/``), and the atomic
+    ``content/evidence/codebase_vuln_management/``), and the atomic
     write via a sibling ``.tmp`` + ``os.replace`` so a concurrent
     reader cannot observe a partial write.
 

@@ -1,0 +1,321 @@
+{
+  "created": "2026-06-03T00:00:00Z",
+  "created_by": "identity--c0c0c0c0-c0c0-4c0c-8c0c-c0c0c0c0c0c0",
+  "description": "SOC alert_triage source playbook. Ingests typed alert payloads from at least two source shapes (push from detection pipeline, pull from a shared alert store), enriches with telemetry context, suppresses already-seen or known-benign hits inside a configurable window, applies a deterministic prioritisation policy (free-text fields may be routed through a DSPy module, the priority decision itself stays in code), and routes the case onto a response branch keyed on the disposition. SKELETON: action bodies are stubs; the workflow graph, join keys, and metric/control references are the contract this source artifact commits to.",
+  "id": "playbook--a1e47431-0000-4000-8000-000000000000",
+  "labels": [
+    "alert_triage",
+    "skeleton",
+    "source-artifact"
+  ],
+  "modified": "2026-06-03T00:00:00Z",
+  "name": "Alert triage",
+  "playbook_types": [
+    "notification",
+    "detection",
+    "investigation",
+    "mitigation"
+  ],
+  "playbook_variables": {
+    "__alert_id__": {
+      "description": "Identifier of the inbound alert in the operator's alert store. Carried opaquely; the source shape is asserted in __alert_source_shape__.",
+      "external": true,
+      "type": "string"
+    },
+    "__alert_source_shape__": {
+      "description": "One of: push_detection_pipeline, pull_alert_store. Used to select the normalization path in the ingest step.",
+      "external": true,
+      "type": "string"
+    },
+    "__benign_or_seen__": {
+      "description": "Set by the suppression check: true when the alert matches a known- benign rule or an already-seen case fingerprint inside the configured suppression window.",
+      "external": false,
+      "type": "boolean"
+    },
+    "__priority__": {
+      "description": "Deterministic priority assigned by the prioritisation policy. One of: p1_severe, p2_high, p3_routine, p4_informational.",
+      "external": false,
+      "type": "string"
+    }
+  },
+  "spec_version": "2.0",
+  "type": "playbook",
+  "workflow": {
+    "action--a1e47431-0000-4000-8000-000000000002": {
+      "description": "SKELETON. Normalise the inbound alert into the SecOps-NG alert envelope. Two source shapes are required by the roadmap acceptance criteria (push from detection pipeline, pull from a shared alert store); the dispatcher branches on __alert_source_shape__. Body of the normalization rules lands in the CORE-INGEST card.",
+      "in_args": [
+        "__alert_id__",
+        "__alert_source_shape__"
+      ],
+      "name": "ingest typed alert payload",
+      "on_completion": "action--a1e47431-0000-4000-8000-000000000003",
+      "type": "action",
+      "x_secops_ng": {
+        "control_refs": [
+          "control.incident_handling_capability@v1"
+        ],
+        "core_body": {
+          "in": {
+            "raw": "__raw_payload__",
+            "source_shape": "__alert_source_shape__"
+          },
+          "out": "__alert_payload__",
+          "primitive": "alert_triage.primitives.payloads.validate_alert_payload"
+        },
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--a1e47431-0000-4000-8000-000000000003": {
+      "description": "SKELETON. Pull adjacent telemetry for the entities named in the alert (subject identity, source/destination, asset) so the prioritisation policy and suppression check have evidence beyond the alert envelope itself. Stubbed; the enrichment fan-out lands in CORE-ENRICH.",
+      "name": "enrich with telemetry context",
+      "on_completion": "if-condition--a1e47431-0000-4000-8000-000000000004",
+      "out_args": [
+        "__benign_or_seen__"
+      ],
+      "type": "action",
+      "x_secops_ng": {
+        "control_refs": [
+          "control.incident_handling_capability@v1"
+        ],
+        "core_body": {
+          "in": {
+            "asset_ref": "__asset_ref__",
+            "classification": "__classification__",
+            "detection_rule_id": "__detection_rule_id__",
+            "subject_ref": "__subject_ref__"
+          },
+          "out": "__seen_key__",
+          "primitive": "alert_triage.primitives.suppression.canonical_seen_key"
+        },
+        "metric_refs": [
+          "kpi.mttd@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.authentication@v1",
+          "telemetry.ocsf.account_change@v1",
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--a1e47431-0000-4000-8000-000000000005": {
+      "description": "SKELETON. Link this alert onto the existing case (or onto the benign-rule record), close it without paging, and account the suppression against the false-positive-rate KPI and (when the suppression covers a re-fire of a previously closed case) the recurring-incident correlator.",
+      "name": "suppress and close",
+      "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
+      "type": "action",
+      "x_secops_ng": {
+        "control_refs": [
+          "control.incident_handling_capability@v1",
+          "control.recurring_incident_correlator@v1"
+        ],
+        "core_body": {
+          "in": {
+            "asset_ref": "__asset_ref__",
+            "classification": "__classification__",
+            "detection_rule_id": "__detection_rule_id__",
+            "subject_ref": "__subject_ref__"
+          },
+          "out": "__close_record_key__",
+          "primitive": "alert_triage.primitives.suppression.canonical_seen_key"
+        },
+        "metric_refs": [
+          "kpi.false_positive_rate@v1"
+        ]
+      }
+    },
+    "action--a1e47431-0000-4000-8000-000000000006": {
+      "description": "SKELETON. Apply the operator's prioritisation policy. The policy itself is expressed as code (the roadmap pins this: deterministic prioritisation, DSPy used only for free-text fields like the analyst summary). Output is __priority__ \u2208 {p1_severe, p2_high, p3_routine, p4_informational}.",
+      "name": "classify and prioritise (deterministic policy)",
+      "on_completion": "switch-condition--a1e47431-0000-4000-8000-000000000007",
+      "out_args": [
+        "__priority__"
+      ],
+      "type": "action",
+      "x_secops_ng": {
+        "control_refs": [
+          "control.incident_handling_capability@v1"
+        ],
+        "core_body": {
+          "in": {
+            "context": "__asset_context__",
+            "correlates_open_case": "__correlates_open_case__",
+            "detection_class": "__detection_class__",
+            "detection_severity": "__detection_severity__"
+          },
+          "out": "__priority_verdict__",
+          "primitive": "alert_triage.primitives.prioritisation.prioritise"
+        },
+        "metric_refs": [
+          "kpi.detection_coverage@v1"
+        ]
+      }
+    },
+    "action--a1e47431-0000-4000-8000-000000000008": {
+      "description": "SKELETON. Page the on-call responder, open the incident case, stamp the timeline-start signal, and hand off to the incident management playbook. Records against the MTTR-critical clock and the regulator-notification-overrun KRI window.",
+      "name": "response: p1 severe \u2014 page and escalate",
+      "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
+      "type": "action",
+      "x_secops_ng": {
+        "control_refs": [
+          "control.incident_handling_capability@v1",
+          "control.incident_timeline_signals@v1"
+        ],
+        "core_body": {
+          "in": {
+            "asset_criticality": "__asset_context__.asset_criticality",
+            "internet_exposed": "__asset_context__.internet_exposed",
+            "priority": "__priority__",
+            "regulated_data": "__asset_context__.regulated_data"
+          },
+          "out": "__escalation_directive__",
+          "primitive": "alert_triage.primitives.response.escalation_route"
+        },
+        "metric_refs": [
+          "kpi.mttr_critical@v1",
+          "kri.escalation_tier_breach@v1",
+          "kpi.notification_sla_compliance@v1"
+        ]
+      }
+    },
+    "action--a1e47431-0000-4000-8000-000000000009": {
+      "description": "SKELETON. Queue the case to the primary analyst queue with the enriched evidence packet, no page. Records against the MTTR clock and the handoff-brief delivery SLA.",
+      "name": "response: p2 high \u2014 queue for primary analyst",
+      "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
+      "type": "action",
+      "x_secops_ng": {
+        "control_refs": [
+          "control.incident_handling_capability@v1"
+        ],
+        "core_body": {
+          "in": {
+            "asset_criticality": "__asset_context__.asset_criticality",
+            "internet_exposed": "__asset_context__.internet_exposed",
+            "priority": "__priority__",
+            "regulated_data": "__asset_context__.regulated_data"
+          },
+          "out": "__notification_directive__",
+          "primitive": "alert_triage.primitives.response.notify_on_call"
+        },
+        "metric_refs": [
+          "kpi.mttr_critical@v1",
+          "kpi.handoff_brief_delivery_sla@v1"
+        ]
+      }
+    },
+    "action--a1e47431-0000-4000-8000-00000000000a": {
+      "description": "SKELETON. Append to the review queue for batched analyst attention; no SLA clock beyond the routine review-completion SLA.",
+      "name": "response: p3 routine \u2014 queue for review",
+      "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
+      "type": "action",
+      "x_secops_ng": {
+        "control_refs": [
+          "control.incident_handling_capability@v1"
+        ],
+        "core_body": {
+          "in": {
+            "asset_criticality": "__asset_context__.asset_criticality",
+            "internet_exposed": "__asset_context__.internet_exposed",
+            "priority": "__priority__",
+            "regulated_data": "__asset_context__.regulated_data"
+          },
+          "out": "__review_queue_directive__",
+          "primitive": "alert_triage.primitives.response.route_to_review_queue"
+        },
+        "metric_refs": [
+          "kpi.review_completion_sla@v1"
+        ]
+      }
+    },
+    "action--a1e47431-0000-4000-8000-00000000000b": {
+      "description": "SKELETON. Record the alert for telemetry-coverage accounting and close without further action. Feeds the false-positive-rate denominator and the detection-coverage view.",
+      "name": "response: p4 informational \u2014 log and close",
+      "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
+      "type": "action",
+      "x_secops_ng": {
+        "control_refs": [
+          "control.incident_handling_capability@v1"
+        ],
+        "metric_refs": [
+          "kpi.false_positive_rate@v1",
+          "kpi.detection_coverage@v1"
+        ]
+      }
+    },
+    "end--a1e47431-0000-4000-8000-00000000000c": {
+      "name": "triage-end",
+      "type": "end"
+    },
+    "if-condition--a1e47431-0000-4000-8000-000000000004": {
+      "description": "Suppression branch. on_success: matches a known-benign rule or an already-seen case fingerprint inside the window; suppress and close. on_failure: proceed to prioritisation.",
+      "name": "already-seen or known-benign?",
+      "on_failure": "action--a1e47431-0000-4000-8000-000000000006",
+      "on_success": "action--a1e47431-0000-4000-8000-000000000005",
+      "type": "if-condition"
+    },
+    "start--a1e47431-0000-4000-8000-000000000001": {
+      "name": "triage-start",
+      "on_completion": "action--a1e47431-0000-4000-8000-000000000002",
+      "type": "start"
+    },
+    "switch-condition--a1e47431-0000-4000-8000-000000000007": {
+      "cases": {
+        "p1_severe": [
+          "action--a1e47431-0000-4000-8000-000000000008"
+        ],
+        "p2_high": [
+          "action--a1e47431-0000-4000-8000-000000000009"
+        ],
+        "p3_routine": [
+          "action--a1e47431-0000-4000-8000-00000000000a"
+        ],
+        "p4_informational": [
+          "action--a1e47431-0000-4000-8000-00000000000b"
+        ]
+      },
+      "description": "Route to the response branch keyed on the deterministic priority. Each branch is a single response-routing action that hands off to the appropriate downstream playbook or owner queue. Bodies of downstream playbooks are out of scope here.",
+      "name": "route on priority",
+      "switch": "__priority__",
+      "type": "switch-condition"
+    }
+  },
+  "workflow_start": "start--a1e47431-0000-4000-8000-000000000001",
+  "x_secops_ng": {
+    "compile_targets": [
+      "n8n",
+      "temporal",
+      "langgraph"
+    ],
+    "content_version": "0.1.0",
+    "control_refs": [
+      "control.incident_handling_capability@v1",
+      "control.incident_timeline_signals@v1",
+      "control.recurring_incident_correlator@v1"
+    ],
+    "maturity": "draft",
+    "metric_refs": [
+      "kpi.mttd@v1",
+      "kpi.mttr_critical@v1",
+      "kpi.false_positive_rate@v1",
+      "kpi.detection_coverage@v1",
+      "kpi.review_completion_sla@v1",
+      "kpi.handoff_brief_delivery_sla@v1",
+      "kpi.notification_sla_compliance@v1",
+      "kri.escalation_tier_breach@v1"
+    ],
+    "sources": [
+      "OASIS CACAO v2.0 \u2014 workflow step types (start, action, if-condition, switch-condition, end), variable conventions, x_ extension namespace",
+      "NIS2 Directive (EU) 2022/2555, Article 21(2)(b) \u2014 incident handling capability",
+      "DORA Regulation (EU) 2022/2554, Article 17 \u2014 ICT-related incident management process",
+      "MITRE D3FEND \u2014 Alert Analysis, Operational Reporting",
+      "OSCAL anchors: NIST 800-53 IR-4 / IR-5 / IR-6 (incident handling, monitoring, reporting) wired through content/controls/ entries control.incident_handling_capability@v1, control.incident_timeline_signals@v1, control.recurring_incident_correlator@v1",
+      "OCSF v1.4.0 \u2014 Authentication (class 3002), Account Change (class 3001), API Activity (class 6003); Security Finding (class 2001) pending a content/telemetry/ entry"
+    ],
+    "stable_id": "playbook.alert_triage@v1",
+    "telemetry_refs": [
+      "telemetry.ocsf.api_activity@v1",
+      "telemetry.ocsf.authentication@v1",
+      "telemetry.ocsf.account_change@v1"
+    ]
+  }
+}

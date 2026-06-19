@@ -14,13 +14,13 @@ deterministically, and that the three Article 23(4) regulator-
 notification milestones (early-warning 24h, incident-notification 72h,
 final-report 1 month) were submitted on time. That demonstration takes
 the shape of one per-execution artifact emitted every time the
-`incident-management` playbook (F-WF-05) runs.
+`incident_management` playbook (F-WF-05) runs.
 
 This directory is the contributor home for that stream. The artifact
 shape is declared in
 [`schemas/evidence/incidents.schema.json`](../../../schemas/evidence/incidents.schema.json);
 the upstream workflow is
-[`content/playbooks/incident-management/`](../../playbooks/incident-management/);
+[`content/playbooks/incident_management/`](../../playbooks/incident_management/);
 the indicators it feeds live under
 [`content/metrics/`](../../metrics/) — `kpi.mttd@v1`, `kpi.mttr@v1`,
 `kpi.mttr_critical@v1`, `kpi.mttr_containment@v1`,
@@ -65,7 +65,7 @@ At a glance, each artifact carries:
 - `classification` — F-WF-05 classify-significance verdict:
   `{ significant, cross_border, reasons[], rule_ids[], severity, summary }`.
   `rule_ids` pins behaviour against
-  `content/playbooks/incident-management/primitives/classification_policy.yaml`
+  `content/playbooks/incident_management/primitives/classification_policy.yaml`
   so a replay-vs-original diff is a single-string check.
 - `lifecycle` — `{ first_observation_at, detected_at, triaged_at,
   contained_at, eradicated_at, recovered_at, closed_at }`. Catalog KPIs

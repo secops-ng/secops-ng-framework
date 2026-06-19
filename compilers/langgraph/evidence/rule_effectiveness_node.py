@@ -8,7 +8,7 @@ import is required at the compiler layer, matching the runtime-free
 convention documented in ``compilers/langgraph/__init__.py`` and
 mirrored by the other F-CP-* / F-WF-* node adapters.
 
-F-WF-04 CORE-LANGGRAPH — the detection-engineering rule lifecycle
+F-WF-04 CORE-LANGGRAPH — the detection_engineering rule lifecycle
 workflow's ``measure`` state emits one per-rule-version effectiveness
 metric snapshot per (rule_id, rule_version) per evaluation window per
 indicator. This adapter is the LangGraph-side glue for that emission;

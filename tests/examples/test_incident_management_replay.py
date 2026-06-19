@@ -1,7 +1,7 @@
-"""Same-target deterministic-replay contract for the incident-management example.
+"""Same-target deterministic-replay contract for the incident_management example.
 
 F-WF-05 EXTEND-tests-replay. Mirror of F-WF-03 EXTEND-tests-replay
-(``tests/examples/test_alert_triage_replay.py``) for the incident-management
+(``tests/examples/test_alert_triage_replay.py``) for the incident_management
 worked example. Cross-target byte-parity of the AuditTrail is already covered
 by ``tests/compilers/_shared/test_audit_mirror_cross_target_parity.py``; this
 file pins the orthogonal property: **for each compile target, feeding the same
@@ -16,7 +16,7 @@ the operator saw.
 The companion happy-path golden suite
 (``tests/examples/test_incident_management_happy_path.py``) pins the canonical
 case-state JSON shape; this suite pins the audit-envelope byte stream the
-``examples/{n8n,temporal,langgraph}/incident-management/`` SKELETON-wave CORE
+``examples/{n8n,temporal,langgraph}/incident_management/`` SKELETON-wave CORE
 bindings emit when re-driven from the recorded history.
 
 Approach
@@ -46,11 +46,11 @@ Per-target replay contract surface
   produce identical node outputs.
 
 The emitter-shaped call patterns mirror the traversal order each target
-produces for the incident-management CACAO playbook (intake → classify →
+produces for the incident_management CACAO playbook (intake → classify →
 open_timeline → submit_24h → submit_72h → submit_1m → close_timeline). They are
 intentionally synthetic so this test does not depend on the optional
 ``langgraph`` / ``temporalio`` / n8n runtimes — same precedent as the
-cross-target parity suite and the alert-triage replay suite.
+cross-target parity suite and the alert_triage replay suite.
 
 Shared-primitive coverage
 -------------------------
@@ -123,7 +123,7 @@ def mirror_mod(tmp_path: Path):
 # ---------------------------------------------------------------------------
 
 _TS_PLACEHOLDER = "2026-06-07T00:00:00Z"
-_PLAYBOOK_ID = "incident-management"
+_PLAYBOOK_ID = "incident_management"
 _PLAYBOOK_VERSION = "0.1.0"
 _WORKFLOW_RUN_ID = "replay-run-001"
 
@@ -137,9 +137,9 @@ _DEST_EARLY_WARNING = "regulator://national-csirt/early_warning"
 _DEST_NOTIFICATION = "regulator://national-csirt/notification"
 _DEST_FINAL_REPORT = "regulator://national-csirt/final_report"
 
-# Seven semantic events shaped after the CACAO incident-management
+# Seven semantic events shaped after the CACAO incident_management
 # playbook's action-typed steps. Step ids match the canonical playbook
-# (content/playbooks/incident-management/playbook.cacao.json). Tool-name
+# (content/playbooks/incident_management/playbook.cacao.json). Tool-name
 # presence follows the existing parity-suite convention: tool steps
 # surface a tool_name, orchestration / node steps do not. The seven
 # events together cover the four F-WF-05 shared primitives the
@@ -245,7 +245,7 @@ def _canonical_attrs(event: dict, *, compile_target: str) -> dict:
 # ---------------------------------------------------------------------------
 # Per-target traversal-shaped emits.
 #
-# Each helper walks the seven incident-management events in the order the
+# Each helper walks the seven incident_management events in the order the
 # matching emitter would, feeding each into the AuditTrail. The
 # differences between helpers are intentional: they encode the per-target
 # traversal shape so a future regression that breaks one emitter's

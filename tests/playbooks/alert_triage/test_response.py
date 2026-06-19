@@ -1,4 +1,4 @@
-"""Unit tests for the alert-triage response-routing primitives.
+"""Unit tests for the alert_triage response-routing primitives.
 
 Covers both :func:`escalation_route` (p1 severe) and
 :func:`notify_on_call` (p2 high) — siblings on the same input shape.

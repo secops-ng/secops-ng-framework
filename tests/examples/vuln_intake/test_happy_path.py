@@ -1,7 +1,7 @@
 """Happy-path golden replay test across n8n + Temporal + LangGraph targets.
 
 F-WF-01 EXTEND-tests-happy. The three reference compile targets each
-bind the CORE action bodies of the vuln-intake playbook to the same
+bind the CORE action bodies of the vuln_intake playbook to the same
 shared deterministic primitives (``vuln_intake.primitives.dedup`` for
 intake, ``vuln_intake.primitives.severity`` for triage); LM-touching
 steps consume a deterministic-stub adapter per
@@ -49,7 +49,7 @@ FIXTURE = (
 )
 
 # CACAO step ids the canonical playbook pins for the switch-condition
-# response branches. Mirrors content/playbooks/vuln-intake/playbook.cacao.json
+# response branches. Mirrors content/playbooks/vuln_intake/playbook.cacao.json
 # \u00a7switch-condition--...007 cases.
 _RESPONSE_BRANCH_BY_SEVERITY = {
     "critical": "action--01a17a01-0000-4000-8000-000000000008",
@@ -158,7 +158,7 @@ def _assemble_canonical_state(
 def _drive_n8n(case: dict) -> dict:
     """n8n traversal: Code-node bodies fire in linear playbook order.
 
-    Mirrors ``examples/n8n/vuln-intake/workflow.n8n.json`` \u2014 the two
+    Mirrors ``examples/n8n/vuln_intake/workflow.n8n.json`` \u2014 the two
     CORE-bound Code nodes carry the primitive imports verbatim
     (intake \u2192 canonicalize_case_field, triage \u2192 severity_policy).
     """
@@ -183,7 +183,7 @@ def _drive_n8n(case: dict) -> dict:
 def _drive_temporal(case: dict) -> dict:
     """Temporal traversal: activity calls in workflow declaration order.
 
-    Mirrors ``examples/temporal/vuln-intake/workflow.temporal.py`` \u2014
+    Mirrors ``examples/temporal/vuln_intake/workflow.temporal.py`` \u2014
     the two CORE-bound ``@activity.defn`` bodies invoke the same
     primitives the n8n target imports.
     """
@@ -208,7 +208,7 @@ def _drive_temporal(case: dict) -> dict:
 def _drive_langgraph(case: dict) -> dict:
     """LangGraph traversal: tools fire in GraphSpec edge order.
 
-    Mirrors ``examples/langgraph/vuln-intake/state_bindings.py`` \u2014
+    Mirrors ``examples/langgraph/vuln_intake/state_bindings.py`` \u2014
     the two CORE-bound ``@tool`` bodies invoke the same primitives the
     n8n and Temporal targets import.
     """

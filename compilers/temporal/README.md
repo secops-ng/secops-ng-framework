@@ -25,7 +25,7 @@ workflow code when lowering lands.
 ```python
 from compilers.temporal import emit_file
 
-source = emit_file("content/playbooks/vuln-intake/playbook.cacao.json")
+source = emit_file("content/playbooks/vuln_intake/playbook.cacao.json")
 ```
 
 Output is deterministic: the same AST always yields byte-identical source.
@@ -49,7 +49,7 @@ attributes use the shared `secops_ng.*` keyspace —
 `secops_ng.workflow.run_id` placeholder bound by the host runtime. A
 sibling `_audit_mirror.py` appends an `AuditRecord` per span so the
 audit property holds when OTLP is offline. See the worked example
-[`examples/temporal/vuln-intake/`](../../examples/temporal/vuln-intake/)
+[`examples/temporal/vuln_intake/`](../../examples/temporal/vuln_intake/)
 and its `Observability` section for the operator-config envelope
 (`OTEL_EXPORTER_OTLP_ENDPOINT`, EU-resident collector guidance,
 provider neutrality).

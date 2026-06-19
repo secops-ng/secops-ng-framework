@@ -1,6 +1,6 @@
-"""Golden test for the n8n reference compiler — executive-metrics-rollup.
+"""Golden test for the n8n reference compiler — executive_metrics_rollup.
 
-Mirrors ``test_golden.py`` (vuln-intake) for the
+Mirrors ``test_golden.py`` (vuln_intake) for the
 ``executive_metrics_rollup`` fixture: parses the CACAO v2 playbook,
 emits the n8n workflow JSON, and pins it byte-for-byte against a
 checked-in golden so any emitter drift is caught in review.
@@ -44,7 +44,7 @@ def test_executive_metrics_rollup_golden_matches() -> None:
     rendered = _serialise(workflow)
     expected = GOLDEN.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "n8n golden drift (executive-metrics-rollup). Regenerate via "
+        "n8n golden drift (executive_metrics_rollup). Regenerate via "
         "`python -m tools.compile tests/compilers/_shared/fixtures/"
         "executive_metrics_rollup.cacao.json --target n8n --out "
         f"{GOLDEN.relative_to(REPO_ROOT)}` and commit in the same PR."

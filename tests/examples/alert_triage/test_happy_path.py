@@ -1,7 +1,7 @@
 """Happy-path golden replay test across n8n + Temporal + LangGraph targets.
 
 F-WF-03 EXTEND-tests-happy. The three reference compile targets each
-bind the CORE action bodies of the alert-triage playbook to the same
+bind the CORE action bodies of the alert_triage playbook to the same
 shared deterministic primitives
 (``alert_triage.primitives.payloads.validate_alert_payload`` for
 intake, ``alert_triage.primitives.suppression.canonical_seen_key`` for
@@ -28,7 +28,7 @@ declaration order, state-bindings tool order) while invoking the same
 shared primitives the artefacts import.
 
 Mirror of ``tests/examples/vuln_intake/test_happy_path.py``
-(F-WF-01 EXTEND-tests-happy, PR #228) \u2014 same shape, alert-triage
+(F-WF-01 EXTEND-tests-happy, PR #228) \u2014 same shape, alert_triage
 contract.
 """
 from __future__ import annotations
@@ -54,7 +54,7 @@ FIXTURE = (
 
 # CACAO step ids the canonical playbook pins for the switch-condition
 # response branches. Mirrors
-# content/playbooks/alert-triage.cacao.yaml \u00a7switch-condition--...007.
+# content/playbooks/alert_triage.cacao.yaml \u00a7switch-condition--...007.
 _RESPONSE_BRANCH_BY_PRIORITY: dict[Priority, str] = {
     "p1_severe": "action--a1e47431-0000-4000-8000-000000000008",
     "p2_high": "action--a1e47431-0000-4000-8000-000000000009",
@@ -183,7 +183,7 @@ def _assemble_canonical_state(
 def _drive_n8n(case: dict) -> dict:
     """n8n traversal: Code-node bodies fire in linear playbook order.
 
-    Mirrors ``examples/n8n/alert-triage/workflow.n8n.json`` \u2014 the four
+    Mirrors ``examples/n8n/alert_triage/workflow.n8n.json`` \u2014 the four
     CORE-bound Code nodes carry the primitive imports verbatim
     (ingest \u2192 validate_alert_payload, enrich \u2192 canonical_seen_key,
     suppression if-condition \u2192 stub lookup, classify \u2192 prioritise).
@@ -213,7 +213,7 @@ def _drive_n8n(case: dict) -> dict:
 def _drive_temporal(case: dict) -> dict:
     """Temporal traversal: activity calls in workflow declaration order.
 
-    Mirrors ``examples/temporal/alert-triage/workflow.temporal.py`` \u2014
+    Mirrors ``examples/temporal/alert_triage/workflow.temporal.py`` \u2014
     the CORE-bound ``@activity.defn`` bodies invoke the same primitives
     the n8n target imports.
     """
@@ -242,7 +242,7 @@ def _drive_temporal(case: dict) -> dict:
 def _drive_langgraph(case: dict) -> dict:
     """LangGraph traversal: tools fire in GraphSpec edge order.
 
-    Mirrors ``examples/langgraph/alert-triage/state_bindings.py`` \u2014
+    Mirrors ``examples/langgraph/alert_triage/state_bindings.py`` \u2014
     the CORE-bound ``@tool`` bodies invoke the same primitives the n8n
     and Temporal targets import.
     """

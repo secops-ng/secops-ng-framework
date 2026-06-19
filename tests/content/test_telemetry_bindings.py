@@ -2,7 +2,7 @@
 
 Asserts each binding JSON parses, validates against the
 content-model telemetry schema, and carries the OCSF v1.4.0 class_uid
-the phishing-triage playbook references. Class UIDs are pinned against
+the phishing_triage playbook references. Class UIDs are pinned against
 the upstream OCSF v1.4.0 schema; do not change without verifying at
 https://schema.ocsf.io/1.4.0/.
 """

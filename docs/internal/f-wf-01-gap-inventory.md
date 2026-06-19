@@ -17,13 +17,13 @@ ROADMAP F-WF-01 talks about `workflows/vulnerability_triage/`. The
 on-disk layout that has actually emerged in this repository is
 
 ```
-content/playbooks/vuln-intake/            # CACAO source of truth
-examples/{n8n,temporal,langgraph}/vuln-intake/   # compiled worked examples
+content/playbooks/vuln_intake/            # CACAO source of truth
+examples/{n8n,temporal,langgraph}/vuln_intake/   # compiled worked examples
 ```
 
 That divergence pre-dates this card and matches the layout for every
-other shipped workflow (posture-audit, phishing-triage, …). This
-inventory treats `vuln-intake` as the canonical name; a ROADMAP wording
+other shipped workflow (posture-audit, phishing_triage, …). This
+inventory treats `vuln_intake` as the canonical name; a ROADMAP wording
 fix is out of scope here and will be picked up when F-WF-01 flips to
 Shipped.
 
@@ -31,21 +31,21 @@ Shipped.
 
 | ROADMAP requirement | Status | Where |
 |---|---|---|
-| Canonical CACAO source for the workflow | ✅ done | `content/playbooks/vuln-intake/playbook.cacao.json` (11 steps: 1 start, 7 action, 1 if-condition, 1 switch-condition, 1 end) |
-| Worked example — n8n | ✅ SKELETON | `examples/n8n/vuln-intake/workflow.n8n.json` |
-| Worked example — Temporal | ✅ SKELETON | `examples/temporal/vuln-intake/workflow.temporal.py` |
-| Worked example — LangGraph | ✅ SKELETON | `examples/langgraph/vuln-intake/{graph_spec.json,state_bindings.py}` |
+| Canonical CACAO source for the workflow | ✅ done | `content/playbooks/vuln_intake/playbook.cacao.json` (11 steps: 1 start, 7 action, 1 if-condition, 1 switch-condition, 1 end) |
+| Worked example — n8n | ✅ SKELETON | `examples/n8n/vuln_intake/workflow.n8n.json` |
+| Worked example — Temporal | ✅ SKELETON | `examples/temporal/vuln_intake/workflow.temporal.py` |
+| Worked example — LangGraph | ✅ SKELETON | `examples/langgraph/vuln_intake/{graph_spec.json,state_bindings.py}` |
 | Byte-parity golden tests (drift guards) | ✅ done | `tests/examples/vuln_intake/` + `tests/examples/test_langgraph_vuln_intake.py` |
 | OTel spans on every node | ⚠️ partial | Temporal + LangGraph emit `_TRACER.start_as_current_span(...)` per action; n8n is a node-graph format so OTel is a runtime concern documented per node-id, not a per-node instruction in the JSON. |
 | `AuditTrail` mirror integration | ✅ done | All three targets call `AuditTrail.current().append(...)` per action (delivered by the F-CR-04 wave). |
-| **Library code / primitives directory** | ❌ missing | No `content/playbooks/vuln-intake/primitives/` exists. Severity policy, CVSS+EPSS scoring helpers, and the deterministic dedup function have nowhere to live. |
-| **DSPy signature for severity rating (free-text fields only)** | ❌ missing | No `DSPy` import or `dspy.Signature` exists in the vuln-intake tree. |
+| **Library code / primitives directory** | ❌ missing | No `content/playbooks/vuln_intake/primitives/` exists. Severity policy, CVSS+EPSS scoring helpers, and the deterministic dedup function have nowhere to live. |
+| **DSPy signature for severity rating (free-text fields only)** | ❌ missing | No `DSPy` import or `dspy.Signature` exists in the vuln_intake tree. |
 | **Deterministic dedup** | ❌ missing | No dedup helper, no canonicalisation of `__cve_id__ + __asset_ref__`, no idempotency key. |
 | **CORE action bodies** (intake, triage, assess, regulator, 4× response) | ❌ missing | All 7 action stubs in all three targets `raise NotImplementedError(...)`. |
-| **Tests — happy path** | ❌ missing | The only vuln-intake tests today are byte-parity drift guards. |
+| **Tests — happy path** | ❌ missing | The only vuln_intake tests today are byte-parity drift guards. |
 | **Tests — dedup-collision** | ❌ missing | No dedup test exists because no dedup helper exists. |
 | **Tests — replay** | ❌ missing | No replay test (golden replay across all three targets). |
-| **Cookbook entry + walkthrough docs** | ❌ missing | `content/playbooks/vuln-intake/README.md` exists but only describes the playbook shape; there is no cookbook walkthrough doc under `docs/cookbook/` (the directory does not yet exist for vuln-intake). |
+| **Cookbook entry + walkthrough docs** | ❌ missing | `content/playbooks/vuln_intake/README.md` exists but only describes the playbook shape; there is no cookbook walkthrough doc under `docs/cookbook/` (the directory does not yet exist for vuln_intake). |
 | **`config.yaml`** | ❌ missing | F-WF-02 (Posture audit, Shipped) ships its own scaffolding without a per-workflow `config.yaml`. F-WF-01 needs a clear answer on whether the ROADMAP `config.yaml` requirement is satisfied by the CACAO `playbook_variables` block or whether a separate operator-facing YAML is expected. See § 4 — flagged for maintainer review. |
 | **Threat-intel feeds as Pydantic-typed supplier deps (F-CP-04)** | ❌ blocked | F-CP-04 is Status: Proposed. The intake step today carries `__report_source__` as a free string; the supplier-dependency contract cannot land until F-CP-04 ships a Pydantic shape. Tracked but not blocking F-WF-01 closeout — see § 4. |
 
@@ -57,7 +57,7 @@ required.
 
 | CACAO step | n8n | Temporal | LangGraph |
 |---|---|---|---|
-| `start` — `vuln-intake-start` | ✅ trigger node | ✅ workflow entry | ✅ entry binding |
+| `start` — `vuln_intake_start` | ✅ trigger node | ✅ workflow entry | ✅ entry binding |
 | `action--…000002` — intake disclosure | ❌ CORE body | ❌ CORE body | ❌ CORE body |
 | `action--…000003` — triage and asset correlation (CVSS+EPSS+severity+dedup) | ❌ CORE body | ❌ CORE body | ❌ CORE body |
 | `action--…000004` — assess CRA reporting trigger | ❌ CORE body | ❌ CORE body | ❌ CORE body |
@@ -68,7 +68,7 @@ required.
 | `action--…000009` — response: high | ❌ CORE body | ❌ CORE body | ❌ CORE body |
 | `action--…00000a` — response: scheduled remediation | ❌ CORE body | ❌ CORE body | ❌ CORE body |
 | `action--…00000b` — response: accept risk | ❌ CORE body | ❌ CORE body | ❌ CORE body |
-| `end` — `vuln-intake-end` | ✅ | ✅ | ✅ |
+| `end` — `vuln_intake_end` | ✅ | ✅ | ✅ |
 
 That is **7 actions × 3 targets = 21 CORE bodies missing**, plus the
 shared primitives module they will all call into.
@@ -99,14 +99,14 @@ dispatcher only promotes cards whose upstreams are done.
 
 | # | Card | Parents (other siblings) | Public-bar |
 |---|---|---|---|
-| 1 | F-WF-01 CORE-PRIM — shared primitives (severity policy, CVSS+EPSS helpers, deterministic dedup, DSPy signature for free-text fields) under `content/playbooks/vuln-intake/primitives/` | — | yes |
-| 2 | F-WF-01 CORE-N8N — wire 7 CORE action bodies in `examples/n8n/vuln-intake/workflow.n8n.json` against the primitives contract; regen via `regenerate.sh`; golden byte-parity green | 1 | yes |
-| 3 | F-WF-01 CORE-TMPRL — wire 7 CORE action bodies in `examples/temporal/vuln-intake/workflow.temporal.py` against the primitives contract; regen; golden byte-parity green | 1 | yes |
-| 4 | F-WF-01 CORE-LG — wire 7 CORE action bodies in `examples/langgraph/vuln-intake/state_bindings.py` against the primitives contract; regen; golden byte-parity green | 1 | yes |
+| 1 | F-WF-01 CORE-PRIM — shared primitives (severity policy, CVSS+EPSS helpers, deterministic dedup, DSPy signature for free-text fields) under `content/playbooks/vuln_intake/primitives/` | — | yes |
+| 2 | F-WF-01 CORE-N8N — wire 7 CORE action bodies in `examples/n8n/vuln_intake/workflow.n8n.json` against the primitives contract; regen via `regenerate.sh`; golden byte-parity green | 1 | yes |
+| 3 | F-WF-01 CORE-TMPRL — wire 7 CORE action bodies in `examples/temporal/vuln_intake/workflow.temporal.py` against the primitives contract; regen; golden byte-parity green | 1 | yes |
+| 4 | F-WF-01 CORE-LG — wire 7 CORE action bodies in `examples/langgraph/vuln_intake/state_bindings.py` against the primitives contract; regen; golden byte-parity green | 1 | yes |
 | 5 | F-WF-01 EXTEND-tests-happy — happy-path golden replay test across all three targets in `tests/examples/vuln_intake/` | 2, 3, 4 | yes |
 | 6 | F-WF-01 EXTEND-tests-dedup — dedup-collision test (same CVE × same asset_ref → single case) across all three targets | 2, 3, 4 | yes |
 | 7 | F-WF-01 EXTEND-tests-replay — deterministic-replay test (same input twice → byte-identical AuditTrail) across all three targets | 2, 3, 4 | yes |
-| 8 | F-WF-01 EXTEND-docs-cookbook — cookbook walkthrough under `docs/cookbook/vuln-intake.md` + worked-example README polish across all three targets | 2, 3, 4 | yes |
+| 8 | F-WF-01 EXTEND-docs-cookbook — cookbook walkthrough under `docs/cookbook/vuln_intake.md` + worked-example README polish across all three targets | 2, 3, 4 | yes |
 | 9 | F-WF-01 EXTEND-config — answer the `config.yaml` question (CACAO `playbook_variables` vs separate operator YAML) and ship whichever is approved | 1 | yes |
 | 10 | F-WF-01 CLOSEOUT — ROADMAP.md status flip In Progress → Shipped + decisions log update | 1–9 | yes |
 

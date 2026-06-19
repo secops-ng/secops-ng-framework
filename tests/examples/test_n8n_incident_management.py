@@ -1,21 +1,21 @@
-"""Drift guard for the ``examples/n8n/incident-management/`` worked example.
+"""Drift guard for the ``examples/n8n/incident_management/`` worked example.
 
 Mirrors ``tests/examples/test_n8n_alert_triage.py`` (and
 ``tests/examples/post_incident_review/test_n8n_workflow.py`` etc.):
 parses the worked-example CACAO mirror, emits the n8n workflow JSON,
 and pins the result byte-for-byte against the committed
-``examples/n8n/incident-management/workflow.n8n.json``.
+``examples/n8n/incident_management/workflow.n8n.json``.
 
 F-WF-05 CORE-WIRE-N8N (SKELETON wave) seam — divergence guard.
 =============================================================
-The canonical incident-management source at
-``content/playbooks/incident-management/playbook.cacao.json`` ships
+The canonical incident_management source at
+``content/playbooks/incident_management/playbook.cacao.json`` ships
 without ``x_secops_ng.core_body`` blocks. The n8n SKELETON example
 intentionally diverges to demonstrate the primitive wire-in shape
 (classification, fail-closed destination resolver, three-stage NIS2
 Article 23 clock) ahead of the sibling Temporal and LangGraph
 CORE-WIRE cards. The divergence is bounded by an overlay JSON at
-``examples/n8n/incident-management/core_body.overlay.json`` whose
+``examples/n8n/incident_management/core_body.overlay.json`` whose
 ``workflow_overlays`` block is the *only* difference permitted between
 the canonical source and the n8n mirror.
 
@@ -30,7 +30,7 @@ consumers.
 
 Regenerate via::
 
-    ./examples/n8n/incident-management/regenerate.sh
+    ./examples/n8n/incident_management/regenerate.sh
 """
 from __future__ import annotations
 
@@ -42,9 +42,9 @@ from compilers._shared.cacao_parser import parse_file
 from compilers.n8n.emit import emit
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-EXAMPLE_DIR = REPO_ROOT / "examples" / "n8n" / "incident-management"
+EXAMPLE_DIR = REPO_ROOT / "examples" / "n8n" / "incident_management"
 CANON_JSON = (
-    REPO_ROOT / "content" / "playbooks" / "incident-management" / "playbook.cacao.json"
+    REPO_ROOT / "content" / "playbooks" / "incident_management" / "playbook.cacao.json"
 )
 MIRROR_JSON = EXAMPLE_DIR / "playbook.cacao.json"
 WORKED_EXAMPLE = EXAMPLE_DIR / "workflow.n8n.json"
@@ -94,9 +94,9 @@ def test_mirror_matches_canonical_plus_overlay() -> None:
 
     rendered = MIRROR_JSON.read_text(encoding="utf-8")
     assert rendered == expected_text, (
-        "examples/n8n/incident-management/playbook.cacao.json drift from "
+        "examples/n8n/incident_management/playbook.cacao.json drift from "
         "(canonical CACAO source + core_body.overlay.json). Regenerate via "
-        "`./examples/n8n/incident-management/regenerate.sh` and commit the "
+        "`./examples/n8n/incident_management/regenerate.sh` and commit the "
         "result. If the canonical source itself now carries the core_body "
         "blocks (CORE-WIRE-TMPRL + CORE-WIRE-LG have landed), the overlay "
         "should be emptied in the same PR."
@@ -138,9 +138,9 @@ def test_worked_example_matches_emitter_output() -> None:
     rendered = _serialise_workflow(emit(playbook))
     expected = WORKED_EXAMPLE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/n8n/incident-management/workflow.n8n.json drifted from the "
+        "examples/n8n/incident_management/workflow.n8n.json drifted from the "
         "n8n emitter output. Regenerate via "
-        "`./examples/n8n/incident-management/regenerate.sh` and commit the new bytes."
+        "`./examples/n8n/incident_management/regenerate.sh` and commit the new bytes."
     )
 
 
@@ -228,7 +228,7 @@ def _action_without_commands_steps() -> dict[str, dict]:
 
     Steps that carry ``x_secops_ng.core_body`` would compile to an n8n Code
     node rendering the primitive call (CORE-MECH-EMIT-N8N) rather than the
-    Set-node uplift. SKELETON-stage incident-management ships with zero
+    Set-node uplift. SKELETON-stage incident_management ships with zero
     CORE bodies, so this set is the full set of action steps.
     """
     raw = json.loads(MIRROR_JSON.read_text(encoding="utf-8"))
@@ -250,7 +250,7 @@ def test_action_without_commands_steps_emit_set_nodes() -> None:
     """No `noOp` placeholders left for steps that should carry intent."""
     nodes_by_id = _nodes_by_id()
     action_steps = _action_without_commands_steps()
-    assert action_steps, "expected SKELETON action steps in incident-management"
+    assert action_steps, "expected SKELETON action steps in incident_management"
     for step_id in action_steps:
         node = nodes_by_id[step_id]
         assert node["type"] == "n8n-nodes-base.set", (

@@ -10,8 +10,8 @@ object suitable for `n8n import:workflow` or the n8n REST API.
 ## Quickstart
 
 ```bash
-python -m tools.compile content/playbooks/vuln-intake/playbook.cacao.json \
-    --target n8n --out /tmp/vuln-intake.n8n.json
+python -m tools.compile content/playbooks/vuln_intake/playbook.cacao.json \
+    --target n8n --out /tmp/vuln_intake.n8n.json
 ```
 
 Or programmatically:

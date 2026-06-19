@@ -3,7 +3,7 @@ name: three-target-parity
 # Three-target byte-parity matrix for the M0 cookbook workflows.
 #
 # The pytest suite under tests/examples/ already pins the canonical
-# vuln-intake / phishing-triage / etc. goldens. This lane catches the
+# vuln_intake / phishing_triage / etc. goldens. This lane catches the
 # remaining drift class: examples whose committed bytes are stale because
 # a compiler change landed without re-running the per-example
 # regenerate.sh. It runs the top-level orchestrator in --check mode,
@@ -32,11 +32,11 @@ jobs:
       matrix:
         target: [n8n, temporal, langgraph]
         workflow:
-          - vuln-intake
-          - identity-compromise
-          - phishing-triage
-          - threat-intel-ingest
-          - ransomware-containment
+          - vuln_intake
+          - identity_compromise
+          - phishing_triage
+          - threat_intel_ingest
+          - ransomware_containment
     steps:
       - name: Checkout
         uses: actions/checkout@v4

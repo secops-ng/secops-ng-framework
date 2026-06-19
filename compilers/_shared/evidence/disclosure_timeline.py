@@ -3,7 +3,7 @@
 A pure helper that turns one ``assess-disclosure`` / ``track-timeline``
 walk over one (SBOM, advisory, component) finding into one record
 conforming to
-``content/evidence/codebase-vuln-management/disclosure-timeline-record.schema.json``
+``content/evidence/codebase_vuln_management/disclosure-timeline-record.schema.json``
 and writes it to disk.
 
 The emitter is deliberately decoupled from any compile target:
@@ -54,7 +54,7 @@ __all__ = [
 ]
 
 # Pin matches the ``schema_version`` const in
-# ``content/evidence/codebase-vuln-management/disclosure-timeline-record.schema.json``.
+# ``content/evidence/codebase_vuln_management/disclosure-timeline-record.schema.json``.
 # Bumped together with the schema when a breaking change ships.
 SCHEMA_VERSION = "0.1.0"
 STREAM = "codebase_vuln_management"
@@ -141,7 +141,7 @@ class SourceData:
 
 @dataclass(frozen=True)
 class DisclosureTimelineContext:
-    """One finding produced by the codebase-vuln-management workflow.
+    """One finding produced by the codebase_vuln_management workflow.
 
     A workflow step (``assess-disclosure`` resolving into
     ``track-timeline``) builds this dataclass from its own state — the

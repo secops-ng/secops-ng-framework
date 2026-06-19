@@ -1,0 +1,555 @@
+{
+  "name": "Incident management",
+  "nodes": [
+    {
+      "id": "start--50000000-0000-4000-8000-000000000001",
+      "name": "incident-mgmt-start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__signal_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the originating incident signal handed in by the upstream triage workflow (alert_triage close-out, ransomware_containment close-out, or an operator-raised ticket)."
+            },
+            {
+              "name": "__notification_destinations__",
+              "type": "object",
+              "value": "",
+              "description": "Operator-supplied dictionary of regulator-notification destinations. Keys are the three regulator-submission stages ('early_warning', 'notification', 'final_report'); values are opaque destination handles resolved at the compile target's config layer (n8n credential, Temporal worker env, LangGraph runtime config). The framework ships no default endpoint per the sovereign-stack constraint; absent or empty entries fail the corresponding submit action by contract."
+            },
+            {
+              "name": "__incident_id__",
+              "type": "string",
+              "value": "",
+              "description": "Workflow-assigned incident identifier. Joined into the timeline JSON artefact path at `content/evidence/incidents/<incident-id>/timeline.json` (consumed downstream by F-CP-02)."
+            },
+            {
+              "name": "__significant__",
+              "type": "boolean",
+              "value": "",
+              "description": "Whether the intake event meets the NIS2 Article 23(3) significance threshold. Deterministic classification \u2014 produced by the classify-significance action."
+            },
+            {
+              "name": "__cross_border__",
+              "type": "boolean",
+              "value": "",
+              "description": "Whether the incident has cross-border impact under NIS2 Article 23(6). Deterministic classification \u2014 produced by the classify-significance action."
+            },
+            {
+              "name": "__timeline_handle__",
+              "type": "string",
+              "value": "",
+              "description": "Opaque handle returned by the F-PT-02 incident-timeline pattern's open-timeline call. Consumed by every subsequent timeline-event submission and by the close-timeline action."
+            },
+            {
+              "name": "__early_warning_event_id__",
+              "type": "string",
+              "value": "",
+              "description": "Timeline-event identifier returned by the 24-hour early-warning submission. Persisted into the timeline JSON."
+            },
+            {
+              "name": "__notification_event_id__",
+              "type": "string",
+              "value": "",
+              "description": "Timeline-event identifier returned by the 72-hour notification submission. Persisted into the timeline JSON."
+            },
+            {
+              "name": "__final_report_ready__",
+              "type": "boolean",
+              "value": "",
+              "description": "Whether the root-cause analysis and applied-mitigations narrative for the final report are complete before the one-month boundary. Determines whether the workflow submits the final report or closes out with a deferred-final-report marker on the timeline (the deferred case is closed under the same timeline; the late final-report submission ships through a separate operator-driven re-entry that is out of scope for this card)."
+            },
+            {
+              "name": "__final_report_event_id__",
+              "type": "string",
+              "value": "",
+              "description": "Timeline-event identifier returned by the one-month final-report submission. Persisted into the timeline JSON."
+            },
+            {
+              "name": "__timeline_artefact_path__",
+              "type": "string",
+              "value": "",
+              "description": "Repository-relative path where the canonical timeline JSON artefact was persisted by the close-timeline action."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--50000000-0000-4000-8000-000000000002",
+      "name": "intake significant-incident signal",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.signal_id",
+              "name": "in.signal_id",
+              "value": "={{$workflow.variables.signal_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.incident_id",
+              "name": "out.incident_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_handling_capability@v1, control.incident_timeline_signals@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.incident_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.timeline_completeness@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Receive the originating incident signal and hydrate it with the typed intake-event payload shape consumed by the F-PT-02 incident-timeline pattern. Produces __incident_id__. CORE body lands in CORE-PRIM (card 5); SKELETON stub raises NotImplementedError against the named contract.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--50000000-0000-4000-8000-000000000003",
+      "name": "classify significance and cross-border scope",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from incident_management.primitives.classification import classify_significance\n__classification_verdict__ = classify_significance(signals=__intake_signals__)"
+      },
+      "notes": "Apply the deterministic significance + cross-border classification policy per NIS2 Article 23(3) and 23(6). No DSPy reach \u2014 regulated decisions are deterministic code. Produces __significant__ and __cross_border__.",
+      "notesInFlow": true
+    },
+    {
+      "id": "if-condition--50000000-0000-4000-8000-000000000004",
+      "name": "significant?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "secops_ng_condition",
+              "leftValue": "",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "notes": "Branch on __significant__. True paths into the regulator-timeline three-stage submission flow. False routes directly to the end step (the audit-only close-out for non-significant events is logged for the false-positive KPI by an out-of-scope downstream card).",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--50000000-0000-4000-8000-000000000005",
+      "name": "open incident timeline",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.incident_id",
+              "name": "in.incident_id",
+              "value": "={{$workflow.variables.incident_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.significant",
+              "name": "in.significant",
+              "value": "={{$workflow.variables.significant}}",
+              "type": "string"
+            },
+            {
+              "id": "in.cross_border",
+              "name": "in.cross_border",
+              "value": "={{$workflow.variables.cross_border}}",
+              "type": "string"
+            },
+            {
+              "id": "out.timeline_handle",
+              "name": "out.timeline_handle",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_timeline_signals@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.incident_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.timeline_completeness@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Signal the F-PT-02 incident-timeline pattern's start: stage clock 0 begins, the timeline-state machine moves into the early-warning window. Produces __timeline_handle__ \u2014 the opaque pattern handle every subsequent submission threads through.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--50000000-0000-4000-8000-000000000006",
+      "name": "submit 24-hour early warning",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from incident_management.primitives.regulator_submission import resolve_destination\n__early_warning_destination__ = resolve_destination(destinations=__notification_destinations__, stage='early_warning')"
+      },
+      "notes": "Submit the NIS2 Article 23(4)(a) early warning through the operator-configured regulator destination for the 'early_warning' stage. Emits a timeline event consumed by the F-PT-02 pattern. Bounded by the stage-clock primitive that the CORE-PRIM card will land \u2014 overrun trips the regulator-notification-overrun KRI.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--50000000-0000-4000-8000-000000000007",
+      "name": "submit 72-hour notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from incident_management.primitives.stage_clock import verdict_for_submission\n__notification_stage_verdict__ = verdict_for_submission(stage='notification', opened_at=__timeline_opened_at__, submitted_at=__notification_submitted_at__)"
+      },
+      "notes": "Submit the NIS2 Article 23(4)(b) incident notification through the operator-configured regulator destination for the 'notification' stage. Emits a timeline event consumed by the F-PT-02 pattern. Bounded by the stage-clock primitive \u2014 overrun trips the regulator-notification-overrun KRI.",
+      "notesInFlow": true
+    },
+    {
+      "id": "if-condition--50000000-0000-4000-8000-000000000008",
+      "name": "final-report material complete?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2060,
+        420
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "secops_ng_condition",
+              "leftValue": "",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "notes": "Branch on __final_report_ready__. True paths into the one-month final-report submission. False paths around it: the timeline is closed with a deferred-final-report marker so the timeline JSON is well-formed and consumable downstream; a late final-report submission is operator-driven re-entry and out of scope for this card.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--50000000-0000-4000-8000-000000000009",
+      "name": "submit 1-month final report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2320,
+        240
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from incident_management.primitives.regulator_submission import resolve_destination\n__final_report_destination__ = resolve_destination(destinations=__notification_destinations__, stage='final_report')"
+      },
+      "notes": "Submit the NIS2 Article 23(4)(c) final report through the operator-configured regulator destination for the 'final_report' stage. The free-text fields on this submission \u2014 incident narrative, root-cause description, applied-mitigations summary \u2014 are the single DSPy-signature reach for this workflow; every other field is deterministic. Bounded by the stage-clock primitive \u2014 overrun trips the regulator-notification-overrun KRI.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--50000000-0000-4000-8000-00000000000a",
+      "name": "close incident timeline",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2580,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.incident_id",
+              "name": "in.incident_id",
+              "value": "={{$workflow.variables.incident_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.timeline_handle",
+              "name": "in.timeline_handle",
+              "value": "={{$workflow.variables.timeline_handle}}",
+              "type": "string"
+            },
+            {
+              "id": "out.timeline_artefact_path",
+              "name": "out.timeline_artefact_path",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_timeline_signals@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.incident_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.timeline_completeness@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Signal the F-PT-02 incident-timeline pattern's close: the canonical regulator-shaped timeline JSON is persisted at content/evidence/incidents/<__incident_id__>/timeline.json for downstream consumption by F-CP-02. Stamps the timeline-completeness KPI.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--50000000-0000-4000-8000-00000000000b",
+      "name": "incident-mgmt-end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2840,
+        240
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "incident-mgmt-start": {
+      "main": [
+        [
+          {
+            "node": "intake significant-incident signal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "intake significant-incident signal": {
+      "main": [
+        [
+          {
+            "node": "classify significance and cross-border scope",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classify significance and cross-border scope": {
+      "main": [
+        [
+          {
+            "node": "significant?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "significant?": {
+      "main": [
+        [
+          {
+            "node": "open incident timeline",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "incident-mgmt-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "open incident timeline": {
+      "main": [
+        [
+          {
+            "node": "submit 24-hour early warning",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "submit 24-hour early warning": {
+      "main": [
+        [
+          {
+            "node": "submit 72-hour notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "submit 72-hour notification": {
+      "main": [
+        [
+          {
+            "node": "final-report material complete?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "final-report material complete?": {
+      "main": [
+        [
+          {
+            "node": "submit 1-month final report",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "close incident timeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "submit 1-month final report": {
+      "main": [
+        [
+          {
+            "node": "close incident timeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "close incident timeline": {
+      "main": [
+        [
+          {
+            "node": "incident-mgmt-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "incident_management",
+    "incident-timeline",
+    "regulator-notification",
+    "nis2",
+    "nis2-article-23",
+    "dora",
+    "three-stage-timeline"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.incident_management@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0"
+    },
+    "secops_ng_notes": [
+      "step 'action--50000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'if-condition--50000000-0000-4000-8000-000000000004' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
+      "step 'action--50000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'if-condition--50000000-0000-4000-8000-000000000008' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
+      "step 'action--50000000-0000-4000-8000-00000000000a': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}

@@ -1,6 +1,6 @@
-"""Golden test for the n8n reference compiler — on-call-rotation.
+"""Golden test for the n8n reference compiler — on_call_rotation.
 
-Mirrors ``test_golden.py`` (vuln-intake) for the ``on_call_rotation``
+Mirrors ``test_golden.py`` (vuln_intake) for the ``on_call_rotation``
 fixture: parses the CACAO v2 playbook, emits the n8n workflow JSON, and
 pins it byte-for-byte against a checked-in golden so any emitter drift
 is caught in review.
@@ -44,7 +44,7 @@ def test_on_call_rotation_golden_matches() -> None:
     rendered = _serialise(workflow)
     expected = GOLDEN.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "n8n golden drift (on-call-rotation). Regenerate via "
+        "n8n golden drift (on_call_rotation). Regenerate via "
         "`python -m tools.compile tests/compilers/_shared/fixtures/"
         "on_call_rotation.cacao.json --target n8n --out "
         f"{GOLDEN.relative_to(REPO_ROOT)}` and commit in the same PR."

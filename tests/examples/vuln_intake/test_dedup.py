@@ -1,6 +1,6 @@
 """Dedup-collision contract test across n8n, Temporal, and LangGraph targets.
 
-The vuln-intake worked examples share one primitive contract for case
+The vuln_intake worked examples share one primitive contract for case
 deduplication: ``vuln_intake.primitives.dedup.canonicalize_case_field``
 is bound to the ``intake disclosure`` step of every compiled target, and
 ``case_idempotency_key`` collapses two replays of the same disclosure
@@ -52,9 +52,9 @@ DEDUP_SYMBOL = "canonicalize_case_field"
 
 # (target_label, path_to_emitted_artefact) pairs.
 TARGETS: list[tuple[str, Path]] = [
-    ("n8n", EXAMPLES / "n8n" / "vuln-intake" / "workflow.n8n.json"),
-    ("temporal", EXAMPLES / "temporal" / "vuln-intake" / "workflow.temporal.py"),
-    ("langgraph", EXAMPLES / "langgraph" / "vuln-intake" / "state_bindings.py"),
+    ("n8n", EXAMPLES / "n8n" / "vuln_intake" / "workflow.n8n.json"),
+    ("temporal", EXAMPLES / "temporal" / "vuln_intake" / "workflow.temporal.py"),
+    ("langgraph", EXAMPLES / "langgraph" / "vuln_intake" / "state_bindings.py"),
 ]
 
 
@@ -151,7 +151,7 @@ def test_audit_trail_records_dedup_decision_once() -> None:
     import importlib.util
     import sys
 
-    mirror_path = EXAMPLES / "langgraph" / "vuln-intake" / "_audit_mirror.py"
+    mirror_path = EXAMPLES / "langgraph" / "vuln_intake" / "_audit_mirror.py"
     spec = importlib.util.spec_from_file_location(
         "vuln_intake_audit_mirror", mirror_path
     )
@@ -244,7 +244,7 @@ def test_distinctness_holds_across_asset_kinds(asset_ref: str) -> None:
 
 
 def test_idempotency_key_is_target_agnostic() -> None:
-    """The dedup primitive lives in ``content/playbooks/vuln-intake/`` and
+    """The dedup primitive lives in ``content/playbooks/vuln_intake/`` and
     is imported verbatim by every target's intake step. Driving it from
     the test runner directly is therefore the same call the n8n
     ``pythonCode`` node, the Temporal ``@activity.defn``, and the

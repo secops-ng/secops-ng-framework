@@ -1,6 +1,6 @@
 """Incidents evidence-artifact emitter (F-CP-02 SKELETON).
 
-A pure helper that turns one execution of the F-WF-05 incident-management
+A pure helper that turns one execution of the F-WF-05 incident_management
 playbook into one record conforming to
 ``schemas/evidence/incidents.schema.json`` and writes it to disk.
 
@@ -155,7 +155,7 @@ class NotificationMilestone:
 
 @dataclass(frozen=True)
 class IncidentsContext:
-    """One execution of the F-WF-05 incident-management playbook.
+    """One execution of the F-WF-05 incident_management playbook.
 
     A workflow step builds this dataclass from its own state — the
     incident identifier the F-WF-05 ``timeline_open`` primitive issued,

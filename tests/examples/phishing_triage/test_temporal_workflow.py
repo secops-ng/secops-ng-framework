@@ -1,12 +1,12 @@
-"""Drift guard for the ``examples/temporal/phishing-triage/`` worked example.
+"""Drift guard for the ``examples/temporal/phishing_triage/`` worked example.
 
-Mirrors the vuln-intake / identity-compromise / cloud-misconfiguration
+Mirrors the vuln_intake / identity_compromise / cloud_misconfiguration
 temporal example tests: re-emits the Temporal workflow stub from the
 canonical CACAO playbook and pins the result byte-for-byte against the
-committed ``examples/temporal/phishing-triage/workflow.temporal.py``.
+committed ``examples/temporal/phishing_triage/workflow.temporal.py``.
 Adds an activity-name \u2194 CACAO action-id parity check so the
 one-to-one mirroring contract documented in
-``examples/temporal/phishing-triage/README.md`` is enforced by tests,
+``examples/temporal/phishing_triage/README.md`` is enforced by tests,
 not by convention.
 
 Also pins the co-located ``playbook.cacao.json`` mirror byte-for-byte
@@ -15,7 +15,7 @@ against the canonical CACAO source, so the regenerate.sh contract
 
 Regenerate via::
 
-    ./examples/temporal/phishing-triage/regenerate.sh
+    ./examples/temporal/phishing_triage/regenerate.sh
 """
 from __future__ import annotations
 
@@ -27,9 +27,9 @@ from compilers.temporal.emit import emit_file
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SOURCE = (
-    REPO_ROOT / "content" / "playbooks" / "phishing-triage" / "playbook.cacao.json"
+    REPO_ROOT / "content" / "playbooks" / "phishing_triage" / "playbook.cacao.json"
 )
-EXAMPLE_DIR = REPO_ROOT / "examples" / "temporal" / "phishing-triage"
+EXAMPLE_DIR = REPO_ROOT / "examples" / "temporal" / "phishing_triage"
 WORKED_EXAMPLE = EXAMPLE_DIR / "workflow.temporal.py"
 MIRRORED_CACAO = EXAMPLE_DIR / "playbook.cacao.json"
 
@@ -47,18 +47,18 @@ def test_worked_example_matches_emitter_output() -> None:
     rendered = emit_file(SOURCE)
     expected = WORKED_EXAMPLE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/temporal/phishing-triage/workflow.temporal.py drifted "
+        "examples/temporal/phishing_triage/workflow.temporal.py drifted "
         "from the Temporal emitter output. Regenerate via "
-        "`./examples/temporal/phishing-triage/regenerate.sh` and commit "
+        "`./examples/temporal/phishing_triage/regenerate.sh` and commit "
         "the new bytes."
     )
 
 
 def test_mirrored_cacao_matches_canonical_source() -> None:
     assert MIRRORED_CACAO.read_bytes() == SOURCE.read_bytes(), (
-        "examples/temporal/phishing-triage/playbook.cacao.json drifted "
-        "from the canonical content/playbooks/phishing-triage/playbook.cacao.json. "
-        "Regenerate via `./examples/temporal/phishing-triage/regenerate.sh`."
+        "examples/temporal/phishing_triage/playbook.cacao.json drifted "
+        "from the canonical content/playbooks/phishing_triage/playbook.cacao.json. "
+        "Regenerate via `./examples/temporal/phishing_triage/regenerate.sh`."
     )
 
 

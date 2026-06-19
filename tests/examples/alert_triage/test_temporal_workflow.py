@@ -1,7 +1,7 @@
-"""Drift guard for the ``examples/temporal/alert-triage/`` worked example.
+"""Drift guard for the ``examples/temporal/alert_triage/`` worked example.
 
-The canonical alert-triage CACAO source is YAML at
-``content/playbooks/alert-triage.cacao.yaml``. The worked example commits:
+The canonical alert_triage CACAO source is YAML at
+``content/playbooks/alert_triage.cacao.yaml``. The worked example commits:
 
 * ``playbook.cacao.json`` — byte-deterministic JSON mirror of the YAML
   source (the Temporal emitter consumes JSON via the CACAO parser);
@@ -14,10 +14,10 @@ the README documents.
 
 Regenerate via::
 
-    ./examples/temporal/alert-triage/regenerate.sh
+    ./examples/temporal/alert_triage/regenerate.sh
 
-Mirrors the langgraph alert-triage and per-target temporal drift guards
-(phishing-triage, identity-compromise, cloud-misconfiguration).
+Mirrors the langgraph alert_triage and per-target temporal drift guards
+(phishing_triage, identity_compromise, cloud_misconfiguration).
 """
 from __future__ import annotations
 
@@ -30,8 +30,8 @@ import yaml
 from compilers.temporal.emit import emit_file
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-EXAMPLE_DIR = REPO_ROOT / "examples" / "temporal" / "alert-triage"
-CANON_YAML = REPO_ROOT / "content" / "playbooks" / "alert-triage.cacao.yaml"
+EXAMPLE_DIR = REPO_ROOT / "examples" / "temporal" / "alert_triage"
+CANON_YAML = REPO_ROOT / "content" / "playbooks" / "alert_triage.cacao.yaml"
 MIRRORED_CACAO = EXAMPLE_DIR / "playbook.cacao.json"
 WORKED_EXAMPLE = EXAMPLE_DIR / "workflow.temporal.py"
 
@@ -72,9 +72,9 @@ def test_json_mirror_matches_yaml_source() -> None:
     rendered = _serialise_json_mirror(data)
     expected = MIRRORED_CACAO.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/temporal/alert-triage/playbook.cacao.json drifted from the "
+        "examples/temporal/alert_triage/playbook.cacao.json drifted from the "
         "canonical YAML source. Regenerate via "
-        "`./examples/temporal/alert-triage/regenerate.sh` and commit the new "
+        "`./examples/temporal/alert_triage/regenerate.sh` and commit the new "
         "bytes."
     )
 
@@ -83,9 +83,9 @@ def test_worked_example_matches_emitter_output() -> None:
     rendered = emit_file(MIRRORED_CACAO)
     expected = WORKED_EXAMPLE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/temporal/alert-triage/workflow.temporal.py drifted from the "
+        "examples/temporal/alert_triage/workflow.temporal.py drifted from the "
         "Temporal emitter output. Regenerate via "
-        "`./examples/temporal/alert-triage/regenerate.sh` and commit the new "
+        "`./examples/temporal/alert_triage/regenerate.sh` and commit the new "
         "bytes."
     )
 

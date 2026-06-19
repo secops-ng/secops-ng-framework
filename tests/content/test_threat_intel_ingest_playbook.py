@@ -1,4 +1,4 @@
-"""Tests for the threat-intel-ingest SKELETON playbook.
+"""Tests for the threat_intel_ingest SKELETON playbook.
 
 Verifies:
 - the authored CACAO playbook validates against
@@ -23,7 +23,7 @@ import pytest
 from jsonschema import Draft202012Validator
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-PB_DIR = REPO_ROOT / "content" / "playbooks" / "threat-intel-ingest"
+PB_DIR = REPO_ROOT / "content" / "playbooks" / "threat_intel_ingest"
 PB_PATH = PB_DIR / "playbook.cacao.json"
 README_PATH = PB_DIR / "README.md"
 SCHEMA_PATH = REPO_ROOT / "content-model" / "playbook.schema.json"

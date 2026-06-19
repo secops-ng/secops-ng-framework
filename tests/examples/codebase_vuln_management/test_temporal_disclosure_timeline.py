@@ -1,7 +1,7 @@
 """F-WF-07 CORE-TEMPORAL — committed worked-example pins the Temporal adapter.
 
 The committed
-``examples/temporal/codebase-vuln-management/evidence/disclosure-timeline-record.json``
+``examples/temporal/codebase_vuln_management/evidence/disclosure-timeline-record.json``
 is the Temporal activity adapter's output for the context pinned in
 the example's ``regenerate.py``. This test re-drives the adapter
 exactly as a Temporal worker would (typed
@@ -16,7 +16,7 @@ adapter-replay invariant the CORE-TEMPORAL deliverable promises.
 
 If the change is intentional, regenerate the example::
 
-    PYTHONPATH=. python examples/temporal/codebase-vuln-management/regenerate.py
+    PYTHONPATH=. python examples/temporal/codebase_vuln_management/regenerate.py
 
 and commit the updated bytes alongside the emitter change.
 """
@@ -30,7 +30,7 @@ from pathlib import Path
 from compilers.temporal.evidence import emit_disclosure_timeline_artifact_activity
 
 REPO = Path(__file__).resolve().parents[3]
-EXAMPLE = REPO / "examples" / "temporal" / "codebase-vuln-management"
+EXAMPLE = REPO / "examples" / "temporal" / "codebase_vuln_management"
 SNAPSHOT = EXAMPLE / "evidence" / "disclosure-timeline-record.json"
 REGEN = EXAMPLE / "regenerate.py"
 
@@ -58,10 +58,10 @@ def test_example_snapshot_matches_temporal_adapter(tmp_path: Path) -> None:
     )
     written = Path(written_str)
     assert written.read_bytes() == SNAPSHOT.read_bytes(), (
-        "examples/temporal/codebase-vuln-management/evidence/"
+        "examples/temporal/codebase_vuln_management/evidence/"
         "disclosure-timeline-record.json drifted from the Temporal "
         "adapter. If intentional, regenerate via "
-        "`PYTHONPATH=. python examples/temporal/codebase-vuln-management/"
+        "`PYTHONPATH=. python examples/temporal/codebase_vuln_management/"
         "regenerate.py` and commit the new bytes."
     )
 
@@ -88,7 +88,7 @@ def test_temporal_replay_matches_committed_n8n_sibling() -> None:
         REPO
         / "examples"
         / "n8n"
-        / "codebase-vuln-management"
+        / "codebase_vuln_management"
         / "evidence"
         / "disclosure-timeline-record.json"
     )

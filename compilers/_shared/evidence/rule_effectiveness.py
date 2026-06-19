@@ -1,6 +1,6 @@
 """Per-rule-version effectiveness-snapshot emitter (F-WF-04 CORE-N8N).
 
-A pure helper that turns one ``measure`` walk of the detection-engineering
+A pure helper that turns one ``measure`` walk of the detection_engineering
 rule lifecycle into one record conforming to
 ``schemas/evidence/rule-effectiveness-snapshot.schema.json`` and writes
 it to disk.
@@ -138,7 +138,7 @@ class RefViz:
 class RuleEffectivenessContext:
     """One ``(rule_id, rule_version)`` evaluation of one effectiveness indicator.
 
-    The ``measure`` state of the detection-engineering rule lifecycle
+    The ``measure`` state of the detection_engineering rule lifecycle
     (F-WF-04) builds this dataclass from its own state — the rule
     being measured, the indicator catalogue entry, the OCSF source
     shape the indicator was derived from, the visualisation hint, and

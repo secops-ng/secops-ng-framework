@@ -31,7 +31,7 @@ column points to the typed shape the stream emits.
 | Stream | Card | Directory | Status | One-line summary |
 |--------|------|-----------|--------|------------------|
 | Risk-analysis | F-CP-01 | [`risk-analysis/`](risk-analysis/README.md) | In Progress | Per-control attestation that the operator's risk-management policy is adopted, owned by a named role, and re-assessed on its declared cadence (NIS2 Art. 21(2)(a), DORA Art. 5–6). |
-| Incidents | F-CP-02 | _pending_ | Proposed | Per-incident artifact emitted by the incident-management workflow, scoped to NIS2 reporting windows (NIS2 Art. 21(2)(b), Art. 23). |
+| Incidents | F-CP-02 | _pending_ | Proposed | Per-incident artifact emitted by the incident_management workflow, scoped to NIS2 reporting windows (NIS2 Art. 21(2)(b), Art. 23). |
 | Supply-chain | F-CP-03 | [`supply-chain/`](supply-chain/SCHEMA.md) | SKELETON in flight | Dependencies snapshot per workflow execution that calls an external provider, including provider sovereignty classification (NIS2 Art. 21(2)(d), Art. 22). |
 | Vulnerabilities | F-CP-04 | _pending_ | In Progress | Triage decisions and disclosure timelines emitted by `vulnerability_triage`, wired to the CVD-timing KPI family (NIS2 Art. 21(2)(e), CRA Art. 11). |
 | Crypto attestation | F-CP-05 | [`crypto/`](crypto/README.md) | SCHEMA in flight | Per-execution attestation that no secret was baked into workflow code — env-only injection, hard-failed at boot otherwise (NIS2 Art. 21(2)(h), Core Directive #6). |

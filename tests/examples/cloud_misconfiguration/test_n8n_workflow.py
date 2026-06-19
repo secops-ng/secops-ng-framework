@@ -1,18 +1,18 @@
-"""Drift guard for the ``examples/n8n/cloud-misconfiguration/`` worked example.
+"""Drift guard for the ``examples/n8n/cloud_misconfiguration/`` worked example.
 
-Mirrors the vuln-intake n8n example test: parses the canonical CACAO
+Mirrors the vuln_intake n8n example test: parses the canonical CACAO
 playbook, emits the n8n workflow JSON, and pins the result byte-for-byte
-against the committed ``examples/n8n/cloud-misconfiguration/workflow.json``.
+against the committed ``examples/n8n/cloud_misconfiguration/workflow.json``.
 Adds a node-id ↔ CACAO action-id parity check so the one-to-one mirroring
-contract documented in ``examples/n8n/cloud-misconfiguration/README.md`` is
+contract documented in ``examples/n8n/cloud_misconfiguration/README.md`` is
 enforced by tests, not by convention.
 
 Regenerate via::
 
     PYTHONPATH=. python -m tools.compile \\
-        content/playbooks/cloud-misconfiguration/playbook.cacao.json \\
+        content/playbooks/cloud_misconfiguration/playbook.cacao.json \\
         --target n8n \\
-        --out examples/n8n/cloud-misconfiguration/workflow.json
+        --out examples/n8n/cloud_misconfiguration/workflow.json
 """
 from __future__ import annotations
 
@@ -27,11 +27,11 @@ SOURCE = (
     REPO_ROOT
     / "content"
     / "playbooks"
-    / "cloud-misconfiguration"
+    / "cloud_misconfiguration"
     / "playbook.cacao.json"
 )
 WORKED_EXAMPLE = (
-    REPO_ROOT / "examples" / "n8n" / "cloud-misconfiguration" / "workflow.json"
+    REPO_ROOT / "examples" / "n8n" / "cloud_misconfiguration" / "workflow.json"
 )
 
 
@@ -44,10 +44,10 @@ def test_worked_example_matches_emitter_output() -> None:
     rendered = _serialise(emit(playbook))
     expected = WORKED_EXAMPLE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/n8n/cloud-misconfiguration/workflow.json drifted from the "
+        "examples/n8n/cloud_misconfiguration/workflow.json drifted from the "
         "n8n emitter output. Regenerate via `PYTHONPATH=. python -m "
-        "tools.compile content/playbooks/cloud-misconfiguration/playbook.cacao.json "
-        "--target n8n --out examples/n8n/cloud-misconfiguration/workflow.json` "
+        "tools.compile content/playbooks/cloud_misconfiguration/playbook.cacao.json "
+        "--target n8n --out examples/n8n/cloud_misconfiguration/workflow.json` "
         "and commit the new bytes."
     )
 
@@ -222,17 +222,17 @@ def test_co_located_cacao_mirror_matches_canonical() -> None:
         REPO_ROOT
         / "examples"
         / "n8n"
-        / "cloud-misconfiguration"
+        / "cloud_misconfiguration"
         / "playbook.cacao.json"
     )
     assert mirror.exists(), (
-        "examples/n8n/cloud-misconfiguration/playbook.cacao.json missing — "
-        "run ./examples/n8n/cloud-misconfiguration/regenerate.sh"
+        "examples/n8n/cloud_misconfiguration/playbook.cacao.json missing — "
+        "run ./examples/n8n/cloud_misconfiguration/regenerate.sh"
     )
     assert mirror.read_bytes() == SOURCE.read_bytes(), (
-        "examples/n8n/cloud-misconfiguration/playbook.cacao.json drifted "
+        "examples/n8n/cloud_misconfiguration/playbook.cacao.json drifted "
         "from the canonical CACAO source. Re-run "
-        "./examples/n8n/cloud-misconfiguration/regenerate.sh and commit."
+        "./examples/n8n/cloud_misconfiguration/regenerate.sh and commit."
     )
 
 

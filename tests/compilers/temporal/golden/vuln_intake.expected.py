@@ -93,7 +93,7 @@ QUEUE_ROUTINE_TICKET_RETRY_POLICY = RetryPolicy(
 
 @workflow.defn
 class PlaybookVulnIntakeV1Workflow:
-    """CACAO playbook used by the shared parser tests. Triages an incoming vulnerability advisory, branches on critical severity, then opens a remediation ticket. Authoring of the canonical vuln-intake playbook under content/ is tracked on a separate card; this copy is a parser fixture only.
+    """CACAO playbook used by the shared parser tests. Triages an incoming vulnerability advisory, branches on critical severity, then opens a remediation ticket. Authoring of the canonical vuln_intake playbook under content/ is tracked on a separate card; this copy is a parser fixture only.
 
     CACAO playbook id : playbook--aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa
     stable_id         : playbook.vuln_intake@v1

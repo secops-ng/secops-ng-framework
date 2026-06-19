@@ -3,7 +3,7 @@
   "nodes": [
     {
       "id": "start--30000000-0000-4000-8000-000000000001",
-      "name": "identity-compromise-start",
+      "name": "identity_compromise_start",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
@@ -318,7 +318,7 @@
     },
     {
       "id": "end--30000000-0000-4000-8000-000000000008",
-      "name": "identity-compromise-end",
+      "name": "identity_compromise_end",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
@@ -331,7 +331,7 @@
     },
     {
       "id": "end--30000000-0000-4000-8000-000000000009",
-      "name": "identity-compromise-false-positive-end",
+      "name": "identity_compromise_false_positive_end",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
@@ -344,7 +344,7 @@
     }
   ],
   "connections": {
-    "identity-compromise-start": {
+    "identity_compromise_start": {
       "main": [
         [
           {
@@ -377,7 +377,7 @@
         ],
         [
           {
-            "node": "identity-compromise-false-positive-end",
+            "node": "identity_compromise_false_positive_end",
             "type": "main",
             "index": 0
           }
@@ -421,7 +421,7 @@
       "main": [
         [
           {
-            "node": "identity-compromise-end",
+            "node": "identity_compromise_end",
             "type": "main",
             "index": 0
           }
@@ -435,7 +435,7 @@
   },
   "staticData": null,
   "tags": [
-    "identity-compromise",
+    "identity_compromise",
     "account-takeover",
     "iam",
     "session-revocation",

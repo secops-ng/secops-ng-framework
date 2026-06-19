@@ -1,15 +1,15 @@
-"""Drift guard for the ``examples/n8n/alert-triage/`` worked example.
+"""Drift guard for the ``examples/n8n/alert_triage/`` worked example.
 
 Mirrors the other n8n example tests (``tests/examples/phishing_triage/
 test_n8n_workflow.py`` etc.): parses the worked-example CACAO mirror,
 emits the n8n workflow JSON, and pins the result byte-for-byte against
-the committed ``examples/n8n/alert-triage/workflow.n8n.json``.
+the committed ``examples/n8n/alert_triage/workflow.n8n.json``.
 
-Unlike phishing-triage / vuln-intake the canonical alert-triage source
-lives one level up at ``content/playbooks/alert-triage.cacao.yaml``
+Unlike phishing_triage / vuln_intake the canonical alert_triage source
+lives one level up at ``content/playbooks/alert_triage.cacao.yaml``
 (YAML), so this test additionally verifies the byte-deterministic
 JSON mirror committed alongside the n8n example is in sync with that
-YAML — same contract the LangGraph alert-triage drift guard enforces
+YAML — same contract the LangGraph alert_triage drift guard enforces
 for its mirror. The pattern follows
 ``tests/examples/test_langgraph_alert_triage.py`` for the mirror check
 and the n8n CORE assertions (node-id / Set-node uplift) follow
@@ -17,7 +17,7 @@ and the n8n CORE assertions (node-id / Set-node uplift) follow
 
 Regenerate via::
 
-    ./examples/n8n/alert-triage/regenerate.sh
+    ./examples/n8n/alert_triage/regenerate.sh
 """
 from __future__ import annotations
 
@@ -30,8 +30,8 @@ from compilers._shared.cacao_parser import parse_file
 from compilers.n8n.emit import emit
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-EXAMPLE_DIR = REPO_ROOT / "examples" / "n8n" / "alert-triage"
-CANON_YAML = REPO_ROOT / "content" / "playbooks" / "alert-triage.cacao.yaml"
+EXAMPLE_DIR = REPO_ROOT / "examples" / "n8n" / "alert_triage"
+CANON_YAML = REPO_ROOT / "content" / "playbooks" / "alert_triage.cacao.yaml"
 MIRROR_JSON = EXAMPLE_DIR / "playbook.cacao.json"
 WORKED_EXAMPLE = EXAMPLE_DIR / "workflow.n8n.json"
 
@@ -68,9 +68,9 @@ def test_json_mirror_matches_yaml_source() -> None:
     rendered = _serialise_json_mirror(data)
     expected = MIRROR_JSON.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/n8n/alert-triage/playbook.cacao.json drift from the "
+        "examples/n8n/alert_triage/playbook.cacao.json drift from the "
         "canonical YAML source. Regenerate via "
-        "`bash examples/n8n/alert-triage/regenerate.sh` and commit the result."
+        "`bash examples/n8n/alert_triage/regenerate.sh` and commit the result."
     )
 
 
@@ -79,9 +79,9 @@ def test_worked_example_matches_emitter_output() -> None:
     rendered = _serialise_workflow(emit(playbook))
     expected = WORKED_EXAMPLE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/n8n/alert-triage/workflow.n8n.json drifted from the "
+        "examples/n8n/alert_triage/workflow.n8n.json drifted from the "
         "n8n emitter output. Regenerate via "
-        "`./examples/n8n/alert-triage/regenerate.sh` and commit the new bytes."
+        "`./examples/n8n/alert_triage/regenerate.sh` and commit the new bytes."
     )
 
 
@@ -201,7 +201,7 @@ def test_core_body_steps_emit_code_nodes() -> None:
     rendering the primitive call (per CORE-MECH-EMIT-N8N)."""
     nodes_by_id = _nodes_by_id()
     core_steps = _core_body_steps()
-    assert core_steps, "expected at least one CORE-bound step in alert-triage"
+    assert core_steps, "expected at least one CORE-bound step in alert_triage"
     for step_id, step in core_steps.items():
         node = nodes_by_id[step_id]
         assert node["type"] == "n8n-nodes-base.code", (

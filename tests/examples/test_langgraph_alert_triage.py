@@ -1,12 +1,12 @@
-"""Drift guard for the ``examples/langgraph/alert-triage/`` worked example.
+"""Drift guard for the ``examples/langgraph/alert_triage/`` worked example.
 
 The worked example commits the *real* artefacts produced by the
-LangGraph reference compiler against the alert-triage CACAO source.
+LangGraph reference compiler against the alert_triage CACAO source.
 Unlike the other LangGraph worked examples in this repository, the
-canonical alert-triage source lives one directory up at
-``content/playbooks/alert-triage.cacao.yaml`` (YAML), so the worked
+canonical alert_triage source lives one directory up at
+``content/playbooks/alert_triage.cacao.yaml`` (YAML), so the worked
 example additionally commits a byte-deterministic JSON mirror at
-``examples/langgraph/alert-triage/playbook.cacao.json`` (the input the
+``examples/langgraph/alert_triage/playbook.cacao.json`` (the input the
 LangGraph emitter actually consumes).
 
 This test re-runs the YAML→JSON mirror and both emitters, then asserts
@@ -17,11 +17,11 @@ the committed files match byte-for-byte:
 * ``state_bindings.py`` — ``python -m compilers.langgraph.state``
 
 Any intentional source / compiler change must be paired with a
-regeneration (``examples/langgraph/alert-triage/regenerate.sh``) so
+regeneration (``examples/langgraph/alert_triage/regenerate.sh``) so
 the worked example never lies about what the live compiler produces.
 
 Pattern mirrors ``tests/examples/test_langgraph_post_incident_review.py``;
-the extra mirror-drift assertion is specific to alert-triage and the
+the extra mirror-drift assertion is specific to alert_triage and the
 other YAML-sourced playbooks that will follow.
 """
 from __future__ import annotations
@@ -37,8 +37,8 @@ from compilers.langgraph.emit import emit
 from compilers.langgraph.state import render_module
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-EXAMPLE_DIR = REPO_ROOT / "examples" / "langgraph" / "alert-triage"
-CANON_YAML = REPO_ROOT / "content" / "playbooks" / "alert-triage.cacao.yaml"
+EXAMPLE_DIR = REPO_ROOT / "examples" / "langgraph" / "alert_triage"
+CANON_YAML = REPO_ROOT / "content" / "playbooks" / "alert_triage.cacao.yaml"
 COMMITTED_JSON = EXAMPLE_DIR / "playbook.cacao.json"
 COMMITTED_GRAPH = EXAMPLE_DIR / "graph_spec.json"
 COMMITTED_MODULE = EXAMPLE_DIR / "state_bindings.py"
@@ -76,9 +76,9 @@ def test_json_mirror_matches_yaml_source() -> None:
     rendered = _serialise_json_mirror(data)
     expected = COMMITTED_JSON.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/langgraph/alert-triage/playbook.cacao.json drift from the "
+        "examples/langgraph/alert_triage/playbook.cacao.json drift from the "
         "canonical YAML source. Regenerate via "
-        "`bash examples/langgraph/alert-triage/regenerate.sh` and commit the "
+        "`bash examples/langgraph/alert_triage/regenerate.sh` and commit the "
         "result."
     )
 
@@ -88,8 +88,8 @@ def test_graph_spec_matches_emitter_output() -> None:
     rendered = _serialise_graph(emit(playbook))
     expected = COMMITTED_GRAPH.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/langgraph/alert-triage/graph_spec.json drift. Regenerate "
-        "via `bash examples/langgraph/alert-triage/regenerate.sh` and commit "
+        "examples/langgraph/alert_triage/graph_spec.json drift. Regenerate "
+        "via `bash examples/langgraph/alert_triage/regenerate.sh` and commit "
         "the result."
     )
 
@@ -105,7 +105,7 @@ def test_state_bindings_matches_state_emitter_output() -> None:
     rendered = render_module(playbook) + "\n"
     expected = COMMITTED_MODULE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/langgraph/alert-triage/state_bindings.py drift. Regenerate "
-        "via `bash examples/langgraph/alert-triage/regenerate.sh` and commit "
+        "examples/langgraph/alert_triage/state_bindings.py drift. Regenerate "
+        "via `bash examples/langgraph/alert_triage/regenerate.sh` and commit "
         "the result."
     )

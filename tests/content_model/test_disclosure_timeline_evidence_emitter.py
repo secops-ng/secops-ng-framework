@@ -3,7 +3,7 @@
 Pins:
 
 1. The shared emitter renders / writes a record that validates against
-   ``content/evidence/codebase-vuln-management/disclosure-timeline-record.schema.json``.
+   ``content/evidence/codebase_vuln_management/disclosure-timeline-record.schema.json``.
 2. The record ``id`` is deterministic on
    ``(workflow_id, sbom_content_hash, component.purl, advisory_id)``
    — same inputs reproduce the same id; different inputs do not.
@@ -43,7 +43,7 @@ SCHEMA_PATH = (
     REPO
     / "content"
     / "evidence"
-    / "codebase-vuln-management"
+    / "codebase_vuln_management"
     / "disclosure-timeline-record.schema.json"
 )
 

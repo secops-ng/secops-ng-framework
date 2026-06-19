@@ -1,0 +1,43 @@
+{
+  "stable_id": "kpi.mttd_phishing@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Mean time to detect — phishing report",
+  "summary": "Time between the earliest available evidence of a suspicious message in inbound email telemetry and the moment the phishing_triage enrichment step completes. Measures how fast a reported (or swept) message moves from sitting in a mailbox to having an OCSF Email/URL/File-Activity-shaped evidence packet attached. Lower is better.",
+  "unit": "minutes",
+  "direction": "lower_is_better",
+  "target": { "value": 30, "comparator": "<=", "rationale": "ENISA good-practice baseline for inbound phishing-report triage latency." },
+  "thresholds": [
+    { "name": "warn",   "comparator": ">", "value": 60,  "severity": "warn" },
+    { "name": "breach", "comparator": ">", "value": 240, "severity": "high" }
+  ],
+  "measurement": {
+    "source": "composite",
+    "aggregation": "p95",
+    "formula": "p95( enrichment_step.completed_at - earliest_email_event_time ) over phishing_triage runs in window.",
+    "inputs": [
+      { "name": "first_event",      "telemetry_ref": "telemetry.ocsf.email_activity@v1", "field": "time", "description": "earliest OCSF Email Activity timestamp for the reported message" },
+      { "name": "enrichment_done",  "playbook_ref":  "playbook.phishing_triage@v1", "playbook_step": "action--c0a17a01-0000-4000-8000-000000000003", "description": "completion of the enrich-headers/URLs/attachments step" }
+    ],
+    "window": { "duration": "P30D", "sliding": true }
+  },
+  "playbook_refs": [
+    { "playbook_id": "playbook.phishing_triage@v1", "step_id": "action--c0a17a01-0000-4000-8000-000000000003" }
+  ],
+  "detection_refs": [
+    "detection.sigma.email.suspicious_sender_domain@v1",
+    "detection.sigma.email.url_shortener_in_body@v1",
+    "detection.sigma.email.attachment_double_extension@v1"
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.email_activity@v1",
+    "telemetry.ocsf.url_activity@v1",
+    "telemetry.ocsf.file_activity@v1"
+  ],
+  "external_refs": [
+    { "name": "ENISA Threat Landscape", "source": "ENISA", "url": "https://www.enisa.europa.eu/topics/threat-risk-management" },
+    { "name": "NIS2 Article 21(2)(b) — incident handling", "source": "EUR-Lex", "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj", "external_id": "32022L2555" }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}

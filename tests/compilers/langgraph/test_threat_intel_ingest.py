@@ -1,7 +1,7 @@
-"""Golden tests for the LangGraph reference compiler — threat-intel-ingest.
+"""Golden tests for the LangGraph reference compiler — threat_intel_ingest.
 
-Mirrors ``test_golden.py`` (vuln-intake) and
-``test_identity_compromise.py`` for the threat-intel-ingest fixture:
+Mirrors ``test_golden.py`` (vuln_intake) and
+``test_identity_compromise.py`` for the threat_intel_ingest fixture:
 pins both the GraphSpec JSON and the state + tool bindings module
 byte-for-byte.
 
@@ -63,7 +63,7 @@ def test_graph_spec_matches_golden() -> None:
     rendered = _serialise_graph(emit(playbook))
     expected = GOLDEN_GRAPH.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "LangGraph graph-spec golden drift (threat-intel-ingest). "
+        "LangGraph graph-spec golden drift (threat_intel_ingest). "
         "Regenerate via `python -m compilers.langgraph.emit "
         f"{FIXTURE.relative_to(REPO_ROOT)} > "
         f"{GOLDEN_GRAPH.relative_to(REPO_ROOT)}` and commit in the same PR."
@@ -81,7 +81,7 @@ def test_graph_spec_emit_is_deterministic() -> None:
 
 
 def test_graph_spec_golden_has_expected_shape() -> None:
-    """Sanity-check the golden carries the threat-intel-ingest topology."""
+    """Sanity-check the golden carries the threat_intel_ingest topology."""
     payload = json.loads(GOLDEN_GRAPH.read_text(encoding="utf-8"))
     assert payload["stable_id"] == "playbook.threat_intel_ingest@v1"
     assert payload["end_sentinel"] == "__END__"
@@ -107,7 +107,7 @@ def test_module_matches_golden() -> None:
     rendered = render_module(playbook)
     expected = GOLDEN_MODULE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "LangGraph state-module golden drift (threat-intel-ingest). "
+        "LangGraph state-module golden drift (threat_intel_ingest). "
         "Regenerate via `python -m compilers.langgraph.state "
         f"{FIXTURE.relative_to(REPO_ROOT)} > "
         f"{GOLDEN_MODULE.relative_to(REPO_ROOT)}` and commit in the same PR."

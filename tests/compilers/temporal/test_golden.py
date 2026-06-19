@@ -1,6 +1,6 @@
 """Golden test for the Temporal compiler.
 
-Locks down the exact emitted Python source for the ``vuln-intake`` worked
+Locks down the exact emitted Python source for the ``vuln_intake`` worked
 example. Any change to the emitter that alters output for this fixture
 must update the golden file in lockstep, surfacing regressions in code
 review rather than letting silent drift land on main.
@@ -70,7 +70,7 @@ def test_data_exfil_matches_golden() -> None:
     actual = emit_file(DATA_EXFIL_FIXTURE)
     expected = DATA_EXFIL_GOLDEN.read_text(encoding="utf-8")
     assert actual == expected, (
-        "Temporal emitter output drifted from the data-exfil golden file. "
+        "Temporal emitter output drifted from the data_exfil golden file. "
         "If this change is intentional, regenerate "
         f"{DATA_EXFIL_GOLDEN.relative_to(Path(__file__).resolve().parents[3])} "
         "and review the diff before committing."
@@ -89,8 +89,8 @@ def test_data_exfil_emit_is_deterministic() -> None:
 
 
 def test_worked_example_stub_matches_golden() -> None:
-    """The committed `examples/temporal/data-exfil/workflow.temporal.py`
-    is the emitter's output for the data-exfil fixture; any drift between
+    """The committed `examples/temporal/data_exfil/workflow.temporal.py`
+    is the emitter's output for the data_exfil fixture; any drift between
     the worked example and the golden indicates the example was edited
     by hand instead of regenerated.
     """
@@ -98,7 +98,7 @@ def test_worked_example_stub_matches_golden() -> None:
         Path(__file__).resolve().parents[3]
         / "examples"
         / "temporal"
-        / "data-exfil"
+        / "data_exfil"
         / "workflow.temporal.py"
     )
     assert stub.exists(), f"missing worked-example stub: {stub}"
@@ -111,7 +111,7 @@ def test_threat_intel_ingest_matches_golden() -> None:
     actual = emit_file(THREAT_INTEL_INGEST_FIXTURE)
     expected = THREAT_INTEL_INGEST_GOLDEN.read_text(encoding="utf-8")
     assert actual == expected, (
-        "Temporal emitter output drifted from the threat-intel-ingest "
+        "Temporal emitter output drifted from the threat_intel_ingest "
         "golden file. If this change is intentional, regenerate "
         f"{THREAT_INTEL_INGEST_GOLDEN.relative_to(Path(__file__).resolve().parents[3])} "
         "and review the diff before committing."
@@ -133,11 +133,11 @@ def test_threat_intel_ingest_emit_is_deterministic() -> None:
     )
 
 
-# The threat-intel-ingest worked-example drift guard lives in
+# The threat_intel_ingest worked-example drift guard lives in
 # tests/examples/threat_intel_ingest/test_temporal_workflow.py — it
-# pins examples/temporal/threat-intel-ingest/workflow.temporal.py
+# pins examples/temporal/threat_intel_ingest/workflow.temporal.py
 # against the emitter output for the *canonical* CACAO playbook
-# (content/playbooks/threat-intel-ingest/playbook.cacao.json), which
+# (content/playbooks/threat_intel_ingest/playbook.cacao.json), which
 # is what regenerate.sh actually consumes. The fixture under
 # tests/compilers/_shared/fixtures/ is a separate compiler unit-test
 # input and diverges from the canonical source; do not pin the worked

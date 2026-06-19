@@ -54,7 +54,7 @@ Shared vocabularies the schema imports:
   the three Article 23(4) milestone names with their duration suffix
   (`early_warning_24h`, `incident_notification_72h`,
   `final_report_1mo`). The workflow-internal `StageName` alphabet in
-  [`primitives/stage_clock.py`](../../playbooks/incident-management/primitives/stage_clock.py)
+  [`primitives/stage_clock.py`](../../playbooks/incident_management/primitives/stage_clock.py)
   (`early_warning` / `notification` / `final_report`) maps onto this
   enum 1:1 via the duration suffix.
 - `provenance` shape — `{ source_url, captured_at, commit_sha }`,
@@ -77,7 +77,7 @@ each of the three atoms (`nis2:art-23-early-warning`,
 language is not copied into this repository.
 
 The incidents evidence stream discharges the operational half of that
-obligation by emitting, per execution of the `incident-management`
+obligation by emitting, per execution of the `incident_management`
 playbook (F-WF-05), a per-execution artifact that records *which
 incident the operator is handling*, *what significance verdict fired
 under what rule-ids*, *what point on the detect-to-recover lifecycle
@@ -96,7 +96,7 @@ the regulator clock and the upstream workflow signal that pins
 
 | Article 23(4) milestone | Schema enum value (`notification_timeline[].milestone`) | `clock_started_at` is pinned by | `submitted_at` is pinned by | `on_time` semantics | Downstream KPI / KRI |
 |-------------------------|---------------------------------------------------------|---------------------------------|------------------------------|---------------------|----------------------|
-| §23(4)(a) — early-warning, ≤24h from operator awareness | `early_warning_24h` | F-WF-05 `classify-significance` verdict on `lifecycle.detected_at` (operator-awareness anchor); rule-ids pinned in `classification.rule_ids[]`. | F-WF-05 `regulator-submission(early_warning)` stage success, recorded by [`primitives/regulator_submission.py`](../../playbooks/incident-management/primitives/regulator_submission.py). | `submitted_at − clock_started_at ≤ 24h`, evaluated by [`primitives/stage_clock.py`](../../playbooks/incident-management/primitives/stage_clock.py) on the `early_warning` stage. | `kpi.early_warning_on_time@v1`, `kri.early_warning_missed@v1`. |
+| §23(4)(a) — early-warning, ≤24h from operator awareness | `early_warning_24h` | F-WF-05 `classify-significance` verdict on `lifecycle.detected_at` (operator-awareness anchor); rule-ids pinned in `classification.rule_ids[]`. | F-WF-05 `regulator-submission(early_warning)` stage success, recorded by [`primitives/regulator_submission.py`](../../playbooks/incident_management/primitives/regulator_submission.py). | `submitted_at − clock_started_at ≤ 24h`, evaluated by [`primitives/stage_clock.py`](../../playbooks/incident_management/primitives/stage_clock.py) on the `early_warning` stage. | `kpi.early_warning_on_time@v1`, `kri.early_warning_missed@v1`. |
 | §23(4)(b) — incident notification, ≤72h from awareness | `incident_notification_72h` | Same operator-awareness anchor (`lifecycle.detected_at`); the 72h clock runs from the same `t0` as the 24h clock, not from the early-warning submission. | F-WF-05 `regulator-submission(notification)` stage success. | `submitted_at − clock_started_at ≤ 72h`, evaluated by `stage_clock.py` on the `notification` stage. | `kpi.notification_72h_on_time@v1`, `kpi.notification_sla_compliance@v1`, `kri.regulator_notification_overrun@v1`. |
 | §23(4)(d) — final report, ≤1 month after the incident notification | `final_report_1mo` | The incident-notification submission timestamp on the prior `incident_notification_72h` entry (`submitted_at`); the 1-month clock runs from notification, not from awareness. | F-WF-05 `regulator-submission(final_report)` stage success. | `submitted_at − clock_started_at ≤ 30d`, evaluated by `stage_clock.py` on the `final_report` stage. An operator who prefers calendar-month arithmetic swaps the helper in their compile target's adapter; the schema carries the timestamps, not the interpretation. | `kpi.final_report_on_time@v1`, `kpi.review_completion_sla@v1`. |
 

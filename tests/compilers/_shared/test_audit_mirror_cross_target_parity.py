@@ -83,7 +83,7 @@ def mirror_mod(tmp_path: Path):
 # to keep parity reproducible.
 _TS_PLACEHOLDER = "2026-06-03T00:00:00Z"
 
-_PLAYBOOK_ID = "vuln-intake"
+_PLAYBOOK_ID = "vuln_intake"
 _PLAYBOOK_VERSION = "0.1.0"
 _WORKFLOW_RUN_ID = "run-001"
 
@@ -271,7 +271,7 @@ def test_envelope_header_field_order_is_pinned(mirror_mod) -> None:
         b'"kind":"header",'
         b'"run_id":"run-001",'
         b'"schema_version":"1",'
-        b'"workflow_id":"vuln-intake"}'
+        b'"workflow_id":"vuln_intake"}'
     )
 
 

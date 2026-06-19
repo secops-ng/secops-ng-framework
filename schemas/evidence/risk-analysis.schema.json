@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://secops-ng.org/schemas/evidence/risk-analysis.schema.json",
   "title": "SecOps-NG Risk-Analysis Evidence Artifact",
-  "description": "Typed shape for one evidence artifact emitted by the risk-analysis evidence stream (F-CP-01). One artifact is produced per (control, cadence) pair; downstream consumers (kri.control_effectiveness@v1, the F-CP-06 effectiveness-loop stream, executive-metrics rollups) read these as the operator-side source of truth for how a risk-management control is performing against its declared review cadence. Public-bar artifact: operator-side strings (policy versions, owner labels) MUST stay role-shaped (mailbox, working-group, role title); individual names are out of scope per AGENTS.md §3.",
+  "description": "Typed shape for one evidence artifact emitted by the risk-analysis evidence stream (F-CP-01). One artifact is produced per (control, cadence) pair; downstream consumers (kri.control_effectiveness@v1, the F-CP-06 effectiveness-loop stream, executive_metrics rollups) read these as the operator-side source of truth for how a risk-management control is performing against its declared review cadence. Public-bar artifact: operator-side strings (policy versions, owner labels) MUST stay role-shaped (mailbox, working-group, role title); individual names are out of scope per AGENTS.md §3.",
   "type": "object",
   "additionalProperties": false,
   "required": [

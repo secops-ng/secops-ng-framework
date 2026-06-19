@@ -1,0 +1,170 @@
+# Cross-references for the threat_intel_ingest playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed/emitted, and the EU regulatory clauses (NIS2 /
+# DORA) this playbook helps operationalise. Inbound references
+# (NIS2 article 21(2)(d), DORA article 19(2)) live in
+# content/mappings/{nis2,dora}/ so the graph is closed in both
+# directions.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.threat_intel_ingest@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the feed-pull,
+  # normalisation, blocklist propagation, and detection-activation
+  # steps. Catalogue URLs resolve to the public NIST OSCAL repository.
+  - id: control.threat_intel_program@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: PM-16
+    title: Threat Awareness Program
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=PM-16
+    notes: >-
+      Anchors the playbook in an ongoing threat-awareness programme;
+      the upstream feed pull and normalisation steps are the
+      operational evidence the programme produces.
+
+  - id: control.threat_intel_program_automated_sharing@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: PM-16(1)
+    title: Threat Awareness Program | Automated Means for Sharing Threat Intelligence
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=PM-16(1)
+    notes: >-
+      Speaks directly to automated machine-readable threat-intel
+      ingest (STIX 2.1 / TAXII), which is the input contract of this
+      playbook.
+
+  - id: control.security_alerts_advisories_directives@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SI-5
+    title: Security Alerts, Advisories, and Directives
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-5
+    notes: >-
+      Receipt of external alerts and advisories — covers the upstream
+      feed pull and the operator-side propagation to detection.
+
+  - id: control.system_monitoring@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SI-4
+    title: System Monitoring
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-4
+    notes: >-
+      Covers the activate-detection-rule step: indicators feed the
+      monitoring system so subsequent telemetry generates alerts.
+
+  - id: control.boundary_protection@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SC-7
+    title: Boundary Protection
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SC-7
+    notes: >-
+      Covers the propagate-to-blocklist step: high-confidence
+      indicators (IP, domain, hash) are pushed to perimeter / DNS /
+      EDR enforcement points.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned where the technique applies to a
+  # single step; otherwise the step field is omitted.
+  - step: action--10000000-0000-4000-8000-000000000002
+    d3fend_id: D3-OAM
+    d3fend_name: Operational Activity Mapping
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    notes: >-
+      pull upstream feed — receiving operational/threat data from an
+      external source to inform defensive activity.
+
+  - step: action--10000000-0000-4000-8000-000000000003
+    d3fend_id: D3-IAA
+    d3fend_name: Identifier Activity Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IdentifierActivityAnalysis/
+    notes: >-
+      normalise STIX to OCSF — analysing identifiers (IPs, domains,
+      hashes) to characterise indicator activity.
+
+  - step: action--10000000-0000-4000-8000-000000000005
+    d3fend_id: D3-ITF
+    d3fend_name: Inbound Traffic Filtering
+    url: https://d3fend.mitre.org/technique/d3f:InboundTrafficFiltering/
+    notes: >-
+      propagate to blocklist — perimeter firewall blocklist
+      propagation for inbound traffic from indicator IPs.
+
+  - step: action--10000000-0000-4000-8000-000000000005
+    d3fend_id: D3-OTF
+    d3fend_name: Outbound Traffic Filtering
+    url: https://d3fend.mitre.org/technique/d3f:OutboundTrafficFiltering/
+    notes: >-
+      propagate to blocklist — egress filtering against known-bad C2
+      destinations from the indicator set.
+
+  - step: action--10000000-0000-4000-8000-000000000005
+    d3fend_id: D3-DNSDL
+    d3fend_name: DNS Denylisting
+    url: https://d3fend.mitre.org/technique/d3f:DNSDenylisting/
+    notes: >-
+      propagate to blocklist — DNS-layer sinkhole / denylist for
+      indicator domains.
+
+  - step: action--10000000-0000-4000-8000-000000000006
+    d3fend_id: D3-NTA
+    d3fend_name: Network Traffic Analysis
+    url: https://d3fend.mitre.org/technique/d3f:NetworkTrafficAnalysis/
+    notes: >-
+      activate detection rule — SIEM-side detection that matches
+      subsequent network telemetry against the activated rule set.
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. Note on the consumed side: the
+  # upstream input is a STIX 2.1 bundle delivered over TAXII (or an
+  # equivalent STIX 2.1 endpoint), NOT an OCSF event. STIX SDOs
+  # (Indicator, Malware, Threat-Actor) are mapped into the operator's
+  # canonical normalised-indicator record at the normalise step; the
+  # released OCSF v1.3.0 catalogue does not contain a dedicated
+  # threat-intel ingest class to pin against, so no consumed OCSF
+  # entry is asserted here. The only OCSF binding this playbook
+  # commits to is the Detection Finding (class_uid 2004) it emits
+  # when the activated upstream Sigma rule matches subsequent
+  # telemetry.
+  - id: telemetry.detection_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2004
+    class_name: Detection Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted when the activated upstream Sigma rule matches
+      subsequent telemetry. Schema:
+      https://schema.ocsf.io/1.3.0/classes/detection_finding
+
+nis2:
+  # Inbound entry lives at
+  # content/mappings/nis2/article-21-2-d.yaml (id nis2:art-21-2-d)
+  # and backlinks to playbook.threat_intel_ingest@v1.
+  - mapping_id: nis2:art-21-2-d
+    article: 21(2)(d)
+    notes: >-
+      Supply-chain security obligations under Art. 21(2)(d) require
+      essential and important entities to address the security
+      characteristics of direct suppliers and service providers.
+      Threat-intel ingest contributes the IOC-driven signal that
+      lets an operator notice when a known-bad indicator touches a
+      supplier-adjacent surface, feeding the supplier-attestation
+      and re-attestation cadence.
+
+dora:
+  # Inbound entry lives at
+  # content/mappings/dora/article-19-and-28.yaml
+  # (id dora:art-19-cyber-threat-voluntary) and backlinks to
+  # playbook.threat_intel_ingest@v1.
+  - mapping_id: dora:art-19-cyber-threat-voluntary
+    article: "19(2)"
+    notes: >-
+      DORA Art. 19(2) permits voluntary notification of significant
+      cyber threats to the competent authority. Threat-intel ingest
+      produces the normalised indicator stream and Detection Finding
+      events that an operator can lift into a voluntary notification
+      payload; the framework provides the artefact, the operator owns
+      the submission decision and transport.

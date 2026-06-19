@@ -1,7 +1,7 @@
 """Threat-intel-ingest KPI metric files — schema validation + linkage.
 
 Validates every JSON in
-``content-model/examples/threat-intel-ingest/metrics/`` against the
+``content-model/examples/threat_intel_ingest/metrics/`` against the
 metrics schema and asserts the per-playbook linkage invariants the
 EXTEND card commits to:
 
@@ -9,7 +9,7 @@ EXTEND card commits to:
 - each metric pins ``playbook.threat_intel_ingest@v1`` in its
   ``playbook_refs``;
 - step_ids referenced from metrics resolve to real workflow steps
-  in ``content/playbooks/threat-intel-ingest/playbook.cacao.json``;
+  in ``content/playbooks/threat_intel_ingest/playbook.cacao.json``;
 - the playbook's top-level ``x_secops_ng.metric_refs`` is exactly the
   set of metric stable_ids present in the metrics dir (closed graph).
 
@@ -26,9 +26,9 @@ from jsonschema import Draft202012Validator
 ROOT = Path(__file__).resolve().parents[2]
 CONTENT_MODEL = ROOT / "content-model"
 METRICS_SCHEMA = CONTENT_MODEL / "metrics.schema.json"
-METRICS_DIR = CONTENT_MODEL / "examples" / "threat-intel-ingest" / "metrics"
+METRICS_DIR = CONTENT_MODEL / "examples" / "threat_intel_ingest" / "metrics"
 PLAYBOOK_PATH = (
-    ROOT / "content" / "playbooks" / "threat-intel-ingest" / "playbook.cacao.json"
+    ROOT / "content" / "playbooks" / "threat_intel_ingest" / "playbook.cacao.json"
 )
 PLAYBOOK_STABLE_ID = "playbook.threat_intel_ingest@v1"
 
@@ -62,7 +62,7 @@ def test_metrics_dir_is_populated() -> None:
     files = _metric_files()
     assert files, (
         "expected at least one metric JSON under "
-        "content-model/examples/threat-intel-ingest/metrics/"
+        "content-model/examples/threat_intel_ingest/metrics/"
     )
 
 

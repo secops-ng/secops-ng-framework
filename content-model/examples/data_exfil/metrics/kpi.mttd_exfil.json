@@ -1,0 +1,72 @@
+{
+  "stable_id": "kpi.mttd_exfil@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Mean time to detect \u2014 data exfiltration (MTTD)",
+  "summary": "Time between the earliest available evidence of egress of classified data in telemetry and the moment a SecOps-NG detection fires on it. Lower is better.",
+  "unit": "minutes",
+  "direction": "lower_is_better",
+  "target": {
+    "value": 30,
+    "comparator": "<=",
+    "rationale": "ENISA good-practice baseline for exfiltration-class signals."
+  },
+  "thresholds": [
+    {
+      "name": "warn",
+      "comparator": ">",
+      "value": 60,
+      "severity": "warn"
+    },
+    {
+      "name": "breach",
+      "comparator": ">",
+      "value": 240,
+      "severity": "critical"
+    }
+  ],
+  "measurement": {
+    "source": "composite",
+    "aggregation": "p95",
+    "formula": "p95( detection.first_fire_time - telemetry.first_event_time ) over confirmed data_exfil findings within window.",
+    "inputs": [
+      {
+        "name": "first_event",
+        "telemetry_ref": "telemetry.ocsf.dlp_alert@v1",
+        "field": "time",
+        "description": "earliest DLP-alert OCSF event time"
+      },
+      {
+        "name": "first_fire",
+        "detection_ref": "detection.sigma.dlp_egress_alert@v1",
+        "description": "earliest detection firing time correlated to the finding"
+      }
+    ],
+    "window": {
+      "duration": "P30D",
+      "sliding": true
+    }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.data_exfil@v1",
+      "step_id": "triage_signal"
+    }
+  ],
+  "detection_refs": [
+    "detection.sigma.dlp_egress_alert@v1",
+    "detection.sigma.data_staging_archive_created@v1"
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.dlp_alert@v1"
+  ],
+  "external_refs": [
+    {
+      "name": "ENISA Threat Landscape",
+      "source": "ENISA",
+      "url": "https://www.enisa.europa.eu/topics/threat-risk-management"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}

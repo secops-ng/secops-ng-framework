@@ -1,4 +1,4 @@
-"""Unit tests for the alert-triage typed-payload validators.
+"""Unit tests for the alert_triage typed-payload validators.
 
 Covers both source shapes:
 

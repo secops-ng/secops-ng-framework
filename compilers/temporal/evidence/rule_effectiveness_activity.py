@@ -10,7 +10,7 @@ re-implementing record assembly.
 
 Per the workflow contract, one effectiveness-metric snapshot is emitted
 per ``(rule_id, rule_version)`` per evaluation window per indicator by
-the ``measure`` state of the detection-engineering rule lifecycle. The
+the ``measure`` state of the detection_engineering rule lifecycle. The
 activity returns the absolute artifact path as a string so the
 Temporal-side caller can attach it to subsequent activity inputs (the
 follow-up re-tune branch, the F-WF-09 auditor-bundle slot once that

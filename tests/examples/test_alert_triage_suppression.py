@@ -1,6 +1,6 @@
 """Suppression-window collision contract across n8n, Temporal, and LangGraph.
 
-The alert-triage worked examples share one primitive contract for case
+The alert_triage worked examples share one primitive contract for case
 suppression: ``alert_triage.primitives.suppression.canonical_seen_key``
 is bound to the enrich-and-prepare step (``__seen_key__``) and the
 ``suppress and close`` step of every compiled target. Two alerts that
@@ -69,9 +69,9 @@ SUPPRESSION_SYMBOL = "canonical_seen_key"
 
 # (target_label, path_to_emitted_artefact) pairs — one test per target.
 TARGETS: list[tuple[str, Path]] = [
-    ("n8n", EXAMPLES / "n8n" / "alert-triage" / "workflow.n8n.json"),
-    ("temporal", EXAMPLES / "temporal" / "alert-triage" / "workflow.temporal.py"),
-    ("langgraph", EXAMPLES / "langgraph" / "alert-triage" / "state_bindings.py"),
+    ("n8n", EXAMPLES / "n8n" / "alert_triage" / "workflow.n8n.json"),
+    ("temporal", EXAMPLES / "temporal" / "alert_triage" / "workflow.temporal.py"),
+    ("langgraph", EXAMPLES / "langgraph" / "alert_triage" / "state_bindings.py"),
 ]
 
 
@@ -204,7 +204,7 @@ def test_second_alert_routes_to_existing_case_within_window() -> None:
     verdict_second = window.is_seen(now=now_t1, **_ALERT_B)
     assert verdict_second.suppressed is True, (
         "second alert within the suppression window must be suppressed; "
-        "the alert-triage contract collapses re-fires onto the prior case"
+        "the alert_triage contract collapses re-fires onto the prior case"
     )
     assert verdict_second.seen_key == verdict_first.seen_key
     assert verdict_second.matched_case_ref == "case-0001"
@@ -272,7 +272,7 @@ def test_audit_trail_records_suppression_decision_once() -> None:
     import importlib.util
     import sys
 
-    mirror_path = EXAMPLES / "langgraph" / "alert-triage" / "_audit_mirror.py"
+    mirror_path = EXAMPLES / "langgraph" / "alert_triage" / "_audit_mirror.py"
     spec = importlib.util.spec_from_file_location(
         "alert_triage_audit_mirror", mirror_path
     )
@@ -351,7 +351,7 @@ def test_changing_any_seen_key_field_yields_distinct_key(
 
 def test_seen_key_is_target_agnostic() -> None:
     """The suppression primitive lives in
-    ``content/playbooks/alert-triage/`` and is imported verbatim by every
+    ``content/playbooks/alert_triage/`` and is imported verbatim by every
     target's enrich + suppress-and-close steps. Driving it from the test
     runner directly is therefore the same call the n8n ``pythonCode``
     node, the Temporal ``@activity.defn``, and the LangGraph ``@tool``

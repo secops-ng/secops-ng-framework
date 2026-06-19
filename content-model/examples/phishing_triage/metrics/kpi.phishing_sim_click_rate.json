@@ -1,0 +1,37 @@
+{
+  "stable_id": "kpi.phishing_sim_click_rate@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Phishing simulation click rate",
+  "summary": "Share of recipients who clicked a URL in a sanctioned phishing-simulation campaign within the evaluation window. A staff-awareness coverage KPI tied to NIS2 Article 21(2)(g) cyber-hygiene and training obligations. The phishing_triage playbook contributes the click telemetry because credential-harvest-branch responses account clicker identities against the simulation campaign tag.",
+  "unit": "percent",
+  "direction": "lower_is_better",
+  "target": { "value": 5, "comparator": "<=", "rationale": "Awareness-programme baseline; sustained rates above this trigger remediation training." },
+  "thresholds": [
+    { "name": "warn",   "comparator": ">", "value": 10, "severity": "warn" },
+    { "name": "breach", "comparator": ">", "value": 20, "severity": "high" }
+  ],
+  "measurement": {
+    "source": "telemetry",
+    "aggregation": "percent",
+    "formula": "100 * count(distinct recipients with at least one OCSF URL Activity click event on a simulation-tagged URL) / count(distinct recipients targeted by the campaign).",
+    "inputs": [
+      { "name": "clicks",     "telemetry_ref": "telemetry.ocsf.url_activity@v1", "field": "user.uid", "description": "URL Activity click events whose URL matches the simulation campaign tag" },
+      { "name": "recipients", "telemetry_ref": "telemetry.ocsf.email_activity@v1", "field": "recipient.email_addr", "description": "distinct recipients of the simulation campaign messages" }
+    ],
+    "window": { "duration": "P30D", "sliding": true }
+  },
+  "playbook_refs": [
+    { "playbook_id": "playbook.phishing_triage@v1", "step_id": "action--c0a17a01-0000-4000-8000-000000000009" }
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.url_activity@v1",
+    "telemetry.ocsf.email_activity@v1"
+  ],
+  "external_refs": [
+    { "name": "NIS2 Article 21(2)(g) — cyber hygiene and training", "source": "EUR-Lex", "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj", "external_id": "32022L2555" },
+    { "name": "ENISA Awareness Raising Manual", "source": "ENISA", "url": "https://www.enisa.europa.eu/topics/cybersecurity-education/awareness-raising" }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}

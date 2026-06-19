@@ -1,9 +1,9 @@
-"""End-to-end content-model worked example: cloud-misconfiguration.
+"""End-to-end content-model worked example: cloud_misconfiguration.
 
 Mirrors `test_vuln_intake_example.py` and validates every artifact in
-`content-model/examples/cloud-misconfiguration/` against its layer
-schema. The cloud-misconfiguration example has a slightly different
-shape than vuln-intake — three controls + two telemetry classes, and
+`content-model/examples/cloud_misconfiguration/` against its layer
+schema. The cloud_misconfiguration example has a slightly different
+shape than vuln_intake — three controls + two telemetry classes, and
 no in-tree detection layer (the detection refs are upstream SigmaHQ
 rules pinned via the playbook's `external_references`) — so the
 cross-reference assertions are adapted accordingly.
@@ -18,8 +18,8 @@ from jsonschema import Draft202012Validator
 
 ROOT = Path(__file__).resolve().parents[2]
 CONTENT_MODEL = ROOT / "content-model"
-EX = CONTENT_MODEL / "examples" / "cloud-misconfiguration"
-PLAYBOOK_PATH = ROOT / "content" / "playbooks" / "cloud-misconfiguration" / "playbook.cacao.json"
+EX = CONTENT_MODEL / "examples" / "cloud_misconfiguration"
+PLAYBOOK_PATH = ROOT / "content" / "playbooks" / "cloud_misconfiguration" / "playbook.cacao.json"
 
 SCHEMAS = {
     "playbook":  CONTENT_MODEL / "playbook.schema.json",

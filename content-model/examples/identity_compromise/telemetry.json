@@ -1,0 +1,51 @@
+{
+  "stable_id": "telemetry.ocsf.authentication@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Authentication event (OCSF IAM Activity)",
+  "summary": "Identity-provider authentication event bound to the OCSF Authentication class. Consumed by impossible-travel detection and feeds the identity_compromise triage, MFA reset, session revocation, and lateral-hunt steps.",
+  "ocsf": {
+    "version": "1.3.0",
+    "category_uid": 3,
+    "category_name": "Identity & Access Management",
+    "class_uid": 3002,
+    "class_name": "Authentication",
+    "profiles": [
+      "cloud"
+    ]
+  },
+  "direction": "ingest",
+  "sample": {
+    "path": "content-model/examples/identity_compromise/telemetry.sample.json",
+    "media_type": "application/json"
+  },
+  "fields_used": [
+    "time",
+    "activity_id",
+    "user.uid",
+    "user.name",
+    "src_endpoint.ip",
+    "src_endpoint.location.country",
+    "auth_protocol",
+    "logon_type",
+    "mfa",
+    "status_id",
+    "session.uid"
+  ],
+  "detection_refs": [
+    "detection.sigma.azure_identity_protection_impossible_travel@v1"
+  ],
+  "control_refs": [
+    "control.iam.mfa_enforcement@v1"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.identity_compromise@v1",
+      "step_id": "triage_identity_signal"
+    }
+  ],
+  "sources": [
+    "OCSF v1.3.0 — Authentication (class_uid 3002)"
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org"
+}

@@ -1,0 +1,65 @@
+{
+  "stable_id": "control.cspm_baseline@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Cloud Security Posture Management — baseline attestation",
+  "summary": "Operator-maintained CSPM baseline that classifies each in-scope cloud resource against a canonical posture policy (NIST 800-53 CM-2 / CM-6 baselines, CIS Benchmarks, provider-published security baselines). Continuous-monitoring deviations are emitted as OCSF Compliance Findings (2003) and consumed by the cloud_misconfiguration playbook's ingest-finding step.",
+  "oscal": {
+    "component": {
+      "uuid": "6a7b8c9d-0e1f-4a2b-8c3d-4e5f6a7b8c9d",
+      "type": "service",
+      "title": "CSPM baseline service",
+      "description": "Continuous-monitoring service that evaluates cloud resources against the operator's posture baseline and emits compliance findings on deviation.",
+      "control-implementations": [
+        {
+          "uuid": "5a6b7c8d-9e0f-4011-9213-a4b5c6d7e8f0",
+          "source": "https://doi.org/10.6028/NIST.SP.800-53r5",
+          "description": "Implements baseline configuration, configuration settings, and component inventory for cloud resources.",
+          "implemented-requirements": [
+            {
+              "uuid": "ef010001-0001-0001-0001-000000000001",
+              "control-id": "cm-2",
+              "description": "Baseline configuration: operator maintains and reviews the cloud posture baseline."
+            },
+            {
+              "uuid": "ef010001-0001-0001-0001-000000000002",
+              "control-id": "cm-6",
+              "description": "Configuration settings: deviations from the baseline are detected and reported."
+            },
+            {
+              "uuid": "ef010001-0001-0001-0001-000000000003",
+              "control-id": "cm-8",
+              "description": "System component inventory: in-scope cloud resources are enumerated and tracked."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "d3fend": {
+    "technique_id": "D3-RAPA",
+    "technique_name": "Resource Access Pattern Analysis",
+    "url": "https://d3fend.mitre.org/technique/d3f:ResourceAccessPatternAnalysis/"
+  },
+  "attack_counters": [],
+  "detected_by": [
+    "detection.sigma.cspm_finding_critical@v1",
+    "detection.sigma.public_storage_bucket@v1"
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.compliance_finding@v1",
+    "telemetry.ocsf.cloud_resource_inventory@v1"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.cloud_misconfiguration@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000002"
+    }
+  ],
+  "maintainer": "controls-wg@secops-ng.org",
+  "sources": [
+    "NIST SP 800-53 Rev. 5 — CM-2 Baseline Configuration, CM-6 Configuration Settings, CM-8 System Component Inventory",
+    "ENISA — Cloud Security: posture-management guidance",
+    "MITRE D3FEND v1.0.0 — D3-RAPA Resource Access Pattern Analysis"
+  ]
+}

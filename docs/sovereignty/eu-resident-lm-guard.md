@@ -122,6 +122,6 @@ merging.
 * `compilers/_shared/lm_endpoint_guard.py` — implementation.
 * `tests/compilers/_shared/test_lm_endpoint_guard.py` — unit tests
   covering classification, the override, and runtime-module render.
-* The worked-example READMEs under `examples/langgraph/vuln-intake/`
-  (F-WF-01) and `examples/langgraph/phishing-triage/` (F-WF-03 worked
+* The worked-example READMEs under `examples/langgraph/vuln_intake/`
+  (F-WF-01) and `examples/langgraph/phishing_triage/` (F-WF-03 worked
   surface) reference the guard.

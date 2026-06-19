@@ -1,7 +1,7 @@
 """F-WF-04 CORE-N8N — committed worked-example pins the n8n adapter.
 
 The committed
-``examples/n8n/detection-engineering/evidence/rule-effectiveness-snapshot.json``
+``examples/n8n/detection_engineering/evidence/rule-effectiveness-snapshot.json``
 is the n8n adapter's output for the payload pinned in the example's
 ``regenerate.py``. This test re-drives the adapter from that payload
 and pins the on-disk bytes against the committed example — so a
@@ -10,7 +10,7 @@ changes serialisation gets caught at the byte level.
 
 If the change is intentional, regenerate the example::
 
-    PYTHONPATH=. python examples/n8n/detection-engineering/regenerate.py
+    PYTHONPATH=. python examples/n8n/detection_engineering/regenerate.py
 
 and commit the updated bytes alongside the emitter change.
 """
@@ -23,7 +23,7 @@ from pathlib import Path
 from compilers.n8n.evidence import emit_rule_effectiveness_snapshot_n8n
 
 REPO = Path(__file__).resolve().parents[3]
-EXAMPLE = REPO / "examples" / "n8n" / "detection-engineering"
+EXAMPLE = REPO / "examples" / "n8n" / "detection_engineering"
 SNAPSHOT = EXAMPLE / "evidence" / "rule-effectiveness-snapshot.json"
 REGEN = EXAMPLE / "regenerate.py"
 
@@ -49,10 +49,10 @@ def test_example_snapshot_matches_n8n_adapter(tmp_path: Path) -> None:
     result = emit_rule_effectiveness_snapshot_n8n(payload, tmp_path)
     written = Path(result["artifact_path"])
     assert written.read_bytes() == SNAPSHOT.read_bytes(), (
-        "examples/n8n/detection-engineering/evidence/"
+        "examples/n8n/detection_engineering/evidence/"
         "rule-effectiveness-snapshot.json drifted from the n8n adapter. "
         "If intentional, regenerate via "
-        "`PYTHONPATH=. python examples/n8n/detection-engineering/"
+        "`PYTHONPATH=. python examples/n8n/detection_engineering/"
         "regenerate.py` and commit the new bytes."
     )
 

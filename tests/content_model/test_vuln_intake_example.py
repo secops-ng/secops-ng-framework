@@ -1,6 +1,6 @@
-"""End-to-end content-model worked example: vuln-intake.
+"""End-to-end content-model worked example: vuln_intake.
 
-Validates every artifact in `content-model/examples/vuln-intake/` against
+Validates every artifact in `content-model/examples/vuln_intake/` against
 its layer schema and asserts the cross-reference graph is closed:
 
 - playbook ↔ detection / control / telemetry / metric (both directions)
@@ -23,7 +23,7 @@ from jsonschema import Draft202012Validator
 
 ROOT = Path(__file__).resolve().parents[2]
 CONTENT_MODEL = ROOT / "content-model"
-EX = CONTENT_MODEL / "examples" / "vuln-intake"
+EX = CONTENT_MODEL / "examples" / "vuln_intake"
 
 SCHEMAS = {
     "playbook":  CONTENT_MODEL / "playbook.schema.json",

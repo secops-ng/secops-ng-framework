@@ -1,7 +1,7 @@
-"""Golden tests for the LangGraph reference compiler — ransomware-containment.
+"""Golden tests for the LangGraph reference compiler — ransomware_containment.
 
-Mirrors ``test_golden.py`` (vuln-intake) and ``test_identity_compromise.py``
-for the ransomware-containment fixture: pins both the GraphSpec JSON and
+Mirrors ``test_golden.py`` (vuln_intake) and ``test_identity_compromise.py``
+for the ransomware_containment fixture: pins both the GraphSpec JSON and
 the state + tool bindings module byte-for-byte.
 
 Regenerate via::
@@ -62,7 +62,7 @@ def test_graph_spec_matches_golden() -> None:
     rendered = _serialise_graph(emit(playbook))
     expected = GOLDEN_GRAPH.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "LangGraph graph-spec golden drift (ransomware-containment). "
+        "LangGraph graph-spec golden drift (ransomware_containment). "
         "Regenerate via `python -m compilers.langgraph.emit "
         f"{FIXTURE.relative_to(REPO_ROOT)} > "
         f"{GOLDEN_GRAPH.relative_to(REPO_ROOT)}` and commit in the same PR."
@@ -80,7 +80,7 @@ def test_graph_spec_emit_is_deterministic() -> None:
 
 
 def test_graph_spec_golden_has_expected_shape() -> None:
-    """Sanity-check the golden carries the ransomware-containment topology."""
+    """Sanity-check the golden carries the ransomware_containment topology."""
     payload = json.loads(GOLDEN_GRAPH.read_text(encoding="utf-8"))
     assert payload["stable_id"] == "playbook.ransomware_containment@v1"
     assert payload["end_sentinel"] == "__END__"
@@ -106,7 +106,7 @@ def test_module_matches_golden() -> None:
     rendered = render_module(playbook)
     expected = GOLDEN_MODULE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "LangGraph state-module golden drift (ransomware-containment). "
+        "LangGraph state-module golden drift (ransomware_containment). "
         "Regenerate via `python -m compilers.langgraph.state "
         f"{FIXTURE.relative_to(REPO_ROOT)} > "
         f"{GOLDEN_MODULE.relative_to(REPO_ROOT)}` and commit in the same PR."

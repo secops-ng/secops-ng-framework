@@ -1,7 +1,7 @@
-"""Golden test for the Temporal compiler — executive-metrics-rollup.
+"""Golden test for the Temporal compiler — executive_metrics_rollup.
 
-Pins the emitted Temporal workflow stub for the executive-metrics-rollup
-fixture; mirrors ``test_golden.py`` (vuln-intake) so any drift surfaces
+Pins the emitted Temporal workflow stub for the executive_metrics_rollup
+fixture; mirrors ``test_golden.py`` (vuln_intake) so any drift surfaces
 in review.
 
 Regenerate via::

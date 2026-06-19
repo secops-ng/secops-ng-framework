@@ -1,0 +1,234 @@
+# SecOps-NG — Detection engineering (F-WF-04) — rule lifecycle source playbook
+#
+# Portable CACAO v2 + SecOps-NG content-model superset expressed as
+# YAML so it doubles as the human-curated source the per-target
+# compilers (n8n / Temporal / LangGraph) consume. The schema gate
+# treats this file as an object and does not care about the
+# serialization format; the n8n reference compiler reads it via
+# ``yaml.safe_load`` and emits an importable workflow.n8n.json.
+#
+# Status: experimental. The four-state rule lifecycle machine
+# (propose -> review -> ship -> measure) is wired with deterministic,
+# unconditional transitions; action bodies are operator-wired
+# placeholders carrying the CACAO I/O contract (``in_args`` /
+# ``out_args``) plus the x_secops_ng reference bundles. Gating
+# predicates on review/ship and the per-target primitive bodies
+# land in follow-up sibling cards alongside byte-parity goldens
+# and the cookbook walkthrough.
+#
+# Source: NIS2 Article 21(2)(f) — assessment of the effectiveness of
+# cybersecurity risk-management measures. The ``measure`` state emits
+# the per-rule-version effectiveness-metric snapshot defined at
+# ``schemas/evidence/rule-effectiveness-snapshot.schema.json``; the
+# n8n adapter for that snapshot ships at
+# ``compilers/n8n/evidence/rule_effectiveness_node.py`` and is
+# exercised by the worked example at
+# ``examples/n8n/detection_engineering/evidence/``.
+
+type: playbook
+spec_version: "2.0"
+id: "playbook--f0e4f404-0000-4000-8000-000000000001"
+name: "Detection engineering — rule lifecycle"
+description: >-
+  Source playbook for the detection_engineering rule lifecycle.
+  Moves a rule version deterministically through four states:
+  propose (intake the candidate rule and its rationale),
+  review (peer review against the operator's review checklist),
+  ship (promote to production status in the operator's detection
+  store), and measure (emit a per-rule-version effectiveness-metric
+  snapshot the operator's chosen metric sink consumes).
+  Action bodies are operator-wired placeholders carrying the CACAO
+  I/O contract; the workflow graph, step ids, and schema references
+  are the contract this artifact commits to. CACAO v2 + SecOps-NG
+  content-model extensions.
+
+playbook_types:
+  - investigation
+  - notification
+
+created_by: "identity--c0c0c0c0-c0c0-4c0c-8c0c-c0c0c0c0c0c0"
+created: "2026-06-18T00:00:00Z"
+modified: "2026-06-18T00:00:00Z"
+
+labels:
+  - detection_engineering
+  - rule-lifecycle
+  - source-artifact
+
+external_references:
+  - name: NIS2 Directive (EU) 2022/2555, Article 21(2)(f) — effectiveness assessment of risk-management measures
+    source: EUR-Lex
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: OASIS CACAO v2.0 specification
+    source: OASIS
+    url: https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html
+
+playbook_variables:
+  __rule_id__:
+    type: string
+    description: >-
+      Stable identifier of the rule being lifecycled. Opaque to the
+      framework; the operator's detection store assigns it.
+    external: true
+  __rule_version__:
+    type: string
+    description: >-
+      Version label of the candidate rule. The lifecycle operates on a
+      single rule-version at a time so the effectiveness snapshot can
+      pin its measurement to the exact version that produced it.
+    external: true
+  __proposal_rationale__:
+    type: string
+    description: >-
+      Short rationale the proposer attached to the candidate rule
+      (what threat it addresses, which detection gap it closes,
+      which ATT&CK technique(s) it binds). Carried opaquely through
+      the lifecycle.
+    external: true
+  __review_verdict__:
+    type: string
+    description: >-
+      Verdict produced by the review state. One of: approved,
+      changes_requested, rejected. Transitions are unconditional in
+      this artifact; the gating predicate on ``review -> ship`` reads
+      this variable in a follow-up sibling card.
+    external: false
+  __ship_status__:
+    type: string
+    description: >-
+      Production status after the ship state. One of: production,
+      staged, withdrawn. Transitions are unconditional in this
+      artifact; the gating predicate on ``ship -> measure`` reads this
+      variable in a follow-up sibling card.
+    external: false
+  __effectiveness_snapshot_id__:
+    type: string
+    description: >-
+      Stable identifier of the per-rule-version effectiveness
+      snapshot emitted by the measure state. SHA-256 hex digest
+      shape per the snapshot schema. Persisted into the operator's
+      configured metric sink.
+    external: false
+
+workflow_start: "start--f0e4f404-0000-4000-8000-000000000001"
+
+workflow:
+
+  "start--f0e4f404-0000-4000-8000-000000000001":
+    type: start
+    name: "rule-lifecycle-start"
+    on_completion: "action--f0e4f404-0000-4000-8000-000000000002"
+
+  "action--f0e4f404-0000-4000-8000-000000000002":
+    type: action
+    name: "propose-rule-version"
+    description: >-
+      Intake the candidate rule version, its rationale, and the
+      ATT&CK / detection-class bindings the proposer asserts. Operator
+      wires the proposal-envelope handler in n8n; the CACAO I/O
+      contract carries the inputs and the variable the next step
+      reads.
+    in_args:
+      - __rule_id__
+      - __rule_version__
+      - __proposal_rationale__
+    on_completion: "action--f0e4f404-0000-4000-8000-000000000003"
+    x_secops_ng:
+      control_refs:
+        - "control.control_effectiveness_test@v1"
+
+  "action--f0e4f404-0000-4000-8000-000000000003":
+    type: action
+    name: "review-rule-version"
+    description: >-
+      Peer-review the candidate rule against the operator's review
+      checklist. Produces ``__review_verdict__``. Transitions are
+      unconditional in this artifact; the follow-up sibling inserts a
+      switch-condition keyed on the verdict with three branches
+      (approved -> ship, changes_requested -> propose, rejected -> end).
+    in_args:
+      - __rule_id__
+      - __rule_version__
+    out_args:
+      - __review_verdict__
+    on_completion: "action--f0e4f404-0000-4000-8000-000000000004"
+    x_secops_ng:
+      control_refs:
+        - "control.control_effectiveness_test@v1"
+
+  "action--f0e4f404-0000-4000-8000-000000000004":
+    type: action
+    name: "ship-rule-version"
+    description: >-
+      Promote the approved rule version to production status in the
+      operator's detection store. Operator-side destination is
+      resolved at the compile target's config layer (sovereign-stack
+      constraint — the framework ships no default detection store).
+      Sets ``__ship_status__``.
+    in_args:
+      - __rule_id__
+      - __rule_version__
+      - __review_verdict__
+    out_args:
+      - __ship_status__
+    on_completion: "action--f0e4f404-0000-4000-8000-000000000005"
+    x_secops_ng:
+      control_refs:
+        - "control.control_effectiveness_test@v1"
+
+  "action--f0e4f404-0000-4000-8000-000000000005":
+    type: action
+    name: "measure-rule-version"
+    description: >-
+      Emit a per-rule-version effectiveness-metric snapshot shaped per
+      ``schemas/evidence/rule-effectiveness-snapshot.schema.json``.
+      The snapshot pins the indicator value to the exact
+      (``__rule_id__``, ``__rule_version__``) the lifecycle is
+      operating on and carries pointers to the OCSF source-data shape
+      and the reference visualisation hint the F-CP-06 effectiveness
+      stream consumes. Metric storage is operator-configured; the n8n
+      adapter at ``compilers/n8n/evidence/rule_effectiveness_node.py``
+      writes the snapshot to a directory the operator's chosen sink
+      ingests from.
+    in_args:
+      - __rule_id__
+      - __rule_version__
+      - __ship_status__
+    out_args:
+      - __effectiveness_snapshot_id__
+    on_completion: "end--f0e4f404-0000-4000-8000-000000000006"
+    x_secops_ng:
+      control_refs:
+        - "control.control_effectiveness_test@v1"
+      telemetry_refs:
+        - "telemetry.ocsf.detection_finding@v1"
+      metric_refs:
+        - "kpi.detection_coverage@v1"
+        - "kpi.false_positive_rate@v1"
+        - "kri.control_effectiveness@v1"
+
+  "end--f0e4f404-0000-4000-8000-000000000006":
+    type: end
+    name: "rule-lifecycle-end"
+
+# Playbook-level SecOps-NG content-model extensions. The pending
+# sibling cards covering gating predicates, byte-parity goldens, and
+# the cookbook walkthrough are tracked in ROADMAP.md § F-WF-04.
+x_secops_ng:
+  stable_id: "playbook.detection_engineering@v1"
+  content_version: "0.1.0"
+  maturity: experimental
+  compile_targets:
+    - n8n
+  control_refs:
+    - "control.control_effectiveness_test@v1"
+  telemetry_refs:
+    - "telemetry.ocsf.detection_finding@v1"
+  metric_refs:
+    - "kpi.detection_coverage@v1"
+    - "kpi.false_positive_rate@v1"
+    - "kri.control_effectiveness@v1"
+  sources:
+    - "NIS2 Directive (EU) 2022/2555, Article 21(2)(f) — effectiveness assessment of cybersecurity risk-management measures."
+    - "OASIS CACAO v2.0 — workflow step types, variable conventions, x_ extension namespace."
+    - "OCSF v1.3.0 Detection Finding (class_uid 2004) — the canonical OCSF event class the rule lifecycle's measure state binds against."

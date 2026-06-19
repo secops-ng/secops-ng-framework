@@ -1,0 +1,65 @@
+{
+  "stable_id": "kpi.cloud_posture_coverage@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Cloud posture coverage — CSPM-attested resources",
+  "summary": "Share of in-scope cloud resources covered by a CSPM baseline attestation in the evaluation window. Direct measure of how much of the cloud estate the cloud_misconfiguration playbook can see into. Anchored on NIS2 Article 21(2)(i) (asset management) and DORA Article 9 (ICT systems hygiene).",
+  "unit": "percent",
+  "direction": "higher_is_better",
+  "target": {
+    "value": 95,
+    "comparator": ">=",
+    "rationale": "Coverage floor below which posture-finding completeness degrades nonlinearly."
+  },
+  "thresholds": [
+    { "name": "warn",   "comparator": "<", "value": 90, "severity": "warn" },
+    { "name": "breach", "comparator": "<", "value": 75, "severity": "high" }
+  ],
+  "measurement": {
+    "source": "telemetry",
+    "aggregation": "percent",
+    "formula": "100 * count(distinct resource_uid attested by CSPM baseline in window) / count(distinct in-scope cloud resources).",
+    "inputs": [
+      {
+        "name": "attested_resources",
+        "telemetry_ref": "telemetry.ocsf.cloud_resource_inventory@v1",
+        "field": "resource_uid",
+        "description": "distinct resources appearing in cloud-resource-inventory telemetry within the window"
+      },
+      {
+        "name": "baseline_attestation",
+        "control_ref": "control.cspm_baseline@v1",
+        "description": "control attestation state per resource"
+      }
+    ],
+    "window": { "duration": "P1D", "sliding": true }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.cloud_misconfiguration@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000003"
+    }
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.cloud_resource_inventory@v1"
+  ],
+  "control_refs": [
+    "control.cspm_baseline@v1"
+  ],
+  "external_refs": [
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 21(2)(i) — asset management",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+      "external_id": "32022L2555"
+    },
+    {
+      "name": "DORA Regulation (EU) 2022/2554, Article 9 — protection and prevention",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+      "external_id": "32022R2554"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}

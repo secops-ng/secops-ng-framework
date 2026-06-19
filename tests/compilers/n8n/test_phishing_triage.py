@@ -1,4 +1,4 @@
-"""Golden test for the n8n reference compiler — phishing-triage.
+"""Golden test for the n8n reference compiler — phishing_triage.
 
 Mirrors ``test_cloud_misconfiguration.py`` for the ``phishing_triage``
 fixture: parses the CACAO v2 playbook, emits the n8n workflow JSON,
@@ -44,7 +44,7 @@ def test_phishing_triage_golden_matches() -> None:
     rendered = _serialise(workflow)
     expected = GOLDEN.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "n8n golden drift (phishing-triage). Regenerate via "
+        "n8n golden drift (phishing_triage). Regenerate via "
         "`python -m tools.compile tests/compilers/_shared/fixtures/"
         "phishing_triage.cacao.json --target n8n --out "
         f"{GOLDEN.relative_to(REPO_ROOT)}` and commit in the same PR."

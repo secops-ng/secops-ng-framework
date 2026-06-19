@@ -23,7 +23,7 @@ Emits a target-neutral `GraphSpec` from a parsed CACAO playbook:
 ```python
 from compilers.langgraph import emit_from_file
 
-spec = emit_from_file("content/playbooks/vuln-intake/playbook.cacao.json")
+spec = emit_from_file("content/playbooks/vuln_intake/playbook.cacao.json")
 print(spec.entry)            # first real node reached from workflow_start
 for node in spec.nodes: ...
 for edge in spec.edges: ...  # unconditional transitions
@@ -173,13 +173,13 @@ worked-example `assemble.py` wraps each LangGraph node in a
 `secops_ng.workflow.run_id` placeholder bound by the host runtime. A
 sibling `_audit_mirror.py` appends an `AuditRecord` per span so the
 audit property holds when OTLP is offline. See the worked example
-[`examples/langgraph/vuln-intake/`](../../examples/langgraph/vuln-intake/)
+[`examples/langgraph/vuln_intake/`](../../examples/langgraph/vuln_intake/)
 and its `Observability` section for the operator-config envelope
 (`OTEL_EXPORTER_OTLP_ENDPOINT`, EU-resident collector guidance,
 provider neutrality).
 
 ## See also
 
-- [`examples/langgraph/vuln-intake/`](../../examples/langgraph/vuln-intake/) —
+- [`examples/langgraph/vuln_intake/`](../../examples/langgraph/vuln_intake/) —
   end-to-end worked example: playbook, regenerated artifacts, and a
   reference `StateGraph` assembly.

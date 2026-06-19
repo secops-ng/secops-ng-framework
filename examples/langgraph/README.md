@@ -7,24 +7,24 @@ runtime.
 
 ## Index
 
-- [`vuln-intake/`](vuln-intake/) — vulnerability intake playbook. The
+- [`vuln_intake/`](vuln_intake/) — vulnerability intake playbook. The
   first end-to-end worked example: portable CACAO playbook →
   GraphSpec JSON → generated state + `@tool` bindings → reference
   assembly. Includes a regeneration script and a drift test so the
   artifacts stay in lockstep with the compiler.
-- [`threat-intel-ingest/`](threat-intel-ingest/) — threat-intelligence
+- [`threat_intel_ingest/`](threat_intel_ingest/) — threat-intelligence
   ingest playbook. Pull → normalise → confidence-threshold branch into
   blocklist propagation or detection-only activation.
-- [`phishing-triage/`](phishing-triage/) — phishing-triage playbook.
+- [`phishing_triage/`](phishing_triage/) — phishing_triage playbook.
   Ingest reported / mailbox-sweep email → enrich with email-security
   gateway, URL sandbox, attachment sandbox → suppression-cache check →
   intent classification → response branch (containment + ticketing or
   user-feedback close).
-- [`identity-compromise/`](identity-compromise/) — identity-compromise
+- [`identity_compromise/`](identity_compromise/) — identity_compromise
   response playbook. Triage identity signal → confirmation branch →
   MFA reset → session revocation → lateral-movement hunt → IAM audit
   and persistence removal.
-- [`incident-management/`](incident-management/) — incident-management
+- [`incident_management/`](incident_management/) — incident_management
   playbook (NIS2 Article 23 three-stage regulator timeline). Intake
   signal → classify significance + cross-border scope → open timeline
   → 24-hour early warning → 72-hour notification → optional one-month

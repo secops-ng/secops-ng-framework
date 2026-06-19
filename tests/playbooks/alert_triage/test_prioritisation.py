@@ -1,4 +1,4 @@
-"""Unit tests for the alert-triage prioritisation policy.
+"""Unit tests for the alert_triage prioritisation policy.
 
 The policy is deterministic: detection axis + asset axis + suppression
 axis → one of four priority bands. Tests pin every rule in isolation,

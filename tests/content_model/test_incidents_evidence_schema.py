@@ -5,7 +5,7 @@ Pins:
 1. ``schemas/nis2_incident_notification_milestone.json`` is a valid
    Draft 2020-12 schema and declares the canonical NIS2 Article 23(4)
    regulator-notification milestone vocabulary promoted out of the
-   F-WF-05 incident-management workflow.
+   F-WF-05 incident_management workflow.
 2. ``schemas/evidence/incidents.schema.json`` is a valid Draft 2020-12
    schema and accepts a minimal artifact + rejects the obvious
    incident-id, execution-id, regulation-ref, classification,
@@ -15,7 +15,7 @@ Pins:
    and Art. 23 declare ``evidence_stream_refs: [incidents]``.
 4. The NIS2 incident-notification milestone enum maps 1:1 onto the
    workflow-internal ``StageName`` alphabet declared by
-   ``content/playbooks/incident-management/primitives/stage_clock.py``
+   ``content/playbooks/incident_management/primitives/stage_clock.py``
    (drift guard between the typed enum and the F-WF-05 stage table).
 """
 
@@ -402,7 +402,7 @@ def test_stage_clock_alphabet_matches_promoted_milestones() -> None:
         REPO
         / "content"
         / "playbooks"
-        / "incident-management"
+        / "incident_management"
         / "primitives"
         / "stage_clock.py"
     )

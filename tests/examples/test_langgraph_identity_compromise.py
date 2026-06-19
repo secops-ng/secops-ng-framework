@@ -1,8 +1,8 @@
-"""Drift guard for the ``examples/langgraph/identity-compromise/`` worked example.
+"""Drift guard for the ``examples/langgraph/identity_compromise/`` worked example.
 
-Mirrors the phishing-triage and ransomware-containment LangGraph example
+Mirrors the phishing_triage and ransomware_containment LangGraph example
 tests: re-runs ``compilers.langgraph.emit`` and ``compilers.langgraph.state``
-against the canonical identity-compromise CACAO playbook and pins the
+against the canonical identity_compromise CACAO playbook and pins the
 committed ``graph_spec.json`` + ``state_bindings.py`` byte-for-byte.
 
 Also pins the co-located ``playbook.cacao.json`` mirror byte-for-byte
@@ -11,7 +11,7 @@ against the canonical CACAO source, so the regenerate.sh contract
 
 Regenerate via::
 
-    ./examples/langgraph/identity-compromise/regenerate.sh
+    ./examples/langgraph/identity_compromise/regenerate.sh
 """
 from __future__ import annotations
 import pytest
@@ -25,9 +25,9 @@ from compilers.langgraph.state import render_module
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SOURCE = (
-    REPO_ROOT / "content" / "playbooks" / "identity-compromise" / "playbook.cacao.json"
+    REPO_ROOT / "content" / "playbooks" / "identity_compromise" / "playbook.cacao.json"
 )
-EXAMPLE_DIR = REPO_ROOT / "examples" / "langgraph" / "identity-compromise"
+EXAMPLE_DIR = REPO_ROOT / "examples" / "langgraph" / "identity_compromise"
 MIRRORED_CACAO = EXAMPLE_DIR / "playbook.cacao.json"
 COMMITTED_GRAPH = EXAMPLE_DIR / "graph_spec.json"
 COMMITTED_MODULE = EXAMPLE_DIR / "state_bindings.py"
@@ -56,9 +56,9 @@ def test_committed_artefacts_exist() -> None:
 
 def test_mirrored_cacao_matches_canonical_source() -> None:
     assert MIRRORED_CACAO.read_bytes() == SOURCE.read_bytes(), (
-        "examples/langgraph/identity-compromise/playbook.cacao.json drifted "
-        "from the canonical content/playbooks/identity-compromise/playbook.cacao.json. "
-        "Regenerate via `./examples/langgraph/identity-compromise/regenerate.sh`."
+        "examples/langgraph/identity_compromise/playbook.cacao.json drifted "
+        "from the canonical content/playbooks/identity_compromise/playbook.cacao.json. "
+        "Regenerate via `./examples/langgraph/identity_compromise/regenerate.sh`."
     )
 
 
@@ -67,8 +67,8 @@ def test_graph_spec_matches_emitter_output() -> None:
     rendered = _serialise_graph(emit(playbook))
     expected = COMMITTED_GRAPH.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/langgraph/identity-compromise/graph_spec.json drift. "
-        "Regenerate via `./examples/langgraph/identity-compromise/regenerate.sh` "
+        "examples/langgraph/identity_compromise/graph_spec.json drift. "
+        "Regenerate via `./examples/langgraph/identity_compromise/regenerate.sh` "
         "and commit the result."
     )
 
@@ -85,8 +85,8 @@ def test_state_bindings_matches_state_emitter_output() -> None:
     rendered = render_module(playbook) + "\n"
     expected = COMMITTED_MODULE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/langgraph/identity-compromise/state_bindings.py drift. "
-        "Regenerate via `./examples/langgraph/identity-compromise/regenerate.sh` "
+        "examples/langgraph/identity_compromise/state_bindings.py drift. "
+        "Regenerate via `./examples/langgraph/identity_compromise/regenerate.sh` "
         "and commit the result."
     )
 

@@ -1,6 +1,6 @@
-"""End-to-end content-model worked example: ransomware-containment.
+"""End-to-end content-model worked example: ransomware_containment.
 
-Validates every artifact in `content-model/examples/ransomware-containment/`
+Validates every artifact in `content-model/examples/ransomware_containment/`
 against its layer schema and asserts the cross-reference graph that the
 example *does* materialise is closed:
 
@@ -16,7 +16,7 @@ example *does* materialise is closed:
 - the OCSF sample payload's `class_uid` matches the telemetry binding;
 - metric stable_id namespace prefix agrees with its `kind`.
 
-The ransomware-containment example deliberately materialises only one
+The ransomware_containment example deliberately materialises only one
 mid-layer artifact per layer (the canonical containment binding) and
 references additional controls / telemetry that live in sibling worked
 examples — so the assertions accept any `detection.sigma.*`,
@@ -35,7 +35,7 @@ from jsonschema import Draft202012Validator
 
 ROOT = Path(__file__).resolve().parents[2]
 CONTENT_MODEL = ROOT / "content-model"
-EX = CONTENT_MODEL / "examples" / "ransomware-containment"
+EX = CONTENT_MODEL / "examples" / "ransomware_containment"
 
 SCHEMAS = {
     "playbook":  CONTENT_MODEL / "playbook.schema.json",

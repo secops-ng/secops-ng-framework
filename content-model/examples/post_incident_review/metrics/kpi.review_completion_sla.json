@@ -1,0 +1,70 @@
+{
+  "stable_id": "kpi.review_completion_sla@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "kind": "kpi",
+  "title": "Post-incident review completion SLA",
+  "summary": "Time between incident closure and submission of a complete blameless-review artifact. The clock starts when the incident-handling case is moved to a closed status and stops when the post_incident_review playbook's blameless-review-template step completes with a non-empty review artifact. Lower is better. The 30-day target is anchored on NIS2 Article 23(4)(d) and DORA Article 19(4)(c), both of which require a final report no later than one month after the (intermediate) incident notification \u2014 the review artifact is the structured input the operator's reporting compiler consumes to produce that final report.",
+  "unit": "days",
+  "direction": "lower_is_better",
+  "target": {
+    "value": 30,
+    "comparator": "<=",
+    "rationale": "Aligned with NIS2 Art. 23(4)(d) and DORA Art. 19(4)(c) one-month final-report obligations."
+  },
+  "thresholds": [
+    {
+      "name": "warn",
+      "comparator": ">",
+      "value": 30,
+      "severity": "warn"
+    },
+    {
+      "name": "breach",
+      "comparator": ">",
+      "value": 60,
+      "severity": "high"
+    }
+  ],
+  "measurement": {
+    "source": "workflow",
+    "aggregation": "p95",
+    "formula": "p95( blameless_review_step.completed_at - incident.closed_at ) over closed incidents in window.",
+    "inputs": [
+      {
+        "name": "review_artifact",
+        "playbook_ref": "playbook.post_incident_review@v1",
+        "playbook_step": "action--40000000-0000-4000-8000-000000000003",
+        "description": "wall-clock duration from incident close to blameless-review-template completion"
+      }
+    ],
+    "window": {
+      "duration": "P90D",
+      "sliding": true
+    }
+  },
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.post_incident_review@v1",
+      "step_id": "action--40000000-0000-4000-8000-000000000003"
+    }
+  ],
+  "telemetry_refs": [
+    "telemetry.ocsf.incident_finding@v1"
+  ],
+  "external_refs": [
+    {
+      "name": "NIS2 Article 23(4)(d) \u2014 final report one month after notification",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+      "external_id": "32022L2555"
+    },
+    {
+      "name": "DORA Article 19(4)(c) \u2014 final report one month after intermediate report",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+      "external_id": "32022R2554"
+    }
+  ],
+  "maintainer": "metrics-wg@secops-ng.org"
+}

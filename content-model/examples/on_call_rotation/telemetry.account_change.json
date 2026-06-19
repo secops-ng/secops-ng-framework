@@ -1,0 +1,43 @@
+{
+  "stable_id": "telemetry.ocsf.account_change@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Account change event (rotation roster + handoff observation)",
+  "summary": "OCSF Account Change events the on_call_rotation playbook reads when resolving the active roster and emits when a rotation handoff transitions primary / secondary tiers. The same class carries upstream Sigma-flagged privileged-account modifications that the playbook surfaces in the handoff brief so the incoming responder inherits open rotation-gap risk.",
+  "ocsf": {
+    "version": "1.3.0",
+    "category_uid": 3,
+    "category_name": "Identity & Access Management",
+    "class_uid": 3001,
+    "class_name": "Account Change"
+  },
+  "direction": "both",
+  "fields_used": [
+    "time",
+    "activity_id",
+    "actor.user.uid",
+    "user.uid",
+    "user.name",
+    "user.type",
+    "user.groups",
+    "src_endpoint.ip",
+    "status_id"
+  ],
+  "detection_refs": [
+    "detection.sigma.privileged_account_modification@v1"
+  ],
+  "control_refs": [
+    "control.on_call_roster_governance@v1"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.on_call_rotation@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000002"
+    },
+    {
+      "playbook_id": "playbook.on_call_rotation@v1",
+      "step_id": "action--30000000-0000-4000-8000-000000000003"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org"
+}

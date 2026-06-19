@@ -1,4 +1,4 @@
-"""Unit tests for the alert-triage suppression-window helper.
+"""Unit tests for the alert_triage suppression-window helper.
 
 Covers:
 

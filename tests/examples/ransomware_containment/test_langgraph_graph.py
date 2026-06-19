@@ -1,8 +1,8 @@
-"""Drift guard for the ``examples/langgraph/ransomware-containment/`` worked example.
+"""Drift guard for the ``examples/langgraph/ransomware_containment/`` worked example.
 
-Mirrors the phishing-triage LangGraph example test: re-runs
+Mirrors the phishing_triage LangGraph example test: re-runs
 ``compilers.langgraph.emit`` and ``compilers.langgraph.state`` against
-the canonical ransomware-containment CACAO playbook and pins the
+the canonical ransomware_containment CACAO playbook and pins the
 committed ``graph_spec.json`` + ``state_bindings.py`` byte-for-byte.
 
 Also pins the co-located ``playbook.cacao.json`` mirror byte-for-byte
@@ -12,7 +12,7 @@ drift guards already present in this directory.
 
 Regenerate via::
 
-    ./examples/langgraph/ransomware-containment/regenerate.sh
+    ./examples/langgraph/ransomware_containment/regenerate.sh
 """
 from __future__ import annotations
 import pytest
@@ -29,10 +29,10 @@ SOURCE = (
     REPO_ROOT
     / "content"
     / "playbooks"
-    / "ransomware-containment"
+    / "ransomware_containment"
     / "playbook.cacao.json"
 )
-EXAMPLE_DIR = REPO_ROOT / "examples" / "langgraph" / "ransomware-containment"
+EXAMPLE_DIR = REPO_ROOT / "examples" / "langgraph" / "ransomware_containment"
 MIRRORED_CACAO = EXAMPLE_DIR / "playbook.cacao.json"
 COMMITTED_GRAPH = EXAMPLE_DIR / "graph_spec.json"
 COMMITTED_MODULE = EXAMPLE_DIR / "state_bindings.py"
@@ -61,9 +61,9 @@ def test_committed_artefacts_exist() -> None:
 
 def test_mirrored_cacao_matches_canonical_source() -> None:
     assert MIRRORED_CACAO.read_bytes() == SOURCE.read_bytes(), (
-        "examples/langgraph/ransomware-containment/playbook.cacao.json drifted "
-        "from the canonical content/playbooks/ransomware-containment/playbook.cacao.json. "
-        "Regenerate via `./examples/langgraph/ransomware-containment/regenerate.sh`."
+        "examples/langgraph/ransomware_containment/playbook.cacao.json drifted "
+        "from the canonical content/playbooks/ransomware_containment/playbook.cacao.json. "
+        "Regenerate via `./examples/langgraph/ransomware_containment/regenerate.sh`."
     )
 
 
@@ -72,8 +72,8 @@ def test_graph_spec_matches_emitter_output() -> None:
     rendered = _serialise_graph(emit(playbook))
     expected = COMMITTED_GRAPH.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/langgraph/ransomware-containment/graph_spec.json drift. "
-        "Regenerate via `./examples/langgraph/ransomware-containment/regenerate.sh` "
+        "examples/langgraph/ransomware_containment/graph_spec.json drift. "
+        "Regenerate via `./examples/langgraph/ransomware_containment/regenerate.sh` "
         "and commit the result."
     )
 
@@ -90,8 +90,8 @@ def test_state_bindings_matches_state_emitter_output() -> None:
     rendered = render_module(playbook) + "\n"
     expected = COMMITTED_MODULE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/langgraph/ransomware-containment/state_bindings.py drift. "
-        "Regenerate via `./examples/langgraph/ransomware-containment/regenerate.sh` "
+        "examples/langgraph/ransomware_containment/state_bindings.py drift. "
+        "Regenerate via `./examples/langgraph/ransomware_containment/regenerate.sh` "
         "and commit the result."
     )
 

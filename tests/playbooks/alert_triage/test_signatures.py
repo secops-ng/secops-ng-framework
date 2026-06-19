@@ -1,4 +1,4 @@
-"""Schema-introspection tests for the alert-triage DSPy signature.
+"""Schema-introspection tests for the alert_triage DSPy signature.
 
 Asserts contract stability of the single free-text signature
 (:class:`AnalystNarrativeSummary`) without instantiating a live

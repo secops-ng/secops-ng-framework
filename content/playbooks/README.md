@@ -14,8 +14,8 @@ by separate cards.
 
 | Slug                      | Stable ID                              | Mappings overlay                                            |
 |---------------------------|----------------------------------------|-------------------------------------------------------------|
-| `data-exfil`              | `playbook.data_exfil@v1`               | _pending_                                                   |
-| `threat-intel-ingest`     | `playbook.threat_intel_ingest@v1`      | [`mappings.yaml`](threat-intel-ingest/mappings.yaml) (SKELETON — placeholders) |
+| `data_exfil`              | `playbook.data_exfil@v1`               | _pending_                                                   |
+| `threat_intel_ingest`     | `playbook.threat_intel_ingest@v1`      | [`mappings.yaml`](threat_intel_ingest/mappings.yaml) (SKELETON — placeholders) |
 
 The mappings overlay column links to the per-playbook `mappings.yaml`
 (see `schemas/playbook-mappings.schema.json`). SKELETON rows ship

@@ -1,7 +1,7 @@
-"""Golden test for the Temporal compiler — ransomware-containment.
+"""Golden test for the Temporal compiler — ransomware_containment.
 
-Pins the emitted Temporal workflow stub for the ransomware-containment
-fixture; mirrors ``test_golden.py`` (vuln-intake) so any drift surfaces
+Pins the emitted Temporal workflow stub for the ransomware_containment
+fixture; mirrors ``test_golden.py`` (vuln_intake) so any drift surfaces
 in review.
 
 Regenerate via::

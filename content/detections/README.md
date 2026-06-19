@@ -8,7 +8,7 @@ Each file here is a YAML pointer record:
 sigma_ref: SigmaHQ/rules:rules/windows/process_creation/proc_creation_win_susp_rundll32.yml
 purpose: Surface suspicious rundll32 invocations during phishing triage.
 used_by:
-  - content/playbooks/phishing-triage/
+  - content/playbooks/phishing_triage/
 notes: ...
 ```
 

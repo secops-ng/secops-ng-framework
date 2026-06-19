@@ -11,14 +11,14 @@ demonstrate, per case, that the triage decision was made, the
 coordinated-disclosure SLA was held, security updates were disseminated
 on time, and the regulator-notification milestones (24h / 72h / 14d)
 were submitted on time. That demonstration takes the shape of one
-per-execution artifact emitted every time the `vuln-intake` playbook
+per-execution artifact emitted every time the `vuln_intake` playbook
 runs.
 
 This directory is the contributor home for that stream. The artifact
 shape is declared in
 [`schemas/evidence/vulns.schema.json`](../../../schemas/evidence/vulns.schema.json);
 the upstream workflow is
-[`content/playbooks/vuln-intake/`](../../playbooks/vuln-intake/);
+[`content/playbooks/vuln_intake/`](../../playbooks/vuln_intake/);
 the indicators it feeds live under
 [`content/metrics/`](../../metrics/) — `kpi.vuln_disclosure_sla@v1`,
 `kri.cvd_intake_aging@v1`, `kpi.patch_disseminated_on_time@v1`, and

@@ -23,7 +23,7 @@ framework repo root.
 
 ```bash
 PYTHONPATH=. python -m compilers.langgraph.emit \
-    content/playbooks/vuln-intake/playbook.cacao.json
+    content/playbooks/vuln_intake/playbook.cacao.json
 ```
 
 That prints a JSON document describing the LangGraph topology: entry
@@ -38,7 +38,7 @@ runtime.
 
 ```bash
 PYTHONPATH=. python -m compilers.langgraph.state \
-    content/playbooks/vuln-intake/playbook.cacao.json \
+    content/playbooks/vuln_intake/playbook.cacao.json \
     > vuln_intake_state.py
 ```
 
@@ -61,7 +61,7 @@ from pathlib import Path
 from compilers._shared.cacao_parser import parse_file
 from compilers.langgraph import emit, render_module
 
-playbook = parse_file("content/playbooks/vuln-intake/playbook.cacao.json")
+playbook = parse_file("content/playbooks/vuln_intake/playbook.cacao.json")
 
 spec = emit(playbook)                 # GraphSpec — topology, no runtime
 module_source = render_module(playbook)  # Python source string
@@ -82,7 +82,7 @@ from langgraph.graph import StateGraph, END
 from compilers.langgraph import emit_from_file
 from vuln_intake_state import STATE_SCHEMA, TOOLS, AGENTIC_HOOK
 
-spec = emit_from_file("content/playbooks/vuln-intake/playbook.cacao.json")
+spec = emit_from_file("content/playbooks/vuln_intake/playbook.cacao.json")
 
 graph = StateGraph(STATE_SCHEMA)
 for node in spec.nodes:
@@ -226,7 +226,7 @@ both diffs in the same PR.
 ## Worked example
 
 A regenerable, end-to-end worked example lives under
-[`examples/langgraph/vuln-intake/`](../../examples/langgraph/vuln-intake/):
+[`examples/langgraph/vuln_intake/`](../../examples/langgraph/vuln_intake/):
 the portable CACAO playbook, the emitted GraphSpec JSON, the generated
 state + `@tool` bindings module, and a hand-written reference assembly
 that wires everything into a `langgraph.graph.StateGraph`. Start there
@@ -238,6 +238,6 @@ surface, the example covers the integration shape.
 - `compilers/langgraph/README.md` — module-level engineering notes
   (translation tables, design rationale, internals).
 - `tests/compilers/langgraph/` — golden tests and regeneration recipe.
-- `examples/langgraph/vuln-intake/` — end-to-end worked example.
+- `examples/langgraph/vuln_intake/` — end-to-end worked example.
 - `docs/compilers/README.md` — index of all reference compilers.
 - `docs/sovereignty/` — sovereignty posture for the framework.
