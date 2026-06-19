@@ -31,6 +31,9 @@ from compilers.temporal.evidence.effectiveness_activity import (
 from compilers.temporal.evidence.disclosure_timeline_activity import (
     emit_disclosure_timeline_artifact_activity,
 )
+from compilers.temporal.evidence.rule_effectiveness_activity import (
+    emit_rule_effectiveness_snapshot_activity,
+)
 from compilers.temporal.evidence.bundle_activity import (
     emit_bundle_manifest_activity,
 )
@@ -44,5 +47,6 @@ __all__ = [
     "emit_access_artifact_activity",
     "emit_effectiveness_artifact_activity",
     "emit_disclosure_timeline_artifact_activity",
+    "emit_rule_effectiveness_snapshot_activity",
     "emit_bundle_manifest_activity",
 ]
