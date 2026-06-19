@@ -20,11 +20,19 @@ separate sibling cards.
 
 | Path                                                     | Purpose                                |
 |----------------------------------------------------------|----------------------------------------|
-| `regenerate.py`                                          | Drives the Temporal activity end-to-end |
+| `playbook.cacao.json`                                    | Mirrored canonical CACAO source        |
+| `regenerate.sh`                                          | Mirrors the canonical playbook + emits the Temporal workflow stub |
+| `workflow.temporal.py`                                   | Generated Temporal workflow stub       |
+| `regenerate.py`                                          | Drives the Temporal evidence activity end-to-end |
 | `evidence/disclosure-timeline-record.json`               | One emitted finding                    |
 
-Regenerate after any change to the shared emitter or the Temporal
-adapter, from the repo root:
+Regenerate the workflow stub after any change to the canonical CACAO
+playbook or to `compilers/temporal/*`, from the repo root:
+
+    ./examples/temporal/codebase-vuln-management/regenerate.sh
+
+Regenerate the disclosure-timeline evidence record after any change
+to the shared emitter or the Temporal adapter, from the repo root:
 
     PYTHONPATH=. python examples/temporal/codebase-vuln-management/regenerate.py
 
@@ -69,13 +77,15 @@ adapters write byte-identical records.
 
 ## What this example does not do
 
-- It does not emit a runnable `workflow.temporal.py`. The merged
-  F-WF-07 SKELETON playbook ships placeholder action bodies that the
-  topology-translating CACAO → Temporal emitter cannot lower today;
-  the CORE-TEMPORAL scope here is the *evidence emitter activity*,
-  not the workflow translator. A runnable `workflow.temporal.py`
-  lands once the CORE-FANOUT card wires action bodies into the
-  playbook.
+- The committed `workflow.temporal.py` is a generated stub. CORE
+  primitive calls are inlined into the activity bodies under the
+  Temporal `@activity.defn` decorators; the workflow lowering itself
+  (the `@workflow.run` method) still raises `NotImplementedError`
+  pending the workflow-translator slice. Operators wire the
+  per-finding loop, the activity scheduling, and the `__finding__` /
+  `__disclosure_window__` plumbing in their worker; the activity
+  bodies emit the disclosure-timeline record via the shared evidence
+  helper as documented above.
 - It does not embed advisory text, reporter contact information, or
   raw SBOM payload. These are operator-side surfaces; per AGENTS.md
   §3 they may carry personal data and are out of scope at this
