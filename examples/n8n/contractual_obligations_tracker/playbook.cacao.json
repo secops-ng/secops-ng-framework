@@ -1,0 +1,164 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--10101010-0000-4000-8000-000000000001",
+  "name": "Contractual obligations tracker",
+  "description": "Supplier-contract obligation tracking workflow under NIS2 Article 21(2)(d) supply-chain security. On each execution, ingest a supplier contract reference, extract the per-clause obligations the operator has accepted from that contract, schedule the next review date for each obligation against the operator's review-cadence policy, and emit one obligation-evidence artifact pinning the contract id, the extracted obligation set, the per-obligation review-state, and the provenance envelope. SKELETON: the five-state topology (workflow_start -> ingest-contract -> extract-obligations -> schedule-review -> emit-obligation-evidence -> workflow_end) and the x_secops_ng joins into the control / telemetry layers are pinned at this layer; per-target compiler emitters and the canonical primitive bindings land in the CORE-FANOUT sibling cards. Opens the NIS2 Article 21(2)(d) supply-chain control family at the workflow layer (per-entity supplier-contract obligation surface).",
+  "playbook_types": [
+    "investigation",
+    "notification"
+  ],
+  "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+  "created": "2026-06-19T00:00:00Z",
+  "modified": "2026-06-19T00:00:00Z",
+  "labels": [
+    "supply-chain",
+    "contracts",
+    "obligations",
+    "obligation-evidence",
+    "nis2",
+    "skeleton"
+  ],
+  "playbook_variables": {
+    "__execution_id__": {
+      "type": "string",
+      "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Pinned by the upstream runtime; the workflow reads it for the obligation-evidence artifact join.",
+      "external": true
+    },
+    "__contract_ref__": {
+      "type": "string",
+      "description": "Pointer to the operator's supplier-contract record under review on this execution. Operator-configured; the workflow reads it as the opaque pointer to a contract held in the operator's document store. The framework ships no default document-store endpoint and no vendor SDK bundling — the operator supplies whatever store is in scope (a sovereign EU object store, an on-prem document management system, a Git-managed contract repository).",
+      "external": true
+    },
+    "__contract_record_ref__": {
+      "type": "string",
+      "description": "Pointer to the ingested contract record produced by ingest-contract. Closed shape per CORE sibling card; contract-id keyed, supplier-classification and effective-date envelope valued. Consumed by extract-obligations.",
+      "external": false
+    },
+    "__obligation_set_ref__": {
+      "type": "string",
+      "description": "Pointer to the per-contract obligation set produced by extract-obligations — one entry per declared obligation with the clause reference, obligation text, obligation kind (security control, audit right, attestation cadence, sub-processor disclosure), and the contractual review/expiry cadence. Consumed by schedule-review and by emit-obligation-evidence.",
+      "external": false
+    },
+    "__review_schedule_ref__": {
+      "type": "string",
+      "description": "Pointer to the per-obligation review schedule produced by schedule-review — one entry per obligation with the next-review-due timestamp derived deterministically from the obligation's contractual cadence and the operator's review-policy. Consumed by emit-obligation-evidence.",
+      "external": false
+    },
+    "__obligation_artifact_ref__": {
+      "type": "string",
+      "description": "Pointer to the obligation-evidence artifact emitted by emit-obligation-evidence, shaped against schemas/evidence/contractual-obligations.schema.json.",
+      "external": false
+    }
+  },
+  "workflow_start": "start--10101010-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--10101010-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "contractual-obligations-tracker-start",
+      "on_completion": "action--10101010-0000-4000-8000-000000000002"
+    },
+    "action--10101010-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "ingest-contract",
+      "description": "Read the supplier-contract record referenced by __contract_ref__ from the operator-supplied document store and bind it to a normalised in-workflow contract record (contract_id, supplier_ref, effective_at, expires_at, jurisdiction). Read-only by contract; the workflow MUST NOT mutate the source document. Document-store endpoint is operator-configured — the framework ships no default non-EU endpoint and no hosted DMS dependency.",
+      "on_completion": "action--10101010-0000-4000-8000-000000000003",
+      "in_args": [
+        "__execution_id__",
+        "__contract_ref__"
+      ],
+      "out_args": [
+        "__contract_record_ref__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.supplier_inventory@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--10101010-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "extract-obligations",
+      "description": "Walk the ingested contract record and extract the per-clause obligations the operator has accepted from that contract. Per obligation, capture the clause reference, the obligation text (operator-canonicalised string — no commentary, no rewrites at this layer), the obligation kind (security-control commitment, audit-right window, attestation cadence, sub-processor disclosure, breach-notification cadence), and any contractual review/expiry cadence the clause itself declares. Deterministic on the same contract record — re-extraction under the same inputs re-derives the same obligation set.",
+      "on_completion": "action--10101010-0000-4000-8000-000000000004",
+      "in_args": [
+        "__contract_record_ref__"
+      ],
+      "out_args": [
+        "__obligation_set_ref__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.supplier_inventory@v1",
+          "control.provider_attestation@v1"
+        ]
+      }
+    },
+    "action--10101010-0000-4000-8000-000000000004": {
+      "type": "action",
+      "name": "schedule-review",
+      "description": "Derive the per-obligation review schedule from the extracted obligation set and the operator's review-cadence policy. For each obligation, compute the next-review-due timestamp deterministically from (last_reviewed_at, contractual cadence declared by the clause, operator-policy fallback cadence). Pure derivation — the workflow MUST NOT contact the supplier on this step, and the schedule is computed in-band from the obligation record and the policy alone.",
+      "on_completion": "action--10101010-0000-4000-8000-000000000005",
+      "in_args": [
+        "__obligation_set_ref__"
+      ],
+      "out_args": [
+        "__review_schedule_ref__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.provider_attestation@v1"
+        ]
+      }
+    },
+    "action--10101010-0000-4000-8000-000000000005": {
+      "type": "action",
+      "name": "emit-obligation-evidence",
+      "description": "Combine the ingested contract record, the extracted obligation set, and the per-obligation review schedule into one obligation-evidence artifact shaped against schemas/evidence/contractual-obligations.schema.json (stream: contractual-obligations). The artifact carries the workflow id, execution id, compile target, regulation_refs (nis2:art-21-2-d, optionally nis2:art-22 for the Union-level overlay), control_refs, the contract id, the obligation set, the per-obligation review-state, and the provenance envelope. Emission is byte-stable: same execution inputs, same compile target, same obligation set re-derive the same artifact_id. Destination is operator-configured — no default non-EU endpoint.",
+      "on_completion": "end--10101010-0000-4000-8000-000000000006",
+      "in_args": [
+        "__execution_id__",
+        "__contract_record_ref__",
+        "__obligation_set_ref__",
+        "__review_schedule_ref__"
+      ],
+      "out_args": [
+        "__obligation_artifact_ref__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.supplier_inventory@v1",
+          "control.provider_attestation@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "end--10101010-0000-4000-8000-000000000006": {
+      "type": "end",
+      "name": "contractual-obligations-tracker-end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.contractual_obligations_tracker@v1",
+    "content_version": "0.1.0",
+    "maturity": "draft",
+    "compile_targets": [],
+    "control_refs": [
+      "control.supplier_inventory@v1",
+      "control.provider_attestation@v1"
+    ],
+    "telemetry_refs": [
+      "telemetry.ocsf.api_activity@v1"
+    ],
+    "sources": [
+      "OASIS CACAO v2.0 specification",
+      "NIS2 Directive (EU) 2022/2555 — Article 21(2)(d)",
+      "SecOps-NG obligation evidence stream — schemas/evidence/contractual-obligations.schema.json"
+    ]
+  }
+}
