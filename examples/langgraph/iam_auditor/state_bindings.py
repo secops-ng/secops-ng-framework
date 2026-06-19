@@ -33,12 +33,42 @@ class PlaybookIamAuditorV1State(TypedDict, total=False):
     # playbook_variable: __execution_id__
     # Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Pinned by the upstream runtime; the workflow reads it for the access-evidence artifact join.
     execution_id: str
+    # playbook_variable: __workflow_id__
+    # Stable workflow stable-id from content/playbooks/<workflow>/. Joined into the access-evidence artifact_id derivation; constant per playbook (`iam_auditor`) and supplied as a flat token so the CORE primitive call mirrors the F-WF-01 / F-WF-07 binding convention.
+    workflow_id: str
+    # playbook_variable: __compile_target__
+    # Which of the three reference compile targets produced the running form of the workflow. Pinned by the compile target's own boot path (`n8n`, `temporal`, `langgraph`); the primitive validates it against the access.schema enum.
+    compile_target: str
+    # playbook_variable: __principal_type__
+    # Mechanical classification of the caller resolved by the runtime — one of `service_account`, `workflow_runtime`, `automation_role`. Personal-user principals are out of scope for F-CP-07 and rejected at the primitive boundary.
+    principal_type: str
+    # playbook_variable: __principal_id__
+    # Stable role-shaped handle for the caller identity (service-account name, workflow-runtime principal id, automation role). Pinned by the compile target's runtime; the primitive validates the role-shape regex pinned by the F-CP-07 schema so a personal name or credential-shaped string fails loud at this step.
+    principal_id: str
+    # playbook_variable: __identity_provider__
+    # Optional short operator-defined token naming the IdP that issued or resolves the caller principal (`keycloak`, `dex`, `temporal`, `n8n`, `langgraph`). Free text is rejected by the primitive.
+    identity_provider: str
     # playbook_variable: __caller_identity_ref__
     # Pointer to the caller-identity block produced by enumerate-identities — role-shaped principal id (service-account name, workflow-runtime principal, automation role) per the F-CP-07 public-bar discipline.
     caller_identity_ref: str
+    # playbook_variable: __capabilities_raw__
+    # Operator-supplied raw capability list the runtime walked from its IAM provider. JSON-native list of verb.resource tokens; the primitive canonicalises (NFKC + lower-case) and dedups exact-match repeats so re-runs collapse to byte-identical bytes.
+    capabilities_raw: str
     # playbook_variable: __capabilities_ref__
     # Pointer to the closed capability list produced by enumerate-capabilities — verb.resource tokens the caller held at execution time.
     capabilities_ref: str
+    # playbook_variable: __regulation_refs__
+    # Schema-shaped regulation references the artifact attests (typically `["nis2:art-21-2-i"]`). JSON-native list; pinned by the compile target's boot config so the operator can extend without re-compiling.
+    regulation_refs: str
+    # playbook_variable: __control_refs__
+    # Control stable-ids the artifact attests. JSON-native list; the primitive validates each entry against the `control.<id>@v<n>` shape.
+    control_refs: str
+    # playbook_variable: __captured_at__
+    # ISO-8601 UTC second-precision timestamp (`...Z`) pinned at emission time by the upstream runtime; carried on the artifact's top-level captured_at and on provenance.captured_at.
+    captured_at: str
+    # playbook_variable: __source_url__
+    # URL of the workflow run that produced this artifact. Compile targets supply their own run-id URLs; the URL itself is opaque to the schema.
+    source_url: str
     # playbook_variable: __access_artifact_ref__
     # Pointer to the access-evidence artifact emitted by emit-access-evidence, shaped against schemas/evidence/access.schema.json.
     access_artifact_ref: str
@@ -53,7 +83,7 @@ class PlaybookIamAuditorV1State(TypedDict, total=False):
     messages: Annotated[list[AnyMessage], add_messages]
 
 @tool
-async def enumerate_identities(execution_id: str) -> str:
+async def enumerate_identities(principal_type: str, principal_id: str, identity_provider: str) -> str:
     """Resolve the caller identity that invoked the compiled workflow on this execution. The identity is role-shaped (service-account name, workflow-runtime principal id, automation role) — never an individual personal name or a credential-shaped string. The compile target's runtime is the source of truth: n8n credential binding, Temporal worker identity, LangGraph runtime principal. Output is the caller-identity block consumed by emit-access-evidence.
 
     CACAO step_id : action--08aa0d10-0000-4000-8000-000000000002
@@ -66,12 +96,11 @@ async def enumerate_identities(execution_id: str) -> str:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--08aa0d10-0000-4000-8000-000000000002', attributes={'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000002', 'secops_ng.step.name': 'enumerate-identities', 'secops_ng.tool.name': 'enumerate_identities', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--08aa0d10-0000-4000-8000-000000000002'"
-        )
+        from content.playbooks.iam_auditor.primitives.identity import resolve_caller_identity
+        __caller_identity_ref__ = resolve_caller_identity(principal_type=__principal_type__, principal_id=__principal_id__, identity_provider=__identity_provider__)
 
 @tool
-async def enumerate_capabilities(caller_identity_ref: str) -> str:
+async def enumerate_capabilities(capabilities_raw: str) -> str:
     """Walk the closed capability list the resolved caller identity held at execution time. Each capability is a verb.resource token; the list is closed (no implicit grants). This is the runtime-side assertion; the F-PT-01 platform card carries the orthogonal guarantee that the caller actually held the listed capabilities at boot, which is out of scope for this workflow.
 
     CACAO step_id : action--08aa0d10-0000-4000-8000-000000000003
@@ -84,12 +113,11 @@ async def enumerate_capabilities(caller_identity_ref: str) -> str:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--08aa0d10-0000-4000-8000-000000000003', attributes={'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000003', 'secops_ng.step.name': 'enumerate-capabilities', 'secops_ng.tool.name': 'enumerate_capabilities', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--08aa0d10-0000-4000-8000-000000000003'"
-        )
+        from content.playbooks.iam_auditor.primitives.capabilities import build_capability_list
+        __capabilities_ref__ = build_capability_list(capabilities=__capabilities_raw__)
 
 @tool
-async def emit_access_evidence(caller_identity_ref: str, capabilities_ref: str, execution_id: str) -> str:
+async def emit_access_evidence(workflow_id: str, execution_id: str, compile_target: str, regulation_refs: str, control_refs: str, caller_identity_ref: str, capabilities_ref: str, captured_at: str, source_url: str) -> str:
     """Combine the caller-identity block and the capability list into one access-evidence artifact shaped against schemas/evidence/access.schema.json (stream: access). The artifact carries the workflow id, execution id, compile target, regulation_refs (nis2:art-21-2-i), control_refs, captured_at, and provenance. Emission is byte-stable: same execution inputs and same compile target re-derive the same artifact_id (SHA-256 of workflow_id|execution_id|compile_target). Destination is operator-configured — no default non-EU endpoint.
 
     CACAO step_id : action--08aa0d10-0000-4000-8000-000000000004
@@ -102,9 +130,8 @@ async def emit_access_evidence(caller_identity_ref: str, capabilities_ref: str, 
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--08aa0d10-0000-4000-8000-000000000004', attributes={'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000004', 'secops_ng.step.name': 'emit-access-evidence', 'secops_ng.tool.name': 'emit_access_evidence', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--08aa0d10-0000-4000-8000-000000000004'"
-        )
+        from content.playbooks.iam_auditor.primitives.artifact import build_access_artifact
+        __access_artifact_ref__ = build_access_artifact(workflow_id=__workflow_id__, execution_id=__execution_id__, compile_target=__compile_target__, regulation_refs=__regulation_refs__, control_refs=__control_refs__, caller_identity=__caller_identity_ref__, capabilities=__capabilities_ref__, captured_at=__captured_at__, source_url=__source_url__)
 
 async def llm_step(state: PlaybookIamAuditorV1State) -> dict:
     """Agentic-extension hook.
