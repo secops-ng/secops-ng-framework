@@ -22,7 +22,17 @@ entries:
     playbook_refs:
       - playbook.identity_compromise@v1
       - playbook.cloud_misconfiguration@v1
+      - playbook.iam_auditor@v1
     metric_refs:
       - kri.orphaned_privileged_accounts@v1
       - kri.asset_inventory_drift@v1
       - kpi.cloud_posture_coverage@v1
+    evidence_stream_refs:
+      - access
+    notes: >-
+      SKELETON: `playbook.iam_auditor@v1` is shipped with declarative
+      placeholder step bodies pending CORE / EXTEND sibling cards.
+      It is the per-execution capability-inventory producer that
+      anchors the access evidence stream (F-CP-07) against this
+      obligation; the schema for the artifact it emits lives at
+      schemas/evidence/access.schema.json.
