@@ -103,7 +103,7 @@ PAYLOAD: dict = {
     ],
     "evaluated_at": "2026-06-19T05:00:00Z",
     "captured_at": "2026-06-19T05:00:00Z",
-    "source_url": "https://secops-ng.org/playbooks/infra_posture_management",
+    "source_url": "https://example.org/runs/infra_posture_management_example_0001",
 }
 
 

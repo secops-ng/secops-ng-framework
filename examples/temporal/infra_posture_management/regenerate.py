@@ -99,7 +99,7 @@ CTX = PostureContext(
     ),
     evaluated_at=datetime(2026, 6, 19, 5, 0, 0, tzinfo=timezone.utc),
     captured_at=datetime(2026, 6, 19, 5, 0, 0, tzinfo=timezone.utc),
-    source_url="https://secops-ng.org/playbooks/infra_posture_management",
+    source_url="https://example.org/runs/infra_posture_management_example_0001",
 )
 
 
