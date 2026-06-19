@@ -622,7 +622,7 @@ not a separate documentation chore.
 
 ### F-GD-02 — Lawful-basis check in CI
 
-- **Status:** Proposed
+- **Status:** Shipped
 - **Priority:** P2
 - **Acceptance criteria:**
   - CI fails if a workflow ships without a corresponding data-flow
