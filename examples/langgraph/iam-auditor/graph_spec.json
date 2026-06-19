@@ -1,0 +1,48 @@
+{
+  "conditional_edges": [],
+  "edges": [
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--08aa0d10-0000-4000-8000-000000000003",
+      "src": "action--08aa0d10-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--08aa0d10-0000-4000-8000-000000000004",
+      "src": "action--08aa0d10-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--08aa0d10-0000-4000-8000-000000000004"
+    }
+  ],
+  "end_sentinel": "__END__",
+  "entry": "action--08aa0d10-0000-4000-8000-000000000002",
+  "name": "IAM auditor \u2014 capability inventory",
+  "nodes": [
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "enumerate-identities",
+      "name": "action--08aa0d10-0000-4000-8000-000000000002",
+      "step_id": "action--08aa0d10-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "enumerate-capabilities",
+      "name": "action--08aa0d10-0000-4000-8000-000000000003",
+      "step_id": "action--08aa0d10-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "emit-access-evidence",
+      "name": "action--08aa0d10-0000-4000-8000-000000000004",
+      "step_id": "action--08aa0d10-0000-4000-8000-000000000004"
+    }
+  ],
+  "playbook_id": "playbook--08aa0d10-0000-4000-8000-000000000001",
+  "stable_id": "playbook.iam_auditor@v1"
+}
