@@ -310,11 +310,24 @@ named operator use-case. Each cookbook workflow lives under
 
 ### F-WF-07 — Codebase vulnerability management
 
-- **Status:** Proposed
+- **Status:** Shipped
 - **Priority:** P2
 - **Acceptance criteria:**
-  - SBOM-driven dependency review workflow with disclosure timeline
-    capture.
+  - `content/playbooks/codebase_vuln_management/` carries the CACAO
+    playbook and deterministic primitives (SBOM pin, finding
+    normalisation, CVD disclosure-window resolution, timeline-record
+    builder); compiled targets land under
+    `examples/{n8n,temporal,langgraph}/codebase_vuln_management/`.
+  - SBOM-driven dependency review workflow: `ingest-sbom` →
+    `review-deps` → `assess-disclosure` → `track-timeline`; transitions
+    deterministic and replay-tested across all three targets.
+  - Per-finding disclosure-timeline-record emitted per workflow
+    execution against
+    `content/evidence/codebase_vuln_management/disclosure-timeline-record.schema.json`,
+    deterministic on `(workflow_id, sbom_content_hash, component.purl,
+    advisory_id)`.
+  - Cookbook entry + cross-target byte-parity goldens
+    (`tests/examples/codebase_vuln_management/`).
 - **Sovereign-stack constraints:** Default scanner is a CLI installable
   from EU-hosted package index; no hosted scanner SaaS dependency.
 - **Depends on:** F-WF-01
