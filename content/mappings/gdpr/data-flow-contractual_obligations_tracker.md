@@ -64,7 +64,7 @@ against contracts whose contracting party is a legal entity (the
 typical case for supplier contracts), no personal data is processed
 and GDPR does not engage. The sections below score the worst case:
 a contract whose contracting party is a natural person (a sole
-trader, an individual consultant, a named contractor) or whose
+trader, an individual freelancer, a named contractor) or whose
 named-contact / signatory fields the operator chooses to ingest are
 attributable to natural persons.
 
@@ -80,7 +80,7 @@ attributable to a natural person; supplier contracts with legal
 entities fall outside GDPR scope for the contracting-party fields):
 
 - **The supplier contracting party** — where the supplier is a
-  sole trader, an individual consultant, or a freelancer whose
+  sole trader, an individual contractor, or a freelancer whose
   contracting identity is a natural person, the natural person on
   whose behalf the contract was signed. This is the central data
   subject where the supplier is not a legal entity.
