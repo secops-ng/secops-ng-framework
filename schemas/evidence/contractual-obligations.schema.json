@@ -1,0 +1,259 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/evidence/contractual-obligations.schema.json",
+  "title": "SecOps-NG Contractual-Obligations Evidence Artifact",
+  "description": "Typed shape for one evidence artifact emitted by the contractual-obligations evidence stream (F-WF-10). One artifact is produced per execution of the contractual-obligations tracker workflow against a single supplier-contract reference; it enumerates the obligations the operator has accepted from that contract and the per-obligation review schedule the workflow derived. Discharges the contract-time half of NIS2 Article 21(2)(d) (per-entity supply-chain risk management — security characteristics of direct suppliers and service providers with periodic re-attestation) and complements the execution-time F-CP-03 supply-chain stream which captures the dependency surface a workflow resolved against at runtime. The two streams share no key by design (this stream keys on `contract_id`; F-CP-03 keys on `(workflow_id, execution_id)`); a CORE-FANOUT sibling will pin the cross-stream join on `supplier_ref` <-> `provider_id` once both surfaces are at CORE. Public-bar artifact: supplier identifiers are opaque operator-side ids, operator-side strings (owner labels, clause refs) MUST stay role-shaped or URN-shaped, and individual personal names are out of scope per AGENTS.md §3. SKELETON layer: required-field shape and the high-level `contract`, `obligations[]`, and `review_schedule[]` envelopes are pinned so the CORE-FANOUT sibling cards can bind primitive emitters against a stable contract; inner object shapes are intentionally permissive at this layer and tightened in EXTEND-schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_id",
+    "stream",
+    "workflow_id",
+    "execution_id",
+    "regulation_refs",
+    "control_refs",
+    "contract",
+    "obligations",
+    "review_schedule",
+    "owner",
+    "captured_at",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Pinned schema version. Lets a consumer reject artifacts produced under an older schema once breaking changes ship. SKELETON layer carries 0.1.0; the EXTEND-schema sibling card lifts it to 1.0.0 once inner envelopes are tightened.",
+      "type": "string",
+      "const": "0.1.0"
+    },
+    "artifact_id": {
+      "description": "Stable per-artifact identifier. Convention: SHA-256 hex digest of `<workflow_id>|<execution_id>|<contract.contract_id>|<captured_at>` (UTF-8, no separators around the pipes). Two executions of the same workflow at the same instant against the same contract collide deliberately; the same execution re-emitted at the same captured_at stays byte-identical.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "stream": {
+      "description": "Identifies which evidence stream produced the artifact. Constant on this schema.",
+      "type": "string",
+      "const": "contractual-obligations"
+    },
+    "workflow_id": {
+      "description": "Stable workflow identifier — one of the workflow ids declared under `content/playbooks/<workflow-id>/`. The F-WF-10 SKELETON anchor is `contractual_obligations_tracker`.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[a-z][a-z0-9_-]*$"
+    },
+    "execution_id": {
+      "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Re-runs of the same workflow_id produce distinct execution_ids.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "regulation_refs": {
+      "description": "Pins to the upstream regulatory mapping entries this artifact helps satisfy (typically `nis2:art-21-2-d` plus, where applicable, `nis2:art-22` for the Union-level Cooperation-Group overlay). At least one entry — an artifact with no regulatory anchor is not evidence in the F-WF-10 sense. Joins back into content/mappings/<regime>/*.yaml via the `id` field.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(nis2|dora|cra|gdpr|iso27001|soc2):[a-z0-9][a-z0-9.-]*$",
+        "maxLength": 120
+      }
+    },
+    "control_refs": {
+      "description": "Control stable-ids attested by this artifact. At least one — typically `control.supplier_inventory@v1` and `control.provider_attestation@v1`.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+      }
+    },
+    "contract": {
+      "description": "The normalised supplier-contract record the workflow ingested on this execution.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract_id", "supplier_ref", "effective_at"],
+      "properties": {
+        "contract_id": {
+          "description": "Stable operator-side identifier for the contract record (e.g. `contract.supplier-x.master-services@v1`). The contract catalogue is operator-supplied; the framework ships the schema, not the catalogue. Public-bar text: opaque operator id, no commercial brand names baked into the schema.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "^contract\\.[a-z0-9][a-z0-9._-]*@v[0-9]+(\\.[0-9]+){0,2}$"
+        },
+        "supplier_ref": {
+          "description": "Stable operator-side identifier for the supplier the contract is with. Same shape vocabulary as F-CP-03's `provider_id` (`provider.<id>@v<n>`) so the cross-stream join can be wired up at CORE without a schema rename. Where the supplier is also a runtime provider, `supplier_ref` and `provider_id` SHOULD agree.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "^provider\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+        },
+        "effective_at": {
+          "description": "ISO-8601 date on which the contract took effect.",
+          "type": "string",
+          "format": "date"
+        },
+        "expires_at": {
+          "description": "ISO-8601 date on which the contract expires. `null` for evergreen / open-ended contracts.",
+          "type": ["string", "null"],
+          "format": "date"
+        },
+        "jurisdiction": {
+          "description": "ISO-3166 alpha-2 country code for the governing-law jurisdiction the contract names. The SKELETON layer treats this as advisory; the EXTEND-schema sibling card tightens it once cross-border-transfer scoring is folded into the artifact.",
+          "type": "string",
+          "pattern": "^[A-Z]{2}$"
+        }
+      }
+    },
+    "obligations": {
+      "description": "One record per obligation the operator has accepted from this contract. Empty array is invalid — an obligation-evidence artifact for a contract with zero extracted obligations should not be emitted at all. SKELETON layer carries a permissive inner shape; EXTEND-schema tightens the clause-reference and obligation-kind vocabularies.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": false,
+      "items": { "$ref": "#/$defs/obligation_record" }
+    },
+    "review_schedule": {
+      "description": "One record per obligation declared in `obligations[]`, in the same order. Carries the per-obligation review schedule the workflow derived from the obligation's contractual cadence and the operator's review-policy.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": false,
+      "items": { "$ref": "#/$defs/review_record" }
+    },
+    "owner": {
+      "description": "Dated ownership pointer for the supplier-inventory control attestation. Role-shaped — a working-group mailbox, a generic role title, or a community handle. Individual personal names are out of scope per AGENTS.md §3 and rejected here as a matter of schema discipline.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "assigned_at"],
+      "properties": {
+        "role": {
+          "description": "Generic role or working-group identifier (e.g. 'supplier-governance@example.org', 'procurement-lead', 'contracts-on-call'). Personal names are not used.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "assigned_at": {
+          "description": "ISO-8601 date on which the role was assigned ownership of the contractual-obligations attestation chain.",
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "captured_at": {
+      "description": "ISO-8601 UTC timestamp at which this artifact was captured. Stable input to the artifact_id derivation so re-emissions in the same execution at the same instant stay byte-identical.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "provenance": {
+      "description": "Where this artifact came from. Mirrors the provenance pattern used by content/evidence/*/schemas/* so a reviewer can re-derive the chain back to source.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_url", "captured_at"],
+      "properties": {
+        "source_url": {
+          "description": "URL of the workflow run (or workflow-content source) that produced this artifact. Compile targets may use their own run-id URLs; the URL itself is opaque to this schema.",
+          "type": "string",
+          "format": "uri"
+        },
+        "captured_at": {
+          "description": "ISO-8601 date or date-time matching the artifact-level captured_at.",
+          "type": "string"
+        },
+        "commit_sha": {
+          "description": "Optional commit SHA of the content snapshot the workflow walked.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,64}$"
+        }
+      }
+    },
+    "retention": {
+      "description": "Optional retention pointer the operator declares for this evidentiary record. ISO-8601 duration. The community-default value is an open question to be settled in the EXTEND sibling card, mirroring the equivalent F-CP-02 / F-CP-03 / F-CP-04 deferrals.",
+      "type": "string",
+      "pattern": "^P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+S)?)?$"
+    }
+  },
+  "$defs": {
+    "obligation_record": {
+      "type": "object",
+      "description": "One obligation the operator has accepted from this contract. SKELETON layer pins clause_ref, obligation_kind, and text; the inner envelopes for cadence / scope / waiver are tightened in EXTEND-schema.",
+      "additionalProperties": false,
+      "required": ["obligation_id", "clause_ref", "obligation_kind", "text"],
+      "properties": {
+        "obligation_id": {
+          "description": "Stable per-contract identifier for the obligation (e.g. `obligation.audit-right`, `obligation.attestation-cadence`). Operator-supplied; the framework ships the schema, not the catalogue.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "^obligation\\.[a-z][a-z0-9_-]*$"
+        },
+        "clause_ref": {
+          "description": "Reference into the source contract where the obligation lives (e.g. 'cl-8.4', 'annex-2/§3'). Free-text shape at the SKELETON layer; the EXTEND-schema sibling card tightens this to a stable clause-ref grammar.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "obligation_kind": {
+          "description": "Which kind of obligation this is. SKELETON-layer enum; the EXTEND-schema sibling card lifts this into a shared vocabulary at schemas/contractual_obligation_kind.json once the cross-stream join with F-CP-03 lands.",
+          "type": "string",
+          "enum": [
+            "security_control_commitment",
+            "audit_right",
+            "attestation_cadence",
+            "sub_processor_disclosure",
+            "breach_notification_cadence",
+            "data_localisation",
+            "other"
+          ]
+        },
+        "text": {
+          "description": "Operator-canonicalised obligation text. No commentary, no rewrites at the SKELETON layer; the EXTEND-schema sibling card pins a canonicalisation pass once the per-target emitters are worked through. Public-bar text: no individual names, no operator branding.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "cadence": {
+          "description": "Contractual cadence the clause itself declares for the obligation (e.g. 'P1Y' for annual attestation, 'PT0S' for immediate breach notification). ISO-8601 duration. `null` when the clause carries no explicit cadence — the schedule then falls back to the operator's review-policy.",
+          "type": ["string", "null"],
+          "pattern": "^P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+S)?)?$"
+        }
+      }
+    },
+    "review_record": {
+      "type": "object",
+      "description": "Per-obligation review schedule, paired one-to-one with the `obligations[]` array. SKELETON layer pins the next-review-due timestamp and the state; the EXTEND-schema sibling card pins the waiver / deferral envelope.",
+      "additionalProperties": false,
+      "required": ["obligation_id", "state", "next_review_due_at"],
+      "properties": {
+        "obligation_id": {
+          "description": "Pointer to the matching `obligations[].obligation_id` in this artifact.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "^obligation\\.[a-z][a-z0-9_-]*$"
+        },
+        "state": {
+          "description": "Current review state for the obligation. SKELETON-layer enum mirroring the F-CP-03 attestation_state vocabulary; the EXTEND-schema sibling card lifts this into a shared vocabulary at schemas/obligation_review_state.json.",
+          "type": "string",
+          "enum": [
+            "current",
+            "due_soon",
+            "overdue",
+            "waived",
+            "unknown"
+          ]
+        },
+        "last_reviewed_at": {
+          "description": "ISO-8601 UTC timestamp of the most recent review event for this obligation. `null` when no review has taken place yet (newly-extracted obligation; state is then 'unknown').",
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "next_review_due_at": {
+          "description": "ISO-8601 UTC timestamp at which the next review falls due. The supplier-attestation-staleness KRI (queued in F-WF-10 EXTEND-metrics) fires when (artifact captured_at > next_review_due_at).",
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

@@ -19,11 +19,22 @@ entries:
       - control.provider_attestation@v1
     playbook_refs:
       - playbook.threat_intel_ingest@v1
+      - playbook.contractual_obligations_tracker@v1
     metric_refs:
       - kri.suppliers_attestation_stale@v1
     evidence_stream_refs:
       - supply-chain
+      - contractual-obligations
     notes: >-
-      Sovereign-provider classification (residency, ownership, sub-processor
-      chain) reads from a private KB via a file-fixture interface; the
-      framework repo never ingests KB contents.
+      Two surfaces feed this clause. The execution-time surface is the
+      F-CP-03 supply-chain evidence stream (one artifact per workflow
+      execution enumerating external-provider dependencies). The
+      contract-time surface is the F-WF-10 contractual-obligations
+      stream (one artifact per supplier-contract execution enumerating
+      the obligations the operator has accepted and the per-obligation
+      review schedule). SKELETON:
+      `playbook.contractual_obligations_tracker@v1` is shipped with
+      declarative placeholder step bodies pending CORE / EXTEND sibling
+      cards. Sovereign-provider classification (residency, ownership,
+      sub-processor chain) reads from a private KB via a file-fixture
+      interface; the framework repo never ingests KB contents.
