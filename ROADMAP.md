@@ -300,11 +300,46 @@ named operator use-case. Each cookbook workflow lives under
 
 ### F-WF-06 — Infrastructure posture management
 
-- **Status:** Proposed
+- **Status:** Shipped
 - **Priority:** P2
 - **Acceptance criteria:**
-  - Continuous variant of F-WF-02 driven by scheduled re-execution.
-- **Sovereign-stack constraints:** —
+  - `content/playbooks/infra_posture_management/` carries the canonical
+    CACAO playbook (`playbook.infra_posture_management@v1`) and
+    deterministic primitives (`collect.collect_posture_state`,
+    `controls.evaluate_controls`,
+    `artifact.build_posture_artifact`) with zero placeholders across
+    all three action bodies; compiled targets land under
+    `examples/{n8n,temporal,langgraph}/infra_posture_management/`.
+  - Continuous re-execution topology: `collect-posture` →
+    `evaluate-controls` → `emit-posture-evidence`; transitions
+    deterministic and replay-tested across all three targets. The
+    continuous shape is the scheduled re-execution variant of the
+    F-WF-02 per-request posture-audit lane — both share the
+    posture-evidence schema, they differ in cadence (request-driven
+    vs. scheduler-driven) and in the durability of the artifact
+    series.
+  - Per-execution posture-evidence-record emitted against
+    `schemas/evidence/posture.schema.json` (stream: `posture`);
+    `artifact_id` derives deterministically from
+    `SHA-256(workflow_id|execution_id|compile_target|policy_version.value)`,
+    so re-emissions inside the same execution under the same policy
+    version are byte-identical at the path level. The record pins the
+    posture-state snapshot hash, the per-control evaluation result
+    set, the NIS2 Article 21(2)(a) `regulation_refs`, and the
+    closed `control_refs` list. The `artifact_id` is **per-target**
+    by construction — the same logical execution under each compile
+    target re-derives a distinct id; byte-parity is asserted per
+    target, not across targets.
+  - Cookbook entry + per-target byte-parity goldens
+    (`tests/examples/infra_posture_management/test_{n8n,temporal,langgraph}_workflow_golden.py`
+    and `test_{n8n,temporal,langgraph}_posture_evidence.py`) pin both
+    the per-target workflow artefact and the per-target
+    posture-evidence record.
+- **Sovereign-stack constraints:** Source endpoints for
+  `collect-posture` (cloud-account read APIs, identity-provider read
+  APIs, network-baseline read APIs) and the artifact destination for
+  `emit-posture-evidence` are operator-configured; the framework
+  ships no default endpoint and bundles no vendor SDK.
 - **Depends on:** F-WF-02
 - **Source:** NIS2 Art. 21(2)(a).
 
