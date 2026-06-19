@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/evidence/posture.schema.json",
+  "title": "SecOps-NG Posture Evidence Artifact (SKELETON stub)",
+  "description": "Typed shape for one evidence artifact emitted by the infrastructure-posture-management evidence stream — the continuous variant of the F-WF-02 posture-audit lane. One artifact is produced per scheduled execution of `playbook.infra_posture_management@v1` and pins, mechanically, (a) the posture-state snapshot the workflow collected over the operator's in-scope infrastructure manifest and (b) the per-control evaluation result set the workflow derived against that snapshot under the policy version in force at evaluation time. Downstream consumer is the NIS2 Article 21(2)(a) risk-analysis / information-system-security-policies mapping. SKELETON: the required-field shape is pinned at this layer so the CORE-FANOUT sibling cards can bind primitive emitters against a stable contract; the nested object shapes (`posture_state` value structure, `control_evaluation` deviation list) are intentionally permissive at the SKELETON layer and tightened in the EXTEND-schema sibling card once the per-target emitters have been worked through. Public-bar artifact: operator-side strings (resource ids, policy versions, owner labels) MUST stay role-shaped or opaque; individual personal names, credential-shaped strings, and raw cloud-account secret material are out of scope per AGENTS.md §3 and rejected at the schema boundary.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_id",
+    "stream",
+    "workflow_id",
+    "execution_id",
+    "compile_target",
+    "regulation_refs",
+    "control_refs",
+    "policy_version",
+    "posture_state",
+    "control_evaluation",
+    "evaluated_at",
+    "captured_at",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Pinned schema version. Lets a consumer reject artifacts produced under an older schema once breaking changes ship.",
+      "type": "string",
+      "const": "0.1.0"
+    },
+    "artifact_id": {
+      "description": "Stable per-artifact identifier. Convention: SHA-256 hex digest of `<workflow_id>|<execution_id>|<compile_target>|<policy_version.value>` (UTF-8, no separators around the pipes). Deterministic on those four inputs so a replay of the same execution under the same compile target and the same policy version re-derives the same id; re-emissions inside the same execution stay byte-identical at the path level.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "stream": {
+      "description": "Identifies which evidence stream produced the artifact. Constant on this schema.",
+      "type": "string",
+      "const": "posture"
+    },
+    "workflow_id": {
+      "description": "Stable identifier of the workflow whose execution this artifact covers. Convention: lower-snake-case workflow stable-id from `content/playbooks/<workflow>/` — for posture-management artifacts this is `infra_posture_management`. Joins back into the workflow content layer so a reviewer can re-derive which playbook was compiled into the running form.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*$",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "execution_id": {
+      "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Each scheduled re-execution emits its own posture artifact — re-runs of the same workflow produce distinct execution_ids and distinct artifact_ids.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "compile_target": {
+      "description": "Which of the three reference compile targets produced the running form of the workflow. The artifact is target-specific because the posture-collection surface differs per target. Constrained to the three reference targets the project ships compilers for.",
+      "type": "string",
+      "enum": ["n8n", "temporal", "langgraph"]
+    },
+    "regulation_refs": {
+      "description": "Pins to the upstream regulatory mapping entries this artifact helps satisfy (typically `nis2:art-21-2-a`). At least one entry — an artifact with no regulatory anchor is not evidence in the posture-stream sense. Joins back into content/mappings/<regime>/*.yaml via the `id` field.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(nis2|dora|cra|gdpr|iso27001|soc2):[a-z0-9][a-z0-9.-]*$",
+        "maxLength": 120
+      }
+    },
+    "control_refs": {
+      "description": "Control stable-ids attested by this artifact. At least one — typically `control.cspm_baseline@v1`, `control.risk_management_policy@v1`, or `control.asset_inventory_delta@v1`.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+      }
+    },
+    "policy_version": {
+      "description": "The version of the operator's posture policy that was in force when the controls were evaluated against the collected posture state. Pairs the evaluation with the policy text a reviewer can re-derive. Role-shaped: SemVer or content-hash; arbitrary free text rejected.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scheme", "value"],
+      "properties": {
+        "scheme": {
+          "description": "How `value` is interpreted. `semver` for a SemVer string published with the policy document; `content_hash` for a SHA-256 hex digest of the policy bytes as fetched.",
+          "type": "string",
+          "enum": ["semver", "content_hash"]
+        },
+        "value": {
+          "description": "The actual version token. SemVer string for `semver`; 64-char lower-hex SHA-256 for `content_hash`.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      }
+    },
+    "posture_state": {
+      "description": "Pointer to or summary of the posture-state snapshot the workflow collected against the operator's in-scope infrastructure manifest. SKELETON: the inner shape is intentionally permissive — the CORE-FANOUT sibling cards bind the per-target collection primitive and the EXTEND-schema sibling card tightens the inner object shape. Required keys at this layer: a `scope_ref` opaque pointer back to the operator's manifest, a `resource_count` non-negative integer, and a `snapshot_hash` content hash of the collected snapshot bytes for replay re-derivation.",
+      "type": "object",
+      "required": ["scope_ref", "resource_count", "snapshot_hash"],
+      "properties": {
+        "scope_ref": {
+          "description": "Opaque pointer back to the operator's in-scope infrastructure manifest. Operator-side string; the framework does not interpret it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "resource_count": {
+          "description": "Number of distinct resources the workflow walked under the declared scope.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "snapshot_hash": {
+          "description": "SHA-256 hex digest of the collected snapshot bytes. Anchors replay re-derivation.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "control_evaluation": {
+      "description": "Per-control evaluation result set the workflow derived against the snapshot under the declared policy_version. SKELETON: at least one entry; the inner shape is intentionally permissive at this layer — the EXTEND-schema sibling card tightens the deviation list and pins the attestation_state vocabulary against `schemas/attestation_state.json`. Required per-entry keys at this layer: a `control_ref` to the control evaluated, an `attestation_state` token, and a non-negative `deviation_count` so reviewer-side rollups can read the artifact without re-walking the deviation list.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["control_ref", "attestation_state", "deviation_count"],
+        "properties": {
+          "control_ref": {
+            "type": "string",
+            "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+          },
+          "attestation_state": {
+            "description": "Attestation outcome for this control against the snapshot. SKELETON enum mirrors the F-CP-01 risk-analysis vocabulary; tightened against schemas/attestation_state.json in the EXTEND-schema sibling card.",
+            "type": "string",
+            "enum": ["effective", "partially_effective", "ineffective", "overdue"]
+          },
+          "deviation_count": {
+            "description": "Number of distinct resources whose collected configuration deviated from the policy baseline for this control. Zero for `effective`.",
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "evaluated_at": {
+      "description": "ISO-8601 UTC timestamp at which the per-control evaluation was performed against the posture snapshot. Distinct from `captured_at` for the upstream `collect-posture` step.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "captured_at": {
+      "description": "ISO-8601 UTC timestamp at which the posture-state snapshot was collected. Carried alongside `evaluated_at` so a reviewer can see both ends of the per-execution window.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "provenance": {
+      "description": "Where this artifact came from. Mirrors the provenance pattern used by content/controls/*.yaml so a reviewer can re-derive the chain back to source.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_url", "captured_at"],
+      "properties": {
+        "source_url": {
+          "description": "URL of the workflow run (or workflow-content source) that produced this artifact.",
+          "type": "string",
+          "format": "uri"
+        },
+        "captured_at": {
+          "description": "ISO-8601 date or date-time matching the artifact-level captured_at.",
+          "type": "string"
+        },
+        "commit_sha": {
+          "description": "Optional commit SHA of the content snapshot the workflow walked.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,64}$"
+        }
+      }
+    },
+    "owner": {
+      "description": "Optional dated ownership pointer for the posture posture the artifact covers. Role-shaped — a working-group mailbox, a generic role title, or a community handle. Individual personal names are out of scope per AGENTS.md §3.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "assigned_at"],
+      "properties": {
+        "role": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "assigned_at": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "retention": {
+      "description": "Optional retention pointer the operator declares for this evidentiary record. ISO-8601 duration.",
+      "type": "string",
+      "pattern": "^P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+S)?)?$"
+    }
+  }
+}

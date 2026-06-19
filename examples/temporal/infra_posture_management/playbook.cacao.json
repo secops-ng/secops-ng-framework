@@ -1,0 +1,175 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--06f06f06-0000-4000-8000-000000000001",
+  "name": "Infrastructure posture management",
+  "description": "Continuous infrastructure-posture-management workflow. On each scheduled re-execution, collect the current posture state of the in-scope infrastructure (cloud accounts, identity boundaries, network baseline), evaluate each declared control against that state, then emit one posture-evidence artifact shaped against schemas/evidence/posture.schema.json so a regulator-facing reviewer can re-derive what the posture was at evaluation time. SKELETON: the four-state topology (workflow_start -> collect-posture -> evaluate-controls -> emit-posture-evidence -> workflow_end) and the x_secops_ng joins are pinned at this layer; per-target compiler emitters and the canonical primitive bindings land in the CORE-FANOUT sibling cards. Continuous variant of the F-WF-02 posture-audit workflow under NIS2 Article 21(2)(a).",
+  "playbook_types": [
+    "investigation",
+    "notification"
+  ],
+  "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+  "created": "2026-06-19T00:00:00Z",
+  "modified": "2026-06-19T00:00:00Z",
+  "labels": [
+    "posture",
+    "infrastructure",
+    "continuous",
+    "posture-evidence",
+    "nis2",
+    "skeleton"
+  ],
+  "playbook_variables": {
+    "__execution_id__": {
+      "type": "string",
+      "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Pinned by the upstream runtime; the workflow reads it for the posture-evidence artifact join.",
+      "external": true
+    },
+    "__scope_ref__": {
+      "type": "string",
+      "description": "Pointer to the operator's in-scope infrastructure manifest (cloud accounts, identity boundaries, network baselines) under review on this execution. Operator-configured; the workflow reads it as the closed list of resources the posture evaluation walks. No default scope is shipped — the framework does not assume the operator's infrastructure shape.",
+      "external": true
+    },
+    "__posture_state_ref__": {
+      "type": "string",
+      "description": "Pointer to the collected posture-state snapshot produced by collect-posture. Closed shape per CORE sibling card; resource-id keyed, configuration-state valued. Consumed by evaluate-controls.",
+      "external": false
+    },
+    "__control_evaluation_ref__": {
+      "type": "string",
+      "description": "Pointer to the per-control evaluation result set produced by evaluate-controls — one entry per (control_ref, scoped-resource-id) pair, with the attestation state (effective / partially_effective / ineffective) and the deviation list. Consumed by emit-posture-evidence.",
+      "external": false
+    },
+    "__posture_artifact_ref__": {
+      "type": "string",
+      "description": "Pointer to the posture-evidence artifact emitted by emit-posture-evidence, shaped against schemas/evidence/posture.schema.json.",
+      "external": false
+    }
+  },
+  "workflow_start": "start--06f06f06-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--06f06f06-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "infra-posture-management-start",
+      "on_completion": "action--06f06f06-0000-4000-8000-000000000002"
+    },
+    "action--06f06f06-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "collect-posture",
+      "description": "Walk the in-scope infrastructure manifest at __scope_ref__ and collect the current posture-state snapshot: per-resource configuration state read from the operator's posture sources (cloud account read APIs, identity-provider read APIs, network-baseline read APIs). Read-only by contract; the workflow MUST NOT mutate any resource on the collect path. Source endpoints are operator-configured — the framework ships no default non-EU endpoint and no hosted-SaaS dependency.",
+      "on_completion": "action--06f06f06-0000-4000-8000-000000000003",
+      "in_args": [
+        "__execution_id__",
+        "__scope_ref__"
+      ],
+      "out_args": [
+        "__posture_state_ref__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.cspm_baseline@v1",
+          "control.asset_inventory_delta@v1",
+          "control.cloud_identity_least_privilege@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kpi.cloud_posture_coverage@v1"
+        ],
+        "core_body": {
+          "placeholder": true,
+          "note": "SKELETON: per-target posture-collection primitive bindings land in the CORE-FANOUT sibling cards."
+        }
+      }
+    },
+    "action--06f06f06-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "evaluate-controls",
+      "description": "Evaluate each control declared in the operator's posture policy against the collected posture state. Per (control_ref, scoped-resource-id) pair, classify the attestation state as effective, partially_effective, or ineffective; capture the deviation list (configuration values that differ from the declared baseline) on partially_effective / ineffective entries. Deterministic on the same posture snapshot and the same policy version — re-evaluation under the same inputs re-derives the same result set so a reviewer can re-derive the evaluation off the committed artifact.",
+      "on_completion": "action--06f06f06-0000-4000-8000-000000000004",
+      "in_args": [
+        "__posture_state_ref__"
+      ],
+      "out_args": [
+        "__control_evaluation_ref__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.cspm_baseline@v1",
+          "control.risk_management_policy@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kpi.cloud_posture_coverage@v1",
+          "kri.risk_register_staleness@v1"
+        ],
+        "core_body": {
+          "placeholder": true,
+          "note": "SKELETON: per-control evaluation primitive bindings land in the CORE-FANOUT sibling cards."
+        }
+      }
+    },
+    "action--06f06f06-0000-4000-8000-000000000004": {
+      "type": "action",
+      "name": "emit-posture-evidence",
+      "description": "Combine the posture-state snapshot and the per-control evaluation result set into one posture-evidence artifact shaped against schemas/evidence/posture.schema.json (stream: posture). The artifact carries the workflow id, execution id, compile target, regulation_refs (nis2:art-21-2-a), control_refs, the evaluated_at timestamp, the policy version under which the evaluation ran, and the provenance envelope. Emission is byte-stable: same execution inputs, same compile target, same policy version re-derive the same artifact_id (SHA-256 of workflow_id|execution_id|compile_target|policy_version). Destination is operator-configured — no default non-EU endpoint.",
+      "on_completion": "end--06f06f06-0000-4000-8000-000000000005",
+      "in_args": [
+        "__execution_id__",
+        "__posture_state_ref__",
+        "__control_evaluation_ref__"
+      ],
+      "out_args": [
+        "__posture_artifact_ref__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.cspm_baseline@v1",
+          "control.risk_management_policy@v1",
+          "control.asset_inventory_delta@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kpi.cloud_posture_coverage@v1"
+        ],
+        "core_body": {
+          "placeholder": true,
+          "note": "SKELETON: posture-evidence emission primitive binding lands in the CORE-FANOUT sibling cards."
+        }
+      }
+    },
+    "end--06f06f06-0000-4000-8000-000000000005": {
+      "type": "end",
+      "name": "infra-posture-management-end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.infra_posture_management@v1",
+    "content_version": "0.1.0",
+    "maturity": "draft",
+    "compile_targets": [],
+    "control_refs": [
+      "control.cspm_baseline@v1",
+      "control.risk_management_policy@v1",
+      "control.asset_inventory_delta@v1",
+      "control.cloud_identity_least_privilege@v1"
+    ],
+    "telemetry_refs": [
+      "telemetry.ocsf.api_activity@v1"
+    ],
+    "metric_refs": [
+      "kpi.cloud_posture_coverage@v1",
+      "kri.risk_register_staleness@v1"
+    ],
+    "sources": [
+      "OASIS CACAO v2.0 specification",
+      "NIS2 Directive (EU) 2022/2555 — Article 21(2)(a)",
+      "SecOps-NG posture evidence stream — schemas/evidence/posture.schema.json"
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "conditional_edges": [],
+  "edges": [
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--06f06f06-0000-4000-8000-000000000003",
+      "src": "action--06f06f06-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--06f06f06-0000-4000-8000-000000000004",
+      "src": "action--06f06f06-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--06f06f06-0000-4000-8000-000000000004"
+    }
+  ],
+  "end_sentinel": "__END__",
+  "entry": "action--06f06f06-0000-4000-8000-000000000002",
+  "name": "Infrastructure posture management",
+  "nodes": [
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "collect-posture",
+      "name": "action--06f06f06-0000-4000-8000-000000000002",
+      "step_id": "action--06f06f06-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "evaluate-controls",
+      "name": "action--06f06f06-0000-4000-8000-000000000003",
+      "step_id": "action--06f06f06-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "emit-posture-evidence",
+      "name": "action--06f06f06-0000-4000-8000-000000000004",
+      "step_id": "action--06f06f06-0000-4000-8000-000000000004"
+    }
+  ],
+  "playbook_id": "playbook--06f06f06-0000-4000-8000-000000000001",
+  "stable_id": "playbook.infra_posture_management@v1"
+}

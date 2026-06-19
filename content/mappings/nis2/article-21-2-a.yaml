@@ -15,13 +15,25 @@ entries:
     status: draft
     control_refs:
       - control.risk_management_policy@v1
-    playbook_refs: []
+      - control.cspm_baseline@v1
+      - control.asset_inventory_delta@v1
+    playbook_refs:
+      - playbook.infra_posture_management@v1
     metric_refs:
       - kri.risk_register_staleness@v1
+      - kpi.cloud_posture_coverage@v1
     evidence_stream_refs:
       - risk-analysis
+      - posture
     notes: >-
       Most of (a) is governance (policy text, board approval) and lives in
       docs templates rather than workflow content. The agentic slice is the
       re-assessment cadence enforcement, exercised by the evidence-collector
       pattern; that slice is mapped under (f) (effectiveness assessment).
+      SKELETON: `playbook.infra_posture_management@v1` is shipped with
+      declarative placeholder step bodies pending CORE / EXTEND sibling
+      cards. It is the continuous variant of the Shipped F-WF-02
+      posture-audit lane — scheduled re-execution emits one posture-evidence
+      artifact per tick (schemas/evidence/posture.schema.json, stream
+      `posture`) so the periodic-re-assessment obligation has a durable
+      artifact series the F-CP-06 effectiveness loop can read against.
