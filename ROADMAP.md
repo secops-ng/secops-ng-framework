@@ -268,7 +268,7 @@ named operator use-case. Each cookbook workflow lives under
 
 ### F-WF-04 — Detection engineering
 
-- **Status:** Proposed
+- **Status:** Shipped
 - **Priority:** P1
 - **Acceptance criteria:**
   - Rule lifecycle workflow: propose → review → ship → measure.
