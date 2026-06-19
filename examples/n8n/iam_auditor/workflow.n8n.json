@@ -20,16 +20,76 @@
               "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Pinned by the upstream runtime; the workflow reads it for the access-evidence artifact join."
             },
             {
+              "name": "__workflow_id__",
+              "type": "string",
+              "value": "",
+              "description": "Stable workflow stable-id from content/playbooks/<workflow>/. Joined into the access-evidence artifact_id derivation; constant per playbook (`iam_auditor`) and supplied as a flat token so the CORE primitive call mirrors the F-WF-01 / F-WF-07 binding convention."
+            },
+            {
+              "name": "__compile_target__",
+              "type": "string",
+              "value": "",
+              "description": "Which of the three reference compile targets produced the running form of the workflow. Pinned by the compile target's own boot path (`n8n`, `temporal`, `langgraph`); the primitive validates it against the access.schema enum."
+            },
+            {
+              "name": "__principal_type__",
+              "type": "string",
+              "value": "",
+              "description": "Mechanical classification of the caller resolved by the runtime \u2014 one of `service_account`, `workflow_runtime`, `automation_role`. Personal-user principals are out of scope for F-CP-07 and rejected at the primitive boundary."
+            },
+            {
+              "name": "__principal_id__",
+              "type": "string",
+              "value": "",
+              "description": "Stable role-shaped handle for the caller identity (service-account name, workflow-runtime principal id, automation role). Pinned by the compile target's runtime; the primitive validates the role-shape regex pinned by the F-CP-07 schema so a personal name or credential-shaped string fails loud at this step."
+            },
+            {
+              "name": "__identity_provider__",
+              "type": "string",
+              "value": "",
+              "description": "Optional short operator-defined token naming the IdP that issued or resolves the caller principal (`keycloak`, `dex`, `temporal`, `n8n`, `langgraph`). Free text is rejected by the primitive."
+            },
+            {
               "name": "__caller_identity_ref__",
               "type": "string",
               "value": "",
               "description": "Pointer to the caller-identity block produced by enumerate-identities \u2014 role-shaped principal id (service-account name, workflow-runtime principal, automation role) per the F-CP-07 public-bar discipline."
             },
             {
+              "name": "__capabilities_raw__",
+              "type": "string",
+              "value": "",
+              "description": "Operator-supplied raw capability list the runtime walked from its IAM provider. JSON-native list of verb.resource tokens; the primitive canonicalises (NFKC + lower-case) and dedups exact-match repeats so re-runs collapse to byte-identical bytes."
+            },
+            {
               "name": "__capabilities_ref__",
               "type": "string",
               "value": "",
               "description": "Pointer to the closed capability list produced by enumerate-capabilities \u2014 verb.resource tokens the caller held at execution time."
+            },
+            {
+              "name": "__regulation_refs__",
+              "type": "string",
+              "value": "",
+              "description": "Schema-shaped regulation references the artifact attests (typically `[\"nis2:art-21-2-i\"]`). JSON-native list; pinned by the compile target's boot config so the operator can extend without re-compiling."
+            },
+            {
+              "name": "__control_refs__",
+              "type": "string",
+              "value": "",
+              "description": "Control stable-ids the artifact attests. JSON-native list; the primitive validates each entry against the `control.<id>@v<n>` shape."
+            },
+            {
+              "name": "__captured_at__",
+              "type": "string",
+              "value": "",
+              "description": "ISO-8601 UTC second-precision timestamp (`...Z`) pinned at emission time by the upstream runtime; carried on the artifact's top-level captured_at and on provenance.captured_at."
+            },
+            {
+              "name": "__source_url__",
+              "type": "string",
+              "value": "",
+              "description": "URL of the workflow run that produced this artifact. Compile targets supply their own run-id URLs; the URL itself is opaque to the schema."
             },
             {
               "name": "__access_artifact_ref__",
@@ -46,42 +106,15 @@
     {
       "id": "action--08aa0d10-0000-4000-8000-000000000002",
       "name": "enumerate-identities",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         500,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.execution_id",
-              "name": "in.execution_id",
-              "value": "={{$workflow.variables.execution_id}}",
-              "type": "string"
-            },
-            {
-              "id": "out.caller_identity_ref",
-              "name": "out.caller_identity_ref",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.jml_evidence@v1, control.privileged_access_review@v1, control.cloud_identity_least_privilege@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.authentication@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.iam_auditor.primitives.identity import resolve_caller_identity\n__caller_identity_ref__ = resolve_caller_identity(principal_type=__principal_type__, principal_id=__principal_id__, identity_provider=__identity_provider__)"
       },
       "notes": "Resolve the caller identity that invoked the compiled workflow on this execution. The identity is role-shaped (service-account name, workflow-runtime principal id, automation role) \u2014 never an individual personal name or a credential-shaped string. The compile target's runtime is the source of truth: n8n credential binding, Temporal worker identity, LangGraph runtime principal. Output is the caller-identity block consumed by emit-access-evidence.",
       "notesInFlow": true
@@ -89,42 +122,15 @@
     {
       "id": "action--08aa0d10-0000-4000-8000-000000000003",
       "name": "enumerate-capabilities",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         760,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.caller_identity_ref",
-              "name": "in.caller_identity_ref",
-              "value": "={{$workflow.variables.caller_identity_ref}}",
-              "type": "string"
-            },
-            {
-              "id": "out.capabilities_ref",
-              "name": "out.capabilities_ref",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.privileged_access_review@v1, control.cloud_identity_least_privilege@v1, control.asset_inventory_delta@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.account_change@v1, telemetry.ocsf.api_activity@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.iam_auditor.primitives.capabilities import build_capability_list\n__capabilities_ref__ = build_capability_list(capabilities=__capabilities_raw__)"
       },
       "notes": "Walk the closed capability list the resolved caller identity held at execution time. Each capability is a verb.resource token; the list is closed (no implicit grants). This is the runtime-side assertion; the F-PT-01 platform card carries the orthogonal guarantee that the caller actually held the listed capabilities at boot, which is out of scope for this workflow.",
       "notesInFlow": true
@@ -132,60 +138,15 @@
     {
       "id": "action--08aa0d10-0000-4000-8000-000000000004",
       "name": "emit-access-evidence",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1020,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.caller_identity_ref",
-              "name": "in.caller_identity_ref",
-              "value": "={{$workflow.variables.caller_identity_ref}}",
-              "type": "string"
-            },
-            {
-              "id": "in.capabilities_ref",
-              "name": "in.capabilities_ref",
-              "value": "={{$workflow.variables.capabilities_ref}}",
-              "type": "string"
-            },
-            {
-              "id": "in.execution_id",
-              "name": "in.execution_id",
-              "value": "={{$workflow.variables.execution_id}}",
-              "type": "string"
-            },
-            {
-              "id": "out.access_artifact_ref",
-              "name": "out.access_artifact_ref",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.jml_evidence@v1, control.privileged_access_review@v1, control.asset_inventory_delta@v1, control.cloud_identity_least_privilege@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.account_change@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.cloud_posture_coverage@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.iam_auditor.primitives.artifact import build_access_artifact\n__access_artifact_ref__ = build_access_artifact(workflow_id=__workflow_id__, execution_id=__execution_id__, compile_target=__compile_target__, regulation_refs=__regulation_refs__, control_refs=__control_refs__, caller_identity=__caller_identity_ref__, capabilities=__capabilities_ref__, captured_at=__captured_at__, source_url=__source_url__)"
       },
       "notes": "Combine the caller-identity block and the capability list into one access-evidence artifact shaped against schemas/evidence/access.schema.json (stream: access). The artifact carries the workflow id, execution id, compile target, regulation_refs (nis2:art-21-2-i), control_refs, captured_at, and provenance. Emission is byte-stable: same execution inputs and same compile target re-derive the same artifact_id (SHA-256 of workflow_id|execution_id|compile_target). Destination is operator-configured \u2014 no default non-EU endpoint.",
       "notesInFlow": true
@@ -260,21 +221,16 @@
     "iam-audit",
     "capability-inventory",
     "access-evidence",
-    "nis2",
-    "skeleton"
+    "nis2"
   ],
   "pinData": {},
   "meta": {
     "secops_ng": {
       "stable_id": "playbook.iam_auditor@v1",
-      "content_version": "0.1.0",
-      "maturity": "draft",
+      "content_version": "0.2.0",
+      "maturity": "experimental",
       "source_playbook_id": "playbook--08aa0d10-0000-4000-8000-000000000001"
     },
-    "secops_ng_notes": [
-      "step 'action--08aa0d10-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'action--08aa0d10-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'action--08aa0d10-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
-    ]
+    "secops_ng_notes": []
   }
 }
