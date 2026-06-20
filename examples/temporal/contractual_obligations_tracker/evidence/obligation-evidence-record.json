@@ -1,0 +1,86 @@
+{
+  "artifact_id": "41af9b4917261a5a7ac442847c19788c1b9fbc1777401bca5e4fe45349df22df",
+  "captured_at": "2026-06-19T05:00:00Z",
+  "contract": {
+    "contract_id": "contract.supplier-eu-iaas.master-services@v1",
+    "effective_at": "2025-01-01",
+    "expires_at": "2027-12-31",
+    "jurisdiction": "NL",
+    "supplier_ref": "provider.supplier_eu_iaas@v1"
+  },
+  "control_refs": [
+    "control.supplier_inventory@v1",
+    "control.provider_attestation@v1"
+  ],
+  "execution_id": "exec-2026-06-19T05:00:00Z-0001",
+  "obligations": [
+    {
+      "cadence": "P1Y",
+      "clause_ref": "cl-8.4",
+      "obligation_id": "obligation.audit-right",
+      "obligation_kind": "audit_right",
+      "text": "Operator may audit supplier security controls once per contract year with thirty days written notice."
+    },
+    {
+      "cadence": "P1Y",
+      "clause_ref": "cl-9.1",
+      "obligation_id": "obligation.attestation-cadence",
+      "obligation_kind": "attestation_cadence",
+      "text": "Supplier shall provide an annual independent control attestation report covering the in-scope services."
+    },
+    {
+      "cadence": "P1D",
+      "clause_ref": "cl-11.2",
+      "obligation_id": "obligation.breach-notification",
+      "obligation_kind": "breach_notification_cadence",
+      "text": "Supplier shall notify operator of a confirmed security incident affecting the in-scope services within twenty-four hours of detection."
+    },
+    {
+      "cadence": "P30D",
+      "clause_ref": "annex-2/section-3",
+      "obligation_id": "obligation.sub-processor-disclosure",
+      "obligation_kind": "sub_processor_disclosure",
+      "text": "Supplier shall maintain a current register of sub-processors processing operator data and notify operator at least thirty days before any addition or replacement."
+    }
+  ],
+  "owner": {
+    "assigned_at": "2025-01-01",
+    "role": "supplier-governance@example.org"
+  },
+  "provenance": {
+    "captured_at": "2026-06-19T05:00:00Z",
+    "source_url": "https://example.org/runs/contractual_obligations_tracker_example_0001"
+  },
+  "regulation_refs": [
+    "nis2:art-21-2-d"
+  ],
+  "review_schedule": [
+    {
+      "last_reviewed_at": "2026-03-01T09:00:00Z",
+      "next_review_due_at": "2027-03-01T09:00:00Z",
+      "obligation_id": "obligation.audit-right",
+      "state": "current"
+    },
+    {
+      "last_reviewed_at": "2026-01-15T09:00:00Z",
+      "next_review_due_at": "2027-01-15T09:00:00Z",
+      "obligation_id": "obligation.attestation-cadence",
+      "state": "current"
+    },
+    {
+      "last_reviewed_at": null,
+      "next_review_due_at": "2026-06-20T05:00:00Z",
+      "obligation_id": "obligation.breach-notification",
+      "state": "unknown"
+    },
+    {
+      "last_reviewed_at": "2026-06-15T09:00:00Z",
+      "next_review_due_at": "2026-07-15T09:00:00Z",
+      "obligation_id": "obligation.sub-processor-disclosure",
+      "state": "due_soon"
+    }
+  ],
+  "schema_version": "0.1.0",
+  "stream": "contractual-obligations",
+  "workflow_id": "contractual_obligations_tracker"
+}
