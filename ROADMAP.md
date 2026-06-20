@@ -466,14 +466,31 @@ named operator use-case. Each cookbook workflow lives under
 
 ### F-WF-11 — On-boarding / off-boarding
 
-- **Status:** Proposed
+- **Status:** Shipped
 - **Priority:** P3
 - **Acceptance criteria:**
   - Identity lifecycle workflow with capability grant/revoke
     confirmation.
 - **Sovereign-stack constraints:** —
-- **Depends on:** F-WF-08
+- **Depends on:** F-WF-08 (Shipped)
 - **Source:** NIS2 Art. 21(2)(i).
+- **Shipped via:**
+  - SKELETON — #364
+    (`content/playbooks/onboarding_offboarding_tracker/` CACAO
+    scaffold + lifecycle-event state machine + `nis2:art-21-2-i`
+    mapping anchor reusing the F-CP-07 access evidence stream).
+  - CORE-FANOUT-N8N — #366 (n8n emitter + worked example under
+    `examples/n8n/onboarding_offboarding_tracker/` + byte-parity
+    golden).
+  - CORE-FANOUT-TEMPORAL — #367 (Temporal activity adapter + worked
+    example under `examples/temporal/onboarding_offboarding_tracker/`
+    + cross-target byte-parity golden).
+  - CORE-FANOUT-LANGGRAPH — #368 (LangGraph node adapter + worked
+    example under `examples/langgraph/onboarding_offboarding_tracker/`
+    closing the three-target byte-parity ring).
+  - EXTEND-metrics — #369 (joiner-to-provisioned-time and
+    leaver-to-revoked-time KRI entries under `content/metrics/` with
+    playbook pin).
 
 ### F-WF-12 — IT and security support agent
 
