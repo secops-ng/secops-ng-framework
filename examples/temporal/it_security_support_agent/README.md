@@ -3,7 +3,11 @@
 CORE-FANOUT-TEMPORAL worked example. This directory pins the
 operator-facing layout for the Temporal worked example of the
 `playbook.it_security_support_agent@v1` IT and security support-agent
-workflow (F-WF-12; NIS2 Article 21(2)(b)). The canonical CACAO source
+workflow (F-WF-12; NIS2 Article 21(2)(b)). The workflow ingests a
+ticket-shaped interaction, runs deterministic triage, and either
+emits an automated-resolution close or an explicit hand-off to a
+human responder; the per-execution interaction-evidence artefact
+records both branches against the reused F-CP-02 incidents stream. The canonical CACAO source
 lives at
 `../../../content/playbooks/it_security_support_agent/playbook.cacao.json`
 and is mirrored here byte-identical so the diff against the emitted
@@ -11,25 +15,25 @@ artefact is easy to inspect.
 
 ## Maturity
 
-`CORE-FANOUT-TEMPORAL` — the Temporal workflow emitter is bound, the
-five action bodies carry deterministic `core_body` bindings into
+`Shipped` — the Temporal workflow emitter is bound, the five action
+bodies carry deterministic `core_body` bindings into
 `content.playbooks.it_security_support_agent.primitives.*` (the same
-primitives the n8n sibling binds), and the per-execution
-interaction-evidence artefact is materialised through the Temporal
-activity at
+primitives the n8n and LangGraph siblings bind), and the
+per-execution interaction-evidence artefact is materialised through
+the Temporal activity at
 `compilers.temporal.evidence.emit_interaction_evidence_artifact_activity`
 against `schemas/evidence/incidents.schema.json` (reused F-CP-02
 incidents stream). The byte-parity goldens that pin both the emitted
 `workflow.temporal.py` stub and the interaction-evidence record live
 under `tests/examples/it_security_support_agent/`; the immutable
 fixture lives under `tests/fixtures/it_security_support_agent/`.
-CORE-FANOUT-LG follows in a further serial sibling card.
 
 The interaction-evidence record is target-agnostic on the wire (the
-schema carries no `compile_target` field), so the Temporal and n8n
-adapters emit byte-identical records for the same canonical payload.
-This invariant is pinned by
-`test_temporal_fixture_matches_n8n_fixture` under
+schema carries no `compile_target` field), so the Temporal, n8n, and
+LangGraph adapters emit byte-identical records for the same canonical
+payload. This invariant is pinned by
+`test_temporal_fixture_matches_n8n_fixture` and
+`test_langgraph_fixture_matches_temporal_fixture` under
 `tests/examples/it_security_support_agent/`.
 
 ## Layout
@@ -88,12 +92,3 @@ intake-only audit-close branch) so the KPI surface does not
 overcount. Both workflows anchor onto
 `schemas/evidence/incidents.schema.json` and the same NIS2 Article
 21(2)(b) anchor.
-
-## Pending siblings
-
-Queued serially after this CORE-FANOUT-TEMPORAL merges:
-
-- **CORE-FANOUT-LG** — LangGraph emitter and byte-parity golden under
-  `examples/langgraph/it_security_support_agent/`.
-- **EXTEND-metrics** — handoff-rate / automated-resolution-rate
-  KPI/KRI surface anchored against F-CP-02.

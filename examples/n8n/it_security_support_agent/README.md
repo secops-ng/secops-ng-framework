@@ -1,9 +1,13 @@
 # examples/n8n/it_security_support_agent
 
-CORE-FANOUT-N8N-WIRE worked example. This directory pins the
+CORE-FANOUT-N8N worked example. This directory pins the
 operator-facing layout for the n8n worked example of the
 `playbook.it_security_support_agent@v1` IT and security support-agent
-workflow (F-WF-12; NIS2 Article 21(2)(b)). The canonical CACAO source
+workflow (F-WF-12; NIS2 Article 21(2)(b)). The workflow ingests a
+ticket-shaped interaction, runs deterministic triage, and either
+emits an automated-resolution close or an explicit hand-off to a
+human responder; the per-execution interaction-evidence artefact
+records both branches against the reused F-CP-02 incidents stream. The canonical CACAO source
 lives at
 `../../../content/playbooks/it_security_support_agent/playbook.cacao.json`
 and is mirrored here byte-identical so the diff against the emitted
@@ -11,8 +15,8 @@ artefact is easy to inspect.
 
 ## Maturity
 
-`CORE-FANOUT-N8N-GOLDEN` — the n8n workflow emitter is bound, the
-five action bodies carry deterministic `core_body` bindings into
+`Shipped` — the n8n workflow emitter is bound, the five action
+bodies carry deterministic `core_body` bindings into
 `content.playbooks.it_security_support_agent.primitives.*`, and the
 per-execution interaction-evidence artefact is materialised through
 the n8n adapter at
@@ -22,8 +26,12 @@ incidents stream). The byte-parity goldens that pin both the emitted
 `workflow.n8n.json` and the interaction-evidence record live under
 `tests/examples/it_security_support_agent/`; the immutable fixture
 lives under `tests/fixtures/it_security_support_agent/`.
-CORE-FANOUT-TMP and CORE-FANOUT-LG follow in further serial sibling
-cards.
+
+The Temporal and LangGraph siblings ship the same primitives against
+the same incidents-stream schema; the three-target byte-parity ring
+is closed by `test_n8n_fixture_matches_temporal_fixture` and
+`test_langgraph_fixture_matches_n8n_fixture` under
+`tests/examples/it_security_support_agent/`.
 
 ## Layout
 
@@ -80,14 +88,3 @@ intake-only audit-close branch) so the KPI surface does not
 overcount. Both workflows anchor onto
 `schemas/evidence/incidents.schema.json` and the same NIS2 Article
 21(2)(b) anchor.
-
-## Pending siblings
-
-Queued serially after this GOLDEN merges:
-
-- **CORE-FANOUT-TMP** — Temporal emitter and byte-parity golden under
-  `examples/temporal/it_security_support_agent/`.
-- **CORE-FANOUT-LG** — LangGraph emitter and byte-parity golden under
-  `examples/langgraph/it_security_support_agent/`.
-- **EXTEND-metrics** — handoff-rate / automated-resolution-rate
-  KPI/KRI surface anchored against F-CP-02.
