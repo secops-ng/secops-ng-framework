@@ -136,7 +136,20 @@ def _count_audit_appends(source: str, step_id: str) -> int:
 
 
 def _example_dirs_with_regenerate() -> list[Path]:
-    return sorted(p.parent for p in LG_EXAMPLES.glob("*/regenerate.sh"))
+    """Discover LangGraph workflow-graph examples that ship a ``regenerate.sh``.
+
+    Pattern-surface examples (e.g. ``examples/langgraph/eidas2_wallet/`` for
+    F-SV-02) ship a ``regenerate.sh`` but no ``playbook.cacao.json`` — they
+    materialise a typed input bundle rather than emit a workflow graph. The
+    span / graph_spec / state_bindings invariants below assume a workflow
+    graph, so pattern examples are filtered out here. They have their own
+    byte-parity goldens under ``tests/examples/langgraph/<pattern>/``.
+    """
+    return sorted(
+        p.parent
+        for p in LG_EXAMPLES.glob("*/regenerate.sh")
+        if (p.parent / "playbook.cacao.json").exists()
+    )
 
 
 # --------------------------------------------------------------------------- #
