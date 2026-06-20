@@ -413,12 +413,54 @@ named operator use-case. Each cookbook workflow lives under
 
 ### F-WF-10 — Contractual-obligations tracker
 
-- **Status:** Proposed
+- **Status:** Shipped
 - **Priority:** P3
 - **Acceptance criteria:**
-  - Supplier-contract obligation extraction and review-date workflow.
+  - `content/playbooks/contractual_obligations_tracker/` carries the
+    canonical CACAO playbook
+    (`playbook.contractual_obligations_tracker@v1`) and deterministic
+    primitives (`ingest.ingest_contract`,
+    `obligations.extract_obligations`,
+    `schedule.schedule_reviews`,
+    `artifact.build_obligation_artifact`) with zero placeholders
+    across all four action bodies; compiled targets land under
+    `examples/{n8n,temporal,langgraph}/contractual_obligations_tracker/`.
+  - Per-contract obligation-tracking topology: `ingest-contract` →
+    `extract-obligations` → `schedule-review` →
+    `emit-obligation-evidence`; transitions deterministic and
+    replay-tested across all three targets. This stream is the
+    contract-time counterpart to the F-CP-03 supply-chain
+    execution-time stream; both pin the operator's supply-chain
+    posture along complementary axes (per-contract obligation surface
+    vs. per-execution dependency surface).
+  - Per-execution obligation-evidence-record emitted against
+    `schemas/evidence/contractual-obligations.schema.json` (stream:
+    `contractual_obligations`); `artifact_id` derives deterministically
+    from
+    `SHA-256(workflow_id|execution_id|contract_id|captured_at)`, so
+    re-emissions inside the same execution against the same contract
+    record at the same `captured_at` instant are byte-identical at
+    the path level. The record pins the canonical `contract` block,
+    the sorted `obligations[]` set, the paired `review_schedule[]`
+    with `unknown` / `current` / `due_soon` / `overdue` / `waived`
+    state classification, the NIS2 Article 21(2)(d)
+    `regulation_refs`, and the closed `control_refs` list. The
+    `artifact_id` does **not** key on `compile_target` — the three
+    reference targets re-derive byte-identical bytes from the same
+    execution context; byte-parity is asserted across targets.
+  - Cookbook entry
+    ([`docs/cookbook/contractual_obligations_tracker.md`](docs/cookbook/contractual_obligations_tracker.md))
+    + per-target byte-parity goldens
+    (`tests/examples/contractual_obligations_tracker/test_{n8n,temporal,langgraph}_workflow_golden.py`
+    and `test_{n8n,temporal,langgraph}_obligation_evidence.py`) pin
+    both the per-target workflow artefact and the per-target
+    obligation-evidence record.
 - **Sovereign-stack constraints:** Operator-supplied document store;
-  no hosted DMS dependency.
+  no hosted DMS dependency, no vendor SDK bundled. The document-store
+  read endpoint that `ingest-contract` reads, the review-policy
+  source, and the artifact destination that
+  `emit-obligation-evidence` writes are operator-configured; the
+  framework ships no default endpoint.
 - **Depends on:** F-CP-03 (supply-chain stream)
 - **Source:** NIS2 Art. 21(2)(d).
 
