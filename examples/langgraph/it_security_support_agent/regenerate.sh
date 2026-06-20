@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 # Regenerate the committed it_security_support_agent LangGraph
 # worked-example artefacts from the canonical CACAO playbook. Run from
-# the repo root after any change to the playbook source or to
-# compilers/langgraph/*.
+# the repo root after any change to the playbook source, to
+# compilers/langgraph/*, or to the LangGraph interaction-evidence node
+# adapter.
 #
-# At the SKELETON layer the per-execution interaction-evidence
-# artefact and the byte-parity golden for it land in the
-# CORE-FANOUT-LG sibling that follows this SKELETON. The workflow
-# graph itself is emitted at the SKELETON layer because the CACAO
-# topology is pinned and the LangGraph node adapter is workflow-agnostic.
+# F-WF-12 CORE-FANOUT-LANGGRAPH: the per-execution interaction-evidence
+# artefact under evidence/ is materialised by the sibling
+# ``regenerate.py`` script in this directory; that artefact targets the
+# LangGraph interaction-evidence node adapter (reused F-CP-02 incidents
+# stream) rather than the whole graph topology.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -27,3 +28,7 @@ PYTHONPATH="${REPO_ROOT}" python -m compilers.langgraph.state "${MIRROR}" > "${H
 # docs/observability/audit-mirror.md for the co-location rationale.
 PYTHONPATH="${REPO_ROOT}" python -m compilers._shared.audit_mirror_cli \
     --out "${HERE}/_audit_mirror.py"
+
+# Materialise the representative interaction-evidence artefact under
+# evidence/ via the LangGraph interaction-evidence node adapter.
+PYTHONPATH="${REPO_ROOT}" python "${HERE}/regenerate.py"

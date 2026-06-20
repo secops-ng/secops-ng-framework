@@ -1,50 +1,52 @@
 # examples/langgraph/it_security_support_agent
 
-SKELETON-FANOUT scaffold shell. This directory pins the operator-facing
-layout for the LangGraph worked example of the
+CORE-FANOUT-LANGGRAPH worked example. This directory pins the
+operator-facing layout for the LangGraph worked example of the
 `playbook.it_security_support_agent@v1` IT and security support-agent
 workflow (F-WF-12; NIS2 Article 21(2)(b)). The canonical CACAO source
 lives at
 `../../../content/playbooks/it_security_support_agent/playbook.cacao.json`
-and is mirrored here byte-identical so the diff against the eventual
-emitted artefact is easy to inspect.
+and is mirrored here byte-identical so the diff against the emitted
+artefact is easy to inspect.
 
 ## Maturity
 
-`SKELETON-FANOUT` — scaffold only for the workflow-emitter side. No
-representative interaction-evidence artifact and no byte-parity
-golden under `tests/examples/langgraph/it_security_support_agent/` at
-this layer. The per-execution evidence artifact and the byte-parity
-golden land in the CORE-FANOUT-LG sibling that follows this
-SKELETON (queued serially after this SKELETON merges, to avoid
-concurrent byte-parity golden churn across the three targets).
+`CORE-FANOUT-LANGGRAPH` — the LangGraph emitter is bound, the five
+action bodies on the generated `state_bindings.py` carry deterministic
+`core_body` bindings into
+`content.playbooks.it_security_support_agent.primitives.*` (the same
+primitives the n8n and Temporal siblings bind), and the per-execution
+interaction-evidence artefact is materialised through the LangGraph
+node adapter at
+`compilers.langgraph.evidence.emit_interaction_evidence_artifact_node`
+against `schemas/evidence/incidents.schema.json` (reused F-CP-02
+incidents stream). The byte-parity goldens that pin both the emitted
+LangGraph artefacts (GraphSpec + state bindings) and the
+interaction-evidence record live under
+`tests/examples/it_security_support_agent/`; the immutable fixture
+lives under `tests/fixtures/it_security_support_agent/`.
 
-## SKELETON-layer emitter wire-up (LangGraph only)
-
-Following the established LangGraph shell pattern, `regenerate.sh`
-also drives the LangGraph emitter at the SKELETON layer to keep the
-idempotency-test contract green: it mirrors the canonical CACAO
-source, calls `compilers.langgraph.emit` to materialise
-`graph_spec.json`, calls `compilers.langgraph.state` to materialise
-`state_bindings.py`, and calls `compilers._shared.audit_mirror_cli`
-to materialise the dependency-free `_audit_mirror.py` sibling. The
-step-body tool stubs raise `NotImplementedError` until the
-CORE-FANOUT-LG sibling that follows this SKELETON binds the
-primitive set.
+The interaction-evidence record is target-agnostic on the wire (the
+schema carries no `compile_target` field), so the LangGraph, n8n, and
+Temporal adapters emit byte-identical records for the same canonical
+payload. This invariant is pinned by
+`test_langgraph_fixture_matches_n8n_fixture` and
+`test_langgraph_fixture_matches_temporal_fixture` under
+`tests/examples/it_security_support_agent/`.
 
 ## Layout
 
-| Path                       | Source compiler                       | Status at SKELETON                                                                  |
-|----------------------------|---------------------------------------|-------------------------------------------------------------------------------------|
-| `playbook.cacao.json`      | (input mirror)                        | Byte-identical mirror of the canonical SKELETON playbook                            |
-| `regenerate.sh`            | (tooling)                             | Re-mirrors the canonical playbook and re-emits LG artefacts                         |
-| `regenerate.py`            | (tooling)                             | Placeholder; no evidence emitter bound until CORE-FANOUT-LG                         |
-| `graph_spec.json`          | `compilers.langgraph.emit`            | Emitted at SKELETON (topology-only — declarative placeholder step bodies)           |
-| `state_bindings.py`        | `compilers.langgraph.state`           | Emitted at SKELETON (tool stubs raise NotImplementedError until CORE-FANOUT-LG)     |
-| `_audit_mirror.py`         | `compilers._shared.audit_mirror_cli`  | Emitted at SKELETON (dependency-free; co-located audit-mirror sibling)              |
-| `evidence/`                | (per-execution output)                | Placeholder; representative interaction-evidence artifact lands in CORE-FANOUT-LG   |
+| Path                                       | Source compiler                       | Status                                                                                  |
+|--------------------------------------------|---------------------------------------|-----------------------------------------------------------------------------------------|
+| `playbook.cacao.json`                      | (input mirror)                        | Byte-identical mirror of the canonical playbook                                         |
+| `regenerate.sh`                            | (tooling)                             | Re-mirrors the canonical playbook and re-emits the worked LG artefacts + interaction artefact |
+| `regenerate.py`                            | (tooling)                             | Drives the primitive chain and emits the interaction-evidence artefact (LangGraph node) |
+| `graph_spec.json`                          | `compilers.langgraph.emit`            | Compiled LangGraph topology (nodes + edges) for the playbook                            |
+| `state_bindings.py`                        | `compilers.langgraph.state`           | Compiled state TypedDict + `@tool`-decorated action bodies bound to the five CORE primitives |
+| `_audit_mirror.py`                         | `compilers._shared.audit_mirror_cli`  | Dependency-free audit-mirror sibling (co-located observability glue)                    |
+| `evidence/interaction-evidence.json`       | `compilers.langgraph.evidence`        | Representative interaction-evidence artefact (F-CP-02 incidents-stream shape)           |
 
-## How to regenerate (SKELETON)
+## How to regenerate
 
 From the repository root:
 
@@ -53,25 +55,37 @@ examples/langgraph/it_security_support_agent/regenerate.sh
 ```
 
 The script copies the canonical CACAO source over the local mirror,
-re-emits the GraphSpec + state-bindings stub + audit-mirror sibling
-from the mirrored playbook, and is otherwise a no-op pending the
-CORE-FANOUT-LG sibling. The emitted artefacts carry topology and
-state-channel shape only; primitive bindings and the representative
-access-evidence artifact land in CORE-FANOUT-LG.
+re-emits the GraphSpec + state-bindings + audit-mirror sibling via the
+LangGraph compiler, and materialises the per-execution
+interaction-evidence artefact under `evidence/`.
 
 ## Source
 
 - Canonical playbook: [`content/playbooks/it_security_support_agent/`](../../../content/playbooks/it_security_support_agent/)
-- Interaction-evidence schema (reused from F-CP-02): [`schemas/evidence/incidents.schema.json`](../../../schemas/evidence/incidents.schema.json)
-- Incidents evidence stream contributor home: [`content/evidence/incidents/`](../../../content/evidence/incidents/)
+- Primitives: [`content/playbooks/it_security_support_agent/primitives/`](../../../content/playbooks/it_security_support_agent/primitives/)
+- Incidents-evidence schema (reused from F-CP-02): [`schemas/evidence/incidents.schema.json`](../../../schemas/evidence/incidents.schema.json)
 - Regulatory anchor (NIS2 Article 21(2)(b)): [`content/mappings/nis2/article-21-2-b.yaml`](../../../content/mappings/nis2/article-21-2-b.yaml)
 
 ## Sovereign-stack default
 
-The ticketing source the workflow reads, the self-service surface the
-workflow calls against, the responder-queue surface the human handoff
-acknowledges against, and the interaction-evidence store the emitted
-artifact targets are all operator-configured. No default hosted
-helpdesk, no ITSM-SaaS dependency, no default non-EU endpoint, no
-vendor SDK bundled. The reference LangGraph compile-target binding
-lands in CORE-FANOUT-LG.
+The ticketing source the workflow reads, the self-service surface it
+walks, the responder queue it confirms acknowledgement against, and
+the evidence store the emitted artifact targets are all
+operator-configured. No default hosted helpdesk, no ITSM-SaaS
+dependency, no default non-EU endpoint, no vendor SDK bundled. The
+reference LangGraph compile target ships action-step tool bodies that
+import from `content.playbooks.it_security_support_agent.primitives`;
+the operator's LangGraph runtime is expected to make that package
+importable alongside the graph process.
+
+## Relation to F-WF-05 incident_management
+
+The F-WF-05 incident-management workflow produces one incidents-stream
+artifact per incident-case execution; this support-agent workflow
+produces one interaction-evidence artifact per support interaction on
+the same reused F-CP-02 incidents stream. A support→incident handoff
+keeps `classification.significant=true` so the NIS2 Article 21(2)(b)
+KPI surface counts it once on the same anchor F-WF-05 discharges; an
+automated-resolution closure emits with `classification.significant=false`
+on the schema's intake-only audit-close branch so the interaction is
+still durable evidence without overcounting the incident KPI.

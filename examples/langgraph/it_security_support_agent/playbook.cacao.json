@@ -3,7 +3,7 @@
   "spec_version": "2.0",
   "id": "playbook--20122012-0000-4000-8000-000000000001",
   "name": "IT and security support agent",
-  "description": "Ticket-shaped interaction workflow that ingests one operator-supplied support request, classifies it (informational / actionable / incident-shaped), attempts an automated resolution against the declared self-service surface, escalates to a human responder when automated resolution does not close the request, and emits one interaction-evidence artifact pinning the request, the classification, the automated-resolution outcome, and the human-handoff envelope when one fires. The human-handoff step is a first-class, explicit step — a support interaction MUST end with either an automated-resolution closure or a confirmed handoff to a human responder; the workflow does not silently auto-close. SKELETON: the seven-state topology (workflow_start -> ingest-support-request -> classify-request -> attempt-automated-resolution -> escalate-with-human-handoff -> emit-interaction-evidence -> workflow_end) and the x_secops_ng joins into the control / telemetry layers are pinned at this layer; per-target compiler emitters and the canonical primitive bindings land in the CORE-FANOUT sibling cards. Anchors against the F-CP-02 incidents evidence stream so support→incident handoffs feed the same NIS2 Article 21(2)(b) incident-handling capability the F-WF-05 incident_management workflow discharges.",
+  "description": "Ticket-shaped interaction workflow that ingests one operator-supplied support request, classifies it (informational / actionable / incident-shaped), attempts an automated resolution against the declared self-service surface, escalates to a human responder when automated resolution does not close the request, and emits one interaction-evidence artifact pinning the request, the classification, the automated-resolution outcome, and the human-handoff envelope when one fires. The human-handoff step is a first-class, explicit step — a support interaction MUST end with either an automated-resolution closure or a confirmed handoff to a human responder; the workflow does not silently auto-close. CORE: the five action bodies bind to deterministic primitives in content.playbooks.it_security_support_agent.primitives; CORE-FANOUT-N8N pins the n8n adapter binding and the operator-facing example — TMP and LG follow in sibling cards. Anchors against the F-CP-02 incidents evidence stream so support→incident handoffs feed the same NIS2 Article 21(2)(b) incident-handling capability the F-WF-05 incident_management workflow discharges.",
   "playbook_types": [
     "investigation",
     "notification"
@@ -16,13 +16,22 @@
     "ticket",
     "interaction",
     "human-handoff",
-    "nis2",
-    "skeleton"
+    "nis2"
   ],
   "playbook_variables": {
+    "__workflow_id__": {
+      "type": "string",
+      "description": "Stable workflow stable-id from content/playbooks/<workflow>/. Joined into the interaction-evidence artifact_id derivation; constant per playbook (`it_security_support_agent`) and supplied as a flat token so the CORE primitive call mirrors the F-WF-08 / F-WF-10 / F-WF-11 binding convention.",
+      "external": true
+    },
     "__execution_id__": {
       "type": "string",
       "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Pinned by the upstream runtime; the workflow reads it for the interaction-evidence artifact join.",
+      "external": true
+    },
+    "__compile_target__": {
+      "type": "string",
+      "description": "Which of the three reference compile targets produced the running form of the workflow. Pinned by the compile target's own boot path (`n8n`, `temporal`, `langgraph`); carried through into the artifact's provenance for replay-vs-original diffing.",
       "external": true
     },
     "__support_request_ref__": {
@@ -30,19 +39,74 @@
       "description": "Pointer to the operator's incoming support request under processing on this execution. Operator-configured; the workflow reads it as an opaque pointer to a ticket record held in the operator's ticketing source (a sovereign EU helpdesk runtime, an on-prem ITSM, a Git-managed request inbox, a mailbox bridge). The framework ships no default hosted helpdesk / ITSM-SaaS dependency, no default non-EU endpoint, and no vendor SDK bundling — the operator supplies whatever ticketing source is in scope.",
       "external": true
     },
+    "__raw_support_request__": {
+      "type": "string",
+      "description": "Operator-supplied JSON-native support-request record the runtime fetched from the ticketing source pointed at by `__support_request_ref__`. Required keys: `request_kind` (informational | actionable | incident-shaped), `requester_handle` (role-shaped), `declared_symptom` (1..400 chars, single line), `received_at` (ISO-8601 UTC). Personal-user requester handles and credential-shaped strings are rejected at the primitive boundary.",
+      "external": true
+    },
+    "__classification_verdict_input__": {
+      "type": "string",
+      "description": "Operator-supplied JSON-native classification verdict envelope. Required keys: `category` (informational | actionable | incident-shaped — MUST agree with the ingested record's `request_kind`), `severity` (Informational | Low | Medium | High | Critical), `rule_ids` (ordered list of policy-rule ids that fired), `policy_version` (opaque version string). The compile target's runtime evaluates the policy table off-band; the primitive only re-validates the closed verdict shape.",
+      "external": true
+    },
+    "__automated_resolution_observation__": {
+      "type": "string",
+      "description": "Operator-supplied JSON-native observation envelope read back from the operator's self-service surface after the workflow ran the declared automated-resolution action set. Required keys: `outcome` (resolved | partial | not_attempted | failed), `declared_action_set` (ordered, deduplicated `<family>.<slug>` action ids — empty for `not_attempted`), `observed_state` (1..400 chars). The compile target's runtime is the source of truth for the read-back; the primitive only re-validates the closed shape.",
+      "external": true
+    },
+    "__handoff_inputs__": {
+      "type": "string",
+      "description": "Operator-supplied JSON-native envelope carrying the role-shaped `responder_queue` handle, the operator-bound `acknowledgement_ref` opaque pointer, and an optional `policy_override` boolean. When the closed decision rule does not fire, the operator inputs are omitted on the emitted envelope. Personal-user responder handles are out of scope per AGENTS.md §3 and are rejected at the primitive boundary.",
+      "external": true
+    },
+    "__regulation_refs__": {
+      "type": "string",
+      "description": "Schema-shaped regulation references the artifact attests (typically `[\"nis2:art-21-2-b\"]`). JSON-native list; pinned by the compile target's boot config so the operator can extend without re-compiling.",
+      "external": true
+    },
+    "__control_refs__": {
+      "type": "string",
+      "description": "Control stable-ids the artifact attests. JSON-native list; the primitive validates each entry against the `control.<id>@v<n>` shape. Typically `control.incident_handling_capability@v1`.",
+      "external": true
+    },
+    "__owner_role__": {
+      "type": "string",
+      "description": "Role-shaped ownership pointer for the support-interaction posture this artifact covers — a working-group mailbox, a generic role title, or a community handle. Personal names are out of scope per AGENTS.md §3 and rejected at the artifact-builder boundary.",
+      "external": true
+    },
+    "__owner_assigned_at__": {
+      "type": "string",
+      "description": "ISO-8601 date (`YYYY-MM-DD`) on which the role was assigned ownership of the support-interaction posture.",
+      "external": true
+    },
+    "__captured_at__": {
+      "type": "string",
+      "description": "ISO-8601 UTC second-precision timestamp (`...Z`) pinned at emission time by the upstream runtime; carried on the artifact's top-level `captured_at`, on `provenance.captured_at`, and on `lifecycle.detected_at`.",
+      "external": true
+    },
+    "__source_url__": {
+      "type": "string",
+      "description": "URL of the workflow run that produced this artifact. Compile targets supply their own run-id URLs; the URL itself is opaque to the schema.",
+      "external": true
+    },
+    "__cross_border__": {
+      "type": "string",
+      "description": "NIS2 Article 23(6) cross-border-scope flag. Operator-supplied JSON-native boolean; defaults to `false` because the workflow cannot derive scope from the support-request record alone.",
+      "external": true
+    },
     "__support_request_record_ref__": {
       "type": "string",
-      "description": "Pointer to the ingested support-request record produced by ingest-support-request. Closed shape per CORE sibling card; request-kind (informational | actionable | incident-shaped) keyed, requester-handle + declared-symptom envelope valued. Consumed by classify-request.",
+      "description": "Pointer to the ingested support-request record produced by ingest-support-request. Closed shape per CORE binding; request-kind (informational | actionable | incident-shaped) keyed, role-shaped requester-handle + declared-symptom envelope valued. Consumed by classify-request, attempt-automated-resolution, and emit-interaction-evidence.",
       "external": false
     },
     "__classification_ref__": {
       "type": "string",
-      "description": "Pointer to the classification verdict produced by classify-request — closed `category` (informational | actionable | incident-shaped), declared severity band, and the ordered policy-rule ids that fired. Deterministic on the ingested record; consumed by attempt-automated-resolution and escalate-with-human-handoff.",
+      "description": "Pointer to the classification verdict produced by classify-request — closed `category` (informational | actionable | incident-shaped), declared severity band, and the ordered policy-rule ids that fired. Deterministic on the ingested record; consumed by attempt-automated-resolution, escalate-with-human-handoff, and emit-interaction-evidence.",
       "external": false
     },
     "__automated_resolution_ref__": {
       "type": "string",
-      "description": "Pointer to the automated-resolution attempt record produced by attempt-automated-resolution — closed `outcome` (resolved | partial | not_attempted | failed), the declared self-service action set the workflow ran, and the closed observation envelope read back from the operator's resolution surface. Consumed by escalate-with-human-handoff to decide whether a handoff fires.",
+      "description": "Pointer to the automated-resolution attempt record produced by attempt-automated-resolution — closed `outcome` (resolved | partial | not_attempted | failed), the declared self-service action set the workflow ran, and the closed observation envelope read back from the operator's resolution surface. Consumed by escalate-with-human-handoff and emit-interaction-evidence.",
       "external": false
     },
     "__human_handoff_ref__": {
@@ -69,7 +133,7 @@
       "description": "Read the support-request record referenced by __support_request_ref__ from the operator-supplied ticketing source and bind it to a normalised in-workflow request record (request_kind in {informational, actionable, incident-shaped}, requester_handle, declared_symptom, received_at). Read-only by contract; the workflow MUST NOT mutate the source request on this step. Ticketing-source endpoint is operator-configured — the framework ships no default hosted helpdesk, no ITSM-SaaS dependency, and no non-EU default endpoint.",
       "on_completion": "action--20122012-0000-4000-8000-000000000003",
       "in_args": [
-        "__execution_id__",
+        "__raw_support_request__",
         "__support_request_ref__"
       ],
       "out_args": [
@@ -81,16 +145,25 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.it_security_support_agent.primitives.ingest.ingest_support_request",
+          "in": {
+            "raw_request": "__raw_support_request__",
+            "support_request_ref": "__support_request_ref__"
+          },
+          "out": "__support_request_record_ref__"
+        }
       }
     },
     "action--20122012-0000-4000-8000-000000000003": {
       "type": "action",
       "name": "classify-request",
-      "description": "Classify the ingested support-request record against the operator-supplied classification policy and bind the verdict to a normalised classification record (category in {informational, actionable, incident-shaped}, severity band, ordered rule_ids that fired). Deterministic on the same request record + same policy version — re-runs collapse to byte-identical bytes at the verdict layer. The actual policy evaluation is delegated to the CORE primitive bound in the CORE-FANOUT sibling card; at SKELETON the step pins the contract only.",
+      "description": "Classify the ingested support-request record against the operator-supplied classification policy and bind the verdict to a normalised classification record (category in {informational, actionable, incident-shaped}, severity band, ordered rule_ids that fired). Deterministic on the same request record + same policy version — re-runs collapse to byte-identical bytes at the verdict layer. The actual policy evaluation is delegated to the compile target's runtime; the primitive re-validates the closed verdict shape so a free-text category or a wildcard severity cannot slip past the step boundary.",
       "on_completion": "action--20122012-0000-4000-8000-000000000004",
       "in_args": [
-        "__support_request_record_ref__"
+        "__support_request_record_ref__",
+        "__classification_verdict_input__"
       ],
       "out_args": [
         "__classification_ref__"
@@ -101,17 +174,26 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.it_security_support_agent.primitives.classify.classify_request",
+          "in": {
+            "support_request_record": "__support_request_record_ref__",
+            "classification_verdict": "__classification_verdict_input__"
+          },
+          "out": "__classification_ref__"
+        }
       }
     },
     "action--20122012-0000-4000-8000-000000000004": {
       "type": "action",
       "name": "attempt-automated-resolution",
-      "description": "Attempt the declared automated-resolution path against the operator's self-service surface — knowledge-base lookup for informational requests, parameterised self-service action for actionable requests, no-attempt pass-through for incident-shaped requests. The attempt is bounded by the operator-declared self-service action set and is closed (no implicit actions beyond what the classification authorises). On every outcome the step records a closed observation envelope (outcome in {resolved, partial, not_attempted, failed}, observed_state) read back from the operator's resolution surface. Read-mostly with bounded write-back; the actual self-service execution is delegated to the CORE primitive bound in the CORE-FANOUT sibling card; at SKELETON the step pins the contract only.",
+      "description": "Attempt the declared automated-resolution path against the operator's self-service surface — knowledge-base lookup for informational requests, parameterised self-service action for actionable requests, no-attempt pass-through for incident-shaped requests. The attempt is bounded by the operator-declared self-service action set and is closed (no implicit actions beyond what the classification authorises). On every outcome the step records a closed observation envelope (outcome in {resolved, partial, not_attempted, failed}, observed_state) read back from the operator's resolution surface. Read-mostly with bounded write-back; the actual self-service execution is delegated to the compile target in its native idiom; the primitive only pins the closed-observation shape.",
       "on_completion": "action--20122012-0000-4000-8000-000000000005",
       "in_args": [
         "__support_request_record_ref__",
-        "__classification_ref__"
+        "__classification_ref__",
+        "__automated_resolution_observation__"
       ],
       "out_args": [
         "__automated_resolution_ref__"
@@ -122,7 +204,16 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.it_security_support_agent.primitives.resolution.attempt_automated_resolution",
+          "in": {
+            "support_request_record": "__support_request_record_ref__",
+            "classification": "__classification_ref__",
+            "observation": "__automated_resolution_observation__"
+          },
+          "out": "__automated_resolution_ref__"
+        }
       }
     },
     "action--20122012-0000-4000-8000-000000000005": {
@@ -132,7 +223,8 @@
       "on_completion": "action--20122012-0000-4000-8000-000000000006",
       "in_args": [
         "__classification_ref__",
-        "__automated_resolution_ref__"
+        "__automated_resolution_ref__",
+        "__handoff_inputs__"
       ],
       "out_args": [
         "__human_handoff_ref__"
@@ -143,7 +235,16 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.it_security_support_agent.primitives.handoff.escalate_with_human_handoff",
+          "in": {
+            "classification": "__classification_ref__",
+            "automated_resolution": "__automated_resolution_ref__",
+            "handoff_inputs": "__handoff_inputs__"
+          },
+          "out": "__human_handoff_ref__"
+        }
       }
     },
     "action--20122012-0000-4000-8000-000000000006": {
@@ -152,11 +253,19 @@
       "description": "Combine the ingested support-request record, the classification verdict, the automated-resolution observation envelope, and the human-handoff envelope into one interaction-evidence artifact shaped against schemas/evidence/incidents.schema.json (stream: incidents). On an incident-shaped classification or a handoff_fired=true path the artifact is emitted with classification.significant=true so the F-CP-02 incidents stream picks it up under NIS2 Article 21(2)(b); on an automated-resolution closure path the artifact is emitted with classification.significant=false (the schema's intake-only audit-close branch) so the interaction is still durable evidence without overcounting the incident KPI surface. The artifact carries the workflow id (it_security_support_agent), execution id, compile target, regulation_refs (nis2:art-21-2-b), control_refs, captured_at, and provenance. Destination is operator-configured — no default non-EU endpoint.",
       "on_completion": "end--20122012-0000-4000-8000-000000000007",
       "in_args": [
+        "__workflow_id__",
         "__execution_id__",
+        "__regulation_refs__",
+        "__control_refs__",
         "__support_request_record_ref__",
         "__classification_ref__",
         "__automated_resolution_ref__",
-        "__human_handoff_ref__"
+        "__human_handoff_ref__",
+        "__captured_at__",
+        "__source_url__",
+        "__owner_role__",
+        "__owner_assigned_at__",
+        "__cross_border__"
       ],
       "out_args": [
         "__interaction_artifact_ref__"
@@ -167,7 +276,26 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.it_security_support_agent.primitives.artifact.build_interaction_artifact",
+          "in": {
+            "workflow_id": "__workflow_id__",
+            "execution_id": "__execution_id__",
+            "regulation_refs": "__regulation_refs__",
+            "control_refs": "__control_refs__",
+            "support_request_record": "__support_request_record_ref__",
+            "classification_verdict": "__classification_ref__",
+            "automated_resolution": "__automated_resolution_ref__",
+            "handoff_envelope": "__human_handoff_ref__",
+            "captured_at": "__captured_at__",
+            "source_url": "__source_url__",
+            "owner_role": "__owner_role__",
+            "owner_assigned_at": "__owner_assigned_at__",
+            "cross_border": "__cross_border__"
+          },
+          "out": "__interaction_artifact_ref__"
+        }
       }
     },
     "end--20122012-0000-4000-8000-000000000007": {
@@ -177,9 +305,9 @@
   },
   "x_secops_ng": {
     "stable_id": "playbook.it_security_support_agent@v1",
-    "content_version": "0.1.0",
-    "maturity": "draft",
-    "compile_targets": [],
+    "content_version": "0.2.0",
+    "maturity": "experimental",
+    "compile_targets": ["n8n"],
     "control_refs": [
       "control.incident_handling_capability@v1"
     ],
