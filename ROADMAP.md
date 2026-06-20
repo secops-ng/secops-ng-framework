@@ -477,14 +477,35 @@ named operator use-case. Each cookbook workflow lives under
 
 ### F-WF-12 — IT and security support agent
 
-- **Status:** Proposed
+- **Status:** Shipped
 - **Priority:** P3
 - **Acceptance criteria:**
   - Ticket-shaped interaction workflow with explicit handoff to a
     human responder.
 - **Sovereign-stack constraints:** —
-- **Depends on:** F-WF-03
-- **Source:** community input.
+- **Depends on:** F-WF-03 (Shipped)
+- **Source:** NIS2 Art. 21(2)(b); community input.
+- **Shipped via:**
+  - SKELETON — #365 (`content/playbooks/it_security_support_agent/`
+    CACAO scaffold + cookbook entry).
+  - CORE-FANOUT-N8N-PRIM — #370 (five deterministic primitives under
+    `content/playbooks/it_security_support_agent/primitives/` with
+    unit coverage).
+  - CORE-FANOUT-N8N-WIRE — #371 (playbook `core_body` binds + n8n
+    worked example emission under
+    `examples/n8n/it_security_support_agent/`).
+  - CORE-FANOUT-N8N-GOLDEN — #372 (interaction-evidence emitter
+    `compilers/n8n/evidence/` + byte-parity golden + immutable
+    fixture under
+    `tests/fixtures/it_security_support_agent/`).
+  - CORE-FANOUT-TEMPORAL — #373 (Temporal activity adapter under
+    `compilers/temporal/evidence/` + worked example under
+    `examples/temporal/it_security_support_agent/` + cross-target
+    byte-parity golden).
+  - CORE-FANOUT-LANGGRAPH — #374 (LangGraph node adapter under
+    `compilers/langgraph/evidence/` + worked example under
+    `examples/langgraph/it_security_support_agent/` closing the
+    three-target byte-parity ring).
 
 ---
 

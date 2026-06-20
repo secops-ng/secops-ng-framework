@@ -3,7 +3,11 @@
 CORE-FANOUT-LANGGRAPH worked example. This directory pins the
 operator-facing layout for the LangGraph worked example of the
 `playbook.it_security_support_agent@v1` IT and security support-agent
-workflow (F-WF-12; NIS2 Article 21(2)(b)). The canonical CACAO source
+workflow (F-WF-12; NIS2 Article 21(2)(b)). The workflow ingests a
+ticket-shaped interaction, runs deterministic triage, and either
+emits an automated-resolution close or an explicit hand-off to a
+human responder; the per-execution interaction-evidence artefact
+records both branches against the reused F-CP-02 incidents stream. The canonical CACAO source
 lives at
 `../../../content/playbooks/it_security_support_agent/playbook.cacao.json`
 and is mirrored here byte-identical so the diff against the emitted
@@ -11,8 +15,8 @@ artefact is easy to inspect.
 
 ## Maturity
 
-`CORE-FANOUT-LANGGRAPH` — the LangGraph emitter is bound, the five
-action bodies on the generated `state_bindings.py` carry deterministic
+`Shipped` — the LangGraph emitter is bound, the five action bodies on
+the generated `state_bindings.py` carry deterministic
 `core_body` bindings into
 `content.playbooks.it_security_support_agent.primitives.*` (the same
 primitives the n8n and Temporal siblings bind), and the per-execution
