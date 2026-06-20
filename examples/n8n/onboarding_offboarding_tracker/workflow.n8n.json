@@ -1,0 +1,308 @@
+{
+  "name": "On-boarding / off-boarding tracker",
+  "nodes": [
+    {
+      "id": "start--20212021-0000-4000-8000-000000000001",
+      "name": "onboarding-offboarding-tracker-start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__workflow_id__",
+              "type": "string",
+              "value": "",
+              "description": "Stable workflow stable-id from content/playbooks/<workflow>/. Joined into the access-evidence artifact_id derivation; constant per playbook (`onboarding_offboarding_tracker`) and supplied as a flat token so the CORE primitive call mirrors the F-WF-08 / F-WF-10 binding convention."
+            },
+            {
+              "name": "__execution_id__",
+              "type": "string",
+              "value": "",
+              "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Pinned by the upstream runtime; the workflow reads it for the access-evidence artifact join."
+            },
+            {
+              "name": "__compile_target__",
+              "type": "string",
+              "value": "",
+              "description": "Which of the three reference compile targets produced the running form of the workflow. Pinned by the compile target's own boot path (`n8n`, `temporal`, `langgraph`); the primitive validates it against the access.schema enum."
+            },
+            {
+              "name": "__lifecycle_event_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Opaque operator-side pointer to the lifecycle-event record under processing on this execution. Operator-configured; the workflow reads it as an opaque pointer to a joiner / mover / leaver event held in the operator's identity source (a sovereign EU directory, an on-prem IdP, a Git-managed role-and-capability repository). The framework ships no default hosted IdP / HR-SaaS dependency, no default non-EU endpoint, and no vendor SDK bundling \u2014 the operator supplies whatever identity source is in scope."
+            },
+            {
+              "name": "__raw_event__",
+              "type": "string",
+              "value": "",
+              "description": "Operator-supplied JSON-native lifecycle-event record the runtime fetched from the identity source pointed at by `__lifecycle_event_ref__`. Required keys: `event_kind` (joiner | mover | leaver), `principal_type` (service_account | workflow_runtime | automation_role), `principal_id` (role-shaped), `effective_at` (ISO-8601 UTC); optional: `identity_provider`, `add_set`, `remove_set`. Personal-user principals and credential-shaped strings are rejected at the primitive boundary."
+            },
+            {
+              "name": "__observed_capabilities__",
+              "type": "string",
+              "value": "",
+              "description": "Operator-supplied JSON-native list of verb.resource tokens the runtime walked from the operator's identity source on the read-back step, AFTER the declared capability delta was applied. The closed observed list is the post-lifecycle capability surface the resolved principal carries; missing grants and lingering revokes surface as the divergence detail on the confirmation record."
+            },
+            {
+              "name": "__regulation_refs__",
+              "type": "string",
+              "value": "",
+              "description": "Schema-shaped regulation references the artifact attests (typically `[\"nis2:art-21-2-i\"]`). JSON-native list; pinned by the compile target's boot config so the operator can extend without re-compiling."
+            },
+            {
+              "name": "__control_refs__",
+              "type": "string",
+              "value": "",
+              "description": "Control stable-ids the artifact attests. JSON-native list; the primitive validates each entry against the `control.<id>@v<n>` shape. Typically `control.jml_evidence@v1`, `control.privileged_access_review@v1`, and `control.cloud_identity_least_privilege@v1`."
+            },
+            {
+              "name": "__owner_role__",
+              "type": "string",
+              "value": "",
+              "description": "Role-shaped ownership pointer for the access-control posture this artifact covers \u2014 a working-group mailbox, a generic role title, or a community handle. Personal names are out of scope per AGENTS.md \u00a73 and rejected at the artifact-builder boundary."
+            },
+            {
+              "name": "__owner_assigned_at__",
+              "type": "string",
+              "value": "",
+              "description": "ISO-8601 date (`YYYY-MM-DD`) on which the role was assigned ownership of the access-control posture."
+            },
+            {
+              "name": "__captured_at__",
+              "type": "string",
+              "value": "",
+              "description": "ISO-8601 UTC second-precision timestamp (`...Z`) pinned at emission time by the upstream runtime; carried on the artifact's top-level `captured_at` and on `provenance.captured_at`."
+            },
+            {
+              "name": "__source_url__",
+              "type": "string",
+              "value": "",
+              "description": "URL of the workflow run that produced this artifact. Compile targets supply their own run-id URLs; the URL itself is opaque to the schema."
+            },
+            {
+              "name": "__lifecycle_event_record_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Pointer to the ingested lifecycle-event record produced by ingest-lifecycle-event. Closed shape per CORE binding; event-kind (joiner | mover | leaver) keyed, role-shaped principal handle + declared capability-delta envelope valued. Consumed by resolve-identity and apply-capability-delta."
+            },
+            {
+              "name": "__resolved_identity_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Pointer to the resolved caller-identity block produced by resolve-identity \u2014 role-shaped principal handle (service-account name, workflow-runtime principal id, automation role) per the F-CP-07 public-bar discipline. Personal-user principals are rejected at the primitive boundary."
+            },
+            {
+              "name": "__capability_delta_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Pointer to the applied capability-delta record produced by apply-capability-delta \u2014 the closed `verb.resource` add-set and remove-set the workflow asked the operator's identity source to materialise against the resolved principal. Consumed by confirm-grant-revoke."
+            },
+            {
+              "name": "__confirmation_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Pointer to the grant/revoke confirmation record produced by confirm-grant-revoke \u2014 the closed observed capability list the resolved principal carries after the delta was applied, plus the divergence detail (missing grants, lingering revokes). The confirmation closes the loop between declared intent (capability_delta) and observed effect (closed capability list)."
+            },
+            {
+              "name": "__access_artifact_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Pointer to the access-evidence artifact emitted by emit-access-evidence, shaped against schemas/evidence/access.schema.json. Reuses the F-CP-07 access stream \u2014 the artifact carries the resolved role-shaped caller identity and the closed observed capability list the principal holds at the end of this lifecycle execution."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--20212021-0000-4000-8000-000000000002",
+      "name": "ingest-lifecycle-event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.onboarding_offboarding_tracker.primitives.ingest import ingest_lifecycle_event\n__lifecycle_event_record_ref__ = ingest_lifecycle_event(raw_event=__raw_event__, lifecycle_event_ref=__lifecycle_event_ref__)"
+      },
+      "notes": "Read the lifecycle-event record referenced by __lifecycle_event_ref__ from the operator-supplied identity source and bind it to a normalised in-workflow event record (event_kind in {joiner, mover, leaver}, principal_handle, declared_capability_delta, effective_at). Read-only by contract; the workflow MUST NOT mutate the source event on this step. Identity-source endpoint is operator-configured \u2014 the framework ships no default hosted IdP, no HR-SaaS dependency, and no non-EU default endpoint.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--20212021-0000-4000-8000-000000000003",
+      "name": "resolve-identity",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.onboarding_offboarding_tracker.primitives.identity import resolve_identity\n__resolved_identity_ref__ = resolve_identity(lifecycle_event_record=__lifecycle_event_record_ref__)"
+      },
+      "notes": "Resolve the principal_handle carried by the ingested lifecycle event against the operator's identity source and bind it to a role-shaped caller-identity block (principal_type in {service_account, workflow_runtime, automation_role}, principal_id, identity_provider). The principal is role-shaped by contract \u2014 never an individual personal name or a credential-shaped string. Personal-user principals are rejected at the primitive boundary; the F-WF-08 IAM auditor enforces the same shape on the read side.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--20212021-0000-4000-8000-000000000004",
+      "name": "apply-capability-delta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.onboarding_offboarding_tracker.primitives.delta import apply_capability_delta\n__capability_delta_ref__ = apply_capability_delta(lifecycle_event_record=__lifecycle_event_record_ref__, resolved_identity=__resolved_identity_ref__)"
+      },
+      "notes": "Apply the declared capability delta from the ingested lifecycle event against the resolved principal \u2014 grant the add-set on a joiner event, adjust both add-set and remove-set on a mover event, drain the remove-set on a leaver event. Capabilities are verb.resource tokens; the delta is closed (no implicit grants, no implicit revocations beyond what the event declares). Deterministic on the same event record + same resolved principal \u2014 re-runs collapse to byte-identical bytes at the delta layer. The actual mutation on the operator's identity source is delegated to the compile target in its native idiom; the primitive only pins the closed-delta shape.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--20212021-0000-4000-8000-000000000005",
+      "name": "confirm-grant-revoke",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.onboarding_offboarding_tracker.primitives.confirmation import confirm_grant_revoke\n__confirmation_ref__ = confirm_grant_revoke(capability_delta=__capability_delta_ref__, observed_capabilities=__observed_capabilities__)"
+      },
+      "notes": "Re-read the resolved principal's closed capability list from the same operator-supplied identity source and confirm that the declared capability delta landed \u2014 the add-set is present, the remove-set is gone. The confirmation closes the loop between intent (capability_delta) and observed effect (closed capability list); divergence between declared and observed surfaces as missing-grant / lingering-revoke entries on the confirmation record, which the emitted access-evidence artifact carries downstream. Read-only on this step.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--20212021-0000-4000-8000-000000000006",
+      "name": "emit-access-evidence",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.onboarding_offboarding_tracker.primitives.artifact import build_access_artifact\n__access_artifact_ref__ = build_access_artifact(workflow_id=__workflow_id__, execution_id=__execution_id__, compile_target=__compile_target__, regulation_refs=__regulation_refs__, control_refs=__control_refs__, resolved_identity=__resolved_identity_ref__, confirmation=__confirmation_ref__, captured_at=__captured_at__, source_url=__source_url__, owner_role=__owner_role__, owner_assigned_at=__owner_assigned_at__)"
+      },
+      "notes": "Combine the resolved caller-identity block and the confirmed closed capability list into one access-evidence artifact shaped against schemas/evidence/access.schema.json (stream: access). The artifact carries the workflow id (onboarding_offboarding_tracker), execution id, compile target, regulation_refs (nis2:art-21-2-i), control_refs, captured_at, and provenance. Reuses the F-CP-07 access stream that F-WF-08 IAM auditor already binds onto \u2014 joiner-mover-leaver execution evidence is one access artifact per lifecycle event, runtime-side capability inventory is one access artifact per workflow execution, both feed the same NIS2 Article 21(2)(i) clause anchor. Destination is operator-configured \u2014 no default non-EU endpoint.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--20212021-0000-4000-8000-000000000007",
+      "name": "onboarding-offboarding-tracker-end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "onboarding-offboarding-tracker-start": {
+      "main": [
+        [
+          {
+            "node": "ingest-lifecycle-event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ingest-lifecycle-event": {
+      "main": [
+        [
+          {
+            "node": "resolve-identity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "resolve-identity": {
+      "main": [
+        [
+          {
+            "node": "apply-capability-delta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "apply-capability-delta": {
+      "main": [
+        [
+          {
+            "node": "confirm-grant-revoke",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "confirm-grant-revoke": {
+      "main": [
+        [
+          {
+            "node": "emit-access-evidence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "emit-access-evidence": {
+      "main": [
+        [
+          {
+            "node": "onboarding-offboarding-tracker-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "iam",
+    "identity-lifecycle",
+    "joiner-mover-leaver",
+    "access-evidence",
+    "nis2"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.onboarding_offboarding_tracker@v1",
+      "content_version": "0.2.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--20212021-0000-4000-8000-000000000001"
+    },
+    "secops_ng_notes": []
+  }
+}
