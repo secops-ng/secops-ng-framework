@@ -1,60 +1,58 @@
 # examples/n8n/contractual_obligations_tracker
 
-SKELETON-FANOUT scaffold shell. This directory pins the operator-facing
-layout for the n8n worked example of the
-`playbook.contractual_obligations_tracker@v1` supplier-contract
-obligations tracker workflow (F-WF-10; NIS2 Article 21(2)(d)). The
-canonical CACAO source lives at
-`../../../content/playbooks/contractual_obligations_tracker/playbook.cacao.json`
-and is mirrored here byte-identical so the diff against the eventual
-emitted artefact is easy to inspect.
+n8n worked example for the `playbook.contractual_obligations_tracker@v1`
+supplier-contract obligations tracker workflow (F-WF-10; NIS2 Article
+21(2)(d)).
 
 ## Maturity
 
-`SKELETON-FANOUT` — scaffold only. No n8n workflow emitter
-binding, no representative obligation-evidence artifact, and no
-byte-parity golden under
-`tests/examples/n8n/contractual_obligations_tracker/` at
-this layer. The compiler emitter, the per-execution evidence
-artifact, and the byte-parity golden land in the F-WF-10
-CORE-FANOUT-N8N sibling card queued serially after this
-SKELETON merges (to avoid concurrent byte-parity golden churn
-across the three targets).
+`CORE-FANOUT-N8N` — the n8n compile target binding for the
+canonical CACAO playbook. The n8n compiler emits the workflow JSON
+deterministically from the canonical playbook; the n8n adapter at
+`compilers.n8n.evidence.emit_contractual_obligations_artifact_n8n`
+delegates to the framework-agnostic emitter under
+`compilers._shared.evidence.contractual_obligations` so the
+per-execution obligation-evidence artifact is byte-stable. The TMP
+and LG siblings of this card carry the Temporal and LangGraph
+adapters; per-target byte parity will be pinned in the cross-target
+parity test once all three land.
 
 ## Layout
 
-| Path                       | Source compiler          | Status at SKELETON                                                          |
-|----------------------------|--------------------------|-----------------------------------------------------------------------------|
-| `playbook.cacao.json`      | (input mirror)           | Byte-identical mirror of the canonical SKELETON playbook                    |
-| `regenerate.sh`            | (tooling)                | Re-mirrors the canonical playbook into this directory                       |
-| `regenerate.py`            | (tooling)                | Placeholder; no evidence emitter bound until CORE-FANOUT-N8N            |
-| `workflow.n8n.json`          | `compilers.n8n`             | **Not present at SKELETON.** Emitted in CORE-FANOUT-N8N.                |
-| `evidence/`                | (per-execution output)   | Placeholder; representative obligation-evidence artifact lands in CORE-FANOUT-N8N |
+| Path | Source | Contents |
+|------|--------|----------|
+| `playbook.cacao.json` | (input mirror) | Byte-identical mirror of the canonical playbook |
+| `workflow.n8n.json` | `compilers.n8n` | n8n workflow JSON emitted from the canonical playbook |
+| `evidence/obligation-evidence-record.json` | n8n adapter | One representative obligation-evidence artifact (shape: `schemas/evidence/contractual-obligations.schema.json`) |
+| `regenerate.sh` | (tooling) | Regenerates the workflow + evidence record from the canonical playbook |
+| `regenerate.py` | (tooling) | Drives the n8n contractual-obligations adapter against the pinned payload |
 
-## How to regenerate (SKELETON)
+## How to regenerate
 
 From the repository root:
 
 ```sh
-examples/n8n/contractual_obligations_tracker/regenerate.sh
+./examples/n8n/contractual_obligations_tracker/regenerate.sh
 ```
 
-The script copies the canonical CACAO source over the local mirror so
-this directory stays in sync with
-`content/playbooks/contractual_obligations_tracker/`. It does **not**
-emit a n8n workflow artefact at this layer — the canonical
-playbook ships with declarative placeholder step bodies
-(`x_secops_ng.core_body.placeholder: true`), so there are no primitive
-bindings for the n8n compiler emitter to translate yet. The
-emitter and the worked-artefact emission land in F-WF-10
-CORE-FANOUT-N8N.
+The script copies the canonical CACAO source over the local mirror,
+re-emits `workflow.n8n.json` via the unified `python -m tools.compile`
+CLI, and re-runs the per-execution adapter against the pinned payload
+in `regenerate.py`. Run after any change to the canonical playbook,
+the n8n compiler, or the n8n contractual-obligations adapter; commit
+the resulting bytes alongside the change.
+
+The committed `obligation-evidence-record.json` is the adapter's
+output renamed for human-friendly diffing; the deterministic
+`<artifact_id>.json` written by the adapter is the SHA-256-named
+sibling of the same bytes.
 
 ## Source
 
 - Canonical playbook: [`content/playbooks/contractual_obligations_tracker/`](../../../content/playbooks/contractual_obligations_tracker/)
 - Obligation-evidence schema: [`schemas/evidence/contractual-obligations.schema.json`](../../../schemas/evidence/contractual-obligations.schema.json)
-- Evidence stream contributor home: [`content/evidence/contractual_obligations_tracker/`](../../../content/evidence/contractual_obligations_tracker/)
 - Regulatory anchor (NIS2 Article 21(2)(d)): [`content/mappings/nis2/article-21-2-d.yaml`](../../../content/mappings/nis2/article-21-2-d.yaml)
+- Byte-parity fixture: [`tests/fixtures/contractual_obligations_tracker/n8n.obligation-evidence-record.json`](../../../tests/fixtures/contractual_obligations_tracker/n8n.obligation-evidence-record.json)
 
 ## Sovereign-stack default
 
@@ -68,11 +66,15 @@ no hosted DMS dependency, no vendor SDK bundled. The reference
 compile targets emit to whatever the operator wires; the playbook
 commits to the artefact contract, not the destination.
 
-## Pending sibling
+## Pending siblings
 
-- **F-WF-10 CORE-FANOUT-N8N** — bind the n8n compiler
-  emitter against the canonical primitive set, regenerate
-  `workflow.n8n.json` deterministically from the canonical playbook,
-  materialise one representative obligation-evidence artifact under
-  `evidence/`, and pin both with a byte-parity golden under
-  `tests/examples/n8n/contractual_obligations_tracker/`.
+- **F-WF-10 CORE-FANOUT-TMP** — Temporal adapter + cross-target
+  byte-parity test against this n8n fixture.
+- **F-WF-10 CORE-FANOUT-LG** — LangGraph adapter + cross-target
+  byte-parity test against this n8n fixture.
+- **F-WF-10 EXTEND-metrics** — pin the supplier-attestation-staleness
+  KRI and supplier-obligation-coverage KPI; bind via `metric_refs` on
+  the canonical playbook.
+- **F-WF-10 EXTEND-schema** — tighten the inner envelopes of
+  `obligation_kind`, `clause_ref`, and the waiver / deferral surface;
+  lift `schema_version` to 1.0.0.

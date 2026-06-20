@@ -127,6 +127,16 @@ from compilers._shared.evidence.dora_art19_report import (
     emit_dora_art19_report,
     render_dora_art19_report,
 )
+from compilers._shared.evidence.contractual_obligations import (
+    ContractBlock,
+    ContractualObligationsContext,
+    ObligationEntry,
+    OwnerBlock,
+    ReviewEntry,
+    derive_artifact_id as derive_contractual_obligations_artifact_id,
+    emit_contractual_obligations_artifact,
+    render_contractual_obligations_artifact,
+)
 
 __all__ = [
     "RiskAnalysisContext",
@@ -214,4 +224,12 @@ __all__ = [
     "derive_dora_art19_report_id",
     "emit_dora_art19_report",
     "render_dora_art19_report",
+    "ContractBlock",
+    "ContractualObligationsContext",
+    "ObligationEntry",
+    "OwnerBlock",
+    "ReviewEntry",
+    "derive_contractual_obligations_artifact_id",
+    "emit_contractual_obligations_artifact",
+    "render_contractual_obligations_artifact",
 ]

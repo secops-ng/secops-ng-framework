@@ -23,10 +23,16 @@ feeding the obligation evidence stream under
 
 ## Maturity
 
-`SKELETON` — scope is the CACAO topology plus the `x_secops_ng` joins
-into the control / telemetry layers. No compiler emitters, no
-per-target byte-parity goldens, and no canonical primitive bindings
-at this layer; those land in the sibling CORE / EXTEND cards (see
+`CORE-FANOUT-N8N` — the canonical CACAO playbook binds the four
+action bodies to deterministic primitives under
+`content.playbooks.contractual_obligations_tracker.primitives`, and
+the n8n compile target carries the per-execution
+obligation-evidence emitter. Per-target byte parity for the n8n
+adapter is pinned by the worked example under
+[`examples/n8n/contractual_obligations_tracker/`](../../../examples/n8n/contractual_obligations_tracker/)
+plus the immutable fixture under
+[`tests/fixtures/contractual_obligations_tracker/`](../../../tests/fixtures/contractual_obligations_tracker/).
+Temporal and LangGraph adapters land in their own sibling cards (see
 [Pending siblings](#pending-siblings)).
 
 ## State machine
@@ -92,30 +98,40 @@ the playbook commits to the artifact contract, not the destination.
 
 ## Files
 
-- `playbook.cacao.json` — the CACAO v2 skeleton
-  (`playbook.contractual_obligations_tracker@v1`). Step bodies are
-  declarative placeholders at this layer (no primitive bindings yet);
-  the canonical primitive set lands in the CORE-FANOUT sibling cards.
+- `playbook.cacao.json` — the CACAO v2 playbook
+  (`playbook.contractual_obligations_tracker@v1`). Each action step
+  binds its `x_secops_ng.core_body` to a deterministic primitive
+  under `primitives/`.
+- `primitives/ingest.py` — `ingest_contract` (canonicalise raw
+  supplier-contract record into the schema's `contract` block).
+- `primitives/obligations.py` — `extract_obligations` (canonicalise
+  the operator-supplied obligation list, sorted by `obligation_id`).
+- `primitives/schedule.py` — `schedule_reviews` (derive per-obligation
+  review schedule from cadence + operator policy + captured_at).
+- `primitives/artifact.py` — `build_obligation_artifact` (assemble
+  the JSON-native obligation-evidence record + derive the
+  deterministic `artifact_id`).
 
 ## Pending siblings
 
-This SKELETON intentionally stops at scaffold + control/telemetry
-joins. The remaining work is tracked as separate sibling cards queued
-serially once this SKELETON merges (to avoid concurrent byte-parity
-golden churn across the three reference targets):
+The remaining work is tracked as separate sibling cards queued
+serially (to avoid concurrent byte-parity golden churn across the
+three reference targets):
 
-- **CORE-FANOUT-N8N** — n8n compiler emitter + byte-parity golden +
-  worked example body under `examples/n8n/contractual_obligations_tracker/`.
-- **CORE-FANOUT-TMP** — Temporal compiler emitter + byte-parity golden
-  + worked example body under `examples/temporal/contractual_obligations_tracker/`.
-- **CORE-FANOUT-LG** — LangGraph compiler emitter + byte-parity golden
-  + worked example body under `examples/langgraph/contractual_obligations_tracker/`.
+- **CORE-FANOUT-TMP** — Temporal compiler adapter + cross-target
+  byte-parity test against the n8n fixture, worked example body under
+  `examples/temporal/contractual_obligations_tracker/`.
+- **CORE-FANOUT-LG** — LangGraph compiler adapter + cross-target
+  byte-parity test against the n8n fixture, worked example body under
+  `examples/langgraph/contractual_obligations_tracker/`.
 - **EXTEND-schema** — tighten the obligation-evidence schema's inner
   envelopes (per-obligation clause shape, per-obligation review-state)
-  once the per-target emitters have been worked through.
+  once the per-target emitters have been worked through; lift
+  `schema_version` to 1.0.0.
 - **EXTEND-metrics** — author the supplier-attestation-staleness KRI
   and the supplier-obligation-coverage KPI in `content/metrics/` and
   wire their `metric_refs` into the playbook and the schema. Held
-  out of SKELETON to keep the metric_refs / catalog link guard green.
+  out of CORE-FANOUT-N8N to keep the metric_refs / catalog link
+  guard green.
 - **EXTEND-docs-closeout** — flip `F-WF-10` ROADMAP status from
   `Proposed` to `Shipped` and add the cookbook walkthrough.

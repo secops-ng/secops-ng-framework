@@ -39,6 +39,9 @@ from compilers.n8n.evidence.posture_node import emit_posture_artifact_n8n
 from compilers.n8n.evidence.dora_art19_report_node import (
     emit_dora_art19_report_n8n,
 )
+from compilers.n8n.evidence.contractual_obligations_node import (
+    emit_contractual_obligations_artifact_n8n,
+)
 
 __all__ = [
     "emit_risk_analysis_artifact_n8n",
@@ -53,4 +56,5 @@ __all__ = [
     "emit_bundle_manifest_n8n",
     "emit_posture_artifact_n8n",
     "emit_dora_art19_report_n8n",
+    "emit_contractual_obligations_artifact_n8n",
 ]

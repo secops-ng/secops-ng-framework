@@ -1,0 +1,275 @@
+{
+  "name": "Contractual obligations tracker",
+  "nodes": [
+    {
+      "id": "start--10101010-0000-4000-8000-000000000001",
+      "name": "contractual-obligations-tracker-start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__workflow_id__",
+              "type": "string",
+              "value": "",
+              "description": "Stable workflow stable-id from content/playbooks/<workflow>/. Joined into the obligation-evidence artifact_id derivation; constant per playbook (`contractual_obligations_tracker`) and supplied as a flat token so the CORE primitive call mirrors the F-WF-06 / F-WF-07 binding convention."
+            },
+            {
+              "name": "__execution_id__",
+              "type": "string",
+              "value": "",
+              "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Pinned by the upstream runtime; the workflow reads it for the obligation-evidence artifact join."
+            },
+            {
+              "name": "__contract_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Opaque operator-side pointer to the supplier-contract record under review on this execution. Operator-configured; the workflow reads it as the opaque pointer to a contract held in the operator's document store. The framework ships no default document-store endpoint and no vendor SDK bundling \u2014 the operator supplies whatever store is in scope (a sovereign EU object store, an on-prem document management system, a Git-managed contract repository)."
+            },
+            {
+              "name": "__raw_contract__",
+              "type": "string",
+              "value": "",
+              "description": "Operator-supplied JSON-native supplier-contract record the runtime fetched from the document store pointed at by `__contract_ref__`. Required keys: `contract_id`, `supplier_ref`, `effective_at`; optional: `expires_at`, `jurisdiction`. The framework ships the schema, not the catalogue."
+            },
+            {
+              "name": "__raw_obligations__",
+              "type": "string",
+              "value": "",
+              "description": "Operator-supplied JSON-native list of obligation records extracted from the contract upstream. One entry per declared obligation with `obligation_id`, `clause_ref`, `obligation_kind`, `text`, and optional `cadence`. The framework does not parse contract text; it canonicalises and validates the operator-supplied list."
+            },
+            {
+              "name": "__review_policy__",
+              "type": "string",
+              "value": "",
+              "description": "Operator-supplied JSON-native review-cadence policy. Required keys: `fallback_cadence` (ISO-8601 duration), `due_soon_window` (ISO-8601 duration); optional `last_reviewed_at` map and `waived_obligation_ids` list. Pinned by the operator's procurement-governance config; the workflow does no calendar arithmetic outside this policy."
+            },
+            {
+              "name": "__regulation_refs__",
+              "type": "string",
+              "value": "",
+              "description": "Schema-shaped regulation references the artifact attests (typically `[\"nis2:art-21-2-d\"]`, optionally `nis2:art-22` for the Union-level Cooperation-Group overlay). JSON-native list; pinned by the compile target's boot config so the operator can extend without re-compiling."
+            },
+            {
+              "name": "__control_refs__",
+              "type": "string",
+              "value": "",
+              "description": "Control stable-ids the artifact attests. JSON-native list; the primitive validates each entry against the `control.<id>@v<n>` shape. Typically `control.supplier_inventory@v1` and `control.provider_attestation@v1`."
+            },
+            {
+              "name": "__owner_role__",
+              "type": "string",
+              "value": "",
+              "description": "Role-shaped ownership pointer for the supplier-inventory attestation chain \u2014 a working-group mailbox, a generic role title, or a community handle. Personal names are out of scope per AGENTS.md \u00a73 and rejected at the artifact-builder boundary."
+            },
+            {
+              "name": "__owner_assigned_at__",
+              "type": "string",
+              "value": "",
+              "description": "ISO-8601 date (`YYYY-MM-DD`) on which the role was assigned ownership of the contractual-obligations attestation chain."
+            },
+            {
+              "name": "__captured_at__",
+              "type": "string",
+              "value": "",
+              "description": "ISO-8601 UTC second-precision timestamp (`...Z`) pinned at emission time by the upstream runtime; carried on the artifact's top-level `captured_at`, on `provenance.captured_at`, and as the time anchor the review-schedule primitive derives state against."
+            },
+            {
+              "name": "__source_url__",
+              "type": "string",
+              "value": "",
+              "description": "URL of the workflow run that produced this artifact. Compile targets supply their own run-id URLs; the URL itself is opaque to the schema."
+            },
+            {
+              "name": "__contract_record_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Pointer to the canonical contract block produced by ingest-contract \u2014 contract-id keyed, supplier-classification and effective-date envelope valued. Consumed by extract-obligations and emit-obligation-evidence."
+            },
+            {
+              "name": "__obligation_set_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Pointer to the per-contract obligation set produced by extract-obligations \u2014 one entry per declared obligation with the clause reference, obligation text, obligation kind, and the contractual review/expiry cadence. Sorted by `obligation_id` for byte-stable replay. Consumed by schedule-review and emit-obligation-evidence."
+            },
+            {
+              "name": "__review_schedule_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Pointer to the per-obligation review schedule produced by schedule-review \u2014 one entry per obligation paired one-to-one with `__obligation_set_ref__`, with the next-review-due timestamp derived deterministically from the obligation's contractual cadence and the operator's review-policy. Consumed by emit-obligation-evidence."
+            },
+            {
+              "name": "__obligation_artifact_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Pointer to the obligation-evidence artifact emitted by emit-obligation-evidence, shaped against schemas/evidence/contractual-obligations.schema.json."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--10101010-0000-4000-8000-000000000002",
+      "name": "ingest-contract",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.contractual_obligations_tracker.primitives.ingest import ingest_contract\n__contract_record_ref__ = ingest_contract(raw_contract=__raw_contract__, contract_ref=__contract_ref__)"
+      },
+      "notes": "Read the supplier-contract record referenced by __contract_ref__ from the operator-supplied document store and bind it to a normalised in-workflow contract record (contract_id, supplier_ref, effective_at, expires_at, jurisdiction). Read-only by contract; the workflow MUST NOT mutate the source document. Document-store endpoint is operator-configured \u2014 the framework ships no default non-EU endpoint and no hosted DMS dependency.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--10101010-0000-4000-8000-000000000003",
+      "name": "extract-obligations",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.contractual_obligations_tracker.primitives.obligations import extract_obligations\n__obligation_set_ref__ = extract_obligations(raw_obligations=__raw_obligations__, contract=__contract_record_ref__)"
+      },
+      "notes": "Walk the ingested contract record and extract the per-clause obligations the operator has accepted from that contract. Per obligation, capture the clause reference, the obligation text (operator-canonicalised string \u2014 no commentary, no rewrites at this layer), the obligation kind (security-control commitment, audit-right window, attestation cadence, sub-processor disclosure, breach-notification cadence, data-localisation, other), and any contractual review/expiry cadence the clause itself declares. Deterministic on the same contract record \u2014 re-extraction under the same inputs re-derives the same obligation set.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--10101010-0000-4000-8000-000000000004",
+      "name": "schedule-review",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.contractual_obligations_tracker.primitives.schedule import schedule_reviews\n__review_schedule_ref__ = schedule_reviews(obligations=__obligation_set_ref__, review_policy=__review_policy__, captured_at=__captured_at__)"
+      },
+      "notes": "Derive the per-obligation review schedule from the extracted obligation set and the operator's review-cadence policy. For each obligation, compute the next-review-due timestamp deterministically from (last_reviewed_at, contractual cadence declared by the clause, operator-policy fallback cadence). Pure derivation \u2014 the workflow MUST NOT contact the supplier on this step, and the schedule is computed in-band from the obligation record, the policy, and the captured_at anchor alone.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--10101010-0000-4000-8000-000000000005",
+      "name": "emit-obligation-evidence",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.contractual_obligations_tracker.primitives.artifact import build_obligation_artifact\n__obligation_artifact_ref__ = build_obligation_artifact(workflow_id=__workflow_id__, execution_id=__execution_id__, regulation_refs=__regulation_refs__, control_refs=__control_refs__, contract=__contract_record_ref__, obligations=__obligation_set_ref__, review_schedule=__review_schedule_ref__, owner_role=__owner_role__, owner_assigned_at=__owner_assigned_at__, captured_at=__captured_at__, source_url=__source_url__)"
+      },
+      "notes": "Combine the ingested contract record, the extracted obligation set, and the per-obligation review schedule into one obligation-evidence artifact shaped against schemas/evidence/contractual-obligations.schema.json (stream: contractual-obligations). The artifact carries the workflow id, execution id, regulation_refs (nis2:art-21-2-d, optionally nis2:art-22 for the Union-level overlay), control_refs, the contract id, the obligation set, the per-obligation review-state, the owner block, and the provenance envelope. Emission is byte-stable: same execution inputs re-derive the same artifact_id (SHA-256 of workflow_id|execution_id|contract.contract_id|captured_at). Destination is operator-configured \u2014 no default non-EU endpoint.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--10101010-0000-4000-8000-000000000006",
+      "name": "contractual-obligations-tracker-end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "contractual-obligations-tracker-start": {
+      "main": [
+        [
+          {
+            "node": "ingest-contract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ingest-contract": {
+      "main": [
+        [
+          {
+            "node": "extract-obligations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "extract-obligations": {
+      "main": [
+        [
+          {
+            "node": "schedule-review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "schedule-review": {
+      "main": [
+        [
+          {
+            "node": "emit-obligation-evidence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "emit-obligation-evidence": {
+      "main": [
+        [
+          {
+            "node": "contractual-obligations-tracker-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "supply-chain",
+    "contracts",
+    "obligations",
+    "obligation-evidence",
+    "nis2"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.contractual_obligations_tracker@v1",
+      "content_version": "0.2.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--10101010-0000-4000-8000-000000000001"
+    },
+    "secops_ng_notes": []
+  }
+}
