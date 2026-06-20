@@ -1,0 +1,104 @@
+stable_id: kri.leaver_to_revoked_time@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Leaver-to-revoked time
+summary: >
+  Time elapsed between the declared effective_at on a leaver lifecycle
+  event and the timestamp at which the access-evidence artifact records
+  the leaver's remove-set as observed-absent on the operator's identity
+  source. A residual-risk indicator on the offboarding edge of NIS2
+  Article 21(2)(i): a slow revocation tail surfaces as the departed
+  principal continuing to carry capabilities past the operator's
+  HR-source intent, which is the canonical lingering-access exposure
+  the joiner-mover-leaver control family is designed to close. Bound
+  to the access-evidence stream (F-CP-07) emitted by the
+  onboarding_offboarding_tracker playbook; the catalog entry is
+  identity-vendor-neutral and the compile target resolves the concrete
+  identity-source identifier.
+unit: minutes
+direction: lower_is_better
+target:
+  value: 60
+  comparator: "<="
+  rationale: >
+    Community-recommended starting point for the unscoped catalog
+    baseline. Privileged-role-scoped variants (for example a
+    privileged-leaver revocation indicator) tighten this target and
+    live as separate catalog entries.
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 60
+    severity: warn
+  - name: breach
+    comparator: ">"
+    value: 1440
+    severity: high
+measurement:
+  source: composite
+  aggregation: p95
+  formula: >
+    For each access-evidence artifact emitted within the evaluation
+    window whose lifecycle event_kind is "leaver" and whose
+    confirm-grant-revoke step recorded the declared remove-set as
+    observed-absent, compute
+    (artifact.captured_at - lifecycle_event.effective_at) in minutes.
+    Aggregate as p95 across artifacts. Exclude leaver events where the
+    confirm-grant-revoke step surfaced a lingering-revoke entry on the
+    confirmation record (those are tracked as a separate
+    revocation-divergence indicator, not as latency) so this indicator
+    does not silently improve when revocation fails outright.
+    Reference visualisation: a p50 / p95 latency histogram sliced by
+    identity_provider on a daily-tumbling window, with the warn /
+    breach thresholds overlaid; the histogram is the canonical
+    operator-facing surface for this KRI and the compile target is the
+    source of truth for the executable form.
+  inputs:
+    - name: lifecycle_event_effective_at
+      description: >
+        Declared effective_at field on the leaver lifecycle event
+        ingested by the onboarding_offboarding_tracker playbook. Bound
+        by the ingest primitive at the
+        action--20212021-0000-4000-8000-000000000002 step.
+      playbook_step: action--20212021-0000-4000-8000-000000000002
+      telemetry_ref: telemetry.ocsf.account_change@v1
+    - name: confirmed_capability_observation
+      description: >
+        confirm-grant-revoke step transition that records the leaver's
+        declared remove-set as observed-absent on the operator's
+        identity source. Bound to the confirm-grant-revoke step of
+        the onboarding_offboarding_tracker playbook.
+      playbook_step: action--20212021-0000-4000-8000-000000000005
+      telemetry_ref: telemetry.ocsf.account_change@v1
+    - name: artifact_captured_at
+      description: >
+        captured_at field on the access-evidence artifact emitted by
+        the emit-access-evidence step. Bound to the artifact schema at
+        schemas/evidence/access.schema.json.
+      playbook_step: action--20212021-0000-4000-8000-000000000006
+  window:
+    duration: P30D
+    sliding: true
+playbook_refs:
+  - playbook_id: playbook.onboarding_offboarding_tracker@v1
+    step_id: action--20212021-0000-4000-8000-000000000005
+  - playbook_id: playbook.onboarding_offboarding_tracker@v1
+    step_id: action--20212021-0000-4000-8000-000000000006
+control_refs:
+  - control.jml_evidence@v1
+  - control.privileged_access_review@v1
+telemetry_refs:
+  - telemetry.ocsf.account_change@v1
+external_refs:
+  - name: NIS2 — Article 21(2)(i) human-resources security, access control, asset management
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(i)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ENISA — Threat Landscape methodology, identity-lifecycle discussion
+    source: ENISA
+    url: https://www.enisa.europa.eu/publications/enisa-threat-landscape
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
