@@ -2,12 +2,13 @@
 # Regenerate the committed n8n worked-example artefacts for the
 # IT and security support-agent workflow from the canonical CACAO
 # playbook. Run from the repo root after any change to the playbook
-# source or the n8n compiler.
+# source, the n8n compiler, or the support-agent primitives.
 #
-# This CORE-FANOUT-N8N-WIRE script emits the workflow graph only —
-# the per-execution interaction-evidence artefact under ``evidence/``
-# is materialised by the GOLDEN sibling that follows this WIRE and is
-# left as a placeholder at this layer.
+# The per-execution interaction-evidence artefact under ``evidence/``
+# is materialised by the sibling ``regenerate.py`` script in this
+# directory; that artefact targets the n8n interaction-evidence
+# adapter (reused F-CP-02 incidents stream) rather than the whole
+# workflow graph.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -23,5 +24,6 @@ PYTHONPATH="${REPO_ROOT}" python -m tools.compile \
     --target n8n \
     --out "${HERE}/workflow.n8n.json"
 
-# Defer interaction-evidence artefact materialisation to the GOLDEN sibling.
+# Materialise the representative interaction-evidence artefact under
+# evidence/ via the n8n interaction-evidence adapter.
 PYTHONPATH="${REPO_ROOT}" python "${HERE}/regenerate.py"
