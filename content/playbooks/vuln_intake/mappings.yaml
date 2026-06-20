@@ -1,0 +1,221 @@
+# Cross-references for the vuln_intake playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed/emitted, and the EU regulatory clauses this
+# playbook helps operationalise. Inbound references live in
+# content/mappings/{cra,nis2,dora}/ so the graph is closed in both
+# directions.
+#
+# CRA closure: the schema's top-level keys are fixed
+# (oscal/d3fend/ocsf/nis2/dora). CRA cross-references for this
+# playbook are therefore expressed inbound only — multiple entries
+# in content/mappings/cra/{article-13,article-14-and-annex-i,
+# annex-i-1-essential-cybersecurity}.yaml already backlink to
+# playbook.vuln_intake@v1 (cra:annex-i-1-security-updates-capability,
+# cra:art-13-vuln-handling-process, cra:art-13-security-updates-
+# distribution, cra:annex-i-2-sbom, cra:annex-i-2-vuln-handling,
+# cra:annex-i-2-cvd-policy, cra:annex-i-2-security-updates,
+# cra:art-14-early-warning, cra:art-14-notification-72h).
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.vuln_intake@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the intake,
+  # triage, CRA-trigger assessment, regulator-notification, and
+  # per-severity response steps. Catalogue URLs resolve to the
+  # public NIST OSCAL repository.
+  - id: control.vuln_disclosure_intake@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SA-15(8)
+    title: Development Process, Standards, and Tools | Reuse of Threat and Vulnerability Information
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SA-15(8)
+    notes: >-
+      Anchors the inbound coordinated-disclosure channel and the
+      single-point-of-contact obligation: the operator reuses
+      external vulnerability disclosures (researcher reports, vendor
+      advisories, CVE feed hits) as input to the development and
+      maintenance process.
+
+  - id: control.flaw_remediation@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SI-2
+    title: Flaw Remediation
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-2
+    notes: >-
+      Covers the per-severity response branches: identify, report,
+      and correct information-system flaws through the security
+      update shipped on the operator's SLA for the duration of the
+      support period.
+
+  - id: control.security_alerts_advisories_directives@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SI-5
+    title: Security Alerts, Advisories, and Directives
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-5
+    notes: >-
+      Receipt and onward dissemination of external vulnerability
+      alerts and advisories — covers the intake step on the inbound
+      side and the operator-issued advisory on the outbound side.
+
+  - id: control.vulnerability_monitoring_scanning@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: RA-5
+    title: Vulnerability Monitoring and Scanning
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=RA-5
+    notes: >-
+      Covers the triage step: CVSS / EPSS scoring and SBOM /
+      asset-inventory correlation as the monitoring component that
+      turns a disclosure into a remediation candidate.
+
+  - id: control.incident_reporting@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-6
+    title: Incident Reporting
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-6
+    notes: >-
+      Covers the CRA Article 14 regulator-notification chain: the
+      24-hour early-warning, the 72-hour notification, the 14-day
+      final report, and the severe-incident notification fired when
+      the actively-exploited or severe-incident branch is taken.
+
+  - id: control.software_component_inventory@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CM-8
+    title: System Component Inventory
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CM-8
+    notes: >-
+      Covers the SBOM / asset-inventory side of the triage step: the
+      affected-component correlation depends on a maintained
+      machine-readable component inventory (CRA Annex I §2(1) SBOM).
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned where the technique applies to a
+  # single step.
+  - step: action--01a17a01-0000-4000-8000-000000000002
+    d3fend_id: D3-OAM
+    d3fend_name: Operational Activity Mapping
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    notes: >-
+      intake disclosure — receiving operational vulnerability data
+      from an external coordinated-disclosure channel to inform
+      defensive activity.
+
+  - step: action--01a17a01-0000-4000-8000-000000000003
+    d3fend_id: D3-AVE
+    d3fend_name: Application Vulnerability Enumeration
+    url: https://d3fend.mitre.org/technique/d3f:ApplicationVulnerabilityEnumeration/
+    notes: >-
+      triage and asset correlation — enumerating known
+      vulnerabilities against the affected component identified by
+      the SBOM / asset-inventory match.
+
+  - step: action--01a17a01-0000-4000-8000-000000000003
+    d3fend_id: D3-SYSVA
+    d3fend_name: System Vulnerability Assessment
+    url: https://d3fend.mitre.org/technique/d3f:SystemVulnerabilityAssessment/
+    notes: >-
+      triage and asset correlation — CVSS / EPSS scoring of the
+      assessed system component to derive the severity band that
+      drives downstream routing.
+
+  - step: action--01a17a01-0000-4000-8000-000000000008
+    d3fend_id: D3-SU
+    d3fend_name: Software Update
+    url: https://d3fend.mitre.org/technique/d3f:SoftwareUpdate/
+    notes: >-
+      response: critical — shipping the security update across
+      affected releases free of charge for the duration of the
+      support period.
+
+  - step: action--01a17a01-0000-4000-8000-000000000009
+    d3fend_id: D3-SU
+    d3fend_name: Software Update
+    url: https://d3fend.mitre.org/technique/d3f:SoftwareUpdate/
+    notes: >-
+      response: high — shipping the security update on the
+      operator's high-severity SLA paired with an advisory through
+      the dissemination channel.
+
+  - step: action--01a17a01-0000-4000-8000-00000000000a
+    d3fend_id: D3-SU
+    d3fend_name: Software Update
+    url: https://d3fend.mitre.org/technique/d3f:SoftwareUpdate/
+    notes: >-
+      response: scheduled remediation — security update scheduled
+      on the operator's standard release cadence with the advisory
+      rolled into the next scheduled advisory bundle.
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. The intake side consumes a
+  # Vulnerability Finding (class_uid 2002) materialised from the
+  # inbound disclosure (researcher report, advisory, CVE feed hit,
+  # or internal scan finding). The CRA regulator-notification chain
+  # emits Compliance Finding (class_uid 2003) records keyed to the
+  # 24h / 72h / 14d / severe-incident artefacts; an operator-issued
+  # advisory is treated as a downstream materialisation, not a
+  # separate OCSF class binding.
+  - id: telemetry.vulnerability_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2002
+    class_name: Vulnerability Finding
+    ocsf_version: "1.3.0"
+    direction: consumes
+    notes: >-
+      Consumed at the intake step. The disclosure (researcher
+      report, vendor advisory, CVE feed hit, or internal scan
+      finding) is normalised into a Vulnerability Finding record
+      that carries the CVE id, affected component, CVSS / EPSS
+      scoring inputs, and the SBOM / asset-inventory correlation.
+      Schema: https://schema.ocsf.io/1.3.0/classes/vulnerability_finding
+
+  - id: telemetry.compliance_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2003
+    class_name: Compliance Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by the regulator-notification chain (CRA Art. 14):
+      one Compliance Finding per 24-hour early-warning, 72-hour
+      notification, 14-day final report, and severe-incident
+      notification, keyed to the case so the timeline-signal
+      controls can audit on-time-delivery KPIs. Schema:
+      https://schema.ocsf.io/1.3.0/classes/compliance_finding
+
+nis2:
+  # Inbound entry lives at
+  # content/mappings/nis2/article-21-2-e.yaml (id nis2:art-21-2-e)
+  # and backlinks to playbook.vuln_intake@v1.
+  - mapping_id: nis2:art-21-2-e
+    article: 21(2)(e)
+    notes: >-
+      NIS2 Art. 21(2)(e) requires security in network and information
+      systems acquisition, development and maintenance — including
+      vulnerability handling and disclosure, and SBOM production for
+      releases. The vuln_intake playbook is the operational artefact
+      that drives the inbound disclosure channel, the SBOM /
+      asset-inventory correlation, and the security-update
+      dissemination side of this obligation.
+
+dora:
+  # Inbound entry lives at
+  # content/mappings/dora/article-9-and-rts-vuln-mgmt.yaml
+  # (id dora:art-9-vuln-mgmt) and backlinks to
+  # playbook.vuln_intake@v1.
+  - mapping_id: dora:art-9-vuln-mgmt
+    article: "9(4)(a)"
+    notes: >-
+      DORA Art. 9(4)(a), operationalised by the JC RTS on ICT risk
+      management framework (Commission Delegated Regulation (EU)
+      2024/1774) Art. 10 vulnerability and patch management
+      procedures. The vuln_intake playbook is the operator-facing
+      procedure: identification of vulnerabilities via inbound
+      disclosure and CVE-feed monitoring, risk-based prioritisation
+      via the triage and severity-routing steps, and tracking of
+      remediation status to closure via the per-severity response
+      branches.
