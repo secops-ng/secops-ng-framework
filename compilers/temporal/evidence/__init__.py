@@ -46,6 +46,9 @@ from compilers.temporal.evidence.dora_art19_report_activity import (
 from compilers.temporal.evidence.contractual_obligations_activity import (
     emit_contractual_obligations_artifact_activity,
 )
+from compilers.temporal.evidence.interaction_evidence_activity import (
+    emit_interaction_evidence_artifact_activity,
+)
 
 __all__ = [
     "emit_risk_analysis_artifact_activity",
@@ -61,4 +64,5 @@ __all__ = [
     "emit_posture_artifact_activity",
     "emit_dora_art19_report_activity",
     "emit_contractual_obligations_artifact_activity",
+    "emit_interaction_evidence_artifact_activity",
 ]
