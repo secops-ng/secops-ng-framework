@@ -23,6 +23,7 @@ entries:
       - playbook.identity_compromise@v1
       - playbook.cloud_misconfiguration@v1
       - playbook.iam_auditor@v1
+      - playbook.onboarding_offboarding_tracker@v1
     metric_refs:
       - kri.orphaned_privileged_accounts@v1
       - kri.asset_inventory_drift@v1
@@ -36,3 +37,14 @@ entries:
       anchors the access evidence stream (F-CP-07) against this
       obligation; the schema for the artifact it emits lives at
       schemas/evidence/access.schema.json.
+      `playbook.onboarding_offboarding_tracker@v1` (F-WF-11) is the
+      per-lifecycle-event grant/revoke-confirmation counterpart —
+      one access artifact per joiner / mover / leaver event,
+      anchored on the same F-CP-07 access stream and shaped against
+      the same `schemas/evidence/access.schema.json` envelope. The
+      two playbooks discharge complementary halves of this
+      obligation surface: the IAM auditor pins which caller invoked
+      a running workflow and what capabilities that caller held;
+      the on-boarding / off-boarding tracker pins the declared
+      capability delta on a joiner-mover-leaver event and the
+      observed confirmation that the delta landed.
