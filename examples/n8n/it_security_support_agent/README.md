@@ -11,27 +11,29 @@ artefact is easy to inspect.
 
 ## Maturity
 
-`CORE-FANOUT-N8N-WIRE` — the n8n workflow emitter is bound and the
+`CORE-FANOUT-N8N-GOLDEN` — the n8n workflow emitter is bound, the
 five action bodies carry deterministic `core_body` bindings into
-`content.playbooks.it_security_support_agent.primitives.*`. The
-byte-parity golden test that pins the emitted `workflow.n8n.json`
-against the compiler lives under
-`tests/examples/it_security_support_agent/`. The representative
-per-execution interaction-evidence artefact wired against
-`schemas/evidence/incidents.schema.json`, the immutable fixture, and
-its byte-parity golden test land in the GOLDEN sibling that follows
-this WIRE. CORE-FANOUT-TMP and CORE-FANOUT-LG follow in further
-serial sibling cards.
+`content.playbooks.it_security_support_agent.primitives.*`, and the
+per-execution interaction-evidence artefact is materialised through
+the n8n adapter at
+`compilers.n8n.evidence.emit_interaction_evidence_artifact_n8n`
+against `schemas/evidence/incidents.schema.json` (reused F-CP-02
+incidents stream). The byte-parity goldens that pin both the emitted
+`workflow.n8n.json` and the interaction-evidence record live under
+`tests/examples/it_security_support_agent/`; the immutable fixture
+lives under `tests/fixtures/it_security_support_agent/`.
+CORE-FANOUT-TMP and CORE-FANOUT-LG follow in further serial sibling
+cards.
 
 ## Layout
 
 | Path                                       | Source compiler          | Status                                                                                |
 |--------------------------------------------|--------------------------|---------------------------------------------------------------------------------------|
 | `playbook.cacao.json`                      | (input mirror)           | Byte-identical mirror of the canonical playbook                                       |
-| `regenerate.sh`                            | (tooling)                | Re-mirrors the canonical playbook and re-emits the worked workflow artefact           |
-| `regenerate.py`                            | (tooling)                | Validates the CORE primitives binding for the GOLDEN sibling that follows this WIRE   |
+| `regenerate.sh`                            | (tooling)                | Re-mirrors the canonical playbook and re-emits the worked workflow + artefact         |
+| `regenerate.py`                            | (tooling)                | Drives the primitive chain and emits the interaction-evidence artefact (n8n adapter)  |
 | `workflow.n8n.json`                        | `compilers.n8n`          | Compiled n8n workflow JSON — Code-node bodies for the five CORE primitives            |
-| `evidence/`                                | (placeholder)            | Interaction-evidence artefact materialised by the GOLDEN sibling (F-CP-02 shape)      |
+| `evidence/interaction-evidence.json`       | `compilers.n8n.evidence` | Representative interaction-evidence artefact (F-CP-02 incidents-stream shape)         |
 
 ## How to regenerate
 
@@ -41,10 +43,9 @@ From the repository root:
 examples/n8n/it_security_support_agent/regenerate.sh
 ```
 
-The script copies the canonical CACAO source over the local mirror
-and re-emits `workflow.n8n.json` via the n8n compiler. The
-per-execution interaction-evidence artefact under `evidence/` is
-materialised by the GOLDEN sibling that follows this WIRE.
+The script copies the canonical CACAO source over the local mirror,
+re-emits `workflow.n8n.json` via the n8n compiler, and materialises
+the per-execution interaction-evidence artefact under `evidence/`.
 
 ## Source
 
@@ -82,11 +83,8 @@ overcount. Both workflows anchor onto
 
 ## Pending siblings
 
-Queued serially after this WIRE merges:
+Queued serially after this GOLDEN merges:
 
-- **CORE-FANOUT-N8N-GOLDEN** — interaction-evidence emitter wired
-  against `schemas/evidence/incidents.schema.json`, byte-parity
-  golden, and the immutable fixture.
 - **CORE-FANOUT-TMP** — Temporal emitter and byte-parity golden under
   `examples/temporal/it_security_support_agent/`.
 - **CORE-FANOUT-LG** — LangGraph emitter and byte-parity golden under
