@@ -1,59 +1,61 @@
 # examples/langgraph/contractual_obligations_tracker
 
-SKELETON-FANOUT scaffold shell. This directory pins the operator-facing
-layout for the LangGraph worked example of the
-`playbook.contractual_obligations_tracker@v1` supplier-contract
+Worked example for the LangGraph compilation of
+`playbook.contractual_obligations_tracker@v1` — the supplier-contract
 obligations tracker workflow (F-WF-10; NIS2 Article 21(2)(d)). The
 canonical CACAO source lives at
 `../../../content/playbooks/contractual_obligations_tracker/playbook.cacao.json`
-and is mirrored here byte-identical so the diff against the eventual
-emitted artefact is easy to inspect.
+and is mirrored here byte-identical so the diff against the emitted
+artefacts is easy to inspect.
 
-## Maturity
+## Files in this directory
 
-`SKELETON-FANOUT` — scaffold only. No LangGraph workflow emitter
-binding, no representative obligation-evidence artifact, and no
-byte-parity golden under
-`tests/examples/langgraph/contractual_obligations_tracker/` at
-this layer. The compiler emitter, the per-execution evidence
-artifact, and the byte-parity golden land in the F-WF-10
-CORE-FANOUT-LG sibling card queued serially after this
-SKELETON merges (to avoid concurrent byte-parity golden churn
-across the three targets).
+| Path                                            | Source compiler                                   | Notes                                                                                          |
+|-------------------------------------------------|---------------------------------------------------|------------------------------------------------------------------------------------------------|
+| `playbook.cacao.json`                           | (input mirror)                                    | Byte-identical mirror of the canonical playbook                                                |
+| `graph_spec.json`                               | `compilers.langgraph.emit`                        | Target-neutral GraphSpec (nodes, edges, conditional edges) — byte-parity golden                |
+| `state_bindings.py`                             | `compilers.langgraph.state`                       | Generated `TypedDict` state + `@tool`-decorated action wrappers — byte-parity golden           |
+| `_audit_mirror.py`                              | `compilers._shared.audit_mirror_cli`              | Dependency-free `AuditTrail` / `AuditRecord` sibling materialised by the compiler              |
+| `regenerate.sh`                                 | (tooling)                                         | Re-mirrors playbook + emits `graph_spec.json` + `state_bindings.py` + audit-mirror             |
+| `regenerate.py`                                 | (tooling)                                         | Drives the LangGraph obligation-evidence node adapter end-to-end                               |
+| `evidence/obligation-evidence-record.json`      | `compilers.langgraph.evidence.contractual_obligations_node` | Representative obligation-evidence artifact (byte-parity golden)                              |
 
-## Layout
+## How to regenerate
 
-| Path                       | Source compiler          | Status at SKELETON                                                          |
-|----------------------------|--------------------------|-----------------------------------------------------------------------------|
-| `playbook.cacao.json`      | (input mirror)           | Byte-identical mirror of the canonical SKELETON playbook                    |
-| `regenerate.sh`            | (tooling)                | Re-mirrors the canonical playbook into this directory                       |
-| `regenerate.py`            | (tooling)                | Placeholder; no evidence emitter bound until CORE-FANOUT-LG            |
-| `workflow.langgraph.py`          | `compilers.langgraph`             | **Not present at SKELETON.** Emitted in CORE-FANOUT-LG.                |
-| `evidence/`                | (per-execution output)   | Placeholder; representative obligation-evidence artifact lands in CORE-FANOUT-LG |
-
-## How to regenerate (SKELETON)
-
-From the repository root:
+After any change to the canonical playbook or to `compilers/langgraph/*`,
+refresh the committed artifacts from the repository root:
 
 ```sh
-examples/langgraph/contractual_obligations_tracker/regenerate.sh
+./examples/langgraph/contractual_obligations_tracker/regenerate.sh
+PYTHONPATH=. python examples/langgraph/contractual_obligations_tracker/regenerate.py
 ```
 
-The script copies the canonical CACAO source over the local mirror so
-this directory stays in sync with
-`content/playbooks/contractual_obligations_tracker/`. It does **not**
-emit a LangGraph workflow artefact at this layer — the canonical
-playbook ships with declarative placeholder step bodies
-(`x_secops_ng.core_body.placeholder: true`), so there are no primitive
-bindings for the LangGraph compiler emitter to translate yet. The
-emitter and the worked-artefact emission land in F-WF-10
-CORE-FANOUT-LG.
+The shell script:
+
+1. Mirrors the canonical CACAO source over `playbook.cacao.json`.
+2. Emits `graph_spec.json` via `compilers.langgraph.emit`.
+3. Emits `state_bindings.py` via `compilers.langgraph.state`.
+4. Materialises `_audit_mirror.py` via `compilers._shared.audit_mirror_cli`.
+
+The Python script drives the LangGraph obligation-evidence node adapter
+against the representative context (re-used byte-identical from the
+Temporal sibling at `examples/temporal/contractual_obligations_tracker/`)
+to write one `obligation-evidence-record.json` under `evidence/`.
+
+Regeneration is deterministic and idempotent — re-running on a clean
+checkout produces byte-identical artefacts. The obligation-evidence
+artifact is target-agnostic on the wire (the schema carries no
+`compile_target` field), so the LangGraph, n8n, and Temporal worked
+examples are byte-identical at the record level; a cross-target
+byte-parity test under
+`tests/examples/contractual_obligations_tracker/` pins this.
 
 ## Source
 
 - Canonical playbook: [`content/playbooks/contractual_obligations_tracker/`](../../../content/playbooks/contractual_obligations_tracker/)
 - Obligation-evidence schema: [`schemas/evidence/contractual-obligations.schema.json`](../../../schemas/evidence/contractual-obligations.schema.json)
-- Evidence stream contributor home: [`content/evidence/contractual_obligations_tracker/`](../../../content/evidence/contractual_obligations_tracker/)
+- Contractual-obligations shared emitter: [`compilers/_shared/evidence/contractual_obligations.py`](../../../compilers/_shared/evidence/contractual_obligations.py)
+- LangGraph contractual-obligations adapter: [`compilers/langgraph/evidence/contractual_obligations_node.py`](../../../compilers/langgraph/evidence/contractual_obligations_node.py)
 - Regulatory anchor (NIS2 Article 21(2)(d)): [`content/mappings/nis2/article-21-2-d.yaml`](../../../content/mappings/nis2/article-21-2-d.yaml)
 
 ## Sovereign-stack default
@@ -67,12 +69,3 @@ operator-configured at execution time. No default non-EU endpoint,
 no hosted DMS dependency, no vendor SDK bundled. The reference
 compile targets emit to whatever the operator wires; the playbook
 commits to the artefact contract, not the destination.
-
-## Pending sibling
-
-- **F-WF-10 CORE-FANOUT-LG** — bind the LangGraph compiler
-  emitter against the canonical primitive set, regenerate
-  `workflow.langgraph.py` deterministically from the canonical playbook,
-  materialise one representative obligation-evidence artifact under
-  `evidence/`, and pin both with a byte-parity golden under
-  `tests/examples/langgraph/contractual_obligations_tracker/`.

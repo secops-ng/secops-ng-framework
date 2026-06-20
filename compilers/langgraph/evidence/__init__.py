@@ -46,6 +46,9 @@ from compilers.langgraph.evidence.posture_node import (
 from compilers.langgraph.evidence.dora_art19_report_node import (
     emit_dora_art19_report_node,
 )
+from compilers.langgraph.evidence.contractual_obligations_node import (
+    emit_contractual_obligations_artifact_node,
+)
 
 __all__ = [
     "emit_risk_analysis_artifact_node",
@@ -60,4 +63,5 @@ __all__ = [
     "emit_rule_effectiveness_snapshot_node",
     "emit_posture_artifact_node",
     "emit_dora_art19_report_node",
+    "emit_contractual_obligations_artifact_node",
 ]
