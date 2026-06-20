@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
-# SKELETON scaffold for examples/n8n/it_security_support_agent.
+# Regenerate the committed n8n worked-example artefacts for the
+# IT and security support-agent workflow from the canonical CACAO
+# playbook. Run from the repo root after any change to the playbook
+# source or the n8n compiler.
 #
-# At the SKELETON layer this script only keeps the local CACAO mirror
-# byte-identical to the canonical playbook source. The n8n workflow
-# emitter binding, the per-execution interaction-evidence artefact, and
-# the byte-parity golden land in the CORE-FANOUT-N8N sibling that
-# follows this SKELETON.
+# This CORE-FANOUT-N8N-WIRE script emits the workflow graph only —
+# the per-execution interaction-evidence artefact under ``evidence/``
+# is materialised by the GOLDEN sibling that follows this WIRE and is
+# left as a placeholder at this layer.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -15,5 +17,11 @@ CANON="${REPO_ROOT}/content/playbooks/it_security_support_agent/playbook.cacao.j
 # Keep the mirrored CACAO source byte-identical to the canonical playbook.
 cp "${CANON}" "${HERE}/playbook.cacao.json"
 
-echo "it_security_support_agent (n8n): playbook mirror refreshed."
-echo "Workflow emission deferred to CORE-FANOUT-N8N."
+# Emit the n8n workflow from the canonical playbook via the unified CLI.
+PYTHONPATH="${REPO_ROOT}" python -m tools.compile \
+    "${CANON}" \
+    --target n8n \
+    --out "${HERE}/workflow.n8n.json"
+
+# Defer interaction-evidence artefact materialisation to the GOLDEN sibling.
+PYTHONPATH="${REPO_ROOT}" python "${HERE}/regenerate.py"
