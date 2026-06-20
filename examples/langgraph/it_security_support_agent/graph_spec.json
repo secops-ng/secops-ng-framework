@@ -1,0 +1,72 @@
+{
+  "conditional_edges": [],
+  "edges": [
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--20122012-0000-4000-8000-000000000003",
+      "src": "action--20122012-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--20122012-0000-4000-8000-000000000004",
+      "src": "action--20122012-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--20122012-0000-4000-8000-000000000005",
+      "src": "action--20122012-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--20122012-0000-4000-8000-000000000006",
+      "src": "action--20122012-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--20122012-0000-4000-8000-000000000006"
+    }
+  ],
+  "end_sentinel": "__END__",
+  "entry": "action--20122012-0000-4000-8000-000000000002",
+  "name": "IT and security support agent",
+  "nodes": [
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "ingest-support-request",
+      "name": "action--20122012-0000-4000-8000-000000000002",
+      "step_id": "action--20122012-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "classify-request",
+      "name": "action--20122012-0000-4000-8000-000000000003",
+      "step_id": "action--20122012-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "attempt-automated-resolution",
+      "name": "action--20122012-0000-4000-8000-000000000004",
+      "step_id": "action--20122012-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "escalate-with-human-handoff",
+      "name": "action--20122012-0000-4000-8000-000000000005",
+      "step_id": "action--20122012-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "emit-interaction-evidence",
+      "name": "action--20122012-0000-4000-8000-000000000006",
+      "step_id": "action--20122012-0000-4000-8000-000000000006"
+    }
+  ],
+  "playbook_id": "playbook--20122012-0000-4000-8000-000000000001",
+  "stable_id": "playbook.it_security_support_agent@v1"
+}
