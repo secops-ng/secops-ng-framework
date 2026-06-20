@@ -801,7 +801,7 @@ manual configuration.
 
 ### F-SV-02 — eIDAS 2.0 wallet integration pattern
 
-- **Status:** Proposed
+- **Status:** Shipped
 - **Priority:** P2
 - **Acceptance criteria:**
   - Pattern (under `patterns/eidas2_wallet/`) shows how to consume an
@@ -811,6 +811,25 @@ manual configuration.
   reference schemas only.
 - **Depends on:** F-PT-03
 - **Source:** Research `2026-05-16-eidas2-wallet-patterns.md` (private; available on request).
+- **Shipped via:**
+  - SKELETON — #377 (`patterns/eidas2_wallet/` Pydantic v2
+    `WalletAttestationInput` typed-input model + cross-target fixture
+    under `tests/fixtures/eidas2_wallet/` anchoring the byte-parity
+    ring).
+  - CORE-FANOUT-N8N — #378 (n8n credentials-node adapter under
+    `compilers/n8n/patterns/eidas2_wallet_node.py` + worked example
+    under `examples/n8n/eidas2_wallet/` + byte-parity golden).
+  - CORE-FANOUT-TEMPORAL — #379 (Temporal `@activity.defn`
+    `materialise_wallet_attestation_input_activity` under
+    `compilers/temporal/patterns/eidas2_wallet_activity.py` + worked
+    example under `examples/temporal/eidas2_wallet/` + cross-target
+    byte-parity golden).
+  - CORE-FANOUT-LANGGRAPH — #380 (LangGraph state→state node
+    `materialise_wallet_attestation_input_node` under
+    `compilers/langgraph/patterns/eidas2_wallet_node.py` + worked
+    example under `examples/langgraph/eidas2_wallet/` closing the
+    three-target byte-parity ring; input_id
+    `50e1470262066f3c3e13f8e3bb966b3abf4798fc8cf22aed334e55c105f289dd`).
 
 ### F-SV-03 — DORA technical-incident reporting alignment
 

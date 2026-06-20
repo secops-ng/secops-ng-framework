@@ -1,8 +1,11 @@
 # patterns/eidas2_wallet/ — eIDAS 2.0 EUDIW attestation as workflow input
 
-ROADMAP feature: **F-SV-02** (SKELETON deliverable). The CORE
-fan-out (compile-target emitters) and EXTEND (worked examples) land
-on follow-up cards.
+ROADMAP feature: **F-SV-02** — Shipped with three-target parity
+(SKELETON #377, CORE-FANOUT-N8N #378, CORE-FANOUT-TEMPORAL #379,
+CORE-FANOUT-LANGGRAPH #380). The CORE fan-out (compile-target
+emitters) and EXTEND (worked examples) have landed under
+`examples/{n8n,temporal,langgraph}/eidas2_wallet/` with byte-identical
+cross-target goldens.
 
 ## What this pattern is
 
