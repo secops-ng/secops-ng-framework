@@ -1,0 +1,38 @@
+{
+  "artifact_id": "8b2a22e144e414d63bc9db66466cad6b698164bbedff36578743897f5b94ebeb",
+  "caller_identity": {
+    "identity_provider": "keycloak",
+    "principal_id": "automation-onboarding-runner",
+    "principal_type": "service_account"
+  },
+  "capabilities": [
+    "incidents.read",
+    "evidence.write",
+    "secrets.read"
+  ],
+  "capability_count": 3,
+  "captured_at": "2026-06-19T05:00:00Z",
+  "compile_target": "temporal",
+  "control_refs": [
+    "control.jml_evidence@v1",
+    "control.privileged_access_review@v1",
+    "control.cloud_identity_least_privilege@v1"
+  ],
+  "execution_id": "temporal:exec-onboff-001",
+  "owner": {
+    "assigned_at": "2026-01-15",
+    "role": "identity-wg"
+  },
+  "provenance": {
+    "captured_at": "2026-06-19T05:00:00Z",
+    "commit_sha": "deadbeef0123456789",
+    "source_url": "https://example.org/runs/onboarding_offboarding_tracker_001"
+  },
+  "regulation_refs": [
+    "nis2:art-21-2-i"
+  ],
+  "retention": "P2Y",
+  "schema_version": "1.0.0",
+  "stream": "access",
+  "workflow_id": "onboarding_offboarding_tracker"
+}
