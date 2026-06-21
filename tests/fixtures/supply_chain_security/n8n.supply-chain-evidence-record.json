@@ -1,0 +1,74 @@
+{
+  "aggregates": {
+    "ai_provider_count": 0,
+    "eu_hosted_count": 2,
+    "non_eu_count": 0,
+    "sovereign_count": 2,
+    "total_providers": 2
+  },
+  "artifact_id": "420e93dbf4c004762c8690da178ee8e2a49e5f03ca67b9ee49c072f4f549aa4e",
+  "captured_at": "2026-06-21T12:00:05Z",
+  "control_refs": [
+    "control.supplier_inventory@v1"
+  ],
+  "dependencies": [
+    {
+      "attestation": {
+        "attestation_ref": "atte-2026Q2-0001",
+        "last_reattested_at": "2026-04-01T00:00:00Z",
+        "next_due_at": "2027-04-01T00:00:00Z",
+        "state": "effective"
+      },
+      "call_count": 4,
+      "kind": "software_dependency",
+      "provider_id": "provider.upstream_dep_eu@v1",
+      "risk_notes": "EU-hosted direct dependency; SBOM diff fired on the 1.2.3 release tag.",
+      "sovereignty_classification": {
+        "band_rationale": "EU-owned provider operating wholly inside an EU Member State; no declared sub-processors.",
+        "kb_ref": "supplier-kb://provider-upstream-dep-eu/2026-Q2",
+        "ownership": "eu_owned",
+        "residency": "eu",
+        "sovereignty_band": "sovereign",
+        "sub_processor_chain": []
+      },
+      "version": "1.2.3"
+    },
+    {
+      "attestation": {
+        "attestation_ref": "atte-2026Q2-0002",
+        "last_reattested_at": "2026-04-01T00:00:00Z",
+        "next_due_at": "2027-04-01T00:00:00Z",
+        "state": "effective"
+      },
+      "call_count": 1,
+      "kind": "data_feed",
+      "provider_id": "provider.cve_feed_eu@v1",
+      "sovereignty_classification": {
+        "band_rationale": "EU-owned vulnerability data feed; no declared sub-processors.",
+        "kb_ref": "supplier-kb://provider-cve-feed-eu/2026-Q2",
+        "ownership": "eu_owned",
+        "residency": "eu",
+        "sovereignty_band": "sovereign",
+        "sub_processor_chain": []
+      },
+      "version": "2026-06-07"
+    }
+  ],
+  "execution_id": "n8n:exec-scs-0001",
+  "owner": {
+    "assigned_at": "2026-01-15",
+    "role": "supplier-governance@example.org"
+  },
+  "provenance": {
+    "captured_at": "2026-06-21T12:00:05Z",
+    "commit_sha": "deadbeef0123456789",
+    "source_url": "https://example.org/runs/supply_chain_security_0001"
+  },
+  "regulation_refs": [
+    "nis2:art-21-2-d"
+  ],
+  "retention": "P2Y",
+  "schema_version": "1.0.0",
+  "stream": "supply-chain",
+  "workflow_id": "supply_chain_security"
+}
