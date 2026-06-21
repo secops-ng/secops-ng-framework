@@ -72,12 +72,13 @@ target ships Code-node bodies that import from
 runtime is expected to make that package importable alongside the
 n8n instance.
 
+## Sibling targets
+
+- **Temporal sibling:** [`examples/temporal/supply_chain_security/`](../../temporal/supply_chain_security/)
+- **LangGraph sibling:** [`examples/langgraph/supply_chain_security/`](../../langgraph/supply_chain_security/)
+
 ## Pending siblings
 
-- **F-WF-SCS CORE-FANOUT-TMP** — Temporal adapter for the same
-  primitive chain.
-- **F-WF-SCS CORE-FANOUT-LG** — LangGraph adapter for the same
-  primitive chain.
 - **F-WF-SCS EXTEND** — OSCAL / D3FEND / OCSF / NIS2 / DORA / CRA
   inbound + outbound mapping closure, `metric_refs` pinning the
   supplier-attestation-staleness KRI and the supply-chain coverage
