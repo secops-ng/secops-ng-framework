@@ -1,0 +1,48 @@
+# DORA orphan-CI assertion skip manifest.
+#
+# Used by `tools.lint_playbook_orphans --framework dora` (and the
+# nightly multi-framework workflow) to allow a finalized playbook to
+# stay without an inbound `playbook_refs:` citation under
+# `content/mappings/dora/` without tripping the G-02 KRI.
+#
+# Each entry is a deliberate, audited exclusion. The rationale is
+# committed history; the SKELETON guard rejects any entry that lacks
+# the two required fields. Removing a slug from this list re-arms the
+# assertion against it immediately.
+#
+# A slug listed here MUST refer to a directory under
+# `content/playbooks/` that carries a CACAO finalization marker
+# (`playbook.cacao.json` or `playbook.cacao.yaml`). Listing a
+# non-finalized or non-existent slug is a hard error.
+
+skip:
+  - slug: executive_metrics
+    rationale: >-
+      Reporting playbook that aggregates KPI/KRI evidence for board-
+      level review; it is not the operational object of any single
+      DORA Article 5/6/7/8/9/10/11/12/13/14/19/28 obligation. It
+      surfaces indirectly via the `metric_refs:` on each clause's
+      mapping rather than via `playbook_refs:`, which is the audited
+      convention for reporting playbooks across every framework.
+  - slug: incident_management
+    rationale: >-
+      Regulator-notification engine — also referenced from the NIS2
+      Art. 23 mapping tree. The DORA Art. 19 / Art. 28 narrative in
+      `content/mappings/dora/article-19-and-28.yaml` and
+      `content/mappings/dora/article-19-report-variant.md` already
+      documents the wiring; the per-clause `article-19-and-28.yaml`
+      `playbook_refs:` list currently cites the upstream incident-type
+      playbooks (`ransomware_containment`, `data_exfil`,
+      `identity_compromise`, `post_incident_review`) that feed the
+      engine. Direct `playbook.incident_management@v1` citation is
+      tracked as a per-clause content follow-up to the dora mapping
+      tree, not deferred indefinitely.
+  - slug: phishing_triage
+    rationale: >-
+      Sub-threshold for DORA major-incident classification per
+      Commission Delegated Regulation (EU) 2024/1772 of 13 March 2024;
+      `content/mappings/dora/article-19-and-28.yaml` explicitly notes
+      that phishing triage on its own does not meet the DORA reporting
+      threshold and is therefore intentionally not cited under a DORA
+      clause. CRA Art. 14 and NIS2 Art. 23 mapping trees own the
+      cross-regime citation where applicable.
