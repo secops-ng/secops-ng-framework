@@ -1,0 +1,376 @@
+# Cross-references for the detection_engineering playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed/emitted, and the EU regulatory clauses this
+# playbook helps operationalise. Inbound references live in
+# content/mappings/{nis2,dora,gdpr}/ so the graph is closed in both
+# directions.
+#
+# This playbook (F-WF-04) operates the detection-rule lifecycle as a
+# durable four-state machine: propose (intake the candidate rule
+# version and its rationale into the operator's detection store),
+# review (peer-review against the operator's review checklist and
+# record the verdict), ship (promote the approved rule version to
+# production status in the operator's detection store), and measure
+# (emit a per-rule-version effectiveness-metric snapshot shaped per
+# schemas/evidence/rule-effectiveness-snapshot.schema.json that the
+# F-CP-06 effectiveness evidence stream consumes). The lifecycle is
+# the source of audit-evident evidence that the operator's detection
+# programme assesses the effectiveness of its risk-management
+# measures over time: each shipped rule version carries a paired
+# effectiveness snapshot that pins the indicator value to the exact
+# (rule_id, rule_version) the lifecycle is operating on. The inbound
+# anchor at content/mappings/nis2/article-21-2-f.yaml backlinks this
+# playbook for exactly that reason.
+#
+# Deliberate OSCAL omissions (mirror of the omission-note pattern
+# from the cloud_misconfiguration, codebase_vuln_management,
+# iam_auditor, and on_call_rotation overlays):
+#   - SI-4 (System Monitoring) is NOT pinned: this playbook operates
+#     the upstream rule-content lifecycle (which rules exist, in
+#     what state, with what effectiveness) — the runtime monitoring
+#     surface those rules drive once shipped belongs to the
+#     per-detection playbooks and the operator's SIEM under their
+#     SI-4 policy. Pinning SI-4 here would double-count the
+#     monitoring control surface against a content-engineering step.
+#   - IR-4 (Incident Handling) is NOT pinned: the rules this
+#     playbook ships feed incident detection downstream, but the
+#     handling capability itself is operated by the per-incident
+#     playbooks (ransomware_containment, data_exfil,
+#     identity_compromise, phishing_triage, post_incident_review)
+#     which carry IR-4 on their own overlays. Detection-rule
+#     authoring is content-engineering upstream of handling.
+#   - AU-2 (Event Logging) is NOT pinned: the measure step emits
+#     OCSF Detection Finding records (shape, not subject-records),
+#     but defining the operator's audit-event policy is upstream of
+#     this playbook. The emitted records are consumed by the
+#     operator's existing OCSF store under its AU-2 policy.
+#   - RA-3 (Risk Assessment) is NOT pinned: the proposal-rationale
+#     the proposer attaches at propose typically cites the threat
+#     the rule addresses, but the organisational risk-assessment
+#     surface — what threats are in scope, what the residual risk
+#     posture is — is the F-GO-* governance layer's responsibility,
+#     not this playbook's. The lifecycle consumes the operator's
+#     risk-assessment output as context for proposal acceptance; it
+#     does not itself produce a risk assessment.
+#
+# CRA closure: the schema's top-level keys are fixed
+# (oscal/d3fend/ocsf/nis2/dora). CRA cross-references for this
+# playbook are not expressed either inbound or outbound. The
+# detection_engineering playbook is an operator-side rule-lifecycle
+# discipline — proposing, reviewing, shipping, and measuring the
+# effectiveness of internal detection rules over the operator's own
+# telemetry — not a product-side incident reporting or
+# vulnerability-disclosure flow. CRA Art. 14 product-notification
+# obligations and Annex I vulnerability-handling requirements
+# therefore do not attach here; no outbound CRA entries are emitted
+# on this overlay, consistent with siblings.
+#
+# DORA closure: DORA Art. 19 covers reporting of major ICT-related
+# incidents, and DORA Art. 6 the ICT risk-management framework
+# (Regulation (EU) 2022/2554). Neither attaches to the detection-rule
+# lifecycle on its critical path. The rules this playbook ships are
+# content inputs to the per-incident playbooks that DORA Art. 19
+# anchors against (ransomware_containment, data_exfil,
+# identity_compromise), not themselves the notification step; and
+# the ICT risk-management framework governance surface is the
+# F-GO-* governance layer's responsibility, not this playbook's.
+# No inbound DORA file backlinks playbook.detection_engineering@v1
+# today, and no outbound DORA entry is emitted on this overlay. If
+# a future DORA Art. 6 governance anchor lands that names the
+# detection-effectiveness assessment programme this playbook
+# discharges (as opposed to a per-incident notification step), an
+# outbound entry can be added together with the inbound entry —
+# mirroring the on_call_rotation DORA Art. 6 gap-note pattern: gap
+# notes are separate closure cards, not scope creep on a
+# single-purpose mappings PR.
+#
+# GDPR closure: the inbound GDPR data-flow record at
+# content/mappings/gdpr/data-flow-detection_engineering.md declares
+# this workflow OUT OF SCOPE for GDPR processing — the lifecycle
+# payload (rule identifiers, version labels, proposer rationale,
+# review verdicts, shipped-status flags, per-rule-version
+# effectiveness-metric snapshots) is detection content, not personal
+# data of a natural person under Art. 4(1). The framework treats
+# __rule_id__, __rule_version__, and __proposal_rationale__ as
+# role-shaped opaque strings; they describe detection content, not
+# data subjects. No Art. 6 lawful-basis selection is engaged on the
+# critical path. The schema's regulatory top-level keys are fixed
+# (nis2/dora) and no GDPR clause-file convention is carried today;
+# this overlay therefore emits no outbound GDPR entry, and the
+# inbound ROPA file at content/mappings/gdpr/data-flow-
+# detection_engineering.md is the authoritative GDPR record. A
+# future operator extension that attaches identity attributes to
+# the proposal envelope (proposer email, reviewer identity, etc.)
+# would re-engage Art. 6 selection on the ROPA side; this overlay
+# does not pre-emptively pin a placeholder against a non-existent
+# inbound clause anchor.
+#
+# SigmaHQ closure: the playbook's external_references carry no
+# upstream SigmaHQ rule-id TODOs because the playbook IS the rule
+# lifecycle — Sigma (or any operator-chosen detection-content
+# format) is the *payload* the lifecycle moves through propose →
+# review → ship → measure, not an external reference the lifecycle
+# pins against. Per-rule Sigma identifiers attach to the
+# __rule_id__ binding the operator's detection store assigns, not
+# to this overlay.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.detection_engineering@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the propose-rule-
+  # version, review-rule-version, ship-rule-version, and
+  # measure-rule-version steps. Catalogue URLs resolve to the public
+  # NIST OSCAL repository.
+  - id: control.control_effectiveness_test@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CA-7
+    title: Continuous Monitoring
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CA-7
+    notes: >-
+      Anchors the measure-rule-version step end-to-end: CA-7 requires
+      the organisation to develop a continuous-monitoring strategy
+      that includes establishing metrics, ongoing assessment of
+      control effectiveness, and reporting. The per-rule-version
+      effectiveness snapshot emitted at measure is the audit-evident
+      artifact that discharges that obligation across the
+      detection-rule population: each shipped rule version carries a
+      paired effectiveness snapshot pinned to the exact
+      (__rule_id__, __rule_version__) the lifecycle is operating on,
+      and the F-CP-06 effectiveness evidence stream consumes those
+      snapshots into the operator's metric sink. The playbook's own
+      x_secops_ng.control_refs declares this control on every action
+      body for exactly this reason.
+
+  - id: control.security_assessment@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CA-2
+    title: Control Assessments
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CA-2
+    notes: >-
+      Anchors the review-rule-version step: CA-2 requires the
+      organisation to assess security and privacy controls in the
+      system to determine the extent to which the controls are
+      implemented correctly, operating as intended, and producing
+      the desired outcome. The peer-review step is the per-rule-
+      version materialisation of that assessment discipline against
+      the candidate detection control: the operator's review
+      checklist (false-positive risk, ATT&CK-technique coverage
+      claim, query-cost ceiling, etc.) is the assessment criteria,
+      and __review_verdict__ ∈ {approved, changes_requested,
+      rejected} is the recorded assessment outcome. The
+      content-effectiveness loop closes at measure; the
+      control-assessment loop closes at review.
+
+  - id: control.flaw_remediation@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SI-2
+    title: Flaw Remediation
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-2
+    notes: >-
+      Covers the propose-rule-version and ship-rule-version steps as
+      the detection-content side of flaw-remediation discipline:
+      SI-2 requires the organisation to identify, report, and
+      correct system flaws, and to install security-relevant
+      updates. A detection-rule proposal is typically motivated by a
+      newly identified gap (a missed threat, a noisy false positive,
+      a regulatory baseline shift) and the ship state is the
+      promotion of the corrected rule version into production. The
+      __ship_status__ ∈ {production, staged, withdrawn} variable is
+      the audit-evident record of the remediation outcome for this
+      rule version; withdrawn carries the same audit-evidence weight
+      as production because it explicitly removes a flawed detection
+      from the operator's runtime surface.
+
+  - id: control.configuration_change_control@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CM-3
+    title: Configuration Change Control
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CM-3
+    notes: >-
+      Anchors the propose → review → ship transition as a whole:
+      CM-3 requires the organisation to determine, document, and
+      approve configuration changes to the system, with security
+      and privacy impact analyses on proposed changes and explicit
+      approval before implementation. A detection rule is a
+      configuration of the operator's SIEM / detection store; the
+      review-rule-version step is the explicit-approval discipline
+      and the ship-rule-version step is the change-implementation
+      step. The variables __review_verdict__ and __ship_status__
+      jointly form the audit-evident change-control record for the
+      rule version. The follow-up sibling card that inserts the
+      switch-condition on __review_verdict__ (approved → ship,
+      changes_requested → propose, rejected → end) is the
+      materialisation of CM-3's "approve before implementation"
+      gating.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned to the real action UUIDs resolved
+  # from content/playbooks/detection_engineering/playbook.cacao.yaml
+  # (four action bodies: propose-rule-version, review-rule-version,
+  # ship-rule-version, measure-rule-version). D3FEND v1.0.0 frames
+  # its defensive techniques around runtime countermeasures against
+  # adversary behaviours; the detection-rule lifecycle itself is
+  # content-engineering upstream of runtime countermeasures, and the
+  # closest available defensive-technique anchor that does match is
+  # D3-DA (Detection Analytics — the discipline of analysing
+  # collected data to identify adversary behaviours) at the
+  # measure-rule-version step where the lifecycle's effectiveness
+  # binding actually lives. The propose, review, and ship steps are
+  # deliberately not pinned to a D3FEND technique and the gap is
+  # documented in line (mirroring the D3-SWI / D3-UAP precedent on
+  # codebase_vuln_management and iam_auditor, and the handoff-brief
+  # gap note on on_call_rotation).
+  - step: action--f0e4f404-0000-4000-8000-000000000005
+    d3fend_id: D3-DA
+    d3fend_name: Detection Analytics
+    url: https://d3fend.mitre.org/technique/d3f:DetectionAnalytics/
+    notes: >-
+      measure-rule-version — emitting the per-rule-version
+      effectiveness snapshot is the audit-evident discharge of the
+      Detect-tactic detection-analytics discipline against the
+      operator's own detection content: the snapshot pins the
+      indicator value (detection coverage, false-positive rate,
+      control-effectiveness signal) to the exact (__rule_id__,
+      __rule_version__) the lifecycle is operating on, and the
+      F-CP-06 effectiveness evidence stream consumes those
+      snapshots into the operator's metric sink for trend analysis.
+      D3-DA frames the discipline of analysing collected data to
+      identify adversary behaviours, and the per-rule effectiveness
+      assessment is the meta-analytic that audits whether the
+      operator's analytic surface is itself fit for purpose.
+
+  # propose-rule-version (action--f0e4f404-0000-4000-8000-
+  # 000000000002), review-rule-version (action--f0e4f404-0000-4000-
+  # 8000-000000000003), and ship-rule-version (action--f0e4f404-
+  # 0000-4000-8000-000000000004) are deliberately NOT pinned to a
+  # D3FEND technique. D3FEND v1.0.0 frames its defensive techniques
+  # around runtime countermeasures against adversary behaviours;
+  # intake of a candidate detection-rule version, peer-review
+  # assessment against an operator's review checklist, and
+  # promotion of an approved rule version to production status are
+  # content-engineering disciplines upstream of runtime
+  # countermeasures, and forcing them onto a D3FEND tag (e.g.
+  # mapping propose to D3-SWI Software Inventory because the rule
+  # is a software artifact, or ship to D3-SCP System Configuration
+  # Permissions because the production-status flag is a
+  # configuration change) would misrepresent the techniques.
+  # These three steps are anchored on the CA-2, SI-2, and CM-3
+  # OSCAL controls above where the obligations actually live. This
+  # mirrors the iam_auditor and on_call_rotation pattern: pin the
+  # closest available technique only where the discipline matches,
+  # and document the absence where it does not, rather than
+  # inventing coverage.
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. The propose-rule-version,
+  # review-rule-version, and ship-rule-version steps consume and
+  # emit API Activity (6003) records against the operator's
+  # detection store and review-system endpoints (the proposal-
+  # envelope write, the verdict-record write, the production-status
+  # transition write). The measure-rule-version step emits a
+  # Detection Finding (2004) record per rule version — not as a
+  # per-event detection finding fired in production (those are
+  # emitted by the shipped rules themselves at runtime) but as the
+  # meta-finding that describes the rule version itself as a
+  # detection asset, anchored against the per-rule-version
+  # effectiveness snapshot the F-CP-06 stream consumes. The OCSF
+  # bindings here pin the runtime-side telemetry surface the
+  # operator's SIEM reads; the x_secops_ng.telemetry_refs on the
+  # playbook artifact carry the same URN pointers so the compiler
+  # can route emissions consistently across n8n / Temporal /
+  # LangGraph targets.
+  - id: telemetry.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: both
+    notes: >-
+      Consumed and emitted at the propose-rule-version,
+      review-rule-version, and ship-rule-version steps (read and
+      write calls against the operator's detection store and
+      review-system endpoints: the proposal-envelope write that
+      records __rule_id__, __rule_version__, and
+      __proposal_rationale__; the verdict-record write that records
+      __review_verdict__; the production-status transition write
+      that records __ship_status__). The api_activity records carry
+      the request metadata the operator's SIEM joins against the
+      kpi.control_effectiveness_coverage@v1 and
+      kri.overdue_effectiveness_tests@v1 metrics to audit per-rule
+      lifecycle progression. Schema:
+      https://schema.ocsf.io/1.3.0/classes/api_activity
+
+  - id: telemetry.ocsf.detection_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2004
+    class_name: Detection Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted at the measure-rule-version step as the meta-finding
+      that describes the rule version itself as a detection asset,
+      anchored against the per-rule-version effectiveness snapshot
+      shaped per schemas/evidence/rule-effectiveness-snapshot.schema.json.
+      The class_uid 2004 binding here is the canonical OCSF event
+      class the rule lifecycle's measure state binds against per
+      the playbook artifact's external_references and
+      x_secops_ng.telemetry_refs. The snapshot's source_data field
+      references an OCSF class identifier (the *shape* of the data
+      the rule queries against in production), so the Detection
+      Finding emission carries both the meta-finding payload and
+      the structural pointer the F-CP-06 effectiveness stream needs
+      to trend the indicator value across rule versions. Schema:
+      https://schema.ocsf.io/1.3.0/classes/detection_finding
+
+nis2:
+  # Inbound entry already backlinks playbook.detection_engineering@v1:
+  #   - content/mappings/nis2/article-21-2-f.yaml
+  #     (id nis2:art-21-2-f — Art. 21(2)(f) effectiveness assessment
+  #     of cybersecurity risk-management measures; the per-rule-
+  #     version effectiveness snapshot emitted by the measure state
+  #     is the audit-evident artifact)
+  # Pinned outbound below to close the graph.
+  - mapping_id: nis2:art-21-2-f
+    article: 21(2)(f)
+    notes: >-
+      NIS2 Art. 21(2)(f) requires policies and procedures to assess
+      the effectiveness of cybersecurity risk-management measures,
+      with results archived. The detection_engineering playbook's
+      measure-rule-version step is the per-rule-version
+      materialisation of that effectiveness assessment: each shipped
+      rule version carries a paired effectiveness snapshot shaped
+      per schemas/evidence/rule-effectiveness-snapshot.schema.json
+      that pins the indicator value to the exact (__rule_id__,
+      __rule_version__) the lifecycle is operating on, and the
+      F-CP-06 effectiveness evidence stream consumes those
+      snapshots into the operator's metric sink for archival and
+      trend analysis. The metric_refs the inbound entry already
+      declares (kri.control_effectiveness@v1,
+      kpi.control_effectiveness_coverage@v1,
+      kri.overdue_effectiveness_tests@v1) all attach to this
+      playbook's runtime; this outbound entry is the structural
+      closure of that backlink.
+
+dora:
+  # No inbound DORA file currently backlinks
+  # playbook.detection_engineering@v1. DORA Art. 19 covers reporting
+  # of major ICT-related incidents (the per-incident playbooks
+  # carry that anchor; detection rules are content inputs to those
+  # playbooks, not themselves the notification step) and DORA Art. 6
+  # covers the ICT risk-management framework governance surface
+  # (the F-GO-* governance layer's responsibility, not this
+  # playbook's). No outbound DORA entry is emitted on this overlay;
+  # see the file-header DORA closure note. A separate inbound-
+  # closure card would add a DORA anchor against the
+  # detection-effectiveness assessment programme this playbook
+  # discharges if and when the inbound side is populated, mirroring
+  # the on_call_rotation DORA Art. 6 gap-note pattern (gap notes are
+  # separate cards, not scope creep on a single-purpose mappings
+  # PR).
+  []
