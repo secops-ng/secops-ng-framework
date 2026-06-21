@@ -22,7 +22,14 @@
 #
 # CRA closure: phishing triage does not exercise CRA Art. 14
 # product-side vulnerability-notification obligations (those run
-# on playbook.vuln_intake@v1). No outbound CRA entries.
+# on playbook.vuln_intake@v1). The Annex I §2(2) vulnerability-
+# handling bridge — credential-harvest, BEC, and malware-attached
+# findings as vuln-intake inputs — is asserted inbound at
+# content/mappings/cra/annex-i-2-2-vuln-handling-phishing.yaml
+# (entry cra:annex-i-2-2-vuln-handling-phishing). The schema's
+# top-level keys are fixed (oscal/d3fend/ocsf/nis2/dora) and do not
+# carry a cra-key; the inbound entry is the canonical edge and a
+# footer-comment pointer is appended at the bottom of this file.
 #
 # GDPR closure: the per-workflow Art. 30 Record of Processing
 # Activity for this playbook lives at
@@ -271,3 +278,15 @@ dora:
   # No outbound DORA entries are emitted on this overlay; the
   # escalation path stays separate by design.
   []
+
+# ---------------------------------------------------------------------
+# CRA Annex I §2(2) inbound pointer (no schema cra-key; the inbound
+# entry is the canonical edge).
+#
+# See content/mappings/cra/annex-i-2-2-vuln-handling-phishing.yaml
+# (entry cra:annex-i-2-2-vuln-handling-phishing) for the
+# credential-exposure → vuln-handling bridge that closes this
+# playbook against the Annex I §2(2) vulnerability-handling lane.
+# Companion entry on the general §2(2) obligation lives at
+# content/mappings/cra/article-14-and-annex-i.yaml (entry
+# cra:annex-i-2-vuln-handling).

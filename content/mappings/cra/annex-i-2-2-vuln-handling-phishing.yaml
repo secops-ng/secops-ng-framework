@@ -1,0 +1,59 @@
+# CRA — Annex I §2(2) vulnerability-handling: phishing as a
+# credential-exposure vector into the vuln-intake lane.
+#
+# Companion to article-14-and-annex-i.yaml (entry
+# `cra:annex-i-2-vuln-handling`, which carries the general
+# product-side obligation to address and remediate vulnerabilities
+# without delay). This file pins the social-engineering surface of
+# that obligation: credential-harvest and BEC outcomes surfaced by
+# the phishing_triage playbook are themselves vulnerability-handling
+# inputs — exposed credentials and impersonation findings have to be
+# documented and remediated under the same Annex I §2(2) lane
+# operated by vuln_intake.
+regime: cra
+entries:
+  - id: cra:annex-i-2-2-vuln-handling-phishing
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §2(2)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Address and remediate vulnerabilities without delay throughout
+      the support period — including findings produced by the
+      social-engineering surface (credential-harvest, business email
+      compromise, malware-attached) where the triage outcome is the
+      exposure of a credential, an impersonated identity, or a
+      compromised endpoint that constitutes a product-side
+      vulnerability-handling input.
+    status: draft
+    control_refs:
+      - control.incident_handling_capability@v1
+      - control.vuln_disclosure_intake@v1
+    playbook_refs:
+      - playbook.phishing_triage@v1
+    metric_refs:
+      - kpi.vuln_disclosure_sla@v1
+    evidence_stream_refs:
+      - vulns
+    notes: >-
+      Companion to `cra:annex-i-2-vuln-handling` in
+      article-14-and-annex-i.yaml, which carries the general Annex I
+      §2(2) vuln-handling obligation against `playbook.vuln_intake@v1`.
+      This entry pins the credential-exposure → vuln-intake bridge:
+      the phishing_triage playbook's credential-harvest, BEC, and
+      malware-attached response branches produce findings (exposed
+      credentials, impersonated senders, compromised endpoints) that
+      are themselves vulnerability-handling inputs into the same
+      Annex I §2 lane operated by vuln_intake. Cross-links: the
+      coordinated-disclosure shell for the same lane is
+      `cra:annex-i-2-cvd-policy` (Annex I §2(5)); the
+      security-updates dissemination obligation is
+      `cra:annex-i-2-security-updates` (Annex I §2(7)); the
+      codebase-side vulnerability-management overlay is
+      `cra:annex-i-2-codebase-vuln-mgmt`. The NIS2 parallel is
+      `nis2:art-21-2-g` (basic cyber-hygiene and phishing-simulation
+      training); the DORA escalation chain runs via
+      `playbook.identity_compromise@v1` per the carve-out asserted
+      at `dora:art-18-classification`.
