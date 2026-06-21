@@ -1,0 +1,418 @@
+# Cross-references for the it_security_support_agent playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed/emitted, and the EU regulatory clauses this
+# playbook helps operationalise. Inbound references live in
+# content/mappings/{nis2,dora,gdpr}/ so the graph is closed in both
+# directions.
+#
+# The it_security_support_agent playbook is a ticket-shaped
+# support-interaction workflow: ingest one operator-supplied support
+# request, classify it (informational / actionable / incident-shaped),
+# attempt the declared automated-resolution path against the
+# operator's self-service surface, and either close the interaction
+# on a successful automated resolution OR escalate to a human
+# responder via an explicit, first-class handoff step — a support
+# interaction MUST end with either an automated-resolution closure
+# or a confirmed handoff to a human responder; the workflow does
+# not silently auto-close. It emits one interaction-evidence
+# artifact against schemas/evidence/incidents.schema.json (the
+# F-CP-02 incidents stream), feeding the same NIS2 Article 21(2)(b)
+# incident-handling capability the F-WF-05 incident_management
+# workflow discharges — the two workflows discharge complementary
+# halves of the same obligation: this playbook is the interaction
+# front-line, F-WF-05 is the lifecycle owner once an incident is
+# opened. The inbound anchor at
+# content/mappings/nis2/article-21-2-b.yaml backlinks this playbook
+# alongside the per-incident playbooks (phishing_triage,
+# identity_compromise, ransomware_containment, data_exfil,
+# post_incident_review) and the responder-readiness surface
+# (on_call_rotation) for exactly that reason.
+#
+# Deliberate OSCAL omissions (mirror of the SC-8 / SA-11 / AC-5
+# omission-note pattern from the cloud_misconfiguration,
+# codebase_vuln_management, iam_auditor, and on_call_rotation
+# overlays):
+#   - IR-6 (Incident Reporting) is NOT pinned: regulator
+#     notification (NIS2 Art. 23 24h / 72h / one-month, DORA Art. 19
+#     4h / 72h / one-month) is operated by playbook.incident_management
+#     once an incident has been opened, not by the front-line
+#     support-interaction workflow. Pinning IR-6 here would
+#     double-count the reporting surface. The handoff this playbook
+#     emits is the entry into the lifecycle F-WF-05 carries IR-6
+#     against; this overlay anchors only the handling-capability
+#     entry path.
+#   - AC-2 (Account Management) is NOT pinned: the workflow reads
+#     the requester handle from the support-request record and the
+#     responder-queue handle from the handoff-inputs envelope, but
+#     it does not provision, modify, or terminate accounts. The
+#     account-management discipline against the requester and
+#     responder populations is operated upstream by the operator's
+#     IdP and HR offboarding flow (playbook.iam_auditor anchors AC-2;
+#     playbook.onboarding_offboarding_tracker anchors the joiner /
+#     leaver surface). Pinning AC-2 here would misrepresent the
+#     account-management control surface.
+#   - AT-2 (Awareness Training) is NOT pinned: the workflow does
+#     not run the awareness-training programme or evidence its
+#     completion. The closest related surface is the phishing-
+#     simulation feedback loop already anchored on
+#     playbook.phishing_triage@v1 via nis2:art-21-2-g; the support
+#     interaction front-line is upstream of that loop.
+#   - AU-2 (Event Logging) is NOT pinned: the playbook emits OCSF
+#     API Activity records, but defining the operator's audit-event
+#     policy is upstream of this playbook. The emitted records are
+#     consumed by the operator's existing OCSF store under its AU-2
+#     policy.
+#   - IA-2 (Identification and Authentication — Organizational
+#     Users) is NOT pinned: the workflow names the requester by
+#     ticketing-source handle and the responder by role-shaped queue
+#     handle (rota id, automation responder role, on-call shift
+#     handle) for routing only; it does not itself authenticate
+#     either party. Authentication is performed by the operator's
+#     IdP / helpdesk runtime / paging system, not by this workflow.
+#
+# CRA closure: the schema's top-level keys are fixed
+# (oscal/d3fend/ocsf/nis2/dora). CRA cross-references for this
+# playbook are not expressed either inbound or outbound. The
+# it_security_support_agent is an operator-side support-interaction
+# front-line — not a product-side vulnerability disclosure flow or
+# product incident-notification flow. CRA Art. 14 product-
+# notification obligations and Annex I vulnerability-handling
+# requirements therefore do not attach here; no outbound CRA
+# entries are emitted on this overlay, consistent with siblings.
+#
+# DORA closure: no DORA inbound entry currently backlinks
+# playbook.it_security_support_agent@v1. The DORA Art. 17
+# (ICT-related incident management process) and Art. 19 (reporting
+# of major ICT-related incidents) surfaces are anchored against
+# playbook.incident_management@v1 — the lifecycle owner that
+# operates classification and the three regulator-submission
+# stages once an incident has been opened. The support-interaction
+# front-line emits the handoff that enters F-WF-05, but the
+# DORA-bearing steps (classification under Art. 18(1), four-hour
+# initial / 72h intermediate / one-month final under Art. 19(4))
+# all run on F-WF-05, not on this playbook. This overlay does NOT
+# silently widen scope to pin an outbound DORA entry against a
+# missing inbound; if a future inbound-closure card adds an
+# Art. 17 process anchor against this playbook (the front-line
+# entry path for support-to-incident handoffs in financial
+# entities), the outbound pin lands together with the inbound
+# entry. This mirrors the on_call_rotation Art. 6 gap-note
+# precedent and the contractual_obligations_tracker empty-block
+# precedent: gap notes are separate cards, not scope creep on a
+# single-purpose mappings PR. No outbound DORA entries are emitted
+# on this overlay.
+#
+# GDPR closure: inbound GDPR clause files are not carried as YAML
+# cross-references in content/mappings/gdpr/ today (the regime is
+# expressed there as per-workflow Records of Processing Activity,
+# not as Art. 32 / 33 clause anchors); the per-workflow Art. 30
+# RoPA for this playbook already lives at
+# content/mappings/gdpr/data-flow-it_security_support_agent.md and
+# covers the requester-identifier, request-metadata, classification-
+# metadata, automated-resolution-observation, human-handoff-envelope,
+# and execution-metadata processing the steps below operate on.
+# Lawful basis is grounded in Art. 6(1)(c) legal obligation where
+# NIS2 Art. 21(2)(b) transposition applies, with Art. 6(1)(f)
+# legitimate interests as the secondary basis. When a GDPR
+# clause-file convention lands, an inbound entry for Art. 32
+# (security of processing) and an Art. 22 anchor (the workflow's
+# explicit first-class human-handoff step is the technical control
+# that rules Art. 22(1) out for the front-line interaction) against
+# this playbook can be added without a schema change.
+#
+# SigmaHQ closure: the playbook does not declare detection_refs at
+# the SKELETON layer — the support-interaction front-line is a
+# triage / resolution / handoff flow, not a detection flow.
+# Detection signal feeding into the support-request stream is
+# operated upstream by playbook.detection_engineering and the
+# per-incident playbooks; no detection rule ids are pinned outbound
+# on this overlay.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.it_security_support_agent@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the ingest-support-
+  # request, classify-request, attempt-automated-resolution,
+  # escalate-with-human-handoff, and emit-interaction-evidence
+  # steps. Catalogue URLs resolve to the public NIST OSCAL
+  # repository. Anchored to the OSCAL refs declared on
+  # content/controls/control.incident_handling_capability@v1.yaml,
+  # which the playbook's per-step x_secops_ng.control_refs already
+  # tag end-to-end.
+  - id: control.incident_handling@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-4
+    title: Incident Handling
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-4
+    notes: >-
+      Anchors the playbook end-to-end as the front-line entry into
+      the incident-handling capability: IR-4 requires the
+      organisation to implement an incident-handling capability
+      that includes preparation, detection and analysis,
+      containment, eradication, and recovery. This workflow
+      operates the preparation-and-analysis-front-line slice
+      (ingest the support request, classify against the operator's
+      policy, attempt automated resolution against the declared
+      self-service surface, escalate to a human responder when
+      automated resolution does not close the request) and emits
+      the handoff envelope that opens the
+      playbook.incident_management@v1 lifecycle where containment,
+      eradication, and recovery are operated. Pinning IR-4 here
+      mirrors the same anchor on the per-incident playbooks
+      (phishing_triage, identity_compromise, ransomware_containment,
+      data_exfil) — the support front-line and the per-incident
+      handling capability are complementary halves of the same IR-4
+      surface.
+
+  - id: control.incident_response_plan@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-8
+    title: Incident Response Plan
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-8
+    notes: >-
+      The CACAO playbook is the executable form of the
+      incident-response plan for the support-interaction
+      front-line: IR-8 requires the organisation to define and
+      maintain an incident-response plan that identifies the
+      roles, responsibilities, and escalation paths used. The
+      five-step ordered topology (ingest → classify → attempt
+      automated resolution → explicit human handoff → emit
+      interaction evidence) and the first-class handoff step
+      together are the plan artefact a reviewer reads to see how
+      a support request becomes an incident-handling event under
+      the plan.
+
+  - id: control.incident_response_assistance@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-7
+    title: Incident Response Assistance
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-7
+    notes: >-
+      Anchors the escalate-with-human-handoff step: IR-7 requires
+      the organisation to provide an incident-response support
+      resource that offers advice and assistance to users for the
+      handling and reporting of security incidents. The
+      first-class explicit handoff step (role-shaped responder
+      queue handle, handoff trigger reason, operator-bound
+      acknowledgement reference) is the audit-evident discharge
+      of that assistance obligation at the front-line entry
+      point: every support interaction either closes on the
+      declared self-service surface or hands off to a human
+      responder along the operator's pre-bound channel, never a
+      silent auto-close. Mirrors the IR-7 anchor on the
+      on_call_rotation overlay (generate-handoff-brief / notify-
+      incoming-on-call) — the two playbooks operate complementary
+      assistance surfaces (front-line interaction handoff vs.
+      shift-boundary handoff).
+
+  - id: control.incident_monitoring@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-5
+    title: Incident Monitoring
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-5
+    notes: >-
+      Covers the emit-interaction-evidence step: IR-5 requires the
+      organisation to track and document incidents. The
+      interaction-evidence artifact (request reference + closed
+      classification verdict + automated-resolution observation
+      envelope + human-handoff envelope + execution metadata)
+      emitted against schemas/evidence/incidents.schema.json is
+      the per-execution audit trail that documents the front-line
+      interaction outcome — closed on the intake-only audit-close
+      branch (classification.significant=false) for automated-
+      resolution closures, and on the significance-anchored
+      branch (classification.significant=true) for handoffs that
+      open an incident on the F-WF-05 lifecycle. The F-CP-02
+      incidents evidence stream is the shared track-and-document
+      surface both this playbook and incident_management feed.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned to the real action UUIDs resolved
+  # from content/playbooks/it_security_support_agent/playbook.cacao.json
+  # (five action bodies: ingest-support-request, classify-request,
+  # attempt-automated-resolution, escalate-with-human-handoff,
+  # emit-interaction-evidence). D3FEND v1.0.0 frames its defensive
+  # techniques around runtime countermeasures against adversary
+  # behaviours; the support-interaction front-line is a triage /
+  # resolution / handoff governance flow, so only the
+  # classification step has a clean D3FEND anchor. The remaining
+  # steps are documented absences (mirroring the iam_auditor D3-UAP
+  # gap note and the on_call_rotation handoff-brief gap note: pin
+  # the closest available technique only where the discipline
+  # matches, and document the absence where it does not, rather
+  # than inventing coverage).
+  - step: action--20122012-0000-4000-8000-000000000003
+    d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    notes: >-
+      classify-request — application of the operator-supplied
+      classification policy against the ingested support-request
+      record, producing the closed `category` (informational /
+      actionable / incident-shaped) + severity band + ordered
+      rule_ids verdict that gates the downstream resolution and
+      handoff steps. D3-IRA frames the Detect-tactic analytic
+      surface that turns a raw support request into a triage
+      verdict; the closed-shape re-validation at the primitive
+      boundary is what makes the verdict reviewable.
+
+  # ingest-support-request (action--20122012-0000-4000-8000-
+  # 000000000002) is deliberately NOT pinned to a D3FEND technique.
+  # The step is a read-only bind from an operator-supplied
+  # ticketing source to a normalised in-workflow record — it does
+  # not itself run a defensive countermeasure against any
+  # adversary behaviour. Forcing it onto a D3-AM (Account
+  # Monitoring) or D3-OSM (Operating System Monitoring) tag would
+  # misrepresent the technique (the requester handle is read for
+  # the purpose of routing the interaction, not to monitor the
+  # account). The OSCAL anchor for the step is IR-4 / IR-8 above,
+  # where the obligation actually lives.
+  #
+  # attempt-automated-resolution (action--20122012-0000-4000-8000-
+  # 000000000004) is deliberately NOT pinned. The step executes
+  # the operator-declared automated-resolution action set against
+  # the operator's self-service surface — knowledge-base lookup
+  # for informational requests, parameterised self-service action
+  # for actionable requests, no-attempt pass-through for incident-
+  # shaped requests. D3FEND v1.0.0 does not carry a defensive
+  # technique for "operator-declared self-service action set
+  # execution"; the closest tags (D3-RUA Remediate User Account,
+  # D3-NTF Network Traffic Filtering) all over-specify the runtime
+  # surface, which is operator-bound and intentionally open-ended.
+  # The OSCAL anchor for the step is IR-4 above (the handling
+  # capability slice this workflow operates).
+  #
+  # escalate-with-human-handoff (action--20122012-0000-4000-8000-
+  # 000000000005) is deliberately NOT pinned. Structured handoff-
+  # envelope materialisation and responder-queue acknowledgement
+  # is a responder-readiness governance discipline, not a runtime
+  # countermeasure against an adversary behaviour. The step is
+  # anchored on the IR-7 OSCAL control above (Incident Response
+  # Assistance) where the obligation actually lives. This mirrors
+  # the on_call_rotation generate-handoff-brief / notify-incoming-
+  # on-call gap-note pattern.
+  #
+  # emit-interaction-evidence (action--20122012-0000-4000-8000-
+  # 000000000006) is deliberately NOT pinned. Artifact composition
+  # against schemas/evidence/incidents.schema.json and emission
+  # to the operator-bound evidence store is a documentation
+  # discipline, not a runtime countermeasure. The step is
+  # anchored on the IR-5 OSCAL control above (Incident
+  # Monitoring) where the track-and-document obligation lives.
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. Every step of the playbook
+  # tags telemetry.ocsf.api_activity@v1 on its x_secops_ng
+  # telemetry_refs, so the runtime-side telemetry surface this
+  # overlay pins is a single API Activity (6003) binding consumed
+  # and emitted across the five action bodies:
+  #   - ingest-support-request: CONSUMES API Activity (read against
+  #     the operator's ticketing source to fetch the support
+  #     request).
+  #   - classify-request: CONSUMES + EMITS API Activity (reads the
+  #     normalised record + the operator-supplied classification
+  #     verdict; emits the closed verdict record).
+  #   - attempt-automated-resolution: CONSUMES + EMITS API Activity
+  #     (calls against the operator's self-service surface — KB
+  #     lookup, parameterised self-service action — and reads back
+  #     the closed observation envelope).
+  #   - escalate-with-human-handoff: CONSUMES + EMITS API Activity
+  #     (acknowledges against the operator's responder queue and
+  #     re-reads the queue surface to confirm landing).
+  #   - emit-interaction-evidence: EMITS API Activity (the artifact
+  #     emission to the operator's incidents evidence store).
+  # The OCSF Detection Finding (2004) class is intentionally NOT
+  # pinned here: the workflow does not emit a detection finding;
+  # the F-CP-02 interaction-evidence artifact this playbook emits
+  # is schema-shaped against schemas/evidence/incidents.schema.json
+  # at the artifact layer, with the OCSF telemetry projection
+  # already collapsed onto api_activity per the playbook's per-step
+  # x_secops_ng.telemetry_refs.
+  - id: telemetry.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: both
+    notes: >-
+      Consumed at ingest-support-request (read calls against the
+      operator's ticketing source — sovereign EU helpdesk runtime,
+      on-prem ITSM, Git-managed request inbox, or mailbox bridge
+      — that hydrate the normalised support-request record),
+      consumed and emitted at classify-request (closed-verdict
+      re-validation and verdict-record emission), consumed and
+      emitted at attempt-automated-resolution (calls into the
+      operator's self-service surface and read-back of the closed
+      observation envelope), consumed and emitted at
+      escalate-with-human-handoff (acknowledgement against the
+      operator's role-shaped responder queue and re-read of the
+      queue surface to confirm landing), and emitted at
+      emit-interaction-evidence (the interaction-evidence
+      artifact emission to the operator's incidents evidence
+      store under content/evidence/incidents/). The api_activity
+      records carry the request metadata the EXTEND-metrics
+      sibling card's automated-resolution-rate KPI and
+      handoff-acknowledgement-time KRI will read once those land.
+      Schema: https://schema.ocsf.io/1.3.0/classes/api_activity
+
+nis2:
+  # Inbound entry already backlinks playbook.it_security_support_agent@v1:
+  #   - content/mappings/nis2/article-21-2-b.yaml
+  #     (id nis2:art-21-2-b — incident-handling capability;
+  #     front-line support-to-incident entry path)
+  # Pinned outbound below to close the graph.
+  - mapping_id: nis2:art-21-2-b
+    article: 21(2)(b)
+    notes: >-
+      NIS2 Art. 21(2)(b) requires operating an incident-handling
+      capability (detect, triage, contain, remediate, capture
+      lessons learned). The it_security_support_agent playbook
+      discharges the front-line entry path into that capability:
+      one support request per execution, classified against the
+      operator's policy, attempted-automatically against the
+      declared self-service surface, and either closed or
+      explicitly handed off to the human responder that opens the
+      incident on the playbook.incident_management@v1 lifecycle.
+      The first-class explicit handoff step guarantees that the
+      front-line never silently auto-closes a support interaction
+      — every interaction emits an interaction-evidence artifact
+      against the F-CP-02 incidents stream, with
+      classification.significant=true on the handoff path (so the
+      incident-handling KPI surface counts it once on the same
+      Art. 21(2)(b) anchor F-WF-05 discharges) and
+      classification.significant=false on the automated-resolution
+      closure path (the schema's intake-only audit-close branch).
+      The inbound entry's `playbook_refs` already lists this
+      playbook alongside the per-incident playbooks
+      (phishing_triage, identity_compromise, ransomware_containment,
+      data_exfil, post_incident_review) and the responder-readiness
+      surface (on_call_rotation); this outbound entry is the
+      structural closure of that backlink.
+
+dora:
+  # No DORA inbound entry currently backlinks
+  # playbook.it_security_support_agent@v1. The DORA-bearing steps
+  # for ICT-related incidents (classification under Art. 18(1),
+  # four-hour initial / 72h intermediate / one-month final under
+  # Art. 19(4)) all run on playbook.incident_management@v1 — the
+  # lifecycle owner once an incident has been opened, which carries
+  # the dora:art-18-classification, dora:art-19-initial-4h,
+  # dora:art-19-intermediate-72h, and dora:art-19-final-one-month
+  # backlinks on its own overlay. This overlay does NOT silently
+  # widen scope to pin an outbound DORA entry against a missing
+  # inbound; a separate inbound-closure card (e.g. an Art. 17
+  # ICT-related-incident-management-process anchor against the
+  # support-interaction front-line, where the policy surface would
+  # rightfully attach) adds the inbound entry and the outbound pin
+  # lands together with it. This mirrors the on_call_rotation
+  # DORA Art. 6 gap-note precedent (PR #389/#390/#391) and the
+  # contractual_obligations_tracker empty-block precedent
+  # (PR #395): gap notes are separate cards, not scope creep on a
+  # single-purpose mappings PR. No outbound DORA entries are
+  # emitted on this overlay.
+  []
