@@ -1,0 +1,58 @@
+# CRA — Annex I §1(l) logging-and-monitoring (alert-triage edge).
+#
+# Companion to annex-i-1-essential-cybersecurity.yaml (entry
+# `cra:annex-i-1-logging-monitoring`, the §1(l) catch-all that pins
+# detection-coverage evidence and the recurring-incident correlator).
+# This file pins the operational-triage half of the same §1(l)
+# capability: once products emit security-related records, the
+# operator has to triage those signals durably to demonstrate the
+# logging-and-monitoring obligation is live and useful — not merely
+# that the records are being written.
+#
+# Pairs with the sibling rule-lifecycle edge
+# `cra:annex-i-1-l-logging-monitoring-detection-engineering`, which
+# pins the upstream half (rule authorship and tuning behind the same
+# §1(l) capability). Together the two edges cover rule lifecycle and
+# triage; this file is the triage half.
+regime: cra
+entries:
+  - id: cra:annex-i-1-l-logging-monitoring-alert-triage
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §1(l)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Products with digital elements shall provide security-related
+      information by recording and monitoring relevant internal
+      activity, including the access to or modification of data,
+      services or functions, with an opt-out mechanism for the user —
+      operationalised through durable triage of the resulting alert
+      stream so that recording and monitoring remain demonstrably
+      live and consequential, not merely emitted.
+    status: draft
+    control_refs:
+      - control.detection_coverage_evidence@v1
+      - control.recurring_incident_correlator@v1
+    playbook_refs:
+      - playbook.alert_triage@v1
+    metric_refs:
+      - kpi.mttr@v1
+      - kri.false_positive_rate@v1
+    evidence_stream_refs:
+      - alerts
+    notes: >-
+      Companion to `cra:annex-i-1-logging-monitoring` in
+      annex-i-1-essential-cybersecurity.yaml, which pins the §1(l)
+      catch-all (detection-coverage evidence plus the recurring-
+      incident correlator). This entry pins the operational-triage
+      half: the alert_triage playbook is the durable lane that
+      consumes the product-emitted signal stream and produces the
+      evidence that monitoring is consequential. Pairs with the
+      sibling rule-lifecycle edge
+      `cra:annex-i-1-l-logging-monitoring-detection-engineering`,
+      which carries the upstream rule authorship and tuning behind
+      the same §1(l) capability. The NIS2 parallel is
+      `nis2:art-21-2-b` (incident handling); the DORA parallel is
+      `dora:art-17-incident-management-process`.
