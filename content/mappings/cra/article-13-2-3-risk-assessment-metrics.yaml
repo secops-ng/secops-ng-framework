@@ -1,0 +1,65 @@
+# CRA — Article 13(2)–(3) risk assessment, metrics roll-up companion.
+#
+# Companion to article-13.yaml (entry `cra:art-13-risk-assessment`,
+# which covers the procedural shell around Art.13(2)–(3): a dated
+# risk-management policy paired with a recurring framework review
+# that shows the assessment remains live across the product
+# lifecycle). This file pins the KPI/KRI roll-up surface that
+# materialises the manufacturer's risk posture per cadence: the
+# executive_metrics rollup loads the operator's pinned KPI/KRI
+# catalogue, evaluates each entry against its threshold bands over
+# the rollup window, scores per-control effectiveness, and emits a
+# board-ready summary artifact. That recurring measurement is how
+# Art.13(2)–(3)'s "take the outcome of that assessment into account
+# during the planning, design, development, production, delivery
+# and maintenance phases" stays auditable across the product
+# lifecycle — the risk-assessment policy in article-13.yaml is the
+# upstream artefact, this overlay is the recurring evidence that
+# the assessment continues to bind operational decisions.
+regime: cra
+entries:
+  - id: cra:art-13-2-3-risk-assessment-metrics
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: "13(2)–(3)"
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Manufacturers shall undertake an assessment of the cybersecurity
+      risks associated with the product with digital elements and take
+      the outcome of that assessment into account during the planning,
+      design, development, production, delivery and maintenance phases
+      of the product, with a view to minimising cybersecurity risks,
+      preventing security incidents and minimising the impacts of such
+      incidents — including by maintaining a recurring KPI/KRI
+      roll-up of the manufacturer's risk posture that surfaces
+      breach-band excursions and overdue corrective actions to the
+      board across the product lifecycle.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+      - control.control_effectiveness_test@v1
+    playbook_refs:
+      - playbook.executive_metrics@v1
+    metric_refs:
+      - kpi.review_completion_sla@v1
+      - kpi.corrective_action_close_rate@v1
+      - kri.corrective_action_overdue@v1
+    notes: >-
+      Companion to `cra:art-13-risk-assessment` in article-13.yaml,
+      which pins the procedural shell of the Art.13(2)–(3)
+      obligation (a dated risk-management policy and a recurring
+      framework review). This entry pins the metrics roll-up that
+      shows the risk posture remains live: the executive_metrics
+      playbook loads the operator's pinned KPI/KRI catalogue
+      version, validates each entry against the content-model
+      metrics schema, computes per-metric evaluations over the
+      rollup window, groups them by control_ref to derive a
+      composite control-effectiveness score in 0.0..1.0, raises a
+      board-attention flag on any breach-band excursion, and emits
+      a board-ready summary artifact. The NIS2 parallel is
+      `nis2:art-21-2-f` (effectiveness assessment of cybersecurity
+      risk-management measures, with results archived); the DORA
+      parallel is `dora:art-6-framework` (ICT risk-management
+      framework periodic review).
