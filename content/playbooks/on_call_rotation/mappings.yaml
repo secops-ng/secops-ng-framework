@@ -414,3 +414,20 @@ dora:
       escalation-tier surface of the same arrangement. The inbound
       entry already lists this playbook for exactly that reason;
       this outbound entry closes the graph.
+
+
+# CRA closure: the playbook-mappings schema's top-level keys are fixed
+# (oscal/d3fend/ocsf/nis2/dora). The inbound CRA backlink for this
+# playbook lives at
+# content/mappings/cra/article-13-12-spoc-on-call-rotation.yaml
+# (id cra:art-13-12-spoc-on-call-rotation) — Art.13(12) requires
+# manufacturers to provide a single point of contact for users to
+# communicate directly and rapidly with them, including for the
+# reporting of vulnerabilities, and on_call_rotation is the
+# after-hours reachability slice that keeps the Annex I §2(5)
+# coordinated-vulnerability-disclosure intake reachable outside
+# business hours. Sibling to the business-hours edge filed against
+# the same Art.13(12) SPOC clause for the it_security_support_agent
+# playbook. No outbound pin block is emitted here because the
+# schema does not currently carry a CRA key; the EXTEND layer that
+# adds CRA to the schema is filed as a sibling card.
