@@ -77,16 +77,22 @@
 #     access-management observational anchor on its own overlay.
 #
 # CRA closure: the schema's top-level keys are fixed
-# (oscal/d3fend/ocsf/nis2/dora). CRA cross-references for this
-# playbook are not expressed either inbound or outbound. The
-# infra_posture_management playbook is an operator-side posture-
-# evidence discipline — continuous attestation that the operator's
-# own infrastructure remains in its declared baseline — not a
-# product-side incident reporting or vulnerability-disclosure flow.
-# CRA Art. 14 product-notification obligations and Annex I
-# vulnerability-handling requirements therefore do not attach here;
-# no outbound CRA entries are emitted on this overlay, consistent
-# with siblings.
+# (oscal/d3fend/ocsf/nis2/dora) and do not currently carry a CRA key.
+# The inbound CRA backlink for this playbook is closed at
+# content/mappings/cra/annex-i-1-b-secure-by-default-infra-posture.yaml
+# (id cra:annex-i-1-b-secure-by-default-infra-posture) — Annex I §1(b)
+# secure-by-default configuration, pinning the drift-detection lane
+# (continuous attestation that the deployed configuration remains in
+# the declared §1(b) baseline) as the structural companion to
+# `cra:annex-i-1-secure-by-default` (which pins `cloud_misconfiguration`
+# as the misconfiguration-remediation lane against the same baseline).
+# CRA Art. 14 product-notification obligations and Annex I §2
+# vulnerability-handling requirements do not attach here — this is an
+# operator-side posture-evidence discipline, not a product-side
+# incident or disclosure flow. No outbound CRA block is emitted here;
+# the EXTEND layer that adds CRA to the schema is filed as a sibling
+# card. The CRA closure footer at file foot restates the pointer
+# below the existing nis2 / dora regime blocks.
 #
 # DORA closure: DORA Art. 9 (protection and prevention) and DORA
 # Art. 6 (ICT risk-management framework, Regulation (EU) 2022/2554)
@@ -440,3 +446,17 @@ dora:
   # closure precedent: gap notes are separate closure cards, not
   # scope creep on a single-purpose mappings PR.
   []
+
+# CRA closure (footer pointer): the inbound CRA backlink for this
+# playbook is closed at
+# content/mappings/cra/annex-i-1-b-secure-by-default-infra-posture.yaml
+# (id cra:annex-i-1-b-secure-by-default-infra-posture) — Annex I §1(b)
+# secure-by-default configuration. The drift-detection lane this
+# playbook operates is the structural companion to
+# `cra:annex-i-1-secure-by-default` (which pins `cloud_misconfiguration`
+# as the misconfiguration-remediation lane against the same §1(b)
+# baseline). No outbound CRA pin block is emitted here because the
+# playbook-mappings schema's top-level regime keys are fixed
+# (oscal/d3fend/ocsf/nis2/dora) and do not currently carry a CRA key;
+# the EXTEND layer that adds CRA to the schema is filed as a sibling
+# card.
