@@ -13,19 +13,20 @@ carry a `cra:` block — extending the schema is filed as a sibling
 EXTEND card; for now CRA closure is asserted in comments at the foot
 of each playbook overlay.
 
-## Mapped (7 / 19)
+## Mapped (8 / 19)
 
 | Playbook | Inbound entry |
 |----------|---------------|
 | `cloud_misconfiguration` | `cra:annex-i-1-secure-by-default` |
 | `codebase_vuln_management` | `cra:annex-i-2-codebase-vuln-mgmt` |
+| `contractual_obligations_tracker` | `cra:art-13-4-component-due-diligence-contracts` |
 | `data_exfil` | `cra:art-14-severe-incident` |
 | `identity_compromise` | `cra:annex-i-1-secure-by-default` |
 | `post_incident_review` | `cra:art-14-final-report` |
 | `ransomware_containment` | `cra:art-14-severe-incident` |
 | `vuln_intake` | `cra:annex-i-2-*`, `cra:art-13-*`, `cra:art-14-*` |
 
-## Orphaned (12 / 19)
+## Orphaned (11 / 19)
 
 Playbooks shipped without any inbound CRA entry. Each row notes the
 nearest candidate CRA clause; the actual edge belongs in a per-clause
@@ -34,7 +35,6 @@ yaml under this directory rather than as a comment.
 | Playbook | Nearest CRA clause | Notes |
 |----------|--------------------|-------|
 | `alert_triage` | Annex I §1(j) logging-and-monitoring | Operational triage of product-emitted signals. |
-| `contractual_obligations_tracker` | Art. 13(4) component due diligence | Supplier / third-party attestation surface. |
 | `detection_engineering` | Annex I §1(j) logging-and-monitoring | Rule lifecycle behind the §1(j) monitoring capability. |
 | `executive_metrics` | Art. 13(2)–(3) risk assessment | KPI/KRI roll-up for the manufacturer risk posture. |
 | `iam_auditor` | Annex I §1(d) access control | Periodic access-attestation against the §1(d) baseline. |
