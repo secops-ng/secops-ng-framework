@@ -1,0 +1,61 @@
+# CRA — Annex I §1(b) secure-by-default configuration — infrastructure
+# posture drift detection lane.
+#
+# Companion to `cra:annex-i-1-secure-by-default` in
+# annex-i-1-essential-cybersecurity.yaml, which already pins
+# `cloud_misconfiguration` against Annex I §1(b). This file pins the
+# infrastructure-posture drift-detection sub-lane: the secure-by-
+# default obligation under §1(b) is not satisfied by a one-shot
+# baseline declaration — it has to be paired with a continuous
+# attestation surface that detects when the deployed configuration
+# drifts from the declared baseline. The infra_posture_management
+# playbook is that surface: on each scheduled re-execution it collects
+# per-resource configuration state, evaluates each declared control
+# against the baseline, and emits one posture-evidence artifact shaped
+# per schemas/evidence/posture.schema.json.
+regime: cra
+entries:
+  - id: cra:annex-i-1-b-secure-by-default-infra-posture
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §1(b)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Products with digital elements shall be made available on the
+      market with a secure-by-default configuration, including the
+      possibility to reset the product to its original state, on the
+      basis of the risk assessment referred to in Article 13(3) —
+      and the deployed configuration shall remain demonstrably aligned
+      with that baseline over the support period through a documented
+      continuous-attestation discipline that detects and records
+      drift from the declared baseline.
+    status: draft
+    control_refs:
+      - control.cspm_baseline@v1
+      - control.baseline_configuration@v1
+      - control.configuration_settings@v1
+    playbook_refs:
+      - playbook.infra_posture_management@v1
+    metric_refs:
+      - kpi.cloud_posture_coverage@v1
+      - kri.control_effectiveness@v1
+    evidence_stream_refs:
+      - posture
+    notes: >-
+      Companion to `cra:annex-i-1-secure-by-default` in
+      annex-i-1-essential-cybersecurity.yaml, which pins
+      `cloud_misconfiguration` against the §1(b) baseline as the
+      misconfiguration-remediation lane. This entry pins the drift-
+      detection lane: infra_posture_management is the continuous-
+      attestation surface that demonstrates the deployed configuration
+      remains in the declared §1(b) baseline across scheduled re-
+      executions, emitting one posture-evidence artifact per run that
+      a reviewer can re-derive deterministically from the committed
+      snapshot and policy version. The NIS2 parallel is
+      `nis2:art-21-2-a` (policies on the security of network and
+      information systems, periodic re-assessment with dated
+      ownership) which already backlinks this playbook; the §1(b)
+      drift-detection pin is the structural CRA-side complement of
+      that periodic-re-assessment obligation.
