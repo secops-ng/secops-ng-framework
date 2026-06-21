@@ -1,0 +1,273 @@
+# Cross-references for the phishing_triage playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed/emitted, and the EU regulatory clauses this
+# playbook helps operationalise. Inbound references live in
+# content/mappings/{nis2,dora}/ so the graph is closed in both
+# directions.
+#
+# DORA closure: the schema's top-level keys are fixed
+# (oscal/d3fend/ocsf/nis2/dora). Phishing triage on its own is
+# sub-threshold for DORA Art. 18 major-classification — the BEC
+# and credential-harvest response branches hand off to
+# playbook.identity_compromise@v1 (and, where exfil follows, to
+# playbook.data_exfil@v1) for the regulator-notification chain.
+# This carve-out is asserted on the inbound side at
+# content/mappings/dora/article-19-and-28.yaml (entry
+# dora:art-18-classification explicitly excludes phishing_triage),
+# so the outbound dora array on this overlay is intentionally
+# empty. The escalation path is captured by the downstream
+# playbooks' own overlays.
+#
+# CRA closure: phishing triage does not exercise CRA Art. 14
+# product-side vulnerability-notification obligations (those run
+# on playbook.vuln_intake@v1). No outbound CRA entries.
+#
+# GDPR closure: the per-workflow Art. 30 Record of Processing
+# Activity for this playbook lives at
+# content/mappings/gdpr/data-flow-phishing_triage.md and covers
+# the message-content, header, URL, attachment, and recipient-
+# identifier processing the enrichment and response steps below
+# operate on.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.phishing_triage@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the intake,
+  # enrichment, suppression, intent-classification, and response
+  # branches. Catalogue URLs resolve to the public NIST OSCAL
+  # repository. Anchored to the OSCAL refs declared on
+  # content/controls/control.incident_handling_capability@v1.yaml,
+  # control.incident_timeline_signals@v1.yaml,
+  # control.training_attestation@v1.yaml,
+  # control.phishing_simulation@v1.yaml, and
+  # control.recurring_incident_correlator@v1.yaml.
+  - id: control.incident_handling@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-4
+    title: Incident Handling
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-4
+    notes: >-
+      Anchors the playbook end-to-end as the incident-handling
+      capability for inbound suspicious-email cases: intake,
+      enrichment, suppression, intent classification, and the five
+      response branches exercised step-by-step.
+
+  - id: control.incident_monitoring@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-5
+    title: Incident Monitoring
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-5
+    notes: >-
+      Covers the timeline-signal control wired through the
+      response branches (phishing, credential-harvest, malware-
+      attached, BEC, manual-review): each branch stamps the
+      phishing MTTR clock and the BEC branch additionally stamps
+      the timeline-completeness KPI and the regulator-overrun KRI
+      so a reviewer can audit per-case lifecycle anchors.
+
+  - id: control.incident_response_assistance_correlation@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-4(4)
+    title: Incident Handling | Information Correlation
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-4(4)
+    notes: >-
+      Covers the suppression branch: an already-seen case
+      fingerprint or known-benign sender is correlated against the
+      live case set and linked onto the existing case (or onto the
+      sender record) without paging — the recurring-incident
+      correlator semantics applied at the report grain.
+
+  - id: control.literacy_training@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AT-2
+    title: Literacy Training and Awareness
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AT-2
+    notes: >-
+      Covers the intake source accounting at the ingest step:
+      user-reported messages are the operational evidence of the
+      literacy / awareness programme, while mailbox-sweep reports
+      cover the population the programme has not yet reached. The
+      __report_source__ split lets the operator account both
+      streams against the awareness control.
+
+  - id: control.literacy_training_inside_threat@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AT-2(3)
+    title: Literacy Training and Awareness | Social Engineering and Mining
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AT-2(3)
+    notes: >-
+      Covers the simulation accounting on the credential-harvest
+      response branch: clickers identified from URL Activity
+      telemetry on a sanctioned phishing-simulation source feed
+      the simulation click-rate KPI that the social-engineering
+      training enhancement is measured against.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned where the technique applies to a
+  # single step. Anchored to D3-MA / D3-SRA / D3-IRA from the
+  # controls' d3fend_refs and the playbook's own D3FEND sources.
+  - step: action--c0a17a01-0000-4000-8000-000000000002
+    d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    notes: >-
+      ingest report — hydration of the reported email's envelope,
+      headers, body, and attachment metadata from the email-
+      security platform so the enrichment and intent-classification
+      steps can run against a canonical case object. The
+      __report_source__ split (user_report vs mailbox_sweep) is
+      carried through for downstream metric accounting.
+
+  - step: action--c0a17a01-0000-4000-8000-000000000003
+    d3fend_id: D3-MA
+    d3fend_name: Message Authentication
+    url: https://d3fend.mitre.org/technique/d3f:MessageAuthentication/
+    notes: >-
+      enrich headers — sender-domain authentication via SPF, DKIM,
+      and DMARC against the reported envelope. The verdict per
+      mechanism is carried on the enriched case object that the
+      intent classifier reads from.
+
+  - step: action--c0a17a01-0000-4000-8000-000000000003
+    d3fend_id: D3-SRA
+    d3fend_name: Sender Reputation Analysis
+    url: https://d3fend.mitre.org/technique/d3f:SenderReputationAnalysis/
+    notes: >-
+      enrich headers / URLs — sender-domain reputation lookup and
+      URL reputation against the operator's allow/deny posture.
+      Correlated against the Sigma email-related rule references
+      pinned on the playbook's CACAO x_secops_ng.detection_refs.
+
+  - step: action--c0a17a01-0000-4000-8000-000000000006
+    d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    notes: >-
+      classify intent — application of the operator's intent
+      classifier (rule-based, ML, or analyst-review per maturity)
+      to the enriched evidence, producing one of phishing,
+      credential_harvest, malware_attached, business_email_
+      compromise, or unknown. The classifier itself is operator-
+      bound; only the output contract is fixed by this playbook.
+
+  - step: action--c0a17a01-0000-4000-8000-00000000000b
+    d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    notes: >-
+      response: business email compromise — escalation to the
+      fraud / finance liaison, freeze of any pending payment
+      instruction tied to the message, and hand-off to an
+      identity_compromise sub-investigation for the impersonated
+      or compromised sender account. The branch stamps the
+      timeline-completeness KPI and the regulator-notification-
+      overrun KRI alongside the phishing MTTR clock because a
+      BEC case routinely trips the NIS2 Art. 23 / DORA Art. 19
+      reporting chain on the downstream playbook.
+
+ocsf:
+  # OCSF telemetry bindings. The enrichment and intent-classification
+  # steps consume Email Activity, Email URL Activity, and File
+  # Activity records against the reported message; the credential-
+  # harvest response branch additionally reads URL Activity to
+  # identify clickers and the malware-attached response branch
+  # reads File Activity to correlate any recipients who opened the
+  # attachment. The playbook itself does not emit a new OCSF class
+  # — it consumes the upstream email-security platform's records
+  # and the case envelope it produces is operator-canonical, not
+  # OCSF-typed. The Email URL Activity class is OCSF v1.4.0+; the
+  # playbook's own sources cite OCSF v1.4.0 so the overlay binds
+  # against that version end-to-end for consistency.
+  - id: telemetry.email_activity@v1
+    category_uid: 4
+    category_name: Network Activity
+    class_uid: 4009
+    class_name: Email Activity
+    ocsf_version: "1.4.0"
+    direction: consumes
+    notes: >-
+      Consumed at the ingest and enrichment steps as the canonical
+      envelope-and-header record for the reported message. Anchored
+      to the telemetry.ocsf.email_activity@v1 ref declared on the
+      playbook's CACAO x_secops_ng.telemetry_refs. Schema:
+      https://schema.ocsf.io/1.4.0/classes/email_activity
+
+  - id: telemetry.email_url_activity@v1
+    category_uid: 4
+    category_name: Network Activity
+    class_uid: 4012
+    class_name: Email URL Activity
+    ocsf_version: "1.4.0"
+    direction: consumes
+    notes: >-
+      Consumed at the enrichment step (URL reputation against
+      operator allow/deny posture) and at the credential-harvest
+      response branch (identifying clickers so identity team can
+      force credential reset / step-up). Anchored to the
+      telemetry.ocsf.email_url_activity@v1 ref declared on the
+      playbook's CACAO x_secops_ng.telemetry_refs. Schema:
+      https://schema.ocsf.io/1.4.0/classes/email_url_activity
+
+  - id: telemetry.file_activity@v1
+    category_uid: 1
+    category_name: System Activity
+    class_uid: 1001
+    class_name: File Activity
+    ocsf_version: "1.4.0"
+    direction: consumes
+    notes: >-
+      Consumed at the enrichment step (attachment static-analysis
+      record) and at the malware-attached response branch
+      (correlating any recipient host-side open of the attachment
+      so the endpoint owner playbook receives the right targets).
+      Anchored to the telemetry.ocsf.file_activity@v1 ref declared
+      on the playbook's CACAO x_secops_ng.telemetry_refs. Schema:
+      https://schema.ocsf.io/1.4.0/classes/file_activity
+
+nis2:
+  # Inbound entries live at content/mappings/nis2/article-21-2-b.yaml
+  # (id nis2:art-21-2-b — incident-handling capability) and
+  # content/mappings/nis2/article-21-2-g.yaml (id nis2:art-21-2-g
+  # — basic cyber-hygiene practices and training including phishing-
+  # simulation exercises), both of which list
+  # playbook.phishing_triage@v1 on their playbook_refs.
+  - mapping_id: nis2:art-21-2-b
+    article: 21(2)(b)
+    notes: >-
+      NIS2 Art. 21(2)(b) requires operation of an incident-handling
+      capability: detect, triage, contain, remediate, and capture
+      lessons learned. The phishing_triage playbook is the
+      operational discharge of the triage and (for the four
+      typed-intent branches) the contain-and-remediate stages for
+      inbound suspicious-email cases; the BEC branch is the
+      hand-off into the regulator-notification chain on
+      playbook.identity_compromise@v1.
+
+  - mapping_id: nis2:art-21-2-g
+    article: 21(2)(g)
+    notes: >-
+      NIS2 Art. 21(2)(g) requires basic cyber-hygiene practices and
+      cybersecurity training for staff, including phishing-
+      simulation exercises with completion tracked. The
+      phishing_triage playbook is the runtime that closes the loop
+      on the simulation programme: user-reported messages are the
+      evidence of awareness-training effectiveness, and the
+      credential-harvest response branch on a sanctioned-
+      simulation source feeds the simulation click-rate KPI.
+
+dora:
+  # Phishing triage on its own is sub-threshold for DORA Art. 18
+  # major-classification. The inbound carve-out is asserted at
+  # content/mappings/dora/article-19-and-28.yaml (entry
+  # dora:art-18-classification explicitly excludes
+  # playbook.phishing_triage@v1 — its BEC and credential-harvest
+  # branches escalate into playbook.identity_compromise@v1 and,
+  # where exfil follows, playbook.data_exfil@v1, both of which
+  # carry the DORA Art. 18 / 19 backlinks on their own overlays).
+  # No outbound DORA entries are emitted on this overlay; the
+  # escalation path stays separate by design.
+  []
