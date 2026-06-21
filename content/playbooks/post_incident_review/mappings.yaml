@@ -1,0 +1,369 @@
+# Cross-references for the post_incident_review playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed/emitted, and the EU regulatory clauses this
+# playbook helps operationalise. Inbound references live in
+# content/mappings/{nis2,dora}/ so the graph is closed in both
+# directions.
+#
+# This playbook is the operational engine for the post-incident
+# review chain: collate a chronological timeline from the artifacts
+# responders left behind (flagging anti-forensics gaps rather than
+# silently smoothing them over), walk a blameless review template
+# against that timeline, and register corrective actions with owner,
+# due-date, and verification clause. Registration is the deliverable
+# here — execution and verification of each corrective action are
+# out of scope and live on the operator's existing change/ticketing
+# system. The companion narrative at
+# content/mappings/nis2/article-23-incident-handling.md and the DORA
+# Art. 13 inbound entry describe how the per-execution review
+# artefact and corrective-action register feed back into the ICT
+# risk-management framework and the NIS2 Art. 23(4)(d) final report.
+#
+# Deliberate OSCAL omissions (mirror of the SC-8 / 5023 omission-note
+# pattern from the cloud_misconfiguration overlay):
+#   - CA-7 (Continuous Monitoring) is NOT pinned: the playbook
+#     registers corrective actions but does not track them to
+#     closure — closure-tracking is the operator's POA&M / ticketing
+#     surface, not this playbook.
+#   - CM-3 (Configuration Change Control) is NOT pinned: corrective
+#     actions are registered as work items, not applied here. A
+#     change-management-exercised pin would belong on the playbook
+#     that lands the configuration change (e.g.
+#     cloud_misconfiguration's guided-remediation step).
+#   - CP-2 (Contingency Plan) is NOT pinned: business-continuity
+#     improvements identified during the review are recorded as
+#     corrective actions and registered downstream; the contingency-
+#     plan update itself is exercised by the operator's BCM
+#     surface, not by this playbook.
+#   - AU-12 (Audit Record Generation) is NOT pinned: the timeline
+#     collation step consumes audit records (AU-6) the operator's
+#     audit-generation discipline already produced; the playbook
+#     does not generate audit records itself beyond the OCSF
+#     Incident Finding case envelope captured under SI-4.
+#
+# CRA closure: the schema's top-level keys are fixed
+# (oscal/d3fend/ocsf/nis2/dora). The post_incident_review playbook
+# is the regulator-side post-incident learning loop; it does not
+# carry CRA Art. 14 product-side notifications. CRA cross-references
+# are therefore expressed inbound only when a CRA clause file lands
+# that anchors lessons-learned (no such clause file exists today;
+# no schema change required to add one later). No outbound CRA
+# entries are emitted on this overlay; consistent with siblings.
+#
+# GDPR closure: inbound GDPR clause files are not carried as YAML
+# cross-references in content/mappings/gdpr/ today (the regime is
+# expressed there as per-workflow Records of Processing Activity,
+# not as Art. 32 / 33 clause anchors); the per-workflow Art. 30 RoPA
+# for this playbook lives at
+# content/mappings/gdpr/data-flow-post_incident_review.md and covers
+# the timeline, review-artefact, and corrective-action-register
+# processing (responder identifiers, affected-subject summaries,
+# evidence-gap annotations) the steps below operate on. When a GDPR
+# clause-file convention lands, an inbound entry for Art. 32
+# (security of processing — appropriate technical and organisational
+# measures, including the lessons-learned discipline that adjusts
+# those measures after an incident) against this playbook can be
+# added without a schema change.
+#
+# DORA inbound-gap note: dora:art-13-learning-evolving in
+# content/mappings/dora/article-13.yaml is the natural inbound
+# anchor for this playbook (post-ICT-related incident reviews
+# analysing causes of disruption and identifying required
+# improvements) but currently carries an empty playbook_refs list.
+# This overlay does NOT silently widen scope to pin Art. 13
+# outbound; a separate inbound-entry card adds the backlink. The
+# entries below pin only inbound entries that already backlink
+# playbook.post_incident_review@v1.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.post_incident_review@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the timeline-collation,
+  # blameless-review-template, and corrective-action-tracking steps.
+  # Catalogue URLs resolve to the public NIST OSCAL repository.
+  - id: control.incident_handling@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-4
+    title: Incident Handling
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-4
+    notes: >-
+      Anchors the playbook end-to-end as the lessons-learned
+      discharge of the incident-handling capability: IR-4 requires
+      incorporation of lessons learned from ongoing incident-
+      handling activities into incident-response procedures,
+      training, and testing. This playbook is the executable form
+      of that requirement — timeline collation, blameless review
+      template, and corrective-action registration are the three
+      steps a reviewer reads when auditing whether the lessons-
+      learned loop is actually closed.
+
+  - id: control.incident_monitoring@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-5
+    title: Incident Monitoring
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-5
+    notes: >-
+      Covers the timeline-collation step: IR-5 demands tracking and
+      documentation of incidents. The collated chronological
+      timeline (ticket comments, chat transcripts, EDR/SIEM
+      exports, network captures, operator-supplied evidence
+      packages) and its evidence-gaps annotation are the durable
+      monitoring artefact the rest of the playbook reads against.
+
+  - id: control.poam@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CA-5
+    title: Plan of Action and Milestones
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CA-5
+    notes: >-
+      Covers the corrective-action-tracking step: CA-5 demands a
+      documented plan of action and milestones with owner, due-
+      date, and tracked-to-closure semantics. The corrective-
+      action register produced by this playbook is the POA&M
+      artefact for the closed incident; the register populates the
+      operator's existing ticketing/change system, which holds the
+      tracked-to-closure obligation.
+
+  - id: control.audit_record_review@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AU-6
+    title: Audit Record Review, Analysis, and Reporting
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AU-6
+    notes: >-
+      Covers the timeline-collation step's audit-record surface:
+      AU-6 demands review and analysis of audit records for
+      indications of inappropriate or unusual activity. The
+      collation step ingests the operator's audit-record stream
+      (EDR / SIEM exports, eventlog snapshots) and flags
+      anti-forensics signals (cleared eventlogs, disabled audit
+      policy, timestomped files — the SigmaHQ rule IDs enumerated
+      on the CACAO external_references) as evidence-gap
+      annotations the review template explicitly addresses.
+
+  - id: control.system_monitoring@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SI-4
+    title: System Monitoring
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-4
+    notes: >-
+      Anchors the timeline-collation step's detection surface: the
+      anti-forensics / audit-tampering Sigma detections cited on
+      the CACAO x_secops_ng.detection_refs (eventlog cleared,
+      audit policy tampering via auditpol, event auditing
+      disabled, PowerShell timestomp) run on the operator's
+      system-monitoring layer. Their hits become the
+      __evidence_gaps_present__ verdict the review template's
+      mandatory evidence-gaps section reads.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned where the technique applies to a
+  # single step.
+  - step: action--40000000-0000-4000-8000-000000000002
+    d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    notes: >-
+      timeline collation — chronological reconstruction of the
+      incident from ticket comments, chat transcripts, EDR/SIEM
+      exports, network captures, and operator-supplied evidence
+      packages. The anti-forensics detection bindings on the
+      CACAO step (SigmaHQ eventlog-cleared / audit-policy-
+      tampering / timestomp rules) feed the evidence-gaps verdict
+      the Analyze-tactic incident-response-analysis demands when
+      the timeline is reconstructed under partial evidence.
+
+  - step: action--40000000-0000-4000-8000-000000000003
+    d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    notes: >-
+      blameless review template — walk of the operator's review
+      template against the collated timeline, separating
+      contributing factors (process, tooling, staffing, training,
+      environment) from individual error and capturing decisions
+      that were reasonable given the evidence available at the
+      time. When __evidence_gaps_present__ is true the evidence-
+      gaps section is mandatory rather than optional. The
+      Analyze-tactic incident-response-analysis discipline is
+      what the template formalises.
+
+  - step: action--40000000-0000-4000-8000-000000000004
+    d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    notes: >-
+      corrective-action tracking — extraction of corrective
+      actions from the review artefact and registration of each
+      one with owner, due-date, and verification clause. The
+      Analyze-tactic incident-response-analysis output is the
+      corrective-action register the operator's existing
+      change/ticketing system tracks to closure; execution and
+      verification of each action are deliberately out of scope
+      for this playbook.
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. The timeline-collation step
+  # consumes Process Activity (1007), File Activity (1001), and
+  # Authentication (3002) records — the substrate the operator's
+  # audit-record stream lands in and the Sigma anti-forensics rules
+  # cited on the CACAO external_references match against. The
+  # blameless-review-template and corrective-action-tracking steps
+  # emit Incident Findings (2005) carrying the case envelope
+  # (incident id, review artefact reference, corrective-action
+  # register reference, evidence-gaps verdict) so the
+  # timeline-completeness, review-completion-SLA, corrective-action
+  # close-rate, and corrective-action-overdue metrics declared on
+  # the CACAO x_secops_ng.metric_refs can audit timing and
+  # completeness.
+  - id: telemetry.process_activity@v1
+    category_uid: 1
+    category_name: System Activity
+    class_uid: 1007
+    class_name: Process Activity
+    ocsf_version: "1.3.0"
+    direction: consumes
+    notes: >-
+      Consumed at the timeline-collation step: process-creation /
+      process-termination records carry the auditpol-tampering,
+      timestomp-via-PowerShell, and suspicious-eventlog-clear
+      signals enumerated on the CACAO external_references. Their
+      presence in the audit-record stream contributes to the
+      __evidence_gaps_present__ verdict. Schema:
+      https://schema.ocsf.io/1.3.0/classes/process_activity
+
+  - id: telemetry.file_activity@v1
+    category_uid: 1
+    category_name: System Activity
+    class_uid: 1001
+    class_name: File Activity
+    ocsf_version: "1.3.0"
+    direction: consumes
+    notes: >-
+      Consumed at the timeline-collation step: file-write /
+      file-attribute-change records carry the timestomp and
+      log-tampering signals that contribute to the
+      __evidence_gaps_present__ verdict when the timeline is
+      reconstructed against the responder-supplied evidence
+      packages. Schema:
+      https://schema.ocsf.io/1.3.0/classes/file_activity
+
+  - id: telemetry.authentication@v1
+    category_uid: 3
+    category_name: Identity & Access Management
+    class_uid: 3002
+    class_name: Authentication
+    ocsf_version: "1.3.0"
+    direction: consumes
+    notes: >-
+      Consumed at the timeline-collation step: authentication
+      records anchor the responder-action and identity-activity
+      slices of the chronological timeline (who logged in to
+      which surface at which time during the incident window).
+      Schema:
+      https://schema.ocsf.io/1.3.0/classes/authentication
+
+  - id: telemetry.incident_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2005
+    class_name: Incident Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by the blameless-review-template and corrective-
+      action-tracking steps: each milestone (review artefact
+      reference, corrective-action register reference, evidence-
+      gaps verdict) is recorded as an Incident Finding keyed to
+      the closed incident so the timeline-completeness, review-
+      completion-SLA, corrective-action close-rate, and
+      corrective-action-overdue metrics declared on the CACAO
+      x_secops_ng.metric_refs can audit timing and completeness.
+      Anchored to the telemetry.ocsf.incident_finding@v1 ref
+      declared on the playbook's CACAO x_secops_ng.telemetry_refs.
+      Schema:
+      https://schema.ocsf.io/1.3.0/classes/incident_finding
+
+nis2:
+  # Inbound entries live at content/mappings/nis2/article-21-2-b.yaml
+  # (id nis2:art-21-2-b — incident-handling capability, including
+  # lessons-learned) and content/mappings/nis2/article-23.yaml
+  # (id nis2:art-23-final-report — Art. 23(4)(d) final report
+  # contents including root-cause analysis and applied mitigations),
+  # both backlinking to playbook.post_incident_review@v1.
+  - mapping_id: nis2:art-21-2-b
+    article: 21(2)(b)
+    notes: >-
+      NIS2 Art. 21(2)(b) requires an incident-handling capability
+      covering detection, triage, containment, remediation, and
+      capture of lessons learned. The post_incident_review
+      playbook is the operational discharge of the lessons-learned
+      slice of that obligation: collate the timeline, walk a
+      blameless review template that separates contributing
+      factors from individual error, and register corrective
+      actions with owner, due-date, and verification clause so
+      the lessons-learned loop is auditably closed rather than
+      informal.
+
+  - mapping_id: nis2:art-23-final-report
+    article: 23(4)(d)
+    notes: >-
+      NIS2 Art. 23(4)(d) requires a final report no later than
+      one month after the incident notification, including a
+      detailed description of the incident, the type of threat
+      or root cause that likely triggered it, applied and
+      ongoing mitigation measures, and (where applicable) the
+      cross-border impact. The post_incident_review playbook
+      produces the root-cause and applied-mitigation evidence
+      the final report references: the timeline grounds the
+      "detailed description", the blameless review's
+      contributing-factors analysis grounds the "type of threat
+      or root cause", and the corrective-action register grounds
+      the "applied and ongoing mitigation measures" clause.
+
+dora:
+  # Inbound entries live at content/mappings/dora/article-19-and-28.yaml
+  # (ids dora:art-19-final-one-month — DORA Art. 19(4)(c) final
+  # report after a major ICT-related incident, and
+  # dora:art-18-recurring-incident — Art. 18(2) recurring-incident
+  # aggregation that the post-incident review feeds with
+  # contributing-factor analysis), both backlinking to
+  # playbook.post_incident_review@v1.
+  #
+  # dora:art-13-learning-evolving in content/mappings/dora/article-13.yaml
+  # is the natural inbound anchor for this playbook (post-ICT-related
+  # incident reviews analysing causes of disruption and identifying
+  # required improvements to ICT operations / business continuity)
+  # but currently carries an empty playbook_refs list. An outbound
+  # pin is deliberately NOT asserted here pending a separate
+  # inbound-entry card; see the file header for the gap note.
+  - mapping_id: dora:art-19-final-one-month
+    article: "19(4)(c)"
+    notes: >-
+      DORA Art. 19(4)(c) requires a final report no later than
+      one month after the initial incident notification,
+      including the root-cause analysis, the categorisation of
+      the incident, and the mitigation measures applied or
+      planned to prevent recurrence. The post_incident_review
+      playbook produces the root-cause and mitigation evidence
+      the DORA final report references the same way it does for
+      the NIS2 Art. 23(4)(d) submission: the blameless review's
+      contributing-factors analysis grounds the root-cause
+      narrative, and the corrective-action register grounds the
+      "mitigation measures applied or planned" clause.
+
+  - mapping_id: dora:art-18-recurring-incident
+    article: "18(2)"
+    notes: >-
+      DORA Art. 18(2) recurring-incident aggregation requires
+      identification of incidents that, while individually below
+      the major-classification threshold, recur with the same
+      apparent root cause and aggregate to a major incident. The
+      post_incident_review playbook feeds that aggregation: the
+      blameless review's contributing-factors analysis and the
+      corrective-action register are the per-incident inputs the
+      recurring-incident-clusters KRI groups across incidents to
+      surface chronic root causes the operator has not closed.
