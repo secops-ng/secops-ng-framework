@@ -1,0 +1,442 @@
+# Cross-references for the infra_posture_management playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed/emitted, and the EU regulatory clauses this
+# playbook helps operationalise. Inbound references live in
+# content/mappings/{nis2,dora,gdpr}/ so the graph is closed in both
+# directions.
+#
+# This playbook (F-WF-06, continuous variant of F-WF-02) operates the
+# infrastructure-posture-management lifecycle as a durable
+# scheduled-re-execution machine: collect (walk the in-scope
+# infrastructure manifest at __scope_ref__ and read the current
+# posture-state snapshot from the operator's posture sources — cloud
+# account read APIs, identity-provider read APIs, network-baseline
+# read APIs — read-only by contract), evaluate (per (control_ref,
+# scoped-resource-id) pair, classify the attestation state as
+# effective / partially_effective / ineffective against the declared
+# baseline, with deviation lists captured on partial / ineffective
+# entries; deterministic on the same snapshot and the same policy
+# version so a reviewer can re-derive the result set off the
+# committed inputs), and emit (combine the posture-state snapshot and
+# the per-control evaluation result set into one posture-evidence
+# artifact shaped per schemas/evidence/posture.schema.json, stream
+# `posture`, with a byte-stable artifact_id pinned to
+# workflow_id|execution_id|compile_target|policy_version). The
+# per-execution posture-evidence artifact is the audit-evident
+# discharge of the NIS2 Art. 21(2)(a) policies-on-the-security-of-
+# network-and-information-systems obligation: each scheduled run
+# emits one durable attestation that the in-scope infrastructure
+# remains in the posture its declared control catalog requires, and
+# the artifact series the F-CP-06 effectiveness loop consumes against
+# the kpi.cloud_posture_coverage@v1 / kri.control_effectiveness@v1
+# metrics. The inbound anchor at
+# content/mappings/nis2/article-21-2-a.yaml backlinks this playbook
+# for exactly that reason.
+#
+# Deliberate OSCAL omissions (mirror of the omission-note pattern
+# from the cloud_misconfiguration, codebase_vuln_management,
+# iam_auditor, on_call_rotation, and detection_engineering overlays):
+#   - SI-2 (Flaw Remediation) is NOT pinned: this playbook operates
+#     the observational posture-evaluation surface (collect, evaluate,
+#     emit) — the workflow is read-only by contract and MUST NOT
+#     mutate any resource on the collect path. Remediation of a
+#     non-effective attestation is operator-side downstream of this
+#     evidence emission, operated by the per-resource configuration
+#     playbooks and the operator's change-management surface, which
+#     carry SI-2 on their own overlays. Pinning SI-2 here would
+#     double-count the flaw-remediation control surface against an
+#     observational step.
+#   - CM-3 (Configuration Change Control) is NOT pinned: the
+#     workflow does not propose, approve, or implement configuration
+#     changes — the change-control discipline attaches to the
+#     downstream remediation surface where the configuration is
+#     actually mutated, not to this observational evidence step. The
+#     baseline-alignment record this playbook emits is an input to
+#     that change-control loop, not the change-control step itself.
+#   - IR-4 / IR-8 (Incident Handling / Incident Response Plan) are
+#     NOT pinned: posture drift detection is an upstream evidence
+#     surface; incident handling is operated by the per-incident
+#     playbooks (ransomware_containment, data_exfil,
+#     identity_compromise, phishing_triage, post_incident_review)
+#     which carry IR-4 / IR-8 on their own overlays. A non-effective
+#     attestation emitted here MAY trigger a downstream incident
+#     workflow, but the incident-handling capability itself is not
+#     this playbook's discipline.
+#   - AU-2 (Event Logging) is NOT pinned: the collect step emits
+#     OCSF API Activity records against the operator's posture
+#     sources, but defining the operator's audit-event policy is
+#     upstream of this playbook. The emitted records are consumed
+#     by the operator's existing OCSF store under its AU-2 policy.
+#   - AC-3 (Access Enforcement) is NOT pinned: the workflow reads
+#     identity-boundary configuration to evaluate posture against
+#     the declared baseline; it does not itself enforce access. The
+#     enforcement surface is the operator's IdP / cloud IAM under
+#     its own AC-3 policy, and the iam_auditor playbook carries the
+#     access-management observational anchor on its own overlay.
+#
+# CRA closure: the schema's top-level keys are fixed
+# (oscal/d3fend/ocsf/nis2/dora). CRA cross-references for this
+# playbook are not expressed either inbound or outbound. The
+# infra_posture_management playbook is an operator-side posture-
+# evidence discipline — continuous attestation that the operator's
+# own infrastructure remains in its declared baseline — not a
+# product-side incident reporting or vulnerability-disclosure flow.
+# CRA Art. 14 product-notification obligations and Annex I
+# vulnerability-handling requirements therefore do not attach here;
+# no outbound CRA entries are emitted on this overlay, consistent
+# with siblings.
+#
+# DORA closure: DORA Art. 9 (protection and prevention) and DORA
+# Art. 6 (ICT risk-management framework, Regulation (EU) 2022/2554)
+# both name disciplines a continuous-posture-evidence stream
+# operationally supports for financial entities — Art. 9's
+# resilience and security of ICT systems requirement and Art. 6's
+# overarching governance surface. Neither is currently expressed as
+# a clause-anchor backlink to playbook.infra_posture_management@v1
+# in content/mappings/dora/; the existing DORA inbound files
+# (article-6.yaml, article-9-and-rts-vuln-mgmt.yaml, etc.) do not
+# list this playbook in their playbook_refs today. This overlay does
+# NOT silently widen scope to pin an outbound DORA entry against a
+# missing inbound; a separate inbound-closure card adds the
+# Art. 9 / Art. 6 playbook_refs entry and the outbound pin lands
+# together with the inbound entry. This mirrors the
+# on_call_rotation DORA Art. 6 gap-note precedent and the
+# detection_engineering DORA closure precedent: gap notes are
+# separate closure cards, not scope creep on a single-purpose
+# mappings PR.
+#
+# GDPR closure: the inbound GDPR data-flow record at
+# content/mappings/gdpr/data-flow-infra_posture_management.md is the
+# authoritative Art. 30 RoPA entry for this playbook. Its scoring is
+# IN-SCOPE-IN-WORST-CASE: posture state is resource-shaped by
+# design (cloud-account, identity-boundary, and network-baseline
+# configuration values), and for operators whose identity boundaries
+# carry only non-personal service / workload identities GDPR does
+# not engage; the worst case (an operator whose identity boundary
+# carries attributable natural-person principals — named employee or
+# contractor identities visible inside the IdP / cloud IAM the
+# workflow reads) is scored under primary basis **Art. 6(1)(c)
+# legal obligation** (the operator is a regulated entity discharging
+# NIS2 Art. 21(2)(a) as transposed nationally) with secondary basis
+# **Art. 6(1)(f) legitimate interests** for operators outside
+# statutory scope. The schema's regulatory top-level keys are fixed
+# (nis2/dora) and no GDPR clause-file convention is carried today;
+# this overlay therefore emits no outbound GDPR entry, and the
+# inbound ROPA file is the authoritative GDPR record. The
+# data-subject-rights operationalisation in §7 of that ROPA
+# (Art. 15 access via the posture-evidence store and the OCSF
+# activity store; Art. 17 erasure via store TTLs with Art. 6(1)(c)
+# refusal grounds during the statutory evidence-retention window;
+# Art. 22 not engaged because emission is observational and any
+# downstream automated remediation is re-scored where defined) is
+# the contract this overlay's evaluate-controls and
+# emit-posture-evidence steps respect. When a GDPR clause-file
+# convention lands, an inbound entry for Art. 32 (security of
+# processing — appropriate technical and organisational measures,
+# including the documented continuous posture-evidence discipline
+# this playbook discharges) against this playbook can be added
+# without a schema change.
+#
+# SigmaHQ closure: the playbook's external_references carry no
+# upstream SigmaHQ rule-id pointers because this playbook is not a
+# detection-content surface — it is a configuration-attestation
+# surface. Detection-rule lifecycle is operated by the
+# detection_engineering playbook; posture drift detection here is
+# baseline-comparison against the operator's declared control
+# catalog, not adversary-behaviour signature matching. No SigmaHQ
+# entries are emitted on this overlay, consistent with the framing
+# in the playbook's own description.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.infra_posture_management@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the collect-posture,
+  # evaluate-controls, and emit-posture-evidence steps. Catalogue
+  # URLs resolve to the public NIST OSCAL repository.
+  - id: control.cspm_baseline@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CA-7
+    title: Continuous Monitoring
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CA-7
+    notes: >-
+      Anchors the playbook end-to-end: CA-7 requires the organisation
+      to develop a continuous-monitoring strategy that includes
+      establishing metrics, ongoing assessment of control
+      effectiveness, configuration management, and reporting. The
+      scheduled-re-execution shape of this playbook (collect →
+      evaluate → emit on every tick) is the audit-evident
+      materialisation of that strategy against the operator's
+      in-scope infrastructure: each run produces one posture-evidence
+      artifact pinned to the policy version in force, and the
+      artifact series the F-CP-06 effectiveness loop reads against
+      kpi.cloud_posture_coverage@v1 (coverage of the declared
+      control catalog) and kri.control_effectiveness@v1 (residual
+      ineffective-attestation count) closes the continuous-
+      monitoring loop. The playbook's own x_secops_ng.control_refs
+      declares control.cspm_baseline@v1 for exactly this anchor.
+
+  - id: control.risk_management_policy@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: RA-3
+    title: Risk Assessment
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=RA-3
+    notes: >-
+      Anchors the evaluate-controls step against the risk-analysis
+      half of NIS2 Art. 21(2)(a): RA-3 requires the organisation to
+      conduct a risk assessment of the system and the information it
+      processes, and to update the assessment when significant
+      changes occur. The per-(control_ref, scoped-resource-id)
+      attestation state emitted here is the per-execution evidence
+      that the risk-assessment surface remains live against the
+      current infrastructure — partially_effective and ineffective
+      entries are the deviation set that re-enters the operator's
+      risk register, and kri.risk_register_staleness@v1 (declared on
+      the inbound art-21-2-a entry) is the metric that audits the
+      register update cadence the playbook feeds. Pinning RA-3 here
+      is the structural complement to CA-7 above: CA-7 anchors the
+      monitoring cadence, RA-3 anchors what the monitoring evaluates
+      against.
+
+  - id: control.baseline_configuration@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CM-2
+    title: Baseline Configuration
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CM-2
+    notes: >-
+      Anchors the evaluate-controls step's baseline-comparison
+      discipline: CM-2 requires the organisation to develop,
+      document, and maintain a current baseline configuration of the
+      system. The operator's declared control catalog and the
+      per-control evaluation criteria the policy version pins are
+      the per-resource materialisation of that baseline; the
+      evaluate-controls step is the per-execution comparison of the
+      collected posture-state snapshot against that baseline, and
+      the deviation list captured on partially_effective /
+      ineffective entries is the audit-evident record of where the
+      live configuration has drifted from the baseline. Determinism
+      on the same snapshot and the same policy version is what makes
+      this step a CM-2 evaluation rather than a heuristic check.
+
+  - id: control.configuration_settings@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CM-6
+    title: Configuration Settings
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CM-6
+    notes: >-
+      Anchors the collect-posture step end-to-end and the
+      evaluate-controls step on the configuration-setting surface:
+      CM-6 requires the organisation to establish and document
+      configuration settings for components of the system that
+      reflect the most restrictive mode consistent with operational
+      requirements. The per-resource configuration state the
+      collect step reads from the operator's cloud-account, identity-
+      provider, and network-baseline read APIs is the source-of-
+      truth observation against which the operator's CM-6 settings
+      are evaluated; the evaluate step's attestation state is the
+      per-execution verdict on whether those settings remain in the
+      established mode. The asset-inventory side of this is carried
+      separately by control.asset_inventory_delta@v1 declared on the
+      playbook's own x_secops_ng.control_refs (CM-8 lineage) and is
+      not duplicated here.
+
+  - id: control.control_assessment@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CA-2
+    title: Control Assessments
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CA-2
+    notes: >-
+      Covers the evaluate-controls and emit-posture-evidence steps as
+      the per-execution materialisation of CA-2: CA-2 requires the
+      organisation to assess the security and privacy controls in
+      the system to determine the extent to which the controls are
+      implemented correctly, operating as intended, and producing
+      the desired outcome. The attestation state per
+      (control_ref, scoped-resource-id) pair — effective,
+      partially_effective, ineffective — is the recorded assessment
+      outcome, and the emitted posture-evidence artifact is the
+      durable assessment report shaped against
+      schemas/evidence/posture.schema.json. CA-2 closes the
+      assessment loop where CA-7 (above) opens the monitoring
+      cadence: monitor continuously (CA-7), assess each control
+      (CA-2), and the artifact series is the joint evidence trail.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned to the real action UUIDs resolved
+  # from content/playbooks/infra_posture_management/playbook.cacao.json
+  # (three action bodies: collect-posture, evaluate-controls,
+  # emit-posture-evidence). The Model tactic in D3FEND v1.0.0
+  # carries the discipline that fits a configuration-attestation
+  # workflow most precisely: D3-CI (Configuration Inventory —
+  # identifying and recording the properties of devices and
+  # software). The collect-posture step is anchored on D3-CI; the
+  # evaluate-controls step extends the same discipline to the
+  # baseline-comparison surface and is anchored on D3-CI as well
+  # (D3FEND v1.0.0 does not carry a separate technique for
+  # comparison-against-baseline distinct from configuration
+  # inventory). The emit-posture-evidence step is deliberately not
+  # pinned to a D3FEND technique and the gap is documented in line
+  # (mirroring the handoff-brief gap note on on_call_rotation, the
+  # propose/review/ship gap notes on detection_engineering, and the
+  # D3-SWI / D3-UAP precedent on codebase_vuln_management and
+  # iam_auditor).
+  - step: action--06f06f06-0000-4000-8000-000000000002
+    d3fend_id: D3-CI
+    d3fend_name: Configuration Inventory
+    url: https://d3fend.mitre.org/technique/d3f:ConfigurationInventory/
+    notes: >-
+      collect-posture — walking the in-scope infrastructure manifest
+      at __scope_ref__ and reading the per-resource configuration
+      state (cloud-account configuration values, identity-boundary
+      configuration values, network-baseline configuration values)
+      from the operator's posture sources is the Model-tactic
+      configuration-inventory discipline materialised against the
+      operator's own infrastructure. D3-CI frames the discipline as
+      identifying and recording the properties of devices and
+      software; the collected posture-state snapshot
+      (__posture_state_ref__) is the per-execution recording of
+      those properties across the in-scope manifest. The
+      read-only-by-contract constraint on this step is what keeps
+      it within the Model tactic rather than crossing into Harden.
+
+  - step: action--06f06f06-0000-4000-8000-000000000003
+    d3fend_id: D3-CI
+    d3fend_name: Configuration Inventory
+    url: https://d3fend.mitre.org/technique/d3f:ConfigurationInventory/
+    notes: >-
+      evaluate-controls — the per-(control_ref, scoped-resource-id)
+      classification of the attestation state against the declared
+      baseline is the assessment half of the configuration-inventory
+      discipline: D3-CI's "recording the properties" phase produces
+      the inventory the collect step delivered; the evaluate step
+      compares that inventory against the operator's declared
+      baseline (the policy version's per-control evaluation criteria)
+      and records the deviation list. D3FEND v1.0.0 does not carry
+      a distinct technique for baseline-comparison separate from
+      configuration inventory; the evaluation is the meta-
+      discipline that audits whether the inventory matches the
+      operator's declared posture, and the deviation set is the
+      audit-evident artifact that re-enters the operator's risk
+      register via the kri.risk_register_staleness@v1 metric
+      declared on the inbound art-21-2-a entry.
+
+  # emit-posture-evidence (action--06f06f06-0000-4000-8000-
+  # 000000000004) is deliberately NOT pinned to a D3FEND technique.
+  # D3FEND v1.0.0 frames its defensive techniques around runtime
+  # countermeasures (and inventory / model disciplines on the
+  # adjacent surface); per-execution artifact emission of an
+  # attestation record shaped per schemas/evidence/posture.schema.json
+  # for downstream consumption by the F-CP-06 effectiveness loop is
+  # an evidence-stream emission discipline, not a runtime
+  # countermeasure or an inventory step, and forcing it onto a
+  # D3FEND tag would misrepresent the technique. This step is
+  # anchored on the CA-2 and CA-7 OSCAL controls above where the
+  # obligation actually lives (continuous monitoring reporting and
+  # control-assessment recording). This mirrors the iam_auditor
+  # D3-UAP gap note, the on_call_rotation handoff-brief gap note,
+  # and the detection_engineering propose / review / ship gap
+  # notes: pin the closest available technique only where the
+  # discipline matches, and document the absence where it does
+  # not, rather than inventing coverage.
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. The collect-posture step
+  # consumes and emits API Activity (6003) records against the
+  # operator's posture-source endpoints (the cloud-account read API
+  # calls, the identity-provider read API calls, the
+  # network-baseline read API calls). The evaluate-controls step is
+  # a pure-function evaluation over the in-memory snapshot and the
+  # policy version under which the run executes, and does not by
+  # itself read or write external telemetry — the policy-version
+  # binding is part of the artifact emitted at the next step. The
+  # emit-posture-evidence step emits one API Activity (6003) record
+  # for the write call against the operator's posture-evidence
+  # store. The OCSF binding here pins the runtime-side telemetry
+  # surface the operator's SIEM reads; the
+  # x_secops_ng.telemetry_refs on the playbook artifact carries
+  # telemetry.ocsf.api_activity@v1 so the compiler can route
+  # emissions consistently across n8n / Temporal / LangGraph
+  # targets. No OCSF Detection Finding (2004) binding is declared
+  # here because this playbook does not emit detection findings —
+  # it emits posture-evidence artifacts shaped per the framework's
+  # own evidence schema; the OCSF surface this playbook touches is
+  # bounded to the API Activity class on its read and write paths.
+  - id: telemetry.ocsf.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: both
+    notes: >-
+      Consumed and emitted at the collect-posture step (read calls
+      against the operator's cloud-account read API, identity-
+      provider read API, and network-baseline read API that produce
+      the per-resource configuration values composing
+      __posture_state_ref__), and emitted at the
+      emit-posture-evidence step (the write call against the
+      operator's posture-evidence store that persists the artifact
+      shaped per schemas/evidence/posture.schema.json). The
+      api_activity records carry the request metadata the
+      operator's SIEM joins against the kpi.cloud_posture_coverage@v1
+      and kri.control_effectiveness@v1 metrics to audit per-execution
+      coverage and residual ineffective-attestation count. The
+      direction is `both` on a single binding because the collect
+      path consumes and the emit path emits the same OCSF class
+      against the same operator-bound telemetry surface; splitting
+      into two bindings would not add structural information. Schema:
+      https://schema.ocsf.io/1.3.0/classes/api_activity
+
+nis2:
+  # Inbound entry already backlinks playbook.infra_posture_management@v1:
+  #   - content/mappings/nis2/article-21-2-a.yaml
+  #     (id nis2:art-21-2-a — Art. 21(2)(a) policies on risk
+  #     analysis and on the security of network and information
+  #     systems; the per-execution posture-evidence artifact is the
+  #     audit-evident discharge)
+  # Pinned outbound below to close the graph.
+  - mapping_id: nis2:art-21-2-a
+    article: 21(2)(a)
+    notes: >-
+      NIS2 Art. 21(2)(a) requires essential and important entities to
+      adopt and maintain policies on risk analysis and on the
+      security of network and information systems, including periodic
+      re-assessment with dated ownership. The
+      infra_posture_management playbook is the continuous-attestation
+      slice of that obligation: on each scheduled re-execution it
+      collects the current posture state of the in-scope
+      infrastructure, evaluates each declared control against that
+      state, and emits one posture-evidence artifact shaped per
+      schemas/evidence/posture.schema.json (stream `posture`) so the
+      periodic-re-assessment obligation has a durable artifact
+      series the F-CP-06 effectiveness loop and the operator's risk
+      register read against. The metric_refs the inbound entry
+      already declares (kri.risk_register_staleness@v1,
+      kpi.cloud_posture_coverage@v1) both attach to this playbook's
+      runtime — the staleness metric audits the re-assessment
+      cadence, the coverage metric audits the control-catalog
+      reach across the in-scope manifest. This outbound entry is the
+      structural closure of that backlink.
+
+dora:
+  # No inbound DORA file currently backlinks
+  # playbook.infra_posture_management@v1. DORA Art. 9 (protection and
+  # prevention — resilience and security of ICT systems) and DORA
+  # Art. 6 (ICT risk-management framework, Regulation (EU)
+  # 2022/2554) both name disciplines a continuous-posture-evidence
+  # stream operationally supports for financial entities, but the
+  # existing DORA inbound files in content/mappings/dora/ do not
+  # list this playbook in their playbook_refs today. No outbound
+  # DORA entry is emitted on this overlay; see the file-header DORA
+  # closure note. A separate inbound-closure card would add a DORA
+  # anchor (e.g. dora:art-9-protection or dora:art-6-governance) to
+  # playbook.infra_posture_management@v1 if and when the inbound
+  # side is populated, and the outbound pin would land together
+  # with the inbound entry. This mirrors the on_call_rotation
+  # DORA Art. 6 gap-note pattern and the detection_engineering DORA
+  # closure precedent: gap notes are separate closure cards, not
+  # scope creep on a single-purpose mappings PR.
+  []
