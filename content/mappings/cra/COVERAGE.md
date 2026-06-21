@@ -54,3 +54,30 @@ per-clause yaml per playbook) and the EXTEND layer (OSCAL component-
 definition expansion, D3FEND cross-links, and the nightly
 orphan-CI assertion that fires the G-02 KRI) are filed as sibling
 cards.
+
+## Orphan-CI assertion
+
+The nightly G-02 KRI assertion lives at
+`tools/lint_cra_playbook_orphans.py` and runs from
+`.github/workflows/cra-orphan-ci.yml` on `main`, on every PR that
+touches `content/playbooks/` or `content/mappings/cra/`, and on a
+nightly schedule. Two firing lanes:
+
+* **Regression (immediate).** A playbook that previously carried an
+  inbound `playbook_refs:` citation under a CRA YAML and lost it in
+  the current diff fails the build immediately.
+* **Net-new (7-day grace).** A finalized playbook with no inbound
+  CRA citation trips once its CACAO finalization marker is older
+  than 7 days, so CORE per-edge cards can land in their own PRs
+  without forcing the EXTEND mapping into the same change.
+
+Deliberate, audited exclusions live in
+`content/mappings/cra/_orphan_skip.yaml`. Each entry requires a
+`slug` (pointing at a finalized playbook directory) and a
+`rationale`; the assertion validates both shape and target on every
+run.
+
+The workflow also emits a `--format kri` payload as a build
+artifact (`g-02-cra-kri/g-02-cra.json`) for the dashboard ingest:
+shape is `{kri_id, kri_name, regime, status, coverage, findings,
+emitted_at}`, with `status` one of `ok | degraded | tripped`.
