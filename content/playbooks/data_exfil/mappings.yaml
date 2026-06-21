@@ -1,0 +1,430 @@
+# Cross-references for the data_exfil playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed/emitted, and the EU regulatory clauses this
+# playbook helps operationalise. Inbound references live in
+# content/mappings/{nis2,dora}/ so the graph is closed in both
+# directions.
+#
+# This playbook is the operational engine for the DLP / egress-signal
+# response chain: it triages the signal, assesses scope and data
+# classification, contains confirmed exfiltration (egress filter,
+# session / token revocation on the implicated identity), and gates
+# regulator / customer notification on the affected-subjects
+# threshold so EU operators can meet NIS2 Art. 23, DORA Art. 19,
+# and (where personal data is in scope) GDPR Art. 33 / 34 reporting
+# obligations. The downstream regulator-submission timeline itself
+# is owned by playbook.incident_management@v1; this playbook's
+# notify-regulator step hands off into that chain.
+#
+# Upstream hand-off closure: phishing_triage's BEC and credential-
+# harvest branches escalate into playbook.identity_compromise@v1
+# and (where exfil follows) into this playbook. The phishing_triage
+# overlay (content/playbooks/phishing_triage/mappings.yaml) names
+# playbook.data_exfil@v1 as that downstream exfil-escalation
+# handoff; this overlay closes the outbound side.
+#
+# CRA closure: the schema's top-level keys are fixed
+# (oscal/d3fend/ocsf/nis2/dora). CRA cross-references for this
+# playbook are therefore expressed inbound only — entry
+# cra:art-14-severe-incident in
+# content/mappings/cra/article-14-and-annex-i.yaml (Art. 14(3)
+# severe-incident notification, 24h / 72h / 1-month timing) already
+# lists playbook.data_exfil@v1 on its playbook_refs. The CRA Art. 14
+# regulator-submission timeline itself is dispatched through
+# playbook.incident_management@v1, the same way the NIS2 Art. 23 /
+# DORA Art. 19 chain is.
+#
+# GDPR closure: data exfil is the playbook most likely to trip the
+# GDPR Art. 33 / 34 personal-data-breach notification chain — the
+# regulator-notification-threshold gate at
+# if-condition--20000000-0000-4000-8000-000000000006 routes against
+# NIS2 Art. 23, DORA Art. 19, and GDPR Art. 33 jointly per the
+# CACAO playbook description. Inbound GDPR clause files are not
+# carried as YAML cross-references in content/mappings/gdpr/ today
+# (the regime is expressed there as per-workflow Records of
+# Processing Activity, not as Art. 33 / 34 clause anchors); the
+# per-workflow Art. 30 RoPA for this playbook lives at
+# content/mappings/gdpr/data-flow-data_exfil.md and covers the
+# scope-assessment and notification-payload processing the steps
+# below operate on. When a GDPR clause-file convention lands, an
+# inbound entry for Art. 33 / 34 against this playbook can be
+# added without a schema change.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.data_exfil@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the triage, scope-
+  # assessment, containment (egress filter + session / token
+  # revocation), and regulator / customer notification steps.
+  # Catalogue URLs resolve to the public NIST OSCAL repository.
+  - id: control.incident_handling@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-4
+    title: Incident Handling
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-4
+    notes: >-
+      Anchors the playbook end-to-end as the incident-handling
+      capability for the data-exfiltration case set:
+      detection-to-containment-to-notification exercised
+      step-by-step (triage, scope assessment, containment,
+      regulator and customer notification).
+
+  - id: control.incident_monitoring@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-5
+    title: Incident Monitoring
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-5
+    notes: >-
+      Covers the per-case timeline anchors the playbook stamps
+      from triage through containment and notification: the
+      MTTD, containment-MTTR, and notification-SLA KPIs declared
+      on the CACAO x_secops_ng.metric_refs all read against the
+      monitoring discipline this control demands.
+
+  - id: control.incident_reporting@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-6
+    title: Incident Reporting
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-6
+    notes: >-
+      Covers the NIS2 Art. 23 / DORA Art. 19 / CRA Art. 14
+      regulator-notification chain and the GDPR Art. 33 / 34
+      personal-data-breach notification chain triggered when the
+      affected-subjects count and data classification cross the
+      operator's regulator-routing threshold. The submission
+      timeline itself is dispatched by
+      playbook.incident_management@v1; this playbook's
+      notify-regulator step is the upstream emitter that feeds
+      the regulator-side engine.
+
+  - id: control.information_flow_enforcement@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AC-4
+    title: Information Flow Enforcement
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AC-4
+    notes: >-
+      Covers the containment step's egress-policy tightening on
+      the destination(s) named in the signal: the operator's
+      information-flow-enforcement layer is the runtime that
+      receives the bound deny / quarantine instructions and
+      stops further exfiltration toward the named sinks.
+
+  - id: control.boundary_protection@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SC-7
+    title: Boundary Protection
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SC-7
+    notes: >-
+      Covers the containment step at the network boundary: the
+      egress chokepoint applies the deny / rate-limit policy on
+      the destination(s) named in the signal so further
+      exfiltration via the implicated network path is cut off
+      while the case is being assessed.
+
+  - id: control.system_monitoring@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SI-4
+    title: System Monitoring
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-4
+    notes: >-
+      Anchors the triage step's input: the originating DLP /
+      egress signal is produced by the operator's
+      system-monitoring layer (DLP agent, egress proxy, anomaly
+      detector on data-staging activity) and is the artefact the
+      triage step hydrates with originating user / asset /
+      destination context.
+
+  - id: control.security_categorization@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: RA-2
+    title: Security Categorization
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=RA-2
+    notes: >-
+      Covers the scope-assessment step: the resolved
+      __data_classification__ output (public / internal /
+      confidential / restricted / special-category) is the
+      security-categorization verdict the rest of the playbook
+      branches on, driving both containment proportionality and
+      regulator-notification routing.
+
+  - id: control.account_management_disable_accounts@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AC-2(13)
+    title: Account Management | Disable Accounts for High-Risk Individuals
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AC-2(13)
+    notes: >-
+      Covers the containment step's identity cut-out where the
+      originating principal is disabled and active sessions /
+      refresh tokens are invalidated for the duration of the
+      containment window — the operational analogue of disabling
+      a high-risk account so the attacker cannot pivot off the
+      implicated credential to continue exfiltration.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned where the technique applies to a
+  # single step.
+  - step: action--20000000-0000-4000-8000-000000000002
+    d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    notes: >-
+      triage signal — hydration of the originating DLP / egress
+      signal with originating user / asset / destination context
+      and a decision on whether the signal warrants scope
+      assessment or is a known benign egress pattern.
+
+  - step: action--20000000-0000-4000-8000-000000000003
+    d3fend_id: D3-FA
+    d3fend_name: Forensic Analysis
+    url: https://d3fend.mitre.org/technique/d3f:ForensicAnalysis/
+    notes: >-
+      scope assessment — determination of the volume and
+      classification of data observed leaving the boundary, the
+      count of distinct data subjects affected, and whether
+      actual exfiltration occurred or was prevented in-line.
+      Produces __data_classification__, __affected_subjects_count__,
+      and __exfil_confirmed__ on the case envelope the rest of
+      the playbook branches on.
+
+  - step: action--20000000-0000-4000-8000-000000000005
+    d3fend_id: D3-NTF
+    d3fend_name: Network Traffic Filtering
+    url: https://d3fend.mitre.org/technique/d3f:NetworkTrafficFiltering/
+    notes: >-
+      containment — egress-policy tightening on the destination(s)
+      named in the signal: a deny / rate-limit rule at the
+      operator's egress chokepoint stops further data flow
+      toward the implicated sink for the duration of the
+      containment window.
+
+  - step: action--20000000-0000-4000-8000-000000000005
+    d3fend_id: D3-ACI
+    d3fend_name: Authentication Cache Invalidation
+    url: https://d3fend.mitre.org/technique/d3f:AuthenticationCacheInvalidation/
+    notes: >-
+      containment — invalidation of live sessions, refresh and
+      access tokens for the originating principal so the
+      attacker cannot pivot off cached credentials to continue
+      the exfiltration through a parallel session.
+
+  - step: action--20000000-0000-4000-8000-000000000005
+    d3fend_id: D3-AL
+    d3fend_name: Account Locking
+    url: https://d3fend.mitre.org/technique/d3f:AccountLocking/
+    notes: >-
+      containment — disable of the originating principal at the
+      IdP for the duration of the containment window so no new
+      authentication path is available pending the
+      forced-credential-rotation handover (deeper IdP-side audit
+      lives on playbook.identity_compromise@v1).
+
+  - step: action--20000000-0000-4000-8000-000000000007
+    d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    notes: >-
+      notify regulator — composition of the structured incident
+      finding sourced from the scope-assessment outputs and
+      hand-off along the operator's pre-bound regulator channel
+      (national CSIRT for NIS2, competent authority for DORA,
+      supervisory authority for GDPR). The submission-timeline
+      engine itself is playbook.incident_management@v1.
+
+  - step: action--20000000-0000-4000-8000-000000000008
+    d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    notes: >-
+      notify customer — composition of the data-subject /
+      customer-facing notification payload from the
+      scope-assessment outputs (data classification, affected-
+      subjects count) and hand-off along the operator's
+      pre-bound channel. Tracked separately from the regulator
+      submission so the notification-SLA KPI can report the two
+      timelines independently.
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. The triage step consumes the
+  # originating DLP / egress signal shaped as a Detection Finding.
+  # The scope-assessment step additionally reads Network Activity
+  # to scope the destination(s) and volume. The containment step
+  # emits Account Change records keyed to the implicated
+  # principal (account disable, session invalidation, token
+  # revocation). The regulator and customer notification steps
+  # emit Compliance Finding records keyed to the case and the
+  # notification milestone, and the playbook's case envelope
+  # itself is an Incident Finding that the downstream
+  # incident_management engine inherits.
+  #
+  # The CACAO playbook's external sources additionally cite the
+  # OCSF DLP Activity event class as the upstream class that
+  # produces the originating signal. A telemetry binding for the
+  # DLP-specific class is omitted here because the OCSF class_uid
+  # for DLP Activity could not be verified against OCSF v1.3.0
+  # without speculation; once a telemetry.ocsf.dlp_alert@v1 file
+  # lands under content/telemetry/, a CORE follow-up card can pin
+  # it without a schema change. See the PR body for the gap note.
+  - id: telemetry.detection_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2004
+    class_name: Detection Finding
+    ocsf_version: "1.3.0"
+    direction: consumes
+    notes: >-
+      Consumed at the triage step: the originating DLP / egress
+      signal (Sigma matches on dlp_egress_alert and
+      data_staging_archive_created referenced under the CACAO
+      x_secops_ng.detection_refs) is delivered as a Detection
+      Finding the triage step hydrates with originating user /
+      asset / destination context. Schema:
+      https://schema.ocsf.io/1.3.0/classes/detection_finding
+
+  - id: telemetry.network_activity@v1
+    category_uid: 4
+    category_name: Network Activity
+    class_uid: 4001
+    class_name: Network Activity
+    ocsf_version: "1.3.0"
+    direction: consumes
+    notes: >-
+      Consumed at the scope-assessment step: egress flow records
+      against the destination(s) named in the signal used to
+      bound the volume of data observed leaving the boundary and
+      to confirm or rule out actual exfiltration before
+      containment fires. Schema:
+      https://schema.ocsf.io/1.3.0/classes/network_activity
+
+  - id: telemetry.account_change@v1
+    category_uid: 3
+    category_name: Identity & Access Management
+    class_uid: 3001
+    class_name: Account Change
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by the containment step: each cut-out on the
+      originating principal (account disable, session
+      invalidation, refresh / access token revocation) is
+      recorded as an Account Change event so the
+      containment-MTTR KPI can audit on-time containment.
+      Schema:
+      https://schema.ocsf.io/1.3.0/classes/account_change
+
+  - id: telemetry.incident_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2005
+    class_name: Incident Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted as the canonical case envelope by the
+      notify-regulator step (anchored to the
+      telemetry.ocsf.incident_finding@v1 ref declared on the
+      playbook's CACAO x_secops_ng.telemetry_refs). The
+      downstream regulator-submission engine
+      (playbook.incident_management@v1) consumes this envelope
+      as the upstream-playbook hand-off shaped the same way as
+      its other intake sources. Schema:
+      https://schema.ocsf.io/1.3.0/classes/incident_finding
+
+  - id: telemetry.compliance_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2003
+    class_name: Compliance Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by the notify-regulator and notify-customer steps
+      when the affected-subjects count and data classification
+      cross the regulator-notification threshold: one Compliance
+      Finding per regulator submission (NIS2 Art. 23 / DORA
+      Art. 19 / GDPR Art. 33) and one per customer-facing
+      Art. 34 communication, keyed to the case so the
+      notification-SLA KPI and the regulator-notification-
+      overrun KRI declared on the CACAO x_secops_ng.metric_refs
+      can audit on-time delivery. Schema:
+      https://schema.ocsf.io/1.3.0/classes/compliance_finding
+
+nis2:
+  # Inbound entries live at content/mappings/nis2/article-21-2-b.yaml
+  # (id nis2:art-21-2-b — incident-handling capability) and
+  # content/mappings/nis2/article-23.yaml
+  # (ids nis2:art-23-early-warning, nis2:art-23-notification-72h),
+  # all backlinking to playbook.data_exfil@v1.
+  - mapping_id: nis2:art-21-2-b
+    article: 21(2)(b)
+    notes: >-
+      NIS2 Art. 21(2)(b) requires operation of an incident-handling
+      capability: detect, triage, contain, remediate, and capture
+      lessons learned. The data_exfil playbook is the operational
+      discharge of detect-through-contain-through-notify for the
+      data-exfiltration case set, with the regulator-submission
+      tail handed off to playbook.incident_management@v1.
+
+  - mapping_id: nis2:art-23-early-warning
+    article: 23(4)(a)
+    notes: >-
+      NIS2 Art. 23(4)(a) requires a 24-hour early warning to the
+      competent authority for significant incidents. The
+      data_exfil playbook routes into this branch through the
+      regulator-notification-threshold gate when the
+      affected-subjects count and data classification together
+      cross the significant-incident threshold; the early-warning
+      emission itself is rendered by
+      playbook.incident_management@v1 from the case envelope
+      this playbook hands off.
+
+  - mapping_id: nis2:art-23-notification-72h
+    article: 23(4)(b)
+    notes: >-
+      NIS2 Art. 23(4)(b) requires a 72-hour notification with an
+      initial assessment of severity and impact. The data_exfil
+      playbook's scope-assessment outputs (__data_classification__,
+      __affected_subjects_count__) feed the severity / impact /
+      affected-subjects sections of the assessment that
+      playbook.incident_management@v1 emits.
+
+dora:
+  # Inbound entries live at content/mappings/dora/article-19-and-28.yaml
+  # (ids dora:art-18-classification, dora:art-19-initial-4h,
+  # dora:art-19-intermediate-72h), all backlinking to
+  # playbook.data_exfil@v1.
+  - mapping_id: dora:art-18-classification
+    article: "18(1)"
+    notes: >-
+      DORA Art. 18(1) requires classification of ICT-related
+      incidents against the criteria in the JC RTS on incident
+      classification (Commission Delegated Regulation (EU)
+      2024/1772). The data_exfil playbook's scope-assessment step
+      produces the data-classification, affected-subjects-count,
+      and exfil-confirmed evidence that drives the
+      major-classification verdict on the downstream
+      playbook.incident_management@v1 engine.
+
+  - mapping_id: dora:art-19-initial-4h
+    article: "19(4)(a)"
+    notes: >-
+      DORA Art. 19(4)(a) requires an initial notification within
+      4 hours of classification as a major incident. The
+      data_exfil playbook's triage and scope-assessment artefacts
+      anchor the initial-notification payload that
+      playbook.incident_management@v1 emits along the
+      regulator channel.
+
+  - mapping_id: dora:art-19-intermediate-72h
+    article: "19(4)(b)"
+    notes: >-
+      DORA Art. 19(4)(b) requires an intermediate notification
+      within 72 hours with updated assessment. The data_exfil
+      playbook's containment outcome (was further exfiltration
+      stopped at the egress filter, was the implicated principal
+      cut out) and the resolved scope feed the updated
+      assessment for the intermediate report on the downstream
+      playbook.incident_management@v1 engine.
