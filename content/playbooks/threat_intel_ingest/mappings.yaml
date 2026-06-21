@@ -179,6 +179,13 @@ dora:
 # intel ingest is the upstream-awareness channel that surfaces
 # advisory-feed entries, CSIRT bulletins, and supplier-notice
 # indicators into the same vulnerability-handling lane operated by
-# vuln_intake. No outbound pin block is emitted here because the
-# schema does not currently carry a CRA key; the EXTEND layer that
-# adds CRA to the schema is filed as a sibling card.
+# vuln_intake. The outbound CRA pin block is now emitted below.
+
+cra:
+  # Inbound entries live at:
+  # - content/mappings/cra/article-13-6-third-party-vuln-awareness.yaml (`cra:art-13-6-third-party-vuln-awareness`)
+  # All backlink to playbook.threat_intel_ingest@v1.
+  - mapping_id: cra:art-13-6-third-party-vuln-awareness
+    article: "13(6)"
+    notes: >-
+      Outbound backlink for the inbound entry in article-13-6-third-party-vuln-awareness.yaml.

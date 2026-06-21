@@ -428,6 +428,13 @@ dora:
 # coordinated-vulnerability-disclosure intake reachable outside
 # business hours. Sibling to the business-hours edge filed against
 # the same Art.13(12) SPOC clause for the it_security_support_agent
-# playbook. No outbound pin block is emitted here because the
-# schema does not currently carry a CRA key; the EXTEND layer that
-# adds CRA to the schema is filed as a sibling card.
+# playbook. The outbound CRA pin block is now emitted below.
+
+cra:
+  # Inbound entries live at:
+  # - content/mappings/cra/article-13-12-spoc-on-call-rotation.yaml (`cra:art-13-12-spoc-on-call-rotation`)
+  # All backlink to playbook.on_call_rotation@v1.
+  - mapping_id: cra:art-13-12-spoc-on-call-rotation
+    article: "13(12)"
+    notes: >-
+      Outbound backlink for the inbound entry in article-13-12-spoc-on-call-rotation.yaml.

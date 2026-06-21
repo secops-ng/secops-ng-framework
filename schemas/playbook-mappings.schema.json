@@ -2,10 +2,10 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://secops-ng.org/schemas/playbook-mappings.schema.json",
   "title": "SecOps-NG Playbook Mappings Overlay",
-  "description": "Per-playbook outbound view of the content model: pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event classes, and the EU regulatory clauses (NIS2, DORA) this playbook helps operationalise. One file lives at content/playbooks/<slug>/mappings.yaml. Each top-level key holds an array of structural pointers; siblings in content/mappings/<regime>/ hold the inbound regulator-side view so the graph is closed in both directions. Placeholder IDs marked with `todo: true` are permitted while a playbook is still in SKELETON / CORE / EXTEND build-out.",
+  "description": "Per-playbook outbound view of the content model: pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event classes, and the EU regulatory clauses (NIS2, DORA, CRA) this playbook helps operationalise. One file lives at content/playbooks/<slug>/mappings.yaml. Each top-level key holds an array of structural pointers; siblings in content/mappings/<regime>/ hold the inbound regulator-side view so the graph is closed in both directions. Placeholder IDs marked with `todo: true` are permitted while a playbook is still in SKELETON / CORE / EXTEND build-out.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["playbook", "oscal", "d3fend", "ocsf", "nis2", "dora"],
+  "required": ["playbook", "oscal", "d3fend", "ocsf", "nis2", "dora", "cra"],
   "properties": {
     "playbook": {
       "description": "Long-form URN of the playbook this overlay belongs to. Must match the playbook artifact's x_secops_ng.stable_id.",
@@ -37,6 +37,11 @@
       "description": "DORA cross-references this playbook helps operationalise. Each entry pins a mapping id from content/mappings/dora/*.yaml so the graph is closed in both directions. SKELETON entries may use todo: true and a placeholder mapping_id while the inbound side is being populated.",
       "type": "array",
       "items": { "$ref": "#/$defs/regulatory_entry_dora" }
+    },
+    "cra": {
+      "description": "CRA (Cyber Resilience Act, Regulation (EU) 2024/2847) cross-references this playbook helps operationalise. Each entry pins a mapping id from content/mappings/cra/*.yaml so the graph is closed in both directions. SKELETON entries may use todo: true and a placeholder mapping_id while the inbound side is being populated.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/regulatory_entry_cra" }
     }
   },
   "$defs": {
@@ -160,6 +165,28 @@
         },
         "article": {
           "description": "Article reference shorthand, e.g. '19(2)'. Informational; the authoritative citation lives on the inbound mapping entry.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "todo": { "$ref": "#/$defs/todo_flag" },
+        "notes": { "type": "string", "maxLength": 2000 }
+      }
+    },
+    "regulatory_entry_cra": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mapping_id"],
+      "properties": {
+        "mapping_id": {
+          "description": "Mapping id from content/mappings/cra/*.yaml that this playbook backlinks to.",
+          "type": "string",
+          "pattern": "^cra:[a-z0-9][a-z0-9.-]*$",
+          "minLength": 3,
+          "maxLength": 120
+        },
+        "article": {
+          "description": "Article / annex reference shorthand, e.g. 'Annex I §1(b)' or '13(6)'. Informational; the authoritative citation lives on the inbound mapping entry.",
           "type": "string",
           "minLength": 1,
           "maxLength": 80
