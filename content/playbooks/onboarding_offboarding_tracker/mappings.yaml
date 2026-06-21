@@ -1,0 +1,589 @@
+# Cross-references for the onboarding_offboarding_tracker playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed/emitted, and the EU regulatory clauses this
+# playbook helps operationalise. Inbound references live in
+# content/mappings/{nis2,dora}/ so the graph is closed in both
+# directions.
+#
+# This playbook (F-WF-11) is the per-lifecycle-event grant/revoke-
+# confirmation counterpart to the iam_auditor's per-execution
+# capability-inventory engine: on each run, ingest one operator-
+# supplied lifecycle event (joiner, mover, or leaver) for a role-
+# shaped runtime principal (service-account, workflow-runtime
+# principal, or automation role), resolve that principal against the
+# operator's identity source, apply the declared capability delta
+# (grant on join, adjust on move, revoke on leave), confirm the
+# grant/revoke landed at the principal's downstream capability
+# surface by re-reading the closed observed capability list, and
+# emit one access-evidence artifact pinning the resulting caller-
+# identity and closed capability list. The artifact is shaped
+# against schemas/evidence/access.schema.json (stream: access),
+# carrying the workflow id, execution id, compile target,
+# regulation_refs (typically `["nis2:art-21-2-i"]`), control_refs,
+# captured_at, and provenance — the same F-CP-07 envelope the
+# iam_auditor playbook emits against, so the two playbooks together
+# close the NIS2 Art. 21(2)(i) joiner-mover-leaver attestation
+# surface: continuous capability-inventory on every workflow
+# execution (iam_auditor) plus one grant/revoke-confirmation
+# artifact per lifecycle event (this playbook).
+#
+# Caller principals are role-shaped by design (service-account name,
+# workflow-runtime principal id, automation role). Personal-user
+# principals are rejected at the F-CP-07 primitive boundary; the
+# regex pinned by `schemas/evidence/access.schema.json` fails the
+# step loud rather than silently widening scope to natural persons.
+# This boundary is what lets the GDPR closure below default to
+# inbound-only (see GDPR closure note).
+#
+# Deliberate OSCAL omissions (mirror of the SC-8 / SA-11 / IA-2
+# omission-note pattern from the cloud_misconfiguration,
+# codebase_vuln_management, iam_auditor, on_call_rotation,
+# detection_engineering, and infra_posture_management overlays):
+#   - IA-2 (Identification and Authentication — Organizational
+#     Users) is NOT pinned: the workflow rejects personal-user
+#     principals at the primitive boundary (see header). IA-9
+#     (Service Identification and Authentication) is the control
+#     that covers the service / automation / workflow-runtime
+#     principals this playbook actually resolves and is pinned
+#     below in its place. This mirrors the iam_auditor sibling
+#     decision exactly.
+#   - AC-5 (Separation of Duties) is NOT pinned: the workflow
+#     applies a declared capability delta against a single resolved
+#     role-shaped principal; it does not assert separation-of-duties
+#     between roles. A separation-of-duties pin would belong on the
+#     governance content surface that defines the role split (who
+#     may approve a lifecycle event, who may execute it), not on
+#     this per-lifecycle-event grant/revoke-confirmation step.
+#   - AU-2 (Event Logging) is NOT pinned: the playbook emits OCSF
+#     Account Change records as the access-evidence carrier, but
+#     defining the operator's audit-event policy is upstream of
+#     this playbook. The emitted records are consumed by the
+#     operator's existing OCSF store under its AU-2 policy.
+#   - AC-7 (Unsuccessful Logon Attempts) is NOT pinned: failure
+#     handling on identity-source read calls is delegated to the
+#     compile target's runtime (n8n / Temporal / LangGraph) and the
+#     operator's IdP; the playbook does not implement lockout or
+#     throttling logic itself.
+#   - IR-4 (Incident Handling) is NOT pinned: a divergence detected
+#     by the confirm-grant-revoke step (missing grant or lingering
+#     revoke) is the audit-evident artifact a downstream incident
+#     workflow MAY consume, but the incident-handling capability
+#     itself is operated by the per-incident playbooks
+#     (identity_compromise, post_incident_review) which carry IR-4
+#     on their own overlays. Pinning IR-4 here would double-count
+#     the control surface.
+#
+# CRA closure: the schema's top-level keys are fixed
+# (oscal/d3fend/ocsf/nis2/dora). CRA cross-references for this
+# playbook are not expressed either inbound or outbound. The
+# onboarding_offboarding_tracker is an operator-side identity-
+# lifecycle discipline — per-event grant/revoke-confirmation
+# evidence — not a product-side incident reporting or
+# vulnerability-disclosure flow. CRA Art. 14 product-notification
+# obligations and Annex I vulnerability-handling requirements
+# therefore do not attach here; no outbound CRA entries are emitted
+# on this overlay, consistent with siblings.
+#
+# DORA closure: DORA Art. 9 (protection and prevention — including
+# access-management obligations for financial entities,
+# Regulation (EU) 2022/2554) and the access-management /
+# authentication-governance articles of the JC RTS on ICT risk-
+# management framework (Commission Delegated Regulation (EU)
+# 2024/1774) both name disciplines a per-lifecycle-event grant/
+# revoke-confirmation stream operationally supports. Neither is
+# currently expressed as a clause-anchor backlink to
+# playbook.onboarding_offboarding_tracker@v1 in
+# content/mappings/dora/; the existing DORA inbound file at
+# content/mappings/dora/article-9-and-rts-vuln-mgmt.yaml is
+# vulnerability/patch scoped (id dora:art-9-vuln-mgmt) and does
+# not cover the access-management slice. This overlay does NOT
+# silently widen scope to pin an outbound DORA entry against a
+# missing inbound; a separate inbound-closure card adds the
+# Art. 9 access-management anchor (e.g.
+# content/mappings/dora/article-9-access-management.yaml or an
+# extension of the existing Art. 9 inbound) and the outbound pin
+# lands together with the inbound entry. This mirrors the
+# iam_auditor sibling DORA closure note exactly, and the
+# on_call_rotation / infra_posture_management gap-note precedent:
+# gap notes are separate closure cards, not scope creep on a
+# single-purpose mappings PR.
+#
+# GDPR closure: a per-workflow Art. 30 Record of Processing
+# Activity for this playbook already lives at
+# content/mappings/gdpr/data-flow-onboarding_offboarding_tracker.md
+# and covers the role-shaped-principal-handle, declared-capability-
+# delta, observed-capability-list, and confirmation-divergence
+# processing the five steps below operate on, lawful-basis-grounded
+# in Art. 6(1)(c) legal obligation (NIS2 Art. 21(2)(i) as
+# transposed nationally; DORA Art. 9 inherits the same primary
+# basis for financial entities) with Art. 6(1)(f) legitimate
+# interests as the secondary basis for operators outside statutory
+# scope. The principal-shape primitive boundary (role-shaped only,
+# personal-user principals rejected) is what keeps the worst-case
+# GDPR engagement narrow — for operators whose runtime principals
+# are exclusively non-personal service / workload identities GDPR
+# does not engage at all. The schema's regulatory top-level keys
+# are fixed (nis2/dora) and no GDPR clause-file convention is
+# carried today; this overlay therefore emits no outbound GDPR
+# entry, and the inbound ROPA file is the authoritative GDPR
+# record. When a GDPR clause-file convention lands, an inbound
+# entry for Art. 32 (security of processing — appropriate
+# technical and organisational measures, including the documented
+# per-lifecycle-event grant/revoke-confirmation discipline this
+# playbook discharges) against this playbook can be added without
+# a schema change. This mirrors the phishing_triage / iam_auditor
+# GDPR closure-comment convention.
+#
+# SigmaHQ closure: the playbook's external_references carry no
+# upstream SigmaHQ rule-id pointers because this playbook is not a
+# detection-content surface — it is a grant/revoke-confirmation
+# attestation surface. Detection-rule lifecycle is operated by the
+# detection_engineering playbook; any rule-based alerting on
+# joiner-mover-leaver anomalies (e.g. lingering-revoke patterns,
+# unexpected privilege escalation on a mover event) attaches to
+# the detection_engineering overlay's SigmaHQ surface, not here.
+# No SigmaHQ entries are emitted on this overlay, consistent with
+# the framing in the playbook's own description.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.onboarding_offboarding_tracker@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the ingest-lifecycle-
+  # event, resolve-identity, apply-capability-delta, confirm-grant-
+  # revoke, and emit-access-evidence steps. Catalogue URLs resolve to
+  # the public NIST OSCAL repository. Anchored to the OSCAL refs
+  # declared on content/controls/control.jml_evidence@v1.yaml,
+  # control.privileged_access_review@v1.yaml, and
+  # control.cloud_identity_least_privilege@v1.yaml — the three
+  # controls this playbook's x_secops_ng.control_refs assert.
+  - id: control.account_management@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AC-2
+    title: Account Management
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AC-2
+    notes: >-
+      Anchors the resolve-identity and apply-capability-delta steps:
+      AC-2 requires the organisation to identify and manage system
+      accounts, monitor their use, and notify account managers on
+      account-lifecycle events (creation, modification, disablement,
+      removal). The role-shaped principal resolved from the
+      operator's identity source plus the declared capability delta
+      applied against that principal is the per-lifecycle-event
+      materialisation of the AC-2 lifecycle — joiner events exercise
+      creation, mover events exercise modification, leaver events
+      exercise disablement / removal. The control.jml_evidence@v1
+      file's oscal_refs declares AC-2 for exactly this anchor.
+
+  - id: control.account_management_disable_accounts@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AC-2(3)
+    title: Account Management | Disable Accounts
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AC-2(3)
+    notes: >-
+      Anchors the leaver branch of the apply-capability-delta and
+      confirm-grant-revoke steps: AC-2(3) requires the organisation
+      to disable accounts within a defined time period when no
+      longer associated with a user or role. The remove-set on a
+      leaver event is the runtime materialisation of that
+      requirement, and the confirm-grant-revoke read-back closes
+      the loop by re-reading the principal's closed capability list
+      to verify the disable actually landed — lingering-revoke
+      entries on the confirmation record are the audit-evident
+      surface a reviewer joins against kri.leaver_to_revoked_time@v1
+      (declared on the playbook's x_secops_ng.metric_refs) to audit
+      the leaver-to-revoked SLA. The control.jml_evidence@v1 file's
+      oscal_refs declares AC-2(3) for exactly this anchor.
+
+  - id: control.access_enforcement@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AC-3
+    title: Access Enforcement
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AC-3
+    notes: >-
+      Covers the apply-capability-delta step: AC-3 demands
+      enforcement of approved authorisations for logical access to
+      information and system resources in accordance with applicable
+      access-control policies. The declared add-set / remove-set on
+      the lifecycle event is the per-event authorisation envelope;
+      the apply step is where that envelope is asked to materialise
+      against the operator's identity source. AC-3 is the
+      enforcement-side complement to the AC-2 lifecycle-management
+      anchor above; the iam_auditor sibling pins AC-3 on its
+      enumerate-capabilities step for the read-side observation of
+      what the enforcement layer was honouring at execution time.
+
+  - id: control.least_privilege@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AC-6
+    title: Least Privilege
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AC-6
+    notes: >-
+      Anchors the apply-capability-delta and confirm-grant-revoke
+      steps' least-privilege surface: AC-6 requires the organisation
+      to employ the principle of least privilege, allowing only
+      authorised accesses for users (or processes acting on behalf
+      of users) which are necessary to accomplish assigned
+      organisational tasks. The closed-delta shape of the apply
+      step (no implicit grants beyond what the event declares) is
+      the structural enforcement of that principle on a mover or
+      joiner event, and the closed observed capability list the
+      confirm step re-reads is the per-execution evidence that no
+      capability widened beyond declared intent.
+      control.cloud_identity_least_privilege@v1.yaml declares AC-6
+      for exactly this anchor.
+
+  - id: control.review_of_user_privileges@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AC-6(7)
+    title: Least Privilege | Review of User Privileges
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AC-6(7)
+    notes: >-
+      Anchors the confirm-grant-revoke step's review surface:
+      AC-6(7) requires the organisation to periodically review the
+      privileges assigned to roles to validate the need for such
+      privileges. The per-lifecycle-event confirmation record this
+      playbook emits — closed observed capability list plus
+      divergence detail (missing grants, lingering revokes) against
+      the declared delta — is the event-level discharge of that
+      review obligation, complementary to the periodic-review
+      cadence the operator's access-governance function runs.
+      control.privileged_access_review@v1.yaml and
+      control.cloud_identity_least_privilege@v1.yaml both declare
+      AC-6(7) on their oscal_refs.
+
+  - id: control.personnel_termination@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: PS-4
+    title: Personnel Termination
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=PS-4
+    notes: >-
+      Anchors the leaver branch of the ingest-lifecycle-event and
+      apply-capability-delta steps: PS-4 requires the organisation
+      to terminate information-system access on personnel
+      termination within a defined time period. Because this
+      playbook's primitive boundary rejects personal-user
+      principals (see header) and accepts only role-shaped handles,
+      the PS-4 anchor here applies in the structural sense — a
+      leaver event closes a role-shaped principal's tenure on the
+      operator's identity surface, the closed remove-set is the
+      access-termination envelope, and the confirm-grant-revoke
+      step is the audit-evident closure on whether termination
+      landed. PS-4 is pinned per the control.jml_evidence@v1
+      oscal_refs declaration; the role-shaping is the
+      public-bar-hygiene complement that keeps the termination
+      surface in scope without naming individuals.
+
+  - id: control.service_identification_authentication@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IA-9
+    title: Service Identification and Authentication
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IA-9
+    notes: >-
+      Covers the resolve-identity step's principal-resolution
+      surface: IA-9 demands identification and authentication of
+      system services and the processes acting on behalf of system
+      services. Because the playbook's primitive boundary rejects
+      personal-user principals and accepts only role-shaped
+      handles (service_account, workflow_runtime, automation_role),
+      IA-9 is the right anchor for the principal types this
+      workflow resolves — and is pinned in place of IA-2
+      (Identification of Organizational Users) per the deliberate-
+      omission note in the header. This mirrors the iam_auditor
+      sibling decision on the same F-CP-07 access stream.
+
+  - id: control.system_component_inventory@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CM-8
+    title: System Component Inventory
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CM-8
+    notes: >-
+      Covers the emit-access-evidence step's inventory surface:
+      CM-8 requires a current, accurate, and maintained inventory
+      of system components. The closed observed capability list
+      pinned to the access-evidence artifact at emission is the
+      machine-readable inventory entry for the identity component
+      of the lifecycle-event execution — the verb.resource tokens
+      the resolved principal carries after the declared delta
+      landed, captured as the audit-evident inventory record. The
+      iam_auditor sibling pins CM-8 on the same F-CP-07 access
+      artifact for the per-execution capability-inventory side;
+      this playbook pins CM-8 for the per-lifecycle-event grant/
+      revoke-confirmation side. Both feed the same access-evidence
+      stream and the same NIS2 Art. 21(2)(i) clause anchor.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned to the real action UUIDs resolved
+  # from content/playbooks/onboarding_offboarding_tracker/playbook.cacao.json
+  # (five action bodies: ingest-lifecycle-event, resolve-identity,
+  # apply-capability-delta, confirm-grant-revoke, emit-access-
+  # evidence). D3FEND v1.0.0 does not carry a dedicated technique
+  # for per-lifecycle-event grant/revoke-confirmation or for
+  # access-evidence artifact emission; the closest defensive-
+  # technique anchors are pinned below with the gaps documented in
+  # line, mirroring the iam_auditor D3-UAP / D3-SCP precedent on
+  # the same F-CP-07 access stream and the D3-SWI precedent on
+  # codebase_vuln_management.
+  - step: action--20212021-0000-4000-8000-000000000002
+    d3fend_id: D3-AM
+    d3fend_name: Account Monitoring
+    url: https://d3fend.mitre.org/technique/d3f:AccountMonitoring/
+    notes: >-
+      ingest-lifecycle-event — reading the lifecycle-event record
+      from the operator-supplied identity source and binding it to
+      a normalised in-workflow event record (event_kind in {joiner,
+      mover, leaver}, principal_handle, declared_capability_delta,
+      effective_at) is the Detect-tactic account-monitoring
+      discipline on the source-of-truth surface. The identity-
+      source endpoint is operator-configured — the framework ships
+      no default hosted IdP — and this step normalises whatever
+      shape the operator supplies into the closed in-workflow
+      event record the rest of the playbook reads. The
+      control.jml_evidence@v1 file's d3fend_refs declares D3-AM
+      for exactly this anchor.
+
+  - step: action--20212021-0000-4000-8000-000000000003
+    d3fend_id: D3-AM
+    d3fend_name: Account Monitoring
+    url: https://d3fend.mitre.org/technique/d3f:AccountMonitoring/
+    notes: >-
+      resolve-identity — resolving the principal_handle carried by
+      the ingested lifecycle event against the operator's identity
+      source and binding it to a role-shaped caller-identity block
+      is the per-event materialisation of the same account-
+      monitoring discipline the iam_auditor sibling pins for its
+      enumerate-identities step. The principal is role-shaped by
+      contract (service_account, workflow_runtime, automation_role)
+      — personal-user principals are rejected at the primitive
+      boundary, the same primitive boundary the F-CP-07 access
+      schema enforces — and the resolved block is the per-event
+      anchor the access-evidence artifact carries downstream.
+
+  - step: action--20212021-0000-4000-8000-000000000004
+    d3fend_id: D3-UAP
+    d3fend_name: User Account Permissions
+    url: https://d3fend.mitre.org/technique/d3f:UserAccountPermissions/
+    notes: >-
+      apply-capability-delta — materialising the declared add-set
+      and remove-set against the resolved principal is the per-
+      event grant/revoke half of the user-account-permissions
+      defensive discipline. D3FEND v1.0.0 frames D3-UAP around the
+      explicit modelling and restriction of what a given account
+      is permitted to do; this step is where the modelled delta is
+      asked to take effect on the operator's identity source. The
+      closed-delta contract (no implicit grants beyond what the
+      event declares, no implicit revocations beyond the remove-
+      set) is what keeps the discipline within the D3-UAP frame.
+      D3FEND v1.0.0 does not carry a dedicated capability-delta
+      technique; D3-UAP is the closest defensive-technique anchor
+      and is pinned with this gap note, mirroring the iam_auditor
+      D3-UAP gap note on the same F-CP-07 surface.
+
+  - step: action--20212021-0000-4000-8000-000000000004
+    d3fend_id: D3-SCP
+    d3fend_name: System Configuration Permissions
+    url: https://d3fend.mitre.org/technique/d3f:SystemConfigurationPermissions/
+    notes: >-
+      apply-capability-delta — the declared delta against a role-
+      shaped principal includes configuration-level grants and
+      revocations (verb.resource tokens addressing IAM, policy,
+      and identity-configuration surfaces). D3-SCP is pinned
+      alongside D3-UAP because system-configuration permissions
+      and account permissions are produced by the same IAM-source
+      mutation but discharge distinct D3FEND techniques; this is
+      the same D3-UAP / D3-SCP split the iam_auditor sibling uses
+      on its enumerate-capabilities step and the identity_compromise
+      overlay uses on its IAM audit and persistence-removal step.
+
+  - step: action--20212021-0000-4000-8000-000000000005
+    d3fend_id: D3-AM
+    d3fend_name: Account Monitoring
+    url: https://d3fend.mitre.org/technique/d3f:AccountMonitoring/
+    notes: >-
+      confirm-grant-revoke — re-reading the resolved principal's
+      closed capability list from the same operator-supplied
+      identity source to confirm that the declared delta landed
+      (add-set present, remove-set gone) is the Detect-tactic
+      account-monitoring discipline materialised against the
+      post-delta state. The divergence detail captured on the
+      confirmation record (missing grants, lingering revokes) is
+      the audit-evident surface a reviewer joins against
+      kri.joiner_to_provisioned_time@v1 and
+      kri.leaver_to_revoked_time@v1 (declared on the playbook's
+      x_secops_ng.metric_refs) to audit the per-event SLA. Read-
+      only on this step.
+
+  # emit-access-evidence (action--20212021-0000-4000-8000-
+  # 000000000006) is deliberately NOT pinned to a separate D3FEND
+  # technique. D3FEND v1.0.0 frames its defensive techniques
+  # around runtime countermeasures and inventory / model
+  # disciplines on the adjacent surface; per-lifecycle-event
+  # artifact emission of an access-evidence record shaped per
+  # schemas/evidence/access.schema.json for downstream consumption
+  # by the F-CP-07 access stream is an evidence-stream emission
+  # discipline, not a runtime countermeasure or an inventory step,
+  # and forcing it onto a D3FEND tag would misrepresent the
+  # technique. This step is anchored on the AC-2, AC-6(7), and
+  # CM-8 OSCAL controls above where the obligation actually lives
+  # (account-management lifecycle recording, periodic-review
+  # discharge, system-component inventory). The iam_auditor
+  # sibling pins D3-AM on its emit-access-evidence step on the
+  # grounds that the per-execution caller-identity emission is the
+  # audit-trail materialisation of the same account-monitoring
+  # technique its enumerate-identities step uses; on this
+  # playbook the emission is the audit-trail materialisation of
+  # the D3-UAP / D3-SCP delta-application discipline above (not
+  # the D3-AM principal-resolution discipline), so a separate
+  # D3-AM pin here would not add structural information. This
+  # mirrors the infra_posture_management emit-posture-evidence
+  # gap note: pin the closest available technique only where the
+  # discipline matches, and document the absence where it does
+  # not, rather than inventing coverage.
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. The ingest-lifecycle-event step
+  # consumes Account Change (3001) from the operator's identity
+  # source (joiner / mover / leaver event records). The resolve-
+  # identity step consumes Authentication (3002) from the
+  # operator's IdP for the principal-resolution surface. The
+  # apply-capability-delta step emits Account Change (3001)
+  # records carrying the per-event delta envelope. The confirm-
+  # grant-revoke step consumes API Activity (6003) records (the
+  # read-back call against the principal's downstream capability
+  # surface that produces the closed observed capability list).
+  # The emit-access-evidence step emits Account Change (3001)
+  # records carrying the access-evidence artifact reference so
+  # the kri.joiner_to_provisioned_time@v1 /
+  # kri.leaver_to_revoked_time@v1 metrics declared on the
+  # playbook's x_secops_ng.metric_refs can audit the per-event
+  # SLA. The shape of the emitted access-evidence artifact itself
+  # is a content-model-native evidence shape (see
+  # schemas/evidence/access.schema.json) rather than an OCSF
+  # class — the OCSF binding below pins the runtime-side telemetry
+  # surface the operator's SIEM / identity store reads, not the
+  # durable evidence artefact the access store retains. The
+  # iam_auditor sibling pins the same three OCSF classes on its
+  # own steps; the bindings are intentionally parallel because the
+  # two playbooks feed the same F-CP-07 access stream from
+  # complementary halves (per-execution capability inventory and
+  # per-lifecycle-event grant/revoke confirmation).
+  - id: telemetry.account_change@v1
+    category_uid: 3
+    category_name: Identity & Access Management
+    class_uid: 3001
+    class_name: Account Change
+    ocsf_version: "1.3.0"
+    direction: both
+    notes: >-
+      Consumed at the ingest-lifecycle-event step (joiner / mover /
+      leaver event records from the operator's identity source —
+      IdP role-surface mutations, role-and-capability repository
+      commits, HR-managed role-source events — that supply the
+      __raw_event__ the workflow normalises), emitted at the
+      apply-capability-delta step (one record per applied delta
+      carrying the closed add-set and remove-set against the
+      resolved principal so the operator's SIEM can correlate
+      intent against IAM-source mutation traces), and emitted at
+      the emit-access-evidence step (one record per lifecycle
+      event carrying the access-evidence artifact reference so the
+      operator's SIEM and the per-event SLA metrics audit the
+      grant/revoke-confirmation surface). The Account Change class
+      is the right OCSF anchor on all three points because the
+      joiner-mover-leaver lifecycle is itself a sequence of
+      access-relevant changes on the operator's IAM ledger; the
+      direction is `both` on a single binding because the consume
+      path and the two emit paths share the same OCSF class
+      against the same operator-bound telemetry surface, mirroring
+      the on_call_rotation Account Change consume-and-emit
+      binding. Schema:
+      https://schema.ocsf.io/1.3.0/classes/account_change
+
+  - id: telemetry.authentication@v1
+    category_uid: 3
+    category_name: Identity & Access Management
+    class_uid: 3002
+    class_name: Authentication
+    ocsf_version: "1.3.0"
+    direction: consumes
+    notes: >-
+      Consumed at the resolve-identity step: principal-resolution
+      records from the operator's identity source (IdP sign-in /
+      runtime-principal-bind events, service-account lookup
+      responses, automation-role registration records) anchor the
+      role-shaped caller-identity block the access-evidence
+      artifact carries. The iam_auditor sibling pins the same
+      class on its enumerate-identities step for the per-execution
+      side; this playbook pins it for the per-event side. Schema:
+      https://schema.ocsf.io/1.3.0/classes/authentication
+
+  - id: telemetry.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: consumes
+    notes: >-
+      Consumed at the confirm-grant-revoke step: read-back calls
+      against the resolved principal's downstream capability
+      surface (cloud IAM read API, IdP role-surface read API, or
+      capability-registry read endpoint, as configured by the
+      operator) produce the closed observed capability list the
+      primitive walks. The api_activity records carry the request
+      metadata the primitive canonicalises (NFKC + lower-case)
+      and dedups so re-runs collapse to byte-identical bytes at
+      the confirmation layer. The iam_auditor sibling consumes the
+      same class on its enumerate-capabilities step for the
+      per-execution capability walk; the read shape is parallel.
+      Schema: https://schema.ocsf.io/1.3.0/classes/api_activity
+
+nis2:
+  # Inbound entry lives at
+  # content/mappings/nis2/article-21-2-i.yaml
+  # (id nis2:art-21-2-i — HR security, access-control policies,
+  # and asset management) and already backlinks
+  # playbook.onboarding_offboarding_tracker@v1 on its
+  # playbook_refs list alongside playbook.iam_auditor@v1 (the
+  # per-execution capability-inventory counterpart on the same
+  # F-CP-07 access stream). No inbound expansion is required on
+  # this PR — the graph is already closed.
+  - mapping_id: nis2:art-21-2-i
+    article: 21(2)(i)
+    notes: >-
+      NIS2 Art. 21(2)(i) requires human-resources security,
+      access-control policies, and asset management — including
+      joiner-mover-leaver evidence, privileged-access review
+      cadence, and asset-inventory delta capture. The
+      onboarding_offboarding_tracker playbook is the operational
+      discharge of the per-lifecycle-event grant/revoke-
+      confirmation slice of that obligation: one access-evidence
+      artifact per joiner / mover / leaver event, shaped against
+      schemas/evidence/access.schema.json, carrying the resolved
+      role-shaped caller identity and the closed observed
+      capability list the principal holds after the declared
+      delta was applied. The per-execution capability-inventory
+      half of the obligation is operated by playbook.iam_auditor@v1
+      on the same F-CP-07 access stream; the two playbooks
+      discharge complementary halves of the obligation surface,
+      and the inbound entry already lists both in its
+      playbook_refs for exactly that reason. This outbound entry
+      is the structural closure of that backlink.
+
+dora:
+  # No outbound DORA entry is asserted. The inbound DORA file at
+  # content/mappings/dora/article-9-and-rts-vuln-mgmt.yaml is
+  # vulnerability/patch scoped (id dora:art-9-vuln-mgmt) and does
+  # not cover the access-management slice of DORA Art. 9
+  # (Regulation (EU) 2022/2554) or the access-management /
+  # authentication-governance articles of the JC RTS on ICT risk-
+  # management framework (Commission Delegated Regulation (EU)
+  # 2024/1774); no inbound DORA entry currently backlinks
+  # playbook.onboarding_offboarding_tracker@v1. Per the
+  # iam_auditor sibling DORA closure precedent on the same F-CP-07
+  # access stream, an outbound pin is deliberately NOT asserted
+  # here pending a separate inbound-entry card; see the file
+  # header for the gap note.
+  []
