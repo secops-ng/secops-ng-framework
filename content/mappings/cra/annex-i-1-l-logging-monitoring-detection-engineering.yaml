@@ -1,0 +1,61 @@
+# CRA — Annex I §1(l) logging-and-monitoring (detection-engineering half).
+#
+# Companion to annex-i-1-essential-cybersecurity.yaml (entry
+# `cra:annex-i-1-logging-monitoring`, the §1(l) catch-all anchored on
+# the runtime recording/monitoring capability). This file pins the
+# rule-lifecycle half of the §1(l) obligation: the discipline of
+# proposing, reviewing, shipping, and measuring the effectiveness of
+# the detection rules that consume the recorded internal-activity
+# stream. The catch-all entry covers "is the product recording
+# relevant internal activity?"; this entry covers "are the rules that
+# read that recording fit for purpose, and is their effectiveness
+# audited over time?". Sibling to the operational-triage half pinned
+# under `cra:annex-i-1-l-logging-monitoring-alert-triage`, which
+# covers the per-finding triage discipline.
+regime: cra
+entries:
+  - id: cra:annex-i-1-l-logging-monitoring-detection-engineering
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §1(l)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Products with digital elements shall provide security-related
+      information by recording and monitoring relevant internal
+      activity, including the access to or modification of data,
+      services or functions, with an opt-out mechanism for the user —
+      operationalised on the rule-content side through a documented
+      detection-rule lifecycle that proposes, peer-reviews, ships, and
+      measures the effectiveness of the rules consuming the recorded
+      activity, so the monitoring capability remains fit for purpose
+      across product evolution.
+    status: draft
+    control_refs:
+      - control.control_effectiveness_test@v1
+      - control.security_assessment@v1
+    playbook_refs:
+      - playbook.detection_engineering@v1
+    metric_refs:
+      - kpi.control_effectiveness_coverage@v1
+      - kri.overdue_effectiveness_tests@v1
+    evidence_stream_refs:
+      - effectiveness
+    notes: >-
+      Companion to `cra:annex-i-1-logging-monitoring` in
+      annex-i-1-essential-cybersecurity.yaml, which pins the §1(l)
+      catch-all on the runtime recording/monitoring capability. This
+      entry pins the rule-lifecycle half: the propose → review → ship
+      → measure state machine operated by the detection_engineering
+      playbook is the audit-evident discipline that keeps the rules
+      reading the §1(l) recording stream fit for purpose, with each
+      shipped rule version carrying a paired effectiveness snapshot
+      that the F-CP-06 effectiveness evidence stream consumes. The
+      operational-triage half of the §1(l) capability is pinned
+      separately at `cra:annex-i-1-l-logging-monitoring-alert-triage`
+      (triage of the per-finding stream the shipped rules emit at
+      runtime). The NIS2 parallel for the rule-lifecycle effectiveness
+      discipline is `nis2:art-21-2-f` (effectiveness assessment of
+      cybersecurity risk-management measures), already inbound on the
+      detection_engineering overlay.
