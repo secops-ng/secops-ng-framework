@@ -1,0 +1,104 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--5c5c5c5c-0000-4000-8000-000000000001",
+  "name": "Supply-chain security",
+  "description": "Supply-chain-security playbook scaffold (NIS2 Directive (EU) 2022/2555, Article 21(2)(d)). Detects and responds to supply-chain compromises that reach the operator through a direct supplier, service provider, or upstream software component. SKELETON: pins the workflow topology (workflow_start -> assess-supplier-signal -> emit-supply-chain-evidence -> workflow_end) and the x_secops_ng joins into the SecOps-NG content model; per-target compiler emitters (n8n / Temporal / LangGraph), regulatory-mapping fan-out (OSCAL / D3FEND / NIS2 / DORA / CRA inbound + outbound), metric refs, and byte-parity goldens are out of scope and land in CORE / EXTEND sibling cards. The shipped action bodies are placeholders that pin the contract only; real action logic is delegated to the CORE sibling card.",
+  "playbook_types": [
+    "investigation",
+    "notification"
+  ],
+  "created_by": "identity--5c5c5c5c-5c5c-45c5-85c5-c5c5c5c5c5c5",
+  "created": "2026-06-21T00:00:00Z",
+  "modified": "2026-06-21T00:00:00Z",
+  "labels": [
+    "supply-chain",
+    "supplier",
+    "nis2",
+    "skeleton"
+  ],
+  "playbook_variables": {
+    "__execution_id__": {
+      "type": "string",
+      "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Pinned by the upstream runtime; the workflow reads it for the supply-chain-evidence artifact join.",
+      "external": true
+    },
+    "__supplier_signal_ref__": {
+      "type": "string",
+      "description": "Pointer to the inbound supply-chain signal under processing on this execution. Operator-configured; the workflow reads it as an opaque pointer to a signal record held in the operator's threat-intel surface, supplier-attestation feed, SBOM-watch tooling, or upstream-advisory inbox. The framework ships no default hosted feed dependency, no default non-EU endpoint, and no vendor SDK bundling — the operator supplies whatever signal source is in scope.",
+      "external": true
+    },
+    "__assessment_ref__": {
+      "type": "string",
+      "description": "Pointer to the supply-chain-impact assessment record produced by assess-supplier-signal. Closed shape per CORE sibling card; verdict-keyed (no_impact | watch | confirmed_compromise), affected-supplier-handle and affected-component-set valued. Consumed by emit-supply-chain-evidence.",
+      "external": false
+    },
+    "__supply_chain_artifact_ref__": {
+      "type": "string",
+      "description": "Pointer to the supply-chain-evidence artifact emitted by emit-supply-chain-evidence. Anchored against the F-CP-03 supply-chain evidence stream so the NIS2 Article 21(2)(d) supplier-security obligation has a per-execution audit-trail entry. Schema and emission target are operator-configured and detailed in the CORE / EXTEND sibling cards.",
+      "external": false
+    }
+  },
+  "workflow_start": "start--5c5c5c5c-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--5c5c5c5c-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "supply-chain-security-start",
+      "on_completion": "action--5c5c5c5c-0000-4000-8000-000000000002"
+    },
+    "action--5c5c5c5c-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "assess-supplier-signal",
+      "description": "Read the inbound supply-chain signal referenced by __supplier_signal_ref__ from the operator-supplied signal source and bind it to a normalised supply-chain-impact assessment record (verdict in {no_impact, watch, confirmed_compromise}, affected_supplier_handle, affected_component_set, received_at). SKELETON placeholder: this step pins the contract only — the actual assessment policy (signal-source ingestion, SBOM correlation, supplier-attestation lookup, verdict scoring) is delegated to the CORE primitive bound in the CORE sibling card. Read-only against the operator's signal source by contract; the workflow MUST NOT mutate the source signal on this step.",
+      "on_completion": "action--5c5c5c5c-0000-4000-8000-000000000003",
+      "in_args": [
+        "__execution_id__",
+        "__supplier_signal_ref__"
+      ],
+      "out_args": [
+        "__assessment_ref__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.supplier_inventory@v1"
+        ]
+      }
+    },
+    "action--5c5c5c5c-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "emit-supply-chain-evidence",
+      "description": "Combine the execution metadata and the supply-chain-impact assessment record into one supply-chain-evidence artifact anchored against the F-CP-03 supply-chain evidence stream, so the NIS2 Article 21(2)(d) supplier-security obligation has a per-execution audit-trail entry. SKELETON placeholder: the artifact shape (schema reference, classification flags, captured_at, provenance, regulation_refs) is pinned by the CORE / EXTEND sibling cards; this step pins the contract only. Destination is operator-configured — no default non-EU endpoint.",
+      "on_completion": "end--5c5c5c5c-0000-4000-8000-000000000004",
+      "in_args": [
+        "__execution_id__",
+        "__assessment_ref__"
+      ],
+      "out_args": [
+        "__supply_chain_artifact_ref__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.supplier_inventory@v1"
+        ]
+      }
+    },
+    "end--5c5c5c5c-0000-4000-8000-000000000004": {
+      "type": "end",
+      "name": "supply-chain-security-end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.supply_chain_security@v1",
+    "content_version": "0.1.0",
+    "maturity": "draft",
+    "compile_targets": [],
+    "control_refs": [
+      "control.supplier_inventory@v1"
+    ],
+    "sources": [
+      "OASIS CACAO v2.0 specification",
+      "NIS2 Directive (EU) 2022/2555 — Article 21(2)(d)",
+      "Community input — supply-chain security workflow scaffold"
+    ]
+  }
+}
