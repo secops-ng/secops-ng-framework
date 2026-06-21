@@ -168,3 +168,17 @@ dora:
       events that an operator can lift into a voluntary notification
       payload; the framework provides the artefact, the operator owns
       the submission decision and transport.
+
+# CRA closure: the playbook-mappings schema's top-level keys are fixed
+# (oscal/d3fend/ocsf/nis2/dora). The inbound CRA backlink for this
+# playbook lives at
+# content/mappings/cra/article-13-6-third-party-vuln-awareness.yaml
+# (id cra:art-13-6-third-party-vuln-awareness) — Art.13(6) requires
+# manufacturers to systematically document vulnerabilities including
+# "any relevant information provided by third parties", and threat-
+# intel ingest is the upstream-awareness channel that surfaces
+# advisory-feed entries, CSIRT bulletins, and supplier-notice
+# indicators into the same vulnerability-handling lane operated by
+# vuln_intake. No outbound pin block is emitted here because the
+# schema does not currently carry a CRA key; the EXTEND layer that
+# adds CRA to the schema is filed as a sibling card.
