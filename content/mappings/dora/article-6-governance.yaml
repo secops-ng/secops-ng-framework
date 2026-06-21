@@ -1,0 +1,68 @@
+# DORA — Article 6 (ICT risk-management framework), governance slice.
+# Companion to article-6.yaml (id dora:art-6-framework — the annual
+# review and ICT-auditor-cycle slice of the same Art. 6 anchor). This
+# file covers the governance-roles-and-responsibilities slice
+# anchored on Art. 6(4): clearly assigned functions and
+# responsibilities for all ICT-related tasks, and the arrangements
+# for effective communication, cooperation, and coordination among
+# those functions that make the ICT risk-management framework
+# operable on a continuous basis.
+#
+# Out of scope here: the annual review and ICT-auditor cycle slice
+# (lives in article-6.yaml, id dora:art-6-framework), incident
+# reporting (Art. 17–19), third-party risk (Art. 28+).
+regime: dora
+entries:
+  - id: dora:art-6-governance
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "6(4)"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Assign clearly defined functions and responsibilities for all
+      ICT-related tasks within the ICT risk-management framework, and
+      put in place the arrangements for effective communication,
+      cooperation, and coordination among those functions on a
+      continuous basis so that the framework is operable in practice,
+      including the on-call responsibility arrangements that bind
+      named responders to the operator's incident-response capability
+      across the rotation calendar.
+    status: draft
+    control_refs:
+      - control.ict_risk_governance@v1
+      - control.incident_handling_capability@v1
+    playbook_refs:
+      - playbook.on_call_rotation@v1
+    metric_refs:
+      - kpi.coverage_on_call_schedule@v1
+      - kpi.mttr_on_call_ack@v1
+      - kpi.handoff_brief_delivery_sla@v1
+      - kri.escalation_tier_breach@v1
+    evidence_stream_refs:
+      - risk-analysis
+    notes: >-
+      Level 1 anchor is DORA Art. 6(4) (clearly assigned functions
+      and responsibilities for all ICT-related tasks and the
+      arrangements for effective communication, cooperation, and
+      coordination among them). This entry is the
+      governance-roles-and-responsibilities counterpart to the
+      annual-review-and-audit-cycle slice expressed in article-6.yaml
+      (id dora:art-6-framework); both files anchor on the same Art. 6
+      ICT risk-management framework obligation but discharge
+      independent operational disciplines and are mapped separately
+      to keep the inbound graph atom-per-obligation. The
+      on_call_rotation playbook discharges the per-shift
+      materialisation of the on-call responsibility arrangement: the
+      roster slots resolved at the load-rotation-roster step are the
+      per-shift identification of the named responder discharging the
+      ICT-related incident-response function, the bound escalation
+      chain at the bind-escalation-tiers step is the
+      communication-cooperation-coordination arrangement published to
+      the paging system's runtime configuration, and the
+      kpi.coverage_on_call_schedule@v1 metric audits that the
+      arrangement is populated across the rotation calendar. Overlaps
+      NIS2 Art. 21(2)(b) (incident-handling capability and responder
+      readiness); the same playbook is referenced from
+      mappings/nis2/article-21-2-b.yaml.

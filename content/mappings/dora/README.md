@@ -22,7 +22,12 @@ in the private repos).
 ## Files
 
 - `article-5.yaml` — Art. 5 governance and organisation.
-- `article-6.yaml` — Art. 6 ICT risk-management framework.
+- `article-6.yaml` — Art. 6 ICT risk-management framework (annual
+  review and ICT-auditor cycle).
+- `article-6-governance.yaml` — Art. 6(4) clearly assigned functions
+  and responsibilities for ICT-related tasks and the
+  communication-cooperation-coordination arrangements (on-call
+  responsibility).
 - `article-7.yaml` — Art. 7 ICT systems, protocols and tools.
 - `article-8.yaml` — Art. 8 identification (assets, functions,
   dependencies).
