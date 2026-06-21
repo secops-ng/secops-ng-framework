@@ -1,0 +1,411 @@
+# Cross-references for the contractual_obligations_tracker playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed/emitted, and the EU regulatory clauses this
+# playbook helps operationalise. Inbound references live in
+# content/mappings/{nis2,dora}/ so the graph is closed in both
+# directions.
+#
+# This playbook (F-WF-10) operates the contract-time half of the
+# NIS2 Article 21(2)(d) supply-chain security surface: on each
+# execution it ingests a supplier-contract record from the
+# operator's document store, extracts the per-clause obligations the
+# operator has accepted from that contract, derives a deterministic
+# per-obligation review schedule from the operator's review-cadence
+# policy, and emits one obligation-evidence artifact (stream
+# `contractual-obligations`, shaped per
+# schemas/evidence/contractual-obligations.schema.json) pinning the
+# contract id, the obligation set, the per-obligation review-state,
+# and the provenance envelope. The artifact series is the durable
+# audit trail for the supplier-contract obligation surface and feeds
+# the kri.suppliers_attestation_stale@v1 metric the inbound entries
+# already declare. The framework ships the schema, the workflow
+# shape, and the deterministic derivation primitives — not the
+# operator's contract catalogue. The inbound anchors at
+# content/mappings/nis2/article-21-2-d.yaml backlink this playbook
+# on its `playbook_refs` and `evidence_stream_refs`
+# (contractual-obligations) for exactly that reason.
+#
+# Deliberate OSCAL omissions (mirror of the omission-note pattern
+# from the cloud_misconfiguration, codebase_vuln_management,
+# iam_auditor, on_call_rotation, detection_engineering, and
+# infra_posture_management overlays):
+#   - SI-2 (Flaw Remediation) is NOT pinned: this playbook operates
+#     the observational obligation-evidence surface (ingest, extract,
+#     schedule, emit) — the workflow is read-only by contract on the
+#     ingest path and MUST NOT mutate the source contract record.
+#     Remediation of an overdue or unfulfilled obligation is
+#     operator-side downstream of this evidence emission, operated
+#     by the operator's procurement-governance surface and the
+#     per-supplier escalation playbooks, not by this workflow.
+#   - CA-2 / CA-7 (Control Assessments / Continuous Monitoring) are
+#     NOT pinned: those anchors attach to the runtime-posture
+#     evidence surface (infra_posture_management carries them on
+#     its own overlay). The contractual-obligations stream is a
+#     contract-time evidence surface — the artifact attests what
+#     the operator has accepted in writing and when each clause is
+#     next due for review, not whether the supplier's runtime
+#     posture currently meets it. Pinning CA-2 / CA-7 here would
+#     double-count the assessment surface against the runtime side.
+#   - IR-4 (Incident Handling) is NOT pinned: an obligation lapse
+#     or a clause breach MAY trigger a downstream incident workflow
+#     (ransomware_containment, data_exfil, identity_compromise,
+#     post_incident_review) where the third-party dimension is
+#     material, but the incident-handling capability itself is not
+#     this playbook's discipline; the per-incident playbooks carry
+#     IR-4 on their own overlays.
+#   - AU-2 (Event Logging) is NOT pinned: the workflow emits OCSF
+#     API Activity records against the operator's document store
+#     and against the artifact destination, but defining the
+#     operator's audit-event policy is upstream of this playbook.
+#     The emitted records are consumed by the operator's existing
+#     OCSF store under its AU-2 policy.
+#
+# DORA closure: DORA Art. 28 (third-party register) and DORA
+# Art. 30(2) (contractual clauses) both name disciplines the
+# contractual-obligations stream operationally supports for
+# financial entities — Art. 28's register-of-information surface
+# (the obligation-evidence artifact is the per-contract input that
+# closes the contractual-arrangements column of the register) and
+# Art. 30(2)'s minimum-clause-set surface (the extracted obligation
+# kinds enumerate the operator's discharge of the Art. 30(2) clause
+# elements: service description, data-processing locations,
+# exit-strategy obligations, audit rights, termination rights).
+# The inbound entries at content/mappings/dora/article-19-and-28.yaml
+# carry both `dora:art-28-third-party-register` and
+# `dora:art-30-contractual-clauses` with `playbook_refs: []` today —
+# no playbook is currently pinned on either inbound side. This
+# overlay does NOT silently widen scope to pin an outbound DORA
+# entry against an empty-`playbook_refs` inbound; a separate
+# inbound-closure card adds this playbook to both
+# `dora:art-28-third-party-register.playbook_refs` and
+# `dora:art-30-contractual-clauses.playbook_refs`, and the outbound
+# pins land together with the inbound entries. This mirrors the
+# on_call_rotation DORA Art. 6 gap-note precedent, the
+# detection_engineering DORA closure precedent, and the
+# infra_posture_management DORA gap-note precedent: gap notes are
+# separate closure cards, not scope creep on a single-purpose
+# mappings PR.
+#
+# NIS2 Art. 22 closure: NIS2 Art. 22(1) places the coordinated
+# supply-chain risk-assessment action with the Cooperation Group
+# (acting with the Commission and ENISA), not with Member States or
+# entities directly; the inbound entry at
+# content/mappings/nis2/article-22.yaml therefore carries no
+# `playbook_refs` field at all. The framework's per-entity
+# discharge of the Art. 22(2)+ input flow is the supply-chain
+# evidence stream (operated by playbook.threat_intel_ingest@v1 on
+# the F-CP-03 supply-chain surface), not the contractual-
+# obligations stream operated by this playbook. The Art. 22
+# Union-level overlay reference is carried as an optional value on
+# the artifact's `regulation_refs` field at runtime (see the
+# playbook's __regulation_refs__ variable description) rather than
+# as an outbound mapping anchor here; pinning nis2:art-22 outbound
+# without a matching inbound `playbook_refs` would silently widen
+# scope. The runtime overlay path stays open; the structural
+# mapping graph stays narrow.
+#
+# CRA closure: the schema's top-level keys are fixed
+# (oscal/d3fend/ocsf/nis2/dora). CRA cross-references for this
+# playbook are not expressed either inbound or outbound. The
+# contractual_obligations_tracker is an operator-side procurement-
+# governance evidence discipline — what the operator has accepted
+# in writing from a direct supplier and when each clause is next
+# due for review — not a product-side incident reporting or
+# vulnerability-disclosure flow. CRA Art. 14 product-notification
+# obligations and Annex I vulnerability-handling requirements
+# therefore do not attach here; no outbound CRA entries are emitted
+# on this overlay, consistent with siblings.
+#
+# GDPR closure: inbound GDPR clause files are not carried as YAML
+# cross-references in content/mappings/gdpr/ today (the regime is
+# expressed there as per-workflow Records of Processing Activity,
+# not as Art. 32 / 33 clause anchors); a per-workflow Art. 30 RoPA
+# for this playbook is in scope for a separate documentation card.
+# The obligation records this workflow operates on are
+# clause-shaped and contract-shaped — obligation_id, clause_ref,
+# obligation_kind, text, cadence — not natural-person attribute
+# records; the only personal-data-adjacent surface is the
+# __owner_role__ field, which the artifact-builder primitive
+# canonicalises to a role / mailbox / community handle and rejects
+# personal names at the boundary per AGENTS.md § 3. When a GDPR
+# clause-file convention lands, an inbound entry can be added
+# without a schema change.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.contractual_obligations_tracker@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the ingest-contract,
+  # extract-obligations, schedule-review, and emit-obligation-
+  # evidence steps. Catalogue URLs resolve to the public NIST OSCAL
+  # repository. Anchored to the OSCAL refs declared on
+  # content/controls/control.supplier_inventory@v1.yaml (SR-2, SR-3)
+  # and content/controls/control.provider_attestation@v1.yaml
+  # (SR-3, SR-6), both of which the playbook's CACAO
+  # x_secops_ng.control_refs already cite.
+  - id: control.supply_chain_risk_management_plan@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SR-2
+    title: Supply Chain Risk Management Plan
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SR-2
+    notes: >-
+      Anchors the ingest-contract step: SR-2 requires the
+      organisation to develop and maintain a supply-chain
+      risk-management plan covering the controls and processes it
+      applies to direct suppliers. Reading a supplier-contract
+      record into the canonical in-workflow contract envelope
+      (contract_id, supplier_ref, effective_at, expires_at,
+      jurisdiction) is the per-execution materialisation of the
+      plan's per-supplier input surface: each emitted
+      obligation-evidence artifact pins a contract id back to the
+      supplier the plan covers and is the durable record that the
+      plan's intake side has actually been exercised against this
+      supplier on this execution.
+
+  - id: control.supply_chain_controls_and_processes@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SR-3
+    title: Supply Chain Controls and Processes
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SR-3
+    notes: >-
+      Anchors the extract-obligations step: SR-3 requires the
+      organisation to establish a process for identifying and
+      addressing weaknesses or deficiencies in supply-chain
+      elements. Walking the ingested contract record and extracting
+      the per-clause obligations the operator has accepted —
+      capturing the clause reference, the canonicalised obligation
+      text, the obligation kind (security-control commitment,
+      audit-right window, attestation cadence, sub-processor
+      disclosure, breach-notification cadence, data-localisation,
+      other), and any contractual review/expiry cadence the clause
+      declares — is the audit-evident discharge of the
+      identification half of that obligation. SR-3 attaches to
+      both this playbook's control surface (control.supplier_
+      inventory@v1, control.provider_attestation@v1).
+
+  - id: control.supplier_assessments_and_reviews@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SR-6
+    title: Supplier Assessments and Reviews
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SR-6
+    notes: >-
+      Anchors the schedule-review and emit-obligation-evidence
+      steps: SR-6 requires the organisation to assess and review
+      the supply-chain-related risks associated with suppliers and
+      their products and services. The per-obligation review
+      schedule the schedule-review step derives — next-review-due
+      timestamp computed deterministically from (last_reviewed_at,
+      contractual cadence, operator-policy fallback cadence) — is
+      the per-clause materialisation of the SR-6 review obligation,
+      and the obligation-evidence artifact emitted at the
+      emit-obligation-evidence step is the durable per-execution
+      record the kri.suppliers_attestation_stale@v1 metric joins
+      against to surface overdue reviews. Anchors the
+      provider-attestation half of the playbook's control surface.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned to the real action UUIDs resolved
+  # from content/playbooks/contractual_obligations_tracker/
+  # playbook.cacao.json (four action bodies: ingest-contract,
+  # extract-obligations, schedule-review, emit-obligation-evidence).
+  # The Model tactic in D3FEND v1.0.0 carries the discipline that
+  # fits a contract-time obligation-inventory workflow most
+  # precisely: D3-CI (Configuration Inventory — identifying and
+  # recording the properties of devices and software), applied
+  # here to the supply-chain-adjacent surface (contract-shaped
+  # configuration of the operator's supplier relationships rather
+  # than device / software configuration directly). The
+  # ingest-contract and extract-obligations steps are anchored on
+  # D3-CI. The schedule-review and emit-obligation-evidence steps
+  # are deliberately not pinned to a D3FEND technique and the gap
+  # is documented in line (mirroring the emit-posture-evidence
+  # gap note on infra_posture_management, the handoff-brief gap
+  # note on on_call_rotation, the propose / review / ship gap
+  # notes on detection_engineering, and the D3-SWI / D3-UAP
+  # precedent on codebase_vuln_management and iam_auditor).
+  - step: action--10101010-0000-4000-8000-000000000002
+    d3fend_id: D3-CI
+    d3fend_name: Configuration Inventory
+    url: https://d3fend.mitre.org/technique/d3f:ConfigurationInventory/
+    notes: >-
+      ingest-contract — reading the supplier-contract record
+      referenced by __contract_ref__ from the operator-supplied
+      document store and binding it to a normalised in-workflow
+      envelope (contract_id, supplier_ref, effective_at,
+      expires_at, jurisdiction) is the Model-tactic configuration-
+      inventory discipline applied to the supply-chain-adjacent
+      surface: the contract record is the per-supplier
+      configuration of the operator's contractual surface, and the
+      normalised envelope is the per-execution recording of that
+      configuration. D3-CI frames the discipline as identifying
+      and recording the properties of devices and software; the
+      contract-shaped extension here mirrors the
+      infra_posture_management D3-CI anchor on its own
+      configuration-inventory surface. The read-only-by-contract
+      constraint on this step is what keeps it within the Model
+      tactic rather than crossing into Harden.
+
+  - step: action--10101010-0000-4000-8000-000000000003
+    d3fend_id: D3-CI
+    d3fend_name: Configuration Inventory
+    url: https://d3fend.mitre.org/technique/d3f:ConfigurationInventory/
+    notes: >-
+      extract-obligations — walking the ingested contract record
+      and producing the per-clause obligation set (clause_ref,
+      canonicalised obligation text, obligation_kind, optional
+      contractual cadence) is the assessment half of the
+      configuration-inventory discipline against the contractual
+      surface: D3-CI's "recording the properties" phase produces
+      the contract envelope the ingest step delivered; the extract
+      step records the per-clause property set (which obligations
+      the operator has accepted, of which kinds, under which
+      cadences) so the rest of the workflow has a structured
+      inventory to schedule and emit against. D3FEND v1.0.0 does
+      not carry a separate technique for clause-level extraction
+      distinct from configuration inventory; the extraction is
+      the meta-discipline that audits the contract's per-clause
+      obligation property set, and the obligation set is the
+      audit-evident artifact that re-enters the
+      kri.suppliers_attestation_stale@v1 metric via the emitted
+      evidence record. Deterministic on the same contract record —
+      re-extraction under the same inputs re-derives the same
+      obligation set (no operator commentary, no rewrites at this
+      layer).
+
+  # schedule-review (action--10101010-0000-4000-8000-000000000004)
+  # is deliberately NOT pinned to a D3FEND technique. D3FEND v1.0.0
+  # frames its defensive techniques around runtime countermeasures
+  # against adversary behaviours and around inventory / model
+  # disciplines on the adjacent surface; pure deterministic
+  # derivation of a next-review-due timestamp from (last_reviewed_at,
+  # contractual cadence, operator-policy fallback cadence) is a
+  # calendar-arithmetic discipline against the policy and the
+  # captured_at anchor, not a runtime countermeasure or an
+  # inventory step, and forcing it onto a D3FEND tag would
+  # misrepresent the technique. This step is anchored on the SR-6
+  # OSCAL control above (Supplier Assessments and Reviews) where
+  # the obligation actually lives. This mirrors the
+  # infra_posture_management emit-posture-evidence gap note: pin
+  # the closest available technique only where the discipline
+  # matches, and document the absence where it does not, rather
+  # than inventing coverage.
+
+  # emit-obligation-evidence (action--10101010-0000-4000-8000-
+  # 000000000005) is deliberately NOT pinned to a D3FEND technique
+  # for the same reason: per-execution artifact emission of an
+  # attestation record shaped per
+  # schemas/evidence/contractual-obligations.schema.json for
+  # downstream consumption by the kri.suppliers_attestation_stale@v1
+  # metric is an evidence-stream emission discipline, not a
+  # runtime countermeasure or an inventory step. This step is
+  # anchored on the SR-3 and SR-6 OSCAL controls above (Supply
+  # Chain Controls and Processes / Supplier Assessments and
+  # Reviews) where the obligation actually lives. This mirrors
+  # the on_call_rotation handoff-brief gap note and the
+  # infra_posture_management emit-posture-evidence gap note.
+
+ocsf:
+  # OCSF telemetry bindings. The ingest-contract step consumes
+  # API Activity (6003) records against the operator's document
+  # store (the read call against __contract_ref__ that hydrates
+  # __raw_contract__); the emit-obligation-evidence step emits
+  # API Activity (6003) records carrying the dispatch of the
+  # obligation-evidence artifact to the operator-configured
+  # destination so the operator's SIEM and the
+  # kri.suppliers_attestation_stale@v1 metric can audit the
+  # artifact stream end-to-end. The playbook itself does not
+  # consume or emit any non-API-Activity OCSF class — the
+  # extract-obligations and schedule-review steps are
+  # deterministic in-band derivations against
+  # __contract_record_ref__ / __obligation_set_ref__ /
+  # __review_policy__ / __captured_at__ and do not touch the
+  # telemetry surface. The OCSF bindings here pin the runtime-side
+  # telemetry surface the operator's SIEM reads; the
+  # x_secops_ng.telemetry_refs on the playbook artifact
+  # (telemetry.ocsf.api_activity@v1) carry the same URN pointer
+  # so the compiler can route emissions consistently across the
+  # declared compile targets (n8n today; Temporal and LangGraph
+  # follow on sibling cards).
+  - id: telemetry.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: both
+    notes: >-
+      Consumed at the ingest-contract step: the read call against
+      the operator's document store (resolving __contract_ref__ to
+      the supplier-contract record hydrated as __raw_contract__)
+      produces an api_activity record carrying the request
+      metadata (method, endpoint, response status, latency) that
+      the operator's SIEM can audit for read-side compliance with
+      the read-only-by-contract constraint on this step. Emitted
+      at the emit-obligation-evidence step: the dispatch of the
+      obligation-evidence artifact to the operator-configured
+      destination (sovereign EU object store, on-prem evidence
+      bucket, Git-managed evidence repository — the framework
+      ships no default non-EU endpoint) produces an api_activity
+      record the kri.suppliers_attestation_stale@v1 metric joins
+      against the artifact stream to surface per-supplier
+      attestation freshness across the rotation calendar. Anchored
+      to the telemetry.ocsf.api_activity@v1 ref declared on the
+      playbook's CACAO x_secops_ng.telemetry_refs. Schema:
+      https://schema.ocsf.io/1.3.0/classes/api_activity
+
+nis2:
+  # Inbound entry already backlinks playbook.contractual_obligations_tracker@v1:
+  #   - content/mappings/nis2/article-21-2-d.yaml
+  #     (id nis2:art-21-2-d — supply-chain security; the
+  #     contractual-obligations stream is the contract-time half
+  #     of the F-CP-03 supply-chain evidence surface that the
+  #     inbound entry's evidence_stream_refs already lists)
+  # Pinned outbound below to close the graph. The NIS2 Art. 22
+  # Union-level Cooperation-Group overlay reference is carried as
+  # an optional runtime value on the artifact's regulation_refs
+  # field (see the playbook's __regulation_refs__ variable
+  # description), not as an outbound mapping anchor here; see the
+  # file-header NIS2 Art. 22 closure note for the rationale.
+  - mapping_id: nis2:art-21-2-d
+    article: 21(2)(d)
+    notes: >-
+      NIS2 Art. 21(2)(d) requires entities to address supply-chain
+      security including the security characteristics of direct
+      suppliers and service providers, with periodic
+      re-attestation. The contractual_obligations_tracker playbook
+      is the contract-time half of the operator-side discharge of
+      that obligation: it captures what the operator has accepted
+      in writing from each direct supplier (the per-clause
+      obligation set extracted from the supplier contract) and
+      when each clause is next due for review (the per-obligation
+      review schedule derived from the operator's review-cadence
+      policy), and emits the durable obligation-evidence artifact
+      that the kri.suppliers_attestation_stale@v1 metric joins
+      against. The inbound entry's evidence_stream_refs already
+      lists `contractual-obligations` alongside the runtime
+      `supply-chain` stream operated by
+      playbook.threat_intel_ingest@v1; this outbound entry is the
+      structural closure of that backlink. The execution-time
+      runtime-posture half of the same Art. 21(2)(d) discipline is
+      operated by the threat_intel_ingest supply-chain evidence
+      stream; the two streams compose into the periodic
+      re-attestation surface the article requires.
+
+dora:
+  # DORA Art. 28 (third-party register) and DORA Art. 30(2)
+  # (contractual clauses) both name disciplines this playbook
+  # operationally supports for financial entities, but the inbound
+  # entries at content/mappings/dora/article-19-and-28.yaml carry
+  # `playbook_refs: []` on both `dora:art-28-third-party-register`
+  # and `dora:art-30-contractual-clauses` today — no playbook is
+  # currently pinned on either inbound side. This overlay does NOT
+  # silently widen scope to pin an outbound DORA entry against an
+  # empty-`playbook_refs` inbound; a separate inbound-closure card
+  # adds this playbook to both inbound `playbook_refs` and the
+  # outbound pins land together with the inbound entries. See the
+  # file-header DORA closure note. No outbound DORA entries are
+  # emitted on this overlay.
+  []
