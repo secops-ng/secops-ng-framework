@@ -1,0 +1,63 @@
+# CRA — Article 13(4) component due diligence (supplier-attestation channel).
+#
+# Companion to article-13.yaml (entry `cra:art-13-component-due-diligence`,
+# which covers the procedural shell around Art.13(4) — dated supplier
+# inventory plus provider-attestation evidence). This file pins the
+# operational sub-surface: the contract-time obligation channel through
+# which the manufacturer captures what each direct supplier has
+# committed to in writing (per-clause obligation set, attestation
+# cadence, audit/termination rights), so the Art.13(4) due-diligence
+# discharge is evidenced as a durable per-contract artifact stream
+# rather than only as a static supplier register.
+regime: cra
+entries:
+  - id: cra:art-13-4-component-due-diligence-contracts
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: "13(4)"
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      When placing a product with digital elements on the market,
+      manufacturers shall exercise due diligence when integrating
+      components sourced from third parties so that those components
+      do not compromise the cybersecurity of the product, including
+      when integrating components of free and open-source software
+      that have not been made available on the market in the course
+      of a commercial activity — operationalised here through the
+      contract-time obligation channel that captures, per direct
+      supplier, the per-clause obligations the manufacturer has
+      accepted in writing (security-control commitments,
+      attestation cadences, sub-processor disclosure,
+      breach-notification windows, audit and termination rights)
+      and the per-obligation review schedule that keeps the
+      due-diligence record live across the product lifecycle.
+    status: draft
+    control_refs:
+      - control.supplier_inventory@v1
+      - control.provider_attestation@v1
+    playbook_refs:
+      - playbook.contractual_obligations_tracker@v1
+    metric_refs:
+      - kri.suppliers_attestation_stale@v1
+    evidence_stream_refs:
+      - contractual-obligations
+    notes: >-
+      Companion to `cra:art-13-component-due-diligence` in
+      article-13.yaml, which covers the procedural shell around
+      Art.13(4) (dated supplier inventory + provider-attestation
+      evidence). This entry pins the supplier-attestation
+      operational channel: the contractual_obligations_tracker
+      playbook is the contract-time discipline that materialises
+      the per-supplier obligation set from each direct-supplier
+      contract and emits the durable obligation-evidence artifact
+      (stream `contractual-obligations`) that the
+      kri.suppliers_attestation_stale@v1 metric joins against to
+      surface overdue per-clause reviews. The NIS2 parallel is
+      `nis2:art-21-2-d` (supply-chain security, contract-time
+      half); the DORA parallels are `dora:art-28-third-party-register`
+      and `dora:art-30-contractual-clauses` (third-party register
+      and minimum-clause-set surface), both of which the
+      playbook's outbound overlay defers behind their respective
+      inbound-closure cards.
