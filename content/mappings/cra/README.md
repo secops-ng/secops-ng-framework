@@ -30,6 +30,15 @@ per Art. 71).
 
 Mapping IDs are `cra:<slug>` (e.g. `cra:annex-i-1-h`, `cra:art-14-early-warning`).
 
+## Coverage
+
+[`COVERAGE.md`](COVERAGE.md) tracks which shipped playbooks under
+`content/playbooks/` carry an inbound CRA entry. CRA is the laggard
+regime on the G-02 regulatory-mapping coverage axis; the inventory
+lists each orphan playbook against its nearest candidate CRA clause so
+follow-on per-clause yamls can be filed one at a time rather than as a
+single monolithic edit.
+
 ## OSCAL component-definition
 
 `oscal-component-definition.json` is an OSCAL 1.1.2 component-definition

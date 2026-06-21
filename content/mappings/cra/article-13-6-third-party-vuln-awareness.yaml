@@ -1,0 +1,50 @@
+# CRA — Article 13(6) third-party vulnerability information.
+#
+# Companion to article-13.yaml (entry `cra:art-13-vuln-handling-process`,
+# which covers the systematic-documentation procedural shell around
+# Art.13(6)). This file pins the upstream-awareness sub-clause: "and
+# any relevant information provided by third parties". The manufacturer
+# obligation under Art.13(6) is not satisfied by an internal-only
+# disclosure intake — it has to ingest third-party signals (advisory
+# feeds, threat-intel, CSIRT bulletins, supplier notices) into the
+# same vulnerability-documentation record.
+regime: cra
+entries:
+  - id: cra:art-13-6-third-party-vuln-awareness
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: "13(6)"
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Manufacturers shall systematically document, in a manner that is
+      proportionate to the nature and the cybersecurity risks of the
+      product, relevant cybersecurity aspects concerning the product
+      with digital elements, including vulnerabilities of which they
+      become aware and any relevant information provided by third
+      parties — covering, in particular, machine-readable threat
+      intelligence, advisory feeds, CSIRT bulletins, and supplier
+      notices that surface vulnerabilities affecting the product or
+      its components.
+    status: draft
+    control_refs:
+      - control.vuln_disclosure_intake@v1
+    playbook_refs:
+      - playbook.threat_intel_ingest@v1
+      - playbook.vuln_intake@v1
+    metric_refs:
+      - kri.cvd_intake_aging@v1
+    evidence_stream_refs:
+      - vulns
+    notes: >-
+      Companion to `cra:art-13-vuln-handling-process` in article-13.yaml,
+      which covers the documentation-process side of Art.13(6). This
+      entry pins the third-party-information sub-clause: the
+      threat_intel_ingest playbook is the awareness channel that
+      surfaces advisory-feed and CSIRT-bulletin records into the same
+      vulnerability-handling lane operated by vuln_intake. The NIS2
+      parallel is `nis2:art-21-2-d` (threat-intel ingest under the
+      supply-chain obligation); the DORA parallel is
+      `dora:art-19-cyber-threat-voluntary` (voluntary cyber-threat
+      notification).
