@@ -1,0 +1,238 @@
+{
+  "name": "Supply-chain security",
+  "nodes": [
+    {
+      "id": "start--5c5c5c5c-0000-4000-8000-000000000001",
+      "name": "supply-chain-security-start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__workflow_id__",
+              "type": "string",
+              "value": "",
+              "description": "Stable workflow stable-id from content/playbooks/<workflow>/. Joined into the supply-chain-evidence artifact_id derivation; constant per playbook (`supply_chain_security`) and supplied as a flat token so the CORE primitive call mirrors the F-WF-08 / F-WF-10 binding convention."
+            },
+            {
+              "name": "__execution_id__",
+              "type": "string",
+              "value": "",
+              "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Pinned by the upstream runtime; the workflow reads it for the supply-chain-evidence artifact join."
+            },
+            {
+              "name": "__signal_class__",
+              "type": "string",
+              "value": "",
+              "description": "Short operator-defined token classifying the upstream supply-chain signal source. One of `sbom_diff`, `supplier_attestation`, `upstream_advisory`, `threat_intel`, `operator_report`. Pinned by the compile target's boot config so the assess-supplier-signal primitive can canonicalise without a free-text shape."
+            },
+            {
+              "name": "__signal_verdict__",
+              "type": "string",
+              "value": "",
+              "description": "Operator-side disposition emitted by the scoring policy upstream of this workflow. One of `no_impact`, `watch`, `confirmed_compromise`. The framework ships no default scoring policy; the operator's compile target supplies the verdict per its own SBOM-correlation / supplier-attestation / threat-intel logic."
+            },
+            {
+              "name": "__signal_supplier_handle__",
+              "type": "string",
+              "value": "",
+              "description": "Stable operator-side supplier identifier in `provider.<id>@v<n>` shape \u2014 mirrors the F-CP-03 dependencies[].provider_id vocabulary so the assessment round-trips into the supply-chain-evidence artifact without re-canonicalisation. Personal names and contact-shaped strings fail loud at the assess-supplier-signal primitive boundary per the public-bar discipline."
+            },
+            {
+              "name": "__signal_component_set__",
+              "type": "string",
+              "value": "",
+              "description": "JSON-native list of PURL pointers (`pkg:<type>/<namespace?>/<name>@<version?>`) for the components implicated on this execution. Operator-supplied; the assess-supplier-signal primitive canonicalises (NFKC + dedup + sort) so two replays of the same signal collapse to byte-identical bytes. Empty list is valid for supplier-level signals or `no_impact` verdicts."
+            },
+            {
+              "name": "__signal_received_at__",
+              "type": "string",
+              "value": "",
+              "description": "ISO-8601 UTC second-precision timestamp (`...Z`) pinned by the upstream signal source at the moment the signal was received. Not derived in the workflow; no clock reads."
+            },
+            {
+              "name": "__signal_id__",
+              "type": "string",
+              "value": "",
+              "description": "Optional opaque operator-side signal identifier for cross-referencing back to the source feed entry. Free string, <= 200 chars. Pinned by the compile target's signal-ingest path."
+            },
+            {
+              "name": "__signal_scoring_notes__",
+              "type": "string",
+              "value": "",
+              "description": "Optional short operator-side rationale for the scoring decision. Free text, <= 400 chars. Captured on the assessment block for downstream review."
+            },
+            {
+              "name": "__assessment_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Pointer to the closed supply-chain-impact assessment block produced by assess-supplier-signal \u2014 verdict-keyed (no_impact | watch | confirmed_compromise), affected-supplier-handle and affected-component-set valued, received_at and signal_class anchored. Consumed by emit-supply-chain-evidence."
+            },
+            {
+              "name": "__dependencies__",
+              "type": "string",
+              "value": "",
+              "description": "JSON-native list of dependency objects matching the F-CP-03 dependencies[] shape (provider_id, kind, call_count, sovereignty_classification, attestation, optional version / risk_notes). Operator-supplied \u2014 the framework ships no default dependency catalogue; the operator's supplier-inventory is the source of truth. The assessment block's affected_supplier_handle MUST appear among these entries or the emit-supply-chain-evidence primitive rejects the call (no silently-orphaned artifacts)."
+            },
+            {
+              "name": "__aggregates__",
+              "type": "string",
+              "value": "",
+              "description": "Optional JSON-native pre-computed aggregate counts the operator already tracks (total_providers, sovereign_count, eu_hosted_count, non_eu_count, ai_provider_count). Forwarded verbatim onto the artifact when present; omitted entirely when absent."
+            },
+            {
+              "name": "__regulation_refs__",
+              "type": "string",
+              "value": "",
+              "description": "Schema-shaped regulation references the artifact attests (typically `[\"nis2:art-21-2-d\"]`). JSON-native list; pinned by the compile target's boot config so the operator can extend without re-compiling."
+            },
+            {
+              "name": "__control_refs__",
+              "type": "string",
+              "value": "",
+              "description": "Control stable-ids the artifact attests. JSON-native list; the shared emitter validates each entry against the `control.<id>@v<n>` shape."
+            },
+            {
+              "name": "__owner_role__",
+              "type": "string",
+              "value": "",
+              "description": "Role-shaped operator-side owner handle for the supplier-inventory attestation (non-empty, <= 200 chars). Carried on the artifact's owner block. Personal names are out of scope per the public-bar discipline."
+            },
+            {
+              "name": "__owner_assigned_at__",
+              "type": "string",
+              "value": "",
+              "description": "ISO-8601 date (`YYYY-MM-DD`) the named owner role was assigned the supplier-inventory attestation. Pinned by operator policy; not derived in the workflow."
+            },
+            {
+              "name": "__captured_at__",
+              "type": "string",
+              "value": "",
+              "description": "ISO-8601 UTC second-precision timestamp (`...Z`) pinned at emission time by the upstream runtime; carried on the artifact's top-level captured_at and on provenance.captured_at. Part of the deterministic artifact_id derivation alongside workflow_id and execution_id."
+            },
+            {
+              "name": "__source_url__",
+              "type": "string",
+              "value": "",
+              "description": "URL of the workflow run that produced this artifact. Compile targets supply their own run-id URLs; the URL itself is opaque to the schema."
+            },
+            {
+              "name": "__supply_chain_artifact_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Pointer to the supply-chain-evidence artifact emitted by emit-supply-chain-evidence, shaped against schemas/evidence/supply-chain.schema.json. Anchored against the F-CP-03 supply-chain evidence stream so the NIS2 Article 21(2)(d) supplier-security obligation has a per-execution audit-trail entry."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--5c5c5c5c-0000-4000-8000-000000000002",
+      "name": "assess-supplier-signal",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.supply_chain_security.primitives.assess import assess_supplier_signal\n__assessment_ref__ = assess_supplier_signal(signal_class=__signal_class__, verdict=__signal_verdict__, affected_supplier_handle=__signal_supplier_handle__, received_at=__signal_received_at__, affected_component_set=__signal_component_set__, signal_id=__signal_id__, scoring_notes=__signal_scoring_notes__)"
+      },
+      "notes": "Canonicalise the operator-supplied raw supply-chain signal envelope into the closed assessment block the downstream emit step consumes. The operator's compile target performs the upstream I/O (signal-feed ingestion, SBOM correlation against the operator's component inventory, supplier-attestation lookup, scoring policy) and supplies the result as JSON-native arguments; this step is the shape-and-discipline gate at the step boundary so a free-text signal class, an unknown verdict, or a personal-name supplier reference fails loud here rather than at the artifact-emit boundary downstream. Read-only against the operator's signal source by contract; the workflow MUST NOT mutate the source signal on this step.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--5c5c5c5c-0000-4000-8000-000000000003",
+      "name": "emit-supply-chain-evidence",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.supply_chain_security.primitives.artifact import build_supply_chain_evidence_artifact\n__supply_chain_artifact_ref__ = build_supply_chain_evidence_artifact(workflow_id=__workflow_id__, execution_id=__execution_id__, regulation_refs=__regulation_refs__, control_refs=__control_refs__, assessment=__assessment_ref__, dependencies=__dependencies__, owner_role=__owner_role__, owner_assigned_at=__owner_assigned_at__, captured_at=__captured_at__, source_url=__source_url__, aggregates=__aggregates__)"
+      },
+      "notes": "Combine the execution metadata, the closed assessment block, and the operator-declared dependency surface into one supply-chain-evidence artifact shaped against schemas/evidence/supply-chain.schema.json (stream: supply-chain). The primitive wires through the F-CP-03 shared emitter at compilers/_shared/evidence/supply_chain.py and pins the supply-chain-security-side join: the affected_supplier_handle on the assessment block MUST appear among the declared dependencies[] on this execution, so the artifact actually documents the implicated supplier rather than producing a silent orphan. Emission is byte-stable: same execution inputs re-derive the same artifact_id (SHA-256 of workflow_id|execution_id|captured_at). The artifact carries the NIS2 Article 21(2)(d) regulation reference so the per-execution audit-trail entry has a regulatory anchor. Destination is operator-configured \u2014 no default non-EU endpoint.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--5c5c5c5c-0000-4000-8000-000000000004",
+      "name": "supply-chain-security-end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "supply-chain-security-start": {
+      "main": [
+        [
+          {
+            "node": "assess-supplier-signal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "assess-supplier-signal": {
+      "main": [
+        [
+          {
+            "node": "emit-supply-chain-evidence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "emit-supply-chain-evidence": {
+      "main": [
+        [
+          {
+            "node": "supply-chain-security-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "supply-chain",
+    "supplier",
+    "nis2",
+    "core-prim"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.supply_chain_security@v1",
+      "content_version": "0.2.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--5c5c5c5c-0000-4000-8000-000000000001"
+    },
+    "secops_ng_notes": []
+  }
+}
