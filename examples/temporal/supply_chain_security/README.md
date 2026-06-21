@@ -73,10 +73,13 @@ compile target ships an activity stub that imports from
 Temporal worker is expected to make that package importable on the
 worker's PYTHONPATH.
 
+## Sibling targets
+
+- **LangGraph sibling:** [`examples/langgraph/supply_chain_security/`](../../langgraph/supply_chain_security/)
+  closes the third compile-target binding for the same primitive chain.
+
 ## Pending siblings
 
-- **F-WF-SCS CORE-FANOUT-LG** — LangGraph adapter for the same
-  primitive chain.
 - **F-WF-SCS EXTEND** — OSCAL / D3FEND / OCSF / NIS2 / DORA / CRA
   inbound + outbound mapping closure, `metric_refs` pinning the
   supplier-attestation-staleness KRI and the supply-chain coverage
