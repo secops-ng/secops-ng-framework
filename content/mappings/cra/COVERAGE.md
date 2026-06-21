@@ -13,20 +13,26 @@ carry a `cra:` block — extending the schema is filed as a sibling
 EXTEND card; for now CRA closure is asserted in comments at the foot
 of each playbook overlay.
 
-## Mapped (8 / 19)
+## Mapped (14 / 19)
 
 | Playbook | Inbound entry |
 |----------|---------------|
+| `alert_triage` | `cra:annex-i-1-l-logging-monitoring-alert-triage` |
 | `cloud_misconfiguration` | `cra:annex-i-1-secure-by-default` |
 | `codebase_vuln_management` | `cra:annex-i-2-codebase-vuln-mgmt` |
+| `contractual_obligations_tracker` | `cra:art-13-4-component-due-diligence-contracts` |
 | `data_exfil` | `cra:art-14-severe-incident` |
+| `executive_metrics` | `cra:art-13-2-3-risk-assessment-metrics` |
 | `identity_compromise` | `cra:annex-i-1-secure-by-default` |
+| `it_security_support_agent` | `cra:art-13-12-spoc-it-support-agent` |
 | `on_call_rotation` | `cra:art-13-12-spoc-on-call-rotation` |
+| `onboarding_offboarding_tracker` | `cra:annex-i-1-d-access-control-jml` |
+| `phishing_triage` | `cra:annex-i-2-2-vuln-handling-phishing` |
 | `post_incident_review` | `cra:art-14-final-report` |
 | `ransomware_containment` | `cra:art-14-severe-incident` |
 | `vuln_intake` | `cra:annex-i-2-*`, `cra:art-13-*`, `cra:art-14-*` |
 
-## Orphaned (11 / 19)
+## Orphaned (5 / 19)
 
 Playbooks shipped without any inbound CRA entry. Each row notes the
 nearest candidate CRA clause; the actual edge belongs in a per-clause
@@ -34,16 +40,10 @@ yaml under this directory rather than as a comment.
 
 | Playbook | Nearest CRA clause | Notes |
 |----------|--------------------|-------|
-| `alert_triage` | Annex I §1(j) logging-and-monitoring | Operational triage of product-emitted signals. |
-| `contractual_obligations_tracker` | Art. 13(4) component due diligence | Supplier / third-party attestation surface. |
-| `detection_engineering` | Annex I §1(j) logging-and-monitoring | Rule lifecycle behind the §1(j) monitoring capability. |
-| `executive_metrics` | Art. 13(2)–(3) risk assessment | KPI/KRI roll-up for the manufacturer risk posture. |
+| `detection_engineering` | Annex I §1(l) logging-and-monitoring | Rule lifecycle behind the §1(l) monitoring capability. |
 | `iam_auditor` | Annex I §1(d) access control | Periodic access-attestation against the §1(d) baseline. |
 | `incident_management` | (deliberate skip) | Regulator-notification engine for NIS2 Art. 23 / DORA Art. 19; the CRA Art. 14 product-vuln chain runs on `vuln_intake` and stays separate by design. See note in `content/playbooks/incident_management/mappings.yaml`. |
 | `infra_posture_management` | Annex I §1(b) secure-by-default config | Configuration drift detection against the §1(b) baseline. |
-| `it_security_support_agent` | Art. 13(12) single point of contact | User-facing reachability channel (paired with `on_call_rotation`). |
-| `onboarding_offboarding_tracker` | Annex I §1(d) access control | Joiner/mover/leaver lifecycle behind §1(d). |
-| `phishing_triage` | Annex I §2(2) vulnerability-handling | Social-engineering vector that surfaces credential-exposure findings into the vuln-handling lane. |
 | `threat_intel_ingest` | Art. 13(6) third-party vuln information | "Any relevant information provided by third parties" — upstream awareness channel. **Closed in the first per-clause increment shipped alongside this inventory.** |
 
 ## SKELETON / CORE / EXTEND split

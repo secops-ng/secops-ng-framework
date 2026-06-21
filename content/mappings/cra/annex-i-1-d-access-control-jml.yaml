@@ -1,0 +1,60 @@
+# CRA — Annex I §1(d) access control, joiner/mover/leaver lifecycle.
+#
+# Sibling to the periodic-attestation edge under the same §1(d) clause
+# (anchored on the `iam_auditor` playbook, filed as a separate
+# per-edge card) and companion to `cra:annex-i-1-access-control`
+# in `annex-i-1-essential-cybersecurity.yaml` (which carries the broader
+# authentication and least-privilege framing under §1(d) and pins the
+# `identity_compromise` playbook). This file pins the per-lifecycle-event
+# grant/revoke-confirmation slice of the §1(d) obligation: joiner, mover,
+# and leaver events on a role-shaped runtime principal materialise
+# capability changes against the operator's identity surface, and the
+# confirmation read-back is the audit-evident closure that the declared
+# delta actually landed.
+regime: cra
+entries:
+  - id: cra:annex-i-1-d-access-control-jml
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §1(d)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Products with digital elements shall ensure protection from
+      unauthorised access by appropriate control mechanisms, including
+      but not limited to authentication, identity or access-management
+      systems, and shall report on possible unauthorised access —
+      operationalised on the joiner/mover/leaver lifecycle by per-event
+      grant and revoke confirmation against a role-shaped runtime
+      principal so that the access surface tracks the declared
+      capability delta event by event.
+    status: draft
+    control_refs:
+      - control.jml_evidence@v1
+      - control.privileged_access_review@v1
+      - control.cloud_identity_least_privilege@v1
+    playbook_refs:
+      - playbook.onboarding_offboarding_tracker@v1
+    metric_refs:
+      - kri.joiner_to_provisioned_time@v1
+      - kri.leaver_to_revoked_time@v1
+    evidence_stream_refs:
+      - access
+    notes: >-
+      Companion to `cra:annex-i-1-access-control` in
+      `annex-i-1-essential-cybersecurity.yaml`, which carries the broader
+      authentication and least-privilege framing under Annex I §1(d) and
+      pins the `identity_compromise` playbook for the unauthorised-access
+      detection side. Sibling to the periodic-attestation edge under the
+      same §1(d) clause, anchored on the `iam_auditor` playbook and
+      filed as a separate per-edge card: the two playbooks
+      discharge complementary halves of the §1(d) surface —
+      continuous capability inventory on every workflow execution
+      (`iam_auditor`) plus one grant/revoke-confirmation artifact per
+      lifecycle event (`onboarding_offboarding_tracker`). The NIS2
+      parallel for the same lifecycle slice is `nis2:art-21-2-i`
+      (cybersecurity hygiene practices including access control); the
+      DORA parallel under Art. 9 access-management is filed as a
+      separate inbound-closure card per the playbook's DORA closure
+      note.

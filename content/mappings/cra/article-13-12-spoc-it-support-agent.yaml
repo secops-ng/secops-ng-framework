@@ -1,0 +1,63 @@
+# CRA — Article 13(12) single point of contact (user-facing reachability).
+#
+# Companion to article-13.yaml (entry `cra:art-13-spoc`, the procedural
+# shell that anchors the Art.13(12) obligation against the
+# vulnerability-disclosure intake control). This file pins the
+# user-facing reachability sub-clause: "to enable users to communicate
+# directly and rapidly with [the manufacturer]". The Art.13(12)
+# obligation is operationalised by two complementary surfaces — the
+# in-hours support-interaction front-line operated by
+# it_security_support_agent (this entry), and the after-hours
+# reachability surface operated by on_call_rotation (sibling entry
+# under the same clause). The pair together discharges the
+# "easy to identify by users and available" reachability requirement
+# across the full operating cycle.
+regime: cra
+entries:
+  - id: cra:art-13-12-spoc-it-support-agent
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: "13(12)"
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Manufacturers shall provide a single point of contact to enable
+      users to communicate directly and rapidly with them, including in
+      order to facilitate the reporting of vulnerabilities of the
+      product with digital elements, and shall ensure that that single
+      point of contact is easy to identify by users and available in
+      one of the official languages of the Member States understandable
+      to users — operationalised here as the in-hours support-
+      interaction front-line that ingests one user-supplied support
+      request per execution, classifies it against the operator's
+      policy, attempts automated resolution against the declared
+      self-service surface, and either closes the interaction on a
+      successful automated resolution or escalates to a human
+      responder via an explicit, first-class handoff step.
+    status: draft
+    control_refs:
+      - control.incident_handling_capability@v1
+    playbook_refs:
+      - playbook.it_security_support_agent@v1
+    metric_refs: []
+    evidence_stream_refs:
+      - incidents
+    notes: >-
+      Companion to `cra:art-13-spoc` in article-13.yaml, which carries
+      the procedural shell around Art.13(12) (the dated record that the
+      public contact channel is live and reachable, anchored on
+      control.vuln_disclosure_intake@v1). This entry pins the
+      user-facing reachability sub-clause: the it_security_support_agent
+      playbook is the in-hours interaction front-line that turns a
+      user-supplied support request into either an automated-resolution
+      closure or an explicit human handoff opening the
+      playbook.incident_management@v1 lifecycle — never a silent
+      auto-close. Paired with the after-hours sibling entry
+      `cra:art-13-12-spoc-on-call-rotation` (on_call_rotation,
+      shift-boundary reachability) so the two halves of the Art.13(12)
+      "easy to identify by users and available" obligation are both
+      structurally closed against the playbook catalogue. The NIS2
+      parallel is `nis2:art-21-2-b` (incident-handling capability;
+      front-line support-to-incident entry path), which already
+      backlinks this playbook on the inbound side.
