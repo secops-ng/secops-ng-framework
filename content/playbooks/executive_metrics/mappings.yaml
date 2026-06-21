@@ -1,0 +1,363 @@
+# Cross-references for the executive_metrics playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed/emitted, and the EU regulatory clauses this
+# playbook helps operationalise. Inbound references live in
+# content/mappings/{nis2,dora,gdpr}/ so the graph is closed in both
+# directions.
+#
+# This playbook operates the operator's KPI/KRI catalogue as a
+# durable rollup: it loads the pinned catalogue version against the
+# evaluated rollup window, validates each metric body against the
+# content-model metrics schema, computes per-metric evaluations
+# against the operator's telemetry / workflow / control-attestation
+# sources, groups the evaluations by control_ref to derive a
+# composite control-effectiveness score in 0.0..1.0, branches on
+# whether any evaluation matched its breach band to annotate a
+# board-attention flag, and emits a structured board-ready summary
+# artifact for handoff to the operator's downstream board pack
+# pipeline. The playbook is content-only — distribution, signing,
+# and archival of the emitted summary are out of scope and are
+# discharged by the operator's existing board pack pipeline.
+#
+# D3FEND closure: the schema's top-level keys are fixed
+# (oscal/d3fend/ocsf/nis2/dora). The playbook's own
+# external_references explicitly state that no D3FEND technique
+# applies because no attack is being defended against in this
+# workflow — an executive rollup is a reporting / control-
+# effectiveness assessment surface, not a runtime countermeasure.
+# The d3fend array below is intentionally empty with the rationale
+# carried in line. This mirrors the SigmaHQ-not-referenced posture
+# on the same playbook (sources list) and the documented-absence
+# discipline established by the on_call_rotation, iam_auditor, and
+# codebase_vuln_management overlays where the closest available
+# anchor would misrepresent the technique.
+#
+# OSCAL anchoring: the playbook's x_secops_ng.control_refs declare
+# control.control_effectiveness_test@v1 (anchored to CA-2 / CA-7 /
+# ISO 27002 A.5.36 / NIS2 art21-2-f on the control body) and
+# control.risk_management_policy@v1 (anchored to PM-9 / RA-3 /
+# ISO 27002 A.5.1 / NIS2 art21-2-a). The external_references on the
+# playbook additionally cite OSCAL CA-2 (Control Assessments) and
+# PM-6 (Measures of Performance) as the catalogue anchors for the
+# control-effectiveness scoring shape. CA-2, CA-7, PM-6, PM-9, and
+# RA-3 are pinned outbound below against the steps that exercise
+# them.
+#
+# NIS2 closure: the playbook's external_references cite NIS2
+# Art. 21(2)(f) (effectiveness assessment of cybersecurity
+# risk-management measures, with results archived) as a primary
+# regulatory anchor. The inbound entry at
+# content/mappings/nis2/article-21-2-f.yaml
+# (id nis2:art-21-2-f) currently lists only
+# playbook.detection_engineering@v1 on its playbook_refs (the
+# F-WF-04 rule-lifecycle measure-state surface) and does NOT
+# currently backlink playbook.executive_metrics@v1. This overlay
+# does NOT silently widen scope to pin an outbound NIS2 Art. 21(2)(f)
+# entry against a non-backlinking inbound; a separate inbound-
+# closure card adds playbook.executive_metrics@v1 to the
+# nis2:art-21-2-f playbook_refs (alongside the existing
+# detection_engineering entry, since both playbooks discharge
+# complementary halves of the effectiveness-assessment surface —
+# detection_engineering at the per-rule-version measure-state
+# layer, executive_metrics at the KPI/KRI rollup and control-
+# effectiveness scoring layer) and the outbound pin lands together
+# with the inbound update. This mirrors the iam_auditor PR #391,
+# post_incident_review PR #389, codebase_vuln_management PR #390,
+# onboarding_offboarding_tracker PR #396, and
+# contractual_obligations_tracker PR #395 precedent: gap notes are
+# separate cards, not scope creep on a single-purpose mappings PR.
+# The nis2 array below is therefore intentionally empty pending the
+# inbound-closure card.
+#
+# DORA closure: the playbook's external_references cite DORA
+# Art. 6 (ICT risk-management framework, periodic review) as a
+# primary regulatory anchor. The inbound entry at
+# content/mappings/dora/article-6.yaml (id dora:art-6-framework)
+# currently carries `playbook_refs: []` and does NOT currently
+# backlink playbook.executive_metrics@v1. Per the precedent cited
+# in the NIS2 closure note above, this overlay does NOT silently
+# widen scope to pin an outbound DORA Art. 6 entry against an
+# empty-`playbook_refs` inbound; a separate inbound-closure card
+# adds playbook.executive_metrics@v1 to the dora:art-6-framework
+# playbook_refs and the outbound pin lands together with the
+# inbound update. The same posture applies to DORA Art. 5
+# (governance and organisation, content/mappings/dora/article-5.yaml,
+# id dora:art-5-governance, `playbook_refs: []`) which the task
+# brief flags alongside Art. 6 — the periodic-review and
+# governance-reporting surfaces the executive rollup discharges
+# are an operational fit for both Art. 5 and Art. 6, but the same
+# inbound-closure discipline applies. The dora array below is
+# therefore intentionally empty pending the inbound-closure card.
+#
+# CRA closure: an executive rollup is a control-effectiveness
+# reporting workflow, not a product-side incident reporting or
+# vulnerability disclosure flow. CRA Art. 14 product-notification
+# obligations and Annex I vulnerability-handling requirements
+# therefore do not attach here; no outbound CRA entries are emitted
+# on this overlay, consistent with siblings.
+#
+# GDPR closure: the per-workflow Art. 30 Record of Processing
+# Activity for this playbook lives at
+# content/mappings/gdpr/data-flow-executive_metrics.md and covers
+# the metric-evaluation, control-attestation, and board-summary
+# processing the steps below operate on. The rollup operates on
+# aggregate KPI/KRI evaluations and per-control effectiveness
+# scores rather than on personal data directly; where individual
+# responder identifiers appear in upstream metric inputs (e.g.
+# ack-latency snapshots), those are inherited from the contributing
+# playbooks' own RoPAs.
+#
+# SigmaHQ closure: the playbook's external_references explicitly
+# state that SigmaHQ is intentionally not referenced — an executive
+# rollup is a reporting workflow, not a detection workflow, so no
+# Sigma rule IDs are pinned. No detection_refs anchors are emitted
+# on this overlay, consistent with that posture.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.executive_metrics@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the resolve-catalog,
+  # evaluate-metrics, score-control-effectiveness, raise-board-
+  # attention-flag, and emit-board-summary steps. Catalogue URLs
+  # resolve to the public NIST OSCAL repository. Anchored to the
+  # OSCAL refs declared on
+  # content/controls/control.control_effectiveness_test@v1.yaml
+  # (CA-2 / CA-7) and
+  # content/controls/control.risk_management_policy@v1.yaml
+  # (PM-9 / RA-3), plus the CA-2 and PM-6 anchors named directly in
+  # the playbook's external_references.
+  - id: control.control_assessments@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CA-2
+    title: Control Assessments
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CA-2
+    notes: >-
+      Anchors the score-control-effectiveness step as the playbook's
+      primary control-assessment surface: CA-2 requires the
+      organisation to assess the security and privacy controls in
+      the system to determine the extent to which the controls are
+      implemented correctly, operating as intended, and producing
+      the desired outcome. Grouping the per-metric evaluations by
+      control_ref and deriving a composite per-control effectiveness
+      score in 0.0..1.0 is the per-window materialisation of that
+      assessment discipline against the operator's control
+      catalogue. The playbook's external_references cite CA-2
+      explicitly as the catalogue anchor for the scoring shape, and
+      content/controls/control.control_effectiveness_test@v1.yaml
+      pins CA-2 on its oscal_refs for the same reason.
+
+  - id: control.continuous_monitoring@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CA-7
+    title: Continuous Monitoring
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CA-7
+    notes: >-
+      Anchors the evaluate-metrics step's recurring-rollup
+      discipline: CA-7 requires the organisation to develop and
+      implement a continuous monitoring strategy that includes
+      ongoing assessments of control effectiveness. The recurring
+      cadence the executive rollup operates under (monthly,
+      quarterly, or operator-supplied via __rollup_window__) is the
+      per-cadence materialisation of the continuous-monitoring
+      strategy against the KPI/KRI catalogue;
+      content/controls/control.control_effectiveness_test@v1.yaml
+      already pins CA-7 on its oscal_refs as the cadence anchor.
+
+  - id: control.information_security_measures_of_performance@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: PM-6
+    title: Information Security and Privacy Measures of Performance
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=PM-6
+    notes: >-
+      Anchors the evaluate-metrics and emit-board-summary steps as
+      the measures-of-performance surface: PM-6 requires the
+      organisation to develop, monitor, and report on the results
+      of information security and privacy measures of performance.
+      The per-metric evaluations carried by __metric_evaluations__
+      (observed value, matched threshold band, lower-layer artifact
+      bindings) and the board-ready summary emitted at the rollup
+      tail are the audit-evident discharge of that measurement,
+      monitoring, and reporting obligation against the operator's
+      KPI/KRI catalogue. The playbook's external_references cite
+      PM-6 explicitly as the catalogue anchor for the rollup's
+      scoring shape alongside CA-2.
+
+  - id: control.risk_management_strategy@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: PM-9
+    title: Risk Management Strategy
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=PM-9
+    notes: >-
+      Covers the score-control-effectiveness step's programme-level
+      aggregation: PM-9 requires the organisation to develop a
+      comprehensive strategy to manage security, privacy, and
+      supply-chain risk that is implemented consistently across the
+      organisation. The programme-level effectiveness score
+      aggregated from the per-control scores is the per-window
+      view of the strategy's discharge against the catalogue;
+      content/controls/control.risk_management_policy@v1.yaml
+      pins PM-9 on its oscal_refs for exactly this anchor.
+
+  - id: control.risk_assessment@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: RA-3
+    title: Risk Assessment
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=RA-3
+    notes: >-
+      Anchors the resolve-catalog and evaluate-metrics steps'
+      input-validation surface: RA-3 requires the organisation to
+      assess risk to organisational operations, assets, and
+      individuals, including from supply-chain and system
+      operations, on a recurring basis. The catalogue version
+      pinned per run via __catalog_ref__ and the per-entry schema
+      validation against content-model/metrics.schema.json
+      (entries failing validation are recorded for the corrective-
+      action register and excluded from the score so a malformed
+      entry cannot inflate or deflate effectiveness) is the
+      per-cadence materialisation of the risk-assessment
+      discipline against the KPI/KRI corpus;
+      content/controls/control.risk_management_policy@v1.yaml
+      pins RA-3 on its oscal_refs for the same reason.
+
+  # IR-4 (Incident Handling) is intentionally NOT pinned: the
+  # executive rollup operates downstream of incident handling and
+  # consumes incident-derived KPIs and KRIs (e.g. handoff-brief
+  # delivery SLA, on-call ack MTTR, control-effectiveness, overdue
+  # corrective actions) as input evaluations, but does not itself
+  # detect / triage / contain / remediate any incident. Pinning
+  # IR-4 here would double-count the control surface that the
+  # per-incident playbooks (ransomware_containment, data_exfil,
+  # identity_compromise, phishing_triage, post_incident_review)
+  # already carry on their own overlays.
+  #
+  # AU-2 (Event Logging) is intentionally NOT pinned: the
+  # board-ready summary artifact emitted at the rollup tail is a
+  # content artifact handed off to the operator's board pack
+  # pipeline, not an audit-event emission. The per-step API
+  # Activity records (resolve-catalog read, board-summary dispatch)
+  # are consumed by the operator's existing OCSF store under its
+  # AU-2 policy; defining that policy is upstream of this playbook
+  # and the audit-event obligation does not attach here.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # The playbook's external_references explicitly state: "MITRE
+  # D3FEND — intentionally not referenced; no D3FEND technique
+  # applies because no attack is being defended against in this
+  # workflow." An executive rollup is a control-effectiveness
+  # assessment and reporting surface — resolve-catalog,
+  # evaluate-metrics, score-control-effectiveness, raise-board-
+  # attention-flag, and emit-board-summary — not a runtime
+  # countermeasure against any adversary behaviour. D3FEND v1.0.0
+  # frames its defensive techniques around runtime countermeasures
+  # (account monitoring, software inventory, network isolation,
+  # configuration inventory, etc.); forcing the rollup's
+  # measurement and reporting steps onto a D3FEND tag would
+  # misrepresent the technique. This mirrors the
+  # documented-absence discipline established by the
+  # on_call_rotation handoff-brief gap note, the
+  # contractual_obligations_tracker schedule-review and emit-
+  # obligation-evidence gap notes, and the
+  # infra_posture_management emit-posture-evidence gap note: pin
+  # the closest available technique only where the discipline
+  # matches, and document the absence where it does not, rather
+  # than inventing coverage. The d3fend array is intentionally
+  # empty.
+  []
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. The resolve-catalog and
+  # evaluate-metrics steps consume API Activity (6003) records
+  # against the operator's KPI/KRI catalogue store (the read call
+  # resolving __catalog_ref__ that hydrates the per-entry metric
+  # bodies) and against the operator's telemetry / workflow /
+  # control-attestation sources (the per-metric measurement reads
+  # over __rollup_window__ that produce __metric_evaluations__).
+  # The emit-board-summary step emits API Activity (6003) records
+  # carrying the dispatch of the structured board-ready summary
+  # artifact (window, per-metric evaluations with threshold bands,
+  # per-control effectiveness scores, programme-level score, and
+  # — if set — the board-attention flag) to the operator's board
+  # pack pipeline endpoint so the operator's SIEM and the
+  # kpi.review_completion_sla@v1 metric can audit per-window
+  # rollup delivery. The score-control-effectiveness and raise-
+  # board-attention-flag steps are deterministic in-band
+  # derivations against __metric_evaluations__ and do not touch
+  # the telemetry surface. The OCSF bindings here pin the runtime-
+  # side telemetry surface the operator's SIEM reads.
+  - id: telemetry.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: both
+    notes: >-
+      Consumed at the resolve-catalog step (the read call against
+      __catalog_ref__ that hydrates the per-entry KPI/KRI bodies
+      and validates each against content-model/metrics.schema.json)
+      and at the evaluate-metrics step (the per-metric measurement
+      reads over __rollup_window__ against the operator's
+      telemetry / workflow / control-attestation sources). Emitted
+      at the emit-board-summary step (the dispatch of the
+      structured board-ready summary artifact to the operator's
+      board pack pipeline endpoint — the framework ships no
+      default board pack destination; the endpoint is operator-
+      configured, with a sovereign-EU bias consistent with the
+      project's hosting posture). The api_activity records carry
+      the request metadata (method, endpoint, response status,
+      latency) that the kpi.review_completion_sla@v1 metric reads
+      to report per-window rollup-delivery freshness; failures or
+      delays surface against the kri.corrective_action_overdue@v1
+      annotation surface. Schema:
+      https://schema.ocsf.io/1.3.0/classes/api_activity
+
+nis2:
+  # No outbound NIS2 entry is asserted on this overlay. The
+  # playbook's external_references cite NIS2 Art. 21(2)(f)
+  # (effectiveness assessment of cybersecurity risk-management
+  # measures, with results archived) as the primary regulatory
+  # anchor, but the inbound entry at
+  # content/mappings/nis2/article-21-2-f.yaml
+  # (id nis2:art-21-2-f) currently lists only
+  # playbook.detection_engineering@v1 on its playbook_refs and
+  # does NOT currently backlink playbook.executive_metrics@v1.
+  # Per the file-header NIS2 closure note (and the iam_auditor
+  # PR #391, post_incident_review PR #389,
+  # codebase_vuln_management PR #390, onboarding_offboarding_
+  # tracker PR #396, and contractual_obligations_tracker PR #395
+  # precedent on the same discipline), an outbound pin is
+  # deliberately NOT asserted here pending a separate inbound-
+  # entry card that adds playbook.executive_metrics@v1 to the
+  # nis2:art-21-2-f playbook_refs alongside the existing
+  # detection_engineering entry. The two playbooks discharge
+  # complementary halves of the effectiveness-assessment surface
+  # (per-rule-version measure-state at detection_engineering,
+  # KPI/KRI rollup and control-effectiveness scoring here) and
+  # the outbound pin lands together with the inbound update.
+  []
+
+dora:
+  # No outbound DORA entry is asserted on this overlay. The
+  # playbook's external_references cite DORA Art. 6 (ICT risk-
+  # management framework, periodic review) as the primary
+  # regulatory anchor, with DORA Art. 5 (governance and
+  # organisation) named as an adjacent surface in the task brief.
+  # The inbound entries at content/mappings/dora/article-6.yaml
+  # (id dora:art-6-framework) and content/mappings/dora/article-
+  # 5.yaml (id dora:art-5-governance) both carry
+  # `playbook_refs: []` and do NOT currently backlink
+  # playbook.executive_metrics@v1. Per the file-header DORA
+  # closure note and the cross-sibling precedent cited in the
+  # NIS2 section, an outbound pin is deliberately NOT asserted
+  # here pending separate inbound-entry cards that add
+  # playbook.executive_metrics@v1 to the dora:art-6-framework
+  # playbook_refs (the periodic-review and ICT-risk-framework
+  # surface the rollup operationally discharges) and — if scoped
+  # — to the dora:art-5-governance playbook_refs (the
+  # board-level governance-reporting surface). The outbound pins
+  # land together with the inbound updates.
+  []
