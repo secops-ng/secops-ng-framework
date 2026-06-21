@@ -64,8 +64,12 @@ cover the in-scope CRA obligations:
 
 Statement text is borrowed verbatim from each YAML entry's `obligation`
 field; `source-entry-id`, `source-control-ref`, and `source-article`
-props preserve the round-trip back to the YAML. CORE-tier
-implemented-requirements for Annex I §2 and Article 14 also carry
+props preserve the round-trip back to the YAML. Implemented-requirements
+for Annex I §1 (secure-by-design and secure-by-default product
+properties), Annex I §2 (vulnerability handling), Article 13
+(manufacturer obligations: risk assessment, component due diligence,
+vulnerability-handling process, security-update dissemination, single
+point of contact), and Article 14 (reporting obligations) also carry
 `source-d3fend-technique` and `source-d3fend-entry-id` props anchoring
 each obligation to a defensive technique in
 `content/mappings/d3fend/cra.yaml`. EXTEND coverage of additional CRA
