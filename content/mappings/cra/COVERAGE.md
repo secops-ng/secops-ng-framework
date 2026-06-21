@@ -24,6 +24,7 @@ of each playbook overlay.
 | `executive_metrics` | `cra:art-13-2-3-risk-assessment-metrics` |
 | `identity_compromise` | `cra:annex-i-1-secure-by-default` |
 | `it_security_support_agent` | `cra:art-13-12-spoc-it-support-agent` |
+| `phishing_triage` | `cra:annex-i-2-2-vuln-handling-phishing` |
 | `post_incident_review` | `cra:art-14-final-report` |
 | `ransomware_containment` | `cra:art-14-severe-incident` |
 | `vuln_intake` | `cra:annex-i-2-*`, `cra:art-13-*`, `cra:art-14-*` |
@@ -43,7 +44,6 @@ yaml under this directory rather than as a comment.
 | `infra_posture_management` | Annex I §1(b) secure-by-default config | Configuration drift detection against the §1(b) baseline. |
 | `onboarding_offboarding_tracker` | Annex I §1(d) access control | Joiner/mover/leaver lifecycle behind §1(d). |
 | `on_call_rotation` | Art. 13(12) single point of contact | After-hours reachability for the §2(5) coordinated-disclosure intake. |
-| `phishing_triage` | Annex I §2(2) vulnerability-handling | Social-engineering vector that surfaces credential-exposure findings into the vuln-handling lane. |
 | `threat_intel_ingest` | Art. 13(6) third-party vuln information | "Any relevant information provided by third parties" — upstream awareness channel. **Closed in the first per-clause increment shipped alongside this inventory.** |
 
 ## SKELETON / CORE / EXTEND split
