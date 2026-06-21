@@ -1,0 +1,75 @@
+# CRA — Article 13(12) single point of contact: after-hours rotation.
+#
+# Companion to article-13.yaml (entry `cra:art-13-spoc`, which pins the
+# Art.13(12) obligation as the procedural shell — manufacturers shall
+# provide a single point of contact for users to communicate directly
+# and rapidly with them, including for the reporting of
+# vulnerabilities). This file pins the after-hours reachability slice:
+# the Art.13(12) SPOC has to remain reachable outside business hours
+# for the coordinated-disclosure intake required by Annex I §2(5), and
+# the on_call_rotation playbook is the per-shift materialisation of
+# that reachability arrangement — it loads the rotation roster against
+# the evaluated shift window, resolves the primary slot, and binds the
+# escalation chain (primary / secondary / manager) that the
+# vulnerability-disclosure intake fans out through when a report
+# lands off-hours.
+#
+# Sibling to the business-hours edge: the `it_security_support_agent`
+# playbook is the user-facing reachability channel during business
+# hours; `on_call_rotation` is the after-hours continuation of the
+# same Art.13(12) SPOC obligation. Both edges close against the same
+# clause; the per-clause split is deliberate so the inbound graph
+# reflects the two operational regimes that together discharge the
+# obligation.
+regime: cra
+entries:
+  - id: cra:art-13-12-spoc-on-call-rotation
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: "13(12)"
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Manufacturers shall provide a single point of contact to enable
+      users to communicate directly and rapidly with them, including
+      in order to facilitate the reporting of vulnerabilities of the
+      product with digital elements — pinned here on the after-hours
+      reachability slice: the SPOC has to remain reachable outside
+      business hours for the coordinated-vulnerability-disclosure
+      intake required by Annex I §2(5), discharged by the rotation
+      roster, the resolved primary slot, and the bound escalation
+      chain published to the paging system's runtime configuration.
+    status: draft
+    control_refs:
+      - control.vuln_disclosure_intake@v1
+    playbook_refs:
+      - playbook.on_call_rotation@v1
+    metric_refs:
+      - kpi.coverage_on_call_schedule@v1
+      - kpi.mttr_on_call_ack@v1
+    notes: >-
+      Companion to `cra:art-13-spoc` in article-13.yaml, which pins
+      the Art.13(12) obligation as the procedural shell. This entry
+      is the after-hours operational slice: on_call_rotation loads
+      the rotation roster against the evaluated shift window,
+      resolves the primary slot, and binds the escalation chain
+      (primary / secondary / manager) that the
+      vulnerability-disclosure intake fans out through when a report
+      lands off-hours. The intake itself is the Annex I §2(5)
+      coordinated-vulnerability-disclosure policy pinned at
+      `cra:annex-i-2-cvd-policy` in article-14-and-annex-i.yaml —
+      the rotation is the responder-readiness arrangement that
+      keeps that intake reachable across the 24h day. Sibling to
+      the business-hours edge filed for the
+      `it_security_support_agent` playbook against the same
+      Art.13(12) SPOC clause: that edge pins the user-facing
+      support channel during business hours; this edge pins the
+      after-hours continuation. The NIS2 parallel is
+      `nis2:art-23` (early-warning clock) and the DORA parallel
+      is `dora:art-19-and-28` (initial-notification clock) —
+      both clocks start at the responder's first acknowledgement,
+      and the inbound entries in those regimes already backlink
+      the on_call_rotation playbook for that reason. SigmaHQ /
+      detection_refs intentionally not pinned here; this file
+      anchors the regulatory edge, not the detection surface.
