@@ -1,0 +1,385 @@
+# Cross-references for the on_call_rotation playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed/emitted, and the EU regulatory clauses this
+# playbook helps operationalise. Inbound references live in
+# content/mappings/{nis2,dora,gdpr}/ so the graph is closed in both
+# directions.
+#
+# This playbook operates the on-call rotation as durable, auditable
+# state: it loads the current rotation roster against the evaluated
+# shift window, resolves the primary slot, binds the escalation chain
+# (primary / secondary / manager) the operator's paging system fans
+# out through, and — when the evaluated window crosses a rotation
+# boundary — composes a structured handoff brief covering open
+# incidents, recent alerts, and the ack-latency snapshot, and
+# delivers it to the incoming on-call. The on-call rotation is the
+# head of the regulator-notification clock: the 24-hour NIS2 Art. 23
+# early-warning window and the 4-hour DORA Art. 19 initial-
+# notification window both start at the responder's first
+# acknowledgement, so an unbound primary slot or a slow ack delays
+# every downstream notification step regardless of how fast those
+# steps themselves run. The inbound anchors at
+# content/mappings/nis2/article-23.yaml,
+# content/mappings/nis2/article-21-2-b.yaml, and
+# content/mappings/dora/article-19-and-28.yaml backlink this
+# playbook for exactly that reason.
+#
+# Deliberate OSCAL omissions (mirror of the SC-8 / SA-11 / AC-5
+# omission-note pattern from the cloud_misconfiguration,
+# codebase_vuln_management, and iam_auditor overlays):
+#   - IR-4 (Incident Handling) is NOT pinned: this playbook operates
+#     the responder-readiness surface upstream of incident handling
+#     (who is paged, in what order, with what handoff context). The
+#     incident-handling capability itself is operated by the
+#     per-incident playbooks (ransomware_containment, data_exfil,
+#     identity_compromise, phishing_triage, post_incident_review)
+#     which carry IR-4 on their own overlays. Pinning IR-4 here
+#     would double-count the control surface.
+#   - AC-5 (Separation of Duties) is NOT pinned: the escalation
+#     chain encodes a tier ordering, not a separation-of-duties
+#     assertion. A separation-of-duties anchor would belong on the
+#     governance content surface that defines the role split (who
+#     may approve, who may execute) rather than on the per-execution
+#     rotation-binding step here.
+#   - AU-2 (Event Logging) is NOT pinned: the playbook emits OCSF
+#     Account Change and API Activity records, but defining the
+#     operator's audit-event policy is upstream of this playbook.
+#     The emitted records are consumed by the operator's existing
+#     OCSF store under its AU-2 policy.
+#   - IA-2 (Identification and Authentication — Organizational
+#     Users) is NOT pinned: the workflow names responders by roster
+#     handle (paging-system identifier, employee identifier, or work
+#     email, depending on the operator's roster source) for the
+#     purpose of binding the escalation chain and addressing the
+#     handoff brief; it does not itself authenticate those users.
+#     Authentication of the responder when they acknowledge or page
+#     is performed by the operator's IdP / paging system, not by
+#     this workflow.
+#
+# CRA closure: the schema's top-level keys are fixed
+# (oscal/d3fend/ocsf/nis2/dora). CRA cross-references for this
+# playbook are not expressed either inbound or outbound. The
+# on_call_rotation is an operator-side responder-readiness surface
+# — roster resolution, escalation-chain binding, shift-handoff
+# brief composition — not a product-side incident reporting or
+# vulnerability disclosure flow. CRA Art. 14 product-notification
+# obligations and Annex I vulnerability-handling requirements
+# therefore do not attach here; no outbound CRA entries are emitted
+# on this overlay, consistent with siblings.
+#
+# DORA inbound-gap note: DORA Art. 6 (ICT risk-management framework,
+# Regulation (EU) 2022/2554), which the playbook's own
+# external_references cites as a governance anchor for on-call
+# responsibility, is not currently expressed as a clause-anchor
+# YAML in content/mappings/dora/. The existing inbound DORA file at
+# content/mappings/dora/article-19-and-28.yaml backlinks this
+# playbook on the dora:art-19-initial-4h entry (because the
+# 4-hour post-classification clock starts at the responder's first
+# acknowledgement), which is the inbound anchor pinned outbound
+# below. This overlay does NOT silently widen scope to pin an
+# outbound Art. 6 governance entry against a missing inbound; a
+# separate inbound-closure card adds the Art. 6 anchor (e.g.
+# content/mappings/dora/article-6-governance.yaml) and the outbound
+# pin lands together with the inbound entry. This mirrors the
+# post_incident_review PR #389, codebase_vuln_management PR #390,
+# and iam_auditor PR #391 precedent: gap notes are separate cards,
+# not scope creep on a single-purpose mappings PR.
+#
+# GDPR closure: inbound GDPR clause files are not carried as YAML
+# cross-references in content/mappings/gdpr/ today (the regime is
+# expressed there as per-workflow Records of Processing Activity,
+# not as Art. 32 / 33 clause anchors); the per-workflow Art. 30
+# RoPA for this playbook already lives at
+# content/mappings/gdpr/data-flow-on_call_rotation.md and covers
+# the responder-identifier, roster-attribute, ack-latency-snapshot,
+# and inherited-incident-metadata processing the steps below
+# operate on, lawful-basis-grounded in Art. 6(1)(f) legitimate
+# interests with Art. 6(1)(c) legal obligation as the secondary
+# basis where NIS2 Art. 21(2)(b) or DORA Art. 6 transposition
+# applies. When a GDPR clause-file convention lands, an inbound
+# entry for Art. 32 (security of processing — appropriate technical
+# and organisational measures, including the documented responder-
+# readiness discipline this playbook discharges) against this
+# playbook can be added without a schema change.
+#
+# SigmaHQ closure: the playbook's external_references carry two
+# TODO entries for upstream SigmaHQ rule ids (off-hours
+# authentication anomaly during rotation handoff; suspicious
+# privileged-account modification during rotation gaps) pending
+# CORE-layer detection wiring. Those ids are intentionally not
+# pinned here; the SKELETON overlay anchors the regulatory and
+# control surface, and the CORE-layer detection card will land the
+# detection_refs side once stable upstream rule ids are selected.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.on_call_rotation@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the load-roster,
+  # bind-escalation, generate-handoff-brief, and notify-incoming-
+  # on-call steps. Catalogue URLs resolve to the public NIST OSCAL
+  # repository.
+  - id: control.account_management@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AC-2
+    title: Account Management
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AC-2
+    notes: >-
+      Anchors the load-rotation-roster step: AC-2 requires the
+      organisation to identify and manage system accounts and to
+      monitor their use. The roster slots resolved here
+      (__current_on_call__, __next_on_call__) are the per-shift
+      managed-account view of the responder population that the
+      paging system and downstream incident playbooks dispatch
+      against; the resolution is normalised from the operator's
+      roster source of truth (paging schedule, calendar feed, or
+      roster file) into the playbook variables the rest of the
+      workflow reads.
+
+  - id: control.incident_response_plan@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-8
+    title: Incident Response Plan
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-8
+    notes: >-
+      Anchors the bind-escalation-tiers step: IR-8 requires the
+      organisation to define and maintain an incident-response
+      plan that identifies the roles, responsibilities, and
+      escalation paths used during an incident. The escalation
+      chain bound here (primary / secondary / manager) is the
+      per-execution materialisation of the plan's escalation-path
+      element, published to the paging system's runtime
+      configuration so the next page uses the chain the plan
+      specifies. IR-4 (Incident Handling) is intentionally NOT
+      pinned here per the deliberate-omission note in the header:
+      handling itself is operated by the per-incident playbooks,
+      not by the rotation-readiness surface.
+
+  - id: control.incident_response_assistance@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-7
+    title: Incident Response Assistance
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-7
+    notes: >-
+      Covers the generate-handoff-brief and notify-incoming-on-call
+      steps: IR-7 demands that the organisation provide responders
+      with information and assistance to support incident handling.
+      The structured handoff brief composed at the shift-handoff
+      window (open incidents, recent alerts within the configured
+      lookback, outstanding escalations, ack-latency snapshot for
+      the prior shift) is the audit-evident discharge of that
+      assistance obligation across the rotation boundary, and the
+      delivery to the incoming responder along the operator's
+      pre-bound channel is the materialisation step that
+      kpi.handoff_brief_delivery_sla@v1 audits.
+
+  - id: control.contingency_plan@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CP-2
+    title: Contingency Plan
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CP-2
+    notes: >-
+      Anchors the load-rotation-roster and bind-escalation-tiers
+      steps' continuity surface: CP-2 requires the organisation to
+      develop a contingency plan that identifies essential
+      missions and the personnel who carry them. The rotation
+      roster and bound escalation chain are the per-shift
+      identification of the personnel discharging the incident-
+      response essential mission; the kpi.coverage_on_call_schedule@v1
+      metric declared on the playbook's x_secops_ng.metric_refs
+      audits that the contingency-plan personnel identification is
+      always populated across the rotation calendar.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned to the real action UUIDs resolved
+  # from content/playbooks/on_call_rotation/playbook.cacao.json
+  # (four action bodies: load-rotation-roster, bind-escalation-
+  # tiers, generate-handoff-brief, notify-incoming-on-call).
+  # D3FEND v1.0.0 does not carry a dedicated technique for shift-
+  # handoff brief composition or for on-call escalation-chain
+  # binding; the closest defensive-technique anchor is D3-AM
+  # (Account Monitoring) on the roster-resolution surface, with
+  # the gap on the handoff-brief surface documented in line
+  # (mirroring the D3-SWI / D3-UAP precedent on
+  # codebase_vuln_management and iam_auditor).
+  - step: action--30000000-0000-4000-8000-000000000002
+    d3fend_id: D3-AM
+    d3fend_name: Account Monitoring
+    url: https://d3fend.mitre.org/technique/d3f:AccountMonitoring/
+    notes: >-
+      load-rotation-roster — resolving who holds the primary slot
+      and who receives the next shift for the evaluated window is
+      the Detect-tactic account-monitoring discipline on the
+      responder population. The roster source of truth (paging
+      schedule, calendar feed, or roster file) is operator-bound;
+      this step normalises its output into the per-shift
+      __current_on_call__ / __next_on_call__ binding the rest of
+      the workflow reads. The playbook's own external_references
+      cite D3-AM for exactly this anchor.
+
+  - step: action--30000000-0000-4000-8000-000000000003
+    d3fend_id: D3-AM
+    d3fend_name: Account Monitoring
+    url: https://d3fend.mitre.org/technique/d3f:AccountMonitoring/
+    notes: >-
+      bind-escalation-tiers — resolving the primary / secondary /
+      manager chain and publishing it to the paging system's
+      runtime configuration is the per-execution materialisation
+      of the account-monitoring discipline against the on-call
+      responder set: the bound chain is the durable record of
+      which managed accounts are in scope for paging on the
+      evaluated shift window, and is the input the
+      kri.escalation_tier_breach@v1 metric joins against when an
+      out-of-band escalation occurs.
+
+  # generate-handoff-brief (action--30000000-0000-4000-8000-
+  # 000000000005) and notify-incoming-on-call (action--30000000-
+  # 0000-4000-8000-000000000006) are deliberately NOT pinned to a
+  # D3FEND technique. D3FEND v1.0.0 frames its defensive techniques
+  # around runtime countermeasures against adversary behaviours
+  # (account monitoring, software inventory, network isolation,
+  # etc.); structured shift-handoff brief composition and delivery
+  # is a responder-readiness governance discipline, not a runtime
+  # countermeasure, and forcing it onto a D3FEND tag would
+  # misrepresent the technique. The handoff-brief steps are
+  # anchored on the IR-7 OSCAL control above (Incident Response
+  # Assistance) where the obligation actually lives. This mirrors
+  # the iam_auditor D3-UAP gap note: pin the closest available
+  # technique only where the discipline matches, and document the
+  # absence where it does not, rather than inventing coverage.
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. The load-rotation-roster step
+  # consumes Account Change (3001) from the operator's roster
+  # source of truth (paging system schedule mutations, calendar-
+  # feed updates) to resolve the per-shift slot binding. The
+  # bind-escalation-tiers step emits an Account Change (3001)
+  # record carrying the bound escalation chain so the operator's
+  # SIEM and the kpi.coverage_on_call_schedule@v1 /
+  # kri.escalation_tier_breach@v1 metrics can audit per-shift
+  # coverage. The generate-handoff-brief and notify-incoming-
+  # on-call steps consume API Activity (6003) records (the
+  # operator's open-incident store, the recent-alert source, the
+  # ack-latency-snapshot source) and emit API Activity (6003)
+  # records (the brief artifact emission to the structured
+  # handoff store and the delivery dispatch to the incoming
+  # responder's channel). The OCSF bindings here pin the runtime-
+  # side telemetry surface the operator's SIEM reads; the
+  # x_secops_ng.telemetry_refs on the playbook artifact carry the
+  # same URN pointers so the compiler can route emissions
+  # consistently across n8n / Temporal / LangGraph targets.
+  - id: telemetry.account_change@v1
+    category_uid: 3
+    category_name: Identity & Access Management
+    class_uid: 3001
+    class_name: Account Change
+    ocsf_version: "1.3.0"
+    direction: both
+    notes: >-
+      Consumed at the load-rotation-roster step (roster source
+      mutation records — paging-system schedule edits, calendar-
+      feed updates — that re-shape the per-shift slot binding),
+      and emitted at the bind-escalation-tiers step (one record
+      per shift carrying the bound primary / secondary / manager
+      chain so the operator's SIEM and the rotation-coverage
+      metrics audit per-shift coverage). The Account Change class
+      is used for the rotation-binding emission because the
+      published-to-paging-system configuration is itself an
+      access-relevant change in the operator's IAM-ledger sense,
+      even when no responder identifier was added or removed on
+      this run. Schema:
+      https://schema.ocsf.io/1.3.0/classes/account_change
+
+  - id: telemetry.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: both
+    notes: >-
+      Consumed at the generate-handoff-brief step (read calls
+      against the operator's open-incident store, recent-alert
+      source, and ack-latency-snapshot source within the
+      configured lookback that produce the brief's structured
+      payload) and emitted at the generate-handoff-brief and
+      notify-incoming-on-call steps (the brief artifact emission
+      to the structured handoff store and the delivery dispatch
+      to the incoming responder's pre-bound channel — paging
+      system DM, chat thread, or email). The api_activity records
+      carry the request metadata the kpi.handoff_brief_delivery_sla@v1
+      metric reads to report compose-time and deliver-time
+      independently. Schema:
+      https://schema.ocsf.io/1.3.0/classes/api_activity
+
+nis2:
+  # Inbound entries already backlink playbook.on_call_rotation@v1:
+  #   - content/mappings/nis2/article-21-2-b.yaml
+  #     (id nis2:art-21-2-b — incident-handling capability;
+  #     responder readiness)
+  #   - content/mappings/nis2/article-23.yaml
+  #     (id nis2:art-23-early-warning — Art. 23(4)(a) 24-hour
+  #     early-warning notification; the rotation is the head of
+  #     the early-warning clock)
+  # Both are pinned outbound below to close the graph.
+  - mapping_id: nis2:art-21-2-b
+    article: 21(2)(b)
+    notes: >-
+      NIS2 Art. 21(2)(b) requires operating an incident-handling
+      capability (detect, triage, contain, remediate, capture
+      lessons learned). The on_call_rotation playbook discharges
+      the responder-readiness precondition of that capability:
+      without a bound primary slot, a populated escalation chain,
+      and a delivered shift-handoff brief, the detect/triage/
+      contain steps the per-incident playbooks operate have no
+      durable responder to dispatch against. The metric_refs the
+      inbound entry already declares (kpi.coverage_on_call_schedule@v1,
+      kpi.mttr_on_call_ack@v1, kpi.handoff_brief_delivery_sla@v1,
+      kri.escalation_tier_breach@v1) all attach to this playbook's
+      runtime; this outbound entry is the structural closure of
+      that backlink.
+
+  - mapping_id: nis2:art-23-early-warning
+    article: 23(4)(a)
+    notes: >-
+      NIS2 Art. 23(4)(a) sets the 24-hour early-warning
+      notification window from awareness of a significant
+      incident. The on-call rotation is the head of that clock:
+      the awareness-to-acknowledgement latency the
+      kpi.mttr_on_call_ack@v1 metric audits, plus the
+      kpi.coverage_on_call_schedule@v1 coverage guarantee on the
+      primary slot, jointly determine how much of the 24-hour
+      window is consumed before any downstream notification step
+      can run. The inbound entry already lists this playbook
+      alongside the per-incident playbooks (ransomware_containment,
+      data_exfil, identity_compromise) for exactly that reason;
+      this outbound entry closes the graph.
+
+dora:
+  # Inbound entry already backlinks playbook.on_call_rotation@v1:
+  #   - content/mappings/dora/article-19-and-28.yaml
+  #     (id dora:art-19-initial-4h — Art. 19(4)(a) 4-hour
+  #     post-classification initial-notification window for major
+  #     ICT-related incidents)
+  # Pinned outbound below to close the graph. The DORA Art. 6
+  # governance anchor (ICT risk-management framework) is NOT
+  # pinned here pending a separate inbound-closure card; see the
+  # file header DORA inbound-gap note.
+  - mapping_id: dora:art-19-initial-4h
+    article: 19(4)(a)
+    notes: >-
+      DORA Art. 19(4)(a) requires submission of an initial
+      notification of a major ICT-related incident to the
+      competent authority within 4 hours of classification as
+      major (and no later than 24 hours from awareness). The
+      4-hour post-classification clock starts at the responder's
+      first acknowledgement; an unbound primary slot or a slow
+      ack delays the whole notification chain regardless of how
+      fast the submission step itself runs. The inbound entry's
+      notes call this out explicitly and list this playbook
+      alongside the per-incident playbooks that operate the
+      classification and submission steps; this outbound entry is
+      the structural closure of that backlink.
