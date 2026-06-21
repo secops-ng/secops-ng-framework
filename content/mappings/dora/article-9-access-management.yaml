@@ -1,0 +1,62 @@
+# DORA — Article 9 (Protection and Prevention), access-management slice.
+# Companion to article-9-and-rts-vuln-mgmt.yaml (the vulnerability and
+# patch management slice of the same Art. 9 anchor). This file covers
+# the access-management and authentication-governance obligations
+# operationalised by the JC RTS on ICT risk management framework
+# (Commission Delegated Regulation (EU) 2024/1774) Articles 20–22 on
+# identity management, access management, and authentication.
+#
+# Out of scope here: vulnerability and patch management (lives in
+# article-9-and-rts-vuln-mgmt.yaml), incident reporting (Art. 17–19),
+# third-party risk (Art. 28+).
+regime: dora
+entries:
+  - id: dora:art-9-access-mgmt
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "9(4)(c)"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Implement policies that limit physical and virtual access to ICT
+      system resources and data to what is required for legitimate
+      functions and activities, and design identity-management and
+      access-management arrangements that allocate access rights on a
+      need-to-know, need-to-use, and least-privilege basis, with
+      strong authentication for privileged and remote access and
+      continuous review of granted rights against the operator's
+      least-privilege baseline.
+    status: draft
+    control_refs:
+      - control.cloud_identity_least_privilege@v1
+      - control.privileged_access_review@v1
+      - control.jml_evidence@v1
+    playbook_refs:
+      - playbook.iam_auditor@v1
+      - playbook.onboarding_offboarding_tracker@v1
+    metric_refs:
+      - kri.orphaned_privileged_accounts@v1
+      - kpi.cloud_posture_coverage@v1
+    evidence_stream_refs:
+      - access
+    notes: >-
+      Level 1 anchor is DORA Art. 9(4)(c) (access-management policies as
+      part of the protection and prevention obligation); the operative
+      detail is in the Level 2 RTS — Commission Delegated Regulation
+      (EU) 2024/1774 (JC RTS on ICT risk management framework) Articles
+      20–22 (identity management, access management, authentication).
+      This entry is the access-management counterpart to the
+      vulnerability and patch management slice expressed in
+      article-9-and-rts-vuln-mgmt.yaml; both files anchor on the same
+      Art. 9 protection-and-prevention obligation but discharge
+      independent operational disciplines and are mapped separately
+      to keep the inbound graph atom-per-obligation. The two
+      playbooks referenced cover complementary halves of the access
+      surface: `playbook.iam_auditor@v1` is the per-execution
+      capability-inventory producer on the F-CP-07 access stream, and
+      `playbook.onboarding_offboarding_tracker@v1` is the
+      per-lifecycle-event grant/revoke-confirmation counterpart on
+      the same stream. Overlaps NIS2 Art. 21(2)(i) (HR security,
+      access-control policies, asset management); the same playbooks
+      are referenced from mappings/nis2/article-21-2-i.yaml.
