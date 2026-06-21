@@ -13,7 +13,7 @@ carry a `cra:` block — extending the schema is filed as a sibling
 EXTEND card; for now CRA closure is asserted in comments at the foot
 of each playbook overlay.
 
-## Mapped (7 / 19)
+## Mapped (8 / 19)
 
 | Playbook | Inbound entry |
 |----------|---------------|
@@ -21,11 +21,12 @@ of each playbook overlay.
 | `codebase_vuln_management` | `cra:annex-i-2-codebase-vuln-mgmt` |
 | `data_exfil` | `cra:art-14-severe-incident` |
 | `identity_compromise` | `cra:annex-i-1-secure-by-default` |
+| `it_security_support_agent` | `cra:art-13-12-spoc-it-support-agent` |
 | `post_incident_review` | `cra:art-14-final-report` |
 | `ransomware_containment` | `cra:art-14-severe-incident` |
 | `vuln_intake` | `cra:annex-i-2-*`, `cra:art-13-*`, `cra:art-14-*` |
 
-## Orphaned (12 / 19)
+## Orphaned (11 / 19)
 
 Playbooks shipped without any inbound CRA entry. Each row notes the
 nearest candidate CRA clause; the actual edge belongs in a per-clause
@@ -40,7 +41,6 @@ yaml under this directory rather than as a comment.
 | `iam_auditor` | Annex I §1(d) access control | Periodic access-attestation against the §1(d) baseline. |
 | `incident_management` | (deliberate skip) | Regulator-notification engine for NIS2 Art. 23 / DORA Art. 19; the CRA Art. 14 product-vuln chain runs on `vuln_intake` and stays separate by design. See note in `content/playbooks/incident_management/mappings.yaml`. |
 | `infra_posture_management` | Annex I §1(b) secure-by-default config | Configuration drift detection against the §1(b) baseline. |
-| `it_security_support_agent` | Art. 13(12) single point of contact | User-facing reachability channel (paired with `on_call_rotation`). |
 | `onboarding_offboarding_tracker` | Annex I §1(d) access control | Joiner/mover/leaver lifecycle behind §1(d). |
 | `on_call_rotation` | Art. 13(12) single point of contact | After-hours reachability for the §2(5) coordinated-disclosure intake. |
 | `phishing_triage` | Annex I §2(2) vulnerability-handling | Social-engineering vector that surfaces credential-exposure findings into the vuln-handling lane. |
