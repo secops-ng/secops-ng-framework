@@ -1,0 +1,393 @@
+# Cross-references for the ransomware_containment playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed/emitted, and the EU regulatory clauses this
+# playbook helps operationalise. Inbound references live in
+# content/mappings/{nis2,dora}/ so the graph is closed in both
+# directions.
+#
+# CRA closure: the schema's top-level keys are fixed
+# (oscal/d3fend/ocsf/nis2/dora). CRA cross-references for this
+# playbook are therefore expressed inbound only — entries in
+# content/mappings/cra/annex-i-1-essential-cybersecurity.yaml
+# (cra:annex-i-1-availability — Annex I §1(h) availability after
+# incident, backed by control.backup_attestation@v1 and
+# control.restore_drill@v1) and
+# content/mappings/cra/article-14-and-annex-i.yaml
+# (cra:art-14-severe-incident — Art. 14(3) severe-incident
+# notification, 24h/72h/1-month timing) already backlink to
+# playbook.ransomware_containment@v1.
+#
+# GDPR closure: the per-workflow Art. 30 Record of Processing
+# Activity for this workflow lives at
+# content/mappings/gdpr/data-flow-ransomware_containment.md and
+# covers the host-isolation and identity-revocation processing on
+# the affected device user / principal that the steps below operate
+# on. Identity-revocation here is the local cut-out (account
+# disable, session/refresh-token invalidation) on the principal
+# implicated by the ransomware event; deeper IdP-side audit lives
+# in the identity_compromise playbook.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.ransomware_containment@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the triage,
+  # endpoint-isolation (EDR / network-ACL fallback), identity-
+  # revocation, backup-verification, and comms-plan steps.
+  # Catalogue URLs resolve to the public NIST OSCAL repository.
+  - id: control.incident_handling@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-4
+    title: Incident Handling
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-4
+    notes: >-
+      Anchors the playbook end-to-end as the incident-handling
+      capability for the ransomware case set:
+      detection-to-containment-to-notification exercised
+      step-by-step (triage, isolation, identity revocation, backup
+      integrity, comms).
+
+  - id: control.incident_reporting@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-6
+    title: Incident Reporting
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-6
+    notes: >-
+      Covers the NIS2 Art. 23 / DORA Art. 19 / CRA Art. 14
+      regulator-notification chain triggered when the ransomware
+      event crosses the significant-incident / major-incident /
+      severe-incident threshold; the 24h early-warning, the 4h
+      DORA initial / 72h notification, and the intermediate /
+      final report artefacts are emitted along the comms-plan
+      branch.
+
+  - id: control.malicious_code_protection@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SI-3
+    title: Malicious Code Protection
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-3
+    notes: >-
+      Anchors the triage step: the originating ransomware signal
+      (shadow-copy deletion, wbadmin backup deletion, WMI / PS
+      vssadmin chains, mass-rename file-system activity) is
+      surfaced by the operator's malicious-code-protection layer
+      and is the input the triage step hydrates with host and
+      principal context.
+
+  - id: control.boundary_protection@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SC-7
+    title: Boundary Protection
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SC-7
+    notes: >-
+      Covers the endpoint-isolation network-ACL fallback step:
+      when the EDR agent is unreachable, a deny rule at the
+      operator's egress chokepoint quarantines the affected host
+      at the boundary so further lateral spread and command-and-
+      control are cut off pending recovery.
+
+  - id: control.system_backup@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CP-9
+    title: System Backup
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CP-9
+    notes: >-
+      Anchors the backup-verification step: the most recent
+      known-good snapshot that pre-dates the event window is
+      located and the snapshot catalogue hash is integrity-checked
+      so the recovery option remains exercisable without paying
+      the ransom.
+
+  - id: control.system_recovery_and_reconstitution@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CP-10
+    title: System Recovery and Reconstitution
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CP-10
+    notes: >-
+      Reinforces the backup-verification step on the recovery
+      side: the verified snapshot is the prerequisite artefact
+      for the separate (out-of-scope here) recovery playbook
+      that reconstitutes the affected host from the known-good
+      state.
+
+  - id: control.account_management_disable_accounts@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AC-2(13)
+    title: Account Management | Disable Accounts for High-Risk Individuals
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AC-2(13)
+    notes: >-
+      Covers the identity-revocation step where the implicated
+      principal is disabled at the IdP and active sessions /
+      refresh tokens / Kerberos TGTs are invalidated for the
+      duration of the containment window — the operational
+      analogue of disabling a high-risk account.
+
+  - id: control.audit_review_analysis_reporting@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AU-6
+    title: Audit Record Review, Analysis, and Reporting
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AU-6
+    notes: >-
+      Covers the triage step's hydration of host and identity
+      context: correlation of process-creation, file-system, and
+      authentication audit records around the originating signal
+      to decide whether the ransomware event is confirmed before
+      isolation fires.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook
+  # step. CACAO step UUIDs are pinned where the technique applies
+  # to a single step.
+  - step: action--30000000-0000-4000-8000-000000000002
+    d3fend_id: D3-FA
+    d3fend_name: File Analysis
+    url: https://d3fend.mitre.org/technique/d3f:FileAnalysis/
+    notes: >-
+      triage signal — analysis of the file-system artefacts that
+      originated the ransomware case (shadow-copy deletion, mass
+      rename / encryption activity, wbadmin backup deletion) to
+      decide whether the event is confirmed before isolation
+      fires.
+
+  - step: action--30000000-0000-4000-8000-000000000002
+    d3fend_id: D3-PSA
+    d3fend_name: Process Spawn Analysis
+    url: https://d3fend.mitre.org/technique/d3f:ProcessSpawnAnalysis/
+    notes: >-
+      triage signal — analysis of the process-creation chain
+      (PowerShell / WMI vssadmin / wbadmin invocations) on the
+      affected host that the Sigma rules referenced under
+      external_references on the CACAO playbook flagged.
+
+  - step: action--30000000-0000-4000-8000-000000000005
+    d3fend_id: D3-NI
+    d3fend_name: Network Isolation
+    url: https://d3fend.mitre.org/technique/d3f:NetworkIsolation/
+    notes: >-
+      endpoint isolation — EDR isolate — the EDR agent quarantines
+      the affected host at the endpoint so further encryption
+      activity stops and lateral movement / command-and-control
+      paths are cut off.
+
+  - step: action--30000000-0000-4000-8000-000000000006
+    d3fend_id: D3-NTF
+    d3fend_name: Network Traffic Filtering
+    url: https://d3fend.mitre.org/technique/d3f:NetworkTrafficFiltering/
+    notes: >-
+      endpoint isolation — network ACL deny (fallback) — when the
+      EDR agent is unreachable, a deny rule at the operator's
+      egress chokepoint filters all traffic to and from the
+      affected host so the containment cut-out still fires.
+
+  - step: action--30000000-0000-4000-8000-000000000007
+    d3fend_id: D3-ACI
+    d3fend_name: Authentication Cache Invalidation
+    url: https://d3fend.mitre.org/technique/d3f:AuthenticationCacheInvalidation/
+    notes: >-
+      identity revocation — invalidation of live sessions, refresh
+      and access tokens, and Kerberos TGTs for the implicated
+      principal so the attacker cannot pivot off the compromised
+      host through the principal's cached credentials.
+
+  - step: action--30000000-0000-4000-8000-000000000007
+    d3fend_id: D3-AL
+    d3fend_name: Account Locking
+    url: https://d3fend.mitre.org/technique/d3f:AccountLocking/
+    notes: >-
+      identity revocation — disable of the implicated principal
+      at the IdP for the duration of the containment window so
+      no new authentication path is available pending recovery.
+
+  - step: action--30000000-0000-4000-8000-000000000008
+    d3fend_id: D3-FH
+    d3fend_name: File Hashing
+    url: https://d3fend.mitre.org/technique/d3f:FileHashing/
+    notes: >-
+      backup verification — integrity check of the snapshot
+      catalogue hash against the known-good baseline so the
+      verified snapshot can anchor the recovery option without
+      paying the ransom.
+
+  - step: action--30000000-0000-4000-8000-000000000008
+    d3fend_id: D3-EHB
+    d3fend_name: Encrypted Host-storage Backup
+    url: https://d3fend.mitre.org/technique/d3f:EncryptedHost-storageBackup/
+    notes: >-
+      backup verification — confirmation that the most recent
+      known-good snapshot pre-dates the event window and is
+      stored on the operator's offline / immutable backup tier
+      so it is not in-scope of the in-progress ransomware
+      encryption.
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. The triage step consumes
+  # endpoint and authentication telemetry plus the originating
+  # Detection Finding. The endpoint-isolation, identity-revocation,
+  # and backup-verification steps emit Account Change / device-
+  # state-change records keyed to the host or principal. A
+  # Compliance Finding is emitted when the NIS2 Art. 23 /
+  # DORA Art. 19 / CRA Art. 14 notification branch fires from the
+  # comms-plan step.
+  - id: telemetry.detection_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2004
+    class_name: Detection Finding
+    ocsf_version: "1.3.0"
+    direction: consumes
+    notes: >-
+      Consumed at the triage step: the originating ransomware
+      signal (Sigma matches on shadow-copy deletion via vssadmin
+      / WMI / PowerShell, Windows Backup deletion via wbadmin,
+      mass file-rename / encryption activity) is delivered as a
+      Detection Finding produced by the upstream rules referenced
+      under external_references on the CACAO playbook. Schema:
+      https://schema.ocsf.io/1.3.0/classes/detection_finding
+
+  - id: telemetry.process_activity@v1
+    category_uid: 1
+    category_name: System Activity
+    class_uid: 1007
+    class_name: Process Activity
+    ocsf_version: "1.3.0"
+    direction: consumes
+    notes: >-
+      Consumed at the triage step: process-creation records on
+      the affected host (PowerShell / WMI vssadmin / wbadmin
+      invocations and their parent / grand-parent chains) used
+      to confirm the ransomware signal before isolation fires.
+      Schema:
+      https://schema.ocsf.io/1.3.0/classes/process_activity
+
+  - id: telemetry.file_system_activity@v1
+    category_uid: 1
+    category_name: System Activity
+    class_uid: 1001
+    class_name: File System Activity
+    ocsf_version: "1.3.0"
+    direction: consumes
+    notes: >-
+      Consumed at the triage and backup-verification steps:
+      file-system events surrounding the encryption window
+      (mass rename, write, delete on the affected host) at
+      triage; snapshot-catalogue file-state records at backup
+      verification. Schema:
+      https://schema.ocsf.io/1.3.0/classes/file_system_activity
+
+  - id: telemetry.authentication@v1
+    category_uid: 3
+    category_name: Identity & Access Management
+    class_uid: 3002
+    class_name: Authentication
+    ocsf_version: "1.3.0"
+    direction: consumes
+    notes: >-
+      Consumed at the triage step: recent sign-in metadata for
+      the principal implicated by the host's logged-on user so
+      identity revocation acts on the correct authoritative
+      principal. Schema:
+      https://schema.ocsf.io/1.3.0/classes/authentication
+
+  - id: telemetry.account_change@v1
+    category_uid: 3
+    category_name: Identity & Access Management
+    class_uid: 3001
+    class_name: Account Change
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by the identity-revocation step: each containment
+      action on the implicated principal (account disable,
+      session invalidation, refresh/access-token revocation,
+      Kerberos TGT invalidation) is recorded as an Account Change
+      event so the timeline-signal controls can audit on-time
+      containment KPIs. Schema:
+      https://schema.ocsf.io/1.3.0/classes/account_change
+
+  - id: telemetry.compliance_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2003
+    class_name: Compliance Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by the comms-plan step when the incident crosses
+      the NIS2 Art. 23 / DORA Art. 19 / CRA Art. 14 threshold:
+      one Compliance Finding per 24-hour early-warning, 4-hour
+      DORA initial notification, 72-hour notification, and
+      intermediate / final report, keyed to the case so the
+      timeline-signal controls can audit on-time delivery.
+      Schema:
+      https://schema.ocsf.io/1.3.0/classes/compliance_finding
+
+nis2:
+  # Inbound entries live at content/mappings/nis2/article-21-2-b.yaml
+  # (id nis2:art-21-2-b) and content/mappings/nis2/article-23.yaml
+  # (ids nis2:art-23-early-warning, nis2:art-23-notification-72h),
+  # all backlinking to playbook.ransomware_containment@v1.
+  - mapping_id: nis2:art-21-2-b
+    article: 21(2)(b)
+    notes: >-
+      NIS2 Art. 21(2)(b) requires an incident-handling capability.
+      The ransomware_containment playbook is the operational
+      artefact that operationalises this obligation for the
+      ransomware case set — detect, triage, contain (host
+      isolation + identity revocation), preserve recovery
+      (backup verification), and notify.
+
+  - mapping_id: nis2:art-23-early-warning
+    article: 23(4)(a)
+    notes: >-
+      NIS2 Art. 23(4)(a) requires a 24-hour early-warning to the
+      competent authority for significant incidents. The
+      ransomware_containment playbook escalates to this branch
+      through the comms-plan step when the event crosses the
+      significant-incident threshold (impact on essential
+      services, lateral-movement risk, data exposure on
+      encrypted file scope).
+
+  - mapping_id: nis2:art-23-notification-72h
+    article: 23(4)(b)
+    notes: >-
+      NIS2 Art. 23(4)(b) requires a 72-hour notification with an
+      initial assessment of severity and impact. The
+      ransomware_containment playbook's isolation, identity-
+      revocation, and backup-verification artefacts feed the
+      severity / impact / indicators-of-compromise sections of
+      the assessment.
+
+dora:
+  # Inbound entries live at content/mappings/dora/article-19-and-28.yaml
+  # (ids dora:art-18-classification, dora:art-19-initial-4h,
+  # dora:art-19-intermediate-72h), all backlinking to
+  # playbook.ransomware_containment@v1.
+  - mapping_id: dora:art-18-classification
+    article: "18(1)"
+    notes: >-
+      DORA Art. 18(1) requires classification of ICT-related
+      incidents against the criteria in the JC RTS on incident
+      classification (Commission Delegated Regulation (EU)
+      2024/1772). The ransomware_containment playbook produces
+      the host-blast-radius, encryption-scope, and recovery-
+      option evidence that drives the classification decision.
+
+  - mapping_id: dora:art-19-initial-4h
+    article: "19(4)(a)"
+    notes: >-
+      DORA Art. 19(4)(a) requires an initial notification within
+      4 hours of classification as a major incident. The
+      ransomware_containment playbook's isolation and identity-
+      revocation artefacts anchor the initial notification
+      payload through the comms-plan step.
+
+  - mapping_id: dora:art-19-intermediate-72h
+    article: "19(4)(b)"
+    notes: >-
+      DORA Art. 19(4)(b) requires an intermediate notification
+      within 72 hours with updated assessment. The
+      ransomware_containment playbook's backup-verification
+      result and any lateral-movement closure feed the updated
+      assessment for the intermediate report.
