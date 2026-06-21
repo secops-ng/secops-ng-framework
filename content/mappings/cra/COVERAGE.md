@@ -20,6 +20,7 @@ of each playbook overlay.
 | `cloud_misconfiguration` | `cra:annex-i-1-secure-by-default` |
 | `codebase_vuln_management` | `cra:annex-i-2-codebase-vuln-mgmt` |
 | `data_exfil` | `cra:art-14-severe-incident` |
+| `executive_metrics` | `cra:art-13-2-3-risk-assessment-metrics` |
 | `identity_compromise` | `cra:annex-i-1-secure-by-default` |
 | `it_security_support_agent` | `cra:art-13-12-spoc-it-support-agent` |
 | `post_incident_review` | `cra:art-14-final-report` |
@@ -37,7 +38,6 @@ yaml under this directory rather than as a comment.
 | `alert_triage` | Annex I §1(j) logging-and-monitoring | Operational triage of product-emitted signals. |
 | `contractual_obligations_tracker` | Art. 13(4) component due diligence | Supplier / third-party attestation surface. |
 | `detection_engineering` | Annex I §1(j) logging-and-monitoring | Rule lifecycle behind the §1(j) monitoring capability. |
-| `executive_metrics` | Art. 13(2)–(3) risk assessment | KPI/KRI roll-up for the manufacturer risk posture. |
 | `iam_auditor` | Annex I §1(d) access control | Periodic access-attestation against the §1(d) baseline. |
 | `incident_management` | (deliberate skip) | Regulator-notification engine for NIS2 Art. 23 / DORA Art. 19; the CRA Art. 14 product-vuln chain runs on `vuln_intake` and stays separate by design. See note in `content/playbooks/incident_management/mappings.yaml`. |
 | `infra_posture_management` | Annex I §1(b) secure-by-default config | Configuration drift detection against the §1(b) baseline. |
