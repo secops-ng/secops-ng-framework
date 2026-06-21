@@ -1,0 +1,92 @@
+name: cra-orphan-ci
+
+# G-02 KRI assertion for the CRA regulatory-mapping coverage axis.
+#
+# Walks `content/playbooks/` and `content/mappings/cra/` and fires
+# the G-02 KRI when a finalized playbook either:
+#
+#   * regresses (had an inbound CRA citation in the baseline ref and
+#     no longer does in the PR head) — immediate hard fail; or
+#   * is net-new without any inbound CRA citation and the CACAO
+#     finalization marker is older than the 7-day grace window —
+#     hard fail.
+#
+# Runs nightly on `main` and on every PR touching the two trees.
+# The KRI emission (``--format kri``) is uploaded as an artifact so
+# the dashboard ingest can read it without re-running the linter.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "content/playbooks/**"
+      - "content/mappings/cra/**"
+      - "tools/lint_cra_playbook_orphans.py"
+      - "tests/content/test_cra_playbook_orphans.py"
+      - ".github/workflows/cra-orphan-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "content/playbooks/**"
+      - "content/mappings/cra/**"
+      - "tools/lint_cra_playbook_orphans.py"
+  schedule:
+    # Nightly at 02:17 UTC — off-peak, away from on-the-hour spikes.
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cra-orphan-ci:
+    name: G-02 CRA orphan assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history for baseline diff)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML)
+        run: pip install --no-cache-dir pyyaml
+
+      - name: Resolve baseline ref
+        id: baseline
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "ref=origin/${{ github.base_ref }}" >> "$GITHUB_OUTPUT"
+          else
+            # Nightly / push on main: diff against the parent of HEAD so
+            # a regression introduced by HEAD is still surfaced.
+            echo "ref=HEAD~1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run CRA orphan-CI assertion (text)
+        run: |
+          python -m tools.lint_cra_playbook_orphans \
+            --baseline-ref "${{ steps.baseline.outputs.ref }}" \
+            --format text
+
+      - name: Emit G-02 KRI payload
+        if: always()
+        run: |
+          mkdir -p .kri-out
+          python -m tools.lint_cra_playbook_orphans \
+            --baseline-ref "${{ steps.baseline.outputs.ref }}" \
+            --format kri > .kri-out/g-02-cra.json || true
+          cat .kri-out/g-02-cra.json
+
+      - name: Upload KRI artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g-02-cra-kri
+          path: .kri-out/g-02-cra.json
+          if-no-files-found: warn
+          retention-days: 30

@@ -1,0 +1,27 @@
+# CRA orphan-CI assertion skip manifest.
+#
+# Used by `tools.lint_cra_playbook_orphans` (and the workflow at
+# `.github/workflows/cra-orphan-ci.yml`) to allow a finalized playbook
+# to stay without an inbound `playbook_refs:` citation under
+# `content/mappings/cra/` without tripping the G-02 KRI.
+#
+# Each entry is a deliberate, audited exclusion. The rationale is
+# committed history; the SKELETON guard rejects any entry that lacks
+# the two required fields. Removing a slug from this list re-arms the
+# assertion against it immediately.
+#
+# A slug listed here MUST refer to a directory under
+# `content/playbooks/` that carries a CACAO finalization marker
+# (`playbook.cacao.json` or `playbook.cacao.yaml`). Listing a
+# non-finalized or non-existent slug is a hard error.
+
+skip:
+  - slug: incident_management
+    rationale: >-
+      Regulator-notification engine for NIS2 Art. 23 / DORA Art. 19.
+      The CRA Art. 14 product-vulnerability notification chain runs
+      on `vuln_intake` and stays separate by design — pinning
+      `incident_management` against a CRA clause would conflate two
+      distinct notification regimes. See the inline note in
+      `content/playbooks/incident_management/mappings.yaml` and the
+      CRA coverage table at `content/mappings/cra/COVERAGE.md`.
