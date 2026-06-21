@@ -1,0 +1,38 @@
+# NIS2 orphan-CI assertion skip manifest.
+#
+# Used by `tools.lint_playbook_orphans --framework nis2` (and the
+# nightly multi-framework workflow) to allow a finalized playbook to
+# stay without an inbound `playbook_refs:` citation under
+# `content/mappings/nis2/` without tripping the G-02 KRI.
+#
+# Each entry is a deliberate, audited exclusion. The rationale is
+# committed history; the SKELETON guard rejects any entry that lacks
+# the two required fields. Removing a slug from this list re-arms the
+# assertion against it immediately.
+#
+# A slug listed here MUST refer to a directory under
+# `content/playbooks/` that carries a CACAO finalization marker
+# (`playbook.cacao.json` or `playbook.cacao.yaml`). Listing a
+# non-finalized or non-existent slug is a hard error.
+
+skip:
+  - slug: executive_metrics
+    rationale: >-
+      Reporting playbook that aggregates KPI/KRI evidence for board-
+      level review; it is not the operational object of any single
+      NIS2 Article 21/22/23 obligation. It surfaces indirectly via the
+      `metric_refs:` on each clause's mapping rather than via
+      `playbook_refs:`, which is the audited convention for reporting
+      playbooks across every framework.
+  - slug: incident_management
+    rationale: >-
+      Regulator-notification engine — also referenced from the DORA
+      Art. 19 mapping tree. The NIS2 Art. 23 narrative in
+      `content/mappings/nis2/article-23-incident-handling.md` already
+      documents the wiring; the per-clause `article-23.yaml`
+      `playbook_refs:` lists currently cite the upstream incident-type
+      playbooks (`ransomware_containment`, `data_exfil`,
+      `identity_compromise`, `post_incident_review`) that feed the
+      engine. Direct `playbook.incident_management@v1` citation is
+      tracked as a per-clause content follow-up to the nis2 mapping
+      tree, not deferred indefinitely.

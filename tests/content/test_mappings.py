@@ -43,10 +43,17 @@ _SKELETON_REGIMES: frozenset[str] = frozenset({"d3fend"})
 
 
 def _mapping_files() -> list[Path]:
+    # Underscore-prefixed manifests (e.g. ``_orphan_skip.yaml``) are
+    # framework-level control files, not regulatory mappings — the
+    # orphan-CI linter excludes them by the same convention. Keep the
+    # two filters aligned so adding a new ``_*.yaml`` knob doesn't
+    # break the mapping-validation suite.
     return sorted(
         p
         for p in MAPPINGS_DIR.glob("*/*.yaml")
-        if p.is_file() and p.parent.name not in _SKELETON_REGIMES
+        if p.is_file()
+        and not p.name.startswith("_")
+        and p.parent.name not in _SKELETON_REGIMES
     )
 
 
