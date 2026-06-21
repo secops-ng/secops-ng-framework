@@ -13,7 +13,7 @@ carry a `cra:` block — extending the schema is filed as a sibling
 EXTEND card; for now CRA closure is asserted in comments at the foot
 of each playbook overlay.
 
-## Mapped (15 / 19)
+## Mapped (16 / 19)
 
 | Playbook | Inbound entry |
 |----------|---------------|
@@ -23,6 +23,7 @@ of each playbook overlay.
 | `contractual_obligations_tracker` | `cra:art-13-4-component-due-diligence-contracts` |
 | `data_exfil` | `cra:art-14-severe-incident` |
 | `executive_metrics` | `cra:art-13-2-3-risk-assessment-metrics` |
+| `iam_auditor` | `cra:annex-i-1-d-access-control-iam-auditor` |
 | `identity_compromise` | `cra:annex-i-1-secure-by-default` |
 | `infra_posture_management` | `cra:annex-i-1-b-secure-by-default-infra-posture` |
 | `it_security_support_agent` | `cra:art-13-12-spoc-it-support-agent` |
@@ -33,7 +34,7 @@ of each playbook overlay.
 | `ransomware_containment` | `cra:art-14-severe-incident` |
 | `vuln_intake` | `cra:annex-i-2-*`, `cra:art-13-*`, `cra:art-14-*` |
 
-## Orphaned (4 / 19)
+## Orphaned (3 / 19)
 
 Playbooks shipped without any inbound CRA entry. Each row notes the
 nearest candidate CRA clause; the actual edge belongs in a per-clause
@@ -42,7 +43,6 @@ yaml under this directory rather than as a comment.
 | Playbook | Nearest CRA clause | Notes |
 |----------|--------------------|-------|
 | `detection_engineering` | Annex I §1(l) logging-and-monitoring | Rule lifecycle behind the §1(l) monitoring capability. |
-| `iam_auditor` | Annex I §1(d) access control | Periodic access-attestation against the §1(d) baseline. |
 | `incident_management` | (deliberate skip) | Regulator-notification engine for NIS2 Art. 23 / DORA Art. 19; the CRA Art. 14 product-vuln chain runs on `vuln_intake` and stays separate by design. See note in `content/playbooks/incident_management/mappings.yaml`. |
 | `threat_intel_ingest` | Art. 13(6) third-party vuln information | "Any relevant information provided by third parties" — upstream awareness channel. **Closed in the first per-clause increment shipped alongside this inventory.** |
 
