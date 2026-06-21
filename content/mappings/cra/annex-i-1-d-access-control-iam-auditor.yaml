@@ -1,0 +1,65 @@
+# CRA — Annex I §1(d) access control (periodic access-attestation lane).
+#
+# Companion to `cra:annex-i-1-access-control` in
+# annex-i-1-essential-cybersecurity.yaml, which already pins the
+# identity_compromise playbook as the agentic anchor for §1(d)
+# (authentication and least-privilege under unauthorised-access
+# response). This file pins the periodic access-attestation
+# lane: the per-execution caller-identity resolution and closed-
+# capability enumeration that iam_auditor emits as access-evidence
+# artifacts against the §1(d) baseline.
+#
+# Sibling under the same clause: the onboarding_offboarding_tracker
+# playbook (per-lifecycle-event JML grant/revoke evidence) is filed
+# as a companion edge under §1(d) and lands in its own per-clause
+# yaml so the access-control baseline reads as a triplet:
+# identity_compromise (unauthorised-access response),
+# iam_auditor (periodic attestation), and
+# onboarding_offboarding_tracker (lifecycle grant/revoke).
+regime: cra
+entries:
+  - id: cra:annex-i-1-d-access-control-iam-auditor
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §1(d)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Products with digital elements shall ensure protection from
+      unauthorised access by appropriate control mechanisms, including
+      but not limited to authentication, identity or access-management
+      systems, and shall report on possible unauthorised access — the
+      periodic access-attestation lane: continuous verification that
+      the access controls in place at any given execution match the
+      documented least-privilege baseline, with per-execution
+      caller-identity resolution and closed-capability enumeration
+      retained as audit evidence.
+    status: draft
+    control_refs:
+      - control.account_management@v1
+      - control.access_enforcement@v1
+      - control.least_privilege@v1
+      - control.service_identification_authentication@v1
+    playbook_refs:
+      - playbook.iam_auditor@v1
+    metric_refs:
+      - kpi.cloud_posture_coverage@v1
+    evidence_stream_refs:
+      - access
+    notes: >-
+      Companion to `cra:annex-i-1-access-control` in
+      annex-i-1-essential-cybersecurity.yaml, which pins
+      identity_compromise as the agentic anchor for §1(d)
+      (unauthorised-access response). This entry pins the
+      periodic access-attestation lane: iam_auditor's per-execution
+      caller-identity resolution and closed-capability enumeration
+      against the F-CP-07 access-evidence stream is the
+      continuous-verification half of the §1(d) baseline. The
+      onboarding_offboarding_tracker sibling under the same clause
+      carries the per-lifecycle-event JML grant/revoke half and is
+      filed as its own per-clause yaml. The NIS2 parallel is
+      `nis2:art-21-2-i` (HR security, access-control policies,
+      asset management); the DORA parallel is
+      `dora:art-9-access-mgmt` (access-management arrangements
+      under the JC RTS Arts. 20–22).
