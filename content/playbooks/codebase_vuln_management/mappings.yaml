@@ -1,0 +1,314 @@
+# Cross-references for the codebase_vuln_management playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed/emitted, and the EU regulatory clauses this
+# playbook helps operationalise. Inbound references live in
+# content/mappings/{cra,nis2,dora}/ so the graph is closed in both
+# directions.
+#
+# This playbook is the codebase-side SBOM-driven vulnerability
+# management engine: ingest the canonical SBOM for the release under
+# review and pin its content hash on the case, walk the SBOM's
+# top-level dependencies against a vulnerability database (NVD, OSV,
+# GHSA) using the operator's locally-runnable scanner CLI, resolve
+# per-finding disclosure-window deadlines from the operator's CVD
+# policy and the severity tier the scanner produced, and emit one
+# disclosure-timeline record per finding for the downstream metrics
+# streams. It is the proactive codebase-side counterpart to the
+# reactive reporter-disclosed surface that playbook.vuln_intake@v1
+# operates; both anchor against the same NIS2 Art. 21(2)(e) and CRA
+# Annex I §2 obligation set but on opposite halves of the
+# vulnerability-handling lifecycle.
+#
+# CRA closure: the schema's top-level keys are fixed
+# (oscal/d3fend/ocsf/nis2/dora). CRA cross-references for this
+# playbook are therefore expressed inbound only — the entry
+# cra:annex-i-2-codebase-vuln-mgmt in
+# content/mappings/cra/article-14-and-annex-i.yaml already lists
+# playbook.codebase_vuln_management@v1 on its playbook_refs and
+# pins Annex I §2(1) SBOM production, §2(2) remediation without
+# delay, §2(5) coordinated-vulnerability-disclosure policy, and
+# §2(7) security-update dissemination through the support period.
+# No outbound CRA Art. 14 incident-reporting closure is asserted
+# here: a codebase-side finding only becomes Art. 14 reportable
+# when it rises to actively-exploited / severe-incident grade and
+# is handed off to the regulator-notification chain operated by
+# playbook.vuln_intake@v1 (which carries the cra:art-14-* inbound
+# entries against itself).
+#
+# DORA closure: the inbound entry dora:art-9-vuln-mgmt in
+# content/mappings/dora/article-9-and-rts-vuln-mgmt.yaml lists
+# playbook.vuln_intake@v1 and playbook.cloud_misconfiguration@v1
+# on its playbook_refs but does not currently backlink
+# playbook.codebase_vuln_management@v1. SBOM-driven codebase
+# vulnerability management is squarely inside DORA Art. 9(4)(a) and
+# the JC RTS on ICT risk management framework (Commission Delegated
+# Regulation (EU) 2024/1774) Art. 10 vulnerability and patch
+# management procedures, so the outbound entry below is asserted on
+# its merits. The inbound-side gap (adding this playbook URN to the
+# dora:art-9-vuln-mgmt playbook_refs list) is documented here and
+# left for a separate inbound-closure card, per the
+# post_incident_review precedent: gap notes do not silently widen
+# the scope of a single-purpose mappings PR.
+#
+# GDPR closure: inbound GDPR clause files are not carried as YAML
+# cross-references in content/mappings/gdpr/ today (the regime is
+# expressed there as per-workflow Records of Processing Activity,
+# not as Art. 32 / 33 clause anchors). A per-workflow Art. 30 RoPA
+# is not warranted for this playbook: the steps operate on
+# component metadata (package names, versions, hashes), CVE
+# identifiers, advisory text, severity scoring inputs, and policy-
+# derived disclosure deadlines — none of which constitute personal
+# data on the codebase side of the SBOM-driven flow. The reporter-
+# disclosure ingestion surface where personal data can appear
+# (researcher contact details, attribution metadata) is operated by
+# playbook.vuln_intake@v1; the per-workflow Art. 30 RoPA lives on
+# that playbook, not on this one.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.codebase_vuln_management@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the SBOM ingest,
+  # dependency walk / scan, CVD scoring, and disclosure-timeline
+  # emit steps. Catalogue URLs resolve to the public NIST OSCAL
+  # repository.
+  - id: control.software_component_inventory@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CM-8
+    title: System Component Inventory
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CM-8
+    notes: >-
+      Anchors the SBOM ingest step: the canonical machine-readable
+      component inventory of the release under review is the input
+      every downstream step joins against. The content hash pinned
+      on the case discharges the "current, accurate, and
+      maintained" obligation on CM-8 for the artefact under
+      review, and the SBOM itself is the discharge of CRA Annex I
+      §2(1) on the codebase side.
+
+  - id: control.dev_process_vuln_information_reuse@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SA-15(8)
+    title: Development Process, Standards, and Tools | Reuse of Threat and Vulnerability Information
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SA-15(8)
+    notes: >-
+      Covers the dependency walk / scan step: external vulnerability
+      information (NVD, OSV, GHSA advisory feeds and the scanner's
+      derived findings) is reused as input to the operator's
+      development and maintenance process for the release under
+      review, closing the SBOM-adjacent half of the control.
+
+  - id: control.vulnerability_monitoring_scanning@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: RA-5
+    title: Vulnerability Monitoring and Scanning
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=RA-5
+    notes: >-
+      Covers the dependency walk / scan step proper: scheduled and
+      release-gated scanning of the codebase's declared top-level
+      dependencies against the chosen vulnerability database with
+      the operator's locally-runnable scanner CLI. The "no hosted
+      scanner SaaS" default in the playbook description discharges
+      the sovereignty side of RA-5 alongside the control itself.
+
+  - id: control.security_alerts_advisories_directives@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SI-5
+    title: Security Alerts, Advisories, and Directives
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-5
+    notes: >-
+      Covers the advisory-feed receipt side of the dependency walk:
+      NVD / OSV / GHSA advisories are the inbound stream the scanner
+      evaluates the SBOM against. The operator-issued security
+      update that ships after a finding is remediated is a downstream
+      effect handled by the dissemination side of the lifecycle
+      (operated by playbook.vuln_intake@v1) and is not double-
+      counted here.
+
+  - id: control.flaw_remediation@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SI-2
+    title: Flaw Remediation
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-2
+    notes: >-
+      Covers the disclosure-window discipline this playbook
+      enforces: per-finding deadlines resolved from the operator's
+      CVD policy and the scanner-derived severity tier drive the
+      SLA against which flaw remediation is tracked. The "remediate
+      without delay" obligation under CRA Annex I §2(2) is
+      operationally discharged through SI-2 timeliness signals
+      derived from the disclosure-timeline records this playbook
+      emits.
+
+  - id: control.supply_chain_risk_policy@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SR-3
+    title: Supply Chain Controls and Processes
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SR-3
+    notes: >-
+      Covers the codebase-side supply-chain discipline: SBOM-driven
+      dependency review is the documented, repeatable process the
+      operator runs against the components it consumes from the
+      software supply chain. The SBOM content-hash pin on the case
+      gives the SR-3 process an auditable artefact per release.
+
+  # Deliberate omissions (with rationale, so a future reviewer does
+  # not have to re-derive them):
+  #   - SA-11 (Developer Testing and Evaluation): the playbook does
+  #     not perform developer-side testing; it consumes vulnerability
+  #     evidence about already-released components. SA-11 belongs on
+  #     the build-pipeline content surface, not on this overlay.
+  #   - IR-6 (Incident Reporting): regulator-notification reporting
+  #     is operated by playbook.vuln_intake@v1 once a finding rises
+  #     to actively-exploited / severe-incident grade. Inbound CRA
+  #     Art. 14 entries already list vuln_intake on their
+  #     playbook_refs; double-pinning IR-6 here would overstate this
+  #     playbook's role in the reporting chain.
+  #   - SR-4 (Provenance): SBOM-provenance assertions (signed SBOMs,
+  #     attestations, in-toto links) are a build-pipeline / release
+  #     surface concern and are not exercised by the steps in this
+  #     playbook. A future card can revisit SR-4 if the SBOM ingest
+  #     step grows a provenance-verification primitive.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned to the real action UUIDs resolved
+  # from content/playbooks/codebase_vuln_management/playbook.cacao.json
+  # (four action bodies: ingest-sbom, review-deps, assess-disclosure,
+  # track-timeline).
+  - step: action--01a17a07-0000-4000-8000-000000000002
+    d3fend_id: D3-SWI
+    d3fend_name: Software Inventory
+    url: https://d3fend.mitre.org/technique/d3f:SoftwareInventory/
+    notes: >-
+      ingest-sbom — pinning the canonical SBOM artefact for the
+      release under review and stamping its content hash on the
+      case discharges the software-inventory technique on the
+      operator's codebase. D3FEND v1.0.0 does not carry a
+      dedicated SBOM-inventory technique; D3-SWI is the closest
+      defensive-technique anchor and the SBOM is the machine-
+      readable form of the inventory artefact it covers.
+
+  - step: action--01a17a07-0000-4000-8000-000000000003
+    d3fend_id: D3-AVE
+    d3fend_name: Asset Vulnerability Enumeration
+    url: https://d3fend.mitre.org/technique/d3f:AssetVulnerabilityEnumeration/
+    notes: >-
+      review-deps — enumerating known vulnerabilities against the
+      SBOM's declared top-level dependencies using the locally-
+      runnable scanner CLI is the asset-vulnerability-enumeration
+      discipline on the codebase side: each SBOM entry is an
+      asset whose advertised version is matched against the chosen
+      vulnerability database.
+
+  - step: action--01a17a07-0000-4000-8000-000000000003
+    d3fend_id: D3-SYSVA
+    d3fend_name: System Vulnerability Assessment
+    url: https://d3fend.mitre.org/technique/d3f:SystemVulnerabilityAssessment/
+    notes: >-
+      review-deps — the scanner's per-finding severity output is the
+      system-vulnerability-assessment artefact the downstream
+      disclosure-window resolution joins against. Pinned alongside
+      D3-AVE because enumeration and severity assessment are
+      produced by the same scanner invocation but discharge
+      distinct D3FEND techniques.
+
+  - step: action--01a17a07-0000-4000-8000-000000000004
+    d3fend_id: D3-OAM
+    d3fend_name: Operational Activity Mapping
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    notes: >-
+      assess-disclosure — resolving the per-finding disclosure-
+      window deadline from the operator's CVD policy and the
+      scanner-derived severity tier is the operational-activity-
+      mapping discipline: each finding is bound to the policy
+      activity that governs its handling timeline.
+
+  - step: action--01a17a07-0000-4000-8000-000000000005
+    d3fend_id: D3-OAM
+    d3fend_name: Operational Activity Mapping
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    notes: >-
+      track-timeline — emitting one disclosure-timeline record per
+      finding against
+      content/evidence/codebase_vuln_management/disclosure-timeline-record.schema.json
+      is the audit-trail materialisation of the same operational-
+      activity mapping: each record carries the operator's CVD-
+      policy-derived deadlines and the case anchor the downstream
+      metrics streams join against.
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. The dependency walk produces a
+  # Vulnerability Finding (class_uid 2002) per scanner hit, keyed to
+  # the SBOM-resolved affected component. The disclosure-timeline
+  # records emitted by track-timeline are a content-model-native
+  # evidence shape (see
+  # content/evidence/codebase_vuln_management/disclosure-timeline-record.schema.json)
+  # rather than an OCSF class — they are deliberately not double-
+  # mapped to a Compliance Finding here, since the CRA Art. 14
+  # regulator-notification chain that emits Compliance Finding
+  # records is operated by playbook.vuln_intake@v1.
+  - id: telemetry.vulnerability_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2002
+    class_name: Vulnerability Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by the dependency walk / scan step (review-deps): one
+      Vulnerability Finding per scanner hit, carrying the CVE id,
+      the affected component resolved from the SBOM, the scanner-
+      derived severity tier, and the case anchor stamped at SBOM
+      ingest. The downstream disclosure-timeline record is built
+      from one (finding, policy) pair and references the same
+      finding by id. Schema:
+      https://schema.ocsf.io/1.3.0/classes/vulnerability_finding
+
+nis2:
+  # Inbound entry lives at
+  # content/mappings/nis2/article-21-2-e.yaml
+  # (id nis2:art-21-2-e-codebase) and backlinks to
+  # playbook.codebase_vuln_management@v1 as the codebase-side
+  # proactive counterpart to the reactive reporter-disclosed
+  # nis2:art-21-2-e entry operated by playbook.vuln_intake@v1.
+  - mapping_id: nis2:art-21-2-e-codebase
+    article: 21(2)(e)
+    notes: >-
+      NIS2 Art. 21(2)(e) requires security in network and
+      information systems acquisition, development and
+      maintenance — including vulnerability handling and disclosure
+      and SBOM production for releases. This playbook is the
+      operational artefact that drives the proactive codebase-side
+      half of that obligation: SBOM ingest, dependency review
+      against advisory feeds, CVD-policy-derived disclosure-window
+      resolution, and per-finding disclosure-timeline emission.
+
+dora:
+  # Inbound entry lives at
+  # content/mappings/dora/article-9-and-rts-vuln-mgmt.yaml
+  # (id dora:art-9-vuln-mgmt). At the time of writing its
+  # playbook_refs list carries playbook.vuln_intake@v1 and
+  # playbook.cloud_misconfiguration@v1 but does NOT yet backlink
+  # playbook.codebase_vuln_management@v1. The outbound entry below
+  # is asserted on its merits (SBOM-driven codebase vulnerability
+  # management is squarely inside Art. 9(4)(a) and the JC RTS on
+  # ICT risk management framework Art. 10 vuln/patch procedures);
+  # the inbound-side closure (adding this playbook URN to the
+  # backlink list) is left for a separate inbound-closure card per
+  # the post_incident_review precedent — gap notes do not silently
+  # widen the scope of a single-purpose mappings PR.
+  - mapping_id: dora:art-9-vuln-mgmt
+    article: "9(4)(a)"
+    notes: >-
+      DORA Art. 9(4)(a), operationalised by the JC RTS on ICT risk
+      management framework (Commission Delegated Regulation (EU)
+      2024/1774) Art. 10 vulnerability and patch management
+      procedures. This playbook is the codebase-side operator-
+      facing procedure: SBOM ingest as the documented component
+      inventory, dependency walk as the identification step,
+      CVD-policy-derived disclosure-window resolution as the
+      risk-based prioritisation step, and per-finding disclosure-
+      timeline records as the tracking-to-closure audit trail.
