@@ -1,0 +1,330 @@
+# Cross-references for the incident_management playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed/emitted, and the EU regulatory clauses this
+# playbook helps operationalise. Inbound references live in
+# content/mappings/{nis2,dora}/ so the graph is closed in both
+# directions.
+#
+# This playbook is the operational engine for the NIS2 Art. 23 /
+# DORA Art. 19 three-stage regulator-notification chain (early
+# warning, intermediate notification, final report) and for the
+# Art. 18(1) significance/major-classification verdict that gates
+# the chain. The companion narratives at
+# content/mappings/nis2/article-23-incident-handling.md and
+# content/mappings/dora/article-19-report-variant.md describe how
+# the per-execution evidence artefact discharges the regulator
+# timeline; this overlay pins the structural ids those narratives
+# reference.
+#
+# CRA closure: the schema's top-level keys are fixed
+# (oscal/d3fend/ocsf/nis2/dora). The incident_management playbook
+# is the regulator-side incident-notification engine; it does not
+# carry CRA Art. 14 product-side vulnerability-notification timings
+# (those run on the vuln_intake playbook against the vulnerabilities
+# evidence stream). No outbound CRA entries are emitted on this
+# overlay; the two notification chains stay separate by design.
+#
+# GDPR closure: the per-workflow Art. 30 Record of Processing
+# Activity for this playbook lives at
+# content/mappings/gdpr/data-flow-incident_management.md and covers
+# the regulator-submission processing (signatory identifiers on the
+# early-warning / 72-hour / final-report submissions, affected-
+# subject counts, cross-border-scope attributes) that the steps
+# below operate on.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.incident_management@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the intake,
+  # significance-classification, timeline-open, three regulator-
+  # submission stages, and timeline-close steps. Catalogue URLs
+  # resolve to the public NIST OSCAL repository. Anchored to the
+  # OSCAL refs declared on content/controls/control.incident_
+  # handling_capability@v1.yaml and content/controls/control.
+  # incident_timeline_signals@v1.yaml.
+  - id: control.incident_handling@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-4
+    title: Incident Handling
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-4
+    notes: >-
+      Anchors the playbook end-to-end as the incident-handling
+      capability for significant ICT-related incidents: intake,
+      classification, timeline open, three-stage regulator
+      submission, and close-out exercised step-by-step.
+
+  - id: control.incident_response_plan@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-8
+    title: Incident Response Plan
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-8
+    notes: >-
+      The CACAO playbook is the executable form of the incident-
+      response plan for significant incidents: the ordered step
+      sequence and the regulator-submission branches are the plan
+      artefact a reviewer reads.
+
+  - id: control.incident_reporting@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-6
+    title: Incident Reporting
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-6
+    notes: >-
+      Covers the NIS2 Art. 23 / DORA Art. 19 regulator-notification
+      chain: the 24h early-warning, the 72h notification, and the
+      one-month final report are emitted along the three submission
+      branches below.
+
+  - id: control.incident_monitoring@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-5
+    title: Incident Monitoring
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-5
+    notes: >-
+      Covers the open-timeline / close-timeline pair and the
+      stage-clock primitive: tracking and documentation of the
+      incident from awareness through final-report delivery,
+      including the per-stage submission instants the timeline-
+      signal controls audit against.
+
+  - id: control.audit_review_analysis_reporting@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AU-6
+    title: Audit Record Review, Analysis, and Reporting
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AU-6
+    notes: >-
+      Covers the timeline-event log appended at each stage: the
+      per-execution audit trail the regulator submissions are
+      derived from, reviewed and analysed by the timeline-signal
+      KPIs (on-time delivery, completeness) and pinned by the
+      evidence-stream golden tests.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned where the technique applies to a
+  # single step. Anchored to D3-IRA / D3-FA from the controls'
+  # d3fend_refs.
+  - step: action--50000000-0000-4000-8000-000000000002
+    d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    notes: >-
+      intake significant-incident signal — hydration of the
+      originating incident signal (upstream playbook hand-off,
+      detection-finding payload, on-call escalation) with case
+      context so the classification step can run a deterministic
+      significance verdict.
+
+  - step: action--50000000-0000-4000-8000-000000000003
+    d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    notes: >-
+      classify significance and cross-border scope — application
+      of the NIS2 Art. 23(3) significant-incident criteria and the
+      DORA Art. 18(1) major-classification rule pack against the
+      hydrated case, producing the rule-id-pinned verdict that
+      gates the regulator-submission chain.
+
+  - step: action--50000000-0000-4000-8000-000000000005
+    d3fend_id: D3-FA
+    d3fend_name: Forensic Analysis
+    url: https://d3fend.mitre.org/technique/d3f:ForensicAnalysis/
+    notes: >-
+      open incident timeline — initialisation of the per-incident
+      timeline session keyed on a stable incident id; the
+      deterministic event-log the downstream submissions are
+      derived from and the audit-trail a reviewer follows from a
+      missed-milestone signal back to the rule-id that started
+      the clock.
+
+  - step: action--50000000-0000-4000-8000-000000000006
+    d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    notes: >-
+      submit 24-hour early warning — emission of the NIS2 Art.
+      23(4)(a) / DORA Art. 19(4)(a) early-warning notification
+      with the suspected-cause and cross-border-impact flags,
+      keyed to the operator-awareness anchor on the timeline.
+
+  - step: action--50000000-0000-4000-8000-000000000007
+    d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    notes: >-
+      submit 72-hour notification — emission of the NIS2 Art.
+      23(4)(b) / DORA Art. 19(4)(b) incident notification with the
+      initial severity / impact / IoC assessment, chained against
+      the prior early-warning event id.
+
+  - step: action--50000000-0000-4000-8000-000000000009
+    d3fend_id: D3-FA
+    d3fend_name: Forensic Analysis
+    url: https://d3fend.mitre.org/technique/d3f:ForensicAnalysis/
+    notes: >-
+      submit 1-month final report — emission of the NIS2 Art.
+      23(4)(d) / DORA Art. 19(4)(c) final report with the detailed
+      description, root-cause analysis, and applied-mitigation
+      record, chained against the prior notification event id.
+
+  - step: action--50000000-0000-4000-8000-00000000000a
+    d3fend_id: D3-FA
+    d3fend_name: Forensic Analysis
+    url: https://d3fend.mitre.org/technique/d3f:ForensicAnalysis/
+    notes: >-
+      close incident timeline — finalisation of the timeline
+      session and emission of the closure record so the per-
+      execution evidence artefact under the incidents stream is
+      sealed and the timeline-completeness KPI can audit the
+      chain.
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. The intake step consumes the
+  # upstream Detection Finding (or peer playbook hand-off shaped
+  # the same way). The three regulator-submission steps emit
+  # Compliance Findings keyed to the case and the milestone. The
+  # open/close timeline steps emit Incident Finding records as the
+  # canonical case envelope.
+  - id: telemetry.detection_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2004
+    class_name: Detection Finding
+    ocsf_version: "1.3.0"
+    direction: consumes
+    notes: >-
+      Consumed at the intake step: the originating significant-
+      incident signal arrives as a Detection Finding (from an
+      upstream detection rule) or as a peer-playbook hand-off
+      shaped the same way (identity_compromise, ransomware_
+      containment, data_exfil, vuln_intake escalating into the
+      regulator-reporting chain). Schema:
+      https://schema.ocsf.io/1.3.0/classes/detection_finding
+
+  - id: telemetry.incident_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2005
+    class_name: Incident Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by the open-timeline and close-timeline steps: the
+      canonical case envelope (incident id, classification verdict,
+      lifecycle anchors) carried alongside the per-stage
+      submission records. Anchored to the
+      telemetry.ocsf.incident_finding@v1 ref declared on the
+      playbook's CACAO x_secops_ng.telemetry_refs. Schema:
+      https://schema.ocsf.io/1.3.0/classes/incident_finding
+
+  - id: telemetry.compliance_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2003
+    class_name: Compliance Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by each of the three regulator-submission steps: one
+      Compliance Finding per 24-hour early-warning, 72-hour
+      notification, and one-month final report, keyed to the case
+      and the milestone so the timeline-signal controls can audit
+      on-time delivery. Schema:
+      https://schema.ocsf.io/1.3.0/classes/compliance_finding
+
+nis2:
+  # Inbound entries live at content/mappings/nis2/article-23.yaml
+  # (ids nis2:art-23-early-warning, nis2:art-23-notification-72h,
+  # nis2:art-23-final-report) and are narrated by
+  # content/mappings/nis2/article-23-incident-handling.md, which
+  # describes the per-execution evidence-stream artefact this
+  # playbook emits as the operational discharge of the Art. 23(4)
+  # three-milestone chain.
+  - mapping_id: nis2:art-23-early-warning
+    article: 23(4)(a)
+    notes: >-
+      NIS2 Art. 23(4)(a) requires a 24-hour early-warning to the
+      competent authority for significant incidents. The
+      incident_management playbook's submit-24-hour-early-warning
+      step is the operational discharge: the regulator-submission
+      stage clock starts on the timeline-open instant
+      (operator-awareness anchor) and the early_warning_24h
+      milestone is recorded on the per-execution evidence artefact.
+
+  - mapping_id: nis2:art-23-notification-72h
+    article: 23(4)(b)
+    notes: >-
+      NIS2 Art. 23(4)(b) requires a 72-hour notification with an
+      initial assessment of severity and impact. The
+      incident_management playbook's submit-72-hour-notification
+      step is the operational discharge: chained against the prior
+      early-warning event id, with the initial severity / impact /
+      IoC assessment carried on the submission payload.
+
+  - mapping_id: nis2:art-23-final-report
+    article: 23(4)(d)
+    notes: >-
+      NIS2 Art. 23(4)(d) requires a final report no later than one
+      month after the incident notification. The incident_
+      management playbook's submit-1-month-final-report step is the
+      operational discharge: chained against the prior
+      notification event id, with the detailed description,
+      root-cause analysis, and applied-mitigation record on the
+      submission payload.
+
+dora:
+  # Inbound entries live at content/mappings/dora/article-19-and-28.yaml
+  # (ids dora:art-18-classification, dora:art-19-initial-4h,
+  # dora:art-19-intermediate-72h, dora:art-19-final-one-month) and
+  # are narrated by content/mappings/dora/article-19-report-variant.md,
+  # which traces each field on the DORA Art. 19 technical-incident
+  # report variant back to the F-WF-05 incident_management
+  # timeline record it is derived from.
+  - mapping_id: dora:art-18-classification
+    article: "18(1)"
+    notes: >-
+      DORA Art. 18(1) requires classification of ICT-related
+      incidents against the criteria in Commission Delegated
+      Regulation (EU) 2024/1772. The incident_management
+      playbook's classify-significance-and-cross-border-scope step
+      runs the major-classification verdict that gates the Art. 19
+      submission chain; the rule-ids pinned in the verdict are
+      carried on every downstream submission so a reviewer can
+      audit the classification from missed-milestone back to the
+      rule that fired the clock.
+
+  - mapping_id: dora:art-19-initial-4h
+    article: "19(4)(a)"
+    notes: >-
+      DORA Art. 19(4)(a) requires an initial notification within 4
+      hours of classification as a major incident. The incident_
+      management playbook's submit-24-hour-early-warning step
+      emits the initial_4h report variant on the DORA lane: the
+      regulator-submission stage clock starts on the major-
+      classification verdict and the on-time semantics are pinned
+      by the stage-clock primitive.
+
+  - mapping_id: dora:art-19-intermediate-72h
+    article: "19(4)(b)"
+    notes: >-
+      DORA Art. 19(4)(b) requires an intermediate notification
+      within 72 hours of major classification with an updated
+      assessment. The incident_management playbook's submit-
+      72-hour-notification step emits the intermediate_72h report
+      variant on the DORA lane, chained against the prior
+      initial_4h event id.
+
+  - mapping_id: dora:art-19-final-one-month
+    article: "19(4)(c)"
+    notes: >-
+      DORA Art. 19(4)(c) requires a final report no later than one
+      month after the intermediate notification. The incident_
+      management playbook's submit-1-month-final-report step emits
+      the final_1mo report variant on the DORA lane: the closure
+      record carries the root-cause analysis and applied-
+      mitigation actions the report variant's emitter requires,
+      chained against the prior intermediate_72h event id.
