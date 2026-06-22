@@ -31,6 +31,7 @@ entries:
       - playbook.vuln_intake@v1
       - playbook.cloud_misconfiguration@v1
       - playbook.codebase_vuln_management@v1
+      - playbook.infra_posture_management@v1
     metric_refs:
       - kpi.vuln_disclosure_sla@v1
       - kri.cvd_intake_aging@v1
@@ -39,6 +40,7 @@ entries:
       - kpi.cloud_posture_coverage@v1
       - kri.recurring_cloud_misconfig@v1
       - kri.releases_without_sbom@v1
+      - kri.control_effectiveness@v1
     evidence_stream_refs:
       - vulns
     notes: >-
@@ -71,3 +73,39 @@ entries:
       policy is not a DORA obligation in the way it is under CRA
       Annex I §2(5); only the inbound monitoring and triage side
       maps cleanly here.
+      The continuous-posture-evidence side of the same Art. 9
+      protection-and-prevention surface is operated by
+      `playbook.infra_posture_management@v1` (collect → evaluate
+      against the declared baseline → emit posture-evidence): each
+      scheduled re-execution emits one posture-evidence artifact
+      shaped per `schemas/evidence/posture.schema.json` (stream
+      `posture`), with attestation state classified per
+      (control_ref, scoped-resource-id) pair against the operator's
+      declared control catalog. The artifact series is the
+      audit-evident discharge of the configuration-baseline half of
+      Art. 9(4)(a) — the per-execution attestation that the
+      in-scope infrastructure remains in the protection-and-
+      prevention posture the operator's declared baseline requires,
+      and the partially_effective / ineffective deviation set that
+      re-enters the operator's risk register feeds the same
+      vulnerability-and-patch-management surface this entry anchors
+      (a posture deviation that exposes a vulnerability surface
+      enters the vuln-intake / patch-management lane via the
+      F-CP-06 effectiveness loop). `kri.control_effectiveness@v1`
+      is lifted onto this entry's `metric_refs` for that closure:
+      the residual ineffective-attestation count is the measurement
+      complement of the existing cloud-posture-coverage KPI that
+      the posture-evidence stream emits, and is declared on the
+      playbook side
+      (`content/playbooks/infra_posture_management/playbook.cacao.json`
+      x_secops_ng.metric_refs). control_refs are not extended here
+      for this backlink: the playbook's own x_secops_ng pins
+      `control.cspm_baseline@v1` (already on this entry's
+      control_refs) plus `control.asset_inventory_delta@v1` and
+      `control.cloud_identity_least_privilege@v1`; no populated
+      cross-reference file under `content/controls/` currently
+      lifts the latter two and the control_xref lint test enforces
+      that gate, so the broader control lift is left to a follow-on
+      card after the xref files land. Convention follows
+      article-10.yaml (inbound backlink + metric lift, control lift
+      deferred to xref-landed follow-on).
