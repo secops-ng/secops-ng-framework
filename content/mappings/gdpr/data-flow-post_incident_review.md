@@ -264,3 +264,91 @@ live. Sovereignty review at compile time is the gate.
   performance-management consequence, automated suspension from
   the rotation, automated regulator-facing attribution), the
   operator MUST re-score this section.
+
+## 8. Outbound personal-data transfer
+
+The workflow has no direct regulator-submission or peer-operator
+notification leg of its own — the parent `incident_management`
+workflow owns the NIS2 Art. 23 / DORA Art. 19 / CRA Art. 14 / GDPR
+Art. 33 submission legs scored as the worked exemplar at
+[`data-flow-incident_management.md`](./data-flow-incident_management.md) §8.
+The `post_incident_review` workflow's outbound footprint is the
+egress of its durable artefacts (timeline artifact, blameless-review
+document, corrective-action register entry) into operator-bound
+processors, scored below against GDPR Chapter V (Art. 44–49). The
+EU-residency posture is sovereignty-first by default per Directive 1,
+and the operator's compile-time bindings are the knobs that can break
+the scoring.
+
+**Leg A — Operator-bound processor egress (review-document store,
+corrective-action register store, change / ticketing system).**
+
+- *Destination class.* Operator-bound processors under GDPR Art. 28 —
+  the review-document store holding the blameless-review artifact
+  (the operator's GRC tool, document store, or wiki), the
+  corrective-action register store (typically the operator's
+  existing change / ticketing system), and the change / ticketing
+  system that owns execution and verification of each register
+  entry. The framework ships no default endpoint; each is
+  operator-supplied through compile-target binding.
+- *Transfer mechanism.* **No transfer** under the default binding.
+  The reference compile targets (n8n / Temporal / LangGraph
+  self-host on Nebul / OVHcloud / Scaleway / Hetzner) are
+  EU-hostable, and the review-document and corrective-action
+  register stores are operator-supplied with no SecOps-NG-hosted
+  fallback. If the operator binds a non-EU GRC tool, document
+  store, wiki, or change / ticketing system, the binding MUST be
+  re-scored under Art. 46 SCCs with supplementary measures
+  (encryption-at-rest with operator-held keys, pseudonymisation of
+  responder and affected-subject identifiers in the timeline and
+  review-document narrative before egress) before the binding goes
+  live.
+- *EU-residency posture.* Default is EU-resident operator-bound
+  processors only. The compile-time sovereignty review is the gate;
+  the framework ships no default processor endpoint and no fallback
+  that could route an artifact outside the EU. The operator's DPA
+  inventory (GDPR Art. 28) is the durable record of the processor
+  binding the review-document and corrective-action stores depend
+  on.
+- *Data minimisation on egress.* The review-document payload
+  carries the timeline narrative, contributing-factor analysis, and
+  evidence-handling flags for any Art. 9 exposure surfaced during
+  the review; the corrective-action register entry carries owner
+  identifier, due-date, and verification-clause text per the
+  enumeration in §3. No payload beyond what those artefacts require
+  is emitted, and the workflow does not emit per-subject
+  behavioural profiles or analytics-only projections to a separate
+  store independent of the parent case.
+
+**Leg B — Metrics-layer egress (control-effectiveness rollup,
+executive_metrics rollup).**
+
+- *Destination class.* Operator-bound metrics processor under GDPR
+  Art. 28 — the metric layer consuming
+  `kpi.timeline_completeness@v1`, `kpi.review_completion_sla@v1`,
+  `kpi.corrective_action_close_rate@v1`, and
+  `kri.corrective_action_overdue@v1`, and the
+  `control.blameless_review@v1` /
+  `control.corrective_action_register@v1` control-effectiveness
+  rollup that feeds the operator's `executive_metrics` workflow.
+- *Transfer mechanism.* **No transfer** under the default binding.
+  The metrics layer is operator-bound on the same sovereign-stack
+  reference targets as the artifact stores; a non-EU metrics
+  processor (a US-hosted observability or business-intelligence
+  SaaS) MUST be re-scored under Art. 46 SCCs.
+- *EU-residency posture.* Default is EU-resident metrics
+  processor; compile-time sovereignty review is the gate. The
+  framework ships no default metrics endpoint.
+- *Data minimisation on egress.* The recipient is the aggregated
+  counter, not the per-incident identifier — the metrics layer
+  receives counts and rates rather than the timeline narrative or
+  the responder identifiers carrying them. Per-incident identifiers
+  remain in the review-document and corrective-action register
+  stores under Leg A and are not duplicated into the metrics
+  surface.
+
+The §6 cross-border scoring as a whole is **no transfer** —
+consistent with both legs above scoring no-transfer under the
+default sovereign-stack posture. Any operator re-scoring of a leg
+here MUST be reflected in §6 in the same change so the two sections
+do not disagree.

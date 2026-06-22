@@ -544,3 +544,171 @@ is in place.
   section, surface the Art. 22 applicability, and document
   the safeguards (right to obtain human intervention, right
   to contest the decision) the operator provides.
+
+## 8. Outbound personal-data transfer
+
+The workflow has four classes of outbound leg that carry personal
+data outside the operator's incident-record store. Each is scored
+below against GDPR Chapter V (Art. 44–49); the EU-residency posture
+is sovereignty-first by default per Directive 1, and the operator's
+compile-time bindings are the knobs that can break the scoring.
+
+**Leg A — Regulator submissions (national CSIRT under NIS2 Art. 12,
+competent authority under DORA Art. 46, supervisory authority under
+GDPR Art. 33).**
+
+- *Destination class.* Regulator under independent-controller
+  routing — the national CSIRT designated under NIS2 Art. 12 for
+  NIS2-scope notifications, the competent authority designated
+  under DORA Art. 46 for DORA-scope notifications, and the
+  supervisory authority designated under GDPR Art. 51 for the
+  GDPR Art. 33 personal-data-breach notification leg. The
+  regulator is a controller in its own right for the notification
+  it receives; the operator is the controller for the upstream
+  exfiltration processing. The framework ships no default
+  regulator endpoint; the destination is operator-supplied through
+  playbook variables.
+- *Transfer mechanism.* **No transfer.** EU competent authorities
+  under NIS2 Art. 12, DORA Art. 46, and GDPR Art. 51 are EU/EEA-
+  resident by construction. The technical control that holds this
+  is that the regulator endpoint URLs are operator-supplied through
+  compile-time variables and sovereignty review at compile time
+  refuses any non-EU endpoint.
+- *EU-residency posture.* Default is EU-resident regulator
+  destinations only. A non-EU binding (a third-country sectoral
+  regulator notified because the exfiltrated set touches that
+  jurisdiction's subjects) MUST be re-scored under Art. 46 SCCs
+  with operator-held encryption keys on the submission envelope,
+  or under Art. 49(1)(d) "important reasons of public interest"
+  derogation where the cross-border notification is mandated by a
+  statute the operator is bound by.
+- *Data minimisation on egress.* The regulator notification
+  payload carries `__affected_subjects_count__`, the
+  `__data_classification__` category labels, the OCSF Security
+  Finding (2001) reference, the containment-evidence references,
+  and the operator's nominated contact. Per-subject identifiers
+  (originating actor's session metadata, asset identifiers,
+  destination handles) are NOT included in the regulator
+  submission; aggregate counts and category labels under
+  Art. 5(1)(c) data minimisation are the regulator-template
+  shape.
+
+**Leg B — Affected-subject notification under GDPR Art. 34.**
+
+- *Destination class.* The data subjects themselves whose records
+  were observed leaving the boundary — the affected-subject set
+  derived during scope assessment against the operator's
+  data-subject register. The communication is controller-to-
+  subject under Art. 34, not a processor leg in its own right.
+  The subject-communication processor (transactional email,
+  postal aggregator, in-app messaging) that physically carries
+  the notification is scored as a separate Art. 28 processor under
+  Leg D.
+- *Transfer mechanism.* **No transfer** for the controller-to-
+  subject leg itself: the GDPR Art. 34 communication is addressed
+  to the affected subjects directly and the Chapter V regime
+  applies to processor / sub-processor routing under it (Leg D),
+  not to the controller-to-subject relationship. Where an
+  affected subject is resident in a third country at the time of
+  notification (cross-border breach scope), the operator's
+  outbound channel routing for that subject MUST be re-scored
+  against the Chapter V instrument that authorises the routing.
+- *EU-residency posture.* Default is EU-resident subject set
+  served by EU-region subject-communication processor (Leg D).
+  Where the affected set spans non-EU subjects, the routing per
+  subject is operator-bound and re-scored.
+- *Data minimisation on egress.* The notification template
+  carries the breach description, the categories of personal data
+  affected, the likely consequences, the operator's contact for
+  follow-up, and the recommended mitigations the subject can
+  take — the GDPR Art. 34(2) template shape. Per-subject
+  identifiers from the operator's data-subject register are
+  dereferenced transiently to address the notification; the
+  notification batch identifier (not the per-subject attributes)
+  is retained against the incident record per §5.
+
+**Leg C — Operator-bound DLP / IdP / endpoint / network egress
+processors.**
+
+- *Destination class.* Operator-bound processors under GDPR
+  Art. 28 — the DLP platform (signal hydration, post-containment
+  validation), the IdP (session-token revocation, credential
+  rotation), the endpoint-management surface (host isolation), and
+  the network-egress surface (egress-policy tightening) that
+  receive the containment-step actions and produce the
+  `control.network_egress_filtering@v1` and
+  `control.dlp_enforcement@v1` attestations.
+- *Transfer mechanism.* **No transfer** under the default
+  EU-pinned binding: the reference compile targets are
+  framework-agnostic and run on the operator's own sovereign-
+  hosted runtime, and the framework ships no SecOps-NG-hosted
+  egress path. If the operator binds a non-EU DLP SaaS control
+  plane, a US-region IdP tenant (Azure AD / Entra ID, Okta), a
+  non-EU endpoint-management or network-egress SaaS, the binding
+  MUST be re-scored under Art. 46 SCCs (EU-US Data Privacy
+  Framework where the provider is a certified US recipient,
+  otherwise standard contractual clauses) with supplementary
+  measures (pseudonymisation of originating-actor / destination /
+  asset identifiers before egress, operator-managed encryption
+  keys held in the EU) before the binding goes live.
+- *EU-residency posture.* Default is EU-region processor tenants
+  on every operator-bound endpoint above. The compile-time
+  sovereignty review is the gate; the operator's DPA inventory
+  under GDPR Art. 28 is the durable record of the binding the
+  scoring depends on.
+- *Data minimisation on egress.* The payload to each processor is
+  scoped to what the containment action requires — actor
+  identifier and session-token reference to the IdP for
+  revocation, host identifier to the endpoint-management surface
+  for isolation, destination identifier to the network-egress
+  surface for policy tightening, signal reference to the DLP
+  platform for re-validation. Payload bytes from the exfiltrated
+  data are NOT routed through these processors; the workflow
+  operates against the classification surface, not the leaked
+  records (§3).
+
+**Leg D — Operator-bound subject-communication and ticketing /
+paging processors.**
+
+- *Destination class.* Operator-bound processors under GDPR
+  Art. 28 — the subject-communication processor (transactional
+  email, postal aggregator, in-app messaging) that physically
+  carries the Art. 34 notification batch (Leg B), and the
+  ticketing / chat / paging processor that carries the
+  asset-owner notification, the on-call hand-off, and the
+  operational annotations against the incident.
+- *Transfer mechanism.* **No transfer** under the default
+  EU-region binding. The subject-communication processor is the
+  highest-risk substitution in this workflow because the
+  notification batch carries the affected-subject contact
+  attributes by construction; a non-EU subject-communication
+  processor (US-hosted transactional email SaaS) MUST be
+  re-scored under Art. 46 SCCs / DPF with supplementary measures
+  (envelope encryption with operator-held keys where the
+  processor supports it, minimal-attribute templating so the
+  processor sees only what is necessary to deliver the
+  notification) before the binding goes live. Non-EU ticketing /
+  chat / paging processors carry the actor / asset / destination
+  identifiers and the incident link on call; re-score on the same
+  Chapter V instruments.
+- *EU-residency posture.* Default is EU-region processor tenant
+  for both legs. Sovereignty review at compile time is the gate
+  for the subject-communication binding more than any other in
+  this workflow, given the breach-by-construction nature of the
+  notification recipients.
+- *Data minimisation on egress.* The subject-communication batch
+  carries the Art. 34(2) template fields (Leg B) plus the
+  per-subject contact attribute (email address, postal address,
+  account identifier) dereferenced transiently from the
+  operator's data-subject register. The ticketing / chat / paging
+  payload carries actor identifier, asset identifier, destination
+  identifier, severity, and the incident link — no payload bytes
+  from the exfiltrated data and no Art. 9 attribute beyond the
+  `__data_classification__` label.
+
+The §6 cross-border scoring as a whole is **no transfer** for the
+default EU-pinned binding — consistent with all four legs above
+scoring no-transfer. Any operator re-scoring of a leg here MUST be
+reflected in §6 in the same change so the two sections do not
+disagree; the non-EU subject-communication processor binding is the
+re-score gate this workflow is most likely to hit.
