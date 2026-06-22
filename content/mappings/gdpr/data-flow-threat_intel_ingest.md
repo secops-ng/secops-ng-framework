@@ -375,3 +375,130 @@ review at compile time is the gate.
   applicability, and document the safeguards (right to obtain
   human intervention, right to contest the decision) the
   operator provides.
+
+## 8. Outbound personal-data transfer
+
+The workflow has three classes of outbound leg that carry personal
+data outside the operator's normalised-indicator store. Each is
+scored below against GDPR Chapter V (Art. 44–49); the EU-residency
+posture is sovereignty-first by default per Directive 1, and the
+operator's compile-time bindings are the knobs that can break the
+scoring. The §6 cross-border scoring as a whole is `no transfer`
+under the default sovereign-stack posture — consistent with every
+leg below — and an operator re-scoring of any leg here MUST be
+reflected in §6 in the same change so the two sections do not
+disagree.
+
+**Leg A — TAXII poll to upstream feed publisher (operator → publisher
+metadata egress).**
+
+- *Destination class.* Threat-intel sharing community — the upstream
+  feed publisher identified by `__feed_id__`. The default binding
+  is an EU-resident publisher (the ENISA-coordinated EU CSIRTs
+  network feed, a national CSIRT bulletin from an EU member state,
+  or a community MISP instance the operator participates in that is
+  itself EU-hosted). The publisher acts as an independent
+  controller of the bundle it publishes; the poll metadata the
+  operator exposes (source IP, TAXII client identifier, polled
+  collection identifier and timestamp) is incidental controller-to-
+  controller exposure rather than a processor binding.
+- *Transfer mechanism.* **No transfer** for the default EU-resident
+  publisher. The TAXII session terminates inside the EU/EEA. Where
+  the operator binds a non-EU upstream feed publisher (US-hosted
+  ISAC feeds, US-government feeds such as CISA AIS or FBI flash
+  bulletins, commercial CTI vendors hosted outside the EU,
+  APAC-based community feeds), the leg MUST be re-scored under
+  Art. 46 SCCs with the EU-US Data Privacy Framework substituted
+  for SCCs where the publisher is a certified US recipient, or
+  under Art. 49 derogation only where the cross-border defensive-
+  community sharing is mandated by a statute the operator is
+  bound by.
+- *EU-residency posture.* Default is EU-resident publisher only;
+  the operator-bound knob is the compile-time `__feed_id__`
+  binding (and the TAXII collection URL the binding resolves to).
+  The technical control that holds the posture is that the
+  framework ships no default feed binding — the operator wires
+  the publisher at compile time and sovereignty review at compile
+  time refuses any non-EU endpoint absent an Art. 46 / Art. 49
+  rationale.
+- *Data minimisation on egress.* The operator exposes only the
+  TAXII client identifier and the source IP of the polling
+  runtime to the publisher; no operator-side telemetry, no
+  affected-subject identifiers, no detection state leaves with
+  the poll. The TAXII protocol surface is the minimum the
+  upstream session requires.
+
+**Leg B — Enforcement-plane propagation (high-confidence indicator
+push to perimeter firewall, DNS sinkhole, EDR allow/deny list).**
+
+- *Destination class.* Operator-bound processors under GDPR
+  Art. 28 — the enforcement-plane processors named in §4
+  (perimeter firewall, DNS sinkhole, EDR allow/deny list). The
+  controllership of the indicator data the operator pushes
+  remains with the operator; the enforcement processor is bound
+  to a Data Processing Agreement governing the operator's use of
+  the control plane.
+- *Transfer mechanism.* **No transfer** under the default
+  binding: the operator's EU-region control planes for the
+  perimeter, DNS, and EDR processors are EU-resident, and the
+  push terminates inside the EU/EEA. Where the operator binds a
+  vendor-hosted enforcement-plane processor whose control plane
+  is outside the EU, the leg MUST be re-scored under Art. 46
+  SCCs with supplementary measures (encryption-at-rest with
+  operator-held keys on the indicator payload at rest in the
+  vendor's plane, pseudonymisation of any IP / domain / email
+  / hash that resolves to a natural person before propagation)
+  before the binding goes live.
+- *EU-residency posture.* Default is EU-region control planes
+  only; the operator-bound knob is the compile-time
+  enforcement-plane processor binding for each of the
+  perimeter, DNS, and EDR slots. The technical control that
+  holds the posture is that the framework ships no default
+  enforcement-plane processor and no fallback that could route
+  the propagation outside the EU; the operator's DPA inventory
+  (GDPR Art. 28) is the durable record of the processor
+  binding the propagation cycle depends on.
+- *Data minimisation on egress.* The propagation payload
+  carries the indicator value, the indicator type, the
+  confidence score, and the upstream `valid_from` /
+  `valid_until` window only. No operator-side telemetry,
+  no source-analyst provenance, no incidental third-party
+  identifier from §3 is enriched onto the payload — the
+  enforcement processor receives the minimum the blocklist
+  surface requires.
+
+**Leg C — OCSF Detection Finding emission to the operator's SIEM /
+telemetry store.**
+
+- *Destination class.* Operator-bound processor under GDPR
+  Art. 28 — the operator's SIEM / OCSF telemetry store. The
+  workflow emits `telemetry.ocsf.detection_finding@v1`
+  (class_uid 2004) on subsequent SIEM rule match against an
+  indicator the workflow propagated; the store binding the
+  operator wires at compile time receives the events.
+- *Transfer mechanism.* **No transfer** under the default
+  binding: the operator's EU-region-pinned SIEM / OCSF store
+  is EU-resident and the emission terminates inside the
+  EU/EEA. Where the operator binds a non-EU SIEM /
+  telemetry processor (a US-hosted SIEM vendor backend,
+  an APAC-region telemetry aggregator), the leg MUST be
+  re-scored under Art. 46 SCCs with supplementary measures
+  (encryption-at-rest with operator-held keys on the OCSF
+  payload at rest, pseudonymisation of identifier fields
+  on the Detection Finding before egress) before the
+  binding goes live.
+- *EU-residency posture.* Default is EU-region telemetry
+  store only; the operator-bound knob is the compile-time
+  SIEM / OCSF processor binding. The technical control
+  that holds the posture is that the framework ships no
+  default telemetry processor and no fallback that could
+  route OCSF emissions outside the EU.
+- *Data minimisation on egress.* The Detection Finding
+  carries the indicator value, the indicator type, the
+  matching rule reference, the match timestamp, and the
+  observed source / destination identifiers from the
+  triggering telemetry. The workflow does not enrich the
+  Finding with source-analyst provenance metadata or the
+  upstream feed publisher's identity; the Finding carries
+  only the operator-side observation, not the upstream
+  bundle context.
