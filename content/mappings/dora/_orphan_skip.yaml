@@ -33,3 +33,23 @@ skip:
       threshold and is therefore intentionally not cited under a DORA
       clause. CRA Art. 14 and NIS2 Art. 23 mapping trees own the
       cross-regime citation where applicable.
+  - slug: it_security_support_agent
+    rationale: >-
+      Front-line support-interaction workflow. The DORA incident-
+      bearing surface (Art. 18(1) classification; Art. 19(4) four-hour
+      initial / 72-hour intermediate / one-month final reporting) is
+      owned by `playbook.incident_management@v1`, which already carries
+      the `dora:art-18-classification`, `dora:art-19-initial-4h`,
+      `dora:art-19-intermediate-72h`, and `dora:art-19-final-one-month`
+      backlinks on its overlay. A forced outbound DORA pin against the
+      front-line entry path would misrepresent the obligation surface:
+      this playbook intakes and routes, it is not the classification
+      owner or the reporting owner. Mirrors the overlay gap-note on
+      `content/playbooks/it_security_support_agent/mappings.yaml`
+      (`dora: []` block, lines ~405-426): a DORA edge here would only
+      be appropriate alongside a net-new Art. 17 (ICT-related incident
+      management process) front-line entry-path anchor, which does not
+      exist in `content/mappings/dora/` and is out of scope for the
+      grace-window closure. Mirrors the `phishing_triage` precedent
+      above: gap notes are separate cards, not scope creep on a
+      single-purpose orphan-CI closure.
