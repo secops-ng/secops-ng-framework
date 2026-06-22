@@ -53,15 +53,6 @@ skip:
       playbook. Machine-readable per-clause `playbook_refs:` YAML is
       tracked as an F-MAP-GDPR CORE follow-on; this skip entry is
       retired in the PR that lands that YAML.
-  - slug: data_exfil
-    rationale: >-
-      SKELETON interim coverage — `content/mappings/gdpr/data-flow-data_exfil.md`
-      documents the GDPR Article 33 (notification of a personal data
-      breach to the supervisory authority) and Article 34 (communication
-      of a personal data breach to the data subject) data-flow surface
-      for this playbook. Machine-readable per-clause `playbook_refs:`
-      YAML is tracked as an F-MAP-GDPR CORE follow-on; this skip entry
-      is retired in the PR that lands that YAML.
   - slug: detection_engineering
     rationale: >-
       SKELETON interim coverage — `content/mappings/gdpr/data-flow-detection_engineering.md`
@@ -88,27 +79,6 @@ skip:
       this playbook. Machine-readable per-clause `playbook_refs:` YAML
       is tracked as an F-MAP-GDPR CORE follow-on; this skip entry is
       retired in the PR that lands that YAML.
-  - slug: identity_compromise
-    rationale: >-
-      SKELETON interim coverage — `content/mappings/gdpr/data-flow-identity_compromise.md`
-      documents the GDPR Article 33 (notification of a personal data
-      breach) and Article 32 (security of processing) data-flow surface
-      for this playbook. Machine-readable per-clause `playbook_refs:`
-      YAML is tracked as an F-MAP-GDPR CORE follow-on; this skip entry
-      is retired in the PR that lands that YAML.
-  - slug: incident_management
-    rationale: >-
-      Regulator-notification engine — also referenced from the NIS2
-      Art. 23 and DORA Art. 19 mapping trees. The GDPR Article 33
-      notification narrative in
-      `content/mappings/gdpr/data-flow-incident_management.md` already
-      documents the wiring at SKELETON time; per-clause
-      `playbook_refs:` YAML currently cites the upstream incident-type
-      playbooks (`ransomware_containment`, `data_exfil`,
-      `identity_compromise`, `post_incident_review`) that feed the
-      engine. Direct `playbook.incident_management@v1` citation under a
-      GDPR clause is tracked as a per-clause content follow-up to the
-      gdpr mapping tree, not deferred indefinitely.
   - slug: infra_posture_management
     rationale: >-
       SKELETON interim coverage — `content/mappings/gdpr/data-flow-infra_posture_management.md`
@@ -161,14 +131,6 @@ skip:
       per-clause `playbook_refs:` YAML is tracked as an F-MAP-GDPR CORE
       follow-on; this skip entry is retired in the PR that lands that
       YAML.
-  - slug: ransomware_containment
-    rationale: >-
-      SKELETON interim coverage — `content/mappings/gdpr/data-flow-ransomware_containment.md`
-      documents the GDPR Article 33 (notification of a personal data
-      breach) and Article 32 (security of processing) data-flow surface
-      for this playbook. Machine-readable per-clause `playbook_refs:`
-      YAML is tracked as an F-MAP-GDPR CORE follow-on; this skip entry
-      is retired in the PR that lands that YAML.
   - slug: supply_chain_security
     rationale: >-
       SKELETON interim coverage — `content/mappings/gdpr/data-flow-supply_chain_security.md`
