@@ -461,3 +461,133 @@ is in place.
   section, surface the Art. 22 applicability, and document the
   safeguards (right to obtain human intervention, right to
   contest the decision) the operator provides.
+
+## 8. Outbound personal-data transfer
+
+The workflow's outbound legs that carry personal data outside the
+operator's incident-/finding-case boundary are all
+**operator-bound processor egress under GDPR Art. 28**, not
+controller-to-controller transfers to a regulator or peer operator.
+The CSPM finding chain has no statutory outbound-notification leg of
+its own — significant breaches uncovered by a misconfiguration hand
+off to the `incident_management` and `data_exfil` workflows, which
+carry the regulator-submission scoring in their own §8.
+
+**Leg A — Notification processor egress (ticketing / chat / paging).**
+
+- *Destination class.* Operator-bound processor under GDPR Art. 28 —
+  the operator's pre-bound notification surface (ticketing,
+  chat, paging) that receives the resource-owner notification per
+  `__severity__`, and the security-engineering on-call page when
+  `__remediation_verified__` is false.
+- *Transfer mechanism.* **No transfer** under the default sovereign-
+  stack posture: self-hosted ticketing / chat / paging on an EU-region
+  endpoint, or an EU-region SaaS variant. A non-EU control plane (a
+  US-hosted SaaS ticketing / chat / paging surface, common in the
+  market) MUST be re-scored under **SCCs (Art. 46)** with the
+  EU-US Data Privacy Framework cited where the processor is a
+  certified US recipient; supplementary measures are operator-held
+  encryption keys on the notification payload and minimisation of the
+  payload's owner / principal identifiers (handle-only, no work
+  email) before egress.
+- *EU-residency posture (Directive 1).* Default is EU-resident
+  notification processors only. The technical controls that hold
+  the posture are the operator's compile-time binding of the
+  notification channel and the sovereignty review at compile time;
+  the framework ships no default endpoint.
+- *Data minimisation on egress (Art. 5(1)(c)).* The notification
+  payload carries the resource-owner identifier (`__owner_id__`),
+  the resource identifier (`__resource_id__`), `__severity__`, and
+  the finding link — not the IAM-principal set, not the audit-log
+  actor identifier, not the full Compliance Finding (2003) body.
+  The escalation page carries the same fields plus the failing
+  re-scan evidence; no per-principal identifiers in the page text.
+
+**Leg B — IaC pipeline egress (remediation pull request).**
+
+- *Destination class.* Operator-bound processor under GDPR Art. 28 —
+  the operator's IaC pipeline / code-forge surface receiving the
+  proposed remediation under `control.iac_policy_guardrail@v1`.
+- *Transfer mechanism.* **No transfer** when the IaC pipeline is
+  the operator's EU-hosted CI surface. A non-EU code-forge SaaS host
+  MUST be re-scored under **SCCs (Art. 46)** naming the third
+  country and the transfer instrument; supplementary measures are
+  pseudonymisation of the proposed-change provenance metadata
+  (commit author / reviewer identifiers) and encryption-at-rest
+  with operator-held keys on the pipeline's artifact store.
+- *EU-residency posture (Directive 1).* Default is the operator's
+  EU-hosted code-forge / pipeline surface; the framework ships no
+  default and the binding is operator-bound at compile time.
+- *Data minimisation on egress (Art. 5(1)(c)).* The pull request
+  carries the proposed configuration delta, the violated baseline
+  rule fingerprint, and the resource-and-owner enrichment that
+  supports it; IAM principal identifiers appear only where the
+  remediation rewrites an over-permissive identity binding and the
+  rewrite itself is the change. Audit-log actor identifiers are
+  not transmitted to the pipeline.
+
+**Leg C — CSPM platform egress (re-scan invocation).**
+
+- *Destination class.* Operator-bound processor under GDPR Art. 28
+  (where the CSPM platform is a third-party SaaS) or the cloud
+  provider's native posture surface (where the CSPM platform is
+  the provider's own — Security Hub / Defender for Cloud / Security
+  Command Center). The egress payload is the targeted re-scan
+  invocation against the same baseline rule and resource.
+- *Transfer mechanism.* **No transfer** when the CSPM platform's
+  endpoint is EU-region (the provider's EU-region native CSPM, or
+  an EU-hosted third-party CSPM). A non-EU CSPM SaaS host MUST be
+  re-scored under **SCCs (Art. 46)** with the EU-US Data Privacy
+  Framework cited where applicable; supplementary measures are
+  scrubbing of owner / principal / actor identifiers from the
+  re-scan request before egress and pseudonymisation of any
+  principal identifiers visible in the platform's finding-evidence
+  pane.
+- *EU-residency posture (Directive 1).* Default is an EU-region
+  CSPM endpoint; the binding is operator-bound at compile time and
+  the sovereignty review is the gate.
+- *Data minimisation on egress (Art. 5(1)(c)).* The re-scan request
+  carries `__resource_id__`, the baseline rule fingerprint, and
+  the operator's tenant / project / account identifier — not the
+  IAM-principal set, not the audit-log actor identifier, not the
+  ownership-graph fields used in the internal notification step.
+
+**Leg D — Cloud-provider control-plane egress (IAM-policy read,
+remediation write).**
+
+- *Destination class.* The cloud provider's control plane acts as
+  a controller in its own right for the identity / IAM principal
+  records its audit log captures, and as a processor on the
+  operator's behalf for the resource-state read and the remediation
+  write. The IAM-principal identifiers in the policy body are
+  read at enrichment time; the remediation write rewrites the
+  policy under `control.cloud_identity_least_privilege@v1`.
+- *Transfer mechanism.* **No transfer** under the default sovereign-
+  stack posture: an EU-region cloud account whose control-plane
+  region is pinned to the EU (AWS / Azure / GCP EU regions, or an
+  EU-sovereign equivalent). A non-EU control-plane region — an
+  account whose region is set to a US or APAC home region — MUST
+  be re-scored under **SCCs (Art. 46)** with the EU-US Data Privacy
+  Framework cited where the provider is a certified US recipient;
+  supplementary measures are customer-managed encryption keys
+  held in the EU on the IAM-policy store and audit-log region
+  pinning to the EU even where the resource sits elsewhere.
+- *EU-residency posture (Directive 1).* Default is an EU-region
+  control plane. The operator's account-configuration binding is
+  the boundary that holds `__resource_id__` lookup, IAM-policy
+  read, and remediation write within the EU; sovereignty review
+  at compile time refuses non-EU regions on the SKELETON binding.
+- *Data minimisation on egress (Art. 5(1)(c)).* The IAM-policy
+  read returns only the principal set bound to the violated
+  resource; the remediation write rewrites only the bindings the
+  violated baseline rule fingerprints. No bulk export of the
+  account's IAM graph is performed by the workflow.
+
+Cross-reference §6: the cross-border scoring as a whole is
+**no transfer** for the default sovereign-stack posture, consistent
+with all four legs above scoring no-transfer under operator-bound
+EU-region processor endpoints. Any operator re-scoring of a leg
+here (non-EU notification SaaS, non-EU code forge, non-EU CSPM,
+non-EU cloud region) MUST be reflected in §6 in the same change so
+the two sections do not disagree. The §8 enumerates each leg; the
+§6 records the workflow's processing-as-a-whole transfer scoring.
