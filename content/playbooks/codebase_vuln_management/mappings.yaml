@@ -289,17 +289,12 @@ nis2:
 dora:
   # Inbound entry lives at
   # content/mappings/dora/article-9-and-rts-vuln-mgmt.yaml
-  # (id dora:art-9-vuln-mgmt). At the time of writing its
-  # playbook_refs list carries playbook.vuln_intake@v1 and
-  # playbook.cloud_misconfiguration@v1 but does NOT yet backlink
-  # playbook.codebase_vuln_management@v1. The outbound entry below
-  # is asserted on its merits (SBOM-driven codebase vulnerability
-  # management is squarely inside Art. 9(4)(a) and the JC RTS on
-  # ICT risk management framework Art. 10 vuln/patch procedures);
-  # the inbound-side closure (adding this playbook URN to the
-  # backlink list) is left for a separate inbound-closure card per
-  # the post_incident_review precedent — gap notes do not silently
-  # widen the scope of a single-purpose mappings PR.
+  # (id dora:art-9-vuln-mgmt). Its playbook_refs list now backlinks
+  # playbook.codebase_vuln_management@v1 alongside
+  # playbook.vuln_intake@v1 and playbook.cloud_misconfiguration@v1;
+  # the SBOM-driven codebase side of Art. 9(4)(a) / JC RTS Art. 10
+  # is operated by this playbook. The outbound entry below mirrors
+  # that backlink.
   - mapping_id: dora:art-9-vuln-mgmt
     article: "9(4)(a)"
     notes: >-

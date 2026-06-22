@@ -30,6 +30,7 @@ entries:
     playbook_refs:
       - playbook.vuln_intake@v1
       - playbook.cloud_misconfiguration@v1
+      - playbook.codebase_vuln_management@v1
     metric_refs:
       - kpi.vuln_disclosure_sla@v1
       - kri.cvd_intake_aging@v1
@@ -37,6 +38,7 @@ entries:
       - kpi.mttr_cloud_misconfig@v1
       - kpi.cloud_posture_coverage@v1
       - kri.recurring_cloud_misconfig@v1
+      - kri.releases_without_sbom@v1
     evidence_stream_refs:
       - vulns
     notes: >-
@@ -50,7 +52,22 @@ entries:
       Art 21(2)(e) and CRA Annex I §2 / Art 14 on vulnerability handling;
       the same `playbook.vuln_intake@v1` is referenced from
       mappings/nis2/article-21-2-e.yaml and from
-      mappings/cra/article-14-and-annex-i.yaml. Coordinated vulnerability
-      disclosure as an *outbound* CVD policy is not a DORA obligation in
-      the way it is under CRA Annex I §2(5); only the inbound monitoring
-      and triage side maps cleanly here.
+      mappings/cra/article-14-and-annex-i.yaml. The SBOM-driven
+      codebase side of the same vulnerability and patch management
+      surface is operated by `playbook.codebase_vuln_management@v1`
+      (software-component inventory, scheduled scanning against
+      advisory feeds, flaw remediation tracked against CVD-policy-
+      derived deadlines, with `kri.releases_without_sbom@v1`
+      covering the "no inventory" failure mode); the outbound side
+      of that playbook already backlinks `dora:art-9-vuln-mgmt`.
+      Follow-on: the OSCAL controls exercised on the codebase side
+      (CM-8 software-component inventory, RA-5 vulnerability
+      monitoring, SI-2 flaw remediation) are documented on the
+      codebase-side mappings overlay but do not yet have populated
+      cross-reference files under `content/controls/`; lifting them
+      onto this entry's `control_refs` list is gated on those xref
+      files landing and is left to a separate card.
+      Coordinated vulnerability disclosure as an *outbound* CVD
+      policy is not a DORA obligation in the way it is under CRA
+      Annex I §2(5); only the inbound monitoring and triage side
+      maps cleanly here.
