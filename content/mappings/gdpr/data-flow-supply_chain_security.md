@@ -166,3 +166,67 @@ layer.
   The first-class handoff into `incident_management` is the
   technical control that rules Art. 22(1) out for any verdict that
   would otherwise gate a subject-affecting action.
+
+## 8. Outbound personal-data transfer
+
+The workflow has one class of outbound leg that carries personal
+data outside the operator's incident / triage surface — emission of
+the supply-chain-evidence artifact to the operator-bound F-CP-03
+evidence stream. The downstream `incident_management` handoff
+described in §4 is an internal cross-playbook transition on the
+operator's own runtime, not an outbound transfer; the regulator-
+notification surface lives on F-WF-05 and is scored under that
+workflow's data-flow document, not here. The upstream signal-source
+binding is an inbound pull (the workflow reads; it does not push
+back to the supplier or the upstream advisory mailbox). The leg
+below is scored against GDPR Chapter V (Art. 44–49); the
+EU-residency posture is sovereignty-first by default per
+Directive 1, and the operator's compile-time bindings are the knobs
+that can break the scoring. The §6 cross-border scoring as a whole
+is `no transfer at the framework layer` — consistent with the
+single leg below — and any operator re-scoring of the leg here
+MUST be reflected in §6 in the same change so the two sections do
+not disagree.
+
+**Leg A — Supply-chain-evidence artifact emission to the
+operator-bound F-CP-03 evidence stream.**
+
+- *Destination class.* Operator-bound processor under GDPR
+  Art. 28 — the F-CP-03 supply-chain-evidence store the operator
+  wires at compile time (a sovereign EU object store, an on-prem
+  evidence-pack archive, or a Git-managed evidence repository).
+  The store is the only durable destination for the
+  per-execution supply-chain-evidence artifact; the operator's
+  security-operations reviewers are internal recipients
+  consuming the artifact in place, not a separate outbound
+  destination.
+- *Transfer mechanism.* **No transfer** under the default
+  binding: the framework ships no default non-EU endpoint and
+  no vendor-bundled evidence-store dependency, and the
+  reference compile targets (n8n / Temporal / LangGraph
+  self-host on Nebul / OVHcloud / Scaleway / Hetzner) terminate
+  the emission inside the EU/EEA on the operator's
+  EU-region-pinned evidence store. Where the operator binds a
+  non-EU evidence store, the leg MUST be re-scored under
+  Art. 46 SCCs with supplementary measures (encryption-at-rest
+  with operator-held keys on the evidence-pack at rest,
+  pseudonymisation of any incidental natural-person handle on
+  the artifact before egress) before the binding goes live.
+- *EU-residency posture.* Default is EU-region evidence store
+  only; the operator-bound knob is the compile-time F-CP-03
+  store binding. The technical control that holds the posture
+  is that the hygiene-linter forward-public bar forbids the
+  framework from defaulting to a non-EU endpoint, and the
+  operator's DPA inventory (GDPR Art. 28) is the durable
+  record of the processor binding the evidence emission
+  depends on.
+- *Data minimisation on egress.* The artifact carries the
+  supplier reference, the affected-component reference, the
+  verdict (`no_impact` / `watch` / `confirmed_compromise`), the
+  per-execution identifier, and the `captured_at` timestamp.
+  Incidental personal data carried by the signal payload — a
+  researcher's name on a CVE acknowledgement, an upstream
+  advisory's contact line — rides through as opaque routing
+  metadata on the artifact and is not used to profile the
+  data subject; the schema does not require it and the
+  workflow does not enrich it.

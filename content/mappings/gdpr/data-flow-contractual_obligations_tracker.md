@@ -249,3 +249,96 @@ binding goes live. Sovereignty review at compile time is the gate.
   supplier-termination decision that ends a contracting relationship
   without human review, that downstream decision MUST be re-scored
   where it is defined, not here.
+
+## 8. Outbound personal-data transfer
+
+The workflow has two classes of outbound leg that carry personal
+data outside the operator's contract-record source. Each is scored
+below against GDPR Chapter V (Art. 44–49); the EU-residency posture
+is sovereignty-first by default per Directive 1, and the operator's
+compile-time bindings are the knobs that can break the scoring. The
+supplier-contract document store named in §4 is an inbound read —
+the workflow reads contract records from it, not pushes to it — and
+is not scored here. The §6 cross-border scoring as a whole is
+`no transfer` under the default sovereign-stack posture —
+consistent with both legs below — and any operator re-scoring of a
+leg here MUST be reflected in §6 in the same change so the two
+sections do not disagree.
+
+**Leg A — Obligation-evidence artifact emission to the
+operator-bound F-WF-10 contractual-obligations evidence store.**
+
+- *Destination class.* Operator-bound processor under GDPR
+  Art. 28 — the obligation-evidence store the operator wires at
+  compile time (a sovereign EU object store, an on-prem
+  evidence-pack archive, or a Git-managed evidence repository
+  the operator's vendor-risk function consumes). The supplier
+  itself is not a recipient of the artifact; the artifact lands
+  inside the operator's audit-evidence surface only.
+- *Transfer mechanism.* **No transfer** under the default
+  binding: the framework ships no default non-EU endpoint and
+  no vendor-bundled evidence-store dependency, and the
+  reference compile targets (n8n / Temporal / LangGraph
+  self-host on Nebul / OVHcloud / Scaleway / Hetzner) terminate
+  the emission inside the EU/EEA on the operator's
+  EU-region-pinned evidence store. Where the operator binds a
+  non-EU obligation-evidence store, the leg MUST be re-scored
+  under Art. 46 SCCs with supplementary measures
+  (encryption-at-rest with operator-held keys on the
+  evidence-pack at rest, pseudonymisation of any natural-person
+  signatory or contact handle attached to the artifact before
+  egress) before the binding goes live.
+- *EU-residency posture.* Default is EU-region evidence store
+  only; the operator-bound knob is the compile-time F-WF-10
+  evidence-store binding. The technical control that holds the
+  posture is that the framework ships no default
+  evidence-store endpoint and no fallback that could route the
+  emission outside the EU; the operator's DPA inventory
+  (GDPR Art. 28) is the durable record of the processor
+  binding the evidence emission depends on.
+- *Data minimisation on egress.* The artifact carries the
+  contract record reference (`__contract_record_ref__`), the
+  supplier reference, the per-clause obligation set
+  (`__obligation_set_ref__`), the per-obligation review schedule
+  (`__review_schedule_ref__`), the per-execution identifier
+  (`__execution_id__`), and the `captured_at` timestamp. Where
+  the contracting party or named signatory is attributable to a
+  natural person (the §3 worst-case path), that handle rides on
+  the supplier reference field as captured-as-observed; no
+  signatory profile, no contract-body free text, and no
+  credential material is enriched onto the artifact.
+
+**Leg B — OCSF API Activity emission to the operator-bound
+telemetry / SIEM store.**
+
+- *Destination class.* Operator-bound processor under GDPR
+  Art. 28 — the operator's SIEM / OCSF telemetry store. The
+  workflow emits `telemetry.ocsf.api_activity@v1` records
+  covering the contract-record ingest and obligation-extraction
+  steps; the store binding the operator wires at compile time
+  receives the events.
+- *Transfer mechanism.* **No transfer** under the default
+  binding: the operator's EU-region-pinned SIEM / OCSF store is
+  EU-resident and the emission terminates inside the EU/EEA.
+  Where the operator binds a non-EU SIEM / telemetry processor,
+  the leg MUST be re-scored under Art. 46 SCCs with
+  supplementary measures (encryption-at-rest with operator-held
+  keys on the OCSF payload at rest, pseudonymisation of the
+  supplier reference and any natural-person signatory handle on
+  the API Activity record before egress) before the binding
+  goes live.
+- *EU-residency posture.* Default is EU-region telemetry store
+  only; the operator-bound knob is the compile-time SIEM /
+  OCSF processor binding. The technical control that holds the
+  posture is that the framework ships no default telemetry
+  processor and no fallback that could route OCSF emissions
+  outside the EU.
+- *Data minimisation on egress.* The API Activity record
+  carries the document-store endpoint, the contract record
+  reference, the per-execution identifier, the actor (the
+  workflow's runtime identity), and the activity outcome
+  (ingest succeeded / failed, extract succeeded / failed). The
+  obligation set itself, the per-clause obligation text, and
+  the review schedule are not enriched onto the OCSF record;
+  the durable copy of those lives on the evidence artifact in
+  Leg A, not on the telemetry record.
