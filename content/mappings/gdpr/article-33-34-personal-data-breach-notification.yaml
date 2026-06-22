@@ -1,0 +1,185 @@
+# GDPR — personal data breach notification cluster (Art. 33 + Art. 34).
+#
+# F-MAP-GDPR CORE-1: first per-clause GDPR mapping YAML, retiring the
+# matching four SKELETON skip entries (data_exfil, identity_compromise,
+# incident_management, ransomware_containment) so the gdpr orphan-CI
+# assertion re-arms against this cluster's slugs.
+#
+# Scope of this file:
+#
+#   - gdpr:art-33 — notification of a personal data breach to the
+#     supervisory authority (the 72-hour clock). All four cluster
+#     playbooks are agentic anchors for this clause: data_exfil and
+#     identity_compromise generate the personal-data-breach event;
+#     ransomware_containment generates the personal-data-breach event
+#     where the encryption-of-personal-data limb of Art. 4(12) is
+#     met; incident_management is the regulator-notification engine
+#     that times and submits the Art. 33 envelope.
+#
+#   - gdpr:art-34 — communication of a personal data breach to the
+#     data subject (high-risk threshold). data_exfil is the agentic
+#     anchor because the data-flow doc explicitly carries the Art. 34
+#     affected-subject notification leg as a workflow output. The
+#     other three cluster playbooks may surface Art. 34 indirectly
+#     once their data-flow docs are extended; that work is a CORE-2..N
+#     follow-on per the F-MAP-GDPR roadmap and is deliberately not
+#     pulled into this entry.
+#
+# Out of scope of this file (carved into later CORE slices):
+#
+#   - Art. 5(1)(f) integrity/confidentiality and Art. 32 security-of-
+#     processing as the broader security-baseline anchors. The skip
+#     rationales for identity_compromise and ransomware_containment
+#     reference Art. 32 as a dual axis, but the data-flow docs do not
+#     name Art. 32 by number for the breach-notification cluster —
+#     the Art. 32 entries are authored under a sibling per-clause
+#     YAML alongside the wider security-of-processing playbook set
+#     (cloud_misconfiguration, detection_engineering, infra_posture,
+#     iam_auditor, codebase_vuln_management, vuln_intake, etc.) as a
+#     dedicated CORE slice, not stretched into this breach-notification
+#     file.
+#
+#   - The other 15 SKELETON skip slugs (cloud_misconfiguration,
+#     codebase_vuln_management, contractual_obligations_tracker,
+#     detection_engineering, executive_metrics, iam_auditor,
+#     infra_posture_management, it_security_support_agent,
+#     on_call_rotation, onboarding_offboarding_tracker,
+#     phishing_triage, post_incident_review, supply_chain_security,
+#     threat_intel_ingest, vuln_intake) — each is a separate CORE
+#     follow-on card; this file retires only the four breach-
+#     notification cluster slugs in `_orphan_skip.yaml`.
+#
+# Cross-references:
+#
+#   - NIS2 parallel: content/mappings/nis2/article-23.yaml pins the
+#     same four playbooks under nis2:art-23-early-warning and
+#     nis2:art-23-notification-72h. The GDPR Art. 33 72-hour clock and
+#     the NIS2 Art. 23 72-hour notification run on the same incident
+#     timeline; the two regimes file separate notifications to
+#     separate authorities against the same underlying event.
+#
+#   - DORA parallel: content/mappings/dora/ entries under Art. 19
+#     pin ransomware_containment and data_exfil under the major-ICT-
+#     incident reporting timeline. Same multi-regime dependency.
+#
+#   - CRA parallel: Art. 14 incident reporting in
+#     content/mappings/cra/article-14-and-annex-i.yaml.
+
+regime: gdpr
+entries:
+  - id: gdpr:art-33-notification-personal-data-breach
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "33"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Notify a personal data breach to the supervisory authority
+      without undue delay and, where feasible, within 72 hours of
+      becoming aware of it, unless the breach is unlikely to result
+      in a risk to the rights and freedoms of natural persons. The
+      notification must describe the nature of the breach, the
+      categories and approximate counts of data subjects and
+      records affected, the DPO or other contact point, the likely
+      consequences, and the mitigations taken or proposed; a delay
+      past 72 hours must be accompanied by reasons for the delay.
+    status: draft
+    control_refs:
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.data_exfil@v1
+      - playbook.identity_compromise@v1
+      - playbook.incident_management@v1
+      - playbook.ransomware_containment@v1
+    metric_refs:
+      - kpi.notification_sla_compliance@v1
+      - kri.regulator_notification_overrun@v1
+      - kpi.early_warning_on_time@v1
+      - kpi.notification_72h_on_time@v1
+    evidence_stream_refs:
+      - incidents
+    notes: >-
+      The four cluster playbooks form the personal-data-breach
+      notification surface end-to-end. data_exfil and
+      identity_compromise are the upstream event-generation lanes:
+      a confirmed DLP / egress event under data_exfil meets the
+      Art. 4(12) personal-data-breach definition the moment
+      __exfil_confirmed__ is true and __data_classification__
+      indicates personal data; an identity_compromise event is a
+      personal-data-breach when unauthorised access to a principal's
+      account materialises the breach of confidentiality limb of
+      Art. 4(12). ransomware_containment is a personal-data-breach
+      under the destruction or loss limb of Art. 4(12) where the
+      encryption-of-personal-data scope of the incident is
+      established at scope assessment. incident_management is the
+      regulator-notification engine: its agentic role under this
+      clause is to time the 72-hour clock against the operator's
+      supervisory authority, stage the Art. 33(3) content fields
+      (nature of the breach, subject and record counts, DPO contact,
+      likely consequences, mitigations), and submit the notification
+      via the operator-bound regulator channel. The
+      `kpi.notification_72h_on_time@v1` and
+      `kri.regulator_notification_overrun@v1` metrics are the
+      operational KRIs for this clause; the
+      `kpi.early_warning_on_time@v1` shows on the citation set
+      because the NIS2 Art. 23 24-hour early-warning runs against
+      the same incident timeline and ahead of the GDPR 72-hour clock
+      on the same event. The 72-hour SLA is a `where feasible`
+      threshold under GDPR Art. 33(1) — a delayed notification with
+      a documented `reasons for the delay` field is compliant and
+      the SLA KPI tracks the documented-reason path separately.
+
+  - id: gdpr:art-34-communication-data-subject
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "34"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Communicate a personal data breach to the affected data
+      subjects without undue delay where it is likely to result in
+      a high risk to their rights and freedoms. The communication
+      must describe the nature of the breach in clear language and
+      carry the DPO or contact point, the likely consequences, and
+      the mitigations. The communication is not required where the
+      data is rendered unintelligible (e.g. by encryption), where
+      subsequent measures eliminate the high risk, or where it
+      would involve disproportionate effort — in which case an
+      equally effective public communication substitutes.
+    status: draft
+    control_refs:
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.data_exfil@v1
+    metric_refs:
+      - kpi.notification_sla_compliance@v1
+      - kri.regulator_notification_overrun@v1
+    evidence_stream_refs:
+      - incidents
+    notes: >-
+      data_exfil is the cluster's agentic anchor for Art. 34: the
+      data-flow doc explicitly carries the affected-subject
+      notification leg as a workflow output, the scope-assessment
+      step derives __affected_subjects_count__ and
+      __data_classification__ against the operator's classification
+      baseline, and the regulator-routing policy evaluates the
+      high-risk-threshold gate under Art. 34(1) against those
+      outputs. The workflow's Art. 34 dispatch addresses the subject
+      set through the operator-bound subject-communication processor
+      (transactional email / postal / in-app) along the operator's
+      pre-bound channel. identity_compromise, incident_management,
+      and ransomware_containment may surface an Art. 34
+      communication step indirectly (a confirmed personal-data-
+      breach event under those playbooks routes through
+      incident_management which can trigger the operator's existing
+      Art. 34 dispatch); that wiring is not yet in the data-flow
+      docs and is deliberately deferred to a CORE-2..N slice rather
+      than stretched into this entry. The Art. 34(3) exemption
+      conditions (encryption rendering data unintelligible,
+      subsequent measures eliminating the high risk, disproportionate
+      effort with public communication substitute) are operationally
+      gated by the regulator-routing policy at scope assessment, not
+      by this YAML — the clause records the obligation and the
+      agentic anchor; the policy holds the exemption logic.
