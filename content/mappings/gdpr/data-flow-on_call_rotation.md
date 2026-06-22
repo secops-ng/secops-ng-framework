@@ -223,3 +223,96 @@ Sovereignty review at compile time is the gate.
   against a responder (auto-removal from the rotation, automated
   performance-management consequence on the ack-latency snapshot),
   the operator MUST re-score this section.
+
+## 8. Outbound personal-data transfer
+
+The workflow has two classes of outbound leg that carry personal
+data (responder identifiers and the handoff brief's inherited
+incident metadata) outside the operator's primary rotation-record
+store. Each is scored below against GDPR Chapter V (Art. 44–49);
+the EU-residency posture is sovereignty-first by default per
+Directive 1, and the operator's compile-time bindings are the
+knobs that can break the scoring.
+
+**Leg A — Paging-system processor egress (bound escalation chain
+publish + paging fan-out at page time).**
+
+- *Destination class.* Operator-bound processor under GDPR
+  Art. 28 — the operator's paging system receiving the bound
+  escalation chain at rebind time and consuming it to fan out to
+  primary / secondary / manager at page time. The framework
+  ships no default paging vendor; the destination is
+  operator-supplied through compile-time bindings.
+- *Transfer mechanism.* **No transfer** under the default
+  binding: the paging system is operator-pinned to an EU-resident
+  endpoint and the reference compile targets (n8n / Temporal /
+  LangGraph self-host on Nebul / OVHcloud / Scaleway / Hetzner)
+  publish through the operator's own paging integration with no
+  SecOps-NG-hosted intermediary. If the operator binds a non-EU
+  paging vendor (a US-hosted incident-response platform is the
+  common case), the binding MUST be re-scored under Art. 46 SCCs
+  with supplementary measures (encryption-at-rest with
+  operator-held keys, pseudonymisation of responder identifiers
+  in the escalation-chain envelope before egress) before the
+  binding goes live.
+- *EU-residency posture.* Default is an EU-resident paging
+  system. The compile-time sovereignty review is the gate; the
+  framework ships no default paging endpoint and no fallback that
+  could route an escalation-chain publish or a page fan-out
+  outside the EU. The operator's DPA inventory (GDPR Art. 28) is
+  the durable record of the paging-vendor binding.
+- *Data minimisation on egress.* The bound escalation chain
+  carries the responder identifiers and the contact handles the
+  paging system requires to reach primary / secondary / manager;
+  no additional rota metadata or incident telemetry is emitted to
+  the paging vendor outside the page-time envelope. The
+  page-time fan-out carries the inherited incident reference and
+  the minimum context the responder needs to acknowledge, not the
+  full incident case.
+
+**Leg B — Handoff-brief delivery channel + roster-source read
+(roster source of truth, delivery channel carrying the handoff
+brief, handoff-brief artifact store).**
+
+- *Destination class.* Operator-bound processors under GDPR
+  Art. 28 — the roster source (paging-system schedule, calendar
+  feed, or roster file the workflow reads from); the delivery
+  channel carrying the handoff brief to the incoming on-call
+  (paging-system DM, chat thread, email); and the operator's
+  handoff-brief artifact store retaining the brief for the
+  rotation-record window. Each is operator-supplied through
+  playbook variables.
+- *Transfer mechanism.* **No transfer** under the default
+  binding: the roster source, the delivery channel, and the
+  artifact store are operator-pinned to EU-resident endpoints
+  and the workflow reads / writes through the operator's own
+  integrations with no SecOps-NG-hosted intermediary. If the
+  operator binds a non-EU roster source (a calendar SaaS hosted
+  outside the EU), a non-EU delivery channel (a chat SaaS hosted
+  outside the EU), or a non-EU artifact store, the binding MUST
+  be re-scored under Art. 46 SCCs with supplementary measures
+  (encryption-at-rest with operator-held keys, pseudonymisation
+  of responder identifiers in the brief envelope before egress)
+  before the binding goes live.
+- *EU-residency posture.* Default is EU-resident endpoints
+  across all three surfaces. The compile-time sovereignty review
+  is the gate; the framework ships no default roster source, no
+  default delivery channel, and no default artifact store. The
+  brief is composed locally from inherited incident metadata
+  already resident on the operator's case store — no external
+  aggregation or public-cloud-AI call on the brief's narrative
+  fields.
+- *Data minimisation on egress.* The roster-source read carries
+  the minimum responder identifier the operator's roster system
+  requires to return the schedule; the handoff-brief delivery
+  carries the brief envelope (`__brief_id__`, inherited incident
+  metadata, escalation-tier policy) addressed to the incoming
+  on-call's contact handle; the artifact-store write retains the
+  brief for the rotation-record window as §5 enumerates, with no
+  additional projection of responder telemetry.
+
+The §6 cross-border scoring as a whole is **no transfer** —
+consistent with both legs above scoring no-transfer under the
+default sovereign-stack posture. Any operator re-scoring of a leg
+here MUST be reflected in §6 in the same change so the two
+sections do not disagree.

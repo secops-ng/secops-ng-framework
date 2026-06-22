@@ -281,3 +281,90 @@ Sovereignty review at compile time is the gate.
   into an automated downstream decision that closes the request
   without human review, that downstream decision MUST be re-scored
   where it is defined, not here.
+
+## 8. Outbound personal-data transfer
+
+The workflow has two classes of outbound leg that carry personal
+data outside the operator's primary support-interaction store. Each
+is scored below against GDPR Chapter V (Art. 44–49); the
+EU-residency posture is sovereignty-first by default per Directive
+1, and the operator's compile-time bindings are the knobs that can
+break the scoring.
+
+**Leg A — Operator-bound ticketing / ITSM processor egress
+(ingest source, self-service surface, responder queue,
+interaction-evidence store).**
+
+- *Destination class.* Operator-bound processors under GDPR
+  Art. 28 — the operator's helpdesk runtime / on-prem ITSM /
+  Git-managed request inbox / mailbox bridge providing the
+  ticketing source; the operator's knowledge-base or scripted
+  remediation runtime providing the self-service surface; the
+  operator's on-call rota or rota-management runtime providing
+  the responder queue; the operator's incidents-evidence store
+  receiving the emitted interaction artifact. The framework
+  ships no hosted-helpdesk / ITSM-SaaS default and no vendor SDK
+  bundling; every binding is operator-supplied at compile time.
+- *Transfer mechanism.* **No transfer** under the default
+  binding: the reference compile targets (n8n / Temporal /
+  LangGraph self-host on Nebul / OVHcloud / Scaleway / Hetzner)
+  are EU-hostable and the four processor destinations are
+  operator-pinned to EU-resident endpoints. If the operator
+  binds a non-EU helpdesk SaaS, a non-EU knowledge-base store, a
+  non-EU rota system, or a non-EU evidence store, the binding
+  MUST be re-scored under Art. 46 SCCs with supplementary
+  measures (encryption-at-rest with operator-held keys,
+  pseudonymisation of requester and responder identifiers in the
+  ticket envelope and interaction-evidence record before
+  egress) before the binding goes live.
+- *EU-residency posture.* Default is EU-resident endpoints
+  across all four processor surfaces. The compile-time
+  sovereignty review is the gate; the framework ships no default
+  endpoint and no fallback that could route a ticket read, a
+  self-service action, a responder-queue acknowledgement, or an
+  evidence write outside the EU. The operator's DPA inventory
+  (GDPR Art. 28) is the durable record of each processor
+  binding.
+- *Data minimisation on egress.* The ticketing-source read
+  carries the request reference and the requester identifier the
+  operator's helpdesk runtime requires to address the ticket;
+  the self-service-surface call carries the classification and
+  the minimum requester context the action requires; the
+  responder-queue acknowledgement carries the human-handoff
+  envelope without duplicating the underlying request body; the
+  interaction-evidence artifact carries the closed classification
+  + automated-resolution outcome + handoff envelope + execution
+  metadata as §3 enumerates, with no additional projection of
+  requester telemetry.
+
+**Leg B — Telemetry / SIEM store egress (OCSF API Activity
+records emitted during ingest, classification, resolution,
+handoff, and emission).**
+
+- *Destination class.* Operator-bound processor under GDPR
+  Art. 28 — the operator's SIEM or OCSF-shaped telemetry store
+  receiving the API Activity records the workflow emits across
+  its five state transitions.
+- *Transfer mechanism.* **No transfer** under the default
+  binding: the OCSF store is operator-pinned to an EU-resident
+  endpoint and the reference compile targets emit through the
+  operator's own logging path with no SecOps-NG-hosted
+  intermediary. If the operator binds a non-EU SIEM, the binding
+  MUST be re-scored under Art. 46 SCCs with pseudonymisation of
+  requester and responder identifiers in the activity-record
+  envelope before egress.
+- *EU-residency posture.* EU-resident SIEM / OCSF store only by
+  default. The compile-time sovereignty review is the gate; the
+  framework emits to the operator's configured logging endpoint
+  and ships no fallback.
+- *Data minimisation on egress.* OCSF API Activity records carry
+  the state transition, the request reference, and the minimum
+  classification context required by the activity-record shape;
+  the underlying request body and the self-service-action
+  parameters are not duplicated into the telemetry leg.
+
+The §6 cross-border scoring as a whole is **no transfer** —
+consistent with both legs above scoring no-transfer under the
+default sovereign-stack posture. Any operator re-scoring of a leg
+here MUST be reflected in §6 in the same change so the two
+sections do not disagree.

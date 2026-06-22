@@ -226,3 +226,79 @@ Sovereignty review at compile time is the gate.
   output triggers an automated adverse action against the subject
   (account lockout, endpoint isolation without review), the
   operator MUST re-score this section.
+
+## 8. Outbound personal-data transfer
+
+The workflow has two classes of outbound leg that carry personal
+data outside the alert-triage workflow's transient envelope. Each
+is scored below against GDPR Chapter V (Art. 44–49); the
+EU-residency posture is sovereignty-first by default per Directive
+1, and the operator's compile-time bindings are the knobs that can
+break the scoring.
+
+**Leg A — Downstream handoff to incident_management / specialist
+queue / on_call_rotation.**
+
+- *Destination class.* Internal downstream playbook recipients —
+  incident_management on escalation, the operator's specialist
+  queue on routing, on_call_rotation on a paging disposition.
+  These are framework-internal handoffs, not Art. 28 processor
+  destinations.
+- *Transfer mechanism.* **No transfer.** The downstream playbooks
+  execute on the same sovereign-hosted runtime as the triage
+  workflow; the handoff payload moves between framework-internal
+  state machines and never crosses the operator's processing
+  boundary. The technical control that holds this is the
+  framework-agnostic compile target executing all three reference
+  runtimes (n8n / Temporal / LangGraph) on the operator's
+  EU-hostable infrastructure.
+- *EU-residency posture.* Default is EU-resident downstream
+  destinations only. If the operator binds a non-EU incident-case
+  store or a non-EU specialist-queue runtime, the handoff payload
+  inherits the downstream playbook's §8 re-scoring under Art. 46
+  SCCs with pseudonymisation of subject and account identifiers
+  before egress.
+- *Data minimisation on egress.* The handoff envelope carries the
+  triage disposition, the inherited alert identifiers, and the
+  enrichment projection from §3; it does not duplicate the raw
+  telemetry, which stays on the operator's OCSF / telemetry
+  store.
+
+**Leg B — Operator-bound processor egress (enrichment providers,
+shared alert store, paging gateway).**
+
+- *Destination class.* Operator-bound processors under GDPR
+  Art. 28 — asset inventory, identity directory, threat-intel
+  lookup, the shared alert store providing the pull-source shape,
+  and the paging gateway carrying the on-call disposition. Each
+  is operator-supplied through playbook variables; the framework
+  ships no default endpoint.
+- *Transfer mechanism.* **No transfer** under the default
+  binding: the reference compile targets are EU-hostable and the
+  framework ships no SecOps-NG-hosted egress path. If the
+  operator binds a non-EU enrichment provider, a non-EU shared
+  alert store, or a non-EU paging gateway, the binding MUST be
+  re-scored under Art. 46 SCCs with supplementary measures
+  (encryption-at-rest with operator-held keys, pseudonymisation
+  of subject and account identifiers before the enrichment
+  lookup or the paging payload egresses) before the binding goes
+  live.
+- *EU-residency posture.* The compile-time sovereignty review is
+  the gate. The framework ships no default processor endpoint
+  and no fallback that could route an enrichment lookup, an
+  alert-store read, or a paging payload outside the EU; the
+  operator's DPA inventory (GDPR Art. 28) is the durable record
+  of the binding each dependency depends on.
+- *Data minimisation on egress.* The enrichment lookup carries
+  the minimum identifier (account name, asset id, indicator
+  value) the upstream provider requires to return its
+  projection; the paging payload carries the disposition summary
+  stripped of the underlying telemetry. Per-alert raw payloads
+  are not transmitted to a processor outside the operator's
+  primary store.
+
+The §6 cross-border scoring as a whole is **no transfer** —
+consistent with both legs above scoring no-transfer under the
+default sovereign-stack posture. Any operator re-scoring of a leg
+here MUST be reflected in §6 in the same change so the two
+sections do not disagree.
