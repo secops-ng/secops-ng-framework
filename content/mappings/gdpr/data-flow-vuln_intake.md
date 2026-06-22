@@ -302,3 +302,163 @@ review at compile time is the gate.
   disclosure (account lockout against a reporter, automated
   regulator filing without human review), the operator MUST
   re-score this section.
+
+## 8. Outbound personal-data transfer
+
+The workflow has four classes of outbound leg that carry personal
+data outside the operator's disclosure-case store. Each is scored
+below against GDPR Chapter V (Art. 44–49); the EU-residency posture
+is sovereignty-first by default per Directive 1, and the operator's
+compile-time bindings are the knobs that can break the scoring.
+
+**Leg A — CRA Article 14 regulator submissions (early warning,
+72-hour notification, one-month final report on actively-exploited
+or severe-incident clocks).**
+
+- *Destination class.* The operator's competent authority under
+  CRA Article 14 — typically the national CSIRT designated for CRA
+  reporting, or the sectoral regulator where one is statutorily
+  named. The framework ships no default endpoint; the destination
+  is operator-supplied through playbook variables, exactly as the
+  parallel `incident_management` workflow's NIS2 / DORA submissions.
+- *Transfer mechanism.* **No transfer.** EU competent authorities
+  under CRA Article 14 are EU/EEA-resident by construction. The
+  technical control that holds this is that the regulator portal
+  URLs are operator-supplied through compile-time variables and
+  sovereignty review at compile time refuses any non-EU endpoint.
+- *EU-residency posture (Directive 1).* Default is EU-resident CRA
+  competent-authority destinations only. A non-EU binding (a
+  third-country authority notified because a cross-border statute
+  binds the operator) MUST be re-scored under **SCCs (Art. 46)**
+  with operator-held encryption keys on the submission envelope,
+  or under **Art. 49(1)(d) "important reasons of public interest"**
+  derogation where the cross-border notification is mandated by
+  statute the operator is bound by.
+- *Data minimisation on egress (Art. 5(1)(c)).* The CRA template
+  carries affected-component identifiers (PURL + version), the
+  vulnerability identifier (CVE / GHSA / OSV), the operator's
+  signatory name on the early-warning / 72-hour / final-report
+  submissions, and free-text narrative scoped to the regulator
+  template (technical description, mitigation, dissemination
+  status). Reporter contact details are NOT transmitted to the
+  regulator; the reporter's relationship is bilateral between
+  reporter and operator under the CVD policy. Where the reporter
+  requested pseudonymity at intake, the case-side handle alone
+  appears in any submission narrative that references the
+  disclosure source.
+
+**Leg B — Coordinated-disclosure egress to a CVE Numbering
+Authority / advisory database (MITRE / GHSA / national CSIRT-run
+CNA, OSV).**
+
+- *Destination class.* A CVE Numbering Authority or advisory-
+  database controller — typically MITRE (or a delegated CNA, where
+  the operator IS a CNA for its own components), the GitHub
+  Security Advisory database for GHSA-shaped publications, or the
+  national-CSIRT-run CNA where the operator's jurisdiction has one.
+  The destination is the controller of the assigned advisory
+  identifier and the public advisory record.
+- *Transfer mechanism.* **No transfer** when the advisory database
+  is EU-hosted (a national-CSIRT-run CNA, an EU mirror of OSV). A
+  non-EU CNA — MITRE in the US, GHSA on a US-hosted GitHub control
+  plane — MUST be re-scored under **SCCs (Art. 46)** with the
+  EU-US Data Privacy Framework cited where the recipient is a
+  certified US controller; for a US-based CNA acting under its own
+  statutory mandate, an alternative scoring is **Art. 49(1)(d)
+  "important reasons of public interest"** where the coordinated-
+  disclosure submission is made in the public interest of network
+  and information security and a structural instrument is not
+  available. Supplementary measures are minimisation of personal-
+  data fields in the CVE record (reporter attribution only where
+  the reporter consented at intake per §2; no operator-internal
+  responder identifiers in the public record).
+- *EU-residency posture (Directive 1).* The default published in
+  this workflow is a national-CSIRT-run CNA or an EU-hosted
+  advisory database where one is available for the affected
+  component class. Operators submitting to MITRE / GHSA as the
+  primary CNA MUST flag the binding at compile time and re-score
+  this section.
+- *Data minimisation on egress (Art. 5(1)(c)).* The CVE / GHSA
+  record carries the vulnerability identifier, the affected
+  component (PURL + version range), the technical description,
+  the CVSS / EPSS scoring, the reporter attribution where
+  consented per §2, and the operator's response-branch signatory
+  identifier; reporter contact details, operator-internal incident
+  commander identifiers, and the disclosure-case narrative are
+  scoped out of the public record.
+
+**Leg C — Reporter acknowledgement and dissemination notification.**
+
+- *Destination class.* The reporter named at intake — an external
+  natural person, a security-research team, an operator-of-another-
+  product whose own scanning surfaced the issue, or (where the
+  reporter requested pseudonymity) a handle resolvable to a
+  contact channel.
+- *Transfer mechanism.* The acknowledgement is sent to the
+  reporter's contact address as supplied; where the reporter is
+  EU/EEA-resident the transfer is **no transfer**. Where the
+  reporter is outside the EU/EEA, the acknowledgement is a
+  transfer in itself, scored under **Art. 49(1)(b) "necessary for
+  the performance of a contract"** (the CVD relationship
+  established at intake) and **Art. 49(1)(f) "necessary for the
+  establishment, exercise, or defence of legal claims"** where
+  the disclosure may underlie subsequent legal action. The
+  transfer is bounded to the acknowledgement and the dissemination
+  notification and is recorded on the case.
+- *EU-residency posture (Directive 1).* The framework cannot pin
+  reporter location — the reporter chooses their own contact
+  channel. The EU-residency posture is held by the operator's
+  notification infrastructure (EU-region mail / messaging
+  processor); reporter location is the unbound factor and the
+  Art. 49 derogation above carries the third-country case.
+- *Data minimisation on egress (Art. 5(1)(c)).* The acknowledgement
+  carries the case identifier, the receipt confirmation per CRA
+  single-point-of-contact, the disposition the response branch
+  routed onto, and the operator's response-branch signatory; the
+  acknowledgement does NOT carry operator-internal incident
+  commander identifiers, post-incident review fields, or any
+  other reporter's identifiers from sibling cases.
+
+**Leg D — Operator-bound processor egress (case store, SBOM store,
+EPSS / CVE feed providers, telemetry store).**
+
+- *Destination class.* Operator-bound processors under GDPR
+  Art. 28 — the operator's sovereign-hosted disclosure-case store,
+  the SBOM store the correlation step queries, the EPSS provider
+  invoked during the scoring step, the CVE feed (NVD mirror or
+  sovereign equivalent) consulted at intake, and the OCSF
+  telemetry store the workflow emits Vulnerability Finding records
+  into.
+- *Transfer mechanism.* **No transfer** under the default sovereign-
+  stack posture: EU-hosted case store, EU-hosted SBOM store,
+  sovereign mirrors of CVE / EPSS as the documented default, an
+  EU-region OCSF telemetry store. A non-EU EPSS / CVE-feed
+  provider, a non-EU SBOM SaaS, or a non-EU case-store binding
+  MUST be re-scored under **SCCs (Art. 46)** with supplementary
+  measures (encryption-at-rest with operator-held keys,
+  pseudonymisation of reporter and maintainer identifiers in the
+  case record before egress).
+- *EU-residency posture (Directive 1).* The compile-time
+  sovereignty review is the gate. The framework ships no default
+  processor endpoint and no fallback that could route case-store
+  writes outside the EU; the operator's DPA inventory (GDPR
+  Art. 28) is the durable record of the processor bindings the
+  case-store choice depends on. For EPSS and the CVE feed the
+  framework documents sovereign mirror endpoints as the default.
+- *Data minimisation on egress (Art. 5(1)(c)).* The CVE-feed /
+  EPSS calls carry the vulnerability identifier only — no reporter
+  or maintainer identifiers leave the operator's boundary on these
+  legs. The SBOM-store call carries the affected-component PURL.
+  The case-store write carries the full §3 record exactly as
+  enumerated; no analytics-only projection is emitted to a
+  separate store independent of the case.
+
+Cross-reference §6: the §6 cross-border scoring as a whole is
+**no transfer** for the default sovereign-stack posture, with the
+two specific egress risks (reporter outside EU/EEA — Art. 49
+derogation, public advisory dissemination — non-Chapter V
+publication) already flagged. The §8 above enumerates each leg with
+its Chapter V mechanism and is consistent with §6: any leg here
+re-scored under SCCs (non-EU CNA, non-EU processor binding) MUST
+be reflected in §6 in the same change so the two sections do not
+disagree.

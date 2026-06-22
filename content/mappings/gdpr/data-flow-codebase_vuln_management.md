@@ -111,3 +111,32 @@ exercise a right against this workflow. Subject Access Requests, if
 any, reach the operator through the sibling `vuln_intake` workflow
 (reporter-disclosed intake) rather than this codebase-side
 dependency-review chain.
+
+## 8. Outbound personal-data transfer
+
+**No outbound personal-data transfer — N/A.** Per §3, the workflow
+processes software components (PURL + version) and software
+vulnerabilities (CVE / GHSA / OSV advisory identifiers); no category
+of natural person is the subject of the processing, so no Chapter V
+outbound leg exists.
+
+The non-personal-data outbound legs documented elsewhere (advisory-
+database fetches in §6, the public coordinated-disclosure advisory in
+§4, handoff to the sibling `vuln_intake` workflow when a codebase
+finding crosses into reporter-disclosed actively-exploited territory)
+do not engage Chapter V because their payloads carry no personal
+data. Where the handoff to `vuln_intake` introduces reporter or
+maintainer identifiers downstream, the Chapter V scoring lives in
+[`data-flow-vuln_intake.md`](./data-flow-vuln_intake.md) §8, not
+here.
+
+Cross-reference §6: the workflow-as-a-whole cross-border scoring is
+**no transfer** and this §8 carries no contradicting leg.
+
+If a future binding wires a non-default scanner SaaS, an attribution
+field that captures the maintainer identifier of the affected
+component, or any other surface that introduces personal data into
+the codebase-side dependency-review chain, this section MUST be
+re-scored against the canonical four-axis shape (destination class,
+transfer mechanism, EU-residency posture, data minimisation) and
+§3 amended in the same change.
