@@ -279,3 +279,125 @@ live. Sovereignty review at compile time is the gate.
   applicability, and document the safeguards (right to obtain
   human intervention, right to contest the decision) the
   operator provides.
+
+## 8. Outbound personal-data transfer
+
+The workflow has four classes of outbound leg that carry personal
+data outside the runtime's own process boundary into operator-bound
+processors. Each is scored below against GDPR Chapter V
+(Art. 44–49); the EU-residency posture is sovereignty-first by
+default per Directive 1, and the operator's compile-time bindings
+are the knobs that can break the scoring. The internal notification
+to the contained principal is an operator-internal data-subject
+communication and is not enumerated as a Chapter V outbound leg.
+
+**Leg A — Identity provider read and containment-action write
+(operator-bound IdP — Entra ID, Okta, Google Workspace, AWS IAM
+Identity Center, or equivalent).**
+
+- *Destination class.* Processor under GDPR Art. 28 — the
+  operator's IdP. The leg is bidirectional: the workflow reads
+  the sign-in signal and the MFA factor / session inventories,
+  and writes the MFA reset, session and refresh-token
+  revocations, and conditional-access surface diffs as the
+  containment step. The framework ships no default endpoint.
+- *Transfer mechanism.* **No transfer.** The default
+  sovereign-stack posture pins the IdP to an EU-region tenant
+  (Entra EU geo, Okta EU cell, Google Workspace EU data region,
+  AWS IAM Identity Center in an EU region). The technical
+  control is the operator's compile-time region pin on the
+  IdP binding; sovereignty review at compile time refuses any
+  non-EU tenant.
+- *EU-residency posture.* Default is an EU-resident IdP tenant
+  under an Art. 28 DPA. A non-EU binding (a US-region IdP cell
+  where the operator's directory is hosted) MUST be re-scored
+  under Art. 46 SCCs with supplementary measures
+  (encryption-at-rest with operator-held keys, pseudonymisation
+  of the principal reference before egress) before the binding
+  goes live; Art. 49 derogations are not a default posture for
+  a recurring containment workflow.
+- *Data minimisation on egress.* The containment payload carries
+  the principal reference and the action verb (reset MFA, revoke
+  sessions, revoke refresh tokens, remove OAuth grant, remove
+  conditional-access exception); authentication factor secrets
+  and refresh-token plaintext are never read into the workflow
+  beyond the reset and revocation span.
+
+**Leg B — Downstream SaaS tenants federated against the IdP
+(session and token revocation walk).**
+
+- *Destination class.* Processor under GDPR Art. 28 — each
+  downstream SaaS tenant whose session and token stores are
+  walked during revocation. The set is operator-bound in the
+  compile-target binding rather than the playbook.
+- *Transfer mechanism.* **No transfer.** The default
+  sovereign-stack posture pins each downstream SaaS to its
+  EU-region tenant; the technical control is the operator's
+  compile-time region pin on every federated SaaS binding.
+- *EU-residency posture.* Default is EU-resident SaaS tenants
+  under Art. 28 DPAs. A non-EU SaaS tenant in the federation
+  graph MUST be re-scored under Art. 46 SCCs with
+  supplementary measures (encryption-at-rest with operator-held
+  keys, pseudonymisation of the principal reference before
+  egress) before the revocation walk reaches it; where the
+  federation includes a third-country SaaS that does not
+  support EU-region pinning, the operator MUST surface the
+  binding in compile-time sovereignty review and document the
+  transfer instrument explicitly.
+- *Data minimisation on egress.* The revocation walk carries the
+  principal reference and the revoke verb against the SaaS's
+  session / refresh-token store; per-session payload contents
+  are not read.
+
+**Leg C — Telemetry / SIEM store write (OCSF Authentication
+(3002), API Activity (6003), and Account Change (3001) records
+emitted during triage, revocation, hunt, and audit).**
+
+- *Destination class.* Processor under GDPR Art. 28 — the
+  operator's telemetry / SIEM store. No default endpoint ships
+  with the framework.
+- *Transfer mechanism.* **No transfer.** The default
+  sovereign-stack posture pins the telemetry store to an
+  EU-region SIEM or sovereign log-archive. The technical
+  control is the operator's compile-time region pin on the
+  telemetry-store binding.
+- *EU-residency posture.* Default is an EU-resident telemetry
+  store under an Art. 28 DPA. A non-EU binding MUST be re-scored
+  under Art. 46 SCCs with supplementary measures (encryption-at-
+  rest with operator-held keys, pseudonymisation of the
+  principal reference before egress) before the binding goes
+  live.
+- *Data minimisation on egress.* OCSF activity records carry the
+  principal reference, the action metadata, and the
+  IAM-surface diffs enumerated in §3; authentication factor
+  secrets and token plaintext are never written.
+
+**Leg D — Case-management / ticketing system (parent incident
+case the workflow opens on confirmed compromise).**
+
+- *Destination class.* Processor under GDPR Art. 28 — the
+  operator's case-management / ticketing system. The framework
+  ships no default endpoint.
+- *Transfer mechanism.* **No transfer.** The default
+  sovereign-stack posture pins the case-management system to an
+  EU-region tenant or sovereign-hosted case store. The
+  technical control is the operator's compile-time region pin
+  on the case-store binding.
+- *EU-residency posture.* Default is an EU-resident case-store
+  under an Art. 28 DPA. A non-EU binding (a US-region SaaS
+  ticketing tenant) MUST be re-scored under Art. 46 SCCs with
+  supplementary measures (encryption-at-rest with operator-held
+  keys, pseudonymisation of the principal reference before
+  egress) before the binding goes live.
+- *Data minimisation on egress.* The case carries the
+  containment evidence enumerated in §3 — MFA factor
+  inventories pre / post reset, session-revocation count,
+  lateral-movement findings, IAM-audit diffs; authentication
+  factor secrets and token plaintext are never written onto the
+  case.
+
+The §6 cross-border scoring as a whole is **no transfer** —
+consistent with all four legs above scoring no-transfer under the
+default sovereign-stack posture. Any operator re-scoring of a leg
+here MUST be reflected in §6 in the same change so the two
+sections do not disagree.
