@@ -1,0 +1,236 @@
+# GDPR — security-of-processing cluster (Art. 32).
+#
+# F-MAP-GDPR CORE-2: second per-clause GDPR mapping YAML after the
+# CORE-1 breach-notification cluster (Art. 33 / Art. 34). Retires the
+# matching seven SKELETON skip entries (cloud_misconfiguration,
+# codebase_vuln_management, detection_engineering, iam_auditor,
+# infra_posture_management, it_security_support_agent, vuln_intake) so
+# the gdpr orphan-CI assertion re-arms against this cluster's slugs.
+#
+# Scope of this file:
+#
+#   - gdpr:art-32-1-b — ensuring the ongoing confidentiality,
+#     integrity, availability, and resilience of processing systems
+#     and services. Six technical-security playbooks are agentic
+#     anchors: cloud_misconfiguration and infra_posture_management
+#     hold the cloud-posture confidentiality / integrity / baseline
+#     surface; iam_auditor and it_security_support_agent hold the
+#     access-control / operator-support confidentiality surface;
+#     codebase_vuln_management and vuln_intake hold the
+#     vulnerability-handling integrity surface against the operator's
+#     own codebase and against coordinated-disclosure intake from
+#     external reporters.
+#
+#   - gdpr:art-32-1-d — process for regularly testing, assessing, and
+#     evaluating the effectiveness of technical and organisational
+#     measures for ensuring the security of the processing.
+#     detection_engineering is the agentic anchor that emits per-
+#     rule-version effectiveness snapshots into the F-CP-06
+#     effectiveness stream; infra_posture_management is anchored as
+#     the periodic posture re-execution counterpart whose posture-
+#     evidence ticks feed the same effectiveness loop. Both are the
+#     workflow surfaces the data-flow docs explicitly carry as
+#     regular-testing / evaluation outputs.
+#
+# Out of scope of this file (carved into later CORE slices):
+#
+#   - Art. 32(1)(a) pseudonymisation and encryption of personal data,
+#     and Art. 32(1)(c) ability to restore availability and access to
+#     personal data in a timely manner in the event of a physical or
+#     technical incident. These two limbs do not yet have a finalized
+#     playbook whose data-flow doc explicitly carries them as an
+#     agentic anchor — Art. 32(1)(c) restore-availability is the
+#     natural anchor for a future restore-drill / backup-attestation
+#     playbook (cf. control.backup_attestation@v1,
+#     control.restore_drill@v1) and is deferred to a CORE-3..N slice
+#     rather than stretched into this entry.
+#
+#   - Art. 25 data protection by design and by default. Several
+#     SKELETON skip rationales (codebase_vuln_management,
+#     infra_posture_management, vuln_intake) name Art. 25 as a
+#     secondary axis alongside Art. 32. The Art. 25 entries are
+#     authored under a sibling per-clause YAML as a dedicated CORE
+#     by-design slice, not stretched into this security-of-processing
+#     file.
+#
+#   - Art. 5(1)(f) integrity and confidentiality of processing as a
+#     principle-level axis. The principle anchors the same operational
+#     surface but is governed under Art. 5 / Art. 24 controller
+#     accountability rather than under Art. 32 measures. The Art. 5
+#     entries are authored under a sibling per-clause YAML in a later
+#     CORE slice.
+#
+#   - The remaining eight SKELETON skip slugs (contractual_obligations_tracker,
+#     executive_metrics, on_call_rotation, onboarding_offboarding_tracker,
+#     phishing_triage, post_incident_review, supply_chain_security,
+#     threat_intel_ingest) — each is a separate CORE follow-on card;
+#     this file retires only the seven security-of-processing cluster
+#     slugs in `_orphan_skip.yaml`.
+#
+# Cross-references:
+#
+#   - NIS2 parallel: content/mappings/nis2/article-21-2-a.yaml,
+#     article-21-2-e.yaml, article-21-2-f.yaml, and article-21-2-i.yaml
+#     pin the same playbook set against the NIS2 risk-management,
+#     vulnerability-handling, effectiveness-assessment, and HR-security /
+#     access-control measures. The GDPR Art. 32 security-of-processing
+#     baseline and the NIS2 Art. 21(2) cybersecurity-risk-management
+#     measures run against the same underlying control surface; the two
+#     regimes carry separate obligations against the same operator
+#     evidence.
+#
+#   - DORA parallel: content/mappings/dora/ entries under Art. 9 (ICT
+#     risk management framework) anchor codebase_vuln_management and
+#     vuln_intake on the JC RTS on ICT risk management framework
+#     (Commission Delegated Regulation (EU) 2024/1774) Art. 10
+#     vulnerability-management surface. Same multi-regime dependency.
+#
+#   - CRA parallel: Annex I essential cybersecurity requirements in
+#     content/mappings/cra/article-14-and-annex-i.yaml carries the
+#     codebase-side vulnerability-handling and SBOM-production surface
+#     against the same playbooks.
+
+regime: gdpr
+entries:
+  - id: gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "32"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Implement appropriate technical and organisational measures to
+      ensure a level of security appropriate to the risk, including
+      the ability to ensure the ongoing confidentiality, integrity,
+      availability, and resilience of processing systems and
+      services. Measures must take account of the state of the art,
+      the costs of implementation, and the nature, scope, context,
+      and purposes of processing, as well as the risk of varying
+      likelihood and severity for the rights and freedoms of natural
+      persons.
+    status: draft
+    control_refs:
+      - control.cspm_baseline@v1
+      - control.iac_policy_guardrail@v1
+      - control.cloud_identity_least_privilege@v1
+      - control.privileged_access_review@v1
+      - control.mfa_state_probe@v1
+      - control.patch_evidence@v1
+      - control.sbom_capture@v1
+      - control.vuln_disclosure_intake@v1
+    playbook_refs:
+      - playbook.cloud_misconfiguration@v1
+      - playbook.codebase_vuln_management@v1
+      - playbook.iam_auditor@v1
+      - playbook.infra_posture_management@v1
+      - playbook.it_security_support_agent@v1
+      - playbook.vuln_intake@v1
+    metric_refs:
+      - kpi.cloud_posture_coverage@v1
+      - kpi.mttd_cloud_misconfig@v1
+      - kpi.mttr_cloud_misconfig@v1
+      - kri.recurring_cloud_misconfig@v1
+      - kpi.patch_disseminated_on_time@v1
+      - kpi.vuln_disclosure_sla@v1
+      - kri.cvd_intake_aging@v1
+      - kri.releases_without_sbom@v1
+    evidence_stream_refs:
+      - posture
+      - vulns
+      - access
+    notes: >-
+      The six cluster playbooks form the ongoing-security baseline
+      end-to-end. cloud_misconfiguration is the reactive lane: a
+      Cloud Security Posture Management finding against the
+      configuration baseline is the integrity-of-processing event the
+      workflow responds to, the remediation is the integrity
+      restoration, and the targeted re-scan is the confirmation that
+      the deviation no longer fires. infra_posture_management is the
+      continuous counterpart: scheduled re-execution emits one
+      posture-evidence artifact per tick
+      (`schemas/evidence/posture.schema.json`, stream `posture`) so
+      the ongoing-confidentiality / integrity / availability obligation
+      has a durable artifact series rather than a point-in-time
+      attestation. iam_auditor pins the per-execution capability
+      inventory against the access evidence stream
+      (`schemas/evidence/access.schema.json`) — the
+      ongoing-confidentiality surface is exercised by recording which
+      caller invoked a workflow against what capabilities and feeding
+      the privileged-access-review cadence.
+      it_security_support_agent is the operator-support counterpart
+      whose ongoing-confidentiality surface is the
+      least-privilege-by-default routing of operator interactions
+      with the workflow inventory through the agent's auditable
+      handle / rota / workload identifier vocabulary.
+      codebase_vuln_management is the proactive integrity-of-
+      processing lane against the operator's own codebase: the
+      workflow walks the operator's SBOM against advisory feeds,
+      tracks per-finding acknowledge / fix / disclose deadlines, and
+      drives the patch evidence stream. vuln_intake is the reactive
+      coordinated-disclosure counterpart: a reporter-disclosed
+      vulnerability is the integrity-of-processing event, the intake
+      workflow logs it against the disclosure-window clock and routes
+      it to the operator's remediation lane. The level-of-security-
+      appropriate-to-the-risk threshold under Art. 32(1) is
+      operationally gated by the operator's risk-management policy
+      (control.risk_management_policy@v1, anchored on Art. 24
+      controller accountability rather than on this clause), not by
+      this YAML — the clause records the agentic anchors against
+      ongoing C/I/A; the policy holds the appropriateness
+      determination.
+
+  - id: gdpr:art-32-1-d-regular-testing-and-effectiveness
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "32"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Implement a process for regularly testing, assessing, and
+      evaluating the effectiveness of technical and organisational
+      measures for ensuring the security of the processing. The
+      results of these assessments must be available as evidence
+      that the security measures continue to meet the
+      level-of-security-appropriate-to-the-risk threshold over time.
+    status: draft
+    control_refs:
+      - control.control_effectiveness_test@v1
+      - control.detection_coverage_evidence@v1
+      - control.cspm_baseline@v1
+    playbook_refs:
+      - playbook.detection_engineering@v1
+      - playbook.infra_posture_management@v1
+    metric_refs:
+      - kri.control_effectiveness@v1
+      - kpi.detection_coverage@v1
+      - kpi.false_positive_rate@v1
+      - kpi.cloud_posture_coverage@v1
+    evidence_stream_refs:
+      - effectiveness
+      - posture
+    notes: >-
+      detection_engineering is the primary agentic anchor for the
+      regular-testing-and-effectiveness limb: its rule-lifecycle
+      `propose -> review -> ship -> measure` cycle emits per-rule-
+      version effectiveness snapshots shaped against
+      `schemas/evidence/rule-effectiveness-snapshot.schema.json`
+      into the F-CP-06 effectiveness evidence stream. The snapshots
+      are the testable / archivable artifact the Art. 32(1)(d)
+      obligation requires for the detection lane of the operator's
+      security measures. infra_posture_management is the periodic
+      posture-re-execution counterpart: each scheduled tick emits a
+      posture-evidence artifact whose captured_at and retention
+      fields hold the durability the effectiveness loop reads
+      against, so the configuration-baseline lane of the operator's
+      security measures has its own time-series surface against this
+      clause. The NIS2 parallel under
+      `nis2:art-21-2-f` anchors the same detection_engineering
+      effectiveness surface against the NIS2 risk-management-
+      effectiveness-assessment obligation; the GDPR and NIS2 regimes
+      file separate evidence requirements against the same
+      underlying effectiveness stream. Periodic re-assessment cadence
+      and archival of results are operator-side responsibilities
+      discharged by the snapshot's captured_at and retention fields
+      plus the upstream control's review_cadence.
