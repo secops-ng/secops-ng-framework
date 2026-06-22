@@ -524,6 +524,75 @@ named operator use-case. Each cookbook workflow lives under
     `examples/langgraph/it_security_support_agent/` closing the
     three-target byte-parity ring).
 
+### F-WF-SCS — Supply-chain security
+
+- **Status:** Shipped
+- **Priority:** P2
+- **Acceptance criteria:**
+  - `content/playbooks/supply_chain_security/` carries the canonical
+    CACAO playbook (`playbook.supply_chain_security@v1`) and
+    deterministic primitives (`assess.assess_supplier_signal`,
+    `artifact.build_supply_chain_evidence_artifact`) with zero
+    placeholders across both action bodies; compiled targets land
+    under `examples/{n8n,temporal,langgraph}/supply_chain_security/`.
+  - Per-signal supplier-assessment topology: `assess-supplier-signal`
+    → `emit-supply-chain-evidence`; transitions deterministic and
+    replay-tested across all three targets. This per-signal surface
+    is the operator-side disposition counterpart to the F-CP-03
+    per-execution `dependencies-snapshot.json` stream; both share
+    `schemas/evidence/supply-chain.schema.json` and the shared
+    emitter under `compilers/_shared/evidence/supply_chain.py`, and
+    join on `(workflow_id, execution_id)`.
+  - Per-execution supply-chain-evidence record emitted against
+    `schemas/evidence/supply-chain.schema.json` (stream:
+    `supply-chain`); `artifact_id` derives deterministically from
+    `SHA-256(workflow_id|execution_id|captured_at)`, so re-emissions
+    inside the same execution at the same `captured_at` instant are
+    byte-identical at the path level. The record pins the canonical
+    `assessment` block (closed `verdict` / `signal_class` /
+    `affected_supplier_handle` / sorted PURL
+    `affected_component_set`), the sorted `dependencies[]` set, the
+    NIS2 Article 21(2)(d) `regulation_refs`, and the closed
+    `control_refs` list. The `artifact_id` does **not** key on
+    `compile_target` — the three reference targets re-derive
+    byte-identical bytes from the same execution context; byte-parity
+    is asserted across targets.
+  - Cookbook entry
+    ([`docs/cookbook/supply_chain_security.md`](docs/cookbook/supply_chain_security.md))
+    + per-target byte-parity goldens
+    (`tests/examples/supply_chain_security/test_{n8n,temporal,langgraph}_workflow_golden.py`
+    and `test_{n8n,temporal,langgraph}_supply_chain_evidence.py`)
+    pin both the per-target workflow artefact and the per-target
+    supply-chain-evidence record.
+- **Sovereign-stack constraints:** Operator-supplied signal feed and
+  evidence sink; no hosted SBOM-correlation SaaS dependency, no
+  default threat-intel feed binding, no vendor SDK bundled. The
+  signal-feed source, the supplier-attestation lookup, and the
+  artifact destination are operator-configured; the framework ships
+  no default endpoint.
+- **Depends on:** F-CP-03 (supply-chain stream)
+- **Source:** NIS2 Art. 21(2)(d).
+- **Shipped via:**
+  - SKELETON — #418
+    (`content/playbooks/supply_chain_security/` CACAO scaffold + G-01
+    finalized-playbook coverage with `nis2:art-21-2-d` anchor).
+  - CORE-PRIM — #419 (canonical `assess_supplier_signal` and
+    `build_supply_chain_evidence_artifact` action logic under
+    `content/playbooks/supply_chain_security/primitives/` with unit
+    coverage and supplier-integrity invariant).
+  - CORE-FANOUT-N8N — #420 (n8n emitter + worked example under
+    `examples/n8n/supply_chain_security/` + byte-parity golden).
+  - CORE-FANOUT-TEMPORAL — #421 (Temporal activity adapter + worked
+    example under `examples/temporal/supply_chain_security/` +
+    cross-target byte-parity golden).
+  - CORE-FANOUT-LANGGRAPH — #422 (LangGraph node adapter + worked
+    example under `examples/langgraph/supply_chain_security/`
+    closing the three-target byte-parity ring).
+- EXTEND-mappings (OSCAL / D3FEND / OCSF / NIS2 / DORA / CRA inbound
+  + outbound regulatory closure) and EXTEND-metrics
+  (supplier-attestation-staleness KRI and supply-chain-coverage KPI
+  pinning) fan out into sibling cards tracked separately.
+
 ---
 
 ## Epic PT — Pattern Library

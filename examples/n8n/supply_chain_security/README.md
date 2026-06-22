@@ -18,10 +18,10 @@ the framework-agnostic F-CP-03 shared emitter under
 `compilers._shared.evidence.supply_chain` so the per-execution
 supply-chain-evidence artifact is byte-stable across replays.
 
-The Temporal and LangGraph siblings of this card are explicit
-sibling cards on the roadmap; the cross-target byte-parity ring will
-be closed once all three n8n / Temporal / LangGraph adapters carry
-the same payload shape.
+The Temporal sibling lands at `examples/temporal/supply_chain_security/`
+and the LangGraph sibling at `examples/langgraph/supply_chain_security/`;
+the three-target byte-parity ring is closed across all three reference
+compilers under F-WF-SCS (see ROADMAP.md F-WF-SCS).
 
 ## Layout
 
