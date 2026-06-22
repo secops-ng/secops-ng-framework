@@ -6,9 +6,12 @@
 # (one standard at a time). The NIS2 Art. 21(2)(d) closure landed
 # in this overlay alongside the matching addition of
 # playbook.supply_chain_security@v1 to the inbound playbook_refs at
-# content/mappings/nis2/article-21-2-d.yaml. OSCAL, D3FEND, OCSF,
-# DORA, and CRA closures remain delegated to their own sibling
-# cards.
+# content/mappings/nis2/article-21-2-d.yaml. The DORA Art. 28
+# (third-party register) closure landed alongside the matching
+# addition of playbook.supply_chain_security@v1 to the inbound
+# playbook_refs at content/mappings/dora/article-19-and-28.yaml
+# (id dora:art-28-third-party-register). OSCAL, D3FEND, OCSF, and
+# CRA closures remain delegated to their own sibling cards.
 #
 # Schema: schemas/playbook-mappings.schema.json
 playbook: playbook.supply_chain_security@v1
@@ -55,6 +58,59 @@ nis2:
       Article so the periodic re-attestation surface the article
       requires has an explicit owning workflow.
 
-dora: []
+dora:
+  # Inbound entry backlinks playbook.supply_chain_security@v1:
+  #   - content/mappings/dora/article-19-and-28.yaml
+  #     (id dora:art-28-third-party-register — register of
+  #     information in relation to all contractual arrangements
+  #     with ICT third-party service providers, including the
+  #     function supported, criticality assessment,
+  #     sub-contracting chain, and data-location indicators).
+  # This outbound entry is the structural closure of that
+  # backlink. The two contributing streams the supply_chain_security
+  # playbook composes are already pinned on sibling DORA entries:
+  # the runtime supply-chain evidence stream operated by
+  # playbook.threat_intel_ingest@v1 lands on
+  # dora:art-19-cyber-threat-voluntary, and the contract-time
+  # obligation-evidence stream operated by
+  # playbook.contractual_obligations_tracker@v1 lands on
+  # dora:art-28-third-party-register and
+  # dora:art-30-contractual-clauses. CRA closure remains delegated
+  # to its own EXTEND-mappings sibling card.
+  - mapping_id: dora:art-28-third-party-register
+    article: "28"
+    notes: >-
+      DORA Art. 28 requires financial entities to maintain a register
+      of information for all contractual arrangements with ICT
+      third-party service providers, kept current as supplier sets,
+      criticality assessments, sub-contracting chains, and
+      data-location indicators drift. The supply_chain_security
+      playbook is the operator-side orchestration spine that joins
+      the two contributing streams the register's living-artifact
+      requirement implies: the runtime F-CP-03 supply-chain evidence
+      stream (per-execution external provider dependencies, SBOM
+      correlation, supplier-attestation lookup, operated by
+      playbook.threat_intel_ingest@v1) and the contract-time F-WF-10
+      contractual-obligations stream (per-supplier accepted
+      obligations and per-clause review cadence, operated by
+      playbook.contractual_obligations_tracker@v1). The
+      assess-supplier-signal / record-supplier-evidence step pair
+      canonicalises a raw supplier signal into the closed assessment
+      block the register's criticality and re-attestation surface
+      consumes, so any drift on a direct supplier the runtime stream
+      flags re-enters the register the Article anchors. The inbound
+      entry's playbook_refs lists both
+      playbook.contractual_obligations_tracker@v1 and
+      playbook.supply_chain_security@v1; this outbound entry closes
+      the graph by pinning the orchestration playbook against the
+      Article so the periodic re-attestation surface the Article
+      requires has an explicit owning workflow. control_refs and
+      metric_refs are not extended on the inbound entry: the
+      playbook declares only control.supplier_inventory@v1 (already
+      on the entry) and no additional metric_refs of its own.
+      Convention follows the NIS2 Art. 21(2)(d) entry on this same
+      overlay and the infra_posture_management overlay closure on
+      PR #437 (inbound backlink + outbound pin, additional
+      control/metric lifts deferred to follow-on cards).
 
 cra: []
