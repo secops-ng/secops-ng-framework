@@ -121,3 +121,70 @@ do not leave it blank.
 >   triage-and-suppress generally does not.
 
 `<fill in>`
+
+## 8. Outbound personal-data transfer
+
+<!-- skeleton-pending: F-MAP-GDPR EXTEND-outbound rollout (G-02). This
+section is OPTIONAL until the per-playbook EXTEND fan-out lands. The
+linter accepts a missing or unfilled §8 today; the worked exemplar
+(data-flow-incident_management.md) is the reference shape. Drift
+(renaming the heading, inserting a non-canonical §8) is still
+flagged. -->
+
+> **GDPR Chapter V (Art. 44–49) — outbound direction.** Where the
+> workflow SENDS personal data outside the operator's primary
+> processing boundary — regulator submissions, peer-operator or
+> cross-border notification, threat-intel sharing, processor /
+> sub-processor egress — score each outbound leg of the workflow
+> against:
+>
+> - **Destination class** — name the recipient category for the
+>   outbound leg: regulator (national CSIRT, sectoral authority,
+>   DPA), peer operator under a cooperation duty, processor or
+>   sub-processor bound to a Data Processing Agreement (GDPR
+>   Art. 28), threat-intel sharing community, or other named
+>   counterparty. List each leg separately when the workflow has
+>   more than one outbound destination.
+> - **Transfer mechanism** — score the Chapter V instrument that
+>   authorises the transfer:
+>   - **no transfer** — the destination is EU/EEA-resident and no
+>     personal data leaves the EU; name the technical control that
+>     holds the EU-residency posture (sovereign-hosted endpoint,
+>     region-pinned regulator portal, processor whose contract
+>     pins EU-only processing).
+>   - **adequacy (Art. 45)** — the destination is in a third
+>     country covered by an adequacy decision; name the country
+>     and the decision.
+>   - **SCCs / BCRs / supplementary measures (Art. 46)** — the
+>     destination is in a third country without adequacy; name
+>     the transfer instrument and the supplementary measures
+>     (encryption-at-rest with operator-held keys, pseudonymisation
+>     before egress) the operator MUST have in place before the
+>     binding is wired in production.
+>   - **derogation (Art. 49)** — only for one-off specific-situation
+>     transfers; name the derogation ground (consent, public
+>     interest, vital interests, legal claims) and why a structural
+>     instrument is not used. Derogations are not a default posture.
+> - **EU-residency posture (Directive 1 — sovereignty-first).** State
+>   the default posture the framework ships: EU-resident destinations
+>   only, sovereign-hosted runtime, no public-cloud-AI egress on the
+>   outbound leg. Name the technical controls that hold the posture
+>   and the operator-bound knobs (compile-time variables, processor
+>   endpoints) where a non-EU binding would break the scoring and
+>   require re-scoring under Art. 46 / Art. 49.
+> - **Data minimisation on egress (Art. 5(1)(c)).** State what the
+>   outbound payload carries and what it deliberately omits. Where
+>   the regulator template requires aggregate counts and category
+>   labels rather than per-subject identifiers, say so; where the
+>   peer-operator notification carries an indicator-of-compromise
+>   stripped of subject identifiers, say so.
+>
+> Cross-reference §6 — that section scores the cross-border
+> transfer question against the workflow's processing as a whole;
+> this section enumerates each outbound leg and the Chapter V
+> mechanism the operator relies on for it. The two scorings must be
+> consistent: an outbound leg scored under SCCs in §8 cannot
+> co-exist with a `no transfer` finding in §6 unless §6 explicitly
+> records the SCC-bound leg.
+
+`<fill in>`

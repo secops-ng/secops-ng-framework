@@ -30,6 +30,7 @@ from tools.lint_gdpr_lawful_basis import (
     check,
     discover_playbooks,
     lawful_basis_is_non_empty,
+    skeleton_pending_sections,
 )
 
 
@@ -51,6 +52,16 @@ REAL_TEMPLATE_PATH = (
 
 def _canonical() -> list[str]:
     return canonical_sections(REAL_TEMPLATE_PATH.read_text(encoding="utf-8"))
+
+
+def _skeleton_pending() -> set[str]:
+    return skeleton_pending_sections(REAL_TEMPLATE_PATH.read_text(encoding="utf-8"))
+
+
+def _required() -> list[str]:
+    """Canonical sections that are NOT skeleton-pending (i.e. enforced now)."""
+    pending = _skeleton_pending()
+    return [h for h in _canonical() if h not in pending]
 
 
 # ---------------------------------------------------------------------------
@@ -188,7 +199,7 @@ def test_fail_when_doc_missing(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("missing_heading", _canonical())
+@pytest.mark.parametrize("missing_heading", _required())
 def test_fail_when_individual_section_missing(
     tmp_path: Path, missing_heading: str
 ) -> None:
@@ -206,7 +217,7 @@ def test_fail_when_individual_section_missing(
     assert missing_heading in missing[0].message
 
 
-@pytest.mark.parametrize("empty_heading", _canonical())
+@pytest.mark.parametrize("empty_heading", _required())
 def test_fail_when_individual_section_empty(
     tmp_path: Path, empty_heading: str
 ) -> None:
@@ -346,6 +357,68 @@ def test_fail_when_template_missing(tmp_path: Path) -> None:
     assert len(findings) == 1
     assert findings[0].kind == "missing_template"
     assert "_data-flow-template.md" in findings[0].path
+
+
+# ---------------------------------------------------------------------------
+# Skeleton-pending behaviour (rollout-optional sections)
+# ---------------------------------------------------------------------------
+
+
+def test_skeleton_pending_section_absent_does_not_fail(tmp_path: Path) -> None:
+    """A canonical section tagged ``<!-- skeleton-pending -->`` in the
+    template may be omitted from a workflow's data-flow doc without
+    tripping missing_section."""
+    pending = _skeleton_pending()
+    if not pending:
+        pytest.skip("no skeleton-pending sections in template")
+    _seed_template(tmp_path)
+    _make_playbook(tmp_path, "demo-workflow")
+    _make_data_flow(tmp_path, "demo-workflow", omit=pending)
+
+    findings = check(tmp_path)
+    assert findings == [], "\n".join(f.message for f in findings)
+
+
+def test_skeleton_pending_section_unfilled_does_not_fail(tmp_path: Path) -> None:
+    """A skeleton-pending section that IS present but carries only the
+    template placeholder body must not trip empty_section."""
+    pending = _skeleton_pending()
+    if not pending:
+        pytest.skip("no skeleton-pending sections in template")
+    _seed_template(tmp_path)
+    _make_playbook(tmp_path, "demo-workflow")
+    _make_data_flow(
+        tmp_path,
+        "demo-workflow",
+        section_bodies={heading: "`<fill in>`" for heading in pending},
+    )
+
+    findings = check(tmp_path)
+    assert findings == [], "\n".join(f.message for f in findings)
+
+
+def test_skeleton_pending_section_still_drift_checked(tmp_path: Path) -> None:
+    """Renaming a skeleton-pending heading still trips drift —
+    pending-status only relaxes presence/fill, not the heading text."""
+    pending = _skeleton_pending()
+    if not pending:
+        pytest.skip("no skeleton-pending sections in template")
+    target = sorted(pending)[0]
+    renamed = target + " (renamed)"
+    _seed_template(tmp_path)
+    _make_playbook(tmp_path, "demo-workflow")
+    _make_data_flow(
+        tmp_path,
+        "demo-workflow",
+        rename={target: renamed},
+    )
+
+    findings = check(tmp_path)
+    kinds = {(f.kind, f.section) for f in findings}
+    # Drift: the renamed heading is unexpected.
+    assert ("unexpected_section", renamed) in kinds
+    # The original heading is pending, so its absence is NOT a finding.
+    assert ("missing_section", target) not in kinds
 
 
 # ---------------------------------------------------------------------------

@@ -4,7 +4,9 @@ Per-workflow GDPR data-flow entry for the `incident_management`
 cookbook playbook (`playbook.incident_management@v1`). Filled in
 against [`_data-flow-template.md`](./_data-flow-template.md). Together
 the seven sections below form the Art. 30 Record of Processing
-Activity entry for this workflow.
+Activity entry for this workflow, and §8 documents the outbound
+personal-data transfer legs under GDPR Chapter V (Art. 44–49) as the
+worked exemplar for the F-MAP-GDPR EXTEND-outbound pass.
 
 Workflow source of truth:
 [`content/playbooks/incident_management/`](../../playbooks/incident_management/).
@@ -233,3 +235,100 @@ live. Sovereignty review at compile time is the gate.
   named in the incident (account lockout, automated regulator
   filing without human review), the operator MUST re-score this
   section.
+
+## 8. Outbound personal-data transfer
+
+The workflow has three classes of outbound leg that carry personal
+data outside the operator's incident-case store. Each is scored
+below against GDPR Chapter V (Art. 44–49); the EU-residency posture
+is sovereignty-first by default per Directive 1, and the operator's
+compile-time bindings are the knobs that can break the scoring.
+
+**Leg A — NIS2 Article 23 regulator submissions (early warning,
+72-hour notification, one-month final report).**
+
+- *Destination class.* The operator's competent authority under
+  NIS2 — a national CSIRT or sectoral regulator — and, where the
+  operator is in scope, the parallel destinations required by DORA
+  Article 19 and CRA Article 14. The framework ships no default
+  endpoint; the destination is operator-supplied through playbook
+  variables.
+- *Transfer mechanism.* **No transfer.** EU competent authorities
+  under NIS2 are EU/EEA-resident by construction; DORA / CRA
+  parallels are EU-resident under their own statutory regimes. The
+  technical control that holds this is that the regulator portal
+  URLs are operator-supplied through compile-time variables and
+  sovereignty review at compile time refuses any non-EU endpoint.
+- *EU-residency posture.* Default is EU-resident regulator
+  destinations only. A non-EU binding (a third-country sectoral
+  regulator notified because the incident touches that
+  jurisdiction's subjects) MUST be re-scored under Art. 46 SCCs
+  with operator-held encryption keys on the submission envelope,
+  or under Art. 49(1)(d) "important reasons of public interest"
+  derogation where the cross-border notification is mandated by a
+  statute the operator is bound by.
+- *Data minimisation on egress.* The regulator template carries
+  aggregate affected-subject counts and category labels, not
+  per-subject identifiers; signatory names and the final-report
+  free-text fields (narrative, root cause, applied mitigations)
+  are scoped to what the regulator template requires. Incident
+  telemetry inside the case is not transmitted to the regulator
+  outside the submission envelope.
+
+**Leg B — Cross-border / peer-operator notification under NIS2
+Article 23 cooperation.**
+
+- *Destination class.* Peer operators or competent authorities in
+  other Member States named in the incident's cross-border scope,
+  notified through the NIS2 cooperation-group routing the
+  operator's national CSIRT maintains.
+- *Transfer mechanism.* **No transfer.** The cooperation-group
+  routing is EU-internal by construction. The cross-border-scope
+  classification in §2 is the gate that decides whether a peer is
+  notified; the scoring here covers only the GDPR Chapter V
+  question for the notification payload.
+- *EU-residency posture.* EU-resident peers only. A notification
+  to a third-country peer operator (incident touches a non-EU
+  jurisdiction with a reciprocal cooperation agreement) MUST be
+  re-scored under Art. 46 SCCs with pseudonymisation of any
+  affected-subject identifiers before egress; the default
+  posture omits per-subject identifiers entirely.
+- *Data minimisation on egress.* Indicator-of-compromise extracts
+  (hashes, network indicators, signatures) stripped of subject
+  identifiers; aggregate affected-subject counts only where the
+  cooperation routing requires them.
+
+**Leg C — Operator-bound processor egress (incident-case store,
+evidence-pack store, document-signing service for final-report
+submissions).**
+
+- *Destination class.* Operator-bound processors under GDPR
+  Art. 28 — typically the operator's sovereign-hosted incident-
+  case store, evidence-pack store, and any document-signing
+  service the operator wires for regulator-submission signatures.
+- *Transfer mechanism.* **No transfer** under the default
+  binding: the reference compile targets (n8n / Temporal /
+  LangGraph self-host on Nebul / OVHcloud / Scaleway / Hetzner)
+  are EU-hostable and the framework ships no SecOps-NG-hosted
+  egress path. If the operator binds a non-EU store or
+  signing service, the binding MUST be re-scored under
+  Art. 46 SCCs with supplementary measures (encryption-at-rest
+  with operator-held keys, pseudonymisation of affected-subject
+  identifiers in the case record before egress) before the
+  binding goes live.
+- *EU-residency posture.* The compile-time sovereignty review is
+  the gate. The framework ships no default processor endpoint
+  and no fallback that could route case-store writes outside the
+  EU; the operator's DPA inventory (GDPR Art. 28) is the durable
+  record of the processor binding the case-store choice depends
+  on.
+- *Data minimisation on egress.* The case-store payload carries
+  the incident telemetry and regulator-submission envelopes
+  exactly as §3 enumerates; no analytics-only projection is
+  emitted to a separate store independent of the case.
+
+The §6 cross-border scoring as a whole is **no transfer** —
+consistent with all three legs above scoring no-transfer under
+the default sovereign-stack posture. Any operator re-scoring of
+a leg here MUST be reflected in §6 in the same change so the
+two sections do not disagree.

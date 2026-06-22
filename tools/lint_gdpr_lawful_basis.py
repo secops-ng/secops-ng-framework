@@ -168,6 +168,17 @@ def _extract_sections(markdown_text: str) -> "list[tuple[str, list[str]]]":
     return sections
 
 
+#: HTML-comment marker tagging a section in the canonical template as
+#: rollout-optional. A section whose template body contains
+#: ``<!-- skeleton-pending`` is part of the canonical heading set
+#: (drift / unexpected_section checks still apply to it) but is allowed
+#: to be missing OR present-but-unfilled in a workflow's data-flow doc.
+#: Used to stage multi-PR EXTEND rollouts (e.g. the per-playbook
+#: outbound-transfer fan-out) without breaking the existing tree on the
+#: SKELETON PR.
+SKELETON_PENDING_MARKER = "<!-- skeleton-pending"
+
+
 def _section_body_is_non_empty(body_lines: Iterable[str]) -> bool:
     """Return True iff ``body_lines`` contains contributor prose.
 
@@ -203,6 +214,24 @@ def canonical_sections(template_text: str) -> list[str]:
     return [heading for heading, _ in _extract_sections(template_text)]
 
 
+def skeleton_pending_sections(template_text: str) -> set[str]:
+    """Return canonical headings tagged ``<!-- skeleton-pending -->`` in the template.
+
+    A skeleton-pending section is part of the canonical set (drift /
+    unexpected_section checks still apply) but allowed to be missing OR
+    present-but-unfilled in a per-workflow data-flow doc until the
+    EXTEND rollout PR fills it. Used to stage multi-PR fan-outs without
+    breaking the existing tree on the SKELETON PR.
+    """
+    pending: set[str] = set()
+    for heading, body in _extract_sections(template_text):
+        for line in body:
+            if SKELETON_PENDING_MARKER in line:
+                pending.add(heading)
+                break
+    return pending
+
+
 # Backward-compatibility shim retained for the SKELETON tests and any
 # downstream importer.
 def lawful_basis_is_non_empty(markdown_text: str) -> bool:
@@ -235,6 +264,17 @@ def _load_template_sections(root: Path) -> list[str]:
     return canonical_sections(template_path.read_text(encoding="utf-8"))
 
 
+def _load_skeleton_pending(root: Path) -> set[str]:
+    """Load skeleton-pending section headings from the template under ``root``.
+
+    Returns the empty set if the template is missing.
+    """
+    template_path = root / GDPR_MAPPINGS_SUBDIR / TEMPLATE_FILENAME
+    if not template_path.is_file():
+        return set()
+    return skeleton_pending_sections(template_path.read_text(encoding="utf-8"))
+
+
 def check(root: Path) -> list[Finding]:
     """Run the CI guard against ``root`` and return findings.
 
@@ -244,6 +284,7 @@ def check(root: Path) -> list[Finding]:
     findings: list[Finding] = []
 
     canonical = _load_template_sections(root)
+    pending = _load_skeleton_pending(root)
     template_rel = GDPR_MAPPINGS_SUBDIR / TEMPLATE_FILENAME
     if not canonical:
         # Template missing or empty — single explanatory finding, no
@@ -310,7 +351,12 @@ def check(root: Path) -> list[Finding]:
 
         # Missing / empty canonical sections.
         for heading in canonical:
+            is_pending = heading in pending
             if heading not in section_index:
+                if is_pending:
+                    # Skeleton-pending sections are allowed to be
+                    # absent until the EXTEND rollout lands.
+                    continue
                 findings.append(
                     Finding(
                         workflow=workflow,
@@ -326,6 +372,10 @@ def check(root: Path) -> list[Finding]:
                 )
                 continue
             if not _section_body_is_non_empty(section_index[heading]):
+                if is_pending:
+                    # Skeleton-pending sections may be present-but-
+                    # unfilled until the EXTEND rollout fills them.
+                    continue
                 findings.append(
                     Finding(
                         workflow=workflow,
