@@ -188,8 +188,35 @@ entries:
       - control.provider_attestation@v1
     playbook_refs:
       - playbook.contractual_obligations_tracker@v1
+      - playbook.supply_chain_security@v1
     metric_refs:
       - kri.suppliers_attestation_stale@v1
+    notes: >-
+      Article 28 requires the third-party register to be maintained as
+      a living artifact, not a one-shot inventory: the supplier set,
+      criticality assessments, sub-contracting chains, and
+      data-location indicators all drift as contracts are signed,
+      amended, and terminated. Two playbooks compose against this
+      surface. `playbook.contractual_obligations_tracker@v1` is the
+      contract-time obligation-evidence stream — per-supplier accepted
+      obligations and per-clause review cadence — and is the
+      register's documentary half. `playbook.supply_chain_security@v1`
+      is the orchestration spine that joins that contract-time stream
+      to the runtime supply-chain-evidence stream operated by
+      `playbook.threat_intel_ingest@v1` (per-execution external
+      provider dependencies, SBOM correlation, supplier-attestation
+      lookup); its assess-supplier-signal / record-supplier-evidence
+      step pair canonicalises a raw supplier signal into the closed
+      assessment block the register's criticality and re-attestation
+      surface consumes, so any drift on a direct supplier the runtime
+      surface flags re-enters the same register the Article anchors.
+      control_refs and metric_refs are not extended here: the
+      orchestration playbook declares only
+      `control.supplier_inventory@v1` (already on this entry) and no
+      additional metric_refs of its own. Convention follows
+      article-10.yaml and article-9-and-rts-vuln-mgmt.yaml (inbound
+      backlink + reuse of existing controls/metrics, additional
+      control/metric lifts deferred to follow-on cards).
 
   - id: dora:art-30-contractual-clauses
     regulation:
