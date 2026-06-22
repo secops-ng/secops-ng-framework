@@ -84,15 +84,31 @@
 # identity_compromise), not themselves the notification step; and
 # the ICT risk-management framework governance surface is the
 # F-GO-* governance layer's responsibility, not this playbook's.
-# No inbound DORA file backlinks playbook.detection_engineering@v1
-# today, and no outbound DORA entry is emitted on this overlay. If
-# a future DORA Art. 6 governance anchor lands that names the
-# detection-effectiveness assessment programme this playbook
-# discharges (as opposed to a per-incident notification step), an
-# outbound entry can be added together with the inbound entry —
-# mirroring the on_call_rotation DORA Art. 6 gap-note pattern: gap
-# notes are separate closure cards, not scope creep on a
-# single-purpose mappings PR.
+# The inbound backlink that DOES land cleanly is DORA Art. 10
+# (Detection, Chapter II): Art. 10 requires mechanisms to promptly
+# detect anomalous activities with multiple layers of control and
+# *defined alert thresholds and criteria*, and the propose →
+# review → ship → measure rule lifecycle this playbook operates is
+# the audit-evident discipline that keeps those alert thresholds
+# and criteria fit for purpose. content/mappings/dora/article-10.yaml
+# (id `dora:art-10-detection`) backlinks
+# `playbook.detection_engineering@v1` on its `playbook_refs`, lifts
+# the playbook-side `kpi.false_positive_rate@v1` and
+# `kri.control_effectiveness@v1` onto its `metric_refs` alongside
+# the pre-existing `kpi.detection_coverage@v1` and `kpi.mttd@v1`,
+# and notes the convention follows article-9-and-rts-vuln-mgmt.yaml
+# (inbound backlink + metric lift, control lift deferred to
+# xref-landed follow-on). No outbound DORA pin is emitted on this
+# overlay because the schema's regulatory keys currently carry
+# inbound clause ids on the mapping side only; the outbound-side
+# DORA EXTEND layer is filed as a separate card. If a future DORA
+# Art. 6 governance anchor lands that names the detection-
+# effectiveness assessment programme this playbook discharges (as
+# opposed to a per-incident notification step), an outbound entry
+# can be added together with the Art. 6 inbound entry — mirroring
+# the on_call_rotation DORA Art. 6 gap-note pattern: gap notes are
+# separate closure cards, not scope creep on a single-purpose
+# mappings PR.
 #
 # GDPR closure: the inbound GDPR data-flow record at
 # content/mappings/gdpr/data-flow-detection_engineering.md declares

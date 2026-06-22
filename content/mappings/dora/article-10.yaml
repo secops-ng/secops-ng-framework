@@ -26,13 +26,35 @@ entries:
     control_refs:
       - control.detection_coverage_evidence@v1
       - control.cspm_baseline@v1
-    playbook_refs: []
+    playbook_refs:
+      - playbook.detection_engineering@v1
     metric_refs:
       - kpi.detection_coverage@v1
       - kpi.mttd@v1
+      - kpi.false_positive_rate@v1
+      - kri.control_effectiveness@v1
     notes: >-
       Article 10 turns detection from a tooling claim into an
       evidenced control. The agentic slice is the dated detection-
       coverage attestation against the declared scope (logs, identity,
       cloud posture) plus the time-to-detect metric stream that proves
-      the alerting actually fires.
+      the alerting actually fires. The rule-content side of that same
+      surface — propose → review → ship → measure of detection
+      content, with each shipped rule version carrying a paired
+      effectiveness snapshot — is operated by
+      `playbook.detection_engineering@v1`; the per-rule-version
+      effectiveness snapshot is the audit-evident artifact that keeps
+      the alert thresholds and criteria this Article calls for fit
+      for purpose over time, and the false-positive-rate /
+      control-effectiveness KRIs lifted onto this entry are the
+      measurement complements of detection-coverage that the
+      lifecycle's measure step emits. control_refs are not extended
+      here: the rule-lifecycle side already pins
+      `control.control_effectiveness_test@v1` (NIST SP 800-53 CA-7)
+      on its own overlay, but no populated cross-reference file
+      under `content/controls/` currently lifts that id; the
+      control_xref lint test enforces that gate, and lifting the
+      CA-7 anchor onto this entry's `control_refs` is left to a
+      follow-on card after the xref file lands. Convention follows
+      article-9-and-rts-vuln-mgmt.yaml (inbound backlink + metric
+      lift, control lift deferred to xref-landed follow-on).
