@@ -1,31 +1,14 @@
-# Outbound playbook-mappings overlay for supply_chain_security
-# (SKELETON placeholder — schema-valid stub only).
+# Outbound playbook-mappings overlay for supply_chain_security.
 #
-# This SKELETON card pins the workflow topology and the per-step
-# x_secops_ng joins on playbook.cacao.json. The full cross-reference
-# graph (OSCAL controls, MITRE D3FEND defensive techniques, OCSF
-# telemetry classes, NIS2 / DORA / CRA regulatory backlinks) is the
-# explicit out-of-scope surface for the SKELETON layer and is
-# delegated to the CORE / EXTEND sibling cards. Per the schema's
-# `additionalProperties: false`, all six structural keys must be
-# present even when empty; this file is the minimal schema-valid
-# placeholder that lets the G-02 finalized-playbook coverage guard
-# (tests/content/test_playbook_mapping_coverage.py) accept the new
-# SKELETON directory without trapping it as an orphan.
-#
-# Inbound regulatory anchors under content/mappings/{nis2,dora,cra}/
-# are deliberately NOT mutated by this SKELETON card. The NIS2
-# Article 21(2)(d) inbound entry at
-# content/mappings/nis2/article-21-2-d.yaml already exists and
-# currently backlinks playbook.threat_intel_ingest@v1 and
-# playbook.contractual_obligations_tracker@v1. Adding
-# playbook.supply_chain_security@v1 to that list, alongside the
-# matching outbound `nis2:` entry below, is work for the EXTEND
-# sibling card so the SKELETON stays a single-deliverable scope.
-# The G-02 nis2 orphan-CI lane tolerates net-new playbooks under
-# the 7-day grace window keyed on the CACAO finalization marker
-# mtime, so the EXTEND sibling has a defined window to land the
-# inbound + outbound regulatory closure together.
+# Per the schema's `additionalProperties: false`, all six structural
+# keys must be present; empty arrays mark surfaces whose closure is
+# delegated to sibling EXTEND-mappings cards per the ROADMAP fan-out
+# (one standard at a time). The NIS2 Art. 21(2)(d) closure landed
+# in this overlay alongside the matching addition of
+# playbook.supply_chain_security@v1 to the inbound playbook_refs at
+# content/mappings/nis2/article-21-2-d.yaml. OSCAL, D3FEND, OCSF,
+# DORA, and CRA closures remain delegated to their own sibling
+# cards.
 #
 # Schema: schemas/playbook-mappings.schema.json
 playbook: playbook.supply_chain_security@v1
@@ -36,7 +19,41 @@ d3fend: []
 
 ocsf: []
 
-nis2: []
+nis2:
+  # Inbound entry backlinks playbook.supply_chain_security@v1:
+  #   - content/mappings/nis2/article-21-2-d.yaml
+  #     (id nis2:art-21-2-d — supply-chain security; security
+  #     characteristics of direct suppliers and service providers,
+  #     with periodic re-attestation)
+  # The supply_chain_security playbook is the orchestration spine
+  # that composes the two pre-existing surfaces already pinned on
+  # the inbound entry: the runtime supply-chain evidence stream
+  # operated by playbook.threat_intel_ingest@v1 and the
+  # contract-time obligation-evidence stream operated by
+  # playbook.contractual_obligations_tracker@v1. This outbound
+  # entry is the structural closure of that backlink; OSCAL,
+  # D3FEND, OCSF, DORA, and CRA closures land via their own
+  # EXTEND-mappings sibling cards per the ROADMAP fan-out.
+  - mapping_id: nis2:art-21-2-d
+    article: 21(2)(d)
+    notes: >-
+      NIS2 Art. 21(2)(d) requires entities to address supply-chain
+      security including the security characteristics of direct
+      suppliers and service providers, with periodic
+      re-attestation. The supply_chain_security playbook is the
+      operator-side composition surface that joins the two
+      contributing streams the article requires: the runtime
+      F-CP-03 supply-chain evidence stream (per-execution external
+      provider dependencies, operated by
+      playbook.threat_intel_ingest@v1) and the contract-time
+      F-WF-10 contractual-obligations stream (per-supplier accepted
+      obligations and per-clause review cadence, operated by
+      playbook.contractual_obligations_tracker@v1). The inbound
+      entry's evidence_stream_refs lists both `supply-chain` and
+      `contractual-obligations`; this outbound entry closes the
+      graph by pinning the orchestration playbook against the
+      Article so the periodic re-attestation surface the article
+      requires has an explicit owning workflow.
 
 dora: []
 
