@@ -1,0 +1,102 @@
+name: gdpr-orphan-ci
+
+# G-02 KRI assertion for the GDPR regulatory-mapping coverage axis.
+#
+# Walks `content/playbooks/` and `content/mappings/gdpr/` and fires
+# the G-02 KRI when a finalized playbook either:
+#
+#   * regresses (had an inbound GDPR citation in the baseline ref and
+#     no longer does in the PR head) — immediate hard fail; or
+#   * is net-new without any inbound GDPR citation and the CACAO
+#     finalization marker is older than the 7-day grace window —
+#     hard fail.
+#
+# At SKELETON time the gdpr tree carries no machine-readable per-clause
+# YAML; every currently-finalized playbook is held under the audited
+# `_orphan_skip.yaml` manifest pointing at the existing
+# `data-flow-<slug>.md` doc as interim coverage. As CORE follow-on
+# cards land per-clause `playbook_refs:` YAML, the matching skip entry
+# is retired in the same PR so the orphan-CI assertion re-arms.
+#
+# Runs nightly on `main` and on every PR touching the two trees.
+# The KRI emission (``--format kri``) is uploaded as an artifact so
+# the dashboard ingest can read it without re-running the linter.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "content/playbooks/**"
+      - "content/mappings/gdpr/**"
+      - "tools/lint_playbook_orphans.py"
+      - "tests/content/test_gdpr_playbook_orphans.py"
+      - ".github/workflows/gdpr-orphan-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "content/playbooks/**"
+      - "content/mappings/gdpr/**"
+      - "tools/lint_playbook_orphans.py"
+  schedule:
+    # Nightly at 02:23 UTC — off-peak, off-the-hour, and offset from
+    # the cra/dora/nis2 lanes so concurrent log lines stay legible.
+    - cron: "23 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gdpr-orphan-ci:
+    name: G-02 GDPR orphan assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history for baseline diff)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML)
+        run: pip install --no-cache-dir pyyaml
+
+      - name: Resolve baseline ref
+        id: baseline
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "ref=origin/${{ github.base_ref }}" >> "$GITHUB_OUTPUT"
+          else
+            # Nightly / push on main: diff against the parent of HEAD so
+            # a regression introduced by HEAD is still surfaced.
+            echo "ref=HEAD~1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run GDPR orphan-CI assertion (text)
+        run: |
+          python -m tools.lint_playbook_orphans \
+            --framework gdpr \
+            --baseline-ref "${{ steps.baseline.outputs.ref }}" \
+            --format text
+
+      - name: Emit G-02 KRI payload
+        if: always()
+        run: |
+          mkdir -p .kri-out
+          python -m tools.lint_playbook_orphans \
+            --framework gdpr \
+            --baseline-ref "${{ steps.baseline.outputs.ref }}" \
+            --format kri > .kri-out/g-02-gdpr.json || true
+          cat .kri-out/g-02-gdpr.json
+
+      - name: Upload KRI artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g-02-gdpr-kri
+          path: .kri-out/g-02-gdpr.json
+          if-no-files-found: warn
+          retention-days: 30

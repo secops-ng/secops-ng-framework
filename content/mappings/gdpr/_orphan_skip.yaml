@@ -1,0 +1,197 @@
+# GDPR orphan-CI assertion skip manifest.
+#
+# Used by `tools.lint_playbook_orphans --framework gdpr` (and the
+# nightly per-framework workflow) to allow a finalized playbook to
+# stay without an inbound `playbook_refs:` citation under
+# `content/mappings/gdpr/` without tripping the G-02 KRI.
+#
+# Each entry is a deliberate, audited exclusion. The rationale is
+# committed history; the SKELETON guard rejects any entry that lacks
+# the two required fields. Removing a slug from this list re-arms the
+# assertion against it immediately.
+#
+# A slug listed here MUST refer to a directory under
+# `content/playbooks/` that carries a CACAO finalization marker
+# (`playbook.cacao.json` or `playbook.cacao.yaml`). Listing a
+# non-finalized or non-existent slug is a hard error.
+#
+# SKELETON state (G-02 / gdpr axis):
+#
+# At SKELETON time the `content/mappings/gdpr/` tree ships 22
+# data-flow markdown documents and zero machine-readable per-clause
+# YAML, so every currently-finalized playbook is technically a
+# `gdpr-orphan`. Each entry below points at the existing
+# `data-flow-<slug>.md` doc as interim coverage so the G-02 / gdpr
+# KRI lands `ok` against the current snapshot while CORE follow-on
+# cards author the per-clause `playbook_refs:` YAML. As a real YAML
+# mapping lands for a slug, the matching skip entry below MUST be
+# removed in the same PR so the orphan-CI assertion re-arms against
+# regressions in the wired-up coverage.
+
+skip:
+  - slug: cloud_misconfiguration
+    rationale: >-
+      SKELETON interim coverage — `content/mappings/gdpr/data-flow-cloud_misconfiguration.md`
+      documents the GDPR Article 5(1)(f) integrity/confidentiality and
+      Article 32 security-of-processing data-flow surface for this
+      playbook. Machine-readable per-clause `playbook_refs:` YAML is
+      tracked as an F-MAP-GDPR CORE follow-on; this skip entry is
+      retired in the PR that lands that YAML.
+  - slug: codebase_vuln_management
+    rationale: >-
+      SKELETON interim coverage — `content/mappings/gdpr/data-flow-codebase_vuln_management.md`
+      documents the GDPR Article 32 (security of processing) and
+      Article 25 (data protection by design and by default) data-flow
+      surface for this playbook. Machine-readable per-clause
+      `playbook_refs:` YAML is tracked as an F-MAP-GDPR CORE follow-on;
+      this skip entry is retired in the PR that lands that YAML.
+  - slug: contractual_obligations_tracker
+    rationale: >-
+      SKELETON interim coverage — `content/mappings/gdpr/data-flow-contractual_obligations_tracker.md`
+      documents the GDPR Article 28 (processor) and Article 26 (joint
+      controller) contractual-obligation tracking surface for this
+      playbook. Machine-readable per-clause `playbook_refs:` YAML is
+      tracked as an F-MAP-GDPR CORE follow-on; this skip entry is
+      retired in the PR that lands that YAML.
+  - slug: data_exfil
+    rationale: >-
+      SKELETON interim coverage — `content/mappings/gdpr/data-flow-data_exfil.md`
+      documents the GDPR Article 33 (notification of a personal data
+      breach to the supervisory authority) and Article 34 (communication
+      of a personal data breach to the data subject) data-flow surface
+      for this playbook. Machine-readable per-clause `playbook_refs:`
+      YAML is tracked as an F-MAP-GDPR CORE follow-on; this skip entry
+      is retired in the PR that lands that YAML.
+  - slug: detection_engineering
+    rationale: >-
+      SKELETON interim coverage — `content/mappings/gdpr/data-flow-detection_engineering.md`
+      documents the GDPR Article 32 (security of processing) and
+      Article 5(1)(f) integrity/confidentiality data-flow surface for
+      this playbook. Machine-readable per-clause `playbook_refs:` YAML
+      is tracked as an F-MAP-GDPR CORE follow-on; this skip entry is
+      retired in the PR that lands that YAML.
+  - slug: executive_metrics
+    rationale: >-
+      Reporting playbook that aggregates KPI/KRI evidence for board-
+      level review; it is not the operational object of any single
+      GDPR Article 5/24/25/32/33/34/35 obligation. It surfaces
+      indirectly via the `metric_refs:` on each clause's mapping
+      rather than via `playbook_refs:`, which is the audited
+      convention for reporting playbooks across every framework.
+      `content/mappings/gdpr/data-flow-executive_metrics.md` documents
+      the indirect surface for this SKELETON snapshot.
+  - slug: iam_auditor
+    rationale: >-
+      SKELETON interim coverage — `content/mappings/gdpr/data-flow-iam_auditor.md`
+      documents the GDPR Article 32(1)(b) ongoing-confidentiality and
+      Article 5(1)(f) integrity/confidentiality data-flow surface for
+      this playbook. Machine-readable per-clause `playbook_refs:` YAML
+      is tracked as an F-MAP-GDPR CORE follow-on; this skip entry is
+      retired in the PR that lands that YAML.
+  - slug: identity_compromise
+    rationale: >-
+      SKELETON interim coverage — `content/mappings/gdpr/data-flow-identity_compromise.md`
+      documents the GDPR Article 33 (notification of a personal data
+      breach) and Article 32 (security of processing) data-flow surface
+      for this playbook. Machine-readable per-clause `playbook_refs:`
+      YAML is tracked as an F-MAP-GDPR CORE follow-on; this skip entry
+      is retired in the PR that lands that YAML.
+  - slug: incident_management
+    rationale: >-
+      Regulator-notification engine — also referenced from the NIS2
+      Art. 23 and DORA Art. 19 mapping trees. The GDPR Article 33
+      notification narrative in
+      `content/mappings/gdpr/data-flow-incident_management.md` already
+      documents the wiring at SKELETON time; per-clause
+      `playbook_refs:` YAML currently cites the upstream incident-type
+      playbooks (`ransomware_containment`, `data_exfil`,
+      `identity_compromise`, `post_incident_review`) that feed the
+      engine. Direct `playbook.incident_management@v1` citation under a
+      GDPR clause is tracked as a per-clause content follow-up to the
+      gdpr mapping tree, not deferred indefinitely.
+  - slug: infra_posture_management
+    rationale: >-
+      SKELETON interim coverage — `content/mappings/gdpr/data-flow-infra_posture_management.md`
+      documents the GDPR Article 32 (security of processing) and
+      Article 25 (data protection by design and by default) data-flow
+      surface for this playbook. Machine-readable per-clause
+      `playbook_refs:` YAML is tracked as an F-MAP-GDPR CORE follow-on;
+      this skip entry is retired in the PR that lands that YAML.
+  - slug: it_security_support_agent
+    rationale: >-
+      SKELETON interim coverage — `content/mappings/gdpr/data-flow-it_security_support_agent.md`
+      documents the GDPR Article 32 (security of processing) and
+      Article 15 (right of access by the data subject) operator-support
+      data-flow surface for this playbook. Machine-readable per-clause
+      `playbook_refs:` YAML is tracked as an F-MAP-GDPR CORE follow-on;
+      this skip entry is retired in the PR that lands that YAML.
+  - slug: on_call_rotation
+    rationale: >-
+      SKELETON interim coverage — `content/mappings/gdpr/data-flow-on_call_rotation.md`
+      documents the GDPR Article 33 (timely notification, 72-hour
+      window) and Article 32 (security of processing) operational-
+      readiness data-flow surface for this playbook. Machine-readable
+      per-clause `playbook_refs:` YAML is tracked as an F-MAP-GDPR CORE
+      follow-on; this skip entry is retired in the PR that lands that
+      YAML.
+  - slug: onboarding_offboarding_tracker
+    rationale: >-
+      SKELETON interim coverage — `content/mappings/gdpr/data-flow-onboarding_offboarding_tracker.md`
+      documents the GDPR Article 5(1)(c) data-minimisation,
+      Article 5(1)(e) storage-limitation, and Article 32(1)(b)
+      ongoing-confidentiality data-flow surface for this playbook.
+      Machine-readable per-clause `playbook_refs:` YAML is tracked as
+      an F-MAP-GDPR CORE follow-on; this skip entry is retired in the
+      PR that lands that YAML.
+  - slug: phishing_triage
+    rationale: >-
+      SKELETON interim coverage — `content/mappings/gdpr/data-flow-phishing_triage.md`
+      documents the GDPR Article 33 personal-data-breach risk-assessment
+      surface for this playbook (a phishing event becomes notifiable
+      only if it crosses the Article 33(1) likelihood-of-risk threshold).
+      Machine-readable per-clause `playbook_refs:` YAML is tracked as
+      an F-MAP-GDPR CORE follow-on; this skip entry is retired in the
+      PR that lands that YAML.
+  - slug: post_incident_review
+    rationale: >-
+      SKELETON interim coverage — `content/mappings/gdpr/data-flow-post_incident_review.md`
+      documents the GDPR Article 33(5) (documenting personal data
+      breaches) and Article 32 (security of processing) post-incident
+      evidence data-flow surface for this playbook. Machine-readable
+      per-clause `playbook_refs:` YAML is tracked as an F-MAP-GDPR CORE
+      follow-on; this skip entry is retired in the PR that lands that
+      YAML.
+  - slug: ransomware_containment
+    rationale: >-
+      SKELETON interim coverage — `content/mappings/gdpr/data-flow-ransomware_containment.md`
+      documents the GDPR Article 33 (notification of a personal data
+      breach) and Article 32 (security of processing) data-flow surface
+      for this playbook. Machine-readable per-clause `playbook_refs:`
+      YAML is tracked as an F-MAP-GDPR CORE follow-on; this skip entry
+      is retired in the PR that lands that YAML.
+  - slug: supply_chain_security
+    rationale: >-
+      SKELETON interim coverage — `content/mappings/gdpr/data-flow-supply_chain_security.md`
+      documents the GDPR Article 28 (processor obligations) and
+      Article 32 (security of processing) third-party data-flow surface
+      for this playbook. Machine-readable per-clause `playbook_refs:`
+      YAML is tracked as an F-MAP-GDPR CORE follow-on; this skip entry
+      is retired in the PR that lands that YAML.
+  - slug: threat_intel_ingest
+    rationale: >-
+      SKELETON interim coverage — `content/mappings/gdpr/data-flow-threat_intel_ingest.md`
+      documents the GDPR Article 6(1)(f) legitimate-interest balancing
+      and Article 5(1)(c) data-minimisation data-flow surface for this
+      playbook (threat-intel feeds may carry personal data; the
+      processing basis and minimisation posture is the audited
+      surface). Machine-readable per-clause `playbook_refs:` YAML is
+      tracked as an F-MAP-GDPR CORE follow-on; this skip entry is
+      retired in the PR that lands that YAML.
+  - slug: vuln_intake
+    rationale: >-
+      SKELETON interim coverage — `content/mappings/gdpr/data-flow-vuln_intake.md`
+      documents the GDPR Article 32 (security of processing) and
+      Article 25 (data protection by design) coordinated-disclosure
+      data-flow surface for this playbook. Machine-readable per-clause
+      `playbook_refs:` YAML is tracked as an F-MAP-GDPR CORE follow-on;
+      this skip entry is retired in the PR that lands that YAML.
