@@ -10,8 +10,14 @@
 # (third-party register) closure landed alongside the matching
 # addition of playbook.supply_chain_security@v1 to the inbound
 # playbook_refs at content/mappings/dora/article-19-and-28.yaml
-# (id dora:art-28-third-party-register). OSCAL, D3FEND, OCSF, and
-# CRA closures remain delegated to their own sibling cards.
+# (id dora:art-28-third-party-register). The CRA Art. 13(4)
+# (component due-diligence, supplier-attestation channel)
+# closure landed alongside the matching addition of
+# playbook.supply_chain_security@v1 to the inbound playbook_refs
+# at content/mappings/cra/article-13-4-component-due-diligence-contracts.yaml
+# (id cra:art-13-4-component-due-diligence-contracts). OSCAL,
+# D3FEND, and OCSF closures remain delegated to their own
+# sibling cards.
 #
 # Schema: schemas/playbook-mappings.schema.json
 playbook: playbook.supply_chain_security@v1
@@ -113,4 +119,54 @@ dora:
       PR #437 (inbound backlink + outbound pin, additional
       control/metric lifts deferred to follow-on cards).
 
-cra: []
+cra:
+  # Inbound entry backlinks playbook.supply_chain_security@v1:
+  #   - content/mappings/cra/article-13-4-component-due-diligence-contracts.yaml
+  #     (id cra:art-13-4-component-due-diligence-contracts —
+  #     component due-diligence, supplier-attestation channel:
+  #     contract-time obligation set per direct supplier, including
+  #     security-control commitments, attestation cadences,
+  #     sub-processor disclosure, breach-notification windows, and
+  #     audit/termination rights).
+  # This outbound entry is the structural closure of that
+  # backlink. The two contributing streams the
+  # supply_chain_security playbook composes are already pinned on
+  # sibling CRA surfaces: the contract-time obligation-evidence
+  # stream operated by playbook.contractual_obligations_tracker@v1
+  # lands on cra:art-13-4-component-due-diligence-contracts, and
+  # the runtime supply-chain evidence stream operated by
+  # playbook.threat_intel_ingest@v1 is composed in via the
+  # orchestration spine this entry pins. With this entry all four
+  # regulatory mapping trees (nis2/dora/cra/gdpr) reach the
+  # supply_chain_security playbook with both inbound backlink and
+  # outbound pin closed; OSCAL, D3FEND, and OCSF closures remain
+  # delegated to their own EXTEND-mappings sibling cards.
+  - mapping_id: cra:art-13-4-component-due-diligence-contracts
+    article: 13(4)
+    notes: >-
+      CRA Art. 13(4) requires manufacturers to exercise due diligence
+      when integrating third-party components so they do not
+      compromise the cybersecurity of the product with digital
+      elements, operationalised on the inbound entry as the
+      contract-time obligation channel that captures, per direct
+      supplier, the per-clause obligations the manufacturer has
+      accepted in writing plus the per-obligation review schedule
+      that keeps the due-diligence record live across the product
+      lifecycle. The supply_chain_security playbook is the
+      operator-side composition surface that joins the two
+      contributing streams the Article's due-diligence requirement
+      implies: the runtime F-CP-03 supply-chain evidence stream
+      (per-execution external provider dependencies, operated by
+      playbook.threat_intel_ingest@v1) and the contract-time F-WF-10
+      contractual-obligations stream (per-supplier accepted
+      obligations and per-clause review cadence, operated by
+      playbook.contractual_obligations_tracker@v1). The inbound
+      entry's playbook_refs lists both
+      playbook.contractual_obligations_tracker@v1 and
+      playbook.supply_chain_security@v1; this outbound entry closes
+      the graph by pinning the orchestration playbook against the
+      Article so the per-supplier due-diligence record the Article
+      requires has an explicit owning workflow. Convention follows
+      the NIS2 Art. 21(2)(d) and DORA Art. 28 entries on this same
+      overlay (inbound backlink + outbound pin, additional
+      control/metric lifts deferred to follow-on cards).
