@@ -24,19 +24,6 @@ skip:
       surfaces indirectly via the `metric_refs:` on each clause's
       mapping rather than via `playbook_refs:`, which is the audited
       convention for reporting playbooks across every framework.
-  - slug: incident_management
-    rationale: >-
-      Regulator-notification engine — also referenced from the NIS2
-      Art. 23 mapping tree. The DORA Art. 19 / Art. 28 narrative in
-      `content/mappings/dora/article-19-and-28.yaml` and
-      `content/mappings/dora/article-19-report-variant.md` already
-      documents the wiring; the per-clause `article-19-and-28.yaml`
-      `playbook_refs:` list currently cites the upstream incident-type
-      playbooks (`ransomware_containment`, `data_exfil`,
-      `identity_compromise`, `post_incident_review`) that feed the
-      engine. Direct `playbook.incident_management@v1` citation is
-      tracked as a per-clause content follow-up to the dora mapping
-      tree, not deferred indefinitely.
   - slug: phishing_triage
     rationale: >-
       Sub-threshold for DORA major-incident classification per
