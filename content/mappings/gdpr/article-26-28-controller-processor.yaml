@@ -1,0 +1,248 @@
+# GDPR — controller-processor cluster (Art. 26 + Art. 28).
+#
+# F-MAP-GDPR CORE-4: fourth per-clause GDPR mapping YAML after the
+# CORE-1 breach-notification cluster (Art. 33 / Art. 34), the CORE-2
+# security-of-processing cluster (Art. 32), and the CORE-3 data-
+# protection-principles cluster (Art. 5(1)(b)/(c)/(e)). Retires the
+# matching one SKELETON skip entry (contractual_obligations_tracker)
+# so the gdpr orphan-CI assertion re-arms against this cluster's slug.
+#
+# Scope of this file:
+#
+#   - gdpr:art-28-processor-contractual-obligations — processing by a
+#     processor governed by a contract or other legal act that binds
+#     the processor to the controller and sets out the subject matter
+#     and duration of the processing, the nature and purpose of the
+#     processing, the type of personal data and categories of data
+#     subjects, and the obligations and rights of the controller.
+#     contractual_obligations_tracker is the agentic anchor whose
+#     data-flow doc (§2 Lawful basis, §4 Recipients) explicitly
+#     carries the Art. 28 processor surface: per-execution
+#     materialisation of the per-supplier obligation set the
+#     operator has accepted (security-control commitments,
+#     attestation cadence, sub-processor disclosure,
+#     breach-notification windows, audit-right windows), emitted as
+#     a durable per-contract evidence artifact on the F-WF-10
+#     contractual-obligations evidence stream.
+#
+#   - gdpr:art-26-joint-controllers-arrangements — where two or more
+#     controllers jointly determine the purposes and means of
+#     processing, they shall in a transparent manner determine their
+#     respective responsibilities for compliance with the obligations
+#     under this Regulation by means of an arrangement between them.
+#     contractual_obligations_tracker is the agentic anchor whose
+#     data-flow doc (§1 Purpose, §2 Lawful basis) carries the Art. 26
+#     joint-controller surface explicitly: where a supplier-contract
+#     contracting party is itself a joint-controller (a co-operating
+#     processor under a shared-determination arrangement rather than
+#     a pure Art. 28 processor), the workflow inventories the
+#     respective-responsibilities clauses on the same contract
+#     record alongside the Art. 28 processor obligation set, on the
+#     same per-execution obligation-evidence artifact.
+#
+# Out of scope of this file (carved into later CORE slices):
+#
+#   - Art. 28(3)(a-h) per-letter sub-obligation enumeration as
+#     standalone clause-level entries. This file pins the Art. 28
+#     surface as the contractual-obligation engine; the per-letter
+#     sub-obligation list (documented instructions, confidentiality
+#     commitments, security measures, sub-processor consent,
+#     assistance with data-subject rights, assistance with Art. 32-36
+#     obligations, deletion-or-return at end of processing, and
+#     audit-right windows) is materialised by the obligation set the
+#     workflow extracts from the contract record at execution time,
+#     not by a static per-letter YAML.
+#
+#   - Art. 26(2) information made available to the data subject
+#     (joint-controller arrangement essence). The Art. 26(2)
+#     transparency surface is governed under the operator's Art. 13
+#     / Art. 14 information-provision pathway rather than under the
+#     contract-time obligation engine, and is deferred to the
+#     CORE transparency slice (paired with Art. 6 lawful-basis) when
+#     a finalised playbook explicitly carries the Art. 13 / Art. 14
+#     transparency surface as its agentic anchor.
+#
+#   - Art. 28(10) processor-becomes-controller exception (a processor
+#     that, in infringement of the Regulation, determines the
+#     purposes and means of processing is considered to be a
+#     controller in respect of that processing). The exception is
+#     evidentiary against the per-contract obligation record this
+#     workflow emits rather than a separate workflow anchor; the
+#     remediation pathway is governed under Art. 24 controller
+#     accountability and is authored alongside the Art. 24 entry in
+#     a later CORE slice.
+#
+#   - Art. 25 data protection by design and by default. The Art. 25
+#     entries are authored under a dedicated CORE by-design slice
+#     paired with Art. 32(1)(a)/(c) per the F-MAP-GDPR roadmap, not
+#     stretched into this controller-processor file.
+#
+#   - The remaining four SKELETON skip slugs (executive_metrics,
+#     on_call_rotation, phishing_triage, post_incident_review) —
+#     executive_metrics surfaces indirectly via metric_refs across
+#     other clauses (audited convention for reporting playbooks);
+#     on_call_rotation, phishing_triage, and post_incident_review
+#     are Art. 32 / Art. 33 anchors carved into a later CORE slice
+#     against the operational-readiness and post-incident-evidence
+#     surfaces respectively. This file retires only the
+#     contractual_obligations_tracker slug in `_orphan_skip.yaml`.
+#
+# Cross-references:
+#
+#   - CRA parallel: content/mappings/cra/article-13-4-component-due-
+#     diligence-contracts.yaml pins contractual_obligations_tracker
+#     under the CRA Art. 13(4) component due-diligence surface
+#     (manufacturer's contract-time discipline against direct
+#     suppliers). The CRA Art. 13(4) supplier-attestation channel
+#     and the GDPR Art. 28 processor-contract channel run on the
+#     same per-execution obligation-evidence artifact; the two
+#     regimes file separate evidentiary requirements against the
+#     same workflow output.
+#
+#   - NIS2 parallel: content/mappings/nis2/article-21-2-d.yaml pins
+#     contractual_obligations_tracker under the NIS2 Art. 21(2)(d)
+#     supply-chain-security measure (contract-time half, alongside
+#     the execution-time supply_chain_security anchor). The NIS2
+#     supply-chain obligation discharges against the same contract-
+#     time obligation engine this clause anchors.
+#
+#   - DORA parallel: content/mappings/dora/ entries under Art. 28
+#     (ICT third-party risk register) and Art. 30 (contractual
+#     minimum-clause set) carry contractual_obligations_tracker
+#     for financial entities. The DORA Art. 28 third-party register
+#     and Art. 30 minimum-clause set are deferred behind their own
+#     inbound-closure cards per the playbook's outbound overlay.
+
+regime: gdpr
+entries:
+  - id: gdpr:art-28-processor-contractual-obligations
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "28"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Where processing is to be carried out on behalf of a
+      controller, the controller shall use only processors providing
+      sufficient guarantees to implement appropriate technical and
+      organisational measures so that the processing meets the
+      requirements of this Regulation and ensures the protection of
+      the rights of the data subject. Processing by a processor shall
+      be governed by a contract or other legal act under Union or
+      Member State law that binds the processor to the controller
+      and sets out the subject matter and duration of the processing,
+      the nature and purpose of the processing, the type of personal
+      data and categories of data subjects, and the obligations and
+      rights of the controller — including documented-instructions,
+      confidentiality, security, sub-processor, data-subject-rights
+      assistance, deletion-or-return, and audit-right obligations.
+    status: draft
+    control_refs:
+      - control.supplier_inventory@v1
+      - control.provider_attestation@v1
+    playbook_refs:
+      - playbook.contractual_obligations_tracker@v1
+    metric_refs:
+      - kri.suppliers_attestation_stale@v1
+    evidence_stream_refs:
+      - contractual-obligations
+    notes: >-
+      contractual_obligations_tracker is the agentic anchor for the
+      Art. 28 processor-contractual-obligations limb. The workflow
+      ingests one supplier-contract record per execution, extracts
+      the per-clause obligation set the operator has accepted
+      (security-control commitments, audit-right windows,
+      attestation cadence, sub-processor disclosure cadence,
+      breach-notification windows), derives the per-obligation
+      next-review-due schedule deterministically from the
+      contractual cadence and the operator's review policy, and
+      emits one obligation-evidence artifact against
+      `schemas/evidence/contractual-obligations.schema.json` feeding
+      the F-WF-10 contractual-obligations evidence stream. The
+      data-flow doc names the Art. 28 surface at §2 Lawful basis
+      (primary basis: Art. 6(1)(c) under NIS2 Art. 21(2)(d)
+      transposition; the contracting party is typically a legal
+      entity outside GDPR scope, with the worst-case scoring against
+      sole-trader or named-signatory cases) and at §4 Recipients
+      (the supplier-contract document store and the obligation-
+      evidence store are operator-bound processors under their own
+      Art. 28 Data Processing Agreements before the bindings are
+      wired in production). The per-letter Art. 28(3) sub-obligation
+      list (documented instructions, confidentiality, security,
+      sub-processor consent, data-subject-rights assistance,
+      Art. 32-36 assistance, deletion-or-return, audit rights) is
+      materialised by the obligation set the workflow extracts from
+      each contract record at execution time and emitted on the same
+      per-contract artifact rather than enumerated as separate
+      per-letter clauses in this YAML — the artifact's structure is
+      the per-letter evidence, the clause records the agentic
+      anchor and the bounded pipeline. The
+      kri.suppliers_attestation_stale@v1 KRI joins against the
+      contractual-obligations evidence stream to surface overdue
+      per-clause reviews; the appropriateness determination of the
+      processor under Art. 28(1) ("sufficient guarantees") is
+      operator-side, discharged under the operator's Art. 24
+      controller accountability surface rather than by this YAML.
+
+  - id: gdpr:art-26-joint-controllers-arrangements
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "26"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Where two or more controllers jointly determine the purposes
+      and means of processing, they shall be joint controllers.
+      They shall in a transparent manner determine their respective
+      responsibilities for compliance with the obligations under
+      this Regulation, in particular as regards the exercising of
+      the rights of the data subject and their respective duties
+      to provide the information referred to in Articles 13 and 14,
+      by means of an arrangement between them; the essence of the
+      arrangement shall be made available to the data subject.
+    status: draft
+    control_refs:
+      - control.supplier_inventory@v1
+      - control.provider_attestation@v1
+    playbook_refs:
+      - playbook.contractual_obligations_tracker@v1
+    evidence_stream_refs:
+      - contractual-obligations
+    notes: >-
+      contractual_obligations_tracker is the agentic anchor for the
+      Art. 26 joint-controller-arrangement limb where a
+      supplier-contract contracting party is itself a joint
+      controller (a co-operating processor under a shared-
+      determination arrangement rather than a pure Art. 28
+      processor). The data-flow doc carries the Art. 26 surface at
+      §1 Purpose (per-clause obligation set inventories supplier
+      security-control commitments, audit-right windows, and
+      sub-processor disclosure — the latter two are the
+      respective-responsibilities surface for joint-controller
+      arrangements) and at §2 Lawful basis (the contracting-party
+      modelling is bounded by the contract record's contracting-
+      party shape; where the party is itself a joint controller
+      under an Art. 26 arrangement, the per-clause obligation set
+      the workflow extracts pins the respective-responsibility
+      clauses on the same record as the Art. 28 processor
+      obligation set). The per-execution obligation-evidence
+      artifact emitted to the F-WF-10 contractual-obligations
+      stream therefore carries the Art. 26 respective-
+      responsibilities surface and the Art. 28 processor-obligation
+      surface on the same record; the audit-right window and the
+      sub-processor disclosure cadence are the durable per-clause
+      attestation surface a joint controller is obliged to evidence
+      under Art. 26(1). The Art. 26(2) data-subject information
+      requirement (essence of the arrangement made available to
+      the data subject) is governed under the operator's Art. 13
+      / Art. 14 information-provision pathway rather than under
+      this contract-time obligation engine, and is carved to a
+      later CORE transparency slice. The joint-controller
+      determination itself — whether a given contracting party
+      meets the Art. 26(1) joint-determination test — is operator-
+      side under the operator's Art. 24 accountability surface;
+      the clause records the agentic anchor and the per-contract
+      respective-responsibilities surface, the operator's
+      arrangement holds the joint-determination call.
