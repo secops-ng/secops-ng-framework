@@ -189,3 +189,35 @@ identified or identifiable from the workflow's payload.
 If a future operator extension binds subject-identifiable
 attributes to the lifecycle, this section must describe how the
 extended workflow accommodates each engaged right.
+
+## 8. Outbound personal-data transfer
+
+**Out of scope: no personal data processed in this workflow.**
+Chapter V outbound legs (Art. 44–49) are not engaged because the
+workflow has no personal-data payload to transmit. This is
+consistent with the §3 / §4 / §6 scoring: the four-state
+lifecycle (`propose → review → ship → measure`) operates on
+detection-content artifacts (rule-version envelopes, review
+verdicts, production-status flags, effectiveness snapshots)
+keyed on opaque content identifiers (`__rule_version_id__`,
+`__effectiveness_snapshot_id__`), not on natural-person
+identifiers.
+
+The downstream content destinations — the operator's detection
+store on `ship`, the operator's metric sink on `measure`, and
+any peer detection-rule sharing community the operator
+participates in — receive content artifacts, not personal data.
+The operator's sovereignty review of those destinations is
+recorded against the operator's own bindings in its ROPA; this
+workflow does not introduce a Chapter V outbound leg.
+
+If a future operator extension attaches a personal-data attribute
+to any of the persisted records (proposer email, reviewer
+identity, requestor's organisation), this section MUST be
+re-scored — each outbound leg (downstream content pipelines,
+peer detection-rule sharing community, operator-bound detection
+store and metric sink) enumerated separately against destination
+class, transfer mechanism (no transfer / adequacy / SCCs /
+derogation), EU-residency posture per Directive 1, and data
+minimisation on egress per Art. 5(1)(c) — and §6 updated to
+match.
