@@ -404,3 +404,150 @@ remains scored **no transfer**.
   re-score this section, surface the Art. 22 applicability, and
   document the safeguards (right to obtain human intervention,
   right to contest the decision) the operator provides.
+
+## 8. Outbound personal-data transfer
+
+The workflow has three classes of outbound leg that carry personal
+data outside the operator's incident-case store. Each is scored
+below against GDPR Chapter V (Art. 44–49); the EU-residency posture
+is sovereignty-first by default per Directive 1, and the operator's
+compile-time bindings are the knobs that can break the scoring.
+
+**Leg A — NIS2 Article 23 regulator pre-notification (staged for
+human sign-off, not transmitted by the workflow).**
+
+- *Destination class.* The operator's competent authority under
+  NIS2 — a national CSIRT or sectoral regulator — and, where the
+  operator is in scope, the parallel destination under DORA
+  Article 19 (financial-sector competent authority). The framework
+  ships no default endpoint; the destination is operator-supplied
+  through playbook variables and the eventual transmission is
+  performed by the human comms officer along the operator's
+  existing regulatory channel, not by the workflow itself.
+- *Transfer mechanism.* **No transfer.** EU competent authorities
+  under NIS2 Art. 12 and DORA Art. 46 are EU/EEA-resident by
+  construction; the workflow's outbound leg is the drafted
+  pre-notification staged into the operator's comms-plan
+  artifact, and the eventual transmission to the regulator is
+  EU-internal. The technical control that holds this is that the
+  regulator endpoint is operator-supplied through compile-time
+  variables and sovereignty review at compile time refuses any
+  non-EU endpoint.
+- *EU-residency posture.* Default is EU-resident regulator
+  destinations only. A non-EU binding (a third-country sectoral
+  regulator notified because the ransomware impact touches that
+  jurisdiction's subjects) MUST be re-scored under Art. 46 SCCs
+  with operator-held encryption keys on the submission envelope,
+  or under Art. 49(1)(d) "important reasons of public interest"
+  derogation where the cross-border notification is mandated by a
+  statute the operator is bound by.
+- *Data minimisation on egress.* The drafted pre-notification
+  carries the affected-host identifier (`__affected_host__`), the
+  affected-identity identifier (`__affected_identity__`), the
+  detection summary, the containment-action references (EDR
+  isolate or network-ACL deny, identity revocation,
+  backup-verification verdict), and the operator's nominated
+  contact. Per-subject behavioural detail and the full
+  process / file / network activity records observed on the
+  affected host are NOT included in the draft submission;
+  aggregate references to the OCSF activity records are the
+  regulator-template shape, with the full records resident on the
+  operator's telemetry store (Leg C).
+
+**Leg B — Operator-bound containment processor egress (EDR vendor /
+network control plane, identity provider, backup catalogue, case
+management, paging).**
+
+- *Destination class.* Operator-bound processors under GDPR
+  Art. 28 — the EDR vendor (or self-hosted EDR control plane)
+  owning the host-isolation action, the network control plane
+  (firewall, switchport controller, SDN policy engine) executing
+  the network-ACL deny fallback, the identity provider (Azure AD /
+  Entra ID, Okta, Google Workspace, AWS IAM Identity Center, or
+  equivalent) owning the account-disable, session-revocation,
+  refresh-token-invalidation, and Kerberos-TGT-invalidation
+  actions, the backup catalogue and snapshot store queried for the
+  snapshot identifier and integrity hash, the case-management /
+  ticketing system carrying the parent incident case, and the
+  paging / communications system used to deliver the staged
+  regulator pre-notification draft to the comms officer for
+  sign-off.
+- *Transfer mechanism.* **No transfer** under the default
+  EU-pinned binding: the reference compile targets are
+  framework-agnostic and run on the operator's own sovereign-
+  hosted runtime, and the framework ships no SecOps-NG-hosted
+  containment service. If the operator binds a non-EU EDR vendor
+  cloud (a US-hosted EDR control plane, a non-EU-region tenant of
+  an EU-hosted vendor), a non-EU IdP tenant, a non-EU-hosted
+  backup service, a non-EU case-management or paging vendor, the
+  binding MUST be re-scored under Art. 46 SCCs (EU-US Data Privacy
+  Framework where the provider is a certified US recipient,
+  otherwise standard contractual clauses) with supplementary
+  measures (encryption-at-rest with operator-held keys,
+  pseudonymisation of host or principal identifiers before egress,
+  header stripping on the OCSF projection) before the binding
+  goes live. The EDR vendor binding is the most common third-
+  country dependency in this workflow and the most likely
+  re-score trigger.
+- *EU-residency posture.* Default is EU-region processor tenant
+  on every operator-bound endpoint above. The compile-time
+  sovereignty review is the gate; the operator's DPA inventory
+  under GDPR Art. 28 is the durable record of the binding the
+  scoring depends on.
+- *Data minimisation on egress.* The payload to each processor is
+  scoped to what the containment action requires — host
+  identifier to the EDR control plane or network surface for
+  isolation, principal identifier and session / refresh-token /
+  Kerberos-TGT references to the IdP for revocation, snapshot
+  identifier and catalogue pointer to the backup catalogue for
+  verification, parent incident-case identifier and the
+  containment-evidence references to the case-management system,
+  and the IR-lead / comms-officer identifiers to the paging
+  system. Token plaintext and credential material are processed
+  transiently for the revocation step and are NOT persisted past
+  the per-call span (§3 / §5); the durable artefacts are
+  inventories, counts, and catalogue references.
+
+**Leg C — Telemetry / SIEM egress (OCSF activity records, metrics
+layer).**
+
+- *Destination class.* Operator-bound telemetry / SIEM processor
+  under GDPR Art. 28 — the telemetry store receiving the OCSF
+  Process Activity (1007), File Activity (1001), Network Activity
+  (4001), Authentication (3002), and Security Finding (2001)
+  records emitted across triage, containment, revocation, and
+  verification, and the metrics layer consuming
+  `kpi.mttd_ransomware@v1`, `kpi.mttr_containment@v1`,
+  `kpi.backup_integrity_pass_rate@v1`,
+  `kpi.notification_sla_compliance@v1`,
+  `kpi.timeline_completeness@v1`, and
+  `kri.regulator_notification_overrun@v1`.
+- *Transfer mechanism.* **No transfer** under the default
+  EU-region binding. A non-EU telemetry / SIEM processor (a
+  US-region SIEM SaaS tenant) MUST be re-scored under Art. 46
+  SCCs with supplementary measures (header stripping on the OCSF
+  projection so the projection carries the activity record
+  without subject identifiers, operator-held encryption keys on
+  the egress envelope) before the binding goes live. A non-EU
+  threat-intelligence enrichment endpoint bound into the triage
+  step (the playbook as shipped does not bind one, but a common
+  operator extension does) is a separate re-score gate on the
+  same Chapter V instruments.
+- *EU-residency posture.* Default is EU-region telemetry / SIEM
+  tenant and EU-region metrics processor; compile-time
+  sovereignty review is the gate.
+- *Data minimisation on egress.* The OCSF activity records carry
+  the host, identity, network, process, and file activity
+  observed on the affected host during the event window — the
+  records are projected as observed for the containment record
+  rather than extracted into separate per-subject profiles (§3).
+  The metrics layer recipient is the aggregated counter, not the
+  per-host or per-identity record — counts and rates rather than
+  the OCSF events themselves.
+
+The §6 cross-border scoring as a whole is **no transfer** for the
+default EU-pinned binding — consistent with all three legs above
+scoring no-transfer. Any operator re-scoring of a leg here MUST be
+reflected in §6 in the same change so the two sections do not
+disagree; the non-EU EDR vendor binding under Leg B is the
+re-score gate this workflow is most likely to hit.
