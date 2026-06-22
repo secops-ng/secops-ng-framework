@@ -94,24 +94,42 @@
 # card. The CRA closure footer at file foot restates the pointer
 # below the existing nis2 / dora regime blocks.
 #
-# DORA closure: DORA Art. 9 (protection and prevention) and DORA
-# Art. 6 (ICT risk-management framework, Regulation (EU) 2022/2554)
-# both name disciplines a continuous-posture-evidence stream
-# operationally supports for financial entities — Art. 9's
-# resilience and security of ICT systems requirement and Art. 6's
-# overarching governance surface. Neither is currently expressed as
-# a clause-anchor backlink to playbook.infra_posture_management@v1
-# in content/mappings/dora/; the existing DORA inbound files
-# (article-6.yaml, article-9-and-rts-vuln-mgmt.yaml, etc.) do not
-# list this playbook in their playbook_refs today. This overlay does
-# NOT silently widen scope to pin an outbound DORA entry against a
-# missing inbound; a separate inbound-closure card adds the
-# Art. 9 / Art. 6 playbook_refs entry and the outbound pin lands
-# together with the inbound entry. This mirrors the
-# on_call_rotation DORA Art. 6 gap-note precedent and the
-# detection_engineering DORA closure precedent: gap notes are
-# separate closure cards, not scope creep on a single-purpose
-# mappings PR.
+# DORA closure: DORA Art. 9 (protection and prevention) names the
+# discipline a continuous-posture-evidence stream operationally
+# supports for financial entities — resilience and security of ICT
+# systems, with the JC RTS on ICT risk management framework
+# (Commission Delegated Regulation (EU) 2024/1774) Article 10
+# operationalising the configuration-baseline / vulnerability-and-
+# patch-management surface as the Level 2 detail. The inbound
+# backlink for this playbook is closed at
+# content/mappings/dora/article-9-and-rts-vuln-mgmt.yaml
+# (id `dora:art-9-vuln-mgmt`): the entry's playbook_refs lists
+# `playbook.infra_posture_management@v1` alongside the existing
+# `playbook.vuln_intake@v1`, `playbook.cloud_misconfiguration@v1`,
+# and `playbook.codebase_vuln_management@v1`, and lifts
+# `kri.control_effectiveness@v1` onto its metric_refs as the
+# residual ineffective-attestation count complement of the
+# cloud-posture-coverage KPI already declared there. The
+# per-execution posture-evidence artifact this playbook emits is
+# the audit-evident discharge of the configuration-baseline half
+# of Art. 9(4)(a) — partially_effective / ineffective deviations
+# re-enter the operator's risk register and feed the same
+# vulnerability-and-patch-management surface the inbound entry
+# anchors via the F-CP-06 effectiveness loop. DORA Art. 6 (ICT
+# risk-management framework governance surface) remains
+# unanchored as a clause-level backlink to this playbook: Art. 6
+# is the F-GO-* governance layer's responsibility, not this
+# playbook's per-execution attestation discipline. No outbound
+# DORA pin block is emitted on this overlay because the
+# playbook-mappings schema's top-level regime key for DORA is
+# present but the convention across the codebase is that outbound
+# DORA pins land together with their inbound entries; the
+# Art. 9(4)(a) backlink is the only inbound DORA anchor for this
+# playbook today, and a corresponding outbound entry pinned to
+# `dora:art-9-vuln-mgmt` lands in the playbook-side dora block
+# below. This mirrors the cloud_misconfiguration and
+# codebase_vuln_management DORA closure patterns (inbound on
+# `dora:art-9-vuln-mgmt`, outbound to the same id).
 #
 # GDPR closure: the inbound GDPR data-flow record at
 # content/mappings/gdpr/data-flow-infra_posture_management.md is the
@@ -428,24 +446,41 @@ nis2:
       structural closure of that backlink.
 
 dora:
-  # No inbound DORA file currently backlinks
-  # playbook.infra_posture_management@v1. DORA Art. 9 (protection and
-  # prevention — resilience and security of ICT systems) and DORA
-  # Art. 6 (ICT risk-management framework, Regulation (EU)
-  # 2022/2554) both name disciplines a continuous-posture-evidence
-  # stream operationally supports for financial entities, but the
-  # existing DORA inbound files in content/mappings/dora/ do not
-  # list this playbook in their playbook_refs today. No outbound
-  # DORA entry is emitted on this overlay; see the file-header DORA
-  # closure note. A separate inbound-closure card would add a DORA
-  # anchor (e.g. dora:art-9-protection or dora:art-6-governance) to
-  # playbook.infra_posture_management@v1 if and when the inbound
-  # side is populated, and the outbound pin would land together
-  # with the inbound entry. This mirrors the on_call_rotation
-  # DORA Art. 6 gap-note pattern and the detection_engineering DORA
-  # closure precedent: gap notes are separate closure cards, not
-  # scope creep on a single-purpose mappings PR.
-  []
+  # Inbound entries live at content/mappings/dora/article-9-and-rts-vuln-mgmt.yaml
+  # (id dora:art-9-vuln-mgmt — protection and prevention, including
+  # secure-configuration baselines under the JC RTS on ICT risk
+  # management framework, Commission Delegated Regulation (EU)
+  # 2024/1774), backlinking to playbook.infra_posture_management@v1.
+  - mapping_id: dora:art-9-vuln-mgmt
+    article: "9(4)(a)"
+    notes: >-
+      DORA Art. 9(4)(a), operationalised by the JC RTS on ICT risk
+      management framework (Commission Delegated Regulation (EU)
+      2024/1774) Article 10, requires documented vulnerability and
+      patch management procedures covering identification, risk-
+      based prioritisation, and tracking of remediation to closure.
+      The infra_posture_management playbook discharges the
+      configuration-baseline attestation slice of that obligation:
+      on each scheduled re-execution, collect the current
+      posture-state snapshot of the in-scope infrastructure,
+      evaluate each declared control against the operator's declared
+      baseline, and emit one posture-evidence artifact shaped per
+      schemas/evidence/posture.schema.json (stream `posture`) with
+      attestation state classified per (control_ref,
+      scoped-resource-id) pair. The partially_effective /
+      ineffective deviation set is the per-execution input that
+      re-enters the operator's risk register and feeds the same
+      vulnerability-and-patch-management surface this entry anchors
+      via the F-CP-06 effectiveness loop —
+      `kri.control_effectiveness@v1` (lifted onto the inbound entry's
+      metric_refs alongside the pre-existing
+      `kpi.cloud_posture_coverage@v1`) is the residual
+      ineffective-attestation count this stream emits. This pairs
+      with the cloud_misconfiguration outbound on the same
+      `dora:art-9-vuln-mgmt` anchor (which carries the
+      remediation half of the cloud-baseline-deviation surface);
+      this playbook is the observational-attestation half on the
+      same anchor.
 
 # CRA closure (footer pointer): the inbound CRA backlink for this
 # playbook is closed at
