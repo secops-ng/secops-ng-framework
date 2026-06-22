@@ -1,0 +1,264 @@
+# GDPR — data-protection principles cluster (Art. 5(1)(b)/(c)/(e)).
+#
+# F-MAP-GDPR CORE-3: third per-clause GDPR mapping YAML after the
+# CORE-1 breach-notification cluster (Art. 33 / Art. 34) and CORE-2
+# security-of-processing cluster (Art. 32). Retires the matching three
+# SKELETON skip entries (onboarding_offboarding_tracker,
+# supply_chain_security, threat_intel_ingest) so the gdpr orphan-CI
+# assertion re-arms against this cluster's slugs.
+#
+# Scope of this file:
+#
+#   - gdpr:art-5-1-b-purpose-limitation — personal data collected for
+#     specified, explicit, and legitimate purposes and not further
+#     processed in a manner incompatible with those purposes.
+#     supply_chain_security is the agentic anchor whose data-flow
+#     doc carries Art. 5(1)(b) by literal cite at the §1 Purpose
+#     section: the workflow processes one inbound supply-chain signal
+#     per execution against the operator's NIS2 Art. 21(2)(d)
+#     supplier-security obligation, and the persisted artifacts (the
+#     supply-chain-evidence record and the assessment record) are
+#     bounded to that supplier-security purpose by construction.
+#
+#   - gdpr:art-5-1-c-data-minimisation — personal data adequate,
+#     relevant, and limited to what is necessary in relation to the
+#     purposes for which they are processed. threat_intel_ingest and
+#     onboarding_offboarding_tracker are the agentic anchors:
+#     threat_intel_ingest's normalisation step retains only the
+#     STIX indicator value, type, confidence, valid-from / valid-
+#     until window, and upstream created_by_ref, and explicitly does
+#     not extract or persist Art. 9 attributes the upstream bundle
+#     may incidentally carry; onboarding_offboarding_tracker
+#     resolves role-shaped runtime principals only (service-account
+#     name, workflow-runtime principal id, automation role),
+#     rejects personal-user principals at the F-CP-07 primitive
+#     boundary, and persists the closed `verb.resource` capability
+#     list rather than credential plaintext or factor secret.
+#
+#   - gdpr:art-5-1-e-storage-limitation — personal data kept in a
+#     form which permits identification of data subjects for no
+#     longer than necessary for the purposes for which they are
+#     processed. supply_chain_security and onboarding_offboarding_
+#     tracker are the agentic anchors: the supply_chain_security
+#     data-flow doc carries Art. 5(1)(e) by literal cite at the §5
+#     Retention section against the operator-supplied retention
+#     policy that governs every artifact on the F-CP-03 supply-chain
+#     evidence stream; onboarding_offboarding_tracker is stateless
+#     across runs and inherits the operator's audit-window TTL on
+#     the access-evidence store (F-CP-07) and the telemetry store,
+#     with no separate workflow-side retention horizon introduced.
+#
+# Out of scope of this file (carved into later CORE slices,
+# mirroring the CORE-2 carve-out):
+#
+#   - Art. 5(1)(a) lawfulness, fairness, and transparency. The
+#     lawful-basis surface is already carried per-workflow in each
+#     `data-flow-<slug>.md` §2 and is governed under Art. 6 /
+#     Art. 9 rather than Art. 5(1)(a) as a principle-level axis.
+#     A dedicated Art. 5(1)(a) entry, if authored, belongs alongside
+#     an Art. 6 lawful-basis entry in a later CORE slice.
+#
+#   - Art. 5(1)(d) accuracy. No shipped data-flow doc carries
+#     accuracy as its agentic surface; the principle is operator-
+#     side rather than workflow-side for the current cookbook.
+#
+#   - Art. 5(1)(f) integrity and confidentiality of processing as a
+#     principle-level axis. The principle anchors the same
+#     operational surface as Art. 32 but is governed under Art. 5 /
+#     Art. 24 controller accountability rather than under Art. 32
+#     measures; the Art. 5(1)(f) entry is authored under a sibling
+#     per-clause YAML in a later CORE slice rather than stretched
+#     into this principles file.
+#
+#   - Art. 5(2) accountability. Authored alongside Art. 24
+#     controller accountability in a later CORE slice.
+#
+#   - Art. 25 data protection by design and by default. Several
+#     SKELETON skip rationales (codebase_vuln_management,
+#     infra_posture_management, vuln_intake) name Art. 25 as a
+#     secondary axis; the Art. 25 entries are authored under a
+#     dedicated CORE by-design slice.
+#
+#   - The remaining five SKELETON skip slugs (contractual_obligations_
+#     tracker, executive_metrics, on_call_rotation, phishing_triage,
+#     post_incident_review) — each is a separate CORE follow-on
+#     card; this file retires only the three principles-cluster
+#     slugs in `_orphan_skip.yaml`. vuln_intake is already retired
+#     by CORE-2 against Art. 32(1)(b); its Art. 5(1)(c) reporter-
+#     contact minimisation surface is documented in the §5 Retention
+#     and §7 Erasure sections but is not pinned again here to keep
+#     this file scoped to the three slugs the CORE-3 slice retires.
+#
+# Cross-references:
+#
+#   - NIS2 parallel: content/mappings/nis2/article-21-2-d.yaml pins
+#     supply_chain_security under the NIS2 Art. 21(2)(d) supplier-
+#     security measure; content/mappings/nis2/article-21-2-i.yaml
+#     pins onboarding_offboarding_tracker under the NIS2 Art. 21(2)(i)
+#     access-control / asset-management / HR-security measure;
+#     content/mappings/nis2/article-21-2-b.yaml carries
+#     threat_intel_ingest under the NIS2 Art. 21(2)(b) incident-
+#     handling / threat-intel surface. The GDPR principle-level
+#     entries below file separate evidence requirements against the
+#     same underlying playbook set.
+#
+#   - DORA parallel: content/mappings/dora/ entries under Art. 28
+#     (ICT third-party risk) pin supply_chain_security for financial
+#     entities. Same multi-regime dependency.
+#
+#   - CRA parallel: Art. 14 incident reporting and Annex I §2(5)
+#     coordinated-vulnerability-disclosure surface in
+#     content/mappings/cra/article-14-and-annex-i.yaml carries
+#     vuln_intake; threat_intel_ingest is not pinned under CRA at
+#     this slice.
+
+regime: gdpr
+entries:
+  - id: gdpr:art-5-1-b-purpose-limitation
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "5(1)(b)"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Collect personal data for specified, explicit, and legitimate
+      purposes and do not further process it in a manner that is
+      incompatible with those purposes. The purpose must be fixed at
+      collection time and the downstream processing pipeline must
+      stay bounded by it; secondary uses that drift from the
+      collection purpose require their own lawful basis and a
+      compatibility assessment.
+    status: draft
+    playbook_refs:
+      - playbook.supply_chain_security@v1
+    evidence_stream_refs:
+      - supply-chain
+    notes: >-
+      supply_chain_security is the agentic anchor for the purpose-
+      limitation limb: the workflow processes one inbound supply-
+      chain signal per execution against the operator's
+      supplier-security obligation, and the persisted artifacts
+      (the assessment record and the supply-chain-evidence record
+      shaped against `schemas/evidence/supply-chain.schema.json`)
+      are bounded to that supplier-security purpose by construction.
+      The data-flow doc names Art. 5(1)(b) by literal cite at the
+      §1 Purpose blockquote; the operational surface that holds the
+      limb is the per-execution audit-trail entry the workflow
+      writes to the F-CP-03 supply-chain evidence stream, which is
+      readable only by the operator's supplier-security review
+      function. Where a signal incidentally carries a researcher
+      contact handle or a supplier-side analyst identifier, the
+      handle is retained only as long as the parent evidence
+      artifact and is not reused for any purpose outside that
+      supplier-security review (see the linked Art. 5(1)(e)
+      storage-limitation entry for the retention coupling). The
+      purpose-limitation determination itself — whether a proposed
+      downstream use of the artifact is compatible with the
+      collection purpose — is operator-side, discharged under the
+      operator's Art. 6 / Art. 24 accountability surface rather
+      than by this YAML; the clause records the agentic anchor and
+      the bounded pipeline, the operator's policy holds the
+      compatibility test.
+
+  - id: gdpr:art-5-1-c-data-minimisation
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "5(1)(c)"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Process personal data that is adequate, relevant, and limited
+      to what is necessary in relation to the purposes for which
+      they are processed. The processing pipeline must demonstrate
+      that no unnecessary attribute is collected, derived, or
+      retained against the purpose declared at §2 of each workflow's
+      data-flow record.
+    status: draft
+    playbook_refs:
+      - playbook.threat_intel_ingest@v1
+      - playbook.onboarding_offboarding_tracker@v1
+    metric_refs:
+      - kpi.coverage_threat_intel_feed@v1
+      - kri.joiner_to_provisioned_time@v1
+      - kri.leaver_to_revoked_time@v1
+    evidence_stream_refs:
+      - access
+    notes: >-
+      threat_intel_ingest and onboarding_offboarding_tracker form
+      the data-minimisation anchor pair. threat_intel_ingest's
+      normalisation step retains only the STIX 2.1 indicator value,
+      type, confidence, `valid_from` / `valid_until` window, and
+      upstream `created_by_ref`; WHOIS-style registrant fields are
+      not extracted, the raw upstream bundle is processed
+      transiently and not persisted past the normalisation step's
+      dedup horizon, and Art. 9 attributes the upstream feed may
+      incidentally carry (e.g. a leaked victim record with health
+      or trade-union identifiers) are explicitly not extracted or
+      persisted — the canonical normalised-indicator record carries
+      indicator-level metadata only. onboarding_offboarding_tracker
+      resolves role-shaped runtime principals only (service-account
+      name, workflow-runtime principal id, automation role) and
+      rejects personal-user principals at the F-CP-07 primitive
+      boundary by the regex pinned in
+      `schemas/evidence/access.schema.json`, which fails the step
+      loud rather than silently widening scope to natural persons;
+      the persisted access-evidence artifact carries the resolved-
+      identity reference, the closed `verb.resource` capability
+      list, and per-execution metadata, with no credential
+      material, factor secret, or token plaintext read or stored.
+      The minimisation determination is enforced by construction
+      at the normalisation step (threat_intel_ingest) and at the
+      F-CP-07 schema boundary (onboarding_offboarding_tracker)
+      rather than by this YAML; the clause records the agentic
+      anchors and the per-step minimisation surface.
+
+  - id: gdpr:art-5-1-e-storage-limitation
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "5(1)(e)"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Keep personal data in a form which permits identification of
+      data subjects for no longer than is necessary for the
+      purposes for which the personal data are processed. The
+      retention horizon must be declared per workflow and enforced
+      by a technical mechanism (TTL, evidence-pack expiry, or an
+      equivalent ageing step on the operator's durable store).
+    status: draft
+    playbook_refs:
+      - playbook.supply_chain_security@v1
+      - playbook.onboarding_offboarding_tracker@v1
+    evidence_stream_refs:
+      - supply-chain
+      - access
+    notes: >-
+      supply_chain_security and onboarding_offboarding_tracker are
+      the agentic anchors for the storage-limitation limb. The
+      supply_chain_security data-flow doc names Art. 5(1)(e) by
+      literal cite at the §5 Retention blockquote: the CACAO
+      artifact itself holds no personal data at rest; the per-
+      execution records (the assessment record and the supply-
+      chain-evidence artifact) are written to operator-bound stores
+      under the operator's existing retention policy for the F-CP-03
+      supply-chain evidence stream, and where an inbound signal
+      incidentally carries a researcher contact handle, the handle
+      is retained only as long as the parent evidence artifact and
+      is purged with it. onboarding_offboarding_tracker is
+      stateless across runs: the durable retention horizon is the
+      operator-owned access-evidence store (F-CP-07) and the
+      telemetry / OCSF store, with no copy of the lifecycle-event
+      record, the resolved principal, or the applied capability
+      delta retained by the workflow beyond the emission span; the
+      access-evidence artifact inherits the operator's audit-window
+      TTL required by the governing regulation (typically NIS2 /
+      DORA evidence-retention obligations), enforced by the store's
+      TTL or evidence-pack expiry. The SKELETON layer does not pin
+      a default retention period for either anchor — the period is
+      operator-supplied at compile time under the operator's Art. 6
+      / Art. 24 accountability surface; this clause records the
+      agentic anchors and the enforcement mechanism, not the
+      duration.
