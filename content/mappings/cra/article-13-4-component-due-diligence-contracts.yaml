@@ -39,6 +39,7 @@ entries:
       - control.provider_attestation@v1
     playbook_refs:
       - playbook.contractual_obligations_tracker@v1
+      - playbook.supply_chain_security@v1
     metric_refs:
       - kri.suppliers_attestation_stale@v1
     evidence_stream_refs:
@@ -54,7 +55,17 @@ entries:
       contract and emits the durable obligation-evidence artifact
       (stream `contractual-obligations`) that the
       kri.suppliers_attestation_stale@v1 metric joins against to
-      surface overdue per-clause reviews. The NIS2 parallel is
+      surface overdue per-clause reviews. `playbook.supply_chain_security@v1`
+      is the orchestration spine that joins this contract-time
+      obligation-evidence stream to the runtime F-CP-03 supply-chain
+      evidence stream operated by `playbook.threat_intel_ingest@v1`
+      (per-execution external provider dependencies, SBOM correlation,
+      supplier-attestation lookup); its assess-supplier-signal /
+      record-supplier-evidence step pair canonicalises a raw supplier
+      signal into the closed assessment block the Art.13(4)
+      due-diligence record consumes, so any drift the runtime stream
+      flags on a direct supplier re-enters the contract-time evidence
+      surface the Article anchors. The NIS2 parallel is
       `nis2:art-21-2-d` (supply-chain security, contract-time
       half); the DORA parallels are `dora:art-28-third-party-register`
       and `dora:art-30-contractual-clauses` (third-party register
