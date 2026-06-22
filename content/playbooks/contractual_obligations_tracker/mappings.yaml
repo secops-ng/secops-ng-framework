@@ -73,20 +73,13 @@
 # elements: service description, data-processing locations,
 # exit-strategy obligations, audit rights, termination rights).
 # The inbound entries at content/mappings/dora/article-19-and-28.yaml
-# carry both `dora:art-28-third-party-register` and
-# `dora:art-30-contractual-clauses` with `playbook_refs: []` today —
-# no playbook is currently pinned on either inbound side. This
-# overlay does NOT silently widen scope to pin an outbound DORA
-# entry against an empty-`playbook_refs` inbound; a separate
-# inbound-closure card adds this playbook to both
+# now carry `playbook.contractual_obligations_tracker@v1` on both
 # `dora:art-28-third-party-register.playbook_refs` and
-# `dora:art-30-contractual-clauses.playbook_refs`, and the outbound
-# pins land together with the inbound entries. This mirrors the
-# on_call_rotation DORA Art. 6 gap-note precedent, the
-# detection_engineering DORA closure precedent, and the
-# infra_posture_management DORA gap-note precedent: gap notes are
-# separate closure cards, not scope creep on a single-purpose
-# mappings PR.
+# `dora:art-30-contractual-clauses.playbook_refs`; the outbound pins
+# below close the graph in both directions. This mirrors the
+# codebase_vuln_management DORA closure precedent (PR #434): the
+# inbound playbook_refs and the outbound dora pins land together in
+# a single SKELETON-sized mapping PR.
 #
 # NIS2 Art. 22 closure: NIS2 Art. 22(1) places the coordinated
 # supply-chain risk-assessment action with the Cooperation Group
@@ -403,18 +396,56 @@ nis2:
 dora:
   # DORA Art. 28 (third-party register) and DORA Art. 30(2)
   # (contractual clauses) both name disciplines this playbook
-  # operationally supports for financial entities, but the inbound
-  # entries at content/mappings/dora/article-19-and-28.yaml carry
-  # `playbook_refs: []` on both `dora:art-28-third-party-register`
-  # and `dora:art-30-contractual-clauses` today — no playbook is
-  # currently pinned on either inbound side. This overlay does NOT
-  # silently widen scope to pin an outbound DORA entry against an
-  # empty-`playbook_refs` inbound; a separate inbound-closure card
-  # adds this playbook to both inbound `playbook_refs` and the
-  # outbound pins land together with the inbound entries. See the
-  # file-header DORA closure note. No outbound DORA entries are
-  # emitted on this overlay.
-  []
+  # operationally supports for financial entities. The inbound
+  # entries at content/mappings/dora/article-19-and-28.yaml now
+  # backlink playbook.contractual_obligations_tracker@v1 on both
+  # `dora:art-28-third-party-register.playbook_refs` and
+  # `dora:art-30-contractual-clauses.playbook_refs`; the outbound
+  # pins below close the graph in both directions. See the
+  # file-header DORA closure note.
+  - mapping_id: dora:art-28-third-party-register
+    article: "28"
+    notes: >-
+      DORA Art. 28 requires financial entities to maintain a
+      register of information in relation to all contractual
+      arrangements with ICT third-party service providers (function
+      supported, criticality assessment, sub-contracting chain,
+      data-location indicators). The contractual-obligations stream
+      operated by this playbook is the per-contract input surface
+      that closes the contractual-arrangements column of that
+      register: each emitted obligation-evidence artifact pins a
+      contract id, the supplier_ref, the effective/expires window,
+      the jurisdiction, and the extracted per-clause obligation set
+      against the supplier the register row covers. The artifact
+      stream is the durable per-execution record the operator's
+      register-assembly surface joins against to assert the
+      Art. 28 register has actually been exercised against this
+      supplier on this execution. Inbound backlink lives at
+      content/mappings/dora/article-19-and-28.yaml on
+      `dora:art-28-third-party-register.playbook_refs`.
+
+  - mapping_id: dora:art-30-contractual-clauses
+    article: "30(2)"
+    notes: >-
+      DORA Art. 30(2) requires that contractual arrangements with
+      ICT third-party service providers include a defined minimum
+      clause set (service description, data-processing locations,
+      exit-strategy obligations, audit rights, termination rights).
+      The extract-obligations step of this playbook walks the
+      ingested contract record and produces the per-clause
+      obligation set keyed by obligation_kind — the obligation_kind
+      taxonomy (security-control commitment, audit-right window,
+      attestation cadence, sub-processor disclosure,
+      breach-notification cadence, data-localisation, other)
+      enumerates the operator's discharge of the Art. 30(2) clause
+      elements against each ingested contract. The emitted
+      obligation-evidence artifact is the durable per-execution
+      attestation that each Art. 30(2) clause element is present
+      (or flagged absent) on this contract, and the per-obligation
+      review schedule the schedule-review step derives is the
+      cadence side of the same surface. Inbound backlink lives at
+      content/mappings/dora/article-19-and-28.yaml on
+      `dora:art-30-contractual-clauses.playbook_refs`.
 
 # CRA inbound (footer pointer; no schema cra-key emitted): the
 # inbound CRA backlink for this playbook lives at
