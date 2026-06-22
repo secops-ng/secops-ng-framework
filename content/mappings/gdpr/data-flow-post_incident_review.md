@@ -42,6 +42,19 @@ nationally. The retained timeline, review document, and corrective-
 action register are the evidence the operator presents to demonstrate
 the learning obligation has been discharged.
 
+Where the closed incident was a confirmed personal-data breach, the
+same three artefacts materialise the operator's **GDPR Art. 33(5)**
+obligation to "document any personal-data breaches, comprising the
+facts relating to the personal-data breach, its effects and the
+remedial action taken" — the timeline records the facts and effects,
+the blameless review document records the contributing-factor
+analysis, and the corrective-action register records the remedial
+action with owner, due-date, and verification clause. The workflow
+does not itself decide whether a closed incident was a personal-data
+breach (the parent incident-management workflow carries the
+Art. 33(1) notifiability decision); it produces the Art. 33(5)
+documentation record for cases where that decision was positive.
+
 Secondary: **GDPR Art. 6(1)(f) — legitimate interests** applies to
 the internal blameless-review portion of the workflow that is not
 strictly mandated by the regulator template — capturing contributing

@@ -49,6 +49,19 @@ existence of a documented on-call rotation with a bound escalation
 chain is itself a regulatory expectation, and the per-rotation record
 is the evidence the workflow produces.
 
+The rotation also backs the operator's readiness against **GDPR
+Art. 33(3)** — the "without undue delay" notification obligation, and
+the 72-hour outer bound on notification to the supervisory authority
+where a personal-data breach is detected: the handoff brief is the
+artifact that keeps a documented responder against that clock across
+shift boundaries for clock-spanning breach cases, so the responsible
+on-call at any point in the 72-hour window can be identified from the
+rotation record and the inherited brief. The workflow does not itself
+make a notifiability decision under Art. 33; it operates the
+readiness leg that an Art. 33 notification depends on when the
+operator's case-management workflow escalates a confirmed
+personal-data breach.
+
 Special-category data (Art. 9) is not the target of the workflow and
 is not expected to be incidentally observed — the workflow handles
 roster slots, escalation tiers, and handoff metadata, none of which

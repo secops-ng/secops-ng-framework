@@ -39,6 +39,19 @@ obliged to maintain incident-handling capability under **NIS2
 Art. 21(2)(b)** as transposed nationally, **Art. 6(1)(c) — legal
 obligation** also applies.
 
+Triage is also the step that backs the operator's readiness against
+**GDPR Art. 33(1)** — the personal-data-breach notifiability decision
+and its "unless the personal-data breach is unlikely to result in a
+risk to the rights and freedoms of natural persons" likelihood-of-risk
+threshold. A reported phishing or credential-harvest event becomes a
+notifiable personal-data breach only when that threshold is crossed
+(for example, a successful credential capture against a mailbox
+holding personal data of identifiable subjects). The triage step is
+what classifies inbound mail by intent and severity up to the
+decision boundary where the case-management workflow takes over and
+formally evaluates notifiability under Art. 33(1); the triage workflow
+itself does not make that notifiability call.
+
 Special-category data (Art. 9) is not the target of the workflow,
 but may be incidentally observed inside reported message bodies;
 the workflow does not extract or persist Art. 9 attributes
