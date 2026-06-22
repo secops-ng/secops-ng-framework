@@ -201,3 +201,127 @@ Sovereignty review at compile time is the gate.
   classifier whose output triggers an automated adverse action
   against the subject (account lockout, mailbox quarantine
   without review), the operator MUST re-score this section.
+
+## 8. Outbound personal-data transfer
+
+The workflow has four classes of outbound leg that carry personal
+data outside the runtime's own process boundary into operator-bound
+processors. Each is scored below against GDPR Chapter V
+(Art. 44–49); the EU-residency posture is sovereignty-first by
+default per Directive 1, and the operator's compile-time bindings
+are the knobs that can break the scoring.
+
+**Leg A — Email-security platform read (envelope and header
+sources).**
+
+- *Destination class.* Processor under GDPR Art. 28 — the
+  operator's email-security platform feeding envelope and
+  authentication-header sources into triage. The framework
+  ships no default endpoint.
+- *Transfer mechanism.* **No transfer.** The default
+  sovereign-stack posture pins the email-security platform to
+  an EU-region tenant. The technical control is the operator's
+  compile-time region pin on the email-security binding.
+- *EU-residency posture.* Default is an EU-resident
+  email-security platform under an Art. 28 DPA. A non-EU
+  binding (a US-region email-security tenant where the
+  operator's mailflow telemetry is held) MUST be re-scored
+  under Art. 46 SCCs with supplementary measures
+  (encryption-at-rest with operator-held keys, pseudonymisation
+  of envelope addresses before egress) before the binding goes
+  live.
+- *Data minimisation on egress.* Only the envelope projection,
+  authentication-header projection, and message-metadata fields
+  enumerated in §3 are read; the message body and attachments
+  are not read into the workflow beyond the enrichment span.
+
+**Leg B — URL-reputation provider and attachment analyser
+(enrichment).**
+
+- *Destination class.* Processors under GDPR Art. 28 — the
+  operator's URL-reputation provider and the operator's
+  attachment-analysis sandbox. Both are operator-bound in the
+  compile-target binding rather than the playbook.
+- *Transfer mechanism.* **No transfer** is the default scoring
+  under the sovereign-stack posture (an EU-resident
+  URL-reputation provider and an EU-resident sandbox under
+  Art. 28 DPAs are achievable but not universal — most
+  commodity providers are US-hosted by default). Where the
+  operator binds a third-country URL-reputation provider or
+  attachment sandbox, the binding MUST be re-scored under
+  Art. 46 SCCs with supplementary measures (the URL submitted
+  is stripped of envelope identifiers before egress, attachment
+  payloads are submitted as content-hashes where the provider
+  supports hash-first lookup, and the operator-held key wraps
+  any cached verdict written back). Compile-time sovereignty
+  review is the gate and SHOULD surface a non-EU enrichment
+  binding for explicit operator acknowledgement.
+- *EU-residency posture.* Default is EU-resident enrichment
+  providers; the operator's compile-time binding is the knob.
+  An EU-region URL-reputation provider and an EU-region
+  sandbox under Art. 28 DPAs hold the scoring; absent that,
+  re-scoring as above.
+- *Data minimisation on egress.* The URL submitted to the
+  reputation provider is the URL only — no envelope identifiers,
+  no recipient mailbox. The attachment submitted to the sandbox
+  is the attachment payload; envelope identifiers and recipient
+  context are not transmitted alongside it. Where the provider
+  supports it, hash-first lookup is preferred over payload
+  submission.
+
+**Leg C — Paging gateway and notification channel (per-intent
+response branch).**
+
+- *Destination class.* Processors under GDPR Art. 28 — the
+  operator's paging gateway and notification channel for the
+  per-intent response branches (phishing, credential-harvest,
+  malware-attached, BEC, manual review). The framework ships no
+  default endpoint.
+- *Transfer mechanism.* **No transfer.** The default
+  sovereign-stack posture pins the paging gateway and
+  notification channel to EU-region tenants. The technical
+  control is the operator's compile-time region pin on each
+  binding.
+- *EU-residency posture.* Default is EU-resident paging and
+  notification tenants under Art. 28 DPAs. A non-EU binding (a
+  US-region paging SaaS) MUST be re-scored under Art. 46 SCCs
+  with supplementary measures (encryption-at-rest with
+  operator-held keys, pseudonymisation of subject envelope
+  identifiers in the page body before egress) before the
+  binding goes live.
+- *Data minimisation on egress.* The page carries the response
+  branch verdict and the metadata projection enumerated in §3
+  (envelope addresses, intent classification, suppression
+  state); message body and attachments are not paged.
+
+**Leg D — Incident-case store, suppression-record store, and
+telemetry / SIEM store (durable artefacts of triage).**
+
+- *Destination class.* Processors under GDPR Art. 28 — the
+  operator's incident-case store (inherited from the
+  incident_management playbook), the operator's
+  suppression-record store, and the operator's telemetry / SIEM
+  store. No default endpoint ships with the framework.
+- *Transfer mechanism.* **No transfer.** The default
+  sovereign-stack posture pins each store to an EU-region
+  tenant. The technical control is the operator's compile-time
+  region pin on each store binding.
+- *EU-residency posture.* Default is EU-resident stores under
+  Art. 28 DPAs. A non-EU binding MUST be re-scored under
+  Art. 46 SCCs with supplementary measures (encryption-at-rest
+  with operator-held keys, pseudonymisation of envelope
+  addresses before egress) before the binding goes live.
+- *Data minimisation on egress.* The case-store payload carries
+  the triaged-malicious metadata projection enumerated in §3;
+  the suppression record carries envelope and authentication
+  metadata only; OCSF activity records carry the enrichment
+  span metadata. The original message body and attachments are
+  not retained in any of these stores beyond the enrichment
+  span, per §5.
+
+The §6 cross-border scoring as a whole is **no transfer** —
+consistent with all four legs above scoring no-transfer under the
+default sovereign-stack posture (and with the explicit re-scoring
+hooks above where an operator binds a non-EU enrichment provider).
+Any operator re-scoring of a leg here MUST be reflected in §6 in
+the same change so the two sections do not disagree.

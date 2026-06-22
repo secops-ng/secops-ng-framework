@@ -248,3 +248,93 @@ binding goes live. Sovereignty review at compile time is the gate.
   evidence into an automated downstream decision that locks the
   principal out without human review, that downstream decision MUST
   be re-scored where it is defined, not here.
+
+## 8. Outbound personal-data transfer
+
+The workflow has three classes of outbound leg that carry personal
+data outside the runtime's own process boundary into operator-bound
+processors. Each is scored below against GDPR Chapter V
+(Art. 44–49); the EU-residency posture is sovereignty-first by
+default per Directive 1, and the operator's compile-time bindings
+are the knobs that can break the scoring.
+
+**Leg A — Identity source read and capability-delta write
+(operator-bound IdP, cloud IAM, sovereign directory, or
+Git-managed role-and-capability repository).**
+
+- *Destination class.* Processor under GDPR Art. 28 — the
+  operator's identity source. The leg is bidirectional: the
+  workflow reads the lifecycle event and the resolved principal,
+  and writes the capability-delta back as the apply step. No
+  hosted IdP / HR-SaaS default; no vendor SDK bundling; no
+  default non-EU endpoint.
+- *Transfer mechanism.* **No transfer.** The default
+  sovereign-stack posture pins the identity source to an
+  EU-region tenant. The technical control is the operator's
+  compile-time region pin on the identity-source binding;
+  sovereignty review at compile time refuses any non-EU
+  endpoint.
+- *EU-residency posture.* Default is an EU-resident identity
+  source under an Art. 28 DPA. A non-EU binding (a US-region
+  IdP tenant or a non-EU HR-SaaS feeding lifecycle events) MUST
+  be re-scored under Art. 46 SCCs with supplementary measures
+  (encryption-at-rest with operator-held keys, pseudonymisation
+  of the principal reference before egress) before the binding
+  goes live; a derogation under Art. 49 is not a default
+  posture for a recurring joiner-mover-leaver workflow.
+- *Data minimisation on egress.* The capability-delta carries
+  only the principal reference and the grants and revocations
+  the lifecycle event declares; HR-record fields beyond what
+  the resolution step requires are not propagated into the
+  identity source.
+
+**Leg B — Access-evidence store write (operator-bound durable
+store for the emitted joiner-mover-leaver attestation artifact).**
+
+- *Destination class.* Processor under GDPR Art. 28 — the
+  operator's access-evidence store. No default endpoint ships
+  with the framework.
+- *Transfer mechanism.* **No transfer.** The default
+  sovereign-stack posture pins the access-evidence store to an
+  EU-region object store or sovereign archive. The technical
+  control is the operator's compile-time region pin on the
+  access-evidence-store binding.
+- *EU-residency posture.* Default is an EU-resident store under
+  an Art. 28 DPA. A non-EU binding MUST be re-scored under
+  Art. 46 SCCs with supplementary measures (encryption-at-rest
+  with operator-held keys, pseudonymisation of the principal
+  reference before egress) before the binding goes live.
+- *Data minimisation on egress.* The artifact carries the
+  resolved-identity reference, the confirmed capability list,
+  and the execution metadata enumerated in §3; no
+  analytics-only projection is emitted to a separate store
+  independent of the evidence artifact.
+
+**Leg C — Telemetry / SIEM store write (OCSF Account Change,
+Authentication, and API Activity records emitted during ingest,
+resolution, application, and confirmation).**
+
+- *Destination class.* Processor under GDPR Art. 28 — the
+  operator's telemetry / SIEM store. No default endpoint ships
+  with the framework.
+- *Transfer mechanism.* **No transfer.** The default
+  sovereign-stack posture pins the telemetry store to an
+  EU-region SIEM or sovereign log-archive. The technical
+  control is the operator's compile-time region pin on the
+  telemetry-store binding.
+- *EU-residency posture.* Default is an EU-resident telemetry
+  store under an Art. 28 DPA. A non-EU binding MUST be re-scored
+  under Art. 46 SCCs with supplementary measures (encryption-at-
+  rest with operator-held keys, pseudonymisation of the
+  principal reference before egress) before the binding goes
+  live.
+- *Data minimisation on egress.* OCSF activity records carry the
+  principal reference and the action metadata as enumerated in
+  §3; HR-record fields and free-text justification copy beyond
+  what OCSF Account Change requires are not written.
+
+The §6 cross-border scoring as a whole is **no transfer** —
+consistent with all three legs above scoring no-transfer under the
+default sovereign-stack posture. Any operator re-scoring of a leg
+here MUST be reflected in §6 in the same change so the two
+sections do not disagree.
