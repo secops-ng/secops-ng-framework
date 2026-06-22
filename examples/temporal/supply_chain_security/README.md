@@ -18,10 +18,10 @@ delegates to the framework-agnostic F-CP-03 shared emitter under
 `compilers._shared.evidence.supply_chain` so the per-execution
 supply-chain-evidence artifact is byte-stable across replays.
 
-The n8n sibling lands at `examples/n8n/supply_chain_security/`; the
-LangGraph sibling is an explicit sibling card on the roadmap. The
-cross-target byte-parity ring is closed in the F-WF-SCS EXTEND
-sibling.
+The n8n sibling lands at `examples/n8n/supply_chain_security/` and
+the LangGraph sibling at `examples/langgraph/supply_chain_security/`;
+the cross-target byte-parity ring is closed across all three reference
+compilers under F-WF-SCS (see ROADMAP.md F-WF-SCS).
 
 ## Layout
 

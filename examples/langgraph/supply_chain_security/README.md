@@ -21,8 +21,9 @@ supply-chain-evidence artifact is byte-stable across replays.
 This card closes G-03 three-target parity for this workflow alongside
 the n8n sibling at `examples/n8n/supply_chain_security/` (PR #420) and
 the Temporal sibling at `examples/temporal/supply_chain_security/`
-(PR #421). The full cross-target byte-parity ring is closed in the
-F-WF-SCS EXTEND sibling.
+(PR #421). The full cross-target byte-parity ring is closed across
+all three reference compilers under F-WF-SCS (see ROADMAP.md
+F-WF-SCS).
 
 ## Layout
 
