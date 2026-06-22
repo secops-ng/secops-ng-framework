@@ -5,6 +5,25 @@
 # incident_management, ransomware_containment) so the gdpr orphan-CI
 # assertion re-arms against this cluster's slugs.
 #
+# F-MAP-GDPR CORE-5: extends the Art. 33 entry's `playbook_refs:` with
+# the operational-readiness leg of the clause — on_call_rotation,
+# post_incident_review, and phishing_triage — and retires the matching
+# three SKELETON skip entries. These three are readiness anchors, not
+# breach generators: on_call_rotation backs the 72-hour timely-
+# notification window (NIS2 Art. 21(2)(b) incident-handling-capability
+# evidence carried through to GDPR Art. 33's `without undue delay`
+# threshold); post_incident_review backs Art. 33(5)'s documenting-
+# personal-data-breaches obligation via the timeline + review-document
+# evidence trail; phishing_triage backs Art. 33(1)'s likelihood-of-risk
+# notifiability threshold by classifying inbound mail to the point
+# where the personal-data-breach trigger is decided. None of the three
+# is the Art. 33(3) notification engine — incident_management remains
+# the single notification engine in this entry; the readiness leg is
+# what gets the operator to the notification on time and with the
+# evidence the clause requires. Art. 34 (high-risk subject-
+# notification) is NOT extended for the three readiness playbooks
+# because their data-flow docs do not name Art. 34 by number.
+#
 # Scope of this file:
 #
 #   - gdpr:art-33 — notification of a personal data breach to the
@@ -39,15 +58,15 @@
 #     dedicated CORE slice, not stretched into this breach-notification
 #     file.
 #
-#   - The other 15 SKELETON skip slugs (cloud_misconfiguration,
-#     codebase_vuln_management, contractual_obligations_tracker,
-#     detection_engineering, executive_metrics, iam_auditor,
-#     infra_posture_management, it_security_support_agent,
-#     on_call_rotation, onboarding_offboarding_tracker,
-#     phishing_triage, post_incident_review, supply_chain_security,
-#     threat_intel_ingest, vuln_intake) — each is a separate CORE
-#     follow-on card; this file retires only the four breach-
-#     notification cluster slugs in `_orphan_skip.yaml`.
+#   - The remaining 11 SKELETON skip slugs (cloud_misconfiguration,
+#     codebase_vuln_management, detection_engineering,
+#     executive_metrics, iam_auditor, infra_posture_management,
+#     it_security_support_agent, onboarding_offboarding_tracker,
+#     supply_chain_security, threat_intel_ingest, vuln_intake) — each
+#     is a separate CORE follow-on card; this file retires only the
+#     four breach-notification cluster slugs and the three Art-33
+#     operational-readiness slugs (on_call_rotation,
+#     post_incident_review, phishing_triage) in `_orphan_skip.yaml`.
 #
 # Cross-references:
 #
@@ -91,6 +110,9 @@ entries:
       - playbook.data_exfil@v1
       - playbook.identity_compromise@v1
       - playbook.incident_management@v1
+      - playbook.on_call_rotation@v1
+      - playbook.phishing_triage@v1
+      - playbook.post_incident_review@v1
       - playbook.ransomware_containment@v1
     metric_refs:
       - kpi.notification_sla_compliance@v1
@@ -128,7 +150,28 @@ entries:
       on the same event. The 72-hour SLA is a `where feasible`
       threshold under GDPR Art. 33(1) — a delayed notification with
       a documented `reasons for the delay` field is compliant and
-      the SLA KPI tracks the documented-reason path separately.
+      the SLA KPI tracks the documented-reason path separately. The
+      three operational-readiness playbooks (on_call_rotation,
+      phishing_triage, post_incident_review) wire the upstream
+      readiness leg of the clause without themselves generating the
+      personal-data-breach event: phishing_triage classifies inbound
+      mail to the point where a confirmed credential-harvest or BEC
+      case crosses the Art. 33(1) likelihood-of-risk notifiability
+      threshold and is handed to incident_management for the
+      Art. 33(3) envelope; on_call_rotation binds the escalation
+      chain and delivers the rotation-boundary handoff brief that
+      keeps a documented responder against the 72-hour clock during
+      a clock-spanning incident, supplying the
+      incident-handling-capability evidence the `without undue delay`
+      threshold is read against; post_incident_review produces the
+      timeline artifact, blameless review document, and
+      corrective-action register that materialise Art. 33(5)'s
+      documenting-personal-data-breaches obligation against a closed
+      breach case. Art. 34 (high-risk subject notification) is not
+      extended for these three readiness playbooks because their
+      data-flow docs do not name Art. 34 by number — the subject-
+      notification leg of the cluster remains anchored on data_exfil
+      in the Art-34 entry below.
 
   - id: gdpr:art-34-communication-data-subject
     regulation:
