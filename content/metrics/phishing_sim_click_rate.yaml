@@ -20,13 +20,33 @@ measurement:
     data.'
   inputs:
   - name: numerator
-    description: Population matching the indicator's success (or, for lower-is-better,
-      failure) condition.
+    description: >
+      Count of phishing-simulation recipients who clicked the simulated
+      lure inside the evaluation window. Carried on the OCSF Email URL
+      Activity event the phishing_triage credential-harvest response
+      step consumes when it identifies clickers from URL-Activity
+      telemetry against the sanctioned-simulation source; the catalog
+      entry binds to that OCSF class shape, not to a vendor-specific
+      simulation platform.
+    playbook_step: action--c0a17a01-0000-4000-8000-000000000009
+    telemetry_ref: telemetry.ocsf.email_url_activity@v1
+    field: actor.user.uid
   - name: denominator
-    description: Reference population the numerator is normalised against.
+    description: >
+      Count of phishing-simulation recipients in scope for the
+      evaluated campaign cohort. Sourced from the operator's
+      simulation-roster scoping artifact (the cohort the campaign was
+      sent to) rather than the telemetry stream — the catalog entry
+      does not name a specific simulation product. Excluding the
+      denominator from a telemetry binding keeps the indicator stable
+      against URL-Activity ingestion gaps in the same surface that
+      produces the numerator, matching the detection_coverage and
+      coverage-cluster convention.
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+- telemetry.ocsf.email_url_activity@v1
 playbook_refs:
 - playbook_id: playbook.phishing_triage@v1
   step_id: action--c0a17a01-0000-4000-8000-000000000009
