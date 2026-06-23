@@ -85,8 +85,12 @@ VIZ_REQUIRED_STEMS = (
     "false_positive_rate",
     "lateral_hunt_coverage",
     "recurring_cloud_misconfig",
-    # F-MET SKELETON corrective-action governance cluster (this card)
+    # F-MET SKELETON corrective-action governance cluster (#460)
     "control_effectiveness",
+    # F-MET SKELETON incident-process integrity cluster (this card)
+    "timeline_completeness",
+    "review_completion_sla",
+    "handoff_brief_delivery_sla",
 )
 
 
