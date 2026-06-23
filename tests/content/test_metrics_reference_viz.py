@@ -44,10 +44,15 @@ VIZ_REQUIRED_STEMS = (
     "mttd",
     "mttd_phishing",
     "mttd_ransomware",
-    # F-MET SKELETON mttr remediation-latency cluster (this card)
+    # F-MET SKELETON mttr remediation-latency cluster (#450)
     "mttr",
     "mttr_containment",
     "mttr_phishing_triage",
+    # F-MET SKELETON mttd per-scenario detection-latency cluster (this card)
+    "mttd_cloud_misconfig",
+    "mttd_exfil",
+    "mttd_identity_compromise",
+    "mttd_threat_intel_indicator",
 )
 
 
