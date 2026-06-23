@@ -21,14 +21,38 @@ measurement:
     operator data.'
   inputs:
   - name: numerator
-    description: Population that contributes to the risk reading (e.g. recurring findings,
-      missed notifications, breaches).
+    description: >
+      Count of phishing detections suppressed (auto-closed, tuned out,
+      marked benign without analyst review) in the evaluation window.
+      Carried on the OCSF Email Activity event the phishing_triage
+      suppress-and-close step consumes when it correlates an already-
+      seen case fingerprint or known-benign sender and closes the
+      report without paging; the catalog entry binds to that OCSF
+      class shape, not to a vendor-specific case-management or email-
+      security product.
+    playbook_step: action--c0a17a01-0000-4000-8000-000000000005
+    telemetry_ref: telemetry.ocsf.email_activity@v1
+    field: email.uid
   - name: denominator
-    description: Reference population the numerator is normalised against. Omit for
-      raw-count KRIs.
+    description: >
+      Count of phishing detections fired in the evaluation window — the
+      full population of reported-message records ingested by the
+      phishing_triage ingest step, regardless of triage outcome. Carried
+      on the same OCSF Email Activity class the playbook consumes at
+      ingest. Volume-sourced from the telemetry stream rather than an
+      operator scoping artifact because, unlike the coverage cluster,
+      the catalog entry's "detections fired" semantics IS the
+      telemetry-consumption view; an ingestion gap on this surface
+      collapses both numerator and denominator together, leaving the
+      ratio well-defined.
+    playbook_step: action--c0a17a01-0000-4000-8000-000000000002
+    telemetry_ref: telemetry.ocsf.email_activity@v1
+    field: email.uid
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+- telemetry.ocsf.email_activity@v1
 playbook_refs:
 - playbook_id: playbook.phishing_triage@v1
   step_id: action--c0a17a01-0000-4000-8000-000000000005

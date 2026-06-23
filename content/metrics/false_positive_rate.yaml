@@ -55,17 +55,33 @@ measurement:
     - name: detection_firings
       description: >
         Stream of detection firings within the evaluation window,
-        bound to their detection-class stable_id. Catalog entry is
-        detection-vendor neutral.
+        bound to their detection-class stable_id. Carried on the OCSF
+        Detection Finding meta-finding that SIEM rule matches emit at
+        runtime; the catalog entry binds to that OCSF class shape, not
+        to a vendor-specific rule object. Catalog entry is detection-
+        vendor neutral.
+      telemetry_ref: telemetry.ocsf.detection_finding@v1
+      field: finding_info.uid
     - name: triage_dispositions
       description: >
         Closed triage dispositions tagging each firing as false
         positive, true positive, or benign / expected. Sourced from
         the operator's case-management system; the catalog entry does
-        not name a specific tool.
+        not name a specific tool. Carried on the OCSF Detection
+        Finding event the operator's case-management surface stamps
+        when the analyst closes the firing — disposition_id encodes
+        the false-positive / true-positive / benign axis, and firings
+        whose disposition remains unset at evaluation time are excluded
+        per the formula so the indicator does not flap during triage
+        backlogs.
+      telemetry_ref: telemetry.ocsf.detection_finding@v1
+      field: disposition_id
   window:
     duration: P30D
     sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.detection_finding@v1
 
 external_refs:
   # Primary regulatory anchors. Only IDs already named in
