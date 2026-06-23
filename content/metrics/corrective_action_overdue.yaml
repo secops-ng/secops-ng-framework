@@ -21,14 +21,38 @@ measurement:
     data.'
   inputs:
   - name: numerator
-    description: Population that contributes to the risk reading (e.g. recurring findings,
-      missed notifications, breaches).
+    description: >
+      Population of corrective-action ledger entries whose committed
+      due-date has elapsed and whose closed-state transition has not yet
+      been recorded by the end of the evaluation window. Carried on the
+      OCSF Incident Finding event the post_incident_review
+      corrective-action ledger step emits at ledger-entry open (status_id
+      transition into the open state, with the committed due-date carried
+      on the same event); the catalog entry binds to that OCSF class
+      shape, not to a vendor-specific case-management or ticketing
+      object. A ledger entry is counted as overdue when the open-state
+      event's due-date is earlier than `evaluation_now` and no
+      closed-state transition has been observed for the same ledger
+      entry.
+    playbook_step: action--40000000-0000-4000-8000-000000000004
+    telemetry_ref: telemetry.ocsf.incident_finding@v1
+    field: start_time
   - name: denominator
-    description: Reference population the numerator is normalised against. Omit for
-      raw-count KRIs.
+    description: >
+      Reference population of corrective-action ledger entries tracked
+      in the evaluation window (open at any point in the window).
+      Carried on the OCSF Incident Finding event the
+      post_incident_review corrective-action ledger step emits at
+      ledger-entry open (status_id transition into the open state),
+      regardless of whether the entry has since closed or overrun.
+    playbook_step: action--40000000-0000-4000-8000-000000000004
+    telemetry_ref: telemetry.ocsf.incident_finding@v1
+    field: start_time
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+- telemetry.ocsf.incident_finding@v1
 playbook_refs:
 - playbook_id: playbook.post_incident_review@v1
   step_id: action--40000000-0000-4000-8000-000000000004

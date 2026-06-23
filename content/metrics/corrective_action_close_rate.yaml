@@ -20,13 +20,34 @@ measurement:
     operator data.'
   inputs:
   - name: numerator
-    description: Population matching the indicator's success (or, for lower-is-better,
-      failure) condition.
+    description: >
+      Population of corrective actions closed within the evaluation
+      window. Carried on the OCSF Incident Finding event the
+      post_incident_review corrective-action ledger step emits when a
+      ledger entry transitions into the closed state (status_id
+      transition into the closed state); the catalog entry binds to that
+      OCSF class shape, not to a vendor-specific case-management or
+      ticketing object.
+    playbook_step: action--40000000-0000-4000-8000-000000000004
+    telemetry_ref: telemetry.ocsf.incident_finding@v1
+    field: time
   - name: denominator
-    description: Reference population the numerator is normalised against.
+    description: >
+      Reference population of corrective-action ledger entries in scope
+      during the evaluation window (open at any point in the window, or
+      transitioned out of the open state during the window). Carried on
+      the OCSF Incident Finding event the post_incident_review
+      corrective-action ledger step emits at ledger-entry open
+      (status_id transition into the open state), regardless of whether
+      the entry has since closed.
+    playbook_step: action--40000000-0000-4000-8000-000000000004
+    telemetry_ref: telemetry.ocsf.incident_finding@v1
+    field: start_time
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+- telemetry.ocsf.incident_finding@v1
 playbook_refs:
 - playbook_id: playbook.post_incident_review@v1
   step_id: action--40000000-0000-4000-8000-000000000004
