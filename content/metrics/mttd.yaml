@@ -60,16 +60,35 @@ measurement:
         Earliest event in the telemetry stream that, in hindsight, was
         part of the incident's causal chain. Bound at evaluation time by
         the incident's post-incident review timeline, not at detection
-        time.
-      telemetry_ref: telemetry.host_process_create@v1
+        time. The unscoped baseline does not pin a single OCSF class —
+        the relevant source class is whichever upstream class the
+        post-incident review identifies as the causal-chain origin
+        (account_change / authentication / api_activity / email_activity /
+        file_activity / detection_finding for indicator-match scope, etc.);
+        the scoped MTTD variants (kpi.mttd_phishing@v1,
+        kpi.mttd_ransomware@v1, kpi.mttd_exfil@v1,
+        kpi.mttd_cloud_misconfig@v1, kpi.mttd_identity_compromise@v1,
+        kpi.mttd_threat_intel_indicator@v1) pin the concrete class per
+        scope. The `time` field on the chosen class is the evaluation
+        anchor.
+      field: time
     - name: first_detection_fire
       description: >
         First authoritative detection firing that opened the incident
-        record. Catalog entry is detection-vendor-neutral; the compile
+        record. Carried on the OCSF Detection Finding meta-finding the
+        detection_engineering measure-rule-version step emits and that
+        SIEM rule matches downstream emit at runtime; the catalog entry
+        binds to that OCSF class shape, not to a vendor-specific rule
+        object. Catalog entry is detection-vendor-neutral; the compile
         target resolves the concrete detection identifier.
+      telemetry_ref: telemetry.ocsf.detection_finding@v1
+      field: finding_info.uid
   window:
     duration: P30D
     sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.detection_finding@v1
 
 external_refs:
   # Primary regulatory anchors. Only IDs already named in
