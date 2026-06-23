@@ -17,6 +17,7 @@ Each binding is a JSON document validated by
 | `telemetry.ocsf.email_activity@v1`     | 1.4.0        | 4009      | Email Activity       | `playbook.phishing_triage@v1`          |
 | `telemetry.ocsf.email_url_activity@v1` | 1.4.0        | 4012      | Email URL Activity   | `playbook.phishing_triage@v1`          |
 | `telemetry.ocsf.file_activity@v1`      | 1.4.0        | 1001      | File System Activity | `playbook.phishing_triage@v1`          |
+| `telemetry.ocsf.incident_finding@v1`   | 1.4.0        | 2005      | Incident Finding     | `playbook.incident_management@v1`      |
 
 Class UIDs are pinned to OCSF v1.4.0; do not introduce a binding without
 verifying its class UID against the upstream schema at

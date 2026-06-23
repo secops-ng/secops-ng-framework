@@ -1,0 +1,36 @@
+{
+  "stable_id": "telemetry.ocsf.incident_finding@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Incident Finding event (incident-record telemetry for GDPR Art. 33 breach-notification clock tracking)",
+  "summary": "OCSF Incident Finding events the incident_management playbook emits and reads when it opens, classifies, and progresses a personal-data-breach incident through the GDPR Article 33 notification chain. Carries the operator-awareness timestamp at classification (start of the 72-hour clock), the case classification verdict, and the regulator-notification dispatch transition. Consumed by the breach-notification clock-margin KRI to compute in-flight margin per active case.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2005,
+    "class_name": "Incident Finding"
+  },
+  "direction": "both",
+  "fields_used": [
+    "time",
+    "activity_id",
+    "status_id",
+    "finding_info.uid",
+    "finding_info.title",
+    "incident.uid",
+    "incident.status_id",
+    "incident.confidentiality_id",
+    "start_time",
+    "first_seen_time"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.incident_management@v1"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org",
+  "sources": [
+    "OCSF v1.4.0 Findings category — Incident Finding class (uid 2005)"
+  ]
+}
