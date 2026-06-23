@@ -66,10 +66,14 @@ VIZ_REQUIRED_STEMS = (
     "joiner_to_provisioned_time",
     "leaver_to_revoked_time",
     "mttc_identity_compromise",
-    # F-MET SKELETON regulatory-notification SLA cluster (this card)
+    # F-MET SKELETON regulatory-notification SLA cluster (#455)
     "notification_sla_compliance",
     "regulator_notification_overrun",
     "vuln_disclosure_sla",
+    # F-MET SKELETON coverage cluster (this card)
+    "cloud_posture_coverage",
+    "coverage_on_call_schedule",
+    "coverage_threat_intel_feed",
 )
 
 
