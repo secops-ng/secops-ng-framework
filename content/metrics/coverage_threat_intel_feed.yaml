@@ -44,13 +44,36 @@ measurement:
     executable form against operator data.
   inputs:
   - name: covered_population
-    description: Count of in-scope entries currently under the named control surface.
+    description: >
+      Count of in-scope threat-intel feeds for which the operator has at
+      least one activated upstream detection rule sourced from the feed
+      and matching against operator telemetry inside the evaluation
+      window. Carried on the OCSF Detection Finding the
+      threat_intel_ingest activate-detection-rule step emits when an
+      activated upstream rule matches subsequent telemetry — a feed
+      counts as covered when at least one rule sourced from it produces
+      a Detection Finding in the window (`finding_info.uid` records the
+      rule-match identity, and the originating feed is carried on the
+      rule's threat-intel provenance metadata). The catalog entry binds
+      to that OCSF class shape, not to a vendor-specific TIP, blocklist,
+      or SIEM rule object.
+    playbook_step: action--10000000-0000-4000-8000-000000000006
+    telemetry_ref: telemetry.ocsf.detection_finding@v1
+    field: finding_info.uid
   - name: total_population
-    description: Count of in-scope entries the operator believes should be under the
-      named control surface.
+    description: >
+      Count of in-scope threat-intel feeds the operator's scoping
+      artifact declares as relevant. Sourced from the operator's feed
+      scoping artifact rather than the telemetry stream — the catalog
+      entry does not name a specific scoping file. Excluding this from
+      a telemetry binding keeps the denominator stable against
+      ingestion gaps in the feed-handling surface itself, matching the
+      detection_coverage convention.
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+- telemetry.ocsf.detection_finding@v1
 playbook_refs:
 - playbook_id: playbook.threat_intel_ingest@v1
   step_id: action--10000000-0000-4000-8000-000000000002

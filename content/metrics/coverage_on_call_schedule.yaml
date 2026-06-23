@@ -43,13 +43,33 @@ measurement:
     executable form against operator data.
   inputs:
   - name: covered_population
-    description: Count of in-scope entries currently under the named control surface.
+    description: >
+      Count of in-scope on-call rotation slots (rotation, shift-window
+      tuples) with at least one named primary responder bound for the
+      evaluated shift. Carried on the OCSF Account Change event the
+      on_call_rotation load-rotation-roster step consumes from the
+      operator's roster source — each rotation slot's bound-responder
+      identity surfaces as an Account Change record naming the responder
+      handle. The catalog entry binds to that OCSF class shape, not to a
+      vendor-specific paging or scheduling product.
+    playbook_step: action--30000000-0000-4000-8000-000000000002
+    telemetry_ref: telemetry.ocsf.account_change@v1
+    field: actor.user.uid
   - name: total_population
-    description: Count of in-scope entries the operator believes should be under the
-      named control surface.
+    description: >
+      Count of in-scope on-call rotation slots (rotation, shift-window
+      tuples) the operator's scoping artifact declares should be
+      covered. Sourced from the operator's rotation scoping artifact
+      rather than the telemetry stream — the catalog entry does not
+      name a specific scoping file. Excluding this from a telemetry
+      binding keeps the denominator stable against roster-ingestion gaps
+      in the paging surface itself, matching the detection_coverage
+      convention.
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+- telemetry.ocsf.account_change@v1
 playbook_refs:
 - playbook_id: playbook.on_call_rotation@v1
   step_id: action--30000000-0000-4000-8000-000000000002
