@@ -31,14 +31,34 @@ measurement:
   inputs:
   - name: first_detection_fire
     description: First authoritative detection firing that opened the incident record
-      at the scoped class.
+      at the scoped class — the firing the page event downstream is triggered off.
+      Carried on the OCSF Detection Finding meta-finding the detection_engineering
+      measure-rule-version step emits and that SIEM rule matches downstream emit at
+      runtime; the catalog entry binds to that OCSF class shape, not to a
+      vendor-specific rule object.
+    telemetry_ref: telemetry.ocsf.detection_finding@v1
+    field: finding_info.uid
   - name: first_response_action
     description: First playbook step transition whose purpose matches the scoped response
       class (acknowledge). Bound to the canonical step of the compiled response playbook.
+      The acknowledgement-endpoint timestamp is carried on the OCSF Incident Finding
+      the incident_management playbook emits when the incident record transitions
+      out of the page-pending status into an acknowledged status (the on-call
+      responder has accepted the page); the catalog entry binds to that OCSF class
+      shape, not to a vendor-specific on-call/paging-product object — the operator's
+      page-product webhook delivery into incident_management is the surface that
+      drives the status transition. The `incident.status_id` transition on that
+      class is the evaluation anchor; the playbook_step pins which transition counts
+      as the acknowledgement in the compiled response playbook.
     playbook_step: acknowledge
+    telemetry_ref: telemetry.ocsf.incident_finding@v1
+    field: incident.status_id
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+- telemetry.ocsf.detection_finding@v1
+- telemetry.ocsf.incident_finding@v1
 playbook_refs:
 - playbook_id: playbook.on_call_rotation@v1
   step_id: action--30000000-0000-4000-8000-000000000003
