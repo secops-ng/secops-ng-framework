@@ -74,10 +74,13 @@ VIZ_REQUIRED_STEMS = (
     "cloud_posture_coverage",
     "coverage_on_call_schedule",
     "coverage_threat_intel_feed",
-    # F-MET SKELETON remediation-throughput cluster (this card)
+    # F-MET SKELETON remediation-throughput cluster (#457)
     "corrective_action_close_rate",
     "corrective_action_overdue",
     "patch_disseminated_on_time",
+    # F-MET SKELETON phishing-detection cluster (this card)
+    "phishing_sim_click_rate",
+    "phishing_suppression_rate",
 )
 
 
