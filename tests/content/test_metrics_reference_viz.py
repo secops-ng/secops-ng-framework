@@ -48,6 +48,11 @@ VIZ_REQUIRED_STEMS = (
     "mttr",
     "mttr_containment",
     "mttr_phishing_triage",
+    # F-MET SKELETON CRA regulatory-reporting clock cluster (#451)
+    "cra_early_warning_on_time",
+    "cra_notification_72h_on_time",
+    "cra_severe_incident_on_time",
+    "cra_final_report_on_time",
     # F-MET SKELETON mttd per-scenario detection-latency cluster (this card)
     "mttd_cloud_misconfig",
     "mttd_exfil",
