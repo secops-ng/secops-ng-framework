@@ -59,19 +59,39 @@ measurement:
     - name: first_detection_fire
       description: >
         First authoritative detection firing that opened the incident
-        record at critical severity. Catalog entry is detection-vendor
-        neutral; the compile target resolves the concrete detection
-        identifier.
+        record at critical severity. Carried on the OCSF Detection
+        Finding meta-finding the detection_engineering measure-rule-
+        version step emits and that SIEM rule matches downstream emit
+        at runtime; the catalog entry binds to that OCSF class shape,
+        not to a vendor-specific rule object. Catalog entry is
+        detection-vendor neutral; the compile target resolves the
+        concrete detection identifier.
+      telemetry_ref: telemetry.ocsf.detection_finding@v1
+      field: finding_info.uid
     - name: first_containment_action
       description: >
         First playbook step transition in the response workflow whose
         purpose is to limit blast radius (isolate, block, revoke,
         quarantine). Bound to the canonical containment step of the
-        compiled response playbook.
+        compiled response playbook. The resolution-endpoint timestamp
+        is carried on the OCSF Incident Finding the incident_management
+        playbook emits when the incident record transitions out of the
+        initial-triage status into a containment-active status; the
+        catalog entry binds to that OCSF class shape, not to a
+        vendor-specific case-management object. The `incident.status_id`
+        transition on that class is the evaluation anchor; the
+        playbook_step name pins which transition counts as the
+        first containment action in the compiled response playbook.
       playbook_step: containment
+      telemetry_ref: telemetry.ocsf.incident_finding@v1
+      field: incident.status_id
   window:
     duration: P30D
     sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.detection_finding@v1
+  - telemetry.ocsf.incident_finding@v1
 
 external_refs:
   # Primary regulatory anchors. Only IDs already named in
