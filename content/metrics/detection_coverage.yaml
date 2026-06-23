@@ -46,6 +46,16 @@ measurement:
     flagged out-of-scope from both numerator and denominator so the
     indicator reflects the operator's declared perimeter, not the full
     ATT&CK matrix.
+    Reference visualisation: a stacked bar chart of |C| (covered) and
+    |T| - |C| (uncovered) techniques sliced by ATT&CK tactic, with the
+    overall ratio annotated as the headline figure and the warn / breach
+    thresholds overlaid as horizontal lines; the chart is the canonical
+    operator-facing surface for this KPI and the compile target is the
+    source of truth for the executable form. The committed reference
+    rendering lives at
+    `content/metrics/detection_coverage.viz.md` — that file is the
+    contract for the chart shape; the compile target renders the
+    executable form against operator data.
   inputs:
     - name: in_scope_techniques
       description: >
@@ -56,11 +66,23 @@ measurement:
     - name: production_detections
       description: >
         Detections in production maturity bound to one or more
-        techniques via the shared stable_id shape. Catalog entry is
+        techniques via the shared stable_id shape. The operator's
+        detection store materialises the inventory; each rule version's
+        production-status transition emits an OCSF Detection Finding
+        meta-finding at the detection_engineering measure-rule-version
+        step, and the catalog entry binds to that OCSF class shape
+        (not to a vendor-specific rule object). Catalog entry is
         detection-vendor neutral.
+      playbook_ref: playbook.detection_engineering@v1
+      playbook_step: action--f0e4f404-0000-4000-8000-000000000005
+      telemetry_ref: telemetry.ocsf.detection_finding@v1
+      field: finding_info.uid
   window:
     duration: P1D
     sliding: false
+
+telemetry_refs:
+  - telemetry.ocsf.detection_finding@v1
 
 external_refs:
   # Primary regulatory anchors. Only IDs already named in
