@@ -50,6 +50,12 @@ measurement:
     latest attestation predates the control's declared review cadence,
     count as overdue (i.e. NOT effective). Compensating-control credit
     is out of scope of this indicator and lives in a separate KRI.
+    Reference visualisation: a ratio-headline gauge with warn / breach
+    / critical overlays over a per-control-family non-effective-share
+    drill-down; the committed reference rendering lives at
+    `content/metrics/control_effectiveness.viz.md` — that file is the
+    contract for the chart shape; the compile target renders the
+    executable form against operator data.
   inputs:
     - name: in_scope_controls
       description: >
