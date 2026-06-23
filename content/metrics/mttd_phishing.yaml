@@ -15,10 +15,17 @@ direction: lower_is_better
 measurement:
   source: composite
   aggregation: p95
-  formula: For each incident in scope closed within the evaluation window, compute
+  formula: 'For each incident in scope closed within the evaluation window, compute
     (first_detection_fire_timestamp - earliest_telemetry_event_timestamp) in minutes
     and aggregate as p95. Exclude incidents where the earliest telemetry timestamp
     is unknown so the indicator does not silently improve when ingestion breaks.
+    Reference visualisation: a horizontal bar chart of detection_latency_minutes per
+    closed phishing-rooted incident in the window with the p95 aggregate annotated
+    as the headline figure; this scoped variant inherits the threshold-band shape
+    from kpi.mttd@v1 and operators typically tighten phishing-specific numeric values
+    in their own scoped overrides. The committed reference rendering lives at
+    `content/metrics/mttd_phishing.viz.md` — that file is the contract for the chart
+    shape; the compile target renders the executable form against operator data.'
   inputs:
   - name: earliest_telemetry_event
     description: Earliest event in the telemetry stream that, in hindsight, was part
