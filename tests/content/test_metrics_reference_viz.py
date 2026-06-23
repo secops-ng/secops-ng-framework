@@ -62,10 +62,14 @@ VIZ_REQUIRED_STEMS = (
     "mttd_exfil",
     "mttd_identity_compromise",
     "mttd_threat_intel_indicator",
-    # F-MET SKELETON identity-lifecycle cluster (this card)
+    # F-MET SKELETON identity-lifecycle cluster (#454)
     "joiner_to_provisioned_time",
     "leaver_to_revoked_time",
     "mttc_identity_compromise",
+    # F-MET SKELETON regulatory-notification SLA cluster (this card)
+    "notification_sla_compliance",
+    "regulator_notification_overrun",
+    "vuln_disclosure_sla",
 )
 
 

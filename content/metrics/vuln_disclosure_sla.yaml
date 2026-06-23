@@ -39,6 +39,15 @@ measurement:
     Ratio = compliant_count / in_scope_count. Exclude disclosures whose
     intake step never fired (record-keeping gap) so the indicator does
     not silently improve when the intake channel stalls.
+    Reference visualisation: a horizontal bar chart of
+    acknowledgement_margin_minutes per inbound disclosure intake-closed
+    in the window, with a vertical line at zero marking the on-time
+    predicate and the ratio aggregate annotated as the headline figure
+    against the warn / breach bands; the chart is the canonical
+    operator-facing surface for this KPI. The committed reference
+    rendering lives at `content/metrics/vuln_disclosure_sla.viz.md` —
+    that file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
   inputs:
     - name: intake_disclosure
       description: >

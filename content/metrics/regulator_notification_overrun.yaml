@@ -12,9 +12,19 @@ direction: lower_is_better
 measurement:
   source: composite
   aggregation: ratio
-  formula: Computed from the lower content layers per the inputs below. The catalog
-    entry is the contract; the compile target is the source of truth for the executable
-    form.
+  formula: >
+    Computed from the lower content layers per the inputs below. The
+    catalog entry is the contract; the compile target is the source of
+    truth for the executable form. Reference visualisation: a horizontal
+    bar chart of submission_margin_minutes per regulator-facing
+    notification due in the window, sliced by regulatory regime, with a
+    vertical line at zero marking the statutory-clock overrun predicate
+    and the ratio aggregate annotated as the headline figure (direction
+    lower_is_better); the chart is the canonical operator-facing risk
+    surface for this KRI. The committed reference rendering lives at
+    `content/metrics/regulator_notification_overrun.viz.md` — that file
+    is the contract for the chart shape; the compile target renders the
+    executable form against operator data.
   inputs:
   - name: numerator
     description: Population that contributes to the risk reading (e.g. recurring findings,
