@@ -1,0 +1,38 @@
+{
+  "stable_id": "telemetry.ocsf.detection_finding@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Detection Finding event (per-rule detection-asset meta-finding for the detection-engineering rule lifecycle)",
+  "summary": "OCSF Detection Finding events the detection_engineering playbook emits at the measure-rule-version step as the meta-finding describing each rule version itself as a detection asset, and that the threat_intel_ingest playbook downstream consumers emit at runtime on SIEM rule match against the armed indicators. Carries the rule identity, lifecycle state, and the OCSF source-data shape the rule queries against — the inventory shape the kpi.detection_coverage@v1 metric reads to count production detections bound to in-scope ATT&CK techniques.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding"
+  },
+  "direction": "both",
+  "fields_used": [
+    "time",
+    "activity_id",
+    "status_id",
+    "finding_info.uid",
+    "finding_info.title",
+    "finding_info.product.name",
+    "finding_info.types",
+    "category_uid",
+    "class_uid"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.detection_engineering@v1"
+    },
+    {
+      "playbook_id": "playbook.threat_intel_ingest@v1"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org",
+  "sources": [
+    "OCSF v1.4.0 Findings category — Detection Finding class (uid 2004)"
+  ]
+}
