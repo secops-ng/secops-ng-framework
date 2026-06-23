@@ -37,7 +37,13 @@ measurement:
     is earlier than (case_open_timestamp + per-severity SLA). Ratio =
     on_time_count / dispatched_count. Exclude cases whose dissemination
     step never fired so the indicator does not silently improve when the
-    release pipeline stalls.
+    release pipeline stalls. Reference visualisation: a ratio-headline
+    gauge with warn / breach band overlays over a per-dispatch margin
+    drill-down sliced by severity band, with a zero-line on-time overlay
+    on the drill-down; the committed reference rendering lives at
+    `content/metrics/patch_disseminated_on_time.viz.md` — that file is
+    the contract for the chart shape; the compile target renders the
+    executable form against operator data.
   inputs:
     - name: case_open
       description: >
