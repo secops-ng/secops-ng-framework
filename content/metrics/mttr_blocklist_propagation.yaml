@@ -15,10 +15,19 @@ direction: lower_is_better
 measurement:
   source: workflow
   aggregation: p95
-  formula: For each incident in scope closed within the evaluation window, compute
+  formula: 'For each incident in scope closed within the evaluation window, compute
     (first_response_action_timestamp - first_detection_fire_timestamp) in minutes
     and aggregate as p95. Exclude incidents where the scoped response step never fired
     so the indicator does not silently improve when the response pipeline stalls.
+    Reference visualisation: a horizontal bar chart of remediation_latency_minutes
+    per closed in-scope incident in the window at the propagate step with the p95
+    aggregate annotated as the headline figure; this scoped variant inherits the
+    threshold-band shape from kpi.mttr_critical@v1 and operators typically tighten
+    enforcement-distribution targets in their own scoped overrides given the
+    indicator-of-compromise volume profile. The committed reference rendering lives
+    at `content/metrics/mttr_blocklist_propagation.viz.md` — that file is the
+    contract for the chart shape; the compile target renders the executable form
+    against operator data.'
   inputs:
   - name: first_detection_fire
     description: First authoritative detection firing that opened the incident record
