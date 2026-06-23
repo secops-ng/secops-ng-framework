@@ -45,6 +45,16 @@ measurement:
     incidents. Exclude incidents where the containment step never fired
     (record-keeping gap) so the indicator does not silently improve when
     the response pipeline stalls.
+    Reference visualisation: a horizontal bar chart of
+    remediation_latency_minutes per closed critical incident in the
+    window with the warn / breach thresholds overlaid as vertical
+    lines and the p95 aggregate annotated as the headline figure; the
+    bar chart is the canonical operator-facing surface for this KPI
+    and the compile target is the source of truth for the executable
+    form. The committed reference rendering lives at
+    `content/metrics/mttr.viz.md` — that file is the contract for the
+    chart shape; the compile target renders the executable form
+    against operator data.
   inputs:
     - name: first_detection_fire
       description: >
