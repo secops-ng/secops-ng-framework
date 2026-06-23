@@ -52,8 +52,11 @@ measurement:
     Reference visualisation: a p50 / p95 latency histogram sliced by
     identity_provider on a daily-tumbling window, with the warn /
     breach thresholds overlaid; the histogram is the canonical
-    operator-facing surface for this KRI and the compile target is the
-    source of truth for the executable form.
+    operator-facing surface for this KRI. The committed reference
+    rendering lives at
+    `content/metrics/leaver_to_revoked_time.viz.md` — that file is
+    the contract for the chart shape; the compile target renders the
+    executable form against operator data.
   inputs:
     - name: lifecycle_event_effective_at
       description: >

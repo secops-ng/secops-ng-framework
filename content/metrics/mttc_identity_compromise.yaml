@@ -13,9 +13,20 @@ direction: lower_is_better
 measurement:
   source: workflow
   aggregation: p95
-  formula: For each identity_compromise incident closed within the evaluation window,
+  formula: 'For each identity_compromise incident closed within the evaluation window,
     compute (first_containment_action_timestamp - first_detection_fire_timestamp)
     in minutes and aggregate as p95. Exclude incidents where containment never fired.
+    Reference visualisation: a horizontal bar chart of containment_latency_minutes
+    per closed identity-compromise incident in the window with the p95 aggregate
+    annotated as the headline figure; this scoped variant inherits the
+    threshold-band shape from the unscoped containment-baseline
+    kpi.mttr_containment@v1 (which in turn inherits from kpi.mttr_critical@v1),
+    and operators with NIS2 Art. 21(2)(b) incident-handling and Art. 21(2)(e)
+    access-control obligations typically tighten identity-specific numeric values
+    in their own scoped overrides. The committed reference rendering lives at
+    `content/metrics/mttc_identity_compromise.viz.md` — that file is the contract
+    for the chart shape; the compile target renders the executable form against
+    operator data.'
   inputs:
   - name: first_detection_fire
     description: First authoritative detection firing of identity compromise.

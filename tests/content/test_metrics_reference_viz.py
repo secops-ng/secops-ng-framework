@@ -57,11 +57,15 @@ VIZ_REQUIRED_STEMS = (
     "mttr_blocklist_propagation",
     "mttr_cloud_misconfig",
     "mttr_on_call_ack",
-    # F-MET SKELETON mttd per-scenario detection-latency cluster (this card)
+    # F-MET SKELETON mttd per-scenario detection-latency cluster (#452)
     "mttd_cloud_misconfig",
     "mttd_exfil",
     "mttd_identity_compromise",
     "mttd_threat_intel_indicator",
+    # F-MET SKELETON identity-lifecycle cluster (this card)
+    "joiner_to_provisioned_time",
+    "leaver_to_revoked_time",
+    "mttc_identity_compromise",
 )
 
 
