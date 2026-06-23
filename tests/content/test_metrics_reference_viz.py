@@ -87,10 +87,17 @@ VIZ_REQUIRED_STEMS = (
     "recurring_cloud_misconfig",
     # F-MET SKELETON corrective-action governance cluster (#460)
     "control_effectiveness",
-    # F-MET SKELETON incident-process integrity cluster (this card)
+    # F-MET SKELETON incident-process integrity cluster (#461)
     "timeline_completeness",
     "review_completion_sla",
     "handoff_brief_delivery_sla",
+    # F-MET SKELETON CLOSEOUT cluster (this card) — closes G-04
+    # viz-coverage: every content/metrics/*.yaml now carries a sibling
+    # .viz.md reference visualisation.
+    "backup_integrity_pass_rate",
+    "cvd_intake_aging",
+    "escalation_tier_breach",
+    "releases_without_sbom",
 )
 
 
@@ -177,4 +184,28 @@ def test_viz_md_contains_mermaid_block() -> None:
     assert not missing, (
         "G-04 def-of-done: missing ```mermaid reference rendering in: "
         f"{missing}"
+    )
+
+
+def test_every_metric_yaml_has_viz_sibling() -> None:
+    """G-04 viz-coverage closeout: no `content/metrics/*.yaml` may
+    remain without a sibling `<stem>.viz.md`.
+
+    The F-MET catch-up wave (PRs #447–#461 plus the CLOSEOUT cluster)
+    landed reference-visualisation siblings for every catalog metric
+    one cluster at a time. With the CLOSEOUT cluster merged, this
+    assertion turns from "allow-listed coverage" into "full coverage"
+    — any future metric YAML must ship with a sibling viz.md in the
+    same PR, or this test fails and the catalog DoD regresses.
+    """
+    yamls = sorted(p for p in METRICS_DIR.glob("*.yaml"))
+    missing: list[str] = []
+    for yaml_path in yamls:
+        viz = yaml_path.with_suffix("").with_suffix(".viz.md")
+        if not viz.exists():
+            missing.append(yaml_path.stem)
+    assert not missing, (
+        "G-04 viz-coverage closeout: the following catalog metric YAMLs "
+        "have no sibling reference visualisation; every metric YAML must "
+        f"ship with a `<stem>.viz.md` alongside it: {missing}"
     )
