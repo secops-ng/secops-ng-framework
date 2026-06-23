@@ -78,9 +78,13 @@ VIZ_REQUIRED_STEMS = (
     "corrective_action_close_rate",
     "corrective_action_overdue",
     "patch_disseminated_on_time",
-    # F-MET SKELETON phishing-detection cluster (this card)
+    # F-MET SKELETON phishing-detection cluster (#458)
     "phishing_sim_click_rate",
     "phishing_suppression_rate",
+    # F-MET SKELETON detection-quality cluster (this card)
+    "false_positive_rate",
+    "lateral_hunt_coverage",
+    "recurring_cloud_misconfig",
 )
 
 

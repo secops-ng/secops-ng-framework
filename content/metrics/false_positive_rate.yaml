@@ -44,7 +44,13 @@ measurement:
     adjudicated true positive. Report FP_C / (FP_C + TP_C). Exclude
     firings whose adjudication is still pending at evaluation time so
     the indicator reflects closed dispositions only. Report per class;
-    aggregate across classes is left to the dashboard.
+    aggregate across classes is left to the dashboard. Reference
+    visualisation: a ratio-headline gauge with warn / breach overlays
+    over a per-detection-class false-positive-rate drill-down; the
+    committed reference rendering lives at
+    `content/metrics/false_positive_rate.viz.md` — that file is the
+    contract for the chart shape; the compile target renders the
+    executable form against operator data.
   inputs:
     - name: detection_firings
       description: >
