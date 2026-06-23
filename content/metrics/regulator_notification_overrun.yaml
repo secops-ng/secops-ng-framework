@@ -27,14 +27,30 @@ measurement:
     executable form against operator data.
   inputs:
   - name: numerator
-    description: Population that contributes to the risk reading (e.g. recurring findings,
-      missed notifications, breaches).
+    description: >
+      Population of regulator-facing notifications submitted after their
+      statutory deadline. Carried on the OCSF Incident Finding event the
+      regulator-notification step emits at dispatch (status_id transition
+      into the notified state) whose `time` is later than the statutory
+      clock boundary anchored on the case's start_time; the catalog entry
+      binds to that OCSF class shape, not to a regulator-submission
+      envelope.
+    telemetry_ref: telemetry.ocsf.incident_finding@v1
+    field: time
   - name: denominator
-    description: Reference population the numerator is normalised against. Omit for
-      raw-count KRIs.
+    description: >
+      Reference population of regulator-facing notifications due in the
+      evaluation window. Carried on the OCSF Incident Finding event the
+      regulator-notification step emits at every statutory-clock due-
+      event (status_id transition into the notification-due state),
+      regardless of whether the submission completed on time.
+    telemetry_ref: telemetry.ocsf.incident_finding@v1
+    field: time
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+- telemetry.ocsf.incident_finding@v1
 playbook_refs:
 - playbook_id: playbook.data_exfil@v1
   step_id: action--20000000-0000-4000-8000-000000000007

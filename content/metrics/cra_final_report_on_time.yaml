@@ -51,15 +51,28 @@ measurement:
       description: >
         Operator-awareness timestamp recorded by the CRA reporting
         trigger assessment step, used as the start of the 14-day clock.
+        Carried on the OCSF Incident Finding event the vuln_intake
+        reporting-trigger assessment step emits (status_id transition
+        into the CRA-reportable state); the catalog entry binds to that
+        OCSF class shape, not to a regulator-submission envelope.
       playbook_step: action--01a17a01-0000-4000-8000-000000000004
+      telemetry_ref: telemetry.ocsf.incident_finding@v1
+      field: start_time
     - name: notification_dispatch
       description: >
         Regulator-notification chain step transition that dispatches the
         final report submitted no later than 14 days after a corrective or mitigating measure becomes available.
+        Carried on the OCSF Incident Finding event the regulator-
+        notification step emits (status_id transition into the notified
+        state).
       playbook_step: action--01a17a01-0000-4000-8000-000000000006
+      telemetry_ref: telemetry.ocsf.incident_finding@v1
+      field: time
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+  - telemetry.ocsf.incident_finding@v1
 playbook_refs:
   - playbook_id: playbook.vuln_intake@v1
     step_id: action--01a17a01-0000-4000-8000-000000000006

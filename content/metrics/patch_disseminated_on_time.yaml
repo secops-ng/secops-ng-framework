@@ -48,15 +48,29 @@ measurement:
     - name: case_open
       description: >
         First playbook step transition that registers the disclosure on
-        the case ledger.
+        the case ledger. Carried on the OCSF Incident Finding event the
+        vuln_intake intake step emits when it opens the vulnerability
+        case (status_id transition into the intake-registered state);
+        the catalog entry binds to that OCSF class shape, not to a
+        vendor-specific vulnerability-tracker object.
       playbook_step: action--01a17a01-0000-4000-8000-000000000002
+      telemetry_ref: telemetry.ocsf.incident_finding@v1
+      field: start_time
     - name: dissemination
       description: >
         Per-severity response step transition that dispatches the
-        security update and advisory.
+        security update and advisory. Carried on the OCSF Incident
+        Finding event the vuln_intake dissemination step emits at
+        publish (status_id transition into the disseminated state); the
+        catalog entry binds to that OCSF class shape, not to a vendor-
+        specific release-pipeline or advisory-feed object.
+      telemetry_ref: telemetry.ocsf.incident_finding@v1
+      field: time
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+  - telemetry.ocsf.incident_finding@v1
 playbook_refs:
   - playbook_id: playbook.vuln_intake@v1
     step_id: action--01a17a01-0000-4000-8000-000000000008
