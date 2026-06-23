@@ -36,7 +36,18 @@ measurement:
     For each triage step transition recorded within the evaluation
     window, increment when the SBOM PURL lookup against the affected
     release returns no record. Distinct releases are counted once per
-    window.
+    window. Reference visualisation: a horizontal bar chart of
+    SBOM-presence (1 = lookup returned a top-level-dependency SBOM,
+    0 = no record) per distinct release observed in the evaluation
+    window, sliced by release origin (first-party-internal-build /
+    vendor-redistribute / upstream-open-source), with a horizontal line
+    at the presence-floor of 1 marking the SBOM-required predicate and
+    the count aggregate annotated as the headline figure; the chart is
+    the canonical operator-facing surface for this KRI. The committed
+    reference rendering lives at
+    `content/metrics/releases_without_sbom.viz.md` — that file is the
+    contract for the chart shape; the compile target renders the
+    executable form against operator data.
   inputs:
     - name: triage_step
       description: >
