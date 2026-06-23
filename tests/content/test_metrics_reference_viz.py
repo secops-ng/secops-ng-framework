@@ -40,10 +40,14 @@ VIZ_REQUIRED_STEMS = (
     "breach_notification_clock_margin",
     # F-MET SKELETON detection_coverage (#448)
     "detection_coverage",
-    # F-MET SKELETON mttd detection-latency cluster (this card)
+    # F-MET SKELETON mttd detection-latency cluster (#449)
     "mttd",
     "mttd_phishing",
     "mttd_ransomware",
+    # F-MET SKELETON mttr remediation-latency cluster (this card)
+    "mttr",
+    "mttr_containment",
+    "mttr_phishing_triage",
 )
 
 
