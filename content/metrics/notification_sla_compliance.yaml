@@ -12,9 +12,19 @@ direction: higher_is_better
 measurement:
   source: composite
   aggregation: ratio
-  formula: Computed from the lower content layers per the inputs below. The catalog
-    entry is the contract; the compile target is the source of truth for the executable
-    form.
+  formula: >
+    Computed from the lower content layers per the inputs below. The
+    catalog entry is the contract; the compile target is the source of
+    truth for the executable form. Reference visualisation: a horizontal
+    bar chart of delivery_margin_minutes per operator-facing
+    notification dispatched in the window, sliced by notification
+    channel, with a vertical line at zero marking the on-time predicate
+    and the ratio aggregate annotated as the headline figure; the chart
+    is the canonical operator-facing surface for this KPI. The committed
+    reference rendering lives at
+    `content/metrics/notification_sla_compliance.viz.md` — that file is
+    the contract for the chart shape; the compile target renders the
+    executable form against operator data.
   inputs:
   - name: numerator
     description: Population matching the indicator's success (or, for lower-is-better,
