@@ -11,9 +11,14 @@ direction: lower_is_better
 measurement:
   source: composite
   aggregation: ratio
-  formula: Computed from the lower content layers per the inputs below. The catalog
+  formula: 'Computed from the lower content layers per the inputs below. The catalog
     entry is the contract; the compile target is the source of truth for the executable
-    form.
+    form. Reference visualisation: a ratio-headline gauge over a per-corrective-action
+    due-date-margin drill-down sliced by severity band, with a zero-line overdue overlay
+    on the drill-down; the committed reference rendering lives at
+    `content/metrics/corrective_action_overdue.viz.md` — that file is the contract for
+    the chart shape; the compile target renders the executable form against operator
+    data.'
   inputs:
   - name: numerator
     description: Population that contributes to the risk reading (e.g. recurring findings,

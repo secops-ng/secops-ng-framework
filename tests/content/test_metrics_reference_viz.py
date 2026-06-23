@@ -70,10 +70,14 @@ VIZ_REQUIRED_STEMS = (
     "notification_sla_compliance",
     "regulator_notification_overrun",
     "vuln_disclosure_sla",
-    # F-MET SKELETON coverage cluster (this card)
+    # F-MET SKELETON coverage cluster (#456)
     "cloud_posture_coverage",
     "coverage_on_call_schedule",
     "coverage_threat_intel_feed",
+    # F-MET SKELETON remediation-throughput cluster (this card)
+    "corrective_action_close_rate",
+    "corrective_action_overdue",
+    "patch_disseminated_on_time",
 )
 
 
