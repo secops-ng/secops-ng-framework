@@ -25,10 +25,22 @@ thresholds:
 measurement:
   source: composite
   aggregation: ratio
-  formula: Ratio of in-scope assets, schedules, feeds, or surfaces covered by the
-    named control surface to the total in-scope population, evaluated over a rolling
-    window. Exclude entries where the in-scope population is unknown so the indicator
-    does not silently improve on record-keeping gaps.
+  formula: >
+    Ratio of in-scope on-call rotation hours with at least one named
+    primary responder assigned to total in-scope rotation hours,
+    evaluated over a rolling window. Exclude rotation hours whose
+    in-scope state is unknown so the indicator does not silently improve
+    on record-keeping gaps.
+    Reference visualisation: a per-rotation stacked horizontal bar chart
+    partitioned by coverage state (covered / uncovered), with the
+    overall `covered_population / total_population` ratio annotated as
+    the headline figure and the warn / breach thresholds overlaid on a
+    companion ratio axis; the chart is the canonical operator-facing
+    surface for this KPI and the compile target is the source of truth
+    for the executable form. The committed reference rendering lives at
+    `content/metrics/coverage_on_call_schedule.viz.md` — that file is
+    the contract for the chart shape; the compile target renders the
+    executable form against operator data.
   inputs:
   - name: covered_population
     description: Count of in-scope entries currently under the named control surface.
