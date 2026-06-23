@@ -28,14 +28,30 @@ measurement:
     shape; the compile target renders the executable form against operator data.'
   inputs:
   - name: earliest_telemetry_event
-    description: Earliest event in the telemetry stream that, in hindsight, was part
-      of the incident's causal chain.
+    description: >
+      Earliest event in the telemetry stream that, in hindsight, was
+      part of the incident's causal chain. OCSF Email Activity (class_uid
+      4009) — the inbound-email observation that, in hindsight, is the
+      causal-chain origin for a phishing-rooted incident; the
+      phishing_triage playbook consumes this class as its primary input.
+    telemetry_ref: telemetry.ocsf.email_activity@v1
+    field: time
   - name: first_detection_fire
-    description: First authoritative detection firing that opened the incident record.
-      Catalog entry is detection-vendor-neutral.
+    description: >
+      First authoritative detection firing that opened the incident
+      record. Carried on the OCSF Detection Finding meta-finding the
+      detection_engineering measure-rule-version step emits and that
+      SIEM rule matches downstream emit at runtime; the catalog entry
+      binds to that OCSF class shape, not to a vendor-specific rule
+      object. Catalog entry is detection-vendor-neutral.
+    telemetry_ref: telemetry.ocsf.detection_finding@v1
+    field: finding_info.uid
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+- telemetry.ocsf.detection_finding@v1
+- telemetry.ocsf.email_activity@v1
 playbook_refs:
 - playbook_id: playbook.phishing_triage@v1
   step_id: action--c0a17a01-0000-4000-8000-000000000003

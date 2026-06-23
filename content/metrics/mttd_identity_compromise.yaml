@@ -30,14 +30,31 @@ measurement:
     data.'
   inputs:
   - name: earliest_telemetry_event
-    description: Earliest event in the telemetry stream that, in hindsight, was part
-      of the incident's causal chain.
+    description: >
+      Earliest event in the telemetry stream that, in hindsight, was
+      part of the incident's causal chain. OCSF Authentication (class_uid
+      3002) — the earliest authentication observation (anomalous logon,
+      token-replay, MFA-bypass attempt) that, in hindsight, is the
+      causal-chain origin for an identity-compromise-rooted incident.
+      The identity_compromise playbook consumes this class.
+    telemetry_ref: telemetry.ocsf.authentication@v1
+    field: time
   - name: first_detection_fire
-    description: First authoritative detection firing that opened the incident record.
-      Catalog entry is detection-vendor-neutral.
+    description: >
+      First authoritative detection firing that opened the incident
+      record. Carried on the OCSF Detection Finding meta-finding the
+      detection_engineering measure-rule-version step emits and that
+      SIEM rule matches downstream emit at runtime; the catalog entry
+      binds to that OCSF class shape, not to a vendor-specific rule
+      object. Catalog entry is detection-vendor-neutral.
+    telemetry_ref: telemetry.ocsf.detection_finding@v1
+    field: finding_info.uid
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+- telemetry.ocsf.authentication@v1
+- telemetry.ocsf.detection_finding@v1
 playbook_refs:
 - playbook_id: playbook.identity_compromise@v1
   step_id: action--30000000-0000-4000-8000-000000000002
