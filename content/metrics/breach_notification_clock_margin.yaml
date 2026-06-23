@@ -1,0 +1,117 @@
+stable_id: kri.breach_notification_clock_margin@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: GDPR Art. 33 breach-notification clock margin
+summary: >
+  Remaining margin to the GDPR Article 33(1) 72-hour personal-data-breach
+  notification deadline for in-flight breach cases, measured as
+  (awareness_timestamp + 72 hours) - now for cases whose Art. 33(3)
+  notification has not yet been dispatched. A residual-risk indicator
+  on the regulator-notification edge of the breach-notification cluster:
+  the smaller the bottom-percentile margin across active cases, the
+  closer the operator's notification pipeline is to overrunning the
+  72-hour clock. Bound to the personal-data-breach notification engine
+  (playbook.incident_management@v1) that times the clock and submits
+  the Art. 33 envelope; the catalog entry is supervisory-authority-
+  neutral and the compile target resolves the operator's concrete
+  regulator destination.
+unit: minutes
+direction: higher_is_better
+target:
+  value: 1440
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point: hold at least 24 hours of
+    safety buffer between the bottom-percentile case and the Art. 33
+    deadline so the notification pipeline can absorb a stage-clock
+    slip without filing late. Operators with tighter internal SLOs
+    (e.g. a 12-hour buffer) override the target in the compile target
+    without diverging the catalog contract.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 1440
+    severity: warn
+  - name: high
+    comparator: "<"
+    value: 240
+    severity: high
+  - name: breach
+    comparator: "<"
+    value: 0
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: min
+  formula: >
+    For each open Art. 33-reportable incident currently in flight in
+    the evaluation window — i.e. the personal-data-breach trigger has
+    fired at classification and the Art. 33 notification step has not
+    yet emitted its timeline event — compute
+    margin_minutes = ((awareness_timestamp + 72 hours) - evaluation_now)
+    in minutes. Aggregate as the min across active cases (the worst-
+    case in-flight margin the operator can see on the dashboard,
+    i.e. the case nearest the 72-hour deadline). Exclude cases whose Art. 33 notification has
+    already dispatched (those are settled and tracked by
+    `kpi.notification_72h_on_time@v1` / `kri.regulator_notification_overrun@v1`)
+    so the indicator does not silently improve when notifications
+    complete; exclude cases whose classification step has not yet
+    confirmed the Art. 4(12) personal-data-breach definition so the
+    indicator does not smear over candidate-only cases. A negative
+    margin means the case has overrun the clock and an Art. 33(1)
+    "reasons for the delay" record is required on submission.
+    Reference visualisation: a horizontal bar chart of margin_minutes
+    per active case sliced by classification severity, with the warn /
+    high / breach thresholds overlaid as vertical lines and the min
+    aggregate annotated as the headline figure; the bar chart is the canonical operator-
+    facing surface for this KRI and the compile target is the source
+    of truth for the executable form.
+  inputs:
+    - name: awareness_timestamp
+      description: >
+        Operator-awareness timestamp recorded by the
+        incident_management classification step when the Art. 4(12)
+        personal-data-breach definition is met, used as the start of
+        the GDPR Art. 33 72-hour clock.
+      playbook_step: action--50000000-0000-4000-8000-000000000003
+    - name: notification_dispatch
+      description: >
+        Regulator-notification step transition that emits the
+        Art. 33(3) notification timeline event. Absence of this event
+        for a personal-data-breach-classified case is what marks the
+        case as in-flight for the margin computation.
+      playbook_step: action--50000000-0000-4000-8000-000000000007
+    - name: evaluation_now
+      description: >
+        Timestamp at which the indicator is evaluated. Supplied by
+        the compile target's scheduler; the catalog contract is the
+        formula, not the cadence.
+  window:
+    duration: P30D
+    sliding: true
+playbook_refs:
+  - playbook_id: playbook.incident_management@v1
+    step_id: action--50000000-0000-4000-8000-000000000003
+  - playbook_id: playbook.incident_management@v1
+    step_id: action--50000000-0000-4000-8000-000000000007
+external_refs:
+  - name: GDPR — Article 33(1) breach-notification clock (72 hours)
+    source: EU
+    external_id: Regulation (EU) 2016/679, Art. 33(1)
+    url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+  - name: GDPR — Article 33(3) notification content fields
+    source: EU
+    external_id: Regulation (EU) 2016/679, Art. 33(3)
+    url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+  - name: GDPR — Article 4(12) personal-data-breach definition
+    source: EU
+    external_id: Regulation (EU) 2016/679, Art. 4(12)
+    url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+  - name: EDPB — Guidelines 9/2022 on personal data breach notification
+    source: EDPB
+    url: https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-92022-personal-data-breach-notification_en
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
