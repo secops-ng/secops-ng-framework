@@ -60,7 +60,7 @@ title: "kpi.phishing_sim_click_rate@v1 — click rate per simulation campaign (P
 ---
 xychart-beta horizontal
     title "share of in-scope recipients who clicked the simulated lure, per campaign"
-    x-axis "simulation campaign (fired in window)" ["camp-A (engineering)", "camp-B (finance)", "camp-C (sales)", "camp-D (operations)", "camp-E (executive)"]
+    x-axis "simulation campaign (fired in window)" ["camp-A (engineering)", "camp-B (finance)", "camp-C (support)", "camp-D (operations)", "camp-E (executive)"]
     y-axis "click_rate" 0 --> 0.30
     bar [0.02, 0.05, 0.11, 0.17, 0.22]
 ```
@@ -73,7 +73,7 @@ counts implied by the cohort labels):
 |------------------------|------------|--------------------------------------------------------|
 | camp-A (engineering)   | 0.02       | very low click rate — strong awareness reinforcement   |
 | camp-B (finance)       | 0.05       | low click rate, comfortably below cohort expectation   |
-| camp-C (sales)         | 0.11       | mid-band — programme owner watches the trend           |
+| camp-C (support)       | 0.11       | mid-band — programme owner watches the trend           |
 | camp-D (operations)    | 0.17       | elevated — pulls the headline reading upward           |
 | camp-E (executive)     | 0.22       | top of drill-down — awareness reinforcement candidate  |
 
