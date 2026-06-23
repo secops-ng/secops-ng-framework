@@ -53,10 +53,15 @@ VIZ_REQUIRED_STEMS = (
     "cra_notification_72h_on_time",
     "cra_severe_incident_on_time",
     "cra_final_report_on_time",
-    # F-MET SKELETON mttr per-scenario remediation-latency cluster (this card)
+    # F-MET SKELETON mttr per-scenario remediation-latency cluster (#453)
     "mttr_blocklist_propagation",
     "mttr_cloud_misconfig",
     "mttr_on_call_ack",
+    # F-MET SKELETON mttd per-scenario detection-latency cluster (this card)
+    "mttd_cloud_misconfig",
+    "mttd_exfil",
+    "mttd_identity_compromise",
+    "mttd_threat_intel_indicator",
 )
 
 
