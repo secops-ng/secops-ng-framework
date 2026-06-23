@@ -66,27 +66,42 @@ measurement:
     high / breach thresholds overlaid as vertical lines and the min
     aggregate annotated as the headline figure; the bar chart is the canonical operator-
     facing surface for this KRI and the compile target is the source
-    of truth for the executable form.
+    of truth for the executable form. The committed reference
+    rendering lives at
+    `content/metrics/breach_notification_clock_margin.viz.md` — that
+    file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
   inputs:
     - name: awareness_timestamp
       description: >
         Operator-awareness timestamp recorded by the
         incident_management classification step when the Art. 4(12)
         personal-data-breach definition is met, used as the start of
-        the GDPR Art. 33 72-hour clock.
+        the GDPR Art. 33 72-hour clock. Carried on the Incident
+        Finding event the classification step emits (status_id
+        transition into the classified-as-breach state); the catalog
+        entry binds to the OCSF class shape, not to a regulator-
+        submission envelope.
       playbook_step: action--50000000-0000-4000-8000-000000000003
+      telemetry_ref: telemetry.ocsf.incident_finding@v1
+      field: start_time
     - name: notification_dispatch
       description: >
         Regulator-notification step transition that emits the
         Art. 33(3) notification timeline event. Absence of this event
         for a personal-data-breach-classified case is what marks the
-        case as in-flight for the margin computation.
+        case as in-flight for the margin computation. Carried on the
+        Incident Finding event the regulator-notification step emits
+        (status_id transition into the notified state).
       playbook_step: action--50000000-0000-4000-8000-000000000007
+      telemetry_ref: telemetry.ocsf.incident_finding@v1
+      field: time
     - name: evaluation_now
       description: >
         Timestamp at which the indicator is evaluated. Supplied by
         the compile target's scheduler; the catalog contract is the
-        formula, not the cadence.
+        formula, not the cadence. Not bound to a telemetry class —
+        this is the scheduler clock, not an OCSF event.
   window:
     duration: P30D
     sliding: true
@@ -95,6 +110,8 @@ playbook_refs:
     step_id: action--50000000-0000-4000-8000-000000000003
   - playbook_id: playbook.incident_management@v1
     step_id: action--50000000-0000-4000-8000-000000000007
+telemetry_refs:
+  - telemetry.ocsf.incident_finding@v1
 external_refs:
   - name: GDPR — Article 33(1) breach-notification clock (72 hours)
     source: EU
