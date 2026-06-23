@@ -44,6 +44,16 @@ measurement:
     where the earliest telemetry timestamp is unknown (record-keeping
     gap) so the indicator does not silently improve when ingestion
     breaks.
+    Reference visualisation: a horizontal bar chart of
+    detection_latency_minutes per closed incident in the window with
+    the warn / breach thresholds overlaid as vertical lines and the
+    p95 aggregate annotated as the headline figure; the bar chart is
+    the canonical operator-facing surface for this KPI and the
+    compile target is the source of truth for the executable form.
+    The committed reference rendering lives at
+    `content/metrics/mttd.viz.md` — that file is the contract for
+    the chart shape; the compile target renders the executable form
+    against operator data.
   inputs:
     - name: earliest_telemetry_event
       description: >
