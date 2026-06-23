@@ -44,13 +44,34 @@ measurement:
     executable form against operator data.
   inputs:
   - name: covered_population
-    description: Count of in-scope entries currently under the named control surface.
+    description: >
+      Count of in-scope cloud-account containers (accounts, subscriptions,
+      projects, tenants) currently under the named posture-management
+      surface. A container counts as covered when at least one
+      posture-rule evaluation against it has been observed in the
+      evaluation window. Carried on the OCSF Detection Finding
+      meta-finding the cloud-posture surface emits at each posture-rule
+      evaluation (`finding_info.uid` records the rule-evaluation
+      identity, and the affected container is carried on the finding's
+      cloud-context fields); the catalog entry binds to that OCSF class
+      shape, not to a vendor-specific CSPM finding object.
+    telemetry_ref: telemetry.ocsf.detection_finding@v1
+    field: finding_info.uid
   - name: total_population
-    description: Count of in-scope entries the operator believes should be under the
-      named control surface.
+    description: >
+      Count of in-scope cloud-account containers (accounts, subscriptions,
+      projects, tenants) the operator believes should be under the named
+      posture-management surface. Sourced from the operator's cloud-
+      inventory scoping artifact rather than the telemetry stream — the
+      catalog entry does not name a specific inventory file. Excluding
+      this from a telemetry binding keeps the denominator stable against
+      ingestion gaps in the posture surface itself, matching the
+      detection_coverage convention.
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+- telemetry.ocsf.detection_finding@v1
 playbook_refs:
 - playbook_id: playbook.cloud_misconfiguration@v1
   step_id: action--30000000-0000-4000-8000-000000000003

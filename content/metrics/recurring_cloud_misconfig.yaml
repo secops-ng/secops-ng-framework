@@ -20,14 +20,33 @@ measurement:
     executable form against operator data.'
   inputs:
   - name: numerator
-    description: Population that contributes to the risk reading (e.g. recurring findings,
-      missed notifications, breaches).
+    description: >
+      Population of cloud_misconfiguration findings re-observed within
+      the evaluation window after a prior remediation had closed them.
+      Carried on the OCSF Detection Finding the cloud-posture surface
+      emits at each posture-rule firing; the recurring subset is the set
+      of findings whose `finding_info.uid` resolves to a posture-rule /
+      container pair that had a prior closed state earlier in the case
+      ledger and re-fired inside the window. The catalog entry binds to
+      that OCSF class shape, not to a vendor-specific CSPM finding
+      object.
+    telemetry_ref: telemetry.ocsf.detection_finding@v1
+    field: finding_info.uid
   - name: denominator
-    description: Reference population the numerator is normalised against. Omit for
-      raw-count KRIs.
+    description: >
+      Reference population of all cloud_misconfiguration findings
+      observed in the evaluation window, regardless of whether the
+      finding represents a first occurrence or a recurrence. Carried on
+      the same OCSF Detection Finding class as the numerator; the
+      catalog entry binds to that OCSF class shape, not to a vendor-
+      specific CSPM finding object.
+    telemetry_ref: telemetry.ocsf.detection_finding@v1
+    field: finding_info.uid
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+- telemetry.ocsf.detection_finding@v1
 playbook_refs:
 - playbook_id: playbook.cloud_misconfiguration@v1
   step_id: action--30000000-0000-4000-8000-000000000005
