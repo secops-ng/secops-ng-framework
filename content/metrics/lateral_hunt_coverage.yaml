@@ -25,10 +25,15 @@ thresholds:
 measurement:
   source: composite
   aggregation: ratio
-  formula: Ratio of in-scope assets, schedules, feeds, or surfaces covered by the
+  formula: 'Ratio of in-scope assets, schedules, feeds, or surfaces covered by the
     named control surface to the total in-scope population, evaluated over a rolling
     window. Exclude entries where the in-scope population is unknown so the indicator
-    does not silently improve on record-keeping gaps.
+    does not silently improve on record-keeping gaps. Reference visualisation: a
+    per-family stacked horizontal bar chart with covered / uncovered partitions and
+    a ratio-headline gauge carrying warn / breach overlays; the committed reference
+    rendering lives at `content/metrics/lateral_hunt_coverage.viz.md` — that file
+    is the contract for the chart shape; the compile target renders the executable
+    form against operator data.'
   inputs:
   - name: covered_population
     description: Count of in-scope entries currently under the named control surface.
