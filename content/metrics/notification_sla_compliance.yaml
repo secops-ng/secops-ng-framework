@@ -27,13 +27,29 @@ measurement:
     executable form against operator data.
   inputs:
   - name: numerator
-    description: Population matching the indicator's success (or, for lower-is-better,
-      failure) condition.
+    description: >
+      Population of operator-facing notifications delivered within their
+      committed SLA. Carried on the OCSF Incident Finding event the
+      incident_management notification step emits (status_id transition
+      into the notified state) whose `time` is earlier than the
+      committed SLA boundary; the catalog entry binds to that OCSF class
+      shape, not to a vendor-specific paging / ticketing object.
+    telemetry_ref: telemetry.ocsf.incident_finding@v1
+    field: time
   - name: denominator
-    description: Reference population the numerator is normalised against.
+    description: >
+      Reference population of operator-facing notifications due in the
+      evaluation window. Carried on the OCSF Incident Finding event the
+      incident_management notification step emits at every committed-SLA
+      due-event (status_id transition into the notification-due state),
+      regardless of whether the delivery completed on time.
+    telemetry_ref: telemetry.ocsf.incident_finding@v1
+    field: time
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+- telemetry.ocsf.incident_finding@v1
 playbook_refs:
 - playbook_id: playbook.data_exfil@v1
   step_id: action--20000000-0000-4000-8000-000000000007

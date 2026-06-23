@@ -52,16 +52,29 @@ measurement:
     - name: intake_disclosure
       description: >
         First playbook step transition that registers an inbound
-        disclosure on the case ledger.
+        disclosure on the case ledger. Carried on the OCSF Incident
+        Finding event the vuln_intake intake step emits when it opens
+        the case (status_id transition into the intake-registered state);
+        the catalog entry binds to that OCSF class shape, not to a
+        vendor-specific case-management object.
       playbook_step: action--01a17a01-0000-4000-8000-000000000002
+      telemetry_ref: telemetry.ocsf.incident_finding@v1
+      field: start_time
     - name: reporter_acknowledgement
       description: >
         Acknowledgement send-event recorded against the disclosure on the
         case ledger. The compile target binds the concrete delivery
-        channel.
+        channel. Carried on the OCSF Incident Finding event the
+        vuln_intake reporter-acknowledgement step emits at send (status_id
+        transition into the acknowledged state); the catalog entry binds
+        to that OCSF class shape, not to a delivery-channel object.
+      telemetry_ref: telemetry.ocsf.incident_finding@v1
+      field: time
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+  - telemetry.ocsf.incident_finding@v1
 playbook_refs:
   - playbook_id: playbook.vuln_intake@v1
     step_id: action--01a17a01-0000-4000-8000-000000000002
