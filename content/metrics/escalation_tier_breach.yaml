@@ -27,14 +27,42 @@ measurement:
     executable form against operator data.
   inputs:
   - name: numerator
-    description: Population that contributes to the risk reading (e.g. recurring findings,
-      missed notifications, breaches).
+    description: >
+      Population of incidents in the evaluation window whose engaged
+      escalation tier exceeded the planned tier ceiling carried on the
+      bound chain for the responsible shift. Joined against the OCSF
+      Account Change event the on_call_rotation bind-escalation-tiers
+      step emits each shift carrying the bound primary / secondary /
+      manager chain — an incident counts toward the numerator when its
+      engagement record references a responder whose tier index in the
+      bound chain is past the planned ceiling for that shift. Carried
+      on the OCSF Account Change class because the bound chain is the
+      durable record of which managed-account tiers are in scope for
+      paging on the evaluated shift window, and the actor.user.uid of
+      the engaged responder is the join key. The catalog entry binds
+      to that OCSF class shape, not to a vendor-specific paging or
+      ticketing product.
+    playbook_step: action--30000000-0000-4000-8000-000000000003
+    telemetry_ref: telemetry.ocsf.account_change@v1
+    field: actor.user.uid
   - name: denominator
-    description: Reference population the numerator is normalised against. Omit for
-      raw-count KRIs.
+    description: >
+      Reference population of in-scope incidents in the evaluation
+      window keyed against the bound-chain records the on_call_rotation
+      bind-escalation-tiers step emits one-per-shift. Carried on the
+      OCSF Account Change event the same step emits at chain binding;
+      the join from incident -> responsible shift -> bound chain
+      yields exactly one bound-chain reference per in-scope incident
+      in the window, regardless of whether the engaged tier later
+      exceeded the planned ceiling.
+    playbook_step: action--30000000-0000-4000-8000-000000000003
+    telemetry_ref: telemetry.ocsf.account_change@v1
+    field: actor.user.uid
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+- telemetry.ocsf.account_change@v1
 playbook_refs:
 - playbook_id: playbook.on_call_rotation@v1
   step_id: action--30000000-0000-4000-8000-000000000003

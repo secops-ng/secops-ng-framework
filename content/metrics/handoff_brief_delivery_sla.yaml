@@ -26,13 +26,38 @@ measurement:
     executable form against operator data.
   inputs:
   - name: numerator
-    description: Population matching the indicator's success (or, for lower-is-better,
-      failure) condition.
+    description: >
+      Population of dispatched shift-handoff briefs whose
+      notify-incoming-on-call delivery dispatch landed inside the
+      committed time-window for the rotation boundary. Carried on the
+      OCSF API Activity event the on_call_rotation
+      notify-incoming-on-call step emits at delivery dispatch
+      (request metadata records compose-time and deliver-time
+      independently so the on-time predicate can be evaluated against
+      the operator's pre-bound channel). The catalog entry binds to
+      that OCSF class shape, not to a vendor-specific paging,
+      messaging, or email product.
+    playbook_step: action--30000000-0000-4000-8000-000000000006
+    telemetry_ref: telemetry.ocsf.api_activity@v1
+    field: time
   - name: denominator
-    description: Reference population the numerator is normalised against.
+    description: >
+      Reference population of in-scope shift-handoff briefs the
+      on_call_rotation generate-handoff-brief step composed for
+      rotation boundaries in the evaluation window. Carried on the
+      OCSF API Activity event the generate-handoff-brief step emits at
+      brief-artifact emission to the structured handoff store
+      (start_time anchors the compose-time event for each composed
+      brief), regardless of whether the subsequent delivery dispatch
+      landed inside the committed window.
+    playbook_step: action--30000000-0000-4000-8000-000000000005
+    telemetry_ref: telemetry.ocsf.api_activity@v1
+    field: start_time
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+- telemetry.ocsf.api_activity@v1
 playbook_refs:
 - playbook_id: playbook.on_call_rotation@v1
   step_id: action--30000000-0000-4000-8000-000000000005

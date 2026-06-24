@@ -26,13 +26,35 @@ measurement:
     executable form against operator data.
   inputs:
   - name: numerator
-    description: Population matching the indicator's success (or, for lower-is-better,
-      failure) condition.
+    description: >
+      Population of closed incidents in the evaluation window whose
+      post-incident review artefact emission landed inside the
+      committed review-completion window after closeout. Carried on
+      the OCSF Incident Finding event the post_incident_review
+      blameless-review-template step emits at review-artefact
+      registration (the case envelope records the review artefact
+      reference and the review-completion time); the catalog entry
+      binds to that OCSF class shape, not to a vendor-specific
+      case-management, ticketing, or document-management product.
+    playbook_step: action--40000000-0000-4000-8000-000000000003
+    telemetry_ref: telemetry.ocsf.incident_finding@v1
+    field: time
   - name: denominator
-    description: Reference population the numerator is normalised against.
+    description: >
+      Reference population of in-scope incidents closed during the
+      evaluation window. Carried on the OCSF Incident Finding event
+      the operator's per-incident playbooks emit at incident closeout
+      (start_time anchors the closeout event from which the
+      review-completion clock starts), regardless of whether the
+      post-incident review artefact has since been emitted.
+    playbook_step: action--40000000-0000-4000-8000-000000000003
+    telemetry_ref: telemetry.ocsf.incident_finding@v1
+    field: start_time
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+- telemetry.ocsf.incident_finding@v1
 playbook_refs:
 - playbook_id: playbook.post_incident_review@v1
   step_id: action--40000000-0000-4000-8000-000000000003
