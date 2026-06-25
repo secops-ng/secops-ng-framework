@@ -1,0 +1,38 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.configuration_settings@v1
+title: Configuration settings
+summary: >-
+  Operator establishes and enforces mandatory configuration settings for
+  systems and components — drawing on recognised hardening guides — so
+  deployed systems match the declared secure-by-default posture and
+  drift is detected and remediated.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "CM-6"
+    title: "Configuration Settings"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "CM-7"
+    title: "Least Functionality"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.8.9"
+    title: "Configuration management"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-e"
+    title: "Security in network and information systems acquisition, development and maintenance"
+  - catalog: "CRA Annex I"
+    control_id: "annex-i-1-b"
+    title: "Delivery with a secure default configuration"
+
+d3fend_refs:
+  - d3f_id: D3-SCP
+    technique_name: "System Configuration Permissions"
+    url: https://d3fend.mitre.org/technique/d3f:SystemConfigurationPermissions/
+    offensive_techniques_attack:
+      - T1562
+      - T1601
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:SystemConfigurationPermissions/
+  captured_at: '2026-06-25'

@@ -1,0 +1,41 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.least_privilege@v1
+title: Least privilege
+summary: >-
+  Operator authorises access for users, processes, and services only
+  with the privileges strictly necessary to accomplish assigned tasks,
+  and reviews entitlements periodically so unused or over-broad rights
+  are removed.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "AC-6"
+    title: "Least Privilege"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "AC-6(7)"
+    title: "Review of User Privileges"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.8.2"
+    title: "Privileged access rights"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.5.15"
+    title: "Access control"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-i"
+    title: "Access control"
+  - catalog: "CRA Annex I"
+    control_id: "annex-i-1-d"
+    title: "Protection from unauthorised access by appropriate control mechanisms"
+
+d3fend_refs:
+  - d3f_id: D3-LFP
+    technique_name: "Local File Permissions"
+    url: https://d3fend.mitre.org/technique/d3f:LocalFilePermissions/
+    offensive_techniques_attack:
+      - T1222
+      - T1548
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:LocalFilePermissions/
+  captured_at: '2026-06-25'

@@ -1,0 +1,38 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.service_identification_authentication@v1
+title: Service identification and authentication
+summary: >-
+  Operator uniquely identifies and authenticates non-organisational
+  services and workloads — including machine-to-machine and inter-service
+  calls — before granting access to protected resources, so every
+  workload identity is anchored to a verifiable credential.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "IA-9"
+    title: "Service Identification and Authentication"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "IA-5"
+    title: "Authenticator Management"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.8.5"
+    title: "Secure authentication"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-j"
+    title: "Multi-factor or continuous authentication"
+  - catalog: "CRA Annex I"
+    control_id: "annex-i-1-d"
+    title: "Protection from unauthorised access by appropriate control mechanisms"
+
+d3fend_refs:
+  - d3f_id: D3-CBAN
+    technique_name: "Certificate-based Authentication"
+    url: https://d3fend.mitre.org/technique/d3f:Certificate-basedAuthentication/
+    offensive_techniques_attack:
+      - T1078
+      - T1550
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:Certificate-basedAuthentication/
+  captured_at: '2026-06-25'

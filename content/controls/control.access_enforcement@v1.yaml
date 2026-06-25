@@ -1,0 +1,38 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.access_enforcement@v1
+title: Access enforcement
+summary: >-
+  Operator enforces approved authorisations for logical access to
+  information and system resources in accordance with applicable access
+  control policies, so every request is mediated against a policy
+  decision point before resources are served.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "AC-3"
+    title: "Access Enforcement"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.5.15"
+    title: "Access control"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.8.3"
+    title: "Information access restriction"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-i"
+    title: "Access control"
+  - catalog: "CRA Annex I"
+    control_id: "annex-i-1-d"
+    title: "Protection from unauthorised access by appropriate control mechanisms"
+
+d3fend_refs:
+  - d3f_id: D3-AM
+    technique_name: "Access Mediation"
+    url: https://d3fend.mitre.org/technique/d3f:AccessMediation/
+    offensive_techniques_attack:
+      - T1548
+      - T1068
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:AccessMediation/
+  captured_at: '2026-06-25'
