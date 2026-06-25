@@ -59,17 +59,38 @@ measurement:
   inputs:
     - name: in_scope_controls
       description: >
-        Set of controls the operator has declared in scope. Sourced
-        from the operator's control catalog (typically an OSCAL system
-        security plan or equivalent); the catalog entry does not name
-        a specific artifact.
+        Set of controls the operator has declared in scope. Carried on
+        the OCSF Compliance Finding event the operator's control
+        catalog emits at each attestation cycle — every in-scope
+        control surfaces as one Compliance Finding record keyed on
+        `compliance.control` (the catalog control identifier), so the
+        in-scope population is the distinct set of control identifiers
+        observed across the cycle. The catalog entry binds to that
+        OCSF class shape, not to a vendor-specific GRC, SSP, or
+        attestation-tool object.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: compliance.control
     - name: latest_attestation
       description: >
         Most recent attestation per control as of the evaluation
-        timestamp, with effectiveness state and attestation date.
+        timestamp. Carried on the same OCSF Compliance Finding event
+        the operator's control catalog emits at each attestation
+        cycle — the latest record per `compliance.control` carries the
+        effectiveness state on `compliance.status_id` (mapped to
+        effective / partially effective / ineffective in
+        `compliance.status`) and the attestation timestamp on `time`,
+        anchoring both axes the indicator needs on the same OCSF class
+        as the in-scope-controls input. A control whose latest
+        attestation predates its declared review cadence counts as
+        overdue (NOT effective) per the formula.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: compliance.status_id
   window:
     duration: P1D
     sliding: false
+
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
 
 external_refs:
   # Primary regulatory anchors. Only IDs already named in

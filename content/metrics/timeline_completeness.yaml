@@ -27,13 +27,44 @@ measurement:
     executable form against operator data.
   inputs:
   - name: numerator
-    description: Population matching the indicator's success (or, for lower-is-better,
-      failure) condition.
+    description: >
+      Population of incidents closed within the evaluation window
+      whose post-incident timeline carries all mandatory milestones
+      (first observation, detection, triage, containment, eradication,
+      recovery, closeout). Carried on the OCSF Incident Finding event
+      the post_incident_review timeline-collation step emits when it
+      stamps the collated milestone set onto the incident record at
+      review-artefact registration — the playbook's mappings.yaml
+      commits the timeline-collation step to Incident Finding
+      (class_uid 2005), with the incident timeline composed from the
+      incident.* extensions on the same event family. An incident
+      counts toward the numerator when its closeout-time Incident
+      Finding event carries the full mandatory-milestone set on the
+      collated record (no missing milestone in incident.events or the
+      equivalent attached milestone list). The catalog entry binds to
+      that OCSF class shape, not to a vendor-specific case-management,
+      ticketing, or document-management product.
+    playbook_step: action--40000000-0000-4000-8000-000000000002
+    telemetry_ref: telemetry.ocsf.incident_finding@v1
+    field: time
   - name: denominator
-    description: Reference population the numerator is normalised against.
+    description: >
+      Reference population of in-scope incidents closed during the
+      evaluation window. Carried on the OCSF Incident Finding event
+      operator playbooks emit at incident closeout (status_id
+      transition into the closed state) — the same OCSF class as the
+      numerator anchors the denominator on the closeout transition
+      that fires the post-incident-review timeline-collation step,
+      regardless of whether the collated timeline turned out complete
+      or partial.
+    playbook_step: action--40000000-0000-4000-8000-000000000002
+    telemetry_ref: telemetry.ocsf.incident_finding@v1
+    field: start_time
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+- telemetry.ocsf.incident_finding@v1
 playbook_refs:
 - playbook_id: playbook.post_incident_review@v1
   step_id: action--40000000-0000-4000-8000-000000000002

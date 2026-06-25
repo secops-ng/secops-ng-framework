@@ -27,13 +27,42 @@ measurement:
     executable form against operator data.
   inputs:
   - name: numerator
-    description: Population matching the indicator's success (or, for lower-is-better,
-      failure) condition.
+    description: >
+      Population of backup-integrity verification attempts whose
+      integrity outcome was a pass (restore-drill succeeded or
+      checksum-verification matched the backup-catalogue record) in
+      the evaluation window. Carried on the OCSF File System Activity
+      event the ransomware_containment backup-verification step emits
+      when it hashes the most-recent known-good snapshot and matches
+      the result against the backup-catalogue record — the playbook's
+      mappings.yaml commits the backup-verification step to File
+      System Activity (class_uid 1001) so each verification attempt
+      lands as one File System Activity record with the integrity
+      outcome carried on the same event (activity_id transitions for
+      the hash/read operation; matched-hash file payload on
+      file.hashes). The catalog entry binds to that OCSF class shape,
+      not to a vendor-specific backup, snapshot, or storage product.
+    playbook_step: action--30000000-0000-4000-8000-000000000008
+    telemetry_ref: telemetry.ocsf.file_activity@v1
+    field: file.hashes
   - name: denominator
-    description: Reference population the numerator is normalised against.
+    description: >
+      Reference population of backup-integrity verification attempts
+      observed in the evaluation window (every attempt, regardless of
+      pass / fail outcome). Carried on the same OCSF File System
+      Activity event the ransomware_containment backup-verification
+      step emits per attempt — one event per verification attempt
+      against the backup-catalogue record anchors the denominator on
+      the same OCSF class as the numerator, matching the established
+      cluster-PR convention.
+    playbook_step: action--30000000-0000-4000-8000-000000000008
+    telemetry_ref: telemetry.ocsf.file_activity@v1
+    field: time
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+- telemetry.ocsf.file_activity@v1
 playbook_refs:
 - playbook_id: playbook.ransomware_containment@v1
   step_id: action--30000000-0000-4000-8000-000000000008

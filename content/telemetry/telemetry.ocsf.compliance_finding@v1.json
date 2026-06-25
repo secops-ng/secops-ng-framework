@@ -1,0 +1,42 @@
+{
+  "stable_id": "telemetry.ocsf.compliance_finding@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Compliance Finding event (control-attestation telemetry for the operator's control-effectiveness self-assessment)",
+  "summary": "OCSF Compliance Finding events the operator's control catalog emits at each control attestation. Carries the per-control attestation outcome (effective / partially effective / ineffective) and the attestation timestamp so the kri.control_effectiveness@v1 indicator can compute residual exposure as the share of in-scope controls NOT in the effective state. Same OCSF class the operator's regulator-notification chain emits at CRA timeline-signal milestones; this catalog entry pins the attestation-side source-data shape the control-effectiveness KRI reads.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2003,
+    "class_name": "Compliance Finding"
+  },
+  "direction": "both",
+  "fields_used": [
+    "time",
+    "activity_id",
+    "status_id",
+    "finding_info.uid",
+    "finding_info.title",
+    "compliance.status_id",
+    "compliance.status",
+    "compliance.control",
+    "compliance.standards",
+    "compliance.requirements"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.vuln_intake@v1"
+    },
+    {
+      "playbook_id": "playbook.ransomware_containment@v1"
+    },
+    {
+      "playbook_id": "playbook.data_exfil@v1"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org",
+  "sources": [
+    "OCSF v1.4.0 Findings category — Compliance Finding class (uid 2003)"
+  ]
+}
