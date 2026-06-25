@@ -4,11 +4,10 @@ Mechanical enforcement of the G-04 definition-of-done KRI in GOALS.md:
 the catalogue must cover all four FOUNDATION properties (auditability,
 determinism, sovereignty, operability) declared in docs/FOUNDATION.md.
 
-CORE wave: every entry under content/metrics/*.yaml carries an accurate
-`foundation_property` value (multi-valued where the metric genuinely
-evidences more than one property), so the union across the catalogue
-covers all four FOUNDATION properties. The previously-xfailed coverage
-assertion is now a hard guard.
+EXTEND wave: `foundation_property` is now a REQUIRED catalogue-schema
+field. Per-entry presence is enforced by the schema; this module guards
+the YAML side independently (presence, enum membership, and the G-04
+union-coverage invariant).
 
 Pure stdlib + PyYAML. No network.
 """
@@ -41,13 +40,22 @@ def _declared_union() -> set[str]:
     return union
 
 
-def test_at_least_one_entry_declares_foundation_property() -> None:
-    """The SKELETON wave ships a seed set; the field must be live somewhere."""
-    union = _declared_union()
-    assert union, (
-        "no catalogue entry declares `foundation_property`; the SKELETON "
-        "seed set is missing. At least one entry under content/metrics/ "
-        "must declare the field so the G-04 KRI guard has live data."
+def test_every_entry_declares_non_empty_foundation_property() -> None:
+    """Per-entry required: every catalogue entry MUST carry a non-empty
+    `foundation_property` list. The schema makes the field required;
+    this assertion guards the YAML side independently so a contributor
+    cannot accidentally land an entry that omits or empties it."""
+    offenders: list[str] = []
+    for path in _yaml_files():
+        doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        values = doc.get("foundation_property")
+        if not isinstance(values, list) or not values:
+            offenders.append(path.name)
+    assert not offenders, (
+        "every entry under content/metrics/*.yaml MUST declare a non-empty "
+        "`foundation_property` list (one or more of auditability, "
+        "determinism, sovereignty, operability). Offending entries: "
+        f"{offenders}."
     )
 
 
