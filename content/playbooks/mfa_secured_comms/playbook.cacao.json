@@ -1,0 +1,212 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8",
+  "name": "Authentication and secured-communications posture",
+  "description": "Operate the multi-factor / continuous-authentication and secured-communications posture surface required by NIS2 Art.21(2)(j): probe the identity-provider surface to confirm MFA coverage across in-scope principals, assess whether continuous-authentication signals are observed on long-lived sessions, verify the out-of-band emergency communications channel is reachable independently of the primary information-system path, capture a dated posture-attestation artifact, and notify the authentication owner. The playbook is the operationalisation of declared authentication and secured-communications policy; it does not author the policy itself. SKELETON only \u2014 control bindings (control.mfa_state_probe@v1, control.oob_channel_probe@v1) are pinned but detection bindings (missing-MFA, stale-session, unreachable-OOB upstream rule ids), golden tests, and per-target compiler emissions are owned by CORE / EXTEND siblings. The metric_refs pin the catalogue entry kri.mfa_coverage_gaps@v1 that already ships under content/mappings/nis2/article-21-2-j.yaml; the CORE/EXTEND siblings add session-staleness and OOB-reachability KPI catalogue entries and re-pin step-level refs against them. CACAO v2 + SecOps-NG content-model extensions.",
+  "playbook_types": [
+    "investigation",
+    "notification"
+  ],
+  "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+  "created": "2026-06-25T00:00:00Z",
+  "modified": "2026-06-25T00:00:00Z",
+  "labels": [
+    "authentication",
+    "mfa",
+    "continuous-authentication",
+    "secured-communications",
+    "out-of-band",
+    "posture",
+    "attestation"
+  ],
+  "external_references": [
+    {
+      "name": "OASIS CACAO v2.0",
+      "description": "Workflow step types, variable conventions, and the x_ extension namespace used to carry SecOps-NG content-model refs.",
+      "source": "OASIS Open"
+    },
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 21(2)(j) \u2014 use of multi-factor or continuous authentication, secured voice/video/text communications, and secured emergency communications systems",
+      "source": "Official Journal of the European Union"
+    },
+    {
+      "name": "ENISA \u2014 Guidelines on authentication and secured-communications baseline for essential and important entities",
+      "source": "ENISA"
+    },
+    {
+      "name": "OCSF v1.3.0 \u2014 API Activity (6003) event class",
+      "source": "OCSF"
+    }
+  ],
+  "playbook_variables": {
+    "__posture_window__": {
+      "type": "string",
+      "description": "ISO 8601 interval describing the posture-evaluation window for this run. Supplied by the scheduler that triggers this playbook (cron, Temporal schedule, or n8n trigger), or by an operator-initiated trigger.",
+      "external": true
+    },
+    "__auth_scope__": {
+      "type": "string",
+      "description": "Identifier of the in-scope authentication and secured-communications surface for this run (matches a row in the operator's documented scope catalogue: which identity providers, which principal classes, which session surfaces, and which out-of-band channels are subject to the declared policy).",
+      "external": true
+    },
+    "__mfa_coverage_id__": {
+      "type": "string",
+      "description": "Identifier of the MFA-coverage probe artifact: per-principal record of MFA enrolment and enforcement state across the identity providers enumerated in __auth_scope__.",
+      "external": false
+    },
+    "__continuous_auth_id__": {
+      "type": "string",
+      "description": "Identifier of the continuous-authentication assessment artifact: per-session record of session age, re-authentication cadence, and presence of continuous-authentication signals against the declared policy.",
+      "external": false
+    },
+    "__oob_channel_status__": {
+      "type": "string",
+      "description": "Identifier of the out-of-band channel verification artifact: per-channel record of reachability, independence from the primary information-system path, and last-tested timestamp for the secured emergency communications channels.",
+      "external": false
+    },
+    "__attestation_id__": {
+      "type": "string",
+      "description": "Identifier of the dated authentication and secured-communications posture attestation record published to the operator's evidence store. Carries the MFA-coverage snapshot, the continuous-authentication assessment, and the OOB-channel verification \u2014 the audit-evident discharge of NIS2 Art.21(2)(j).",
+      "external": false
+    }
+  },
+  "workflow_start": "start--52000000-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--52000000-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "mfa_secured_comms_start",
+      "on_completion": "action--52000000-0000-4000-8000-000000000002"
+    },
+    "action--52000000-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "probe mfa coverage",
+      "description": "Probe the identity providers enumerated in __auth_scope__ for MFA enrolment and enforcement state across every in-scope principal class. Emits __mfa_coverage_id__ as a per-principal record of (principal id, principal class, MFA factor types enrolled, enforcement state, last successful MFA event). The probe is read-only against the identity-provider surface; it does not enrol factors or alter policy. Principals with no declared MFA requirement in the operator's policy are reported as policy gaps rather than enforcement gaps; the distinction is preserved so the attestation surfaces the policy-side and operations-side gaps separately.",
+      "on_completion": "action--52000000-0000-4000-8000-000000000003",
+      "in_args": [
+        "__posture_window__",
+        "__auth_scope__"
+      ],
+      "out_args": [
+        "__mfa_coverage_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.mfa_state_probe@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--52000000-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "assess continuous auth",
+      "description": "Walk the session surfaces enumerated in __auth_scope__ and assess whether continuous-authentication signals (re-authentication on privilege escalation, session re-binding on context change, periodic step-up) are observed on long-lived sessions against the declared cadence. Emits __continuous_auth_id__ as a per-session record of (session id, principal id, session age, last re-auth event, declared cadence, overdue-by-minutes). Sessions in scopes with no declared continuous-authentication cadence are reported as policy gaps rather than overdue re-authentications. The assessment is read-only; it does NOT invalidate sessions or force step-up.",
+      "on_completion": "action--52000000-0000-4000-8000-000000000004",
+      "in_args": [
+        "__auth_scope__",
+        "__mfa_coverage_id__"
+      ],
+      "out_args": [
+        "__continuous_auth_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.mfa_state_probe@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--52000000-0000-4000-8000-000000000004": {
+      "type": "action",
+      "name": "verify oob channels",
+      "description": "Test the out-of-band emergency communications channels enumerated in __auth_scope__ (voice, secure messaging, paging) for reachability and independence from the primary information-system path. Emits __oob_channel_status__ as a per-channel record of (channel id, channel class, last successful test, independence-path verification, owner). The verification is a documented test transaction against each channel; it does not deliver a real emergency notification. Channels with no declared independence path are reported as policy gaps rather than reachability failures.",
+      "on_completion": "action--52000000-0000-4000-8000-000000000005",
+      "in_args": [
+        "__auth_scope__",
+        "__posture_window__"
+      ],
+      "out_args": [
+        "__oob_channel_status__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.oob_channel_probe@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--52000000-0000-4000-8000-000000000005": {
+      "type": "action",
+      "name": "evidence capture",
+      "description": "Compose and publish the dated authentication and secured-communications posture attestation to the operator's evidence store. The record carries the MFA-coverage snapshot, the continuous-authentication assessment, the OOB-channel verification, the posture window, and a top-level gap summary (missing-MFA, stale-session, unreachable-OOB counts). This is the audit-evident artifact that NIS2 Art.21(2)(j) reviewers read; missing or stale attestations are the failure mode the metrics surface. The attestation is always emitted, including the policy-gap branch (which records missing-policy conditions rather than skipping the attestation).",
+      "on_completion": "action--52000000-0000-4000-8000-000000000006",
+      "in_args": [
+        "__mfa_coverage_id__",
+        "__continuous_auth_id__",
+        "__oob_channel_status__",
+        "__posture_window__"
+      ],
+      "out_args": [
+        "__attestation_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.mfa_state_probe@v1",
+          "control.oob_channel_probe@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--52000000-0000-4000-8000-000000000006": {
+      "type": "action",
+      "name": "notify authentication owner",
+      "description": "Deliver the attestation reference to the authentication owner along the operator's pre-bound channel (ticketing system, chat thread, email). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an attestation written but never delivered to the owner is itself a posture gap.",
+      "on_completion": "end--52000000-0000-4000-8000-000000000007",
+      "in_args": [
+        "__attestation_id__",
+        "__auth_scope__"
+      ],
+      "x_secops_ng": {
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "end--52000000-0000-4000-8000-000000000007": {
+      "type": "end",
+      "name": "mfa_secured_comms_end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.mfa_secured_comms@v1",
+    "content_version": "0.1.0",
+    "maturity": "experimental",
+    "compile_targets": [
+      "n8n",
+      "temporal",
+      "langgraph"
+    ],
+    "control_refs": [
+      "control.mfa_state_probe@v1",
+      "control.oob_channel_probe@v1"
+    ],
+    "telemetry_refs": [
+      "telemetry.ocsf.api_activity@v1"
+    ],
+    "metric_refs": [],
+    "sources": [
+      "OASIS CACAO v2.0 specification \u2014 workflow step types, variable conventions, x_ extension namespace",
+      "NIS2 Directive (EU) 2022/2555, Article 21(2)(j) \u2014 use of multi-factor or continuous authentication, secured voice/video/text communications, and secured emergency communications systems",
+      "ENISA \u2014 Guidelines on authentication and secured-communications baseline for essential and important entities",
+      "OCSF \u2014 API Activity (6003) event class"
+    ]
+  }
+}
