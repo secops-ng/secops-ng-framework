@@ -36,13 +36,40 @@ measurement:
     form against operator data.'
   inputs:
   - name: covered_population
-    description: Count of in-scope entries currently under the named control surface.
+    description: >
+      Count of in-scope lateral-movement techniques for which the
+      identity_compromise lateral-movement-hunt step has at least one
+      activated hunt rule that produced a match against operator
+      telemetry inside the evaluation window. Carried on the OCSF
+      Detection Finding the lateral-movement-hunt step emits when an
+      activated hunt rule matches subsequent API-activity or
+      authentication traces attributable to the compromised principal
+      — a technique counts as covered when at least one hunt rule
+      sourced for it produces a Detection Finding in the window
+      (`finding_info.uid` records the rule-match identity, and the
+      originating technique is carried on the rule's technique
+      provenance metadata). The catalog entry binds to that OCSF
+      class shape, not to a vendor-specific SIEM, XDR, or identity-
+      analytics rule object.
+    playbook_step: action--30000000-0000-4000-8000-000000000006
+    telemetry_ref: telemetry.ocsf.detection_finding@v1
+    field: finding_info.uid
   - name: total_population
-    description: Count of in-scope entries the operator believes should be under the
-      named control surface.
+    description: >
+      Count of in-scope lateral-movement techniques the operator's
+      scoping artifact declares should be under an active hunt or
+      detection. Sourced from the operator's technique scoping
+      artifact rather than the telemetry stream — the catalog entry
+      does not name a specific scoping file. Excluding this from a
+      telemetry binding keeps the denominator stable against
+      ingestion gaps in the hunt-rule-handling surface itself,
+      matching the detection_coverage / coverage_threat_intel_feed
+      convention.
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+- telemetry.ocsf.detection_finding@v1
 playbook_refs:
 - playbook_id: playbook.identity_compromise@v1
   step_id: action--30000000-0000-4000-8000-000000000006
