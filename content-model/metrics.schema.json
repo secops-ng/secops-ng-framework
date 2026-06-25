@@ -185,6 +185,16 @@
     "maintainer": {
       "description": "Working-group mailbox or community handle. Generic role addresses only; no individual lead names per directive #7.",
       "type": "string"
+    },
+    "foundation_property": {
+      "description": "Which of the four FOUNDATION properties (auditability, determinism, sovereignty, operability) this metric attests to in an operator's stack. Optional in the SKELETON wave; CORE will backfill the full catalogue and flip the field to required. A metric MAY serve more than one property; list each one. The G-04 catalogue-coverage KRI fires if the union of declared values across the catalogue does not cover all four properties. See docs/FOUNDATION.md.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": ["auditability", "determinism", "sovereignty", "operability"]
+      }
     }
   },
   "allOf": [
