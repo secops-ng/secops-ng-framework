@@ -12,7 +12,8 @@
     "title",
     "unit",
     "direction",
-    "measurement"
+    "measurement",
+    "foundation_property"
   ],
   "additionalProperties": false,
   "properties": {
@@ -187,7 +188,7 @@
       "type": "string"
     },
     "foundation_property": {
-      "description": "Which of the four FOUNDATION properties (auditability, determinism, sovereignty, operability) this metric attests to in an operator's stack. Optional in the SKELETON wave; CORE will backfill the full catalogue and flip the field to required. A metric MAY serve more than one property; list each one. The G-04 catalogue-coverage KRI fires if the union of declared values across the catalogue does not cover all four properties. See docs/FOUNDATION.md.",
+      "description": "Which of the four FOUNDATION properties (auditability, determinism, sovereignty, operability) this metric attests to in an operator's stack. REQUIRED on every catalogue entry; a metric MAY serve more than one property, list each one. The G-04 catalogue-coverage KRI fires if the union of declared values across the catalogue does not cover all four properties. See docs/FOUNDATION.md.",
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
