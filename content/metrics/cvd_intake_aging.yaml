@@ -48,15 +48,35 @@ measurement:
     - name: intake_disclosure
       description: >
         First playbook step transition that registers an inbound
-        disclosure on the case ledger.
+        disclosure on the case ledger. Carried on the OCSF
+        Vulnerability Finding event the vuln_intake intake-disclosure
+        step emits when it persists the raw submission, stamps the
+        case identity, and acknowledges the reporter per the
+        operator's CVD policy and the CRA single-point-of-contact
+        obligation — one Vulnerability Finding per inbound disclosure
+        anchors the intake-time clock the indicator reads off
+        `time`. The catalog entry binds to that OCSF class shape, not
+        to a vendor-specific case-management or ticketing object.
       playbook_step: action--01a17a01-0000-4000-8000-000000000002
+      telemetry_ref: telemetry.ocsf.vulnerability_finding@v1
+      field: time
     - name: case_closed
       description: >
         Terminal step transition that closes the disclosure case on any
         response branch (patch, scheduled remediation, accept-risk).
+        Carried on the same OCSF Vulnerability Finding event the
+        vuln_intake response branches emit at case-closure (status_id
+        transition into the closed state) — the same OCSF class as the
+        intake input anchors the denominator-side cutoff so a case
+        drops out of the open-backlog count once any response branch
+        closes it, regardless of how long it took.
+      telemetry_ref: telemetry.ocsf.vulnerability_finding@v1
+      field: status_id
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+  - telemetry.ocsf.vulnerability_finding@v1
 playbook_refs:
   - playbook_id: playbook.vuln_intake@v1
     step_id: action--01a17a01-0000-4000-8000-000000000002

@@ -51,6 +51,16 @@ EXPECTED_BINDINGS = {
         "class_name": "File System Activity",
         "category_uid": 1,
     },
+    "telemetry.ocsf.vulnerability_finding@v1": {
+        "class_uid": 2002,
+        "class_name": "Vulnerability Finding",
+        "category_uid": 2,
+    },
+    "telemetry.ocsf.compliance_finding@v1": {
+        "class_uid": 2003,
+        "class_name": "Compliance Finding",
+        "category_uid": 2,
+    },
 }
 
 
