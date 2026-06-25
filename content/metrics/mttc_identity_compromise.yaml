@@ -29,14 +29,40 @@ measurement:
     operator data.'
   inputs:
   - name: first_detection_fire
-    description: First authoritative detection firing of identity compromise.
+    description: >
+      First authoritative detection firing of identity compromise.
+      Carried on the OCSF Detection Finding the identity_compromise
+      triage step consumes as the originating identity-protection
+      signal (impossible-travel, password-spray, MFA-bypass,
+      suspicious OAuth grant) — the playbook's mappings.yaml
+      commits the triage step to Detection Finding (class_uid 2004)
+      as the upstream causal observation. The catalog entry binds to
+      that OCSF class shape, not to a vendor-specific identity-
+      protection or SIEM rule object.
+    playbook_step: action--30000000-0000-4000-8000-000000000002
+    telemetry_ref: telemetry.ocsf.detection_finding@v1
+    field: time
   - name: first_containment_action
-    description: First playbook step transition that revokes credentials, terminates
-      sessions, resets MFA, or removes role bindings.
-    playbook_step: containment
+    description: >
+      First playbook step transition that revokes credentials, terminates
+      sessions, resets MFA, or removes role bindings. Carried on the
+      OCSF Account Change event the identity_compromise MFA-reset and
+      session-revocation steps emit — the playbook's mappings.yaml
+      commits those steps to Account Change (class_uid 3001) so each
+      containment action on the principal (factor revocation, session
+      invalidation, OAuth-grant withdrawal, conditional-access
+      exception removal) lands as an Account Change record. The
+      catalog entry binds to that OCSF class shape, not to a vendor-
+      specific IdP, SaaS, or PAM product.
+    playbook_step: action--30000000-0000-4000-8000-000000000004
+    telemetry_ref: telemetry.ocsf.account_change@v1
+    field: time
   window:
     duration: P30D
     sliding: true
+telemetry_refs:
+- telemetry.ocsf.detection_finding@v1
+- telemetry.ocsf.account_change@v1
 playbook_refs:
 - playbook_id: playbook.identity_compromise@v1
   step_id: action--30000000-0000-4000-8000-000000000004
