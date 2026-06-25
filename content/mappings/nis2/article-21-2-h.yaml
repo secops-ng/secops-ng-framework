@@ -18,7 +18,8 @@ entries:
       - control.crypto_policy_inventory@v1
       - control.key_rotation_evidence@v1
       - control.cert_posture_scan@v1
-    playbook_refs: []
+    playbook_refs:
+      - playbook.crypto_posture_management@v1
     metric_refs:
       - kri.expiring_tls_certs@v1
       - kri.overdue_key_rotations@v1
