@@ -1,0 +1,187 @@
+# Cross-references for the backup_recovery playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, OCSF event classes consumed/emitted, and the EU
+# regulatory clauses this playbook helps operationalise. Inbound
+# references live in content/mappings/{nis2,dora}/ so the graph is
+# closed in both directions.
+#
+# This playbook operates the business-continuity exercise surface: on
+# a scheduled or operator-initiated restore-drill window, validate the
+# integrity of the most recent in-scope backup, execute a non-
+# destructive restore drill against the operator's documented isolated
+# drill target, capture the dated attestation + drill evidence, and
+# notify the continuity owner. The playbook does not author the backup
+# policy itself; it operationalises a policy that lives in the
+# operator's governance documentation.
+#
+# Status: SKELETON. CORE-layer cards add the detection bindings for
+# restore-target misconfiguration (restore landing in production,
+# drill target reachable from production network) once stable upstream
+# rule ids are selected; an EXTEND card wires the integrity-failure
+# and drill-cadence metric emitters against the operator's evidence
+# store. This overlay anchors the regulatory and control surface only.
+#
+# Deliberate OSCAL omissions:
+#   - CP-2 (Contingency Plan) is NOT pinned: this playbook operates a
+#     specific exercise step within the contingency-plan lifecycle
+#     (the periodic restore-drill discipline). The plan-authoring
+#     surface itself belongs to the operator's governance
+#     documentation, not to this playbook. CP-2 anchors the
+#     on_call_rotation overlay where the per-shift responder-
+#     identification slice of the same plan lives.
+#   - CP-7 (Alternate Processing Site) is NOT pinned: the isolated
+#     drill target is a documented isolation surface, not a
+#     production-failover site. Pinning CP-7 here would conflate
+#     drill-target isolation with alternate-processing-site
+#     designation.
+#   - AU-2 (Event Logging) is NOT pinned: the playbook emits OCSF
+#     API Activity records, but the operator's audit-event policy is
+#     upstream of this playbook.
+#
+# D3FEND closure: D3FEND v1.0.0 frames its defensive techniques around
+# runtime countermeasures against adversary behaviours (account
+# monitoring, software inventory, network isolation, etc.); the
+# discipline this playbook operates — periodic non-destructive restore
+# drills against backup artifacts — is a continuity-readiness
+# exercise, not a runtime countermeasure against an adversary
+# behaviour. The d3fend block below is intentionally empty rather than
+# carrying a forced tag, mirroring the gap-note precedent on the
+# on_call_rotation overlay for the handoff-brief steps and the
+# iam_auditor overlay for D3-UAP.
+#
+# CRA closure: the playbook-mappings schema's top-level keys are fixed
+# (oscal/d3fend/ocsf/nis2/dora/cra). CRA cross-references are not
+# expressed for this playbook either inbound or outbound. backup_recovery
+# is an operator-side business-continuity exercise surface; CRA Art.13
+# product-notification and Annex I vulnerability-handling obligations
+# do not attach here. No outbound CRA entries are emitted on this
+# overlay.
+#
+# GDPR closure: a per-workflow Records of Processing Activity entry
+# may be added by a sibling card if and when the drill scope is
+# documented to include personal-data restoration. SKELETON does not
+# pre-author that anchor; the integrity-and-drill discipline operates
+# on backup artifacts identified by id rather than by content.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.backup_recovery@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the validate-backup-
+  # integrity, execute-restore-drill, and evidence-capture steps.
+  - id: control.system_backup@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CP-9
+    title: System Backup
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CP-9
+    notes: >-
+      Anchors the validate-backup-integrity and evidence-capture
+      steps: CP-9 requires the organisation to conduct backups of
+      user-level, system-level, and system documentation information,
+      to protect the confidentiality, integrity, and availability of
+      backup information, and to test backup information periodically
+      to verify media reliability and information integrity. The
+      validate-backup-integrity step is the integrity-verification
+      discipline against the candidate backup artifact; the dated
+      attestation emitted by the evidence-capture step is the
+      audit-evident record CP-9(1) (Testing for Reliability and
+      Integrity) reviewers read.
+
+  - id: control.system_recovery_reconstitution@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CP-10
+    title: System Recovery and Reconstitution
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CP-10
+    notes: >-
+      Anchors the execute-restore-drill step: CP-10 requires the
+      organisation to provide for the recovery and reconstitution of
+      the system to a known state within the documented recovery
+      objectives after a disruption, compromise, or failure. The
+      non-destructive restore drill against the operator's isolated
+      drill target is the periodic exercise of that recovery
+      capability; the observed RTO / RPO captured into the drill
+      result is what feeds the kpi.restore_drill_cadence@v1 metric.
+
+d3fend: []
+  # D3FEND v1.0.0 carries no defensive-technique anchor that matches
+  # the periodic non-destructive restore-drill discipline this
+  # playbook operates without misrepresenting it. The block is
+  # intentionally empty rather than carrying a forced tag, mirroring
+  # the gap-note precedent documented in the header. Detection
+  # bindings for restore-target misconfiguration are owned by the
+  # CORE-layer detection card once stable upstream rule ids are
+  # selected.
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. The detect-trigger, validate-
+  # integrity, execute-drill, evidence-capture, and notify steps all
+  # interact with operator API surfaces (the backup store, the key-
+  # management surface, the isolated drill target, the evidence
+  # store, the notification channel). API Activity (6003) is the
+  # consistent class across both consumed and emitted records.
+  - id: telemetry.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: both
+    notes: >-
+      Consumed at the detect-restore-drill-trigger step (read calls
+      against the operator's scheduler, backup-scope catalogue, and
+      backup store to resolve the candidate artifact), at the
+      validate-backup-integrity step (read calls against the backup
+      store for checksum / manifest data and against the
+      key-management surface for decryption-key availability), and at
+      the execute-restore-drill step (write calls against the
+      isolated drill target plus read calls for the observed
+      RTO/RPO measurement). Emitted at the evidence-capture step
+      (write call publishing the dated attestation + drill-evidence
+      record to the operator's evidence store) and at the
+      notify-continuity-owner step (delivery dispatch to the
+      continuity owner's pre-bound channel). The api_activity records
+      carry the request metadata the kpi.restore_drill_cadence@v1 and
+      kri.backup_integrity_failures@v1 metrics read. Schema:
+      https://schema.ocsf.io/1.3.0/classes/api_activity
+
+nis2:
+  # Inbound entries that backlink playbook.backup_recovery@v1:
+  #   - content/mappings/nis2/article-21-2-c.yaml
+  #     (id nis2:art-21-2-c — business continuity, backup management,
+  #     disaster recovery, and crisis management)
+  # Pinned outbound below to close the graph.
+  - mapping_id: nis2:art-21-2-c
+    article: 21(2)(c)
+    notes: >-
+      NIS2 Art. 21(2)(c) requires essential and important entities to
+      operate business-continuity arrangements covering backup
+      management, disaster recovery, and crisis management, with
+      evidence of execution and tested restore drills. The
+      backup_recovery playbook is the per-cycle materialisation of
+      that "tested restore drill" obligation: the integrity-check on
+      the candidate backup, the non-destructive restore against an
+      isolated target, and the dated attestation + drill-evidence
+      record published to the operator's evidence store are the
+      audit-evident discharge of the clause. The
+      kpi.restore_drill_cadence@v1 metric audits drill cadence; the
+      kri.backup_integrity_failures@v1 metric trips on integrity-
+      check regressions. The inbound entry already pins the same
+      control_refs (control.backup_attestation@v1,
+      control.restore_drill@v1) as this overlay; this outbound entry
+      is the structural closure of that backlink.
+
+dora: []
+  # SKELETON scope is NIS2 Art.21(2)(c) only. DORA Art.12 (backup
+  # policies and procedures; periodic testing) is the obvious sibling
+  # anchor — control_refs already line up — but the inbound entry at
+  # content/mappings/dora/article-12.yaml still carries
+  # playbook_refs: []. A sibling card closes the DORA graph by adding
+  # the inbound link there and the outbound entry here in one PR
+  # rather than landing a one-sided edge. No outbound DORA entry is
+  # emitted on this SKELETON overlay.
+
+cra: []
+  # See CRA closure note in the header — no CRA cross-references
+  # attach to the business-continuity exercise surface this playbook
+  # operates.
