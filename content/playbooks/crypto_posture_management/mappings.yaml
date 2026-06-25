@@ -1,0 +1,191 @@
+# Cross-references for the crypto_posture_management playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, OCSF event classes consumed/emitted, and the EU
+# regulatory clauses this playbook helps operationalise. Inbound
+# references live in content/mappings/{nis2,dora}/ so the graph is
+# closed in both directions.
+#
+# This playbook operates the cryptography & encryption posture surface
+# required by NIS2 Art. 21(2)(h): inventory the operator's declared
+# cryptography policy and the assets in its scope, probe the
+# certificate posture of declared TLS endpoints, check key-rotation
+# cadence against the documented rotation schedule, capture a dated
+# posture-attestation artifact, and notify the cryptography owner.
+# The playbook does not author the cryptography policy itself; it
+# operationalises a policy that lives in the operator's governance
+# documentation.
+#
+# Status: SKELETON. CORE-layer cards add the detection bindings for
+# expired-cert / weak-cipher / floor-violation signals once stable
+# upstream rule ids are selected; an EXTEND card wires the
+# cipher-suite-floor KPI and rotation-cadence KPI emitters against
+# the operator's evidence store. This overlay anchors the regulatory
+# and control surface only.
+#
+# Deliberate OSCAL omissions:
+#   - SC-12 (Cryptographic Key Establishment and Management) is the
+#     obvious sibling anchor — control_refs already overlap with
+#     SC-13 — but it covers key generation, distribution, storage,
+#     and destruction across the full lifecycle. This playbook
+#     operates the periodic rotation-cadence and posture-probe slice
+#     of that lifecycle only; the key-establishment-and-management
+#     surface itself belongs to the operator's key-management
+#     governance, not to this exercise playbook. Pinning SC-12 here
+#     would double-count the control surface.
+#   - SC-17 (Public Key Infrastructure Certificates) is NOT pinned:
+#     the certificate-posture probe is read-only and operates
+#     downstream of the PKI surface; SC-17 anchors the PKI
+#     governance content, not the per-window posture check.
+#   - AU-2 (Event Logging) is NOT pinned: the playbook emits OCSF
+#     API Activity records, but the operator's audit-event policy is
+#     upstream of this playbook.
+#
+# D3FEND closure: D3FEND v1.0.0 frames its defensive techniques around
+# runtime countermeasures against adversary behaviours. The discipline
+# this playbook operates — periodic cryptography-posture inventory,
+# certificate-posture probing, and rotation-cadence verification — is
+# a posture-readiness exercise rather than a runtime countermeasure
+# against an adversary behaviour. The d3fend block is intentionally
+# empty rather than carrying a forced tag, mirroring the gap-note
+# precedent on the backup_recovery and on_call_rotation overlays.
+#
+# CRA closure: the playbook-mappings schema's top-level keys are fixed
+# (oscal/d3fend/ocsf/nis2/dora/cra). CRA cross-references are not
+# expressed for this playbook either inbound or outbound.
+# crypto_posture_management is an operator-side posture-exercise
+# surface; CRA Art.13 product-notification and Annex I
+# vulnerability-handling obligations do not attach here. No outbound
+# CRA entries are emitted on this overlay.
+#
+# DORA closure: DORA Art. 9(2)/(3) ICT security policies and the JC
+# RTS on ICT risk management framework (Commission Delegated Reg.
+# (EU) 2024/1774) carry cryptography-policy obligations that overlap
+# this playbook's scope. The inbound entry on the DORA side has not
+# yet been authored; a sibling card closes the DORA graph by adding
+# the inbound link and the outbound entry here in one PR rather than
+# landing a one-sided edge. No outbound DORA entry is emitted on this
+# SKELETON overlay.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.crypto_posture_management@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the inventory-crypto-
+  # policy, probe-cert-posture, check-key-rotation, and
+  # evidence-capture steps.
+  - id: control.cryptographic_protection@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SC-13
+    title: Cryptographic Protection
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SC-13
+    notes: >-
+      Anchors the inventory-crypto-policy and probe-cert-posture
+      steps: SC-13 requires the organisation to determine the
+      cryptographic uses and to implement the types of cryptography
+      required for each use in accordance with applicable laws,
+      directives, regulations, policies, standards, and guidelines.
+      The policy-inventory snapshot is the operator's declared
+      algorithm and key-size floor; the certificate-posture probe is
+      the per-window measurement of negotiated TLS version and cipher
+      suite against that floor. The dated attestation emitted by the
+      evidence-capture step is the audit-evident record SC-13
+      reviewers read against the declared cryptographic uses.
+
+  - id: control.transmission_confidentiality_integrity@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SC-8
+    title: Transmission Confidentiality and Integrity
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SC-8
+    notes: >-
+      Anchors the probe-cert-posture step: SC-8 requires the
+      organisation to protect the confidentiality and integrity of
+      transmitted information. The per-endpoint record of certificate
+      validity, negotiated TLS version, and negotiated cipher suite
+      is the per-window evidence that the transmission-protection
+      capability matches the declared posture; SC-8(1) (Cryptographic
+      Protection) is satisfied via the cryptographic-floor link to
+      SC-13 above.
+
+d3fend: []
+  # D3FEND v1.0.0 carries no defensive-technique anchor that matches
+  # the periodic cryptography-posture-inventory and rotation-cadence
+  # discipline this playbook operates without misrepresenting it. The
+  # block is intentionally empty rather than carrying a forced tag,
+  # mirroring the gap-note precedent documented in the header.
+  # Detection bindings for expired-cert / weak-cipher / floor-
+  # violation signals are owned by the CORE-layer detection card once
+  # stable upstream rule ids are selected.
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. The inventory-policy, probe-cert,
+  # check-rotation, evidence-capture, and notify steps all interact
+  # with operator API surfaces (the governance policy store, the
+  # certificate endpoints, the key-management surface, the evidence
+  # store, the notification channel). API Activity (6003) is the
+  # consistent class across both consumed and emitted records.
+  - id: telemetry.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: both
+    notes: >-
+      Consumed at the inventory-crypto-policy step (read calls
+      against the operator's policy store and the cryptography-scope
+      catalogue to resolve the policy snapshot), at the probe-cert-
+      posture step (TLS handshake records against the declared
+      endpoints — modelled as read-only API activity), and at the
+      check-key-rotation step (read calls against the key-management
+      surface for last-rotation timestamps). Emitted at the
+      evidence-capture step (write call publishing the dated
+      posture-attestation record to the operator's evidence store)
+      and at the notify-crypto-owner step (delivery dispatch to the
+      cryptography owner's pre-bound channel). The api_activity
+      records carry the request metadata the
+      kri.expiring_tls_certs@v1 and kri.overdue_key_rotations@v1
+      metrics read. Schema:
+      https://schema.ocsf.io/1.3.0/classes/api_activity
+
+nis2:
+  # Inbound entries that backlink playbook.crypto_posture_management@v1:
+  #   - content/mappings/nis2/article-21-2-h.yaml
+  #     (id nis2:art-21-2-h — policies and procedures regarding the
+  #     use of cryptography and, where appropriate, encryption)
+  # Pinned outbound below to close the graph.
+  - mapping_id: nis2:art-21-2-h
+    article: 21(2)(h)
+    notes: >-
+      NIS2 Art. 21(2)(h) requires essential and important entities
+      to operate policies and procedures regarding the use of
+      cryptography and, where appropriate, encryption. The
+      crypto_posture_management playbook is the per-cycle
+      materialisation of that obligation's measurement and
+      attestation surface: the inventory of the declared
+      cryptography policy, the per-window certificate-posture probe,
+      the key-rotation-status check, and the dated posture-
+      attestation record published to the operator's evidence store
+      are the audit-evident discharge of the clause. The
+      kri.expiring_tls_certs@v1 metric trips on certificate-expiry
+      regressions; the kri.overdue_key_rotations@v1 metric trips on
+      rotation-cadence regressions. The inbound entry pins the same
+      control_refs (control.crypto_policy_inventory@v1,
+      control.cert_posture_scan@v1, control.key_rotation_evidence@v1)
+      as this overlay; this outbound entry is the structural closure
+      of that backlink.
+
+dora: []
+  # SKELETON scope is NIS2 Art.21(2)(h) only. DORA Art. 9(2)/(3) ICT
+  # security policies and the JC RTS on ICT risk management framework
+  # (Commission Delegated Reg. (EU) 2024/1774) cryptography-policy
+  # obligations are the obvious sibling anchors, but the inbound
+  # entry on the DORA side has not yet been authored. A sibling card
+  # closes the DORA graph by adding the inbound link and the
+  # outbound entry here in one PR rather than landing a one-sided
+  # edge. No outbound DORA entry is emitted on this SKELETON overlay.
+
+cra: []
+  # See CRA closure note in the header — no CRA cross-references
+  # attach to the operator-side cryptography-posture exercise surface
+  # this playbook operates.
