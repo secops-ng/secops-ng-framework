@@ -4,18 +4,11 @@ Mechanical enforcement of the G-04 definition-of-done KRI in GOALS.md:
 the catalogue must cover all four FOUNDATION properties (auditability,
 determinism, sovereignty, operability) declared in docs/FOUNDATION.md.
 
-This is a SKELETON-wave guard. The schema field `foundation_property`
-on a metric entry is OPTIONAL in this wave; a follow-on CORE wave will
-backfill all 44 catalogue entries and flip the field to required. This
-test is the contract that says: regardless of how many entries have
-been tagged, the union of declared values across the catalogue MUST
-cover all four FOUNDATION properties.
-
-Until CORE lands a sovereignty-tagged seed, the union from the
-SKELETON seed set covers three of the four properties. The full union
-assertion is xfailed with `strict=False` so the test surfaces the
-pending gap on every CI run without weakening the assertion or
-breaking the lane.
+CORE wave: every entry under content/metrics/*.yaml carries an accurate
+`foundation_property` value (multi-valued where the metric genuinely
+evidences more than one property), so the union across the catalogue
+covers all four FOUNDATION properties. The previously-xfailed coverage
+assertion is now a hard guard.
 
 Pure stdlib + PyYAML. No network.
 """
@@ -23,7 +16,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -70,16 +62,6 @@ def test_declared_values_are_within_foundation_enum() -> None:
     )
 
 
-@pytest.mark.xfail(
-    strict=False,
-    reason=(
-        "SKELETON wave: seed set covers auditability + determinism + "
-        "operability; sovereignty seed lands with the CORE backfill that "
-        "tags all 44 catalogue entries. This xfail is the live signal "
-        "for the pending G-04 KRI gap and flips to a passing assertion "
-        "the moment CORE lands."
-    ),
-)
 def test_catalogue_covers_all_four_foundation_properties() -> None:
     """G-04 KRI: the union of declared values must cover all four properties."""
     union = _declared_union()
