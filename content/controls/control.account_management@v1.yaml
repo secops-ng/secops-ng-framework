@@ -1,0 +1,38 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.account_management@v1
+title: Account management
+summary: >-
+  Operator manages the full lifecycle of system and service accounts —
+  request, approval, creation, modification, review, disablement, and
+  removal — so every active account maps to a current, authorised role
+  and stale accounts do not linger.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "AC-2"
+    title: "Account Management"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.5.16"
+    title: "Identity management"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.8.2"
+    title: "Privileged access rights"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-i"
+    title: "Access control"
+  - catalog: "CRA Annex I"
+    control_id: "annex-i-1-d"
+    title: "Protection from unauthorised access by appropriate control mechanisms"
+
+d3fend_refs:
+  - d3f_id: D3-LAM
+    technique_name: "Local Account Monitoring"
+    url: https://d3fend.mitre.org/technique/d3f:LocalAccountMonitoring/
+    offensive_techniques_attack:
+      - T1136
+      - T1078
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:LocalAccountMonitoring/
+  captured_at: '2026-06-25'
