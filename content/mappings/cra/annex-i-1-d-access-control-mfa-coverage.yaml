@@ -1,0 +1,82 @@
+# CRA — Annex I §1(d) access control — MFA-coverage and secured-comms lane.
+#
+# Companion to `cra:annex-i-1-access-control` in
+# annex-i-1-essential-cybersecurity.yaml, which already pins
+# `identity_compromise` against §1(d) (the unauthorised-access
+# response anchor), and to the existing §1(d) siblings
+# `cra:annex-i-1-d-access-control-iam-auditor` (periodic access-
+# attestation lane) and `cra:annex-i-1-d-access-control-jml`
+# (lifecycle grant/revoke lane). This file pins the fourth sibling
+# under §1(d): the MFA-coverage and continuous-authentication lane.
+#
+# The §1(d) obligation to "ensure protection from unauthorised access
+# by appropriate control mechanisms, including but not limited to
+# authentication" is not satisfied by the unauthorised-access
+# response and periodic-attestation surfaces alone — it has to be
+# paired with continuous evidence that the multi-factor and
+# continuous-authentication enforcement remains in place across the
+# in-scope principal set, and that the secured emergency
+# communications channel (an explicit Annex I §1(d) authentication-
+# adjacent control surface in the regulation's framing) remains
+# reachable independently of the primary information-system path.
+# The mfa_secured_comms playbook is that surface: on each scheduled
+# cycle it probes MFA coverage across in-scope principals, assesses
+# whether continuous-authentication signals are observed on long-
+# lived sessions, verifies the out-of-band emergency communications
+# channel is reachable independently of the primary path, captures a
+# dated posture-attestation artifact, and notifies the authentication
+# owner.
+regime: cra
+entries:
+  - id: cra:annex-i-1-d-access-control-mfa-coverage
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §1(d)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Products with digital elements shall ensure protection from
+      unauthorised access by appropriate control mechanisms, including
+      but not limited to authentication, identity or access-management
+      systems, and shall report on possible unauthorised access — the
+      MFA-coverage and secured-communications lane: continuous
+      evidence that the multi-factor and continuous-authentication
+      enforcement remains in place across the in-scope principal set,
+      that long-lived sessions remain bounded by the declared
+      continuous-authentication policy, and that the out-of-band
+      emergency communications channel is reachable independently of
+      the primary information-system path, with a dated posture-
+      attestation record retained as audit evidence.
+    status: draft
+    control_refs:
+      - control.mfa_state_probe@v1
+      - control.oob_channel_probe@v1
+    playbook_refs:
+      - playbook.mfa_secured_comms@v1
+    metric_refs:
+      - kri.mfa_coverage_gaps@v1
+    evidence_stream_refs:
+      - attestations
+    notes: >-
+      Fourth sibling under §1(d) alongside
+      `cra:annex-i-1-access-control` (unauthorised-access response,
+      identity_compromise), `cra:annex-i-1-d-access-control-iam-auditor`
+      (periodic access-attestation, iam_auditor), and
+      `cra:annex-i-1-d-access-control-jml` (lifecycle grant/revoke,
+      onboarding_offboarding_tracker). This entry pins the
+      authentication-enforcement and secured-communications lane:
+      mfa_secured_comms' per-window MFA-coverage probe, continuous-
+      authentication assessment, and out-of-band channel verification
+      against the declared authentication and secured-communications
+      policy is the enforcement-state half of the §1(d) baseline.
+      The read-only-by-contract constraint is preserved: the playbook
+      records deviations from the declared coverage and continuous-
+      authentication policy, it does not enrol factors, force re-
+      authentication, or mutate channel configuration. The NIS2
+      parallel is `nis2:art-21-2-j` (multi-factor or continuous
+      authentication, secured voice/video/text and emergency
+      communications); the DORA parallel is
+      `dora:art-9-authentication` (strong authentication mechanisms
+      under JC RTS Arts. 21–22). The kri.mfa_coverage_gaps@v1 metric
+      trips on MFA-coverage regressions.

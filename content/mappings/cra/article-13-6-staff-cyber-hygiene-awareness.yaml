@@ -1,0 +1,77 @@
+# CRA — Article 13(6) staff cyber-hygiene and awareness lane.
+#
+# Companion to `cra:art-13-vuln-handling-process` in article-13.yaml
+# (which covers the systematic-documentation procedural shell around
+# Art.13(6)) and to `cra:art-13-6-third-party-vuln-awareness` in
+# article-13-6-third-party-vuln-awareness.yaml (which pins the
+# upstream-awareness sub-clause for advisory-feed and CSIRT-bulletin
+# ingestion). This file pins the third sibling under Art.13(6): the
+# staff cyber-hygiene and awareness lane.
+#
+# Art.13(6) requires manufacturers to "systematically document...
+# relevant cybersecurity aspects concerning the product with digital
+# elements, including vulnerabilities of which they become aware".
+# Effective discharge of that documentation duty is not satisfied by
+# the disclosure-intake plumbing alone — it has to be paired with a
+# trained workforce that can recognise and route the cybersecurity
+# aspects (phishing, suspicious-update prompts, supplier notices)
+# that surface into that documentation lane. The cyber_hygiene_training
+# playbook is that surface: on each scheduled cycle it inventories
+# the in-scope training roster, schedules the cycle's awareness and
+# role-based assignments, runs the phishing-simulation exercise,
+# tracks completion of mandatory training and the simulation
+# report-rate, captures a dated training-attestation artifact, and
+# notifies the training owner of any gaps.
+regime: cra
+entries:
+  - id: cra:art-13-6-staff-cyber-hygiene-awareness
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: "13(6)"
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Manufacturers shall systematically document, in a manner that is
+      proportionate to the nature and the cybersecurity risks of the
+      product, relevant cybersecurity aspects concerning the product
+      with digital elements, including vulnerabilities of which they
+      become aware — the staff cyber-hygiene and awareness lane:
+      continuous evidence that the workforce operating against the
+      product's cybersecurity surface receives the per-cycle awareness
+      and role-based training necessary to recognise and route those
+      cybersecurity aspects (phishing prompts, suspicious-update
+      requests, supplier notices) into the documentation lane, with
+      per-cycle completion-tracking and a dated training-attestation
+      record retained as audit evidence.
+    status: draft
+    control_refs:
+      - control.training_attestation@v1
+      - control.phishing_simulation@v1
+    playbook_refs:
+      - playbook.cyber_hygiene_training@v1
+    metric_refs:
+      - kpi.training_completion_rate@v1
+      - kpi.phishing_sim_click_rate@v1
+    evidence_stream_refs:
+      - attestations
+    notes: >-
+      Third sibling under Art.13(6) alongside
+      `cra:art-13-vuln-handling-process` (the documentation-process
+      side of the clause, in article-13.yaml) and
+      `cra:art-13-6-third-party-vuln-awareness` (the upstream
+      advisory-feed and CSIRT-bulletin ingestion side, in
+      article-13-6-third-party-vuln-awareness.yaml). This entry pins
+      the staff-side discipline: cyber_hygiene_training's per-cycle
+      awareness and role-based training, phishing-simulation
+      exercise, completion-tracking aggregate, and dated training-
+      attestation record are the workforce-readiness half of the
+      §13(6) baseline. The NIS2 parallel is `nis2:art-21-2-g` (basic
+      cyber-hygiene practices and cybersecurity training for staff
+      including phishing simulations); the DORA parallel is
+      `dora:art-13-training-awareness` (ICT security awareness
+      programmes and digital operational resilience training as
+      compulsory modules). The kpi.training_completion_rate@v1
+      metric trips on completion-rate regressions; the
+      kpi.phishing_sim_click_rate@v1 metric trips on simulation
+      click-rate regressions.

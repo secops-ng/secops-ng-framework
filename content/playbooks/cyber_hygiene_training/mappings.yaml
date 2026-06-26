@@ -81,13 +81,18 @@
 # this overlay; the operator's posture-management layer is the
 # upstream of those signal shapes.
 #
-# CRA closure: the playbook-mappings schema's top-level keys are
-# fixed (oscal/d3fend/ocsf/nis2/dora/cra). CRA cross-references are
-# not expressed for this playbook either inbound or outbound.
-# cyber_hygiene_training is an operator-side workforce posture-
-# exercise surface; CRA Art.13 product-notification and Annex I
-# vulnerability-handling obligations do not attach here. No outbound
-# CRA entries are emitted on this overlay.
+# CRA closure: the inbound entry on the CRA side lives at
+# content/mappings/cra/article-13-6-staff-cyber-hygiene-awareness.yaml
+# (id cra:art-13-6-staff-cyber-hygiene-awareness — Art.13(6) staff
+# cyber-hygiene and awareness lane). That entry is the third sibling
+# under Art.13(6) alongside cra:art-13-vuln-handling-process
+# (documentation-process side, in article-13.yaml) and
+# cra:art-13-6-third-party-vuln-awareness (upstream advisory-feed and
+# CSIRT-bulletin ingestion); cyber_hygiene_training pins the
+# workforce-readiness half — per-cycle awareness and role-based
+# training, phishing-simulation exercise, completion-tracking, and a
+# dated training-attestation record. The matching outbound entry on
+# this overlay closes the graph.
 #
 # DORA closure: the inbound entry on the DORA side lives at
 # content/mappings/dora/article-13-6-training.yaml (id
@@ -339,7 +344,20 @@ dora:
       independent operational disciplines and are mapped separately
       to preserve the atom-per-obligation shape).
 
-cra: []
-  # See CRA closure note in the header — no CRA cross-references
-  # attach to the operator-side workforce posture-exercise surface
-  # this playbook operates.
+cra:
+  - mapping_id: cra:art-13-6-staff-cyber-hygiene-awareness
+    article: "13(6)"
+    notes: >-
+      Outbound backlink for the inbound entry in
+      article-13-6-staff-cyber-hygiene-awareness.yaml. Third sibling
+      under Art.13(6) alongside cra:art-13-vuln-handling-process (the
+      documentation-process side, in article-13.yaml) and
+      cra:art-13-6-third-party-vuln-awareness (the upstream advisory-
+      feed and CSIRT-bulletin ingestion side); cyber_hygiene_training
+      pins the workforce-readiness half — per-cycle awareness and
+      role-based training, phishing-simulation exercise, completion-
+      tracking aggregate, and a dated training-attestation record.
+      The NIS2 parallel (nis2:art-21-2-g) and DORA parallel
+      (dora:art-13-training-awareness) are already pinned on this
+      overlay above; the CRA backlink completes the regulatory
+      triplet.

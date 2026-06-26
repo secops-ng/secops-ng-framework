@@ -82,13 +82,22 @@
 # D3-SRA), infra_posture_management (D3-CI), iam_auditor (D3-AM
 # / D3-UAP gap), and on_call_rotation (D3-AM).
 #
-# CRA closure: the playbook-mappings schema's top-level keys are
-# fixed (oscal/d3fend/ocsf/nis2/dora/cra). CRA cross-references are
-# not expressed for this playbook either inbound or outbound.
-# mfa_secured_comms is an operator-side posture-exercise surface;
-# CRA Art.13 product-notification and Annex I vulnerability-handling
-# obligations do not attach here. No outbound CRA entries are
-# emitted on this overlay.
+# CRA closure: the inbound entry on the CRA side lives at
+# content/mappings/cra/annex-i-1-d-access-control-mfa-coverage.yaml
+# (id cra:annex-i-1-d-access-control-mfa-coverage — Annex I §1(d)
+# access control, MFA-coverage and secured-communications lane). That
+# entry is the fourth sibling under §1(d) alongside
+# cra:annex-i-1-access-control (unauthorised-access response,
+# identity_compromise), cra:annex-i-1-d-access-control-iam-auditor
+# (periodic access-attestation, iam_auditor), and
+# cra:annex-i-1-d-access-control-jml (lifecycle grant/revoke,
+# onboarding_offboarding_tracker); mfa_secured_comms pins the
+# authentication-enforcement and secured-communications lane —
+# continuous evidence that the MFA and continuous-authentication
+# enforcement remains in place and that the out-of-band emergency
+# communications channel remains reachable independently of the
+# primary path. The matching outbound entry on this overlay closes
+# the graph.
 #
 # DORA closure: the inbound entry on the DORA side lives at
 # content/mappings/dora/article-9-4-b-authentication.yaml (id
@@ -389,7 +398,22 @@ dora:
       dora:art-9-vuln-mgmt, dora:art-9-access-mgmt, and
       dora:art-9-crypto).
 
-cra: []
-  # See CRA closure note in the header — no CRA cross-references
-  # attach to the operator-side authentication and secured-
-  # communications posture exercise surface this playbook operates.
+cra:
+  - mapping_id: cra:annex-i-1-d-access-control-mfa-coverage
+    article: Annex I §1(d)
+    notes: >-
+      Outbound backlink for the inbound entry in
+      annex-i-1-d-access-control-mfa-coverage.yaml. Fourth sibling
+      under §1(d) alongside cra:annex-i-1-access-control
+      (identity_compromise — unauthorised-access response),
+      cra:annex-i-1-d-access-control-iam-auditor (iam_auditor —
+      periodic access-attestation), and
+      cra:annex-i-1-d-access-control-jml (onboarding_offboarding_tracker
+      — lifecycle grant/revoke); mfa_secured_comms pins the
+      authentication-enforcement and secured-communications lane —
+      per-window MFA-coverage probe, continuous-authentication
+      assessment, and out-of-band channel verification against the
+      declared policy. The NIS2 parallel (nis2:art-21-2-j) and DORA
+      parallel (dora:art-9-authentication) are already pinned on this
+      overlay above; the CRA backlink completes the regulatory
+      triplet.

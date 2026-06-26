@@ -70,13 +70,18 @@
 # is avoided by leaving the upstream and downstream steps unpinned
 # rather than forcing the Certificate Analysis tag onto them.
 #
-# CRA closure: the playbook-mappings schema's top-level keys are fixed
-# (oscal/d3fend/ocsf/nis2/dora/cra). CRA cross-references are not
-# expressed for this playbook either inbound or outbound.
-# crypto_posture_management is an operator-side posture-exercise
-# surface; CRA Art.13 product-notification and Annex I
-# vulnerability-handling obligations do not attach here. No outbound
-# CRA entries are emitted on this overlay.
+# CRA closure: the inbound entry on the CRA side lives at
+# content/mappings/cra/annex-i-1-e-confidentiality-crypto-posture.yaml
+# (id cra:annex-i-1-e-confidentiality-crypto-posture — Annex I §1(e)
+# confidentiality of stored, transmitted or otherwise processed data,
+# cryptographic-posture lane). That entry is companion to
+# cra:annex-i-1-confidentiality in annex-i-1-essential-cybersecurity.yaml,
+# which carries the §1(e) clause itself; crypto_posture_management pins
+# the cryptographic-posture lane (continuous evidence that the deployed
+# cryptographic surface — TLS endpoints, cipher suites, key-rotation
+# cadence — remains aligned with the declared cryptography policy
+# across the support period). The matching outbound entry on this
+# overlay closes the graph.
 #
 # DORA closure: the inbound entry on the DORA side lives at
 # content/mappings/dora/article-9-crypto.yaml (id dora:art-9-crypto —
@@ -345,7 +350,18 @@ dora:
       and-prevention surface (companion to dora:art-9-vuln-mgmt and
       dora:art-9-access-mgmt).
 
-cra: []
-  # See CRA closure note in the header — no CRA cross-references
-  # attach to the operator-side cryptography-posture exercise surface
-  # this playbook operates.
+cra:
+  - mapping_id: cra:annex-i-1-e-confidentiality-crypto-posture
+    article: Annex I §1(e)
+    notes: >-
+      Outbound backlink for the inbound entry in
+      annex-i-1-e-confidentiality-crypto-posture.yaml. Companion to
+      cra:annex-i-1-confidentiality (which carries the §1(e) clause
+      itself with an empty playbook_refs list);
+      crypto_posture_management pins the cryptographic-posture lane —
+      continuous evidence that the deployed cryptographic surface
+      (TLS endpoints, cipher suites, key-rotation cadence) remains
+      aligned with the declared cryptography policy across the
+      support period. The NIS2 parallel (nis2:art-21-2-h) and DORA
+      parallel (dora:art-9-crypto) are already pinned on this overlay
+      above; the CRA backlink completes the regulatory triplet.

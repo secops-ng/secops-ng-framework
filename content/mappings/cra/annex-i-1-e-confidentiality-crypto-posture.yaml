@@ -1,0 +1,69 @@
+# CRA — Annex I §1(e) confidentiality — cryptographic-posture lane.
+#
+# Companion to `cra:annex-i-1-confidentiality` in
+# annex-i-1-essential-cybersecurity.yaml, which carries the §1(e)
+# obligation to "protect the confidentiality of stored, transmitted
+# or otherwise processed data...including by encrypting relevant data
+# at rest or in transit by state-of-the-art mechanisms" but currently
+# has an empty playbook_refs list (the cryptographic-protocol
+# inventory is named in the notes but no agentic anchor was pinned).
+# This file pins the cryptographic-posture lane: the §1(e) obligation
+# is not satisfied by a one-shot policy declaration — it has to be
+# paired with continuous evidence that the deployed cryptographic
+# surface matches the declared policy across the support period. The
+# crypto_posture_management playbook is that surface: on each
+# scheduled cycle it inventories the operator's declared cryptography
+# policy, probes the certificate posture of declared TLS endpoints,
+# checks key-rotation cadence against the documented schedule,
+# captures a dated posture-attestation artifact, and notifies the
+# cryptography owner.
+regime: cra
+entries:
+  - id: cra:annex-i-1-e-confidentiality-crypto-posture
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §1(e)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Products with digital elements shall protect the confidentiality
+      of stored, transmitted or otherwise processed data, personal or
+      other, including by encrypting relevant data at rest or in
+      transit by state-of-the-art mechanisms, and by using other
+      technical means — the cryptographic-posture lane: continuous
+      evidence that the deployed cryptographic surface (TLS endpoints,
+      cipher suites, key-rotation cadence) remains aligned with the
+      declared cryptography policy across the support period, with
+      per-window read-only probes against the declared scope and a
+      dated posture-attestation record retained as audit evidence.
+    status: draft
+    control_refs:
+      - control.crypto_policy_inventory@v1
+      - control.cert_posture_scan@v1
+      - control.key_rotation_evidence@v1
+    playbook_refs:
+      - playbook.crypto_posture_management@v1
+    metric_refs:
+      - kri.expiring_tls_certs@v1
+      - kri.overdue_key_rotations@v1
+    evidence_stream_refs:
+      - attestations
+    notes: >-
+      Companion to `cra:annex-i-1-confidentiality` in
+      annex-i-1-essential-cybersecurity.yaml. That entry carries the
+      §1(e) clause itself; this entry pins the cryptographic-posture
+      lane that operationalises it — crypto_posture_management's per-
+      window certificate-posture probe and key-rotation check against
+      the declared policy floor is the continuous-attestation half of
+      the §1(e) baseline. The read-only-by-contract constraint is
+      preserved: the playbook records deviations from the declared
+      policy floor, it does not rotate keys or replace certificates.
+      The NIS2 parallel is `nis2:art-21-2-h` (cryptography and
+      encryption policies and procedures); the DORA parallel is
+      `dora:art-9-crypto` (cryptography slice of the Art. 9
+      protection-and-prevention surface under the JC RTS on ICT risk
+      management framework). The kri.expiring_tls_certs@v1 metric
+      trips on certificate-expiry regressions; the
+      kri.overdue_key_rotations@v1 metric trips on rotation-cadence
+      regressions.
