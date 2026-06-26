@@ -1,0 +1,87 @@
+# DORA — Article 9 (Protection and Prevention), authentication and
+# secured-communications slice.
+# Companion to article-9-and-rts-vuln-mgmt.yaml (vulnerability and
+# patch management), article-9-access-management.yaml (identity and
+# access management), and article-9-crypto.yaml (cryptography and
+# encryption). This file covers the authentication-controls and
+# secured-communications slice of the same Art. 9 protection-and-
+# prevention obligation, operationalised by the JC RTS on ICT risk
+# management framework (Commission Delegated Regulation (EU) 2024/1774)
+# Articles 21 and 22 (access management and authentication, including
+# strong authentication mechanisms for privileged access and remote
+# access scenarios).
+#
+# Out of scope here: vulnerability and patch management (lives in
+# article-9-and-rts-vuln-mgmt.yaml), the broader access-management
+# slice including the identity-management and lifecycle disciplines
+# the iam_auditor and onboarding_offboarding_tracker playbooks
+# operate (lives in article-9-access-management.yaml), cryptography
+# and encryption (lives in article-9-crypto.yaml), incident reporting
+# (Art. 17–19), third-party risk (Art. 28+).
+regime: dora
+entries:
+  - id: dora:art-9-authentication
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "9(4)(b)"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Implement policies and protocols for strong authentication
+      mechanisms based on relevant standards and dedicated controls
+      systems, including for privileged access and remote access, with
+      the supporting protective measures necessary to ensure the
+      confidentiality, integrity and authenticity of the authentication
+      surface and of the secured-communications channels that
+      operationalise it; maintain a per-window measurement of the
+      authentication coverage actually in force across the operator's
+      in-scope principals, of the continuous-authentication signals
+      observed on long-lived sessions, and of the reachability of the
+      out-of-band emergency communications channel that operates
+      independently of the primary information-system path.
+    status: draft
+    control_refs:
+      - control.mfa_state_probe@v1
+      - control.oob_channel_probe@v1
+    playbook_refs:
+      - playbook.mfa_secured_comms@v1
+    metric_refs:
+      - kri.mfa_coverage_gaps@v1
+    notes: >-
+      Level 1 anchor is DORA Art. 9(4)(b) (strong authentication
+      mechanisms based on relevant standards and dedicated controls
+      systems, including for privileged and remote access, as part of
+      the protection-and-prevention obligation); the operative detail
+      is in the Level 2 RTS — Commission Delegated Regulation (EU)
+      2024/1774 (JC RTS on ICT risk management framework) Articles 21
+      and 22, which prescribe the access-management and
+      authentication discipline the operator must operate against,
+      including the requirement for strong authentication on
+      privileged and remote-access paths and the supporting protective
+      measures that ensure the authentication and secured-
+      communications surface remains operable. This entry is the
+      authentication and secured-communications counterpart to the
+      vulnerability-and-patch-management slice expressed in
+      article-9-and-rts-vuln-mgmt.yaml, the access-management slice
+      expressed in article-9-access-management.yaml, and the
+      cryptography slice expressed in article-9-crypto.yaml; all four
+      anchor on the same Art. 9 protection-and-prevention obligation
+      but discharge independent operational disciplines and are
+      mapped separately to keep the inbound graph atom-per-obligation.
+      The access-management entry is the upstream identity-lifecycle
+      and grant-set surface (iam_auditor and
+      onboarding_offboarding_tracker); this authentication entry is
+      the per-window measurement of whether strong authentication is
+      in force on the surface that the access-management entry has
+      granted access to, plus the reachability check on the
+      out-of-band emergency communications channel that backs it.
+      Overlaps NIS2 Art. 21(2)(j) (use of multi-factor or continuous
+      authentication, secured voice/video/text communications, and
+      secured emergency communications systems); the same
+      playbook.mfa_secured_comms@v1 is referenced from
+      mappings/nis2/article-21-2-j.yaml. The kri.mfa_coverage_gaps@v1
+      metric trips on MFA-coverage regressions. The outbound dora:
+      entry on the playbook overlay at
+      content/playbooks/mfa_secured_comms/mappings.yaml is the
+      structural closure of this backlink.
