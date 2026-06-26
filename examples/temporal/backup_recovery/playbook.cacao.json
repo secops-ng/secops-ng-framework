@@ -1,0 +1,228 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba",
+  "name": "Backup and restore-drill exercise",
+  "description": "Exercise the business-continuity surface: on a scheduled or operator-triggered restore-drill window, validate the integrity of the most recent in-scope backup, execute a non-destructive restore drill against an isolated target, capture the dated attestation and drill evidence, and notify the continuity owner. The playbook is the operationalisation of a documented backup policy and recovery procedure; it does not author the policy itself. SKELETON only — control bindings (control.backup_attestation@v1, control.restore_drill@v1) are pinned but detection bindings, golden tests, and per-target compiler emissions are owned by CORE / EXTEND siblings. The metric_refs pin the catalogue entry kpi.backup_integrity_pass_rate@v1 that already ships under content/metrics/; the CORE/EXTEND siblings add restore-drill-cadence and integrity-failure KRI catalogue entries and re-pin step-level refs against them. CACAO v2 + SecOps-NG content-model extensions.",
+  "playbook_types": [
+    "investigation",
+    "notification"
+  ],
+  "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+  "created": "2026-06-25T00:00:00Z",
+  "modified": "2026-06-25T00:00:00Z",
+  "labels": [
+    "business-continuity",
+    "backup",
+    "restore",
+    "disaster-recovery",
+    "attestation"
+  ],
+  "external_references": [
+    {
+      "name": "OASIS CACAO v2.0",
+      "description": "Workflow step types, variable conventions, and the x_ extension namespace used to carry SecOps-NG content-model refs.",
+      "source": "OASIS Open"
+    },
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 21(2)(c) — business continuity, backup management, disaster recovery, and crisis management",
+      "source": "Official Journal of the European Union"
+    },
+    {
+      "name": "DORA Regulation (EU) 2022/2554, Article 12 — backup policies and procedures, restoration and recovery procedures and methods",
+      "source": "Official Journal of the European Union"
+    },
+    {
+      "name": "ENISA — Good practices for business continuity and disaster recovery",
+      "source": "ENISA"
+    },
+    {
+      "name": "OCSF v1.3.0 — API Activity (6003) event class",
+      "source": "OCSF"
+    }
+  ],
+  "playbook_variables": {
+    "__drill_window__": {
+      "type": "string",
+      "description": "ISO 8601 interval describing the restore-drill window being evaluated. Supplied by the scheduler that triggers this playbook (cron, Temporal schedule, or n8n trigger), or by an operator-initiated trigger.",
+      "external": true
+    },
+    "__backup_scope__": {
+      "type": "string",
+      "description": "Identifier of the in-scope data set for this drill (matches a row in the operator's documented backup-scope catalogue: which systems, which datasets, RPO/RTO band).",
+      "external": true
+    },
+    "__candidate_backup_id__": {
+      "type": "string",
+      "description": "Identifier of the most recent backup artifact selected for the drill, resolved against __backup_scope__ and the drill window.",
+      "external": false
+    },
+    "__integrity_ok__": {
+      "type": "boolean",
+      "description": "Outcome of the validate-backup-integrity step: true when the backup's documented integrity checks (checksum, manifest, decryption key availability) all pass; false when any check fails. A false value short-circuits the drill into the evidence-capture and notify branches with a failure record rather than executing the restore.",
+      "external": false
+    },
+    "__drill_result__": {
+      "type": "string",
+      "description": "Identifier of the executed restore-drill artifact: the durable record of the non-destructive restore exercise (target environment, restored object inventory, RTO/RPO observed). Empty when the drill was skipped due to a failed integrity check.",
+      "external": false
+    },
+    "__attestation_id__": {
+      "type": "string",
+      "description": "Identifier of the dated backup-attestation + drill-evidence record published to the operator's evidence store. Always populated, including the integrity-failure branch (which emits an attestation recording the failure).",
+      "external": false
+    }
+  },
+  "workflow_start": "start--50000000-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--50000000-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "backup_recovery_start",
+      "on_completion": "action--50000000-0000-4000-8000-000000000002"
+    },
+    "action--50000000-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "detect restore-drill trigger",
+      "description": "Resolve the trigger for this run: a scheduled drill window matured (cron / Temporal schedule), an operator-initiated drill request landed, or a continuity event up the chain raised the drill cadence. Reads __drill_window__ and __backup_scope__ and selects __candidate_backup_id__ — the most recent backup artifact for the in-scope data set that is eligible for a non-destructive drill against an isolated target.",
+      "on_completion": "action--50000000-0000-4000-8000-000000000003",
+      "in_args": [
+        "__drill_window__",
+        "__backup_scope__"
+      ],
+      "out_args": [
+        "__candidate_backup_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.backup_attestation@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--50000000-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "validate backup integrity",
+      "description": "Run the documented integrity checks on the candidate backup: checksum / manifest verification, decryption-key availability against the operator's key-management surface, and a presence check against the documented backup-scope inventory (no silently-dropped objects). Sets __integrity_ok__. A false outcome short-circuits the drill into the evidence-capture step (failure attestation) without executing the restore, so the operator's continuity owner is notified of the integrity gap rather than discovering it under real recovery pressure.",
+      "on_completion": "if-condition--50000000-0000-4000-8000-000000000004",
+      "in_args": [
+        "__candidate_backup_id__"
+      ],
+      "out_args": [
+        "__integrity_ok__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.backup_attestation@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kpi.backup_integrity_pass_rate@v1"
+        ]
+      }
+    },
+    "if-condition--50000000-0000-4000-8000-000000000004": {
+      "type": "if-condition",
+      "name": "backup integrity ok?",
+      "description": "Branch on __integrity_ok__. True branches into the non-destructive restore-drill execution; false routes straight to evidence capture (failure attestation) and notify, recording the gap without executing the restore against potentially-corrupt data.",
+      "on_success": "action--50000000-0000-4000-8000-000000000005",
+      "on_failure": "action--50000000-0000-4000-8000-000000000006"
+    },
+    "action--50000000-0000-4000-8000-000000000005": {
+      "type": "action",
+      "name": "execute restore drill",
+      "description": "Execute the non-destructive restore drill against the operator's documented isolated drill target (not production). Restore the in-scope objects from __candidate_backup_id__, record the observed RTO / RPO against the documented objectives, capture the restored object inventory, and emit __drill_result__. The drill is non-destructive by construction; production state is untouched. Detection bindings for restore-target misconfiguration (restore landing in production, drill target reachable from production network) are owned by CORE-layer cards once upstream rule ids are selected. A restore-drill-cadence KPI catalogue entry is owned by a sibling EXTEND card; this step intentionally does not pin a step-level metric_ref until that catalogue entry lands.",
+      "on_completion": "action--50000000-0000-4000-8000-000000000006",
+      "in_args": [
+        "__candidate_backup_id__",
+        "__backup_scope__"
+      ],
+      "out_args": [
+        "__drill_result__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.restore_drill@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--50000000-0000-4000-8000-000000000006": {
+      "type": "action",
+      "name": "evidence capture",
+      "description": "Compose and publish the dated attestation + drill-evidence record to the operator's evidence store. The record carries the candidate backup id, integrity-check outcome, executed drill result (or the failure marker for the short-circuit branch), observed RTO/RPO, restored inventory, and the drill window. This is the audit-evident artifact that NIS2 Art.21(2)(c) and DORA Art.12 reviewers read; missing or stale attestations are the failure mode the metrics surface.",
+      "on_completion": "action--50000000-0000-4000-8000-000000000007",
+      "in_args": [
+        "__candidate_backup_id__",
+        "__integrity_ok__",
+        "__drill_result__"
+      ],
+      "out_args": [
+        "__attestation_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.backup_attestation@v1",
+          "control.restore_drill@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kpi.backup_integrity_pass_rate@v1"
+        ]
+      }
+    },
+    "action--50000000-0000-4000-8000-000000000007": {
+      "type": "action",
+      "name": "notify continuity owner",
+      "description": "Deliver the attestation reference to the continuity owner along the operator's pre-bound channel (ticketing system, chat thread, email). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an attestation written but never delivered to the owner is itself a continuity gap.",
+      "on_completion": "end--50000000-0000-4000-8000-000000000008",
+      "in_args": [
+        "__attestation_id__",
+        "__backup_scope__"
+      ],
+      "x_secops_ng": {
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "end--50000000-0000-4000-8000-000000000008": {
+      "type": "end",
+      "name": "backup_recovery_end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.backup_recovery@v1",
+    "content_version": "0.1.0",
+    "maturity": "experimental",
+    "compile_targets": [
+      "n8n",
+      "temporal",
+      "langgraph"
+    ],
+    "control_refs": [
+      "control.backup_attestation@v1",
+      "control.restore_drill@v1"
+    ],
+    "telemetry_refs": [
+      "telemetry.ocsf.api_activity@v1"
+    ],
+    "metric_refs": [
+      "kpi.backup_integrity_pass_rate@v1"
+    ],
+    "sources": [
+      "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
+      "NIS2 Directive (EU) 2022/2555, Article 21(2)(c) — business continuity, backup management, disaster recovery, crisis management",
+      "DORA Regulation (EU) 2022/2554, Article 12 — backup policies and procedures, restoration and recovery procedures and methods",
+      "ENISA — Good practices for business continuity and disaster recovery",
+      "OCSF — API Activity (6003) event class"
+    ]
+  }
+}
