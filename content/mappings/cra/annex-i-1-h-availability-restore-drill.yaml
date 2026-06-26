@@ -1,0 +1,66 @@
+# CRA — Annex I §1(h) availability — periodic restore-drill lane.
+#
+# Companion to `cra:annex-i-1-availability` in
+# annex-i-1-essential-cybersecurity.yaml, which already pins
+# `ransomware_containment` against §1(h) (the containment-side
+# materialisation of availability — preserving essential functions
+# under active incident pressure). This file pins the periodic
+# restore-drill lane: the §1(h) obligation to protect availability
+# "also after an incident, including through resilience and
+# mitigation measures" is not satisfied by containment alone — it
+# has to be paired with continuous evidence that the documented
+# backup and recovery surface remains exercisable on the operator's
+# isolated drill target. The backup_recovery playbook is that
+# surface: on each scheduled drill window it validates the integrity
+# of the candidate backup, executes a non-destructive restore drill
+# against the operator's documented isolated drill target, captures
+# the dated attestation + drill-evidence record, and notifies the
+# continuity owner.
+regime: cra
+entries:
+  - id: cra:annex-i-1-h-availability-restore-drill
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §1(h)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Products with digital elements shall protect the availability of
+      essential and basic functions, also after an incident, including
+      through resilience and mitigation measures against denial-of-
+      service attacks — the periodic restore-drill lane: continuous
+      evidence that the documented backup and recovery surface remains
+      exercisable on the operator's documented isolated drill target,
+      with per-window integrity verification on the candidate backup,
+      a non-destructive restore drill against that target, and a dated
+      attestation + drill-evidence record retained as audit evidence.
+    status: draft
+    control_refs:
+      - control.backup_attestation@v1
+      - control.restore_drill@v1
+    playbook_refs:
+      - playbook.backup_recovery@v1
+    metric_refs:
+      - kpi.restore_drill_cadence@v1
+      - kri.backup_integrity_failures@v1
+    evidence_stream_refs:
+      - attestations
+    notes: >-
+      Companion to `cra:annex-i-1-availability` in
+      annex-i-1-essential-cybersecurity.yaml, which pins
+      ransomware_containment as the containment-side anchor for §1(h)
+      (preserving essential functions under active incident pressure).
+      This entry pins the periodic restore-drill lane: backup_recovery's
+      per-window integrity check on the candidate backup, the non-
+      destructive restore against the operator's documented isolated
+      drill target, and the dated attestation + drill-evidence record
+      published to the operator's evidence store are the continuous-
+      exercise half of the §1(h) baseline. The NIS2 parallel is
+      `nis2:art-21-2-c` (business continuity, backup management,
+      disaster recovery, crisis management); the DORA parallel is
+      `dora:art-12-backup-restore` (backup policies and tested
+      restoration procedures under JC RTS on ICT risk management
+      framework). The kpi.restore_drill_cadence@v1 metric audits drill
+      cadence; the kri.backup_integrity_failures@v1 metric trips on
+      integrity-check regressions.
