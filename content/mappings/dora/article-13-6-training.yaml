@@ -1,0 +1,78 @@
+# DORA — Article 13 (Learning and evolving), ICT-related training and
+# awareness slice.
+# Companion to article-13.yaml, which carries the Art. 13 learning-loop /
+# post-ICT-related-incident-review slice (dora:art-13-learning-evolving).
+# This file covers the distinct training-and-awareness obligation expressed
+# in DORA Art. 13(6) — the per-cycle staff cybersecurity-training and
+# awareness programme financial entities must operate. Out of scope here:
+# the post-incident learning loop (lives in article-13.yaml), Art. 15+
+# digital operational resilience testing, Art. 17+ incident classification
+# and reporting.
+#
+# Authored as a distinct entry rather than overloaded onto
+# dora:art-13-learning-evolving because the two slices discharge
+# independent operational disciplines — the learning-loop slice
+# operationalises the post-incident review cycle, while this training-
+# and-awareness slice operationalises the per-cycle staff awareness and
+# role-based training programme. Keeping the inbound graph atom-per-
+# obligation preserves the same shape DORA Art. 9 carries across
+# article-9-and-rts-vuln-mgmt, article-9-access-management,
+# article-9-crypto, and article-9-4-b-authentication.
+regime: dora
+entries:
+  - id: dora:art-13-training-awareness
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "13(6)"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Develop ICT security awareness programmes and digital operational
+      resilience training as compulsory modules in the staff training
+      schemes, applicable to all staff and members of senior management,
+      with a level of complexity commensurate to the remit of their
+      functions; maintain a per-cycle measurement of the in-scope
+      training roster, the awareness and role-based training cycle
+      assignments, the phishing-simulation exercise outcomes, and the
+      training-completion state against the declared cadence, with a
+      dated training-attestation record published to the operator's
+      evidence store as the audit-evident discharge of the per-cycle
+      obligation.
+    status: draft
+    control_refs:
+      - control.training_attestation@v1
+      - control.phishing_simulation@v1
+    playbook_refs:
+      - playbook.cyber_hygiene_training@v1
+    metric_refs:
+      - kpi.training_completion_rate@v1
+      - kpi.phishing_sim_click_rate@v1
+    notes: >-
+      Level 1 anchor is DORA Art. 13(6) (ICT security awareness
+      programmes and digital operational resilience training as
+      compulsory modules in the staff training schemes, applicable to
+      all staff and members of senior management, with a level of
+      complexity commensurate to the remit of their functions). The
+      cyber_hygiene_training playbook is the per-cycle materialisation
+      of that obligation's measurement and attestation surface: the
+      training-roster snapshot, the cycle assignments, the phishing-
+      simulation run, the completion-tracking aggregate, and the dated
+      training-attestation record published to the operator's evidence
+      store are the audit-evident discharge of the clause. This entry
+      is the training-and-awareness counterpart to the learning-loop /
+      post-incident-review slice expressed in article-13.yaml
+      (dora:art-13-learning-evolving); both anchor on the same Art. 13
+      learning-and-evolving obligation but discharge independent
+      operational disciplines and are mapped separately to keep the
+      inbound graph atom-per-obligation. Overlaps NIS2 Art. 21(2)(g)
+      (basic cyber-hygiene practices and cybersecurity training for
+      staff, including phishing-simulation exercises, with completion
+      tracked); the same playbook.cyber_hygiene_training@v1 is
+      referenced from mappings/nis2/article-21-2-g.yaml. The
+      kpi.training_completion_rate@v1 metric trips on training-
+      completion-rate regressions; the kpi.phishing_sim_click_rate@v1
+      metric trips on simulation click-rate regressions. The outbound
+      dora: entry on the playbook overlay at
+      content/playbooks/cyber_hygiene_training/mappings.yaml is the
+      structural closure of this backlink.

@@ -54,6 +54,11 @@ in the private repos).
   restoration and recovery procedures and methods.
 - `article-13.yaml` — Art. 13 learning and evolving (post-incident
   review).
+- `article-13-6-training.yaml` — Art. 13(6) ICT security awareness
+  programmes and digital operational resilience training as
+  compulsory modules in the staff training schemes (training and
+  awareness slice; companion to `article-13.yaml`'s learning-loop /
+  post-incident-review slice).
 - `article-14.yaml` — Art. 14 communication (crisis communication
   plans).
 - `article-19-and-28.yaml` — Art. 17–19 reporting milestones, Art. 28/30
