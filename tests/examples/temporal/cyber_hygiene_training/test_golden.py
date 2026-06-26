@@ -1,4 +1,4 @@
-"""F-WF-MFA SKELETON-EXAMPLE — Temporal worked example for cyber_hygiene_training.
+"""F-WF-HYG SKELETON-EXAMPLE — Temporal worked example for cyber_hygiene_training.
 
 Opens the cross-target parity lane for the ``cyber_hygiene_training``
 playbook (NIS2 Art.21(2)(g)) by pinning the Temporal end of the
