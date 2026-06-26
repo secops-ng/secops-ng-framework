@@ -1,0 +1,235 @@
+# Cross-references for the cyber_hygiene_training playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, OCSF event classes consumed/emitted, and the EU
+# regulatory clauses this playbook helps operationalise. Inbound
+# references live in content/mappings/{nis2,dora}/ so the graph is
+# closed in both directions.
+#
+# This playbook operates the basic cyber-hygiene and staff security-
+# training posture surface required by NIS2 Art. 21(2)(g): inventory
+# the in-scope training roster against the declared training scope,
+# schedule the per-cycle awareness and role-based training assignments,
+# run the cycle's phishing-simulation exercise, track completion of
+# mandatory training and report-rate on the simulation, capture a dated
+# training-attestation artifact, and notify the training owner of any
+# gaps. The playbook does not author the training or hygiene policy
+# itself; it operationalises a policy that lives in the operator's
+# governance documentation.
+#
+# Status: SKELETON. CORE-layer cards add the detection bindings for
+# missed-training and simulation-click signals once stable upstream
+# rule ids are selected; an EXTEND card wires the per-cohort training-
+# overdue KPI emitters against the operator's evidence store. This
+# overlay anchors the regulatory and control surface only.
+#
+# Deliberate OSCAL omissions:
+#   - AT-2(2) (Insider Threat) is NOT pinned: insider-threat awareness
+#     is a distinct training enhancement with its own programme
+#     ownership; pinning it here would over-claim the scope of the
+#     baseline awareness and role-based training surface this
+#     playbook operates.
+#   - PM-13 (Security and Privacy Workforce) is NOT pinned: PM-13
+#     anchors the broader workforce-development programme (job
+#     postings, qualification standards, succession planning) which
+#     is upstream of the per-cycle training-execution slice this
+#     playbook operates.
+#   - AU-2 (Event Logging) is NOT pinned: the playbook emits OCSF
+#     API Activity records, but the operator's audit-event policy is
+#     upstream of this playbook.
+#
+# D3FEND closure: D3FEND v1.0.0 frames its defensive techniques
+# around runtime countermeasures against adversary behaviours. The
+# discipline this playbook operates — periodic awareness and role-
+# based training scheduling, phishing-simulation exercise execution,
+# and completion tracking — is a posture-readiness exercise rather
+# than a runtime countermeasure against an adversary behaviour. The
+# control_xref files for control.training_attestation@v1 and
+# control.phishing_simulation@v1 do reference D3-UA (User Behavior
+# Analysis) for the analytic surface that consumes training and
+# simulation outcomes, but this playbook does not itself implement
+# behavioural analytics; it produces the per-cycle training and
+# simulation artifacts that D3-UA-aligned analytics consume
+# downstream. The d3fend block is intentionally empty rather than
+# carrying a forced tag, mirroring the gap-note precedent on the
+# mfa_secured_comms, crypto_posture_management, backup_recovery, and
+# on_call_rotation overlays. Detection bindings for missed-training
+# and simulation-click signals are owned by the CORE-layer detection
+# card once stable upstream rule ids are selected.
+#
+# CRA closure: the playbook-mappings schema's top-level keys are
+# fixed (oscal/d3fend/ocsf/nis2/dora/cra). CRA cross-references are
+# not expressed for this playbook either inbound or outbound.
+# cyber_hygiene_training is an operator-side workforce posture-
+# exercise surface; CRA Art.13 product-notification and Annex I
+# vulnerability-handling obligations do not attach here. No outbound
+# CRA entries are emitted on this overlay.
+#
+# DORA closure: DORA Art. 13 ICT-related training and awareness
+# carries staff training obligations that overlap this playbook's
+# scope. The inbound entry on the DORA side has not yet been
+# authored; a sibling card closes the DORA graph by adding the
+# inbound link and the outbound entry here in one PR rather than
+# landing a one-sided edge. No outbound DORA entry is emitted on
+# this SKELETON overlay.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.cyber_hygiene_training@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the inventory-training-
+  # roster, schedule-training-cycle, run-phishing-simulation, track-
+  # completion, and evidence-capture steps.
+  - id: control.literacy_training_and_awareness@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AT-2
+    title: Literacy Training and Awareness
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AT-2
+    notes: >-
+      Anchors the inventory-training-roster, schedule-training-cycle,
+      and run-phishing-simulation steps: AT-2 requires the
+      organisation to provide security literacy training to system
+      users (including managers, senior executives, and contractors)
+      consistent with assigned roles and responsibilities, and AT-2(3)
+      (Social Engineering and Mining) explicitly contemplates practical
+      exercises that simulate social-engineering attacks. The roster
+      snapshot is the per-cycle measurement of which staff are
+      in-scope for the awareness programme; the cycle assignment is
+      the per-cycle scheduling of that programme against declared
+      cadence; the phishing-simulation run is the AT-2(3) practical
+      exercise.
+
+  - id: control.role_based_training@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AT-3
+    title: Role-based Training
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AT-3
+    notes: >-
+      Anchors the inventory-training-roster and schedule-training-
+      cycle steps for the role-based training tracks: AT-3 requires
+      the organisation to provide role-based security training to
+      personnel with assigned security roles and responsibilities
+      before authorising access, when required by changes, and
+      thereafter at the declared cadence. The roster snapshot
+      preserves the per-staff role-based-track assignment so the
+      scheduling step can issue per-role training intents on the
+      declared cadence; the completion-tracking step records role-
+      based overdue separately from awareness overdue so the
+      attestation surfaces the two surfaces independently.
+
+  - id: control.training_records@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AT-4
+    title: Training Records
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AT-4
+    notes: >-
+      Anchors the track-completion and evidence-capture steps: AT-4
+      requires the organisation to document and monitor security
+      training activities, including basic literacy training and
+      specific role-based training, and to retain the records for the
+      declared retention period. The completion-tracking artifact is
+      the per-staff and per-cohort record of completion state against
+      the cycle assignments; the dated training-attestation emitted by
+      the evidence-capture step is the audit-evident record AT-4
+      reviewers read against the operator's declared retention
+      policy.
+
+d3fend: []
+  # D3FEND v1.0.0 carries no defensive-technique anchor that matches
+  # the periodic awareness and role-based training scheduling,
+  # phishing-simulation exercise execution, and completion-tracking
+  # discipline this playbook operates without misrepresenting it. The
+  # control_xref files for control.training_attestation@v1 and
+  # control.phishing_simulation@v1 do reference D3-UA (User Behavior
+  # Analysis) for the analytic surface that consumes training and
+  # simulation outcomes, but this playbook does not itself implement
+  # behavioural analytics; it produces the per-cycle artifacts that
+  # D3-UA-aligned analytics consume downstream. The block is
+  # intentionally empty rather than carrying a forced tag, mirroring
+  # the gap-note precedent documented in the header. Detection
+  # bindings for missed-training and simulation-click signals are
+  # owned by the CORE-layer detection card once stable upstream rule
+  # ids are selected.
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. The inventory-training-roster,
+  # schedule-training-cycle, run-phishing-simulation, track-
+  # completion, evidence-capture, and notify-gaps steps all interact
+  # with operator API surfaces (the HR / identity source, the
+  # learning-management surface, the phishing-simulation dispatch
+  # endpoint, the evidence store, the notification channel). API
+  # Activity (6003) is the consistent class across both consumed and
+  # emitted records.
+  - id: telemetry.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: both
+    notes: >-
+      Consumed at the inventory-training-roster step (read calls
+      against the operator's HR / identity source to resolve cohort
+      and role membership against __training_scope__), at the
+      track-completion step (read calls against the learning-
+      management surface for completion state per staff and per
+      track). Emitted at the schedule-training-cycle step (write
+      calls publishing cycle assignment intents to the learning-
+      management surface), at the run-phishing-simulation step
+      (write calls dispatching the simulation exercise to the
+      enrolled cohorts — modelled as documented exercise traffic
+      against the simulation endpoint, not against production
+      mailflow controls), at the evidence-capture step (write call
+      publishing the dated training-attestation record to the
+      operator's evidence store), and at the notify-gaps step
+      (delivery dispatch to the training owner's pre-bound
+      channel). The api_activity records carry the request metadata
+      the kpi.training_completion_rate@v1 and
+      kpi.phishing_sim_click_rate@v1 metrics read. Schema:
+      https://schema.ocsf.io/1.3.0/classes/api_activity
+
+nis2:
+  # Inbound entries that backlink playbook.cyber_hygiene_training@v1:
+  #   - content/mappings/nis2/article-21-2-g.yaml
+  #     (id nis2:art-21-2-g — basic cyber-hygiene practices and
+  #     cybersecurity training for staff, including phishing-
+  #     simulation exercises, with completion tracked)
+  # Pinned outbound below to close the graph.
+  - mapping_id: nis2:art-21-2-g
+    article: 21(2)(g)
+    notes: >-
+      NIS2 Art. 21(2)(g) requires essential and important entities
+      to operate basic cyber-hygiene practices and cybersecurity
+      training for staff, including phishing-simulation exercises,
+      with completion tracked. The cyber_hygiene_training playbook
+      is the PROACTIVE per-cycle materialisation of that obligation:
+      the training-roster snapshot, the cycle assignments, the
+      phishing-simulation run, the completion-tracking aggregate,
+      and the dated training-attestation record published to the
+      operator's evidence store are the audit-evident discharge of
+      the clause. (The existing playbook.phishing_triage@v1 backlink
+      on the same mapping covers the REACTIVE phishing-incident
+      surface; this playbook covers the proactive training and
+      simulation surface — the two are complementary, not
+      duplicative.) The kpi.training_completion_rate@v1 metric
+      trips on training-completion-rate regressions; the
+      kpi.phishing_sim_click_rate@v1 metric trips on simulation
+      click-rate regressions. The inbound entry pins the same
+      control_refs (control.training_attestation@v1,
+      control.phishing_simulation@v1) as this overlay; this
+      outbound entry is the structural closure of that backlink.
+
+dora: []
+  # SKELETON scope is NIS2 Art.21(2)(g) only. DORA Art. 13 ICT-
+  # related training and awareness carries staff-training
+  # obligations that overlap this playbook's scope, but the inbound
+  # entry on the DORA side has not yet been authored. A sibling card
+  # closes the DORA graph by adding the inbound link and the
+  # outbound entry here in one PR rather than landing a one-sided
+  # edge. No outbound DORA entry is emitted on this SKELETON
+  # overlay.
+
+cra: []
+  # See CRA closure note in the header — no CRA cross-references
+  # attach to the operator-side workforce posture-exercise surface
+  # this playbook operates.
