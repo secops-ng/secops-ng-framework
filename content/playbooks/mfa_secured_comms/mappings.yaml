@@ -1,29 +1,33 @@
 # Cross-references for the mfa_secured_comms playbook.
 #
 # This file is the playbook's outbound view of the content model: it
-# pins OSCAL controls, OCSF event classes consumed/emitted, and the EU
-# regulatory clauses this playbook helps operationalise. Inbound
-# references live in content/mappings/{nis2,dora}/ so the graph is
-# closed in both directions.
+# pins OSCAL controls, OCSF event classes consumed/emitted, MITRE
+# D3FEND defensive techniques, and the EU regulatory clauses this
+# playbook helps operationalise. Inbound references live in
+# content/mappings/{nis2,dora}/ so the graph is closed in both
+# directions.
 #
 # This playbook operates the multi-factor / continuous-authentication
 # and secured-communications posture surface required by NIS2 Art.
-# 21(2)(j): probe MFA coverage across in-scope principals, assess
-# whether continuous-authentication signals are observed on long-lived
-# sessions, verify the out-of-band emergency communications channel
-# is reachable independently of the primary information-system path,
-# capture a dated posture-attestation artifact, and notify the
-# authentication owner. The playbook does not author the
-# authentication or secured-communications policy itself; it
-# operationalises a policy that lives in the operator's governance
-# documentation.
+# 21(2)(j) and DORA Art. 9(4)(b): probe MFA coverage across in-scope
+# principals, assess whether continuous-authentication signals are
+# observed on long-lived sessions, verify the out-of-band emergency
+# communications channel is reachable independently of the primary
+# information-system path, capture a dated posture-attestation
+# artifact, and notify the authentication owner. The playbook does
+# not author the authentication or secured-communications policy
+# itself; it operationalises a policy that lives in the operator's
+# governance documentation.
 #
-# Status: SKELETON. CORE-layer cards add the detection bindings for
-# missing-MFA / stale-session / unreachable-OOB signals once stable
-# upstream rule ids are selected; an EXTEND card wires the
-# session-staleness KPI and OOB-reachability KPI emitters against
-# the operator's evidence store. This overlay anchors the regulatory
-# and control surface only.
+# Status: CORE. The SKELETON overlay anchored the regulatory and
+# control surface; this CORE layer adds the D3FEND detection bindings
+# for the MFA-coverage probe and the continuous-authentication
+# assessment, the OCSF Compliance Finding (2003) emit binding for the
+# per-principal posture-deviation records, and closes the DORA
+# mapping graph (inbound at
+# content/mappings/dora/article-9-4-b-authentication.yaml + outbound
+# here). An EXTEND card wires the session-staleness KPI and
+# OOB-reachability KPI emitters against the operator's evidence store.
 #
 # Deliberate OSCAL omissions:
 #   - IA-5 (Authenticator Management) is the obvious sibling anchor
@@ -43,18 +47,40 @@
 #     API Activity records, but the operator's audit-event policy is
 #     upstream of this playbook.
 #
-# D3FEND closure: D3FEND v1.0.0 frames its defensive techniques
-# around runtime countermeasures against adversary behaviours. The
-# discipline this playbook operates — periodic MFA-coverage probing,
-# continuous-authentication assessment, and OOB-channel readiness
-# verification — is a posture-readiness exercise rather than a
-# runtime countermeasure against an adversary behaviour. The d3fend
-# block is intentionally empty rather than carrying a forced tag,
-# mirroring the gap-note precedent on the crypto_posture_management,
-# backup_recovery, and on_call_rotation overlays. Detection bindings
-# for missing-MFA / stale-session / unreachable-OOB signals are
-# owned by the CORE-layer detection card once stable upstream rule
-# ids are selected.
+# D3FEND closure: D3FEND v1.0.0 carries Account Monitoring (D3-AM)
+# under the Detect tactic as the dated per-principal examination of
+# authentication-surface state — exactly the discipline the
+# probe-mfa-coverage and assess-continuous-auth steps operate. The
+# probe-mfa-coverage step reads per-principal MFA enrolment and
+# enforcement state against the declared coverage policy; the
+# assess-continuous-auth step reads per-principal session age and
+# re-authentication cadence against the declared continuous-
+# authentication policy. Both are read-only dated examinations of the
+# same authentication surface — the same account-monitoring discipline
+# the iam_auditor enumerate-identities and emit-access-evidence steps
+# anchor on D3-AM. The playbook framing remains read-only-by-contract
+# (no MFA enrolment, no forced re-authentication, no factor reset);
+# runtime-countermeasure misrepresentation is avoided by anchoring
+# the probe and assessment steps on the Detect-tactic Account
+# Monitoring technique rather than on the Harden-tactic Multi-factor
+# Authentication (D3-MFA) technique, which is the runtime
+# enforcement discipline owned by the identity provider and exercised
+# under containment by the identity_compromise playbook (which does
+# pin D3-MFA at the factor-reset step). The verify-oob-channels,
+# evidence-capture, and notify-authentication-owner steps are
+# deliberately NOT pinned to D3FEND: D3FEND v1.0.0 carries no
+# defensive technique for out-of-band emergency-communications
+# readiness verification distinct from the channel-delivery surface
+# itself (the OOB channel reachability test is a delivery-discipline
+# health check rather than a detection or countermeasure on the
+# adversary surface), evidence emission is an attestation-stream
+# discipline rather than a detection or countermeasure, and
+# notification is a delivery discipline rather than a defensive
+# technique. This mirrors the per-step pin-where-it-fits /
+# document-the-gap pattern documented on
+# crypto_posture_management (D3-CA), backup_recovery (D3-FH /
+# D3-SRA), infra_posture_management (D3-CI), iam_auditor (D3-AM
+# / D3-UAP gap), and on_call_rotation (D3-AM).
 #
 # CRA closure: the playbook-mappings schema's top-level keys are
 # fixed (oscal/d3fend/ocsf/nis2/dora/cra). CRA cross-references are
@@ -64,14 +90,13 @@
 # obligations do not attach here. No outbound CRA entries are
 # emitted on this overlay.
 #
-# DORA closure: DORA Art. 9(4)(b) authentication controls and the JC
-# RTS on ICT risk management framework (Commission Delegated Reg.
-# (EU) 2024/1774) carry authentication and secured-communications
-# obligations that overlap this playbook's scope. The inbound entry
-# on the DORA side has not yet been authored; a sibling card closes
-# the DORA graph by adding the inbound link and the outbound entry
-# here in one PR rather than landing a one-sided edge. No outbound
-# DORA entry is emitted on this SKELETON overlay.
+# DORA closure: the inbound entry on the DORA side lives at
+# content/mappings/dora/article-9-4-b-authentication.yaml (id
+# dora:art-9-authentication — DORA Art. 9(4)(b) strong authentication
+# mechanisms anchored to the JC RTS on ICT risk management framework,
+# Commission Delegated Regulation (EU) 2024/1774, Arts. 21–22 on
+# access management and authentication). The matching outbound dora:
+# entry below closes the graph.
 #
 # Schema: schemas/playbook-mappings.schema.json
 playbook: playbook.mfa_secured_comms@v1
@@ -114,16 +139,119 @@ oscal:
       out-of-band emergency communications channel remains reachable
       independently of the primary information-system path.
 
-d3fend: []
-  # D3FEND v1.0.0 carries no defensive-technique anchor that matches
-  # the periodic MFA-coverage probing, continuous-authentication
-  # assessment, and OOB-channel readiness verification discipline
-  # this playbook operates without misrepresenting it. The block is
-  # intentionally empty rather than carrying a forced tag, mirroring
-  # the gap-note precedent documented in the header. Detection
-  # bindings for missing-MFA / stale-session / unreachable-OOB
-  # signals are owned by the CORE-layer detection card once stable
-  # upstream rule ids are selected.
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned to the real action UUIDs resolved
+  # from content/playbooks/mfa_secured_comms/playbook.cacao.json
+  # (five action bodies: probe-mfa-coverage, assess-continuous-auth,
+  # verify-oob-channels, evidence-capture, notify-authentication-
+  # owner). The Detect tactic in D3FEND v1.0.0 carries Account
+  # Monitoring (D3-AM) — dated per-principal examination of
+  # authentication-surface state against the operator's declared
+  # authentication policy — which is the discipline the
+  # probe-mfa-coverage and assess-continuous-auth steps operate.
+  # The verify-oob-channels, evidence-capture, and notify-
+  # authentication-owner steps are deliberately not pinned to a
+  # D3FEND technique and the gaps are documented in the header and
+  # in line below (mirroring the inventory / emission / delivery
+  # gap-note precedents on crypto_posture_management,
+  # infra_posture_management, iam_auditor, and on_call_rotation).
+  - step: action--52000000-0000-4000-8000-000000000002
+    d3fend_id: D3-AM
+    d3fend_name: Account Monitoring
+    url: https://d3fend.mitre.org/technique/d3f:AccountMonitoring/
+    notes: >-
+      probe-mfa-coverage — the per-principal read-only examination of
+      MFA enrolment state (which factors are registered against the
+      principal on the identity-provider surface) and enforcement
+      state (whether the access policy that gates the principal's
+      authentication path requires a second factor on the declared
+      privilege class) against the declared coverage policy is the
+      dated-examination discipline D3-AM names. D3FEND frames Account
+      Monitoring as the analysis of account activity to identify
+      adversarial behaviour; the playbook narrows that lens to the
+      operator's own declared principal scope and the operator's own
+      declared authentication policy — same technique, posture-probe
+      scope rather than adversary-attribution scope. The probe is
+      read-only and side-effect-free: no enrolment, no factor reset,
+      no policy mutation. The per-principal records aggregated into
+      __mfa_coverage_id__ are the audit-evident output of the
+      Account Monitoring pass and feed the kri.mfa_coverage_gaps@v1
+      metric. Anchored on the Detect-tactic D3-AM rather than on the
+      Harden-tactic D3-MFA (Multi-factor Authentication) because the
+      MFA technique itself is the runtime enforcement discipline
+      owned by the identity provider and exercised under containment
+      by the identity_compromise factor-reset step; this playbook
+      measures whether that discipline is in force, it does not
+      enforce it. Detection bindings for individual missing-MFA /
+      stale-session upstream rule fingerprints are consumed via the
+      Compliance Finding (2003) telemetry binding below rather than
+      authored as Sigma references on this overlay; the operator's
+      posture-management layer is the upstream of those signal shapes.
+
+  - step: action--52000000-0000-4000-8000-000000000003
+    d3fend_id: D3-AM
+    d3fend_name: Account Monitoring
+    url: https://d3fend.mitre.org/technique/d3f:AccountMonitoring/
+    notes: >-
+      assess-continuous-auth — the per-principal comparison of session
+      age and observed re-authentication events against the declared
+      continuous-authentication policy (maximum session age before
+      re-authentication is required on the declared privilege class,
+      step-up cadence on sensitive operations) is the adjacent
+      dated-examination of the same authentication surface the
+      probe-mfa-coverage step examines on the enrolment-and-
+      enforcement side. The read-only-by-contract constraint applies
+      here too: the playbook does NOT forcibly re-authenticate any
+      session, it records the stale-session-by-minutes deviation and
+      the policy-gap branch (principals on the declared privilege
+      class without a declared continuous-authentication policy are
+      reported as policy gaps rather than stale sessions). The
+      __session_assessment__ artifact feeds the
+      kri.mfa_coverage_gaps@v1 metric alongside the probe-mfa-coverage
+      records. The Detect-tactic D3-AM anchor is shared with the
+      probe-mfa-coverage step because session-age examination and
+      enrolment-state examination are produced by the same
+      account-monitoring walk against the same authentication
+      surface; the discipline is named consistently across both
+      halves of the authentication-posture surface this playbook
+      operates.
+
+  # verify-oob-channels (action--52000000-0000-4000-8000-
+  # 000000000004) is deliberately NOT pinned to a D3FEND technique.
+  # D3FEND v1.0.0 carries no defensive technique for out-of-band
+  # emergency-communications readiness verification distinct from
+  # the channel-delivery surface itself: the per-channel reachability
+  # probe, the independence-path verification (the OOB channel
+  # transit must not share the primary information-system network
+  # path), and the last-tested timestamp record are a delivery-
+  # discipline health check on the emergency-communications channel
+  # rather than a detection or countermeasure on the adversary
+  # surface. Pinning a D3FEND tag here would force the reachability
+  # probe onto a defensive-technique anchor it does not discharge.
+  # This step is anchored on the CP-8 OSCAL control above where the
+  # alternate-telecommunications obligation actually lives. Mirrors
+  # the on_call_rotation handoff-brief gap note (delivery-surface
+  # readiness rather than defensive technique).
+  #
+  # evidence-capture (action--52000000-0000-4000-8000-000000000005)
+  # is deliberately NOT pinned to a D3FEND technique. Per-execution
+  # artifact emission of the dated authentication-posture attestation
+  # for downstream audit consumption is an evidence-stream emission
+  # discipline, not a runtime countermeasure or a detection step,
+  # and forcing it onto a D3FEND tag would misrepresent the
+  # technique. This step is anchored on the IA-2 OSCAL control above.
+  # Mirrors the crypto_posture_management evidence-capture and
+  # backup_recovery evidence-capture gap notes.
+  #
+  # notify-authentication-owner (action--52000000-0000-4000-8000-
+  # 000000000006) is deliberately NOT pinned to a D3FEND technique.
+  # Delivery of an attestation reference to the authentication owner
+  # along the operator's pre-bound channel is a notification
+  # discipline, not a defensive technique. Mirrors the
+  # on_call_rotation handoff-brief gap note, the
+  # crypto_posture_management notify-crypto-owner gap note, and the
+  # backup_recovery notify-continuity-owner gap note.
 
 ocsf:
   # OCSF v1.3.0 telemetry bindings. The probe-mfa-coverage,
@@ -132,7 +260,12 @@ ocsf:
   # identity-provider surface, the session-management surface, the
   # out-of-band channel test endpoints, the evidence store, the
   # notification channel). API Activity (6003) is the consistent
-  # class across both consumed and emitted records.
+  # class across both consumed and emitted records for the
+  # read/write surfaces; Compliance Finding (2003) carries the
+  # per-principal and per-channel posture-deviation records the
+  # account-monitoring pass and the OOB-readiness check emit into
+  # the operator's posture-management layer (the upstream of any
+  # Sigma detection-binding a SIEM consumes from those deviations).
   - id: telemetry.api_activity@v1
     category_uid: 6
     category_name: Application Activity
@@ -155,6 +288,43 @@ ocsf:
       pre-bound channel). The api_activity records carry the
       request metadata the kri.mfa_coverage_gaps@v1 metric reads.
       Schema: https://schema.ocsf.io/1.3.0/classes/api_activity
+
+  - id: telemetry.compliance_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2003
+    class_name: Compliance Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by the probe-mfa-coverage, assess-continuous-auth, and
+      verify-oob-channels steps as the structured per-principal and
+      per-channel deviation records the account-monitoring pass and
+      the OOB-readiness check produce against the declared
+      authentication and secured-communications policy: principals
+      missing required factors on the declared privilege class,
+      principals whose enforcement state is below the declared
+      coverage policy, long-lived sessions past the declared
+      continuous-authentication staleness threshold, principals on
+      the declared privilege class without a declared continuous-
+      authentication policy (policy-gap branch), out-of-band
+      channels that failed the reachability probe, and out-of-band
+      channels whose independence-path verification failed each
+      yield one Compliance Finding keyed to (__mfa_coverage_id__,
+      principal-or-channel-id) so the operator's posture-management
+      layer can route the deviation to the authentication owner and
+      so the SIEM has a stable rule_fingerprint to query against.
+      Read-only posture-probe framing — the Compliance Finding
+      records what the operator's policy says and what the probe
+      observed; no enrolment, factor reset, session termination, or
+      channel mutation is represented. The Compliance Finding
+      stream is the upstream of any Sigma detection-binding a
+      downstream consumer chooses to author against missing-MFA /
+      stale-session / unreachable-OOB / independence-path-failure
+      rule fingerprints; SecOps-NG does not pin stable Sigma rule
+      ids on this overlay (the operator's posture-management layer
+      owns those fingerprints). Schema:
+      https://schema.ocsf.io/1.3.0/classes/compliance_finding
 
 nis2:
   # Inbound entries that backlink playbook.mfa_secured_comms@v1:
@@ -182,16 +352,42 @@ nis2:
       this overlay; this outbound entry is the structural closure of
       that backlink.
 
-dora: []
-  # SKELETON scope is NIS2 Art.21(2)(j) only. DORA Art. 9(4)(b)
-  # authentication controls and the JC RTS on ICT risk management
-  # framework (Commission Delegated Reg. (EU) 2024/1774) carry
-  # authentication and secured-communications obligations that
-  # overlap this playbook's scope, but the inbound entry on the
-  # DORA side has not yet been authored. A sibling card closes the
-  # DORA graph by adding the inbound link and the outbound entry
-  # here in one PR rather than landing a one-sided edge. No outbound
-  # DORA entry is emitted on this SKELETON overlay.
+dora:
+  # Inbound entry that backlinks playbook.mfa_secured_comms@v1:
+  #   - content/mappings/dora/article-9-4-b-authentication.yaml
+  #     (id dora:art-9-authentication — DORA Art. 9(4)(b) strong
+  #     authentication mechanisms, anchored to the JC RTS on ICT
+  #     risk management framework — Commission Delegated Regulation
+  #     (EU) 2024/1774, Arts. 21–22 on access management and
+  #     authentication)
+  # Pinned outbound below to close the graph.
+  - mapping_id: dora:art-9-authentication
+    article: 9(4)(b)
+    notes: >-
+      DORA Art. 9(4)(b) requires financial entities to implement
+      policies and protocols for strong authentication mechanisms
+      based on relevant standards and dedicated controls systems,
+      including for privileged access and remote access, with the
+      supporting protective measures necessary to ensure the
+      confidentiality, integrity and authenticity of the
+      authentication surface and of the secured-communications
+      channels that operationalise it; the Level 2 detail in the JC
+      RTS on ICT risk management framework (Commission Delegated
+      Regulation (EU) 2024/1774) Arts. 21–22 prescribes the
+      access-management and authentication discipline the operator
+      must operate against. The mfa_secured_comms playbook is the
+      per-cycle materialisation of that obligation's measurement and
+      attestation surface — the same discharge shape NIS2 Art.
+      21(2)(j) anchors on. The kri.mfa_coverage_gaps@v1 metric trips
+      on MFA-coverage regressions; the dated posture-attestation
+      record carries the OOB-channel reachability and independence-
+      path evidence. The inbound entry pins the same control_refs
+      (control.mfa_state_probe@v1, control.oob_channel_probe@v1) as
+      this overlay; this outbound entry is the structural closure of
+      that backlink and is the authentication slice of the broader
+      Art. 9 protection-and-prevention surface (companion to
+      dora:art-9-vuln-mgmt, dora:art-9-access-mgmt, and
+      dora:art-9-crypto).
 
 cra: []
   # See CRA closure note in the header — no CRA cross-references
