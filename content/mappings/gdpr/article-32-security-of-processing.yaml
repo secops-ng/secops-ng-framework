@@ -34,16 +34,14 @@
 #
 # Out of scope of this file (carved into later CORE slices):
 #
-#   - Art. 32(1)(a) pseudonymisation and encryption of personal data,
-#     and Art. 32(1)(c) ability to restore availability and access to
-#     personal data in a timely manner in the event of a physical or
-#     technical incident. These two limbs do not yet have a finalized
-#     playbook whose data-flow doc explicitly carries them as an
-#     agentic anchor — Art. 32(1)(c) restore-availability is the
-#     natural anchor for a future restore-drill / backup-attestation
-#     playbook (cf. control.backup_attestation@v1,
-#     control.restore_drill@v1) and is deferred to a CORE-3..N slice
-#     rather than stretched into this entry.
+#   - Art. 32(1)(a) pseudonymisation and encryption of personal data.
+#     This limb does not yet have a finalized playbook whose data-flow
+#     doc explicitly carries it as an agentic anchor and is deferred
+#     to a later CORE slice. The Art. 32(1)(c) restore-availability
+#     limb is anchored by this file (entry
+#     gdpr:art-32-1-c-restore-availability below) now that
+#     playbook.backup_recovery@v1 is finalized; the deferral the
+#     SKELETON state of this file recorded is retired.
 #
 #   - Art. 25 data protection by design and by default. Several
 #     SKELETON skip rationales (codebase_vuln_management,
@@ -199,14 +197,17 @@ entries:
       - control.control_effectiveness_test@v1
       - control.detection_coverage_evidence@v1
       - control.cspm_baseline@v1
+      - control.restore_drill@v1
     playbook_refs:
       - playbook.detection_engineering@v1
       - playbook.infra_posture_management@v1
+      - playbook.backup_recovery@v1
     metric_refs:
       - kri.control_effectiveness@v1
       - kpi.detection_coverage@v1
       - kpi.false_positive_rate@v1
       - kpi.cloud_posture_coverage@v1
+      - kpi.backup_integrity_pass_rate@v1
     evidence_stream_refs:
       - effectiveness
       - posture
@@ -230,7 +231,88 @@ entries:
       effectiveness surface against the NIS2 risk-management-
       effectiveness-assessment obligation; the GDPR and NIS2 regimes
       file separate evidence requirements against the same
-      underlying effectiveness stream. Periodic re-assessment cadence
+      underlying effectiveness stream. backup_recovery is the
+      periodic restore-drill counterpart whose dated attestation +
+      drill-evidence record is the testable / archivable artifact
+      Art. 32(1)(d) names for the backup-and-restore lane of the
+      operator's security measures — the same drill discipline the
+      Art. 32(1)(c) restore-availability entry below anchors as its
+      primary obligation, surfaced here under the periodic-testing
+      lens (NIS2 Art. 21(2)(c) and DORA Art. 12 both require the
+      restore procedure to be tested periodically, not merely
+      defined, and the kpi.backup_integrity_pass_rate@v1 metric is
+      the cadence-evident anchor for that requirement under this
+      clause). Periodic re-assessment cadence
       and archival of results are operator-side responsibilities
       discharged by the snapshot's captured_at and retention fields
       plus the upstream control's review_cadence.
+
+  - id: gdpr:art-32-1-c-restore-availability
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "32"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Implement appropriate technical and organisational measures to
+      ensure the ability to restore the availability and access to
+      personal data in a timely manner in the event of a physical or
+      technical incident. The measure must be exercisable on the
+      operator's documented recovery surface, not merely documented,
+      so the restore capability is evidenced rather than asserted.
+    status: draft
+    control_refs:
+      - control.backup_attestation@v1
+      - control.restore_drill@v1
+    playbook_refs:
+      - playbook.backup_recovery@v1
+    metric_refs:
+      - kpi.backup_integrity_pass_rate@v1
+    evidence_stream_refs:
+      - posture
+    notes: >-
+      backup_recovery is the agentic anchor for the
+      restore-availability limb of Art. 32(1)(c). The playbook
+      operates the periodic restore-drill discipline against the
+      operator's documented isolated drill target: on a scheduled
+      or operator-initiated drill window, it validates the integrity
+      of the most recent in-scope backup artifact
+      (checksum / manifest / decryption-key availability — the File
+      Hashing D3-FH discipline the playbook overlay pins), executes
+      a non-destructive restore against the drill target (the
+      System Recovery Analysis D3-SRA discipline the playbook
+      overlay pins), and emits a dated attestation + drill-evidence
+      record carrying the observed RTO / RPO against the documented
+      objectives. The attestation is the audit-evident artifact that
+      makes the restore-availability capability evidenced rather
+      than asserted; the kpi.backup_integrity_pass_rate@v1 metric
+      audits per-attempt outcomes and is the GDPR-visible failure
+      indicator for the clause. The drill is non-destructive by
+      construction and the playbook framing is read-only-by-contract
+      on the integrity check, so the discipline does not introduce a
+      new processing purpose against the subject data; the lawful
+      basis for the underlying backup processing lives on the
+      operator's production-system data-flow entries under Art.
+      32(1)(b) ongoing-availability and Art. 5(1)(e) storage
+      limitation, not on this exercise playbook (see
+      content/mappings/gdpr/data-flow-backup_recovery.md §2 lawful
+      basis). The NIS2 parallel under `nis2:art-21-2-c`
+      (business-continuity / backup-management / tested-restore-
+      drills) and the DORA parallel under `dora:art-12-backup-
+      restore` anchor the same playbook against their own
+      regime-specific obligations; the three regimes carry separate
+      evidence requirements against the same drill discipline. The
+      Art. 32(1)(d) periodic-testing-and-effectiveness entry above
+      additionally lists backup_recovery as a regular-testing
+      counterpart, since "tested restore drills" engages both the
+      restore-availability obligation (this clause) and the
+      regular-testing-effectiveness obligation (the preceding
+      entry). Art. 32(1)(c) restore-availability is the primary
+      anchor — the obligation the drill discharges in substance —
+      and Art. 32(1)(d) is the secondary anchor — the obligation
+      the drill's periodic cadence and dated attestation
+      additionally evidence. CRA parallel:
+      `cra:annex-i-1-h-availability-restore-drill` (Annex I §1(h)
+      availability, restore-drill lane) anchors the same playbook
+      on the CRA side, completing the regulatory triplet.
