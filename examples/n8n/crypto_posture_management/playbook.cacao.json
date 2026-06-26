@@ -1,0 +1,213 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7",
+  "name": "Cryptography and encryption posture management",
+  "description": "Operate the cryptography & encryption posture surface required by NIS2 Art.21(2)(h): inventory the operator's declared cryptography policy and the assets in its scope, probe the certificate posture of declared TLS endpoints, check key-rotation cadence against the documented rotation schedule, capture a dated posture-attestation artifact, and notify the cryptography owner. The playbook is the operationalisation of a documented cryptography policy; it does not author the policy itself. SKELETON only — control bindings (control.crypto_policy_inventory@v1, control.cert_posture_scan@v1, control.key_rotation_evidence@v1) are pinned but detection bindings (expired-cert, weak-cipher, missed-rotation upstream rule ids), golden tests, and per-target compiler emissions are owned by CORE / EXTEND siblings. The metric_refs pin the catalogue entries kri.expiring_tls_certs@v1 and kri.overdue_key_rotations@v1 that already ship under content/mappings/nis2/article-21-2-h.yaml; the CORE/EXTEND siblings add cipher-suite-floor and rotation-cadence KPI catalogue entries and re-pin step-level refs against them. CACAO v2 + SecOps-NG content-model extensions.",
+  "playbook_types": [
+    "investigation",
+    "notification"
+  ],
+  "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+  "created": "2026-06-25T00:00:00Z",
+  "modified": "2026-06-25T00:00:00Z",
+  "labels": [
+    "cryptography",
+    "encryption",
+    "tls",
+    "key-rotation",
+    "posture",
+    "attestation"
+  ],
+  "external_references": [
+    {
+      "name": "OASIS CACAO v2.0",
+      "description": "Workflow step types, variable conventions, and the x_ extension namespace used to carry SecOps-NG content-model refs.",
+      "source": "OASIS Open"
+    },
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 21(2)(h) — policies and procedures regarding the use of cryptography and, where appropriate, encryption",
+      "source": "Official Journal of the European Union"
+    },
+    {
+      "name": "ENISA — Algorithms, key size and parameters report; post-quantum cryptography readiness",
+      "source": "ENISA"
+    },
+    {
+      "name": "OCSF v1.3.0 — API Activity (6003) event class",
+      "source": "OCSF"
+    }
+  ],
+  "playbook_variables": {
+    "__posture_window__": {
+      "type": "string",
+      "description": "ISO 8601 interval describing the posture-evaluation window for this run. Supplied by the scheduler that triggers this playbook (cron, Temporal schedule, or n8n trigger), or by an operator-initiated trigger.",
+      "external": true
+    },
+    "__crypto_scope__": {
+      "type": "string",
+      "description": "Identifier of the in-scope cryptography surface for this run (matches a row in the operator's documented cryptography-scope catalogue: which TLS endpoints, which key-management surfaces, which datasets-at-rest are subject to the declared policy).",
+      "external": true
+    },
+    "__policy_inventory_id__": {
+      "type": "string",
+      "description": "Identifier of the resolved cryptography-policy inventory snapshot: the operator's declared algorithm floor, key-size floor, rotation cadence, and TLS-version floor at the start of the posture window. Resolved against __crypto_scope__.",
+      "external": false
+    },
+    "__cert_posture_id__": {
+      "type": "string",
+      "description": "Identifier of the certificate-posture probe artifact: per-endpoint record of certificate validity, chain, expiry, negotiated TLS version, and cipher suite against the scope catalogue.",
+      "external": false
+    },
+    "__rotation_status__": {
+      "type": "string",
+      "description": "Identifier of the key-rotation status artifact: per-key record of last-rotation timestamp, declared cadence, and overdue-by counter against __policy_inventory_id__.",
+      "external": false
+    },
+    "__attestation_id__": {
+      "type": "string",
+      "description": "Identifier of the dated cryptography-posture attestation record published to the operator's evidence store. Carries the policy snapshot, the cert-posture probe, and the rotation-status artifact — the audit-evident discharge of NIS2 Art.21(2)(h).",
+      "external": false
+    }
+  },
+  "workflow_start": "start--51000000-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--51000000-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "crypto_posture_management_start",
+      "on_completion": "action--51000000-0000-4000-8000-000000000002"
+    },
+    "action--51000000-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "inventory crypto policy",
+      "description": "Resolve the operator's declared cryptography policy at the start of the posture window: algorithm floor (symmetric and asymmetric), minimum key sizes, declared key-rotation cadence per key class, TLS-version floor, and the set of in-scope endpoints / key-management surfaces / datasets-at-rest enumerated in __crypto_scope__. Reads the operator's governance source-of-truth (policy document or policy catalogue) and emits __policy_inventory_id__ — the snapshot the subsequent steps measure against. The playbook does NOT author the policy; if no policy is declared for __crypto_scope__, this step emits an inventory artifact with the gap explicitly flagged and the downstream steps still run so the attestation records the missing-policy condition.",
+      "on_completion": "action--51000000-0000-4000-8000-000000000003",
+      "in_args": [
+        "__posture_window__",
+        "__crypto_scope__"
+      ],
+      "out_args": [
+        "__policy_inventory_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.crypto_policy_inventory@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--51000000-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "probe cert posture",
+      "description": "Probe the certificate posture of the TLS endpoints enumerated in __crypto_scope__ against the floors carried in __policy_inventory_id__: certificate validity and chain, days-to-expiry, negotiated TLS version, negotiated cipher suite, and presence of mandated extensions. Per-endpoint records are aggregated into __cert_posture_id__. The probe is read-only and side-effect-free against operator infrastructure; it does not attempt connection coercion or downgrade. Detection bindings for expired-cert / weak-cipher / floor-violation upstream rule ids are owned by the CORE-layer sibling card once stable ids are selected.",
+      "on_completion": "action--51000000-0000-4000-8000-000000000004",
+      "in_args": [
+        "__crypto_scope__",
+        "__policy_inventory_id__"
+      ],
+      "out_args": [
+        "__cert_posture_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.cert_posture_scan@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--51000000-0000-4000-8000-000000000004": {
+      "type": "action",
+      "name": "check key rotation",
+      "description": "Walk the key-management surfaces enumerated in __crypto_scope__ and, for each managed key, compare the last-rotation timestamp against the per-key-class cadence carried in __policy_inventory_id__. Emit __rotation_status__ as a per-key record of (key id, key class, last rotation, declared cadence, overdue-by-days). Keys with no declared cadence in the policy snapshot are reported as policy gaps rather than overdue rotations; the distinction is preserved so the attestation surfaces the policy-side and operations-side gaps separately. The check is read-only; it does NOT perform rotations.",
+      "on_completion": "action--51000000-0000-4000-8000-000000000005",
+      "in_args": [
+        "__crypto_scope__",
+        "__policy_inventory_id__"
+      ],
+      "out_args": [
+        "__rotation_status__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.key_rotation_evidence@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--51000000-0000-4000-8000-000000000005": {
+      "type": "action",
+      "name": "evidence capture",
+      "description": "Compose and publish the dated cryptography-posture attestation to the operator's evidence store. The record carries the policy-inventory snapshot, the cert-posture probe artifact, the key-rotation status artifact, the posture window, and a top-level gap summary (missing-policy, expiring-certs, overdue-rotations counts). This is the audit-evident artifact that NIS2 Art.21(2)(h) reviewers read; missing or stale attestations are the failure mode the metrics surface. The attestation is always emitted, including the policy-gap branch (which records the missing-policy condition rather than skipping the attestation).",
+      "on_completion": "action--51000000-0000-4000-8000-000000000006",
+      "in_args": [
+        "__policy_inventory_id__",
+        "__cert_posture_id__",
+        "__rotation_status__",
+        "__posture_window__"
+      ],
+      "out_args": [
+        "__attestation_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.crypto_policy_inventory@v1",
+          "control.cert_posture_scan@v1",
+          "control.key_rotation_evidence@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--51000000-0000-4000-8000-000000000006": {
+      "type": "action",
+      "name": "notify crypto owner",
+      "description": "Deliver the attestation reference to the cryptography owner along the operator's pre-bound channel (ticketing system, chat thread, email). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an attestation written but never delivered to the owner is itself a posture gap.",
+      "on_completion": "end--51000000-0000-4000-8000-000000000007",
+      "in_args": [
+        "__attestation_id__",
+        "__crypto_scope__"
+      ],
+      "x_secops_ng": {
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "end--51000000-0000-4000-8000-000000000007": {
+      "type": "end",
+      "name": "crypto_posture_management_end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.crypto_posture_management@v1",
+    "content_version": "0.1.0",
+    "maturity": "experimental",
+    "compile_targets": [
+      "n8n",
+      "temporal",
+      "langgraph"
+    ],
+    "control_refs": [
+      "control.crypto_policy_inventory@v1",
+      "control.cert_posture_scan@v1",
+      "control.key_rotation_evidence@v1"
+    ],
+    "telemetry_refs": [
+      "telemetry.ocsf.api_activity@v1"
+    ],
+    "metric_refs": [],
+    "sources": [
+      "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
+      "NIS2 Directive (EU) 2022/2555, Article 21(2)(h) — policies and procedures regarding the use of cryptography and, where appropriate, encryption",
+      "ENISA — Algorithms, key size and parameters report; post-quantum cryptography readiness",
+      "OCSF — API Activity (6003) event class"
+    ]
+  }
+}
