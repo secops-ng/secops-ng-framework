@@ -27,12 +27,28 @@ entries:
     control_refs:
       - control.backup_attestation@v1
       - control.restore_drill@v1
-    playbook_refs: []
+    playbook_refs:
+      - playbook.backup_recovery@v1
     metric_refs:
       - kpi.backup_integrity_pass_rate@v1
+      - kpi.restore_drill_cadence@v1
+      - kri.backup_integrity_failures@v1
     notes: >-
       Article 12 is the backup-and-restoration anchor for Chapter II.
       The agentic slice is the dated backup-attestation record paired
       with recurring restore-drill evidence showing that the documented
       RTO/RPO objectives from Article 11 are not just declared but
-      exercised on the data covered by the backup policy.
+      exercised on the data covered by the backup policy. The
+      backup_recovery playbook is the per-cycle materialisation of
+      that "tested restore drill" obligation: the integrity check on
+      the candidate backup, the non-destructive restore against an
+      isolated drill target, and the dated attestation + drill-evidence
+      record published to the operator's evidence store are the
+      audit-evident discharge of the clause. Companion to NIS2 Art.
+      21(2)(c) (business continuity, backup management, disaster
+      recovery, crisis management) at
+      content/mappings/nis2/article-21-2-c.yaml, which pins the same
+      control_refs and the same playbook_ref. The outbound dora: entry
+      on the playbook overlay at
+      content/playbooks/backup_recovery/mappings.yaml is the
+      structural closure of this backlink.

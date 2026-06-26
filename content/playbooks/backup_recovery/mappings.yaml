@@ -15,12 +15,16 @@
 # policy itself; it operationalises a policy that lives in the
 # operator's governance documentation.
 #
-# Status: SKELETON. CORE-layer cards add the detection bindings for
-# restore-target misconfiguration (restore landing in production,
-# drill target reachable from production network) once stable upstream
-# rule ids are selected; an EXTEND card wires the integrity-failure
-# and drill-cadence metric emitters against the operator's evidence
-# store. This overlay anchors the regulatory and control surface only.
+# Status: CORE. The SKELETON overlay anchored the regulatory and
+# control surface; this CORE layer adds the D3FEND detection bindings
+# for the integrity-verification and restore-exercise discipline and
+# closes the DORA mapping graph (inbound at
+# content/mappings/dora/article-12.yaml + outbound here). An EXTEND
+# card adds the restore-target-misconfiguration detection bindings
+# (restore landing in production, drill target reachable from
+# production network) once stable upstream rule ids are selected and
+# wires the integrity-failure and drill-cadence metric emitters
+# against the operator's evidence store.
 #
 # Deliberate OSCAL omissions:
 #   - CP-2 (Contingency Plan) is NOT pinned: this playbook operates a
@@ -41,14 +45,38 @@
 #
 # D3FEND closure: D3FEND v1.0.0 frames its defensive techniques around
 # runtime countermeasures against adversary behaviours (account
-# monitoring, software inventory, network isolation, etc.); the
-# discipline this playbook operates — periodic non-destructive restore
-# drills against backup artifacts — is a continuity-readiness
-# exercise, not a runtime countermeasure against an adversary
-# behaviour. The d3fend block below is intentionally empty rather than
-# carrying a forced tag, mirroring the gap-note precedent on the
-# on_call_rotation overlay for the handoff-brief steps and the
-# iam_auditor overlay for D3-UAP.
+# monitoring, software inventory, network isolation, etc.); two
+# techniques fit the discipline this playbook operates without
+# misrepresenting it. File Hashing (D3-FH) is the per-artifact
+# integrity-verification discipline the validate-backup-integrity
+# step exercises against the candidate backup (checksum and manifest
+# verification against the documented backup-scope inventory); the
+# same technique anchors the backup-snapshot verification step on the
+# ransomware_containment overlay, so the discipline is named
+# consistently across both halves of the operator's continuity
+# surface. System Recovery Analysis (D3-SRA) is the periodic
+# non-destructive restore-exercise discipline the
+# execute-restore-drill step operates against the documented isolated
+# drill target; D3-SRA is the d3fend_ref already pinned on
+# control.restore_drill@v1 and on the inbound dora:art-12-backup-
+# restore / dora:art-11-response-recovery / nis2:art-21-2-c
+# regulatory bindings under content/mappings/d3fend/, so this overlay
+# inherits the same defensive anchor in its outbound view. The
+# detect-restore-drill-trigger, evidence-capture, and
+# notify-continuity-owner steps are deliberately NOT pinned to a
+# D3FEND technique: trigger resolution is a scheduling-surface read
+# upstream of the dated-examination discipline rather than the
+# examination itself, evidence emission is an attestation-stream
+# discipline rather than a detection or countermeasure, and
+# notification is a delivery discipline. The same per-step
+# pin-where-it-fits / document-the-gap pattern is used on
+# crypto_posture_management (inventory / emission / delivery gaps),
+# infra_posture_management (emit-posture-evidence gap),
+# iam_auditor (D3-UAP gap), and on_call_rotation (handoff-brief
+# gap). The playbook framing remains read-only-by-contract on the
+# integrity check and non-destructive-by-construction on the drill
+# (production state is untouched); no runtime countermeasure is
+# represented.
 #
 # CRA closure: the playbook-mappings schema's top-level keys are fixed
 # (oscal/d3fend/ocsf/nis2/dora/cra). CRA cross-references are not
@@ -63,6 +91,21 @@
 # documented to include personal-data restoration. SKELETON does not
 # pre-author that anchor; the integrity-and-drill discipline operates
 # on backup artifacts identified by id rather than by content.
+#
+# DORA closure: the inbound entry on the DORA side lives at
+# content/mappings/dora/article-12.yaml (id dora:art-12-backup-restore
+# — DORA Art. 12 backup policies and procedures, restoration and
+# recovery procedures and methods, with periodic testing). The
+# matching outbound dora: entry below closes the graph. Article 11
+# (response and recovery, RTO/RPO objectives) is the upstream
+# obligation Article 12 operationalises; this overlay does not pin
+# dora:art-11-response-recovery directly because Article 11's
+# operational discharge is broader than the backup-and-restore-drill
+# slice this playbook owns (response-handling and incident-management
+# disciplines anchor elsewhere). Pinning Article 12 only keeps the
+# inbound graph atom-per-obligation, matching the precedent set by
+# crypto_posture_management pinning dora:art-9-crypto rather than the
+# broader dora:art-9-* family.
 #
 # Schema: schemas/playbook-mappings.schema.json
 playbook: playbook.backup_recovery@v1
@@ -103,15 +146,106 @@ oscal:
       capability; the observed RTO / RPO captured into the drill
       result is what feeds the kpi.restore_drill_cadence@v1 metric.
 
-d3fend: []
-  # D3FEND v1.0.0 carries no defensive-technique anchor that matches
-  # the periodic non-destructive restore-drill discipline this
-  # playbook operates without misrepresenting it. The block is
-  # intentionally empty rather than carrying a forced tag, mirroring
-  # the gap-note precedent documented in the header. Detection
-  # bindings for restore-target misconfiguration are owned by the
-  # CORE-layer detection card once stable upstream rule ids are
-  # selected.
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned to the real action UUIDs resolved
+  # from content/playbooks/backup_recovery/playbook.cacao.json
+  # (five action bodies: detect-restore-drill-trigger,
+  # validate-backup-integrity, execute-restore-drill, evidence-
+  # capture, notify-continuity-owner). Two techniques anchor the
+  # exercised discipline: File Hashing (D3-FH) on the per-artifact
+  # integrity-verification step and System Recovery Analysis
+  # (D3-SRA) on the periodic non-destructive restore-exercise step.
+  # The trigger / evidence-capture / notify steps are deliberately
+  # not pinned and the gaps are documented in the header (mirroring
+  # the inventory / emission / delivery gap-note precedents on
+  # crypto_posture_management, infra_posture_management,
+  # iam_auditor, and on_call_rotation).
+  - step: action--50000000-0000-4000-8000-000000000003
+    d3fend_id: D3-FH
+    d3fend_name: File Hashing
+    url: https://d3fend.mitre.org/technique/d3f:FileHashing/
+    notes: >-
+      validate-backup-integrity — the per-artifact integrity check
+      against the candidate backup (checksum / manifest verification,
+      decryption-key availability against the operator's
+      key-management surface, presence check against the documented
+      backup-scope inventory) is the dated-examination discipline
+      D3-FH names. D3FEND frames File Hashing as the computation and
+      comparison of a cryptographic hash of a file against a known
+      baseline; the playbook narrows that lens to the operator's own
+      backup artifacts and the operator's own documented integrity
+      baseline — same technique, continuity-readiness scope rather
+      than adversary-attribution scope. The check is read-only and
+      side-effect-free; a false outcome short-circuits the drill
+      into the evidence-capture branch (failure attestation) without
+      executing the restore against potentially-corrupt data. The
+      __integrity_ok__ boolean is the audit-evident output of the
+      File Hashing pass and feeds the
+      kri.backup_integrity_failures@v1 metric. The same technique
+      anchors the verify-backup-snapshot step on the
+      ransomware_containment overlay, so the integrity-verification
+      discipline is named consistently across both halves of the
+      operator's continuity surface.
+
+  - step: action--50000000-0000-4000-8000-000000000005
+    d3fend_id: D3-SRA
+    d3fend_name: System Recovery Analysis
+    url: https://d3fend.mitre.org/technique/d3f:SystemRecoveryAnalysis/
+    notes: >-
+      execute-restore-drill — the non-destructive restore of the
+      in-scope objects from __candidate_backup_id__ against the
+      operator's documented isolated drill target, with observed
+      RTO / RPO recorded against the documented objectives and the
+      restored object inventory captured into __drill_result__, is
+      the periodic exercise discipline D3-SRA names. D3FEND frames
+      System Recovery Analysis as the analysis of system recovery
+      from a known-good state; the playbook narrows that lens to
+      the operator's own backup artifacts and the operator's own
+      documented drill target — same technique, continuity-
+      readiness scope rather than adversary-recovery scope. The
+      drill is non-destructive by construction; production state is
+      untouched. D3-SRA is the d3fend_ref already pinned on
+      control.restore_drill@v1 and on the inbound dora:art-12-backup-
+      restore / dora:art-11-response-recovery / nis2:art-21-2-c
+      regulatory bindings under content/mappings/d3fend/, so this
+      overlay inherits the same defensive anchor in its outbound
+      view. The __drill_result__ artifact feeds the
+      kpi.restore_drill_cadence@v1 metric. Detection bindings for
+      restore-target misconfiguration (restore landing in
+      production, drill target reachable from production network)
+      are owned by a sibling EXTEND card once stable upstream rule
+      ids are selected.
+
+  # detect-restore-drill-trigger (action--50000000-0000-4000-8000-
+  # 000000000002) is deliberately NOT pinned to a D3FEND technique.
+  # Resolving the trigger for this run (a scheduled drill window
+  # matured, an operator-initiated drill request landed) is a
+  # scheduling-surface read against the operator's scheduler and
+  # backup-scope catalogue — the upstream of the dated-examination
+  # discipline rather than the examination itself. This step is
+  # anchored on the CP-9 OSCAL control above where the
+  # backup-scope-resolution obligation actually lives. Mirrors the
+  # crypto_posture_management inventory-crypto-policy gap note.
+  #
+  # evidence-capture (action--50000000-0000-4000-8000-000000000006)
+  # is deliberately NOT pinned to a D3FEND technique. Per-execution
+  # artifact emission of the dated backup-and-drill attestation for
+  # downstream audit consumption is an evidence-stream emission
+  # discipline, not a runtime countermeasure or a detection step,
+  # and forcing it onto a D3FEND tag would misrepresent the
+  # technique. This step is anchored on the CP-9 / CP-10 OSCAL
+  # controls above. Mirrors the
+  # infra_posture_management emit-posture-evidence gap note and the
+  # crypto_posture_management evidence-capture gap note.
+  #
+  # notify-continuity-owner (action--50000000-0000-4000-8000-
+  # 000000000007) is deliberately NOT pinned to a D3FEND technique.
+  # Delivery of an attestation reference to the continuity owner
+  # along the operator's pre-bound channel is a notification
+  # discipline, not a defensive technique. Mirrors the
+  # on_call_rotation handoff-brief gap note and the
+  # crypto_posture_management notify-crypto-owner gap note.
 
 ocsf:
   # OCSF v1.3.0 telemetry bindings. The detect-trigger, validate-
@@ -171,15 +305,44 @@ nis2:
       control.restore_drill@v1) as this overlay; this outbound entry
       is the structural closure of that backlink.
 
-dora: []
-  # SKELETON scope is NIS2 Art.21(2)(c) only. DORA Art.12 (backup
-  # policies and procedures; periodic testing) is the obvious sibling
-  # anchor — control_refs already line up — but the inbound entry at
-  # content/mappings/dora/article-12.yaml still carries
-  # playbook_refs: []. A sibling card closes the DORA graph by adding
-  # the inbound link there and the outbound entry here in one PR
-  # rather than landing a one-sided edge. No outbound DORA entry is
-  # emitted on this SKELETON overlay.
+dora:
+  # Inbound entry that backlinks playbook.backup_recovery@v1:
+  #   - content/mappings/dora/article-12.yaml
+  #     (id dora:art-12-backup-restore — DORA Art. 12 backup
+  #     policies and procedures, restoration and recovery
+  #     procedures and methods, with periodic testing)
+  # Pinned outbound below to close the graph.
+  - mapping_id: dora:art-12-backup-restore
+    article: "12"
+    notes: >-
+      DORA Art. 12 requires financial entities to develop and
+      document backup policies and procedures specifying the scope
+      of the data subject to backup and the minimum frequency,
+      together with restoration and recovery procedures and methods
+      that ensure restoration of ICT systems and data with minimum
+      downtime and limited disruption, and to test those backup,
+      restoration, and recovery procedures periodically. The
+      backup_recovery playbook is the per-cycle materialisation of
+      that "tested restore drill" obligation — the same discharge
+      shape NIS2 Art. 21(2)(c) anchors on. The integrity check on
+      the candidate backup, the non-destructive restore against the
+      operator's documented isolated drill target, and the dated
+      attestation + drill-evidence record published to the
+      operator's evidence store are the audit-evident discharge of
+      the clause; missing or stale attestations are the failure
+      mode the kpi.restore_drill_cadence@v1 metric surfaces, and
+      integrity-check regressions are the failure mode the
+      kri.backup_integrity_failures@v1 metric trips on. The inbound
+      entry pins the same control_refs (control.backup_attestation@v1,
+      control.restore_drill@v1) as this overlay; this outbound entry
+      is the structural closure of that backlink. Art. 11
+      (response and recovery) is the upstream obligation Art. 12
+      operationalises; this overlay does not pin
+      dora:art-11-response-recovery directly because Art. 11's
+      operational discharge is broader than the backup-and-restore-
+      drill slice this playbook owns. Mirrors the precedent on
+      crypto_posture_management pinning dora:art-9-crypto rather
+      than the broader dora:art-9-* family.
 
 cra: []
   # See CRA closure note in the header — no CRA cross-references
