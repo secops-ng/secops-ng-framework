@@ -1,0 +1,414 @@
+{
+  "name": "Cryptography and encryption posture management",
+  "nodes": [
+    {
+      "id": "start--51000000-0000-4000-8000-000000000001",
+      "name": "crypto_posture_management_start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__posture_window__",
+              "type": "string",
+              "value": "",
+              "description": "ISO 8601 interval describing the posture-evaluation window for this run. Supplied by the scheduler that triggers this playbook (cron, Temporal schedule, or n8n trigger), or by an operator-initiated trigger."
+            },
+            {
+              "name": "__crypto_scope__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the in-scope cryptography surface for this run (matches a row in the operator's documented cryptography-scope catalogue: which TLS endpoints, which key-management surfaces, which datasets-at-rest are subject to the declared policy)."
+            },
+            {
+              "name": "__policy_inventory_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the resolved cryptography-policy inventory snapshot: the operator's declared algorithm floor, key-size floor, rotation cadence, and TLS-version floor at the start of the posture window. Resolved against __crypto_scope__."
+            },
+            {
+              "name": "__cert_posture_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the certificate-posture probe artifact: per-endpoint record of certificate validity, chain, expiry, negotiated TLS version, and cipher suite against the scope catalogue."
+            },
+            {
+              "name": "__rotation_status__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the key-rotation status artifact: per-key record of last-rotation timestamp, declared cadence, and overdue-by counter against __policy_inventory_id__."
+            },
+            {
+              "name": "__attestation_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the dated cryptography-posture attestation record published to the operator's evidence store. Carries the policy snapshot, the cert-posture probe, and the rotation-status artifact \u2014 the audit-evident discharge of NIS2 Art.21(2)(h)."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--51000000-0000-4000-8000-000000000002",
+      "name": "inventory crypto policy",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.posture_window",
+              "name": "in.posture_window",
+              "value": "={{$workflow.variables.posture_window}}",
+              "type": "string"
+            },
+            {
+              "id": "in.crypto_scope",
+              "name": "in.crypto_scope",
+              "value": "={{$workflow.variables.crypto_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "out.policy_inventory_id",
+              "name": "out.policy_inventory_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.crypto_policy_inventory@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Resolve the operator's declared cryptography policy at the start of the posture window: algorithm floor (symmetric and asymmetric), minimum key sizes, declared key-rotation cadence per key class, TLS-version floor, and the set of in-scope endpoints / key-management surfaces / datasets-at-rest enumerated in __crypto_scope__. Reads the operator's governance source-of-truth (policy document or policy catalogue) and emits __policy_inventory_id__ \u2014 the snapshot the subsequent steps measure against. The playbook does NOT author the policy; if no policy is declared for __crypto_scope__, this step emits an inventory artifact with the gap explicitly flagged and the downstream steps still run so the attestation records the missing-policy condition.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--51000000-0000-4000-8000-000000000003",
+      "name": "probe cert posture",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.crypto_scope",
+              "name": "in.crypto_scope",
+              "value": "={{$workflow.variables.crypto_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "in.policy_inventory_id",
+              "name": "in.policy_inventory_id",
+              "value": "={{$workflow.variables.policy_inventory_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.cert_posture_id",
+              "name": "out.cert_posture_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.cert_posture_scan@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Probe the certificate posture of the TLS endpoints enumerated in __crypto_scope__ against the floors carried in __policy_inventory_id__: certificate validity and chain, days-to-expiry, negotiated TLS version, negotiated cipher suite, and presence of mandated extensions. Per-endpoint records are aggregated into __cert_posture_id__. The probe is read-only and side-effect-free against operator infrastructure; it does not attempt connection coercion or downgrade. Detection bindings for expired-cert / weak-cipher / floor-violation upstream rule ids are owned by the CORE-layer sibling card once stable ids are selected.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--51000000-0000-4000-8000-000000000004",
+      "name": "check key rotation",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.crypto_scope",
+              "name": "in.crypto_scope",
+              "value": "={{$workflow.variables.crypto_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "in.policy_inventory_id",
+              "name": "in.policy_inventory_id",
+              "value": "={{$workflow.variables.policy_inventory_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.rotation_status",
+              "name": "out.rotation_status",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.key_rotation_evidence@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Walk the key-management surfaces enumerated in __crypto_scope__ and, for each managed key, compare the last-rotation timestamp against the per-key-class cadence carried in __policy_inventory_id__. Emit __rotation_status__ as a per-key record of (key id, key class, last rotation, declared cadence, overdue-by-days). Keys with no declared cadence in the policy snapshot are reported as policy gaps rather than overdue rotations; the distinction is preserved so the attestation surfaces the policy-side and operations-side gaps separately. The check is read-only; it does NOT perform rotations.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--51000000-0000-4000-8000-000000000005",
+      "name": "evidence capture",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.policy_inventory_id",
+              "name": "in.policy_inventory_id",
+              "value": "={{$workflow.variables.policy_inventory_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.cert_posture_id",
+              "name": "in.cert_posture_id",
+              "value": "={{$workflow.variables.cert_posture_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.rotation_status",
+              "name": "in.rotation_status",
+              "value": "={{$workflow.variables.rotation_status}}",
+              "type": "string"
+            },
+            {
+              "id": "in.posture_window",
+              "name": "in.posture_window",
+              "value": "={{$workflow.variables.posture_window}}",
+              "type": "string"
+            },
+            {
+              "id": "out.attestation_id",
+              "name": "out.attestation_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.crypto_policy_inventory@v1, control.cert_posture_scan@v1, control.key_rotation_evidence@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Compose and publish the dated cryptography-posture attestation to the operator's evidence store. The record carries the policy-inventory snapshot, the cert-posture probe artifact, the key-rotation status artifact, the posture window, and a top-level gap summary (missing-policy, expiring-certs, overdue-rotations counts). This is the audit-evident artifact that NIS2 Art.21(2)(h) reviewers read; missing or stale attestations are the failure mode the metrics surface. The attestation is always emitted, including the policy-gap branch (which records the missing-policy condition rather than skipping the attestation).",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--51000000-0000-4000-8000-000000000006",
+      "name": "notify crypto owner",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.attestation_id",
+              "name": "in.attestation_id",
+              "value": "={{$workflow.variables.attestation_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.crypto_scope",
+              "name": "in.crypto_scope",
+              "value": "={{$workflow.variables.crypto_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Deliver the attestation reference to the cryptography owner along the operator's pre-bound channel (ticketing system, chat thread, email). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an attestation written but never delivered to the owner is itself a posture gap.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--51000000-0000-4000-8000-000000000007",
+      "name": "crypto_posture_management_end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "crypto_posture_management_start": {
+      "main": [
+        [
+          {
+            "node": "inventory crypto policy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "inventory crypto policy": {
+      "main": [
+        [
+          {
+            "node": "probe cert posture",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "probe cert posture": {
+      "main": [
+        [
+          {
+            "node": "check key rotation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check key rotation": {
+      "main": [
+        [
+          {
+            "node": "evidence capture",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "evidence capture": {
+      "main": [
+        [
+          {
+            "node": "notify crypto owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "notify crypto owner": {
+      "main": [
+        [
+          {
+            "node": "crypto_posture_management_end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "cryptography",
+    "encryption",
+    "tls",
+    "key-rotation",
+    "posture",
+    "attestation"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.crypto_posture_management@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7"
+    },
+    "secops_ng_notes": [
+      "step 'action--51000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--51000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--51000000-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--51000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--51000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}
