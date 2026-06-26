@@ -1,0 +1,466 @@
+{
+  "name": "Backup and restore-drill exercise",
+  "nodes": [
+    {
+      "id": "start--50000000-0000-4000-8000-000000000001",
+      "name": "backup_recovery_start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__drill_window__",
+              "type": "string",
+              "value": "",
+              "description": "ISO 8601 interval describing the restore-drill window being evaluated. Supplied by the scheduler that triggers this playbook (cron, Temporal schedule, or n8n trigger), or by an operator-initiated trigger."
+            },
+            {
+              "name": "__backup_scope__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the in-scope data set for this drill (matches a row in the operator's documented backup-scope catalogue: which systems, which datasets, RPO/RTO band)."
+            },
+            {
+              "name": "__candidate_backup_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the most recent backup artifact selected for the drill, resolved against __backup_scope__ and the drill window."
+            },
+            {
+              "name": "__integrity_ok__",
+              "type": "boolean",
+              "value": "",
+              "description": "Outcome of the validate-backup-integrity step: true when the backup's documented integrity checks (checksum, manifest, decryption key availability) all pass; false when any check fails. A false value short-circuits the drill into the evidence-capture and notify branches with a failure record rather than executing the restore."
+            },
+            {
+              "name": "__drill_result__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the executed restore-drill artifact: the durable record of the non-destructive restore exercise (target environment, restored object inventory, RTO/RPO observed). Empty when the drill was skipped due to a failed integrity check."
+            },
+            {
+              "name": "__attestation_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the dated backup-attestation + drill-evidence record published to the operator's evidence store. Always populated, including the integrity-failure branch (which emits an attestation recording the failure)."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--50000000-0000-4000-8000-000000000002",
+      "name": "detect restore-drill trigger",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.drill_window",
+              "name": "in.drill_window",
+              "value": "={{$workflow.variables.drill_window}}",
+              "type": "string"
+            },
+            {
+              "id": "in.backup_scope",
+              "name": "in.backup_scope",
+              "value": "={{$workflow.variables.backup_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "out.candidate_backup_id",
+              "name": "out.candidate_backup_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.backup_attestation@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Resolve the trigger for this run: a scheduled drill window matured (cron / Temporal schedule), an operator-initiated drill request landed, or a continuity event up the chain raised the drill cadence. Reads __drill_window__ and __backup_scope__ and selects __candidate_backup_id__ \u2014 the most recent backup artifact for the in-scope data set that is eligible for a non-destructive drill against an isolated target.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--50000000-0000-4000-8000-000000000003",
+      "name": "validate backup integrity",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.candidate_backup_id",
+              "name": "in.candidate_backup_id",
+              "value": "={{$workflow.variables.candidate_backup_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.integrity_ok",
+              "name": "out.integrity_ok",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.backup_attestation@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.backup_integrity_pass_rate@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Run the documented integrity checks on the candidate backup: checksum / manifest verification, decryption-key availability against the operator's key-management surface, and a presence check against the documented backup-scope inventory (no silently-dropped objects). Sets __integrity_ok__. A false outcome short-circuits the drill into the evidence-capture step (failure attestation) without executing the restore, so the operator's continuity owner is notified of the integrity gap rather than discovering it under real recovery pressure.",
+      "notesInFlow": true
+    },
+    {
+      "id": "if-condition--50000000-0000-4000-8000-000000000004",
+      "name": "backup integrity ok?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "secops_ng_condition",
+              "leftValue": "",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "notes": "Branch on __integrity_ok__. True branches into the non-destructive restore-drill execution; false routes straight to evidence capture (failure attestation) and notify, recording the gap without executing the restore against potentially-corrupt data.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--50000000-0000-4000-8000-000000000005",
+      "name": "execute restore drill",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.candidate_backup_id",
+              "name": "in.candidate_backup_id",
+              "value": "={{$workflow.variables.candidate_backup_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.backup_scope",
+              "name": "in.backup_scope",
+              "value": "={{$workflow.variables.backup_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "out.drill_result",
+              "name": "out.drill_result",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.restore_drill@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Execute the non-destructive restore drill against the operator's documented isolated drill target (not production). Restore the in-scope objects from __candidate_backup_id__, record the observed RTO / RPO against the documented objectives, capture the restored object inventory, and emit __drill_result__. The drill is non-destructive by construction; production state is untouched. Detection bindings for restore-target misconfiguration (restore landing in production, drill target reachable from production network) are owned by CORE-layer cards once upstream rule ids are selected. A restore-drill-cadence KPI catalogue entry is owned by a sibling EXTEND card; this step intentionally does not pin a step-level metric_ref until that catalogue entry lands.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--50000000-0000-4000-8000-000000000006",
+      "name": "evidence capture",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.candidate_backup_id",
+              "name": "in.candidate_backup_id",
+              "value": "={{$workflow.variables.candidate_backup_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.integrity_ok",
+              "name": "in.integrity_ok",
+              "value": "={{$workflow.variables.integrity_ok}}",
+              "type": "string"
+            },
+            {
+              "id": "in.drill_result",
+              "name": "in.drill_result",
+              "value": "={{$workflow.variables.drill_result}}",
+              "type": "string"
+            },
+            {
+              "id": "out.attestation_id",
+              "name": "out.attestation_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.backup_attestation@v1, control.restore_drill@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.backup_integrity_pass_rate@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Compose and publish the dated attestation + drill-evidence record to the operator's evidence store. The record carries the candidate backup id, integrity-check outcome, executed drill result (or the failure marker for the short-circuit branch), observed RTO/RPO, restored inventory, and the drill window. This is the audit-evident artifact that NIS2 Art.21(2)(c) and DORA Art.12 reviewers read; missing or stale attestations are the failure mode the metrics surface.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--50000000-0000-4000-8000-000000000007",
+      "name": "notify continuity owner",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.attestation_id",
+              "name": "in.attestation_id",
+              "value": "={{$workflow.variables.attestation_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.backup_scope",
+              "name": "in.backup_scope",
+              "value": "={{$workflow.variables.backup_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Deliver the attestation reference to the continuity owner along the operator's pre-bound channel (ticketing system, chat thread, email). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an attestation written but never delivered to the owner is itself a continuity gap.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--50000000-0000-4000-8000-000000000008",
+      "name": "backup_recovery_end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2060,
+        420
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "backup_recovery_start": {
+      "main": [
+        [
+          {
+            "node": "detect restore-drill trigger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "detect restore-drill trigger": {
+      "main": [
+        [
+          {
+            "node": "validate backup integrity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validate backup integrity": {
+      "main": [
+        [
+          {
+            "node": "backup integrity ok?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "backup integrity ok?": {
+      "main": [
+        [
+          {
+            "node": "execute restore drill",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "evidence capture",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "execute restore drill": {
+      "main": [
+        [
+          {
+            "node": "evidence capture",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "evidence capture": {
+      "main": [
+        [
+          {
+            "node": "notify continuity owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "notify continuity owner": {
+      "main": [
+        [
+          {
+            "node": "backup_recovery_end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "business-continuity",
+    "backup",
+    "restore",
+    "disaster-recovery",
+    "attestation"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.backup_recovery@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba"
+    },
+    "secops_ng_notes": [
+      "step 'action--50000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--50000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'if-condition--50000000-0000-4000-8000-000000000004' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
+      "step 'action--50000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--50000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--50000000-0000-4000-8000-000000000007': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}
