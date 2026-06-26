@@ -1,0 +1,72 @@
+{
+  "conditional_edges": [],
+  "edges": [
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--52000000-0000-4000-8000-000000000003",
+      "src": "action--52000000-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--52000000-0000-4000-8000-000000000004",
+      "src": "action--52000000-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--52000000-0000-4000-8000-000000000005",
+      "src": "action--52000000-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--52000000-0000-4000-8000-000000000006",
+      "src": "action--52000000-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--52000000-0000-4000-8000-000000000006"
+    }
+  ],
+  "end_sentinel": "__END__",
+  "entry": "action--52000000-0000-4000-8000-000000000002",
+  "name": "Authentication and secured-communications posture",
+  "nodes": [
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "probe mfa coverage",
+      "name": "action--52000000-0000-4000-8000-000000000002",
+      "step_id": "action--52000000-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "assess continuous auth",
+      "name": "action--52000000-0000-4000-8000-000000000003",
+      "step_id": "action--52000000-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "verify oob channels",
+      "name": "action--52000000-0000-4000-8000-000000000004",
+      "step_id": "action--52000000-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "evidence capture",
+      "name": "action--52000000-0000-4000-8000-000000000005",
+      "step_id": "action--52000000-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "notify authentication owner",
+      "name": "action--52000000-0000-4000-8000-000000000006",
+      "step_id": "action--52000000-0000-4000-8000-000000000006"
+    }
+  ],
+  "playbook_id": "playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8",
+  "stable_id": "playbook.mfa_secured_comms@v1"
+}
