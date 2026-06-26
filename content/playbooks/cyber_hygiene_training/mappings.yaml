@@ -7,21 +7,25 @@
 # closed in both directions.
 #
 # This playbook operates the basic cyber-hygiene and staff security-
-# training posture surface required by NIS2 Art. 21(2)(g): inventory
-# the in-scope training roster against the declared training scope,
-# schedule the per-cycle awareness and role-based training assignments,
-# run the cycle's phishing-simulation exercise, track completion of
-# mandatory training and report-rate on the simulation, capture a dated
-# training-attestation artifact, and notify the training owner of any
-# gaps. The playbook does not author the training or hygiene policy
-# itself; it operationalises a policy that lives in the operator's
-# governance documentation.
+# training posture surface required by NIS2 Art. 21(2)(g) and DORA
+# Art. 13(6): inventory the in-scope training roster against the
+# declared training scope, schedule the per-cycle awareness and role-
+# based training assignments, run the cycle's phishing-simulation
+# exercise, track completion of mandatory training and report-rate on
+# the simulation, capture a dated training-attestation artifact, and
+# notify the training owner of any gaps. The playbook does not author
+# the training or hygiene policy itself; it operationalises a policy
+# that lives in the operator's governance documentation.
 #
-# Status: SKELETON. CORE-layer cards add the detection bindings for
-# missed-training and simulation-click signals once stable upstream
-# rule ids are selected; an EXTEND card wires the per-cohort training-
-# overdue KPI emitters against the operator's evidence store. This
-# overlay anchors the regulatory and control surface only.
+# Status: CORE. The SKELETON overlay anchored the regulatory and
+# control surface; this CORE layer adds the OCSF Compliance Finding
+# (2003) emit binding for the per-staff and per-cohort training and
+# simulation-outcome deviation records, and closes the DORA mapping
+# graph (inbound at content/mappings/dora/article-13-6-training.yaml +
+# outbound here). The d3fend block remains empty after the CORE-layer
+# defensibility analysis — see the D3FEND closure section below for
+# the per-step gap rationale. An EXTEND card wires the per-cohort
+# training-overdue KPI emitters against the operator's evidence store.
 #
 # Deliberate OSCAL omissions:
 #   - AT-2(2) (Insider Threat) is NOT pinned: insider-threat awareness
@@ -50,12 +54,32 @@
 # simulation outcomes, but this playbook does not itself implement
 # behavioural analytics; it produces the per-cycle training and
 # simulation artifacts that D3-UA-aligned analytics consume
-# downstream. The d3fend block is intentionally empty rather than
-# carrying a forced tag, mirroring the gap-note precedent on the
-# mfa_secured_comms, crypto_posture_management, backup_recovery, and
-# on_call_rotation overlays. Detection bindings for missed-training
-# and simulation-click signals are owned by the CORE-layer detection
-# card once stable upstream rule ids are selected.
+# downstream. Pinning D3-UA on the inventory-training-roster,
+# schedule-training-cycle, run-phishing-simulation, track-completion,
+# evidence-capture, or notify-gaps steps would force the technique
+# onto a producer surface it does not discharge — D3-UA names the
+# downstream analytic consumer of these artifacts, not the producer.
+# The phishing-simulation exercise is the closest candidate for a
+# Detect-tactic anchor, but D3FEND v1.0.0 carries no defensive
+# technique for documented exercise-traffic dispatch distinct from
+# the operator's mailflow surface itself; the simulation produces
+# the per-recipient click/report record that D3-UA-aligned analytics
+# consume downstream, it is not itself an account-monitoring or
+# user-behaviour-analysis pass. The d3fend block is therefore
+# intentionally empty rather than carrying a forced tag, mirroring
+# the gap-note precedent on mfa_secured_comms (gap-note on the
+# verify-oob-channels / evidence-capture / notify-authentication-
+# owner steps), crypto_posture_management (gap-note on the
+# evidence-capture / notify-crypto-owner steps), backup_recovery
+# (gap-note on the evidence-capture / notify-continuity-owner steps),
+# infra_posture_management (gap-note on the evidence-capture step),
+# iam_auditor (gap-note on the emit-access-evidence step), and
+# on_call_rotation (gap-note on the handoff-brief step). Detection
+# bindings for individual missed-training / simulation-click upstream
+# rule fingerprints are consumed via the Compliance Finding (2003)
+# telemetry binding below rather than authored as Sigma references on
+# this overlay; the operator's posture-management layer is the
+# upstream of those signal shapes.
 #
 # CRA closure: the playbook-mappings schema's top-level keys are
 # fixed (oscal/d3fend/ocsf/nis2/dora/cra). CRA cross-references are
@@ -65,13 +89,19 @@
 # vulnerability-handling obligations do not attach here. No outbound
 # CRA entries are emitted on this overlay.
 #
-# DORA closure: DORA Art. 13 ICT-related training and awareness
-# carries staff training obligations that overlap this playbook's
-# scope. The inbound entry on the DORA side has not yet been
-# authored; a sibling card closes the DORA graph by adding the
-# inbound link and the outbound entry here in one PR rather than
-# landing a one-sided edge. No outbound DORA entry is emitted on
-# this SKELETON overlay.
+# DORA closure: the inbound entry on the DORA side lives at
+# content/mappings/dora/article-13-6-training.yaml (id
+# dora:art-13-training-awareness — DORA Art. 13(6) ICT security
+# awareness programmes and digital operational resilience training as
+# compulsory modules in the staff training schemes). The matching
+# outbound dora: entry below closes the graph. The training-and-
+# awareness slice is authored as a distinct DORA entry rather than
+# overloaded onto the existing dora:art-13-learning-evolving entry
+# (which covers the post-ICT-related-incident-review slice of the
+# same Art. 13 learning-and-evolving obligation) — the two slices
+# discharge independent operational disciplines and are mapped
+# separately to preserve the atom-per-obligation shape DORA Art. 9
+# carries across vuln-mgmt / access-mgmt / crypto / authentication.
 #
 # Schema: schemas/playbook-mappings.schema.json
 playbook: playbook.cyber_hygiene_training@v1
@@ -135,21 +165,30 @@ oscal:
       policy.
 
 d3fend: []
-  # D3FEND v1.0.0 carries no defensive-technique anchor that matches
-  # the periodic awareness and role-based training scheduling,
-  # phishing-simulation exercise execution, and completion-tracking
-  # discipline this playbook operates without misrepresenting it. The
-  # control_xref files for control.training_attestation@v1 and
-  # control.phishing_simulation@v1 do reference D3-UA (User Behavior
-  # Analysis) for the analytic surface that consumes training and
-  # simulation outcomes, but this playbook does not itself implement
-  # behavioural analytics; it produces the per-cycle artifacts that
-  # D3-UA-aligned analytics consume downstream. The block is
-  # intentionally empty rather than carrying a forced tag, mirroring
-  # the gap-note precedent documented in the header. Detection
-  # bindings for missed-training and simulation-click signals are
-  # owned by the CORE-layer detection card once stable upstream rule
-  # ids are selected.
+  # See the D3FEND closure section in the header for the per-step gap
+  # rationale. Summary: D3FEND v1.0.0 carries no defensive technique
+  # whose discipline matches the producer surface this playbook
+  # operates (periodic awareness and role-based training scheduling,
+  # phishing-simulation exercise execution, completion tracking, and
+  # dated training-attestation emission). D3-UA (User Behavior
+  # Analysis) referenced from the control_xref files for
+  # control.training_attestation@v1 and control.phishing_simulation@v1
+  # names the downstream analytic consumer of the per-cycle artifacts
+  # this playbook produces, not the producer; pinning D3-UA on any of
+  # the inventory-training-roster, schedule-training-cycle, run-
+  # phishing-simulation, track-completion, evidence-capture, or
+  # notify-gaps steps would force the technique onto a producer
+  # surface it does not discharge. The block is intentionally empty
+  # rather than carrying a forced tag, mirroring the gap-note
+  # precedent on mfa_secured_comms (verify-oob-channels / evidence-
+  # capture / notify-authentication-owner gap notes),
+  # crypto_posture_management, backup_recovery,
+  # infra_posture_management, iam_auditor, and on_call_rotation.
+  # Detection bindings for individual missed-training and simulation-
+  # click upstream rule fingerprints are consumed via the Compliance
+  # Finding (2003) telemetry binding below; the operator's posture-
+  # management layer owns those fingerprints. SecOps-NG does not pin
+  # stable Sigma rule ids on this overlay.
 
 ocsf:
   # OCSF v1.3.0 telemetry bindings. The inventory-training-roster,
@@ -159,7 +198,11 @@ ocsf:
   # learning-management surface, the phishing-simulation dispatch
   # endpoint, the evidence store, the notification channel). API
   # Activity (6003) is the consistent class across both consumed and
-  # emitted records.
+  # emitted records for the read/write surfaces; Compliance Finding
+  # (2003) carries the per-staff and per-cohort training-and-
+  # simulation deviation records the track-completion step emits into
+  # the operator's posture-management layer (the upstream of any
+  # Sigma detection-binding a SIEM consumes from those deviations).
   - id: telemetry.api_activity@v1
     category_uid: 6
     category_name: Application Activity
@@ -187,6 +230,44 @@ ocsf:
       the kpi.training_completion_rate@v1 and
       kpi.phishing_sim_click_rate@v1 metrics read. Schema:
       https://schema.ocsf.io/1.3.0/classes/api_activity
+
+  - id: telemetry.compliance_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2003
+    class_name: Compliance Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by the track-completion and run-phishing-simulation
+      steps as the structured per-staff and per-cohort deviation
+      records the completion-tracking pass and the simulation
+      outcome aggregate produce against the declared training
+      policy: staff with mandatory awareness training overdue past
+      the cycle due-date, staff with role-based training overdue
+      past the cycle due-date, cohorts whose completion-rate is
+      below the declared target, cohorts whose simulation click-
+      rate exceeds the declared threshold, cohorts whose report-
+      rate is below the declared threshold, and staff with no
+      declared training requirement in the operator's policy (the
+      policy-gap branch — reported separately from completion gaps)
+      each yield one Compliance Finding keyed to (__cycle_id__,
+      staff-or-cohort-id) so the operator's posture-management
+      layer can route the deviation to the training owner and so
+      the SIEM has a stable rule_fingerprint to query against.
+      Read-only posture-readiness framing — the Compliance Finding
+      records what the operator's policy says and what the
+      completion-tracking pass observed; no training assignment
+      mutation, completion-state mutation, or roster mutation is
+      represented (the playbook does not author the operator's
+      training policy or override the learning-management surface's
+      completion records). The Compliance Finding stream is the
+      upstream of any Sigma detection-binding a downstream consumer
+      chooses to author against missed-training / simulation-click
+      / report-rate rule fingerprints; SecOps-NG does not pin
+      stable Sigma rule ids on this overlay (the operator's
+      posture-management layer owns those fingerprints). Schema:
+      https://schema.ocsf.io/1.3.0/classes/compliance_finding
 
 nis2:
   # Inbound entries that backlink playbook.cyber_hygiene_training@v1:
@@ -219,15 +300,44 @@ nis2:
       control.phishing_simulation@v1) as this overlay; this
       outbound entry is the structural closure of that backlink.
 
-dora: []
-  # SKELETON scope is NIS2 Art.21(2)(g) only. DORA Art. 13 ICT-
-  # related training and awareness carries staff-training
-  # obligations that overlap this playbook's scope, but the inbound
-  # entry on the DORA side has not yet been authored. A sibling card
-  # closes the DORA graph by adding the inbound link and the
-  # outbound entry here in one PR rather than landing a one-sided
-  # edge. No outbound DORA entry is emitted on this SKELETON
-  # overlay.
+dora:
+  # Inbound entry that backlinks playbook.cyber_hygiene_training@v1:
+  #   - content/mappings/dora/article-13-6-training.yaml
+  #     (id dora:art-13-training-awareness — DORA Art. 13(6) ICT
+  #     security awareness programmes and digital operational
+  #     resilience training as compulsory modules in the staff
+  #     training schemes, applicable to all staff and members of
+  #     senior management, with a level of complexity commensurate
+  #     to the remit of their functions)
+  # Pinned outbound below to close the graph.
+  - mapping_id: dora:art-13-training-awareness
+    article: 13(6)
+    notes: >-
+      DORA Art. 13(6) requires financial entities to develop ICT
+      security awareness programmes and digital operational
+      resilience training as compulsory modules in the staff
+      training schemes, applicable to all staff and members of
+      senior management, with a level of complexity commensurate to
+      the remit of their functions. The cyber_hygiene_training
+      playbook is the per-cycle materialisation of that obligation's
+      measurement and attestation surface — the same discharge
+      shape NIS2 Art. 21(2)(g) anchors on. The training-roster
+      snapshot, the cycle assignments, the phishing-simulation run,
+      the completion-tracking aggregate, and the dated training-
+      attestation record published to the operator's evidence store
+      are the audit-evident discharge of the clause. The
+      kpi.training_completion_rate@v1 metric trips on training-
+      completion-rate regressions; the kpi.phishing_sim_click_rate@v1
+      metric trips on simulation click-rate regressions. The
+      inbound entry pins the same control_refs
+      (control.training_attestation@v1, control.phishing_simulation@v1)
+      as this overlay; this outbound entry is the structural closure
+      of that backlink and is the training-and-awareness slice of
+      the broader Art. 13 learning-and-evolving surface (companion
+      to dora:art-13-learning-evolving, which covers the post-ICT-
+      related-incident-review slice — the two slices discharge
+      independent operational disciplines and are mapped separately
+      to preserve the atom-per-obligation shape).
 
 cra: []
   # See CRA closure note in the header — no CRA cross-references
