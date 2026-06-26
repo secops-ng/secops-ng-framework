@@ -1,0 +1,415 @@
+{
+  "name": "Authentication and secured-communications posture",
+  "nodes": [
+    {
+      "id": "start--52000000-0000-4000-8000-000000000001",
+      "name": "mfa_secured_comms_start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__posture_window__",
+              "type": "string",
+              "value": "",
+              "description": "ISO 8601 interval describing the posture-evaluation window for this run. Supplied by the scheduler that triggers this playbook (cron, Temporal schedule, or n8n trigger), or by an operator-initiated trigger."
+            },
+            {
+              "name": "__auth_scope__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the in-scope authentication and secured-communications surface for this run (matches a row in the operator's documented scope catalogue: which identity providers, which principal classes, which session surfaces, and which out-of-band channels are subject to the declared policy)."
+            },
+            {
+              "name": "__mfa_coverage_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the MFA-coverage probe artifact: per-principal record of MFA enrolment and enforcement state across the identity providers enumerated in __auth_scope__."
+            },
+            {
+              "name": "__continuous_auth_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the continuous-authentication assessment artifact: per-session record of session age, re-authentication cadence, and presence of continuous-authentication signals against the declared policy."
+            },
+            {
+              "name": "__oob_channel_status__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the out-of-band channel verification artifact: per-channel record of reachability, independence from the primary information-system path, and last-tested timestamp for the secured emergency communications channels."
+            },
+            {
+              "name": "__attestation_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the dated authentication and secured-communications posture attestation record published to the operator's evidence store. Carries the MFA-coverage snapshot, the continuous-authentication assessment, and the OOB-channel verification \u2014 the audit-evident discharge of NIS2 Art.21(2)(j)."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--52000000-0000-4000-8000-000000000002",
+      "name": "probe mfa coverage",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.posture_window",
+              "name": "in.posture_window",
+              "value": "={{$workflow.variables.posture_window}}",
+              "type": "string"
+            },
+            {
+              "id": "in.auth_scope",
+              "name": "in.auth_scope",
+              "value": "={{$workflow.variables.auth_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "out.mfa_coverage_id",
+              "name": "out.mfa_coverage_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.mfa_state_probe@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Probe the identity providers enumerated in __auth_scope__ for MFA enrolment and enforcement state across every in-scope principal class. Emits __mfa_coverage_id__ as a per-principal record of (principal id, principal class, MFA factor types enrolled, enforcement state, last successful MFA event). The probe is read-only against the identity-provider surface; it does not enrol factors or alter policy. Principals with no declared MFA requirement in the operator's policy are reported as policy gaps rather than enforcement gaps; the distinction is preserved so the attestation surfaces the policy-side and operations-side gaps separately.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--52000000-0000-4000-8000-000000000003",
+      "name": "assess continuous auth",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.auth_scope",
+              "name": "in.auth_scope",
+              "value": "={{$workflow.variables.auth_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "in.mfa_coverage_id",
+              "name": "in.mfa_coverage_id",
+              "value": "={{$workflow.variables.mfa_coverage_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.continuous_auth_id",
+              "name": "out.continuous_auth_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.mfa_state_probe@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Walk the session surfaces enumerated in __auth_scope__ and assess whether continuous-authentication signals (re-authentication on privilege escalation, session re-binding on context change, periodic step-up) are observed on long-lived sessions against the declared cadence. Emits __continuous_auth_id__ as a per-session record of (session id, principal id, session age, last re-auth event, declared cadence, overdue-by-minutes). Sessions in scopes with no declared continuous-authentication cadence are reported as policy gaps rather than overdue re-authentications. The assessment is read-only; it does NOT invalidate sessions or force step-up.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--52000000-0000-4000-8000-000000000004",
+      "name": "verify oob channels",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.auth_scope",
+              "name": "in.auth_scope",
+              "value": "={{$workflow.variables.auth_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "in.posture_window",
+              "name": "in.posture_window",
+              "value": "={{$workflow.variables.posture_window}}",
+              "type": "string"
+            },
+            {
+              "id": "out.oob_channel_status",
+              "name": "out.oob_channel_status",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.oob_channel_probe@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Test the out-of-band emergency communications channels enumerated in __auth_scope__ (voice, secure messaging, paging) for reachability and independence from the primary information-system path. Emits __oob_channel_status__ as a per-channel record of (channel id, channel class, last successful test, independence-path verification, owner). The verification is a documented test transaction against each channel; it does not deliver a real emergency notification. Channels with no declared independence path are reported as policy gaps rather than reachability failures.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--52000000-0000-4000-8000-000000000005",
+      "name": "evidence capture",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.mfa_coverage_id",
+              "name": "in.mfa_coverage_id",
+              "value": "={{$workflow.variables.mfa_coverage_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.continuous_auth_id",
+              "name": "in.continuous_auth_id",
+              "value": "={{$workflow.variables.continuous_auth_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.oob_channel_status",
+              "name": "in.oob_channel_status",
+              "value": "={{$workflow.variables.oob_channel_status}}",
+              "type": "string"
+            },
+            {
+              "id": "in.posture_window",
+              "name": "in.posture_window",
+              "value": "={{$workflow.variables.posture_window}}",
+              "type": "string"
+            },
+            {
+              "id": "out.attestation_id",
+              "name": "out.attestation_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.mfa_state_probe@v1, control.oob_channel_probe@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Compose and publish the dated authentication and secured-communications posture attestation to the operator's evidence store. The record carries the MFA-coverage snapshot, the continuous-authentication assessment, the OOB-channel verification, the posture window, and a top-level gap summary (missing-MFA, stale-session, unreachable-OOB counts). This is the audit-evident artifact that NIS2 Art.21(2)(j) reviewers read; missing or stale attestations are the failure mode the metrics surface. The attestation is always emitted, including the policy-gap branch (which records missing-policy conditions rather than skipping the attestation).",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--52000000-0000-4000-8000-000000000006",
+      "name": "notify authentication owner",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.attestation_id",
+              "name": "in.attestation_id",
+              "value": "={{$workflow.variables.attestation_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.auth_scope",
+              "name": "in.auth_scope",
+              "value": "={{$workflow.variables.auth_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Deliver the attestation reference to the authentication owner along the operator's pre-bound channel (ticketing system, chat thread, email). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an attestation written but never delivered to the owner is itself a posture gap.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--52000000-0000-4000-8000-000000000007",
+      "name": "mfa_secured_comms_end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "mfa_secured_comms_start": {
+      "main": [
+        [
+          {
+            "node": "probe mfa coverage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "probe mfa coverage": {
+      "main": [
+        [
+          {
+            "node": "assess continuous auth",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "assess continuous auth": {
+      "main": [
+        [
+          {
+            "node": "verify oob channels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "verify oob channels": {
+      "main": [
+        [
+          {
+            "node": "evidence capture",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "evidence capture": {
+      "main": [
+        [
+          {
+            "node": "notify authentication owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "notify authentication owner": {
+      "main": [
+        [
+          {
+            "node": "mfa_secured_comms_end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "authentication",
+    "mfa",
+    "continuous-authentication",
+    "secured-communications",
+    "out-of-band",
+    "posture",
+    "attestation"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.mfa_secured_comms@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8"
+    },
+    "secops_ng_notes": [
+      "step 'action--52000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--52000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--52000000-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--52000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--52000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}
