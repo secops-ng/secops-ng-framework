@@ -39,6 +39,10 @@ in the private repos).
   policies, anchored to the JC RTS on ICT risk management framework
   (Commission Delegated Regulation (EU) 2024/1774) Arts. 20–22
   (identity management, access management, authentication).
+- `article-9-crypto.yaml` — Art. 9(2)/(3) cryptography and encryption
+  policies, anchored to the JC RTS on ICT risk management framework
+  (Commission Delegated Regulation (EU) 2024/1774) Art. 6 (Encryption
+  and cryptographic controls).
 - `article-10.yaml` — Art. 10 detection.
 - `article-11.yaml` — Art. 11 response and recovery.
 - `article-12.yaml` — Art. 12 backup policies and procedures,

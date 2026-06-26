@@ -1,0 +1,71 @@
+# DORA — Article 9 (Protection and Prevention), cryptography slice.
+# Companion to article-9-and-rts-vuln-mgmt.yaml (vulnerability and
+# patch management) and article-9-access-management.yaml (identity
+# and access management). This file covers the cryptography-policy
+# slice of the same Art. 9 protection-and-prevention obligation,
+# operationalised by the JC RTS on ICT risk management framework
+# (Commission Delegated Regulation (EU) 2024/1774) Article 6
+# (Encryption and cryptographic controls).
+#
+# Out of scope here: vulnerability and patch management (lives in
+# article-9-and-rts-vuln-mgmt.yaml), access management (lives in
+# article-9-access-management.yaml), incident reporting (Art. 17–19),
+# third-party risk (Art. 28+).
+regime: dora
+entries:
+  - id: dora:art-9-crypto
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "9(2)"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Implement ICT security policies, procedures, protocols and
+      tools that protect the confidentiality, integrity and
+      authenticity of data at rest, in use, and in transit,
+      including a documented cryptography and encryption policy
+      covering algorithm and key-size floors, the inventory of
+      in-scope endpoints and key-management surfaces, key-rotation
+      cadence per key class, and the periodic posture-attestation
+      record that demonstrates the declared cryptographic protections
+      remain in force across the operator's ICT estate.
+    status: draft
+    control_refs:
+      - control.crypto_policy_inventory@v1
+      - control.cert_posture_scan@v1
+      - control.key_rotation_evidence@v1
+    playbook_refs:
+      - playbook.crypto_posture_management@v1
+    metric_refs:
+      - kri.expiring_tls_certs@v1
+      - kri.overdue_key_rotations@v1
+    notes: >-
+      Level 1 anchor is DORA Art. 9(2) (protection of data
+      confidentiality, integrity and authenticity through ICT
+      security policies, procedures, protocols and tools), reinforced
+      by Art. 9(3) which requires the policy framework to minimise
+      the impact of ICT risks on data integrity and confidentiality;
+      the operative detail is in the Level 2 RTS — Commission
+      Delegated Regulation (EU) 2024/1774 (JC RTS on ICT risk
+      management framework) Article 6 (Encryption and cryptographic
+      controls), which prescribes the documented cryptography
+      policy, the algorithm and key-size floor, the key-management
+      lifecycle, and the periodic review cadence the operator must
+      operate against. This entry is the cryptography counterpart to
+      the vulnerability-and-patch-management slice expressed in
+      article-9-and-rts-vuln-mgmt.yaml and the access-management
+      slice expressed in article-9-access-management.yaml; all three
+      anchor on the same Art. 9 protection-and-prevention obligation
+      but discharge independent operational disciplines and are
+      mapped separately to keep the inbound graph atom-per-obligation.
+      Overlaps NIS2 Art. 21(2)(h) (policies and procedures regarding
+      the use of cryptography and, where appropriate, encryption);
+      the same playbook.crypto_posture_management@v1 is referenced
+      from mappings/nis2/article-21-2-h.yaml. The
+      kri.expiring_tls_certs@v1 metric trips on certificate-expiry
+      regressions; the kri.overdue_key_rotations@v1 metric trips on
+      rotation-cadence regressions. The outbound dora: entry on the
+      playbook overlay at
+      content/playbooks/crypto_posture_management/mappings.yaml is
+      the structural closure of this backlink.

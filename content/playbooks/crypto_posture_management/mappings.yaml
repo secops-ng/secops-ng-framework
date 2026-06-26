@@ -1,27 +1,29 @@
 # Cross-references for the crypto_posture_management playbook.
 #
 # This file is the playbook's outbound view of the content model: it
-# pins OSCAL controls, OCSF event classes consumed/emitted, and the EU
-# regulatory clauses this playbook helps operationalise. Inbound
-# references live in content/mappings/{nis2,dora}/ so the graph is
-# closed in both directions.
+# pins OSCAL controls, OCSF event classes consumed/emitted, MITRE
+# D3FEND defensive techniques, and the EU regulatory clauses this
+# playbook helps operationalise. Inbound references live in
+# content/mappings/{nis2,dora}/ so the graph is closed in both
+# directions.
 #
 # This playbook operates the cryptography & encryption posture surface
-# required by NIS2 Art. 21(2)(h): inventory the operator's declared
-# cryptography policy and the assets in its scope, probe the
-# certificate posture of declared TLS endpoints, check key-rotation
-# cadence against the documented rotation schedule, capture a dated
-# posture-attestation artifact, and notify the cryptography owner.
-# The playbook does not author the cryptography policy itself; it
-# operationalises a policy that lives in the operator's governance
-# documentation.
+# required by NIS2 Art. 21(2)(h) and DORA Art. 9(2)/(3): inventory the
+# operator's declared cryptography policy and the assets in its scope,
+# probe the certificate posture of declared TLS endpoints, check
+# key-rotation cadence against the documented rotation schedule,
+# capture a dated posture-attestation artifact, and notify the
+# cryptography owner. The playbook does not author the cryptography
+# policy itself; it operationalises a policy that lives in the
+# operator's governance documentation.
 #
-# Status: SKELETON. CORE-layer cards add the detection bindings for
-# expired-cert / weak-cipher / floor-violation signals once stable
-# upstream rule ids are selected; an EXTEND card wires the
-# cipher-suite-floor KPI and rotation-cadence KPI emitters against
-# the operator's evidence store. This overlay anchors the regulatory
-# and control surface only.
+# Status: CORE. The SKELETON overlay anchored the regulatory and
+# control surface; this CORE layer adds the D3FEND detection bindings
+# for the certificate-posture and key-rotation discipline and closes
+# the DORA mapping graph (inbound at
+# content/mappings/dora/article-9-crypto.yaml + outbound here). An
+# EXTEND card wires the cipher-suite-floor KPI and rotation-cadence
+# KPI emitters against the operator's evidence store.
 #
 # Deliberate OSCAL omissions:
 #   - SC-12 (Cryptographic Key Establishment and Management) is the
@@ -41,14 +43,32 @@
 #     API Activity records, but the operator's audit-event policy is
 #     upstream of this playbook.
 #
-# D3FEND closure: D3FEND v1.0.0 frames its defensive techniques around
-# runtime countermeasures against adversary behaviours. The discipline
-# this playbook operates — periodic cryptography-posture inventory,
-# certificate-posture probing, and rotation-cadence verification — is
-# a posture-readiness exercise rather than a runtime countermeasure
-# against an adversary behaviour. The d3fend block is intentionally
-# empty rather than carrying a forced tag, mirroring the gap-note
-# precedent on the backup_recovery and on_call_rotation overlays.
+# D3FEND closure: D3FEND v1.0.0 carries Certificate Analysis (D3-CA)
+# under the Detect tactic as the per-endpoint dated examination of
+# certificate properties — exactly the discipline the probe-cert-
+# posture step operates. The check-key-rotation step extends the
+# same dated-examination discipline to the key-management surface
+# (last-rotation timestamp versus declared cadence); D3FEND v1.0.0
+# does not carry a separate cryptographic-key-analysis technique
+# distinct from Certificate Analysis, and the rotation check is the
+# adjacent dated-examination of the same cryptographic-material
+# inventory, so it is anchored on D3-CA as well. The
+# inventory-crypto-policy and evidence-capture steps are deliberately
+# NOT pinned to D3FEND: policy inventory is a governance-surface
+# read against the operator's declared cryptography policy (the
+# upstream of the configuration-inventory discipline rather than
+# the inventory itself), and evidence emission is an
+# attestation-stream discipline rather than a detection or
+# countermeasure. The notify-crypto-owner step is a delivery
+# discipline, not a defensive technique, and is also left unpinned.
+# This mirrors the per-step pin-where-it-fits / document-the-gap
+# pattern documented on infra_posture_management (D3-CI),
+# detection_engineering (propose / review / ship gaps), and
+# iam_auditor (D3-UAP gap). The playbook framing remains
+# read-only-by-contract — probes do not attempt connection coercion,
+# downgrade, or rotation; runtime-countermeasure misrepresentation
+# is avoided by leaving the upstream and downstream steps unpinned
+# rather than forcing the Certificate Analysis tag onto them.
 #
 # CRA closure: the playbook-mappings schema's top-level keys are fixed
 # (oscal/d3fend/ocsf/nis2/dora/cra). CRA cross-references are not
@@ -58,14 +78,12 @@
 # vulnerability-handling obligations do not attach here. No outbound
 # CRA entries are emitted on this overlay.
 #
-# DORA closure: DORA Art. 9(2)/(3) ICT security policies and the JC
-# RTS on ICT risk management framework (Commission Delegated Reg.
-# (EU) 2024/1774) carry cryptography-policy obligations that overlap
-# this playbook's scope. The inbound entry on the DORA side has not
-# yet been authored; a sibling card closes the DORA graph by adding
-# the inbound link and the outbound entry here in one PR rather than
-# landing a one-sided edge. No outbound DORA entry is emitted on this
-# SKELETON overlay.
+# DORA closure: the inbound entry on the DORA side lives at
+# content/mappings/dora/article-9-crypto.yaml (id dora:art-9-crypto —
+# DORA Art. 9(2)/(3) ICT security policies anchored to the JC RTS on
+# ICT risk management framework, Commission Delegated Regulation
+# (EU) 2024/1774, Art. 6 on encryption and cryptographic controls).
+# The matching outbound dora: entry below closes the graph.
 #
 # Schema: schemas/playbook-mappings.schema.json
 playbook: playbook.crypto_posture_management@v1
@@ -107,15 +125,98 @@ oscal:
       Protection) is satisfied via the cryptographic-floor link to
       SC-13 above.
 
-d3fend: []
-  # D3FEND v1.0.0 carries no defensive-technique anchor that matches
-  # the periodic cryptography-posture-inventory and rotation-cadence
-  # discipline this playbook operates without misrepresenting it. The
-  # block is intentionally empty rather than carrying a forced tag,
-  # mirroring the gap-note precedent documented in the header.
-  # Detection bindings for expired-cert / weak-cipher / floor-
-  # violation signals are owned by the CORE-layer detection card once
-  # stable upstream rule ids are selected.
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned to the real action UUIDs resolved
+  # from content/playbooks/crypto_posture_management/playbook.cacao.json
+  # (five action bodies: inventory-crypto-policy, probe-cert-posture,
+  # check-key-rotation, evidence-capture, notify-crypto-owner). The
+  # Detect tactic in D3FEND v1.0.0 carries Certificate Analysis
+  # (D3-CA) — dated examination of certificate properties against
+  # the operator's declared cryptography policy — which is the
+  # discipline the probe-cert-posture and check-key-rotation steps
+  # operate. The inventory-crypto-policy, evidence-capture, and
+  # notify-crypto-owner steps are deliberately not pinned to a
+  # D3FEND technique and the gaps are documented in the header
+  # (mirroring the inventory / emission / delivery gap-note
+  # precedents on infra_posture_management, iam_auditor, and
+  # on_call_rotation).
+  - step: action--51000000-0000-4000-8000-000000000003
+    d3fend_id: D3-CA
+    d3fend_name: Certificate Analysis
+    url: https://d3fend.mitre.org/technique/d3f:CertificateAnalysis/
+    notes: >-
+      probe-cert-posture — the per-endpoint read-only examination of
+      certificate validity and chain, days-to-expiry, negotiated TLS
+      version, negotiated cipher suite, and presence of mandated
+      extensions against the floors carried in the policy-inventory
+      snapshot is the dated-examination discipline D3-CA names.
+      D3FEND frames Certificate Analysis as analysing a certificate
+      for unauthorized use; the playbook narrows that lens to the
+      operator's own declared endpoints and to the operator's own
+      declared cryptography policy — same technique, posture-probe
+      scope rather than adversary-attribution scope. The probe is
+      read-only and side-effect-free: no connection coercion, no
+      downgrade. The per-endpoint records aggregated into
+      __cert_posture_id__ are the audit-evident output of the
+      Certificate Analysis pass and feed the kri.expiring_tls_certs
+      metric. Detection bindings for individual expired-cert /
+      weak-cipher / floor-violation upstream rule fingerprints are
+      consumed via the Compliance Finding (2003) telemetry binding
+      below rather than authored as Sigma references on this
+      overlay; the operator's posture-management layer is the
+      upstream of those signal shapes.
+
+  - step: action--51000000-0000-4000-8000-000000000004
+    d3fend_id: D3-CA
+    d3fend_name: Certificate Analysis
+    url: https://d3fend.mitre.org/technique/d3f:CertificateAnalysis/
+    notes: >-
+      check-key-rotation — the per-key comparison of last-rotation
+      timestamp against the declared per-key-class cadence is the
+      adjacent dated-examination of the same cryptographic-material
+      inventory the probe-cert-posture step examines on the
+      transport side. D3FEND v1.0.0 does not carry a distinct
+      cryptographic-key-analysis technique separate from Certificate
+      Analysis; the rotation check is anchored on D3-CA so the
+      discipline is named consistently across both halves of the
+      cryptographic-posture surface this playbook operates. The
+      read-only-by-contract constraint applies here too: the
+      playbook does NOT perform rotations, it records the
+      overdue-by-days deviation and the policy-gap branch (keys
+      without a declared cadence are reported as policy gaps rather
+      than overdue rotations). The __rotation_status__ artifact
+      feeds the kri.overdue_key_rotations metric.
+
+  # inventory-crypto-policy (action--51000000-0000-4000-8000-
+  # 000000000002) is deliberately NOT pinned to a D3FEND technique.
+  # D3FEND v1.0.0 does not carry a defensive technique for governance-
+  # policy inventory distinct from the downstream configuration- or
+  # certificate-analysis surface it feeds; the policy snapshot is
+  # the upstream of the dated-examination discipline rather than the
+  # examination itself. This step is anchored on the SC-13 OSCAL
+  # control above where the policy-inventory obligation actually
+  # lives. Mirrors the infra_posture_management collect-posture
+  # framing pattern (D3-CI fits the inventory step there because
+  # configuration inventory is itself a D3FEND technique; cryptography
+  # policy inventory is not).
+  #
+  # evidence-capture (action--51000000-0000-4000-8000-000000000005)
+  # is deliberately NOT pinned to a D3FEND technique. Per-execution
+  # artifact emission of the dated cryptography-posture attestation
+  # for downstream audit consumption is an evidence-stream emission
+  # discipline, not a runtime countermeasure or a detection step,
+  # and forcing it onto a D3FEND tag would misrepresent the
+  # technique. This step is anchored on the SC-13 OSCAL control
+  # above. Mirrors the infra_posture_management emit-posture-evidence
+  # gap note.
+  #
+  # notify-crypto-owner (action--51000000-0000-4000-8000-000000000006)
+  # is deliberately NOT pinned to a D3FEND technique. Delivery of an
+  # attestation reference to the cryptography owner along the
+  # operator's pre-bound channel is a notification discipline, not a
+  # defensive technique. Mirrors the on_call_rotation handoff-brief
+  # gap note.
 
 ocsf:
   # OCSF v1.3.0 telemetry bindings. The inventory-policy, probe-cert,
@@ -123,7 +224,12 @@ ocsf:
   # with operator API surfaces (the governance policy store, the
   # certificate endpoints, the key-management surface, the evidence
   # store, the notification channel). API Activity (6003) is the
-  # consistent class across both consumed and emitted records.
+  # consistent class across both consumed and emitted records for
+  # the read/write surfaces; Compliance Finding (2003) carries the
+  # per-endpoint and per-key posture-deviation records the
+  # certificate-analysis surface emits into the operator's posture-
+  # management layer (the upstream of any Sigma detection-binding a
+  # SIEM consumes from those deviations).
   - id: telemetry.api_activity@v1
     category_uid: 6
     category_name: Application Activity
@@ -147,6 +253,36 @@ ocsf:
       kri.expiring_tls_certs@v1 and kri.overdue_key_rotations@v1
       metrics read. Schema:
       https://schema.ocsf.io/1.3.0/classes/api_activity
+
+  - id: telemetry.compliance_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2003
+    class_name: Compliance Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by the probe-cert-posture and check-key-rotation steps
+      as the structured per-endpoint and per-key deviation records
+      the certificate-analysis pass produces against the declared
+      policy floor: expired or short-dated certificates, negotiated
+      TLS version below the declared floor, negotiated cipher suite
+      below the declared floor, mandated-extension absence, and
+      keys past their declared rotation cadence each yield one
+      Compliance Finding keyed to (__policy_inventory_id__,
+      endpoint-or-key-id) so the operator's posture-management
+      layer can route the deviation to the cryptography owner and
+      so the SIEM has a stable rule_fingerprint to query against.
+      Read-only posture-probe framing — the Compliance Finding
+      records what the operator's policy says and what the probe
+      observed; no remediation, rotation, or countermeasure is
+      represented. The Compliance Finding stream is the upstream
+      of any Sigma detection-binding a downstream consumer chooses
+      to author against expired-cert / weak-cipher / floor-violation
+      / overdue-rotation rule fingerprints; SecOps-NG does not pin
+      stable Sigma rule ids on this overlay (the operator's
+      posture-management layer owns those fingerprints). Schema:
+      https://schema.ocsf.io/1.3.0/classes/compliance_finding
 
 nis2:
   # Inbound entries that backlink playbook.crypto_posture_management@v1:
@@ -175,15 +311,39 @@ nis2:
       as this overlay; this outbound entry is the structural closure
       of that backlink.
 
-dora: []
-  # SKELETON scope is NIS2 Art.21(2)(h) only. DORA Art. 9(2)/(3) ICT
-  # security policies and the JC RTS on ICT risk management framework
-  # (Commission Delegated Reg. (EU) 2024/1774) cryptography-policy
-  # obligations are the obvious sibling anchors, but the inbound
-  # entry on the DORA side has not yet been authored. A sibling card
-  # closes the DORA graph by adding the inbound link and the
-  # outbound entry here in one PR rather than landing a one-sided
-  # edge. No outbound DORA entry is emitted on this SKELETON overlay.
+dora:
+  # Inbound entry that backlinks playbook.crypto_posture_management@v1:
+  #   - content/mappings/dora/article-9-crypto.yaml
+  #     (id dora:art-9-crypto — DORA Art. 9(2)/(3) ICT security
+  #     policies, anchored to the JC RTS on ICT risk management
+  #     framework — Commission Delegated Regulation (EU) 2024/1774,
+  #     Art. 6 on encryption and cryptographic controls)
+  # Pinned outbound below to close the graph.
+  - mapping_id: dora:art-9-crypto
+    article: 9(2)
+    notes: >-
+      DORA Art. 9(2) (reinforced by Art. 9(3)) requires financial
+      entities to implement ICT security policies, procedures,
+      protocols and tools that protect the confidentiality,
+      integrity and authenticity of data at rest, in use, and in
+      transit; the Level 2 detail in the JC RTS on ICT risk
+      management framework (Commission Delegated Regulation (EU)
+      2024/1774) Article 6 prescribes a documented cryptography
+      and encryption policy, algorithm and key-size floors, the
+      key-management lifecycle, and a periodic review cadence. The
+      crypto_posture_management playbook is the per-cycle
+      materialisation of that obligation's measurement and
+      attestation surface — the same discharge shape NIS2 Art.
+      21(2)(h) anchors on. The kri.expiring_tls_certs@v1 metric
+      trips on certificate-expiry regressions; the
+      kri.overdue_key_rotations@v1 metric trips on rotation-cadence
+      regressions. The inbound entry pins the same control_refs
+      (control.crypto_policy_inventory@v1, control.cert_posture_scan@v1,
+      control.key_rotation_evidence@v1) as this overlay; this
+      outbound entry is the structural closure of that backlink and
+      is the cryptography slice of the broader Art. 9 protection-
+      and-prevention surface (companion to dora:art-9-vuln-mgmt and
+      dora:art-9-access-mgmt).
 
 cra: []
   # See CRA closure note in the header — no CRA cross-references
