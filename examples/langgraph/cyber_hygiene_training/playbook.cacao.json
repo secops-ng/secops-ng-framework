@@ -1,0 +1,239 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--8c3d4e5f-6071-4a22-9d3e-f405b6c7d8e9",
+  "name": "Cyber-hygiene and security-training posture",
+  "description": "Operate the basic cyber-hygiene and staff cybersecurity-training posture surface required by NIS2 Art.21(2)(g): inventory the in-scope training roster against the declared training scope, schedule the per-cycle awareness and role-based training assignments, run the cycle's phishing-simulation exercise, track completion of mandatory training and report-rate on the simulation, capture a dated training-attestation artifact, and notify the training owner of any gaps. The playbook is the operationalisation of declared training and hygiene policy; it does not author the policy itself. SKELETON only \u2014 control bindings (control.training_attestation@v1, control.phishing_simulation@v1) are pinned but detection bindings (missed-training, simulation-click upstream rule ids), golden tests, and per-target compiler emissions are owned by CORE / EXTEND siblings. The metric_refs pin the catalogue entries kpi.training_completion_rate@v1 and kpi.phishing_sim_click_rate@v1 that already ship under content/mappings/nis2/article-21-2-g.yaml; the CORE/EXTEND siblings add the per-cohort training-overdue KPI and re-pin step-level refs against it. CACAO v2 + SecOps-NG content-model extensions.",
+  "playbook_types": [
+    "investigation",
+    "notification"
+  ],
+  "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+  "created": "2026-06-26T00:00:00Z",
+  "modified": "2026-06-26T00:00:00Z",
+  "labels": [
+    "cyber-hygiene",
+    "training",
+    "awareness",
+    "phishing-simulation",
+    "attestation",
+    "posture"
+  ],
+  "external_references": [
+    {
+      "name": "OASIS CACAO v2.0",
+      "description": "Workflow step types, variable conventions, and the x_ extension namespace used to carry SecOps-NG content-model refs.",
+      "source": "OASIS Open"
+    },
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 21(2)(g) \u2014 basic cyber-hygiene practices and cybersecurity training",
+      "source": "Official Journal of the European Union"
+    },
+    {
+      "name": "ENISA \u2014 Awareness raising and training guidelines for essential and important entities",
+      "source": "ENISA"
+    },
+    {
+      "name": "OCSF v1.3.0 \u2014 API Activity (6003) event class",
+      "source": "OCSF"
+    }
+  ],
+  "playbook_variables": {
+    "__training_window__": {
+      "type": "string",
+      "description": "ISO 8601 interval describing the training-evaluation window for this run. Supplied by the scheduler that triggers this playbook (cron, Temporal schedule, or n8n trigger), or by an operator-initiated trigger.",
+      "external": true
+    },
+    "__training_scope__": {
+      "type": "string",
+      "description": "Identifier of the in-scope training surface for this run (matches a row in the operator's documented scope catalogue: which staff cohorts, which mandatory awareness and role-based training tracks, and which phishing-simulation cohorts are subject to the declared training policy).",
+      "external": true
+    },
+    "__roster_id__": {
+      "type": "string",
+      "description": "Identifier of the training-roster snapshot artifact: per-staff record of (staff id, cohort, mandatory training tracks assigned, role-based training tracks assigned, joiner/leaver state) resolved from the operator's HR / identity source against __training_scope__.",
+      "external": false
+    },
+    "__cycle_id__": {
+      "type": "string",
+      "description": "Identifier of the scheduled training-cycle artifact: per-cohort record of (cohort id, training track id, assigned at, due at, channel) emitted by the scheduling step against the training-roster snapshot.",
+      "external": false
+    },
+    "__simulation_id__": {
+      "type": "string",
+      "description": "Identifier of the phishing-simulation run artifact: per-recipient record of (recipient id, template id, delivered at, clicked, reported, time-to-report) emitted by the simulation step. The simulation is a documented exercise; it does NOT trigger downstream incident response.",
+      "external": false
+    },
+    "__completion_id__": {
+      "type": "string",
+      "description": "Identifier of the training-completion tracking artifact: per-staff record of (staff id, track id, completion state, completed at, overdue-by-days) and per-cohort aggregate of completion-rate and click/report rate against the declared targets.",
+      "external": false
+    },
+    "__attestation_id__": {
+      "type": "string",
+      "description": "Identifier of the dated cyber-hygiene and security-training posture attestation record published to the operator's evidence store. Carries the training-roster snapshot, the cycle assignments, the simulation results, and the completion tracking \u2014 the audit-evident discharge of NIS2 Art.21(2)(g).",
+      "external": false
+    }
+  },
+  "workflow_start": "start--53000000-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--53000000-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "cyber_hygiene_training_start",
+      "on_completion": "action--53000000-0000-4000-8000-000000000002"
+    },
+    "action--53000000-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "inventory training roster",
+      "description": "Resolve the in-scope training roster from the operator's HR / identity source against __training_scope__: which staff cohorts are subject to mandatory awareness training, which staff hold roles that require role-based training, and which cohorts are enrolled in the phishing-simulation programme. Emits __roster_id__ as a per-staff record of (staff id, cohort, mandatory tracks assigned, role-based tracks assigned, joiner/leaver state). The inventory is read-only against the HR and identity surfaces; it does not modify roster assignments. Staff with no declared training requirement in the operator's policy are reported as policy gaps rather than completion gaps; the distinction is preserved so the attestation surfaces the policy-side and operations-side gaps separately.",
+      "on_completion": "action--53000000-0000-4000-8000-000000000003",
+      "in_args": [
+        "__training_window__",
+        "__training_scope__"
+      ],
+      "out_args": [
+        "__roster_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.training_attestation@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--53000000-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "schedule training cycle",
+      "description": "Schedule the per-cycle awareness and role-based training assignments for the roster emitted by inventory-training-roster against the declared training tracks and cadence. Emits __cycle_id__ as a per-cohort record of (cohort id, training track id, assigned at, due at, channel). The scheduling step writes assignment intents to the operator's learning-management surface; it does NOT push training content directly to staff. Tracks with no declared cadence in the operator's policy are reported as policy gaps rather than scheduling failures.",
+      "on_completion": "action--53000000-0000-4000-8000-000000000004",
+      "in_args": [
+        "__roster_id__",
+        "__training_window__"
+      ],
+      "out_args": [
+        "__cycle_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.training_attestation@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--53000000-0000-4000-8000-000000000004": {
+      "type": "action",
+      "name": "run phishing simulation",
+      "description": "Dispatch the cycle's phishing-simulation exercise to the cohorts enrolled in the simulation programme using a documented simulation template. Emits __simulation_id__ as a per-recipient record of (recipient id, template id, delivered at, clicked, reported, time-to-report). The simulation is a clearly-labelled exercise governed by the operator's awareness programme; it does NOT trigger downstream incident response, does NOT inject content into production mailflow controls, and does NOT exfiltrate credentials. Cohorts with no declared simulation cadence are reported as policy gaps rather than simulation failures.",
+      "on_completion": "action--53000000-0000-4000-8000-000000000005",
+      "in_args": [
+        "__cycle_id__",
+        "__training_scope__"
+      ],
+      "out_args": [
+        "__simulation_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.phishing_simulation@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--53000000-0000-4000-8000-000000000005": {
+      "type": "action",
+      "name": "track completion",
+      "description": "Read completion state for the cycle's training assignments from the operator's learning-management surface and aggregate the phishing-simulation results from __simulation_id__. Emits __completion_id__ as a per-staff record of (staff id, track id, completion state, completed at, overdue-by-days) and per-cohort aggregate of completion-rate, click-rate, and report-rate against the declared targets. The tracking step is read-only against the LMS; it does NOT mark training as complete on the operator's behalf. Tracks past their due date are reported as overdue-completion gaps with the overdue-by-days delta preserved so the attestation surfaces the magnitude of the gap rather than a boolean.",
+      "on_completion": "action--53000000-0000-4000-8000-000000000006",
+      "in_args": [
+        "__cycle_id__",
+        "__simulation_id__"
+      ],
+      "out_args": [
+        "__completion_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.training_attestation@v1",
+          "control.phishing_simulation@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--53000000-0000-4000-8000-000000000006": {
+      "type": "action",
+      "name": "evidence capture",
+      "description": "Compose and publish the dated cyber-hygiene and security-training posture attestation to the operator's evidence store. The record carries the training-roster snapshot, the cycle assignments, the simulation results, the completion tracking, the training window, and a top-level gap summary (missed-mandatory-training, overdue-role-based-training, simulation-click counts). This is the audit-evident artifact NIS2 Art.21(2)(g) reviewers read; missing or stale attestations are the failure mode the metrics surface. The attestation is always emitted, including the policy-gap branch (which records missing-policy conditions rather than skipping the attestation).",
+      "on_completion": "action--53000000-0000-4000-8000-000000000007",
+      "in_args": [
+        "__roster_id__",
+        "__cycle_id__",
+        "__simulation_id__",
+        "__completion_id__",
+        "__training_window__"
+      ],
+      "out_args": [
+        "__attestation_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.training_attestation@v1",
+          "control.phishing_simulation@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--53000000-0000-4000-8000-000000000007": {
+      "type": "action",
+      "name": "notify gaps",
+      "description": "Deliver the attestation reference and the gap summary to the training owner along the operator's pre-bound channel (ticketing system, chat thread, email). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an attestation written but never delivered to the owner is itself a posture gap.",
+      "on_completion": "end--53000000-0000-4000-8000-000000000008",
+      "in_args": [
+        "__attestation_id__",
+        "__training_scope__"
+      ],
+      "x_secops_ng": {
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "end--53000000-0000-4000-8000-000000000008": {
+      "type": "end",
+      "name": "cyber_hygiene_training_end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.cyber_hygiene_training@v1",
+    "content_version": "0.1.0",
+    "maturity": "experimental",
+    "compile_targets": [
+      "n8n",
+      "temporal",
+      "langgraph"
+    ],
+    "control_refs": [
+      "control.training_attestation@v1",
+      "control.phishing_simulation@v1"
+    ],
+    "telemetry_refs": [
+      "telemetry.ocsf.api_activity@v1"
+    ],
+    "metric_refs": [],
+    "sources": [
+      "OASIS CACAO v2.0 specification \u2014 workflow step types, variable conventions, x_ extension namespace",
+      "NIS2 Directive (EU) 2022/2555, Article 21(2)(g) \u2014 basic cyber-hygiene practices and cybersecurity training",
+      "ENISA \u2014 Awareness raising and training guidelines for essential and important entities",
+      "OCSF \u2014 API Activity (6003) event class"
+    ]
+  }
+}
