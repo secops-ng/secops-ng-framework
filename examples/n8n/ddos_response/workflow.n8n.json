@@ -1,0 +1,475 @@
+{
+  "name": "DDoS / availability-incident response",
+  "nodes": [
+    {
+      "id": "start--60000000-0000-4000-8000-000000000001",
+      "name": "ddos_response_start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__protected_service__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the monitored service whose availability is in question (matches a row in the operator's documented service-inventory: which endpoint, which availability objective, which mitigation surface is pre-bound)."
+            },
+            {
+              "name": "__anomaly_window__",
+              "type": "string",
+              "value": "",
+              "description": "ISO 8601 interval describing the availability anomaly being evaluated. Supplied by the monitoring surface (synthetic-probe alert, edge / origin telemetry, operator-initiated trigger)."
+            },
+            {
+              "name": "__attack_vector__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the classified attack vector for the anomaly: volumetric (e.g. UDP / ICMP / amplification flood), protocol (e.g. SYN flood, TCP state exhaustion), or application-layer (e.g. HTTP flood, slow-loris). Empty when classification could not be completed within the documented mitigation-engagement deadline; an empty value short-circuits into an evidence-capture failure record while still engaging the most-restrictive pre-bound mitigation."
+            },
+            {
+              "name": "__mitigation_action_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the engaged mitigation action against the operator's pre-bound response surface (upstream-scrubbing provider activation reference, rate-limit / WAF posture-change ticket id, or failover-to-standby exercise reference). Always populated; the value names the discipline that was engaged even on the short-circuit branch."
+            },
+            {
+              "name": "__service_restored__",
+              "type": "boolean",
+              "value": "",
+              "description": "Outcome of the validate-service-restoration step: true when the protected service is observed back inside the documented availability objective (latency, error rate, throughput) for the documented validation window; false when the service has not recovered and the incident remains active. A false value does not block the evidence-capture and notify branches; the record is published with the failure marker so the incident-management owner is paged with full context rather than discovering the gap later."
+            },
+            {
+              "name": "__evidence_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the dated availability-incident evidence record published to the operator's evidence store. Always populated, including on the short-circuit branch (unclassified vector) and the unrestored-service branch."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--60000000-0000-4000-8000-000000000002",
+      "name": "detect availability anomaly",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.protected_service",
+              "name": "in.protected_service",
+              "value": "={{$workflow.variables.protected_service}}",
+              "type": "string"
+            },
+            {
+              "id": "in.anomaly_window",
+              "name": "in.anomaly_window",
+              "value": "={{$workflow.variables.anomaly_window}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_handling_capability@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.network_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Resolve the trigger for this run: a synthetic-probe alert against __protected_service__ has tripped an availability threshold, edge / origin telemetry shows a sustained throughput / error-rate / latency deviation outside the documented availability objective, or an operator-initiated trigger landed. Reads __protected_service__ and __anomaly_window__ to confirm the anomaly is current and bounded; reads the operator's documented service-inventory row for the protected service to surface the pre-bound mitigation surface (upstream scrubber, rate-limit / WAF, standby failover) the downstream steps will engage against.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--60000000-0000-4000-8000-000000000003",
+      "name": "classify attack vector",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.protected_service",
+              "name": "in.protected_service",
+              "value": "={{$workflow.variables.protected_service}}",
+              "type": "string"
+            },
+            {
+              "id": "in.anomaly_window",
+              "name": "in.anomaly_window",
+              "value": "={{$workflow.variables.anomaly_window}}",
+              "type": "string"
+            },
+            {
+              "id": "out.attack_vector",
+              "name": "out.attack_vector",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_handling_capability@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.network_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Classify the attack vector for the anomaly against the operator's documented vector taxonomy: volumetric (UDP / ICMP / amplification flood), protocol (SYN flood, TCP state exhaustion), or application-layer (HTTP flood, slow-loris). Reads the same monitoring surfaces the detect step consulted plus any operator-bound packet-capture / flow-record source documented for __protected_service__. Sets __attack_vector__. The classification is best-effort and time-boxed; if classification cannot be completed within the documented mitigation-engagement deadline (so the operator is not held by a perfect-classification stall while the service stays down), this step leaves __attack_vector__ empty and the downstream engage-mitigation step engages the most-restrictive pre-bound mitigation rather than waiting.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--60000000-0000-4000-8000-000000000004",
+      "name": "engage mitigation",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.protected_service",
+              "name": "in.protected_service",
+              "value": "={{$workflow.variables.protected_service}}",
+              "type": "string"
+            },
+            {
+              "id": "in.attack_vector",
+              "name": "in.attack_vector",
+              "value": "={{$workflow.variables.attack_vector}}",
+              "type": "string"
+            },
+            {
+              "id": "out.mitigation_action_id",
+              "name": "out.mitigation_action_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_handling_capability@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Engage the appropriate mitigation discipline against the operator's pre-bound response surface for __protected_service__: activate the upstream-scrubbing provider (volumetric); push the documented rate-limit / WAF posture change against the operator's edge surface (application-layer); or initiate the documented failover to the standby (protocol exhaustion or when scrubbing / rate-limit cannot recover the service inside the validation window). Reads __attack_vector__ to select the mitigation discipline; when __attack_vector__ is empty the step engages the most-restrictive pre-bound mitigation (typically failover) rather than waiting for classification. Emits __mitigation_action_id__ \u2014 the durable identifier of the engagement against the response surface (provider activation reference, ticket id, or failover-exercise reference). Detection bindings for mitigation-surface misconfiguration (scrubber not actually engaged, rate-limit pushed to wrong zone, standby reachable but not healthy) are owned by CORE-layer cards once upstream rule ids are selected.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--60000000-0000-4000-8000-000000000005",
+      "name": "validate service restoration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.protected_service",
+              "name": "in.protected_service",
+              "value": "={{$workflow.variables.protected_service}}",
+              "type": "string"
+            },
+            {
+              "id": "in.mitigation_action_id",
+              "name": "in.mitigation_action_id",
+              "value": "={{$workflow.variables.mitigation_action_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.service_restored",
+              "name": "out.service_restored",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_handling_capability@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.network_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Observe the protected service against its documented availability objective (latency, error rate, throughput) for the documented validation window after the mitigation engagement. Reads __protected_service__ and __mitigation_action_id__; sets __service_restored__. A false outcome does not block downstream steps \u2014 the evidence-capture record is published with the failure marker and the notify step pages the incident-management owner with the full context so the next mitigation lever (escalate scrubbing tier, expand rate-limit scope, manual failover) can be engaged. Time-to-mitigation and availability-restoration metric emitters that read this step are owned by a sibling EXTEND card; this step intentionally does not pin a step-level metric_ref until that catalogue entry lands.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--60000000-0000-4000-8000-000000000006",
+      "name": "evidence capture",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.protected_service",
+              "name": "in.protected_service",
+              "value": "={{$workflow.variables.protected_service}}",
+              "type": "string"
+            },
+            {
+              "id": "in.attack_vector",
+              "name": "in.attack_vector",
+              "value": "={{$workflow.variables.attack_vector}}",
+              "type": "string"
+            },
+            {
+              "id": "in.mitigation_action_id",
+              "name": "in.mitigation_action_id",
+              "value": "={{$workflow.variables.mitigation_action_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.service_restored",
+              "name": "in.service_restored",
+              "value": "={{$workflow.variables.service_restored}}",
+              "type": "string"
+            },
+            {
+              "id": "out.evidence_id",
+              "name": "out.evidence_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_handling_capability@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Compose and publish the dated availability-incident evidence record to the operator's evidence store. The record carries the protected service id, the anomaly window, the classified attack vector (or the empty-classification marker on the short-circuit branch), the engaged mitigation action id, the restoration outcome (or the failure marker), and the observed availability-objective measurements across the validation window. This is the audit-evident artifact NIS2 Art. 21(2)(b) reviewers read against an availability/DoS incident; missing or stale evidence is the failure mode the incident-handling metrics surface.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--60000000-0000-4000-8000-000000000007",
+      "name": "notify incident-management owner",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.evidence_id",
+              "name": "in.evidence_id",
+              "value": "={{$workflow.variables.evidence_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.protected_service",
+              "name": "in.protected_service",
+              "value": "={{$workflow.variables.protected_service}}",
+              "type": "string"
+            },
+            {
+              "id": "in.service_restored",
+              "name": "in.service_restored",
+              "value": "={{$workflow.variables.service_restored}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Deliver the evidence reference to the incident-management owner along the operator's pre-bound channel (ticketing system, chat thread, page-out roster). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an evidence record written but never delivered to the owner is itself an incident-handling gap. Notification carries the restoration outcome so a false __service_restored__ pages with appropriate urgency for the next mitigation lever.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--60000000-0000-4000-8000-000000000008",
+      "name": "ddos_response_end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2060,
+        420
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "ddos_response_start": {
+      "main": [
+        [
+          {
+            "node": "detect availability anomaly",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "detect availability anomaly": {
+      "main": [
+        [
+          {
+            "node": "classify attack vector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classify attack vector": {
+      "main": [
+        [
+          {
+            "node": "engage mitigation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "engage mitigation": {
+      "main": [
+        [
+          {
+            "node": "validate service restoration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validate service restoration": {
+      "main": [
+        [
+          {
+            "node": "evidence capture",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "evidence capture": {
+      "main": [
+        [
+          {
+            "node": "notify incident-management owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "notify incident-management owner": {
+      "main": [
+        [
+          {
+            "node": "ddos_response_end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "incident-handling",
+    "availability",
+    "ddos",
+    "denial-of-service",
+    "mitigation",
+    "service-restoration"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.ddos_response@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb"
+    },
+    "secops_ng_notes": [
+      "step 'action--60000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--60000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--60000000-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--60000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--60000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--60000000-0000-4000-8000-000000000007': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}
