@@ -7,6 +7,15 @@
 # infra_posture_management, it_security_support_agent, vuln_intake) so
 # the gdpr orphan-CI assertion re-arms against this cluster's slugs.
 #
+# Subsequent CORE follow-on slices wire additional finalized playbooks
+# into this cluster as their data-flow docs land — backup_recovery on
+# the Art. 32(1)(c) restore-availability limb, then ddos_response on
+# the Art. 32(1)(c) availability-incident-response limb and
+# cyber_hygiene_training on the Art. 32(1)(d) organisational-measures
+# effectiveness limb (the latter two registered as part of the G-02
+# grace-clock top-up addressing the freshly-finalized playbooks before
+# the orphan-CI grace window expires).
+#
 # Scope of this file:
 #
 #   - gdpr:art-32-1-b — ensuring the ongoing confidentiality,
@@ -202,12 +211,15 @@ entries:
       - playbook.detection_engineering@v1
       - playbook.infra_posture_management@v1
       - playbook.backup_recovery@v1
+      - playbook.cyber_hygiene_training@v1
     metric_refs:
       - kri.control_effectiveness@v1
       - kpi.detection_coverage@v1
       - kpi.false_positive_rate@v1
       - kpi.cloud_posture_coverage@v1
       - kpi.backup_integrity_pass_rate@v1
+      - kpi.training_completion_rate@v1
+      - kpi.phishing_sim_click_rate@v1
     evidence_stream_refs:
       - effectiveness
       - posture
@@ -242,8 +254,21 @@ entries:
       restore procedure to be tested periodically, not merely
       defined, and the kpi.backup_integrity_pass_rate@v1 metric is
       the cadence-evident anchor for that requirement under this
-      clause). Periodic re-assessment cadence
-      and archival of results are operator-side responsibilities
+      clause). cyber_hygiene_training is the organisational-measures
+      effectiveness counterpart: the per-cycle awareness and
+      role-based-training programme is itself one of the
+      organisational measures Art. 32(1) names, and the playbook's
+      training-completion aggregate plus the phishing-simulation
+      click / report-rate aggregate published into the dated
+      training-attestation record is the testable / archivable
+      artifact this clause requires for the organisational-measure
+      lane of the operator's security measures. The NIS2 parallel
+      under `nis2:art-21-2-g` and the DORA parallel under
+      `dora:art-13-training-awareness` anchor the same playbook
+      against their own training-and-awareness obligations; the three
+      regimes carry separate evidence requirements against the same
+      per-cycle training-attestation discipline. Periodic re-assessment
+      cadence and archival of results are operator-side responsibilities
       discharged by the snapshot's captured_at and retention fields
       plus the upstream control's review_cadence.
 
@@ -316,3 +341,75 @@ entries:
       `cra:annex-i-1-h-availability-restore-drill` (Annex I §1(h)
       availability, restore-drill lane) anchors the same playbook
       on the CRA side, completing the regulatory triplet.
+
+  - id: gdpr:art-32-1-c-availability-incident-response
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "32"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Implement appropriate technical and organisational measures to
+      ensure the ability to restore the availability and access to
+      personal data in a timely manner in the event of a physical or
+      technical incident — including the per-event availability-
+      incident response discipline against denial-of-service and
+      related availability attacks on services that may carry personal
+      data. The measure must be exercisable on the operator's
+      documented response surface, not merely documented, so the
+      availability-defence capability is evidenced rather than
+      asserted.
+    status: draft
+    control_refs:
+      - control.incident_handling_capability@v1
+    playbook_refs:
+      - playbook.ddos_response@v1
+    metric_refs:
+      - kpi.mttr_containment@v1
+    evidence_stream_refs:
+      - posture
+    notes: >-
+      ddos_response is the agentic anchor for the per-event
+      availability-incident response slice of Art. 32(1)(c). On an
+      availability anomaly against a monitored service that may carry
+      personal data on its production-side processing, the playbook
+      classifies the attack vector against the documented vector
+      taxonomy, engages the operator's pre-bound mitigation surface
+      (upstream scrubbing, rate-limit / WAF posture change, or
+      failover to a documented standby), validates service
+      restoration against the documented availability objective, and
+      emits the dated availability-incident evidence record as the
+      audit-evident discharge of the per-event response. The
+      kpi.mttr_containment@v1 metric audits mean-time-to-containment
+      against the protected-service availability surface and is the
+      GDPR-visible failure indicator for the clause's per-event slice.
+      This entry is the per-event availability-incident-response
+      counterpart to the restore-availability entry above
+      (`gdpr:art-32-1-c-restore-availability`); both anchor on Art.
+      32(1)(c) but discharge independent operational disciplines —
+      the restore-availability slice operationalises the periodic
+      restore-drill discipline on backup_recovery, while this slice
+      operationalises the per-event detect-classify-mitigate-validate
+      discharge against the availability attack surface on
+      ddos_response. The two are kept atom-per-obligation rather than
+      overloaded onto a single entry, mirroring the established
+      shape DORA Art. 11 carries across article-11.yaml
+      (`dora:art-11-response-recovery`, documented-capability +
+      backup attestations) and article-11-availability-response.yaml
+      (`dora:art-11-availability-response`, per-vector availability-
+      response). Per content/mappings/gdpr/data-flow-ddos_response.md
+      §2, the workflow itself processes no personal data — it
+      operates on network-anomaly metrics, service identifiers,
+      classified-vector enumerations, mitigation-action identifiers,
+      and attestation records — so this clause anchors the workflow
+      as an organisational measure protecting the availability
+      dimension of personal-data processing on the protected service,
+      not as a per-subject processing activity. The NIS2 parallel
+      under `nis2:art-21-2-b` (incident-handling capability covering
+      the availability/denial-of-service attack dimension) and the
+      DORA parallel under `dora:art-11-availability-response` anchor
+      the same playbook against their own regime-specific
+      obligations; the three regimes carry separate evidence
+      requirements against the same per-event availability-incident
+      response discipline.
