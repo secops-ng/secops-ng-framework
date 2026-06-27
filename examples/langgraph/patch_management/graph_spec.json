@@ -1,0 +1,96 @@
+{
+  "conditional_edges": [],
+  "edges": [
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--70000000-0000-4000-8000-000000000003",
+      "src": "action--70000000-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--70000000-0000-4000-8000-000000000004",
+      "src": "action--70000000-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--70000000-0000-4000-8000-000000000005",
+      "src": "action--70000000-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--70000000-0000-4000-8000-000000000006",
+      "src": "action--70000000-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--70000000-0000-4000-8000-000000000007",
+      "src": "action--70000000-0000-4000-8000-000000000006"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--70000000-0000-4000-8000-000000000008",
+      "src": "action--70000000-0000-4000-8000-000000000007"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--70000000-0000-4000-8000-000000000008"
+    }
+  ],
+  "end_sentinel": "__END__",
+  "entry": "action--70000000-0000-4000-8000-000000000002",
+  "name": "Coordinated patch / update rollout",
+  "nodes": [
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "detect patch availability",
+      "name": "action--70000000-0000-4000-8000-000000000002",
+      "step_id": "action--70000000-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "classify patch criticality",
+      "name": "action--70000000-0000-4000-8000-000000000003",
+      "step_id": "action--70000000-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "stage rollout to canary ring",
+      "name": "action--70000000-0000-4000-8000-000000000004",
+      "step_id": "action--70000000-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "validate canary",
+      "name": "action--70000000-0000-4000-8000-000000000005",
+      "step_id": "action--70000000-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "fan out to broad rings",
+      "name": "action--70000000-0000-4000-8000-000000000006",
+      "step_id": "action--70000000-0000-4000-8000-000000000006"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "evidence capture",
+      "name": "action--70000000-0000-4000-8000-000000000007",
+      "step_id": "action--70000000-0000-4000-8000-000000000007"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "notify maintenance owner",
+      "name": "action--70000000-0000-4000-8000-000000000008",
+      "step_id": "action--70000000-0000-4000-8000-000000000008"
+    }
+  ],
+  "playbook_id": "playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc",
+  "stable_id": "playbook.patch_management@v1"
+}
