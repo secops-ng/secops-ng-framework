@@ -1,0 +1,91 @@
+# DORA — Article 11 (Response and recovery), per-vector availability-
+# incident response slice.
+# Companion to article-11.yaml, which carries the Art. 11 response-and-
+# recovery anchor for the documented incident-handling capability paired
+# with backup attestations and restore-drill records
+# (dora:art-11-response-recovery). This file covers the distinct per-
+# event response obligation expressed in DORA Art. 11 against the
+# availability/denial-of-service attack dimension — the synchronous
+# detect-classify-mitigate-validate slice an essential or important
+# entity operates against an availability incident under the documented
+# response-and-recovery plan. Out of scope here: the documented
+# incident-handling capability and the backup / restore-drill
+# attestations (live in article-11.yaml), Art. 12 backup policies,
+# Art. 13 learning loop, Art. 17+ incident classification and reporting.
+#
+# Authored as a distinct entry rather than overloaded onto
+# dora:art-11-response-recovery because the two slices discharge
+# independent operational disciplines — the response-and-recovery anchor
+# operationalises the documented incident-handling capability across the
+# case set (handler discipline, dated backup attestations, restore-drill
+# records), while this per-vector availability-response slice
+# operationalises the per-event detect-classify-mitigate-validate
+# discharge against the availability attack surface. Keeping the inbound
+# graph atom-per-obligation preserves the same shape DORA Art. 9 carries
+# across article-9-and-rts-vuln-mgmt, article-9-access-management,
+# article-9-crypto, and article-9-4-b-authentication, and the same shape
+# DORA Art. 13 carries across article-13.yaml (learning-loop slice) and
+# article-13-6-training.yaml (training-and-awareness slice).
+regime: dora
+entries:
+  - id: dora:art-11-availability-response
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "11"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Operate response-and-recovery plans that minimise the impact of
+      an ICT-related incident on the availability dimension of critical
+      or important functions: detect the availability anomaly on the
+      protected service, classify the attack vector against the
+      documented vector taxonomy, engage the documented mitigation
+      discipline against the operator's pre-bound response surface
+      (upstream scrubbing activation, rate-limit / WAF posture change,
+      or failover to a documented standby), validate restoration
+      against the documented recovery time objective for the protected
+      service, and capture the dated availability-incident evidence
+      record as the audit-evident discharge of the per-event response.
+    status: draft
+    control_refs:
+      - control.incident_handling@v1
+      - control.incident_monitoring@v1
+    playbook_refs:
+      - playbook.ddos_response@v1
+    metric_refs:
+      - kpi.mttr_containment@v1
+    notes: >-
+      Level 1 anchor is DORA Art. 11 (response and recovery, RTO/RPO
+      objectives) on the per-event availability-incident slice. The
+      ddos_response playbook is the per-event materialisation of that
+      obligation's detect-classify-mitigate-validate discharge against
+      the availability/denial-of-service attack dimension: the detect-
+      availability-anomaly and classify-attack-vector steps cover the
+      detection / triage slice; the engage-mitigation step covers the
+      containment / remediation slice against the operator's pre-bound
+      response surface (upstream scrubbing, rate-limit / WAF posture
+      change, failover); the validate-service-restoration and
+      evidence-capture steps close the loop with audit-evident
+      observation of recovery against the documented availability
+      objective. This entry is the per-vector availability-response
+      counterpart to the documented-capability anchor expressed in
+      article-11.yaml (dora:art-11-response-recovery); both anchor on
+      the same Art. 11 response-and-recovery obligation but discharge
+      independent operational disciplines and are mapped separately to
+      keep the inbound graph atom-per-obligation. The kpi.mttr_
+      containment@v1 metric trips on mean-time-to-containment
+      regressions on the protected-service availability surface. The
+      lifecycle owner once the incident has been opened remains
+      playbook.incident_management@v1 (which already carries
+      dora:art-18-classification, dora:art-19-initial-4h,
+      dora:art-19-intermediate-72h, and dora:art-19-final-one-month on
+      its overlay); ddos_response operationalises the per-vector
+      response under that lifecycle, it does not replace it. Overlaps
+      NIS2 Art. 21(2)(b) (incident-handling capability covering the
+      availability/denial-of-service attack dimension); the same
+      playbook.ddos_response@v1 is referenced from
+      mappings/nis2/article-21-2-b.yaml. The outbound dora: entry on
+      the playbook overlay at
+      content/playbooks/ddos_response/mappings.yaml is the structural
+      closure of this backlink.
