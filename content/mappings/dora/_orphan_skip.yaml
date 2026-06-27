@@ -53,3 +53,24 @@ skip:
       grace-window closure. Mirrors the `phishing_triage` precedent
       above: gap notes are separate cards, not scope creep on a
       single-purpose orphan-CI closure.
+  - slug: ddos_response
+    rationale: >-
+      DDoS / availability-incident response SKELETON. DORA Art. 11
+      (response and recovery, RTO/RPO objectives) is the upstream
+      obligation availability-incident response operationalises,
+      but Art. 11's operational discharge is broader than the
+      per-event response this playbook owns: the lifecycle owner
+      once an incident has been opened is
+      `playbook.incident_management@v1`, which already carries
+      `dora:art-18-classification`, `dora:art-19-initial-4h`,
+      `dora:art-19-intermediate-72h`, and
+      `dora:art-19-final-one-month` on its overlay. A forced
+      outbound DORA pin against the per-vector response surface
+      would only be appropriate alongside a net-new Art. 11
+      per-vector response anchor under `content/mappings/dora/`,
+      which does not exist and is out of scope for the SKELETON.
+      Mirrors the `it_security_support_agent` precedent above:
+      gap notes are separate cards, not scope creep on a
+      single-purpose SKELETON PR. The SKELETON overlay at
+      `content/playbooks/ddos_response/mappings.yaml` records the
+      same gap note in its `dora: []` block.

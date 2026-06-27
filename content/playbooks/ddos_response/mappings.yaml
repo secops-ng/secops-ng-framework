@@ -1,0 +1,244 @@
+# Cross-references for the ddos_response playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, OCSF event classes consumed/emitted, and the EU
+# regulatory clauses this playbook helps operationalise. Inbound
+# references live in content/mappings/{nis2,dora,cra}/ so the graph is
+# closed in both directions.
+#
+# This playbook operationalises the incident-handling capability for
+# the availability/denial-of-service attack dimension: detect an
+# availability anomaly against a monitored service, classify the
+# attack vector (volumetric, protocol, application-layer), engage the
+# operator's pre-bound mitigation surface (upstream scrubbing,
+# rate-limit / WAF posture change, or failover to a documented
+# standby), validate restoration against the documented availability
+# objective, capture the dated evidence record, and notify the
+# incident-management owner. The playbook does not author the
+# operator's anti-DDoS architecture; it operationalises a documented
+# response posture that lives on the operator's network and
+# continuity surfaces.
+#
+# Status: SKELETON. Only the NIS2 Art. 21(2)(b) incident-handling
+# anchor is pinned here. CORE-layer cards add the D3FEND detection
+# bindings (rate-limit / failover misconfiguration signals) once
+# stable upstream rule ids are selected; EXTEND-layer cards wire the
+# time-to-mitigation and availability-restoration metric emitters
+# against the operator's evidence store. The SKELETON overlay does
+# NOT pre-author a DORA or CRA outbound entry: DORA Art. 11
+# (response and recovery, RTO/RPO objectives) is the upstream
+# obligation availability-incident response operationalises, but no
+# DORA inbound entry currently backlinks
+# playbook.ddos_response@v1, and the SKELETON refuses to silently
+# widen scope; gap notes are separate cards, not scope creep on a
+# single-purpose SKELETON PR. Same shape on the CRA side — no
+# CRA inbound entry currently backlinks playbook.ddos_response@v1
+# (CRA Art. 14 product-vulnerability notification is a distinct
+# regime). The orphan-CI grace-window closure for this playbook is
+# audited as a skip entry under
+# content/mappings/dora/_orphan_skip.yaml and
+# content/mappings/cra/_orphan_skip.yaml.
+#
+# Deliberate OSCAL omissions:
+#   - CP-2 (Contingency Plan) is NOT pinned: this playbook operates
+#     the per-incident response slice (detect-classify-mitigate-
+#     validate) against an availability event, not the contingency-
+#     plan authoring lifecycle. CP-2 anchors the operator's
+#     plan-authoring surface, which lives in governance
+#     documentation; pinning CP-2 here would conflate the per-event
+#     mitigation discipline with the plan-authoring surface.
+#   - SC-5 (Denial-of-service Protection) is NOT pinned: SC-5 anchors
+#     the documented architectural defence (rate-limit posture,
+#     upstream scrubber binding, failover-target designation), which
+#     is the operator's standing posture rather than the per-incident
+#     response this playbook operates. The architectural anchor
+#     belongs on a future infra_posture_management overlay where
+#     posture authoring lives, not on the per-event response.
+#   - AU-2 (Event Logging) is NOT pinned: the playbook emits OCSF
+#     records, but the operator's audit-event policy is upstream of
+#     this playbook.
+#
+# GDPR closure: a per-workflow Records of Processing Activity entry
+# accompanies this overlay at
+# content/mappings/gdpr/data-flow-ddos_response.md. The workflow
+# operates on network-anomaly metrics, service identifiers, and
+# attestation records; no personal data is processed.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.ddos_response@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the detect-availability-
+  # anomaly, classify-attack-vector, engage-mitigation, validate-
+  # service-restoration, evidence-capture, and notify-incident-
+  # management-owner steps.
+  - id: control.incident_handling@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-4
+    title: Incident Handling
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-4
+    notes: >-
+      Anchors the playbook end-to-end as the incident-handling
+      capability for the availability/denial-of-service case set:
+      detect-to-classify-to-mitigate-to-validate exercised step-by-
+      step, with the dated evidence record produced by the
+      evidence-capture step closing the audit-evident loop. The
+      same control anchors the sibling per-incident playbooks
+      (identity_compromise, data_exfil, ransomware_containment) so
+      the incident-handling capability is named consistently across
+      the case set.
+
+  - id: control.incident_monitoring@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-5
+    title: Incident Monitoring
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-5
+    notes: >-
+      Covers the detect-availability-anomaly and validate-service-
+      restoration steps: IR-5 demands tracking and documentation of
+      incidents. The synthetic-probe / edge-telemetry observations
+      captured at detect and the documented-availability-objective
+      measurements captured at validate are the durable monitoring
+      artefact the rest of the playbook reads against. The dated
+      evidence record produced by the evidence-capture step is the
+      audit-evident output IR-5 reviewers consume.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # SKELETON layer pins no D3FEND techniques: the rate-limit /
+  # failover / scrubber-engagement disciplines map onto D3FEND
+  # techniques (Network Traffic Filtering and Outbound Traffic
+  # Filtering on the rate-limit / WAF posture-change side; System
+  # Configuration Permissions on the failover-engagement side) but
+  # stable per-step pins depend on the upstream rule ids selected
+  # by the CORE-layer cards. A SKELETON overlay does not pre-author
+  # D3FEND pins ahead of the detection bindings they will anchor;
+  # the CORE-layer card adds the pins together with the rule ids
+  # so the d3fend block lands closed rather than stub-shaped.
+  # Mirrors the cra/dora gap-note pattern below: empty-block
+  # SKELETON state is the audited convention, not a pre-authoring
+  # surface for a CORE-layer commitment.
+  []
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. The detect-availability-anomaly
+  # and validate-service-restoration steps read network-side
+  # observations (synthetic-probe results, edge / origin throughput
+  # / error-rate / latency series); the classify-attack-vector step
+  # reads the same network surface plus operator-bound packet-
+  # capture / flow-record sources; the engage-mitigation,
+  # evidence-capture, and notify steps interact with operator API
+  # surfaces (upstream-scrubbing provider activation, rate-limit /
+  # WAF posture-change ticketing, failover orchestration, evidence
+  # store, notification channel). Two classes anchor the
+  # discipline: Network Activity on the observation-side and API
+  # Activity on the engagement / emission / delivery side.
+  - id: telemetry.network_activity@v1
+    category_uid: 4
+    category_name: Network Activity
+    class_uid: 4001
+    class_name: Network Activity
+    ocsf_version: "1.3.0"
+    direction: consumes
+    notes: >-
+      Consumed at the detect-availability-anomaly step (synthetic-
+      probe results, edge / origin throughput / error-rate /
+      latency series against __protected_service__), at the
+      classify-attack-vector step (same network surface plus
+      operator-bound packet-capture / flow-record sources to
+      classify volumetric / protocol / application-layer vectors),
+      and at the validate-service-restoration step (post-
+      engagement observation of the protected service against its
+      documented availability objective for the documented
+      validation window). Schema:
+      https://schema.ocsf.io/1.3.0/classes/network_activity
+
+  - id: telemetry.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: both
+    notes: >-
+      Consumed at the engage-mitigation step (write calls against
+      the operator's upstream-scrubbing provider activation
+      endpoint, the operator's edge surface for rate-limit / WAF
+      posture-change pushes, or the operator's failover
+      orchestration surface). Emitted at the evidence-capture step
+      (write call publishing the dated availability-incident
+      evidence record to the operator's evidence store) and at the
+      notify-incident-management-owner step (delivery dispatch to
+      the incident-management owner's pre-bound channel). Schema:
+      https://schema.ocsf.io/1.3.0/classes/api_activity
+
+nis2:
+  # Inbound entry that backlinks playbook.ddos_response@v1:
+  #   - content/mappings/nis2/article-21-2-b.yaml
+  #     (id nis2:art-21-2-b — incident-handling capability)
+  # Pinned outbound below to close the graph.
+  - mapping_id: nis2:art-21-2-b
+    article: 21(2)(b)
+    notes: >-
+      NIS2 Art. 21(2)(b) requires essential and important entities
+      to operate an incident-handling capability covering detection,
+      triage, containment, remediation, and capture of lessons
+      learned. The ddos_response playbook is the operational
+      discharge of the capability for the availability/denial-of-
+      service attack dimension — the case set currently leans on
+      phishing / identity / ransomware playbooks for the per-
+      incident response, none of which carry the availability-
+      attack surface. The detect-availability-anomaly and
+      classify-attack-vector steps cover the detection / triage
+      slice; the engage-mitigation step covers the containment /
+      remediation slice against the operator's pre-bound response
+      surface (upstream scrubbing, rate-limit / WAF posture change,
+      failover); the validate-service-restoration and
+      evidence-capture steps close the loop with audit-evident
+      observation of recovery against the documented availability
+      objective. Lessons-learned is handed off to
+      playbook.post_incident_review@v1, which is the canonical
+      lessons-learned owner across the case set.
+
+dora:
+  # No DORA inbound entry currently backlinks
+  # playbook.ddos_response@v1. DORA Art. 11 (response and recovery,
+  # RTO/RPO objectives) is the upstream obligation
+  # availability-incident response operationalises, but Art. 11's
+  # operational discharge is broader than the per-event response
+  # this playbook owns (response-handling and incident-management
+  # disciplines anchor on playbook.incident_management@v1, which
+  # already carries dora:art-18-classification,
+  # dora:art-19-initial-4h, dora:art-19-intermediate-72h, and
+  # dora:art-19-final-one-month on its overlay). The SKELETON
+  # overlay does NOT silently widen scope to pin an outbound DORA
+  # entry against a missing inbound; a separate inbound-closure
+  # card adds the inbound Art. 11 anchor against the per-vector
+  # response surface and the outbound pin lands together with it.
+  # Mirrors the on_call_rotation DORA Art. 6 gap-note precedent
+  # and the it_security_support_agent dora:[] precedent: gap
+  # notes are separate cards, not scope creep on a single-purpose
+  # SKELETON PR. The orphan-CI grace-window closure for this
+  # playbook is audited as a skip entry under
+  # content/mappings/dora/_orphan_skip.yaml (slug ddos_response).
+  []
+
+cra:
+  # No CRA inbound entry currently backlinks
+  # playbook.ddos_response@v1. CRA Annex I §1(h) availability of
+  # essential and basic functions has two existing inbound
+  # anchors — cra:annex-i-1-availability (containment lane, pinned
+  # to ransomware_containment) and
+  # cra:annex-i-1-h-availability-restore-drill (restore-drill
+  # lane, pinned to backup_recovery). A DDoS / availability-
+  # incident response lane against §1(h) is a defensible inbound
+  # anchor and is the natural next CRA edge for this playbook,
+  # but the SKELETON overlay does NOT pre-author the inbound
+  # entry: gap notes are separate cards, not scope creep on a
+  # single-purpose SKELETON PR. A future inbound-closure card adds
+  # the cra:annex-i-1-h-availability-ddos-response inbound entry
+  # and the outbound pin lands together with it. The orphan-CI
+  # grace-window closure for this playbook is audited as a skip
+  # entry under content/mappings/cra/_orphan_skip.yaml (slug
+  # ddos_response).
+  []
