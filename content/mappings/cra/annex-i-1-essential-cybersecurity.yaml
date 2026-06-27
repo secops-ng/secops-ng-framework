@@ -71,12 +71,27 @@ entries:
     control_refs:
       - control.crypto_policy_inventory@v1
       - control.key_rotation_evidence@v1
-    playbook_refs: []
+    playbook_refs:
+      - playbook.crypto_posture_management@v1
     metric_refs: []
     notes: >-
       Confidentiality is operationalised through a dated cryptographic
       protocol inventory paired with key-rotation evidence demonstrating
-      that the declared crypto remains live in production.
+      that the declared crypto remains live in production. The
+      crypto_posture_management playbook is the agentic anchor for
+      this clause: it pins both control_refs on this entry
+      (control.crypto_policy_inventory@v1 via the inventory-crypto-
+      policy step, control.key_rotation_evidence@v1 via the
+      check-key-rotation step) and emits the dated cryptography-
+      posture attestation that is the audit-evident discharge of the
+      §1(e) confidentiality clause. The cryptographic-posture lane
+      itself is also pinned separately under
+      `cra:annex-i-1-e-confidentiality-crypto-posture` (continuous
+      evidence that the deployed cryptographic surface — TLS
+      endpoints, cipher suites, key-rotation cadence — remains
+      aligned with the declared cryptography policy across the
+      support period); this entry carries the §1(e) clause itself
+      and inherits the same agentic anchor.
 
   - id: cra:annex-i-1-integrity
     regulation:
