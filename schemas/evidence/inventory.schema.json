@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/evidence/inventory.schema.json",
+  "title": "SecOps-NG Asset Inventory Delta Evidence Artifact",
+  "description": "Typed shape for one evidence artifact emitted by the asset-inventory-delta evidence stream. One artifact is produced per scheduled reconciliation execution of `playbook.asset_management@v1` and pins, mechanically, (a) the reconciled operator-authoritative snapshot id for the window, (b) the per-asset delta set against the previous documented snapshot, (c) the per-delta classification against the closed delta taxonomy (`new-managed`, `unmanaged-discovered`, `decommissioned`, `baseline-drift`), and (d) the counted unmanaged-discovered cardinality the NIS2 Article 21(2)(i) reviewer consumes as the exception bucket. The artifact is compile-target-agnostic: the deterministic `artifact_id` keys on `<workflow_id>|<execution_id>|<captured_at>` and does NOT include the compile target, so the three reference compilers (n8n, Temporal, LangGraph) re-derive byte-identical bytes from the same primitive output. Public-bar artifact: asset identifiers stay opaque operator-side strings; individual personal names, credential-shaped strings, and raw configuration secret material are out of scope per AGENTS.md \u00a73.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_id",
+    "stream",
+    "workflow_id",
+    "execution_id",
+    "regulation_refs",
+    "control_refs",
+    "snapshot_window",
+    "snapshot_id",
+    "source_set_id",
+    "delta_set",
+    "delta_classification",
+    "unmanaged_discovered_count",
+    "captured_at",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Pinned schema version. Lets a consumer reject artifacts produced under an older schema once breaking changes ship.",
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "artifact_id": {
+      "description": "Stable per-artifact identifier. Convention: SHA-256 hex digest of `<workflow_id>|<execution_id>|<captured_at>` (UTF-8, no separators around the pipes). Deterministic on those three inputs; re-emissions inside the same execution at the same `captured_at` instant stay byte-identical at the path level. Compile target is intentionally NOT part of the id so the three reference compilers re-derive byte-identical bytes from the same primitive output (this is the byte-parity contract the F-WF-ASSET CORE-FANOUT siblings assert against).",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "stream": {
+      "description": "Identifies which evidence stream produced the artifact. Constant on this schema.",
+      "type": "string",
+      "const": "inventory"
+    },
+    "workflow_id": {
+      "description": "Stable workflow identifier; pinned to `asset_management` for this stream.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*$",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "execution_id": {
+      "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id).",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "regulation_refs": {
+      "description": "Pins to the upstream regulatory mapping entries this artifact helps satisfy. The asset_management playbook anchors against `nis2:art-21-2-i` (human resources security, access-control policies, and asset management).",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(nis2|dora|cra|gdpr|iso27001|soc2):[a-z0-9][a-z0-9.-]*$",
+        "maxLength": 120
+      }
+    },
+    "control_refs": {
+      "description": "Control stable-ids attested by this artifact. The asset_management playbook anchors against `control.asset_inventory_delta@v1`.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+      }
+    },
+    "snapshot_window": {
+      "description": "Identifier of the reconciliation window this run discharges. Operator-defined opaque string naming which inventory cohort the run reconciled against (scheduled-cadence reference, on-demand reconciliation reference, or operator-initiated trigger).",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$"
+    },
+    "snapshot_id": {
+      "description": "Deterministic identifier of the operator-authoritative snapshot the reconcile step composed for this window. Derived inside the reconcile primitive as SHA-256 over a canonical, source-precedence-ordered, normalised asset set; two replays of the same window over the same source set produce byte-identical snapshot ids.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "source_set_id": {
+      "description": "Deterministic identifier of the consulted inventory-source set (the sorted, deduplicated set of `source_id` values the ingest step pulled from). Derived inside the reconcile primitive as SHA-256 over the canonical sorted `(source_id, source_kind)` pair list. Empty source sets are rejected upstream.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "delta_set": {
+      "description": "Per-asset delta set against the previous documented snapshot. Empty array is valid (no-change reconciliation) and emitted explicitly so the audit-evident chain is closed.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/delta_record" }
+    },
+    "delta_classification": {
+      "description": "Per-delta classification against the closed delta taxonomy. The list ordering matches `delta_set` 1:1 (same length, same order). When the classification step short-circuited under the documented reconciliation deadline this field carries the single sentinel entry `[\"unclassified\"]` (see `unclassified` enum value) and the consuming reviewer treats the delta set as unmanaged-discovered for notification urgency.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "new-managed",
+          "unmanaged-discovered",
+          "decommissioned",
+          "baseline-drift",
+          "unclassified"
+        ]
+      }
+    },
+    "unmanaged_discovered_count": {
+      "description": "Pre-computed count of `unmanaged-discovered` entries in `delta_classification`. This is the NIS2 Art. 21(2)(i) exception-bucket cardinality the inventory-owner notification step pages on against the operator's documented threshold.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "captured_at": {
+      "description": "ISO-8601 UTC second-precision timestamp at which this artifact was captured. Part of `artifact_id` so two captures at the same instant against the same execution stay byte-identical, and re-runs at different instants do not collide.",
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "provenance": {
+      "description": "Where this artifact came from. Mirrors the provenance pattern used by the other evidence streams so a reviewer can re-derive the chain back to source.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_url", "captured_at"],
+      "properties": {
+        "source_url": {
+          "description": "URL of the workflow run that produced this artifact. Compile targets may use their own run-id URLs; the URL itself is opaque to this schema.",
+          "type": "string",
+          "format": "uri"
+        },
+        "captured_at": {
+          "description": "ISO-8601 UTC timestamp matching the artifact-level `captured_at`.",
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "commit_sha": {
+          "description": "Optional commit SHA of the content snapshot the workflow walked.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,64}$"
+        }
+      }
+    },
+    "owner": {
+      "description": "Optional dated ownership pointer for the asset-management posture this artifact covers. Role-shaped \u2014 a working-group mailbox, a generic role title, or a community handle. Individual personal names are out of scope per AGENTS.md \u00a73 and rejected here as a matter of schema discipline.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "assigned_at"],
+      "properties": {
+        "role": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "assigned_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        }
+      }
+    },
+    "retention": {
+      "description": "Optional retention pointer the operator declares for this evidentiary record. ISO-8601 duration, defaulted by the operator's configuration.",
+      "type": "string",
+      "pattern": "^P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+S)?)?$"
+    }
+  },
+  "$defs": {
+    "delta_record": {
+      "description": "One per-asset delta entry. Each record names the asset identifier, the sources that observed it (source-attribution carry from the reconcile step, preserved in source-precedence order), the previous and current state markers, and the change kind that triggered the delta. `baseline_hash_previous` / `baseline_hash_current` are present iff the change-kind covers a baseline observation.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "asset_id",
+        "change_kind",
+        "previous_state",
+        "current_state",
+        "source_attribution"
+      ],
+      "properties": {
+        "asset_id": {
+          "description": "Opaque operator-side asset identifier. Role-shaped or URN-shaped; personal-name strings rejected at the primitive boundary.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$"
+        },
+        "change_kind": {
+          "description": "Closed enumeration of delta change-kinds: `appeared` (asset present in current snapshot, absent from previous), `disappeared` (asset present in previous, absent from current), `baseline_diverged` (asset present in both, observed baseline hash differs).",
+          "type": "string",
+          "enum": ["appeared", "disappeared", "baseline_diverged"]
+        },
+        "previous_state": {
+          "description": "Closed enumeration of state markers for the previous snapshot.",
+          "type": "string",
+          "enum": ["absent", "present"]
+        },
+        "current_state": {
+          "description": "Closed enumeration of state markers for the current snapshot.",
+          "type": "string",
+          "enum": ["absent", "present"]
+        },
+        "source_attribution": {
+          "description": "Sources that observed the asset, preserved in operator-documented precedence order (highest-precedence first). At least one entry; deduplicated.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[a-z][a-z0-9_-]{0,127}$"
+          }
+        },
+        "baseline_hash_previous": {
+          "description": "Optional hex digest of the observed baseline at the previous snapshot. Present iff the change-kind is `disappeared` or `baseline_diverged`.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,64}$"
+        },
+        "baseline_hash_current": {
+          "description": "Optional hex digest of the observed baseline at the current snapshot. Present iff the change-kind is `appeared` or `baseline_diverged`.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,64}$"
+        }
+      }
+    }
+  }
+}
