@@ -43,3 +43,22 @@ skip:
       and the outbound pin lands together with it. The SKELETON
       overlay at `content/playbooks/ddos_response/mappings.yaml`
       records the same gap note in its `cra: []` block.
+  - slug: asset_management
+    rationale: >-
+      Asset and configuration management SKELETON. CRA Annex I
+      §1(c) (default secure configurations) and §1(e) (protection
+      from unauthorised access) are defensible upstream anchors
+      for asset-management visibility against manufacturer-side
+      configuration and component delivery, but the CRA's per-
+      product manufacturer scope is narrower than the operator-
+      side estate-wide reconciliation this playbook owns. The
+      manufacturer-vs-operator scope difference needs scope-
+      mapping review before a CRA inbound is authored, and the
+      SKELETON overlay does NOT pre-author the inbound entry:
+      gap notes are separate cards, not scope creep on a single-
+      purpose SKELETON PR. A future inbound-closure card adds the
+      CRA Annex I anchor against the appropriate operator-vs-
+      manufacturer slice and the outbound pin lands together with
+      it on the `content/playbooks/asset_management/mappings.yaml`
+      overlay (`cra: []` block). Mirrors the `patch_management`
+      and `ddos_response` CRA gap-note precedents.
