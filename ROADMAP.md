@@ -595,6 +595,104 @@ named operator use-case. Each cookbook workflow lives under
 
 ---
 
+### F-WF-ASSET — Asset and configuration management
+
+- **Status:** In Progress
+- **Priority:** P2
+- **Goal:** G-01 (content coverage — 25th canonical cookbook
+  playbook, closing the top-5 NIS2 Art. 21 family bar); the
+  inbound mapping at `content/mappings/nis2/article-21-2-i.yaml`
+  citing `playbook.asset_management@v1` also defends G-02 (orphan-
+  free regulatory graph) on the NIS2 axis.
+- **Acceptance criteria:**
+  - `content/playbooks/asset_management/` carries the canonical
+    CACAO SKELETON (`playbook.asset_management@v1`) and the
+    deterministic primitives (`reconcile.reconcile_inventory_snapshot`,
+    `classify.classify_inventory_delta`,
+    `artifact.build_asset_inventory_delta_evidence_artifact`) with
+    zero placeholders across all action bodies; compiled targets
+    land under `examples/{n8n,temporal,langgraph}/asset_management/`.
+  - Per-window reconciliation topology:
+    `ingest-inventory-sources` → `reconcile-authoritative-inventory`
+    → `compute-delta-against-previous-snapshot` → `classify-delta`
+    → `capture-evidence` → `notify-inventory-owner`; transitions
+    deterministic and replay-tested across all three targets.
+  - Per-window asset-inventory-delta evidence record emitted against
+    a stable evidence-stream schema (candidate: extend the access
+    stream `schemas/evidence/access.schema.json` for the
+    capability-inventory companion shape, or stand up a dedicated
+    `schemas/evidence/inventory.schema.json` envelope at the
+    CORE-PRIM card). The record pins the canonical reconciliation
+    block (sorted, normalised asset set, source-attribution carry,
+    closed per-delta classification enumeration), the NIS2
+    Article 21(2)(i) `regulation_refs`, and the closed
+    `control_refs` list. The `artifact_id` derives deterministically
+    from `SHA-256(workflow_id|execution_id|captured_at)`, so
+    re-emissions inside the same execution at the same `captured_at`
+    instant are byte-identical at the path level. The `artifact_id`
+    does **not** key on `compile_target` — the three reference
+    targets re-derive byte-identical bytes from the same execution
+    context; byte-parity is asserted across targets.
+  - Cookbook entry (`docs/cookbook/asset_management.md`) + per-
+    target byte-parity goldens
+    (`tests/examples/asset_management/test_{n8n,temporal,langgraph}_workflow_golden.py`
+    and `test_{n8n,temporal,langgraph}_asset_inventory_delta_evidence.py`)
+    pin both the per-target workflow artefact and the per-target
+    asset-inventory-delta evidence record.
+- **Sovereign-stack constraints:** Operator-supplied inventory
+  sources (CMDB, IaC state backend, cloud-provider asset APIs,
+  endpoint-management agent control plane) and evidence sink; no
+  hosted CMDB-correlation SaaS dependency, no default endpoint-
+  management SDK bundled. The inventory-source set and the
+  artifact destination are operator-configured; the framework
+  ships no default endpoint.
+- **Depends on:** F-CP-07 (access stream — companion capability-
+  inventory artifact shape, candidate envelope for the per-window
+  inventory record), F-CR-01 (`ToolIO` contract for the primitives).
+- **Source:** NIS2 Art. 21(2)(i) — human resources security,
+  access-control policies, and asset management.
+- **SKELETON → CORE → EXTEND decomposition plan:**
+  - SKELETON (this card) —
+    `content/playbooks/asset_management/` CACAO topology + IDs +
+    schema refs, `mappings.yaml` outbound (OSCAL CM-8 / CM-8(2),
+    OCSF API Activity, NIS2 Art. 21(2)(i) inbound closure with
+    `article-21-2-i.yaml` `playbook_refs:` update), DORA / CRA
+    gap-note `_orphan_skip` entries (Art. 8 / Annex I §1 inbound
+    deferred), GDPR per-workflow RoPA entry (no-personal-data
+    pattern, mirrors patch_management).
+  - CORE-PRIM — Deterministic per-step primitives under
+    `content/playbooks/asset_management/primitives/`:
+    `reconcile.reconcile_inventory_snapshot` (sorted, normalised
+    asset-set hash → snapshot id), `classify.classify_inventory_delta`
+    (per-delta taxonomy resolver), and the canonical evidence
+    artifact builder, with unit coverage and a normalisation
+    invariant test asserting source-precedence ordering.
+  - CORE-FANOUT-N8N — n8n emitter under
+    `compilers/n8n/asset_management/` + worked example under
+    `examples/n8n/asset_management/` + byte-parity golden.
+  - CORE-FANOUT-TEMPORAL — Temporal activity adapter under
+    `compilers/temporal/asset_management/` + worked example under
+    `examples/temporal/asset_management/` + cross-target byte-
+    parity golden.
+  - CORE-FANOUT-LANGGRAPH — LangGraph node adapter under
+    `compilers/langgraph/asset_management/` + worked example
+    under `examples/langgraph/asset_management/` closing the
+    three-target byte-parity ring.
+  - EXTEND-mappings — D3FEND per-step lift (D3-AI Asset Inventory,
+    D3-SWI Software Inventory, baseline-drift slice pin), DORA
+    Art. 8 inbound-closure card under
+    `content/mappings/dora/` removing the
+    `_orphan_skip` entry, CRA Annex I scope-mapping review card
+    (manufacturer-vs-operator clarification) ahead of any CRA
+    inbound.
+  - EXTEND-metrics — `kri.asset_inventory_drift@v1` and a new
+    `kpi.unmanaged_asset_cardinality@v1` emitter against the
+    operator's evidence store with the per-window observation
+    series and threshold-band pinning.
+- **Shipped via:** SKELETON in flight against this card.
+
+---
+
 ## Epic PT — Pattern Library
 
 Reusable graph fragments and Pydantic types shared across cookbook

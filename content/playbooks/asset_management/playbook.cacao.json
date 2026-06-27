@@ -1,0 +1,249 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--80a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6dd",
+  "name": "Asset and configuration inventory delta capture",
+  "description": "Operationalise the asset and configuration management capability against the operator's own deployed estate: ingest the documented asset-inventory sources (CMDB, declarative infrastructure-as-code records, cloud-provider asset APIs, endpoint-management agents) on a scheduled cadence, reconcile them into the operator-authoritative snapshot for the current window, compute the per-asset delta against the previous documented snapshot, classify each delta against the operator's documented delta taxonomy (new-managed, unmanaged-discovered, decommissioned, baseline-drift), capture the dated asset-inventory-delta evidence record, and notify the inventory owner so unmanaged or undocumented assets surface as exceptions rather than as quiet drift. The playbook does not author the operator's inventory-source architecture itself; it operationalises a documented reconciliation posture against pre-bound sources. SKELETON only — control bindings (control.asset_inventory_delta@v1) are pinned and the workflow topology + IDs are fixed, but per-step deterministic primitives (source reconciliation, delta classification, evidence emission), detection bindings, golden tests, and per-target compiler emissions are owned by CORE / EXTEND siblings. CACAO v2 + SecOps-NG content-model extensions.",
+  "playbook_types": [
+    "investigation",
+    "notification"
+  ],
+  "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+  "created": "2026-06-27T00:00:00Z",
+  "modified": "2026-06-27T00:00:00Z",
+  "labels": [
+    "asset-management",
+    "configuration-management",
+    "inventory",
+    "delta-capture",
+    "drift-detection",
+    "cmdb"
+  ],
+  "external_references": [
+    {
+      "name": "OASIS CACAO v2.0",
+      "description": "Workflow step types, variable conventions, and the x_ extension namespace used to carry SecOps-NG content-model refs.",
+      "source": "OASIS Open"
+    },
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 21(2)(i) — human resources security, access-control policies, and asset management",
+      "source": "Official Journal of the European Union"
+    },
+    {
+      "name": "ENISA — Good practices on asset management for essential and important entities",
+      "source": "ENISA"
+    },
+    {
+      "name": "OCSF v1.3.0 — API Activity (6003) event class",
+      "source": "OCSF"
+    }
+  ],
+  "playbook_variables": {
+    "__snapshot_window__": {
+      "type": "string",
+      "description": "Identifier of the reconciliation window this run discharges (scheduled-cadence reference, on-demand reconciliation reference, or operator-initiated trigger). Names which inventory cohort the run reconciled against rather than the run's wall-clock time; the wall-clock instant lives on the evidence record itself.",
+      "external": true
+    },
+    "__inventory_source_set__": {
+      "type": "string",
+      "description": "Identifier of the documented inventory-source set the ingest step consulted (CMDB reference, IaC declaration set, cloud-provider asset-API binding, endpoint-management agent fleet). Populated by the ingest step; carried forward so the evidence record names which sources contributed to the reconciled snapshot.",
+      "external": false
+    },
+    "__snapshot_id__": {
+      "type": "string",
+      "description": "Identifier of the reconciled operator-authoritative snapshot the reconcile step composed for this window. Always populated; the value names the snapshot the delta computation reads against. CORE primitives define the deterministic snapshot-id derivation (sorted, normalised asset-set hash) so re-emissions are byte-identical.",
+      "external": false
+    },
+    "__delta_set_id__": {
+      "type": "string",
+      "description": "Identifier of the per-delta set the compute-delta step emits against the previous documented snapshot. Each delta carries an asset identifier, an observed-source attribution, a previous-state marker, and a current-state marker. The set may be empty (no delta against the previous snapshot) — the empty case is still emitted explicitly so the audit-evident chain is closed.",
+      "external": false
+    },
+    "__delta_classification__": {
+      "type": "string",
+      "description": "Identifier of the classified delta set against the operator's documented delta taxonomy: new-managed (asset appeared and is covered by a documented owner), unmanaged-discovered (asset appeared without a documented owner — the exception bucket NIS2 Art. 21(2)(i) reviewers consume), decommissioned (asset disappeared per a documented decommissioning record), baseline-drift (asset present but observed configuration diverges from the documented baseline). Empty when classification could not be completed within the documented reconciliation deadline; an empty value short-circuits into an evidence-capture failure record while still treating the delta set as unmanaged-discovered for notification urgency.",
+      "external": false
+    },
+    "__evidence_id__": {
+      "type": "string",
+      "description": "Identifier of the dated asset-inventory-delta evidence record published to the operator's evidence store. Always populated, including on the empty-delta-set branch and on the unclassified-delta short-circuit branch.",
+      "external": false
+    }
+  },
+  "workflow_start": "start--80000000-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--80000000-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "asset_management_start",
+      "on_completion": "action--80000000-0000-4000-8000-000000000002"
+    },
+    "action--80000000-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "ingest inventory sources",
+      "description": "TODO (CORE): per-source ingest primitive. The action body reads the documented inventory-source set for the current reconciliation window (CMDB reference, IaC declaration set, cloud-provider asset-API binding, endpoint-management agent fleet) and pulls each source's snapshot of declared and observed assets into the playbook's working set. Sets __inventory_source_set__ to the durable identifier of the source set the run consulted. SKELETON pins the topology + ID + control / telemetry refs; the deterministic per-source pull, normalisation, and source-attribution carry are owned by CORE-PRIM. Detection bindings for ingest-side failures (source endpoint unreachable, stale declaration set, partial pull) are owned by CORE-FANOUT cards once upstream rule ids are selected.",
+      "on_completion": "action--80000000-0000-4000-8000-000000000003",
+      "in_args": [
+        "__snapshot_window__"
+      ],
+      "out_args": [
+        "__inventory_source_set__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.asset_inventory_delta@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kri.control_effectiveness@v1"
+        ]
+      }
+    },
+    "action--80000000-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "reconcile authoritative inventory",
+      "description": "TODO (CORE): authoritative-snapshot reconciliation primitive. The action body composes the operator-authoritative snapshot for the current reconciliation window from the ingested source set, resolving source-precedence conflicts against the operator's documented precedence ordering (e.g. IaC declaration wins over discovered observation when both agree on identity but disagree on declared baseline; cloud-provider asset API wins on lifecycle state). Sets __snapshot_id__. SKELETON pins the topology + ID; the deterministic snapshot-id derivation (sorted, normalised asset-set hash so re-emissions inside the same window are byte-identical) is owned by CORE-PRIM. The reconciliation step is read-only against the source set — it does not write back into the operator's CMDB or IaC declarations; correcting drift is the operator's downstream lever, the playbook only surfaces the observation.",
+      "on_completion": "action--80000000-0000-4000-8000-000000000004",
+      "in_args": [
+        "__snapshot_window__",
+        "__inventory_source_set__"
+      ],
+      "out_args": [
+        "__snapshot_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.asset_inventory_delta@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kri.control_effectiveness@v1"
+        ]
+      }
+    },
+    "action--80000000-0000-4000-8000-000000000004": {
+      "type": "action",
+      "name": "compute delta against previous snapshot",
+      "description": "TODO (CORE): per-asset delta-computation primitive. The action body diffs the reconciled snapshot (__snapshot_id__) against the previous documented snapshot for the same source set, emitting the per-delta set: each delta carries an asset identifier, a source-attribution marker for the side that observed the asset, a previous-state marker (absent / present-with-baseline-X / decommissioned), and a current-state marker (absent / present-with-baseline-Y / observed-without-owner). Empty deltas are emitted explicitly so the audit-evident chain is closed even on a no-change reconciliation. Sets __delta_set_id__. SKELETON pins the topology + ID; the deterministic delta normalisation and source-attribution carry are owned by CORE-PRIM.",
+      "on_completion": "action--80000000-0000-4000-8000-000000000005",
+      "in_args": [
+        "__snapshot_window__",
+        "__snapshot_id__"
+      ],
+      "out_args": [
+        "__delta_set_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.asset_inventory_delta@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kri.control_effectiveness@v1"
+        ]
+      }
+    },
+    "action--80000000-0000-4000-8000-000000000005": {
+      "type": "action",
+      "name": "classify delta",
+      "description": "TODO (CORE): per-delta classification primitive. The action body classifies each delta in __delta_set_id__ against the operator's documented delta taxonomy: new-managed (asset appeared and a documented owner / declaration covers it), unmanaged-discovered (asset appeared without a documented owner — the exception bucket NIS2 Art. 21(2)(i) reviewers consume), decommissioned (asset disappeared per a documented decommissioning record), baseline-drift (asset present but the observed configuration diverges from the documented baseline). Sets __delta_classification__. The classification is best-effort and time-boxed; if classification cannot be completed within the documented reconciliation deadline (so the operator is not held by a perfect-classification stall while the window slips), this step leaves __delta_classification__ empty and the downstream evidence-capture step records the unclassified marker while still treating the delta set as unmanaged-discovered for notification urgency. SKELETON pins the topology + ID; deterministic taxonomy-resolution is owned by CORE-PRIM.",
+      "on_completion": "action--80000000-0000-4000-8000-000000000006",
+      "in_args": [
+        "__snapshot_id__",
+        "__delta_set_id__"
+      ],
+      "out_args": [
+        "__delta_classification__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.asset_inventory_delta@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kri.control_effectiveness@v1"
+        ]
+      }
+    },
+    "action--80000000-0000-4000-8000-000000000006": {
+      "type": "action",
+      "name": "capture evidence",
+      "description": "TODO (CORE): dated evidence emission primitive. The action body composes and publishes the dated asset-inventory-delta evidence record to the operator's evidence store. The record carries the reconciliation window, the consulted inventory-source set, the reconciled snapshot id, the delta set id, the per-delta classification (or the unclassified marker on the short-circuit branch), the counted unmanaged-discovered cardinality, and the dated reconciliation timestamp. This is the audit-evident artifact NIS2 Art. 21(2)(i) reviewers read against the asset-management obligation; missing or stale evidence is the failure mode the asset-inventory-drift KRI surfaces. SKELETON pins the topology + ID + control / telemetry / metric refs; the deterministic evidence-id derivation and the canonical record shape are owned by CORE-PRIM.",
+      "on_completion": "action--80000000-0000-4000-8000-000000000007",
+      "in_args": [
+        "__snapshot_window__",
+        "__snapshot_id__",
+        "__delta_set_id__",
+        "__delta_classification__"
+      ],
+      "out_args": [
+        "__evidence_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.asset_inventory_delta@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kri.control_effectiveness@v1"
+        ]
+      }
+    },
+    "action--80000000-0000-4000-8000-000000000007": {
+      "type": "action",
+      "name": "notify inventory owner",
+      "description": "TODO (CORE): owner-notification primitive. The action body delivers the evidence reference to the inventory owner along the operator's pre-bound channel (ticketing system, chat thread, asset-management board). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an evidence record written but never delivered to the owner is itself an asset-management-discipline gap. The notification carries the classified delta breakdown so an unmanaged-discovered cardinality above the operator's documented threshold pages with appropriate urgency for the next asset-management lever (decommission, claim ownership, attach to a documented baseline). SKELETON pins the topology + ID; the deterministic delivery shape is owned by CORE-PRIM.",
+      "on_completion": "end--80000000-0000-4000-8000-000000000008",
+      "in_args": [
+        "__evidence_id__",
+        "__delta_classification__"
+      ],
+      "x_secops_ng": {
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kri.control_effectiveness@v1"
+        ]
+      }
+    },
+    "end--80000000-0000-4000-8000-000000000008": {
+      "type": "end",
+      "name": "asset_management_end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.asset_management@v1",
+    "content_version": "0.1.0",
+    "maturity": "experimental",
+    "compile_targets": [
+      "n8n",
+      "temporal",
+      "langgraph"
+    ],
+    "control_refs": [
+      "control.asset_inventory_delta@v1"
+    ],
+    "telemetry_refs": [
+      "telemetry.ocsf.api_activity@v1"
+    ],
+    "metric_refs": [
+      "kri.control_effectiveness@v1"
+    ],
+    "sources": [
+      "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
+      "NIS2 Directive (EU) 2022/2555, Article 21(2)(i) — human resources security, access-control policies, and asset management",
+      "ENISA — Good practices on asset management for essential and important entities",
+      "OCSF — API Activity (6003) event class"
+    ]
+  }
+}

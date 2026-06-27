@@ -1,0 +1,247 @@
+# Cross-references for the asset_management playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, OCSF event classes consumed/emitted, and the EU
+# regulatory clauses this playbook helps operationalise. Inbound
+# references live in content/mappings/{nis2,dora,cra}/ so the graph is
+# closed in both directions.
+#
+# This playbook operationalises the asset and configuration management
+# capability against the operator's own deployed estate: ingest the
+# documented inventory-source set on a scheduled cadence (CMDB,
+# declarative infrastructure-as-code records, cloud-provider asset
+# APIs, endpoint-management agents), reconcile them into the operator-
+# authoritative snapshot for the current window, compute the per-asset
+# delta against the previous documented snapshot, classify each delta
+# against the operator's documented delta taxonomy (new-managed,
+# unmanaged-discovered, decommissioned, baseline-drift), capture the
+# dated asset-inventory-delta evidence record, and notify the
+# inventory owner. The playbook does not author the operator's
+# inventory-source architecture itself; it operationalises a
+# documented reconciliation posture against pre-bound sources.
+#
+# Status: SKELETON. Only the NIS2 Art. 21(2)(i) asset-management
+# anchor is pinned here. CORE-layer cards add the D3FEND defensive-
+# technique bindings (D3-AI Asset Inventory on the reconcile step,
+# D3-SWI Software Inventory on the ingest step, candidate D3-SYSCONFIG
+# / D3-BCA on the baseline-drift classification slice) once stable
+# upstream rule ids are selected together with the deterministic
+# per-step primitives; EXTEND-layer cards wire the asset-inventory-
+# drift and unmanaged-asset-cardinality metric emitters against the
+# operator's evidence store. The SKELETON overlay does NOT pre-author
+# a DORA or CRA outbound entry: DORA Art. 8 (identification function
+# — asset / configuration register) and CRA Annex I §1(c) / §1(e)
+# (manufacturer obligations for components and configurations
+# delivered with a product) are defensible upstream anchors for
+# asset_management, but no DORA or CRA inbound entry currently
+# backlinks playbook.asset_management@v1, and the SKELETON refuses to
+# silently widen scope; gap notes are separate cards, not scope creep
+# on a single-purpose SKELETON PR. The orphan-CI grace-window closure
+# for this playbook is audited as a skip entry under
+# content/mappings/dora/_orphan_skip.yaml and
+# content/mappings/cra/_orphan_skip.yaml. Mirrors the patch_management
+# and ddos_response SKELETON precedents (single inbound regulatory
+# anchor on the NIS2 axis, deferred DORA / CRA inbound-closure cards).
+#
+# Deliberate OSCAL omissions:
+#   - CM-2 (Baseline Configuration) is NOT pinned at the SKELETON
+#     layer: baseline-drift detection is one of the four delta-
+#     taxonomy buckets but the baseline-authoring surface itself
+#     lives on the operator's configuration-management documentation
+#     upstream of this playbook. CORE-PRIM cards may extend the
+#     OSCAL block with CM-2 once the baseline-drift classification
+#     primitive lands together with its deterministic body, so the
+#     mapping reflects the playbook's actual discharge rather than
+#     a forward-looking pin.
+#   - CM-3 (Configuration Change Control) is NOT pinned: this
+#     playbook operationalises the per-window reconciliation slice
+#     (ingest-reconcile-delta-classify), not the operator's standing
+#     change-management process. CM-3 anchors the operator's
+#     change-control authoring surface, which lives in governance
+#     documentation; pinning CM-3 here would conflate the per-window
+#     reconciliation discipline with the change-control plan-
+#     authoring surface. Mirrors the patch_management CM-3 omission
+#     gap note.
+#   - AU-2 (Event Logging) is NOT pinned: the playbook emits OCSF
+#     records, but the operator's audit-event policy is upstream of
+#     this playbook.
+#
+# GDPR closure: a per-workflow Records of Processing Activity entry
+# accompanies this overlay at
+# content/mappings/gdpr/data-flow-asset_management.md. The workflow
+# operates on asset identifiers, inventory-source identifiers,
+# snapshot identifiers, delta identifiers, configuration-baseline
+# observations, and attestation records; no personal data is
+# processed.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.asset_management@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the ingest-inventory-
+  # sources, reconcile-authoritative-inventory, compute-delta,
+  # classify-delta, capture-evidence, and notify-inventory-owner
+  # steps. The single SKELETON pin anchors the playbook end-to-end
+  # against CM-8 / CM-8(2); CM-2 (baseline configuration) is held
+  # back to the CORE layer where the baseline-drift primitive lands
+  # together with its deterministic body (see header gap note).
+  - id: control.asset_inventory_delta@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CM-8
+    title: System Component Inventory
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CM-8
+    notes: >-
+      Anchors the playbook end-to-end as the system-component-
+      inventory capability: develop and document an inventory of
+      system components that accurately reflects the system,
+      includes all components within the authorization boundary,
+      and is at the level of granularity deemed necessary for
+      tracking and reporting. The ingest-reconcile-delta-classify
+      shape composes the operator-authoritative snapshot for the
+      current window and surfaces the per-asset delta against the
+      previous documented snapshot; the capture-evidence step
+      closes the loop with a dated asset-inventory-delta evidence
+      record.
+
+  - id: control.asset_inventory_delta@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CM-8(2)
+    title: Automated Maintenance
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CM-8
+    notes: >-
+      Covers the reconcile-authoritative-inventory and compute-
+      delta steps: CM-8(2) demands automated mechanisms to help
+      maintain an up-to-date, complete, accurate, and readily
+      available inventory of system components. The deterministic
+      snapshot-id derivation and the per-asset delta normalisation
+      (owned by CORE-PRIM) are the mechanical evidence trail
+      CM-8(2) reviewers consume; the dated evidence record produced
+      by the capture-evidence step is the audit-evident output.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # SKELETON layer pins no D3FEND techniques: the inventory-ingest /
+  # reconciliation / delta-classification disciplines map onto
+  # D3FEND techniques (Asset Inventory D3-AI on the reconcile step,
+  # Software Inventory D3-SWI on the ingest step, variants of
+  # System Configuration / Baseline-Configuration-Authority on the
+  # baseline-drift classification slice) but stable per-step pins
+  # depend on the deterministic primitives selected by the CORE-
+  # layer cards. A SKELETON overlay does not pre-author D3FEND
+  # pins ahead of the primitives they will anchor; the CORE-PRIM
+  # card adds the pins together with the deterministic bodies so
+  # the d3fend block lands closed rather than stub-shaped. Mirrors
+  # the patch_management and ddos_response SKELETON empty-block
+  # convention. The control file
+  # content/controls/control.asset_inventory_delta@v1.yaml already
+  # carries the D3-AI and D3-SWI pins on the control-side overlay;
+  # the per-step lift onto this mapping lands with the CORE bindings.
+  []
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. The ingest-inventory-sources,
+  # reconcile-authoritative-inventory, compute-delta, classify-
+  # delta, capture-evidence, and notify-inventory-owner steps
+  # interact with operator API surfaces (CMDB endpoints, IaC state
+  # backends, cloud-provider asset APIs, endpoint-management agent
+  # control planes, evidence store, notification channel). Richer
+  # per-step telemetry bindings (e.g. OCSF Inventory Info for the
+  # reconciled snapshot, OCSF Configuration State for the baseline-
+  # drift slice) are deferred to CORE-layer cards once stable
+  # upstream signal shapes are selected.
+  - id: telemetry.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: both
+    notes: >-
+      Consumed at the ingest-inventory-sources step (reads against
+      the operator's documented inventory-source set: CMDB,
+      declarative IaC state backend, cloud-provider asset APIs,
+      endpoint-management agent control plane) and at the
+      reconcile-authoritative-inventory / compute-delta / classify-
+      delta steps (read calls against the previous documented
+      snapshot and the operator's documented delta-taxonomy
+      reference). Emitted at the capture-evidence step (write call
+      publishing the dated asset-inventory-delta evidence record
+      to the operator's evidence store) and at the notify-
+      inventory-owner step (delivery dispatch to the inventory
+      owner's pre-bound channel). Schema:
+      https://schema.ocsf.io/1.3.0/classes/api_activity
+
+nis2:
+  # Inbound entry that backlinks playbook.asset_management@v1:
+  #   - content/mappings/nis2/article-21-2-i.yaml
+  #     (id nis2:art-21-2-i — human resources security, access-
+  #     control policies, and asset management)
+  # Pinned outbound below to close the graph. The matching
+  # `playbook_refs:` addition on the NIS2 side lands in this same
+  # SKELETON PR so the orphan-CI graph closes on the NIS2 axis
+  # without a skip entry.
+  - mapping_id: nis2:art-21-2-i
+    article: 21(2)(i)
+    notes: >-
+      NIS2 Art. 21(2)(i) requires essential and important entities
+      to apply asset-management measures alongside HR-security and
+      access-control measures. The asset_management playbook is
+      the operational discharge of the asset-management limb
+      against the operator's own deployed estate — the case set
+      currently leans on iam_auditor, onboarding_offboarding_tracker,
+      cloud_misconfiguration, and identity_compromise for the HR-
+      security and access-control limbs of the same clause; none
+      of those carries the per-window inventory reconciliation and
+      delta-capture discipline against the operator's documented
+      asset sources. The ingest-inventory-sources and reconcile-
+      authoritative-inventory steps cover the inventory-source
+      reconciliation slice; the compute-delta and classify-delta
+      steps cover the per-asset delta surfacing against the
+      operator's documented delta taxonomy; the capture-evidence
+      step closes the loop with audit-evident observation of the
+      reconciliation outcome across the reconciliation window.
+
+dora:
+  # No DORA inbound entry currently backlinks
+  # playbook.asset_management@v1. DORA Art. 8 (identification
+  # function — asset / configuration register, exercised under the
+  # JC RTS on ICT risk management framework — Commission Delegated
+  # Regulation (EU) 2024/1774) is the upstream obligation
+  # asset_management most directly operationalises, but Art. 8's
+  # operational discharge is broader than the per-window
+  # reconciliation this playbook owns (asset-classification and
+  # information-system-mapping disciplines extend beyond inventory
+  # delta-capture into criticality assessment and dependency
+  # mapping). The SKELETON overlay does NOT silently widen scope
+  # to pin an outbound DORA entry against a missing inbound; a
+  # separate inbound-closure card adds the inbound Art. 8 anchor
+  # against the asset / configuration register surface and the
+  # outbound pin lands together with it. Mirrors the patch_management
+  # DORA Art. 9 and ddos_response DORA Art. 11 gap-note precedents:
+  # gap notes are separate cards, not scope creep on a single-
+  # purpose SKELETON PR. The orphan-CI grace-window closure for
+  # this playbook is audited as a skip entry under
+  # content/mappings/dora/_orphan_skip.yaml (slug asset_management).
+  []
+
+cra:
+  # No CRA inbound entry currently backlinks
+  # playbook.asset_management@v1. CRA Annex I §1 essential
+  # cybersecurity requirements (in particular §1(c) on default
+  # secure configurations and §1(e) on protection from
+  # unauthorised access) are defensible upstream anchors for the
+  # asset-management discharge against manufacturer-side
+  # configuration and component visibility, but the CRA's per-
+  # product manufacturer scope is narrower than the operator-side
+  # estate-wide reconciliation this playbook owns. The SKELETON
+  # overlay does NOT pre-author the inbound entry: gap notes are
+  # separate cards, not scope creep on a single-purpose SKELETON
+  # PR. A future inbound-closure card adds the CRA Annex I
+  # anchor (if the manufacturer-vs-operator scope difference is
+  # resolved in scope-mapping review) and the outbound pin lands
+  # together with it. Mirrors the patch_management and
+  # ddos_response CRA gap-note precedents. The orphan-CI grace-
+  # window closure for this playbook is audited as a skip entry
+  # under content/mappings/cra/_orphan_skip.yaml (slug
+  # asset_management).
+  []
