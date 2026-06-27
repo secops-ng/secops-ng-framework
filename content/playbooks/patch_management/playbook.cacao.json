@@ -97,6 +97,9 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kri.cvd_intake_aging@v1"
         ]
       }
     },
@@ -118,6 +121,9 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kri.cvd_intake_aging@v1"
         ]
       }
     },
@@ -140,13 +146,16 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kpi.patch_disseminated_on_time@v1"
         ]
       }
     },
     "action--70000000-0000-4000-8000-000000000005": {
       "type": "action",
       "name": "validate canary",
-      "description": "Observe the canary ring against the operator's documented health gates after the staged rollout: functional probes green, error-rate / latency deviation inside the documented thresholds, rollback path verified for the documented validation window. Reads __update_subject__ and __staged_ring_id__; sets __canary_healthy__. A false outcome does not block downstream steps — the evidence-capture record is published with the failure marker, the fan-out step is skipped, and the notify step pages the maintenance owner with the full context so the next maintenance lever (rollback the canary, escalate the advisory, hold the broad rollout) can be engaged. Time-to-patch and patch-coverage metric emitters that read this step are owned by a sibling EXTEND card; this step intentionally does not pin a step-level metric_ref until that catalogue entry lands.",
+      "description": "Observe the canary ring against the operator's documented health gates after the staged rollout: functional probes green, error-rate / latency deviation inside the documented thresholds, rollback path verified for the documented validation window. Reads __update_subject__ and __staged_ring_id__; sets __canary_healthy__. A false outcome does not block downstream steps — the evidence-capture record is published with the failure marker, the fan-out step is skipped, and the notify step pages the maintenance owner with the full context so the next maintenance lever (rollback the canary, escalate the advisory, hold the broad rollout) can be engaged. The mean-time-to-containment KPI (kpi.mttr_containment@v1) reads this step's __canary_healthy__ observation alongside the evidence-capture timestamp to measure validation-window discharge.",
       "on_completion": "action--70000000-0000-4000-8000-000000000006",
       "in_args": [
         "__update_subject__",
@@ -161,6 +170,9 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kpi.mttr_containment@v1"
         ]
       }
     },
@@ -184,6 +196,9 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kpi.patch_disseminated_on_time@v1"
         ]
       }
     },
@@ -209,6 +224,9 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kri.control_effectiveness@v1"
         ]
       }
     },
@@ -225,6 +243,9 @@
       "x_secops_ng": {
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kri.control_effectiveness@v1"
         ]
       }
     },
@@ -247,6 +268,12 @@
     ],
     "telemetry_refs": [
       "telemetry.ocsf.api_activity@v1"
+    ],
+    "metric_refs": [
+      "kri.cvd_intake_aging@v1",
+      "kpi.patch_disseminated_on_time@v1",
+      "kpi.mttr_containment@v1",
+      "kri.control_effectiveness@v1"
     ],
     "sources": [
       "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",

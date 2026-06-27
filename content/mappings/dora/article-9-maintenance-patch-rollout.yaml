@@ -1,0 +1,102 @@
+# DORA — Article 9 (Protection and prevention), per-event maintenance /
+# patch-rollout discharge slice.
+# Companion to article-9-and-rts-vuln-mgmt.yaml, which carries the
+# Art. 9(4)(a) vulnerability-and-patch-management procedures anchor on
+# the inbound CVD intake and codebase-side vulnerability-handling
+# disciplines (dora:art-9-vuln-mgmt). This file covers the distinct
+# per-event maintenance / patch-rollout obligation expressed in DORA
+# Art. 9 as operationalised by the JC RTS on ICT risk management
+# framework (Commission Delegated Regulation (EU) 2024/1774) Article 10
+# (Vulnerability and patch management procedures) — the staged
+# detect-classify-stage-validate-fan-out discharge of a security
+# update against the operator's deployed estate.
+#
+# Authored as a distinct entry rather than overloaded onto
+# dora:art-9-vuln-mgmt because the two slices discharge independent
+# operational disciplines — the vulnerability-and-patch-management
+# anchor operationalises the inbound vulnerability-handling lifecycle
+# (CVD intake, codebase SBOM scanning, advisory monitoring, prioritised
+# remediation tracking), while this per-event maintenance / patch-
+# rollout slice operationalises the staged rollout of a security
+# update against the operator's already-bound deployment-ring topology
+# under the documented maintenance discipline. Keeping the inbound
+# graph atom-per-obligation preserves the same shape DORA Art. 9
+# carries across article-9-access-management, article-9-crypto, and
+# article-9-4-b-authentication, and the same shape DORA Art. 11
+# carries across article-11.yaml (response-and-recovery anchor) and
+# article-11-availability-response.yaml (per-vector availability-
+# response slice). Mirrors the F-WF-DOS CORE precedent.
+regime: dora
+entries:
+  - id: dora:art-9-maintenance-patch-rollout
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "9(4)(a)"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Operate the maintenance / patch-management discipline against
+      the operator's deployed estate as part of the protection-and-
+      prevention surface: detect that a security update is available
+      against a tracked package / image / firmware line, classify
+      against the documented patch-criticality taxonomy, stage the
+      rollout against the documented deployment-ring topology (test
+      → canary → broad), validate the canary ring against the
+      documented health gates for the documented validation window,
+      fan out to the remaining rings on a green canary, and capture
+      the dated patch-application evidence record. Level 2 detail is
+      in Commission Delegated Regulation (EU) 2024/1774 Article 10
+      (Vulnerability and patch management procedures), including
+      testing and rollback.
+    status: draft
+    control_refs:
+      - control.patch_evidence@v1
+    playbook_refs:
+      - playbook.patch_management@v1
+    metric_refs:
+      - kpi.patch_disseminated_on_time@v1
+      - kri.control_effectiveness@v1
+    notes: >-
+      Level 1 anchor is DORA Art. 9(4)(a) (information security
+      policy, protection-and-prevention surface) on the per-event
+      maintenance / patch-rollout slice; the operative detail is in
+      the Level 2 RTS — Commission Delegated Regulation
+      (EU) 2024/1774 (JC RTS on ICT risk management framework)
+      Article 10 (Vulnerability and patch management procedures).
+      This file follows the inline-cite convention used by
+      article-9-and-rts-vuln-mgmt.yaml. The patch_management
+      playbook is the per-event materialisation of that obligation's
+      detect-classify-stage-validate-fan-out discharge against the
+      operator's deployed estate: the detect-patch-availability and
+      classify-patch-criticality steps cover the advisory-intake and
+      triage slice; the stage-rollout-to-canary-ring and validate-
+      canary steps cover the staged-engagement slice against the
+      operator's documented ring topology; the fan-out-to-broad-
+      rings step covers the broad-engagement slice on a green canary;
+      the evidence-capture step closes the loop with audit-evident
+      observation of the patch application across the validation
+      window. This entry is the per-event maintenance / patch-rollout
+      counterpart to the vulnerability-handling anchor expressed in
+      article-9-and-rts-vuln-mgmt.yaml (dora:art-9-vuln-mgmt); both
+      anchor on the same Art. 9(4)(a) protection-and-prevention
+      surface and the same JC RTS Art. 10 Level 2 detail, but
+      discharge independent operational disciplines (inbound
+      vulnerability-handling lifecycle vs. per-event maintenance /
+      patch-rollout) and are mapped separately to keep the inbound
+      graph atom-per-obligation. The kpi.patch_disseminated_on_time@v1
+      KPI trips on dissemination-SLA regressions across the staged
+      rollout; the kri.control_effectiveness@v1 KRI trips on
+      attestation-state regressions on the control.patch_evidence@v1
+      control which anchors the patch-management capability end-to-
+      end. Overlaps NIS2 Art. 21(2)(e) (security in acquisition,
+      development, and maintenance — the maintenance limb) and CRA
+      Annex I §2 (vulnerability handling / security updates — the
+      rollout limb); the same playbook.patch_management@v1 is
+      referenced from mappings/nis2/article-21-2-e.yaml. CRA closure
+      is deferred to a separate inbound-closure card under
+      content/mappings/cra/ — the CRA orphan_skip entry for this
+      playbook is left in place pending that work. The outbound dora:
+      entry on the playbook overlay at
+      content/playbooks/patch_management/mappings.yaml is the
+      structural closure of this backlink.

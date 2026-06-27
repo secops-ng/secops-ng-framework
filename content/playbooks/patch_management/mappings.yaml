@@ -21,25 +21,102 @@
 # posture against an already-provisioned update channel and ring
 # topology.
 #
-# Status: SKELETON. Only the NIS2 Art. 21(2)(e) maintenance anchor
-# is pinned here. CORE-layer cards add the D3FEND detection bindings
-# (canary-health / rollback-readiness signals) once stable upstream
-# rule ids are selected; EXTEND-layer cards wire the time-to-patch
-# and patch-coverage metric emitters against the operator's evidence
-# store. The SKELETON overlay does NOT pre-author a DORA or CRA
-# outbound entry: DORA Art. 9 ICT-risk-management framework
-# (operations and maintenance disciplines) and CRA Annex I §2
-# vulnerability-handling / security-update obligations are both
-# defensible upstream anchors for patch_management, but no DORA or
-# CRA inbound entry currently backlinks
-# playbook.patch_management@v1, and the SKELETON refuses to silently
-# widen scope; gap notes are separate cards, not scope creep on a
-# single-purpose SKELETON PR. The orphan-CI grace-window closure for
-# this playbook is audited as a skip entry under
-# content/mappings/dora/_orphan_skip.yaml and
-# content/mappings/cra/_orphan_skip.yaml. Mirrors the ddos_response
-# SKELETON precedent (single inbound regulatory anchor on the NIS2
-# axis, deferred DORA / CRA inbound-closure cards).
+# Status: CORE. The SKELETON overlay anchored the regulatory and
+# control surface (NIS2 Art. 21(2)(e) inbound + OSCAL SI-2 / SI-2(2));
+# this CORE layer adds the D3FEND defensive-technique bindings for
+# the detect-patch-availability, classify-patch-criticality, stage-
+# rollout-to-canary-ring, and fan-out-to-broad-rings steps, lifts
+# per-step metric_refs onto the CACAO artifact, and closes the DORA
+# mapping graph (inbound at content/mappings/dora/article-9-
+# maintenance-patch-rollout.yaml + outbound here). EXTEND-layer cards
+# wire the per-target compiler emissions (n8n / Temporal / LangGraph
+# goldens) once the CORE bindings land. CRA closure is deferred to a
+# separate inbound-closure card under content/mappings/cra/ — the
+# CRA orphan_skip entry for this playbook is left in place pending
+# that work.
+#
+# D3FEND closure (per-step rationale):
+#   - detect-patch-availability is pinned to D3-OAM (Operational
+#     Activity Mapping): receiving operational vulnerability /
+#     advisory data from an external coordinated-disclosure or
+#     vendor-feed channel to inform defensive activity is the
+#     operational-activity-mapping discipline D3-OAM names.
+#     Mirrors the vuln_intake intake-step anchor on D3-OAM (which
+#     intakes the same advisory class on the inbound coordinated-
+#     disclosure surface) — same technique, maintenance-rollout
+#     scope rather than vulnerability-handling-lifecycle scope.
+#     Read-only: the playbook records the advisory observation
+#     against the documented deployment-inventory row, it does not
+#     author the operator's advisory-intake surface.
+#   - classify-patch-criticality is pinned to D3-SYSVA (System
+#     Vulnerability Assessment): CVSS / EPSS / exploit-status
+#     enrichment of the advisory against the operator's documented
+#     patch-criticality taxonomy is the system-vulnerability-
+#     assessment discipline D3-SYSVA names. Mirrors the vuln_intake
+#     triage-step anchor on D3-SYSVA (severity scoring on the
+#     inbound coordinated-disclosure side) — same technique, here
+#     applied to the patch-rollout cadence decision (security-
+#     critical / security-routine / feature-only) rather than the
+#     vulnerability-handling-lifecycle severity band.
+#   - stage-rollout-to-canary-ring is pinned to D3-SU (Software
+#     Update): engaging the update against the operator's pre-bound
+#     canary cohort via the documented distribution channel is the
+#     software-update discipline D3-SU names. Mirrors the
+#     vuln_intake per-severity-response anchor on D3-SU and the
+#     control.patch_evidence@v1 control file's D3-SU pin — same
+#     technique, here narrowed to the staged-engagement slice
+#     against the operator's documented ring topology rather than
+#     the per-severity dissemination cadence.
+#   - fan-out-to-broad-rings is pinned to D3-SU (Software Update):
+#     engaging the update against the remaining rings of the
+#     operator's documented deployment-ring topology on a green
+#     canary is the same software-update discipline applied to the
+#     broad-engagement slice. The Software-Update anchor is shared
+#     with the stage-rollout-to-canary-ring step because both
+#     halves of the rollout discharge the same D3-SU technique
+#     against the same documented distribution channel, separated
+#     only by the validate-canary gate that conditions the broad
+#     engagement.
+#   - validate-canary is deliberately NOT pinned. The functional-
+#     probe / error-rate / latency / rollback-readiness
+#     observation against the documented validation window reads
+#     the operator's documented canary-health endpoints; the
+#     health-gate signal shapes (synthetic probes, application
+#     metrics, rollback-readiness attestation) are the operator's
+#     upstream rather than a single D3FEND technique this playbook
+#     discharges — synthetic probes lean toward D3-NTA (Network
+#     Traffic Analysis) but the same gate also reads application-
+#     side error-rate / latency series and rollback-readiness
+#     attestation, neither of which is the network-traffic-analysis
+#     discipline D3-NTA names. Pinning a single D3FEND tag would
+#     misrepresent the validation surface. Mirrors the
+#     ddos_response engage-mitigation gap-note precedent of
+#     refusing a forced pin on a surface this playbook engages
+#     against an operator-bound binding rather than authors.
+#   - evidence-capture is deliberately NOT pinned. Per-execution
+#     artifact emission of the dated patch-application evidence
+#     record for downstream audit consumption is an evidence-stream
+#     emission discipline, not a runtime countermeasure or a
+#     detection step, and forcing it onto a D3FEND tag would
+#     misrepresent the technique. This step is anchored on the
+#     SI-2(2) OSCAL control above. Mirrors the ddos_response /
+#     mfa_secured_comms / crypto_posture_management / backup_recovery
+#     / cyber_hygiene_training evidence-capture gap notes.
+#   - notify-maintenance-owner is deliberately NOT pinned.
+#     Delivery of the evidence reference to the maintenance owner
+#     along the operator's pre-bound channel is a notification
+#     discipline, not a defensive technique. Mirrors the
+#     ddos_response notify-incident-management-owner,
+#     mfa_secured_comms notify-authentication-owner,
+#     crypto_posture_management notify-crypto-owner, and
+#     backup_recovery notify-continuity-owner gap notes.
+# Detection bindings for individual canary-engagement / broad-fan-out
+# / rollback-readiness upstream rule fingerprints are consumed via
+# the existing OCSF API Activity (6003) telemetry binding rather
+# than authored as Sigma references on this overlay; the operator's
+# posture-management layer is the upstream of those signal shapes,
+# and no stable Sigma rule ids are pinned on this overlay (the
+# operator owns those fingerprints).
 #
 # Deliberate OSCAL omissions:
 #   - CM-3 (Configuration Change Control) is NOT pinned: this
@@ -109,19 +186,139 @@ oscal:
 
 d3fend:
   # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
-  # SKELETON layer pins no D3FEND techniques: the canary-engagement
-  # / broad-fan-out / rollback-readiness disciplines map onto D3FEND
-  # techniques (Software Update D3-SU on the engagement side, and
-  # variants of System Configuration Permissions D3-SCP / Network
-  # Traffic Analysis D3-NTA on the canary-health-validation side)
-  # but stable per-step pins depend on the upstream rule ids
-  # selected by the CORE-layer cards. A SKELETON overlay does not
-  # pre-author D3FEND pins ahead of the detection bindings they
-  # will anchor; the CORE-layer card adds the pins together with
-  # the rule ids so the d3fend block lands closed rather than
-  # stub-shaped. Mirrors the ddos_response SKELETON empty-block
-  # convention.
-  []
+  # CACAO step UUIDs are pinned to the real action UUIDs resolved
+  # from content/playbooks/patch_management/playbook.cacao.json
+  # (seven action bodies: detect-patch-availability, classify-patch-
+  # criticality, stage-rollout-to-canary-ring, validate-canary,
+  # fan-out-to-broad-rings, evidence-capture, notify-maintenance-
+  # owner). Four steps carry per-step D3FEND pins: D3-OAM on the
+  # detect step, D3-SYSVA on the classify step, and D3-SU on both
+  # the stage-rollout-to-canary-ring and fan-out-to-broad-rings
+  # steps. The validate-canary, evidence-capture, and notify-
+  # maintenance-owner steps are deliberately not pinned and the
+  # gaps are documented in the header above and in comments below
+  # (mirroring the ddos_response runtime-enforcement / emission /
+  # delivery gap-note precedents).
+  - step: action--70000000-0000-4000-8000-000000000002
+    d3fend_id: D3-OAM
+    d3fend_name: Operational Activity Mapping
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    notes: >-
+      detect-patch-availability — receiving operational
+      vulnerability / advisory data from an external coordinated-
+      disclosure or vendor-feed channel against __update_subject__
+      to inform defensive activity (the maintenance-rollout
+      discharge) is the operational-activity-mapping discipline
+      D3-OAM names. Mirrors the vuln_intake intake-step anchor on
+      D3-OAM, which intakes the same advisory class on the inbound
+      coordinated-disclosure surface; same technique, here narrowed
+      to the maintenance-rollout scope rather than the
+      vulnerability-handling-lifecycle scope. Read-only: the
+      playbook records the advisory observation against the
+      documented deployment-inventory row, it does not author the
+      operator's advisory-intake surface. Detection bindings for
+      individual advisory-intake upstream rule fingerprints are
+      consumed via the API Activity (6003) telemetry binding below
+      rather than authored as Sigma references on this overlay; the
+      operator's advisory-intake layer is the upstream of those
+      signal shapes.
+
+  - step: action--70000000-0000-4000-8000-000000000003
+    d3fend_id: D3-SYSVA
+    d3fend_name: System Vulnerability Assessment
+    url: https://d3fend.mitre.org/technique/d3f:SystemVulnerabilityAssessment/
+    notes: >-
+      classify-patch-criticality — CVSS / EPSS / exploit-status
+      enrichment of the advisory against the operator's documented
+      patch-criticality taxonomy (security-critical, security-
+      routine, feature-only) is the system-vulnerability-assessment
+      discipline D3-SYSVA names. Mirrors the vuln_intake triage-
+      step anchor on D3-SYSVA, which scores the same advisory
+      class on the inbound coordinated-disclosure side; same
+      technique, here applied to the patch-rollout cadence
+      decision against the operator's deployed estate rather than
+      the vulnerability-handling-lifecycle severity band. The
+      classification record (__patch_criticality__) is the audit-
+      evident output of the assessment pass and conditions the
+      rollout cadence selected at the stage-rollout-to-canary-ring
+      step.
+
+  - step: action--70000000-0000-4000-8000-000000000004
+    d3fend_id: D3-SU
+    d3fend_name: Software Update
+    url: https://d3fend.mitre.org/technique/d3f:SoftwareUpdate/
+    notes: >-
+      stage-rollout-to-canary-ring — engaging the update against
+      the operator's pre-bound canary cohort via the documented
+      distribution channel (package mirror, image registry,
+      firmware-distribution surface) is the software-update
+      discipline D3-SU names. Mirrors the vuln_intake per-severity-
+      response anchor on D3-SU and the control.patch_evidence@v1
+      control file's D3-SU pin; same technique, here narrowed to
+      the staged-engagement slice against the operator's documented
+      ring topology rather than the per-severity dissemination
+      cadence. The staged ring identifier (__staged_ring_id__) is
+      the durable artefact of the staged-engagement slice and is
+      consumed by the validate-canary and evidence-capture steps.
+
+  - step: action--70000000-0000-4000-8000-000000000006
+    d3fend_id: D3-SU
+    d3fend_name: Software Update
+    url: https://d3fend.mitre.org/technique/d3f:SoftwareUpdate/
+    notes: >-
+      fan-out-to-broad-rings — engaging the update against the
+      remaining rings of the operator's documented deployment-ring
+      topology on a green canary is the same software-update
+      discipline applied to the broad-engagement slice. The D3-SU
+      anchor is shared with the stage-rollout-to-canary-ring step
+      because both halves of the rollout discharge the same
+      software-update technique against the same documented
+      distribution channel, separated only by the validate-canary
+      gate that conditions the broad engagement. On an unhealthy
+      canary the step is skipped and __broad_rollout_id__ is left
+      empty; the evidence-capture step still publishes the dated
+      record with the skip marker so the audit-evident chain is
+      closed without forcing the broad rollout against a failing
+      canary.
+
+  # validate-canary (action--70000000-0000-4000-8000-000000000005)
+  # is deliberately NOT pinned. The functional-probe / error-rate /
+  # latency / rollback-readiness observation against the documented
+  # validation window reads the operator's documented canary-health
+  # endpoints; the health-gate signal shapes (synthetic probes,
+  # application metrics, rollback-readiness attestation) are the
+  # operator's upstream rather than a single D3FEND technique this
+  # playbook discharges — synthetic probes lean toward D3-NTA
+  # (Network Traffic Analysis) but the same gate also reads
+  # application-side error-rate / latency series and rollback-
+  # readiness attestation, neither of which is the network-traffic-
+  # analysis discipline D3-NTA names. Pinning a single D3FEND tag
+  # would misrepresent the validation surface. Mirrors the
+  # ddos_response engage-mitigation gap-note precedent of refusing
+  # a forced pin on a surface this playbook engages against an
+  # operator-bound binding rather than authors.
+  #
+  # evidence-capture (action--70000000-0000-4000-8000-000000000007)
+  # is deliberately NOT pinned. Per-execution artifact emission of
+  # the dated patch-application evidence record for downstream
+  # audit consumption is an evidence-stream emission discipline,
+  # not a runtime countermeasure or a detection step, and forcing
+  # it onto a D3FEND tag would misrepresent the technique. This
+  # step is anchored on the SI-2(2) OSCAL control above. Mirrors
+  # the ddos_response evidence-capture and the mfa_secured_comms /
+  # crypto_posture_management / backup_recovery /
+  # cyber_hygiene_training evidence-emission gap notes.
+  #
+  # notify-maintenance-owner
+  # (action--70000000-0000-4000-8000-000000000008) is deliberately
+  # NOT pinned. Delivery of the evidence reference to the
+  # maintenance owner along the operator's pre-bound channel
+  # (ticketing system, chat thread, change-management board) is a
+  # notification discipline, not a defensive technique. Mirrors the
+  # ddos_response notify-incident-management-owner,
+  # mfa_secured_comms notify-authentication-owner,
+  # crypto_posture_management notify-crypto-owner, and
+  # backup_recovery notify-continuity-owner gap notes.
 
 ocsf:
   # OCSF v1.3.0 telemetry bindings. The detect-patch-availability,
@@ -194,26 +391,42 @@ nis2:
       window.
 
 dora:
-  # No DORA inbound entry currently backlinks
-  # playbook.patch_management@v1. DORA Art. 9 ICT-risk-management
-  # framework (operations and maintenance disciplines, exercised
-  # under the JC RTS on ICT risk management framework — Commission
-  # Delegated Regulation (EU) 2024/1774) is the upstream obligation
-  # patch_management operationalises, but Art. 9's operational
-  # discharge is broader than the per-update rollout this playbook
-  # owns (operations-management and change-management disciplines
-  # extend beyond patch lifecycle into capacity, configuration,
-  # and incident-response surfaces). The SKELETON overlay does NOT
-  # silently widen scope to pin an outbound DORA entry against a
-  # missing inbound; a separate inbound-closure card adds the
-  # inbound Art. 9 anchor against the maintenance / patch-rollout
-  # surface and the outbound pin lands together with it. Mirrors
-  # the ddos_response DORA Art. 11 gap-note precedent: gap notes
-  # are separate cards, not scope creep on a single-purpose
-  # SKELETON PR. The orphan-CI grace-window closure for this
-  # playbook is audited as a skip entry under
-  # content/mappings/dora/_orphan_skip.yaml (slug patch_management).
-  []
+  # Inbound entry that backlinks playbook.patch_management@v1:
+  #   - content/mappings/dora/article-9-maintenance-patch-rollout.yaml
+  #     (id dora:art-9-maintenance-patch-rollout — DORA Art. 9(4)(a)
+  #     per-event maintenance / patch-rollout slice; companion to
+  #     article-9-and-rts-vuln-mgmt.yaml's vulnerability-handling
+  #     anchor at dora:art-9-vuln-mgmt)
+  # Pinned outbound below to close the graph. The orphan-CI skip
+  # entry for patch_management under
+  # content/mappings/dora/_orphan_skip.yaml is removed in this same
+  # CORE PR — the grace-window skip is no longer needed once the
+  # real edge lands.
+  - mapping_id: dora:art-9-maintenance-patch-rollout
+    article: "9(4)(a)"
+    notes: >-
+      DORA Art. 9(4)(a) requires financial entities to operate the
+      protection-and-prevention surface of their ICT risk management
+      framework against the operator's deployed estate; the operative
+      detail is in the Level 2 RTS (Commission Delegated Regulation
+      (EU) 2024/1774, JC RTS on ICT risk management framework)
+      Article 10 (Vulnerability and patch management procedures),
+      including testing and rollback. The patch_management playbook
+      is the per-event materialisation of the maintenance / patch-
+      rollout slice of that obligation against the operator's
+      deployed estate: detect-classify-stage-validate-fan-out against
+      the documented ring topology with a dated patch-application
+      evidence record. This outbound entry is the structural closure
+      of the dora:art-9-maintenance-patch-rollout backlink and is
+      the per-event maintenance / patch-rollout companion to
+      dora:art-9-vuln-mgmt (vulnerability-handling lifecycle anchor
+      on the inbound CVD-intake and codebase-side surfaces); both
+      anchor on the same Art. 9(4)(a) surface and JC RTS Art. 10
+      Level 2 detail but discharge independent operational
+      disciplines and are mapped separately to keep the inbound
+      graph atom-per-obligation. Mirrors the F-WF-DOS CORE precedent
+      of authoring a distinct per-event slice rather than
+      overloading an existing entry.
 
 cra:
   # No CRA inbound entry currently backlinks
