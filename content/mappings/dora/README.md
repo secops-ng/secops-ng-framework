@@ -49,7 +49,13 @@ in the private repos).
   (Commission Delegated Regulation (EU) 2024/1774) Arts. 21–22
   (access management and authentication).
 - `article-10.yaml` — Art. 10 detection.
-- `article-11.yaml` — Art. 11 response and recovery.
+- `article-11.yaml` — Art. 11 response and recovery (documented
+  incident-handling capability anchor).
+- `article-11-availability-response.yaml` — Art. 11 per-vector
+  availability-incident response slice (detect-classify-mitigate-
+  validate discharge against the availability/denial-of-service attack
+  dimension; companion to `article-11.yaml`'s documented-capability
+  anchor).
 - `article-12.yaml` — Art. 12 backup policies and procedures,
   restoration and recovery procedures and methods.
 - `article-13.yaml` — Art. 13 learning and evolving (post-incident
