@@ -429,19 +429,44 @@ dora:
       overloading an existing entry.
 
 cra:
-  # No CRA inbound entry currently backlinks
-  # playbook.patch_management@v1. CRA Annex I §2 vulnerability-
-  # handling / security-updates obligations are the upstream
-  # anchor patch_management most directly operationalises (Annex I
-  # §2 demands manufacturers provide security updates throughout
-  # the declared support period). The SKELETON overlay does NOT
-  # pre-author the inbound entry: gap notes are separate cards,
-  # not scope creep on a single-purpose SKELETON PR. A future
-  # inbound-closure card adds the
-  # cra:annex-i-2-security-updates-rollout inbound entry and the
-  # outbound pin lands together with it. Mirrors the ddos_response
-  # CRA Annex I §1(h) gap-note precedent. The orphan-CI grace-
-  # window closure for this playbook is audited as a skip entry
-  # under content/mappings/cra/_orphan_skip.yaml (slug
-  # patch_management).
-  []
+  # Inbound entry that backlinks playbook.patch_management@v1:
+  #   - content/mappings/cra/annex-i-2-security-updates-rollout.yaml
+  #     (id cra:annex-i-2-security-updates-rollout — CRA Annex I §2
+  #     per-event maintenance-rollout slice against the operator's
+  #     deployed estate; companion to article-14-and-annex-i.yaml's
+  #     §2(7) dissemination-cadence anchor at
+  #     cra:annex-i-2-security-updates, which pins vuln_intake)
+  # Pinned outbound below to close the graph. The orphan-CI skip
+  # entry for patch_management under
+  # content/mappings/cra/_orphan_skip.yaml is removed in this same
+  # closure PR — the documented grace-window skip is no longer
+  # needed once the real edge lands.
+  - mapping_id: cra:annex-i-2-security-updates-rollout
+    article: Annex I §2
+    notes: >-
+      CRA Annex I §2 requires manufacturers to provide security
+      updates to address identified vulnerabilities throughout the
+      declared support period; the §2(7) limb in particular requires
+      that the updates be disseminated without delay and accompanied
+      by advisory messages. The dissemination-cadence side is anchored
+      by cra:annex-i-2-security-updates in article-14-and-annex-i.yaml
+      against playbook.vuln_intake@v1 (inbound coordinated-disclosure
+      surface that produces the update + advisory pair). The per-event
+      maintenance-rollout side against the operator's own deployed
+      estate is what patch_management operationalises: detect that a
+      security update is available against a tracked package / image /
+      firmware line, classify it against the documented patch-
+      criticality taxonomy, stage the rollout against the documented
+      deployment-ring topology, validate the canary, fan out on a
+      green canary, and capture the dated patch-application evidence
+      record. The two §2 entries discharge independent operational
+      disciplines and are mapped separately to keep the inbound graph
+      atom-per-obligation — mirrors the cra:annex-i-1-availability /
+      cra:annex-i-1-h-availability-restore-drill split on §1(h).
+      Cross-links: the OSCAL anchor is SI-2 / SI-2(2) on
+      control.patch_evidence@v1 (which already carries the CRA Annex I
+      §2 security-updates cross-reference); the NIS2 parallel is
+      nis2:art-21-2-e (security in acquisition, development and
+      maintenance — maintenance limb); the DORA parallel is
+      dora:art-9-maintenance-patch-rollout (Art. 9(4)(a) per-event
+      maintenance / patch-rollout slice under JC RTS Art. 10).
