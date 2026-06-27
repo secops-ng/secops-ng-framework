@@ -1,0 +1,86 @@
+# CRA — Annex I §2 vulnerability-handling / security-updates —
+# maintenance-rollout lane.
+#
+# Companion to `cra:annex-i-2-security-updates` in
+# article-14-and-annex-i.yaml, which already carries the general
+# §2(7) obligation to disseminate security updates without delay for
+# the duration of the support period and pins the inbound coordinated-
+# disclosure surface (`playbook.vuln_intake@v1`). That entry anchors
+# the dissemination-cadence side of the §2 lane: an advisory becomes
+# an update, the update has to be made available and accompanied by
+# advisory messages. It does NOT cover the per-event rollout
+# discipline against the operator's own deployed estate — detecting
+# that a security update is available on a tracked package / image /
+# firmware line, classifying the update against the operator's
+# documented patch-criticality taxonomy, staging it against the
+# documented deployment-ring topology, validating the canary ring,
+# fanning out to the broad rings on a green canary, and capturing the
+# dated patch-application evidence record.
+#
+# This file pins that per-event maintenance-rollout lane. The
+# patch_management playbook is the operational discharge: detect-
+# patch-availability → classify-patch-criticality → stage-rollout-to-
+# canary-ring → validate-canary → fan-out-to-broad-rings → evidence-
+# capture → notify-maintenance-owner against the operator's documented
+# update channel and ring topology. The two §2 entries are mapped
+# separately to keep the inbound graph atom-per-obligation: the
+# article-14-and-annex-i.yaml entry carries the §2(7) dissemination
+# obligation; this entry carries the per-event maintenance-rollout
+# slice that operationalises the same §2 lane against the operator's
+# deployed estate. Mirrors the cra:annex-i-1-availability /
+# cra:annex-i-1-h-availability-restore-drill split on §1(h)
+# (containment lane against ransomware_containment vs. restore-drill
+# lane against backup_recovery): same article, distinct operational
+# disciplines, mapped separately.
+regime: cra
+entries:
+  - id: cra:annex-i-2-security-updates-rollout
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §2
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Provide security updates to address identified vulnerabilities
+      throughout the declared support period — the per-event
+      maintenance-rollout lane: detect that a security update is
+      available against the operator's deployed estate, classify the
+      update against the documented patch-criticality taxonomy, stage
+      it against the documented deployment-ring topology (test →
+      canary → broad), validate the canary against documented health
+      gates, fan out to the remaining rings on a green canary, and
+      capture the dated patch-application evidence record as audit
+      evidence of the rollout discipline.
+    status: draft
+    control_refs:
+      - control.patch_evidence@v1
+    playbook_refs:
+      - playbook.patch_management@v1
+    metric_refs:
+      - kpi.patch_disseminated_on_time@v1
+    evidence_stream_refs:
+      - vulns
+    notes: >-
+      Companion to `cra:annex-i-2-security-updates` in
+      article-14-and-annex-i.yaml, which carries the §2(7)
+      dissemination-cadence obligation against `playbook.vuln_intake@v1`
+      (security updates made available without delay for the duration
+      of the support period, accompanied by advisory messages). This
+      entry pins the per-event maintenance-rollout slice of the same
+      §2 lane: the patch_management playbook's detect-classify-stage-
+      validate-fan-out cycle against the operator's documented update
+      channel and ring topology, with a dated patch-application
+      evidence record produced by the evidence-capture step as the
+      audit-evident output. The two §2 entries discharge independent
+      operational disciplines and are mapped separately to keep the
+      inbound graph atom-per-obligation — mirrors the
+      cra:annex-i-1-availability / cra:annex-i-1-h-availability-
+      restore-drill split on §1(h). The NIS2 parallel is
+      `nis2:art-21-2-e` (security in acquisition, development and
+      maintenance — maintenance limb against the operator's deployed
+      estate); the DORA parallel is `dora:art-9-maintenance-patch-
+      rollout` (Art. 9(4)(a) per-event maintenance / patch-rollout
+      slice under JC RTS on ICT risk management framework Art. 10).
+      The kpi.patch_disseminated_on_time@v1 metric audits per-event
+      rollout-on-time against the documented criticality taxonomy.
