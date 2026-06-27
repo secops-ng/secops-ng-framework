@@ -1,0 +1,614 @@
+{
+  "name": "Coordinated patch / update rollout",
+  "nodes": [
+    {
+      "id": "start--70000000-0000-4000-8000-000000000001",
+      "name": "patch_management_start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__update_subject__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the tracked package / image / firmware line the update applies to (matches a row in the operator's documented deployment-inventory: which subject, which ring topology, which patch-criticality taxonomy applies)."
+            },
+            {
+              "name": "__update_reference__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the security update / patch advisory being rolled out (advisory id, vendor reference, or upstream release tag). Supplied by the operator's documented advisory-intake surface (vendor feed, distribution channel, upstream release notification)."
+            },
+            {
+              "name": "__patch_criticality__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the classified patch-criticality bucket for this update against the operator's documented taxonomy: security-critical (rollout deadline measured in hours / days), security-routine (rollout deadline measured in days / weeks), or feature-only (rollout cadenced against the operator's documented maintenance window). Empty when classification could not be completed within the documented intake deadline; an empty value short-circuits into an evidence-capture failure record while still treating the update as security-critical for downstream scheduling."
+            },
+            {
+              "name": "__staged_ring_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the canary / test ring the staged-rollout step engaged the update against (e.g. test-fleet reference, canary-cohort reference). Always populated; the value names the ring that received the update on the staged branch even on the short-circuit branch."
+            },
+            {
+              "name": "__canary_healthy__",
+              "type": "boolean",
+              "value": "",
+              "description": "Outcome of the validate-canary step: true when the canary ring is observed inside the documented health gates (functional probes green, error-rate / latency deviation inside the documented thresholds, rollback path verified) for the documented validation window; false when the canary is unhealthy and the rollout must be paused. A false value does not block the evidence-capture and notify branches; the record is published with the failure marker and the fan-out step is skipped so the maintenance owner is paged with full context rather than discovering the failure later."
+            },
+            {
+              "name": "__broad_rollout_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the broad-ring rollout engagement once the canary has reported healthy (deployment reference, change ticket id, distribution-channel push reference). Empty on the canary-unhealthy branch; the empty value is recorded in the evidence record and notified to the maintenance owner alongside the canary failure marker."
+            },
+            {
+              "name": "__evidence_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the dated patch-application evidence record published to the operator's evidence store. Always populated, including on the short-circuit branch (unclassified update) and the canary-unhealthy branch."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--70000000-0000-4000-8000-000000000002",
+      "name": "detect patch availability",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.update_subject",
+              "name": "in.update_subject",
+              "value": "={{$workflow.variables.update_subject}}",
+              "type": "string"
+            },
+            {
+              "id": "in.update_reference",
+              "name": "in.update_reference",
+              "value": "={{$workflow.variables.update_reference}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.patch_evidence@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.cvd_intake_aging@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Resolve the trigger for this run: an advisory landed on the operator's documented advisory-intake surface (vendor feed, distribution channel, upstream release notification) against __update_subject__, an operator-scheduled maintenance window opened, or an operator-initiated trigger landed. Reads __update_subject__ and __update_reference__ to confirm the update applies to a tracked deployment-inventory row; reads the operator's documented deployment-inventory row to surface the ring topology (test / canary / broad) and the patch-criticality taxonomy the downstream steps will classify against.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--70000000-0000-4000-8000-000000000003",
+      "name": "classify patch criticality",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.update_subject",
+              "name": "in.update_subject",
+              "value": "={{$workflow.variables.update_subject}}",
+              "type": "string"
+            },
+            {
+              "id": "in.update_reference",
+              "name": "in.update_reference",
+              "value": "={{$workflow.variables.update_reference}}",
+              "type": "string"
+            },
+            {
+              "id": "out.patch_criticality",
+              "name": "out.patch_criticality",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.patch_evidence@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.cvd_intake_aging@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Classify the update against the operator's documented patch-criticality taxonomy: security-critical (rollout deadline measured in hours / days, e.g. remotely exploitable RCE with active exploitation, kernel / hypervisor patch), security-routine (rollout deadline measured in days / weeks, e.g. lower-severity advisories without active exploitation), or feature-only (rollout cadenced against the operator's documented maintenance window, no security urgency). Reads the same advisory surface the detect step consulted plus any operator-bound severity / exploit-status enrichment documented for __update_subject__. Sets __patch_criticality__. The classification is best-effort and time-boxed; if classification cannot be completed within the documented intake deadline (so the operator is not held by a perfect-classification stall while the deadline slips), this step leaves __patch_criticality__ empty and the downstream stage-rollout step treats the update as security-critical for scheduling purposes rather than waiting.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--70000000-0000-4000-8000-000000000004",
+      "name": "stage rollout to canary ring",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.update_subject",
+              "name": "in.update_subject",
+              "value": "={{$workflow.variables.update_subject}}",
+              "type": "string"
+            },
+            {
+              "id": "in.update_reference",
+              "name": "in.update_reference",
+              "value": "={{$workflow.variables.update_reference}}",
+              "type": "string"
+            },
+            {
+              "id": "in.patch_criticality",
+              "name": "in.patch_criticality",
+              "value": "={{$workflow.variables.patch_criticality}}",
+              "type": "string"
+            },
+            {
+              "id": "out.staged_ring_id",
+              "name": "out.staged_ring_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.patch_evidence@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.patch_disseminated_on_time@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Engage the update against the operator's pre-bound canary ring for __update_subject__: push the update through the documented distribution channel (package mirror, image registry, firmware-distribution surface) to the test / canary cohort. Reads __patch_criticality__ to select the rollout cadence (security-critical \u2192 immediate, security-routine \u2192 next-window, feature-only \u2192 maintenance-window); when __patch_criticality__ is empty the step treats the update as security-critical for scheduling rather than waiting for classification. Emits __staged_ring_id__ \u2014 the durable identifier of the canary cohort that received the update (cohort reference, change ticket id, distribution-channel push reference). Detection bindings for canary-engagement misconfiguration (update pushed to wrong ring, distribution channel returned partial success, cohort membership stale) are owned by CORE-layer cards once upstream rule ids are selected.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--70000000-0000-4000-8000-000000000005",
+      "name": "validate canary",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.update_subject",
+              "name": "in.update_subject",
+              "value": "={{$workflow.variables.update_subject}}",
+              "type": "string"
+            },
+            {
+              "id": "in.staged_ring_id",
+              "name": "in.staged_ring_id",
+              "value": "={{$workflow.variables.staged_ring_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.canary_healthy",
+              "name": "out.canary_healthy",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.patch_evidence@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.mttr_containment@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Observe the canary ring against the operator's documented health gates after the staged rollout: functional probes green, error-rate / latency deviation inside the documented thresholds, rollback path verified for the documented validation window. Reads __update_subject__ and __staged_ring_id__; sets __canary_healthy__. A false outcome does not block downstream steps \u2014 the evidence-capture record is published with the failure marker, the fan-out step is skipped, and the notify step pages the maintenance owner with the full context so the next maintenance lever (rollback the canary, escalate the advisory, hold the broad rollout) can be engaged. The mean-time-to-containment KPI (kpi.mttr_containment@v1) reads this step's __canary_healthy__ observation alongside the evidence-capture timestamp to measure validation-window discharge.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--70000000-0000-4000-8000-000000000006",
+      "name": "fan out to broad rings",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.update_subject",
+              "name": "in.update_subject",
+              "value": "={{$workflow.variables.update_subject}}",
+              "type": "string"
+            },
+            {
+              "id": "in.update_reference",
+              "name": "in.update_reference",
+              "value": "={{$workflow.variables.update_reference}}",
+              "type": "string"
+            },
+            {
+              "id": "in.staged_ring_id",
+              "name": "in.staged_ring_id",
+              "value": "={{$workflow.variables.staged_ring_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.canary_healthy",
+              "name": "in.canary_healthy",
+              "value": "={{$workflow.variables.canary_healthy}}",
+              "type": "string"
+            },
+            {
+              "id": "out.broad_rollout_id",
+              "name": "out.broad_rollout_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.patch_evidence@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.patch_disseminated_on_time@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "On a healthy canary (__canary_healthy__ true), engage the update against the remaining rings of the operator's documented deployment-ring topology along the same documented distribution channel. Reads __update_subject__, __update_reference__, __staged_ring_id__, and __canary_healthy__; emits __broad_rollout_id__ \u2014 the durable identifier of the broad-ring engagement (deployment reference, change ticket id, distribution-channel push reference). On an unhealthy canary (__canary_healthy__ false) the step is skipped and __broad_rollout_id__ is left empty; the evidence-capture and notify steps record the skip explicitly so the audit-evident chain is closed without forcing the broad rollout against a failing canary. The conditional shape is intentionally explicit at the description level rather than at a CACAO conditional-step level for SKELETON simplicity; CORE-layer cards may refactor into a `playbook-condition` step once the conditional shape is exercised by the worked-example fan-out.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--70000000-0000-4000-8000-000000000007",
+      "name": "evidence capture",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.update_subject",
+              "name": "in.update_subject",
+              "value": "={{$workflow.variables.update_subject}}",
+              "type": "string"
+            },
+            {
+              "id": "in.update_reference",
+              "name": "in.update_reference",
+              "value": "={{$workflow.variables.update_reference}}",
+              "type": "string"
+            },
+            {
+              "id": "in.patch_criticality",
+              "name": "in.patch_criticality",
+              "value": "={{$workflow.variables.patch_criticality}}",
+              "type": "string"
+            },
+            {
+              "id": "in.staged_ring_id",
+              "name": "in.staged_ring_id",
+              "value": "={{$workflow.variables.staged_ring_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.canary_healthy",
+              "name": "in.canary_healthy",
+              "value": "={{$workflow.variables.canary_healthy}}",
+              "type": "string"
+            },
+            {
+              "id": "in.broad_rollout_id",
+              "name": "in.broad_rollout_id",
+              "value": "={{$workflow.variables.broad_rollout_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.evidence_id",
+              "name": "out.evidence_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.patch_evidence@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.control_effectiveness@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Compose and publish the dated patch-application evidence record to the operator's evidence store. The record carries the update subject, the advisory reference, the classified criticality (or the empty-classification marker on the short-circuit branch), the staged ring id, the canary health outcome (or the failure marker), the broad rollout id (or the empty marker on the canary-failure branch), and the observed health-gate measurements across the validation window. This is the audit-evident artifact NIS2 Art. 21(2)(e) reviewers read against a maintenance / patch-rollout obligation; missing or stale evidence is the failure mode the maintenance metrics surface.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--70000000-0000-4000-8000-000000000008",
+      "name": "notify maintenance owner",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2060,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.evidence_id",
+              "name": "in.evidence_id",
+              "value": "={{$workflow.variables.evidence_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.update_subject",
+              "name": "in.update_subject",
+              "value": "={{$workflow.variables.update_subject}}",
+              "type": "string"
+            },
+            {
+              "id": "in.canary_healthy",
+              "name": "in.canary_healthy",
+              "value": "={{$workflow.variables.canary_healthy}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.control_effectiveness@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Deliver the evidence reference to the maintenance owner along the operator's pre-bound channel (ticketing system, chat thread, change-management board). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an evidence record written but never delivered to the owner is itself a maintenance-discipline gap. Notification carries the canary health outcome so a false __canary_healthy__ pages with appropriate urgency for the next maintenance lever (rollback the canary, escalate the advisory, hold the broad rollout).",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--70000000-0000-4000-8000-000000000009",
+      "name": "patch_management_end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2320,
+        240
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "patch_management_start": {
+      "main": [
+        [
+          {
+            "node": "detect patch availability",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "detect patch availability": {
+      "main": [
+        [
+          {
+            "node": "classify patch criticality",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classify patch criticality": {
+      "main": [
+        [
+          {
+            "node": "stage rollout to canary ring",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "stage rollout to canary ring": {
+      "main": [
+        [
+          {
+            "node": "validate canary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validate canary": {
+      "main": [
+        [
+          {
+            "node": "fan out to broad rings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "fan out to broad rings": {
+      "main": [
+        [
+          {
+            "node": "evidence capture",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "evidence capture": {
+      "main": [
+        [
+          {
+            "node": "notify maintenance owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "notify maintenance owner": {
+      "main": [
+        [
+          {
+            "node": "patch_management_end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "maintenance",
+    "patch-management",
+    "software-update",
+    "rollout",
+    "canary",
+    "ring-deployment"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.patch_management@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc"
+    },
+    "secops_ng_notes": [
+      "step 'action--70000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--70000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--70000000-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--70000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--70000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--70000000-0000-4000-8000-000000000007': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--70000000-0000-4000-8000-000000000008': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}
