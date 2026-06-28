@@ -98,6 +98,9 @@ VIZ_REQUIRED_STEMS = (
     "cvd_intake_aging",
     "escalation_tier_breach",
     "releases_without_sbom",
+    # F-WF-ASSET EXTEND-metrics — asset_management catalog closeout
+    "asset_inventory_drift",
+    "unmanaged_asset_cardinality",
 )
 
 
