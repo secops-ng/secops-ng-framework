@@ -1,0 +1,120 @@
+stable_id: kri.otel_span_attribute_schema_drift@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: OTel span-attribute schema drift across reference compile targets
+summary: >
+  Count of (compile target × span-attribute key) pairs on the
+  evaluation commit where the emitted artifact under
+  ``examples/<target>/<workflow>/`` does not attach the canonical
+  ``secops_ng.*`` span-attribute key declared in the shared helper
+  module at ``compilers/_shared/observability.py``
+  (``SPAN_ATTR_KEYS``). Per F-CR-04 (ROADMAP "OpenTelemetry
+  instrumentation emitted by every reference compiler"), the shared
+  helper documents the span and attribute schema once and is
+  referenced — not duplicated — by each per-target emitter; per
+  docs/FOUNDATION.md §2, that schema is what makes a workflow
+  reviewable across targets. Drift between the helper's declared key
+  tuple and the keys actually attached by an emitter is the
+  residual-risk exposure this KRI tracks.
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: "=="
+  rationale: >
+    The shared helper module is the single source of truth for the
+    OTel attribute schema across the three reference compile targets
+    (F-CR-04 acceptance criterion: shared helper "documents the span
+    and attribute schema and is referenced — not duplicated — by each
+    per-target emitter"). Any missing or extraneous attribute key on
+    an emitted artifact is a determinism / cross-target-correlation
+    regression and must be reconciled in the same PR as the helper
+    change.
+thresholds:
+  - name: warn
+    comparator: ">="
+    value: 1
+    severity: warn
+  - name: breach
+    comparator: ">="
+    value: 3
+    severity: high
+measurement:
+  source: composite
+  aggregation: count
+  formula: >
+    For each reference compile target (n8n / temporal / langgraph),
+    enumerate the canonical ``secops_ng.*`` span-attribute keys
+    declared in the shared helper's ``SPAN_ATTR_KEYS`` tuple
+    (``compilers/_shared/observability.py``). For each (target, key)
+    pair, observe whether the committed reference artifact under
+    ``examples/<target>/<workflow>/`` attaches the key on the
+    appropriate node / activity / tool span. Increment the count when
+    a (target, key) pair is absent from the emitted artifact, when an
+    emitter attaches an attribute under a key not present in the
+    shared tuple, or when the per-example byte-parity golden under
+    ``tests/examples/<workflow>/`` is red because the OTel-wrapping
+    block disagrees with the committed reference. Distinct
+    (target, key) pairs are counted once per commit. Reference
+    visualisation: a horizontal bar chart of per-(target, key)
+    attribute-presence outcomes (1 = present, 0 = drift) sliced by
+    compile target, with a horizontal line at the presence-floor of 1
+    marking the schema predicate and the count aggregate annotated as
+    the headline figure; the chart is the canonical operator-facing
+    surface for this KRI. The committed reference rendering lives at
+    ``content/metrics/otel_span_attribute_schema_drift.viz.md`` —
+    that file is the contract for the chart shape; the compile target
+    renders the executable form against the shared helper and the
+    per-example golden suite at evaluation time.
+  inputs:
+    - name: shared_attribute_schema
+      description: >
+        Shared OTel span-attribute schema declared in
+        ``compilers/_shared/observability.py`` as the
+        ``SPAN_ATTR_KEYS`` tuple. The tuple is the single source of
+        truth for the canonical ``secops_ng.*`` key namespace each
+        reference compile target attaches on its emitted spans.
+        Bound here as the executive_metrics worked example because
+        that playbook exercises the cross-target OTel wrapping the
+        F-CR-04 acceptance criteria pin against.
+      playbook_ref: playbook.executive_metrics@v1
+    - name: per_example_otel_wrapping_assertion
+      description: >
+        Per-example byte-parity golden assertion that covers the
+        emitted OTel wrapping block. Under F-CR-04, the per-example
+        byte-parity goldens under ``tests/examples/`` cover the
+        emitted instrumentation so any regression in the OTel
+        wrapping flips a test red; a red wrapping assertion against
+        the canonical reference artifact under
+        ``examples/<target>/<workflow>/`` increments the count.
+        Bound here as the supply_chain_security worked example
+        because it carries the full three-target ring (n8n,
+        temporal, langgraph) plus the OTel-wrapping assertion in
+        each per-target file.
+      playbook_ref: playbook.supply_chain_security@v1
+  window:
+    duration: P1D
+    sliding: false
+playbook_refs:
+  - playbook_id: playbook.executive_metrics@v1
+  - playbook_id: playbook.supply_chain_security@v1
+  - playbook_id: playbook.asset_management@v1
+external_refs:
+  - name: SecOps-NG FOUNDATION §2 — Determinism
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+  - name: NIS2 — Article 23 incident reporting timelines (motivating context — reviewable cross-target telemetry)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 23
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ENISA — Threat Landscape methodology, telemetry-correlation discussion
+    source: ENISA
+    url: https://www.enisa.europa.eu/publications/enisa-threat-landscape
+  - name: OpenTelemetry — Semantic conventions for spans
+    source: OpenTelemetry
+    url: https://opentelemetry.io/docs/specs/semconv/
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - determinism
+  - auditability
