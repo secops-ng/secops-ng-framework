@@ -1,0 +1,155 @@
+stable_id: kri.patch_rollout_overdue_exposure@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Patch-rollout overdue exposure — count of security updates without a completed broad rollout in the evaluation window
+summary: >
+  Residual-exposure indicator derived from the patch_management
+  patch-application evidence stream. For each scheduled execution of
+  the playbook the evidence-capture step emits one
+  patch-application evidence artifact; this indicator counts those
+  artifacts in the evaluation window whose broad-ring rollout did NOT
+  complete — either because the canary was unhealthy and the fan-out
+  step deterministically skipped the broad ring
+  (`broad_rollout_skip_reason == "canary_unhealthy"`), or because the
+  classify-patch-criticality step short-circuited under the documented
+  intake deadline and emitted the `unclassified` sentinel
+  (`patch_criticality == "unclassified"`, treated as security-critical
+  for scheduling urgency by the downstream stage step). Rising values
+  mean security-critical updates are sitting between detect and broad
+  rollout for longer than the operator's documented patch-management
+  discipline allows — the failure mode NIS2 Art. 21(2)(e) reviewers
+  surface against the maintenance / security-update obligation.
+
+unit: count
+direction: lower_is_better
+
+target:
+  value: 0
+  comparator: "=="
+  rationale: >
+    Community-recommended starting point for the unscoped baseline. A
+    well-disciplined patch-management practice completes the canary
+    -> broad-ring rollout inside the documented intake window for
+    every security-critical observation; the unscoped baseline target
+    is zero outstanding executions. Operators under scoped programmes
+    set a non-zero tolerance with documented rationale in their scoped
+    variants (e.g. a measured allowance for the canary-unhealthy
+    branch under their documented rollback discipline).
+
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 0
+    severity: warn
+  - name: breach
+    comparator: ">"
+    value: 3
+    severity: high
+  - name: critical
+    comparator: ">"
+    value: 10
+    severity: critical
+
+measurement:
+  source: workflow
+  aggregation: max
+  formula: >
+    For each patch_management execution in the evaluation window that
+    emitted a patch-application evidence artifact (stream = `patch`,
+    schemas/evidence/patch.schema.json), count the artifact as an
+    overdue-exposure observation if EITHER
+    `patch_criticality == "unclassified"` (the classify-patch-
+    criticality step short-circuited under the documented intake
+    deadline, treated as security-critical for scheduling) OR
+    `broad_rollout_id == ""` with
+    `broad_rollout_skip_reason == "canary_unhealthy"` (the fan-out
+    step was a deterministic skip against an unhealthy canary).
+    Executions whose evidence-capture step never fired are excluded
+    so the indicator does not silently improve when the pipeline
+    stalls. Aggregate across the window with `max` so a brief
+    excursion is not hidden by a follow-up clean window: operators
+    read the worst-case observation, then drill down to the
+    contributing execution via the evidence store. Reference
+    visualisation: a count-headline gauge with warn / breach /
+    critical band overlays over a per-execution overdue-cause
+    drill-down sliced by execution; the committed reference
+    rendering lives at
+    `content/metrics/patch_rollout_overdue_exposure.viz.md` — that
+    file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: patch_criticality
+      description: >
+        Closed taxonomy bucket emitted by the classify-patch-
+        criticality step:
+        `security-critical` / `security-routine` / `feature-only` /
+        `unclassified`. Carried on the JSON-native patch-application
+        evidence artifact the evidence-capture step emits
+        (schemas/evidence/patch.schema.json, stream = `patch`); the
+        catalog entry binds to that evidence artifact field, not to
+        a vendor-specific patch-management API. The `unclassified`
+        sentinel is the deadline-missed short-circuit branch and is
+        treated as security-critical for scheduling urgency by the
+        downstream stage step.
+      playbook_ref: playbook.patch_management@v1
+      playbook_step: action--70000000-0000-4000-8000-000000000003
+      field: patch_criticality
+    - name: broad_rollout_id
+      description: >
+        Deterministic broad-ring rollout identifier emitted by the
+        fan-out-to-broad-rings step. Carried on the same patch-
+        application evidence artifact. A non-empty 64-char hex
+        digest indicates the broad rollout was engaged after a
+        healthy canary; an empty string indicates the deterministic
+        skip branch against an unhealthy canary (paired with the
+        explicit `broad_rollout_skip_reason` marker).
+      playbook_ref: playbook.patch_management@v1
+      playbook_step: action--70000000-0000-4000-8000-000000000006
+      field: broad_rollout_id
+    - name: broad_rollout_skip_reason
+      description: >
+        Explicit skip marker on the patch-application evidence
+        artifact, present iff `broad_rollout_id` is the empty string
+        (schema invariant on schemas/evidence/patch.schema.json).
+        The closed enum carries `canary_unhealthy` on the
+        deterministic skip branch. Included as a documented input so
+        a consumer drilling down from the headline count reads the
+        contributing skip cause against the per-execution artifact.
+      playbook_ref: playbook.patch_management@v1
+      playbook_step: action--70000000-0000-4000-8000-000000000006
+      field: broad_rollout_skip_reason
+  window:
+    duration: P30D
+    sliding: true
+
+playbook_refs:
+  - playbook_id: playbook.patch_management@v1
+    step_id: action--70000000-0000-4000-8000-000000000007
+
+external_refs:
+  - name: NIS2 — Article 21(2)(e) security in acquisition, development and maintenance
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(e)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 9 protection and prevention (maintenance / patch rollout)
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 9
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: CRA — Annex I §2 (security updates rollout)
+    source: EU
+    external_id: Regulation (EU) 2024/2847, Annex I §2
+    url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+  - name: NIST SP 800-53 Rev. 5 — SI-2 Flaw Remediation
+    source: NIST
+    external_id: NIST SP 800-53 Rev. 5 SI-2
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-2
+  - name: ENISA — Good practices on the patch-management lifecycle
+    source: ENISA
+    url: https://www.enisa.europa.eu/topics/risk-management
+
+maintainer: metrics-wg@secops-ng.org
+
+foundation_property:
+  - auditability
+  - operability

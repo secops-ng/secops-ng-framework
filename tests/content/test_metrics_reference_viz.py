@@ -105,6 +105,9 @@ VIZ_REQUIRED_STEMS = (
     "forward_public_hygiene_high_severity_escape_rate",
     "lm_endpoint_eu_residency_coverage",
     "gdpr_lawful_basis_section_coverage",
+    # F-WF-PATCH EXTEND-metrics — patch_management catalog closeout
+    "patch_rollout_overdue_exposure",
+    "patch_rollout_success_rate",
 )
 
 
