@@ -44,6 +44,7 @@ MIN_KPI: dict = {
             {"name": "first_event", "telemetry_ref": "telemetry.host_process_create@v1"}
         ],
     },
+    "foundation_property": ["operability"],
 }
 
 MIN_KRI: dict = {
@@ -61,6 +62,7 @@ MIN_KRI: dict = {
             {"name": "attested", "control_ref": "control.edr_script_block_logging@v1"}
         ],
     },
+    "foundation_property": ["auditability"],
 }
 
 
