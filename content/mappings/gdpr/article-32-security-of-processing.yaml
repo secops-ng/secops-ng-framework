@@ -16,6 +16,26 @@
 # grace-clock top-up addressing the freshly-finalized playbooks before
 # the orphan-CI grace window expires).
 #
+# This file's most recent G-02 grace-clock top-up wires asset_management
+# and patch_management onto the Art. 32(1)(b) limb as two new sibling
+# entries — `gdpr:art-32-1-b-asset-baseline-and-inventory` (asset
+# reconciliation and per-window inventory-delta evidence is the
+# baseline-discovery surface the ongoing-confidentiality / integrity /
+# availability obligation runs against; without it the other six
+# Art. 32(1)(b) playbooks have no authoritative estate to apply their
+# disciplines against) and `gdpr:art-32-1-b-maintenance-and-security-updates`
+# (per-update rollout, ring-cohort canary validation, and dated
+# patch-application evidence is the maintenance-and-security-updates
+# limb of Art. 32(1)(b), distinct from the codebase-side
+# vulnerability-handling integrity surface already anchored on
+# codebase_vuln_management and vuln_intake — patch_management exercises
+# the operator's deployed-estate update path rather than the
+# operator's own codebase). Both anchor on Art. 32(1)(b) but
+# discharge independent operational disciplines and are kept
+# atom-per-obligation, mirroring the established shape of the
+# Art. 32(1)(c) restore-availability / availability-incident-response
+# pair below.
+#
 # Scope of this file:
 #
 #   - gdpr:art-32-1-b — ensuring the ongoing confidentiality,
@@ -413,3 +433,171 @@ entries:
       obligations; the three regimes carry separate evidence
       requirements against the same per-event availability-incident
       response discipline.
+
+  - id: gdpr:art-32-1-b-asset-baseline-and-inventory
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "32"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Implement appropriate technical and organisational measures to
+      ensure a level of security appropriate to the risk, including
+      the ability to ensure the ongoing confidentiality, integrity,
+      availability, and resilience of processing systems and services.
+      Specifically, the per-window asset-management discipline that
+      maintains the authoritative inventory of information and ICT
+      assets, captures the delta between scheduled snapshots so that
+      unmanaged or undocumented assets surface as exceptions, and
+      records the dated asset-inventory-delta evidence as the
+      audit-evident artifact of the baseline-discovery limb. The
+      measure must be exercisable on the operator's documented
+      inventory-source set, not merely documented, so the
+      ongoing-baseline capability is evidenced rather than asserted.
+    status: draft
+    control_refs:
+      - control.asset_inventory_delta@v1
+    playbook_refs:
+      - playbook.asset_management@v1
+    metric_refs:
+      - kri.asset_inventory_drift@v1
+      - kpi.unmanaged_asset_cardinality@v1
+    evidence_stream_refs:
+      - posture
+    notes: >-
+      asset_management is the agentic anchor for the
+      baseline-and-inventory limb of Art. 32(1)(b). On a scheduled
+      reconciliation tick, the playbook ingests the operator's
+      documented inventory-source set (CMDB, infrastructure-as-code
+      records, cloud-provider asset APIs, endpoint-management agents),
+      reconciles them into the operator-authoritative snapshot for
+      the current window, computes the per-asset delta against the
+      previous documented snapshot, classifies each delta against the
+      operator's documented delta taxonomy (new-managed,
+      unmanaged-discovered, decommissioned, baseline-drift), and emits
+      the dated asset-inventory-delta evidence record as the
+      audit-evident discharge of the per-window discipline. The
+      baseline-and-inventory limb is the prerequisite surface the
+      other Art. 32(1)(b) playbooks anchored on the
+      ongoing-confidentiality-integrity-availability entry above
+      operate against — without an authoritative estate snapshot the
+      configuration-baseline, access-control, and
+      vulnerability-handling disciplines have no scope to apply
+      themselves to. The kri.asset_inventory_drift@v1 metric audits
+      drift between the declared inventory and the reconciled
+      observation, and kpi.unmanaged_asset_cardinality@v1 audits the
+      unmanaged-asset count surfaced by the classify-delta step;
+      both are GDPR-visible failure indicators for the clause's
+      baseline-discovery limb. Per
+      content/mappings/gdpr/data-flow-asset_management.md §2 the
+      workflow itself processes no personal data — it operates on
+      asset identifiers, inventory-source identifiers, snapshot
+      identifiers, delta identifiers, configuration-baseline
+      observations, and attestation records — so this clause anchors
+      the workflow as an organisational measure protecting the
+      ongoing-confidentiality / integrity / availability dimension
+      of personal-data processing on the inventoried services, not
+      as a per-subject processing activity. The Art. 5(2)
+      accountability anchor was considered as an alternative limb
+      but deferred: the data-flow doc frames the workflow as the
+      per-window asset-management discipline NIS2 Art. 21(2)(i)
+      requires operators to run against their documented
+      inventory sources, and the Art. 32(1)(b) ongoing-baseline
+      reading lines up one-to-one with that framing; the Art. 5(2)
+      accountability surface is the operator's documented inventory
+      architecture decision (which sources are authoritative, what
+      the delta taxonomy is), not this playbook's per-window
+      discharge of that architecture. The NIS2 parallel under
+      `nis2:art-21-2-i` anchors the same playbook against the NIS2
+      HR-security / access-control / asset-management measures; the
+      two regimes carry separate evidence requirements against the
+      same per-window reconciliation discipline. d3fend / sigma
+      anchors are intentionally not pinned on this entry — the
+      read-only posture-readiness framing (mirroring the MFA /
+      CRYPTO / BCR CORE precedent) does not characterise asset
+      reconciliation as a runtime countermeasure, and no defensible
+      D3FEND or Sigma surface is available without misrepresenting
+      it as one.
+
+  - id: gdpr:art-32-1-b-maintenance-and-security-updates
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "32"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Implement appropriate technical and organisational measures to
+      ensure a level of security appropriate to the risk, including
+      the ability to ensure the ongoing confidentiality, integrity,
+      availability, and resilience of processing systems and services.
+      Specifically, the per-update maintenance discipline that
+      classifies a security update against the operator's documented
+      patch-criticality taxonomy, stages the rollout against the
+      operator's documented deployment-ring topology, validates the
+      canary ring against documented health gates, fans out to the
+      remaining rings on a green canary, and records the dated
+      patch-application evidence as the audit-evident artifact of
+      the maintenance-and-security-updates limb. The measure must be
+      exercisable on the operator's documented deployed estate, not
+      merely documented, so the maintenance capability is evidenced
+      rather than asserted.
+    status: draft
+    control_refs:
+      - control.patch_evidence@v1
+    playbook_refs:
+      - playbook.patch_management@v1
+    metric_refs:
+      - kpi.patch_disseminated_on_time@v1
+      - kpi.patch_rollout_success_rate@v1
+      - kri.patch_rollout_overdue_exposure@v1
+    evidence_stream_refs:
+      - posture
+    notes: >-
+      patch_management is the agentic anchor for the
+      maintenance-and-security-updates limb of Art. 32(1)(b). On a
+      security update becoming available against a tracked package /
+      image / firmware line, the playbook classifies the update
+      against the operator's documented patch-criticality taxonomy
+      (security-critical, security-routine, feature-only), stages
+      the rollout against the operator's documented deployment-ring
+      topology (test -> canary -> broad), validates the canary ring
+      against documented functional-probe and aggregate
+      error-rate / latency deviation thresholds, fans out to the
+      remaining rings on a green canary, and emits the dated
+      patch-application evidence record as the audit-evident
+      discharge of the per-update rollout discipline. This entry is
+      the deployed-estate counterpart to the codebase-side
+      vulnerability-handling integrity surface anchored on the
+      ongoing-confidentiality-integrity-availability entry above:
+      codebase_vuln_management and vuln_intake operate on the
+      operator's own codebase (SBOM-walk and reporter-disclosed
+      intake), while patch_management operates the operator's
+      deployed estate update path against advisory feeds the
+      operator consumes. The kpi.patch_disseminated_on_time@v1
+      metric audits timeliness against the documented criticality
+      SLA, the kpi.patch_rollout_success_rate@v1 metric audits
+      per-rollout outcomes across rings, and the
+      kri.patch_rollout_overdue_exposure@v1 metric audits exposure
+      drift on overdue rollouts; all three are GDPR-visible failure
+      indicators for the clause's maintenance limb. Per
+      content/mappings/gdpr/data-flow-patch_management.md §2 the
+      workflow itself processes no personal data — it operates on
+      deployment-inventory identifiers, advisory references,
+      ring-cohort identifiers, canary-health gate observations,
+      rollout-action identifiers, and attestation records — so this
+      clause anchors the workflow as an organisational measure
+      protecting the ongoing-integrity dimension of personal-data
+      processing on the deployed services, not as a per-subject
+      processing activity. The NIS2 parallel under `nis2:art-21-2-e`
+      anchors the same playbook against the NIS2 security in
+      acquisition, development and maintenance measures (alongside
+      vuln_intake and cloud_misconfiguration); the two regimes
+      carry separate evidence requirements against the same
+      per-update rollout discipline. d3fend / sigma anchors are
+      intentionally not pinned on this entry — the read-only
+      posture-readiness framing (mirroring the MFA / CRYPTO / BCR
+      CORE precedent) does not characterise per-update rollout as a
+      runtime countermeasure, and no defensible D3FEND or Sigma
+      surface is available without misrepresenting it as one.
