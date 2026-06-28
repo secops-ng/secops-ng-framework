@@ -1,0 +1,109 @@
+stable_id: kpi.forward_public_hygiene_high_severity_escape_rate@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Forward-public hygiene HIGH-severity escape rate to main
+summary: >
+  Ratio of merged-to-main commits in the evaluation window that
+  contain at least one HIGH-severity finding from the forward-public
+  hygiene linter (``tools/hygiene_linter/``). The linter encodes the
+  AGENTS.md §3 public-bar — credential-shaped strings and other
+  HIGH-severity rule hits are gating findings that cannot land on a
+  will-be-public repo without compromising the sovereignty posture
+  the project commits to (no credentials, no internal-infra leakage,
+  community voice). The KPI tracks whether the public-bar gate is
+  actually holding across the merge stream over time; per
+  docs/FOUNDATION.md §3 (Sovereignty), the public-bar holding is the
+  observable evidence that the sovereign-Digital-Commons posture is
+  not silently regressing. The chart shape, threshold bands, and
+  reference rendering are the contract for the operator-facing
+  surface; the compile target is the source of truth for the
+  executable form.
+unit: ratio
+direction: lower_is_better
+target:
+  value: 0
+  comparator: "=="
+  rationale: >
+    HIGH-severity hygiene findings are gating — the linter's exit
+    code is driven by HIGH findings, the CI lane at
+    ``.github/workflows/hygiene-lint.yml`` fails on any HIGH-severity
+    finding, and the maintainer review-flow under
+    ``CONTRIBUTING.md`` documents the gate as non-optional. A green
+    floor at 0 is the only honest target for a sovereign Digital
+    Commons repository; any non-zero reading is a public-bar regression
+    that landed on main despite the gate and must be reconciled.
+thresholds:
+  - name: warn
+    comparator: ">="
+    value: 0.01
+    severity: warn
+  - name: breach
+    comparator: ">="
+    value: 0.05
+    severity: high
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: >
+    Over the evaluation window, count distinct merged-to-main commits
+    where re-running ``python -m tools.hygiene_linter --min-severity
+    HIGH`` against the tree at that commit emits at least one HIGH
+    finding under any committed file. Divide by the total count of
+    merged-to-main commits in the same window. A merge with N HIGH
+    findings still counts as one offending commit — the catalog
+    entry is a coverage indicator, not a finding-volume indicator;
+    the residual-risk volume signal lives on the residual-risk
+    companion KRI rather than on this KPI. Reference visualisation:
+    a per-commit ribbon chart of HIGH-finding presence (1 = at least
+    one HIGH finding, 0 = clean) across the merge stream in the
+    evaluation window, with the overall escape ratio annotated as
+    the headline figure and the warn / breach thresholds overlaid;
+    the chart is the canonical operator-facing surface for this KPI.
+    The committed reference rendering lives at
+    ``content/metrics/forward_public_hygiene_high_severity_escape_rate.viz.md``
+    — that file is the contract for the chart shape; the compile
+    target renders the executable form against the merge log at
+    evaluation time.
+  inputs:
+    - name: hygiene_linter_high_finding
+      description: >
+        A single HIGH-severity finding emitted by
+        ``python -m tools.hygiene_linter`` against the tree at a
+        merged-to-main commit. HIGH-severity rules live under
+        ``tools/hygiene_linter/rules/credentials.py`` (AWS access
+        keys, GitHub tokens, PEM private-key blocks, ``KEY=value``
+        assignments with high-entropy values, generic high-entropy
+        tokens). The linter is dependency-free pure-Python (the
+        module docstring at ``tools/hygiene_linter/cli.py`` pins the
+        contract: "fully offline and pure-Python with no third-party
+        deps"); the catalog entry binds to that artifact shape, not
+        to a vendor-specific SAST surface.
+    - name: merged_commit_under_evaluation
+      description: >
+        Distinct commit observed as a merge into the default branch
+        in the evaluation window. The numerator counts commits that
+        carry at least one ``hygiene_linter_high_finding``; the
+        denominator counts every commit in the same window so the
+        ratio is comparable across windows of different volume.
+  window:
+    duration: P90D
+    sliding: true
+external_refs:
+  - name: SecOps-NG AGENTS.md §3 — Public-bar hygiene
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/AGENTS.md
+  - name: SecOps-NG FOUNDATION §3 — Sovereignty
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+  - name: NIS2 — Article 21(2)(d) supply chain security (motivating context — upstream artifact hygiene)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(d)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ENISA — Coordinated Vulnerability Disclosure guidance (motivating context — public-surface hygiene)
+    source: ENISA
+    url: https://www.enisa.europa.eu/topics/vulnerability-disclosure
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - sovereignty
+  - auditability

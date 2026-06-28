@@ -1,0 +1,138 @@
+stable_id: kpi.gdpr_lawful_basis_section_coverage@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: GDPR data-flow lawful-basis section coverage across cookbook workflows
+summary: >
+  Ratio of cookbook playbooks under ``content/playbooks/`` whose
+  sibling GDPR data-flow document under
+  ``content/mappings/gdpr/data-flow-<workflow>.md`` passes the
+  F-GD-02 CI guard at ``tools/lint_gdpr_lawful_basis.py`` on the
+  evaluation commit. The guard enforces the seven canonical sections
+  of the data-flow template (Purpose, Lawful basis, Categories,
+  Recipients, Retention, Cross-border transfers, Data subject
+  rights), with each section carrying a non-empty contributor body —
+  blockquote template guidance and ``<fill in>`` placeholders do not
+  count as filled. Per F-GD-02 (ROADMAP), the lawful-basis assertion
+  is the sovereignty-posture evidence the project carries on every
+  cookbook workflow; per docs/FOUNDATION.md §3 (Sovereignty), the
+  GDPR lawful-basis register is the public-bar contract the
+  Digital Commons honours so an operator deploying a workflow can
+  trust the lawful basis is documented in the open rather than left
+  to per-deployment improvisation. The chart shape, threshold bands,
+  and reference rendering are the contract for the operator-facing
+  surface; the compile target is the source of truth for the
+  executable form.
+unit: ratio
+direction: higher_is_better
+target:
+  value: 1.0
+  comparator: "=="
+  rationale: >
+    The F-GD-02 EXTEND wave landed the seven-section coverage check
+    as gating CI — every cookbook playbook discovered under
+    ``content/playbooks/`` must have a sibling
+    ``data-flow-<workflow>.md`` whose section set matches the
+    canonical template exactly and whose section bodies are
+    non-empty contributor prose. A green ring across the cookbook
+    surface is the sovereignty floor; anything less than 1.0 means
+    a cookbook workflow shipped without the lawful-basis register
+    the FOUNDATION §3 posture commits the project to maintain.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 1.0
+    severity: warn
+  - name: breach
+    comparator: "<"
+    value: 0.95
+    severity: high
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: >
+    Discover the cookbook-playbook directory names under
+    ``content/playbooks/`` via the
+    ``tools.lint_gdpr_lawful_basis.discover_playbooks`` contract
+    (non-underscore-prefixed directory carrying a ``README.md``).
+    For each discovered playbook, re-run the F-GD-02 guard against
+    the tree at the evaluation commit and record one observation:
+    1 if the playbook's sibling data-flow doc passes the guard
+    (every canonical section is present and non-empty per
+    ``_section_body_is_non_empty``), 0 if any of the four finding
+    kinds fires (``missing_doc``, ``missing_section``,
+    ``empty_section``, ``unexpected_section``). Aggregate as ratio
+    across observations. Reference visualisation: a horizontal bar
+    chart of per-workflow guard outcomes (1 = pass, 0 = fail) per
+    cookbook playbook discovered, sorted by outcome ascending so
+    the failures sit at the top, with a horizontal line at the
+    pass-floor of 1 marking the guard predicate and the ratio
+    aggregate annotated as the headline figure; the chart is the
+    canonical operator-facing surface for this KPI. The committed
+    reference rendering lives at
+    ``content/metrics/gdpr_lawful_basis_section_coverage.viz.md``
+    — that file is the contract for the chart shape; the compile
+    target renders the executable form against the F-GD-02 guard
+    output at evaluation time.
+  inputs:
+    - name: cookbook_playbook_under_evaluation
+      description: >
+        Single cookbook-playbook directory name discovered under
+        ``content/playbooks/`` via the
+        ``tools.lint_gdpr_lawful_basis.discover_playbooks``
+        contract. The discovery rule is pinned in the module
+        docstring: a non-underscore-prefixed directory that carries
+        a ``README.md`` file. Underscore-prefixed directories
+        (Python-package shims for legacy import paths) are excluded
+        because they are not playbooks. Each discovered playbook
+        contributes one observation to the catalog aggregation.
+        Bound here as the executive_metrics worked example because
+        that playbook carries the data-flow doc + cookbook README
+        + cross-target ring this KPI evidences.
+      playbook_ref: playbook.executive_metrics@v1
+    - name: f_gd_02_guard_outcome
+      description: >
+        Outcome of the F-GD-02 CI guard at
+        ``tools/lint_gdpr_lawful_basis.py`` for one cookbook
+        playbook on the evaluation commit. The guard emits findings
+        of kind ``missing_doc``, ``missing_section``,
+        ``empty_section``, or ``unexpected_section``; any finding
+        kind for a playbook fails its observation (the catalog
+        entry does not weight finding kinds — a single fail
+        registers as `0` regardless of how many sections drifted on
+        that playbook's doc, matching the guard's contract that any
+        non-empty findings list is a non-zero exit). Bound here as
+        the it_security_support_agent worked example because it
+        exercises the full seven-section coverage check the EXTEND
+        wave pinned.
+      playbook_ref: playbook.it_security_support_agent@v1
+  window:
+    duration: P1D
+    sliding: false
+playbook_refs:
+  - playbook_id: playbook.executive_metrics@v1
+  - playbook_id: playbook.it_security_support_agent@v1
+  - playbook_id: playbook.incident_management@v1
+  - playbook_id: playbook.asset_management@v1
+external_refs:
+  - name: SecOps-NG FOUNDATION §3 — Sovereignty
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+  - name: SecOps-NG ROADMAP — F-GD-02 lawful-basis CI guard
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/ROADMAP.md
+  - name: GDPR — Article 6 lawfulness of processing
+    source: EU
+    external_id: Regulation (EU) 2016/679, Art. 6
+    url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+  - name: GDPR — Article 30 records of processing activities
+    source: EU
+    external_id: Regulation (EU) 2016/679, Art. 30
+    url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+  - name: EDPB — Guidelines on legitimate interest assessments
+    source: EDPB
+    url: https://edpb.europa.eu/our-work-tools/our-documents/guidelines_en
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - sovereignty
+  - auditability
