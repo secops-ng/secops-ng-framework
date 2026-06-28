@@ -356,22 +356,30 @@ dora:
 
 cra:
   # No CRA inbound entry currently backlinks
-  # playbook.asset_management@v1. CRA Annex I §1 essential
-  # cybersecurity requirements (in particular §1(c) on default
-  # secure configurations and §1(e) on protection from
-  # unauthorised access) are defensible upstream anchors for the
-  # asset-management discharge against manufacturer-side
-  # configuration and component visibility, but the CRA's per-
-  # product manufacturer scope is narrower than the operator-side
-  # estate-wide reconciliation this playbook owns. The SKELETON
-  # overlay does NOT pre-author the inbound entry: gap notes are
-  # separate cards, not scope creep on a single-purpose SKELETON
-  # PR. A future inbound-closure card adds the CRA Annex I
-  # anchor (if the manufacturer-vs-operator scope difference is
-  # resolved in scope-mapping review) and the outbound pin lands
-  # together with it. Mirrors the patch_management and
-  # ddos_response CRA gap-note precedents. The orphan-CI grace-
-  # window closure for this playbook is audited as a skip entry
-  # under content/mappings/cra/_orphan_skip.yaml (slug
-  # asset_management).
+  # playbook.asset_management@v1, and the scope-mapping review
+  # has now concluded this is a durable, reviewed deferral
+  # rather than an open TODO. The estate-wide asset
+  # reconciliation discharge this playbook owns is materially
+  # an operator obligation under NIS2 Art. 21(2)(i) and
+  # DORA Art. 8(4) — both axes are closed (see the nis2: and
+  # dora: blocks above). CRA Annex I is product-by-product
+  # manufacturer scope: every operator-side clause that asset
+  # visibility could plausibly anchor against (§1(b) secure-by-
+  # default, §1(c) configuration security, §1(d) access control,
+  # §1(e) protection from unauthorised access, §1(l) logging /
+  # monitoring) is already pinned to the playbook that actually
+  # discharges it (cloud_misconfiguration /
+  # infra_posture_management / iam_auditor /
+  # onboarding_offboarding_tracker / mfa_secured_comms /
+  # crypto_posture_management / identity_compromise / the
+  # detection-engineering and alert-triage lanes). Adding an
+  # asset_management pin to any of those would duplicate the
+  # discharge and dilute the existing inbound. The
+  # clause-by-clause review is recorded under the
+  # asset_management entry in
+  # content/mappings/cra/_orphan_skip.yaml; the orphan-CI
+  # closure for this playbook on the CRA axis is audited there
+  # as a reviewed skip rather than a pending gap. Re-open the
+  # review if CRA secondary acts carve an operator-side
+  # inventory anchor not already covered by the pins above.
   []

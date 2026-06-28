@@ -45,20 +45,68 @@ skip:
       records the same gap note in its `cra: []` block.
   - slug: asset_management
     rationale: >-
-      Asset and configuration management SKELETON. CRA Annex I
-      §1(c) (default secure configurations) and §1(e) (protection
-      from unauthorised access) are defensible upstream anchors
-      for asset-management visibility against manufacturer-side
-      configuration and component delivery, but the CRA's per-
-      product manufacturer scope is narrower than the operator-
-      side estate-wide reconciliation this playbook owns. The
-      manufacturer-vs-operator scope difference needs scope-
-      mapping review before a CRA inbound is authored, and the
-      SKELETON overlay does NOT pre-author the inbound entry:
-      gap notes are separate cards, not scope creep on a single-
-      purpose SKELETON PR. A future inbound-closure card adds the
-      CRA Annex I anchor against the appropriate operator-vs-
-      manufacturer slice and the outbound pin lands together with
-      it on the `content/playbooks/asset_management/mappings.yaml`
-      overlay (`cra: []` block). Mirrors the `patch_management`
-      and `ddos_response` CRA gap-note precedents.
+      Asset and configuration management. Scope-mapping review
+      against CRA Annex I was completed and concluded that no
+      defensible operator-side CRA inbound exists for this
+      playbook on the current substrate; this entry is therefore
+      a reviewed, durable deferral rather than an open TODO.
+      Clauses considered, with the reason each is manufacturer-
+      scoped or already-pinned-elsewhere:
+        - §1(b) secure-by-default configuration: already pinned
+          to `cloud_misconfiguration` (misconfiguration
+          remediation) under `cra:annex-i-1-secure-by-default` in
+          annex-i-1-essential-cybersecurity.yaml and to
+          `infra_posture_management` (continuous-attestation
+          drift detection) under
+          `cra:annex-i-1-b-secure-by-default-infra-posture`. Both
+          are operator-side complements to the manufacturer's
+          ship-secure obligation; adding `asset_management` would
+          duplicate the §1(b) anchor and dilute the existing
+          drift-detection pin.
+        - §1(c) configuration security including default secure
+          configuration: the manufacturer-side obligation is to
+          ship the product secure-by-default; the operator-side
+          continuous-attestation surface is the `infra_posture_
+          management` / `cloud_misconfiguration` pair above.
+          Asset reconciliation against a canonical inventory
+          (the discharge this playbook owns) is structurally
+          one layer below configuration evaluation — it answers
+          "what is in the estate?", not "is each item configured
+          to the §1(c) baseline?" — so a §1(c) pin would
+          misrepresent the playbook's actual discharge.
+        - §1(d) access control: already pinned to
+          `iam_auditor` / `onboarding_offboarding_tracker` /
+          `mfa_secured_comms` under the three
+          `cra:annex-i-1-d-access-control-*` inbounds.
+          Asset_management does not own an access-control
+          evaluation surface; pinning it here would dilute the
+          existing JML / MFA / IAM-auditor triad.
+        - §1(e) protection from unauthorised access (incl.
+          cryptography): already pinned to `crypto_posture_
+          management` under both `cra:annex-i-1-confidentiality`
+          (in annex-i-1-essential-cybersecurity.yaml) and
+          `cra:annex-i-1-e-confidentiality-crypto-posture`, with
+          `identity_compromise` covering the unauthorised-access
+          incident lane under `cra:annex-i-1-access-control` in
+          the essential-cybersecurity file. Asset visibility is
+          not an unauthorised-access control; a §1(e) pin would
+          misrepresent the discharge.
+        - §1(l) logging and monitoring: already pinned to the
+          alert-triage and detection-engineering lanes; asset
+          inventory is upstream of (not part of) the security-
+          monitoring discharge.
+      Estate-wide asset reconciliation is materially an operator
+      obligation under NIS2 Art. 21(2)(i) and DORA Art. 8(4) —
+      both of which this playbook already discharges via
+      `nis2:art-21-2-i-asset-management` and the DORA Art. 8
+      inbound landed in #519. The CRA's product-by-product
+      manufacturer scope simply has no clause that the
+      operator-side inventory-reconciliation discharge maps onto
+      without duplicating an existing pin. Mirrors the
+      `ddos_response` and `incident_management` CRA deferral
+      precedents in shape and the `patch_management` precedent
+      in regulatory-axis split (operator-side reconciliation
+      stays on NIS2/DORA; CRA stays on the per-product manu-
+      facturer chain). Re-open the review if and when CRA
+      secondary acts or guidance carve an operator-side
+      inventory anchor not already covered by the pins above.
