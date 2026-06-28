@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/evidence/patch.schema.json",
+  "title": "SecOps-NG Patch Application Evidence Artifact",
+  "description": "Typed shape for one evidence artifact emitted by the patch-application evidence stream. One artifact is produced per scheduled execution of `playbook.patch_management@v1` and pins, mechanically, (a) the tracked update subject + advisory reference resolved at the detect step, (b) the classified patch criticality against the closed taxonomy (`security-critical`, `security-routine`, `feature-only`) or the `unclassified` sentinel on the deadline-missed branch, (c) the staged canary ring identifier the stage-rollout step engaged, (d) the canary health outcome from the validate-canary step, (e) the broad rollout identifier from the fan-out step (empty on the canary-unhealthy branch with an explicit skip marker), and (f) the observed health-gate measurements across the validation window. The artifact is compile-target-agnostic: the deterministic `artifact_id` keys on `<workflow_id>|<execution_id>|<captured_at>` and does NOT include the compile target, so the three reference compilers (n8n, Temporal, LangGraph) re-derive byte-identical bytes from the same primitive output. Public-bar artifact: subject / advisory / ring identifiers stay opaque operator-side strings; individual personal names, credential-shaped strings, and raw configuration secret material are out of scope per AGENTS.md \u00a73.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_id",
+    "stream",
+    "workflow_id",
+    "execution_id",
+    "regulation_refs",
+    "control_refs",
+    "update_subject",
+    "update_reference",
+    "patch_criticality",
+    "staged_ring_id",
+    "canary_healthy",
+    "broad_rollout_id",
+    "health_observations",
+    "captured_at",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Pinned schema version. Lets a consumer reject artifacts produced under an older schema once breaking changes ship.",
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "artifact_id": {
+      "description": "Stable per-artifact identifier. Convention: SHA-256 hex digest of `<workflow_id>|<execution_id>|<captured_at>` (UTF-8, no separators around the pipes). Deterministic on those three inputs; re-emissions inside the same execution at the same `captured_at` instant stay byte-identical at the path level. Compile target is intentionally NOT part of the id so the three reference compilers re-derive byte-identical bytes from the same primitive output (this is the byte-parity contract the F-WF-PATCH CORE-FANOUT siblings assert against).",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "stream": {
+      "description": "Identifies which evidence stream produced the artifact. Constant on this schema.",
+      "type": "string",
+      "const": "patch"
+    },
+    "workflow_id": {
+      "description": "Stable workflow identifier; pinned to `patch_management` for this stream.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*$",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "execution_id": {
+      "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id).",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "regulation_refs": {
+      "description": "Pins to the upstream regulatory mapping entries this artifact helps satisfy. The patch_management playbook anchors against `nis2:art-21-2-e` (security in acquisition, development and maintenance), `dora:art-9-maintenance-patch-rollout` (per-event maintenance / patch-rollout slice under JC RTS Art. 10), and `cra:annex-i-2-security-updates-rollout` (per-event maintenance-rollout limb of Annex I \u00a72).",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(nis2|dora|cra|gdpr|iso27001|soc2):[a-z0-9][a-z0-9.-]*$",
+        "maxLength": 120
+      }
+    },
+    "control_refs": {
+      "description": "Control stable-ids attested by this artifact. The patch_management playbook anchors against `control.patch_evidence@v1` (NIST SP 800-53 SI-2 / SI-2(2)).",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+      }
+    },
+    "update_subject": {
+      "description": "Opaque operator-side identifier of the tracked package / image / firmware line the update applies to (matches a row in the operator's documented deployment-inventory). Role-shaped or URN-shaped; personal-name strings rejected at the primitive boundary.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$"
+    },
+    "update_reference": {
+      "description": "Opaque operator-side identifier of the security update / patch advisory being rolled out (advisory id, vendor reference, upstream release tag).",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$"
+    },
+    "patch_criticality": {
+      "description": "Closed taxonomy bucket for this update against the operator's documented patch-criticality taxonomy. `unclassified` is the sentinel emitted on the deadline-missed short-circuit branch; downstream reviewers treat the update as security-critical for scheduling urgency.",
+      "type": "string",
+      "enum": [
+        "security-critical",
+        "security-routine",
+        "feature-only",
+        "unclassified"
+      ]
+    },
+    "staged_ring_id": {
+      "description": "Deterministic identifier of the canary ring the staged-rollout step engaged the update against. Always populated; the value names the ring that received the update on the staged branch even on the short-circuit branch.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "canary_healthy": {
+      "description": "Outcome of the validate-canary step. `true` when the canary ring is observed inside the documented health gates (functional probes green, error-rate / latency deviation inside the documented thresholds, rollback path verified) for the documented validation window; `false` when the canary is unhealthy and the broad rollout was paused.",
+      "type": "boolean"
+    },
+    "broad_rollout_id": {
+      "description": "Deterministic identifier of the broad-ring rollout engagement once the canary has reported healthy. Empty string on the canary-unhealthy branch (the fan-out step is a deterministic skip leaving the broad-rollout id empty with an explicit skip marker on `broad_rollout_skip_reason`).",
+      "type": "string",
+      "pattern": "^(|[0-9a-f]{64})$"
+    },
+    "broad_rollout_skip_reason": {
+      "description": "Explicit skip marker emitted when the fan-out step is deterministically skipped. Required iff `broad_rollout_id` is empty.",
+      "type": "string",
+      "enum": ["canary_unhealthy"]
+    },
+    "health_observations": {
+      "description": "Observed health-gate measurements across the validation window. The closed set mirrors the CACAO gate inputs: functional probe outcome, error-rate / latency deviation, rollback readiness.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "functional_probe",
+        "error_rate_within_threshold",
+        "latency_within_threshold",
+        "rollback_ready"
+      ],
+      "properties": {
+        "functional_probe": {
+          "description": "Closed enum: `green` (probe succeeded), `red` (probe failed), `unknown` (probe did not report inside the validation window).",
+          "type": "string",
+          "enum": ["green", "red", "unknown"]
+        },
+        "error_rate_within_threshold": {
+          "type": "boolean"
+        },
+        "latency_within_threshold": {
+          "type": "boolean"
+        },
+        "rollback_ready": {
+          "type": "boolean"
+        }
+      }
+    },
+    "captured_at": {
+      "description": "ISO-8601 UTC second-precision timestamp at which this artifact was captured. Part of `artifact_id` so two captures at the same instant against the same execution stay byte-identical, and re-runs at different instants do not collide.",
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "provenance": {
+      "description": "Where this artifact came from. Mirrors the provenance pattern used by the other evidence streams so a reviewer can re-derive the chain back to source.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_url", "captured_at"],
+      "properties": {
+        "source_url": {
+          "description": "URL of the workflow run that produced this artifact. Compile targets may use their own run-id URLs; the URL itself is opaque to this schema.",
+          "type": "string",
+          "format": "uri"
+        },
+        "captured_at": {
+          "description": "ISO-8601 UTC timestamp matching the artifact-level `captured_at`.",
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "commit_sha": {
+          "description": "Optional commit SHA of the content snapshot the workflow walked.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,64}$"
+        }
+      }
+    },
+    "owner": {
+      "description": "Optional dated ownership pointer for the maintenance posture this artifact covers. Role-shaped \u2014 a working-group mailbox, a generic role title, or a community handle. Individual personal names are out of scope per AGENTS.md \u00a73 and rejected here as a matter of schema discipline.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "assigned_at"],
+      "properties": {
+        "role": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "assigned_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        }
+      }
+    },
+    "retention": {
+      "description": "Optional retention pointer the operator declares for this evidentiary record. ISO-8601 duration, defaulted by the operator's configuration.",
+      "type": "string",
+      "pattern": "^P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+S)?)?$"
+    }
+  },
+  "allOf": [
+    {
+      "description": "Skip-marker invariant: broad_rollout_skip_reason is present iff broad_rollout_id is the empty string. Captured as conditional allOf clauses so a reviewer can derive the failure mode either way.",
+      "if": {
+        "properties": {"broad_rollout_id": {"const": ""}},
+        "required": ["broad_rollout_id"]
+      },
+      "then": {"required": ["broad_rollout_skip_reason"]}
+    },
+    {
+      "if": {
+        "properties": {"broad_rollout_id": {"pattern": "^[0-9a-f]{64}$"}},
+        "required": ["broad_rollout_id"]
+      },
+      "then": {"not": {"required": ["broad_rollout_skip_reason"]}}
+    }
+  ]
+}
