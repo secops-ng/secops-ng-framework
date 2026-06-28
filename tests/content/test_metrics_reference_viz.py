@@ -101,6 +101,10 @@ VIZ_REQUIRED_STEMS = (
     # F-WF-ASSET EXTEND-metrics — asset_management catalog closeout
     "asset_inventory_drift",
     "unmanaged_asset_cardinality",
+    # F-MET-SOV SKELETON — sovereignty catalog back-fill (G-04)
+    "forward_public_hygiene_high_severity_escape_rate",
+    "lm_endpoint_eu_residency_coverage",
+    "gdpr_lawful_basis_section_coverage",
 )
 
 
