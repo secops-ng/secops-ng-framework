@@ -101,6 +101,9 @@ VIZ_REQUIRED_STEMS = (
     # F-WF-ASSET EXTEND-metrics — asset_management catalog closeout
     "asset_inventory_drift",
     "unmanaged_asset_cardinality",
+    # F-WF-PATCH EXTEND-metrics — patch_management catalog closeout
+    "patch_rollout_overdue_exposure",
+    "patch_rollout_success_rate",
 )
 
 

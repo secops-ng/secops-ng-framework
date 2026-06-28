@@ -1,0 +1,148 @@
+stable_id: kpi.patch_rollout_success_rate@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Patch-rollout success rate — share of patch executions whose broad-ring rollout completed with the canary observed healthy
+summary: >
+  Performance indicator derived from the patch_management
+  patch-application evidence stream. For each scheduled execution of
+  the playbook the evidence-capture step emits one
+  patch-application evidence artifact; this indicator computes the
+  share of executions in the evaluation window whose broad rollout
+  was engaged with a healthy canary — `canary_healthy == True` and a
+  non-empty `broad_rollout_id` against the documented broad-ring
+  topology. Falling values mean the patch-management practice is
+  losing rollouts at the canary gate or at the classify-deadline
+  short-circuit branch — the failure mode NIS2 Art. 21(2)(e), DORA
+  Art. 9, and CRA Annex I §2 reviewers surface against the
+  maintenance / security-update obligation.
+
+unit: ratio
+direction: higher_is_better
+
+target:
+  value: 0.95
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point for the unscoped baseline. A
+    well-disciplined patch-management practice completes at least 95%
+    of attempted patch executions through the canary-and-broad-ring
+    rollout under the documented intake deadline; the residual 5%
+    accounts for legitimate canary-unhealthy halts that the operator's
+    rollback discipline correctly catches before broad exposure.
+    Operators under scoped programmes set higher targets with
+    documented rationale in their scoped variants.
+
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 0.95
+    severity: warn
+  - name: breach
+    comparator: "<"
+    value: 0.80
+    severity: high
+  - name: critical
+    comparator: "<"
+    value: 0.50
+    severity: critical
+
+measurement:
+  source: workflow
+  aggregation: ratio
+  formula: >
+    For each patch_management execution in the evaluation window that
+    emitted a patch-application evidence artifact (stream = `patch`,
+    schemas/evidence/patch.schema.json), count the execution as a
+    successful rollout if `canary_healthy == True` AND
+    `broad_rollout_id` is a non-empty 64-char hex digest (i.e. the
+    fan-out step engaged the broad ring, not the deterministic skip
+    branch). The success rate is `successful_count / total_count`
+    over the window, where `total_count` is the cardinality of
+    patch-application evidence artifacts emitted in the window.
+    Executions whose evidence-capture step never fired are excluded
+    from both numerator and denominator so the indicator does not
+    silently improve when the pipeline stalls. Reference
+    visualisation: a ratio-headline gauge with warn / breach /
+    critical band overlays over a per-execution success / skip
+    drill-down sliced by execution; the committed reference
+    rendering lives at
+    `content/metrics/patch_rollout_success_rate.viz.md` — that file
+    is the contract for the chart shape; the compile target renders
+    the executable form against operator data.
+  inputs:
+    - name: canary_healthy
+      description: >
+        Boolean canary-health outcome emitted by the validate-canary
+        step. Carried on the JSON-native patch-application evidence
+        artifact the evidence-capture step emits
+        (schemas/evidence/patch.schema.json, stream = `patch`); the
+        catalog entry binds to that evidence artifact field, not to a
+        vendor-specific patch-management API. The
+        validate-canary primitive is the source of truth: a healthy
+        canary requires `functional_probe == "green"` AND all three
+        threshold gates (`error_rate_within_threshold`,
+        `latency_within_threshold`, `rollback_ready`) true.
+      playbook_ref: playbook.patch_management@v1
+      playbook_step: action--70000000-0000-4000-8000-000000000005
+      field: canary_healthy
+    - name: broad_rollout_id
+      description: >
+        Deterministic broad-ring rollout identifier emitted by the
+        fan-out-to-broad-rings step. Carried on the same patch-
+        application evidence artifact. A non-empty 64-char hex
+        digest indicates the broad rollout engaged a healthy canary;
+        the empty string indicates the deterministic skip branch
+        against an unhealthy canary. The success condition requires
+        a non-empty digest.
+      playbook_ref: playbook.patch_management@v1
+      playbook_step: action--70000000-0000-4000-8000-000000000006
+      field: broad_rollout_id
+    - name: health_observations
+      description: >
+        Closed-shape health-gate block emitted by the validate-canary
+        step. Carried on the same patch-application evidence artifact
+        as the `health_observations` object
+        (schemas/evidence/patch.schema.json#/properties/health_observations).
+        Included as a documented input so a consumer drilling down
+        from the headline ratio reads the contributing gate values
+        per execution; the boolean `canary_healthy` field is the
+        primary input to the success condition, the block is the
+        forensic context.
+      playbook_ref: playbook.patch_management@v1
+      playbook_step: action--70000000-0000-4000-8000-000000000005
+      field: health_observations
+  window:
+    duration: P30D
+    sliding: true
+
+playbook_refs:
+  - playbook_id: playbook.patch_management@v1
+    step_id: action--70000000-0000-4000-8000-000000000007
+
+external_refs:
+  - name: NIS2 — Article 21(2)(e) security in acquisition, development and maintenance
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(e)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 9 protection and prevention (maintenance / patch rollout)
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 9
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: CRA — Annex I §2 (security updates rollout)
+    source: EU
+    external_id: Regulation (EU) 2024/2847, Annex I §2
+    url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+  - name: NIST SP 800-53 Rev. 5 — SI-2(2) Flaw Remediation | Automated Flaw Remediation Status
+    source: NIST
+    external_id: NIST SP 800-53 Rev. 5 SI-2(2)
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-2
+  - name: ENISA — Good practices on the patch-management lifecycle
+    source: ENISA
+    url: https://www.enisa.europa.eu/topics/risk-management
+
+maintainer: metrics-wg@secops-ng.org
+
+foundation_property:
+  - auditability
+  - operability
