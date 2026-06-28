@@ -20,28 +20,31 @@
 # inventory-source architecture itself; it operationalises a
 # documented reconciliation posture against pre-bound sources.
 #
-# Status: SKELETON. Only the NIS2 Art. 21(2)(i) asset-management
-# anchor is pinned here. CORE-layer cards add the D3FEND defensive-
-# technique bindings (D3-AI Asset Inventory on the reconcile step,
-# D3-SWI Software Inventory on the ingest step, candidate D3-SYSCONFIG
-# / D3-BCA on the baseline-drift classification slice) once stable
-# upstream rule ids are selected together with the deterministic
-# per-step primitives; EXTEND-layer cards wire the asset-inventory-
-# drift and unmanaged-asset-cardinality metric emitters against the
-# operator's evidence store. The SKELETON overlay does NOT pre-author
-# a DORA or CRA outbound entry: DORA Art. 8 (identification function
-# — asset / configuration register) and CRA Annex I §1(c) / §1(e)
-# (manufacturer obligations for components and configurations
-# delivered with a product) are defensible upstream anchors for
-# asset_management, but no DORA or CRA inbound entry currently
-# backlinks playbook.asset_management@v1, and the SKELETON refuses to
-# silently widen scope; gap notes are separate cards, not scope creep
-# on a single-purpose SKELETON PR. The orphan-CI grace-window closure
-# for this playbook is audited as a skip entry under
-# content/mappings/dora/_orphan_skip.yaml and
-# content/mappings/cra/_orphan_skip.yaml. Mirrors the patch_management
-# and ddos_response SKELETON precedents (single inbound regulatory
-# anchor on the NIS2 axis, deferred DORA / CRA inbound-closure cards).
+# Status: SKELETON + EXTEND-mappings-DORA. The NIS2 Art. 21(2)(i)
+# asset-management anchor was pinned at the SKELETON layer. The
+# EXTEND-mappings-DORA card adds the DORA Art. 8 (identification
+# function — asset / configuration register, exercised under the
+# JC RTS on ICT risk management framework — Commission Delegated
+# Regulation (EU) 2024/1774) inbound anchor and the reciprocal
+# outbound entry below, closing the orphan-CI graph on the DORA
+# axis and removing the asset_management skip entry from
+# content/mappings/dora/_orphan_skip.yaml. CORE-layer cards add the
+# D3FEND defensive-technique bindings (D3-AI Asset Inventory on the
+# reconcile step, D3-SWI Software Inventory on the ingest step,
+# candidate D3-SYSCONFIG / D3-BCA on the baseline-drift
+# classification slice) once stable upstream rule ids are selected
+# together with the deterministic per-step primitives; EXTEND-layer
+# cards wire the asset-inventory-drift and unmanaged-asset-
+# cardinality metric emitters against the operator's evidence
+# store. CRA Annex I §1(c) / §1(e) (manufacturer obligations for
+# components and configurations delivered with a product) remains
+# a defensible upstream anchor on the CRA axis, but no CRA inbound
+# entry currently backlinks playbook.asset_management@v1; the CRA
+# inbound-closure is a separate sibling card and the CRA grace-
+# window skip entry stays in place under
+# content/mappings/cra/_orphan_skip.yaml pending that work.
+# Mirrors the patch_management and ddos_response per-axis inbound-
+# closure precedents.
 #
 # Deliberate OSCAL omissions:
 #   - CM-2 (Baseline Configuration) is NOT pinned at the SKELETON
@@ -202,27 +205,50 @@ nis2:
       reconciliation outcome across the reconciliation window.
 
 dora:
-  # No DORA inbound entry currently backlinks
-  # playbook.asset_management@v1. DORA Art. 8 (identification
-  # function — asset / configuration register, exercised under the
-  # JC RTS on ICT risk management framework — Commission Delegated
-  # Regulation (EU) 2024/1774) is the upstream obligation
-  # asset_management most directly operationalises, but Art. 8's
-  # operational discharge is broader than the per-window
-  # reconciliation this playbook owns (asset-classification and
-  # information-system-mapping disciplines extend beyond inventory
-  # delta-capture into criticality assessment and dependency
-  # mapping). The SKELETON overlay does NOT silently widen scope
-  # to pin an outbound DORA entry against a missing inbound; a
-  # separate inbound-closure card adds the inbound Art. 8 anchor
-  # against the asset / configuration register surface and the
-  # outbound pin lands together with it. Mirrors the patch_management
-  # DORA Art. 9 and ddos_response DORA Art. 11 gap-note precedents:
-  # gap notes are separate cards, not scope creep on a single-
-  # purpose SKELETON PR. The orphan-CI grace-window closure for
-  # this playbook is audited as a skip entry under
-  # content/mappings/dora/_orphan_skip.yaml (slug asset_management).
-  []
+  # Inbound entry that backlinks playbook.asset_management@v1:
+  #   - content/mappings/dora/article-8.yaml
+  #     (id dora:art-8-identification — DORA Art. 8 identification
+  #     function: asset / configuration register, exercised under
+  #     the JC RTS on ICT risk management framework — Commission
+  #     Delegated Regulation (EU) 2024/1774)
+  # Pinned outbound below to close the graph. The orphan-CI skip
+  # entry for asset_management under
+  # content/mappings/dora/_orphan_skip.yaml is removed in this same
+  # EXTEND-mappings-DORA PR — the grace-window skip is no longer
+  # needed once the real edge lands.
+  - mapping_id: dora:art-8-identification
+    article: "8"
+    notes: >-
+      DORA Art. 8 (identification function) requires financial
+      entities to identify, classify and adequately document all
+      ICT-supported business functions, information assets and ICT
+      assets supporting those functions, and their interdependencies,
+      and to review the inventory at least annually and upon every
+      major change. The operative detail for the asset / configuration
+      register surface is in the Level 2 RTS (Commission Delegated
+      Regulation (EU) 2024/1774, JC RTS on ICT risk management
+      framework). The asset_management playbook is the per-window
+      reconciliation materialisation of that surface against the
+      operator's deployed estate: ingest the documented inventory-
+      source set (CMDB, declarative infrastructure-as-code records,
+      cloud-provider asset APIs, endpoint-management agents),
+      reconcile to the operator-authoritative snapshot for the
+      current window, compute and classify the per-asset delta
+      against the documented delta taxonomy (new-managed, unmanaged-
+      discovered, decommissioned, baseline-drift), and capture the
+      dated asset-inventory-delta evidence record. This outbound
+      entry is the structural closure of the
+      dora:art-8-identification backlink. Out of scope of this
+      playbook's discharge: the supplier-inventory limb of Art. 8
+      (anchored end-to-end by control.supplier_inventory@v1; the
+      third-party-management playbook slice is owned by a separate
+      inbound-closure card) and the SBOM-capture limb on in-house
+      product assets (anchored end-to-end by control.sbom_capture@v1
+      against CRA Annex I §2, owned on the CRA axis). Mirrors the
+      patch_management DORA Art. 9(4)(a) inbound-closure precedent
+      and the ddos_response DORA Art. 11 inbound-closure precedent:
+      a single per-discipline outbound entry pinned against the
+      atom-per-obligation inbound anchor.
 
 cra:
   # No CRA inbound entry currently backlinks

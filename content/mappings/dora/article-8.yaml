@@ -26,7 +26,8 @@ entries:
       - control.asset_inventory_delta@v1
       - control.supplier_inventory@v1
       - control.sbom_capture@v1
-    playbook_refs: []
+    playbook_refs:
+      - playbook.asset_management@v1
     metric_refs:
       - kri.risk_register_staleness@v1
     notes: >-
@@ -35,3 +36,27 @@ entries:
       response) depends on. The agentic slice is keeping the asset and
       supplier inventories — and the SBOM record for in-house product
       assets — current and showing the dated delta on review cadence.
+      The asset_management playbook is the per-window reconciliation
+      materialisation of the asset / configuration register surface of
+      Art. 8(1) identification against the operator's deployed estate:
+      ingest the documented inventory-source set (CMDB, declarative
+      infrastructure-as-code records, cloud-provider asset APIs,
+      endpoint-management agents), reconcile to the operator-
+      authoritative snapshot for the current window, compute and
+      classify the per-asset delta against the documented delta
+      taxonomy (new-managed, unmanaged-discovered, decommissioned,
+      baseline-drift), and capture the dated asset-inventory-delta
+      evidence record. Level 2 detail for the identification function
+      sits in Commission Delegated Regulation (EU) 2024/1774 (JC RTS
+      on ICT risk management framework). Out of scope here: the
+      supplier-inventory limb (control.supplier_inventory@v1 anchors
+      that surface end-to-end; the third-party-management playbook
+      slice is owned by a separate inbound-closure card) and the
+      SBOM-capture limb on in-house product assets
+      (control.sbom_capture@v1 anchors that surface end-to-end against
+      the CRA Annex I §2 SBOM-capture obligation, owned on the CRA
+      axis). Mirrors the patch_management DORA Art. 9 inbound-closure
+      precedent at content/mappings/dora/article-9-maintenance-patch-
+      rollout.yaml. The outbound dora: entry on the playbook overlay
+      at content/playbooks/asset_management/mappings.yaml is the
+      structural closure of this backlink.
