@@ -20,7 +20,8 @@
 # inventory-source architecture itself; it operationalises a
 # documented reconciliation posture against pre-bound sources.
 #
-# Status: SKELETON + EXTEND-mappings-DORA. The NIS2 Art. 21(2)(i)
+# Status: SKELETON + EXTEND-mappings-DORA + EXTEND-mappings-D3FEND.
+# The NIS2 Art. 21(2)(i)
 # asset-management anchor was pinned at the SKELETON layer. The
 # EXTEND-mappings-DORA card adds the DORA Art. 8 (identification
 # function — asset / configuration register, exercised under the
@@ -123,23 +124,126 @@ oscal:
 
 d3fend:
   # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
-  # SKELETON layer pins no D3FEND techniques: the inventory-ingest /
-  # reconciliation / delta-classification disciplines map onto
-  # D3FEND techniques (Asset Inventory D3-AI on the reconcile step,
-  # Software Inventory D3-SWI on the ingest step, variants of
-  # System Configuration / Baseline-Configuration-Authority on the
-  # baseline-drift classification slice) but stable per-step pins
-  # depend on the deterministic primitives selected by the CORE-
-  # layer cards. A SKELETON overlay does not pre-author D3FEND
-  # pins ahead of the primitives they will anchor; the CORE-PRIM
-  # card adds the pins together with the deterministic bodies so
-  # the d3fend block lands closed rather than stub-shaped. Mirrors
-  # the patch_management and ddos_response SKELETON empty-block
-  # convention. The control file
-  # content/controls/control.asset_inventory_delta@v1.yaml already
-  # carries the D3-AI and D3-SWI pins on the control-side overlay;
-  # the per-step lift onto this mapping lands with the CORE bindings.
-  []
+  # CACAO step UUIDs are pinned to the real action UUIDs resolved
+  # from content/playbooks/asset_management/playbook.cacao.json
+  # (six action bodies: ingest-inventory-sources, reconcile-
+  # authoritative-inventory, compute-delta, classify-delta,
+  # capture-evidence, notify-inventory-owner). Two steps carry
+  # per-step D3FEND pins: D3-SWI on the ingest-inventory-sources
+  # step and D3-AI on the reconcile-authoritative-inventory step.
+  # The compute-delta, classify-delta, capture-evidence, and
+  # notify-inventory-owner steps are deliberately not pinned and
+  # the gaps are documented in the comments below (mirroring the
+  # patch_management and ddos_response per-step gap-note
+  # precedents — defensible technique anchors only, no weak
+  # bindings forced onto the per-window reconciliation discipline
+  # the playbook actually discharges).
+  #
+  # Upstream anchor: content/controls/control.asset_inventory_delta@v1.yaml
+  # already carries D3-AI (Asset Inventory) and D3-SWI (Software
+  # Inventory) on the control-side overlay; this EXTEND-mappings-
+  # D3FEND card is the per-step lift of the same two techniques
+  # onto the playbook overlay, narrowed to the ingest- and
+  # reconcile-side disciplines that produce the inventory the
+  # control names.
+  - step: action--80000000-0000-4000-8000-000000000002
+    d3fend_id: D3-SWI
+    d3fend_name: Software Inventory
+    url: https://d3fend.mitre.org/technique/d3f:SoftwareInventory/
+    notes: >-
+      ingest-inventory-sources — pulling each documented
+      inventory-source's snapshot of declared and observed assets
+      into the playbook's working set (CMDB rows, declarative
+      infrastructure-as-code records, cloud-provider asset-API
+      responses, endpoint-management agent inventories) is the
+      software-inventory discipline D3-SWI names: collection of
+      information about software present on systems against the
+      operator's deployed estate. D3FEND v1.0.0 frames D3-SWI as
+      the inventory-collection technique on the software side
+      specifically; the ingest step's source set is the
+      software-and-component inventory surface the operator's
+      documented sources expose, narrowed to the per-window
+      reconciliation cadence this playbook discharges rather than
+      the standing software-asset-register authoring surface
+      upstream of the playbook. Read-only against each source: the
+      step records the per-source observations under the
+      operator's documented source-precedence ordering, it does
+      not write back into the operator's CMDB or IaC declarations.
+      Mirrors the control.asset_inventory_delta@v1 control file's
+      D3-SWI pin; same technique, here narrowed to the per-window
+      ingest slice rather than the standing inventory surface.
+
+  - step: action--80000000-0000-4000-8000-000000000003
+    d3fend_id: D3-AI
+    d3fend_name: Asset Inventory
+    url: https://d3fend.mitre.org/technique/d3f:AssetInventory/
+    notes: >-
+      reconcile-authoritative-inventory — composing the operator-
+      authoritative snapshot for the current reconciliation window
+      from the ingested source set by merging per-source asset
+      observations under the operator's documented source-
+      precedence ordering, and pinning the deterministic snapshot
+      id (SHA-256 over the canonical, source-precedence-ordered,
+      normalised asset record list) is the asset-inventory
+      discipline D3-AI names: the maintenance of an authoritative
+      record of the assets the operator is responsible for.
+      D3FEND v1.0.0 frames D3-AI as the asset-side counterpart to
+      D3-SWI; the reconcile step is the asset-record reconciliation
+      slice against the operator's deployed estate, narrowed to
+      the per-window snapshot the playbook discharges. The
+      reconciled snapshot id is the audit-evident output of the
+      reconciliation pass and is consumed by the compute-delta /
+      classify-delta / capture-evidence steps. Read-only against
+      the source set: correcting drift is the operator's
+      downstream lever, the playbook only surfaces the
+      observation. Mirrors the control.asset_inventory_delta@v1
+      control file's D3-AI pin; same technique, here narrowed to
+      the per-window reconciliation slice rather than the
+      standing asset-register surface.
+
+  # Deliberate D3FEND omissions:
+  #   - compute-delta (action--80000000-0000-4000-8000-000000000004)
+  #     and classify-delta
+  #     (action--80000000-0000-4000-8000-000000000005) are NOT
+  #     pinned. The candidate techniques considered for the
+  #     baseline-drift slice of classify-delta (D3-SYSCONFIG /
+  #     D3-BCA family — variants of System Configuration /
+  #     Baseline-Configuration-Authority) do not land on a
+  #     defensible per-step anchor for this playbook: the playbook
+  #     surfaces baseline-drift as one of four delta-taxonomy
+  #     buckets against the operator's documented configuration
+  #     baseline, it does not author the baseline itself. The
+  #     baseline-authoring surface and the configuration-authority
+  #     surface live upstream of this playbook (operator
+  #     configuration-management documentation, IaC declaration
+  #     authoring), so pinning a Baseline-Configuration-Authority
+  #     technique on the classify step would conflate the per-
+  #     window delta-classification discipline with the upstream
+  #     authoring surface — exactly the conflation the CM-2 /
+  #     CM-3 OSCAL omissions documented in the header avoid on
+  #     the control axis. The upstream control file does not pin
+  #     a baseline-side D3FEND technique either, so the per-step
+  #     lift here mirrors the upstream anchor rather than forcing
+  #     a weak binding. The compute-delta step is the deterministic
+  #     diff slice between the reconciled snapshot and the
+  #     previous documented snapshot; no defensive-technique
+  #     anchor in D3FEND v1.0.0 names that internal pass at a
+  #     resolution finer than the D3-AI / D3-SWI inventory
+  #     disciplines the reconcile and ingest steps already carry.
+  #   - capture-evidence (action--80000000-0000-4000-8000-
+  #     000000000006) is NOT pinned: the dated evidence-emission
+  #     slice produces the audit-evident asset-inventory-delta
+  #     record, it does not itself execute a defensive technique
+  #     against the operator's deployed estate. Mirrors the
+  #     patch_management evidence-capture and ddos_response
+  #     evidence-capture gap-note precedents.
+  #   - notify-inventory-owner (action--80000000-0000-4000-8000-
+  #     000000000007) is NOT pinned: the notification-delivery
+  #     slice is the operator-side handoff to the inventory owner,
+  #     not a defensive-technique discharge. Mirrors the
+  #     patch_management notify-maintenance-owner and
+  #     ddos_response notify-incident-management-owner gap-note
+  #     precedents.
 
 ocsf:
   # OCSF v1.3.0 telemetry bindings. The ingest-inventory-sources,
