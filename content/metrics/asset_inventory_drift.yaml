@@ -1,0 +1,122 @@
+stable_id: kri.asset_inventory_drift@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Asset-inventory drift — per-window delta rate against the previous documented snapshot
+summary: >
+  Residual-exposure indicator derived from the asset_management
+  reconciliation evidence stream. For each reconciliation window the
+  playbook captures, the indicator reads the per-asset delta set
+  against the previous documented snapshot and reports the share of
+  reconciled assets that are NOT no-change observations. Rising values
+  mean the operator-authoritative inventory is drifting against the
+  documented sources — the failure mode NIS2 Art. 21(2)(i) reviewers
+  surface against the asset-management obligation.
+
+unit: ratio
+direction: lower_is_better
+
+target:
+  value: 0.05
+  comparator: "<="
+  rationale: >
+    Community-recommended starting point for the unscoped baseline. A
+    well-managed estate accrues a small steady-state of legitimate
+    deltas (new-managed onboarding, decommissioned offboarding,
+    baseline-drift remediation) inside the reconciliation cadence;
+    sustained drift above the floor indicates the operator's
+    reconciliation discipline is slipping rather than that the estate
+    itself is changing fast.
+
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 0.05
+    severity: warn
+  - name: breach
+    comparator: ">"
+    value: 0.20
+    severity: high
+  - name: critical
+    comparator: ">"
+    value: 0.50
+    severity: critical
+
+measurement:
+  source: workflow
+  aggregation: mean
+  formula: >
+    For each asset_management reconciliation in the evaluation window
+    that emitted an asset-inventory-delta evidence record, compute the
+    per-window drift ratio = |delta_set| / max(|snapshot|, 1), where
+    |snapshot| is the cardinality of the operator-authoritative
+    snapshot for that window (carried on the same evidence record as
+    snapshot_id provenance). Aggregate across the window with the
+    arithmetic mean of per-reconciliation ratios so a single noisy
+    reconciliation does not dominate the indicator. Reconciliations
+    that emitted the unclassified sentinel still contribute to the
+    indicator (the delta set is shaped before classification);
+    reconciliations whose evidence-capture step never fired are
+    excluded so the indicator does not silently improve when the
+    pipeline stalls. Reference visualisation: a ratio-headline gauge
+    with warn / breach / critical band overlays over a
+    per-reconciliation drift-ratio drill-down sliced by reconciliation
+    window; the committed reference rendering lives at
+    `content/metrics/asset_inventory_drift.viz.md` — that file is the
+    contract for the chart shape; the compile target renders the
+    executable form against operator data.
+  inputs:
+    - name: delta_set
+      description: >
+        Per-asset delta set the asset_management compute-delta step
+        emits at reconciliation. Carried on the JSON-native asset-
+        inventory-delta evidence artifact the capture-evidence step
+        emits (schemas/evidence/inventory.schema.json, stream =
+        `inventory`); the catalog entry binds to that evidence
+        artifact shape, not to a vendor-specific CMDB or asset-API
+        object. Empty delta sets are emitted explicitly and contribute
+        a zero-drift sample to the indicator.
+      playbook_ref: playbook.asset_management@v1
+      playbook_step: action--80000000-0000-4000-8000-000000000004
+      field: delta_set
+    - name: snapshot_id
+      description: >
+        Reconciled operator-authoritative snapshot id for the window.
+        Carried on the same asset-inventory-delta evidence artifact;
+        the catalog entry binds to the snapshot id to anchor the
+        denominator on the same evidentiary record as the numerator.
+        The compile target reads the snapshot cardinality from the
+        operator's evidence store keyed on the snapshot id.
+      playbook_ref: playbook.asset_management@v1
+      playbook_step: action--80000000-0000-4000-8000-000000000003
+      field: snapshot_id
+  window:
+    duration: P30D
+    sliding: true
+
+playbook_refs:
+  - playbook_id: playbook.asset_management@v1
+    step_id: action--80000000-0000-4000-8000-000000000006
+
+external_refs:
+  - name: NIS2 — Article 21(2)(i) human resources security, access-control policies, and asset management
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(i)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 8 ICT-related risk identification (asset register)
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 8
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: NIST SP 800-53 Rev. 5 — CM-8 System Component Inventory
+    source: NIST
+    external_id: NIST SP 800-53 Rev. 5 CM-8
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CM-8
+  - name: ENISA — Good practices on asset management for essential and important entities
+    source: ENISA
+    url: https://www.enisa.europa.eu/topics/risk-management
+
+maintainer: metrics-wg@secops-ng.org
+
+foundation_property:
+  - auditability
+  - operability

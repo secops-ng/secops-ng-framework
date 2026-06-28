@@ -1,0 +1,130 @@
+stable_id: kpi.unmanaged_asset_cardinality@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Unmanaged-asset cardinality — count of assets without authoritative owner/source attribution
+summary: >
+  Performance indicator derived from the asset_management
+  reconciliation evidence stream. For each reconciliation window the
+  playbook captures, the indicator reads the pre-computed
+  `unmanaged_discovered_count` field on the asset-inventory-delta
+  evidence artifact — the per-window cardinality of assets the
+  classify-delta step bucketed as `unmanaged-discovered` (present
+  in the reconciled snapshot, no authoritative owner / source
+  attribution from the reconciliation block) — and reports the most
+  recent observation across the evaluation window. This is the
+  exception bucket NIS2 Art. 21(2)(i) reviewers consume against the
+  asset-management obligation.
+
+unit: count
+direction: lower_is_better
+
+target:
+  value: 0
+  comparator: "=="
+  rationale: >
+    Community-recommended starting point for the unscoped baseline. A
+    well-managed estate carries no unmanaged-discovered assets at
+    reconciliation; the unscoped baseline target is zero and any
+    sustained non-zero observation indicates the operator's
+    asset-management discipline is slipping. Operators under scoped
+    programmes set a non-zero tolerance with documented rationale in
+    their scoped variants.
+
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 0
+    severity: warn
+  - name: breach
+    comparator: ">"
+    value: 10
+    severity: high
+  - name: critical
+    comparator: ">"
+    value: 100
+    severity: critical
+
+measurement:
+  source: workflow
+  aggregation: max
+  formula: >
+    For each asset_management reconciliation in the evaluation window
+    that emitted an asset-inventory-delta evidence record, read the
+    `unmanaged_discovered_count` integer field on the evidence artifact
+    (schemas/evidence/inventory.schema.json — the pre-computed count
+    of delta-classification entries equal to `unmanaged-discovered`).
+    Aggregate across the window with `max` so a brief excursion is
+    not hidden by a follow-up clean reconciliation: operators read the
+    worst-case observation, then drill down to the contributing
+    reconciliation via the evidence store. Reconciliations whose
+    classify-delta step short-circuited and emitted the
+    `unclassified` sentinel still contribute their observed count
+    (the classify primitive treats the unclassified set as
+    unmanaged-discovered for notification urgency, per the playbook
+    description). Reconciliations whose evidence-capture step never
+    fired are excluded so the indicator does not silently improve
+    when the pipeline stalls. Reference visualisation: a count-headline
+    gauge with warn / breach / critical band overlays over a
+    per-reconciliation unmanaged-discovered drill-down sliced by
+    reconciliation window; the committed reference rendering lives at
+    `content/metrics/unmanaged_asset_cardinality.viz.md` — that file
+    is the contract for the chart shape; the compile target renders
+    the executable form against operator data.
+  inputs:
+    - name: unmanaged_discovered_count
+      description: >
+        Per-window cardinality of `unmanaged-discovered` entries in
+        the classify-delta block. Carried on the JSON-native asset-
+        inventory-delta evidence artifact the capture-evidence step
+        emits (schemas/evidence/inventory.schema.json, stream =
+        `inventory`) as the pre-computed `unmanaged_discovered_count`
+        integer field; the catalog entry binds to that evidence
+        artifact shape, not to a vendor-specific CMDB or asset-API
+        object.
+      playbook_ref: playbook.asset_management@v1
+      playbook_step: action--80000000-0000-4000-8000-000000000005
+      field: unmanaged_discovered_count
+    - name: classify_block
+      description: >
+        Per-delta classification block the classify-delta step emits.
+        Carried on the same asset-inventory-delta evidence artifact as
+        the `delta_classification` array; included as a documented
+        input so a consumer drilling down from the headline count
+        reads the contributing delta-classification entries against
+        the artifact's per-asset `delta_set` (one-to-one ordering with
+        `delta_classification`).
+      playbook_ref: playbook.asset_management@v1
+      playbook_step: action--80000000-0000-4000-8000-000000000005
+      field: delta_classification
+  window:
+    duration: P30D
+    sliding: true
+
+playbook_refs:
+  - playbook_id: playbook.asset_management@v1
+    step_id: action--80000000-0000-4000-8000-000000000006
+
+external_refs:
+  - name: NIS2 — Article 21(2)(i) human resources security, access-control policies, and asset management
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(i)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 8 ICT-related risk identification (asset register)
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 8
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: NIST SP 800-53 Rev. 5 — CM-8 System Component Inventory
+    source: NIST
+    external_id: NIST SP 800-53 Rev. 5 CM-8
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CM-8
+  - name: ENISA — Good practices on asset management for essential and important entities
+    source: ENISA
+    url: https://www.enisa.europa.eu/topics/risk-management
+
+maintainer: metrics-wg@secops-ng.org
+
+foundation_property:
+  - auditability
+  - sovereignty
+  - operability
