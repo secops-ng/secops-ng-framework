@@ -1,0 +1,105 @@
+stable_id: kri.compiler_byte_parity_drift@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Per-example byte-parity drift count
+summary: >
+  Count of per-example byte-parity golden assertions that are red on
+  the evaluation commit. The companion residual-risk indicator to
+  kpi.compiler_byte_parity_pass_rate@v1: the KPI tracks the ratio
+  across the ring, the KRI tracks the absolute count of drifted
+  (workflow, target) pairs so the operator can read the residual
+  determinism exposure as a number rather than a percentage. Per
+  docs/FOUNDATION.md §2, byte-parity is the determinism contract for
+  the content the project ships; any drift is open exposure until the
+  emitter change and the committed reference artifact are reconciled
+  in the same PR.
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: "=="
+  rationale: >
+    A green ring across the three reference compile targets is the
+    determinism floor (FOUNDATION §2). Per-example byte-parity golden
+    tests under tests/examples/ are not optional — any non-zero
+    reading is an open determinism exposure on the commit under
+    evaluation.
+thresholds:
+  - name: warn
+    comparator: ">="
+    value: 1
+    severity: warn
+  - name: breach
+    comparator: ">="
+    value: 3
+    severity: high
+measurement:
+  source: composite
+  aggregation: count
+  formula: >
+    For each per-example byte-parity golden assertion exercised by
+    ``python -m pytest tests/examples/`` on the evaluation commit,
+    increment the count when the assertion fails (the reference
+    compiler emitted bytes that do not match the committed reference
+    artifact under ``examples/<target>/<workflow>/``). Distinct
+    (workflow, target) pairs are counted once per commit regardless of
+    how many test cases inside the file exercise the same pair.
+    Reference visualisation: a horizontal bar chart of per-target
+    byte-parity outcomes (1 = pass, 0 = drift) per (workflow, target)
+    pair observed in the golden suite, sliced by compile target
+    (n8n / temporal / langgraph), with a horizontal line at the
+    pass-floor of 1 marking the byte-parity predicate and the count
+    aggregate annotated as the headline figure; the chart is the
+    canonical operator-facing surface for this KRI. The committed
+    reference rendering lives at
+    ``content/metrics/compiler_byte_parity_drift.viz.md`` — that file
+    is the contract for the chart shape; the compile target renders
+    the executable form against the per-example golden suite at
+    evaluation time.
+  inputs:
+    - name: per_example_byte_parity_assertion
+      description: >
+        Per-example byte-parity golden assertion. The assertion
+        re-runs the reference compiler against the canonical CACAO
+        source under
+        ``content/playbooks/<workflow>/playbook.cacao.json`` and
+        asserts the emitted bytes match the committed reference
+        artifact under ``examples/<target>/<workflow>/`` byte-for-byte.
+        The test files live under
+        ``tests/examples/<workflow>/test_{n8n,temporal,langgraph}_workflow_golden.py``
+        for workflows with the full three-target ring, and under
+        ``tests/examples/<workflow>/test_golden.py`` for single-target
+        examples. A failing assertion increments this KRI.
+      playbook_ref: playbook.asset_management@v1
+    - name: cross_target_byte_parity_assertion
+      description: >
+        The same per-example goldens evaluated as the conjunction
+        across the three reference compile targets for one workflow.
+        A single-target drift counts the workflow as red against the
+        cross-target ring even if the other two targets are green;
+        each red (workflow, target) pair contributes one to the count.
+      playbook_ref: playbook.supply_chain_security@v1
+  window:
+    duration: P1D
+    sliding: false
+playbook_refs:
+  - playbook_id: playbook.asset_management@v1
+  - playbook_id: playbook.supply_chain_security@v1
+  - playbook_id: playbook.infra_posture_management@v1
+  - playbook_id: playbook.executive_metrics@v1
+external_refs:
+  - name: SecOps-NG FOUNDATION §2 — Determinism
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+  - name: NIS2 — Article 21(2)(c) business continuity and crisis management (motivating context — reproducible response artifacts)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(c)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ENISA — Threat Landscape methodology, reproducibility-of-evidence discussion
+    source: ENISA
+    url: https://www.enisa.europa.eu/publications/enisa-threat-landscape
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - determinism
+  - auditability
