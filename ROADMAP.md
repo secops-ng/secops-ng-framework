@@ -597,7 +597,7 @@ named operator use-case. Each cookbook workflow lives under
 
 ### F-WF-ASSET — Asset and configuration management
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P2
 - **Goal:** G-01 (content coverage — 25th canonical cookbook
   playbook, closing the top-5 NIS2 Art. 21 family bar); the
@@ -689,7 +689,43 @@ named operator use-case. Each cookbook workflow lives under
     `kpi.unmanaged_asset_cardinality@v1` emitter against the
     operator's evidence store with the per-window observation
     series and threshold-band pinning.
-- **Shipped via:** SKELETON in flight against this card.
+- **Shipped via:**
+  - SKELETON — #515
+    (`content/playbooks/asset_management/` CACAO scaffold + G-01
+    finalized-playbook coverage with `nis2:art-21-2-i` anchor closing
+    the top-5 NIS2 Art. 21 family bar as the 25th canonical cookbook
+    playbook).
+  - CORE-PRIM — #516 (canonical
+    `reconcile.reconcile_inventory_snapshot`,
+    `classify.classify_inventory_delta`, and
+    `artifact.build_asset_inventory_delta_evidence_artifact` action
+    logic under `content/playbooks/asset_management/primitives/`
+    with unit coverage and the source-precedence normalisation
+    invariant).
+  - CORE-FANOUT-N8N — #517 (n8n emitter + worked example under
+    `examples/n8n/asset_management/` + byte-parity golden).
+  - CORE-FANOUT-TEMPORAL — #518 (Temporal activity adapter + worked
+    example under `examples/temporal/asset_management/` +
+    cross-target byte-parity golden).
+  - CORE-FANOUT-LANGGRAPH — #518 (LangGraph node adapter + worked
+    example under `examples/langgraph/asset_management/` closing
+    the three-target byte-parity ring).
+  - EXTEND-mappings-DORA — #519 (DORA Art. 8 inbound closure under
+    `content/mappings/dora/` removing the prior `_orphan_skip`
+    entry).
+  - EXTEND-DOCS — #520 (`docs/cookbook/asset_management.md`
+    cookbook entry).
+  - EXTEND-metrics — #521 (`kri.asset_inventory_drift@v1` and
+    `kpi.unmanaged_asset_cardinality@v1` emitters under
+    `content/metrics/` with per-window observation series and
+    threshold-band pinning).
+  - EXTEND-mappings-D3FEND — #522 (per-step D3FEND defensive-
+    technique lift covering D3-AI Asset Inventory, D3-SWI Software
+    Inventory, and the baseline-drift slice pin).
+  - EXTEND-mappings-CRA — #523 (CRA Annex I scope-mapping review,
+    shipped as a documented manufacturer-vs-operator scope
+    deferral; the CRA axis is recorded as a documented
+    `_orphan_skip` rather than an inbound closure).
 
 ---
 
