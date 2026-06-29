@@ -108,6 +108,11 @@ VIZ_REQUIRED_STEMS = (
     # F-WF-PATCH EXTEND-metrics — patch_management catalog closeout
     "patch_rollout_overdue_exposure",
     "patch_rollout_success_rate",
+    # F-MET-DET CORE — determinism-coverage KPI/KRI deepen (G-04)
+    "same_target_replay_determinism_rate",
+    "same_target_replay_drift",
+    "cross_target_audit_envelope_parity_rate",
+    "span_block_emitter_determinism_rate",
 )
 
 

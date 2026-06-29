@@ -1,0 +1,129 @@
+stable_id: kri.same_target_replay_drift@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Same-target deterministic-replay drift count
+summary: >
+  Count of (workflow, target) cells in the same-target
+  deterministic-replay suite that are red on the evaluation commit.
+  Companion residual-risk indicator to
+  ``kpi.same_target_replay_determinism_rate@v1``: the KPI tracks the
+  ratio across the cells, the KRI tracks the absolute count of
+  drifted (workflow, target) cells so the operator can read the
+  residual offline-replay exposure as a number rather than a
+  percentage. Each cell binds to the same-target replay tests under
+  ``tests/examples/vuln_intake/test_replay.py``,
+  ``tests/examples/test_alert_triage_replay.py``, and
+  ``tests/examples/test_incident_management_replay.py``; per the
+  FOUNDATION §2 determinism contract, a fixed clock and a
+  deterministic-stub LM adapter MUST produce byte-identical audit
+  envelopes across two independent runs of the emitter-shaped
+  traversal. Any non-zero reading is open offline-replay exposure
+  until the divergence is reconciled.
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: "=="
+  rationale: >
+    Same-target replay-byte-parity is the offline-replay floor of
+    FOUNDATION §2 (Determinism). Per the ``test_replay.py`` docstring
+    contract, two independent runs of the same emitter-shaped
+    traversal under a fixed clock and a deterministic-stub LM adapter
+    MUST produce byte-identical audit envelopes. Any non-zero count
+    is open offline-replay exposure on the commit under evaluation
+    and must be reconciled before an auditor can re-drive a captured
+    payload through the worked example with confidence.
+thresholds:
+  - name: warn
+    comparator: ">="
+    value: 1
+    severity: warn
+  - name: breach
+    comparator: ">="
+    value: 3
+    severity: high
+measurement:
+  source: composite
+  aggregation: count
+  formula: >
+    For each (workflow, target) cell exercised by the same-target
+    replay test files
+    ``tests/examples/vuln_intake/test_replay.py``,
+    ``tests/examples/test_alert_triage_replay.py``, and
+    ``tests/examples/test_incident_management_replay.py`` on the
+    evaluation commit, increment the count when any assertion in
+    the cell is red — the byte-equality assertion, the non-empty
+    envelope assertion, or the perturbed-input-breaks-replay
+    assertion. Distinct (workflow, target) cells are counted once
+    per commit regardless of how many assertions in the file are
+    red for that target. Reference visualisation: a horizontal bar
+    chart of per-(workflow, target) replay-assertion outcomes
+    (1 = same-target replay holds, 0 = drift) sliced by compile
+    target, with a horizontal line at the pass-floor of 1 and the
+    count aggregate annotated as the headline figure; the chart is
+    the canonical operator-facing surface for this KRI. The
+    committed reference rendering lives at
+    ``content/metrics/same_target_replay_drift.viz.md`` — that file
+    is the contract for the chart shape; the compile target renders
+    the executable form against the replay-test suite at evaluation
+    time.
+  inputs:
+    - name: same_target_replay_envelope_bytes_assertion
+      description: >
+        Same-target replay-byte-parity assertion. The test re-runs
+        the emitter-shaped traversal for one worked example twice in
+        fresh ``contextvars`` contexts under a fixed clock and a
+        deterministic-stub LM adapter, and asserts the audit-trail
+        envelope bytes are equal across the two runs for each
+        reference compile target. A red assertion increments this
+        KRI for the (workflow, target) cell. Bound here to the
+        vuln_intake worked example as the F-WF-01 EXTEND-tests-replay
+        seed; the catalogue entry covers every same-target replay
+        cell the suite exercises.
+      playbook_ref: playbook.vuln_intake@v1
+    - name: same_target_replay_envelope_nonempty_assertion
+      description: >
+        Companion assertion that the envelope produced by the
+        emitter-shaped traversal is non-empty and well-formed. A red
+        non-empty assertion increments this KRI for the
+        (workflow, target) cell. Bound here to the phishing_triage
+        worked example (a shipped sibling of the alert_triage F-WF-03
+        EXTEND-tests-replay surface).
+      playbook_ref: playbook.phishing_triage@v1
+    - name: same_target_perturbed_input_breaks_replay_assertion
+      description: >
+        Companion assertion that a perturbed input correctly breaks
+        parity. A red perturbed-input assertion increments this KRI
+        for the (workflow, target) cell — a degenerate replay
+        implementation that passes byte-equality by ignoring the
+        input is open exposure. Bound here to the incident_management
+        worked example which carries the F-WF-05 EXTEND-tests-replay
+        siblings.
+      playbook_ref: playbook.incident_management@v1
+  window:
+    duration: P1D
+    sliding: false
+playbook_refs:
+  - playbook_id: playbook.vuln_intake@v1
+  - playbook_id: playbook.phishing_triage@v1
+  - playbook_id: playbook.incident_management@v1
+external_refs:
+  - name: SecOps-NG FOUNDATION §2 — Determinism
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+  - name: NIS2 — Article 21(2)(c) business continuity and crisis management (motivating context — reproducible response artifacts)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(c)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: NIS2 — Article 23 incident reporting (motivating context — auditor-replayable incident artifacts)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 23
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ENISA — Threat Landscape methodology, reproducibility-of-evidence discussion
+    source: ENISA
+    url: https://www.enisa.europa.eu/publications/enisa-threat-landscape
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - determinism
+  - auditability

@@ -1,0 +1,133 @@
+stable_id: kpi.cross_target_audit_envelope_parity_rate@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Cross-target audit-envelope byte-parity pass rate
+summary: >
+  Ratio of cross-target audit-envelope assertions that pass on the
+  evaluation commit. The cross-target parity contract for the
+  ``AuditTrail`` helper is pinned at
+  ``tests/compilers/_shared/test_audit_mirror_cross_target_parity.py``
+  (F-CR-04). The decision doc
+  ``docs/observability/audit-mirror.md`` binds one property the
+  helper must honour: a playbook that runs under the LangGraph
+  emitter and the same playbook under the Temporal emitter MUST
+  produce byte-identical audit envelopes when fed equivalent semantic
+  inputs — that is what makes the offline-replay shape portable
+  across compile targets so an auditor does not need to know which
+  target produced the envelope to consume it. This KPI is the
+  helper-level companion to
+  ``kpi.compiler_byte_parity_pass_rate@v1`` (which covers per-example
+  committed reference artifacts under ``examples/<target>/<workflow>/``);
+  the two metrics pin two different layers of the determinism stack.
+unit: ratio
+direction: higher_is_better
+target:
+  value: 1.0
+  comparator: "=="
+  rationale: >
+    Helper-level cross-target audit-envelope parity is a precondition
+    for the per-example byte-parity contract. Per
+    ``docs/observability/audit-mirror.md`` and the
+    ``test_audit_mirror_cross_target_parity.py`` docstring, two
+    emitter-shaped call patterns fed equivalent semantic inputs MUST
+    produce byte-identical envelopes; anything less than 1.0 means
+    the helper itself is non-deterministic across compile targets
+    and the per-example goldens cannot honestly attest to portability.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 1.0
+    severity: warn
+  - name: breach
+    comparator: "<"
+    value: 0.90
+    severity: high
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: >
+    For each cross-target parity assertion exercised by
+    ``python -m pytest tests/compilers/_shared/test_audit_mirror_cross_target_parity.py``
+    on the evaluation commit, record one observation: 1 if the
+    assertion passes, 0 if it fails. The assertion population is the
+    full set of test functions in the file
+    (``test_cross_target_envelope_bytes_are_identical``,
+    ``test_cross_target_envelope_is_nonempty_and_well_formed``,
+    ``test_envelope_header_field_order_is_pinned``,
+    ``test_envelope_body_attribute_keys_sorted_and_compact``,
+    ``test_diverging_header_compile_target_breaks_parity``,
+    ``test_diverging_semantic_inputs_break_parity``,
+    ``test_double_emit_is_idempotent`` parametrised across the two
+    emitter shapes, and
+    ``test_cross_target_replay_sweep_holds_parity``). Aggregate as
+    ratio across observations. Reference visualisation: a horizontal
+    bar chart of per-assertion outcomes (1 = pass, 0 = fail) with a
+    horizontal line at the pass-floor of 1 and the ratio aggregate
+    annotated as the headline figure; the chart is the canonical
+    operator-facing surface for this KPI. The committed reference
+    rendering lives at
+    ``content/metrics/cross_target_audit_envelope_parity_rate.viz.md`` —
+    that file is the contract for the chart shape; the compile target
+    renders the executable form against the cross-target parity test
+    file at evaluation time.
+  inputs:
+    - name: cross_target_envelope_bytes_assertion
+      description: >
+        Helper-level byte-equality assertion. Two hand-crafted
+        emitter-shaped call patterns — one shaped like the LangGraph
+        emitter's traversal order, one shaped like the Temporal
+        emitter's — feed the same semantic record set into the
+        ``AuditTrail.append()`` API and the test asserts envelope
+        bytes are equal across the two patterns. Bound to the
+        executive_metrics playbook because that worked example
+        exercises the cross-target OTel wrapping the F-CR-04
+        acceptance criteria pin against.
+      playbook_ref: playbook.executive_metrics@v1
+    - name: cross_target_envelope_negative_assertion
+      description: >
+        Helper-level negative-parity assertions —
+        ``test_diverging_header_compile_target_breaks_parity`` and
+        ``test_diverging_semantic_inputs_break_parity`` — that guard
+        against a degenerate parity implementation that would pass
+        the byte-equality assertion vacuously by ignoring either the
+        header or the body. Bound to the supply_chain_security
+        worked example which carries the full three-target ring and
+        the OTel-wrapping assertion in each per-target file.
+      playbook_ref: playbook.supply_chain_security@v1
+    - name: cross_target_envelope_shape_pin_assertion
+      description: >
+        Helper-level shape-pin assertions —
+        ``test_envelope_header_field_order_is_pinned`` and
+        ``test_envelope_body_attribute_keys_sorted_and_compact`` —
+        that pin the envelope serialisation contract so a future
+        change to field order or JSON compactness fails loudly here
+        before it ships into a per-example golden. Bound to the
+        asset_management worked example which carries the full
+        three-target ring per F-WF-ASSET CORE-FANOUT.
+      playbook_ref: playbook.asset_management@v1
+  window:
+    duration: P1D
+    sliding: false
+playbook_refs:
+  - playbook_id: playbook.executive_metrics@v1
+  - playbook_id: playbook.supply_chain_security@v1
+  - playbook_id: playbook.asset_management@v1
+external_refs:
+  - name: SecOps-NG FOUNDATION §2 — Determinism
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+  - name: NIS2 — Article 23 incident reporting timelines (motivating context — reviewable cross-target telemetry)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 23
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ENISA — Threat Landscape methodology, telemetry-correlation discussion
+    source: ENISA
+    url: https://www.enisa.europa.eu/publications/enisa-threat-landscape
+  - name: OpenTelemetry — Semantic conventions for spans
+    source: OpenTelemetry
+    url: https://opentelemetry.io/docs/specs/semconv/
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - determinism
+  - auditability
