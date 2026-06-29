@@ -181,6 +181,31 @@ shipped playbook and (when pinned) to an existing workflow step, and
 (c) the `kpi.*` / `kri.*` namespace prefix agrees with the entry's
 `kind` at the link level.
 
+## OCSF source-data-shape binding lint (G-04)
+
+The catalogue-wide OCSF source-data-shape dimension of the G-04
+catalogue-maturity KPI is enforced by
+`tools/lint_catalogue_ocsf_bindings.py`: every operator-telemetry
+(non-composite) metric in this directory must declare at least one
+`telemetry.ocsf.*` ref, and every declared ref must resolve to a
+shipped class file under `content/telemetry/<ref>.json`. Composite
+metrics (those whose only source is other catalogue entries) are
+exempt. Run it locally with:
+
+```sh
+python -m tools.lint_catalogue_ocsf_bindings --format text
+```
+
+It rides the `catalogue-ocsf-bindings` job in
+`.github/workflows/orphan-ci.yml` alongside the per-cluster
+`posture-ocsf-bindings` (asset/patch posture cluster) and
+`detection-ocsf-bindings` (detection-latency / `mttd_*` cluster) lanes
+— same nightly 02:23 UTC schedule, same PR-on-touch and push-on-main
+triggers. The per-cluster jobs are finer-grained classifiers kept
+green by construction; the catalogue-wide job is the structural floor
+that catches a new metric shipped without any OCSF binding before it
+reaches main.
+
 The remaining baseline entries (`kpi.mttd@v1`, `kpi.mttr_critical@v1`,
 `kpi.detection_coverage@v1`, `kpi.false_positive_rate@v1`,
 `kri.control_effectiveness@v1`) intentionally keep `playbook_refs: []`
