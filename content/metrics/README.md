@@ -206,6 +206,30 @@ green by construction; the catalogue-wide job is the structural floor
 that catches a new metric shipped without any OCSF binding before it
 reaches main.
 
+## Sovereignty LM-endpoint pairing lint (G-04)
+
+The sovereignty corner of the G-04 catalogue-maturity acceptance bar
+is defended by `tools/lint_sovereignty_lm_endpoint_pairing.py`: every
+sovereignty-cluster LM-endpoint coverage KPI
+(`kpi.lm_endpoint_*_coverage@vN` with `foundation_property` including
+`sovereignty`) must ship with a paired sovereignty-cluster
+UNKNOWN-exposure residual-risk KRI
+(`kri.lm_endpoint_*_unknown_*_exposure@vN`) at the same version
+family. This makes the residual-risk pairing a nightly invariant so
+the UNKNOWN classification — the operator-supplied / self-hosted /
+private-gateway shape the coverage KPI cannot distinguish from
+confirmed-non-EU — cannot silently regress out of the catalogue. Run
+it locally with:
+
+```sh
+python -m tools.lint_sovereignty_lm_endpoint_pairing --format text
+```
+
+It rides the `sovereignty-lm-endpoint-pairing` job in
+`.github/workflows/orphan-ci.yml` alongside the OCSF cluster lanes —
+same nightly 02:23 UTC schedule, same PR-on-touch and push-on-main
+triggers.
+
 The remaining baseline entries (`kpi.mttd@v1`, `kpi.mttr_critical@v1`,
 `kpi.detection_coverage@v1`, `kpi.false_positive_rate@v1`,
 `kri.control_effectiveness@v1`) intentionally keep `playbook_refs: []`
