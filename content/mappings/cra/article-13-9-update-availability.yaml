@@ -1,0 +1,88 @@
+# CRA — Article 13(9) update-availability obligation (artifact-retention lane).
+#
+# Companion to `cra:art-13-support-period` in article-13.yaml (Art.13(8),
+# which determines and documents the support period during which
+# vulnerabilities are handled effectively) and to
+# `cra:annex-i-2-security-updates-rollout` in
+# annex-i-2-security-updates-rollout.yaml (Annex I §2 per-event maintenance-
+# rollout slice against the operator's deployed estate). Art.13(8) sets the
+# support window; this file pins the artifact-retention obligation that
+# follows from issuing an update inside that window — once a security
+# update has been issued for a product with digital elements, the
+# manufacturer must keep that update available, free of charge, for at
+# least ten years after placing the product on the market or for the
+# remainder of the support period, whichever is longer.
+#
+# This is an availability/retention obligation against the issued-update
+# artifact, not a per-event rollout obligation against an operator estate
+# (which is what `cra:annex-i-2-security-updates-rollout` anchors) and not
+# the dissemination-cadence obligation (which is what
+# `cra:annex-i-2-security-updates` in article-14-and-annex-i.yaml and
+# `cra:art-13-security-updates-distribution` in article-13.yaml anchor).
+# The patch_management playbook's evidence-capture step produces the dated
+# patch-application evidence record (stream `vulns`) that is the durable
+# artifact whose continued availability across the ten-year /
+# support-period window is what Art.13(9) audits against. The
+# control.patch_evidence@v1 anchor on the manufacturer's flaw-remediation
+# capability (SI-2 / SI-2(2)) carries the retention property: a dated
+# evidence record per issued update, retrievable across the retention
+# window.
+regime: cra
+entries:
+  - id: cra:art-13-update-availability
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: "13(9)"
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Manufacturers shall ensure that issued security updates for a
+      product with digital elements remain available, free of charge,
+      for at least ten years after the product has been placed on the
+      market or for the remainder of the support period determined under
+      Art.13(8), whichever is longer. The retention obligation runs
+      against the issued-update artifact itself: each shipped security
+      update, together with the accompanying advisory message and the
+      dated patch-application evidence record, must remain retrievable
+      across the declared retention window.
+    status: draft
+    control_refs:
+      - control.patch_evidence@v1
+    playbook_refs:
+      - playbook.patch_management@v1
+    metric_refs: []
+    evidence_stream_refs:
+      - vulns
+    notes: >-
+      Companion to `cra:art-13-support-period` in article-13.yaml, which
+      anchors the Art.13(8) determination and documentation of the
+      support period; this entry pins the Art.13(9) retention obligation
+      that follows from issuing an update inside that window. The two
+      clauses are mapped separately to keep the inbound graph
+      atom-per-obligation: Art.13(8) is the support-window declaration,
+      Art.13(9) is the artifact-retention obligation against issued
+      updates inside that window. The patch_management playbook's
+      evidence-capture step is the source of the dated patch-application
+      evidence record that anchors retention; control.patch_evidence@v1
+      (SI-2 / SI-2(2)) is the flaw-remediation anchor whose dated record
+      stream must remain retrievable across the ten-year /
+      support-period window. Distinct from the dissemination-cadence
+      siblings — `cra:annex-i-2-security-updates` in
+      article-14-and-annex-i.yaml and
+      `cra:art-13-security-updates-distribution` in article-13.yaml
+      (both pinned to playbook.vuln_intake@v1 with
+      kpi.patch_disseminated_on_time@v1 as the on-time KPI) — which
+      audit whether the update is reaching users on the clock rather
+      than whether the issued update remains available across the
+      retention window. Also distinct from the per-event
+      maintenance-rollout slice at
+      `cra:annex-i-2-security-updates-rollout`, which audits the
+      operator-side detect-classify-stage-validate-fan-out discipline
+      against the operator's deployed estate. No retention-window KPI
+      is pinned on this entry: the existing
+      kpi.patch_disseminated_on_time@v1 measures dissemination cadence,
+      not artifact availability across the retention window, and
+      pinning it here would conflate two distinct discharges. A
+      retention-window metric is the natural next inbound-closure card
+      for this entry once the metric catalogue carries one.
