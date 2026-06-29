@@ -37,13 +37,16 @@ on:
       - "tools/lint_cra_playbook_orphans.py"
       - "tools/lint_posture_ocsf_bindings.py"
       - "tools/lint_detection_ocsf_bindings.py"
+      - "tools/lint_catalogue_ocsf_bindings.py"
       - "tools/ocsf_cluster_lint.py"
+      - "content/telemetry/**"
       - "tests/content/test_cra_playbook_orphans.py"
       - "tests/content/test_dora_playbook_orphans.py"
       - "tests/content/test_gdpr_playbook_orphans.py"
       - "tests/content/test_nis2_playbook_orphans.py"
       - "tests/content/test_posture_ocsf_bindings.py"
       - "tests/content/test_detection_ocsf_bindings.py"
+      - "tests/content/test_catalogue_ocsf_bindings.py"
       - ".github/workflows/orphan-ci.yml"
   push:
     branches: [main]
@@ -54,10 +57,12 @@ on:
       - "content/mappings/gdpr/**"
       - "content/mappings/nis2/**"
       - "content/metrics/**"
+      - "content/telemetry/**"
       - "tools/lint_playbook_orphans.py"
       - "tools/lint_cra_playbook_orphans.py"
       - "tools/lint_posture_ocsf_bindings.py"
       - "tools/lint_detection_ocsf_bindings.py"
+      - "tools/lint_catalogue_ocsf_bindings.py"
       - "tools/ocsf_cluster_lint.py"
   schedule:
     # Nightly at 02:23 UTC — off-peak, off-the-hour, single slot for
@@ -178,3 +183,34 @@ jobs:
       - name: Run detection-OCSF binding assertion (text)
         run: |
           python -m tools.lint_detection_ocsf_bindings --format text
+
+  catalogue-ocsf-bindings:
+    # G-04 catalogue-maturity OCSF source-data-shape dimension —
+    # catalogue-wide generalisation of the per-cluster posture and
+    # detection-latency lints. Asserts that every operator-telemetry
+    # (non-composite) metric in content/metrics/ declares at least one
+    # telemetry.ocsf.* ref AND that each declared ref resolves to a
+    # real shipped class under content/telemetry/. Closes the
+    # F-MET-OCSF-CATALOGUE triplet (SKELETON #539, CORE #540) by
+    # wiring the linter into the nightly content-CI cadence alongside
+    # the per-cluster jobs; runs independently from the per-framework
+    # orphan matrix and the posture/detection jobs.
+    name: G-04 catalogue-wide OCSF binding assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML)
+        run: pip install --no-cache-dir pyyaml
+
+      - name: Run catalogue-OCSF binding assertion (text)
+        run: |
+          python -m tools.lint_catalogue_ocsf_bindings --format text
