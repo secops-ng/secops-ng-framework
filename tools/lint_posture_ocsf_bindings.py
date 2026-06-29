@@ -19,20 +19,29 @@ SKELETON used to ship the first four bindings.
 Fires when any posture-cluster metric has no ``telemetry.ocsf.*``
 entry in its ``telemetry_refs`` list. Output formats: ``text`` (default)
 and ``json``. Pure stdlib + PyYAML, no network.
+
+Implementation note: the Finding dataclass + YAML loader + scan loop
++ CLI driver live in ``tools.ocsf_cluster_lint``; this module is a
+thin per-cluster wrapper. See that module's docstring for the
+consolidation rationale.
 """
 from __future__ import annotations
 
-import argparse
-import json
 import sys
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
-import yaml
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
-METRICS_DIR = REPO_ROOT / "content" / "metrics"
+from tools.ocsf_cluster_lint import (
+    DEFAULT_METRICS_DIR as METRICS_DIR,
+    Finding,
+    ClusterSpec,
+    OCSF_TELEMETRY_PREFIX,
+    REPO_ROOT,
+    has_ocsf_binding,
+    is_cluster_metric,
+    run_cli,
+    scan_cluster,
+)
 
 # Posture cluster: playbooks whose primary purpose is to emit
 # posture/inventory telemetry against an authoritative source. Metrics
@@ -49,57 +58,18 @@ POSTURE_PLAYBOOK_IDS: frozenset[str] = frozenset(
     }
 )
 
-OCSF_TELEMETRY_PREFIX = "telemetry.ocsf."
 
-
-@dataclass(frozen=True)
-class Finding:
-    metric_stable_id: str
-    metric_path: Path
-    playbook_refs: tuple[str, ...]
-    telemetry_refs: tuple[str, ...]
-
-    def _rel_path(self) -> str:
-        try:
-            return str(self.metric_path.relative_to(REPO_ROOT))
-        except ValueError:
-            return str(self.metric_path)
-
-    def as_text(self) -> str:
-        return (
-            f"{self._rel_path()}: posture-cluster "
-            f"metric {self.metric_stable_id} has no OCSF telemetry_ref "
-            f"(playbook_refs={list(self.playbook_refs)}, "
-            f"telemetry_refs={list(self.telemetry_refs)})"
-        )
-
-    def as_dict(self) -> dict:
-        return {
-            "metric_stable_id": self.metric_stable_id,
-            "metric_path": self._rel_path(),
-            "playbook_refs": list(self.playbook_refs),
-            "telemetry_refs": list(self.telemetry_refs),
-        }
-
-
-def _load_metric(path: Path) -> dict:
-    return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-
-
-def _playbook_ids(doc: dict) -> tuple[str, ...]:
-    refs = doc.get("playbook_refs") or []
-    out: list[str] = []
-    for r in refs:
-        if isinstance(r, dict):
-            pid = r.get("playbook_id")
-            if isinstance(pid, str):
-                out.append(pid)
-    return tuple(out)
-
-
-def _telemetry_refs(doc: dict) -> tuple[str, ...]:
-    refs = doc.get("telemetry_refs") or []
-    return tuple(r for r in refs if isinstance(r, str))
+_SPEC = ClusterSpec(
+    cli_name="posture-ocsf-bindings",
+    cluster_label="posture-cluster",
+    cluster_descr="posture cluster",
+    json_cluster_key="posture_cluster",
+    playbook_ids=POSTURE_PLAYBOOK_IDS,
+    cli_description=(
+        "Assert every posture-cluster metric carries an OCSF "
+        "source-data-shape telemetry_ref (G-04 OCSF dimension)."
+    ),
+)
 
 
 def is_posture_metric(playbook_ids: Iterable[str]) -> bool:
@@ -109,91 +79,26 @@ def is_posture_metric(playbook_ids: Iterable[str]) -> bool:
     The exclusivity gate is what keeps pipeline/sovereignty metrics
     (which fan out across many playbooks) out of the posture cluster.
     """
-    ids = tuple(playbook_ids)
-    if not ids:
-        return False
-    return all(pid in POSTURE_PLAYBOOK_IDS for pid in ids)
-
-
-def has_ocsf_binding(telemetry_refs: Iterable[str]) -> bool:
-    return any(r.startswith(OCSF_TELEMETRY_PREFIX) for r in telemetry_refs)
+    return is_cluster_metric(playbook_ids, POSTURE_PLAYBOOK_IDS)
 
 
 def scan(metrics_dir: Path = METRICS_DIR) -> list[Finding]:
-    findings: list[Finding] = []
-    for path in sorted(metrics_dir.glob("*.yaml")):
-        if path.name.startswith("_"):
-            continue
-        doc = _load_metric(path)
-        pb = _playbook_ids(doc)
-        if not is_posture_metric(pb):
-            continue
-        tr = _telemetry_refs(doc)
-        if not has_ocsf_binding(tr):
-            stable_id = doc.get("stable_id") or path.stem
-            findings.append(
-                Finding(
-                    metric_stable_id=stable_id,
-                    metric_path=path,
-                    playbook_refs=pb,
-                    telemetry_refs=tr,
-                )
-            )
-    return findings
-
-
-def _emit_text(findings: list[Finding]) -> None:
-    if not findings:
-        print(
-            "posture-ocsf-bindings: PASS "
-            f"(posture cluster = {sorted(POSTURE_PLAYBOOK_IDS)})"
-        )
-        return
-    print(
-        f"posture-ocsf-bindings: FAIL — {len(findings)} posture-cluster "
-        "metric(s) missing OCSF source-data-shape binding:"
-    )
-    for f in findings:
-        print(f"  {f.as_text()}")
-
-
-def _emit_json(findings: list[Finding]) -> None:
-    payload = {
-        "posture_cluster": sorted(POSTURE_PLAYBOOK_IDS),
-        "finding_count": len(findings),
-        "findings": [f.as_dict() for f in findings],
-        "status": "fail" if findings else "pass",
-    }
-    print(json.dumps(payload, indent=2, sort_keys=True))
+    return scan_cluster(metrics_dir, _SPEC)
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(
-        description=(
-            "Assert every posture-cluster metric carries an OCSF "
-            "source-data-shape telemetry_ref (G-04 OCSF dimension)."
-        )
-    )
-    parser.add_argument(
-        "--format",
-        choices=("text", "json"),
-        default="text",
-        help="Output format (default: text)",
-    )
-    parser.add_argument(
-        "--metrics-dir",
-        type=Path,
-        default=METRICS_DIR,
-        help=argparse.SUPPRESS,
-    )
-    args = parser.parse_args(argv)
+    return run_cli(argv, _SPEC)
 
-    findings = scan(args.metrics_dir)
-    if args.format == "json":
-        _emit_json(findings)
-    else:
-        _emit_text(findings)
-    return 1 if findings else 0
+
+__all__ = [
+    "POSTURE_PLAYBOOK_IDS",
+    "OCSF_TELEMETRY_PREFIX",
+    "Finding",
+    "has_ocsf_binding",
+    "is_posture_metric",
+    "scan",
+    "main",
+]
 
 
 if __name__ == "__main__":
