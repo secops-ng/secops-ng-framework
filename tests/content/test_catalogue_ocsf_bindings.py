@@ -29,8 +29,12 @@ import yaml
 
 from tools.lint_catalogue_ocsf_bindings import (
     COMPOSITE_SOURCE,
+    DEFAULT_TELEMETRY_DIR,
+    REASON_DANGLING_REF,
+    REASON_NO_BINDING,
     is_operator_telemetry_source,
     main,
+    resolve_ocsf_ref,
     scan,
 )
 
@@ -175,6 +179,127 @@ def test_operator_metric_with_only_non_ocsf_ref_is_flagged(
     findings = scan(synthetic_metrics_dir)
     assert len(findings) == 1
     assert findings[0].metric_stable_id == "kpi.synthetic_only_internal_ref@v1"
+
+
+# ---------------------------------------------------------------------------
+# CORE: OCSF ref resolution against content/telemetry/
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def synthetic_telemetry_dir(tmp_path: Path) -> Path:
+    d = tmp_path / "telemetry"
+    d.mkdir()
+    return d
+
+
+def _write_ocsf_class(directory: Path, ref: str) -> Path:
+    """Write a minimal OCSF class artifact under ``directory`` named
+    ``<ref>.json`` — matches the shipped content/telemetry/ convention.
+    """
+    path = directory / f"{ref}.json"
+    path.write_text(json.dumps({"stable_id": ref}), encoding="utf-8")
+    return path
+
+
+def test_operator_metric_with_resolving_ocsf_ref_passes(
+    synthetic_metrics_dir: Path,
+    synthetic_telemetry_dir: Path,
+) -> None:
+    """CORE: a metric whose OCSF telemetry_ref resolves to a real
+    artifact under content/telemetry/ passes the catalogue guard.
+    """
+    ref = "telemetry.ocsf.synthetic_resolves@v1"
+    _write_ocsf_class(synthetic_telemetry_dir, ref)
+    _write_metric(
+        synthetic_metrics_dir,
+        "metric_resolving",
+        {
+            "stable_id": "kpi.metric_resolving@v1",
+            "kind": "kpi",
+            "measurement": {"source": "siem_event_stream"},
+            "telemetry_refs": [ref],
+        },
+    )
+    assert scan(synthetic_metrics_dir, synthetic_telemetry_dir) == []
+
+
+def test_operator_metric_with_dangling_ocsf_ref_is_flagged(
+    synthetic_metrics_dir: Path,
+    synthetic_telemetry_dir: Path,
+) -> None:
+    """CORE: a present-but-dangling OCSF telemetry_ref — declared on
+    the metric but with no matching artifact under
+    content/telemetry/ — fails. This is the gap the SKELETON missed:
+    presence alone is not enough.
+    """
+    ref = "telemetry.ocsf.no_such_class@v1"
+    # Intentionally do NOT write a backing artifact for ``ref``.
+    _write_metric(
+        synthetic_metrics_dir,
+        "metric_dangling",
+        {
+            "stable_id": "kpi.metric_dangling@v1",
+            "kind": "kpi",
+            "measurement": {"source": "siem_event_stream"},
+            "telemetry_refs": [ref],
+        },
+    )
+    findings = scan(synthetic_metrics_dir, synthetic_telemetry_dir)
+    assert len(findings) == 1
+    f = findings[0]
+    assert f.metric_stable_id == "kpi.metric_dangling@v1"
+    assert f.reason == REASON_DANGLING_REF
+    assert f.unresolved_refs == (ref,)
+
+
+def test_operator_metric_with_partial_resolution_is_flagged(
+    synthetic_metrics_dir: Path,
+    synthetic_telemetry_dir: Path,
+) -> None:
+    """A metric declaring multiple OCSF refs fails if ANY of them is
+    dangling — the catalogue floor is per-ref, not per-metric."""
+    good_ref = "telemetry.ocsf.synthetic_good@v1"
+    bad_ref = "telemetry.ocsf.synthetic_missing@v1"
+    _write_ocsf_class(synthetic_telemetry_dir, good_ref)
+    _write_metric(
+        synthetic_metrics_dir,
+        "metric_partial",
+        {
+            "stable_id": "kpi.metric_partial@v1",
+            "kind": "kpi",
+            "measurement": {"source": "siem_event_stream"},
+            "telemetry_refs": [good_ref, bad_ref],
+        },
+    )
+    findings = scan(synthetic_metrics_dir, synthetic_telemetry_dir)
+    assert len(findings) == 1
+    assert findings[0].reason == REASON_DANGLING_REF
+    assert findings[0].unresolved_refs == (bad_ref,)
+
+
+def test_resolve_ocsf_ref_helper(tmp_path: Path) -> None:
+    d = tmp_path / "telemetry"
+    d.mkdir()
+    _write_ocsf_class(d, "telemetry.ocsf.exists@v1")
+    assert resolve_ocsf_ref("telemetry.ocsf.exists@v1", d)
+    assert not resolve_ocsf_ref("telemetry.ocsf.missing@v1", d)
+    # Non-OCSF refs are not OCSF — helper returns False so callers
+    # can rely on it without pre-filtering by prefix.
+    assert not resolve_ocsf_ref("telemetry.internal.something@v1", d)
+
+
+def test_shipped_tree_ocsf_refs_all_resolve() -> None:
+    """The shipped tree must already satisfy the CORE bar: every
+    bound metric's OCSF ref resolves under content/telemetry/."""
+    findings = scan()
+    assert findings == [], (
+        "shipped catalogue has unresolved OCSF refs: "
+        + ", ".join(
+            f"{f.metric_stable_id} ({f.reason}: {list(f.unresolved_refs)})"
+            for f in findings
+        )
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -1,18 +1,30 @@
 """Catalogue-wide OCSF source-data-shape binding assertion (G-04).
 
-Floor-level catalogue guard for the OCSF source-data-shape dimension of
-the G-04 KPI/KRI catalogue-maturity acceptance bar. The per-cluster
-linters (``tools/lint_posture_ocsf_bindings.py``,
+Floor + CORE-tier catalogue guard for the OCSF source-data-shape
+dimension of the G-04 KPI/KRI catalogue-maturity acceptance bar. The
+per-cluster linters (``tools/lint_posture_ocsf_bindings.py``,
 ``tools/lint_detection_ocsf_bindings.py``) defend their own clusters
 deeply — but a freshly-added operator-telemetry metric that belongs to
 *neither* cluster would currently ship with no OCSF source-data shape
 and nothing would trip. This catalogue-wide guard closes that gap at
 the floor.
 
-Rule: every metric under ``content/metrics/*.yaml`` whose
-``measurement.source`` is an operator-telemetry source (i.e. anything
-other than ``composite``) MUST declare at least one ``telemetry.ocsf.*``
-entry in its ``telemetry_refs`` list.
+Two-layer rule:
+
+1. **Presence (SKELETON floor).** Every metric under
+   ``content/metrics/*.yaml`` whose ``measurement.source`` is an
+   operator-telemetry source (i.e. anything other than ``composite``)
+   MUST declare at least one ``telemetry.ocsf.*`` entry in its
+   ``telemetry_refs`` list.
+2. **Resolution (CORE).** Each declared ``telemetry.ocsf.*`` entry on
+   such a metric MUST resolve to a real artifact under
+   ``content/telemetry/``. The shipped tree uses files named
+   ``content/telemetry/<ref>.json`` (e.g.
+   ``telemetry.ocsf.device_inventory_info@v1.json``). A
+   present-but-dangling ref — pointing at an OCSF class that does not
+   actually exist on disk — fails the guard. This catches the failure
+   mode where a contributor declares an OCSF binding but the
+   referenced class artifact is missing or misnamed.
 
 Exemption: metrics whose ``measurement.source == "composite"`` are
 explicitly exempt. Composite metrics are computed from the project's
@@ -24,28 +36,20 @@ exemption is keyed on ``measurement.source`` exactly, with no
 metric-id allowlist, so newly-added composite governance metrics are
 covered without a list update.
 
-Fires when any non-composite metric has no ``telemetry.ocsf.*`` entry
-in its ``telemetry_refs`` list, or has no ``telemetry_refs`` at all.
 Output formats: ``text`` (default) and ``json``. Pure stdlib + PyYAML,
-no network. Reuses ``has_ocsf_binding`` /
-``OCSF_TELEMETRY_PREFIX`` / ``DEFAULT_METRICS_DIR`` / ``REPO_ROOT``
-from the shared per-cluster helper to keep the binding key check in
-one place.
+no network. Reuses ``has_ocsf_binding`` / ``OCSF_TELEMETRY_PREFIX`` /
+``DEFAULT_METRICS_DIR`` / ``REPO_ROOT`` from the shared per-cluster
+helper to keep the binding key check in one place.
 
-This is the SKELETON tier. Future siblings:
-
-* CORE: deepen the guard so each ``telemetry.ocsf.*`` ref actually
-  resolves to a real OCSF class under ``content/telemetry/``, not
-  just presence.
-* EXTEND: wire as a job stanza in ``.github/workflows/orphan-ci.yml``
-  alongside ``posture-ocsf-bindings`` /
-  ``detection-ocsf-bindings``, plus a README note.
+Future sibling (EXTEND, separate card): wire as a job stanza in
+``.github/workflows/orphan-ci.yml`` alongside ``posture-ocsf-bindings``
+/ ``detection-ocsf-bindings``, plus a README note.
 """
 from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
@@ -57,11 +61,22 @@ from tools.ocsf_cluster_lint import (
     has_ocsf_binding,
 )
 
+# Default location for OCSF class artifacts the catalogue resolves
+# ``telemetry.ocsf.*`` refs against. Per-ref filename convention is
+# ``<ref>.json`` (e.g. ``telemetry.ocsf.patch_state@v1.json``); this
+# is the on-disk shape the shipped tree already uses.
+DEFAULT_TELEMETRY_DIR = REPO_ROOT / "content" / "telemetry"
+
 # Sentinel for the ``measurement.source`` value that exempts a metric
 # from the OCSF source-data-shape requirement. Composite metrics are
 # computed from the project's own CI / governance signal, not from
 # operator OCSF telemetry, so an OCSF binding is not the right shape.
 COMPOSITE_SOURCE = "composite"
+
+# Finding reason codes — keep machine-readable so downstream dashboards
+# can split presence vs resolution failures without parsing prose.
+REASON_NO_BINDING = "no_ocsf_binding"
+REASON_DANGLING_REF = "dangling_ocsf_ref"
 
 CLI_NAME = "catalogue-ocsf-bindings"
 
@@ -72,6 +87,8 @@ class CatalogueFinding:
     metric_path: Path
     measurement_source: str
     telemetry_refs: tuple[str, ...]
+    reason: str = REASON_NO_BINDING
+    unresolved_refs: tuple[str, ...] = field(default_factory=tuple)
 
     def _rel_path(self) -> str:
         try:
@@ -80,6 +97,14 @@ class CatalogueFinding:
             return str(self.metric_path)
 
     def as_text(self) -> str:
+        if self.reason == REASON_DANGLING_REF:
+            return (
+                f"{self._rel_path()}: metric {self.metric_stable_id} "
+                f"(measurement.source={self.measurement_source!r}) has "
+                f"dangling OCSF telemetry_ref(s) "
+                f"{list(self.unresolved_refs)} — no matching artifact "
+                f"under content/telemetry/"
+            )
         return (
             f"{self._rel_path()}: metric {self.metric_stable_id} "
             f"(measurement.source={self.measurement_source!r}) has no "
@@ -93,6 +118,8 @@ class CatalogueFinding:
             "metric_path": self._rel_path(),
             "measurement_source": self.measurement_source,
             "telemetry_refs": list(self.telemetry_refs),
+            "reason": self.reason,
+            "unresolved_refs": list(self.unresolved_refs),
         }
 
 
@@ -111,6 +138,10 @@ def _telemetry_refs(doc: dict) -> tuple[str, ...]:
     return tuple(r for r in refs if isinstance(r, str))
 
 
+def _ocsf_refs(telemetry_refs: tuple[str, ...]) -> tuple[str, ...]:
+    return tuple(r for r in telemetry_refs if r.startswith(OCSF_TELEMETRY_PREFIX))
+
+
 def is_operator_telemetry_source(measurement_source: str) -> bool:
     """Return True if the metric's ``measurement.source`` is an
     operator-telemetry source — i.e. anything other than the
@@ -124,7 +155,26 @@ def is_operator_telemetry_source(measurement_source: str) -> bool:
     return bool(measurement_source) and measurement_source != COMPOSITE_SOURCE
 
 
-def scan(metrics_dir: Path = METRICS_DIR) -> list[CatalogueFinding]:
+def resolve_ocsf_ref(ref: str, telemetry_dir: Path = DEFAULT_TELEMETRY_DIR) -> bool:
+    """Return True iff the OCSF telemetry ref resolves to a real
+    artifact under ``telemetry_dir``.
+
+    Filename convention matches the shipped tree: each ref
+    ``telemetry.ocsf.<class>@v<n>`` is backed by a file
+    ``<ref>.json`` under ``content/telemetry/``. Refs that do not
+    start with ``OCSF_TELEMETRY_PREFIX`` are not OCSF refs and are
+    treated as unresolved by this helper (callers should filter
+    first).
+    """
+    if not ref.startswith(OCSF_TELEMETRY_PREFIX):
+        return False
+    return (telemetry_dir / f"{ref}.json").is_file()
+
+
+def scan(
+    metrics_dir: Path = METRICS_DIR,
+    telemetry_dir: Path = DEFAULT_TELEMETRY_DIR,
+) -> list[CatalogueFinding]:
     findings: list[CatalogueFinding] = []
     for path in sorted(metrics_dir.glob("*.yaml")):
         if path.name.startswith("_"):
@@ -136,14 +186,34 @@ def scan(metrics_dir: Path = METRICS_DIR) -> list[CatalogueFinding]:
             # entirely (a separate schema lint catches the latter).
             continue
         tr = _telemetry_refs(doc)
+        stable_id = doc.get("stable_id") or path.stem
         if not has_ocsf_binding(tr):
-            stable_id = doc.get("stable_id") or path.stem
             findings.append(
                 CatalogueFinding(
                     metric_stable_id=stable_id,
                     metric_path=path,
                     measurement_source=src,
                     telemetry_refs=tr,
+                    reason=REASON_NO_BINDING,
+                )
+            )
+            continue
+        # CORE: every OCSF-prefixed ref on this metric must resolve
+        # to a real artifact under content/telemetry/. A
+        # present-but-dangling ref fails.
+        unresolved = tuple(
+            r for r in _ocsf_refs(tr)
+            if not resolve_ocsf_ref(r, telemetry_dir)
+        )
+        if unresolved:
+            findings.append(
+                CatalogueFinding(
+                    metric_stable_id=stable_id,
+                    metric_path=path,
+                    measurement_source=src,
+                    telemetry_refs=tr,
+                    reason=REASON_DANGLING_REF,
+                    unresolved_refs=unresolved,
                 )
             )
     return findings
@@ -154,12 +224,13 @@ def _emit_text(findings: list[CatalogueFinding]) -> None:
         print(
             f"{CLI_NAME}: PASS "
             f"(every operator-telemetry metric carries an OCSF "
-            f"source-data shape; composite metrics exempt)"
+            f"source-data shape that resolves under "
+            f"content/telemetry/; composite metrics exempt)"
         )
         return
     print(
         f"{CLI_NAME}: FAIL — {len(findings)} operator-telemetry "
-        "metric(s) missing OCSF source-data-shape binding:"
+        "metric(s) with OCSF source-data-shape issues:"
     )
     for f in findings:
         print(f"  {f.as_text()}")
@@ -180,7 +251,8 @@ def main(argv: list[str] | None = None) -> int:
         description=(
             "Assert every operator-telemetry metric in "
             "content/metrics/ carries an OCSF source-data-shape "
-            "telemetry_ref (G-04 OCSF catalogue-wide dimension). "
+            "telemetry_ref that resolves to a real artifact under "
+            "content/telemetry/ (G-04 OCSF catalogue-wide dimension). "
             "Composite-source metrics are exempt."
         )
     )
@@ -196,9 +268,15 @@ def main(argv: list[str] | None = None) -> int:
         default=METRICS_DIR,
         help=argparse.SUPPRESS,
     )
+    parser.add_argument(
+        "--telemetry-dir",
+        type=Path,
+        default=DEFAULT_TELEMETRY_DIR,
+        help=argparse.SUPPRESS,
+    )
     args = parser.parse_args(argv)
 
-    findings = scan(args.metrics_dir)
+    findings = scan(args.metrics_dir, args.telemetry_dir)
     if args.format == "json":
         _emit_json(findings)
     else:
