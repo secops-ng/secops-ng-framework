@@ -32,12 +32,15 @@ on:
       - "content/mappings/dora/**"
       - "content/mappings/gdpr/**"
       - "content/mappings/nis2/**"
+      - "content/metrics/**"
       - "tools/lint_playbook_orphans.py"
       - "tools/lint_cra_playbook_orphans.py"
+      - "tools/lint_posture_ocsf_bindings.py"
       - "tests/content/test_cra_playbook_orphans.py"
       - "tests/content/test_dora_playbook_orphans.py"
       - "tests/content/test_gdpr_playbook_orphans.py"
       - "tests/content/test_nis2_playbook_orphans.py"
+      - "tests/content/test_posture_ocsf_bindings.py"
       - ".github/workflows/orphan-ci.yml"
   push:
     branches: [main]
@@ -47,8 +50,10 @@ on:
       - "content/mappings/dora/**"
       - "content/mappings/gdpr/**"
       - "content/mappings/nis2/**"
+      - "content/metrics/**"
       - "tools/lint_playbook_orphans.py"
       - "tools/lint_cra_playbook_orphans.py"
+      - "tools/lint_posture_ocsf_bindings.py"
   schedule:
     # Nightly at 02:23 UTC — off-peak, off-the-hour, single slot for
     # all four frameworks now that they share one workflow.
@@ -116,3 +121,29 @@ jobs:
           path: .kri-out/g-02-${{ matrix.framework }}.json
           if-no-files-found: warn
           retention-days: 30
+
+  posture-ocsf-bindings:
+    # G-04 catalogue-maturity OCSF source-data-shape dimension —
+    # asserts every metric in the asset/patch posture cluster declares
+    # an OCSF telemetry_ref. Wired into the orphan-CI workflow because
+    # it shares the same nightly content-CI cadence; runs independently
+    # from the per-framework orphan matrix.
+    name: G-04 posture-cluster OCSF binding assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML)
+        run: pip install --no-cache-dir pyyaml
+
+      - name: Run posture-OCSF binding assertion (text)
+        run: |
+          python -m tools.lint_posture_ocsf_bindings --format text
