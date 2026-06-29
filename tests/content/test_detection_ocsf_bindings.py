@@ -52,9 +52,9 @@ def test_shipped_tree_has_no_unbound_detection_metrics() -> None:
     )
 
 
-def test_real_tree_covers_green_anchor() -> None:
-    """Sanity check: the scan actually classifies the SKELETON green
-    anchor (mttd_phishing) as detection-latency-class.
+def test_real_tree_covers_full_mttd_cluster() -> None:
+    """Sanity check: the scan classifies every shipped mttd_* metric
+    as detection-latency-class once the CORE wave widens the cluster.
 
     Without this anchor the assertion could silently degrade to a
     no-op (zero findings because zero metrics classify) and pass for
@@ -74,10 +74,19 @@ def test_real_tree_covers_green_anchor() -> None:
             sid = doc.get("stable_id")
             if isinstance(sid, str):
                 classified.add(sid)
-    assert "kpi.mttd_phishing@v1" in classified, (
-        "detection-latency-cluster classifier no longer identifies "
-        "kpi.mttd_phishing@v1 — adjust DETECTION_PLAYBOOK_IDS or the "
-        f"test (classified={sorted(classified)})."
+    expected = {
+        "kpi.mttd_phishing@v1",
+        "kpi.mttd_ransomware@v1",
+        "kpi.mttd_exfil@v1",
+        "kpi.mttd_cloud_misconfig@v1",
+        "kpi.mttd_identity_compromise@v1",
+        "kpi.mttd_threat_intel_indicator@v1",
+    }
+    missing = expected - classified
+    assert not missing, (
+        "detection-latency-cluster classifier no longer identifies the "
+        f"full mttd_* set — missing={sorted(missing)} "
+        f"(classified={sorted(classified)})."
     )
 
 
@@ -176,29 +185,54 @@ def test_metric_without_playbook_refs_is_not_detection(
 
 
 # ---------------------------------------------------------------------------
-# Negative regression for the green-anchor metric: stripping its OCSF
-# telemetry_refs MUST trip the assertion. This is the structural guard
-# the card asks for.
+# Negative regression for every mttd_* metric in the cluster: stripping
+# its OCSF telemetry_refs MUST trip the assertion. This is the
+# structural guard the F-MET-OCSF-DETECT CORE card asks for —
+# per-metric coverage so a regression on any single binding surfaces.
 # ---------------------------------------------------------------------------
 
 
-def test_stripping_ocsf_ref_trips_assertion(tmp_path: Path) -> None:
-    src = REPO_ROOT / "content" / "metrics" / "mttd_phishing.yaml"
+MTTD_METRICS = (
+    "mttd_phishing",
+    "mttd_ransomware",
+    "mttd_exfil",
+    "mttd_cloud_misconfig",
+    "mttd_identity_compromise",
+    "mttd_threat_intel_indicator",
+)
+
+
+@pytest.mark.parametrize("metric_name", MTTD_METRICS)
+def test_stripping_ocsf_ref_trips_assertion(
+    tmp_path: Path, metric_name: str
+) -> None:
+    src = REPO_ROOT / "content" / "metrics" / f"{metric_name}.yaml"
     doc = yaml.safe_load(src.read_text(encoding="utf-8"))
+    original_ocsf_refs = [
+        r for r in (doc.get("telemetry_refs") or [])
+        if isinstance(r, str) and r.startswith("telemetry.ocsf.")
+    ]
+    assert original_ocsf_refs, (
+        f"{metric_name}.yaml has no OCSF telemetry_refs on main — the "
+        "CORE wave is supposed to leave every mttd_* metric bound; "
+        "fix the metric file before this test can guard it."
+    )
     doc["telemetry_refs"] = [
         r for r in (doc.get("telemetry_refs") or [])
-        if not r.startswith("telemetry.ocsf.")
+        if not (isinstance(r, str) and r.startswith("telemetry.ocsf."))
     ]
     dst_dir = tmp_path / "metrics"
     dst_dir.mkdir()
-    (dst_dir / "mttd_phishing.yaml").write_text(
+    (dst_dir / f"{metric_name}.yaml").write_text(
         yaml.safe_dump(doc, sort_keys=False), encoding="utf-8"
     )
     findings = scan(dst_dir)
     assert len(findings) == 1, (
-        "stripping OCSF refs from mttd_phishing.yaml did not trip the "
-        "detection-latency-cluster assertion"
+        f"stripping OCSF refs from {metric_name}.yaml did not trip "
+        "the detection-latency-cluster assertion "
+        f"(findings={[f.metric_stable_id for f in findings]})"
     )
+    assert findings[0].metric_stable_id == doc.get("stable_id")
 
 
 # ---------------------------------------------------------------------------

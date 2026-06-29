@@ -36,11 +36,14 @@ on:
       - "tools/lint_playbook_orphans.py"
       - "tools/lint_cra_playbook_orphans.py"
       - "tools/lint_posture_ocsf_bindings.py"
+      - "tools/lint_detection_ocsf_bindings.py"
+      - "tools/ocsf_cluster_lint.py"
       - "tests/content/test_cra_playbook_orphans.py"
       - "tests/content/test_dora_playbook_orphans.py"
       - "tests/content/test_gdpr_playbook_orphans.py"
       - "tests/content/test_nis2_playbook_orphans.py"
       - "tests/content/test_posture_ocsf_bindings.py"
+      - "tests/content/test_detection_ocsf_bindings.py"
       - ".github/workflows/orphan-ci.yml"
   push:
     branches: [main]
@@ -54,6 +57,8 @@ on:
       - "tools/lint_playbook_orphans.py"
       - "tools/lint_cra_playbook_orphans.py"
       - "tools/lint_posture_ocsf_bindings.py"
+      - "tools/lint_detection_ocsf_bindings.py"
+      - "tools/ocsf_cluster_lint.py"
   schedule:
     # Nightly at 02:23 UTC — off-peak, off-the-hour, single slot for
     # all four frameworks now that they share one workflow.
@@ -147,3 +152,29 @@ jobs:
       - name: Run posture-OCSF binding assertion (text)
         run: |
           python -m tools.lint_posture_ocsf_bindings --format text
+
+  detection-ocsf-bindings:
+    # G-04 catalogue-maturity OCSF source-data-shape dimension —
+    # asserts every metric in the detection-latency (mttd_*) cluster
+    # declares an OCSF telemetry_ref. Sibling to posture-ocsf-bindings;
+    # rides the same nightly content-CI cadence and runs independently
+    # from the per-framework orphan matrix and the posture job.
+    name: G-04 detection-latency-cluster OCSF binding assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML)
+        run: pip install --no-cache-dir pyyaml
+
+      - name: Run detection-OCSF binding assertion (text)
+        run: |
+          python -m tools.lint_detection_ocsf_bindings --format text
