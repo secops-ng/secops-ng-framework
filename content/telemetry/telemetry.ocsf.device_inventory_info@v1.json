@@ -1,0 +1,31 @@
+{
+  "stable_id": "telemetry.ocsf.device_inventory_info@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Device Inventory Info event (asset-management reconciliation telemetry for the operator's authoritative inventory ledger)",
+  "summary": "OCSF Device Inventory Info events the operator's asset-management surface emits at each reconciliation against an authoritative inventory source. Carries the per-asset identity, observed-source attribution, and reconciliation timestamp so the kpi.unmanaged_asset_cardinality@v1 and kri.asset_inventory_drift@v1 indicators can read asset identity and per-window delta evidence off a single OCSF class shape. Vendor-neutral binding: the catalog entry pins the OCSF Device Inventory Info class (uid 5001), not a CMDB or asset-API product object.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 5,
+    "category_name": "Discovery",
+    "class_uid": 5001,
+    "class_name": "Device Inventory Info"
+  },
+  "direction": "both",
+  "fields_used": [
+    "time",
+    "activity_id",
+    "device.uid",
+    "device.hostname",
+    "device.type_id"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.asset_management@v1"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org",
+  "sources": [
+    "OCSF v1.4.0 Discovery category — Device Inventory Info class (uid 5001)"
+  ]
+}

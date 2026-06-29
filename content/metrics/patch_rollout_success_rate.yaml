@@ -82,10 +82,17 @@ measurement:
         validate-canary primitive is the source of truth: a healthy
         canary requires `functional_probe == "green"` AND all three
         threshold gates (`error_rate_within_threshold`,
-        `latency_within_threshold`, `rollback_ready`) true.
+        `latency_within_threshold`, `rollback_ready`) true. Upstream
+        OCSF source data shape: the OCSF Operating System Patch State
+        class (uid 5004) the operator's patch-management surface emits
+        at each patch-application observation carries the per-patch
+        applied-state activity (`activity_id`, `status_id`) that the
+        validate-canary step reads against the canary ring to shape
+        the boolean outcome.
       playbook_ref: playbook.patch_management@v1
       playbook_step: action--70000000-0000-4000-8000-000000000005
       field: canary_healthy
+      telemetry_ref: telemetry.ocsf.patch_state@v1
     - name: broad_rollout_id
       description: >
         Deterministic broad-ring rollout identifier emitted by the
@@ -94,10 +101,15 @@ measurement:
         digest indicates the broad rollout engaged a healthy canary;
         the empty string indicates the deterministic skip branch
         against an unhealthy canary. The success condition requires
-        a non-empty digest.
+        a non-empty digest. Upstream OCSF source data shape: the
+        broad rollout fans out one OCSF Operating System Patch State
+        (uid 5004) observation per device in the broad ring, anchored
+        on the rollout id; the digest's non-emptiness is the
+        deterministic signal that the broad-ring fan-out engaged.
       playbook_ref: playbook.patch_management@v1
       playbook_step: action--70000000-0000-4000-8000-000000000006
       field: broad_rollout_id
+      telemetry_ref: telemetry.ocsf.patch_state@v1
     - name: health_observations
       description: >
         Closed-shape health-gate block emitted by the validate-canary
@@ -108,13 +120,20 @@ measurement:
         from the headline ratio reads the contributing gate values
         per execution; the boolean `canary_healthy` field is the
         primary input to the success condition, the block is the
-        forensic context.
+        forensic context. Upstream OCSF source data shape: gate
+        values are derived from the OCSF Operating System Patch State
+        (uid 5004) observations from the canary ring during the
+        validation window.
       playbook_ref: playbook.patch_management@v1
       playbook_step: action--70000000-0000-4000-8000-000000000005
       field: health_observations
+      telemetry_ref: telemetry.ocsf.patch_state@v1
   window:
     duration: P30D
     sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.patch_state@v1
 
 playbook_refs:
   - playbook_id: playbook.patch_management@v1

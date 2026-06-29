@@ -1,0 +1,31 @@
+{
+  "stable_id": "telemetry.ocsf.patch_state@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Operating System Patch State event (patch-rollout discovery telemetry for the operator's patch-management ledger)",
+  "summary": "OCSF Operating System Patch State events the operator's patch-management surface emits at each patch-application observation. Carries the per-patch identity (KB / advisory article list), the applied-state activity, and the observation timestamp so the kpi.patch_rollout_success_rate@v1 and kri.patch_rollout_overdue_exposure@v1 indicators can read rollout outcome and overdue-exposure cardinality off a single OCSF class shape. Vendor-neutral binding: the catalog entry pins the OCSF Operating System Patch State class (uid 5004), not a vendor-specific patch-management API object.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 5,
+    "category_name": "Discovery",
+    "class_uid": 5004,
+    "class_name": "Operating System Patch State"
+  },
+  "direction": "both",
+  "fields_used": [
+    "time",
+    "activity_id",
+    "status_id",
+    "device.uid",
+    "kb_article_list"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.patch_management@v1"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org",
+  "sources": [
+    "OCSF v1.4.0 Discovery category — Operating System Patch State class (uid 5004)"
+  ]
+}

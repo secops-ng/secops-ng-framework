@@ -61,6 +61,16 @@ EXPECTED_BINDINGS = {
         "class_name": "Compliance Finding",
         "category_uid": 2,
     },
+    "telemetry.ocsf.device_inventory_info@v1": {
+        "class_uid": 5001,
+        "class_name": "Device Inventory Info",
+        "category_uid": 5,
+    },
+    "telemetry.ocsf.patch_state@v1": {
+        "class_uid": 5004,
+        "class_name": "Operating System Patch State",
+        "category_uid": 5,
+    },
 }
 
 
