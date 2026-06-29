@@ -38,6 +38,7 @@ on:
       - "tools/lint_posture_ocsf_bindings.py"
       - "tools/lint_detection_ocsf_bindings.py"
       - "tools/lint_catalogue_ocsf_bindings.py"
+      - "tools/lint_sovereignty_lm_endpoint_pairing.py"
       - "tools/ocsf_cluster_lint.py"
       - "content/telemetry/**"
       - "tests/content/test_cra_playbook_orphans.py"
@@ -47,6 +48,7 @@ on:
       - "tests/content/test_posture_ocsf_bindings.py"
       - "tests/content/test_detection_ocsf_bindings.py"
       - "tests/content/test_catalogue_ocsf_bindings.py"
+      - "tests/content/test_sovereignty_lm_endpoint_pairing.py"
       - ".github/workflows/orphan-ci.yml"
   push:
     branches: [main]
@@ -63,6 +65,7 @@ on:
       - "tools/lint_posture_ocsf_bindings.py"
       - "tools/lint_detection_ocsf_bindings.py"
       - "tools/lint_catalogue_ocsf_bindings.py"
+      - "tools/lint_sovereignty_lm_endpoint_pairing.py"
       - "tools/ocsf_cluster_lint.py"
   schedule:
     # Nightly at 02:23 UTC — off-peak, off-the-hour, single slot for
@@ -214,3 +217,33 @@ jobs:
       - name: Run catalogue-OCSF binding assertion (text)
         run: |
           python -m tools.lint_catalogue_ocsf_bindings --format text
+
+  sovereignty-lm-endpoint-pairing:
+    # G-04 catalogue-maturity sovereignty corner — asserts that every
+    # sovereignty-cluster LM-endpoint coverage KPI ships with a paired
+    # sovereignty-cluster UNKNOWN-exposure residual-risk KRI at the
+    # same version family. Closes the F-MET-SOV triplet (SKELETON
+    # #542) by making the residual-risk pairing a nightly invariant
+    # so the UNKNOWN-exposure signal cannot silently regress out of
+    # the catalogue. Rides the same nightly content-CI cadence as the
+    # OCSF cluster jobs; runs independently from the per-framework
+    # orphan matrix and the OCSF jobs.
+    name: G-04 sovereignty LM-endpoint pairing assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML)
+        run: pip install --no-cache-dir pyyaml
+
+      - name: Run sovereignty LM-endpoint pairing assertion (text)
+        run: |
+          python -m tools.lint_sovereignty_lm_endpoint_pairing --format text
