@@ -81,10 +81,18 @@ measurement:
         `inventory`) as the pre-computed `unmanaged_discovered_count`
         integer field; the catalog entry binds to that evidence
         artifact shape, not to a vendor-specific CMDB or asset-API
-        object.
+        object. The upstream source data shape (OCSF) the evidence
+        artifact aggregates from is the OCSF Device Inventory Info
+        event class (uid 5001) the operator's asset-management
+        surface emits at each reconciliation against an authoritative
+        inventory source — the per-asset `device.uid` observations
+        whose owner / source attribution is empty contribute one to
+        this count. The catalog entry pins the OCSF class shape, not
+        a CMDB or asset-API product object.
       playbook_ref: playbook.asset_management@v1
       playbook_step: action--80000000-0000-4000-8000-000000000005
       field: unmanaged_discovered_count
+      telemetry_ref: telemetry.ocsf.device_inventory_info@v1
     - name: classify_block
       description: >
         Per-delta classification block the classify-delta step emits.
@@ -93,13 +101,21 @@ measurement:
         input so a consumer drilling down from the headline count
         reads the contributing delta-classification entries against
         the artifact's per-asset `delta_set` (one-to-one ordering with
-        `delta_classification`).
+        `delta_classification`). Upstream OCSF source data shape:
+        the OCSF Device Inventory Info class (uid 5001) carries the
+        per-asset identity observations whose absent owner / source
+        attribution feeds the classify-delta `unmanaged-discovered`
+        bucket.
       playbook_ref: playbook.asset_management@v1
       playbook_step: action--80000000-0000-4000-8000-000000000005
       field: delta_classification
+      telemetry_ref: telemetry.ocsf.device_inventory_info@v1
   window:
     duration: P30D
     sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.device_inventory_info@v1
 
 playbook_refs:
   - playbook_id: playbook.asset_management@v1

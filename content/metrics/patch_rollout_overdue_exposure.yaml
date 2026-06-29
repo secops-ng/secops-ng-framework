@@ -91,10 +91,16 @@ measurement:
         a vendor-specific patch-management API. The `unclassified`
         sentinel is the deadline-missed short-circuit branch and is
         treated as security-critical for scheduling urgency by the
-        downstream stage step.
+        downstream stage step. Upstream OCSF source data shape: the
+        OCSF Operating System Patch State class (uid 5004) the
+        operator's patch-management surface emits at each
+        patch-application observation carries the per-patch identity
+        (`kb_article_list`) the classify step keys its criticality
+        decision against.
       playbook_ref: playbook.patch_management@v1
       playbook_step: action--70000000-0000-4000-8000-000000000003
       field: patch_criticality
+      telemetry_ref: telemetry.ocsf.patch_state@v1
     - name: broad_rollout_id
       description: >
         Deterministic broad-ring rollout identifier emitted by the
@@ -103,10 +109,16 @@ measurement:
         digest indicates the broad rollout was engaged after a
         healthy canary; an empty string indicates the deterministic
         skip branch against an unhealthy canary (paired with the
-        explicit `broad_rollout_skip_reason` marker).
+        explicit `broad_rollout_skip_reason` marker). Upstream OCSF
+        source data shape: the broad rollout fans out one OCSF
+        Operating System Patch State (uid 5004) observation per
+        device in the broad ring, anchored on the rollout id; the
+        digest's emptiness is the deterministic signal that the
+        broad-ring fan-out skipped against an unhealthy canary.
       playbook_ref: playbook.patch_management@v1
       playbook_step: action--70000000-0000-4000-8000-000000000006
       field: broad_rollout_id
+      telemetry_ref: telemetry.ocsf.patch_state@v1
     - name: broad_rollout_skip_reason
       description: >
         Explicit skip marker on the patch-application evidence
@@ -116,12 +128,20 @@ measurement:
         deterministic skip branch. Included as a documented input so
         a consumer drilling down from the headline count reads the
         contributing skip cause against the per-execution artifact.
+        Upstream OCSF source data shape: the skip cause is derived
+        from the OCSF Operating System Patch State (uid 5004) canary-
+        ring observations whose applied-state activity carried
+        unhealthy gate values that prevented the broad-ring fan-out.
       playbook_ref: playbook.patch_management@v1
       playbook_step: action--70000000-0000-4000-8000-000000000006
       field: broad_rollout_skip_reason
+      telemetry_ref: telemetry.ocsf.patch_state@v1
   window:
     duration: P30D
     sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.patch_state@v1
 
 playbook_refs:
   - playbook_id: playbook.patch_management@v1

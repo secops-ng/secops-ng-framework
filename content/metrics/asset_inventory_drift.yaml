@@ -75,10 +75,16 @@ measurement:
         `inventory`); the catalog entry binds to that evidence
         artifact shape, not to a vendor-specific CMDB or asset-API
         object. Empty delta sets are emitted explicitly and contribute
-        a zero-drift sample to the indicator.
+        a zero-drift sample to the indicator. Upstream source data
+        shape (OCSF): the OCSF Device Inventory Info class (uid 5001)
+        the operator's asset-management surface emits at each
+        reconciliation carries the per-asset identity (`device.uid`)
+        observations that the compute-delta step diffs against the
+        previous documented snapshot to shape the delta set.
       playbook_ref: playbook.asset_management@v1
       playbook_step: action--80000000-0000-4000-8000-000000000004
       field: delta_set
+      telemetry_ref: telemetry.ocsf.device_inventory_info@v1
     - name: snapshot_id
       description: >
         Reconciled operator-authoritative snapshot id for the window.
@@ -86,13 +92,21 @@ measurement:
         the catalog entry binds to the snapshot id to anchor the
         denominator on the same evidentiary record as the numerator.
         The compile target reads the snapshot cardinality from the
-        operator's evidence store keyed on the snapshot id.
+        operator's evidence store keyed on the snapshot id. Upstream
+        OCSF source data shape: the snapshot is the reconciled set of
+        OCSF Device Inventory Info (uid 5001) observations from the
+        evaluation window, aggregated against the authoritative
+        inventory source the asset-management surface attributes to.
       playbook_ref: playbook.asset_management@v1
       playbook_step: action--80000000-0000-4000-8000-000000000003
       field: snapshot_id
+      telemetry_ref: telemetry.ocsf.device_inventory_info@v1
   window:
     duration: P30D
     sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.device_inventory_info@v1
 
 playbook_refs:
   - playbook_id: playbook.asset_management@v1
