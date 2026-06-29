@@ -1,0 +1,146 @@
+stable_id: kri.lm_endpoint_unknown_residency_exposure@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: LM endpoints classified UNKNOWN by the shared residency guard — residual sovereignty exposure
+summary: >
+  Residual-risk indicator paired with
+  ``kpi.lm_endpoint_eu_residency_coverage@v1``. Count of LM endpoints
+  declared in compiled example artifacts under
+  ``examples/<target>/<workflow>/`` that the shared EU-resident LM
+  endpoint guard at ``compilers/_shared/lm_endpoint_guard.py``
+  classifies as ``EndpointResidency.UNKNOWN`` — i.e. hosts the
+  pure-heuristic ``classify_endpoint`` cannot resolve to either the EU
+  allowlist / ``eu-*`` region prefix or a known non-EU provider
+  suffix / ``us-*`` / ``apac-*`` region prefix. The shipped coverage
+  KPI lumps NON_EU and UNKNOWN together as 'not covered' so an
+  operator reading the catalog cannot tell whether an off-EU-floor
+  reading is a confirmed non-EU dependency or an unclassified
+  operator-supplied / self-hosted / private-gateway host the guard
+  has no signal on. This KRI surfaces the UNKNOWN sub-signal
+  explicitly so the sovereignty corner of G-04 carries a residual-risk
+  reading alongside the coverage reading. Per F-SV-01 (ROADMAP —
+  Language-Model endpoint residency guard) and docs/FOUNDATION.md §3
+  (Sovereignty), unclassified endpoints are residual risk: the guard
+  does not refuse them at compile time without the documented
+  override env var, but they are not evidence the operator has met
+  the EU-residency posture either.
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: "=="
+  rationale: >
+    The sovereignty floor is that every LM endpoint the cookbook
+    examples declare classifies under a known residency label — EU
+    (counts toward coverage) or NON_EU (explicit exception under the
+    documented override). An UNKNOWN classification is the failure
+    mode where the operator cannot tell which side of the FOUNDATION
+    §3 posture a declared endpoint sits on, so a zero count is the
+    floor the catalog tracks against; any positive reading is an open
+    residual-risk row the project carries on the commit under
+    evaluation. The pairing with
+    ``kpi.lm_endpoint_eu_residency_coverage@v1`` is the contract:
+    coverage rises only when an UNKNOWN host is resolved into a known
+    label, never by silently re-classifying.
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 0
+    severity: warn
+  - name: breach
+    comparator: ">="
+    value: 3
+    severity: high
+measurement:
+  source: composite
+  aggregation: count
+  formula: >
+    For each LM endpoint extracted from a compiled example artifact
+    under ``examples/<target>/<workflow>/`` on the evaluation commit
+    (the same extraction the shared guard performs via
+    ``extract_lm_endpoints`` against the parsed playbook), record one
+    observation: 1 if ``classify_endpoint`` returns
+    ``EndpointResidency.UNKNOWN``, 0 otherwise (``EU`` or ``NON_EU``).
+    Aggregate as count across observations — the catalog headline is
+    the cardinality of UNKNOWN-classified endpoints, not a ratio,
+    because a single unclassified host is already a residual-risk
+    row the operator owes a resolution for. The three-target ring
+    (n8n, Temporal, LangGraph) is the canonical surface — per-target
+    sub-counts are a drill-down dimension, not a separate KRI.
+    Reference visualisation: a horizontal bar chart of per-endpoint
+    classification outcomes (1 = UNKNOWN, 0 = EU or NON_EU) per
+    (workflow, target, endpoint) triple observed in the example
+    suite, sliced by compile target, with a horizontal line at the
+    sovereignty floor of 0 marking the residual-risk predicate and
+    the count aggregate annotated as the headline figure; the chart
+    is the canonical operator-facing surface for this KRI. The
+    committed reference rendering lives at
+    ``content/metrics/lm_endpoint_unknown_residency_exposure.viz.md``
+    — that file is the contract for the chart shape; the compile
+    target renders the executable form against the example artifacts
+    and the shared guard's classifier at evaluation time.
+  inputs:
+    - name: declared_lm_endpoint
+      description: >
+        Single LM endpoint extracted from a compiled example
+        artifact under ``examples/<target>/<workflow>/``. The
+        extraction shape is pinned by the shared guard's
+        ``extract_lm_endpoints`` walker at
+        ``compilers/_shared/lm_endpoint_guard.py``, which traverses
+        the parsed CACAO playbook and surfaces every endpoint a
+        compiler would emit (``playbook_variables.LM_ENDPOINT.value``,
+        ``workflow.<step>.x_secops_ng.lm.endpoint``, etc.). The
+        catalog entry binds to that extractor's output, not to a
+        vendor-specific LM client surface. Bound here as the
+        executive_metrics worked example because that playbook
+        exercises LM-facing steps across the three reference compile
+        targets.
+      playbook_ref: playbook.executive_metrics@v1
+    - name: classification_outcome
+      description: >
+        Residency classification of one ``declared_lm_endpoint`` as
+        returned by ``classify_endpoint`` in
+        ``compilers/_shared/lm_endpoint_guard.py``. Only the
+        ``EndpointResidency.UNKNOWN`` branch counts toward this KRI
+        — i.e. the host does not match ``EU_ALLOWLIST_SUFFIXES``,
+        does not carry an ``eu-*`` leading region label, does not
+        match a known non-EU provider suffix (``.openai.com`` /
+        ``.anthropic.com``), and does not carry a ``us-*`` / ``apac-*``
+        region prefix. This is the operator-supplied / self-hosted /
+        private-gateway shape the coverage KPI cannot distinguish
+        from confirmed-non-EU and which the shared guard does not
+        refuse at compile time without the documented override env
+        var. Bound here as the it_security_support_agent worked
+        example because it carries LM-facing steps across the
+        three-target ring covered by the per-example byte-parity
+        goldens under ``tests/examples/``.
+      playbook_ref: playbook.it_security_support_agent@v1
+  window:
+    duration: P1D
+    sliding: false
+playbook_refs:
+  - playbook_id: playbook.executive_metrics@v1
+  - playbook_id: playbook.it_security_support_agent@v1
+  - playbook_id: playbook.phishing_triage@v1
+external_refs:
+  - name: SecOps-NG FOUNDATION §3 — Sovereignty
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+  - name: SecOps-NG ROADMAP — F-SV-01 EU-resident LM endpoint guard
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/ROADMAP.md
+  - name: GDPR — Chapter V cross-border transfers of personal data
+    source: EU
+    external_id: Regulation (EU) 2016/679, Chapter V
+    url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+  - name: NIS2 — Article 21(2)(d) supply chain security (motivating context — upstream-component residency)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(d)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ENISA — Cloud security guidance, EU-residency considerations
+    source: ENISA
+    url: https://www.enisa.europa.eu/topics/cloud-and-big-data
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - sovereignty

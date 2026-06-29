@@ -104,6 +104,7 @@ VIZ_REQUIRED_STEMS = (
     # F-MET-SOV SKELETON — sovereignty catalog back-fill (G-04)
     "forward_public_hygiene_high_severity_escape_rate",
     "lm_endpoint_eu_residency_coverage",
+    "lm_endpoint_unknown_residency_exposure",
     "gdpr_lawful_basis_section_coverage",
     # F-WF-PATCH EXTEND-metrics — patch_management catalog closeout
     "patch_rollout_overdue_exposure",
