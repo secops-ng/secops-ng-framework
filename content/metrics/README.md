@@ -230,6 +230,27 @@ It rides the `sovereignty-lm-endpoint-pairing` job in
 same nightly 02:23 UTC schedule, same PR-on-touch and push-on-main
 triggers.
 
+## Determinism replay pairing lint (G-04)
+
+The determinism corner of the G-04 catalogue-maturity acceptance bar
+carries the same residual-risk pairing invariant as the sovereignty
+corner: every determinism-cluster replay coverage KPI
+(`kpi.*replay*_(determinism|parity)_rate@vN` with `foundation_property`
+including `determinism`) must ship with a paired determinism-cluster
+replay drift KRI (`kri.*replay*_drift@vN`) at the same version family.
+This is enforced by `tools/lint_determinism_replay_pairing.py` so the
+replay-drift residual-risk reading cannot silently regress out of the
+catalogue. Run it locally with:
+
+```sh
+python -m tools.lint_determinism_replay_pairing --format text
+```
+
+It rides the `determinism-replay-pairing` job in
+`.github/workflows/orphan-ci.yml` alongside the sovereignty and OCSF
+cluster lanes — same nightly 02:23 UTC schedule, same PR-on-touch and
+push-on-main triggers.
+
 The remaining baseline entries (`kpi.mttd@v1`, `kpi.mttr_critical@v1`,
 `kpi.detection_coverage@v1`, `kpi.false_positive_rate@v1`,
 `kri.control_effectiveness@v1`) intentionally keep `playbook_refs: []`
