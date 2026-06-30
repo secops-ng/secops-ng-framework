@@ -39,6 +39,7 @@ on:
       - "tools/lint_detection_ocsf_bindings.py"
       - "tools/lint_catalogue_ocsf_bindings.py"
       - "tools/lint_sovereignty_lm_endpoint_pairing.py"
+      - "tools/lint_determinism_replay_pairing.py"
       - "tools/ocsf_cluster_lint.py"
       - "content/telemetry/**"
       - "tests/content/test_cra_playbook_orphans.py"
@@ -49,6 +50,7 @@ on:
       - "tests/content/test_detection_ocsf_bindings.py"
       - "tests/content/test_catalogue_ocsf_bindings.py"
       - "tests/content/test_sovereignty_lm_endpoint_pairing.py"
+      - "tests/content/test_determinism_replay_pairing.py"
       - ".github/workflows/orphan-ci.yml"
   push:
     branches: [main]
@@ -66,6 +68,7 @@ on:
       - "tools/lint_detection_ocsf_bindings.py"
       - "tools/lint_catalogue_ocsf_bindings.py"
       - "tools/lint_sovereignty_lm_endpoint_pairing.py"
+      - "tools/lint_determinism_replay_pairing.py"
       - "tools/ocsf_cluster_lint.py"
   schedule:
     # Nightly at 02:23 UTC — off-peak, off-the-hour, single slot for
@@ -247,3 +250,33 @@ jobs:
       - name: Run sovereignty LM-endpoint pairing assertion (text)
         run: |
           python -m tools.lint_sovereignty_lm_endpoint_pairing --format text
+
+  determinism-replay-pairing:
+    # G-04 catalogue-maturity determinism corner — asserts that every
+    # determinism-cluster replay coverage KPI ships with a paired
+    # determinism-cluster replay drift residual-risk KRI at the same
+    # version family. Sibling of sovereignty-lm-endpoint-pairing;
+    # extends the same residual-risk pairing invariant pattern to the
+    # determinism corner so the replay-drift signal cannot silently
+    # regress out of the catalogue. Rides the same nightly content-CI
+    # cadence; runs independently from the per-framework orphan
+    # matrix and the OCSF / sovereignty jobs.
+    name: G-04 determinism replay pairing assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML)
+        run: pip install --no-cache-dir pyyaml
+
+      - name: Run determinism replay pairing assertion (text)
+        run: |
+          python -m tools.lint_determinism_replay_pairing --format text
