@@ -43,6 +43,7 @@ on:
       - "tools/lint_post_incident_review_ocsf_bindings.py"
       - "tools/lint_regulatory_notification_ocsf_bindings.py"
       - "tools/lint_identity_access_ocsf_bindings.py"
+      - "tools/lint_vuln_patch_ocsf_bindings.py"
       - "tools/ocsf_cluster_lint.py"
       - "content/telemetry/**"
       - "tests/content/test_cra_playbook_orphans.py"
@@ -57,6 +58,7 @@ on:
       - "tests/content/test_post_incident_review_ocsf_bindings.py"
       - "tests/content/test_regulatory_notification_ocsf_bindings.py"
       - "tests/content/test_identity_access_ocsf_bindings.py"
+      - "tests/content/test_vuln_patch_ocsf_bindings.py"
       - ".github/workflows/orphan-ci.yml"
   push:
     branches: [main]
@@ -78,6 +80,7 @@ on:
       - "tools/lint_post_incident_review_ocsf_bindings.py"
       - "tools/lint_regulatory_notification_ocsf_bindings.py"
       - "tools/lint_identity_access_ocsf_bindings.py"
+      - "tools/lint_vuln_patch_ocsf_bindings.py"
       - "tools/ocsf_cluster_lint.py"
   schedule:
     # Nightly at 02:23 UTC — off-peak, off-the-hour, single slot for
@@ -380,3 +383,36 @@ jobs:
       - name: Run identity-&-access-OCSF binding assertion (text)
         run: |
           python -m tools.lint_identity_access_ocsf_bindings --format text
+
+  vuln-patch-ocsf-bindings:
+    # G-04 catalogue-maturity OCSF source-data-shape dimension —
+    # asserts every metric in the vulnerability-handling & patch
+    # (CRA-family) cluster (vuln_intake, patch_management) declares
+    # an OCSF telemetry_ref. Closes the F-MET-OCSF-VULNPATCH triplet
+    # (SKELETON #551) by wiring the linter into the nightly content-CI
+    # cadence alongside the other cluster jobs; runs independently
+    # from the per-framework orphan matrix and the sibling OCSF /
+    # sovereignty / determinism / post-incident-review /
+    # regulatory-notification / identity-&-access jobs. Secondary:
+    # G-02 regulatory-mapping coverage — the vulnerability-&-patch
+    # cluster carries CRA coordinated-vulnerability-disclosure and
+    # SBOM release obligations.
+    name: G-04 vulnerability-&-patch-cluster OCSF binding assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML)
+        run: pip install --no-cache-dir pyyaml
+
+      - name: Run vulnerability-&-patch-OCSF binding assertion (text)
+        run: |
+          python -m tools.lint_vuln_patch_ocsf_bindings --format text
