@@ -44,7 +44,18 @@ def _catalog_entries() -> list[tuple[Path, dict]]:
 
 
 def _playbook_files() -> list[Path]:
-    return sorted(PLAYBOOKS_DIR.glob("*/playbook.cacao.json"))
+    # Playbooks ship as CACAO v2 in either .json or .yaml serialisation
+    # (see content/playbooks/detection_engineering/playbook.cacao.yaml
+    # for the YAML variant). The link linter is serialization-agnostic.
+    out = list(PLAYBOOKS_DIR.glob("*/playbook.cacao.json"))
+    out += list(PLAYBOOKS_DIR.glob("*/playbook.cacao.yaml"))
+    return sorted(out)
+
+
+def _load_playbook(path: Path) -> dict:
+    if path.suffix == ".yaml":
+        return yaml.safe_load(path.read_text(encoding="utf-8"))
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 @pytest.fixture(scope="module")
@@ -57,7 +68,7 @@ def playbooks() -> dict[str, dict]:
     """Map playbook stable_id -> parsed CACAO document."""
     out: dict[str, dict] = {}
     for pf in _playbook_files():
-        pb = json.loads(pf.read_text(encoding="utf-8"))
+        pb = _load_playbook(pf)
         sid = pb.get("x_secops_ng", {}).get("stable_id")
         assert sid, f"{pf} is missing x_secops_ng.stable_id"
         assert sid not in out, f"duplicate playbook stable_id {sid}"
@@ -100,7 +111,7 @@ def _collect_playbook_metric_refs(pb: dict) -> list[tuple[str, str]]:
 def test_playbook_metric_refs_resolve_to_catalog(
     playbook_path: Path, catalog_ids: set[str]
 ) -> None:
-    pb = json.loads(playbook_path.read_text(encoding="utf-8"))
+    pb = _load_playbook(playbook_path)
     refs = _collect_playbook_metric_refs(pb)
     dangling = [(origin, mref) for origin, mref in refs if mref not in catalog_ids]
     assert not dangling, (
