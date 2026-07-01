@@ -25,6 +25,7 @@ narrative.
 | `iam_auditor`         | [`iam_auditor.md`](iam_auditor.md)                 | `content/playbooks/iam_auditor/`                      |
 | `infra_posture_management` | [`infra_posture_management.md`](infra_posture_management.md) | `content/playbooks/infra_posture_management/`    |
 | `contractual_obligations_tracker` | [`contractual_obligations_tracker.md`](contractual_obligations_tracker.md) | `content/playbooks/contractual_obligations_tracker/` |
+| `detection_engineering` | [`detection_engineering.md`](detection_engineering.md) | `content/playbooks/detection_engineering/`            |
 
 Additional entries land alongside their content sources as workflows
 flip from In Progress to Shipped on
