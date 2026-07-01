@@ -1,0 +1,112 @@
+stable_id: kpi.restore_drill_attestation_freshness@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Restore-drill attestation freshness — share of in-scope backup scopes whose most-recent restore-drill attestation is fresh against the operator's documented cadence
+summary: >
+  Performance indicator derived from the backup_recovery playbook
+  evidence-capture step. For each in-scope backup scope declared in
+  the operator's backup-scope catalogue, the indicator asks whether
+  the most-recent restore-drill attestation published to the
+  evidence store is younger than the operator's documented attestation
+  freshness window. Falling values indicate the audit-evident
+  attestation trail NIS2 Art. 21(2)(c), DORA Art. 12, and CRA Annex I
+  §1(h) reviewers read against the "tested restore drill" obligation is
+  going stale — the same failure mode the sibling cadence KPI names
+  from the operational side.
+unit: ratio
+direction: higher_is_better
+target:
+  value: 0.95
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point. A well-disciplined
+    business-continuity attestation practice ships at least one fresh
+    attestation per in-scope backup scope inside the operator's
+    documented freshness window; the residual 5% accounts for scopes
+    newly added within the window whose first attestation has not yet
+    been emitted. Operators under scoped programmes set higher targets
+    with documented rationale in their scoped variants.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 0.95
+    severity: warn
+  - name: breach
+    comparator: "<"
+    value: 0.80
+    severity: high
+measurement:
+  source: workflow
+  aggregation: ratio
+  formula: >
+    For each in-scope backup scope declared in the operator's
+    backup-scope catalogue, count the scope as fresh if the most-recent
+    attestation emitted by the evidence-capture step of the
+    backup_recovery playbook
+    (action--50000000-0000-4000-8000-000000000006) carries a publish
+    timestamp younger than the operator's documented attestation
+    freshness window. Scopes whose most-recent attestation is older
+    than the freshness window — or whose evidence-store lookup yields
+    no attestation at all — count against the denominator without
+    contributing to the numerator. The freshness rate is
+    `fresh_scopes / total_in_scope`. Reference visualisation: a
+    ratio-headline gauge with warn / breach band overlays over a
+    per-scope attestation-age drill-down sliced by backup scope; the
+    committed reference rendering lives at
+    `content/metrics/restore_drill_attestation_freshness.viz.md` —
+    that file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: fresh_scopes
+      description: >
+        Count of in-scope backup scopes whose most-recent attestation
+        emitted by the evidence-capture step lands inside the
+        operator's documented freshness window. Carried on the OCSF
+        API Activity event the evidence-capture step emits at
+        attestation publication to the operator's evidence store: the
+        write call carries the `__attestation_id__` identifier and the
+        publish timestamp. The catalog entry binds to that OCSF class
+        shape, not to a vendor-specific evidence store or audit
+        product.
+      playbook_ref: playbook.backup_recovery@v1
+      playbook_step: action--50000000-0000-4000-8000-000000000006
+      field: time
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+    - name: total_in_scope
+      description: >
+        Count of in-scope backup scopes declared in the operator's
+        backup-scope catalogue. Sourced from the operator's scoping
+        artifact rather than the telemetry stream so the denominator
+        is stable against evidence-store ingestion gaps, matching the
+        coverage_on_call_schedule and detection_coverage conventions.
+      playbook_ref: playbook.backup_recovery@v1
+  window:
+    duration: P90D
+    sliding: true
+telemetry_refs:
+  - telemetry.ocsf.api_activity@v1
+playbook_refs:
+  - playbook_id: playbook.backup_recovery@v1
+    step_id: action--50000000-0000-4000-8000-000000000006
+external_refs:
+  - name: NIS2 — Article 21(2)(c) business continuity, backup management, disaster recovery, crisis management
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(c)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 12 backup policies and procedures, restoration and recovery procedures and methods
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 12
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: CRA — Annex I §1(h) availability of essential and basic functions
+    source: EU
+    external_id: Regulation (EU) 2024/2847, Annex I §1(h)
+    url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+  - name: NIST SP 800-53 Rev. 5 — CP-9 System Backup
+    source: NIST
+    external_id: NIST SP 800-53 Rev. 5 CP-9
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CP-9
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability
+  - operability

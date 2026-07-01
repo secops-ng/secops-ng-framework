@@ -114,6 +114,11 @@ VIZ_REQUIRED_STEMS = (
     "same_target_replay_drift",
     "cross_target_audit_envelope_parity_rate",
     "span_block_emitter_determinism_rate",
+    # F-MET-BCR SKELETON — backup-recovery cluster (G-04)
+    "restore_drill_cadence",
+    "backup_integrity_failures",
+    "restore_drill_attestation_freshness",
+    "restore_drill_rto_overrun",
 )
 
 

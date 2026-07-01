@@ -1,0 +1,96 @@
+stable_id: kri.restore_drill_rto_overrun@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Restore-drill RTO overrun — count of executed restore drills whose observed recovery time exceeded the documented RTO objective
+summary: >
+  Risk indicator derived from the backup_recovery playbook
+  execute-restore-drill step. Each executed non-destructive restore
+  drill emits a `__drill_result__` artifact carrying the observed
+  RTO measurement against the operator's documented RTO objective for
+  the in-scope backup scope; this indicator counts the drills whose
+  observed RTO exceeded that objective. Rising values indicate the
+  operator's recovery discipline is drifting away from its documented
+  continuity targets — the failure mode the "recovery objectives"
+  half of NIS2 Art. 21(2)(c) and DORA Art. 12 (backup policies and
+  procedures, restoration and recovery procedures and methods) surface
+  against the business-continuity obligation.
+unit: count
+direction: lower_is_better
+thresholds:
+  - name: warn
+    comparator: ">="
+    value: 1
+    severity: warn
+  - name: breach
+    comparator: ">="
+    value: 3
+    severity: high
+measurement:
+  source: workflow
+  aggregation: count
+  formula: >
+    Count of backup_recovery executions in the evaluation window that
+    completed the execute-restore-drill step
+    (action--50000000-0000-4000-8000-000000000005) with a non-empty
+    `__drill_result__` whose observed RTO exceeded the documented RTO
+    objective for the in-scope backup scope. Each overrun contributes
+    one to the count; the count increments once per
+    (backup-scope, drill-execution) pair so a repeated overrun on the
+    same scope across successive drill windows registers each
+    occurrence. Executions whose drill was skipped by the integrity
+    short-circuit (empty `__drill_result__`) are excluded — those
+    cases are covered by the sibling backup_integrity_failures KRI.
+    Reference visualisation: a count-headline card with warn / breach
+    band overlays over a per-drill overrun-margin drill-down sliced
+    by backup scope; the committed reference rendering lives at
+    `content/metrics/restore_drill_rto_overrun.viz.md` — that file is
+    the contract for the chart shape; the compile target renders the
+    executable form against operator data.
+  inputs:
+    - name: rto_overrun_margin
+      description: >
+        Difference between the observed RTO on the completed restore
+        drill and the documented RTO objective for the in-scope
+        backup scope, expressed in the same unit as the objective.
+        Carried on the OCSF API Activity event the
+        execute-restore-drill step emits at drill completion (the
+        write call against the operator's isolated drill target
+        carries the observed RTO measurement in the request-metadata
+        block alongside the `__drill_result__` identifier). Positive
+        values are overruns; zero and negative values are on-target
+        or better. The catalog entry binds to that OCSF class shape,
+        not to a vendor-specific backup, restore, or measurement
+        product.
+      playbook_ref: playbook.backup_recovery@v1
+      playbook_step: action--50000000-0000-4000-8000-000000000005
+      field: duration
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+  window:
+    duration: P90D
+    sliding: true
+telemetry_refs:
+  - telemetry.ocsf.api_activity@v1
+playbook_refs:
+  - playbook_id: playbook.backup_recovery@v1
+    step_id: action--50000000-0000-4000-8000-000000000005
+external_refs:
+  - name: NIS2 — Article 21(2)(c) business continuity, backup management, disaster recovery, crisis management
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(c)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 12 backup policies and procedures, restoration and recovery procedures and methods
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 12
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: NIST SP 800-53 Rev. 5 — CP-10 System Recovery and Reconstitution
+    source: NIST
+    external_id: NIST SP 800-53 Rev. 5 CP-10
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CP-10
+  - name: MITRE D3FEND — D3-SRA System Recovery Analysis
+    source: MITRE
+    url: https://d3fend.mitre.org/technique/d3f:SystemRecoveryAnalysis/
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability
+  - operability

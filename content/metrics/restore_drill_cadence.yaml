@@ -1,0 +1,120 @@
+stable_id: kpi.restore_drill_cadence@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Restore-drill cadence — share of in-scope backup scopes that received a completed restore drill within the operator's documented drill cadence
+summary: >
+  Performance indicator derived from the backup_recovery playbook
+  evidence stream. For every in-scope backup scope declared in the
+  operator's backup-scope catalogue, the indicator asks whether at
+  least one non-destructive restore drill was executed against the
+  documented isolated drill target within the operator's documented
+  drill-cadence window. Falling values indicate the tested-restore-drill
+  discipline NIS2 Art. 21(2)(c), DORA Art. 12, and CRA Annex I §1(h)
+  reviewers surface against the business-continuity / backup-management
+  obligation is losing coverage.
+unit: ratio
+direction: higher_is_better
+target:
+  value: 0.95
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point. A well-disciplined
+    business-continuity practice completes at least one non-destructive
+    restore drill against every in-scope backup scope within its
+    documented cadence window; the residual 5% allows for scopes newly
+    added within the window whose first drill has not yet matured.
+    Operators under scoped programmes set higher targets with documented
+    rationale in their scoped variants.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 0.95
+    severity: warn
+  - name: breach
+    comparator: "<"
+    value: 0.80
+    severity: high
+measurement:
+  source: workflow
+  aggregation: ratio
+  formula: >
+    For each in-scope backup scope declared in the operator's
+    backup-scope catalogue, count the scope as covered if at least one
+    backup_recovery execution completed the execute-restore-drill step
+    (action--50000000-0000-4000-8000-000000000005) with a non-empty
+    `__drill_result__` inside the operator's documented drill-cadence
+    window and emitted a matching attestation via evidence-capture
+    (action--50000000-0000-4000-8000-000000000006). The cadence rate is
+    `covered_scopes / total_in_scope` over the evaluation window.
+    Scopes whose integrity-check short-circuited the drill (failure
+    attestation with an empty `__drill_result__`) count against the
+    numerator: they contribute to the denominator without contributing
+    to the numerator, so the indicator does not silently improve on
+    unrecovered scopes. Reference visualisation: a ratio-headline
+    gauge with warn / breach band overlays over a per-scope
+    covered / uncovered drill-down; the committed reference rendering
+    lives at `content/metrics/restore_drill_cadence.viz.md` — that
+    file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: covered_scopes
+      description: >
+        Count of in-scope backup scopes whose backup_recovery
+        execute-restore-drill step landed a non-empty `__drill_result__`
+        inside the operator's documented drill-cadence window and
+        emitted a matching attestation on the evidence-capture step.
+        Carried on the OCSF API Activity event the
+        backup_recovery execute-restore-drill step emits at drill
+        execution against the documented isolated drill target: the
+        write call against the isolated drill target carries the
+        __drill_result__ identifier and the observed RTO / RPO
+        measurements. The catalog entry binds to that OCSF class shape,
+        not to a vendor-specific backup, snapshot, or storage product.
+      playbook_ref: playbook.backup_recovery@v1
+      playbook_step: action--50000000-0000-4000-8000-000000000005
+      field: time
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+    - name: total_in_scope
+      description: >
+        Count of in-scope backup scopes declared in the operator's
+        backup-scope catalogue. Sourced from the operator's scoping
+        artifact rather than the telemetry stream so the denominator is
+        stable against drill-pipeline gaps in the backup surface
+        itself, matching the coverage_on_call_schedule and
+        detection_coverage conventions.
+      playbook_ref: playbook.backup_recovery@v1
+  window:
+    duration: P90D
+    sliding: true
+telemetry_refs:
+  - telemetry.ocsf.api_activity@v1
+playbook_refs:
+  - playbook_id: playbook.backup_recovery@v1
+    step_id: action--50000000-0000-4000-8000-000000000005
+  - playbook_id: playbook.backup_recovery@v1
+    step_id: action--50000000-0000-4000-8000-000000000006
+external_refs:
+  - name: NIS2 — Article 21(2)(c) business continuity, backup management, disaster recovery, crisis management
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(c)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 12 backup policies and procedures, restoration and recovery procedures and methods
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 12
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: CRA — Annex I §1(h) availability of essential and basic functions
+    source: EU
+    external_id: Regulation (EU) 2024/2847, Annex I §1(h)
+    url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+  - name: NIST SP 800-53 Rev. 5 — CP-10 System Recovery and Reconstitution
+    source: NIST
+    external_id: NIST SP 800-53 Rev. 5 CP-10
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CP-10
+  - name: ENISA — Good practices for business continuity and disaster recovery
+    source: ENISA
+    url: https://www.enisa.europa.eu/topics/risk-management
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability
+  - operability
