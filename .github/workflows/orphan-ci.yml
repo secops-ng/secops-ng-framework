@@ -44,6 +44,7 @@ on:
       - "tools/lint_regulatory_notification_ocsf_bindings.py"
       - "tools/lint_identity_access_ocsf_bindings.py"
       - "tools/lint_vuln_patch_ocsf_bindings.py"
+      - "tools/lint_threat_intel_ocsf_bindings.py"
       - "tools/ocsf_cluster_lint.py"
       - "content/telemetry/**"
       - "tests/content/test_cra_playbook_orphans.py"
@@ -59,6 +60,7 @@ on:
       - "tests/content/test_regulatory_notification_ocsf_bindings.py"
       - "tests/content/test_identity_access_ocsf_bindings.py"
       - "tests/content/test_vuln_patch_ocsf_bindings.py"
+      - "tests/content/test_threat_intel_ocsf_bindings.py"
       - ".github/workflows/orphan-ci.yml"
   push:
     branches: [main]
@@ -81,6 +83,7 @@ on:
       - "tools/lint_regulatory_notification_ocsf_bindings.py"
       - "tools/lint_identity_access_ocsf_bindings.py"
       - "tools/lint_vuln_patch_ocsf_bindings.py"
+      - "tools/lint_threat_intel_ocsf_bindings.py"
       - "tools/ocsf_cluster_lint.py"
   schedule:
     # Nightly at 02:23 UTC — off-peak, off-the-hour, single slot for
@@ -416,3 +419,34 @@ jobs:
       - name: Run vulnerability-&-patch-OCSF binding assertion (text)
         run: |
           python -m tools.lint_vuln_patch_ocsf_bindings --format text
+
+  threat-intel-ocsf-bindings:
+    # G-04 catalogue-maturity OCSF source-data-shape dimension —
+    # asserts every metric in the threat-intel & phishing-detection
+    # cluster (phishing_triage, threat_intel_ingest) declares an OCSF
+    # telemetry_ref. Closes the F-MET-OCSF-THREATINTEL triplet
+    # (SKELETON #553) by wiring the linter into the nightly content-CI
+    # cadence alongside the other cluster jobs; runs independently
+    # from the per-framework orphan matrix and the sibling OCSF /
+    # sovereignty / determinism / post-incident-review /
+    # regulatory-notification / identity-&-access / vulnerability-&-patch
+    # jobs.
+    name: G-04 threat-intel-&-phishing-cluster OCSF binding assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML)
+        run: pip install --no-cache-dir pyyaml
+
+      - name: Run threat-intel-&-phishing-OCSF binding assertion (text)
+        run: |
+          python -m tools.lint_threat_intel_ocsf_bindings --format text
