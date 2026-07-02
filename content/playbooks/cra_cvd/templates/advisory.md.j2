@@ -1,0 +1,82 @@
+{# Advisory template — human-readable Markdown form.
+   Rendered by the publish_advisory step of playbook.cra_cvd@v1 alongside
+   the machine-readable CSAF 2.0 emission in advisory.csaf2.json.j2. Both
+   are published at the coordinated disclosure date
+   __disclosure_target_date__.
+
+   Fields:
+     advisory_id         : operator-issued advisory id (e.g. OP-2026-0007).
+     cve_id              : CVE identifier when a CNA has assigned one;
+                           empty when no CVE has been assigned.
+     title               : one-line summary of the vulnerability.
+     summary             : 1–3 sentence executive summary.
+     affected_products   : list of {product, affected_versions,
+                                    fixed_version_or_workaround} rows.
+     severity_display    : CVSS v4.0 vector plus qualitative label
+                           (LOW / MEDIUM / HIGH / CRITICAL).
+     impact              : what an unpatched instance is exposed to.
+     mitigations         : temporary mitigations for operators who
+                           cannot immediately deploy the fix.
+     fix_reference       : release id / build id the fix ships in.
+     credit_display      : reporter credit line when the reporter has
+                           opted in via the reporter-credit consent
+                           capture on the coordinate_disclosure step;
+                           the string "reporter chose to remain
+                           anonymous" when they have not.
+     disclosure_date_iso : ISO 8601 date the advisory becomes public.
+     advisory_url        : canonical URL of the operator's advisory
+                           listing.
+     operator_display    : operator name as published in the CVD policy.
+#}
+# {{ operator_display }} security advisory {{ advisory_id }}{% if cve_id %} — {{ cve_id }}{% endif %}
+
+Published: {{ disclosure_date_iso }}
+Canonical: {{ advisory_url }}
+
+## Title
+
+{{ title }}
+
+## Summary
+
+{{ summary }}
+
+## Affected products
+
+{% for row in affected_products -%}
+- **{{ row.product }}** — versions {{ row.affected_versions }}
+  Fix: {{ row.fixed_version_or_workaround }}
+{% endfor %}
+
+## Severity
+
+{{ severity_display }}
+
+## Impact
+
+{{ impact }}
+
+## Mitigations
+
+{% if mitigations -%}
+{% for m in mitigations -%}
+- {{ m }}
+{% endfor -%}
+{% else -%}
+None documented beyond deploying the fix.
+{%- endif %}
+
+## Fix
+
+{{ fix_reference }}
+
+## Credit
+
+{{ credit_display }}
+
+## Coordinated disclosure
+
+This advisory was published under the operator's coordinated
+vulnerability disclosure policy. Case handling follows the CRA
+Article 14 lifecycle and ISO/IEC 29147 / 30111 disciplines.
+{% if cve_id %}A CVE identifier was assigned: {{ cve_id }}.{% endif %}

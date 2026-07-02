@@ -79,6 +79,11 @@
       "type": "string",
       "description": "ISO 8601 date agreed with the reporter for coordinated public disclosure. Set at the coordinate_disclosure step after fix validation. The publish_advisory step blocks until this date (or earlier when the reporter, operator, and, if applicable, the CSIRT agree to bring it forward).",
       "external": false
+    },
+    "__reporter_credit_display__": {
+      "type": "string",
+      "description": "Credit line rendered into the public advisory (both human-readable and CSAF 2.0 forms). Populated at the coordinate_disclosure step from the reporter-credit consent capture: the reporter's chosen attribution string when they have opted in to being credited, or the literal marker \"reporter chose to remain anonymous\" when they have not. Empty until coordinate_disclosure records the reporter's consent decision. Consent is captured per-case at coordinate_disclosure time (rather than at intake) so the reporter has seen the draft advisory before agreeing to attribution, per ISO/IEC 29147 guidance.",
+      "external": false
     }
   },
   "workflow_start": "start--c7d51014-0000-4000-8000-000000000001",
@@ -210,7 +215,7 @@
     "action--c7d51014-0000-4000-8000-000000000007": {
       "type": "action",
       "name": "coordinate_disclosure",
-      "description": "SKELETON \u2014 agree the coordinated public-disclosure date with the reporter and, where applicable, the coordinating CSIRT. Records __disclosure_target_date__. Coordinates with the sibling cra_srp_notify run when one is active so the public-advisory publication does not front-run a regulator submission the SRP notification chain has not yet completed. TODO (CORE): CSIRT-coordination adapter and embargo-hold state machine.",
+      "description": "SKELETON \u2014 agree the coordinated public-disclosure date with the reporter and, where applicable, the coordinating CSIRT. Records __disclosure_target_date__ and captures the reporter-credit consent decision into __reporter_credit_display__ (opt-in attribution string or the anonymous marker) so the publish_advisory step can render both the human-readable and CSAF 2.0 advisory templates without a second reporter round-trip. Coordinates with the sibling cra_srp_notify run when one is active so the public-advisory publication does not front-run a regulator submission the SRP notification chain has not yet completed. TODO (CORE): CSIRT-coordination adapter and embargo-hold state machine.",
       "on_completion": "action--c7d51014-0000-4000-8000-000000000008",
       "in_args": [
         "__case_id__",
@@ -218,7 +223,8 @@
         "__fix_ref__"
       ],
       "out_args": [
-        "__disclosure_target_date__"
+        "__disclosure_target_date__",
+        "__reporter_credit_display__"
       ],
       "agent_target": "cvd_intake",
       "x_secops_ng": {
@@ -236,12 +242,13 @@
     "action--c7d51014-0000-4000-8000-000000000008": {
       "type": "action",
       "name": "publish_advisory",
-      "description": "SKELETON \u2014 publish the public advisory at the agreed disclosure date. Advisory carries the affected products / versions, the fix reference, credit to the reporter (where the reporter has consented to attribution), and, when a CVE identifier has been assigned, the CVE id. Records __advisory_id__. TODO (CORE): advisory-template selection (CSAF 2.0 emission alongside human-readable), reporter-credit consent capture, CVE-request adapter.",
+      "description": "SKELETON \u2014 publish the public advisory at the agreed disclosure date. Advisory carries the affected products / versions, the fix reference, credit to the reporter (rendered from __reporter_credit_display__ populated at coordinate_disclosure, either the reporter's opted-in attribution string or the anonymous marker), and, when a CVE identifier has been assigned, the CVE id. Both the human-readable form (content/playbooks/cra_cvd/templates/advisory.md.j2) and the CSAF 2.0 machine-readable form (content/playbooks/cra_cvd/templates/advisory.csaf2.json.j2) are emitted. Records __advisory_id__. TODO (CORE): advisory-template selection binding and CVE-request adapter.",
       "on_completion": "end--c7d51014-0000-4000-8000-00000000000a",
       "in_args": [
         "__case_id__",
         "__fix_ref__",
-        "__disclosure_target_date__"
+        "__disclosure_target_date__",
+        "__reporter_credit_display__"
       ],
       "out_args": [
         "__advisory_id__"
