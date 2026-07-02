@@ -40,7 +40,7 @@
 #
 #   - gdpr:art-32-1-b — ensuring the ongoing confidentiality,
 #     integrity, availability, and resilience of processing systems
-#     and services. Seven technical-security playbooks are agentic
+#     and services. Eight technical-security playbooks are agentic
 #     anchors: cloud_misconfiguration and infra_posture_management
 #     hold the cloud-posture confidentiality / integrity / baseline
 #     surface; iam_auditor and it_security_support_agent hold the
@@ -52,7 +52,13 @@
 #     and advisory-publication channel-security surface that carries
 #     the coordinated-disclosure lifecycle from acknowledgement
 #     through to public advisory under the integrity /
-#     confidentiality-of-processing limb (Art. 32(1)(b)).
+#     confidentiality-of-processing limb (Art. 32(1)(b));
+#     cra_srp_notify holds the regulator-submission channel-security
+#     surface that carries the CRA Article 14 notification chain
+#     (early warning, 72-hour full notification, final report) to
+#     the main-establishment CSIRT and ENISA through the Single
+#     Reporting Platform under the same integrity /
+#     confidentiality-of-processing limb.
 #
 #   - gdpr:art-32-1-d — process for regularly testing, assessing, and
 #     evaluating the effectiveness of technical and organisational
@@ -154,6 +160,7 @@ entries:
       - playbook.cloud_misconfiguration@v1
       - playbook.codebase_vuln_management@v1
       - playbook.cra_cvd@v1
+      - playbook.cra_srp_notify@v1
       - playbook.iam_auditor@v1
       - playbook.infra_posture_management@v1
       - playbook.it_security_support_agent@v1
@@ -172,7 +179,7 @@ entries:
       - vulns
       - access
     notes: >-
-      The seven cluster playbooks form the ongoing-security baseline
+      The eight cluster playbooks form the ongoing-security baseline
       end-to-end. cloud_misconfiguration is the reactive lane: a
       Cloud Security Posture Management finding against the
       configuration baseline is the integrity-of-processing event the
@@ -223,6 +230,18 @@ entries:
       envelope discipline that carries the disclosure lifecycle, not
       the SBOM-walk / reporter-triage-to-remediation discipline that
       codebase_vuln_management and vuln_intake already anchor.
+      cra_srp_notify is the regulator-submission counterpart: an
+      upstream case handoff files the three CRA Art. 14 envelopes
+      (24h early warning, 72h full notification, final report at
+      14 days or 1 month per Art. 14(2)/(3)) against the Single
+      Reporting Platform, simultaneously available to the main-
+      establishment CSIRT and ENISA. The correlation record
+      joining the three submission identifiers to the upstream
+      case is the audit-evident artifact; SRP intake and operator-
+      bound processor legs run under the channel-security
+      discipline in data-flow-cra_srp_notify.md §4/§6. Distinct
+      from cra_cvd (regulator vs reporter); primary GDPR surface
+      remains Art. 30 ROPA.
       The level-of-security-
       appropriate-to-the-risk threshold under Art. 32(1) is
       operationally gated by the operator's risk-management policy
