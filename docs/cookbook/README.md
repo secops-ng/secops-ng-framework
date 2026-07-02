@@ -27,6 +27,7 @@ narrative.
 | `contractual_obligations_tracker` | [`contractual_obligations_tracker.md`](contractual_obligations_tracker.md) | `content/playbooks/contractual_obligations_tracker/` |
 | `detection_engineering` | [`detection_engineering.md`](detection_engineering.md) | `content/playbooks/detection_engineering/`            |
 | `backup_recovery`     | [`backup_recovery.md`](backup_recovery.md)         | `content/playbooks/backup_recovery/`                  |
+| `cyber_hygiene_training` | [`cyber_hygiene_training.md`](cyber_hygiene_training.md) | `content/playbooks/cyber_hygiene_training/`     |
 
 Additional entries land alongside their content sources as workflows
 flip from In Progress to Shipped on
