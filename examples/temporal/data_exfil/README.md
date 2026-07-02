@@ -6,7 +6,7 @@ can import `workflow.temporal.py` into their worker module to see the
 topology the emitter produces; binding the activity bodies to real
 connectors (DLP / egress signal source, IAM and SaaS session
 management, EDR / network egress containment, evidence preservation
-vault, ticketing / notification, regulator and customer notification
+vault, ticketing / notification, regulator and affected-party notification
 gating) is the operator's job.
 
 ## Source

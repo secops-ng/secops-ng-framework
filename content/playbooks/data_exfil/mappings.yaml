@@ -11,7 +11,7 @@
 # response chain: it triages the signal, assesses scope and data
 # classification, contains confirmed exfiltration (egress filter,
 # session / token revocation on the implicated identity), and gates
-# regulator / customer notification on the affected-subjects
+# regulator / affected-party notification on the affected-subjects
 # threshold so EU operators can meet NIS2 Art. 23, DORA Art. 19,
 # and (where personal data is in scope) GDPR Art. 33 / 34 reporting
 # obligations. The downstream regulator-submission timeline itself
@@ -58,7 +58,7 @@ playbook: playbook.data_exfil@v1
 oscal:
   # NIST SP 800-53 Rev. 5 controls exercised by the triage, scope-
   # assessment, containment (egress filter + session / token
-  # revocation), and regulator / customer notification steps.
+  # revocation), and regulator / affected-party notification steps.
   # Catalogue URLs resolve to the public NIST OSCAL repository.
   - id: control.incident_handling@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
@@ -70,7 +70,7 @@ oscal:
       capability for the data-exfiltration case set:
       detection-to-containment-to-notification exercised
       step-by-step (triage, scope assessment, containment,
-      regulator and customer notification).
+      regulator and affected-party notification).
 
   - id: control.incident_monitoring@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
@@ -239,8 +239,8 @@ d3fend:
     d3fend_name: Incident Response Analysis
     url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
     notes: >-
-      notify customer — composition of the data-subject /
-      customer-facing notification payload from the
+      notify affected party — composition of the data-subject-
+      facing notification payload from the
       scope-assessment outputs (data classification, affected-
       subjects count) and hand-off along the operator's
       pre-bound channel. Tracked separately from the regulator
@@ -254,7 +254,7 @@ ocsf:
   # to scope the destination(s) and volume. The containment step
   # emits Account Change records keyed to the implicated
   # principal (account disable, session invalidation, token
-  # revocation). The regulator and customer notification steps
+  # revocation). The regulator and affected-party notification steps
   # emit Compliance Finding records keyed to the case and the
   # notification milestone, and the playbook's case envelope
   # itself is an Incident Finding that the downstream
@@ -341,11 +341,11 @@ ocsf:
     ocsf_version: "1.3.0"
     direction: emits
     notes: >-
-      Emitted by the notify-regulator and notify-customer steps
+      Emitted by the notify-regulator and notify-affected-party steps
       when the affected-subjects count and data classification
       cross the regulator-notification threshold: one Compliance
       Finding per regulator submission (NIS2 Art. 23 / DORA
-      Art. 19 / GDPR Art. 33) and one per customer-facing
+      Art. 19 / GDPR Art. 33) and one per data-subject-facing
       Art. 34 communication, keyed to the case so the
       notification-SLA KPI and the regulator-notification-
       overrun KRI declared on the CACAO x_secops_ng.metric_refs
