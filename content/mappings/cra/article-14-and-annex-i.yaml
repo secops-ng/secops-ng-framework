@@ -236,3 +236,34 @@ entries:
       content/evidence/codebase_vuln_management/disclosure-timeline-record.schema.json).
       The cross-references on the NIS2 side land under
       `nis2:art-21-2-e-codebase` in mappings/nis2/article-21-2-e.yaml.
+
+  - id: cra:art-14-6-ack-to-reporter
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: "14(6)"
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Acknowledge receipt of a reported vulnerability to the reporter
+      without undue delay, in accordance with the operator's
+      documented coordinated-vulnerability-disclosure policy under
+      Annex I §2(5). The acknowledgement window is set by the
+      operator's CVD policy; ISO/IEC 29147 recommends three working
+      days as the community baseline.
+    status: draft
+    control_refs:
+      - control.vuln_disclosure_intake@v1
+    playbook_refs:
+      - playbook.cra_cvd@v1
+    metric_refs:
+      - kpi.cvd_ack_sla@v1
+    evidence_stream_refs:
+      - vulns
+    notes: >-
+      The ack_to_reporter step of playbook.cra_cvd@v1 is the runtime
+      materialisation of this obligation; kpi.cvd_ack_sla@v1 audits
+      on-time delivery against the operator's declared CVD-policy
+      acknowledgement window. Backlog cases whose ack step never fired
+      surface on kri.cvd_intake_aging@v1 so the SLA KPI does not
+      silently improve when the acknowledgement pipeline stalls.
