@@ -1,0 +1,64 @@
+{# Acknowledgement letter template — CRA Article 14 §6.
+   Rendered by the ack_to_reporter step of playbook.cra_cvd@v1.
+
+   Fields:
+     case_id            : operator-assigned CVD case identifier.
+     reporter_display   : the reporter's chosen display name, or
+                          "the reporter" when anonymous / pseudonymous.
+     ack_timestamp_iso  : ISO 8601 timestamp the receipt was stamped at.
+     operator_display   : operator name as published in the CVD policy
+                          / security.txt Contact line.
+     cvd_policy_url     : public URL of the operator's CVD policy so
+                          the reporter can cite the same source the
+                          acknowledgement stamps against.
+     next_update_after  : ISO 8601 date the reporter can expect the
+                          next status update (triage verdict or a
+                          rationale under the policy window).
+     support_pgp_fpr    : PGP key fingerprint used to sign this letter.
+                          Empty when the reporter has not requested a
+                          signed acknowledgement.
+
+   The rendered acknowledgement is delivered by the PGP-signed delivery
+   adapter (sibling adapter card) and persisted on the case ledger under
+   __reporter_ack_ts__.
+
+   CRA Article 14 §6 requires the manufacturer to acknowledge a received
+   vulnerability report within the window declared in the operator's CVD
+   policy; the SecOps-NG operator baseline is 3 working days.
+#}
+Subject: [{{ operator_display }}] Vulnerability disclosure received — case {{ case_id }}
+
+Hello {{ reporter_display }},
+
+Thank you for reaching out. We have received your vulnerability
+disclosure and opened case {{ case_id }} at {{ ack_timestamp_iso }}.
+
+This message is the receipt required by our coordinated vulnerability
+disclosure policy at {{ cvd_policy_url }} — it stamps the case with a
+durable acknowledgement timestamp so both parties have a citable point
+of reference for the disclosure window.
+
+What happens next:
+
+  1. Our triage team reviews the report and either reproduces the
+     vulnerability or writes back with a rationale within the policy
+     window.
+  2. We will send you a status update no later than {{ next_update_after }},
+     even if triage is still in progress at that date.
+  3. If the report is in scope and we develop a fix, we will coordinate
+     a public disclosure date with you before publishing the advisory.
+     We will ask up front whether you would like to be credited by name
+     and whether you would like to review the advisory text before it
+     goes public.
+
+Please keep this case identifier ({{ case_id }}) on any follow-up so we
+can join the correspondence back to the same case.
+
+Kind regards,
+{{ operator_display }} — vulnerability disclosure
+
+{% if support_pgp_fpr -%}
+--
+Signed with PGP fingerprint {{ support_pgp_fpr }}.
+The public key is published at {{ cvd_policy_url }}.
+{%- endif %}
