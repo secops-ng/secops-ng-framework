@@ -29,6 +29,7 @@ narrative.
 | `backup_recovery`     | [`backup_recovery.md`](backup_recovery.md)         | `content/playbooks/backup_recovery/`                  |
 | `cyber_hygiene_training` | [`cyber_hygiene_training.md`](cyber_hygiene_training.md) | `content/playbooks/cyber_hygiene_training/`     |
 | `cra_srp_notify`      | [`cra_srp_notify.md`](cra_srp_notify.md)           | `content/playbooks/cra_srp_notify/`                   |
+| `cra_cvd`             | [`cra_cvd.md`](cra_cvd.md)                         | `content/playbooks/cra_cvd/`                          |
 
 Additional entries land alongside their content sources as workflows
 flip from In Progress to Shipped on
