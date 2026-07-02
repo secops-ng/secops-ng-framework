@@ -24,3 +24,18 @@ skip:
       `metric_refs:` on each clause's mapping rather than via
       `playbook_refs:`, which is the audited convention for reporting
       playbooks across every framework.
+  - slug: cra_srp_notify
+    rationale: >-
+      CRA Article 14 Single Reporting Platform (SRP) notification
+      chain. The playbook's outbound overlay
+      (`content/playbooks/cra_srp_notify/mappings.yaml`) deliberately
+      does not pin NIS2 entries: NIS2 Article 23 significant-incident
+      reporting anchors on incident-management playbooks that emit
+      their own regulator-notification chains, and cross-pinning the
+      CRA-specific SRP submission workflow under NIS2 Art. 23 would
+      misrepresent the obligation surface. The CRA inbound graph is
+      closed via `content/mappings/cra/article-14-and-annex-i.yaml`.
+      A sibling EXTEND card revisits the NIS2 / DORA cross-regime
+      graph once the SRP intake schema is published (Commission
+      pre-go-live testing period ahead of 11 September 2026) and
+      ENISA documents the parallel-reporting interaction.
