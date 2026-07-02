@@ -54,21 +54,3 @@ skip:
       matching entry MUST be removed here in the same PR so the
       orphan-CI re-arms. Follows the `executive_metrics` precedent
       above.
-  - slug: cra_cvd
-    rationale: >-
-      CRA Article 14 coordinated-vulnerability-disclosure (CVD)
-      lifecycle. It is not the operational object of a standalone
-      GDPR Article 5/32/33/34 obligation — its GDPR surface is the
-      record-of-processing entry for the reporter-communication and
-      advisory-publication pipeline, which
-      `content/mappings/gdpr/data-flow-cra_cvd.md` already documents
-      in full as the Article 30 ROPA entry and interim coverage.
-      When the vulnerability affects personal data, the GDPR Article
-      33 breach-notification obligation is discharged by the sibling
-      incident-management / data-exfil lanes that run in parallel;
-      pinning cra_cvd against those clauses here would misrepresent
-      the scope. Per-clause `playbook_refs:` YAML wiring is deferred
-      to a follow-on CORE card that authors the GDPR per-clause YAML
-      set for notification / comms workflows; once that lands, the
-      matching entry MUST be removed here in the same PR so the
-      orphan-CI re-arms. Follows the `cra_srp_notify` precedent.
