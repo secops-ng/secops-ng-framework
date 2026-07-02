@@ -1,0 +1,445 @@
+{
+  "name": "CRA Article 14 SRP notification",
+  "nodes": [
+    {
+      "id": "start--5a509a09-0000-4000-8000-000000000001",
+      "name": "cra_srp_notify_start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__case_id__",
+              "type": "string",
+              "value": "",
+              "description": "Case identifier handed in by the upstream incident-handling or vulnerability-intake playbook. Used as the correlation key across the three submission clocks so a reviewer can join the early-warning, full-notification, and final-report records into a single reportable-event ledger."
+            },
+            {
+              "name": "__clock_kind__",
+              "type": "string",
+              "value": "",
+              "description": "Which CRA Article 14 clock applies to this case. One of: actively_exploited_vulnerability (Art. 14(2) \u2014 14-day final report) or severe_incident (Art. 14(3) \u2014 1-month final report). Selected by the upstream classifier; determines the final-report deadline the delay step waits on."
+            },
+            {
+              "name": "__awareness_ts__",
+              "type": "string",
+              "value": "",
+              "description": "ISO 8601 timestamp when the operator became aware of the actively-exploited vulnerability or severe incident. Anchors the 24h / 72h / 14d-or-30d clocks. Stamped by the upstream classifier; the SRP intake step consumes it directly."
+            },
+            {
+              "name": "__srp_early_warning_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the 24h early-warning submission published to the SRP intake surface. Empty until the early-warning submission returns a confirmed receipt."
+            },
+            {
+              "name": "__srp_full_notification_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the 72h full-notification submission published to the SRP intake surface. Empty until the full-notification submission returns a confirmed receipt."
+            },
+            {
+              "name": "__srp_final_report_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the final-report submission published to the SRP intake surface (14 days for an actively-exploited vulnerability under Art. 14(2), or 1 month for a severe incident under Art. 14(3)). Empty until the final-report submission returns a confirmed receipt."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--5a509a09-0000-4000-8000-000000000002",
+      "name": "early_warning",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.case_id",
+              "name": "in.case_id",
+              "value": "={{$workflow.variables.case_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.clock_kind",
+              "name": "in.clock_kind",
+              "value": "={{$workflow.variables.clock_kind}}",
+              "type": "string"
+            },
+            {
+              "id": "in.awareness_ts",
+              "name": "in.awareness_ts",
+              "value": "={{$workflow.variables.awareness_ts}}",
+              "type": "string"
+            },
+            {
+              "id": "out.srp_early_warning_id",
+              "name": "out.srp_early_warning_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_timeline_signals@v1, control.cra_submission_templates@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.cra_early_warning_on_time@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 CRA Article 14 24-hour early warning. Compose the early-warning submission body (product / manufacturer / vulnerability or incident metadata) against the SRP intake shape and dispatch it to the manufacturer's main-establishment CSIRT via the SRP, with simultaneous availability to ENISA per Article 14. Records __srp_early_warning_id__ on confirmed receipt. TODO (CORE): SRP intake schema is not yet public (Commission page notes a pre-go-live testing period ahead of 11 September 2026); the submission body shape is a placeholder here and a sibling CORE card lands the schema-conformant payload builder once the SRP schema is published. The 24h clock anchor is __awareness_ts__ + 24 hours.",
+      "notesInFlow": true
+    },
+    {
+      "id": "parallel--5a509a09-0000-4000-8000-000000000003",
+      "name": "run 72h + final-report clocks in parallel",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {}
+      },
+      "notes": "Once the 24h early warning is dispatched, the 72h full-notification clock and the 14d-or-30d final-report clock run concurrently. Each branch pairs a CACAO delay step (waiting until the awareness-anchored deadline) with the submission action that follows the wait. Modelling both clocks as parallel branches rather than a serial chain matches the regulation \u2014 the 72h deadline and the 14d / 30d deadline are anchored on the same awareness timestamp, not on each other.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--5a509a09-0000-4000-8000-000000000004",
+      "name": "wait until 72h deadline",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.awareness_ts",
+              "name": "in.awareness_ts",
+              "value": "={{$workflow.variables.awareness_ts}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 durable delay to the CRA Article 14 72-hour deadline. Sleeps until __awareness_ts__ + 72 hours as durable state so the wait survives worker restart on each compile target. TODO (CORE): CACAO v2 does not ship a first-class 'delay' step type; the reference emitters (Temporal timer, n8n Wait node, LangGraph interrupt-then-resume-at-timestamp) each carry the wait in their idiomatic way. The compile-target parity test (roadmap goal G-03) verifies the 72h boundary survives restart without drift on all three targets.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--5a509a09-0000-4000-8000-000000000005",
+      "name": "full_notification",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.case_id",
+              "name": "in.case_id",
+              "value": "={{$workflow.variables.case_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.clock_kind",
+              "name": "in.clock_kind",
+              "value": "={{$workflow.variables.clock_kind}}",
+              "type": "string"
+            },
+            {
+              "id": "in.awareness_ts",
+              "name": "in.awareness_ts",
+              "value": "={{$workflow.variables.awareness_ts}}",
+              "type": "string"
+            },
+            {
+              "id": "out.srp_full_notification_id",
+              "name": "out.srp_full_notification_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_timeline_signals@v1, control.cra_submission_templates@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.cra_notification_72h_on_time@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 CRA Article 14 72-hour full notification. Compose and dispatch the full notification body (product / manufacturer / vulnerability or incident metadata plus corrective / mitigating measures the manufacturer has taken or recommended) to the SRP, with simultaneous availability to ENISA per Article 14. Records __srp_full_notification_id__ on confirmed receipt. TODO (CORE): SRP intake schema is not yet public; the submission body shape is a placeholder pending the CORE card.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--5a509a09-0000-4000-8000-000000000006",
+      "name": "wait until final-report deadline",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.clock_kind",
+              "name": "in.clock_kind",
+              "value": "={{$workflow.variables.clock_kind}}",
+              "type": "string"
+            },
+            {
+              "id": "in.awareness_ts",
+              "name": "in.awareness_ts",
+              "value": "={{$workflow.variables.awareness_ts}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 durable delay to the CRA Article 14 final-report deadline. For __clock_kind__ = actively_exploited_vulnerability (Art. 14(2)) the wait resolves at __awareness_ts__ + 14 days after a corrective or mitigating measure becomes available; for __clock_kind__ = severe_incident (Art. 14(3)) the wait resolves at __awareness_ts__ + 1 month. Modelled as durable state so the wait survives worker restart on each compile target. TODO (CORE): the 'after a corrective measure becomes available' anchor is an event, not a fixed offset from awareness \u2014 the CORE card wires the corrective-measure-available signal from the upstream vulnerability-intake or incident-handling playbook so this delay can start its 14-day clock at the right instant; a placeholder anchor is used in the SKELETON.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--5a509a09-0000-4000-8000-000000000007",
+      "name": "final_report",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.case_id",
+              "name": "in.case_id",
+              "value": "={{$workflow.variables.case_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.clock_kind",
+              "name": "in.clock_kind",
+              "value": "={{$workflow.variables.clock_kind}}",
+              "type": "string"
+            },
+            {
+              "id": "in.awareness_ts",
+              "name": "in.awareness_ts",
+              "value": "={{$workflow.variables.awareness_ts}}",
+              "type": "string"
+            },
+            {
+              "id": "out.srp_final_report_id",
+              "name": "out.srp_final_report_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_timeline_signals@v1, control.cra_submission_templates@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.cra_final_report_on_time@v1, kpi.cra_severe_incident_on_time@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 CRA Article 14 final report. Compose and dispatch the final report (description of the vulnerability, severity and impact, information on actors that have exploited or could exploit the vulnerability, and details of the corrective measures for Art. 14(2); analogous shape for Art. 14(3) severe incidents at the 1-month deadline) to the SRP with simultaneous availability to ENISA. Records __srp_final_report_id__ on confirmed receipt. TODO (CORE): SRP intake schema is not yet public; the submission body shape is a placeholder pending the CORE card.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--5a509a09-0000-4000-8000-00000000000a",
+      "name": "cra_srp_notify_end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2060,
+        420
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "cra_srp_notify_start": {
+      "main": [
+        [
+          {
+            "node": "early_warning",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "early_warning": {
+      "main": [
+        [
+          {
+            "node": "run 72h + final-report clocks in parallel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "run 72h + final-report clocks in parallel": {
+      "main": [
+        [
+          {
+            "node": "cra_srp_notify_end",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "wait until 72h deadline",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "wait until final-report deadline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "wait until 72h deadline": {
+      "main": [
+        [
+          {
+            "node": "full_notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "full_notification": {
+      "main": [
+        [
+          {
+            "node": "cra_srp_notify_end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "wait until final-report deadline": {
+      "main": [
+        [
+          {
+            "node": "final_report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "final_report": {
+      "main": [
+        [
+          {
+            "node": "cra_srp_notify_end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "cra",
+    "article-14",
+    "srp",
+    "notification",
+    "regulator-reporting"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.cra_srp_notify@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--5a509a09-0000-4000-8000-000000000001"
+    },
+    "secops_ng_notes": [
+      "step 'action--5a509a09-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'parallel--5a509a09-0000-4000-8000-000000000003' (parallel): n8n parallelism is implicit (multiple outgoing edges from a node fan out). Emitted Merge node downstream; verify the merge mode in n8n.",
+      "step 'action--5a509a09-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--5a509a09-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--5a509a09-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--5a509a09-0000-4000-8000-000000000007': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}
