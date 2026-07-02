@@ -128,18 +128,18 @@ async def notify_regulator(data_classification: str, affected_subjects_count: in
         )
 
 @tool
-async def notify_customer(data_classification: str, affected_subjects_count: int) -> None:
-    """Notify affected customers / data subjects via the operator's pre-bound channel. Tracked separately from regulator notification so the SLA-compliance KPI can report the two timelines independently.
+async def notify_affected_party(data_classification: str, affected_subjects_count: int) -> None:
+    """Notify affected data subjects via the operator's pre-bound channel. Tracked separately from regulator notification so the notification timelines can be reported independently.
 
     CACAO step_id : action--20000000-0000-4000-8000-000000000008
     CACAO type    : action
     """
     with _TRACER.start_as_current_span(
         name='tool.action--20000000-0000-4000-8000-000000000008',
-        attributes={'secops_ng.playbook.id': 'playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.step.id': 'action--20000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'notify customer', 'secops_ng.tool.name': 'notify_customer', 'secops_ng.workflow.run_id': ''},
+        attributes={'secops_ng.playbook.id': 'playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.step.id': 'action--20000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'notify affected party', 'secops_ng.tool.name': 'notify_affected_party', 'secops_ng.workflow.run_id': ''},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='tool.action--20000000-0000-4000-8000-000000000008', attributes={'secops_ng.playbook.id': 'playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.step.id': 'action--20000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'notify customer', 'secops_ng.tool.name': 'notify_customer', 'secops_ng.workflow.run_id': ''})
+            AuditRecord(span_name='tool.action--20000000-0000-4000-8000-000000000008', attributes={'secops_ng.playbook.id': 'playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.step.id': 'action--20000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'notify affected party', 'secops_ng.tool.name': 'notify_affected_party', 'secops_ng.workflow.run_id': ''})
         )
         raise NotImplementedError(
             f"CACAO action tool not implemented: step_id='action--20000000-0000-4000-8000-000000000008'"
@@ -173,5 +173,5 @@ async def llm_step(state: PlaybookDataExfilV1State) -> dict:
     )
 
 STATE_SCHEMA = PlaybookDataExfilV1State
-TOOLS = (triage_signal, scope_assessment, containment, notify_regulator, notify_customer,)
+TOOLS = (triage_signal, scope_assessment, containment, notify_regulator, notify_affected_party,)
 AGENTIC_HOOK = llm_step

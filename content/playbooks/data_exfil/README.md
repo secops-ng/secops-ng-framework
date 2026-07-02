@@ -2,7 +2,7 @@
 
 CACAO v2 starter playbook for responding to a confirmed-or-suspected
 data-exfiltration signal: DLP / egress signal → scope assessment →
-containment → regulator / customer notification gate.
+containment → regulator / affected-party notification gate.
 
 ## Contents
 

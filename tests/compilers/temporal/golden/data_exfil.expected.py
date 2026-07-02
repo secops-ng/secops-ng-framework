@@ -116,23 +116,23 @@ NOTIFY_REGULATOR_RETRY_POLICY = RetryPolicy(
 )
 
 @activity.defn
-async def notify_customer(data_classification: str, affected_subjects_count: int) -> None:
-    """Notify affected customers / data subjects via the operator's pre-bound channel. Tracked separately from regulator notification so the SLA-compliance KPI can report the two timelines independently.
+async def notify_affected_party(data_classification: str, affected_subjects_count: int) -> None:
+    """Notify affected data subjects via the operator's pre-bound channel. Tracked separately from regulator notification so the notification timelines can be reported independently.
 
     CACAO step_id: action--20000000-0000-4000-8000-000000000008
     """
     with _TRACER.start_as_current_span(
         name='activity.action--20000000-0000-4000-8000-000000000008',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--20000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'notify customer', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_customer'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--20000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'notify affected party', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_affected_party'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--20000000-0000-4000-8000-000000000008', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--20000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'notify customer', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_customer'})
+            AuditRecord(span_name='activity.action--20000000-0000-4000-8000-000000000008', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--20000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'notify affected party', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_affected_party'})
         )
         raise NotImplementedError(
             f"CACAO action stub not implemented: step_id='action--20000000-0000-4000-8000-000000000008'"
         )
 
-NOTIFY_CUSTOMER_RETRY_POLICY = RetryPolicy(
+NOTIFY_AFFECTED_PARTY_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
     maximum_interval=timedelta(seconds=60),
     backoff_coefficient=2.0,
@@ -141,14 +141,14 @@ NOTIFY_CUSTOMER_RETRY_POLICY = RetryPolicy(
 
 @workflow.defn
 class PlaybookDataExfilV1Workflow:
-    """Respond to a DLP / egress signal that indicates possible exfiltration of sensitive data. The playbook triages the signal, assesses scope and data classification, contains confirmed exfiltration, and gates regulator / customer notification on the affected-subjects threshold so EU operators can meet NIS2 Article 23 and DORA Article 19 reporting obligations. CACAO v2 + SecOps-NG content-model extensions.
+    """Respond to a DLP / egress signal that indicates possible exfiltration of sensitive data. The playbook triages the signal, assesses scope and data classification, contains confirmed exfiltration, and gates regulator / affected-party notification on the affected-subjects threshold so EU operators can meet NIS2 Article 23 and DORA Article 19 reporting obligations. CACAO v2 + SecOps-NG content-model extensions.
 
     CACAO playbook id : playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7
     stable_id         : playbook.data_exfil@v1
     content_version   : 0.1.0
     maturity          : experimental
     workflow_start    : start--20000000-0000-4000-8000-000000000001
-    activities        : triage_signal, scope_assessment, containment, notify_regulator, notify_customer
+    activities        : triage_signal, scope_assessment, containment, notify_regulator, notify_affected_party
     """
 
     @workflow.run
@@ -165,5 +165,5 @@ class PlaybookDataExfilV1Workflow:
             )
 
 WORKFLOW = PlaybookDataExfilV1Workflow
-ACTIVITIES = (triage_signal, scope_assessment, containment, notify_regulator, notify_customer,)
-RETRY_POLICIES = (TRIAGE_SIGNAL_RETRY_POLICY, SCOPE_ASSESSMENT_RETRY_POLICY, CONTAINMENT_RETRY_POLICY, NOTIFY_REGULATOR_RETRY_POLICY, NOTIFY_CUSTOMER_RETRY_POLICY,)
+ACTIVITIES = (triage_signal, scope_assessment, containment, notify_regulator, notify_affected_party,)
+RETRY_POLICIES = (TRIAGE_SIGNAL_RETRY_POLICY, SCOPE_ASSESSMENT_RETRY_POLICY, CONTAINMENT_RETRY_POLICY, NOTIFY_REGULATOR_RETRY_POLICY, NOTIFY_AFFECTED_PARTY_RETRY_POLICY,)

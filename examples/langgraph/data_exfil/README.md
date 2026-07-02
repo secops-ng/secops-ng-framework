@@ -58,8 +58,9 @@ The data_exfil playbook branches twice:
    / block egress.
 5. `regulator notification threshold met?` — a second `if-condition`
    step gating the regulatory-notification path. `success` chains
-   through `notify regulator` then `notify customer`; `failure` skips
-   regulator notification and goes straight to `notify customer`.
+   through `notify regulator` then `notify affected party`; `failure`
+   skips regulator notification and goes straight to
+   `notify affected party`.
 
 The conditional-edge router pattern is identical to vuln_intake and
 identity_compromise; see `assemble.py` for the ~10-line wiring.

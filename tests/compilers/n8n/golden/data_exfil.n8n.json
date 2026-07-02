@@ -267,7 +267,7 @@
         },
         "options": {}
       },
-      "notes": "Evaluate __regulator_required__ against the affected-subjects count and data classification per the operator's regulator-routing policy (NIS2 Art. 23, DORA Art. 19, GDPR Art. 33). True branches into regulator notification; in either branch the customer notification path is reached.",
+      "notes": "Evaluate __regulator_required__ against the affected-subjects count and data classification per the operator's regulator-routing policy (NIS2 Art. 23, DORA Art. 19, GDPR Art. 33). True branches into regulator notification; in either branch the data-subject notification path is reached.",
       "notesInFlow": true
     },
     {
@@ -321,7 +321,7 @@
     },
     {
       "id": "action--20000000-0000-4000-8000-000000000008",
-      "name": "notify customer",
+      "name": "notify affected party",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
@@ -359,7 +359,7 @@
         },
         "options": {}
       },
-      "notes": "Notify affected customers / data subjects via the operator's pre-bound channel. Tracked separately from regulator notification so the SLA-compliance KPI can report the two timelines independently.",
+      "notes": "Notify affected data subjects via the operator's pre-bound channel. Tracked separately from regulator notification so the notification timelines can be reported independently.",
       "notesInFlow": true
     },
     {
@@ -450,7 +450,7 @@
         ],
         [
           {
-            "node": "notify customer",
+            "node": "notify affected party",
             "type": "main",
             "index": 0
           }
@@ -461,14 +461,14 @@
       "main": [
         [
           {
-            "node": "notify customer",
+            "node": "notify affected party",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "notify customer": {
+    "notify affected party": {
       "main": [
         [
           {
