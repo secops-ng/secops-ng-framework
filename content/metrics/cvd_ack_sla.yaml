@@ -1,0 +1,114 @@
+stable_id: kpi.cvd_ack_sla@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: CVD acknowledgement-to-reporter SLA compliance
+summary: >
+  Ratio of coordinated-vulnerability-disclosure cases whose
+  acknowledgement to the reporter was dispatched within the operator's
+  documented CVD-policy acknowledgement window to total in-scope cases
+  in the evaluation window. Measures whether the CRA Article 14 §6
+  acknowledgement-to-reporter obligation is held by the operator's CVD
+  intake pipeline end-to-end, including the orchestration latency
+  between intake and the durable acknowledgement dispatch. The
+  acknowledgement window itself is set by the operator's CVD policy
+  (three working days is the community-recommended baseline aligned
+  with ISO/IEC 29147); this KPI reads on-time-ness against whichever
+  window the operator declares.
+unit: ratio
+direction: higher_is_better
+target:
+  value: 1.00
+  comparator: ">="
+  rationale: >
+    CRA Article 14 §6 requires manufacturers to acknowledge the
+    reporter without undue delay: the on-time rate target is 100% and
+    any miss is a reportable compliance exception on the operator's
+    CVD-policy surface.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 1.00
+    severity: warn
+  - name: breach
+    comparator: "<"
+    value: 0.95
+    severity: high
+measurement:
+  source: workflow
+  aggregation: ratio
+  formula: >
+    For each CVD case whose intake fell in the evaluation window,
+    compute whether the reporter-acknowledgement timestamp is earlier
+    than (intake_timestamp + documented CVD-policy acknowledgement
+    window). Ratio = on_time_count / dispatched_count. Exclude
+    in-scope cases whose ack_to_reporter step never fired so the
+    indicator does not silently improve when the acknowledgement
+    pipeline stalls (those cases surface on kri.cvd_intake_aging@v1
+    as an open-backlog signal instead).
+    Reference visualisation: a horizontal bar chart of
+    ack_margin_hours per CVD case acknowledged in the window, with a
+    vertical line at zero marking the on-time predicate and the ratio
+    aggregate annotated as the headline figure against the warn /
+    breach bands; the chart is the canonical operator-facing surface
+    for this KPI and the compile target is the source of truth for
+    the executable form. The committed reference rendering lives at
+    `content/metrics/cvd_ack_sla.viz.md` — that file is the contract
+    for the chart shape; the compile target renders the executable
+    form against operator data.
+  inputs:
+    - name: intake_timestamp
+      description: >
+        Operator-intake timestamp recorded by the cra_cvd intake step,
+        used as the start of the CVD-policy acknowledgement clock.
+        Carried on the OCSF Vulnerability Finding event the cra_cvd
+        intake step emits (status_id transition into the intake state);
+        the catalog entry binds to that OCSF class shape, not to a
+        vendor-specific case-management or ticketing object.
+      playbook_step: action--c7d51014-0000-4000-8000-000000000002
+      telemetry_ref: telemetry.ocsf.vulnerability_finding@v1
+      field: time
+    - name: ack_dispatch
+      description: >
+        Reporter-acknowledgement dispatch step transition that emits
+        the durable, citable acknowledgement to the reporter carrying
+        __case_id__ and the operator's CVD policy reference. Carried
+        on the OCSF Compliance Finding event the cra_cvd
+        ack_to_reporter step emits (status_id transition into the
+        acknowledged state) so the CVD-policy acknowledgement
+        milestone is auditable alongside the coordinated-disclosure
+        and public-advisory milestones.
+      playbook_step: action--c7d51014-0000-4000-8000-000000000003
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: time
+  window:
+    duration: P30D
+    sliding: true
+telemetry_refs:
+  - telemetry.ocsf.vulnerability_finding@v1
+  - telemetry.ocsf.compliance_finding@v1
+playbook_refs:
+  - playbook_id: playbook.cra_cvd@v1
+    step_id: action--c7d51014-0000-4000-8000-000000000003
+external_refs:
+  - name: CRA — Article 14 §6 acknowledgement to reporter
+    source: EU
+    external_id: Regulation (EU) 2024/2847, Art. 14 §6
+    url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+  - name: CRA — Annex I §2(5) coordinated vulnerability disclosure policy
+    source: EU
+    external_id: Regulation (EU) 2024/2847, Annex I §2(5)
+    url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+  - name: ISO/IEC 29147 — Vulnerability disclosure
+    source: ISO
+    external_id: ISO/IEC 29147:2018
+  - name: ISO/IEC 30111 — Vulnerability handling processes
+    source: ISO
+    external_id: ISO/IEC 30111:2019
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability
+  - operability

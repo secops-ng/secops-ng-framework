@@ -6,15 +6,18 @@
 # references live in content/mappings/{cra,nis2,dora,gdpr}/ so the
 # graph is closed in both directions.
 #
-# Status: SKELETON. This playbook is a durable-state scaffold for the
-# operator-side coordinated-vulnerability-disclosure (CVD) lifecycle
-# under CRA Article 14 §1 (CVD policy) and §6 (acknowledgement to the
-# reporter). The action bodies (acknowledgement-letter template,
-# advisory template, CSAF 2.0 emission, CVE-request adapter,
-# CSIRT-coordination adapter) are placeholders; a sibling CORE card
-# lands the full mappings closure including the D3FEND tag selection
-# and the OSCAL SI-5 / RA-5 closure the vuln_disclosure_intake
-# control already anchors.
+# Status: CORE (mappings-C). This playbook is the operator-side
+# coordinated-vulnerability-disclosure (CVD) lifecycle under CRA
+# Article 14 §1 (CVD policy) and §6 (acknowledgement to the reporter).
+# Templates (Sibling A) and adapter stubs (Sibling B) have landed on
+# main; this overlay carries the full mappings closure: OSCAL SI-5 /
+# RA-5 anchors on the vuln_disclosure_intake control (from SKELETON),
+# plus the IR-6 (information sharing) and SI-2 (flaw remediation)
+# anchors that complete the NIST 800-53 rev5 coverage of the CVD
+# lifecycle, and the D3FEND `IncidentResponseAnalysis` selection
+# aligning with the audited `d3fend:cra:annex-i-2-cvd-policy` and
+# `d3fend:cra:annex-i-2-vuln-handling` entries under
+# content/mappings/d3fend/cra.yaml.
 #
 # CRA closure: the inbound entries live at
 # content/mappings/cra/article-14-and-annex-i.yaml. Two Annex I §2
@@ -31,9 +34,11 @@
 #     contact; this playbook is the runtime materialisation of that
 #     policy)
 # The CRA Article 14 §6 acknowledgement-to-reporter obligation is
-# operationalised by the ack_to_reporter step here; the SKELETON
-# does not yet add a new inbound entry for it — that lands with the
-# CORE card together with the SLA KPI wiring.
+# operationalised by the ack_to_reporter step here; this CORE overlay
+# adds the new inbound entry `cra:art-14-6-ack-to-reporter` under
+# content/mappings/cra/article-14-and-annex-i.yaml pinning
+# `playbook.cra_cvd@v1` together with the acknowledgement-SLA KPI
+# `kpi.cvd_ack_sla@v1`.
 #
 # NIS2 / DORA / GDPR closure: the task brief calls out NIS2 Art. 23(1)
 # and GDPR Art. 33 as overlaps that only activate when the case
@@ -56,7 +61,11 @@ oscal:
   # NIST SP 800-53 Rev. 5 controls anchoring the CVD lifecycle. The
   # vuln_disclosure_intake control already pins the OSCAL SI-5 /
   # RA-5 and ISO 27001 A.8.8 / A.6.8 anchors used here, plus the CRA
-  # Annex I §2(5) coordinated-disclosure-policy anchor.
+  # Annex I §2(5) coordinated-disclosure-policy anchor. The mappings-C
+  # overlay extends the anchor set with IR-6 (information sharing)
+  # and SI-2 (flaw remediation) so the full NIST 800-53 rev5 coverage
+  # of the CVD lifecycle is auditable from the outbound overlay
+  # alone, not just from the aggregate control card.
   - id: control.vuln_disclosure_intake@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: SI-5
@@ -79,26 +88,63 @@ oscal:
       surface. RA-5 pairs with the codebase-side codebase_vuln_
       management playbook, which discharges the outbound-scan leg;
       this playbook discharges the reporter-received leg.
+  - id: control.vuln_disclosure_intake@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-6
+    title: Incident Reporting
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-6
+    notes: >-
+      Anchors the ack_to_reporter and coordinate_disclosure steps as
+      the information-sharing leg of the CVD lifecycle. IR-6 requires
+      the organisation to report suspected incidents to the
+      appropriate authorities within organisation-defined time
+      periods; the ack_to_reporter step discharges the CRA Article 14
+      §6 acknowledgement-to-reporter obligation, and the
+      coordinate_disclosure step discharges the coordinated-
+      disclosure agreement with the reporter and, where applicable,
+      the coordinating CSIRT.
+  - id: control.vuln_disclosure_intake@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SI-2
+    title: Flaw Remediation
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-2
+    notes: >-
+      Anchors the develop_fix and validate_fix steps as the flaw-
+      remediation leg of the CVD lifecycle. SI-2 requires the
+      organisation to identify, report, and correct system flaws; the
+      develop_fix step discharges the corrective-measure obligation
+      under CRA Annex I §2(2) (address and remediate vulnerabilities
+      without delay), and the validate_fix step discharges the
+      verify-before-disclosure obligation that ISO/IEC 30111 places
+      on the vulnerability-handling process.
 
 d3fend:
-  # SKELETON — placeholder D3FEND tag. D3FEND v1.0.0 frames its
-  # defensive techniques around runtime countermeasures against
-  # adversary behaviours; a CVD lifecycle is a coordination /
+  # D3FEND v1.0.0 selection for the CVD lifecycle. The audited
+  # cross-reference entries under content/mappings/d3fend/cra.yaml
+  # (`d3fend:cra:annex-i-2-cvd-policy:incident-response-analysis` and
+  # `d3fend:cra:annex-i-2-vuln-handling:incident-response-analysis`)
+  # already anchor CRA Annex I §2(5) and §2(2) on `d3f:
+  # IncidentResponseAnalysis`. This overlay pins the same technique
+  # so the outbound view is consistent with the audited xref graph:
+  # coordinated-vulnerability-disclosure is a coordination /
   # remediation discipline rather than a runtime countermeasure, and
-  # the closest fit is either a documentation / advisory tag or a
-  # vulnerability-analysis tag. Deliberately left as a TODO here in
-  # the same shape the cra_srp_notify overlay uses for its D3FEND
-  # gap — the CORE card either selects the closest-fitting technique
-  # or documents the deliberate absence.
-  - d3fend_id: D3-TODO
-    d3fend_name: TODO (SKELETON — CORE card selects the D3FEND tag or documents the deliberate gap)
-    todo: true
+  # `IncidentResponseAnalysis` is the D3FEND anchor D3FEND v1.0.0
+  # provides for that kind of practitioner activity.
+  - d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
     notes: >-
-      Placeholder pending the CORE card. Vulnerability coordination
-      and public-advisory publication are reporting / remediation
-      disciplines rather than runtime countermeasures; the CORE card
-      selects the closest-fitting D3FEND technique or documents the
-      deliberate absence the way the cra_srp_notify overlay does.
+      D3FEND `IncidentResponseAnalysis` is the technique the audited
+      xref entries `d3fend:cra:annex-i-2-cvd-policy:incident-response-
+      analysis` and `d3fend:cra:annex-i-2-vuln-handling:incident-
+      response-analysis` already anchor for the CRA Annex I §2(5) CVD
+      policy and Annex I §2(2) vulnerability-handling obligations
+      this playbook operationalises. D3FEND v1.0.0 does not carry a
+      dedicated vulnerability-coordination or reporter-
+      acknowledgement technique, and cross-pinning against a runtime-
+      countermeasure technique (e.g. Network Traffic Analysis, User
+      Behavior Analysis) would misrepresent the discipline this
+      playbook operates.
 
 ocsf:
   # OCSF v1.3.0 telemetry binding. Two classes are relevant across
@@ -191,3 +237,11 @@ cra:
       materialisation of that policy; the intake and ack_to_reporter
       steps operate the single-point-of-contact and acknowledgement
       surfaces the policy declares.
+  - mapping_id: cra:art-14-6-ack-to-reporter
+    article: "14(6)"
+    notes: >-
+      Outbound backlink for the CRA Article 14 §6 acknowledgement-
+      to-reporter obligation. The ack_to_reporter step discharges
+      the without-undue-delay acknowledgement, and the acknowledgement-
+      SLA KPI kpi.cvd_ack_sla@v1 audits on-time delivery against the
+      operator's documented CVD-policy acknowledgement window.
