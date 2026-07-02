@@ -384,50 +384,60 @@ reporter  ──►  operator CVD intake  ──►  cra_cvd (this playbook)
   `codebase_vuln_management` under the same OSCAL RA-5 anchor. See
   [`docs/cookbook/codebase_vuln_management.md`](./codebase_vuln_management.md).
 
-## 8. Per-target hand-off
+## 8. Per-target worked examples
 
-The SKELETON deliberately defers the emitted per-target artifacts
-under `examples/{n8n,temporal,langgraph}/cra_cvd/`. Wiring the
-seven action steps into byte-parity emitters requires the
-acknowledgement-letter template, advisory template (including CSAF
-2.0 emission), CVE-request adapter, and CSIRT-coordination adapter
-that the CORE card lands. The shape the emitters will carry is
-already fixed by the canonical CACAO source: seven action steps,
-deterministic transitions, `__case_id__`-anchored variables, and
-the `x_secops_ng` reference bundles pinned in
-`content/playbooks/cra_cvd/mappings.yaml`.
+The three reference compilers ship byte-parity worked examples for
+`cra_cvd` alongside the canonical CACAO source:
 
-The three targets each carry the same idiom precedent established by
-`cra_srp_notify`:
-
-- **n8n** — Set nodes over the seven-step chain, node ids preserving
-  the CACAO step ids verbatim. The `intake`, `ack_to_reporter`,
+- **n8n** —
+  [`examples/n8n/cra_cvd/workflow.n8n.json`](../../examples/n8n/cra_cvd/workflow.n8n.json)
+  (regenerate:
+  [`examples/n8n/cra_cvd/regenerate.sh`](../../examples/n8n/cra_cvd/regenerate.sh)).
+  Set nodes over the seven-step chain, node ids preserving the
+  CACAO step ids verbatim. The `intake`, `ack_to_reporter`,
   `coordinate_disclosure`, and `publish_advisory` steps are Set
   nodes carrying the CACAO I/O contract as editable assignment rows
   plus the `x_secops_ng` reference bundles; a live integrator swaps
   each Set node for an HTTP Request node against their own
   connectors before activating.
-- **Temporal** — one `@workflow.defn` class and one `@activity.defn`
-  function per CACAO action step. The `triage` activity produces
+- **Temporal** —
+  [`examples/temporal/cra_cvd/workflow.temporal.py`](../../examples/temporal/cra_cvd/workflow.temporal.py)
+  (regenerate:
+  [`examples/temporal/cra_cvd/regenerate.sh`](../../examples/temporal/cra_cvd/regenerate.sh)).
+  One `@workflow.defn` class and one `@activity.defn` function per
+  CACAO action step. The `triage` activity produces
   `__triage_verdict__` and `__actively_exploited__`; the
-  compose-with-`cra_srp_notify` fork is a `workflow.start_child_workflow`
-  call the operator wires against their own worker. The public-
-  disclosure hold at `coordinate_disclosure → publish_advisory` is a
-  durable timer against `__disclosure_target_date__` (natural
-  Temporal idiom, same as the `cra_srp_notify` clocks).
-- **LangGraph** — `TypedDict` state plus `@tool`-decorated action
-  wrappers; the target-neutral topology in `graph_spec.json` and the
-  hand-written reference assembly in `assemble.py`. The agentic
-  layer an operator can add on top of the SKELETON (rendering the
-  advisory draft, summarising the case for reviewer sign-off) fills
-  as a private extension; the framework-wide EU-resident LM endpoint
+  compose-with-`cra_srp_notify` fork is a
+  `workflow.start_child_workflow` call the operator wires against
+  their own worker. The public-disclosure hold at
+  `coordinate_disclosure → publish_advisory` is a durable timer
+  against `__disclosure_target_date__` (natural Temporal idiom,
+  same as the `cra_srp_notify` clocks).
+- **LangGraph** —
+  [`examples/langgraph/cra_cvd/graph_spec.json`](../../examples/langgraph/cra_cvd/graph_spec.json)
+  plus
+  [`examples/langgraph/cra_cvd/assemble.py`](../../examples/langgraph/cra_cvd/assemble.py)
+  (regenerate:
+  [`examples/langgraph/cra_cvd/regenerate.sh`](../../examples/langgraph/cra_cvd/regenerate.sh)).
+  `TypedDict` state plus `@tool`-decorated action wrappers; the
+  target-neutral topology in `graph_spec.json` and the hand-written
+  reference assembly in `assemble.py`. The agentic layer an
+  operator can add on top of the SKELETON (rendering the advisory
+  draft, summarising the case for reviewer sign-off) fills as a
+  private extension; the framework-wide EU-resident LM endpoint
   guard re-applies at process startup
   (`compilers/_shared/lm_endpoint_guard.py`).
 
-Cross-target byte-parity goldens land under
-`tests/examples/cra_cvd/test_golden.py` when the emitters ship. A
-fresh regeneration against the canonical CACAO source will match the
-committed emitter output byte-for-byte on all three targets.
+Each folder mirrors the canonical
+`content/playbooks/cra_cvd/playbook.cacao.json` byte-for-byte and
+carries a `README.md` with target-specific idiom notes.
+
+Cross-target byte-parity goldens live under
+[`tests/examples/cra_cvd/test_golden.py`](../../tests/examples/cra_cvd/test_golden.py).
+A fresh regeneration against the canonical CACAO source will match
+the committed emitter output byte-for-byte on all three targets;
+`test_golden.py` also pins the seven-step lifecycle and the linear
+chain across all three targets.
 
 ## 9. Observability — OTel + AuditTrail in every target
 

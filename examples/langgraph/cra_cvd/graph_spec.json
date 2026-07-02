@@ -1,0 +1,96 @@
+{
+  "conditional_edges": [],
+  "edges": [
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--c7d51014-0000-4000-8000-000000000003",
+      "src": "action--c7d51014-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--c7d51014-0000-4000-8000-000000000004",
+      "src": "action--c7d51014-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--c7d51014-0000-4000-8000-000000000005",
+      "src": "action--c7d51014-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--c7d51014-0000-4000-8000-000000000006",
+      "src": "action--c7d51014-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--c7d51014-0000-4000-8000-000000000007",
+      "src": "action--c7d51014-0000-4000-8000-000000000006"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--c7d51014-0000-4000-8000-000000000008",
+      "src": "action--c7d51014-0000-4000-8000-000000000007"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--c7d51014-0000-4000-8000-000000000008"
+    }
+  ],
+  "end_sentinel": "__END__",
+  "entry": "action--c7d51014-0000-4000-8000-000000000002",
+  "name": "CRA Article 14 coordinated vulnerability disclosure (CVD)",
+  "nodes": [
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "intake",
+      "name": "action--c7d51014-0000-4000-8000-000000000002",
+      "step_id": "action--c7d51014-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "ack_to_reporter",
+      "name": "action--c7d51014-0000-4000-8000-000000000003",
+      "step_id": "action--c7d51014-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "triage",
+      "name": "action--c7d51014-0000-4000-8000-000000000004",
+      "step_id": "action--c7d51014-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "develop_fix",
+      "name": "action--c7d51014-0000-4000-8000-000000000005",
+      "step_id": "action--c7d51014-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "validate_fix",
+      "name": "action--c7d51014-0000-4000-8000-000000000006",
+      "step_id": "action--c7d51014-0000-4000-8000-000000000006"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "coordinate_disclosure",
+      "name": "action--c7d51014-0000-4000-8000-000000000007",
+      "step_id": "action--c7d51014-0000-4000-8000-000000000007"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "publish_advisory",
+      "name": "action--c7d51014-0000-4000-8000-000000000008",
+      "step_id": "action--c7d51014-0000-4000-8000-000000000008"
+    }
+  ],
+  "playbook_id": "playbook--c7d51014-0000-4000-8000-000000000001",
+  "stable_id": "playbook.cra_cvd@v1"
+}

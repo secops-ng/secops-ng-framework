@@ -1,0 +1,607 @@
+{
+  "name": "CRA Article 14 coordinated vulnerability disclosure (CVD)",
+  "nodes": [
+    {
+      "id": "start--c7d51014-0000-4000-8000-000000000001",
+      "name": "cra_cvd_start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__case_id__",
+              "type": "string",
+              "value": "",
+              "description": "CVD case identifier assigned at intake. Used as the correlation key across acknowledgement, triage, fix development, validation, coordinated disclosure, and public advisory so a reviewer can join the full disclosure lifecycle into a single reportable-event ledger. Also used as the join key against a sibling cra_srp_notify run if the case trips CRA Article 14(2) or 14(3)."
+            },
+            {
+              "name": "__reporter_contact__",
+              "type": "string",
+              "value": "",
+              "description": "Contact channel provided by the reporter at intake (email, PGP key id, security.txt reference). Empty on anonymous reports; the acknowledgement step SHOULD still write a durable receipt so the case has a citable timestamp for the CRA Article 14 \u00a76 acknowledgement window."
+            },
+            {
+              "name": "__reporter_ack_ts__",
+              "type": "string",
+              "value": "",
+              "description": "ISO 8601 timestamp when the operator acknowledged receipt to the reporter. Anchors the CRA Article 14 \u00a76 acknowledgement window (3 working days on the operator baseline). Stamped by the ack_to_reporter step."
+            },
+            {
+              "name": "__triage_verdict__",
+              "type": "string",
+              "value": "",
+              "description": "Outcome of triage. One of: valid_needs_fix, valid_no_action (compensating control / not applicable), duplicate, not_reproducible, out_of_scope. Determines whether the develop_fix / validate_fix / coordinate_disclosure / publish_advisory lane is taken; non-actionable verdicts short-circuit to a reporter-facing rationale communication and end."
+            },
+            {
+              "name": "__actively_exploited__",
+              "type": "boolean",
+              "value": "",
+              "description": "Whether the vulnerability is actively exploited in the wild at triage time (or becomes actively exploited later). When true, the triage step hands off to the sibling cra_srp_notify playbook with __clock_kind__ = actively_exploited_vulnerability so the Article 14(2) 24h / 72h / 14-day chain runs in parallel with the disclosure lifecycle here."
+            },
+            {
+              "name": "__fix_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Reference to the developed fix (patch commit / build id / advisory-tracked artifact). Empty until the develop_fix step produces a candidate; populated before the validate_fix step gate."
+            },
+            {
+              "name": "__advisory_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the public advisory (CVE-YYYY-NNNNN when a CVE is assigned, plus the operator's own advisory id). Empty until publish_advisory step returns a confirmed publication receipt."
+            },
+            {
+              "name": "__disclosure_target_date__",
+              "type": "string",
+              "value": "",
+              "description": "ISO 8601 date agreed with the reporter for coordinated public disclosure. Set at the coordinate_disclosure step after fix validation. The publish_advisory step blocks until this date (or earlier when the reporter, operator, and, if applicable, the CSIRT agree to bring it forward)."
+            },
+            {
+              "name": "__reporter_credit_display__",
+              "type": "string",
+              "value": "",
+              "description": "Credit line rendered into the public advisory (both human-readable and CSAF 2.0 forms). Populated at the coordinate_disclosure step from the reporter-credit consent capture: the reporter's chosen attribution string when they have opted in to being credited, or the literal marker \"reporter chose to remain anonymous\" when they have not. Empty until coordinate_disclosure records the reporter's consent decision. Consent is captured per-case at coordinate_disclosure time (rather than at intake) so the reporter has seen the draft advisory before agreeing to attribution, per ISO/IEC 29147 guidance."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--c7d51014-0000-4000-8000-000000000002",
+      "name": "intake",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "out.case_id",
+              "name": "out.case_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.reporter_contact",
+              "name": "out.reporter_contact",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.vuln_disclosure_intake@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.vulnerability_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.cvd_intake_aging@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 receive a vulnerability report through the operator's CVD intake surface (security.txt / disclosure address / bug-bounty portal). Assign __case_id__, capture reporter contact, product / component in scope, affected versions, reproduction steps, and any embargo terms the reporter has proposed. TODO (CORE): pin the intake surface adapter (RFC 9116 security.txt address resolution, PGP-encrypted mailbox handling) and the initial evidence-capture shape.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--c7d51014-0000-4000-8000-000000000003",
+      "name": "ack_to_reporter",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.case_id",
+              "name": "in.case_id",
+              "value": "={{$workflow.variables.case_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.reporter_contact",
+              "name": "in.reporter_contact",
+              "value": "={{$workflow.variables.reporter_contact}}",
+              "type": "string"
+            },
+            {
+              "id": "out.reporter_ack_ts",
+              "name": "out.reporter_ack_ts",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.vuln_disclosure_intake@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.cvd_intake_aging@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 CRA Article 14 \u00a76 acknowledgement to the reporter within the operator CVD policy window (3 working days on the operator baseline). Send a durable acknowledgement carrying __case_id__ and the operator's CVD policy reference so the reporter has a citable receipt and the case has a stamped __reporter_ack_ts__ for the acknowledgement-SLA KPI. TODO (CORE): acknowledgement-letter template selection and PGP-signed delivery adapter.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--c7d51014-0000-4000-8000-000000000004",
+      "name": "triage",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.case_id",
+              "name": "in.case_id",
+              "value": "={{$workflow.variables.case_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.triage_verdict",
+              "name": "out.triage_verdict",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.actively_exploited",
+              "name": "out.actively_exploited",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.vuln_disclosure_intake@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.vulnerability_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.false_positive_rate@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 reproduce, assess severity, determine scope of affected versions, and produce __triage_verdict__. When __actively_exploited__ is true (either at triage or when re-evaluated later), fork a sibling cra_srp_notify run with __clock_kind__ = actively_exploited_vulnerability keyed on __case_id__; the disclosure lifecycle here continues in parallel. When __triage_verdict__ is not valid_needs_fix, short-circuit to a reporter-facing rationale communication and end. TODO (CORE): severity-scoring input (CVSS 4.0 vector + operator adjustments), CPE / affected-version enumeration shape, actively-exploited signal source.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--c7d51014-0000-4000-8000-000000000005",
+      "name": "develop_fix",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.case_id",
+              "name": "in.case_id",
+              "value": "={{$workflow.variables.case_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.triage_verdict",
+              "name": "in.triage_verdict",
+              "value": "={{$workflow.variables.triage_verdict}}",
+              "type": "string"
+            },
+            {
+              "id": "out.fix_ref",
+              "name": "out.fix_ref",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.vuln_disclosure_intake@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.vulnerability_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.cvd_intake_aging@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 develop the corrective / mitigating measure for the confirmed vulnerability. Records __fix_ref__ on production of a candidate build or patch. TODO (CORE): fix-artifact provenance shape (SBOM update, signed release attestation) and interaction with the operator's change-management surface.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--c7d51014-0000-4000-8000-000000000006",
+      "name": "validate_fix",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.case_id",
+              "name": "in.case_id",
+              "value": "={{$workflow.variables.case_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.fix_ref",
+              "name": "in.fix_ref",
+              "value": "={{$workflow.variables.fix_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.vuln_disclosure_intake@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.vulnerability_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.false_positive_rate@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 verify the candidate fix closes the reported condition without regressing adjacent behaviour. Confirms __fix_ref__ before disclosure coordination proceeds. TODO (CORE): validation-evidence shape (regression tests, red-team replay, reporter re-verification path).",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--c7d51014-0000-4000-8000-000000000007",
+      "name": "coordinate_disclosure",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.case_id",
+              "name": "in.case_id",
+              "value": "={{$workflow.variables.case_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.reporter_contact",
+              "name": "in.reporter_contact",
+              "value": "={{$workflow.variables.reporter_contact}}",
+              "type": "string"
+            },
+            {
+              "id": "in.fix_ref",
+              "name": "in.fix_ref",
+              "value": "={{$workflow.variables.fix_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "out.disclosure_target_date",
+              "name": "out.disclosure_target_date",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.reporter_credit_display",
+              "name": "out.reporter_credit_display",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.vuln_disclosure_intake@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.cvd_intake_aging@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 agree the coordinated public-disclosure date with the reporter and, where applicable, the coordinating CSIRT. Records __disclosure_target_date__ and captures the reporter-credit consent decision into __reporter_credit_display__ (opt-in attribution string or the anonymous marker) so the publish_advisory step can render both the human-readable and CSAF 2.0 advisory templates without a second reporter round-trip. Coordinates with the sibling cra_srp_notify run when one is active so the public-advisory publication does not front-run a regulator submission the SRP notification chain has not yet completed. TODO (CORE): CSIRT-coordination adapter and embargo-hold state machine.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--c7d51014-0000-4000-8000-000000000008",
+      "name": "publish_advisory",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2060,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.case_id",
+              "name": "in.case_id",
+              "value": "={{$workflow.variables.case_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.fix_ref",
+              "name": "in.fix_ref",
+              "value": "={{$workflow.variables.fix_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "in.disclosure_target_date",
+              "name": "in.disclosure_target_date",
+              "value": "={{$workflow.variables.disclosure_target_date}}",
+              "type": "string"
+            },
+            {
+              "id": "in.reporter_credit_display",
+              "name": "in.reporter_credit_display",
+              "value": "={{$workflow.variables.reporter_credit_display}}",
+              "type": "string"
+            },
+            {
+              "id": "out.advisory_id",
+              "name": "out.advisory_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.vuln_disclosure_intake@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.cvd_intake_aging@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 publish the public advisory at the agreed disclosure date. Advisory carries the affected products / versions, the fix reference, credit to the reporter (rendered from __reporter_credit_display__ populated at coordinate_disclosure, either the reporter's opted-in attribution string or the anonymous marker), and, when a CVE identifier has been assigned, the CVE id. Both the human-readable form (content/playbooks/cra_cvd/templates/advisory.md.j2) and the CSAF 2.0 machine-readable form (content/playbooks/cra_cvd/templates/advisory.csaf2.json.j2) are emitted. Records __advisory_id__. TODO (CORE): advisory-template selection binding and CVE-request adapter.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--c7d51014-0000-4000-8000-00000000000a",
+      "name": "cra_cvd_end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2320,
+        240
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "cra_cvd_start": {
+      "main": [
+        [
+          {
+            "node": "intake",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "intake": {
+      "main": [
+        [
+          {
+            "node": "ack_to_reporter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ack_to_reporter": {
+      "main": [
+        [
+          {
+            "node": "triage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "triage": {
+      "main": [
+        [
+          {
+            "node": "develop_fix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "develop_fix": {
+      "main": [
+        [
+          {
+            "node": "validate_fix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validate_fix": {
+      "main": [
+        [
+          {
+            "node": "coordinate_disclosure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "coordinate_disclosure": {
+      "main": [
+        [
+          {
+            "node": "publish_advisory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "publish_advisory": {
+      "main": [
+        [
+          {
+            "node": "cra_cvd_end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "cra",
+    "article-14",
+    "cvd",
+    "coordinated-disclosure",
+    "vulnerability-handling"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.cra_cvd@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--c7d51014-0000-4000-8000-000000000001"
+    },
+    "secops_ng_notes": [
+      "step 'action--c7d51014-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--c7d51014-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--c7d51014-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--c7d51014-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--c7d51014-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--c7d51014-0000-4000-8000-000000000007': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--c7d51014-0000-4000-8000-000000000008': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}
