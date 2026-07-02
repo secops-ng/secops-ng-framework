@@ -1,0 +1,295 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--c7d51014-0000-4000-8000-000000000001",
+  "name": "CRA Article 14 coordinated vulnerability disclosure (CVD)",
+  "description": "SKELETON \u2014 CACAO v2 scaffold for the operator-side coordinated vulnerability disclosure (CVD) lifecycle a manufacturer of a product with digital elements runs when a reporter (finder / security researcher / downstream operator) submits a vulnerability report against a shipped product. Distinct from playbook.cra_srp_notify@v1: the SRP notification chain covers the regulator-facing 24h / 72h / 14d-or-1-month timer cascade under CRA Article 14 \u00a71\u2013\u00a73; this playbook covers the triage-to-public-advisory lifecycle under CRA Article 14 \u00a71 (which requires an operator CVD policy) and \u00a76 (acknowledgement to the reporter within a policy-declared window, in practice 3 working days on the operator baseline). The two playbooks compose: an intake that trips the Art. 14(2) actively-exploited clock hands off to cra_srp_notify while continuing the disclosure lifecycle here. SKELETON only: submission bodies, advisory template, and reporter-communications channel are placeholders \u2014 a sibling CORE card lands the acknowledgement-letter and advisory templates, the D3FEND tag selection, and the OSCAL / OCSF binding closure. CACAO v2 + SecOps-NG content-model extensions.",
+  "playbook_types": [
+    "coordination",
+    "notification"
+  ],
+  "created_by": "identity--5a509a09-5a50-45a5-85a5-095a509a509a",
+  "created": "2026-07-02T00:00:00Z",
+  "modified": "2026-07-02T00:00:00Z",
+  "valid_from": "2026-07-02T00:00:00Z",
+  "labels": [
+    "cra",
+    "article-14",
+    "cvd",
+    "coordinated-disclosure",
+    "vulnerability-handling"
+  ],
+  "external_references": [
+    {
+      "name": "OASIS CACAO v2.0",
+      "description": "Workflow step types (start, action, end), variable conventions, x_ extension namespace.",
+      "source": "OASIS Open"
+    },
+    {
+      "name": "Cyber Resilience Act (EU) 2024/2847, Article 14 \u2014 manufacturer reporting obligations and coordinated vulnerability disclosure policy",
+      "source": "Official Journal of the European Union",
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj"
+    },
+    {
+      "name": "ISO/IEC 29147:2018 \u2014 Vulnerability disclosure",
+      "source": "ISO/IEC"
+    },
+    {
+      "name": "ISO/IEC 30111:2019 \u2014 Vulnerability handling processes",
+      "source": "ISO/IEC"
+    }
+  ],
+  "playbook_variables": {
+    "__case_id__": {
+      "type": "string",
+      "description": "CVD case identifier assigned at intake. Used as the correlation key across acknowledgement, triage, fix development, validation, coordinated disclosure, and public advisory so a reviewer can join the full disclosure lifecycle into a single reportable-event ledger. Also used as the join key against a sibling cra_srp_notify run if the case trips CRA Article 14(2) or 14(3).",
+      "external": false
+    },
+    "__reporter_contact__": {
+      "type": "string",
+      "description": "Contact channel provided by the reporter at intake (email, PGP key id, security.txt reference). Empty on anonymous reports; the acknowledgement step SHOULD still write a durable receipt so the case has a citable timestamp for the CRA Article 14 \u00a76 acknowledgement window.",
+      "external": true
+    },
+    "__reporter_ack_ts__": {
+      "type": "string",
+      "description": "ISO 8601 timestamp when the operator acknowledged receipt to the reporter. Anchors the CRA Article 14 \u00a76 acknowledgement window (3 working days on the operator baseline). Stamped by the ack_to_reporter step.",
+      "external": false
+    },
+    "__triage_verdict__": {
+      "type": "string",
+      "description": "Outcome of triage. One of: valid_needs_fix, valid_no_action (compensating control / not applicable), duplicate, not_reproducible, out_of_scope. Determines whether the develop_fix / validate_fix / coordinate_disclosure / publish_advisory lane is taken; non-actionable verdicts short-circuit to a reporter-facing rationale communication and end.",
+      "external": false
+    },
+    "__actively_exploited__": {
+      "type": "boolean",
+      "description": "Whether the vulnerability is actively exploited in the wild at triage time (or becomes actively exploited later). When true, the triage step hands off to the sibling cra_srp_notify playbook with __clock_kind__ = actively_exploited_vulnerability so the Article 14(2) 24h / 72h / 14-day chain runs in parallel with the disclosure lifecycle here.",
+      "external": false
+    },
+    "__fix_ref__": {
+      "type": "string",
+      "description": "Reference to the developed fix (patch commit / build id / advisory-tracked artifact). Empty until the develop_fix step produces a candidate; populated before the validate_fix step gate.",
+      "external": false
+    },
+    "__advisory_id__": {
+      "type": "string",
+      "description": "Identifier of the public advisory (CVE-YYYY-NNNNN when a CVE is assigned, plus the operator's own advisory id). Empty until publish_advisory step returns a confirmed publication receipt.",
+      "external": false
+    },
+    "__disclosure_target_date__": {
+      "type": "string",
+      "description": "ISO 8601 date agreed with the reporter for coordinated public disclosure. Set at the coordinate_disclosure step after fix validation. The publish_advisory step blocks until this date (or earlier when the reporter, operator, and, if applicable, the CSIRT agree to bring it forward).",
+      "external": false
+    }
+  },
+  "workflow_start": "start--c7d51014-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--c7d51014-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "cra_cvd_start",
+      "on_completion": "action--c7d51014-0000-4000-8000-000000000002"
+    },
+    "action--c7d51014-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "intake",
+      "description": "SKELETON \u2014 receive a vulnerability report through the operator's CVD intake surface (security.txt / disclosure address / bug-bounty portal). Assign __case_id__, capture reporter contact, product / component in scope, affected versions, reproduction steps, and any embargo terms the reporter has proposed. TODO (CORE): pin the intake surface adapter (RFC 9116 security.txt address resolution, PGP-encrypted mailbox handling) and the initial evidence-capture shape.",
+      "on_completion": "action--c7d51014-0000-4000-8000-000000000003",
+      "out_args": [
+        "__case_id__",
+        "__reporter_contact__"
+      ],
+      "agent_target": "cvd_intake",
+      "x_secops_ng": {
+        "control_refs": [
+          "control.vuln_disclosure_intake@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.vulnerability_finding@v1"
+        ],
+        "metric_refs": [
+          "kri.cvd_intake_aging@v1"
+        ]
+      }
+    },
+    "action--c7d51014-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "ack_to_reporter",
+      "description": "SKELETON \u2014 CRA Article 14 \u00a76 acknowledgement to the reporter within the operator CVD policy window (3 working days on the operator baseline). Send a durable acknowledgement carrying __case_id__ and the operator's CVD policy reference so the reporter has a citable receipt and the case has a stamped __reporter_ack_ts__ for the acknowledgement-SLA KPI. TODO (CORE): acknowledgement-letter template selection and PGP-signed delivery adapter.",
+      "on_completion": "action--c7d51014-0000-4000-8000-000000000004",
+      "in_args": [
+        "__case_id__",
+        "__reporter_contact__"
+      ],
+      "out_args": [
+        "__reporter_ack_ts__"
+      ],
+      "agent_target": "cvd_intake",
+      "x_secops_ng": {
+        "control_refs": [
+          "control.vuln_disclosure_intake@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.compliance_finding@v1"
+        ],
+        "metric_refs": [
+          "kri.cvd_intake_aging@v1"
+        ]
+      }
+    },
+    "action--c7d51014-0000-4000-8000-000000000004": {
+      "type": "action",
+      "name": "triage",
+      "description": "SKELETON \u2014 reproduce, assess severity, determine scope of affected versions, and produce __triage_verdict__. When __actively_exploited__ is true (either at triage or when re-evaluated later), fork a sibling cra_srp_notify run with __clock_kind__ = actively_exploited_vulnerability keyed on __case_id__; the disclosure lifecycle here continues in parallel. When __triage_verdict__ is not valid_needs_fix, short-circuit to a reporter-facing rationale communication and end. TODO (CORE): severity-scoring input (CVSS 4.0 vector + operator adjustments), CPE / affected-version enumeration shape, actively-exploited signal source.",
+      "on_completion": "action--c7d51014-0000-4000-8000-000000000005",
+      "in_args": [
+        "__case_id__"
+      ],
+      "out_args": [
+        "__triage_verdict__",
+        "__actively_exploited__"
+      ],
+      "agent_target": "vuln_triage",
+      "x_secops_ng": {
+        "control_refs": [
+          "control.vuln_disclosure_intake@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.vulnerability_finding@v1"
+        ],
+        "metric_refs": [
+          "kpi.false_positive_rate@v1"
+        ]
+      }
+    },
+    "action--c7d51014-0000-4000-8000-000000000005": {
+      "type": "action",
+      "name": "develop_fix",
+      "description": "SKELETON \u2014 develop the corrective / mitigating measure for the confirmed vulnerability. Records __fix_ref__ on production of a candidate build or patch. TODO (CORE): fix-artifact provenance shape (SBOM update, signed release attestation) and interaction with the operator's change-management surface.",
+      "on_completion": "action--c7d51014-0000-4000-8000-000000000006",
+      "in_args": [
+        "__case_id__",
+        "__triage_verdict__"
+      ],
+      "out_args": [
+        "__fix_ref__"
+      ],
+      "agent_target": "engineering",
+      "x_secops_ng": {
+        "control_refs": [
+          "control.vuln_disclosure_intake@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.vulnerability_finding@v1"
+        ],
+        "metric_refs": [
+          "kri.cvd_intake_aging@v1"
+        ]
+      }
+    },
+    "action--c7d51014-0000-4000-8000-000000000006": {
+      "type": "action",
+      "name": "validate_fix",
+      "description": "SKELETON \u2014 verify the candidate fix closes the reported condition without regressing adjacent behaviour. Confirms __fix_ref__ before disclosure coordination proceeds. TODO (CORE): validation-evidence shape (regression tests, red-team replay, reporter re-verification path).",
+      "on_completion": "action--c7d51014-0000-4000-8000-000000000007",
+      "in_args": [
+        "__case_id__",
+        "__fix_ref__"
+      ],
+      "agent_target": "engineering",
+      "x_secops_ng": {
+        "control_refs": [
+          "control.vuln_disclosure_intake@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.vulnerability_finding@v1"
+        ],
+        "metric_refs": [
+          "kpi.false_positive_rate@v1"
+        ]
+      }
+    },
+    "action--c7d51014-0000-4000-8000-000000000007": {
+      "type": "action",
+      "name": "coordinate_disclosure",
+      "description": "SKELETON \u2014 agree the coordinated public-disclosure date with the reporter and, where applicable, the coordinating CSIRT. Records __disclosure_target_date__. Coordinates with the sibling cra_srp_notify run when one is active so the public-advisory publication does not front-run a regulator submission the SRP notification chain has not yet completed. TODO (CORE): CSIRT-coordination adapter and embargo-hold state machine.",
+      "on_completion": "action--c7d51014-0000-4000-8000-000000000008",
+      "in_args": [
+        "__case_id__",
+        "__reporter_contact__",
+        "__fix_ref__"
+      ],
+      "out_args": [
+        "__disclosure_target_date__"
+      ],
+      "agent_target": "cvd_intake",
+      "x_secops_ng": {
+        "control_refs": [
+          "control.vuln_disclosure_intake@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.compliance_finding@v1"
+        ],
+        "metric_refs": [
+          "kri.cvd_intake_aging@v1"
+        ]
+      }
+    },
+    "action--c7d51014-0000-4000-8000-000000000008": {
+      "type": "action",
+      "name": "publish_advisory",
+      "description": "SKELETON \u2014 publish the public advisory at the agreed disclosure date. Advisory carries the affected products / versions, the fix reference, credit to the reporter (where the reporter has consented to attribution), and, when a CVE identifier has been assigned, the CVE id. Records __advisory_id__. TODO (CORE): advisory-template selection (CSAF 2.0 emission alongside human-readable), reporter-credit consent capture, CVE-request adapter.",
+      "on_completion": "end--c7d51014-0000-4000-8000-00000000000a",
+      "in_args": [
+        "__case_id__",
+        "__fix_ref__",
+        "__disclosure_target_date__"
+      ],
+      "out_args": [
+        "__advisory_id__"
+      ],
+      "agent_target": "cvd_intake",
+      "x_secops_ng": {
+        "control_refs": [
+          "control.vuln_disclosure_intake@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.compliance_finding@v1"
+        ],
+        "metric_refs": [
+          "kri.cvd_intake_aging@v1"
+        ]
+      }
+    },
+    "end--c7d51014-0000-4000-8000-00000000000a": {
+      "type": "end",
+      "name": "cra_cvd_end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.cra_cvd@v1",
+    "content_version": "0.1.0",
+    "maturity": "experimental",
+    "compile_targets": [
+      "n8n",
+      "temporal",
+      "langgraph"
+    ],
+    "control_refs": [
+      "control.vuln_disclosure_intake@v1"
+    ],
+    "telemetry_refs": [
+      "telemetry.ocsf.vulnerability_finding@v1",
+      "telemetry.ocsf.compliance_finding@v1"
+    ],
+    "metric_refs": [
+      "kri.cvd_intake_aging@v1",
+      "kpi.false_positive_rate@v1"
+    ],
+    "sources": [
+      "OASIS CACAO v2.0 specification \u2014 workflow step types (start, action, end), variable conventions, x_ extension namespace",
+      "Cyber Resilience Act (EU) 2024/2847, Article 14 \u2014 manufacturer coordinated vulnerability disclosure policy (\u00a71) and acknowledgement to reporter (\u00a76)",
+      "ISO/IEC 29147:2018 \u2014 Vulnerability disclosure",
+      "ISO/IEC 30111:2019 \u2014 Vulnerability handling processes",
+      "OCSF v1.3.0 \u2014 Vulnerability Finding (class_uid 2002) and Compliance Finding (class_uid 2003) event classes emitted across the lifecycle"
+    ]
+  }
+}

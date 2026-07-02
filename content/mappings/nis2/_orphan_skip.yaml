@@ -39,3 +39,19 @@ skip:
       graph once the SRP intake schema is published (Commission
       pre-go-live testing period ahead of 11 September 2026) and
       ENISA documents the parallel-reporting interaction.
+  - slug: cra_cvd
+    rationale: >-
+      CRA Article 14 coordinated-vulnerability-disclosure (CVD)
+      lifecycle. The playbook's outbound overlay
+      (`content/playbooks/cra_cvd/mappings.yaml`) deliberately does
+      not pin NIS2 entries: NIS2 Article 23 significant-incident
+      reporting anchors on incident-management playbooks that emit
+      their own regulator-notification chains, and cross-pinning the
+      CRA-specific CVD lifecycle under NIS2 Art. 23 would
+      misrepresent the obligation surface. The CRA inbound graph is
+      closed via
+      `content/mappings/cra/article-14-and-annex-i.yaml` (Annex I
+      §2(2) and §2(5)). A sibling CORE / EXTEND card revisits the
+      NIS2 cross-regime graph once ENISA documents the interaction
+      between CRA Article 14 CVD and NIS2 Article 23 parallel
+      reporting for cases that cross both thresholds.

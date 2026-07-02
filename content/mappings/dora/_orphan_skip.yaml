@@ -72,4 +72,22 @@ skip:
       graph once the SRP intake schema is published (Commission
       pre-go-live testing period ahead of 11 September 2026) and
       ENISA documents the parallel-reporting interaction.
+  - slug: cra_cvd
+    rationale: >-
+      CRA Article 14 coordinated-vulnerability-disclosure (CVD)
+      lifecycle. The playbook's outbound overlay
+      (`content/playbooks/cra_cvd/mappings.yaml`) deliberately does
+      not pin DORA entries: DORA Article 19 major-ICT-incident
+      reporting is owned by `playbook.incident_management@v1`, which
+      already carries the Art. 18 classification and Art. 19 initial /
+      intermediate / final backlinks on its overlay. The CRA Art. 14
+      CVD lifecycle is the operator-side reporter-received
+      vulnerability chain on shipped products with digital elements,
+      distinct by design from the financial-entity major-incident
+      reporting path DORA Art. 19 covers. The CRA inbound graph is
+      closed via `content/mappings/cra/article-14-and-annex-i.yaml`
+      (Annex I §2(2) and §2(5)). A sibling CORE / EXTEND card
+      revisits the DORA cross-regime graph once the ESAs document
+      the interaction between CRA Article 14 CVD and DORA Article
+      19 parallel reporting for cases that cross both thresholds.
 

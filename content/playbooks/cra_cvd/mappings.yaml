@@ -1,0 +1,193 @@
+# Cross-references for the cra_cvd playbook.
+#
+# Outbound view of the content model: pins OSCAL controls, MITRE
+# D3FEND defensive techniques, OCSF event classes emitted, and the EU
+# regulatory clauses this playbook helps operationalise. Inbound
+# references live in content/mappings/{cra,nis2,dora,gdpr}/ so the
+# graph is closed in both directions.
+#
+# Status: SKELETON. This playbook is a durable-state scaffold for the
+# operator-side coordinated-vulnerability-disclosure (CVD) lifecycle
+# under CRA Article 14 §1 (CVD policy) and §6 (acknowledgement to the
+# reporter). The action bodies (acknowledgement-letter template,
+# advisory template, CSAF 2.0 emission, CVE-request adapter,
+# CSIRT-coordination adapter) are placeholders; a sibling CORE card
+# lands the full mappings closure including the D3FEND tag selection
+# and the OSCAL SI-5 / RA-5 closure the vuln_disclosure_intake
+# control already anchors.
+#
+# CRA closure: the inbound entries live at
+# content/mappings/cra/article-14-and-annex-i.yaml. Two Annex I §2
+# clauses whose obligations this playbook operationalises are
+# updated in the same PR to pin `playbook.cra_cvd@v1` in their
+# playbook_refs so the inbound graph closes:
+#   - cra:annex-i-2-vuln-handling  (Annex I §2(2) — remediate without
+#     delay across the support period; this playbook is the operator-
+#     side lifecycle that discharges the obligation on reporter-
+#     received cases, complementing the codebase-side
+#     `codebase_vuln_management` discharge)
+#   - cra:annex-i-2-cvd-policy     (Annex I §2(5) — coordinated
+#     vulnerability disclosure policy including single point of
+#     contact; this playbook is the runtime materialisation of that
+#     policy)
+# The CRA Article 14 §6 acknowledgement-to-reporter obligation is
+# operationalised by the ack_to_reporter step here; the SKELETON
+# does not yet add a new inbound entry for it — that lands with the
+# CORE card together with the SLA KPI wiring.
+#
+# NIS2 / DORA / GDPR closure: the task brief calls out NIS2 Art. 23(1)
+# and GDPR Art. 33 as overlaps that only activate when the case
+# actually crosses those regimes' thresholds. This SKELETON
+# deliberately does not pin outbound entries against those regimes:
+# the parallel-notification chains anchor on incident-management /
+# breach-notification playbooks that emit their own regulator-facing
+# submissions. Cross-pinning cra_cvd would misrepresent the scope.
+# A deliberate audited exclusion is recorded in
+# content/mappings/{nis2,dora,gdpr}/_orphan_skip.yaml so the orphan-
+# CI KRI stays defended without spurious cross-regime pins; the
+# sibling CORE card revisits the choice once the interaction with
+# NIS2 Art. 23 parallel reporting and GDPR Art. 33 breach
+# notification is documented by ENISA / EDPB.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.cra_cvd@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls anchoring the CVD lifecycle. The
+  # vuln_disclosure_intake control already pins the OSCAL SI-5 /
+  # RA-5 and ISO 27001 A.8.8 / A.6.8 anchors used here, plus the CRA
+  # Annex I §2(5) coordinated-disclosure-policy anchor.
+  - id: control.vuln_disclosure_intake@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SI-5
+    title: Security Alerts, Advisories, and Directives
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-5
+    notes: >-
+      Anchors the publish_advisory step and the reporter-facing
+      acknowledgement step. SI-5 requires the organisation to
+      disseminate security alerts and advisories; the CVD advisory
+      publication discharges the operator side of that obligation for
+      reporter-received vulnerabilities on shipped products.
+  - id: control.vuln_disclosure_intake@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: RA-5
+    title: Vulnerability Monitoring and Scanning
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=RA-5
+    notes: >-
+      Anchors the triage and develop_fix / validate_fix steps as the
+      inbound-report leg of the operator's vulnerability-management
+      surface. RA-5 pairs with the codebase-side codebase_vuln_
+      management playbook, which discharges the outbound-scan leg;
+      this playbook discharges the reporter-received leg.
+
+d3fend:
+  # SKELETON — placeholder D3FEND tag. D3FEND v1.0.0 frames its
+  # defensive techniques around runtime countermeasures against
+  # adversary behaviours; a CVD lifecycle is a coordination /
+  # remediation discipline rather than a runtime countermeasure, and
+  # the closest fit is either a documentation / advisory tag or a
+  # vulnerability-analysis tag. Deliberately left as a TODO here in
+  # the same shape the cra_srp_notify overlay uses for its D3FEND
+  # gap — the CORE card either selects the closest-fitting technique
+  # or documents the deliberate absence.
+  - d3fend_id: D3-TODO
+    d3fend_name: TODO (SKELETON — CORE card selects the D3FEND tag or documents the deliberate gap)
+    todo: true
+    notes: >-
+      Placeholder pending the CORE card. Vulnerability coordination
+      and public-advisory publication are reporting / remediation
+      disciplines rather than runtime countermeasures; the CORE card
+      selects the closest-fitting D3FEND technique or documents the
+      deliberate absence the way the cra_srp_notify overlay does.
+
+ocsf:
+  # OCSF v1.3.0 telemetry binding. Two classes are relevant across
+  # the lifecycle: Vulnerability Finding (per-case records for
+  # intake / triage / fix development) and Compliance Finding (per-
+  # milestone attestation for acknowledgement, coordinated
+  # disclosure, advisory publication so the timeline-signal control
+  # can audit CRA Art. 14 §6 acknowledgement-SLA and CVD-policy KPIs).
+  - id: telemetry.ocsf.vulnerability_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2002
+    class_name: Vulnerability Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by the intake, triage, develop_fix, and validate_fix
+      steps: one Vulnerability Finding per case, keyed to
+      __case_id__, updated across the lifecycle so the CVD backlog
+      KRI (kri.cvd_intake_aging@v1) can be computed. Schema:
+      https://schema.ocsf.io/1.3.0/classes/vulnerability_finding
+  - id: telemetry.ocsf.compliance_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2003
+    class_name: Compliance Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by the ack_to_reporter, coordinate_disclosure, and
+      publish_advisory steps: one Compliance Finding per policy-
+      declared milestone (CRA Art. 14 §6 acknowledgement, coordinated
+      disclosure date agreement, public advisory publication), keyed
+      to __case_id__ so the on-time-delivery KPI can audit against
+      the operator CVD policy. Schema:
+      https://schema.ocsf.io/1.3.0/classes/compliance_finding
+
+nis2:
+  # SKELETON — no outbound NIS2 anchor. NIS2 Art. 23 significant-
+  # incident reporting anchors on incident-management playbooks
+  # that emit their own regulator-notification chain; cross-pinning
+  # cra_cvd against a NIS2 mapping would misrepresent the scope.
+  # Deliberate audited exclusion recorded in
+  # content/mappings/nis2/_orphan_skip.yaml. A sibling CORE / EXTEND
+  # card revisits this once ENISA documents the interaction between
+  # CRA Article 14 CVD and NIS2 Article 23 parallel reporting.
+  - mapping_id: nis2:todo-cra-cvd-parallel
+    todo: true
+    notes: >-
+      Placeholder pending the CORE / EXTEND card. NIS2 Art. 23
+      parallel-reporting interaction with CRA Art. 14 CVD is not
+      yet documented by ENISA as of 2026-07-02; the CORE card
+      either pins a real inbound NIS2 mapping id or documents the
+      deliberate absence.
+
+dora:
+  # SKELETON — no outbound DORA anchor. DORA Art. 19 major-incident
+  # reporting anchors on financial-entity incident-management
+  # playbooks that emit their own regulator-notification chain;
+  # cross-pinning here would misrepresent the scope. Deliberate
+  # audited exclusion recorded in
+  # content/mappings/dora/_orphan_skip.yaml.
+  - mapping_id: dora:todo-cra-cvd-parallel
+    todo: true
+    notes: >-
+      Placeholder pending the CORE / EXTEND card. DORA Art. 19
+      parallel-reporting interaction with CRA Art. 14 CVD is not
+      yet documented by the ESAs as of 2026-07-02; the CORE card
+      either pins a real inbound DORA mapping id or documents the
+      deliberate absence.
+
+cra:
+  # Inbound entries live at
+  # content/mappings/cra/article-14-and-annex-i.yaml and backlink to
+  # playbook.cra_cvd@v1 (updated in the same PR).
+  - mapping_id: cra:annex-i-2-vuln-handling
+    article: Annex I §2(2)
+    notes: >-
+      Outbound backlink for the operator-side reporter-received leg
+      of the Annex I §2(2) vulnerability-handling obligation. The
+      codebase-side scan-and-remediate leg is discharged by
+      codebase_vuln_management under cra:annex-i-2-codebase-vuln-mgmt;
+      this playbook discharges the reporter-received leg.
+  - mapping_id: cra:annex-i-2-cvd-policy
+    article: Annex I §2(5)
+    notes: >-
+      Outbound backlink for the coordinated-vulnerability-disclosure
+      policy obligation (single point of contact, receipt of
+      information from any source). This playbook is the runtime
+      materialisation of that policy; the intake and ack_to_reporter
+      steps operate the single-point-of-contact and acknowledgement
+      surfaces the policy declares.
