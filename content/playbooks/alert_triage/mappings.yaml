@@ -1,0 +1,288 @@
+# Cross-references for the alert_triage playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed/emitted, and the EU regulatory clauses this
+# playbook helps operationalise. Inbound references live in
+# content/mappings/{nis2,dora,cra}/ so the graph is closed in both
+# directions.
+#
+# DORA closure: the schema's top-level keys are fixed
+# (oscal/d3fend/ocsf/nis2/dora/cra). Alert triage on its own is
+# sub-threshold for DORA Art. 18 major-classification — the priority
+# routing simply hands work onto response branches; the four typed-
+# incident downstream playbooks (identity_compromise, data_exfil,
+# ransomware_containment) carry the DORA Art. 18 backlink on their
+# own overlays. This carve-out mirrors the one asserted on
+# content/mappings/dora/article-19-and-28.yaml (entry
+# dora:art-18-classification) which pins only the downstream
+# playbooks in playbook_refs, and is documented on the inbound side.
+# The outbound dora array on this overlay is intentionally empty.
+#
+# CRA closure: alert triage does not exercise CRA Art. 14 product-
+# side vulnerability-notification obligations directly (those run on
+# playbook.vuln_intake@v1). No outbound cra entries are emitted on
+# this overlay; the outbound cra array is intentionally empty.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.alert_triage@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the ingest, enrich,
+  # suppression, prioritisation, and priority-routed response
+  # branches. Catalogue URLs resolve to the public NIST OSCAL
+  # repository. Anchored to the OSCAL refs declared on
+  # content/controls/control.incident_handling_capability@v1.yaml,
+  # control.incident_timeline_signals@v1.yaml,
+  # control.detection_coverage_evidence@v1.yaml, and
+  # control.recurring_incident_correlator@v1.yaml.
+  - id: control.incident_handling@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-4
+    title: Incident Handling
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-4
+    notes: >-
+      Anchors the playbook end-to-end as the incident-handling
+      capability for inbound alerts: typed-payload ingest,
+      enrichment with adjacent telemetry, suppression of already-
+      seen or known-benign cases, deterministic prioritisation,
+      and routing onto the four priority-keyed response branches
+      (p1 severe, p2 high, p3 routine, p4 informational).
+
+  - id: control.system_monitoring@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SI-4
+    title: System Monitoring
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-4
+    notes: >-
+      Covers the ingest and enrichment surface: alerts arrive from
+      the detection pipeline (push shape) or a shared alert store
+      (pull shape); the enrichment step reads adjacent telemetry
+      to hydrate case context so anomalous activity is surfaced
+      to the right responder. Anchored to the SI-4 oscal_ref on
+      content/controls/control.detection_coverage_evidence@v1.yaml.
+
+  - id: control.incident_monitoring@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-5
+    title: Incident Monitoring
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-5
+    notes: >-
+      Covers the timeline-signal control wired through the
+      priority-routed response branches: each branch stamps the
+      alert-triage MTTR clock and the p1 branch additionally
+      stamps the pager-ack signal so a reviewer can audit
+      per-case lifecycle anchors.
+
+  - id: control.incident_response_assistance_correlation@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-4(4)
+    title: Incident Handling | Information Correlation
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-4(4)
+    notes: >-
+      Covers the suppression branch: an already-seen alert
+      fingerprint or a known-benign suppression rule is
+      correlated against the live case set inside the configured
+      suppression window and the alert is closed without paging
+      — the recurring-incident correlator semantics applied at
+      the alert grain.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned where the technique applies to a
+  # single step. Anchored to D3-IRA / D3-UBA / D3-NTA from the
+  # controls' d3fend_refs.
+  - step: action--a1e47431-0000-4000-8000-000000000002
+    d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    notes: >-
+      ingest typed alert payload — hydration of the inbound
+      alert envelope from either the push detection pipeline
+      or a pull shared alert store into the canonical typed
+      payload the downstream steps operate on. The
+      __alert_source_shape__ split is carried through for
+      downstream metric accounting.
+
+  - step: action--a1e47431-0000-4000-8000-000000000003
+    d3fend_id: D3-UBA
+    d3fend_name: User Behavior Analysis
+    url: https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/
+    notes: >-
+      enrich with telemetry context — pulls adjacent identity
+      and account-change telemetry for the entities named in
+      the alert so the prioritisation policy has behaviour
+      context (repeated auth failures, recent account changes,
+      suspicious API activity) rather than a bare signature
+      match.
+
+  - step: action--a1e47431-0000-4000-8000-000000000003
+    d3fend_id: D3-NTA
+    d3fend_name: Network Traffic Analysis
+    url: https://d3fend.mitre.org/technique/d3f:NetworkTrafficAnalysis/
+    notes: >-
+      enrich with telemetry context — where the inbound alert
+      carries a network-adjacent signal (API activity from an
+      unusual source, egress to an unusual destination), the
+      enrichment step pulls the surrounding network-activity
+      telemetry so the prioritisation policy can distinguish
+      isolated events from a broader traffic pattern.
+
+  - step: action--a1e47431-0000-4000-8000-000000000005
+    d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    notes: >-
+      suppress and close — correlation of the canonical
+      seen-key for the alert against the live case set inside
+      the configured suppression window. A hit closes the
+      alert without paging and is recorded for telemetry-
+      coverage accounting; a miss falls through to the
+      classify-and-prioritise step.
+
+  - step: action--a1e47431-0000-4000-8000-000000000006
+    d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    notes: >-
+      classify and prioritise — application of the operator's
+      deterministic prioritisation policy to the enriched
+      alert envelope, producing one of p1_severe / p2_high /
+      p3_routine / p4_informational. Free-text fields may be
+      routed through a DSPy signature; the priority decision
+      itself stays in code so the policy is auditable.
+
+  - step: action--a1e47431-0000-4000-8000-000000000008
+    d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    notes: >-
+      response: p1 severe — pages the on-call responder and
+      escalates onto the appropriate typed-incident downstream
+      playbook (identity_compromise, ransomware_containment,
+      data_exfil, or incident_management as the case shape
+      requires). The branch stamps the alert-triage MTTR clock
+      and the p1 pager-ack signal so a reviewer can audit
+      on-time escalation.
+
+ocsf:
+  # OCSF telemetry bindings. The ingest step consumes a Detection
+  # Finding envelope carrying the originating detection signal;
+  # the enrichment step additionally consumes Authentication,
+  # Account Change, and API Activity records for the entities
+  # named in the alert. The suppress-and-close branch emits a
+  # lightweight Detection Finding record so the alert stays on
+  # the telemetry-coverage ledger even when it was closed as a
+  # duplicate or known-benign. The playbook itself does not
+  # emit an Incident Finding — the escalation to a downstream
+  # typed-incident playbook carries that responsibility.
+  - id: telemetry.detection_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2004
+    class_name: Detection Finding
+    ocsf_version: "1.3.0"
+    direction: consumes
+    notes: >-
+      Consumed at the ingest step: the originating detection
+      signal (Sigma / detection-engineering match, correlation
+      rule hit, or ad-hoc analytic) is delivered as a Detection
+      Finding the ingest step hydrates into the canonical
+      typed alert payload. Schema:
+      https://schema.ocsf.io/1.3.0/classes/detection_finding
+
+  - id: telemetry.authentication@v1
+    category_uid: 3
+    category_name: Identity & Access Management
+    class_uid: 3002
+    class_name: Authentication
+    ocsf_version: "1.3.0"
+    direction: consumes
+    notes: >-
+      Consumed at the enrichment step: recent authentication
+      events for the principals named in the alert feed the
+      behaviour context the prioritisation policy reads
+      against (repeated failures, unusual location, step-up
+      declines). Anchored to the telemetry.ocsf.authentication@v1
+      ref declared on the playbook's CACAO
+      x_secops_ng.telemetry_refs. Schema:
+      https://schema.ocsf.io/1.3.0/classes/authentication
+
+  - id: telemetry.account_change@v1
+    category_uid: 3
+    category_name: Identity & Access Management
+    class_uid: 3001
+    class_name: Account Change
+    ocsf_version: "1.3.0"
+    direction: consumes
+    notes: >-
+      Consumed at the enrichment step: recent account-change
+      events (password reset, MFA enrolment change, role
+      grant, session invalidation) for the principals named
+      in the alert feed the behaviour context the
+      prioritisation policy reads against. Anchored to the
+      telemetry.ocsf.account_change@v1 ref declared on the
+      playbook's CACAO x_secops_ng.telemetry_refs. Schema:
+      https://schema.ocsf.io/1.3.0/classes/account_change
+
+  - id: telemetry.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: consumes
+    notes: >-
+      Consumed at the ingest step (push-pipeline shape) and
+      at the enrichment step (adjacent API surface for the
+      entities named in the alert). Provisional canonical
+      binding for the alert envelope itself while an OCSF
+      Security Finding (class 2001) telemetry stable_id is
+      pending under content/telemetry/; the ingest step will
+      rebind once the security_finding artifact lands.
+      Anchored to the telemetry.ocsf.api_activity@v1 ref
+      declared on the playbook's CACAO
+      x_secops_ng.telemetry_refs. Schema:
+      https://schema.ocsf.io/1.3.0/classes/api_activity
+
+nis2:
+  # Inbound entry lives at content/mappings/nis2/article-21-2-b.yaml
+  # (id nis2:art-21-2-b — incident-handling capability), which lists
+  # playbook.alert_triage@v1 on its playbook_refs. Article 21(2)(b)
+  # governs the logging + detection + triage side of the incident-
+  # handling obligation; alert triage is the runtime that
+  # operationalises the triage stage across the operator's typed-
+  # alert intake.
+  - mapping_id: nis2:art-21-2-b
+    article: 21(2)(b)
+    notes: >-
+      NIS2 Art. 21(2)(b) requires operation of an incident-handling
+      capability: detect, triage, contain, remediate, and capture
+      lessons learned. The alert_triage playbook is the operational
+      discharge of the triage stage for inbound typed alerts: it
+      normalises the envelope, correlates against the live case
+      set inside the suppression window, applies a deterministic
+      prioritisation policy, and hands work onto the appropriate
+      response branch. The contain / remediate stages are carried
+      by the downstream typed-incident playbooks
+      (identity_compromise, ransomware_containment, data_exfil,
+      incident_management) that this playbook escalates onto.
+
+dora:
+  # Alert triage on its own is sub-threshold for DORA Art. 18
+  # major-classification. The inbound carve-out is asserted at
+  # content/mappings/dora/article-19-and-28.yaml (entry
+  # dora:art-18-classification lists only the downstream
+  # typed-incident playbooks on its playbook_refs —
+  # identity_compromise, ransomware_containment, data_exfil —
+  # each of which carries the DORA Art. 18 backlink on its own
+  # overlay). No outbound DORA entries are emitted on this
+  # overlay; the escalation path stays separate by design.
+  []
+
+cra:
+  # Alert triage does not exercise CRA product-side vulnerability-
+  # notification obligations directly (those run on
+  # playbook.vuln_intake@v1). No outbound CRA entries are emitted
+  # on this overlay.
+  []
