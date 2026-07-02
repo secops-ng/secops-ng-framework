@@ -133,7 +133,7 @@ def test_module_golden_exposes_registry_symbols() -> None:
     assert "AGENTIC_HOOK = llm_step" in src
     assert (
         "TOOLS = (triage_signal, scope_assessment, containment, "
-        "notify_regulator, notify_customer,)"
+        "notify_regulator, notify_affected_party,)"
     ) in src
 
 

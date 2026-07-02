@@ -3,7 +3,7 @@
   "spec_version": "2.0",
   "id": "playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7",
   "name": "Data exfiltration response",
-  "description": "Respond to a DLP / egress signal that indicates possible exfiltration of sensitive data. The playbook triages the signal, assesses scope and data classification, contains confirmed exfiltration, and gates regulator / customer notification on the affected-subjects threshold so EU operators can meet NIS2 Article 23 and DORA Article 19 reporting obligations. CACAO v2 + SecOps-NG content-model extensions.",
+  "description": "Respond to a DLP / egress signal that indicates possible exfiltration of sensitive data. The playbook triages the signal, assesses scope and data classification, contains confirmed exfiltration, and gates regulator / affected-party notification on the affected-subjects threshold so EU operators can meet NIS2 Article 23 and DORA Article 19 reporting obligations. CACAO v2 + SecOps-NG content-model extensions.",
   "playbook_types": [
     "investigation",
     "mitigation",
@@ -131,7 +131,7 @@
     "if-condition--20000000-0000-4000-8000-000000000006": {
       "type": "if-condition",
       "name": "regulator notification threshold met?",
-      "description": "Evaluate __regulator_required__ against the affected-subjects count and data classification per the operator's regulator-routing policy (NIS2 Art. 23, DORA Art. 19, GDPR Art. 33). True branches into regulator notification; in either branch the customer notification path is reached.",
+      "description": "Evaluate __regulator_required__ against the affected-subjects count and data classification per the operator's regulator-routing policy (NIS2 Art. 23, DORA Art. 19, GDPR Art. 33). True branches into regulator notification; in either branch the data-subject notification path is reached.",
       "on_success": "action--20000000-0000-4000-8000-000000000007",
       "on_failure": "action--20000000-0000-4000-8000-000000000008"
     },
@@ -159,8 +159,8 @@
     },
     "action--20000000-0000-4000-8000-000000000008": {
       "type": "action",
-      "name": "notify customer",
-      "description": "Notify affected customers / data subjects via the operator's pre-bound channel. Tracked separately from regulator notification so the SLA-compliance KPI can report the two timelines independently.",
+      "name": "notify affected party",
+      "description": "Notify affected data subjects via the operator's pre-bound channel. Tracked separately from regulator notification so the notification timelines can be reported independently.",
       "on_completion": "end--20000000-0000-4000-8000-000000000009",
       "in_args": [
         "__data_classification__",
