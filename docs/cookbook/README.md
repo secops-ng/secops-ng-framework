@@ -28,6 +28,7 @@ narrative.
 | `detection_engineering` | [`detection_engineering.md`](detection_engineering.md) | `content/playbooks/detection_engineering/`            |
 | `backup_recovery`     | [`backup_recovery.md`](backup_recovery.md)         | `content/playbooks/backup_recovery/`                  |
 | `cyber_hygiene_training` | [`cyber_hygiene_training.md`](cyber_hygiene_training.md) | `content/playbooks/cyber_hygiene_training/`     |
+| `cra_srp_notify`      | [`cra_srp_notify.md`](cra_srp_notify.md)           | `content/playbooks/cra_srp_notify/`                   |
 
 Additional entries land alongside their content sources as workflows
 flip from In Progress to Shipped on
