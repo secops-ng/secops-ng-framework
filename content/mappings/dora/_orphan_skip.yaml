@@ -53,4 +53,23 @@ skip:
       grace-window closure. Mirrors the `phishing_triage` precedent
       above: gap notes are separate cards, not scope creep on a
       single-purpose orphan-CI closure.
+  - slug: cra_srp_notify
+    rationale: >-
+      CRA Article 14 Single Reporting Platform (SRP) notification
+      chain. The playbook's outbound overlay
+      (`content/playbooks/cra_srp_notify/mappings.yaml`) deliberately
+      does not pin DORA entries: DORA Article 19 major-ICT-incident
+      reporting is owned by `playbook.incident_management@v1`, which
+      already carries `dora:art-18-classification`,
+      `dora:art-19-initial-4h`, `dora:art-19-intermediate-72h`, and
+      `dora:art-19-final-one-month` backlinks on its overlay. The CRA
+      Art. 14 SRP submission chain is distinct by design — it is the
+      manufacturer-side notification path to the ENISA-operated SRP,
+      not the financial-entity major-incident reporting path to
+      competent authorities under DORA. The CRA inbound graph is
+      closed via `content/mappings/cra/article-14-and-annex-i.yaml`.
+      A sibling EXTEND card revisits the NIS2 / DORA cross-regime
+      graph once the SRP intake schema is published (Commission
+      pre-go-live testing period ahead of 11 September 2026) and
+      ENISA documents the parallel-reporting interaction.
 
