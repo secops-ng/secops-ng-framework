@@ -1,0 +1,94 @@
+{
+  "conditional_edges": [],
+  "edges": [
+    {
+      "cacao_edge": "on_completion",
+      "dst": "parallel--5a509a09-0000-4000-8000-000000000003",
+      "src": "action--5a509a09-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "parallel--5a509a09-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "next_steps[0]",
+      "dst": "action--5a509a09-0000-4000-8000-000000000004",
+      "src": "parallel--5a509a09-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "next_steps[1]",
+      "dst": "action--5a509a09-0000-4000-8000-000000000006",
+      "src": "parallel--5a509a09-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--5a509a09-0000-4000-8000-000000000005",
+      "src": "action--5a509a09-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--5a509a09-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--5a509a09-0000-4000-8000-000000000007",
+      "src": "action--5a509a09-0000-4000-8000-000000000006"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--5a509a09-0000-4000-8000-000000000007"
+    }
+  ],
+  "end_sentinel": "__END__",
+  "entry": "action--5a509a09-0000-4000-8000-000000000002",
+  "name": "CRA Article 14 SRP notification",
+  "nodes": [
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "early_warning",
+      "name": "action--5a509a09-0000-4000-8000-000000000002",
+      "step_id": "action--5a509a09-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "parallel",
+      "kind": "parallel",
+      "label": "run 72h + final-report clocks in parallel",
+      "name": "parallel--5a509a09-0000-4000-8000-000000000003",
+      "step_id": "parallel--5a509a09-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "wait until 72h deadline",
+      "name": "action--5a509a09-0000-4000-8000-000000000004",
+      "step_id": "action--5a509a09-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "full_notification",
+      "name": "action--5a509a09-0000-4000-8000-000000000005",
+      "step_id": "action--5a509a09-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "wait until final-report deadline",
+      "name": "action--5a509a09-0000-4000-8000-000000000006",
+      "step_id": "action--5a509a09-0000-4000-8000-000000000006"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "final_report",
+      "name": "action--5a509a09-0000-4000-8000-000000000007",
+      "step_id": "action--5a509a09-0000-4000-8000-000000000007"
+    }
+  ],
+  "playbook_id": "playbook--5a509a09-0000-4000-8000-000000000001",
+  "stable_id": "playbook.cra_srp_notify@v1"
+}
