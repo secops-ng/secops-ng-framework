@@ -1,0 +1,178 @@
+# Cross-references for the cra_srp_notify playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes emitted, and the EU regulatory clauses this playbook helps
+# operationalise. Inbound references live in
+# content/mappings/{cra,nis2,dora}/ so the graph is closed in both
+# directions.
+#
+# Status: SKELETON. The playbook is a durable-state scaffold for the
+# CRA Article 14 24h / 72h / 14d-or-1-month notification cascade
+# addressed to the Single Reporting Platform (SRP). The SRP intake
+# schema is not yet public (Commission page notes a pre-go-live
+# testing period ahead of 11 September 2026); this overlay pins the
+# regulatory + control surface so the inbound cra graph closes today,
+# and a sibling CORE card lands the SRP-schema-conformant submission
+# body builder and per-compile-target durable-timer emitters once the
+# SRP schema is published.
+#
+# CRA closure: the inbound entries live at
+# content/mappings/cra/article-14-and-annex-i.yaml. The three Article
+# 14 clauses whose obligations this playbook operationalises are
+# already present there and are updated in the same PR to pin
+# playbook.cra_srp_notify@v1 in their playbook_refs so the inbound
+# graph is closed:
+#   - cra:art-14-early-warning       (14(1) — 24h early warning)
+#   - cra:art-14-notification-72h    (14(2) — 72h full notification)
+#   - cra:art-14-final-report        (14(2) — 14-day final report)
+#   - cra:art-14-severe-incident     (14(3) — severe-incident chain,
+#     24h / 72h / 1-month)
+# Note: the task brief referenced "Art. 14(7)" as the final-report
+# clause; the CRA text as adopted anchors the 14-day final report and
+# the 1-month severe-incident deadline on Art. 14(2)–(3). The inbound
+# mapping file already uses the correct clause numbers and this
+# overlay follows them.
+#
+# NIS2 / DORA closure: severe-incident reporting under CRA Art. 14(3)
+# layers on top of the same incident-timeline signal set NIS2 Art. 23
+# and DORA Art. 19 operationalise. This SKELETON deliberately does not
+# pin outbound NIS2 / DORA entries: those regimes anchor on
+# incident-management playbooks that emit their own regulator-
+# notification chains, and cross-pinning would misrepresent the
+# scope. A sibling EXTEND card revisits the graph once the SRP schema
+# is published and the interaction with NIS2 / DORA parallel
+# reporting is documented by ENISA.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.cra_srp_notify@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 control anchoring the regulator-notification
+  # chain end-to-end. IR-6 (Incident Reporting) is the same OSCAL
+  # anchor the vuln_intake overlay pins for its CRA Article 14
+  # regulator-notification action.
+  - id: control.incident_reporting@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-6
+    title: Incident Reporting
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-6
+    notes: >-
+      Anchors the three submission steps end-to-end: the 24-hour early
+      warning, the 72-hour full notification, and the final report
+      (14 days for an actively-exploited vulnerability under Art. 14(2);
+      1 month for a severe incident under Art. 14(3)). IR-6 requires
+      the organisation to report suspected incidents to designated
+      authorities within organisation-defined time periods; CRA
+      Article 14 pins those periods and names the SRP as the intake
+      surface.
+
+d3fend:
+  # SKELETON — placeholder D3FEND tag. D3FEND v1.0.0 frames its
+  # defensive techniques around runtime countermeasures against
+  # adversary behaviours; regulator-notification is a reporting
+  # discipline rather than a runtime countermeasure and the closest
+  # fit is a documentation / notification tag that we intentionally
+  # leave as a TODO here. A sibling CORE / EXTEND card selects the
+  # final tag (or documents the deliberate gap the way the
+  # backup_recovery overlay documents its trigger / evidence-capture
+  # / notify gaps).
+  - d3fend_id: D3-TODO
+    d3fend_name: TODO (SKELETON — CORE card selects the D3FEND tag or documents the deliberate gap)
+    todo: true
+    notes: >-
+      Placeholder pending the CORE card. Regulator-notification is a
+      reporting discipline rather than a runtime countermeasure; the
+      CORE card either selects the closest-fitting D3FEND technique
+      or documents the deliberate absence the way the
+      backup_recovery / crypto_posture_management overlays document
+      their notify-owner gaps.
+
+ocsf:
+  # OCSF v1.3.0 telemetry binding. The three submission steps each
+  # emit a Compliance Finding record keyed to the case so the
+  # incident-timeline signals control can audit on-time delivery
+  # against the CRA Article 14 clocks. Same class the vuln_intake
+  # regulator-notification action emits.
+  - id: telemetry.compliance_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2003
+    class_name: Compliance Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by the three submission steps: one Compliance Finding
+      per 24-hour early warning, 72-hour full notification, and final
+      report (14 days for an actively-exploited vulnerability under
+      Art. 14(2); 1 month for a severe incident under Art. 14(3)),
+      keyed to __case_id__ so the timeline-signal control can audit
+      on-time-delivery KPIs. Schema:
+      https://schema.ocsf.io/1.3.0/classes/compliance_finding
+
+nis2:
+  # SKELETON — no outbound NIS2 anchor. NIS2 Art. 23 incident
+  # reporting anchors on incident-management playbooks that emit
+  # their own regulator-notification chain to the operator's national
+  # CSIRT; cross-pinning cra_srp_notify against a NIS2 mapping would
+  # misrepresent the scope. A sibling EXTEND card revisits this once
+  # ENISA documents the interaction between CRA Article 14 and NIS2
+  # Article 23 parallel reporting.
+  - mapping_id: nis2:todo-cra-srp-parallel
+    todo: true
+    notes: >-
+      Placeholder pending the CORE / EXTEND card. NIS2 Art. 23
+      parallel-reporting interaction with CRA Art. 14 is not yet
+      documented by ENISA as of 2026-07-02; the CORE card either
+      pins a real inbound NIS2 mapping id or documents the
+      deliberate absence.
+
+dora:
+  # SKELETON — no outbound DORA anchor. DORA Art. 19 major-incident
+  # reporting anchors on financial-entity incident-management
+  # playbooks that emit their own regulator-notification chain; cross-
+  # pinning here would misrepresent the scope. A sibling EXTEND card
+  # revisits this once the ESAs document interaction between CRA
+  # Article 14 and DORA Article 19 parallel reporting.
+  - mapping_id: dora:todo-cra-srp-parallel
+    todo: true
+    notes: >-
+      Placeholder pending the CORE / EXTEND card. DORA Art. 19
+      parallel-reporting interaction with CRA Art. 14 is not yet
+      documented by the ESAs as of 2026-07-02; the CORE card either
+      pins a real inbound DORA mapping id or documents the
+      deliberate absence.
+
+cra:
+  # Inbound entries live at
+  # content/mappings/cra/article-14-and-annex-i.yaml and backlink to
+  # playbook.cra_srp_notify@v1 (updated in the same PR).
+  - mapping_id: cra:art-14-early-warning
+    article: "14(1)"
+    notes: >-
+      Outbound backlink for the 24-hour early-warning obligation. The
+      early_warning action in this playbook is the durable-state
+      materialisation of the Art. 14(1) submission.
+  - mapping_id: cra:art-14-notification-72h
+    article: "14(2)"
+    notes: >-
+      Outbound backlink for the 72-hour full-notification obligation.
+      The full_notification action, guarded by the 72h delay step, is
+      the durable-state materialisation of the Art. 14(2) submission.
+  - mapping_id: cra:art-14-final-report
+    article: "14(2)"
+    notes: >-
+      Outbound backlink for the 14-day final-report obligation for
+      actively-exploited vulnerabilities. The final_report action,
+      guarded by the 14-day delay step under __clock_kind__ =
+      actively_exploited_vulnerability, is the durable-state
+      materialisation of the Art. 14(2) final report.
+  - mapping_id: cra:art-14-severe-incident
+    article: "14(3)"
+    notes: >-
+      Outbound backlink for the severe-incident notification chain
+      (24h / 72h / 1-month). The same three submission steps in this
+      playbook operate the Art. 14(3) chain under __clock_kind__ =
+      severe_incident, with the final-report delay step resolving at
+      awareness + 1 month instead of the 14-day
+      actively-exploited-vulnerability anchor.
