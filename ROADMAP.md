@@ -1049,6 +1049,34 @@ manual configuration.
 
 ---
 
+## Epic ADOPT — Operator adoption signal
+
+Public, community-owned surfaces that make operator adoption of
+SecOps-NG visible without requiring the project to run telemetry.
+
+### F-ADOPT-01 — USED-BY.md operator adoption registry
+
+- **Status:** In Progress
+- **Priority:** P1
+- **Acceptance criteria:**
+  - `USED-BY.md` exists at the repository root as a self-attestation
+    registry (`Organisation | Deployment type | Playbooks in use |
+    Since | Evidence link`) with a heading note stating the project
+    does not collect telemetry and additions land via PR.
+  - `docs/contributing/self-attesting-adoption.md` walks a contributor
+    through fork → edit → PR against `main`, in community voice.
+  - CORE — community outreach lands the first cohort of self-attested
+    entries (target ≥ 5 publicly attestable references by Q4 2026).
+  - EXTEND — CI check that every `USED-BY.md` row's evidence link is
+    a reachable public URL (no login wall, HTTP 2xx on scheduled run).
+- **Sovereign-stack constraints:** No telemetry, no analytics beacons,
+  no maintainer-side collection — the registry is the signal.
+- **Depends on:** —
+- **Source:** Contributor-experience gap surfaced by the FOUNDATION /
+  ROADMAP review; goal G-07 (operator adoption signal, Q4 2026).
+
+---
+
 ## Revision history
 
 - **v0 (2026-05-21).** Initial seed from FOUNDATION.md, ARCHITECTURE.md,
