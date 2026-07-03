@@ -1,0 +1,75 @@
+stable_id: kpi.compiler_idempotency_pass_rate@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Compiler idempotency pass rate across repeated identical-input compile runs
+summary: >
+  Ratio of reference-compiler runs on the evaluation window where two
+  independent invocations against the same input source under
+  ``content/`` produce byte-identical output artifacts. Each pass means
+  the compiler is idempotent for that (compile target, input) pair;
+  each fail means the compiler emitted differing bytes on the second
+  run — a silent non-determinism inside the compiler itself. This KPI
+  complements the cross-target byte-parity KPI by pinning the
+  orthogonal same-target-twice compiler-idempotency axis of
+  FOUNDATION §2 (Determinism).
+unit: ratio
+direction: higher_is_better
+target:
+  value: 1.0
+  comparator: "=="
+  rationale: >
+    A reference compiler that emits different bytes on a repeated
+    identical-input run has moved the operator's replay floor into
+    the compiler itself. Per docs/FOUNDATION.md §2, the compiler
+    MUST be idempotent on the same input; anything below 1.0 is a
+    compiler determinism regression the maintainers own.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 1.0
+    severity: warn
+  - name: breach
+    comparator: "<"
+    value: 0.95
+    severity: high
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: >
+    For each (compile target, playbook input) pair exercised by the
+    reference-compiler idempotency assertions on the evaluation
+    window, record one observation: 1 if two independent compiler
+    invocations against the same input under ``content/`` produce
+    byte-identical output artifacts, 0 if the second run drifts.
+    Aggregate as ratio across observations across the three
+    reference compile targets. The committed reference visualisation
+    lives at
+    ``content/metrics/compiler_idempotency_pass_rate.viz.md`` —
+    that file is the contract for the chart shape; the compile target
+    renders the executable form at evaluation time.
+  inputs:
+    - name: compiler_idempotency_assertion
+      description: >
+        Per-(target, playbook) compiler-idempotency assertion. The
+        assertion re-runs the reference compiler against a fixed input
+        under ``content/`` twice in fresh contexts under a fixed clock
+        and a deterministic-stub LM adapter, and asserts the two
+        output byte-blobs are equal.
+      field: activity_id
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+  window:
+    duration: P1D
+    sliding: false
+external_refs:
+  - name: SecOps-NG FOUNDATION §2 — Determinism
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+  - name: OCSF — API Activity (class 6003)
+    source: OCSF
+    url: https://schema.ocsf.io/1.1.0/classes/api_activity
+telemetry_refs:
+  - telemetry.ocsf.api_activity@v1
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - determinism

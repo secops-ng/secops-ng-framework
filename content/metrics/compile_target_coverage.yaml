@@ -1,0 +1,77 @@
+stable_id: kpi.compile_target_coverage@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Reference-compile-target coverage across playbooks with the full three-target ring
+summary: >
+  Ratio of playbooks under ``content/playbooks/`` on the evaluation
+  commit that ship with a committed compiled example artifact under
+  each of the three reference compile targets
+  (``examples/n8n/``, ``examples/temporal/``, ``examples/langgraph/``)
+  over the total playbook count. FOUNDATION §4 (Operability) requires
+  that the project ship a runnable example for every reference target
+  — an operator on any of n8n / Temporal / LangGraph should find their
+  own compile target represented so the framework-agnostic promise
+  holds up in practice.
+unit: ratio
+direction: higher_is_better
+target:
+  value: 1.0
+  comparator: "=="
+  rationale: >
+    Every playbook the project ships should carry the full three-target
+    example ring. Anything below 1.0 leaves an operator on one of the
+    reference targets without a runnable starting point, breaking the
+    framework-agnostic operability promise per FOUNDATION §4.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 1.0
+    severity: warn
+  - name: breach
+    comparator: "<"
+    value: 0.8
+    severity: high
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: >
+    Over the playbook tree under ``content/playbooks/`` on the
+    evaluation commit, count distinct playbooks with a committed
+    compiled example artifact present under all three of
+    ``examples/n8n/<workflow>/``, ``examples/temporal/<workflow>/``,
+    and ``examples/langgraph/<workflow>/`` (numerator). Divide by
+    the total playbook count in the same commit (denominator). A
+    playbook covered by only one or two targets does not count
+    toward the numerator. The committed reference visualisation lives
+    at ``content/metrics/compile_target_coverage.viz.md`` — that file
+    is the contract for the chart shape; the compile target renders
+    the executable form at evaluation time.
+  inputs:
+    - name: playbook_artifact
+      description: >
+        A single playbook artifact under
+        ``content/playbooks/<workflow>/playbook.cacao.json`` on the
+        evaluation commit, identified by playbook stable_id.
+      field: metadata.uid
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+    - name: three_target_ring_predicate
+      description: >
+        Predicate that classifies a playbook as ring-covered (a
+        committed compiled example artifact exists under each of the
+        three reference compile targets) or partial.
+  window:
+    duration: P1D
+    sliding: false
+external_refs:
+  - name: SecOps-NG FOUNDATION §4 — Operability
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+  - name: OCSF — Compliance Finding (class 2003)
+    source: OCSF
+    url: https://schema.ocsf.io/1.1.0/classes/compliance_finding
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability

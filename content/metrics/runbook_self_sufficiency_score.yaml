@@ -1,0 +1,80 @@
+stable_id: kpi.runbook_self_sufficiency_score@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Runbook self-sufficiency score across playbooks with a complete cookbook walkthrough
+summary: >
+  Ratio of playbooks under ``content/playbooks/`` on the evaluation
+  commit that ship with a complete cookbook walkthrough under
+  ``docs/cookbook/`` — a prose walkthrough covering trigger, expected
+  operator inputs, decision branches, and rollback — over the total
+  playbook count. FOUNDATION §4 (Operability) requires that an
+  operator can run a shipped playbook without having to re-derive the
+  intent from the CACAO source; this KPI tracks whether the cookbook
+  surface is actually holding up its side of the contract.
+unit: ratio
+direction: higher_is_better
+target:
+  value: 1.0
+  comparator: "=="
+  rationale: >
+    Every shipped playbook should carry a cookbook walkthrough an
+    operator can read once and run from. Anything below 1.0 is a
+    playbook the project shipped without a documentation surface an
+    operator can lean on, an operability gap the maintainers own.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 1.0
+    severity: warn
+  - name: breach
+    comparator: "<"
+    value: 0.9
+    severity: high
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: >
+    Over the playbook tree under ``content/playbooks/`` on the
+    evaluation commit, count distinct playbooks that ship with a
+    complete cookbook walkthrough under ``docs/cookbook/<workflow>.md``
+    covering trigger, expected operator inputs, decision branches,
+    and rollback (numerator). Divide by the total playbook count in
+    the same commit (denominator). A cookbook with any of the four
+    required sections missing does not count as complete. The
+    committed reference visualisation lives at
+    ``content/metrics/runbook_self_sufficiency_score.viz.md`` — that
+    file is the contract for the chart shape; the compile target
+    renders the executable form at evaluation time.
+  inputs:
+    - name: playbook_artifact
+      description: >
+        A single playbook artifact under
+        ``content/playbooks/<workflow>/playbook.cacao.json`` on the
+        evaluation commit, identified by playbook stable_id.
+      field: metadata.uid
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+    - name: cookbook_completeness_predicate
+      description: >
+        Predicate that classifies a playbook as covered (a matching
+        cookbook walkthrough under ``docs/cookbook/`` exists and
+        carries the four required sections) or uncovered.
+  window:
+    duration: P1D
+    sliding: false
+external_refs:
+  - name: SecOps-NG FOUNDATION §4 — Operability
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+  - name: NIS2 — Article 21(2)(b) incident handling
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(b)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: OCSF — Compliance Finding (class 2003)
+    source: OCSF
+    url: https://schema.ocsf.io/1.1.0/classes/compliance_finding
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability
