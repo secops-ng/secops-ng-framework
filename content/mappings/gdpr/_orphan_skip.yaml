@@ -39,18 +39,3 @@ skip:
       convention for reporting playbooks across every framework.
       `content/mappings/gdpr/data-flow-executive_metrics.md` documents
       the indirect surface for this SKELETON snapshot.
-  - slug: cra_srp_notify
-    rationale: >-
-      CRA Article 14 notification-chain playbook (single-report
-      pathway to the coordinating CSIRT and ENISA). It is not the
-      operational object of a standalone GDPR Article 5/32/33/34
-      obligation — its GDPR surface is the record-of-processing entry
-      for the notification pipeline itself, which
-      `content/mappings/gdpr/data-flow-cra_srp_notify.md` already
-      documents in full as the Article 30 ROPA entry and interim
-      coverage. Per-clause `playbook_refs:` YAML wiring is deferred
-      to a follow-on CORE card that authors the GDPR per-clause YAML
-      set for notification / comms workflows; once that lands, the
-      matching entry MUST be removed here in the same PR so the
-      orphan-CI re-arms. Follows the `executive_metrics` precedent
-      above.
