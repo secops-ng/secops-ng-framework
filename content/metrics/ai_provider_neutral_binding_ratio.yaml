@@ -1,0 +1,86 @@
+stable_id: kpi.ai_provider_neutral_binding_ratio@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: AI-provider-neutral binding ratio across content artifacts
+summary: 'Ratio of content artifacts under ``content/`` that expose LM / AI-provider
+  bindings through the shared indirection surface (``playbook_variables.LM_ENDPOINT.value``,
+  the ``x_secops_ng.lm.endpoint`` extension key, or the equivalent compiler-side
+  hook) versus content artifacts that hardcode a specific AI provider identifier
+  at author time. Framework- agnosticism (docs/ARCHITECTURE.md) and sovereignty
+  (docs/FOUNDATION.md §3) together require that a content author cannot lock
+  the operator into a specific AI provider — the operator picks the endpoint
+  at deploy time. This KPI tracks whether the shipped content actually honours
+  that contract.
+
+  '
+unit: ratio
+direction: higher_is_better
+target:
+  value: 1.0
+  comparator: ==
+  rationale: 'Every content artifact that touches an AI provider surface should
+    route through the shared indirection so the operator binds the endpoint
+    at deploy time, not the author at write time. A green ring is the FOUNDATION
+    §3 + framework-agnosticism floor.
+
+    '
+thresholds:
+- name: warn
+  comparator: <
+  value: 1.0
+  severity: warn
+- name: breach
+  comparator: <
+  value: 0.9
+  severity: high
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: 'Over the content artifacts under ``content/`` on the evaluation
+    commit that reference an AI provider surface at all, count those whose
+    reference routes through the shared indirection (``playbook_variables.LM_ENDPOINT.value``,
+    ``x_secops_ng.lm.endpoint``, or a compiler-side hook) as the numerator;
+    use the total count of AI-touching artifacts as the denominator. Artifacts
+    that do not touch an AI provider surface at all are out of scope for this
+    ratio. A per-artifact ribbon chart of neutral (1) vs hardcoded (0) bindings
+    is the canonical operator-facing surface; the compile target renders the
+    executable form against the parsed content tree.
+
+    The committed reference visualisation lives at ``content/metrics/ai_provider_neutral_binding_ratio.viz.md``
+    — that file is the contract for the chart shape; the compile target renders
+    the executable form at evaluation time.
+
+    '
+  inputs:
+  - name: ai_touching_content_artifact
+    description: 'Content artifact under ``content/`` that references an AI
+      provider surface at all at the evaluation commit — either through the
+      shared indirection or through a hardcoded provider identifier.
+
+      '
+  - name: neutral_binding_predicate
+    description: 'Predicate that classifies a single reference as neutral
+      (via shared indirection) or hardcoded (author-pinned provider). The
+      predicate is the same shape the shared LM endpoint guard applies at
+      extraction time.
+
+      '
+  window:
+    duration: P1D
+    sliding: false
+external_refs:
+- name: SecOps-NG FOUNDATION §3 — Sovereignty
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+- name: SecOps-NG ARCHITECTURE — framework-agnostic content contract
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/ARCHITECTURE.md
+- name: NIS2 — Article 21(2)(d) supply chain security
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 21(2)(d)
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+- sovereignty
+- operability

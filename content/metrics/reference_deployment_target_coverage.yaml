@@ -1,0 +1,81 @@
+stable_id: kpi.reference_deployment_target_coverage@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Reference compile-target coverage per workflow (n8n / Temporal / LangGraph
+  ring)
+summary: 'Ratio of reference workflows under ``content/playbooks/`` that ship
+  a compiled example artifact across the full three-target ring (n8n + Temporal
+  + LangGraph) under ``examples/<target>/<workflow>/`` on the evaluation commit.
+  The FOUNDATION §3 sovereignty posture and the framework-agnostic architecture
+  together require that every reference workflow demonstrates independence
+  from any single compile target — the operator picks the target at deploy
+  time, so the reference materials cannot ship a workflow that only compiles
+  to one target. This KPI tracks whether that ring is holding.
+
+  '
+unit: ratio
+direction: higher_is_better
+target:
+  value: 1.0
+  comparator: ==
+  rationale: 'Every reference workflow should ship a compiled example artifact
+    for every target in the three-target ring. A green ring across the workflow
+    catalog is the sovereignty + framework-agnosticism floor.
+
+    '
+thresholds:
+- name: warn
+  comparator: <
+  value: 1.0
+  severity: warn
+- name: breach
+  comparator: <
+  value: 0.9
+  severity: high
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: 'Over the reference workflows under ``content/playbooks/`` on the
+    evaluation commit, count workflows with a non-empty compiled example artifact
+    for all three reference compile targets under ``examples/n8n/<workflow>/``,
+    ``examples/temporal/<workflow>/``, and ``examples/langgraph/<workflow>/``
+    (numerator). Divide by the total count of reference workflows (denominator).
+    A workflow that is missing on any target counts as 0 for that workflow
+    — the ratio is a per-workflow predicate.
+
+    The committed reference visualisation lives at ``content/metrics/reference_deployment_target_coverage.viz.md``
+    — that file is the contract for the chart shape; the compile target renders
+    the executable form at evaluation time.
+
+    '
+  inputs:
+  - name: reference_workflow
+    description: 'Reference workflow definition under ``content/playbooks/``
+      at the evaluation commit.
+
+      '
+  - name: target_coverage_predicate
+    description: 'Predicate that classifies a single reference workflow as
+      covered (has a non-empty compiled example artifact for every target
+      in the three-target ring) or uncovered.
+
+      '
+  window:
+    duration: P1D
+    sliding: false
+external_refs:
+- name: SecOps-NG FOUNDATION §3 — Sovereignty
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+- name: SecOps-NG ARCHITECTURE — framework-agnostic content contract
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/ARCHITECTURE.md
+- name: NIS2 — Article 21(2)(d) supply chain security
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 21(2)(d)
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+- sovereignty
+- operability

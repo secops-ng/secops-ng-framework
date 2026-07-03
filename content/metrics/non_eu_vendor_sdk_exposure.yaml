@@ -1,0 +1,83 @@
+stable_id: kri.non_eu_vendor_sdk_exposure@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Non-EU vendor SDK exposure count across compiled artifacts
+summary: 'Count of distinct non-EU vendor SDK identifiers referenced from
+  compiled example artifacts under ``examples/<target>/<workflow>/`` and from
+  the reference compilers on the evaluation commit. The forward-public hygiene
+  linter under ``tools/hygiene_linter/`` blocks new introductions of specific
+  non-EU vendor SDK identifiers via its HIGH-severity rules; this KRI measures
+  the residual historical exposure the codebase carries — i.e. how many non-EU
+  SDK dependencies are still reachable from a compiled surface even after
+  the linter gate is holding on new commits. Per docs/FOUNDATION.md §3 (Sovereignty),
+  the sovereignty posture is not only that new dependencies are gated but
+  that the accumulated historical set trends toward zero over time; this KRI
+  is the observable evidence for that trend.
+
+  '
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: ==
+  rationale: 'The FOUNDATION §3 sovereignty floor is that a compiled reference
+    artifact carries no non-EU vendor SDK identifiers a hygiene rule would
+    flag as HIGH. A count of zero is the floor; any positive reading is a
+    residual-risk row the maintainers own until the dependency is replaced
+    or documented as an explicit exception.
+
+    '
+thresholds:
+- name: warn
+  comparator: '>'
+  value: 0
+  severity: warn
+- name: breach
+  comparator: '>='
+  value: 3
+  severity: high
+measurement:
+  source: composite
+  aggregation: count
+  formula: 'On the evaluation commit, walk the compiled example artifacts
+    under ``examples/<target>/<workflow>/`` and the reference compilers under
+    ``compilers/`` and count distinct non-EU vendor SDK identifiers referenced
+    — module import paths, package names in a manifest, or SDK client-class
+    names that the forward-public hygiene linter under ``tools/hygiene_linter/``
+    classifies as non-EU vendor SDKs via its rule set. A single identifier
+    referenced from multiple files counts once; the catalog entry is an exposure-cardinality
+    indicator, not a reference-volume indicator. Reference visualisation:
+    a bar chart of distinct non-EU SDK identifiers with a per-identifier count
+    of referencing files annotated as a drill-down dimension.
+
+    The committed reference visualisation lives at ``content/metrics/non_eu_vendor_sdk_exposure.viz.md``
+    — that file is the contract for the chart shape; the compile target renders
+    the executable form at evaluation time.
+
+    '
+  inputs:
+  - name: non_eu_vendor_sdk_identifier
+    description: 'Distinct non-EU vendor SDK identifier (import path, package
+      name, or client-class name) observed in a compiled example artifact
+      or a reference compiler at the evaluation commit, as classified by the
+      hygiene linter''s rule set under ``tools/hygiene_linter/rules/``.
+
+      '
+  window:
+    duration: P1D
+    sliding: false
+external_refs:
+- name: SecOps-NG AGENTS.md §3 — Public-bar hygiene
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/AGENTS.md
+- name: SecOps-NG FOUNDATION §3 — Sovereignty
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+- name: NIS2 — Article 21(2)(d) supply chain security
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 21(2)(d)
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+- sovereignty

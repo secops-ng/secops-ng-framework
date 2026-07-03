@@ -1,0 +1,83 @@
+stable_id: kpi.sovereign_cloud_provider_diversity@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Sovereign cloud provider diversity across reference deployment surfaces
+summary: 'Ratio measuring how broadly the reference deployment surfaces the
+  project documents spread across independent EU / sovereign-cloud providers
+  rather than concentrating on a single one. Concentration on one provider
+  is a sovereignty risk even when every provider on the list is EU-resident
+  — the FOUNDATION §3 posture is that an operator can pick up the reference
+  artifacts and land them on the sovereign platform of their choice, so the
+  catalog surface has to document a plural set. Providers currently in scope:
+  Hetzner, OVHcloud, Scaleway, Nebul; the set is the ROADMAP-tracked reference
+  set and this KPI moves as that set evolves. Chart shape, threshold bands,
+  and reference rendering are the contract for the operator- facing surface;
+  the compile target renders the executable form.
+
+  '
+unit: ratio
+direction: higher_is_better
+target:
+  value: 1.0
+  comparator: ==
+  rationale: 'The FOUNDATION §3 posture is provider plurality — every sovereign
+    provider the ROADMAP tracks as a reference target should carry at least
+    one documented deployment surface under the reference materials. A green
+    ring across the full set is the sovereignty floor for the diversity KPI.
+
+    '
+thresholds:
+- name: warn
+  comparator: <
+  value: 1.0
+  severity: warn
+- name: breach
+  comparator: <=
+  value: 0.5
+  severity: high
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: 'Over the reference deployment surfaces documented in the published
+    deployment materials on the evaluation commit, count the distinct sovereign
+    providers with at least one non-placeholder reference (numerator). Divide
+    by the size of the ROADMAP-tracked reference set (denominator). Placeholders
+    and TODO-marked references do not count toward the numerator. A per-provider
+    ribbon chart on the operator-facing surface is the canonical rendering;
+    the executable form lives in the compile target.
+
+    The committed reference visualisation lives at ``content/metrics/sovereign_cloud_provider_diversity.viz.md``
+    — that file is the contract for the chart shape; the compile target renders
+    the executable form at evaluation time.
+
+    '
+  inputs:
+  - name: documented_provider_reference
+    description: 'Distinct sovereign-cloud provider referenced by a non-placeholder
+      deployment surface in the published reference materials at the evaluation
+      commit.
+
+      '
+  - name: reference_provider_set
+    description: 'The ROADMAP-tracked reference set of sovereign-cloud providers
+      the project commits to documenting deployment surfaces for.
+
+      '
+  window:
+    duration: P90D
+    sliding: false
+external_refs:
+- name: SecOps-NG FOUNDATION §3 — Sovereignty
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+- name: NIS2 — Article 21(2)(d) supply chain security
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 21(2)(d)
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+- name: ENISA — Cloud security guidance, EU-residency considerations
+  source: ENISA
+  url: https://www.enisa.europa.eu/topics/cloud-and-big-data
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+- sovereignty
