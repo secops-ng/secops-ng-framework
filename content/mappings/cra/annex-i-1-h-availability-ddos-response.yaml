@@ -1,0 +1,76 @@
+# CRA — Annex I §1(h) availability — DDoS / availability-incident
+# response lane.
+#
+# Third companion under Annex I §1(h) alongside
+# `cra:annex-i-1-availability` in
+# annex-i-1-essential-cybersecurity.yaml (containment lane, pinned to
+# ransomware_containment — preserving essential functions under active
+# incident pressure) and `cra:annex-i-1-h-availability-restore-drill`
+# in annex-i-1-h-availability-restore-drill.yaml (restore-drill lane,
+# pinned to backup_recovery — continuous evidence that the documented
+# backup and recovery surface remains exercisable on the operator's
+# documented isolated drill target). This file pins the per-event
+# DDoS / availability-incident response lane: §1(h) requires
+# availability to be protected "including through resilience and
+# mitigation measures against denial-of-service attacks", and that
+# obligation is not satisfied by containment and restore-drill
+# evidence alone — it also has to be paired with a documented
+# per-event response discipline that detects the availability
+# anomaly, classifies the attack vector, engages the operator's
+# pre-bound mitigation surface, validates restoration against the
+# documented availability objective, and captures the dated evidence
+# record. The ddos_response playbook is that surface.
+regime: cra
+entries:
+  - id: cra:annex-i-1-h-availability-ddos-response
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §1(h)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Products with digital elements shall protect the availability of
+      essential and basic functions, also after an incident, including
+      through resilience and mitigation measures against denial-of-
+      service attacks — the per-event availability-incident response
+      lane: detect the availability anomaly on the protected service,
+      classify the attack vector against the documented vector
+      taxonomy, engage the documented mitigation discipline against
+      the operator's pre-bound response surface (upstream scrubbing
+      activation, rate-limit / WAF posture change, or failover to a
+      documented standby), validate restoration against the documented
+      availability objective, and capture the dated availability-
+      incident evidence record.
+    status: draft
+    control_refs:
+      - control.incident_handling_capability@v1
+    playbook_refs:
+      - playbook.ddos_response@v1
+    metric_refs:
+      - kpi.mttr_containment@v1
+    notes: >-
+      Third companion under Annex I §1(h) alongside
+      cra:annex-i-1-availability in
+      annex-i-1-essential-cybersecurity.yaml, which pins
+      ransomware_containment as the containment-side anchor for §1(h)
+      (preserving essential functions under active incident pressure),
+      and cra:annex-i-1-h-availability-restore-drill in
+      annex-i-1-h-availability-restore-drill.yaml, which pins
+      backup_recovery as the periodic restore-drill anchor
+      (continuous evidence that the documented backup and recovery
+      surface remains exercisable on the operator's documented
+      isolated drill target). This entry pins the per-event DDoS /
+      availability-incident response lane: ddos_response operates the
+      detect-classify-mitigate-validate discharge against the
+      availability/denial-of-service attack dimension — the operator-
+      side per-event materialisation of the §1(h) mitigation-against-
+      DoS obligation, complementary to (not overlapping with) the
+      backup_recovery restore-drill lane and the
+      ransomware_containment containment lane already pinned under
+      this clause. The NIS2 parallel is `nis2:art-21-2-b` (incident-
+      handling capability); the DORA parallel is
+      `dora:art-11-availability-response` (per-vector availability-
+      response slice of Art. 11 response-and-recovery). The
+      kpi.mttr_containment@v1 metric audits containment latency on
+      the per-event slice.

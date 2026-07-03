@@ -25,24 +25,6 @@ skip:
       distinct notification regimes. See the inline note in
       `content/playbooks/incident_management/mappings.yaml` and the
       CRA coverage table at `content/mappings/cra/COVERAGE.md`.
-  - slug: ddos_response
-    rationale: >-
-      DDoS / availability-incident response SKELETON. CRA Annex I
-      §1(h) availability of essential and basic functions has two
-      existing inbound anchors —
-      `cra:annex-i-1-availability` (containment lane, pinned to
-      `ransomware_containment`) and
-      `cra:annex-i-1-h-availability-restore-drill` (restore-drill
-      lane, pinned to `backup_recovery`). A DDoS / availability-
-      incident response lane against §1(h) is the natural next
-      CRA edge for this playbook, but the SKELETON overlay does
-      NOT pre-author the inbound entry: gap notes are separate
-      cards, not scope creep on a single-purpose SKELETON PR. A
-      future inbound-closure card adds the
-      `cra:annex-i-1-h-availability-ddos-response` inbound entry
-      and the outbound pin lands together with it. The SKELETON
-      overlay at `content/playbooks/ddos_response/mappings.yaml`
-      records the same gap note in its `cra: []` block.
   - slug: asset_management
     rationale: >-
       Asset and configuration management. Scope-mapping review

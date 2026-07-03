@@ -137,23 +137,16 @@
 # its overlay; ddos_response operationalises the per-vector response
 # under that lifecycle, it does not replace it.
 #
-# CRA closure: No CRA inbound entry currently backlinks
-# playbook.ddos_response@v1. CRA Annex I §1(h) availability of
-# essential and basic functions has two existing inbound anchors —
+# CRA closure: the inbound entry on the CRA side lives at
+# content/mappings/cra/annex-i-1-h-availability-ddos-response.yaml
+# (id cra:annex-i-1-h-availability-ddos-response — Annex I §1(h)
+# availability, per-event DDoS / availability-incident response
+# lane). Third companion under §1(h) alongside
 # cra:annex-i-1-availability (containment lane, pinned to
-# ransomware_containment) and cra:annex-i-1-h-availability-restore-
-# drill (restore-drill lane, pinned to backup_recovery). A DDoS /
-# availability-incident response lane against §1(h) is a defensible
-# inbound anchor and is the natural next CRA edge for this playbook,
-# but the CORE overlay does NOT pre-author the inbound entry: gap
-# notes are separate cards, not scope creep on a single-purpose CORE
-# PR (the CORE card scope is the D3FEND bindings and the DORA graph
-# closure). A future inbound-closure card adds the
-# cra:annex-i-1-h-availability-ddos-response inbound entry and the
-# outbound pin lands together with it. The orphan-CI grace-window
-# closure for this playbook on the CRA side is audited as a skip
-# entry under content/mappings/cra/_orphan_skip.yaml (slug
-# ddos_response).
+# ransomware_containment) and
+# cra:annex-i-1-h-availability-restore-drill (restore-drill lane,
+# pinned to backup_recovery). The matching outbound cra: entry
+# below closes the graph.
 #
 # GDPR closure: a per-workflow Records of Processing Activity entry
 # accompanies this overlay at
@@ -463,22 +456,30 @@ dora:
       response under that lifecycle, it does not replace it.
 
 cra:
-  # No CRA inbound entry currently backlinks
-  # playbook.ddos_response@v1. CRA Annex I §1(h) availability of
-  # essential and basic functions has two existing inbound
-  # anchors — cra:annex-i-1-availability (containment lane, pinned
-  # to ransomware_containment) and
-  # cra:annex-i-1-h-availability-restore-drill (restore-drill
-  # lane, pinned to backup_recovery). A DDoS / availability-
-  # incident response lane against §1(h) is a defensible inbound
-  # anchor and is the natural next CRA edge for this playbook,
-  # but the CORE overlay does NOT pre-author the inbound entry:
-  # gap notes are separate cards, not scope creep on a single-
-  # purpose CORE PR (the CORE card scope is the D3FEND bindings
-  # and the DORA graph closure). A future inbound-closure card
-  # adds the cra:annex-i-1-h-availability-ddos-response inbound
-  # entry and the outbound pin lands together with it. The
-  # orphan-CI grace-window closure for this playbook on the CRA
-  # side is audited as a skip entry under
-  # content/mappings/cra/_orphan_skip.yaml (slug ddos_response).
-  []
+  # Inbound entry that backlinks playbook.ddos_response@v1:
+  #   - content/mappings/cra/annex-i-1-h-availability-ddos-response.yaml
+  #     (id cra:annex-i-1-h-availability-ddos-response — Annex I
+  #     §1(h) availability, per-event DDoS / availability-incident
+  #     response lane; third companion under §1(h) alongside
+  #     cra:annex-i-1-availability (containment lane, pinned to
+  #     ransomware_containment) and
+  #     cra:annex-i-1-h-availability-restore-drill (restore-drill
+  #     lane, pinned to backup_recovery))
+  # Pinned outbound below to close the graph.
+  - mapping_id: cra:annex-i-1-h-availability-ddos-response
+    article: Annex I §1(h)
+    notes: >-
+      Outbound backlink for the inbound entry in
+      annex-i-1-h-availability-ddos-response.yaml. The per-event
+      DDoS / availability-incident response lane discharges the
+      operator-side §1(h) availability-of-essential-functions
+      obligation by restoring service availability after volumetric,
+      protocol, or application-layer attack, complementary to (not
+      overlapping with) the backup_recovery restore-drill lane
+      (cra:annex-i-1-h-availability-restore-drill) and the
+      ransomware_containment containment lane
+      (cra:annex-i-1-availability) already pinned under this clause.
+      The NIS2 parallel (nis2:art-21-2-b) and DORA parallel
+      (dora:art-11-availability-response) are already pinned on this
+      overlay above; the CRA backlink completes the regulatory
+      triplet.
