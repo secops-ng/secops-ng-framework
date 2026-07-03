@@ -161,7 +161,20 @@
 # processing — appropriate technical and organisational measures,
 # including the documented continuous posture-evidence discipline
 # this playbook discharges) against this playbook can be added
-# without a schema change.
+# without a schema change. Under
+# content/mappings/gdpr/article-32-security-of-processing.yaml this
+# playbook is now anchored on Art. 32(1)(b)
+# ongoing-confidentiality/integrity/availability and on Art. 32(1)(d)
+# regular-testing-and-effectiveness (operational-measures view — the
+# per-execution posture-evidence artifact against the deployed
+# processing system). Under
+# content/mappings/gdpr/article-25-data-protection-by-design.yaml
+# (F-MAP-GDPR CORE-7) this playbook is additionally anchored on
+# Art. 25(1) data protection by design (design-time view — the
+# hardened-default control-catalog declaration and per-execution
+# discharge that the by-design configuration remains in place across
+# the deployed estate). Both anchors are legitimate against the same
+# playbook under separate clauses of the same regulation.
 #
 # SigmaHQ closure: the playbook's external_references carry no
 # upstream SigmaHQ rule-id pointers because this playbook is not a

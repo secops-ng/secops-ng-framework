@@ -52,12 +52,23 @@
 # post_incident_review precedent: gap notes do not silently widen
 # the scope of a single-purpose mappings PR.
 #
-# GDPR closure: inbound GDPR clause files are not carried as YAML
-# cross-references in content/mappings/gdpr/ today (the regime is
-# expressed there as per-workflow Records of Processing Activity,
-# not as Art. 32 / 33 clause anchors). A per-workflow Art. 30 RoPA
-# is not warranted for this playbook: the steps operate on
-# component metadata (package names, versions, hashes), CVE
+# GDPR closure: inbound GDPR clause files anchor this playbook under
+# content/mappings/gdpr/article-32-security-of-processing.yaml
+# (Art. 32(1)(b) ongoing-confidentiality/integrity/availability — the
+# proactive integrity-of-processing lane against the operator's own
+# codebase per the vulnerability-handling limb) and under
+# content/mappings/gdpr/article-25-data-protection-by-design.yaml
+# (F-MAP-GDPR CORE-7 — Art. 25(1) by-design technical-control surface
+# upstream of production: SBOM ingest + dependency walk +
+# CVD-policy-derived disclosure-window resolution + per-finding
+# disclosure-timeline records as the audit-evident discharge that
+# safeguards were integrated at the time of the determination of the
+# means for processing). The two clauses are legitimate against the
+# same playbook under separate obligations of the same regulation —
+# Art. 32 is the operational-measures view; Art. 25 is the
+# design-time view. A per-workflow Art. 30 RoPA is not warranted
+# because the steps operate on component metadata (package names,
+# versions, hashes), CVE
 # identifiers, advisory text, severity scoring inputs, and policy-
 # derived disclosure deadlines — none of which constitute personal
 # data on the codebase side of the SBOM-driven flow. The reporter-

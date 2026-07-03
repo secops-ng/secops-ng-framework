@@ -1,0 +1,249 @@
+# GDPR — Art. 25 data protection by design and by default.
+#
+# F-MAP-GDPR CORE-7: seventh per-clause GDPR mapping YAML, slotting in
+# beside the existing CORE-1 breach-notification cluster
+# (article-33-34-personal-data-breach-notification.yaml), the CORE-2
+# security-of-processing cluster (article-32-security-of-processing.yaml),
+# the CORE-3 encryption/pseudonymisation slice
+# (article-32-1-a-encryption-pseudonymisation.yaml), the CORE-4
+# data-protection-principles cluster (article-5-data-protection-principles.yaml),
+# the CORE-5 controller/processor cluster
+# (article-26-28-controller-processor.yaml), and the CORE-6 lawful-basis
+# cluster (article-6-lawful-basis.yaml). This file authors the Art. 25
+# by-design slice that the CORE-2 header
+# (article-32-security-of-processing.yaml, lines 85-91) and the CORE-4
+# header (article-5-data-protection-principles.yaml, lines 76-80)
+# explicitly carved out as deferred: three SKELETON skip rationales
+# (codebase_vuln_management, infra_posture_management, vuln_intake) name
+# Art. 25 as a secondary axis alongside Art. 32, and this file closes
+# that named deferral.
+#
+# Scope of this file:
+#
+#   - gdpr:art-25-1-data-protection-by-design — technical and
+#     organisational measures implemented at the time of the
+#     determination of the means for processing and at the time of the
+#     processing itself, effectively implementing data-protection
+#     principles and integrating the necessary safeguards into the
+#     processing. Three finalized playbooks are agentic anchors:
+#
+#     * codebase_vuln_management holds the by-design technical-control
+#       surface upstream of production. Per its data-flow doc §1, the
+#       playbook walks the canonical SBOM for a release under review,
+#       scores each top-level dependency against a vulnerability
+#       database, and resolves the per-finding disclosure-window
+#       deadline from the operator's CVD policy before the release
+#       ships. The dated disclosure-timeline record is the audit-
+#       evident artifact that discharges the "safeguards integrated
+#       into the processing at the time of the determination of the
+#       means" obligation for the codebase side.
+#
+#     * infra_posture_management holds the by-design infrastructure-
+#       posture surface. Per its data-flow doc §1 and §7, each
+#       scheduled re-execution emits one dated posture-evidence
+#       artifact demonstrating that the operator's declared hardened-
+#       default configurations remain in place; configuration drift
+#       away from the by-design baseline surfaces as a per-execution
+#       finding rather than being observed only at incident time.
+#
+#     * vuln_intake holds the reactive-discovery leg of the by-design
+#       loop. Per its data-flow doc §1, inbound coordinated-disclosure
+#       reports against components already in production are the
+#       empirical evidence that a by-design control missed a class of
+#       finding at determination-of-means time; the intake and
+#       per-severity response routing is the discharge that the
+#       operator's design-review discipline incorporates that
+#       evidence into the next release.
+#
+# Out of scope of this file (deliberately):
+#
+#   - Art. 25(2) data protection by default — appropriate measures to
+#     ensure that, by default, only personal data which are necessary
+#     for each specific purpose of the processing are processed. The
+#     three anchor playbooks above operate on the technical-
+#     safeguards limb of Art. 25(1); none of them operates a
+#     "default-processing-boundary" transform against subject data
+#     (e.g. a consent-scope narrowing pipeline, a default-off
+#     feature-flag surface, a data-retention-by-default scheduler).
+#     The data-minimisation-by-construction surface the framework
+#     does carry is already anchored under
+#     gdpr:art-5-1-c-data-minimisation in
+#     article-5-data-protection-principles.yaml
+#     (threat_intel_ingest, onboarding_offboarding_tracker); the
+#     principle-level minimisation entry there is the audited home
+#     today. A future CORE follow-on card authors the Art. 25(2)
+#     entry when a finalized playbook whose data-flow doc explicitly
+#     carries a default-processing-boundary transform lands, rather
+#     than double-pinning the current anchors under two clauses.
+#
+#   - The operator-side design-review discipline itself (the "at the
+#     time of the determination of the means" activity that
+#     Art. 25(1) names in its first limb). Design-review is an
+#     operator-side governance activity discharged under the
+#     operator's Art. 24 controller-accountability surface; this YAML
+#     records the agentic anchors that produce the evidence the
+#     design-review reads against, not the design-review activity
+#     itself.
+#
+# Cross-references:
+#
+#   - NIS2 parallel: content/mappings/nis2/article-21-2-a.yaml,
+#     article-21-2-e.yaml, and article-21-2-f.yaml pin the same three
+#     playbooks against the NIS2 risk-management, vulnerability-
+#     handling, and effectiveness-assessment measures. The GDPR
+#     Art. 25 by-design axis this file anchors is the personal-data-
+#     protection regime's view of the same upstream-of-production
+#     control surface NIS2 carries under Art. 21(2)(a) / (e) / (f);
+#     the two regimes file separate evidence requirements against the
+#     same underlying playbooks.
+#
+#   - DORA parallel: content/mappings/dora/article-9-and-rts-vuln-mgmt.yaml
+#     anchors codebase_vuln_management and vuln_intake on the JC RTS
+#     on ICT risk management framework (Commission Delegated
+#     Regulation (EU) 2024/1774) Art. 10 vulnerability-management
+#     surface. Same multi-regime dependency.
+#
+#   - CRA parallel: Annex I §2 essential cybersecurity requirements
+#     in content/mappings/cra/article-14-and-annex-i.yaml carries
+#     codebase_vuln_management and vuln_intake against SBOM
+#     production, remediation, coordinated-vulnerability-disclosure,
+#     and security-update dissemination duties. The four regimes
+#     (NIS2, DORA, CRA, GDPR) carry separate obligations against the
+#     same by-design playbook cluster.
+#
+#   - Sibling GDPR clauses:
+#     * content/mappings/gdpr/article-32-security-of-processing.yaml
+#       carries the same three playbooks under the Art. 32(1)(b)
+#       ongoing-confidentiality/integrity/availability limb. The
+#       Art. 32 anchor is the operational-measures view (measures
+#       exercised against the deployed processing system); this
+#       file's Art. 25 anchor is the design-time view (measures
+#       exercised at determination-of-means / upstream of production).
+#       Both anchors are legitimate against the same playbooks under
+#       separate clauses of the same regulation.
+#     * content/mappings/gdpr/article-5-data-protection-principles.yaml
+#       carries the data-minimisation-by-construction surface at
+#       gdpr:art-5-1-c-data-minimisation. The Art. 25(2) by-default
+#       limb is deferred to a later CORE slice per the out-of-scope
+#       note above.
+
+regime: gdpr
+entries:
+  - id: gdpr:art-25-1-data-protection-by-design
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "25"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Taking into account the state of the art, the cost of
+      implementation and the nature, scope, context and purposes of
+      processing as well as the risks of varying likelihood and
+      severity for rights and freedoms of natural persons posed by
+      the processing, the controller shall, both at the time of the
+      determination of the means for processing and at the time of
+      the processing itself, implement appropriate technical and
+      organisational measures which are designed to implement
+      data-protection principles in an effective manner and to
+      integrate the necessary safeguards into the processing in
+      order to meet the requirements of this Regulation and protect
+      the rights of data subjects. The measures must be exercisable
+      on the operator's documented release pipeline, deployed
+      infrastructure, and coordinated-disclosure surface — not
+      merely declared in policy — so the by-design capability is
+      evidenced rather than asserted.
+    status: draft
+    control_refs:
+      - control.sbom_capture@v1
+      - control.patch_evidence@v1
+      - control.cspm_baseline@v1
+      - control.iac_policy_guardrail@v1
+      - control.cloud_identity_least_privilege@v1
+      - control.vuln_disclosure_intake@v1
+    playbook_refs:
+      - playbook.codebase_vuln_management@v1
+      - playbook.infra_posture_management@v1
+      - playbook.vuln_intake@v1
+    metric_refs:
+      - kpi.cloud_posture_coverage@v1
+      - kpi.patch_disseminated_on_time@v1
+      - kpi.vuln_disclosure_sla@v1
+      - kri.cvd_intake_aging@v1
+      - kri.releases_without_sbom@v1
+      - kri.recurring_cloud_misconfig@v1
+    evidence_stream_refs:
+      - posture
+      - vulns
+    notes: >-
+      codebase_vuln_management is the by-design technical-control
+      anchor upstream of production: SBOM ingest at the release
+      pipeline pins the canonical component inventory, the
+      dependency-walk step evaluates each top-level dependency
+      against the chosen vulnerability database using the
+      locally-runnable scanner CLI, CVD-policy-derived
+      disclosure-window resolution assigns each finding to the
+      operator's remediation timeline, and per-finding
+      disclosure-timeline records feed the downstream metrics
+      streams. The SBOM content-hash pin on the case is the
+      release-scoped audit-evident artifact for the "safeguards
+      integrated into the processing at the time of the
+      determination of the means" obligation on the codebase side.
+      Per data-flow-codebase_vuln_management.md §2 the workflow
+      itself processes no personal data; this clause anchors it as
+      an organisational measure protecting the by-design integrity
+      of the release pipeline that carries personal-data-processing
+      components downstream. kri.cvd_intake_aging@v1 and
+      kri.releases_without_sbom@v1 are the GDPR-visible failure
+      indicators.
+
+      infra_posture_management is the by-design infrastructure-
+      posture anchor. The control-catalog declaration is the
+      operator's by-design commitment to a set of hardened-default
+      configurations (least-privilege identity boundaries,
+      encryption-in-transit floors, network-baseline segmentation);
+      each scheduled re-execution walks the in-scope manifest,
+      collects a read-only posture-state snapshot, evaluates every
+      declared control, and emits one dated posture-evidence
+      artifact against `schemas/evidence/posture.schema.json` on the
+      F-WF-06 stream. The artifact is the audit-evident discharge
+      that the hardened-default configuration remains in place;
+      drift surfaces as a per-execution finding feeding the
+      operator's design-review loop. Per
+      data-flow-infra_posture_management.md §1-§3 posture state is
+      resource-shaped by design and the workflow-as-a-whole does not
+      introduce a new subject-data processing purpose under this
+      clause. kpi.cloud_posture_coverage@v1 and
+      kri.recurring_cloud_misconfig@v1 are the GDPR-visible failure
+      indicators.
+
+      vuln_intake is the reactive-discovery leg of the by-design
+      loop. Inbound coordinated-disclosure reports against
+      components already in production are empirical evidence that a
+      by-design control missed a class of finding at determination-
+      of-means time; the CRA single-point-of-contact
+      acknowledgement, the CVSS / EPSS triage step, the SBOM /
+      asset-inventory correlation, and the per-severity
+      response-branch routing collectively discharge the "safeguards
+      integrated into the processing at the time of the processing
+      itself" limb. The case record joining the disclosure to the
+      remediation lane is the audit-evident artifact that the
+      operator's design-review discipline incorporates that evidence
+      into the next release. Per data-flow-vuln_intake.md §2 primary
+      lawful basis is Art. 6(1)(c) for the CRA-driven surface with
+      Art. 6(1)(f) on the internal triage portions; the by-design
+      anchor here is downstream of that chain, not a new processing
+      purpose. kpi.vuln_disclosure_sla@v1 and kri.cvd_intake_aging@v1
+      are the GDPR-visible failure indicators.
+
+      State-of-the-art / cost / risk-proportionality gating under
+      Art. 25(1) is operationally discharged by the operator's
+      risk-management policy (control.risk_management_policy@v1,
+      anchored on Art. 24), not by this YAML. Art. 25(2) by-default
+      limb: deferred — the framework's current playbook set does not
+      carry a default-processing-boundary transform against subject
+      data; the data-minimisation-by-construction surface is already
+      anchored under gdpr:art-5-1-c-data-minimisation in
+      article-5-data-protection-principles.yaml. A future CORE
+      follow-on card authors Art. 25(2) when a
+      default-processing-boundary transform lands.
