@@ -42,6 +42,13 @@ for the step-by-step. The short version: fork this repository, add a
 row to the table above, open a PR against `main`. A maintainer merges
 after a format check.
 
+A scheduled CI job (`.github/workflows/used-by-link-check.yml`) runs
+daily and issues an HTTP GET against every evidence link in this
+registry. If your link stops returning a 2xx response, the run turns
+red and lists the affected row in its summary so a maintainer can
+reach out or prune the entry. The check is a signal, not a merge
+gate — link rot on a third-party site does not block unrelated PRs.
+
 ## What this registry is not
 
 - Not a ranking. Rows are alphabetically ordered on the

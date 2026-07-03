@@ -1,0 +1,142 @@
+name: used-by-link-check
+
+# Scheduled and on-push reachability check for evidence links in
+# USED-BY.md. The registry is community-maintained and self-attested;
+# this job flags rows whose public evidence URL has gone dark so
+# maintainers can nudge the contributor or remove the row.
+#
+# Failure semantics: this workflow is a signal, not a merge gate. A
+# broken link surfaces here as a red run and a run-summary listing —
+# it does not block PRs. Link rot on a third-party site is not a
+# reason to refuse an unrelated change.
+
+on:
+  schedule:
+    # Daily at 06:17 UTC. Off-peak, off-hour to avoid clustering with
+    # the top-of-hour cron traffic third-party hosts already serve.
+    - cron: "17 6 * * *"
+  push:
+    branches: [main]
+    paths:
+      - "USED-BY.md"
+      - ".github/workflows/used-by-link-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-links:
+    name: reachability check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check evidence links
+        id: check
+        shell: python
+        run: |
+          import os
+          import re
+          import sys
+          import urllib.request
+          import urllib.error
+
+          REGISTRY = "USED-BY.md"
+          PLACEHOLDER_PREFIX = "https://example.org/"
+          TIMEOUT_SECONDS = 15
+          USER_AGENT = (
+              "secops-ng-used-by-link-check/1.0 "
+              "(+https://github.com/secops-ng/secops-ng-framework)"
+          )
+
+          # Extract the Evidence-link column from every non-header,
+          # non-separator row of the registry table. Any bare URL in
+          # that cell is treated as a link to check.
+          url_pattern = re.compile(r"https?://[^\s|)>\]]+")
+          urls: list[tuple[int, str]] = []
+          with open(REGISTRY, encoding="utf-8") as f:
+              in_table = False
+              header_seen = False
+              for lineno, raw in enumerate(f, start=1):
+                  line = raw.rstrip("\n")
+                  if not line.startswith("|"):
+                      in_table = False
+                      header_seen = False
+                      continue
+                  in_table = True
+                  # Skip the header row and the |---|---| separator.
+                  if not header_seen:
+                      header_seen = True
+                      continue
+                  if set(line.replace("|", "").strip()) <= set("-: "):
+                      continue
+                  cells = [c.strip() for c in line.strip("|").split("|")]
+                  if not cells:
+                      continue
+                  evidence_cell = cells[-1]
+                  for match in url_pattern.findall(evidence_cell):
+                      urls.append((lineno, match))
+
+          if not urls:
+              print("No evidence links found in", REGISTRY)
+              sys.exit(0)
+
+          broken: list[tuple[int, str, str]] = []
+          checked = 0
+          skipped = 0
+          for lineno, url in urls:
+              if url.startswith(PLACEHOLDER_PREFIX):
+                  print(f"skip  line {lineno}: {url} (placeholder)")
+                  skipped += 1
+                  continue
+              checked += 1
+              req = urllib.request.Request(
+                  url,
+                  headers={"User-Agent": USER_AGENT},
+                  method="GET",
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=TIMEOUT_SECONDS) as resp:
+                      status = resp.status
+                      if 200 <= status < 300:
+                          print(f"ok    line {lineno}: {url} ({status})")
+                      else:
+                          reason = f"HTTP {status}"
+                          print(f"fail  line {lineno}: {url} ({reason})")
+                          broken.append((lineno, url, reason))
+              except urllib.error.HTTPError as e:
+                  reason = f"HTTP {e.code}"
+                  print(f"fail  line {lineno}: {url} ({reason})")
+                  broken.append((lineno, url, reason))
+              except (urllib.error.URLError, TimeoutError, OSError) as e:
+                  reason = f"{type(e).__name__}: {e}"
+                  print(f"fail  line {lineno}: {url} ({reason})")
+                  broken.append((lineno, url, reason))
+
+          summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+          if summary_path:
+              with open(summary_path, "a", encoding="utf-8") as sf:
+                  sf.write("# USED-BY.md evidence-link check\n\n")
+                  sf.write(f"- Rows scanned: {checked + skipped}\n")
+                  sf.write(f"- Placeholders skipped: {skipped}\n")
+                  sf.write(f"- Links checked: {checked}\n")
+                  sf.write(f"- Broken: {len(broken)}\n\n")
+                  if broken:
+                      sf.write("## Broken links\n\n")
+                      sf.write("| Line | URL | Reason |\n")
+                      sf.write("|------|-----|--------|\n")
+                      for lineno, url, reason in broken:
+                          safe_reason = reason.replace("|", "\\|")
+                          sf.write(f"| {lineno} | {url} | {safe_reason} |\n")
+
+          if broken:
+              print(f"\n{len(broken)} broken link(s) in {REGISTRY}", file=sys.stderr)
+              sys.exit(1)
+          print(f"\nAll {checked} evidence link(s) reachable")
