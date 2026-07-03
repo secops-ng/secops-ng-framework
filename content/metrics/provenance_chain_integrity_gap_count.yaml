@@ -1,0 +1,93 @@
+stable_id: kri.provenance_chain_integrity_gap_count@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Provenance-chain integrity gap count across content-artifact lineage
+summary: 'Count of distinct breaks on the evaluation commit in the
+  provenance chain that links a compiled artifact back to the
+  content-tree source it was derived from — i.e. compiled example
+  outputs under ``examples/{n8n,temporal,langgraph}/*`` whose lineage
+  cannot be resolved to the source playbook, detection, control, or
+  telemetry stable_id under ``content/`` at that commit. FOUNDATION
+  auditability (docs/FOUNDATION.md §1) requires that an auditor can
+  walk a shipped artifact backwards to the source of truth that
+  produced it; this KRI counts the surfaces where the walk breaks.
+
+  '
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: ==
+  rationale: 'Every compiled artifact the project ships under
+    ``examples/`` should resolve backwards to a source stable_id
+    under ``content/`` on the evaluation commit. Any positive count is
+    a break in the provenance chain the maintainers own until the
+    lineage is either restored or the compiled artifact is retired.
+
+    '
+thresholds:
+- name: warn
+  comparator: '>'
+  value: 0
+  severity: warn
+- name: breach
+  comparator: '>='
+  value: 3
+  severity: high
+measurement:
+  source: composite
+  aggregation: count
+  formula: 'Over the compiled artifact tree under
+    ``examples/{n8n,temporal,langgraph}/*`` on the evaluation commit,
+    count distinct compiled artifacts whose lineage cannot be resolved
+    backwards to a stable_id under ``content/`` — i.e. the compiled
+    artifact declares a source stable_id that is missing from the
+    content tree at that commit, or declares no source stable_id at
+    all. An artifact with N missing back-references still counts as
+    one — the catalog entry is a cardinality indicator; the per-artifact
+    hop drill-down is a dimension, not a separate KRI.
+
+    The committed reference visualisation lives at ``content/metrics/provenance_chain_integrity_gap_count.viz.md``
+    — that file is the contract for the chart shape; the compile target
+    renders the executable form at evaluation time.
+
+    '
+  inputs:
+  - name: compiled_example_artifact
+    description: 'A single compiled example artifact under
+      ``examples/{n8n,temporal,langgraph}/*`` on the evaluation commit.
+
+      '
+    field: metadata.uid
+    telemetry_ref: telemetry.ocsf.detection_finding@v1
+  - name: provenance_predicate
+    description: 'Predicate that classifies a single compiled artifact
+      as resolvable (declared source stable_id exists under ``content/``
+      on the same commit) or broken (source stable_id missing, or not
+      declared).
+
+      '
+  window:
+    duration: P1D
+    sliding: false
+telemetry_refs:
+  - telemetry.ocsf.detection_finding@v1
+external_refs:
+- name: SecOps-NG FOUNDATION §1 — Auditability
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+- name: NIS2 — Article 21(2)(j) cybersecurity risk-management measures
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 21(2)(j)
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+- name: DORA — Article 10 detection of ICT-related incidents
+  source: EU
+  external_id: Regulation (EU) 2022/2554, Art. 10
+  url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+- name: OCSF — Detection Finding (class 2004)
+  source: OCSF
+  url: https://schema.ocsf.io/1.1.0/classes/detection_finding
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+- auditability

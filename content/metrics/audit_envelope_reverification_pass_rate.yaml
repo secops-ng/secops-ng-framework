@@ -1,0 +1,98 @@
+stable_id: kpi.audit_envelope_reverification_pass_rate@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Audit-envelope re-verification pass rate on stored playbook runs
+summary: 'Ratio of stored audit envelopes for completed playbook runs that
+  re-verify cleanly on demand — i.e. re-parsing the durable envelope
+  reproduces the same step-transition sequence and terminal outcome the
+  compile target originally emitted — over the total count of stored
+  audit envelopes exercised by the re-verification sweep in the window.
+  Companion to ``kpi.same_target_replay_determinism_rate@v1``: the
+  same-target replay KPI attests that a fresh compile reproduces
+  byte-parity output; this KPI attests that the *stored* envelope of a
+  historical run still parses to the same shape an auditor would expect
+  to see. FOUNDATION auditability (docs/FOUNDATION.md §1) leans on
+  both signals.
+
+  '
+unit: ratio
+direction: higher_is_better
+target:
+  value: 1.0
+  comparator: ==
+  rationale: 'Every stored audit envelope should re-verify cleanly to the
+    same step-transition sequence and terminal outcome the compile target
+    originally emitted. Anything under 1.0 is either envelope corruption,
+    envelope-format drift, or a compile-target regression — all three are
+    auditability-floor breaches.
+
+    '
+thresholds:
+- name: warn
+  comparator: <
+  value: 1.0
+  severity: warn
+- name: breach
+  comparator: <
+  value: 0.99
+  severity: high
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: 'Over the evaluation window, sweep the stored audit envelopes
+    for completed playbook runs on the operator''s durable audit surface.
+    For each envelope, re-parse it under the current envelope contract
+    and count it as a pass (numerator) if the re-parsed step-transition
+    sequence and terminal outcome match the originally-emitted values
+    verbatim; otherwise count it as a fail. Divide the pass count by
+    the total count of envelopes swept (denominator). Envelope-format
+    drift, envelope corruption, and compile-target regression all
+    surface as fails, and the drill-down groups fails by category.
+
+    The committed reference visualisation lives at ``content/metrics/audit_envelope_reverification_pass_rate.viz.md``
+    — that file is the contract for the chart shape; the compile target
+    renders the executable form at evaluation time.
+
+    '
+  inputs:
+  - name: stored_audit_envelope
+    description: 'A single stored audit envelope on the operator''s
+      durable audit surface, keyed to a completed playbook run.
+
+      '
+    field: metadata.uid
+    telemetry_ref: telemetry.ocsf.incident_finding@v1
+  - name: reverification_predicate
+    description: 'Predicate that classifies a single envelope as pass
+      (re-parsed step-transition sequence and terminal outcome match
+      the originally-emitted values) or fail (any deviation).
+
+      '
+  window:
+    duration: P30D
+    sliding: false
+telemetry_refs:
+  - telemetry.ocsf.incident_finding@v1
+external_refs:
+- name: SecOps-NG FOUNDATION §1 — Auditability
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+- name: SecOps-NG FOUNDATION §2 — Determinism
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+- name: NIS2 — Article 21(2)(j) cybersecurity risk-management measures
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 21(2)(j)
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+- name: DORA — Article 10 detection of ICT-related incidents
+  source: EU
+  external_id: Regulation (EU) 2022/2554, Art. 10
+  url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+- name: OCSF — Incident Finding (class 2005)
+  source: OCSF
+  url: https://schema.ocsf.io/1.1.0/classes/incident_finding
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+- auditability
+- determinism

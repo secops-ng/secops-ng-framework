@@ -1,0 +1,92 @@
+stable_id: kpi.audit_log_tamper_evidence_coverage@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Audit-log tamper-evidence coverage across durable audit surfaces
+summary: 'Ratio of durable audit surfaces on the operator''s stack that
+  emit tamper-evidence signal on every record — a per-record hash chain,
+  a per-batch signature, or a durable third-party timestamp anchor —
+  versus the total count of durable audit surfaces the reference
+  deployment materials name. The FOUNDATION auditability property
+  (docs/FOUNDATION.md §1) requires that an auditor reading the trail
+  after the fact can tell whether records were mutated between write
+  and read; this KPI tracks whether the compile target is actually
+  emitting that signal, or whether the trail is un-attested.
+
+  '
+unit: ratio
+direction: higher_is_better
+target:
+  value: 1.0
+  comparator: ==
+  rationale: 'Every durable audit surface in the reference deployment
+    materials should carry a tamper-evidence signal on every record.
+    A green ring is the auditability + attestation floor a NIS2 or
+    DORA audit expects to find on the trail.
+
+    '
+thresholds:
+- name: warn
+  comparator: <
+  value: 1.0
+  severity: warn
+- name: breach
+  comparator: <
+  value: 0.9
+  severity: high
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: 'Over the durable audit surfaces named in the reference
+    deployment materials on the evaluation commit, count surfaces whose
+    records carry at least one tamper-evidence signal — per-record hash
+    chain, per-batch signature, or third-party durable timestamp anchor
+    (numerator). Divide by the total count of durable audit surfaces the
+    reference deployment materials name (denominator). A per-surface
+    ribbon chart of attested (1) vs un-attested (0) is the canonical
+    operator-facing rendering; the compile target renders the executable
+    form against the parsed reference-deployment inventory.
+
+    The committed reference visualisation lives at ``content/metrics/audit_log_tamper_evidence_coverage.viz.md``
+    — that file is the contract for the chart shape; the compile target
+    renders the executable form at evaluation time.
+
+    '
+  inputs:
+  - name: durable_audit_surface
+    description: 'A single durable audit surface named in the reference
+      deployment materials on the evaluation commit — an append-only log
+      store, a compliance-finding sink, or an OCSF audit stream endpoint.
+
+      '
+    field: metadata.log_provider
+    telemetry_ref: telemetry.ocsf.compliance_finding@v1
+  - name: tamper_evidence_predicate
+    description: 'Predicate that classifies a single surface as attested
+      (per-record hash chain, per-batch signature, or third-party durable
+      timestamp anchor present) or un-attested (no such signal).
+
+      '
+  window:
+    duration: P30D
+    sliding: false
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+external_refs:
+- name: SecOps-NG FOUNDATION §1 — Auditability
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+- name: NIS2 — Article 21(2)(j) cybersecurity risk-management measures
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 21(2)(j)
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+- name: DORA — Article 10 detection of ICT-related incidents
+  source: EU
+  external_id: Regulation (EU) 2022/2554, Art. 10
+  url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+- name: OCSF — Compliance Finding (class 2003)
+  source: OCSF
+  url: https://schema.ocsf.io/1.1.0/classes/compliance_finding
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+- auditability
