@@ -1,0 +1,112 @@
+name: quickstart-gate
+
+# Scheduled end-to-end gate for the practitioner quickstart in
+# docs/quickstart/README.md. Runs the LangGraph reference path
+# verbatim on a clean ubuntu-latest checkout and reports pass /
+# wall-clock minutes to the workflow summary. The wall-clock number
+# is the operator-onboarding pass-rate signal — the quickstart
+# promises a first operator-actionable output inside thirty minutes
+# on a clean machine, and this job is the recurring proof.
+#
+# LangGraph is the target exercised here because it needs no
+# out-of-process runtime (no Docker daemon, no external server) —
+# the emitter is a pure-Python step and the golden suite is the
+# same one a practitioner runs locally. n8n and Temporal remain
+# fully documented in the quickstart; a practitioner picks one of
+# the three, and this gate verifies the target that runs
+# self-contained in CI.
+#
+# Failure semantics: this workflow is a signal. A red run means the
+# quickstart path has drifted — dependency pin, import path, golden
+# byte-parity, or wall-clock over the practitioner floor — and
+# maintainers should read the summary before merging further
+# changes on top.
+#
+# Sovereignty: the job runs on the standard GitHub-hosted runner
+# with only actions/checkout and actions/setup-python. No external
+# services are contacted beyond the Python package index during
+# install; no credentials are needed beyond the default checkout
+# token.
+
+on:
+  schedule:
+    # Weekly, Monday 04:23 UTC. Off-peak and off-hour to avoid
+    # clustering with top-of-hour cron traffic on PyPI mirrors.
+    - cron: "23 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quickstart:
+    name: practitioner quickstart end-to-end
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout (fresh, shallow)
+        uses: actions/checkout@v4
+        with:
+          # Shallow checkout — the quickstart explicitly starts
+          # from a fresh clone with no cached state.
+          fetch-depth: 1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Record start time
+        id: start
+        run: |
+          echo "epoch=$(date -u +%s)" >> "$GITHUB_OUTPUT"
+          echo "iso=$(date -u -Iseconds)" >> "$GITHUB_OUTPUT"
+
+      - name: Create virtualenv and install (quickstart step 2)
+        # Mirrors docs/quickstart/README.md § 2 verbatim.
+        # `pip install -e .[dev]` is the same command a practitioner
+        # runs after activating the venv.
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Compile phishing_triage for LangGraph (quickstart step 4)
+        # Same command the guide documents under "LangGraph (agentic)".
+        run: |
+          . .venv/bin/activate
+          PYTHONPATH=. python -m compilers.langgraph.emit \
+            content/playbooks/phishing_triage/playbook.cacao.json \
+            > /tmp/phishing_triage.graph_spec.json
+          test -s /tmp/phishing_triage.graph_spec.json
+
+      - name: Verify via phishing_triage golden suite (quickstart step 5)
+        # Same pytest invocation the guide documents under "Verify".
+        run: |
+          . .venv/bin/activate
+          python -m pytest tests/examples/ -k phishing_triage -q
+
+      - name: Report wall-clock to summary
+        if: always()
+        run: |
+          end_epoch=$(date -u +%s)
+          start_epoch="${{ steps.start.outputs.epoch }}"
+          elapsed=$((end_epoch - start_epoch))
+          minutes=$((elapsed / 60))
+          seconds=$((elapsed % 60))
+          status="${{ job.status }}"
+          {
+            echo "# Quickstart gate"
+            echo ""
+            echo "- Status: ${status}"
+            echo "- Started: ${{ steps.start.outputs.iso }}"
+            echo "- Wall-clock: ${minutes}m ${seconds}s (${elapsed}s total)"
+            echo ""
+            echo "The practitioner quickstart promises a first"
+            echo "operator-actionable output inside thirty minutes"
+            echo "on a clean machine. This job runs the LangGraph"
+            echo "path verbatim from docs/quickstart/README.md and"
+            echo "records the wall-clock so the community can see"
+            echo "onboarding-pass-rate trend from CI history."
+          } >> "$GITHUB_STEP_SUMMARY"
