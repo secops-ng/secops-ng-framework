@@ -1,0 +1,87 @@
+stable_id: kri.hardcoded_non_eu_endpoint_reference_count@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Hardcoded non-EU endpoint reference count across content and compilers
+summary: 'Count of distinct string-literal non-EU endpoint references observed
+  in the content tree under ``content/`` and the reference compilers under
+  ``compilers/`` on the evaluation commit — where "non-EU endpoint reference"
+  is a hardcoded host, region, or URL that resolves to a non-EU jurisdiction
+  under the shared residency classifier used by the LM endpoint guard. Companion
+  to ``kri.non_eu_lm_endpoint_escape_rate@v1``: that KRI measures LM endpoint
+  escapes at the merge stream; this KRI measures the static literal footprint
+  across the whole codebase, catching non-LM endpoints (webhooks, control
+  planes, storage URLs) as well. Per docs/FOUNDATION.md §3 (Sovereignty),
+  the sovereignty posture at the source layer is that no non-EU endpoint is
+  hardcoded — every endpoint the runtime touches is either behind a shared
+  indirection or explicitly declared as an exception.
+
+  '
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: ==
+  rationale: 'Hardcoded non-EU endpoint references in source content and in
+    reference compilers are a sovereignty regression on a public surface.
+    The floor is zero; any positive count is a residual- risk row the maintainers
+    own until the reference is removed or routed through a shared indirection.
+
+    '
+thresholds:
+- name: warn
+  comparator: '>'
+  value: 0
+  severity: warn
+- name: breach
+  comparator: '>='
+  value: 5
+  severity: high
+measurement:
+  source: composite
+  aggregation: count
+  formula: 'On the evaluation commit, walk the tree under ``content/`` and
+    ``compilers/`` and count distinct string-literal endpoint references —
+    hosts, region identifiers, and full URLs — that the shared residency classifier
+    (the same classifier the LM endpoint guard uses via ``classify_endpoint``)
+    resolves to a non-EU jurisdiction. A single literal referenced from multiple
+    files counts once; the catalog entry is an exposure-cardinality indicator.
+
+    The committed reference visualisation lives at ``content/metrics/hardcoded_non_eu_endpoint_reference_count.viz.md``
+    — that file is the contract for the chart shape; the compile target renders
+    the executable form at evaluation time.
+
+    '
+  inputs:
+  - name: string_literal_endpoint_reference
+    description: 'Distinct string-literal endpoint reference (host, region,
+      or URL) observed in ``content/`` or ``compilers/`` at the evaluation
+      commit.
+
+      '
+  - name: residency_classification_predicate
+    description: 'Predicate that classifies a single string-literal endpoint
+      as EU, NON_EU, or UNKNOWN under the shared classifier used by ``compilers/_shared/lm_endpoint_guard.py``.
+
+      '
+  window:
+    duration: P1D
+    sliding: false
+external_refs:
+- name: SecOps-NG FOUNDATION §3 — Sovereignty
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+- name: SecOps-NG AGENTS.md §3 — Public-bar hygiene
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/AGENTS.md
+- name: GDPR — Chapter V cross-border transfers of personal data
+  source: EU
+  external_id: Regulation (EU) 2016/679, Chapter V
+  url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+- name: NIS2 — Article 21(2)(d) supply chain security
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 21(2)(d)
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+- sovereignty

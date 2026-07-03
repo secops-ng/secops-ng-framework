@@ -1,0 +1,88 @@
+stable_id: kri.non_eu_lm_endpoint_escape_rate@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Non-EU LM endpoint escape rate through the residency guard to main
+summary: 'Ratio of merged-to-main commits in the evaluation window whose compiled
+  example artifacts under ``examples/<target>/<workflow>/`` declare at least
+  one LM endpoint that the shared residency guard at ``compilers/_shared/lm_endpoint_guard.py``
+  classifies as ``EndpointResidency.NON_EU`` without the documented override
+  env var. Paired residual-risk companion to ``kpi.lm_endpoint_eu_residency_coverage@v1``
+  — coverage says how many endpoints hit the EU floor, this KRI says how often
+  the sovereignty gate is being bypassed on the merge stream. Per docs/FOUNDATION.md
+  §3 (Sovereignty) and F-SV-01 (ROADMAP), the gate refusing at compile time
+  is the enforcement surface; this KRI is the observable evidence that the
+  enforcement is not being routinely turned off in landings on main.
+
+  '
+unit: ratio
+direction: lower_is_better
+target:
+  value: 0
+  comparator: ==
+  rationale: 'A NON_EU classification landing on main without the documented
+    override is a sovereignty regression on a public artifact the project
+    ships. The floor is zero; any positive reading is a residual-risk row
+    the maintainers owe a reconciliation for.
+
+    '
+thresholds:
+- name: warn
+  comparator: '>'
+  value: 0
+  severity: warn
+- name: breach
+  comparator: '>='
+  value: 0.05
+  severity: high
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: 'Over the evaluation window, count distinct merged-to-main commits
+    where any LM endpoint extracted from a compiled example artifact under
+    ``examples/<target>/<workflow>/`` via ``extract_lm_endpoints`` classifies
+    as ``EndpointResidency.NON_EU`` under ``classify_endpoint`` in ``compilers/_shared/lm_endpoint_guard.py``.
+    Divide by the total count of merged-to-main commits in the same window.
+    A merge with N NON_EU endpoints still counts as one offending commit —
+    the catalog entry is a coverage indicator, not a finding-volume indicator;
+    the endpoint-volume signal lives on ``kri.lm_endpoint_unknown_residency_exposure@v1``
+    and the coverage signal on ``kpi.lm_endpoint_eu_residency_coverage@v1``.
+
+    The committed reference visualisation lives at ``content/metrics/non_eu_lm_endpoint_escape_rate.viz.md``
+    — that file is the contract for the chart shape; the compile target renders
+    the executable form at evaluation time.
+
+    '
+  inputs:
+  - name: declared_lm_endpoint
+    description: 'Single LM endpoint extracted from a compiled example artifact
+      via the shared guard''s ``extract_lm_endpoints`` walker at ``compilers/_shared/lm_endpoint_guard.py``.
+
+      '
+    playbook_ref: playbook.executive_metrics@v1
+  - name: merged_commit_under_evaluation
+    description: 'Distinct commit observed as a merge into the default branch
+      in the evaluation window.
+
+      '
+  window:
+    duration: P90D
+    sliding: true
+external_refs:
+- name: SecOps-NG FOUNDATION §3 — Sovereignty
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+- name: SecOps-NG ROADMAP — F-SV-01 EU-resident LM endpoint guard
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/ROADMAP.md
+- name: GDPR — Chapter V cross-border transfers of personal data
+  source: EU
+  external_id: Regulation (EU) 2016/679, Chapter V
+  url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+- name: NIS2 — Article 21(2)(d) supply chain security
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 21(2)(d)
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+- sovereignty

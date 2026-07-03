@@ -1,0 +1,90 @@
+stable_id: kpi.eu_regulatory_reference_coverage@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: EU-regulatory external reference coverage across the metrics catalogue
+summary: 'Ratio of catalogue entries under ``content/metrics/*.yaml`` whose
+  ``external_refs`` list carries at least one EU-regulatory anchor (GDPR,
+  NIS2, DORA, CRA, ENISA guidance) versus catalogue entries that cite no EU-regulatory
+  anchor at all on the evaluation commit. The FOUNDATION §3 sovereignty posture
+  pairs with the SecOps-NG regulatory-corpus mission: catalogue metrics that
+  measure operator posture should ground themselves in EU regulatory context
+  so an auditor reading the catalog sees the anchor without leaving the document.
+  This KPI tracks whether that grounding is being kept up across the whole
+  catalog.
+
+  '
+unit: ratio
+direction: higher_is_better
+target:
+  value: 1.0
+  comparator: ==
+  rationale: 'Every operator-facing catalogue entry should carry an EU- regulatory
+    anchor in its ``external_refs`` so the auditor path is one hop away. A
+    green ring is the sovereignty + auditor-context floor.
+
+    '
+thresholds:
+- name: warn
+  comparator: <
+  value: 1.0
+  severity: warn
+- name: breach
+  comparator: <
+  value: 0.8
+  severity: high
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: 'Over the catalogue entries under ``content/metrics/*.yaml`` on
+    the evaluation commit, count entries whose ``external_refs`` list carries
+    at least one EU-regulatory anchor — an entry naming GDPR, NIS2, DORA,
+    CRA, or ENISA guidance (numerator). Divide by the total count of catalogue
+    entries (denominator). A per-entry ribbon chart of anchored (1) vs unanchored
+    (0) is the canonical operator-facing rendering.
+
+    The committed reference visualisation lives at ``content/metrics/eu_regulatory_reference_coverage.viz.md``
+    — that file is the contract for the chart shape; the compile target renders
+    the executable form at evaluation time.
+
+    '
+  inputs:
+  - name: catalogue_entry
+    description: 'Single catalogue YAML file under ``content/metrics/*.yaml``
+      at the evaluation commit.
+
+      '
+  - name: eu_regulatory_anchor_predicate
+    description: 'Predicate that classifies a single catalogue entry as EU-anchored
+      (``external_refs`` names GDPR / NIS2 / DORA / CRA / ENISA) or unanchored.
+
+      '
+  window:
+    duration: P1D
+    sliding: false
+external_refs:
+- name: SecOps-NG FOUNDATION §3 — Sovereignty
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+- name: GDPR — Regulation (EU) 2016/679
+  source: EU
+  external_id: Regulation (EU) 2016/679
+  url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+- name: NIS2 — Directive (EU) 2022/2555
+  source: EU
+  external_id: Directive (EU) 2022/2555
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+- name: DORA — Regulation (EU) 2022/2554
+  source: EU
+  external_id: Regulation (EU) 2022/2554
+  url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+- name: CRA — Regulation on cyber resilience of products with digital elements
+  source: EU
+  url: https://digital-strategy.ec.europa.eu/en/policies/cyber-resilience-act
+- name: ENISA — publications
+  source: ENISA
+  url: https://www.enisa.europa.eu/publications
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+- sovereignty
+- auditability

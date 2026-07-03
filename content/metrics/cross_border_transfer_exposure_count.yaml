@@ -1,0 +1,85 @@
+stable_id: kri.cross_border_transfer_exposure_count@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Cross-border transfer exposure count from reference deployment surfaces
+summary: 'Count of distinct reference deployment surfaces in the published
+  deployment materials that route personal-data-in-scope through a non-EU
+  jurisdiction on the evaluation commit — i.e. surfaces whose documented data
+  path terminates a hop, a storage tier, or a processing step outside the
+  EU / EEA / GDPR-adequacy zone. Residual- risk companion to ``kpi.eu_data_residency_declaration_coverage@v1``:
+  the coverage KPI says how many surfaces declare residency; this KRI says
+  how many surfaces declare a residency posture that lands outside the EU.
+  GDPR Chapter V (cross-border transfers) is the regulatory anchor; docs/FOUNDATION.md
+  §3 is the sovereignty anchor.
+
+  '
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: ==
+  rationale: 'Reference deployment surfaces the project ships should not document
+    a data path that traverses a non-EU jurisdiction under a default configuration.
+    Any positive count is a residual-risk row the maintainers own until the
+    surface either terminates in the EU or documents an explicit Chapter V
+    transfer basis.
+
+    '
+thresholds:
+- name: warn
+  comparator: '>'
+  value: 0
+  severity: warn
+- name: breach
+  comparator: '>='
+  value: 2
+  severity: high
+measurement:
+  source: composite
+  aggregation: count
+  formula: 'Over the reference deployment surfaces documented in the published
+    deployment materials on the evaluation commit, count distinct surfaces
+    whose documented data path traverses a non-EU jurisdiction for personal
+    data. A surface with N non-EU hops still counts as one — the catalog entry
+    is a cardinality indicator; the per-surface hop drill-down is a dimension,
+    not a separate KRI.
+
+    The committed reference visualisation lives at ``content/metrics/cross_border_transfer_exposure_count.viz.md``
+    — that file is the contract for the chart shape; the compile target renders
+    the executable form at evaluation time.
+
+    '
+  inputs:
+  - name: reference_deployment_surface
+    description: 'Distinct reference deployment surface documented in the
+      published deployment materials at the evaluation commit.
+
+      '
+  - name: cross_border_predicate
+    description: 'Predicate that classifies a single surface''s documented
+      data path as EU-terminating or non-EU-traversing under the Chapter V
+      transfer definition.
+
+      '
+  window:
+    duration: P90D
+    sliding: false
+external_refs:
+- name: SecOps-NG FOUNDATION §3 — Sovereignty
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+- name: GDPR — Chapter V cross-border transfers of personal data
+  source: EU
+  external_id: Regulation (EU) 2016/679, Chapter V
+  url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+- name: GDPR — Article 44 general principle for transfers
+  source: EU
+  external_id: Regulation (EU) 2016/679, Art. 44
+  url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+- name: ENISA — Cloud security guidance, EU-residency considerations
+  source: ENISA
+  url: https://www.enisa.europa.eu/topics/cloud-and-big-data
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+- sovereignty

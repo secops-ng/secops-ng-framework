@@ -121,6 +121,19 @@ VIZ_REQUIRED_STEMS = (
     "backup_integrity_failures",
     "restore_drill_attestation_freshness",
     "restore_drill_rto_overrun",
+    # F-METRICS-04 EXTEND — sovereignty coverage boost (G-04/G-05)
+    "non_eu_lm_endpoint_escape_rate",
+    "sovereign_cloud_provider_diversity",
+    "non_eu_vendor_sdk_exposure",
+    "ai_provider_neutral_binding_ratio",
+    "eu_data_residency_declaration_coverage",
+    "cross_border_transfer_exposure_count",
+    "non_eu_critical_dependency_count",
+    "non_eu_saas_free_workflow_ratio",
+    "sovereign_object_storage_binding_coverage",
+    "reference_deployment_target_coverage",
+    "hardcoded_non_eu_endpoint_reference_count",
+    "eu_regulatory_reference_coverage",
 )
 
 

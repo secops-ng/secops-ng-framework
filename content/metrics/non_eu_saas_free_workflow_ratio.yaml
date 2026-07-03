@@ -1,0 +1,88 @@
+stable_id: kpi.non_eu_saas_free_workflow_ratio@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Non-EU-SaaS-free reference workflow execution ratio
+summary: 'Ratio of reference workflows under ``content/playbooks/`` whose
+  compiled example artifacts under ``examples/<target>/<workflow>/`` can execute
+  end-to-end without invoking any non-EU SaaS surface on the evaluation commit
+  — no non-EU LM provider, no non-EU transactional email vendor, no non-EU
+  chat/collab SaaS, no non-EU ticketing SaaS, and no non-EU object-storage
+  endpoint. Operational independence from non-EU SaaS is the observable form
+  of the FOUNDATION §3 sovereignty posture at the runtime layer: a green reading
+  means an operator can pick up a reference workflow and land it inside an
+  EU-only stack without rewriting it. Companion to ``kpi.lm_endpoint_eu_residency_coverage@v1``,
+  which is a narrower slice on the LM endpoint dimension.
+
+  '
+unit: ratio
+direction: higher_is_better
+target:
+  value: 1.0
+  comparator: ==
+  rationale: 'Every reference workflow the project ships should be executable
+    end-to-end on an EU-only stack under a default configuration. A green
+    ring across the workflow catalog is the FOUNDATION §3 operational-independence
+    floor.
+
+    '
+thresholds:
+- name: warn
+  comparator: <
+  value: 1.0
+  severity: warn
+- name: breach
+  comparator: <
+  value: 0.8
+  severity: high
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: 'Over the reference workflows under ``content/playbooks/`` on the
+    evaluation commit, count workflows whose compiled example artifacts across
+    the three reference compile targets exercise no non-EU SaaS surface under
+    the default configuration (numerator). Divide by the total count of reference
+    workflows (denominator). A workflow that exercises a non-EU SaaS surface
+    on any target counts as 0 for that workflow — the ratio is a per-workflow
+    predicate, not a per-target aggregate. A per-workflow ribbon chart of
+    green (1) vs red (0) is the canonical operator-facing rendering.
+
+    The committed reference visualisation lives at ``content/metrics/non_eu_saas_free_workflow_ratio.viz.md``
+    — that file is the contract for the chart shape; the compile target renders
+    the executable form at evaluation time.
+
+    '
+  inputs:
+  - name: reference_workflow
+    description: 'Reference workflow definition under ``content/playbooks/``
+      at the evaluation commit.
+
+      '
+  - name: non_eu_saas_surface_predicate
+    description: 'Predicate that classifies a single reference workflow''s
+      compiled example artifacts as touching or not touching a non-EU SaaS
+      surface under the default configuration.
+
+      '
+  window:
+    duration: P1D
+    sliding: false
+external_refs:
+- name: SecOps-NG FOUNDATION §3 — Sovereignty
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+- name: SecOps-NG ARCHITECTURE — framework-agnostic content contract
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/ARCHITECTURE.md
+- name: GDPR — Chapter V cross-border transfers of personal data
+  source: EU
+  external_id: Regulation (EU) 2016/679, Chapter V
+  url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+- name: NIS2 — Article 21(2)(d) supply chain security
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 21(2)(d)
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+- sovereignty
+- operability

@@ -1,0 +1,88 @@
+stable_id: kpi.sovereign_object_storage_binding_coverage@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Sovereign object-storage binding coverage across compiled artifacts
+summary: 'Ratio of object-storage bindings declared in compiled example artifacts
+  under ``examples/<target>/<workflow>/`` that resolve to an EU-resident /
+  sovereign-provider object-storage surface on the evaluation commit. Object-storage
+  residency is the second most common sovereignty leak after LM endpoint residency
+  in reference content — logs, evidence bundles, and enrichment caches all
+  routinely land on an object store, and the operator inherits that surface
+  as-shipped unless the reference declares residency explicitly. Per docs/FOUNDATION.md
+  §3 (Sovereignty) and GDPR Chapter V, this KPI tracks whether the shipped
+  object-storage bindings honour the EU-residency posture.
+
+  '
+unit: ratio
+direction: higher_is_better
+target:
+  value: 1.0
+  comparator: ==
+  rationale: 'Every object-storage binding declared in a reference compiled
+    artifact should resolve to an EU-resident / sovereign-provider surface
+    under the default configuration. Anything less than 1.0 is a reference-content
+    sovereignty regression.
+
+    '
+thresholds:
+- name: warn
+  comparator: <
+  value: 1.0
+  severity: warn
+- name: breach
+  comparator: <
+  value: 0.9
+  severity: high
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: 'For each object-storage binding extracted from a compiled example
+    artifact under ``examples/<target>/<workflow>/`` on the evaluation commit
+    — the same shape the artifact declares for its log, evidence, and cache
+    stores — record one observation: 1 if the binding resolves to an EU-resident
+    / sovereign-provider surface, 0 otherwise. Aggregate as ratio across observations.
+    The three-target ring (n8n, Temporal, LangGraph) is the canonical surface;
+    per-target sub-ratios are a drill-down dimension, not a separate KPI.
+
+    The committed reference visualisation lives at ``content/metrics/sovereign_object_storage_binding_coverage.viz.md``
+    — that file is the contract for the chart shape; the compile target renders
+    the executable form at evaluation time.
+
+    '
+  inputs:
+  - name: declared_object_storage_binding
+    description: 'Single object-storage binding declared in a compiled example
+      artifact — a URL, bucket identifier, endpoint host, or provider-specific
+      reference the compile target would emit into the runtime configuration.
+
+      '
+  - name: sovereign_binding_predicate
+    description: 'Predicate that classifies a single object-storage binding
+      as EU-resident / sovereign-provider or otherwise, using the allowlist
+      of sovereign object-storage providers the deployment materials pin (OVHcloud
+      Object Storage, Scaleway Object Storage, Hetzner Object Storage, and
+      Nebul sovereign- cloud equivalents).
+
+      '
+  window:
+    duration: P1D
+    sliding: false
+external_refs:
+- name: SecOps-NG FOUNDATION §3 — Sovereignty
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+- name: GDPR — Chapter V cross-border transfers of personal data
+  source: EU
+  external_id: Regulation (EU) 2016/679, Chapter V
+  url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+- name: NIS2 — Article 21(2)(d) supply chain security
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 21(2)(d)
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+- name: ENISA — Cloud security guidance, EU-residency considerations
+  source: ENISA
+  url: https://www.enisa.europa.eu/topics/cloud-and-big-data
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+- sovereignty

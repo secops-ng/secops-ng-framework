@@ -1,0 +1,87 @@
+stable_id: kri.non_eu_critical_dependency_count@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Non-EU-originated critical dependency count in the framework supply
+  chain
+summary: 'Count of distinct critical dependencies in the framework''s manifest
+  (``pyproject.toml`` and the equivalent lock files) whose upstream origin
+  classifies as non-EU on the evaluation commit — where "critical" means the
+  dependency is reachable from a reference compile target''s runtime code
+  path, not solely from a dev or test extras group. Supply-chain sovereignty
+  is directly named in NIS2 Article 21(2)(d); docs/FOUNDATION.md §3 is the
+  SecOps-NG posture. The forward-public hygiene linter blocks specific identifiers
+  on introduction; this KRI is the observable measure of the accumulated historical
+  footprint the codebase carries at the library layer (as distinct from ``kri.non_eu_vendor_sdk_exposure@v1``
+  which measures the vendor- SDK layer).
+
+  '
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: ==
+  rationale: 'The FOUNDATION §3 posture is that the accumulated supply-chain
+    footprint trends toward zero non-EU critical dependencies. Every non-EU
+    critical dependency the manifest carries is a residual- risk row the maintainers
+    own until it is replaced with a sovereign alternative or documented as
+    an explicit exception.
+
+    '
+thresholds:
+- name: warn
+  comparator: '>'
+  value: 0
+  severity: warn
+- name: breach
+  comparator: '>='
+  value: 5
+  severity: high
+measurement:
+  source: composite
+  aggregation: count
+  formula: 'On the evaluation commit, resolve the manifest under ``pyproject.toml``
+    and the equivalent lock files, restrict to dependencies reachable from
+    a reference compile target''s runtime code path (exclude dev and test
+    extras), and count distinct package identifiers whose upstream origin
+    classifies as non-EU under the shared origin resolver used by the hygiene
+    linter''s supply-chain rule set. A package with multiple upstream releases
+    still counts once; the catalog entry is a cardinality indicator.
+
+    The committed reference visualisation lives at ``content/metrics/non_eu_critical_dependency_count.viz.md``
+    — that file is the contract for the chart shape; the compile target renders
+    the executable form at evaluation time.
+
+    '
+  inputs:
+  - name: critical_dependency_identifier
+    description: 'Distinct package identifier reachable from a reference compile
+      target''s runtime code path at the evaluation commit.
+
+      '
+  - name: origin_classification_predicate
+    description: 'Predicate that classifies a single package''s upstream origin
+      as EU or non-EU under the shared resolver used by ``tools/hygiene_linter/``
+      for supply-chain rules.
+
+      '
+  window:
+    duration: P1D
+    sliding: false
+external_refs:
+- name: SecOps-NG FOUNDATION §3 — Sovereignty
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+- name: SecOps-NG AGENTS.md §3 — Public-bar hygiene
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/AGENTS.md
+- name: NIS2 — Article 21(2)(d) supply chain security
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 21(2)(d)
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+- name: ENISA — Guidelines for securing the ICT supply chain
+  source: ENISA
+  url: https://www.enisa.europa.eu/topics/threat-risk-management/threats-and-trends
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+- sovereignty
