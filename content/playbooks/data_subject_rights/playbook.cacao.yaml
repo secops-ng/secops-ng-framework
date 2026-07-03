@@ -1,0 +1,419 @@
+type: playbook
+spec_version: "2.0"
+id: playbook--d5b17a15-0000-4000-8000-000000000001
+name: GDPR Article 15-22 data subject rights (DSR) intake and fulfilment
+description: >-
+  SKELETON — CACAO v2 scaffold for the operator-side data subject
+  rights (DSR) intake and fulfilment lifecycle a controller runs
+  when a data subject exercises one of the GDPR Chapter III rights
+  against personal data the controller holds. Covers Article 15
+  (access), Article 16 (rectification), Article 17 (erasure / right
+  to be forgotten), Article 18 (restriction of processing), Article
+  20 (portability), and Article 21 (objection). Article 22
+  (automated individual decision-making) is treated as an
+  in-scope classifier axis on receive_request rather than a
+  standalone lane — a request that names an Article 22 concern is
+  classified accordingly and routed to the controller's
+  human-in-the-loop review surface as part of the fulfilment
+  envelope, not as a parallel workflow. The lifecycle chains seven
+  steps: receive_request → verify_identity (sovereign IdP
+  integration point) → classify_request → route_to_data_owners →
+  compile_fulfilment_evidence → send_controller_response (within
+  the Article 12(3) one-month response window, extendable by two
+  further months where necessary under Article 12(3)) →
+  record_outcome (durable evidence-store record for the
+  controller's Article 5(2) accountability posture and any
+  downstream regulator query). SKELETON only: subject-verification
+  primitive, per-data-store owner-routing catalogue, and the
+  outbound response envelope templates (portability data-package
+  format, erasure-attestation letter, rectification confirmation)
+  are declared as adapter-bound surfaces the operator wires; a
+  sibling CORE card lands the templates, the D3FEND tag selection
+  closure, and the OSCAL binding closure. CACAO v2 + SecOps-NG
+  content-model extensions.
+playbook_types:
+  - notification
+  - investigation
+created_by: identity--5a509a09-5a50-45a5-85a5-095a509a509a
+created: "2026-07-03T00:00:00Z"
+modified: "2026-07-03T00:00:00Z"
+valid_from: "2026-07-03T00:00:00Z"
+labels:
+  - gdpr
+  - article-15
+  - article-16
+  - article-17
+  - article-18
+  - article-20
+  - article-21
+  - article-22
+  - data-subject-rights
+  - dsr
+external_references:
+  - name: OASIS CACAO v2.0
+    description: >-
+      Workflow step types (start, action, end), variable
+      conventions, x_ extension namespace.
+    source: OASIS Open
+  - name: >-
+      General Data Protection Regulation (EU) 2016/679 —
+      Chapter III, Articles 15-22
+    source: Official Journal of the European Union
+    url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+  - name: "GDPR Article 12 — transparent information, communication and modalities for the exercise of the rights of the data subject"
+    source: Official Journal of the European Union
+    url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+  - name: >-
+      EDPB Guidelines 01/2022 on data subject rights — right of
+      access
+    source: European Data Protection Board
+playbook_variables:
+  __case_id__:
+    type: string
+    description: >-
+      DSR case identifier assigned at intake. Correlation key
+      across identity verification, classification, data-owner
+      routing, evidence compilation, controller response, and
+      outcome recording so a reviewer can join the full
+      request-fulfilment lifecycle into a single reportable-event
+      ledger keyed to the operator's Article 5(2) accountability
+      surface.
+    external: false
+  __subject_contact__:
+    type: string
+    description: >-
+      Contact channel supplied by the data subject at intake
+      (email address, postal address, sovereign IdP-bound
+      identifier, or authenticated in-app account handle). Read by
+      verify_identity to bind the request to the subject on the
+      controller's declared subject-verification surface and by
+      send_controller_response to route the outbound envelope.
+      Treated as personal data throughout; retention and
+      transfer discipline follow the operator's DSR data-flow
+      documentation.
+    external: true
+  __request_type__:
+    type: string
+    description: >-
+      Classified request axis. One of: access (Article 15),
+      rectification (Article 16), erasure (Article 17),
+      restriction (Article 18), portability (Article 20),
+      objection (Article 21), automated-decision-review (Article
+      22 concern). Determines routing to data-store owners and the
+      shape of the fulfilment-evidence pack.
+    external: false
+  __identity_verified__:
+    type: boolean
+    description: >-
+      Whether verify_identity succeeded on the controller's
+      declared subject-verification surface (sovereign IdP
+      integration point on the SecOps-NG substrate). A false
+      outcome short-circuits the workflow into a rejection or an
+      additional-information request under Article 12(6) rather
+      than fulfilling the request against an unverified subject.
+    external: false
+  __data_owner_manifest__:
+    type: string
+    description: >-
+      Reference to the routed data-store owner list resolved by
+      route_to_data_owners against the operator's declared
+      data-inventory surface. Enumerates the per-owner acknowledgement
+      envelopes the workflow expects back before compile_fulfilment_evidence
+      can close. Empty until route_to_data_owners resolves the
+      owner set for the classified request.
+    external: false
+  __fulfilment_pack_ref__:
+    type: string
+    description: >-
+      Reference to the compiled fulfilment evidence pack
+      (portability data package, erasure-attestation set,
+      rectification confirmation, access-copy assembly, or
+      restriction-scope envelope depending on __request_type__).
+      Populated before send_controller_response gates on the
+      Article 12(3) one-month window.
+    external: false
+  __response_deadline__:
+    type: string
+    description: >-
+      ISO 8601 timestamp of the Article 12(3) response deadline
+      derived from __request_received_ts__ plus one month, with an
+      extension marker where the controller has invoked the
+      Article 12(3) two-month extension. send_controller_response
+      MUST send on or before this deadline; the on-time-response
+      KPI reads against this value.
+    external: false
+  __request_received_ts__:
+    type: string
+    description: >-
+      ISO 8601 timestamp when the request was received on the
+      controller's DSR intake surface. Anchors the Article 12(3)
+      response-window clock. Stamped by receive_request.
+    external: false
+  __outcome_code__:
+    type: string
+    description: >-
+      Terminal outcome recorded on the case. One of: fulfilled,
+      partially_fulfilled, refused_manifestly_unfounded,
+      refused_excessive, refused_exemption_applies,
+      extended_two_months, unverified_subject. Feeds the
+      operator's Article 5(2) accountability posture and any
+      downstream regulator query.
+    external: false
+workflow_start: start--d5b17a15-0000-4000-8000-000000000001
+workflow:
+  start--d5b17a15-0000-4000-8000-000000000001:
+    type: start
+    name: dsr_start
+    on_completion: action--d5b17a15-0000-4000-8000-000000000002
+  action--d5b17a15-0000-4000-8000-000000000002:
+    type: action
+    name: receive_request
+    description: >-
+      SKELETON — receive a data subject rights request through the
+      controller's DSR intake surface (privacy-policy address,
+      subject-facing in-app portal, or paper channel accepted per
+      the controller's DSR policy). Assign __case_id__, stamp
+      __request_received_ts__ against the Article 12(3) clock,
+      capture __subject_contact__, and record the subject's
+      stated request. Article 22 concerns raised on the request
+      body are noted on the case for classify_request to route to
+      the human-in-the-loop review surface. TODO (CORE): pin the
+      intake-surface adapter (in-app portal shape, subject-facing
+      privacy-policy contact, and paper-channel scanner) and the
+      initial evidence-capture shape.
+    on_completion: action--d5b17a15-0000-4000-8000-000000000003
+    out_args:
+      - __case_id__
+      - __request_received_ts__
+      - __subject_contact__
+    agent_target: dsr_intake
+    x_secops_ng:
+      control_refs:
+        - control.account_management@v1
+      telemetry_refs:
+        - telemetry.ocsf.compliance_finding@v1
+  action--d5b17a15-0000-4000-8000-000000000003:
+    type: action
+    name: verify_identity
+    description: >-
+      SKELETON — verify the requesting party is the data subject
+      the request concerns, using the controller's declared
+      subject-verification surface. The sovereign IdP integration
+      point sits here: where the subject holds an authenticated
+      account on the controller's IdP, an SSO-bound assertion is
+      the primary verification path; otherwise the controller's
+      out-of-band verification playbook is invoked (recognised
+      identity document check, subject-supplied shared secret,
+      call-back to a channel of record). Sets __identity_verified__.
+      When verification fails, the workflow short-circuits into a
+      documented additional-information request or a rejection
+      under Article 12(6). TODO (CORE): pin the sovereign IdP
+      adapter shape, the out-of-band verification adapter, and
+      the verification-evidence retention discipline.
+    on_completion: action--d5b17a15-0000-4000-8000-000000000004
+    in_args:
+      - __case_id__
+      - __subject_contact__
+    out_args:
+      - __identity_verified__
+    agent_target: dsr_intake
+    x_secops_ng:
+      control_refs:
+        - control.access_enforcement@v1
+        - control.service_identification_authentication@v1
+      telemetry_refs:
+        - telemetry.ocsf.compliance_finding@v1
+  action--d5b17a15-0000-4000-8000-000000000004:
+    type: action
+    name: classify_request
+    description: >-
+      SKELETON — resolve __request_type__ against the subject's
+      stated request. One of access (Article 15), rectification
+      (Article 16), erasure (Article 17), restriction (Article
+      18), portability (Article 20), objection (Article 21), or
+      automated-decision-review (Article 22 concern). A request
+      raising an Article 22 concern is classified and routed to
+      the controller's human-in-the-loop review surface — this
+      lifecycle does not itself review the underlying automated
+      decision. Also computes __response_deadline__ as
+      __request_received_ts__ + one month, with the operator's
+      Article 12(3) two-month extension marker recorded on the
+      case when the controller invokes it. TODO (CORE):
+      classification-primitive input schema (subject-supplied
+      free-text plus operator-controlled structured hints), the
+      extension-decision surface, and the Article 22 handoff
+      catalogue.
+    on_completion: action--d5b17a15-0000-4000-8000-000000000005
+    in_args:
+      - __case_id__
+      - __request_received_ts__
+    out_args:
+      - __request_type__
+      - __response_deadline__
+    agent_target: dsr_intake
+    x_secops_ng:
+      control_refs:
+        - control.account_management@v1
+      telemetry_refs:
+        - telemetry.ocsf.compliance_finding@v1
+  action--d5b17a15-0000-4000-8000-000000000005:
+    type: action
+    name: route_to_data_owners
+    description: >-
+      SKELETON — resolve the per-request set of data-store owners
+      whose stores hold personal data on the subject, against the
+      controller's declared data-inventory surface. Emits a
+      per-owner acknowledgement envelope requesting the
+      request-type-appropriate evidence (access: assembled copy;
+      rectification: applied correction; erasure: deletion or
+      retention-exemption record; restriction: applied restriction
+      marker; portability: structured data package; objection:
+      cessation record or overriding-legitimate-interest note).
+      Records __data_owner_manifest__ so compile_fulfilment_evidence
+      can wait on the expected owner set. TODO (CORE): data-inventory
+      adapter (canonical operator inventory join key), owner-envelope
+      transport, and the owner-side response-timeout policy.
+    on_completion: action--d5b17a15-0000-4000-8000-000000000006
+    in_args:
+      - __case_id__
+      - __request_type__
+    out_args:
+      - __data_owner_manifest__
+    agent_target: dsr_intake
+    x_secops_ng:
+      control_refs:
+        - control.account_management@v1
+      telemetry_refs:
+        - telemetry.ocsf.compliance_finding@v1
+  action--d5b17a15-0000-4000-8000-000000000006:
+    type: action
+    name: compile_fulfilment_evidence
+    description: >-
+      SKELETON — assemble the per-request fulfilment evidence pack
+      from the data-owner acknowledgement envelopes returned
+      against __data_owner_manifest__. For access requests, the
+      pack is the subject-copy assembly (structured extract of
+      personal data plus the Article 15(1) meta-information —
+      purposes, categories, recipients, retention, subject
+      rights, source, and any automated-decision-making
+      disclosure). For rectification requests, the pack is the
+      applied-correction attestation set. For erasure requests,
+      the pack is the deletion-attestation set with any Article
+      17(3) retention exemption documented per-owner. For
+      restriction, the applied restriction-marker set. For
+      portability, the structured data package in a
+      commonly-used, machine-readable format per Article 20(1).
+      For objection, the cessation record or the overriding-
+      legitimate-interest determination per Article 21(1). Records
+      __fulfilment_pack_ref__ before send_controller_response
+      gates on the response window. TODO (CORE): per-request-type
+      pack template shape, portability-data-format binding, and
+      the deletion-attestation evidence discipline.
+    on_completion: action--d5b17a15-0000-4000-8000-000000000007
+    in_args:
+      - __case_id__
+      - __request_type__
+      - __data_owner_manifest__
+    out_args:
+      - __fulfilment_pack_ref__
+    agent_target: dsr_intake
+    x_secops_ng:
+      control_refs:
+        - control.incident_timeline_signals@v1
+      telemetry_refs:
+        - telemetry.ocsf.compliance_finding@v1
+  action--d5b17a15-0000-4000-8000-000000000007:
+    type: action
+    name: send_controller_response
+    description: >-
+      SKELETON — send the controller's response to the data
+      subject on or before __response_deadline__. The response
+      carries the fulfilment-pack contents scoped to
+      __request_type__ and the Article 12 modalities (concise,
+      transparent, intelligible, and easily accessible form, in
+      clear and plain language). Where the controller has invoked
+      the Article 12(3) two-month extension, the initial response
+      carries the extension notice and its reasons; the fulfilment
+      envelope follows before the extended deadline. Where the
+      request is refused under Article 12(5) (manifestly unfounded
+      or excessive) or under an Article 15-22 sub-exemption, the
+      response carries the reasons and the subject's onward
+      remedies (Article 77 supervisory-authority complaint;
+      Article 79 judicial remedy). TODO (CORE): per-request-type
+      response template selection, secure-delivery adapter for the
+      subject-facing envelope, and the refusal-with-remedy
+      template.
+    on_completion: action--d5b17a15-0000-4000-8000-000000000008
+    in_args:
+      - __case_id__
+      - __request_type__
+      - __response_deadline__
+      - __fulfilment_pack_ref__
+      - __subject_contact__
+    agent_target: dsr_intake
+    x_secops_ng:
+      control_refs:
+        - control.incident_timeline_signals@v1
+      telemetry_refs:
+        - telemetry.ocsf.compliance_finding@v1
+  action--d5b17a15-0000-4000-8000-000000000008:
+    type: action
+    name: record_outcome
+    description: >-
+      SKELETON — record the terminal outcome on the controller's
+      evidence store keyed to __case_id__. Sets __outcome_code__
+      and closes the correlation record with the response
+      timestamp, the on-time-vs-deadline delta, and the per-owner
+      fulfilment audit trail. Feeds the operator's Article 5(2)
+      accountability posture and any downstream regulator query
+      (Article 58(1)(a) supervisory-authority information order).
+      TODO (CORE): evidence-store schema, the accountability-record
+      retention window, and the regulator-query dereference path.
+    on_completion: end--d5b17a15-0000-4000-8000-00000000000a
+    in_args:
+      - __case_id__
+      - __request_type__
+    out_args:
+      - __outcome_code__
+    agent_target: dsr_intake
+    x_secops_ng:
+      control_refs:
+        - control.incident_timeline_signals@v1
+      telemetry_refs:
+        - telemetry.ocsf.compliance_finding@v1
+  end--d5b17a15-0000-4000-8000-00000000000a:
+    type: end
+    name: dsr_end
+x_secops_ng:
+  stable_id: playbook.data_subject_rights@v1
+  content_version: 0.1.0
+  maturity: experimental
+  compile_targets:
+    - n8n
+    - temporal
+    - langgraph
+  control_refs:
+    - control.access_enforcement@v1
+    - control.account_management@v1
+    - control.service_identification_authentication@v1
+    - control.incident_timeline_signals@v1
+  telemetry_refs:
+    - telemetry.ocsf.compliance_finding@v1
+  metric_refs: []
+  sources:
+    - >-
+      OASIS CACAO v2.0 specification — workflow step types
+      (start, action, end), variable conventions, x_ extension
+      namespace
+    - >-
+      General Data Protection Regulation (EU) 2016/679 —
+      Chapter III, Articles 15-22 (rights of the data subject)
+      and Article 12 (modalities, response window, refusal
+      grounds)
+    - >-
+      EDPB Guidelines 01/2022 on data subject rights — right of
+      access
+    - >-
+      OCSF v1.3.0 — Compliance Finding (class_uid 2003) event
+      class emitted per lifecycle milestone for the operator's
+      Article 5(2) accountability posture

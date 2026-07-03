@@ -1,0 +1,263 @@
+# Cross-references for the data_subject_rights playbook.
+#
+# Outbound view of the content model: pins OSCAL controls, MITRE
+# D3FEND defensive techniques, OCSF event classes emitted, and the EU
+# regulatory clauses this playbook helps operationalise. Inbound
+# references live in content/mappings/{gdpr,cra,nis2,dora}/ so the
+# graph is closed in both directions.
+#
+# Status: SKELETON (F-WF-DSR SKELETON). The playbook is the
+# operator-side data subject rights (DSR) intake and fulfilment
+# lifecycle for GDPR Articles 15-22 (with Article 22 treated as an
+# in-scope classifier axis on receive_request rather than a
+# standalone lane). A sibling CORE card lands the templates
+# (portability data-package format, erasure-attestation letter,
+# subject-facing response envelopes), the sovereign-IdP subject-
+# verification adapter, the data-owner routing catalogue, and the
+# full mappings closure. This SKELETON overlay pins the GDPR
+# Articles 15-22 clause anchors, a non-empty OSCAL block (AC-2(11)
+# access enforcement and AU-9 audit information protection anchored
+# on operator-side control cross-references), a D3FEND anchor on
+# D3-IAA Identity Access Assurance for the verify_identity step,
+# and a Compliance Finding (2003) telemetry binding. The three
+# regulatory-parallel blocks (nis2, dora, cra) are declared with
+# placeholder todo entries per the audited convention: the DSR
+# lifecycle is a GDPR-specific obligation surface, and cross-pinning
+# under NIS2 / DORA / CRA would misrepresent the scope until a
+# reviewed cross-regime interaction is documented.
+#
+# GDPR closure: inbound entries live at
+# content/mappings/gdpr/article-15-22-data-subject-rights.yaml,
+# authored in the same PR as this SKELETON. Each of the six
+# operational rights (Article 15 access, Article 16 rectification,
+# Article 17 erasure, Article 18 restriction, Article 20
+# portability, Article 21 objection) plus the Article 22 concern
+# routing gets an inbound anchor pinning playbook.data_subject_rights@v1
+# so the GDPR outbound graph closes.
+#
+# NIS2 / DORA / CRA closure: the DSR lifecycle is the operator-side
+# obligation surface under GDPR Chapter III; it is not a NIS2
+# Article 21/23, DORA Article 5-19, or CRA Article 13/14 obligation
+# surface. Deliberate audited exclusions are recorded in
+# content/mappings/{nis2,dora,cra}/_orphan_skip.yaml so the orphan-CI
+# KRI stays defended without spurious cross-regime pins. A sibling
+# CORE / EXTEND card revisits the choice if a documented cross-regime
+# interaction is authored (for example, a NIS2 Art. 23 incident that
+# triggers a wave of DSR requests would run the incident lane and
+# this DSR lane in parallel — the two lanes stay separately anchored,
+# not cross-pinned).
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.data_subject_rights@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls anchoring the DSR lifecycle.
+  # Anchored on operator-side control cross-references that exist
+  # in the framework's controls catalogue; the SKELETON overlay
+  # pins the AC-2(11) access enforcement and AU-9 audit-information
+  # protection anchors called out in the task brief.
+  - id: control.access_enforcement@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AC-2(11)
+    title: Account Management — Usage Conditions
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AC-2
+    notes: >-
+      Anchors the verify_identity step. AC-2(11) requires the
+      organisation to enforce the usage conditions of accounts;
+      binding a DSR request to the requesting subject on the
+      operator's declared subject-verification surface (sovereign
+      IdP-bound assertion for account-holders; out-of-band
+      verification playbook for non-account subjects) is the
+      access-enforcement leg the workflow discharges before any
+      personal data is compiled into the response envelope.
+  - id: control.incident_timeline_signals@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AU-9
+    title: Protection of Audit Information
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AU-9
+    notes: >-
+      Anchors the record_outcome step. AU-9 requires the
+      organisation to protect audit information from unauthorised
+      access, modification, and deletion; the per-case correlation
+      record the workflow persists (case id, response-deadline
+      delta, per-owner fulfilment audit trail, outcome code) is
+      the audit-information surface that discharges the operator's
+      Article 5(2) accountability posture and any downstream
+      Article 58(1)(a) supervisory-authority information order.
+
+d3fend:
+  # D3FEND v1.0.0 selection for the DSR lifecycle. The task brief
+  # calls out D3-IAA Identity Access Assurance for the
+  # verify_identity step; that is the defensive-technique anchor
+  # this SKELETON overlay pins. Other steps (classify_request,
+  # route_to_data_owners, compile_fulfilment_evidence,
+  # send_controller_response, record_outcome) are coordination /
+  # evidence-compilation activities without a dedicated D3FEND
+  # runtime countermeasure — a sibling CORE card revisits the
+  # D3FEND selection once the adapter surfaces are pinned and any
+  # additional technique anchors are audited (for example an
+  # Application Configuration Hardening tag on the data-owner
+  # routing catalogue if the CORE card binds a policy engine).
+  - step: action--d5b17a15-0000-4000-8000-000000000003
+    d3fend_id: D3-IAA
+    d3fend_name: Identity Access Assurance
+    url: https://d3fend.mitre.org/technique/d3f:IdentityAccessAssurance/
+    notes: >-
+      D3FEND Identity Access Assurance is the technique that
+      corresponds to the verify_identity step's job: assuring that
+      the subject exercising the DSR request is the subject the
+      request concerns. On the operator's sovereign IdP integration
+      point the assurance is the IdP-bound assertion; on the
+      out-of-band verification path the assurance is the recognised
+      identity-document check or the shared-secret verification.
+
+ocsf:
+  # OCSF v1.3.0 telemetry binding. The DSR lifecycle is a
+  # compliance-obligation lifecycle rather than a
+  # detection/response lifecycle; Compliance Finding (2003) is the
+  # single event class emitted at the per-milestone granularity
+  # the accountability posture needs. A sibling CORE card revisits
+  # the binding once the CORE adapter surfaces are pinned; the
+  # SKELETON binding is deliberately narrow to avoid over-fitting
+  # against a future adapter shape.
+  - id: telemetry.ocsf.compliance_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2003
+    class_name: Compliance Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by receive_request, verify_identity,
+      classify_request, route_to_data_owners,
+      compile_fulfilment_evidence, send_controller_response, and
+      record_outcome: one Compliance Finding per case-lifecycle
+      milestone, keyed to __case_id__, so the on-time-response
+      KPI (Article 12(3) one-month window) and the operator's
+      Article 5(2) accountability posture can be computed and
+      audited from the emitted telemetry alone. Schema:
+      https://schema.ocsf.io/1.3.0/classes/compliance_finding
+
+nis2:
+  # SKELETON — no outbound NIS2 anchor. The DSR lifecycle is a
+  # GDPR-specific obligation surface under Chapter III of GDPR;
+  # NIS2 Article 21 risk-management and Article 23 significant-
+  # incident reporting are separate obligation surfaces that
+  # anchor on the operator's incident-management and posture-
+  # management playbooks. Cross-pinning the DSR lifecycle here
+  # would misrepresent the scope. Deliberate audited exclusion
+  # recorded in content/mappings/nis2/_orphan_skip.yaml. A sibling
+  # CORE / EXTEND card revisits the choice if a documented cross-
+  # regime interaction is authored.
+  - mapping_id: nis2:todo-dsr-parallel
+    todo: true
+    notes: >-
+      Placeholder pending the CORE / EXTEND card. No documented
+      NIS2 Art. 21/23 parallel-reporting interaction with GDPR
+      Articles 15-22 as of 2026-07-03; the CORE card either pins
+      a real inbound NIS2 mapping id or documents the deliberate
+      absence.
+
+dora:
+  # SKELETON — no outbound DORA anchor. Same rationale as the
+  # nis2 block above: the DSR lifecycle is a GDPR-specific
+  # obligation surface, not a DORA financial-entity ICT-risk or
+  # major-incident-reporting surface. Deliberate audited exclusion
+  # recorded in content/mappings/dora/_orphan_skip.yaml.
+  - mapping_id: dora:todo-dsr-parallel
+    todo: true
+    notes: >-
+      Placeholder pending the CORE / EXTEND card. No documented
+      DORA Art. 5-19 parallel-reporting interaction with GDPR
+      Articles 15-22 as of 2026-07-03; the CORE card either pins
+      a real inbound DORA mapping id or documents the deliberate
+      absence.
+
+cra:
+  # SKELETON — no outbound CRA anchor. Same rationale as the nis2
+  # and dora blocks above: the DSR lifecycle is a GDPR-specific
+  # obligation surface, not a CRA product-security or coordinated-
+  # vulnerability-disclosure obligation surface. Deliberate audited
+  # exclusion recorded in content/mappings/cra/_orphan_skip.yaml.
+  - mapping_id: cra:todo-dsr-parallel
+    todo: true
+    notes: >-
+      Placeholder pending the CORE / EXTEND card. No documented
+      CRA Art. 13/14 or Annex I interaction with GDPR Articles
+      15-22 as of 2026-07-03; the CORE card either pins a real
+      inbound CRA mapping id or documents the deliberate absence.
+
+gdpr:
+  # Inbound entries live at
+  # content/mappings/gdpr/article-15-22-data-subject-rights.yaml
+  # and backlink to playbook.data_subject_rights@v1 (authored in
+  # the same PR). One outbound edge per operational right; the
+  # Article 22 concern axis is folded into the Article 21 objection
+  # entry rather than authored as a standalone edge because the
+  # workflow does not itself review the underlying automated
+  # decision — it classifies and routes.
+  - mapping_id: gdpr:art-15-access
+    article: "15"
+    notes: >-
+      Outbound backlink for the right of access. compile_fulfilment_evidence
+      assembles the Article 15(1) subject-copy pack plus the
+      Article 15(1)(a)-(h) meta-information (purposes, categories,
+      recipients, retention, subject rights, source, automated-
+      decision-making disclosure) against the routed data-owner
+      manifest; send_controller_response emits the pack on or
+      before __response_deadline__.
+  - mapping_id: gdpr:art-16-rectification
+    article: "16"
+    notes: >-
+      Outbound backlink for the right to rectification. route_to_data_owners
+      routes the correction request to each holding data-store
+      owner; compile_fulfilment_evidence assembles the applied-
+      correction attestation set; send_controller_response
+      confirms to the subject.
+  - mapping_id: gdpr:art-17-erasure
+    article: "17"
+    notes: >-
+      Outbound backlink for the right to erasure (right to be
+      forgotten). route_to_data_owners routes the erasure request
+      to each holding data-store owner; compile_fulfilment_evidence
+      assembles the deletion-attestation set with per-owner
+      Article 17(3) retention-exemption records where applicable;
+      send_controller_response confirms to the subject.
+  - mapping_id: gdpr:art-18-restriction
+    article: "18"
+    notes: >-
+      Outbound backlink for the right to restriction of
+      processing. route_to_data_owners routes the restriction
+      request to each holding data-store owner;
+      compile_fulfilment_evidence assembles the applied-
+      restriction-marker set; send_controller_response confirms to
+      the subject and records the Article 18(3) subsequent-
+      lifting-notification hook on the case for the operator to
+      honour when restriction ends.
+  - mapping_id: gdpr:art-20-portability
+    article: "20"
+    notes: >-
+      Outbound backlink for the right to data portability.
+      route_to_data_owners routes the portability request to each
+      holding data-store owner whose processing is on Article
+      6(1)(a) or 6(1)(b) grounds; compile_fulfilment_evidence
+      assembles the Article 20(1) structured, commonly-used,
+      machine-readable data package; send_controller_response
+      emits the package to the subject or, under Article 20(2),
+      transmits it directly to the receiving controller where
+      technically feasible and requested.
+  - mapping_id: gdpr:art-21-objection
+    article: "21"
+    notes: >-
+      Outbound backlink for the right to object (including
+      Article 22 automated-decision-review concerns raised on
+      the request). route_to_data_owners routes the objection to
+      each holding data-store owner; compile_fulfilment_evidence
+      assembles either the cessation record (where the objection
+      succeeds) or the operator's overriding-legitimate-interest
+      determination (where the objection is refused under Article
+      21(1)); an Article 22 concern raised on the request is
+      classified at classify_request and routed to the controller's
+      human-in-the-loop review surface as part of the objection
+      envelope. send_controller_response confirms the outcome to
+      the subject.

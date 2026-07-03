@@ -92,3 +92,18 @@ skip:
       facturer chain). Re-open the review if and when CRA
       secondary acts or guidance carve an operator-side
       inventory anchor not already covered by the pins above.
+  - slug: data_subject_rights
+    rationale: >-
+      GDPR Chapter III data subject rights (DSR) intake and fulfilment
+      lifecycle (Articles 15-22). The playbook's outbound overlay
+      (`content/playbooks/data_subject_rights/mappings.yaml`)
+      deliberately does not pin CRA entries: CRA Article 13/14 and
+      Annex I obligations are manufacturer-side product-security
+      surfaces on products with digital elements, distinct by design
+      from the controller-side subject-rights fulfilment lifecycle
+      GDPR Chapter III authors. Cross-pinning the DSR lifecycle under
+      CRA would misrepresent the obligation surface. The GDPR inbound
+      graph is closed via
+      `content/mappings/gdpr/article-15-22-data-subject-rights.yaml`.
+      A sibling CORE / EXTEND card revisits the CRA cross-regime
+      graph if a documented interaction is authored.
