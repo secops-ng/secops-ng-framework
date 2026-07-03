@@ -18,6 +18,30 @@
 # cra:annex-i-2-cvd-policy, cra:annex-i-2-security-updates,
 # cra:art-14-early-warning, cra:art-14-notification-72h).
 #
+# GDPR closure: inbound GDPR clause files anchor this playbook under
+# content/mappings/gdpr/article-32-security-of-processing.yaml
+# (Art. 32(1)(b) ongoing-confidentiality/integrity/availability — the
+# reactive coordinated-disclosure counterpart to the codebase-side
+# vulnerability-handling lane) and under
+# content/mappings/gdpr/article-25-data-protection-by-design.yaml
+# (F-MAP-GDPR CORE-7 — Art. 25(1) by-design reactive-discovery leg:
+# inbound coordinated-disclosure reports against components already
+# in production are the empirical evidence a by-design control missed
+# a class of finding at determination-of-means time, and the CRA
+# single-point-of-contact acknowledgement + CVSS/EPSS triage + SBOM /
+# asset-inventory correlation + per-severity response-branch routing
+# collectively discharge the "safeguards integrated into the
+# processing at the time of the processing itself" limb, feeding the
+# operator's design-review loop for the next release). The
+# per-workflow Art. 30 Record of Processing Activity for this
+# playbook lives at content/mappings/gdpr/data-flow-vuln_intake.md
+# and covers the reporter-contact, named-maintainer, and
+# regulator-signatory processing surfaces the intake and
+# regulator-notification steps operate on. Both Art. 32 and Art. 25
+# clause anchors are legitimate against this playbook under separate
+# obligations of the same regulation — Art. 32 is the
+# operational-measures view; Art. 25 is the design-time view.
+#
 # Schema: schemas/playbook-mappings.schema.json
 playbook: playbook.vuln_intake@v1
 
