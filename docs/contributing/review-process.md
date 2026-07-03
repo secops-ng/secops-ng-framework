@@ -2,7 +2,7 @@
 
 This page walks through what happens after you open a pull request against
 `secops-ng-framework`, from CI landing to merge. It is the operational
-companion to §6 of [`CONTRIBUTING.md`](../../CONTRIBUTING.md) — that
+companion to §7 of [`CONTRIBUTING.md`](../../CONTRIBUTING.md) — that
 section describes *what* the Custodian reviews for; this page describes
 *how* the pipeline runs around it.
 

@@ -151,7 +151,7 @@ PRs of the type **documentation** on the PR template (§5.1 of
 
 Compiler-surface changes (new primitives, new emitters, changes to
 `ToolIO` boundaries) are not good-first work. Those go through a
-scoping issue first — see §8 of [`CONTRIBUTING.md`](../../CONTRIBUTING.md).
+scoping issue first — see §9 of [`CONTRIBUTING.md`](../../CONTRIBUTING.md).
 Governance, licence-split, and cross-cutting policy changes are also
 not good-first work.
 
