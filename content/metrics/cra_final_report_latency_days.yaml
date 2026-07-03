@@ -1,0 +1,147 @@
+stable_id: kri.cra_final_report_latency_days@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: CRA final-report dispatch latency (14d / 30d)
+summary: >
+  Elapsed days between the CRA Article 14 clock anchor and dispatch
+  of the CRA final report through the Single Reporting Platform
+  (SRP). Two per-case bounds apply: 14 days after a corrective /
+  mitigating measure becomes available for actively-exploited
+  vulnerabilities under Art. 14(2); 30 days (one month) after
+  awareness for severe incidents under Art. 14(3). Residual-risk
+  counterpart to `kpi.cra_final_report_on_time@v1` and
+  `kpi.cra_severe_incident_on_time@v1`: the on-time KPIs read whether
+  the clocks were held; this KRI reads *how close to the wall* each
+  final-report dispatch landed, so operators can see slippage well
+  before the ratios themselves fall below 1.00. Any observation above
+  the applicable per-case bound is a statutory overrun and a
+  reportable compliance exception.
+unit: days
+direction: lower_is_better
+target:
+  value: 14
+  comparator: "<="
+  rationale: >
+    CRA Article 14(2) sets the 14-day final-report deadline anchored
+    on the moment a corrective / mitigating measure becomes available
+    for actively-exploited vulnerabilities; Art. 14(3) sets a 30-day
+    (one-month) deadline anchored on awareness for severe incidents.
+    The target here is the tighter Art. 14(2) bound; the `high`
+    threshold is the looser Art. 14(3) bound so a Art. 14(3) case
+    that overruns 14 but not 30 days surfaces as high (severe-
+    incident case ceiling approaching) rather than as an outright
+    breach, and a case above 30 days is a breach under either regime.
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 10
+    severity: warn
+  - name: high
+    comparator: ">"
+    value: 14
+    severity: high
+  - name: breach
+    comparator: ">"
+    value: 30
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: max
+  formula: >
+    For each CRA Article 14 final-report dispatched within the
+    evaluation window, compute
+    latency_days = (dispatch_timestamp - clock_anchor_timestamp) / 86400,
+    where `clock_anchor_timestamp` is the corrective-measure-available
+    timestamp for `__clock_kind__ = actively_exploited_vulnerability`
+    (Art. 14(2), 14-day bound) and the awareness timestamp for
+    `__clock_kind__ = severe_incident` (Art. 14(3), 30-day bound).
+    Aggregate as `max` across dispatches — the worst-case latency the
+    operator's SRP pipeline delivered in the window, i.e. the case
+    that came closest to (or beyond) the applicable per-case bound.
+    The per-case bound the case is measured against is carried on the
+    Compliance Finding event alongside the latency observation so a
+    reviewer reading the drill-down can tell an Art. 14(2) miss
+    (`> 14` days) from an Art. 14(3) miss (`> 30` days). Exclude
+    in-scope cases whose final-report dispatch step never fired so
+    the indicator does not silently improve when the notification
+    pipeline stalls outright; those cases surface on
+    `kri.regulator_notification_overrun@v1` instead.
+    Reference visualisation: a horizontal bar chart of
+    dispatch_latency_days per CRA final-report dispatched in the
+    window, sliced by `__clock_kind__` (actively-exploited-vulnerability
+    vs severe-incident), with vertical lines at the warn / high /
+    breach thresholds (10d / 14d / 30d) and the max aggregate
+    annotated as the headline figure; direction is `lower_is_better`
+    so a rising max is the leading signal that the operator's
+    final-report pipeline is approaching a statutory wall. The
+    committed reference rendering lives at
+    `content/metrics/cra_final_report_latency_days.viz.md` — that
+    file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: clock_anchor_timestamp
+      description: >
+        Anchor timestamp of the final-report clock — the corrective-
+        measure-available timestamp for actively-exploited
+        vulnerabilities (Art. 14(2), 14-day bound), or the awareness
+        timestamp for severe incidents (Art. 14(3), 30-day bound).
+        Selected at dispatch by the operator's SRP notification chain
+        against the `__clock_kind__` playbook variable. Carried on
+        the OCSF Compliance Finding event the final-report submission
+        emits (status_id transition into the notified state); the
+        catalog entry binds to that OCSF class shape, not to a
+        regulator-submission envelope.
+      playbook_step: action--5a509a09-0000-4000-8000-000000000007
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: start_time
+    - name: notification_dispatch
+      description: >
+        Regulator-notification chain step transition that dispatches
+        the CRA final report through the SRP to the manufacturer's
+        main-establishment CSIRT with simultaneous availability to
+        ENISA per CRA Article 14. Carried on the OCSF Compliance
+        Finding event the final-report submission emits at dispatch
+        (status_id transition into the notified state).
+      playbook_step: action--5a509a09-0000-4000-8000-000000000007
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: time
+    - name: clock_kind
+      description: >
+        Which CRA Article 14 clock applies to this case — one of
+        `actively_exploited_vulnerability` (Art. 14(2), 14-day bound)
+        or `severe_incident` (Art. 14(3), 30-day bound). Selected by
+        the upstream classifier and carried through the SRP
+        notification chain as the `__clock_kind__` playbook variable;
+        used by the compile target to pick the per-case bound the
+        latency is measured against.
+      playbook_step: action--5a509a09-0000-4000-8000-000000000007
+  window:
+    duration: P30D
+    sliding: true
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+playbook_refs:
+  - playbook_id: playbook.cra_srp_notify@v1
+    step_id: action--5a509a09-0000-4000-8000-000000000007
+external_refs:
+  - name: CRA — Article 14(2) final-report obligation (14 days after corrective measure)
+    source: EU
+    external_id: Regulation (EU) 2024/2847, Art. 14(2)
+    url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+  - name: CRA — Article 14(3) severe-incident final-report obligation (one month)
+    source: EU
+    external_id: Regulation (EU) 2024/2847, Art. 14(3)
+    url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+  - name: European Commission — CRA reporting obligations and Single Reporting Platform (applicable 11 September 2026)
+    source: European Commission
+    url: https://digital-strategy.ec.europa.eu/en/policies/cra-reporting
+  - name: ENISA — single reporting platform for CRA Article 14 submissions
+    source: ENISA
+    url: https://www.enisa.europa.eu/
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability

@@ -157,6 +157,12 @@ VIZ_REQUIRED_STEMS = (
     "contributor_pr_ratio_above_90pct",
     "operator_adoption_reference_count",
     "operator_adoption_zero_signals",
+    # F-MET-CRA-LATENCY SKELETON — CRA Art. 14 SRP dispatch-latency KRI
+    # triad (11-Sept-2026 gate); residual-risk counterparts to the
+    # existing cra_*_on_time KPIs.
+    "cra_early_warning_latency_hours",
+    "cra_full_notification_latency_hours",
+    "cra_final_report_latency_days",
 )
 
 
