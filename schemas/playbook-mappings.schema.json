@@ -42,6 +42,11 @@
       "description": "CRA (Cyber Resilience Act, Regulation (EU) 2024/2847) cross-references this playbook helps operationalise. Each entry pins a mapping id from content/mappings/cra/*.yaml so the graph is closed in both directions. SKELETON entries may use todo: true and a placeholder mapping_id while the inbound side is being populated.",
       "type": "array",
       "items": { "$ref": "#/$defs/regulatory_entry_cra" }
+    },
+    "gdpr": {
+      "description": "GDPR (Regulation (EU) 2016/679) cross-references this playbook helps operationalise. Each entry pins a mapping id from content/mappings/gdpr/*.yaml so the graph is closed in both directions. Optional at the playbook level: absence means the playbook has no direct GDPR touchpoint. SKELETON entries may use todo: true and a placeholder mapping_id while the inbound side is being populated.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/regulatory_entry_gdpr" }
     }
   },
   "$defs": {
@@ -187,6 +192,28 @@
         },
         "article": {
           "description": "Article / annex reference shorthand, e.g. 'Annex I §1(b)' or '13(6)'. Informational; the authoritative citation lives on the inbound mapping entry.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "todo": { "$ref": "#/$defs/todo_flag" },
+        "notes": { "type": "string", "maxLength": 2000 }
+      }
+    },
+    "regulatory_entry_gdpr": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mapping_id"],
+      "properties": {
+        "mapping_id": {
+          "description": "Mapping id from content/mappings/gdpr/*.yaml that this playbook backlinks to.",
+          "type": "string",
+          "pattern": "^gdpr:[a-z0-9][a-z0-9.-]*$",
+          "minLength": 4,
+          "maxLength": 120
+        },
+        "article": {
+          "description": "Article reference shorthand, e.g. '35(1)' or '25(1)'. Informational; the authoritative citation lives on the inbound mapping entry.",
           "type": "string",
           "minLength": 1,
           "maxLength": 80
