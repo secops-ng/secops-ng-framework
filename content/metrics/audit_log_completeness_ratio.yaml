@@ -1,0 +1,92 @@
+stable_id: kpi.audit_log_completeness_ratio@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Audit-log completeness ratio across playbook step transitions
+summary: 'Ratio of playbook step transitions on the evaluation window that
+  emit a corresponding audit-log record on the operator''s durable audit
+  surface, over the total count of step transitions the workflow layer
+  executed. The FOUNDATION auditability property (docs/FOUNDATION.md §1)
+  requires that every step transition an operator runs is reconstructable
+  from the audit trail after the fact; this KPI tracks whether the
+  compile target is actually emitting a record for every transition, or
+  whether the audit stream is silently under-counting.
+
+  '
+unit: ratio
+direction: higher_is_better
+target:
+  value: 1.0
+  comparator: ==
+  rationale: 'Every step transition the workflow layer executes should
+    emit a corresponding audit-log record on the durable audit surface.
+    Anything under 1.0 is a silent gap in the reconstructable trail and
+    an auditability floor breach.
+
+    '
+thresholds:
+- name: warn
+  comparator: <
+  value: 1.0
+  severity: warn
+- name: breach
+  comparator: <
+  value: 0.99
+  severity: high
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: 'Over the evaluation window, count the distinct playbook step
+    transitions executed by the workflow layer that carry a matching
+    audit-log record on the operator''s durable audit surface (numerator).
+    Divide by the total count of step transitions the workflow layer
+    executed in the same window (denominator). The match key is the
+    playbook step_id plus the transition timestamp; the compile target
+    emits the executable form of the match against the parsed workflow
+    log and the OCSF audit stream.
+
+    The committed reference visualisation lives at ``content/metrics/audit_log_completeness_ratio.viz.md``
+    — that file is the contract for the chart shape; the compile target
+    renders the executable form at evaluation time.
+
+    '
+  inputs:
+  - name: executed_step_transition
+    description: 'A single playbook step transition executed by the workflow
+      layer in the evaluation window, identified by playbook step_id plus
+      the transition timestamp.
+
+      '
+    field: activity_id
+    telemetry_ref: telemetry.ocsf.api_activity@v1
+  - name: emitted_audit_record
+    description: 'A single audit-log record on the operator''s durable
+      audit surface, keyed to a step transition by step_id plus timestamp
+      under the OCSF API Activity class.
+
+      '
+    field: activity_id
+    telemetry_ref: telemetry.ocsf.api_activity@v1
+  window:
+    duration: P7D
+    sliding: false
+telemetry_refs:
+  - telemetry.ocsf.api_activity@v1
+external_refs:
+- name: SecOps-NG FOUNDATION §1 — Auditability
+  source: SecOps-NG
+  url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+- name: NIS2 — Article 21(2)(j) cybersecurity risk-management measures
+  source: EU
+  external_id: Directive (EU) 2022/2555, Art. 21(2)(j)
+  url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+- name: DORA — Article 10 detection of ICT-related incidents
+  source: EU
+  external_id: Regulation (EU) 2022/2554, Art. 10
+  url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+- name: OCSF — API Activity (class 6003)
+  source: OCSF
+  url: https://schema.ocsf.io/1.1.0/classes/api_activity
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+- auditability

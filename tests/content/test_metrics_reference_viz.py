@@ -134,6 +134,12 @@ VIZ_REQUIRED_STEMS = (
     "reference_deployment_target_coverage",
     "hardcoded_non_eu_endpoint_reference_count",
     "eu_regulatory_reference_coverage",
+    # F-METRICS-04 auditability axis CORE (G-04)
+    "audit_log_completeness_ratio",
+    "audit_log_tamper_evidence_coverage",
+    "audit_envelope_reverification_pass_rate",
+    "decision_trace_completeness_ratio",
+    "provenance_chain_integrity_gap_count",
 )
 
 
