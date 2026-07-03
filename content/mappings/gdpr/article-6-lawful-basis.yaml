@@ -1,0 +1,228 @@
+# GDPR — Article 6 lawful-basis cluster.
+#
+# F-MAP-GDPR CORE-6: per-clause GDPR mapping YAML covering the two
+# Article 6(1) limbs that the shipped cookbook's data-flow docs cite
+# by literal reference in their §2 Lawful basis sections. Anchors
+# `alert_triage`, `phishing_triage`, and `detection_engineering` on
+# the Art. 6(1)(f) legitimate-interests limb (security-operations
+# capability), and `incident_management` on the Art. 6(1)(c)
+# legal-obligation limb (NIS2 Art. 23 / DORA Art. 19 / CRA Art. 14
+# regulator-notification chain). This entry closes the inbound-
+# citation gap that surfaced during Aurora grooming 2026-07-03: the
+# G-02 orphan-CI linter did not previously count `alert_triage` as
+# finalized because the CACAO marker had not been migrated to the
+# per-directory `playbook.cacao.json` shape; migrating the marker
+# (same PR) re-arms the assertion against the slug and this YAML is
+# the inbound edge that keeps the assertion green.
+#
+# Scope of this file:
+#
+#   - gdpr:art-6-1-f-legitimate-interests-security-operations —
+#     Article 6(1)(f) legitimate-interests basis for the operator's
+#     detection and triage security-operations capability. The three
+#     agentic anchors each carry the basis by literal cite in their
+#     data-flow docs' §2 Lawful basis section:
+#     `data-flow-alert_triage.md` §2 primary basis,
+#     `data-flow-phishing_triage.md` §2 primary basis, and
+#     `data-flow-detection_engineering.md` §2 operator-side
+#     inheritance. The controller-side balancing test (interest vs.
+#     the data subject's fundamental rights) is operator-side under
+#     Art. 24 accountability rather than by this YAML; the clause
+#     records the agentic anchors and the bounded processing surface,
+#     the operator's policy holds the balancing determination.
+#
+#   - gdpr:art-6-1-c-legal-obligation-incident-notification —
+#     Article 6(1)(c) legal-obligation basis for the incident-
+#     notification chain the incident_management workflow files
+#     against the NIS2 Art. 23 / DORA Art. 19 / CRA Art. 14
+#     regulator surfaces. The processing under this limb is
+#     necessary for compliance with the operator's statutory
+#     reporting duty, and the personal data carried inside the
+#     regulator submissions is processed only to the extent the
+#     regulator's template requires (per `data-flow-incident_management.md`
+#     §2 primary basis). The Art. 6(1)(f) secondary limb documented
+#     in the same §2 covering the internal incident-handling
+#     portion of the workflow is captured on the security-operations
+#     entry above.
+#
+# Out of scope of this file:
+#
+#   - Art. 6(1)(a) consent, Art. 6(1)(b) contract, Art. 6(1)(d) vital
+#     interests, and Art. 6(1)(e) public interest / official
+#     authority. No shipped data-flow doc names any of these limbs
+#     as its agentic surface for the current cookbook.
+#
+#   - Art. 9 special-category grounds. The shipped data-flow docs
+#     that touch on Art. 9 (alert_triage, phishing_triage,
+#     incident_management) all frame Art. 9 as incidentally-observed
+#     data whose extraction / persistence is bounded by the same
+#     §5 retention discipline rather than as an independent
+#     processing purpose against a §9 ground. A dedicated Art. 9
+#     entry, if authored, belongs in a sibling per-clause YAML
+#     rather than stretched into this Art. 6 file.
+#
+#   - Art. 22 automated decision-making with legal effects. None of
+#     the four anchor playbooks produces an Art. 22-shaped decision
+#     against a natural person (the deterministic priority-routing
+#     step on alert_triage / phishing_triage is a workflow-routing
+#     decision against a detection signal, not a decision against
+#     a data subject); the Art. 22 surface, when reached, is
+#     authored under a dedicated CORE slice.
+#
+# Cross-references:
+#
+#   - NIS2 parallel: content/mappings/nis2/article-21-2-b.yaml
+#     anchors the same alert_triage / phishing_triage playbooks on
+#     the NIS2 Art. 21(2)(b) incident-handling-capability limb.
+#     Same multi-regime dependency: the operator's obligation to
+#     maintain a detection-and-triage capability under NIS2 grounds
+#     the same operational processing that this YAML anchors under
+#     GDPR Art. 6(1)(f).
+#
+#   - DORA parallel: content/mappings/dora/article-10.yaml pairs
+#     detection_engineering (detection-content lane) and
+#     alert_triage (automatic-alert-mechanism lane) against DORA
+#     Art. 10 detection obligation. The Art. 6(1)(c) limb below is
+#     the GDPR-side counterpart of the DORA Art. 19 major-incident
+#     reporting obligation content/mappings/dora/article-19-and-28.yaml
+#     anchors on incident_management.
+#
+#   - CRA parallel: content/mappings/cra/annex-i-1-l-logging-monitoring-alert-triage.yaml
+#     anchors alert_triage on the CRA Annex I §1(l) logging-and-
+#     monitoring surface. The CRA Art. 14 vulnerability-notification
+#     chain that incident_management additionally exercises is
+#     covered under a separate CRA mapping and is out of scope of
+#     this file.
+
+regime: gdpr
+entries:
+  - id: gdpr:art-6-1-f-legitimate-interests-security-operations
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "6(1)(f)"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Process personal data only where the processing is necessary
+      for the purposes of the legitimate interests pursued by the
+      controller or by a third party, except where such interests
+      are overridden by the interests or fundamental rights and
+      freedoms of the data subject. The controller must be able to
+      identify the legitimate interest, demonstrate necessity of the
+      processing to that interest, and evidence the balancing
+      against the data subject's rights.
+    status: draft
+    control_refs:
+      - control.incident_handling_capability@v1
+      - control.detection_coverage_evidence@v1
+    playbook_refs:
+      - playbook.alert_triage@v1
+      - playbook.phishing_triage@v1
+      - playbook.detection_engineering@v1
+    metric_refs:
+      - kpi.mttd@v1
+      - kpi.detection_coverage@v1
+      - kpi.false_positive_rate@v1
+    evidence_stream_refs:
+      - effectiveness
+    notes: >-
+      alert_triage, phishing_triage, and detection_engineering are
+      the three agentic anchors on the Art. 6(1)(f) limb. Each
+      carries the basis by literal cite in its data-flow doc's §2
+      Lawful basis section: alert_triage §2 pins Art. 6(1)(f) as
+      the primary basis for the operator's security-operations
+      triage capability against detection alerts crossing the
+      monitored boundary; phishing_triage §2 pins the same basis
+      for the reporter-triage capability against
+      suspected-phishing submissions; detection_engineering §2
+      documents the operator-side inheritance of Art. 6(1)(f) —
+      the detection-content lifecycle itself processes no personal
+      data (rule metadata, effectiveness snapshots, and per-
+      rule-version dispatch envelopes only), but the operator's
+      downstream deployment of the shipped detection content
+      exercises the security-operations legitimate interest that
+      alert_triage and phishing_triage anchor directly. The three
+      playbooks form the detection-and-triage stage of the
+      operator's security-operations capability and are the
+      agentic surface Art. 6(1)(f) grounds. The balancing test
+      (legitimate interest vs. the data subject's fundamental
+      rights) is operator-side under Art. 24 accountability rather
+      than by this YAML; each data-flow doc's §2 records the
+      necessity and proportionality determination, and §5
+      retention plus §6 recipients discipline the processing scope
+      the balancing test runs against. Where the operator runs in
+      a regulated sector, the secondary Art. 6(1)(c) basis under
+      NIS2 Art. 21(2)(b) / DORA Art. 10 additionally applies to
+      the portion of these workflows that feeds the incident-
+      management chain (per each data-flow doc's §2 secondary
+      basis); the primary Art. 6(1)(f) anchor recorded here is
+      the operational surface, and the secondary Art. 6(1)(c)
+      leg is covered on the incident-notification entry below
+      when the workflow crosses into the regulator-submission
+      lane.
+
+  - id: gdpr:art-6-1-c-legal-obligation-incident-notification
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "6(1)(c)"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Process personal data only where the processing is necessary
+      for compliance with a legal obligation to which the controller
+      is subject. The obligation must be laid down by Union or
+      Member-State law, and the processing must be proportionate to
+      the obligation pursued. For the incident-notification chain,
+      the controlling obligation is the operator's statutory duty
+      to report significant incidents to the competent authority
+      under the applicable sectoral regime.
+    status: draft
+    control_refs:
+      - control.incident_handling_capability@v1
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.incident_management@v1
+    metric_refs:
+      - kpi.notification_sla_compliance@v1
+    evidence_stream_refs:
+      - posture
+    notes: >-
+      incident_management is the agentic anchor for the Art. 6(1)(c)
+      legal-obligation basis. The workflow files the operator's
+      statutory notification envelopes against the NIS2 Art. 23
+      early-warning / 24-hour / 72-hour / final-report chain as
+      transposed nationally, and (where the operator is in scope)
+      the parallel DORA Art. 19 major-ICT-incident chain and the
+      CRA Art. 14 24-hour early-warning / 72-hour full-notification
+      / 14-day-or-1-month final-report chain against the Single
+      Reporting Platform. The lawful basis is the regulatory duty
+      itself; the personal data carried inside the regulator
+      submissions (signatory names on the envelopes, aggregate
+      affected-subject counts and categories, incident timeline
+      identifiers, evidence-pack artefacts attached to the case)
+      is processed only to the extent the regulator's template
+      requires, per data-flow-incident_management.md §2 primary
+      basis. The secondary Art. 6(1)(f) basis the same §2 documents
+      — internal analyst notes, routing, and post-incident-review
+      hooks that are not strictly mandated by the regulator
+      template — is anchored on the security-operations entry
+      above; the two entries are kept atom-per-obligation rather
+      than overloaded onto a single row so the Art. 6(1)(c)
+      legal-obligation surface stays cleanly separated from the
+      Art. 6(1)(f) legitimate-interests surface. The
+      notification-SLA-compliance KPI audits per-submission
+      timeliness against the applicable regime's clock and is the
+      GDPR-visible failure indicator for this clause. The NIS2
+      parallel under `nis2:art-23`, the DORA parallel under
+      `dora:art-19-major-incident-reporting`, and the CRA parallel
+      under `cra:art-14-vulnerability-notification` each anchor
+      the same playbook against their own regime-specific
+      obligations; the four regimes carry separate evidence
+      requirements against the same incident-notification
+      discipline. The proportionality determination (which subject
+      identifiers are actually necessary against the regulator
+      template, and which are minimised out) is operator-side under
+      Art. 5(1)(c) data-minimisation, discharged at the
+      regulator-envelope construction step rather than by this YAML.
