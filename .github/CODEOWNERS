@@ -1,0 +1,26 @@
+# CODEOWNERS — SecOps-NG framework
+#
+# GitHub automatically requests review from the listed owners when a
+# pull request touches a matching path. This file is a floor, not a
+# ceiling: any maintainer may review any PR, and any contributor may
+# comment. The point of the file is to make sure at least one pair of
+# maintainer eyes is on public-history-permanent changes before they
+# land.
+#
+# Only the '@secops-ng/maintainers' GitHub team is referenced here.
+# Individual contributor names are not hardcoded — the team roster is
+# the source of truth and is maintained on GitHub, not in this file.
+#
+# Syntax: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for every path not covered by a more specific rule below.
+* @secops-ng/maintainers
+
+# Portable content — CACAO playbooks. Every playbook change lands on
+# main forever and is compiled by three reference targets, so a
+# maintainer review is required.
+/content/playbooks/ @secops-ng/maintainers
+
+# Cross-framework regulatory mappings (CRA, DORA, GDPR, NIS2, OSCAL,
+# D3FEND). Changes here shift the G-02 KRI and the orphan-CI graph.
+/content/mappings/ @secops-ng/maintainers
