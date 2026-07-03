@@ -1,0 +1,114 @@
+stable_id: kri.cra_full_notification_latency_hours@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: CRA full-notification (72h) dispatch latency
+summary: >
+  Elapsed hours between operator awareness of an actively-exploited
+  vulnerability or severe incident and dispatch of the CRA Article 14(2)
+  72-hour full notification through the Single Reporting Platform
+  (SRP). Residual-risk counterpart to
+  `kpi.cra_notification_72h_on_time@v1`: the on-time KPI reads whether
+  the clock was held; this KRI reads *how close to the wall* each
+  full-notification dispatch landed, so operators can see slippage
+  well before the ratio itself falls below 1.00. The 72-hour bound is
+  set by CRA Article 14(2); any observation above the bound is a
+  statutory overrun and a reportable compliance exception.
+unit: hours
+direction: lower_is_better
+target:
+  value: 72
+  comparator: "<="
+  rationale: >
+    CRA Article 14(2) sets the 72-hour full-notification deadline
+    anchored on the moment the manufacturer becomes aware of an
+    actively-exploited vulnerability or severe incident. The target is
+    the statutory bound; any dispatch beyond it is an overrun the
+    operator must record on the SRP with reasons for the delay.
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 48
+    severity: warn
+  - name: high
+    comparator: ">"
+    value: 60
+    severity: high
+  - name: breach
+    comparator: ">"
+    value: 72
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: max
+  formula: >
+    For each CRA Article 14(2) 72-hour full notification dispatched
+    within the evaluation window, compute
+    latency_hours = (dispatch_timestamp - awareness_timestamp) / 3600.
+    Aggregate as `max` across dispatches — the worst-case latency the
+    operator's SRP pipeline delivered in the window, i.e. the case
+    that came closest to (or beyond) the 72-hour statutory bound.
+    Exclude in-scope cases whose full-notification dispatch step never
+    fired so the indicator does not silently improve when the
+    notification pipeline stalls outright; those cases surface on
+    `kri.regulator_notification_overrun@v1` instead.
+    Reference visualisation: a horizontal bar chart of
+    dispatch_latency_hours per CRA Article 14(2) full-notification
+    dispatched in the window, with vertical lines at the warn / high
+    / breach thresholds (48h / 60h / 72h) and the max aggregate
+    annotated as the headline figure; direction is `lower_is_better`
+    so a rising max is the leading signal that the operator's
+    full-notification pipeline is approaching the statutory wall. The
+    committed reference rendering lives at
+    `content/metrics/cra_full_notification_latency_hours.viz.md` —
+    that file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: awareness_timestamp
+      description: >
+        Operator-awareness timestamp handed to the CRA SRP notification
+        chain by the upstream classifier as the `__awareness_ts__`
+        playbook variable, used as the start of the 72-hour clock.
+        Carried on the OCSF Compliance Finding event the full-
+        notification submission emits (status_id transition into the
+        notified state); the catalog entry binds to that OCSF class
+        shape, not to a regulator-submission envelope.
+      playbook_step: action--5a509a09-0000-4000-8000-000000000005
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: start_time
+    - name: notification_dispatch
+      description: >
+        Regulator-notification chain step transition that dispatches
+        the 72h full notification through the SRP to the manufacturer's
+        main-establishment CSIRT with simultaneous availability to
+        ENISA per CRA Article 14. Carried on the OCSF Compliance
+        Finding event the full-notification submission emits at
+        dispatch (status_id transition into the notified state).
+      playbook_step: action--5a509a09-0000-4000-8000-000000000005
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: time
+  window:
+    duration: P30D
+    sliding: true
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+playbook_refs:
+  - playbook_id: playbook.cra_srp_notify@v1
+    step_id: action--5a509a09-0000-4000-8000-000000000005
+external_refs:
+  - name: CRA — Article 14(2) full-notification obligation (72 hours)
+    source: EU
+    external_id: Regulation (EU) 2024/2847, Art. 14(2)
+    url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+  - name: European Commission — CRA reporting obligations and Single Reporting Platform (applicable 11 September 2026)
+    source: European Commission
+    url: https://digital-strategy.ec.europa.eu/en/policies/cra-reporting
+  - name: ENISA — single reporting platform for CRA Article 14 submissions
+    source: ENISA
+    url: https://www.enisa.europa.eu/
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability
