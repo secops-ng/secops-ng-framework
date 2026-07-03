@@ -1056,7 +1056,11 @@ SecOps-NG visible without requiring the project to run telemetry.
 
 ### F-ADOPT-01 — USED-BY.md operator adoption registry
 
-- **Status:** In Progress
+- **Status:** Shipped
+- **Shipped:** SKELETON (`USED-BY.md` registry + self-attestation
+  contributor guide, #614), CORE (Deployments & Adoption discussion
+  template, #616), and EXTEND (scheduled CI reachability check for
+  evidence links, #615) all merged to `main` — 2026-07-03.
 - **Priority:** P1
 - **Acceptance criteria:**
   - `USED-BY.md` exists at the repository root as a self-attestation
