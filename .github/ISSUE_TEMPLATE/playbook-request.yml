@@ -1,0 +1,96 @@
+name: Playbook request
+description: Propose a new CACAO playbook (or extension to an existing one) for the content tree.
+title: "[playbook-request] <short description>"
+labels: ["playbook-request", "content"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to propose a new CACAO playbook, or a
+        substantive extension to an existing one, for the content tree
+        under `content/`. For code changes to compilers, primitives, or
+        tests, use a regular issue instead.
+
+  - type: textarea
+    id: playbook_name
+    attributes:
+      label: Proposed playbook name
+      description: Short, lower_snake_case slug (e.g. `dora_incident_notification`).
+      placeholder: |
+        cra_srp_notify
+    validations:
+      required: true
+
+  - type: textarea
+    id: intent
+    attributes:
+      label: Operator intent
+      description: In one paragraph, what problem does an operator running this playbook solve?
+      placeholder: |
+        Describe the operational situation. Who runs it, when, and what
+        state does the world need to be in when it finishes?
+    validations:
+      required: true
+
+  - type: textarea
+    id: regulatory_anchor
+    attributes:
+      label: Regulatory or standards anchor
+      description: Which regulation, standard, or control set does this playbook advance?
+      placeholder: |
+        Cite the article, clause, or control identifier. Examples:
+        - CRA Art. 14 §6 (acknowledgement SLA)
+        - GDPR Art. 32(1)(b)
+        - NIS2 Art. 23 (significant incidents)
+        - D3FEND / MITRE ATT&CK technique ids
+    validations:
+      required: true
+
+  - type: textarea
+    id: inputs_outputs
+    attributes:
+      label: Inputs and outputs (rough)
+      description: What data does the playbook read, and what does it produce or emit?
+      placeholder: |
+        - Inputs: OCSF finding, tenant identifier, ...
+        - Outputs: notification record, KPI update, ...
+
+  - type: textarea
+    id: kpis
+    attributes:
+      label: KPIs or KRIs this playbook should move
+      description: Which entries in the KPI/KRI catalogue should this playbook produce or influence?
+      placeholder: |
+        - kpi.time_to_acknowledge
+        - kri.open_incidents_over_sla
+
+  - type: textarea
+    id: prior_art
+    attributes:
+      label: Prior art or related playbooks
+      description: Existing playbooks in `content/playbooks/` this one relates to, extends, or overlaps.
+      placeholder: |
+        Reference sibling playbooks by slug and describe the relationship.
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Voice and hygiene reminder
+
+        Playbook content is community infrastructure. Please write in
+        community voice — no vendor framing, no services-firm framing, no
+        named organisations described as customers or prospects. See
+        `SOUL.md` and `docs/FOUNDATION.md`. The hygiene linter enforces a
+        floor; the review checks for tone.
+
+  - type: checkboxes
+    id: guardrails
+    attributes:
+      label: Guardrails
+      options:
+        - label: The intent, anchor, and examples above contain no credentials, internal hostnames, or contact names.
+          required: true
+        - label: The framing is community/commons, not vendor or services-firm (see `SOUL.md`).
+          required: true
+        - label: I have checked `content/playbooks/` for an existing playbook that already covers this scope.
+          required: true

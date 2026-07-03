@@ -9,6 +9,14 @@ This document walks you through your first contribution end-to-end:
 from cloning the repository to seeing your change reviewed and merged.
 Read it once before you start. It is short on purpose.
 
+## Your first contribution
+
+If this is your first time contributing here, the operational
+companion to this document —
+[`docs/contributing/first-contribution.md`](docs/contributing/first-contribution.md)
+— walks through fork, branch, tests, hygiene linter, and pull request
+as a sequence of exact commands. Read it alongside the sections below.
+
 ## 1. Clone the repository
 
 ```bash

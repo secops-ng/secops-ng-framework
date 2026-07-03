@@ -1,0 +1,66 @@
+name: Good first issue
+description: Propose a small, well-scoped change suitable for a first-time contributor.
+title: "[good-first] <short description>"
+labels: ["good-first-issue"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping widen the commons. This template is for changes
+        that are small, well-scoped, and approachable in a single sitting.
+        If a change turns out to be larger than expected, open a separate
+        issue for the extra scope rather than growing this one.
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What single, self-contained change does this issue cover?
+      placeholder: |
+        A one- to three-sentence description of exactly what needs to
+        change. Reference specific files or directories where possible.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: How will we know this is done?
+      placeholder: |
+        - [ ] Concrete, checkable condition one.
+        - [ ] Concrete, checkable condition two.
+        - [ ] `python -m pytest` passes.
+        - [ ] `python -m tools.hygiene_linter --min-severity LOW` passes.
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and pointers
+      description: Any background reading, related files, or prior discussion?
+      placeholder: |
+        Links to `docs/`, related issues, or the section of `ROADMAP.md`
+        this advances.
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Voice reminder
+
+        Every commit here is public the moment it lands. Please match the
+        voice of the repository: community and commons framing, calm and
+        technical, no vendor or services-firm language, no named organisations
+        described as prospects or partners. `SOUL.md` is the reference; the
+        hygiene linter enforces a floor.
+
+  - type: checkboxes
+    id: guardrails
+    attributes:
+      label: Guardrails
+      options:
+        - label: The change described here contains no credentials, internal hostnames, or contact names.
+          required: true
+        - label: The framing matches `SOUL.md` (community voice, no commercial language).
+          required: true
