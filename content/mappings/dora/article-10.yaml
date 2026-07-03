@@ -28,6 +28,7 @@ entries:
       - control.cspm_baseline@v1
     playbook_refs:
       - playbook.detection_engineering@v1
+      - playbook.alert_triage@v1
     metric_refs:
       - kpi.detection_coverage@v1
       - kpi.mttd@v1
@@ -48,8 +49,27 @@ entries:
       for purpose over time, and the false-positive-rate /
       control-effectiveness KRIs lifted onto this entry are the
       measurement complements of detection-coverage that the
-      lifecycle's measure step emits. control_refs are not extended
-      here: the rule-lifecycle side already pins
+      lifecycle's measure step emits. The paired inbound citation
+      of `playbook.alert_triage@v1` closes the second half of the
+      Article 10 discharge: Art. 10 pairs the "defined alert
+      thresholds and criteria to trigger ICT-related incident
+      detection and response processes" language with "automatic
+      alert mechanisms for relevant staff", and the alert_triage
+      playbook is the operational materialisation of that automatic-
+      alert mechanism — deterministic ingest/enrich/suppress/
+      prioritise of the alert stream the detection surface emits,
+      handing work onto the priority-routed response branches
+      (mirroring the NIS2 Art. 21(2)(b) inbound anchor on the same
+      playbook, which pins the detect→triage stage of the
+      incident-handling capability). The DORA Art. 18 major-
+      classification escalation stays owned by the downstream
+      typed-incident playbooks (identity_compromise,
+      ransomware_containment, data_exfil) and by
+      `playbook.incident_management@v1` on the reporting side —
+      alert_triage is intentionally sub-threshold for Art. 18 and
+      is cited here only for the Art. 10 detect-and-alert surface.
+      control_refs are not extended here: the rule-lifecycle side
+      already pins
       `control.control_effectiveness_test@v1` (NIST SP 800-53 CA-7)
       on its own overlay, but no populated cross-reference file
       under `content/controls/` currently lifts that id; the
