@@ -151,6 +151,12 @@ VIZ_REQUIRED_STEMS = (
     "dependency_free_ratio",
     "operator_onboarding_pass_rate",
     "mean_time_to_first_operator_action",
+    # F-METRICS-04 EXTEND-COMMUNITY — contributor + operator adoption
+    # catalogue axes (G-04/G-06/G-07)
+    "contributor_merged_prs_external_ratio",
+    "contributor_pr_ratio_above_90pct",
+    "operator_adoption_reference_count",
+    "operator_adoption_zero_signals",
 )
 
 

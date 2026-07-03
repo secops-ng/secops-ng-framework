@@ -1,0 +1,102 @@
+stable_id: kri.contributor_pr_ratio_above_90pct@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Founding-maintainer share of merged pull requests above 90%
+summary: >
+  Residual community-health risk indicator: fires when the share of
+  merged pull requests authored by the founding-maintainer set exceeds
+  90% for two consecutive quarterly windows. A framework claiming a
+  Digital Commons posture cannot sustain a merged-change stream that
+  is effectively single-source; a sustained founder-dominant share is
+  a lagging indicator that contributor pipelines (onboarding docs,
+  reviewer bandwidth, discussion surfaces) have decayed. Companion to
+  the `kpi.contributor_merged_prs_external_ratio@v1` positive-signal
+  indicator; the KRI evaluates the inverse ratio and applies a
+  two-window persistence rule so a single quiet quarter does not
+  trigger.
+
+unit: ratio
+direction: lower_is_better
+
+target:
+  value: 0.9
+  comparator: "<"
+  rationale: >
+    A founder-authored merged-PR share at or above 0.9 for two
+    consecutive quarters is treated as sustained founder dominance.
+    Below the threshold, the KRI does not fire; at or above the
+    threshold for a single quarter, warn; at or above for two
+    consecutive quarters, high (see `thresholds`).
+
+thresholds:
+  - name: single_quarter_warn
+    comparator: ">="
+    value: 0.90
+    severity: warn
+  - name: two_quarter_high
+    comparator: ">="
+    value: 0.90
+    severity: high
+
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: >
+    For each quarterly evaluation window, compute the ratio of merged
+    pull requests authored by contributors in the declared
+    founding-maintainer set divided by the total merged-pull-request
+    count in the window. Bot-authored pull requests are excluded from
+    both numerator and denominator. Emit the `high` severity band iff
+    the current window and the immediately preceding window both
+    report a ratio at or above the `two_quarter_high` value; emit the
+    `warn` band iff only the current window is at or above the
+    `single_quarter_warn` value. The two-window persistence rule
+    prevents a single quiet quarter (holiday freeze, release cadence)
+    from tripping the risk indicator.
+    Reference visualisation: a two-window stacked-bar plot showing
+    founder-share (red) vs external-share (green) per quarter, with a
+    horizontal 0.90 warn line overlaid and a two-adjacent-red-bars
+    annotation showing where the `high` band would fire.
+    The committed reference rendering lives at
+    `content/metrics/contributor_pr_ratio_above_90pct.viz.md` — that
+    file is the contract for the chart shape; the compile target
+    renders the executable form against the project's forge data.
+  inputs:
+    - name: merged_pull_request
+      description: >
+        A pull request whose merge event landed in the evaluation
+        window. On GitHub-shaped forges this maps to the pull-request
+        merged-event class in the OCSF Application Activity family
+        (`activity_id: merged`); the catalog entry does not pin a
+        forge vendor.
+    - name: founding_maintainer_set
+      description: >
+        Declared list of founding-maintainer forge logins on the
+        evaluation commit, read from the project's `GOVERNANCE.md` at
+        that commit. The compile target reads the declared list, not
+        an inferred one.
+    - name: two_window_persistence_rule
+      description: >
+        Persistence predicate: the `high` band fires iff the ratio is
+        at or above the threshold for the current window *and* the
+        immediately preceding window. A single quiet quarter cannot
+        trigger the `high` band on its own.
+  window:
+    duration: P90D
+    sliding: false
+
+external_refs:
+  - name: SecOps-NG ROADMAP goal G-06 — contributor adoption signal
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/ROADMAP.md
+  - name: SecOps-NG GOVERNANCE — maintainer roles and decision process
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/GOVERNANCE.md
+  - name: CHAOSS — Contributor community metrics
+    source: CHAOSS
+    url: https://chaoss.community/kbtopic/contributor-metrics/
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability

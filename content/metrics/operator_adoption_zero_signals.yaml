@@ -1,0 +1,101 @@
+stable_id: kri.operator_adoption_zero_signals@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Zero unsolicited operator deployment signals for a full quarter
+summary: >
+  Residual operator-adoption risk indicator: fires when the count of
+  unsolicited public deployment signals (deployment-question threads
+  in the GitHub Discussions template, deployment-tagged issues,
+  `USED-BY.md` pull-requests, community-forum posts referencing shipped
+  playbooks) is zero across a full quarterly window. A framework
+  claiming a Digital Commons posture cannot infer adoption from
+  telemetry it deliberately does not collect; the community-signal
+  stream is therefore the load-bearing early indicator. A single
+  fully-quiet quarter is a lagging signal that operator-facing
+  surfaces (deployment docs, discussion templates, adoption registry)
+  need attention. Companion to the
+  `kpi.operator_adoption_reference_count@v1` positive-signal indicator.
+
+unit: count
+direction: lower_is_better
+
+target:
+  value: 0
+  comparator: ">"
+  rationale: >
+    At least one unsolicited deployment signal per quarter is the
+    community-health floor. Zero signals across a full quarter is a
+    lagging indicator that the operator-adoption surface has decayed
+    and should be inspected; below the threshold, the KRI does not
+    fire.
+
+thresholds:
+  - name: quarterly_high
+    comparator: "=="
+    value: 0
+    severity: high
+
+measurement:
+  source: composite
+  aggregation: count
+  formula: >
+    Over the quarterly evaluation window, count distinct unsolicited
+    deployment signals. Signals are of four declared types:
+    (a) a GitHub Discussions thread opened against the
+    deployment-question template shipped under
+    `.github/DISCUSSION_TEMPLATE/`, (b) an issue tagged with the
+    project's deployment-question label, (c) a pull request against
+    `USED-BY.md` adding a new organisation row, (d) a public
+    community-forum post referencing a shipped playbook `stable_id`.
+    Distinctness is over the (thread_id, signal_type) pair so a
+    single thread is not double-counted. The KRI fires at `high`
+    severity iff the count is exactly zero for the whole window.
+    Reference visualisation: a per-quarter bar chart of total signal
+    count partitioned by signal_type, with a horizontal zero-line
+    highlighted as the fire condition and the previous four quarters
+    shown as context bars.
+    The committed reference rendering lives at
+    `content/metrics/operator_adoption_zero_signals.viz.md` — that
+    file is the contract for the chart shape; the compile target
+    renders the executable form against the project's public signal
+    feeds.
+  inputs:
+    - name: deployment_question_discussion
+      description: >
+        A GitHub Discussions thread opened against the
+        deployment-question template under
+        `.github/DISCUSSION_TEMPLATE/` at the evaluation commit.
+        Each thread counts as one observation.
+    - name: deployment_tagged_issue
+      description: >
+        An issue tagged with the project's deployment-question label
+        in the evaluation window. Each issue counts as one observation.
+    - name: used_by_registry_pull_request
+      description: >
+        A pull request against `USED-BY.md` adding a new organisation
+        row in the evaluation window. Each PR counts as one
+        observation.
+    - name: community_forum_reference
+      description: >
+        A public community-forum post referencing a shipped playbook
+        by `stable_id` from `content/playbooks/`. Public URL
+        required; login-walled forums are excluded.
+  window:
+    duration: P90D
+    sliding: false
+
+external_refs:
+  - name: SecOps-NG ROADMAP goal G-07 — operator adoption signal
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/ROADMAP.md
+  - name: SecOps-NG USED-BY registry — self-attestation policy
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/USED-BY.md
+  - name: CHAOSS — Community adoption metrics
+    source: CHAOSS
+    url: https://chaoss.community/kbtopic/community-adoption/
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability

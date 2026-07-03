@@ -1,0 +1,96 @@
+stable_id: kpi.contributor_merged_prs_external_ratio@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Ratio of merged pull requests authored by external contributors
+summary: >
+  Share of merged pull requests over the evaluation window that were
+  authored by contributors who are not part of the founding-maintainer
+  set. A community-driven framework is healthy when its merged-change
+  stream is not dominated by its founding maintainers indefinitely;
+  this KPI is the positive-signal companion to the
+  `kri.contributor_pr_ratio_above_90pct@v1` risk indicator and directly
+  attests to the G-06 contributor-adoption dimension of the project
+  goals. The catalog entry is repository-agnostic — the compile target
+  resolves the concrete author set at evaluation time.
+
+unit: ratio
+direction: higher_is_better
+
+target:
+  value: 0.25
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point: at least one in four merged
+    changes should come from outside the founding-maintainer set for a
+    project claiming a Digital Commons posture. The threshold is a
+    floor, not a ceiling; healthier projects sit substantially higher.
+
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 0.25
+    severity: warn
+  - name: breach
+    comparator: "<"
+    value: 0.10
+    severity: high
+
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: >
+    Over the evaluation window, count merged pull requests whose author
+    login is not in the declared founding-maintainer set (numerator).
+    Divide by the total count of merged pull requests in the same
+    window (denominator). Merge events are the atom of measurement; a
+    single pull request contributes exactly one observation regardless
+    of commit count. Bot-authored pull requests (dependency-update
+    bots, release automation) are excluded from both numerator and
+    denominator so the ratio reflects human-contributor mix.
+    Reference visualisation: a per-window ribbon plot of the ratio
+    across quarters, with the warn / breach thresholds overlaid as
+    horizontal lines.
+    The committed reference rendering lives at
+    `content/metrics/contributor_merged_prs_external_ratio.viz.md` —
+    that file is the contract for the chart shape; the compile target
+    renders the executable form against the project's forge data.
+  inputs:
+    - name: merged_pull_request
+      description: >
+        A pull request whose merge event landed in the evaluation
+        window. Carried by the forge's merged-PR stream; on GitHub-shaped
+        forges this maps to the pull-request merged-event class in the
+        OCSF Application Activity family (`activity_id: merged`). The
+        catalog entry does not pin a forge vendor — the compile target
+        resolves the concrete class per operator forge.
+    - name: founding_maintainer_set
+      description: >
+        Declared list of founding-maintainer forge logins on the
+        evaluation commit. Carried on the project's governance
+        surface (see `GOVERNANCE.md`); the compile target reads the
+        declared list, not an inferred one.
+    - name: bot_author_predicate
+      description: >
+        Predicate that classifies a pull-request author as a bot
+        account (dependency-update automation, release automation).
+        Bot-authored merges are excluded from both numerator and
+        denominator so the KPI reflects human-contributor mix.
+  window:
+    duration: P90D
+    sliding: false
+
+external_refs:
+  - name: SecOps-NG ROADMAP goal G-06 — contributor adoption signal
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/ROADMAP.md
+  - name: SecOps-NG GOVERNANCE — maintainer roles and decision process
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/GOVERNANCE.md
+  - name: CHAOSS — Contributor community metrics
+    source: CHAOSS
+    url: https://chaoss.community/kbtopic/contributor-metrics/
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability

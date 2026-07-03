@@ -1,0 +1,108 @@
+stable_id: kpi.operator_adoption_reference_count@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Publicly attestable operator adoption references
+summary: >
+  Count of publicly attestable operator references to this framework
+  over the evaluation window. An operator reference is a public
+  artifact naming SecOps-NG as in-use by a named organisation: a
+  `USED-BY.md` registry row, a conference talk recording, a
+  peer-reviewed paper, a blog post, or a public repository that
+  demonstrably deploys shipped playbooks. The catalog entry directly
+  attests to the G-07 operator-adoption dimension of the project
+  goals. SecOps-NG does not collect telemetry from operators — this
+  KPI is intentionally a count of *public* signals only, so the
+  Digital Commons posture is upheld.
+
+unit: count
+direction: higher_is_better
+
+target:
+  value: 5
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point for the first year of a
+    Digital Commons framework: at least five publicly attestable
+    operator references across the evaluation window. The threshold
+    is a floor for the initial ramp; healthier projects sit
+    substantially higher.
+
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 5
+    severity: warn
+  - name: breach
+    comparator: "<"
+    value: 1
+    severity: high
+
+measurement:
+  source: composite
+  aggregation: count
+  formula: >
+    Over the evaluation window, count distinct publicly attestable
+    operator references. Distinctness is over the (organisation, evidence_type)
+    pair — the same organisation contributing both a `USED-BY.md` row
+    and a conference talk counts as two, but two blog posts from the
+    same organisation in the same window count as one. Only public
+    artifacts qualify: private links, login-walled dashboards, and
+    internal wikis are excluded per the `USED-BY.md` policy. The
+    catalog entry is forge-agnostic; the compile target resolves the
+    concrete input feeds at evaluation time.
+    Reference visualisation: a stacked-bar plot per evaluation window
+    partitioned by `evidence_type` (USED-BY.md row, conference talk,
+    paper, blog post, public repository), with the warn / breach
+    thresholds overlaid as horizontal lines on the total-count
+    envelope.
+    The committed reference rendering lives at
+    `content/metrics/operator_adoption_reference_count.viz.md` —
+    that file is the contract for the chart shape; the compile
+    target renders the executable form against the project's public
+    signal feeds.
+  inputs:
+    - name: used_by_registry_row
+      description: >
+        A row in the shipped `USED-BY.md` self-attestation registry at
+        the evaluation commit. Each valid row (organisation,
+        deployment_type, playbooks, since-quarter, evidence link)
+        counts as one observation. The CI link-check job under
+        `.github/workflows/` guards evidence-link reachability so
+        broken rows are surfaced before they contaminate the count.
+    - name: public_talk_or_paper
+      description: >
+        A conference talk recording, peer-reviewed paper, or public
+        write-up naming SecOps-NG as in-use by a named organisation.
+        Public URL required; the compile target does not accept a
+        reference behind a login wall.
+    - name: public_repository_reference
+      description: >
+        A public code repository under a named organisation that
+        demonstrably deploys one or more shipped playbooks from
+        `content/playbooks/`. The repository must be visible without
+        authentication.
+    - name: evidence_type_partition
+      description: >
+        Partition function that classifies each observation into one
+        of the declared evidence types (registry row, talk, paper,
+        blog, repository). Drives the stacked-bar breakdown on the
+        reference visualisation.
+  window:
+    duration: P90D
+    sliding: false
+
+external_refs:
+  - name: SecOps-NG ROADMAP goal G-07 — operator adoption signal
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/ROADMAP.md
+  - name: SecOps-NG USED-BY registry — self-attestation policy
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/USED-BY.md
+  - name: CHAOSS — Community adoption metrics
+    source: CHAOSS
+    url: https://chaoss.community/kbtopic/community-adoption/
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability
