@@ -101,6 +101,14 @@ If nothing on the board fits, opening an issue to propose your own
 change is equally welcome. Smaller, sharper proposals merge faster than
 large undirected ones.
 
+If you would rather start from a curated menu of contribution vectors
+than from the roadmap,
+[`docs/contributing/good-first-issues.md`](docs/contributing/good-first-issues.md)
+lists four concrete starting points — a new CACAO playbook, a compiled
+example for an existing playbook, a translation, or a walkthrough
+improvement — each with the directory to work in, the standards to
+satisfy, and the issue template to open.
+
 ## 5. Open a pull request
 
 Branch from `main`, keep the scope tight, and commit with sign-off:
@@ -166,7 +174,50 @@ A funded contributor may not be the sole approver of a deliverable they
 were funded to produce. Routine for grant-supported work; uncommon for
 contract work.
 
-## 6. What review looks like
+## 6. Community norms
+
+SecOps-NG is a **Digital Commons**, not a company and not a product.
+The norms below are how the project stays that way in practice.
+
+- **Community language.** The voice on every public surface is
+  community, commons, and practitioners — not vendor, services firm,
+  or advisory. Avoid buyer vocabulary (leads, prospects, deals,
+  pipeline, funnel, price points, market-segment acronyms) and avoid
+  money-in framing. [`SOUL.md`](SOUL.md) is the reference; the
+  hygiene linter (§4 in [AGENTS.md](AGENTS.md)) encodes the mechanical
+  floor.
+- **No named organisations as prospects or partners.** Do not attach
+  the name of an organisation the maintainers are talking to, or the
+  name of an individual at such an organisation, to any file, commit,
+  issue, or PR comment. This applies whether the reference is
+  flattering or critical — the public history is permanent, and
+  attribution creates pressure the project's governance model is
+  designed to avoid.
+- **Code of conduct.** Participation is governed by
+  [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md). Read it once. The short
+  version: be calm, be technical, assume good faith, disagree in
+  public, resolve in the thread.
+- **Ask for help in public.** Questions about the framework, a
+  playbook, a compile target, or a review note belong in **GitHub
+  Discussions** or on the issue thread, not in DMs to individual
+  maintainers. A public question benefits every future contributor
+  who hits the same wall; a DM benefits one person once. If you have
+  a genuinely private matter (a security report, a conduct concern,
+  a licensing question that names third parties), the escalation
+  paths in [`SECURITY.md`](SECURITY.md) and
+  [`GOVERNANCE.md`](GOVERNANCE.md) are the way in.
+- **DCO sign-off is not optional.** Every commit ships with
+  `Signed-off-by:` (via `git commit -s`) per §5. This is the point at
+  which you affirm you have the right to contribute the change under
+  the licence that applies to the path. AI-assisted commits do not
+  change the requirement — the human committer's sign-off is what
+  counts.
+
+Reading these once, at the start of your first contribution, makes
+none of the later review notes feel personal. They are how the commons
+converges.
+
+## 7. The review process
 
 Every pull request to this repository is read by a reviewer in the
 **Custodian** role before it can merge. The Custodian is not a
@@ -199,7 +250,14 @@ When the change is approved, a maintainer merges it. You will see your
 name in the commit history and, if the change is user-visible, in the
 release notes for the next version.
 
-### 5.3 Writing a new playbook
+The operational companion to this section —
+[`docs/contributing/review-process.md`](docs/contributing/review-process.md)
+— walks through what CI runs (the hygiene linter, the test suite),
+what CODEOWNERS gates trigger, typical timelines and feedback style,
+how to respond to requested changes, and the squash-merge + delete-branch
+convention. Read it once before your first review round.
+
+### 7.1 Writing a new playbook
 
 If your contribution scaffolds a new CACAO v2 playbook under
 `content/playbooks/`, the operational walkthrough —
@@ -209,7 +267,7 @@ If your contribution scaffolds a new CACAO v2 playbook under
 run the hygiene linter locally. Read it end-to-end before your first
 playbook PR.
 
-### 5.4 Adding a compiled example
+### 7.2 Adding a compiled example
 
 If your contribution adds a runnable example under
 `examples/{n8n,temporal,langgraph}/<playbook>/` for an existing
@@ -220,7 +278,7 @@ layout, the `regenerate.sh` pattern, and the byte-parity golden test
 that anchors each example. Compiler-surface changes themselves (new
 primitives, new emitters) still go through a scoping issue first.
 
-## 7. Adding or editing a workflow
+## 8. Adding or editing a workflow
 
 Workflows under `workflows/` follow a fixed per-directory layout —
 `README.md`, `PROMPT.md`, `primitives.py`, `example.py`, and
@@ -237,7 +295,7 @@ single-shot reproduction prompt every workflow ships) live in
 that are missing any required file, or that leave required files as
 `TODO` stubs, are rejected.
 
-## 8. Proposing larger changes
+## 9. Proposing larger changes
 
 Most changes do not need a formal proposal — an issue plus a PR is
 enough. When a change is *cross-cutting* — touching public APIs,
@@ -252,12 +310,12 @@ the project's scale justifies the ceremony. It does not exist yet
 because the project does not need it yet. The trigger for introducing
 it is documented in [GOVERNANCE.md §4](GOVERNANCE.md).
 
-## 9. Reporting security issues
+## 10. Reporting security issues
 
 Please do **not** open public issues for vulnerabilities. See
 [SECURITY.md](SECURITY.md) for the disclosure process.
 
-## 10. Code of conduct and governance
+## 11. Code of conduct and governance
 
 Participation in this project is governed by
 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). How decisions are made —
