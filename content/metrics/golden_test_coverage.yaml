@@ -1,0 +1,78 @@
+stable_id: kpi.golden_test_coverage@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Golden byte-parity test coverage across compiled example artifacts
+summary: >
+  Ratio of compiled example artifacts under
+  ``examples/{n8n,temporal,langgraph}/*`` on the evaluation commit that
+  are backed by a per-example byte-parity golden test under
+  ``tests/examples/``. A pass means the artifact's bytes are pinned:
+  a compiler change that moves them fails the golden and is caught
+  before merge. FOUNDATION §2 (Determinism) requires that every
+  shipped compiled artifact carry a byte-parity regression net; this
+  KPI tracks the surfaces where the net is in place.
+unit: ratio
+direction: higher_is_better
+target:
+  value: 1.0
+  comparator: "=="
+  rationale: >
+    Every compiled example artifact the project ships should carry a
+    per-example byte-parity golden test. A shipped artifact with no
+    golden is a silent regression surface; anything below 1.0 is
+    a determinism-net gap the maintainers own until the golden
+    lands.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 1.0
+    severity: warn
+  - name: breach
+    comparator: "<"
+    value: 0.9
+    severity: high
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: >
+    Over the compiled example tree under
+    ``examples/{n8n,temporal,langgraph}/*`` on the evaluation commit,
+    count distinct compiled artifacts backed by a per-example
+    byte-parity golden test under ``tests/examples/`` (numerator).
+    Divide by the total compiled-artifact count in the same commit
+    (denominator). The catalog entry is a coverage-shaped ratio; the
+    per-(workflow, target) drill-down is a dimension, not a
+    separate KPI. The committed reference visualisation lives at
+    ``content/metrics/golden_test_coverage.viz.md`` — that file is the
+    contract for the chart shape; the compile target renders the
+    executable form at evaluation time.
+  inputs:
+    - name: compiled_example_artifact
+      description: >
+        A single compiled example artifact under
+        ``examples/{n8n,temporal,langgraph}/<workflow>/`` on the
+        evaluation commit, identified by (compile target, workflow).
+      field: metadata.uid
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+    - name: golden_test_binding_predicate
+      description: >
+        Predicate that classifies a compiled artifact as covered
+        (a per-example byte-parity golden test under
+        ``tests/examples/<workflow>/`` asserts its bytes) or uncovered
+        (no golden test binds to the artifact).
+  window:
+    duration: P1D
+    sliding: false
+external_refs:
+  - name: SecOps-NG FOUNDATION §2 — Determinism
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+  - name: OCSF — Compliance Finding (class 2003)
+    source: OCSF
+    url: https://schema.ocsf.io/1.1.0/classes/compliance_finding
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - determinism

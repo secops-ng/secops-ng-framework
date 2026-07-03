@@ -1,0 +1,85 @@
+stable_id: kri.non_deterministic_step_count@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Non-deterministic workflow step count lacking a deterministic guard
+summary: >
+  Count of distinct workflow steps under ``content/playbooks/`` on the
+  evaluation commit that touch a non-deterministic surface (wall clock,
+  random source, external service call, unpinned dependency lookup)
+  without declaring a matching deterministic guard on the CACAO step
+  metadata. FOUNDATION §2 (Determinism) requires that every step an
+  operator replays lands on the same outcome given the same input;
+  a step touching a non-deterministic surface without a guard cannot
+  make that promise, and this KRI counts the surfaces where the
+  promise is not made.
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: "=="
+  rationale: >
+    Every workflow step that touches a non-deterministic surface should
+    declare a matching deterministic guard on the CACAO step metadata
+    (fixed clock injection, seeded random source, cached lookup,
+    version-pinned dependency). Any positive count is a step the
+    maintainers own until either a guard is added or the step is
+    replaced with a deterministic alternative.
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 0
+    severity: warn
+  - name: breach
+    comparator: ">="
+    value: 5
+    severity: high
+measurement:
+  source: workflow
+  aggregation: count
+  formula: >
+    Over the playbook tree under ``content/playbooks/`` on the
+    evaluation commit, count distinct workflow steps that touch a
+    non-deterministic surface (wall-clock read, random source, external
+    service call, unpinned dependency lookup) without declaring a
+    matching deterministic guard on the CACAO step metadata. A step
+    with multiple missing guards still counts as one — the catalog
+    entry is a cardinality indicator; the per-step guard drill-down
+    is a dimension, not a separate KRI. The committed reference
+    visualisation lives at
+    ``content/metrics/non_deterministic_step_count.viz.md`` — that
+    file is the contract for the chart shape; the compile target
+    renders the executable form at evaluation time.
+  inputs:
+    - name: workflow_step
+      description: >
+        A single workflow step declared under
+        ``content/playbooks/<workflow>/playbook.cacao.json``,
+        identified by playbook stable_id plus step_id.
+      field: activity_id
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+    - name: deterministic_guard_predicate
+      description: >
+        Predicate that classifies a workflow step as guarded (declares
+        a matching deterministic guard on the CACAO step metadata for
+        every non-deterministic surface it touches) or unguarded
+        (touches a non-deterministic surface without a matching guard).
+  window:
+    duration: P1D
+    sliding: false
+telemetry_refs:
+  - telemetry.ocsf.api_activity@v1
+external_refs:
+  - name: SecOps-NG FOUNDATION §2 — Determinism
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+  - name: NIS2 — Article 21(2)(c) business continuity and crisis management
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(c)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: OCSF — API Activity (class 6003)
+    source: OCSF
+    url: https://schema.ocsf.io/1.1.0/classes/api_activity
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - determinism

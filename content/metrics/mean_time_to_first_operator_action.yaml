@@ -1,0 +1,85 @@
+stable_id: kpi.mean_time_to_first_operator_action@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Mean time to first operator action from workflow trigger to first human-actionable step (MTTFA)
+summary: >
+  Median elapsed time from workflow trigger to the first
+  human-actionable step surfaced to an on-call operator, measured
+  across playbook runs on the evaluation window. FOUNDATION §4
+  (Operability) requires that a workflow reaches the human on the
+  loop in bounded time — long pre-flight before the first operator
+  decision is an operability regression even when every downstream
+  step is correct. This KPI complements the MTTD detection-latency
+  cluster (which measures time-to-signal) by pinning
+  time-to-first-operator-decision.
+unit: seconds
+direction: lower_is_better
+target:
+  value: 300
+  comparator: "<="
+  rationale: >
+    Community operator surveys and the ENISA good-practice guidance
+    on incident-handling response cadences converge on a five-minute
+    ceiling from trigger to first human-actionable step as an
+    operability floor for on-call workflows; anything above that is
+    tolerable in narrow scenarios but not the default the reference
+    playbooks should ship.
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 300
+    severity: warn
+  - name: breach
+    comparator: ">"
+    value: 900
+    severity: high
+measurement:
+  source: workflow
+  aggregation: median
+  formula: >
+    For each playbook run recorded on the evaluation window, compute
+    the elapsed time in seconds from workflow trigger to the first
+    step declared human-actionable on the CACAO metadata that
+    surfaces to an on-call operator. Aggregate as median across
+    runs. The committed reference visualisation lives at
+    ``content/metrics/mean_time_to_first_operator_action.viz.md`` —
+    that file is the contract for the chart shape; the compile target
+    renders the executable form at evaluation time.
+  inputs:
+    - name: workflow_run
+      description: >
+        A single playbook run captured on the evaluation window,
+        identified by playbook stable_id plus run correlation id
+        under the OCSF Incident Finding class.
+      field: metadata.uid
+      telemetry_ref: telemetry.ocsf.incident_finding@v1
+    - name: first_operator_action_step
+      description: >
+        The first CACAO step in the run whose metadata declares the
+        step as human-actionable and surfaces it to an on-call
+        operator (a hand-off to a human on the loop).
+      field: activity_id
+      telemetry_ref: telemetry.ocsf.incident_finding@v1
+  window:
+    duration: P30D
+    sliding: false
+external_refs:
+  - name: SecOps-NG FOUNDATION §4 — Operability
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+  - name: NIS2 — Article 21(2)(b) incident handling
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(b)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ENISA — Threat Landscape methodology, incident-response cadence discussion
+    source: ENISA
+    url: https://www.enisa.europa.eu/publications/enisa-threat-landscape
+  - name: OCSF — Incident Finding (class 2005)
+    source: OCSF
+    url: https://schema.ocsf.io/1.1.0/classes/incident_finding
+telemetry_refs:
+  - telemetry.ocsf.incident_finding@v1
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability

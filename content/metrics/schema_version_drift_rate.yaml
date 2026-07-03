@@ -1,0 +1,79 @@
+stable_id: kri.schema_version_drift_rate@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Schema-version drift rate across playbooks lacking a pinned CACAO / OCSF schema version
+summary: >
+  Ratio of playbooks under ``content/playbooks/`` on the evaluation
+  commit that do not declare a pinned CACAO schema version and a
+  pinned OCSF schema version they consume, over the total playbook
+  count. FOUNDATION §2 (Determinism) requires that a re-compile on a
+  future commit lands on the same artifacts as today; an unpinned
+  schema reference silently rebases the playbook onto whichever
+  upstream schema is current at re-compile time, breaking that
+  guarantee. This KRI tracks the surfaces where the pin is missing.
+unit: ratio
+direction: lower_is_better
+target:
+  value: 0.0
+  comparator: "=="
+  rationale: >
+    Every playbook the project ships under ``content/playbooks/``
+    should declare both the CACAO schema version it targets and the
+    OCSF schema version its telemetry bindings consume. Anything
+    above 0.0 is a silent rebase risk on a future re-compile the
+    maintainers own until the pins are restored.
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 0.0
+    severity: warn
+  - name: breach
+    comparator: ">="
+    value: 0.1
+    severity: high
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: >
+    Over the playbook tree under ``content/playbooks/`` on the
+    evaluation commit, count distinct playbooks lacking a pinned
+    CACAO schema version or a pinned OCSF schema version on their
+    telemetry bindings (numerator). Divide by the total playbook
+    count in the same commit (denominator). A playbook with both pins
+    missing still counts as one — the catalog entry is a
+    cardinality-shaped ratio; the per-playbook pin drill-down is a
+    dimension, not a separate KRI. The committed reference
+    visualisation lives at
+    ``content/metrics/schema_version_drift_rate.viz.md`` — that file
+    is the contract for the chart shape; the compile target renders
+    the executable form at evaluation time.
+  inputs:
+    - name: playbook_artifact
+      description: >
+        A single playbook artifact under
+        ``content/playbooks/<workflow>/playbook.cacao.json`` on the
+        evaluation commit, identified by playbook stable_id.
+      field: metadata.uid
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+    - name: schema_pin_predicate
+      description: >
+        Predicate that classifies a playbook as pinned (declares
+        both a CACAO schema version and an OCSF schema version for
+        every telemetry binding it consumes) or drifting (missing
+        either pin).
+  window:
+    duration: P1D
+    sliding: false
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+external_refs:
+  - name: SecOps-NG FOUNDATION §2 — Determinism
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+  - name: OCSF — Compliance Finding (class 2003)
+    source: OCSF
+    url: https://schema.ocsf.io/1.1.0/classes/compliance_finding
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - determinism

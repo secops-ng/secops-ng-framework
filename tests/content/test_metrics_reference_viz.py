@@ -140,6 +140,17 @@ VIZ_REQUIRED_STEMS = (
     "audit_envelope_reverification_pass_rate",
     "decision_trace_completeness_ratio",
     "provenance_chain_integrity_gap_count",
+    # F-METRICS-04 determinism + operability axis CORE (G-04)
+    "replay_parity_rate",
+    "non_deterministic_step_count",
+    "schema_version_drift_rate",
+    "compiler_idempotency_pass_rate",
+    "golden_test_coverage",
+    "runbook_self_sufficiency_score",
+    "compile_target_coverage",
+    "dependency_free_ratio",
+    "operator_onboarding_pass_rate",
+    "mean_time_to_first_operator_action",
 )
 
 
