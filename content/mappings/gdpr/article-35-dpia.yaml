@@ -1,0 +1,328 @@
+# GDPR — Art. 35 data protection impact assessment (DPIA) cluster.
+#
+# F-MAP-GDPR CORE-8: eighth per-clause GDPR mapping YAML, slotting in
+# beside the existing CORE-1 breach-notification cluster
+# (article-33-34-personal-data-breach-notification.yaml) as the second
+# limb of the Art. 33-35 cluster obligation. Art. 33-34 records the
+# after-the-fact notification duty; Art. 35 records the before-the-fact
+# assessment duty for processing "likely to result in a high risk to
+# the rights and freedoms of natural persons". Both limbs anchor on
+# the same operational playbooks — the high-risk profile a DPIA must
+# document under Art. 35 is the same risk profile the notification
+# clauses read against when the residual risk materialises as a
+# personal-data-breach event.
+#
+# Scope of this file:
+#
+#   - gdpr:art-35-1-dpia-high-risk-processing — the general Art. 35(1)
+#     obligation to carry out a data-protection impact assessment
+#     prior to processing that is likely to result in a high risk. All
+#     three cluster playbooks operate on processing surfaces that meet
+#     the high-risk threshold and therefore require a documented DPIA
+#     ahead of production wiring:
+#
+#     * data_exfil operates on a scope-assessment surface that
+#       resolves __data_classification__ and
+#       __affected_subjects_count__ against the operator's
+#       classification baseline. Per data-flow-data_exfil.md §2 the
+#       workflow acknowledges that a confirmed exfiltration may carry
+#       Art. 9 special-category data belonging to external subjects
+#       and that the regulator-notification-threshold gate reads
+#       against the derived subject count and classification. That
+#       combination — potential Art. 9 scope plus subject-count
+#       thresholding plus the Art. 34 subject-communication branch —
+#       is a high-risk processing profile the operator's DPIA must
+#       have documented before this playbook is bound to a production
+#       DLP / egress signal stream.
+#
+#     * identity_compromise operates on the operator's IdP and the
+#       principal's downstream SaaS surface across a bounded lookback
+#       window (data-flow-identity_compromise.md §3 enumerates the
+#       authentication telemetry, IAM-surface metadata, and
+#       lateral-movement findings the workflow reads). Systematic
+#       inspection of a principal's account-level activity at that
+#       depth — session, token, OAuth-grant, inbox-rule, and
+#       role-assignment posture — is the account-level surveillance
+#       pattern that carries a high-risk profile under Art. 35(1) and
+#       requires a DPIA before the workflow is bound to a production
+#       IdP alert stream.
+#
+#     * ransomware_containment operates on the host filesystem,
+#       process, and identity surface of the affected principal and
+#       device user, and on the backup-snapshot catalogue for the
+#       operator's protected volumes (data-flow-ransomware_containment.md
+#       §3). The workflow can, at containment time, revoke a
+#       principal's IdP account, isolate a physical host, and stage
+#       the NIS2 Art. 23 early-warning payload; those are
+#       consequential-decision measures against natural persons that
+#       carry a high-risk profile under Art. 35(1) and require a
+#       DPIA to document the proportionality of the containment
+#       envelope.
+#
+#   - gdpr:art-35-3-a-dpia-systematic-evaluation — Art. 35(3)(a)
+#     mandatory-DPIA trigger: systematic and extensive evaluation of
+#     personal aspects relating to natural persons which is based on
+#     automated processing and on which decisions are based that
+#     produce legal effects concerning the natural person or
+#     similarly significantly affect the natural person.
+#     identity_compromise is the anchor: the IAM-audit step
+#     systematically evaluates a principal's OAuth grants,
+#     conditional-access exceptions, standing role assignments, and
+#     inbox rules, and the containment decision (force session
+#     revocation, force MFA re-enrollment, disable account) is a
+#     decision "similarly significantly affecting" the principal
+#     under this limb.
+#
+#   - gdpr:art-35-3-b-dpia-large-scale-processing — Art. 35(3)(b)
+#     mandatory-DPIA trigger: processing on a large scale of special
+#     categories of data referred to in Art. 9(1), or of personal
+#     data relating to criminal convictions and offences referred to
+#     in Art. 10. data_exfil and ransomware_containment are the
+#     anchors — both workflows operate against processing surfaces
+#     where the affected-subjects count can materialise at large
+#     scale and where the exfiltrated / encrypted payload may carry
+#     Art. 9 categories (data_exfil explicitly recognises this in
+#     its lawful-basis section; ransomware_containment operates on
+#     host filesystems that may hold Art. 9 attributes inside the
+#     snapshot volume even where the workflow itself does not read
+#     them). The large-scale limb is the DPIA hook these two
+#     workflows discharge.
+#
+# Out of scope of this file (deliberately):
+#
+#   - Art. 35(9) — the controller's obligation to seek the views of
+#     data subjects (or their representatives) on the intended
+#     processing where appropriate. This is an operator-side
+#     consultation-record obligation carried on the RoPA extension
+#     surface, not on a playbook. A future ROPA-extension card
+#     authors that entry.
+#
+#   - The Art. 35(3)(c) systematic-monitoring-of-publicly-accessible-
+#     area limb. None of the currently finalized playbooks operates
+#     against a publicly accessible physical area — the closest fit
+#     (identity_compromise) is account-level, not area-level, and is
+#     authored under Art. 35(3)(a) above.
+#
+#   - Cookbook / operator-guide entry for the DPIA process itself.
+#     This YAML records the per-clause anchors; the operator's DPIA
+#     document template and workflow live in the EXTEND-DOCS
+#     follow-on card.
+#
+#   - Cross-regime DPIA interaction with NIS2 Art. 21(2)(f)
+#     effectiveness-assessment measures and DORA Art. 5-16 ICT
+#     risk-management framework outputs — the three regimes carry
+#     separate documented-assessment obligations against overlapping
+#     playbook surfaces, and the cross-regime harmonisation lives on
+#     a follow-on card.
+#
+#   - executive_metrics — stays in _orphan_skip.yaml per the audited
+#     deferral. executive_metrics is the reporting playbook, not a
+#     high-risk processing surface in its own right.
+#
+# Cross-references:
+#
+#   - Sibling GDPR clauses:
+#     * content/mappings/gdpr/article-33-34-personal-data-breach-notification.yaml
+#       carries the same three playbooks under the breach-notification
+#       cluster. Art. 33-35 is a single conceptual cluster: Art. 35
+#       is the ex-ante impact-assessment leg, Art. 33-34 is the
+#       ex-post notification leg on the same high-risk processing
+#       envelope.
+#     * content/mappings/gdpr/article-32-security-of-processing.yaml
+#       carries the Art. 32 security-of-processing measures whose
+#       adequacy is one of the inputs the Art. 35 DPIA evaluates
+#       under Art. 35(7)(d) (measures envisaged to address the
+#       risks).
+#
+#   - NIS2 parallel: content/mappings/nis2/article-21-2-f.yaml pins
+#     effectiveness-assessment measures on overlapping surfaces; the
+#     NIS2 assessment is the network-and-information-systems view of
+#     the same evidence surface the GDPR DPIA reads for the
+#     personal-data axis.
+#
+#   - DORA parallel: content/mappings/dora/ carries the ICT
+#     risk-management framework outputs that a DPIA reads under
+#     Art. 35(7)(c) (assessment of the risks to the rights and
+#     freedoms of data subjects) alongside the NIS2 view.
+
+regime: gdpr
+entries:
+  - id: gdpr:art-35-1-dpia-high-risk-processing
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "35"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Where a type of processing, in particular using new
+      technologies, and taking into account the nature, scope,
+      context and purposes of the processing, is likely to result in
+      a high risk to the rights and freedoms of natural persons, the
+      controller shall, prior to the processing, carry out an
+      assessment of the impact of the envisaged processing operations
+      on the protection of personal data. A single assessment may
+      address a set of similar processing operations that present
+      similar high risks. The assessment must contain a systematic
+      description of the envisaged processing and its purposes, an
+      assessment of the necessity and proportionality of the
+      processing in relation to those purposes, an assessment of the
+      risks to rights and freedoms of data subjects, and the measures
+      envisaged to address the risks including safeguards, security
+      measures and mechanisms to ensure the protection of personal
+      data and demonstrate compliance.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.data_exfil@v1
+      - playbook.identity_compromise@v1
+      - playbook.ransomware_containment@v1
+    metric_refs:
+      - kpi.notification_sla_compliance@v1
+      - kri.regulator_notification_overrun@v1
+    evidence_stream_refs:
+      - incidents
+      - posture
+    notes: >-
+      All three anchor playbooks operate on processing surfaces that
+      meet the Art. 35(1) high-risk threshold and therefore require a
+      documented DPIA ahead of production wiring. data_exfil resolves
+      the affected-subjects count and data classification against the
+      operator's classification baseline and can route into the
+      Art. 34 subject-communication branch when the high-risk
+      threshold is crossed — the ex-ante DPIA is where that
+      threshold-and-response envelope is documented. Per
+      data-flow-data_exfil.md §2 the workflow explicitly acknowledges
+      that a confirmed exfiltration may carry Art. 9 special-category
+      data belonging to external subjects and that the
+      regulator-notification-threshold gate reads against the derived
+      subject count and classification; that combination is exactly
+      the "high risk" envelope Art. 35(1) requires an assessment for.
+      identity_compromise operates on the principal's authentication,
+      IdP posture, OAuth-grant, conditional-access, and inbox-rule
+      surface across a bounded lookback window; systematic inspection
+      of an account at that depth is a high-risk processing profile
+      under Art. 35(1) even where Art. 9 is not the target of the
+      workflow (data-flow-identity_compromise.md §2 confirms Art. 9
+      is not extracted or persisted). ransomware_containment operates
+      on the host filesystem, process, and identity surface of the
+      affected principal and device user, and its containment
+      decisions (account disable, host isolation, snapshot
+      identification) are consequential measures against natural
+      persons that require the operator's DPIA to have documented
+      the proportionality of the containment envelope before the
+      workflow is bound to a production EDR / IdP signal stream. The
+      Art. 35(1) anchor here is the general obligation; the two
+      Art. 35(3) sub-limbs below (§(a) systematic-evaluation and §(b)
+      large-scale-special-categories) name the specific mandatory-
+      DPIA triggers each playbook independently satisfies. The DPIA
+      itself is an operator-side artifact; this YAML records the
+      agentic anchors whose deployment triggers the assessment
+      obligation, not the assessment document.
+
+  - id: gdpr:art-35-3-a-dpia-systematic-evaluation
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "35(3)(a)"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      A data-protection impact assessment referred to in paragraph 1
+      shall in particular be required in the case of a systematic and
+      extensive evaluation of personal aspects relating to natural
+      persons which is based on automated processing, including
+      profiling, and on which decisions are based that produce legal
+      effects concerning the natural person or similarly
+      significantly affect the natural person.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+    playbook_refs:
+      - playbook.identity_compromise@v1
+    metric_refs:
+      - kri.regulator_notification_overrun@v1
+    evidence_stream_refs:
+      - incidents
+    notes: >-
+      identity_compromise is the mandatory-DPIA anchor for the
+      Art. 35(3)(a) systematic-evaluation limb. The IAM-audit step
+      systematically walks the principal's OAuth grants,
+      conditional-access exceptions, standing role assignments, and
+      inbox rules; the lateral-movement hunt evaluates the
+      principal's activity against a bounded lookback window; and
+      the containment decisions the workflow drives (force session
+      and refresh-token revocation, force MFA re-enrollment, account
+      disable) are the "similarly significantly affect" decisions
+      Art. 35(3)(a) names — the principal cannot access their
+      account or downstream SaaS surface for the duration of the
+      containment window. This is the mandatory-DPIA limb that
+      requires the operator to have documented, before wiring this
+      workflow to a production IdP alert stream, the classes of
+      account-level evaluation the workflow performs, the
+      proportionality of the automated containment decisions, and
+      the human-in-the-loop review path for the containment
+      envelope. data_exfil and ransomware_containment sit under the
+      Art. 35(3)(b) large-scale-processing limb below rather than
+      here, because their evaluation of personal aspects is
+      incident-scoped rather than a systematic-and-extensive
+      profiling of the principal's account posture.
+
+  - id: gdpr:art-35-3-b-dpia-large-scale-processing
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "35(3)(b)"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      A data-protection impact assessment referred to in paragraph 1
+      shall in particular be required in the case of processing on a
+      large scale of special categories of data referred to in
+      Article 9(1), or of personal data relating to criminal
+      convictions and offences referred to in Article 10.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.data_exfil@v1
+      - playbook.ransomware_containment@v1
+    metric_refs:
+      - kpi.notification_sla_compliance@v1
+      - kri.regulator_notification_overrun@v1
+    evidence_stream_refs:
+      - incidents
+    notes: >-
+      data_exfil is the primary Art. 35(3)(b) anchor: per
+      data-flow-data_exfil.md §2 the workflow explicitly recognises
+      that special-category data (Art. 9) is materially in scope
+      because a confirmed exfiltration may carry health, biometric,
+      racial or ethnic, political-opinion, trade-union,
+      religious-belief, sex-life, or other Art. 9 categories
+      belonging to external data subjects, and the scope-assessment
+      step derives __affected_subjects_count__ against the
+      operator's classification baseline. The combination of
+      potential Art. 9 scope and a subject count that can materialise
+      at large scale is exactly the mandatory-DPIA trigger under
+      Art. 35(3)(b) — the operator's DPIA must document, before this
+      workflow is bound to a production DLP / egress signal stream,
+      how the large-scale-special-category limb is evaluated at
+      scope-assessment time and how the Art. 34 subject-communication
+      branch is proportioned against the derived scale.
+      ransomware_containment is the secondary anchor: per
+      data-flow-ransomware_containment.md §2 the workflow does not
+      itself derive Art. 9 conclusions, but the host filesystem and
+      backup-snapshot volume it operates against can carry Art. 9
+      attributes inside the artifacts the snapshot covers, and the
+      per-host containment decisions the workflow drives cascade
+      across every subject whose data is held on that host — the
+      unpredictable-scale limb of Art. 35(3)(b) is what the
+      operator's DPIA must document ahead of production wiring for
+      this playbook. identity_compromise is anchored under
+      Art. 35(3)(a) above rather than here, because its lawful-basis
+      section explicitly disclaims Art. 9 scope and its evaluation
+      surface is systematic-account-posture rather than
+      large-scale-special-category.
