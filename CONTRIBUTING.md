@@ -199,6 +199,27 @@ When the change is approved, a maintainer merges it. You will see your
 name in the commit history and, if the change is user-visible, in the
 release notes for the next version.
 
+### 5.3 Writing a new playbook
+
+If your contribution scaffolds a new CACAO v2 playbook under
+`content/playbooks/`, the operational walkthrough —
+[`docs/contributing/playbook-authoring.md`](docs/contributing/playbook-authoring.md)
+— covers the directory scaffold, required CACAO fields, the
+`mappings.yaml` overlay, what the orphan-CI gate checks, and how to
+run the hygiene linter locally. Read it end-to-end before your first
+playbook PR.
+
+### 5.4 Adding a compiled example
+
+If your contribution adds a runnable example under
+`examples/{n8n,temporal,langgraph}/<playbook>/` for an existing
+playbook, the compiler-path walkthrough —
+[`docs/contributing/compiler-walkthrough.md`](docs/contributing/compiler-walkthrough.md)
+— covers the three reference targets, the shared example directory
+layout, the `regenerate.sh` pattern, and the byte-parity golden test
+that anchors each example. Compiler-surface changes themselves (new
+primitives, new emitters) still go through a scoping issue first.
+
 ## 7. Adding or editing a workflow
 
 Workflows under `workflows/` follow a fixed per-directory layout —
