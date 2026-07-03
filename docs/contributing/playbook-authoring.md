@@ -44,9 +44,9 @@ content/playbooks/<name>/
     └── *.j2
 ```
 
-`<name>` is `snake_case`, matches the playbook's `x_secops_ng_slug`
-extension field, and is stable — renames break external references and
-are treated as breaking changes.
+`<name>` is `snake_case`, matches the slug segment of the playbook's
+`x_secops_ng.stable_id` (`playbook.<name>@v<major>`), and is stable —
+renames break external references and are treated as breaking changes.
 
 Not every playbook has templates. Add the directory only if the
 workflow renders artifacts (advisories, notifications, ack letters);
@@ -60,9 +60,9 @@ canonical rule; do not add new ones.
 ## 3. Required CACAO fields
 
 The canonical artifact is `playbook.cacao.json`. It is CACAO v2 plus a
-small SecOps-NG extension namespace under the `x_secops_ng_*` prefix.
-The following fields are required and are checked by
-`tests/content/test_cacao_schema.py`:
+small SecOps-NG extension namespace under the reserved `x_secops_ng`
+object. The following fields are required and are checked by
+`tests/content_model/test_playbook_schema.py`:
 
 | Field | Notes |
 |---|---|
@@ -71,14 +71,22 @@ The following fields are required and are checked by
 | `id` | `playbook--<uuid>`. Generate once; never change. |
 | `name` | Human-readable title. Sentence case, no marketing verbs. |
 | `description` | 1–4 paragraphs. Names the regulatory anchor and the workflow's inputs / outputs. `SKELETON` playbooks say so in the first sentence. |
-| `playbook_types` | One or more of `investigation`, `notification`, `remediation`, `prevention`, `detection`, `attack`. |
+| `playbook_types` | One or more of `investigation`, `notification`, `remediation`, `prevention`, `detection`, `mitigation`, `attack`, `engagement`. |
 | `created_by` | `identity--<uuid>` — a stable identity, not a person. |
 | `created`, `modified`, `valid_from` | ISO-8601 timestamps. |
 | `labels` | Lowercase tokens. Include the regulatory anchor slug (e.g. `cra`, `article-14`). |
 | `external_references` | Standards lineage: cite CACAO, the specific regulatory clause, OSCAL / D3FEND / OCSF where applicable. |
 | `workflow` | Ordered map of `step--<uuid>` entries following CACAO step-type conventions (`start`, `action`, `end`, plus `if-condition` / `while-condition` / `playbook-action` as needed). |
-| `x_secops_ng_slug` | Matches the directory name. Used by the compilers and by mappings. |
-| `x_secops_ng_version` | Semver-lite `v<major>.<minor>`. Start at `v1`. |
+| `x_secops_ng.stable_id` | Nested. Human-curated join key, format `playbook.<slug>@v<major>` (e.g. `playbook.cra_cvd@v1`). This is what mappings and cross-references pin — stable across regenerations of the CACAO `id`. |
+| `x_secops_ng.content_version` | Nested. Semver of the playbook body itself (NOT the CACAO `spec_version`), e.g. `0.1.0`. |
+| `x_secops_ng.maturity` | Nested. One of `draft`, `experimental`, `stable`, `deprecated`. `draft` and `experimental` are not compiled by default in production targets. |
+
+Optional siblings under `x_secops_ng` extend the join graph and are
+declared where relevant: `compile_targets` (subset of `n8n`,
+`temporal`, `langgraph`), `control_refs`, `telemetry_refs`,
+`metric_refs` (each an array of stable-id references into the
+respective content-model layers), and `sources` (free-form provenance
+pointers to upstream specs and clauses).
 
 The step graph is the heart of the playbook. Each step carries a
 `name`, a `description`, and — for `action` steps — a `commands` array
@@ -89,27 +97,57 @@ example.
 ## 4. The mappings overlay
 
 `mappings.yaml` is the outbound view: what this playbook pins on the
-control catalogues and how it emits telemetry. The schema is:
+control catalogues and how it emits telemetry. The schema is at
+`schemas/playbook-mappings.schema.json`; the shape looks like this
+(trimmed from `content/playbooks/cra_cvd/mappings.yaml`):
 
 ```yaml
+playbook: playbook.cra_cvd@v1
+
 oscal:
-  - id: SI-5
-    profile: nist-800-53-rev5
-    role: primary
+  - id: control.vuln_disclosure_intake@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SI-5
+    title: Security Alerts, Advisories, and Directives
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-5
+    notes: >-
+      Anchors the publish_advisory and reporter-acknowledgement steps.
+
 d3fend:
-  - id: IncidentResponseAnalysis
-    role: primary
+  - d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+
 ocsf:
-  - class: 3005          # OCSF Vulnerability Finding
-    role: emits
-regulatory:
-  cra:
-    - clause: annex-i-2-cvd-policy
-      role: operationalises
+  - id: telemetry.ocsf.vulnerability_finding@v1
+    class_uid: 2002
+    class_name: Vulnerability Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+
+nis2: []
+dora: []
+
+cra:
+  - mapping_id: cra:annex-i-2-cvd-policy
+    article: Annex I §2(5)
+    notes: >-
+      Runtime materialisation of the coordinated-vulnerability-
+      disclosure policy obligation.
 ```
 
+The top-level `playbook:` field is required and must match the
+playbook artifact's `x_secops_ng.stable_id`. `oscal[]` entries use
+`id: control.<slug>@v<n>` (URN-validated) plus `oscal_catalog` and
+`control_id`; `title`, `url`, `notes` are optional. `d3fend[]` uses
+`d3fend_id:` (pattern `D3-*`), not `id:`. `ocsf[]` uses `class_uid:`,
+not `class:`. Regulatory bindings are three separate top-level arrays
+— `nis2:`, `dora:`, `cra:` — not nested under a `regulatory:` wrapper;
+each entry pins a `mapping_id: <regime>:<slug>` that resolves against
+the inbound YAML files under `content/mappings/<regime>/`.
+
 The four sections are all optional individually — but a playbook with
-none of them is an orphan and will not pass CI.
+no anchors anywhere is an orphan and will not pass CI.
 
 **Every clause you pin here must have an inbound entry.** For each
 regulatory clause slug you list, there is a corresponding YAML file
@@ -196,8 +234,13 @@ CACAO-defined variables only.
 `python -m pytest` from the repo root runs the full suite. For playbook
 work specifically, the tests that matter are:
 
-- `tests/content/test_cacao_schema.py` — required-field validation.
-- `tests/content/test_playbook_shape.py` — directory-layout invariants.
+- `tests/content_model/test_playbook_schema.py` — schema smoke test:
+  required-field and shape validation against
+  `content-model/playbook.schema.json`.
+- `tests/content/test_playbook_mappings.py` — mappings-shape lint
+  against `schemas/playbook-mappings.schema.json`, plus
+  `tests/content/test_playbook_mapping_coverage.py` for the graph
+  closure across the four regimes.
 - `tests/content/test_<framework>_playbook_orphans.py` — same closure
   the CI workflow enforces, but running locally.
 
