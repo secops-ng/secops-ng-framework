@@ -1,0 +1,107 @@
+title: "[Deployment] <short description>"
+labels: ["deployment", "adoption"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for opening a deployment thread. This category is for
+        operators evaluating, piloting, or running SecOps-NG in the
+        open. Threads here are how the community learns which parts of
+        the framework hold up under real load and which need work.
+
+        The project does not collect telemetry. Public deployment
+        conversations are how we — collectively — see what's being
+        used. If your deployment reaches a stable enough shape to
+        attest publicly, please also consider submitting a PR against
+        [`USED-BY.md`](../../USED-BY.md); see
+        [`docs/contributing/self-attesting-adoption.md`](../../docs/contributing/self-attesting-adoption.md).
+
+        No credentials, no internal hostnames, no client or vendor
+        names attached to individuals. Community voice throughout.
+
+  - type: dropdown
+    id: organisation_type
+    attributes:
+      label: Organisation type
+      description: What kind of organisation is running (or evaluating) the framework?
+      options:
+        - Private sector
+        - Public sector
+        - Academic
+        - Individual / independent operator
+        - Prefer not to say
+    validations:
+      required: true
+
+  - type: dropdown
+    id: deployment_type
+    attributes:
+      label: Deployment type
+      description: Where is the framework running today?
+      options:
+        - Production
+        - Staging / pre-production
+        - Evaluation / proof-of-concept
+        - Research
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: playbooks_of_interest
+    attributes:
+      label: Playbooks of interest
+      description: |
+        Which playbooks from
+        [`content/playbooks/`](../../content/playbooks/) are you
+        running, piloting, or evaluating? Tick all that apply. Leave
+        empty if none of the below are relevant and describe your
+        interest in the open question below.
+      options:
+        - label: alert_triage
+        - label: phishing_triage
+        - label: incident_management
+        - label: vuln_intake
+        - label: patch_management
+        - label: ransomware_containment
+        - label: data_exfil
+        - label: ddos_response
+        - label: post_incident_review
+        - label: threat_intel_ingest
+
+  - type: textarea
+    id: open_question
+    attributes:
+      label: Your question or observation
+      description: |
+        What do you want to discuss? Deployment friction, a gap in the
+        content tree, a compile-target choice (n8n / Temporal /
+        LangGraph), an integration you're missing, a KPI you want to
+        surface — anything an operator would sensibly raise in the
+        open.
+      placeholder: |
+        Describe the deployment shape, the friction you hit, or the
+        question you want the community's input on.
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Public-bar reminder
+
+        This thread is public the moment it lands. Please do not
+        include credentials, internal hostnames, internal task
+        identifiers, or the names of individuals attached to
+        organisations. See [`SOUL.md`](../../SOUL.md) and
+        [`AGENTS.md`](../../AGENTS.md) for the project's voice and the
+        hygiene bar the linter enforces.
+
+  - type: checkboxes
+    id: guardrails
+    attributes:
+      label: Guardrails
+      options:
+        - label: This post contains no credentials, internal hostnames, or contact names.
+          required: true
+        - label: The framing is community/commons — no vendor or services-firm framing.
+          required: true
