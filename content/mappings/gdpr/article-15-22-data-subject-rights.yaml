@@ -1,0 +1,339 @@
+# GDPR — Chapter III data subject rights cluster (Articles 15-22).
+#
+# F-WF-DSR SKELETON: inbound entries for the six operational
+# rights the data_subject_rights playbook operationalises, plus
+# Article 22 automated-decision-review folded into the Article 21
+# objection entry per the playbook's classifier axis. The playbook
+# is the operator-side DSR intake and fulfilment lifecycle — receive
+# request → verify identity (sovereign IdP integration point) →
+# classify request → route to data-store owners → compile fulfilment
+# evidence → send controller response within the Article 12(3)
+# one-month window → record outcome. This file authors the inbound
+# graph so playbook.data_subject_rights@v1 is not an orphan under
+# content/mappings/gdpr/.
+#
+# Scope of this file:
+#
+#   - gdpr:art-15-access — right of access, incl. Article 15(1)(a)-(h)
+#     meta-information and Article 15(3) subject-copy provision.
+#     Anchored on data_subject_rights@v1 which assembles the subject-
+#     copy pack at compile_fulfilment_evidence and emits it via
+#     send_controller_response.
+#
+#   - gdpr:art-16-rectification — right to rectification. Anchored
+#     on data_subject_rights@v1 whose route_to_data_owners step
+#     routes the correction request to holding data-store owners
+#     and whose compile_fulfilment_evidence step assembles the
+#     applied-correction attestation set.
+#
+#   - gdpr:art-17-erasure — right to erasure / right to be
+#     forgotten. Anchored on data_subject_rights@v1 whose
+#     compile_fulfilment_evidence step assembles the deletion-
+#     attestation set with per-owner Article 17(3) retention-
+#     exemption records where applicable.
+#
+#   - gdpr:art-18-restriction — right to restriction of processing.
+#     Anchored on data_subject_rights@v1 whose compile_fulfilment_evidence
+#     step assembles the applied-restriction-marker set and whose
+#     record_outcome step records the Article 18(3) subsequent-
+#     lifting-notification hook.
+#
+#   - gdpr:art-20-portability — right to data portability. Anchored
+#     on data_subject_rights@v1 whose compile_fulfilment_evidence
+#     step assembles the Article 20(1) structured, commonly-used,
+#     machine-readable data package.
+#
+#   - gdpr:art-21-objection — right to object, folding the Article
+#     22 automated-decision-review concern axis. Anchored on
+#     data_subject_rights@v1 whose classify_request step tags an
+#     Article 22 concern on the case and routes it to the operator's
+#     human-in-the-loop review surface as part of the objection
+#     envelope. Article 22 is not authored as a standalone edge
+#     because the workflow does not itself review the underlying
+#     automated decision — it classifies and routes.
+#
+# Out of scope of this file (deliberately):
+#
+#   - Article 12 modalities and response window. Article 12(3) is
+#     the response-window clock every entry below reads against
+#     (one month + optional two-month extension); the Article 12
+#     modality obligation itself is a horizontal obligation across
+#     the six operational rights rather than a standalone edge.
+#     The playbook records the __response_deadline__ variable per-
+#     case and each entry below carries the same modality anchor
+#     via the send_controller_response step; a future CORE slice
+#     may author a dedicated Article 12 entry if a horizontal
+#     modality anchor is needed.
+#
+#   - Article 13/14 information-at-collection obligations. These
+#     anchor on the workflow that COLLECTS personal data, not the
+#     workflow that FULFILS a rights request against already-
+#     collected data. The DSR lifecycle authored here is the
+#     downstream rights-exercise surface; the upstream
+#     information-at-collection surface is owned by each
+#     controller-side collection workflow's own data-flow doc.
+#
+# Cross-references:
+#
+#   - Sibling GDPR clauses: the CORE-1 breach-notification cluster
+#     (article-33-34-personal-data-breach-notification.yaml)
+#     handles the Article 33 / Article 34 breach-notification
+#     obligation surface, which is a controller-side notification
+#     duty distinct from the subject-initiated rights lifecycle
+#     authored here. The CORE-4 data-protection-principles cluster
+#     (article-5-data-protection-principles.yaml) records the
+#     Article 5(1)(b)/(c)/(e) principles the DSR lifecycle inherits
+#     but does not itself operationalise; the DSR entries below
+#     are the operational discharge of the rights-of-the-data-
+#     subject principle under Article 5(1)(a) transparency.
+#
+#   - NIS2 / DORA / CRA parallels: no documented cross-regime
+#     interaction with GDPR Chapter III as of 2026-07-03. The DSR
+#     lifecycle is a GDPR-specific obligation surface;
+#     content/mappings/{nis2,dora,cra}/_orphan_skip.yaml records
+#     the deliberate audited exclusion. A sibling CORE / EXTEND
+#     card revisits the choice if a documented cross-regime
+#     interaction is authored (for example a NIS2 Art. 23 incident
+#     that triggers a wave of DSR requests would run the incident
+#     lane and this DSR lane in parallel — the two lanes stay
+#     separately anchored, not cross-pinned).
+
+regime: gdpr
+entries:
+  - id: gdpr:art-15-access
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "15"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Provide the data subject on request with confirmation of
+      whether personal data concerning them are being processed,
+      access to those personal data, and the Article 15(1)(a)-(h)
+      meta-information (purposes of processing, categories of
+      personal data, recipients or categories of recipients,
+      envisaged retention period or the criteria used to determine
+      it, the existence of the rights to rectification, erasure,
+      restriction, and objection, the right to lodge a complaint
+      with a supervisory authority, information about the source
+      of the personal data where not collected from the subject,
+      and the existence of automated decision-making including
+      profiling and meaningful information about the logic
+      involved). Article 15(3) requires the controller to provide
+      a copy of the personal data undergoing processing.
+    status: draft
+    control_refs:
+      - control.access_enforcement@v1
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.data_subject_rights@v1
+    evidence_stream_refs:
+      - incidents
+    notes: >-
+      data_subject_rights@v1 is the operator-side lifecycle that
+      operationalises Article 15. The verify_identity step binds
+      the request to the subject on the operator's declared
+      sovereign IdP integration point (or the out-of-band
+      verification path) before any personal data is compiled;
+      route_to_data_owners resolves the per-owner subject-copy
+      request against the controller's data-inventory surface;
+      compile_fulfilment_evidence assembles the Article 15(1)
+      meta-information block and the Article 15(3) subject-copy
+      pack; send_controller_response emits the pack on or before
+      the Article 12(3) one-month deadline; record_outcome closes
+      the case with the on-time-vs-deadline delta for the
+      operator's Article 5(2) accountability posture.
+
+  - id: gdpr:art-16-rectification
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "16"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Rectify without undue delay inaccurate personal data
+      concerning the data subject and, taking into account the
+      purposes of the processing, complete incomplete personal
+      data (including by means of providing a supplementary
+      statement). The controller must communicate the
+      rectification to each recipient to whom the personal data
+      have been disclosed under Article 19, unless that proves
+      impossible or involves disproportionate effort.
+    status: draft
+    control_refs:
+      - control.access_enforcement@v1
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.data_subject_rights@v1
+    evidence_stream_refs:
+      - incidents
+    notes: >-
+      data_subject_rights@v1 operationalises Article 16 through
+      the classify_request → route_to_data_owners →
+      compile_fulfilment_evidence → send_controller_response chain
+      keyed to __request_type__ = rectification. The Article 19
+      recipient-communication obligation is discharged on the
+      per-owner acknowledgement envelopes emitted by
+      route_to_data_owners: each owner acknowledges the applied
+      correction and records the downstream-recipient
+      communication where applicable.
+
+  - id: gdpr:art-17-erasure
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "17"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Erase personal data concerning the data subject without
+      undue delay where one of the Article 17(1) grounds applies
+      (no longer necessary; consent withdrawn; successful
+      objection; unlawful processing; legal-obligation compliance;
+      child-subject on information-society-services offer). The
+      Article 17(3) exemptions preserve processing necessary for
+      freedom of expression and information, legal obligation,
+      public interest in public health, archiving / scientific /
+      historical research / statistical purposes, and the
+      establishment / exercise / defence of legal claims. Under
+      Article 17(2) a controller that has made the data public
+      must take reasonable steps to inform other controllers
+      processing the personal data that the subject has requested
+      erasure. Article 19 recipient-communication applies.
+    status: draft
+    control_refs:
+      - control.access_enforcement@v1
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.data_subject_rights@v1
+    evidence_stream_refs:
+      - incidents
+    notes: >-
+      data_subject_rights@v1 operationalises Article 17 through
+      the classify_request → route_to_data_owners →
+      compile_fulfilment_evidence → send_controller_response chain
+      keyed to __request_type__ = erasure. Per-owner deletion
+      attestation is the audit-evident artifact in the
+      fulfilment-evidence pack; per-owner Article 17(3)
+      retention-exemption records document any leg that legitimately
+      retains data (for example a per-owner tax-record retention
+      obligation the operator holds against Article 6(1)(c)).
+
+  - id: gdpr:art-18-restriction
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "18"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Restrict processing on the data subject's request where one
+      of the Article 18(1) grounds applies (accuracy contested;
+      unlawful processing without erasure; controller no longer
+      needs the data but subject needs them for legal claims;
+      pending objection). Where processing is restricted, the
+      Article 18(2) storage-only floor applies. Under Article
+      18(3) the controller must inform the subject before the
+      restriction is lifted. Article 19 recipient-communication
+      applies.
+    status: draft
+    control_refs:
+      - control.access_enforcement@v1
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.data_subject_rights@v1
+    evidence_stream_refs:
+      - incidents
+    notes: >-
+      data_subject_rights@v1 operationalises Article 18 through
+      the classify_request → route_to_data_owners →
+      compile_fulfilment_evidence → send_controller_response chain
+      keyed to __request_type__ = restriction. record_outcome
+      records the Article 18(3) subsequent-lifting-notification
+      hook on the case so the controller honours the notify-
+      before-lifting obligation when the restriction ground ends.
+
+  - id: gdpr:art-20-portability
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "20"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Provide the data subject on request with the personal data
+      they have provided to the controller in a structured,
+      commonly-used, machine-readable format, and transmit the
+      data directly to another controller where technically
+      feasible, where the processing is based on consent under
+      Article 6(1)(a) or 9(2)(a) or on a contract under Article
+      6(1)(b), and where the processing is carried out by
+      automated means. The right does not adversely affect the
+      rights and freedoms of others (Article 20(4)).
+    status: draft
+    control_refs:
+      - control.access_enforcement@v1
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.data_subject_rights@v1
+    evidence_stream_refs:
+      - incidents
+    notes: >-
+      data_subject_rights@v1 operationalises Article 20 through
+      the classify_request → route_to_data_owners →
+      compile_fulfilment_evidence → send_controller_response chain
+      keyed to __request_type__ = portability. The
+      compile_fulfilment_evidence step assembles the
+      structured / commonly-used / machine-readable data package;
+      send_controller_response emits it to the subject or, under
+      Article 20(2), transmits it directly to the receiving
+      controller where technically feasible and requested.
+      route_to_data_owners scopes the pack to consent-grounded or
+      contract-grounded data-store owners; owners on other
+      grounds are excluded from the portability manifest.
+
+  - id: gdpr:art-21-objection
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "21"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Honour the data subject's objection to processing based on
+      Article 6(1)(e) or 6(1)(f) unless the controller
+      demonstrates compelling legitimate grounds which override
+      the interests, rights, and freedoms of the subject, or for
+      the establishment, exercise, or defence of legal claims.
+      Objection to direct-marketing processing under Article 21(2)
+      is unconditional. The workflow also classifies Article 22
+      automated-decision-review concerns raised on the request
+      and routes them to the controller's human-in-the-loop
+      review surface as part of the objection envelope.
+    status: draft
+    control_refs:
+      - control.access_enforcement@v1
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.data_subject_rights@v1
+    evidence_stream_refs:
+      - incidents
+    notes: >-
+      data_subject_rights@v1 operationalises Article 21 through
+      the classify_request → route_to_data_owners →
+      compile_fulfilment_evidence → send_controller_response chain
+      keyed to __request_type__ = objection. Where the objection
+      succeeds, the fulfilment-evidence pack carries the per-owner
+      cessation record; where the controller refuses the objection
+      under Article 21(1), the pack carries the overriding-
+      legitimate-interest determination and the subject's onward
+      remedies (Article 77 supervisory-authority complaint,
+      Article 79 judicial remedy) are named on the response
+      envelope. The Article 22 automated-decision-review concern
+      axis is folded here rather than authored as a standalone
+      edge: the workflow does not review the underlying automated
+      decision, it classifies the concern at classify_request and
+      routes it to the operator's human-in-the-loop review
+      surface as part of the objection lane.

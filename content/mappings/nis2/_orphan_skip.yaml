@@ -39,6 +39,23 @@ skip:
       graph once the SRP intake schema is published (Commission
       pre-go-live testing period ahead of 11 September 2026) and
       ENISA documents the parallel-reporting interaction.
+  - slug: data_subject_rights
+    rationale: >-
+      GDPR Chapter III data subject rights (DSR) intake and fulfilment
+      lifecycle (Articles 15-22). The playbook's outbound overlay
+      (`content/playbooks/data_subject_rights/mappings.yaml`)
+      deliberately does not pin NIS2 entries: NIS2 Article 21 risk-
+      management and Article 23 significant-incident reporting are
+      separate obligation surfaces that anchor on the operator's
+      incident-management and posture-management playbooks. Cross-
+      pinning the DSR lifecycle under NIS2 would misrepresent the
+      obligation surface. The GDPR inbound graph is closed via
+      `content/mappings/gdpr/article-15-22-data-subject-rights.yaml`.
+      A sibling CORE / EXTEND card revisits the NIS2 cross-regime
+      graph if a documented interaction is authored (for example a
+      NIS2 Art. 23 incident that triggers a wave of DSR requests
+      would run the incident lane and the DSR lane in parallel — the
+      two lanes stay separately anchored, not cross-pinned).
   - slug: cra_cvd
     rationale: >-
       CRA Article 14 coordinated-vulnerability-disclosure (CVD)
