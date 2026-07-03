@@ -101,6 +101,10 @@ directions.
 | `kpi.detection_coverage@v1`     | kpi  | ratio   | higher_is_better   | NIS2 Art. 21(2)(b)                          | `nis2:art-21-2-b`                                                |
 | `kpi.false_positive_rate@v1`    | kpi  | ratio   | lower_is_better    | NIS2 Art. 21(2)(b)                          | `nis2:art-21-2-b`                                                |
 | `kri.control_effectiveness@v1`  | kri  | ratio   | lower_is_better    | NIS2 Art. 21(2)(f); NIS2 Art. 21            | `nis2:art-21-2-f`                                                |
+| `kpi.contributor_merged_prs_external_ratio@v1` | kpi | ratio | higher_is_better | ROADMAP G-06 (contributor adoption)                 | —                                                                |
+| `kri.contributor_pr_ratio_above_90pct@v1`      | kri | ratio | lower_is_better  | ROADMAP G-06 (contributor adoption)                 | —                                                                |
+| `kpi.operator_adoption_reference_count@v1`     | kpi | count | higher_is_better | ROADMAP G-07 (operator adoption); USED-BY.md        | —                                                                |
+| `kri.operator_adoption_zero_signals@v1`        | kri | count | lower_is_better  | ROADMAP G-07 (operator adoption); USED-BY.md        | —                                                                |
 
 DORA-side anchors on the unscoped detect-pillar baselines (MTTD,
 detection coverage, FP rate) are intentionally absent because the
