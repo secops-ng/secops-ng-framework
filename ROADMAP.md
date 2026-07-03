@@ -1067,6 +1067,11 @@ SecOps-NG visible without requiring the project to run telemetry.
     through fork → edit → PR against `main`, in community voice.
   - CORE — community outreach lands the first cohort of self-attested
     entries (target ≥ 5 publicly attestable references by Q4 2026).
+    Community infrastructure:
+    `.github/DISCUSSION_TEMPLATE/deployment-question.yml` — a
+    Deployments & Adoption discussion template that surfaces
+    evaluation and pilot interest in the open before it becomes a
+    formal `USED-BY.md` entry.
   - EXTEND — CI check that every `USED-BY.md` row's evidence link is
     a reachable public URL (no login wall, HTTP 2xx on scheduled run).
 - **Sovereign-stack constraints:** No telemetry, no analytics beacons,
