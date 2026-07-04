@@ -18,6 +18,15 @@ resolve **exclusively** to playbooks in the cluster set. The
 exclusivity gate keeps fan-out pipeline/sovereignty metrics — whose
 source-data shape is correctly non-OCSF — out of the cluster.
 
+Some regulatory-latency SKELETON triads pin their host chain
+directly in ``external_refs`` (statutory article citations) rather
+than through a synthetic per-regime notification playbook. For those
+clusters the ``ClusterSpec`` names the members explicitly by
+``stable_id`` and the ``playbook_refs`` exclusivity gate is
+sidestepped — the cluster acts as an allow-list. The
+per-cluster wrapper still declares which chains motivate the group
+in its docstring so the sovereignty / governance intent is legible.
+
 Fires when any cluster-class metric has no ``telemetry.ocsf.*`` entry
 in its ``telemetry_refs`` list. Output formats: ``text`` (default) and
 ``json``. Pure stdlib + PyYAML, no network.
@@ -49,6 +58,19 @@ class ClusterSpec:
     line ("N <cluster_label> metric(s) ..."). ``cluster_descr`` is the
     PASS-line descriptor ("<cluster_descr> = [...]"). ``json_cluster_key``
     names the cluster member-list under the JSON payload.
+
+    Classification mode is inferred from which of the two selector
+    fields is populated:
+
+    * ``playbook_ids`` non-empty → classify by ``playbook_refs``
+      exclusivity (the original mode used by every OCSF cluster whose
+      metrics carry an explicit host-playbook reference).
+    * ``stable_ids`` non-empty → classify by explicit ``stable_id``
+      allow-list (used by regulatory-latency clusters whose SKELETON
+      metrics anchor to a statutory article in ``external_refs``
+      rather than to a per-regime notification playbook).
+
+    Populating both fields is a configuration error.
     """
 
     cli_name: str
@@ -57,6 +79,19 @@ class ClusterSpec:
     json_cluster_key: str
     playbook_ids: frozenset[str]
     cli_description: str
+    stable_ids: frozenset[str] = frozenset()
+
+    def __post_init__(self) -> None:  # pragma: no cover — defensive
+        if self.playbook_ids and self.stable_ids:
+            raise ValueError(
+                "ClusterSpec: set either playbook_ids OR stable_ids, "
+                "not both"
+            )
+        if not self.playbook_ids and not self.stable_ids:
+            raise ValueError(
+                "ClusterSpec: one of playbook_ids or stable_ids "
+                "must be non-empty"
+            )
 
 
 @dataclass(frozen=True)
@@ -125,8 +160,45 @@ def is_cluster_metric(
     return all(pid in cluster for pid in ids)
 
 
+def is_cluster_metric_by_stable_id(
+    stable_id: str | None, cluster_stable_ids: Iterable[str]
+) -> bool:
+    """Return True if ``stable_id`` is in the cluster's stable-id set.
+
+    Used by regulatory-latency clusters that pin membership through
+    the metric's canonical ``stable_id`` rather than through the
+    ``playbook_refs`` exclusivity gate — those SKELETON triads
+    anchor to a statutory article in ``external_refs`` rather than
+    to a per-regime notification playbook, so ``playbook_refs`` is
+    not the right discriminator.
+    """
+    if not isinstance(stable_id, str) or not stable_id:
+        return False
+    return stable_id in frozenset(cluster_stable_ids)
+
+
 def has_ocsf_binding(telemetry_refs: Iterable[str]) -> bool:
     return any(r.startswith(OCSF_TELEMETRY_PREFIX) for r in telemetry_refs)
+
+
+def _member_ids(spec: "ClusterSpec") -> list[str]:
+    """Return the sorted set of ids that name the cluster members —
+    playbook ids for playbook-mode specs, stable ids for stable-id-
+    mode specs. Drives the PASS-line descriptor and the JSON payload.
+    """
+    if spec.stable_ids:
+        return sorted(spec.stable_ids)
+    return sorted(spec.playbook_ids)
+
+
+def _classify(doc: dict, spec: "ClusterSpec") -> bool:
+    """Return True if ``doc`` is a member of the cluster under
+    ``spec``'s configured classification mode."""
+    if spec.stable_ids:
+        return is_cluster_metric_by_stable_id(
+            doc.get("stable_id"), spec.stable_ids
+        )
+    return is_cluster_metric(_playbook_ids(doc), spec.playbook_ids)
 
 
 def scan_cluster(
@@ -137,9 +209,9 @@ def scan_cluster(
         if path.name.startswith("_"):
             continue
         doc = _load_metric(path)
-        pb = _playbook_ids(doc)
-        if not is_cluster_metric(pb, spec.playbook_ids):
+        if not _classify(doc, spec):
             continue
+        pb = _playbook_ids(doc)
         tr = _telemetry_refs(doc)
         if not has_ocsf_binding(tr):
             stable_id = doc.get("stable_id") or path.stem
@@ -159,7 +231,7 @@ def _emit_text(findings: list[Finding], spec: ClusterSpec) -> None:
     if not findings:
         print(
             f"{spec.cli_name}: PASS "
-            f"({spec.cluster_descr} = {sorted(spec.playbook_ids)})"
+            f"({spec.cluster_descr} = {_member_ids(spec)})"
         )
         return
     print(
@@ -172,7 +244,7 @@ def _emit_text(findings: list[Finding], spec: ClusterSpec) -> None:
 
 def _emit_json(findings: list[Finding], spec: ClusterSpec) -> None:
     payload = {
-        spec.json_cluster_key: sorted(spec.playbook_ids),
+        spec.json_cluster_key: _member_ids(spec),
         "finding_count": len(findings),
         "findings": [f.as_dict() for f in findings],
         "status": "fail" if findings else "pass",
@@ -214,6 +286,7 @@ __all__ = [
     "REPO_ROOT",
     "has_ocsf_binding",
     "is_cluster_metric",
+    "is_cluster_metric_by_stable_id",
     "scan_cluster",
     "run_cli",
 ]
