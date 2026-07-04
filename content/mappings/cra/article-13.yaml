@@ -4,11 +4,10 @@
 # (Annex I §2 vulnerability handling + Art.14 reporting). Scope for this
 # the risk-assessment and vulnerability-handling tie-in inside
 # Article 13. Out of scope (deferred to later EXTEND layers):
-# Art.13(10) labelling and user information, Art.13(11) ten-year record
-# retention, Art.13(16) authorised representative, Art.13(19)–(20)
-# market-surveillance cooperation. Art.13(9) update-availability is
-# pinned in the dedicated companion file
-# article-13-9-update-availability.yaml.
+# Art.13(10) labelling and user information, Art.13(16) authorised
+# representative, Art.13(19)–(20) market-surveillance cooperation.
+# Art.13(9) update-availability is pinned in the dedicated companion
+# file article-13-9-update-availability.yaml.
 regime: cra
 entries:
   - id: cra:art-13-risk-assessment
@@ -175,3 +174,36 @@ entries:
       vulnerability-disclosure intake control as the Annex I §2(5)
       coordinated-disclosure policy — the agentic slice is the dated
       record that the public contact channel is live and reachable.
+
+  - id: cra:art-13-record-retention
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: 13(11)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Manufacturers shall, for a period ending ten years after the
+      product with digital elements has been placed on the market or
+      for the support period, whichever is longer, keep the technical
+      documentation and the EU declaration of conformity at the
+      disposal of the market surveillance authorities.
+    status: draft
+    control_refs: []
+    playbook_refs: []
+    metric_refs: []
+    notes: >-
+      Art.13(11) is a records-retention duty on the technical
+      documentation and EU declaration of conformity. The shipped
+      control catalogue under content/controls/ does not yet carry a
+      dedicated evidence-retention control that captures the ten-year
+      (or longer support-period) horizon required here: the closest
+      neighbours — sbom_capture (SBOM retention scoped to the declared
+      support period) and patch_evidence (dated update-dissemination
+      records tied to the same support period) — are subsets of the
+      documentation set Art.13(11) covers, not the whole of it.
+      control_refs is deliberately left empty until an
+      `evidence_retention` control lands and is wired in.
+      Downstream OSCAL/D3FEND rings ignore entries with empty
+      control_refs, so the gap is surfaced through the mapping alone
+      without polluting the CRA component definition.
