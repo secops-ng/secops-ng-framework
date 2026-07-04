@@ -846,6 +846,56 @@ named operator use-case. Each cookbook workflow lives under
 
 ---
 
+### F-WF-DORA-SELFASSESS — DORA Chapter II ICT risk management operator self-assessment roll-up
+
+- **Status:** Shipped
+- **Priority:** P1
+- **Goal:** G-01 (content coverage — a whole-Chapter roll-up
+  playbook that lets a DORA-in-scope financial entity walk the five
+  Chapter II ICT risk management section atoms (Articles 6, 7, 8,
+  10, 11) in a single deterministic workflow and emit a dated
+  self-assessment attestation on the Article 6(5) annual review
+  cadence plus the post-major-incident review trigger the same
+  paragraph names).
+- **Acceptance criteria:**
+  - `content/playbooks/dora_ict_risk_selfassess/` carries the
+    canonical CACAO v2 scaffold
+    (`playbook.dora_ict_risk_selfassess@v1`) with the five Chapter
+    II section atoms wired as deterministic steps, a `mappings.yaml`
+    pinning inbound anchors for each of the five sections, and a
+    README walking the operator through the roll-up structure.
+  - Inbound backlinks land on all five per-section DORA Chapter II
+    map files (`article-6.yaml`, `article-7.yaml`, `article-8.yaml`,
+    `article-10.yaml`, `article-11.yaml`) so the roll-up is
+    discoverable from the existing per-section anchor set.
+  - Three reference-target compile examples land under
+    `examples/{n8n,temporal,langgraph}/dora_ict_risk_selfassess/`
+    with byte-parity goldens across all three targets.
+  - Cookbook entry `docs/cookbook/dora_ict_risk_selfassess.md`
+    walks an operator through running the self-assessment
+    end-to-end against a reference deployment.
+- **Sovereign-stack constraints:** CACAO v2 content only, no
+  proprietary schema. DORA Chapter II (Articles 6, 7, 8, 10, 11) are
+  the regulatory anchors; operator-supplied evidence sink and no
+  default non-EU endpoint.
+- **Depends on:** — (standalone roll-up referencing the existing
+  per-section playbook family).
+- **Source:** DORA — Regulation (EU) 2022/2554 Chapter II
+  (Articles 6 to 14) ICT risk management; Article 6(5) annual
+  review of the ICT risk-management framework and the post-major-
+  incident review trigger; Commission Delegated Regulation (EU)
+  2024/1774 (JC RTS on the ICT risk-management framework).
+- **Shipped via:**
+  - SKELETON — #648
+    (`content/playbooks/dora_ict_risk_selfassess/` CACAO v2 scaffold
+    + `mappings.yaml` + README + inbound backlinks on all five
+    Chapter II section map files).
+  - CORE — #649 (three-target compile examples under
+    `examples/{n8n,temporal,langgraph}/dora_ict_risk_selfassess/`
+    + byte-parity goldens across targets).
+
+---
+
 ## Epic PT — Pattern Library
 
 Reusable graph fragments and Pydantic types shared across cookbook
