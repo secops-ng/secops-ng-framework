@@ -1,0 +1,113 @@
+stable_id: kri.dora_incident_initial_report_latency_hours@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: DORA major-incident initial-report (4h) dispatch latency
+summary: >
+  Elapsed hours between classification of an ICT-related incident as a
+  major incident under the DORA Art. 17 management process and dispatch
+  of the DORA Art. 19(4)(a) initial notification to the operator's
+  competent authority. Residual-risk counterpart to any future
+  `kpi.dora_initial_report_on_time@v1`: the on-time KPI reads whether
+  the clock was held; this KRI reads *how close to the wall* each
+  initial-report dispatch landed, so operators can see slippage well
+  before the ratio itself falls below 1.00. The 4-hour bound is set by
+  DORA Art. 19(4)(a) (initial notification within 4 hours of
+  classification-as-major, subject to the outer 24-hour discovery
+  ceiling); any observation above the bound is a statutory overrun and
+  a reportable compliance exception.
+unit: hours
+direction: lower_is_better
+target:
+  value: 4
+  comparator: "<="
+  rationale: >
+    DORA Art. 19(4)(a) sets a 4-hour initial-report deadline anchored
+    on the moment the financial entity classifies an ICT-related
+    incident as major under the Art. 17 management process. The
+    target is the statutory bound; any dispatch beyond it is an
+    overrun the operator must record for the competent authority with
+    reasons for the delay.
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 2
+    severity: warn
+  - name: high
+    comparator: ">"
+    value: 3
+    severity: high
+  - name: breach
+    comparator: ">"
+    value: 4
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: max
+  formula: >
+    For each DORA Art. 19(4)(a) initial-notification dispatched within
+    the evaluation window, compute
+    latency_hours = (dispatch_timestamp - classification_timestamp) / 3600.
+    Aggregate as `max` across dispatches — the worst-case latency the
+    operator's regulator-notification pipeline delivered in the window,
+    i.e. the case that came closest to (or beyond) the 4-hour statutory
+    bound. Exclude in-scope cases whose initial-notification dispatch
+    step never fired so the indicator does not silently improve when
+    the notification pipeline stalls outright; those cases surface on
+    `kri.regulator_notification_overrun@v1` instead.
+    Reference visualisation: a horizontal bar chart of
+    dispatch_latency_hours per DORA Art. 19(4)(a) initial-notification
+    dispatched in the window, with vertical lines at the warn / high /
+    breach thresholds (2h / 3h / 4h) and the max aggregate annotated
+    as the headline figure; direction is `lower_is_better` so a rising
+    max is the leading signal that the operator's initial-notification
+    pipeline is approaching the statutory wall. The committed
+    reference rendering lives at
+    `content/metrics/dora_incident_initial_report_latency_hours.viz.md`
+    — that file is the contract for the chart shape; the compile
+    target renders the executable form against operator data.
+  inputs:
+    - name: classification_timestamp
+      description: >
+        Classification-as-major timestamp emitted by the DORA Art. 17
+        incident-management process when a candidate ICT-related
+        incident crosses the major-incident threshold. Used as the
+        start of the 4-hour clock. Carried on the OCSF Compliance
+        Finding event the initial-notification submission emits
+        (status_id transition into the notified state); the catalog
+        entry binds to that OCSF class shape, not to a regulator-
+        submission envelope.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: start_time
+    - name: notification_dispatch
+      description: >
+        Regulator-notification chain step transition that dispatches
+        the DORA Art. 19(4)(a) initial notification to the operator's
+        competent authority. Carried on the OCSF Compliance Finding
+        event the initial-notification submission emits at dispatch
+        (status_id transition into the notified state).
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: time
+  window:
+    duration: P30D
+    sliding: true
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+external_refs:
+  - name: DORA — Article 17 ICT-related incident management process
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 17
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: DORA — Article 19(4)(a) initial-notification obligation (4 hours after classification-as-major)
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 19(4)(a)
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: ESAs — Regulatory Technical Standards on DORA major-incident classification and reporting
+    source: ESAs
+    url: https://www.eiopa.europa.eu/browse/regulation-and-policy/digital-operational-resilience-act-dora_en
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability

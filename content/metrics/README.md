@@ -105,6 +105,9 @@ directions.
 | `kri.contributor_pr_ratio_above_90pct@v1`      | kri | ratio | lower_is_better  | ROADMAP G-06 (contributor adoption)                 | —                                                                |
 | `kpi.operator_adoption_reference_count@v1`     | kpi | count | higher_is_better | ROADMAP G-07 (operator adoption); USED-BY.md        | —                                                                |
 | `kri.operator_adoption_zero_signals@v1`        | kri | count | lower_is_better  | ROADMAP G-07 (operator adoption); USED-BY.md        | —                                                                |
+| `kri.dora_incident_initial_report_latency_hours@v1`      | kri | hours | lower_is_better | DORA Art. 17; DORA Art. 19(4)(a)             | —                                                                |
+| `kri.dora_incident_intermediate_report_latency_hours@v1` | kri | hours | lower_is_better | DORA Art. 17; DORA Art. 19(4)(b)             | —                                                                |
+| `kri.dora_incident_final_report_latency_days@v1`         | kri | days  | lower_is_better | DORA Art. 17; DORA Art. 19(4)(c)             | —                                                                |
 
 DORA-side anchors on the unscoped detect-pillar baselines (MTTD,
 detection coverage, FP rate) are intentionally absent because the
