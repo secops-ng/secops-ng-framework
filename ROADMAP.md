@@ -1166,6 +1166,113 @@ manual configuration.
 
 ---
 
+## Epic MET — Regulator-notification latency catalogue
+
+Residual-risk (KRI) catalogue entries measuring statutory
+incident-notification latency across the EU regulatory regimes.
+Each feature ships a triad of KRIs — one per statutory clock — with
+committed reference visualisations, OCSF Compliance Finding source-data
+bindings, and warn / high / breach threshold bands calibrated against
+the regulatory deadline.
+
+### F-MET-CRA-LATENCY — CRA Art. 14 SRP dispatch-latency KRI triad
+
+- **Status:** Shipped
+- **Priority:** P1
+- **Goal:** G-04 (KPI/KRI catalogue maturity — residual-risk latency
+  coverage across every regulator-notification gate the framework
+  targets).
+- **Acceptance criteria:**
+  - `content/metrics/` carries three KRI catalog entries covering the
+    CRA Art. 14 timer cascade for the Single Reporting Platform (SRP)
+    dispatch chain:
+    - `kri.cra_early_warning_latency_hours@v1` — 24h clock (Art. 14(1)).
+    - `kri.cra_full_notification_latency_hours@v1` — 72h clock
+      (Art. 14(2)).
+    - `kri.cra_final_report_latency_days@v1` — 14d / 30d clock
+      (Art. 14(2)–(3) actively-exploited / severe-incident).
+  - Each entry ships a sibling `.viz.md` reference visualisation with a
+    Mermaid rendering and back-references `playbook.cra_srp_notify@v1`
+    at the relevant CACAO step so the bidirectional link linter closes.
+  - OCSF Compliance Finding (`telemetry.ocsf.compliance_finding@v1`)
+    source-data binding declared per entry.
+- **Sovereign-stack constraints:** —
+- **Depends on:** F-METRICS-04
+- **Source:** Cyber Resilience Act (Regulation (EU) 2024/2847) Art. 14;
+  SRP go-live 11 Sept 2026.
+- **Shipped via:**
+  - SKELETON — #622 (three KRI entries + reference visualisations +
+    playbook back-references + a G-03 compile-target restart-drift
+    parity row under `tests/patterns/cra_srp_notify/`).
+
+### F-MET-DORA-LATENCY — DORA Art. 17/19 ICT incident reporting latency KRI triad
+
+- **Status:** Shipped
+- **Priority:** P1
+- **Goal:** G-04 (KPI/KRI catalogue maturity — residual-risk latency
+  coverage across every regulator-notification gate the framework
+  targets).
+- **Acceptance criteria:**
+  - `content/metrics/` carries three KRI catalog entries covering the
+    DORA major-incident reporting timeline:
+    - `kri.dora_incident_initial_report_latency_hours@v1` — 4h clock
+      (Art. 19(4)(a)).
+    - `kri.dora_incident_intermediate_report_latency_hours@v1` — 72h
+      clock (Art. 19(4)(b)).
+    - `kri.dora_incident_final_report_latency_days@v1` — one-month clock
+      (Art. 19(4)(c)).
+  - Each entry ships a sibling `.viz.md` reference visualisation with a
+    Mermaid rendering, an OCSF Compliance Finding
+    (`telemetry.ocsf.compliance_finding@v1`) source-data binding, and
+    warn / high / breach threshold bands.
+  - Catalog index in `content/metrics/README.md` updated to list the
+    three new entries.
+- **Sovereign-stack constraints:** —
+- **Depends on:** F-METRICS-04
+- **Source:** Digital Operational Resilience Act (Regulation (EU)
+  2022/2554) Art. 17 (ICT-related incident management) and Art. 19(4)
+  (reporting timelines).
+- **Shipped via:**
+  - SKELETON — #634 (three KRI entries + reference visualisations +
+    catalog index update). Playbook back-references deferred to a
+    follow-on card binding the KRIs to the shipped incident_management
+    / ransomware_containment / identity_compromise regulator-
+    notification chains.
+
+### F-MET-NIS2-LATENCY — NIS2 Art. 23 incident notification latency KRI triad
+
+- **Status:** Shipped
+- **Priority:** P1
+- **Goal:** G-04 (KPI/KRI catalogue maturity — residual-risk latency
+  coverage across every regulator-notification gate the framework
+  targets).
+- **Acceptance criteria:**
+  - `content/metrics/` carries three KRI catalog entries covering the
+    NIS2 Art. 23(4) statutory clocks for essential/important entities:
+    - `kri.nis2_incident_early_warning_latency_hours@v1` — 24h clock
+      (Art. 23(4)(a)).
+    - `kri.nis2_incident_notification_latency_hours@v1` — 72h clock
+      (Art. 23(4)(b)).
+    - `kri.nis2_incident_final_report_latency_days@v1` — one-month clock
+      (Art. 23(4)(d)).
+  - Each entry ships a sibling `.viz.md` reference visualisation with a
+    Mermaid rendering, an OCSF Compliance Finding
+    (`telemetry.ocsf.compliance_finding@v1`) source-data binding, and
+    warn / high / breach threshold bands.
+  - Catalog index in `content/metrics/README.md` updated to list the
+    three new entries.
+- **Sovereign-stack constraints:** —
+- **Depends on:** F-METRICS-04
+- **Source:** NIS2 Directive (EU) 2022/2555 Art. 23(4); enforcement
+  active since October 2024.
+- **Shipped via:**
+  - SKELETON — #635 (three KRI entries + reference visualisations +
+    catalog index update). Playbook back-references deferred to a
+    follow-on card binding the KRIs to the shipped
+    regulator-notification playbook chains.
+
+---
+
 ## Epic ADOPT — Operator adoption signal
 
 Public, community-owned surfaces that make operator adoption of
