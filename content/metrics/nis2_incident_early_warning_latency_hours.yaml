@@ -1,0 +1,110 @@
+stable_id: kri.nis2_incident_early_warning_latency_hours@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: NIS2 incident early-warning (24h) dispatch latency
+summary: >
+  Elapsed hours between operator awareness of a significant incident
+  under the NIS2 incident-handling process and dispatch of the NIS2
+  Article 23(4)(a) early warning to the CSIRT or, where applicable,
+  the competent authority. Residual-risk counterpart to any future
+  `kpi.nis2_early_warning_on_time@v1`: the on-time KPI reads whether
+  the clock was held; this KRI reads *how close to the wall* each
+  early-warning dispatch landed, so operators can see slippage well
+  before the ratio itself falls below 1.00. The 24-hour bound is set
+  by NIS2 Art. 23(4)(a); any observation above the bound is a
+  statutory overrun and a reportable compliance exception. No non-EU
+  default endpoints participate in the notification chain — the
+  competent-authority / CSIRT submission surface is an EU-hostable
+  endpoint per the sovereign-stack bias.
+unit: hours
+direction: lower_is_better
+target:
+  value: 24
+  comparator: "<="
+  rationale: >
+    NIS2 Art. 23(4)(a) sets the 24-hour early-warning deadline anchored
+    on the moment the essential or important entity becomes aware of a
+    significant incident. The target is the statutory bound; any
+    dispatch beyond it is an overrun the operator must record for the
+    competent authority / CSIRT with reasons for the delay.
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 12
+    severity: warn
+  - name: high
+    comparator: ">"
+    value: 20
+    severity: high
+  - name: breach
+    comparator: ">"
+    value: 24
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: max
+  formula: >
+    For each NIS2 Art. 23(4)(a) early-warning dispatched within the
+    evaluation window, compute
+    latency_hours = (dispatch_timestamp - awareness_timestamp) / 3600.
+    Aggregate as `max` across dispatches — the worst-case latency the
+    operator's CSIRT / competent-authority notification pipeline
+    delivered in the window, i.e. the case that came closest to (or
+    beyond) the 24-hour statutory bound. Exclude in-scope cases whose
+    early-warning dispatch step never fired so the indicator does not
+    silently improve when the notification pipeline stalls outright;
+    those cases surface on `kri.regulator_notification_overrun@v1`
+    instead.
+    Reference visualisation: a horizontal bar chart of
+    dispatch_latency_hours per NIS2 Art. 23(4)(a) early-warning
+    dispatched in the window, with vertical lines at the warn / high
+    / breach thresholds (12h / 20h / 24h) and the max aggregate
+    annotated as the headline figure; direction is `lower_is_better`
+    so a rising max is the leading signal that the operator's early-
+    warning pipeline is approaching the statutory wall. The committed
+    reference rendering lives at
+    `content/metrics/nis2_incident_early_warning_latency_hours.viz.md`
+    — that file is the contract for the chart shape; the compile
+    target renders the executable form against operator data.
+  inputs:
+    - name: awareness_timestamp
+      description: >
+        Operator-awareness timestamp emitted by the NIS2 incident-
+        handling process when a candidate incident crosses the
+        significant-incident threshold under Art. 23(3). Used as the
+        start of the 24-hour early-warning clock. Carried on the OCSF
+        Compliance Finding event the early-warning submission emits
+        (status_id transition into the notified state); the catalog
+        entry binds to that OCSF class shape, not to a regulator-
+        submission envelope.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: start_time
+    - name: notification_dispatch
+      description: >
+        Regulator-notification chain step transition that dispatches
+        the NIS2 Art. 23(4)(a) early warning to the CSIRT or, where
+        applicable, the competent authority. Carried on the OCSF
+        Compliance Finding event the early-warning submission emits at
+        dispatch (status_id transition into the notified state).
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: time
+  window:
+    duration: P30D
+    sliding: true
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+external_refs:
+  - name: NIS2 — Article 23 incident-reporting obligations (early warning within 24 hours)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 23(4)(a)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ENISA — NIS2 incident reporting guidance
+    source: ENISA
+    url: https://www.enisa.europa.eu/topics/cybersecurity-policy/nis-directive-new
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability
