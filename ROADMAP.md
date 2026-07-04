@@ -1305,6 +1305,58 @@ the regulatory deadline.
     follow-on card binding the KRIs to the shipped
     breach-notification playbook chains.
 
+### F-MET-AVAILABILITY — NIS2/DORA service-availability KPI/KRI sextet
+
+- **Status:** Shipped
+- **Priority:** P1
+- **Goal:** G-04 (KPI/KRI catalogue maturity — operability-axis
+  availability metrics closing the four-FOUNDATION-property coverage
+  ring across the NIS2 / DORA service-continuity gates).
+- **Acceptance criteria:**
+  - `content/metrics/` carries six catalog entries covering the
+    NIS2 Art. 21(2)(e) / DORA Art. 8 service-availability and
+    business-continuity duties, split evenly between KPI-side
+    performance signals and KRI-side residual-risk signals:
+    - KPI side:
+      - `kpi.service_availability_rate@v1` — measured availability
+        against declared SLO for essential/important services.
+      - `kpi.rto_compliance_rate@v1` — share of recovery events that
+        met their declared RTO.
+      - `kpi.service_continuity_test_frequency@v1` — cadence of
+        business-continuity / disaster-recovery exercises.
+    - KRI side:
+      - `kri.availability_below_target_exposure@v1` — residual
+        exposure from services running under their declared
+        availability target.
+      - `kri.rto_overrun_exposure_count@v1` — count of recovery
+        events that overran their declared RTO.
+      - `kri.continuity_test_overdue@v1` — count of
+        services / plans whose continuity test is overdue against
+        the declared cadence.
+  - Each entry ships a sibling `.viz.md` reference visualisation with a
+    Mermaid rendering, an OCSF Compliance Finding
+    (`telemetry.ocsf.compliance_finding@v1`) source-data binding, and
+    warn / high / breach threshold bands.
+  - Catalog index in `content/metrics/README.md` updated to list the
+    six new entries.
+  - Nightly orphan-CI assertion lane in
+    `.github/workflows/orphan-ci.yml` asserts the KPI/KRI sextet
+    stays wired to the availability triad (metric ↔ visualisation ↔
+    OCSF binding) so drift is caught out-of-band from PR CI.
+- **Sovereign-stack constraints:** —
+- **Depends on:** F-METRICS-04
+- **Source:** NIS2 Directive (EU) 2022/2555 Art. 21(2)(e)
+  (business-continuity and crisis-management measures); DORA
+  (Regulation (EU) 2022/2554) Art. 8 (ICT business-continuity policy
+  and response-and-recovery plans).
+- **Shipped via:**
+  - SKELETON — #639 (three KPI entries + reference visualisations +
+    catalog index update).
+  - EXTEND — #640 (three KRI-side residual-risk entries + reference
+    visualisations + catalog index update).
+  - CORE — #644 (nightly orphan-CI assertion lane covering the
+    KPI/KRI sextet).
+
 ---
 
 ## Epic ADOPT — Operator adoption signal
