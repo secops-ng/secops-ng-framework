@@ -729,6 +729,67 @@ named operator use-case. Each cookbook workflow lives under
 
 ---
 
+### F-WF-DPIA — GDPR Art. 35 Data Protection Impact Assessment lifecycle
+
+- **Status:** In Progress
+- **Priority:** P1
+- **Goal:** G-01 (content coverage — canonical DPIA cookbook
+  playbook covering the Article 35 lifecycle from screening through
+  DPO consultation and, where required, Article 36 prior consultation
+  with the supervisory authority), G-02 (regulatory-graph closure —
+  GDPR Art. 35 is the primary inbound anchor, with Art. 36 covering
+  the prior-consultation branch).
+- **Acceptance criteria:**
+  - `content/playbooks/data_protection_impact_assessment/` carries
+    the canonical CACAO v2 playbook
+    (`playbook.data_protection_impact_assessment@v1`) and the
+    deterministic primitives with zero placeholders across all
+    action bodies; compiled targets land under
+    `examples/{n8n,temporal,langgraph}/data_protection_impact_assessment/`.
+  - Per-assessment DPIA topology covering the Article 35 lifecycle:
+    screening → threshold decision → assessment (necessity,
+    proportionality, risks to rights and freedoms, mitigations) →
+    DPO consultation → residual-risk gate → optional Article 36
+    prior consultation with the supervisory authority → decision
+    record → evidence emission; transitions deterministic and
+    replay-tested across all three targets.
+  - Per-assessment DPIA evidence record emitted against a stable
+    evidence-stream schema (candidate:
+    `schemas/evidence/dpia.schema.json`) pinning the closed
+    screening outcome, the residual-risk verdict, the DPO
+    consultation record, the Article 35 `regulation_refs` (plus
+    Article 36 when the prior-consultation branch fires), and the
+    closed `control_refs` list. `artifact_id` derives
+    deterministically from
+    `SHA-256(workflow_id|execution_id|captured_at)`; the field
+    does **not** key on `compile_target` so the three reference
+    targets re-derive byte-identical bytes from the same execution
+    context, and byte-parity is asserted across targets.
+  - Cookbook entry
+    (`docs/cookbook/data_protection_impact_assessment.md`) + per-
+    target byte-parity goldens
+    (`tests/examples/data_protection_impact_assessment/test_{n8n,temporal,langgraph}_workflow_golden.py`
+    and per-target DPIA-evidence goldens) pin both the workflow
+    artefact and the DPIA-evidence record.
+  - OSCAL / D3FEND regulatory-graph closure on the GDPR axis
+    (Art. 35 inbound, Art. 36 covering the prior-consultation
+    branch); the D3FEND lift covers the risk-assessment and
+    consultation slices.
+- **Sovereign-stack constraints:** CACAO v2 content only, no
+  proprietary schema. GDPR Art. 35 / Art. 36 are the regulatory
+  anchors; operator-supplied processing-activity register, DPO
+  consultation surface, and evidence sink — the framework ships no
+  hosted DPIA-workflow SaaS binding and no default non-EU endpoint.
+- **Depends on:** F-WF-05 (incident management — reused DPO
+  consultation evidence pattern and consultation-record shape).
+- **Source:** GDPR Art. 35 (DPIA obligation), GDPR Art. 36 (prior
+  consultation with the supervisory authority).
+- **Shipped via:**
+  - _(In progress — SKELETON, CORE, and EXTEND cards to be listed
+    here as they land.)_
+
+---
+
 ## Epic PT — Pattern Library
 
 Reusable graph fragments and Pydantic types shared across cookbook
