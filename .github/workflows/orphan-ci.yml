@@ -51,6 +51,9 @@ on:
       - "tools/lint_backup_recovery_ocsf_bindings.py"
       - "tools/lint_detection_engineering_ocsf_bindings.py"
       - "tools/lint_cra_latency_ocsf_bindings.py"
+      - "tools/lint_dora_latency_ocsf_bindings.py"
+      - "tools/lint_nis2_latency_ocsf_bindings.py"
+      - "tools/lint_gdpr_latency_ocsf_bindings.py"
       - "tools/ocsf_cluster_lint.py"
       - "content/telemetry/**"
       - "tests/content/test_cra_playbook_orphans.py"
@@ -73,6 +76,9 @@ on:
       - "tests/content/test_backup_recovery_ocsf_bindings.py"
       - "tests/content/test_detection_engineering_ocsf_bindings.py"
       - "tests/content/test_cra_latency_ocsf_bindings.py"
+      - "tests/content/test_dora_latency_ocsf_bindings.py"
+      - "tests/content/test_nis2_latency_ocsf_bindings.py"
+      - "tests/content/test_gdpr_latency_ocsf_bindings.py"
       - ".github/workflows/orphan-ci.yml"
   push:
     branches: [main]
@@ -102,6 +108,9 @@ on:
       - "tools/lint_backup_recovery_ocsf_bindings.py"
       - "tools/lint_detection_engineering_ocsf_bindings.py"
       - "tools/lint_cra_latency_ocsf_bindings.py"
+      - "tools/lint_dora_latency_ocsf_bindings.py"
+      - "tools/lint_nis2_latency_ocsf_bindings.py"
+      - "tools/lint_gdpr_latency_ocsf_bindings.py"
       - "tools/ocsf_cluster_lint.py"
   schedule:
     # Nightly at 02:23 UTC — off-peak, off-the-hour, single slot for
@@ -671,3 +680,87 @@ jobs:
       - name: Run CRA-latency-OCSF binding assertion (text)
         run: |
           python -m tools.lint_cra_latency_ocsf_bindings --format text
+
+  dora-latency-ocsf-bindings:
+    # G-04 catalogue-maturity OCSF source-data-shape dimension —
+    # asserts every metric in the DORA-latency cluster (the DORA
+    # Article 19(4) ICT major-incident report dispatch-latency KRI
+    # triad) declares an OCSF telemetry_ref. Closes the
+    # F-MET-DORA-LATENCY triplet (SKELETON #634) by wiring the
+    # linter into the nightly content-CI cadence alongside the
+    # sibling latency-cluster jobs.
+    name: G-04 DORA-latency-cluster OCSF binding assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML)
+        run: pip install --no-cache-dir pyyaml
+
+      - name: Run DORA-latency-OCSF binding assertion (text)
+        run: |
+          python -m tools.lint_dora_latency_ocsf_bindings --format text
+
+  nis2-latency-ocsf-bindings:
+    # G-04 catalogue-maturity OCSF source-data-shape dimension —
+    # asserts every metric in the NIS2-latency cluster (the NIS2
+    # Article 23 significant-incident notification dispatch-latency
+    # KRI triad) declares an OCSF telemetry_ref. Closes the
+    # F-MET-NIS2-LATENCY triplet (SKELETON #635) by wiring the
+    # linter into the nightly content-CI cadence alongside the
+    # sibling latency-cluster jobs.
+    name: G-04 NIS2-latency-cluster OCSF binding assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML)
+        run: pip install --no-cache-dir pyyaml
+
+      - name: Run NIS2-latency-OCSF binding assertion (text)
+        run: |
+          python -m tools.lint_nis2_latency_ocsf_bindings --format text
+
+  gdpr-latency-ocsf-bindings:
+    # G-04 catalogue-maturity OCSF source-data-shape dimension —
+    # asserts every metric in the GDPR-latency cluster (the GDPR
+    # Article 33/34 personal-data-breach notification dispatch-
+    # latency KRI triad) declares an OCSF telemetry_ref. Closes the
+    # F-MET-GDPR-LATENCY triplet (SKELETON #636) by wiring the
+    # linter into the nightly content-CI cadence alongside the
+    # sibling latency-cluster jobs.
+    name: G-04 GDPR-latency-cluster OCSF binding assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML)
+        run: pip install --no-cache-dir pyyaml
+
+      - name: Run GDPR-latency-OCSF binding assertion (text)
+        run: |
+          python -m tools.lint_gdpr_latency_ocsf_bindings --format text
