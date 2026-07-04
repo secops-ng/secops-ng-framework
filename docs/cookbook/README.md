@@ -32,6 +32,8 @@ narrative.
 | `cra_cvd`             | [`cra_cvd.md`](cra_cvd.md)                         | `content/playbooks/cra_cvd/`                          |
 | `mfa_secured_comms`   | [`mfa_secured_comms.md`](mfa_secured_comms.md)     | `content/playbooks/mfa_secured_comms/`                |
 | `data_subject_rights` | [`data_subject_rights.md`](data_subject_rights.md) | `content/playbooks/data_subject_rights/`              |
+| `data_protection_impact_assessment` | [`data_protection_impact_assessment.md`](data_protection_impact_assessment.md) | `content/playbooks/data_protection_impact_assessment/` |
+| `nis2_self_assessment` | [`nis2_self_assessment.md`](nis2_self_assessment.md) | `content/playbooks/nis2_self_assessment/`             |
 
 Additional entries land alongside their content sources as workflows
 flip from In Progress to Shipped on
