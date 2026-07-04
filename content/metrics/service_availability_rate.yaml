@@ -1,0 +1,123 @@
+stable_id: kpi.service_availability_rate@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Service availability rate — proportion of time an in-scope service is available within the evaluation window
+summary: >
+  Proportion of the evaluation window during which an in-scope
+  network-and-information system was available to its consumers,
+  computed against the operator's declared availability envelope for
+  that service. Anchors the "continued availability" limb of the
+  NIS2 Art. 21(1)(b) essential-service continuity obligation and the
+  ICT business-continuity policy under DORA Art. 11 — operators
+  running the framework read this KPI alongside the four-regime
+  incident-notification latency ring to see whether the services
+  those regimes protect are actually staying up. The 99.5% target
+  is an operational benchmark aligned with the NIS2 high-impact
+  classification criteria (recital 101 references significant
+  service disruption as a threshold-shaping factor); neither NIS2
+  nor DORA sets a hard statutory availability floor, so the target
+  is guidance the operator MAY tighten against their own service-
+  criticality tiering — this is flagged clearly here so downstream
+  consumers do not read the 99.5% figure as a statutory ceiling. No
+  non-EU default endpoints participate in the availability-
+  measurement chain — the health-probe / uptime-observation surface
+  is an EU-hostable endpoint per the sovereign-stack bias.
+unit: percent
+direction: higher_is_better
+target:
+  value: 99.5
+  comparator: ">="
+  rationale: >
+    Operational benchmark aligned with NIS2 Art. 21(1)(b) continued-
+    availability obligation and the NIS2 high-impact classification
+    criteria (recital 101 identifies significant service disruption
+    as a threshold-shaping factor). Not a statutory hard floor;
+    operators MAY tighten this against their own service-criticality
+    tiering (e.g. 99.9% for essential services, 99.99% for
+    financial-sector ICT under DORA Art. 11 recovery-objective
+    scoping). Below-target readings are the leading signal that the
+    operator's continuity posture is drifting away from its declared
+    availability envelope well before an incident-notification clock
+    starts.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 99.9
+    severity: warn
+  - name: high
+    comparator: "<"
+    value: 99.5
+    severity: high
+  - name: breach
+    comparator: "<"
+    value: 99.0
+    severity: critical
+measurement:
+  source: telemetry
+  aggregation: percent
+  formula: >
+    For each in-scope service observed in the evaluation window,
+    compute
+    availability_rate = 100 * available_seconds / window_seconds
+    where `available_seconds` is the total time the service passed
+    the operator's declared health-probe contract (probe success
+    per the service's availability envelope) and `window_seconds`
+    is the total duration of the evaluation window. Aggregate as
+    `percent` across observations. Exclude planned-maintenance
+    windows the operator has pre-declared on the service's
+    continuity register so the reading does not conflate scheduled
+    downtime with continuity failure; those windows surface on
+    `kpi.service_continuity_test_frequency@v1` and the operator's
+    change-management KPIs instead.
+    Reference visualisation: a headline percentage gauge with warn
+    / high / breach threshold bands, plus a per-service drill-down
+    ranking services by availability_rate across the window. The
+    committed reference rendering lives at
+    `content/metrics/service_availability_rate.viz.md` — that file
+    is the contract for the chart shape; the compile target renders
+    the executable form against operator data.
+  inputs:
+    - name: probe_success
+      description: >
+        Health-probe observation emitted by the operator's uptime-
+        monitoring surface for the in-scope service. Carried on the
+        OCSF Compliance Finding event the service-availability
+        observation emits (status_id transition into the observed
+        state); the catalog entry binds to that OCSF class shape,
+        not to a vendor-specific uptime, synthetic-monitoring, or
+        probe product.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: status_id
+    - name: observation_timestamp
+      description: >
+        Timestamp of the availability observation used to compute
+        the available_seconds accumulator. Carried on the OCSF
+        Compliance Finding event the service-availability
+        observation emits.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: time
+  window:
+    duration: P30D
+    sliding: true
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+external_refs:
+  - name: NIS2 — Article 21(1)(b) continued availability of network and information systems
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(1)(b)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 11 ICT business continuity policy
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 11
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: ENISA — NIS2 essential/important entity guidance
+    source: ENISA
+    url: https://www.enisa.europa.eu/topics/cybersecurity-policy/nis-directive-new
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability
+  - auditability

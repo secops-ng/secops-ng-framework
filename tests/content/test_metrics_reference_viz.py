@@ -163,6 +163,11 @@ VIZ_REQUIRED_STEMS = (
     "cra_early_warning_latency_hours",
     "cra_full_notification_latency_hours",
     "cra_final_report_latency_days",
+    # F-MET-AVAILABILITY SKELETON — NIS2 Art.21(1)(b) / DORA Art.11
+    # service-availability and continuity KPI triad (G-04)
+    "service_availability_rate",
+    "rto_compliance_rate",
+    "service_continuity_test_frequency",
 )
 
 

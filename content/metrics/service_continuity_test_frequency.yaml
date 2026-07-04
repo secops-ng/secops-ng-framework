@@ -1,0 +1,123 @@
+stable_id: kpi.service_continuity_test_frequency@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Service continuity test frequency — count of ICT continuity plan tests exercised per year
+summary: >
+  Frequency at which the operator exercises its ICT business-
+  continuity plan on the in-scope service portfolio, measured as
+  tests per rolling year. Anchors the periodic-testing limb of
+  NIS2 Art. 21(1)(c) (business continuity, disaster-recovery
+  arrangements) and the annual continuity-testing requirement
+  under DORA Art. 11(6) (ICT business continuity policy shall be
+  tested at least once a year and after every substantive change).
+  The DORA "at least once a year" bound is the statutory floor on
+  which the ≥ 1 target is anchored; NIS2 Art. 21(1)(c) does not
+  set a numeric test cadence and the ≥ 1 target here reads as the
+  community baseline aligned with the DORA floor. Flagged clearly
+  here so downstream consumers do not read the ≥ 1 figure as an
+  NIS2 statutory ceiling. Complements the sibling drill-side
+  KPIs / KRIs (`kpi.restore_drill_cadence@v1`,
+  `kri.restore_drill_rto_overrun@v1`,
+  `kri.restore_drill_attestation_freshness@v1`) which read the
+  backup-recovery drill lane specifically; this KPI reads the
+  wider continuity-plan-testing lane at portfolio level. No non-EU
+  default endpoints participate in the continuity-testing
+  attestation chain — the test-attestation surface is an
+  EU-hostable endpoint per the sovereign-stack bias.
+unit: count
+direction: higher_is_better
+target:
+  value: 1
+  comparator: ">="
+  rationale: >
+    Statutory floor from DORA Art. 11(6): ICT business-continuity
+    policy shall be tested at least once a year. NIS2 Art. 21(1)(c)
+    requires business-continuity arrangements without a numeric
+    cadence; the community baseline aligns with the DORA floor so
+    an operator holding one baseline satisfies both regimes. Below-
+    target readings are a DORA statutory shortfall and a signal
+    that the NIS2 business-continuity arrangement is untested in
+    the current rolling year.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 2
+    severity: warn
+  - name: high
+    comparator: "<"
+    value: 1
+    severity: high
+  - name: breach
+    comparator: "=="
+    value: 0
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: count
+  formula: >
+    Count of ICT business-continuity plan tests attested in the
+    rolling 12-month evaluation window across the in-scope service
+    portfolio. Each attested test contributes one to the count;
+    substantive-change-triggered tests (DORA Art. 11(6) second
+    limb) count alongside the annual cadence test. Exclude tests
+    whose attestation carried a failure-to-execute status so the
+    reading does not silently improve when the operator's testing
+    lane stalls outright; those cases surface on
+    `kri.restore_drill_attestation_freshness@v1` for the drill lane
+    specifically. The count is portfolio-wide, not per-service;
+    per-service testing coverage surfaces on
+    `kpi.restore_drill_cadence@v1` and future
+    continuity-coverage KRIs.
+    Reference visualisation: a count-headline card with warn / high
+    / breach band overlays over a per-quarter drill-down showing
+    the tests attested in each quarter of the rolling year. The
+    committed reference rendering lives at
+    `content/metrics/service_continuity_test_frequency.viz.md` —
+    that file is the contract for the chart shape; the compile
+    target renders the executable form against operator data.
+  inputs:
+    - name: test_attestation
+      description: >
+        ICT business-continuity plan test attestation emitted at
+        test completion by the operator's continuity-testing
+        surface. Carried on the OCSF Compliance Finding event the
+        continuity-test attestation step emits (status_id
+        transition into the attested state); the catalog entry
+        binds to that OCSF class shape, not to a vendor-specific
+        continuity-testing, tabletop-exercise, or attestation
+        product.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: status_id
+    - name: attestation_timestamp
+      description: >
+        Timestamp of the continuity-test attestation, used to slot
+        the observation into the rolling 12-month evaluation
+        window. Carried on the OCSF Compliance Finding event the
+        continuity-test attestation step emits.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: time
+  window:
+    duration: P365D
+    sliding: true
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+external_refs:
+  - name: NIS2 — Article 21(1)(c) business continuity, backup management, disaster recovery, crisis management
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(1)(c)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 11(6) annual testing of ICT business continuity policy
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 11(6)
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: ENISA — NIS2 essential/important entity guidance
+    source: ENISA
+    url: https://www.enisa.europa.eu/topics/cybersecurity-policy/nis-directive-new
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability
+  - auditability
