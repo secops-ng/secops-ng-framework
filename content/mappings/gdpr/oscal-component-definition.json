@@ -1,0 +1,1239 @@
+{
+  "$schema": "http://csrc.nist.gov/ns/oscal/1.1.2/oscal-component-definition-schema.json",
+  "component-definition": {
+    "uuid": "23efc7ac-e193-5ed0-b762-dd3cf85bb842",
+    "metadata": {
+      "title": "SecOps-NG \u2014 GDPR Article-Level Component Definition",
+      "last-modified": "2026-07-04T00:00:00Z",
+      "version": "0.1.0",
+      "oscal-version": "1.1.2"
+    },
+    "components": [
+      {
+        "uuid": "ac80d1fd-3afc-5b26-80b1-5d224bed13fb",
+        "type": "process-procedure",
+        "title": "SecOps-NG",
+        "description": "SecOps-NG is a community-driven Digital Commons of portable security operations content (CACAO playbooks, OSCAL/D3FEND control mappings, OCSF data shapes, KPI/KRI catalog) plus reference compilers to n8n, Temporal, and LangGraph. This component definition exposes how the SecOps-NG content set addresses GDPR (Regulation (EU) 2016/679) article-level obligations covered by the shipped per-clause mapping YAMLs under content/mappings/gdpr/ \u2014 principles (Art. 5), lawful basis (Art. 6), data-subject rights (Art. 15-22), data protection by design (Art. 25), controller/processor and joint-controller arrangements (Art. 26-28), security of processing (Art. 32), personal-data breach notification (Art. 33-34), and data-protection impact assessment (Art. 35).",
+        "control-implementations": [
+          {
+            "uuid": "224e05c6-b108-5775-a72e-07bb075bfe86",
+            "source": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+            "description": "Coverage of GDPR article-level obligations as mapped in the per-clause YAMLs under content/mappings/gdpr/article-*.yaml. One implemented-requirement per (entry, control_ref) pair; entries whose obligation is principle-level and carries no control_ref (e.g. Art. 5(1)(b)/(c)/(e) principles anchored on downstream Art. 6 / Art. 24 accountability surfaces) are represented indirectly through the control_refs of the companion Art. 32 / Art. 25 / Art. 6 entries.",
+            "implemented-requirements": [
+              {
+                "uuid": "76bd2bcd-3562-5d83-aeda-0fc71019b873",
+                "control-id": "control.access_enforcement-v1",
+                "description": "Provide the data subject on request with confirmation of whether personal data concerning them are being processed, access to those personal data, and the Article 15(1)(a)-(h) meta-information (purposes of processing, categories of personal data, recipients or categories of recipients, envisaged retention period or the criteria used to determine it, the existence of the rights to rectification, erasure, restriction, and objection, the right to lodge a complaint with a supervisory authority, information about the source of the personal data where not collected from the subject, and the existence of automated decision-making including profiling and meaningful information about the logic involved). Article 15(3) requires the controller to provide a copy of the personal data undergoing processing.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.access_enforcement@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-15-access"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "15"
+                  }
+                ]
+              },
+              {
+                "uuid": "4270c73c-c810-5226-b149-367abf379b7e",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Provide the data subject on request with confirmation of whether personal data concerning them are being processed, access to those personal data, and the Article 15(1)(a)-(h) meta-information (purposes of processing, categories of personal data, recipients or categories of recipients, envisaged retention period or the criteria used to determine it, the existence of the rights to rectification, erasure, restriction, and objection, the right to lodge a complaint with a supervisory authority, information about the source of the personal data where not collected from the subject, and the existence of automated decision-making including profiling and meaningful information about the logic involved). Article 15(3) requires the controller to provide a copy of the personal data undergoing processing.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-15-access"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "15"
+                  }
+                ]
+              },
+              {
+                "uuid": "0f6293f4-111b-5704-9dfa-f626d8c1ac0e",
+                "control-id": "control.access_enforcement-v1",
+                "description": "Rectify without undue delay inaccurate personal data concerning the data subject and, taking into account the purposes of the processing, complete incomplete personal data (including by means of providing a supplementary statement). The controller must communicate the rectification to each recipient to whom the personal data have been disclosed under Article 19, unless that proves impossible or involves disproportionate effort.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.access_enforcement@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-16-rectification"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "16"
+                  }
+                ]
+              },
+              {
+                "uuid": "b46de8c9-b5f5-5a41-aa4f-016e438b7f92",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Rectify without undue delay inaccurate personal data concerning the data subject and, taking into account the purposes of the processing, complete incomplete personal data (including by means of providing a supplementary statement). The controller must communicate the rectification to each recipient to whom the personal data have been disclosed under Article 19, unless that proves impossible or involves disproportionate effort.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-16-rectification"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "16"
+                  }
+                ]
+              },
+              {
+                "uuid": "f6cf1e1f-f864-59ee-ab7d-61e3651a4175",
+                "control-id": "control.access_enforcement-v1",
+                "description": "Erase personal data concerning the data subject without undue delay where one of the Article 17(1) grounds applies (no longer necessary; consent withdrawn; successful objection; unlawful processing; legal-obligation compliance; child-subject on information-society-services offer). The Article 17(3) exemptions preserve processing necessary for freedom of expression and information, legal obligation, public interest in public health, archiving / scientific / historical research / statistical purposes, and the establishment / exercise / defence of legal claims. Under Article 17(2) a controller that has made the data public must take reasonable steps to inform other controllers processing the personal data that the subject has requested erasure. Article 19 recipient-communication applies.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.access_enforcement@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-17-erasure"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "17"
+                  }
+                ]
+              },
+              {
+                "uuid": "4287ba8a-e21a-5554-b3cb-710802f3d60b",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Erase personal data concerning the data subject without undue delay where one of the Article 17(1) grounds applies (no longer necessary; consent withdrawn; successful objection; unlawful processing; legal-obligation compliance; child-subject on information-society-services offer). The Article 17(3) exemptions preserve processing necessary for freedom of expression and information, legal obligation, public interest in public health, archiving / scientific / historical research / statistical purposes, and the establishment / exercise / defence of legal claims. Under Article 17(2) a controller that has made the data public must take reasonable steps to inform other controllers processing the personal data that the subject has requested erasure. Article 19 recipient-communication applies.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-17-erasure"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "17"
+                  }
+                ]
+              },
+              {
+                "uuid": "bb1821d9-7372-5e90-99a9-6f6e0b4c6af3",
+                "control-id": "control.access_enforcement-v1",
+                "description": "Restrict processing on the data subject's request where one of the Article 18(1) grounds applies (accuracy contested; unlawful processing without erasure; controller no longer needs the data but subject needs them for legal claims; pending objection). Where processing is restricted, the Article 18(2) storage-only floor applies. Under Article 18(3) the controller must inform the subject before the restriction is lifted. Article 19 recipient-communication applies.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.access_enforcement@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-18-restriction"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "18"
+                  }
+                ]
+              },
+              {
+                "uuid": "7f09ab01-9789-5ded-ac8c-2fcf606f4541",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Restrict processing on the data subject's request where one of the Article 18(1) grounds applies (accuracy contested; unlawful processing without erasure; controller no longer needs the data but subject needs them for legal claims; pending objection). Where processing is restricted, the Article 18(2) storage-only floor applies. Under Article 18(3) the controller must inform the subject before the restriction is lifted. Article 19 recipient-communication applies.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-18-restriction"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "18"
+                  }
+                ]
+              },
+              {
+                "uuid": "4b01fcf9-2dd8-58c8-9108-95d9d72d5648",
+                "control-id": "control.access_enforcement-v1",
+                "description": "Provide the data subject on request with the personal data they have provided to the controller in a structured, commonly-used, machine-readable format, and transmit the data directly to another controller where technically feasible, where the processing is based on consent under Article 6(1)(a) or 9(2)(a) or on a contract under Article 6(1)(b), and where the processing is carried out by automated means. The right does not adversely affect the rights and freedoms of others (Article 20(4)).",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.access_enforcement@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-20-portability"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "20"
+                  }
+                ]
+              },
+              {
+                "uuid": "a598e2e5-e6db-58bc-9319-9f4abf0dc491",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Provide the data subject on request with the personal data they have provided to the controller in a structured, commonly-used, machine-readable format, and transmit the data directly to another controller where technically feasible, where the processing is based on consent under Article 6(1)(a) or 9(2)(a) or on a contract under Article 6(1)(b), and where the processing is carried out by automated means. The right does not adversely affect the rights and freedoms of others (Article 20(4)).",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-20-portability"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "20"
+                  }
+                ]
+              },
+              {
+                "uuid": "decabc53-9210-5e76-806a-99ff3e76a2e3",
+                "control-id": "control.access_enforcement-v1",
+                "description": "Honour the data subject's objection to processing based on Article 6(1)(e) or 6(1)(f) unless the controller demonstrates compelling legitimate grounds which override the interests, rights, and freedoms of the subject, or for the establishment, exercise, or defence of legal claims. Objection to direct-marketing processing under Article 21(2) is unconditional. The workflow also classifies Article 22 automated-decision-review concerns raised on the request and routes them to the controller's human-in-the-loop review surface as part of the objection envelope.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.access_enforcement@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-21-objection"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "21"
+                  }
+                ]
+              },
+              {
+                "uuid": "8a9081ec-e646-5c94-ae50-9506b764e7fc",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Honour the data subject's objection to processing based on Article 6(1)(e) or 6(1)(f) unless the controller demonstrates compelling legitimate grounds which override the interests, rights, and freedoms of the subject, or for the establishment, exercise, or defence of legal claims. Objection to direct-marketing processing under Article 21(2) is unconditional. The workflow also classifies Article 22 automated-decision-review concerns raised on the request and routes them to the controller's human-in-the-loop review surface as part of the objection envelope.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-21-objection"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "21"
+                  }
+                ]
+              },
+              {
+                "uuid": "21fa68ff-bcf5-5664-a795-a77f809f6f64",
+                "control-id": "control.sbom_capture-v1",
+                "description": "Taking into account the state of the art, the cost of implementation and the nature, scope, context and purposes of processing as well as the risks of varying likelihood and severity for rights and freedoms of natural persons posed by the processing, the controller shall, both at the time of the determination of the means for processing and at the time of the processing itself, implement appropriate technical and organisational measures which are designed to implement data-protection principles in an effective manner and to integrate the necessary safeguards into the processing in order to meet the requirements of this Regulation and protect the rights of data subjects. The measures must be exercisable on the operator's documented release pipeline, deployed infrastructure, and coordinated-disclosure surface \u2014 not merely declared in policy \u2014 so the by-design capability is evidenced rather than asserted.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.sbom_capture@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-25-1-data-protection-by-design"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "25"
+                  }
+                ]
+              },
+              {
+                "uuid": "77b11069-a8a9-54f9-806b-a78ca41e4182",
+                "control-id": "control.patch_evidence-v1",
+                "description": "Taking into account the state of the art, the cost of implementation and the nature, scope, context and purposes of processing as well as the risks of varying likelihood and severity for rights and freedoms of natural persons posed by the processing, the controller shall, both at the time of the determination of the means for processing and at the time of the processing itself, implement appropriate technical and organisational measures which are designed to implement data-protection principles in an effective manner and to integrate the necessary safeguards into the processing in order to meet the requirements of this Regulation and protect the rights of data subjects. The measures must be exercisable on the operator's documented release pipeline, deployed infrastructure, and coordinated-disclosure surface \u2014 not merely declared in policy \u2014 so the by-design capability is evidenced rather than asserted.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.patch_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-25-1-data-protection-by-design"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "25"
+                  }
+                ]
+              },
+              {
+                "uuid": "ac71e849-fd53-5281-9428-eae6ca49cde1",
+                "control-id": "control.cspm_baseline-v1",
+                "description": "Taking into account the state of the art, the cost of implementation and the nature, scope, context and purposes of processing as well as the risks of varying likelihood and severity for rights and freedoms of natural persons posed by the processing, the controller shall, both at the time of the determination of the means for processing and at the time of the processing itself, implement appropriate technical and organisational measures which are designed to implement data-protection principles in an effective manner and to integrate the necessary safeguards into the processing in order to meet the requirements of this Regulation and protect the rights of data subjects. The measures must be exercisable on the operator's documented release pipeline, deployed infrastructure, and coordinated-disclosure surface \u2014 not merely declared in policy \u2014 so the by-design capability is evidenced rather than asserted.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cspm_baseline@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-25-1-data-protection-by-design"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "25"
+                  }
+                ]
+              },
+              {
+                "uuid": "f9cb84c3-cbf9-5f6a-aee2-54be95108736",
+                "control-id": "control.iac_policy_guardrail-v1",
+                "description": "Taking into account the state of the art, the cost of implementation and the nature, scope, context and purposes of processing as well as the risks of varying likelihood and severity for rights and freedoms of natural persons posed by the processing, the controller shall, both at the time of the determination of the means for processing and at the time of the processing itself, implement appropriate technical and organisational measures which are designed to implement data-protection principles in an effective manner and to integrate the necessary safeguards into the processing in order to meet the requirements of this Regulation and protect the rights of data subjects. The measures must be exercisable on the operator's documented release pipeline, deployed infrastructure, and coordinated-disclosure surface \u2014 not merely declared in policy \u2014 so the by-design capability is evidenced rather than asserted.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.iac_policy_guardrail@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-25-1-data-protection-by-design"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "25"
+                  }
+                ]
+              },
+              {
+                "uuid": "c23daea3-c752-5bb8-89b1-05921909cd81",
+                "control-id": "control.cloud_identity_least_privilege-v1",
+                "description": "Taking into account the state of the art, the cost of implementation and the nature, scope, context and purposes of processing as well as the risks of varying likelihood and severity for rights and freedoms of natural persons posed by the processing, the controller shall, both at the time of the determination of the means for processing and at the time of the processing itself, implement appropriate technical and organisational measures which are designed to implement data-protection principles in an effective manner and to integrate the necessary safeguards into the processing in order to meet the requirements of this Regulation and protect the rights of data subjects. The measures must be exercisable on the operator's documented release pipeline, deployed infrastructure, and coordinated-disclosure surface \u2014 not merely declared in policy \u2014 so the by-design capability is evidenced rather than asserted.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cloud_identity_least_privilege@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-25-1-data-protection-by-design"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "25"
+                  }
+                ]
+              },
+              {
+                "uuid": "a6c5f940-70c9-5f8e-b87a-2eb22c806cf7",
+                "control-id": "control.vuln_disclosure_intake-v1",
+                "description": "Taking into account the state of the art, the cost of implementation and the nature, scope, context and purposes of processing as well as the risks of varying likelihood and severity for rights and freedoms of natural persons posed by the processing, the controller shall, both at the time of the determination of the means for processing and at the time of the processing itself, implement appropriate technical and organisational measures which are designed to implement data-protection principles in an effective manner and to integrate the necessary safeguards into the processing in order to meet the requirements of this Regulation and protect the rights of data subjects. The measures must be exercisable on the operator's documented release pipeline, deployed infrastructure, and coordinated-disclosure surface \u2014 not merely declared in policy \u2014 so the by-design capability is evidenced rather than asserted.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.vuln_disclosure_intake@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-25-1-data-protection-by-design"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "25"
+                  }
+                ]
+              },
+              {
+                "uuid": "6e9a3865-0387-52e7-aeb3-87ac3d0eecec",
+                "control-id": "control.supplier_inventory-v1",
+                "description": "Where processing is to be carried out on behalf of a controller, the controller shall use only processors providing sufficient guarantees to implement appropriate technical and organisational measures so that the processing meets the requirements of this Regulation and ensures the protection of the rights of the data subject. Processing by a processor shall be governed by a contract or other legal act under Union or Member State law that binds the processor to the controller and sets out the subject matter and duration of the processing, the nature and purpose of the processing, the type of personal data and categories of data subjects, and the obligations and rights of the controller \u2014 including documented-instructions, confidentiality, security, sub-processor, data-subject-rights assistance, deletion-or-return, and audit-right obligations.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.supplier_inventory@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-28-processor-contractual-obligations"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "28"
+                  }
+                ]
+              },
+              {
+                "uuid": "e9948a84-0158-578d-981b-705ea0be4f89",
+                "control-id": "control.provider_attestation-v1",
+                "description": "Where processing is to be carried out on behalf of a controller, the controller shall use only processors providing sufficient guarantees to implement appropriate technical and organisational measures so that the processing meets the requirements of this Regulation and ensures the protection of the rights of the data subject. Processing by a processor shall be governed by a contract or other legal act under Union or Member State law that binds the processor to the controller and sets out the subject matter and duration of the processing, the nature and purpose of the processing, the type of personal data and categories of data subjects, and the obligations and rights of the controller \u2014 including documented-instructions, confidentiality, security, sub-processor, data-subject-rights assistance, deletion-or-return, and audit-right obligations.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.provider_attestation@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-28-processor-contractual-obligations"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "28"
+                  }
+                ]
+              },
+              {
+                "uuid": "2af103c5-0fb4-5cfa-a1f0-f81f5aa76169",
+                "control-id": "control.supplier_inventory-v1",
+                "description": "Where two or more controllers jointly determine the purposes and means of processing, they shall be joint controllers. They shall in a transparent manner determine their respective responsibilities for compliance with the obligations under this Regulation, in particular as regards the exercising of the rights of the data subject and their respective duties to provide the information referred to in Articles 13 and 14, by means of an arrangement between them; the essence of the arrangement shall be made available to the data subject.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.supplier_inventory@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-26-joint-controllers-arrangements"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "26"
+                  }
+                ]
+              },
+              {
+                "uuid": "37f080fe-870a-5277-bcce-fc617ea73ce1",
+                "control-id": "control.provider_attestation-v1",
+                "description": "Where two or more controllers jointly determine the purposes and means of processing, they shall be joint controllers. They shall in a transparent manner determine their respective responsibilities for compliance with the obligations under this Regulation, in particular as regards the exercising of the rights of the data subject and their respective duties to provide the information referred to in Articles 13 and 14, by means of an arrangement between them; the essence of the arrangement shall be made available to the data subject.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.provider_attestation@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-26-joint-controllers-arrangements"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "26"
+                  }
+                ]
+              },
+              {
+                "uuid": "7bd6b2b9-ed72-5ca8-ada4-32bcd96c1ede",
+                "control-id": "control.crypto_policy_inventory-v1",
+                "description": "Implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including as appropriate the pseudonymisation and encryption of personal data. Measures must take account of the state of the art, the costs of implementation, and the nature, scope, context, and purposes of processing, as well as the risk of varying likelihood and severity for the rights and freedoms of natural persons. The encryption capability must be exercisable on the operator's documented cryptographic surface \u2014 declared TLS endpoints, cipher-suite floor, key-rotation cadence, and the secured-communications channels that carry personal data \u2014 not merely declared in policy, so the protection capability is evidenced rather than asserted.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.crypto_policy_inventory@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-a-encryption"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "416b2213-d71a-574b-a6ea-28a37d2fac02",
+                "control-id": "control.cert_posture_scan-v1",
+                "description": "Implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including as appropriate the pseudonymisation and encryption of personal data. Measures must take account of the state of the art, the costs of implementation, and the nature, scope, context, and purposes of processing, as well as the risk of varying likelihood and severity for the rights and freedoms of natural persons. The encryption capability must be exercisable on the operator's documented cryptographic surface \u2014 declared TLS endpoints, cipher-suite floor, key-rotation cadence, and the secured-communications channels that carry personal data \u2014 not merely declared in policy, so the protection capability is evidenced rather than asserted.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cert_posture_scan@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-a-encryption"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "cafd3c21-48ec-55c0-965b-0ac1411aa5ab",
+                "control-id": "control.key_rotation_evidence-v1",
+                "description": "Implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including as appropriate the pseudonymisation and encryption of personal data. Measures must take account of the state of the art, the costs of implementation, and the nature, scope, context, and purposes of processing, as well as the risk of varying likelihood and severity for the rights and freedoms of natural persons. The encryption capability must be exercisable on the operator's documented cryptographic surface \u2014 declared TLS endpoints, cipher-suite floor, key-rotation cadence, and the secured-communications channels that carry personal data \u2014 not merely declared in policy, so the protection capability is evidenced rather than asserted.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.key_rotation_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-a-encryption"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "92af08b8-15d6-586d-a29b-4c4a7cfdea77",
+                "control-id": "control.oob_channel_probe-v1",
+                "description": "Implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including as appropriate the pseudonymisation and encryption of personal data. Measures must take account of the state of the art, the costs of implementation, and the nature, scope, context, and purposes of processing, as well as the risk of varying likelihood and severity for the rights and freedoms of natural persons. The encryption capability must be exercisable on the operator's documented cryptographic surface \u2014 declared TLS endpoints, cipher-suite floor, key-rotation cadence, and the secured-communications channels that carry personal data \u2014 not merely declared in policy, so the protection capability is evidenced rather than asserted.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.oob_channel_probe@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-a-encryption"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "75a4945b-a28d-594d-a55b-c935cbeba46e",
+                "control-id": "control.cspm_baseline-v1",
+                "description": "Implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including the ability to ensure the ongoing confidentiality, integrity, availability, and resilience of processing systems and services. Measures must take account of the state of the art, the costs of implementation, and the nature, scope, context, and purposes of processing, as well as the risk of varying likelihood and severity for the rights and freedoms of natural persons.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cspm_baseline@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "70500ace-7b31-5b46-84a4-b01d845db04d",
+                "control-id": "control.iac_policy_guardrail-v1",
+                "description": "Implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including the ability to ensure the ongoing confidentiality, integrity, availability, and resilience of processing systems and services. Measures must take account of the state of the art, the costs of implementation, and the nature, scope, context, and purposes of processing, as well as the risk of varying likelihood and severity for the rights and freedoms of natural persons.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.iac_policy_guardrail@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "0995ef93-4fd8-5119-90a9-96b1fad19faa",
+                "control-id": "control.cloud_identity_least_privilege-v1",
+                "description": "Implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including the ability to ensure the ongoing confidentiality, integrity, availability, and resilience of processing systems and services. Measures must take account of the state of the art, the costs of implementation, and the nature, scope, context, and purposes of processing, as well as the risk of varying likelihood and severity for the rights and freedoms of natural persons.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cloud_identity_least_privilege@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "021b1cad-3035-5ca9-9b07-805a089aa738",
+                "control-id": "control.privileged_access_review-v1",
+                "description": "Implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including the ability to ensure the ongoing confidentiality, integrity, availability, and resilience of processing systems and services. Measures must take account of the state of the art, the costs of implementation, and the nature, scope, context, and purposes of processing, as well as the risk of varying likelihood and severity for the rights and freedoms of natural persons.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.privileged_access_review@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "95405df6-3751-5ece-adba-9991e4d54b63",
+                "control-id": "control.mfa_state_probe-v1",
+                "description": "Implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including the ability to ensure the ongoing confidentiality, integrity, availability, and resilience of processing systems and services. Measures must take account of the state of the art, the costs of implementation, and the nature, scope, context, and purposes of processing, as well as the risk of varying likelihood and severity for the rights and freedoms of natural persons.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.mfa_state_probe@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "67f62596-426b-5c74-9b99-5326a8258cc2",
+                "control-id": "control.patch_evidence-v1",
+                "description": "Implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including the ability to ensure the ongoing confidentiality, integrity, availability, and resilience of processing systems and services. Measures must take account of the state of the art, the costs of implementation, and the nature, scope, context, and purposes of processing, as well as the risk of varying likelihood and severity for the rights and freedoms of natural persons.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.patch_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "47b54e11-bb52-52d2-9229-1d2012d7290f",
+                "control-id": "control.sbom_capture-v1",
+                "description": "Implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including the ability to ensure the ongoing confidentiality, integrity, availability, and resilience of processing systems and services. Measures must take account of the state of the art, the costs of implementation, and the nature, scope, context, and purposes of processing, as well as the risk of varying likelihood and severity for the rights and freedoms of natural persons.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.sbom_capture@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "0385969f-7830-5b2e-b933-aeacb2c564b1",
+                "control-id": "control.vuln_disclosure_intake-v1",
+                "description": "Implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including the ability to ensure the ongoing confidentiality, integrity, availability, and resilience of processing systems and services. Measures must take account of the state of the art, the costs of implementation, and the nature, scope, context, and purposes of processing, as well as the risk of varying likelihood and severity for the rights and freedoms of natural persons.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.vuln_disclosure_intake@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "9a4e82d0-056c-5924-bf40-1e99da5370cd",
+                "control-id": "control.control_effectiveness_test-v1",
+                "description": "Implement a process for regularly testing, assessing, and evaluating the effectiveness of technical and organisational measures for ensuring the security of the processing. The results of these assessments must be available as evidence that the security measures continue to meet the level-of-security-appropriate-to-the-risk threshold over time.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.control_effectiveness_test@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-d-regular-testing-and-effectiveness"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "1af6223b-3ceb-554c-8f51-82d8915ebb10",
+                "control-id": "control.detection_coverage_evidence-v1",
+                "description": "Implement a process for regularly testing, assessing, and evaluating the effectiveness of technical and organisational measures for ensuring the security of the processing. The results of these assessments must be available as evidence that the security measures continue to meet the level-of-security-appropriate-to-the-risk threshold over time.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.detection_coverage_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-d-regular-testing-and-effectiveness"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "6e7e41b8-3531-54ea-8f11-62246582d7c4",
+                "control-id": "control.cspm_baseline-v1",
+                "description": "Implement a process for regularly testing, assessing, and evaluating the effectiveness of technical and organisational measures for ensuring the security of the processing. The results of these assessments must be available as evidence that the security measures continue to meet the level-of-security-appropriate-to-the-risk threshold over time.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cspm_baseline@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-d-regular-testing-and-effectiveness"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "35767055-1f57-5cc5-aff9-7e8a3b1c4149",
+                "control-id": "control.restore_drill-v1",
+                "description": "Implement a process for regularly testing, assessing, and evaluating the effectiveness of technical and organisational measures for ensuring the security of the processing. The results of these assessments must be available as evidence that the security measures continue to meet the level-of-security-appropriate-to-the-risk threshold over time.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.restore_drill@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-d-regular-testing-and-effectiveness"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "af4dc45d-8a92-59e3-9dc0-76fc5cdaf0bc",
+                "control-id": "control.backup_attestation-v1",
+                "description": "Implement appropriate technical and organisational measures to ensure the ability to restore the availability and access to personal data in a timely manner in the event of a physical or technical incident. The measure must be exercisable on the operator's documented recovery surface, not merely documented, so the restore capability is evidenced rather than asserted.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.backup_attestation@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-c-restore-availability"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "aa47eeb1-e551-5510-9bb7-46b8f47b3ad8",
+                "control-id": "control.restore_drill-v1",
+                "description": "Implement appropriate technical and organisational measures to ensure the ability to restore the availability and access to personal data in a timely manner in the event of a physical or technical incident. The measure must be exercisable on the operator's documented recovery surface, not merely documented, so the restore capability is evidenced rather than asserted.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.restore_drill@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-c-restore-availability"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "2e3d1155-ea97-5997-9790-123197c17020",
+                "control-id": "control.incident_handling_capability-v1",
+                "description": "Implement appropriate technical and organisational measures to ensure the ability to restore the availability and access to personal data in a timely manner in the event of a physical or technical incident \u2014 including the per-event availability- incident response discipline against denial-of-service and related availability attacks on services that may carry personal data. The measure must be exercisable on the operator's documented response surface, not merely documented, so the availability-defence capability is evidenced rather than asserted.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_handling_capability@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-c-availability-incident-response"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "bb8ad940-4fcb-5505-9c08-57fbdd42c354",
+                "control-id": "control.asset_inventory_delta-v1",
+                "description": "Implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including the ability to ensure the ongoing confidentiality, integrity, availability, and resilience of processing systems and services. Specifically, the per-window asset-management discipline that maintains the authoritative inventory of information and ICT assets, captures the delta between scheduled snapshots so that unmanaged or undocumented assets surface as exceptions, and records the dated asset-inventory-delta evidence as the audit-evident artifact of the baseline-discovery limb. The measure must be exercisable on the operator's documented inventory-source set, not merely documented, so the ongoing-baseline capability is evidenced rather than asserted.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.asset_inventory_delta@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-b-asset-baseline-and-inventory"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "a68f43c1-3f37-5c60-9ed1-e0a3186b8136",
+                "control-id": "control.patch_evidence-v1",
+                "description": "Implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including the ability to ensure the ongoing confidentiality, integrity, availability, and resilience of processing systems and services. Specifically, the per-update maintenance discipline that classifies a security update against the operator's documented patch-criticality taxonomy, stages the rollout against the operator's documented deployment-ring topology, validates the canary ring against documented health gates, fans out to the remaining rings on a green canary, and records the dated patch-application evidence as the audit-evident artifact of the maintenance-and-security-updates limb. The measure must be exercisable on the operator's documented deployed estate, not merely documented, so the maintenance capability is evidenced rather than asserted.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.patch_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-32-1-b-maintenance-and-security-updates"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "32"
+                  }
+                ]
+              },
+              {
+                "uuid": "f26b19dd-36f8-536c-9dad-9f092fc28994",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Notify a personal data breach to the supervisory authority without undue delay and, where feasible, within 72 hours of becoming aware of it, unless the breach is unlikely to result in a risk to the rights and freedoms of natural persons. The notification must describe the nature of the breach, the categories and approximate counts of data subjects and records affected, the DPO or other contact point, the likely consequences, and the mitigations taken or proposed; a delay past 72 hours must be accompanied by reasons for the delay.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-33-notification-personal-data-breach"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "33"
+                  }
+                ]
+              },
+              {
+                "uuid": "7b8843e1-ff2e-515a-9595-dee466106d57",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Communicate a personal data breach to the affected data subjects without undue delay where it is likely to result in a high risk to their rights and freedoms. The communication must describe the nature of the breach in clear language and carry the DPO or contact point, the likely consequences, and the mitigations. The communication is not required where the data is rendered unintelligible (e.g. by encryption), where subsequent measures eliminate the high risk, or where it would involve disproportionate effort \u2014 in which case an equally effective public communication substitutes.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-34-communication-data-subject"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "34"
+                  }
+                ]
+              },
+              {
+                "uuid": "98414050-4037-5d5e-b412-c3a26f33a79c",
+                "control-id": "control.risk_management_policy-v1",
+                "description": "Where a type of processing, in particular using new technologies, and taking into account the nature, scope, context and purposes of the processing, is likely to result in a high risk to the rights and freedoms of natural persons, the controller shall, prior to the processing, carry out an assessment of the impact of the envisaged processing operations on the protection of personal data. A single assessment may address a set of similar processing operations that present similar high risks. The assessment must contain a systematic description of the envisaged processing and its purposes, an assessment of the necessity and proportionality of the processing in relation to those purposes, an assessment of the risks to rights and freedoms of data subjects, and the measures envisaged to address the risks including safeguards, security measures and mechanisms to ensure the protection of personal data and demonstrate compliance.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.risk_management_policy@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-35-1-dpia-high-risk-processing"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "35"
+                  }
+                ]
+              },
+              {
+                "uuid": "ac4e4f5c-08e9-5b91-8e8a-7f916e05a2ca",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Where a type of processing, in particular using new technologies, and taking into account the nature, scope, context and purposes of the processing, is likely to result in a high risk to the rights and freedoms of natural persons, the controller shall, prior to the processing, carry out an assessment of the impact of the envisaged processing operations on the protection of personal data. A single assessment may address a set of similar processing operations that present similar high risks. The assessment must contain a systematic description of the envisaged processing and its purposes, an assessment of the necessity and proportionality of the processing in relation to those purposes, an assessment of the risks to rights and freedoms of data subjects, and the measures envisaged to address the risks including safeguards, security measures and mechanisms to ensure the protection of personal data and demonstrate compliance.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-35-1-dpia-high-risk-processing"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "35"
+                  }
+                ]
+              },
+              {
+                "uuid": "cc166342-72a3-524b-9ff8-00cac7ee1890",
+                "control-id": "control.risk_management_policy-v1",
+                "description": "A data-protection impact assessment referred to in paragraph 1 shall in particular be required in the case of a systematic and extensive evaluation of personal aspects relating to natural persons which is based on automated processing, including profiling, and on which decisions are based that produce legal effects concerning the natural person or similarly significantly affect the natural person.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.risk_management_policy@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-35-3-a-dpia-systematic-evaluation"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "35(3)(a)"
+                  }
+                ]
+              },
+              {
+                "uuid": "dd574d35-fe5d-585d-9bdc-8f36ec75f784",
+                "control-id": "control.risk_management_policy-v1",
+                "description": "A data-protection impact assessment referred to in paragraph 1 shall in particular be required in the case of processing on a large scale of special categories of data referred to in Article 9(1), or of personal data relating to criminal convictions and offences referred to in Article 10.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.risk_management_policy@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-35-3-b-dpia-large-scale-processing"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "35(3)(b)"
+                  }
+                ]
+              },
+              {
+                "uuid": "179464e4-8f82-5d7f-97a1-4e2d4652821c",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "A data-protection impact assessment referred to in paragraph 1 shall in particular be required in the case of processing on a large scale of special categories of data referred to in Article 9(1), or of personal data relating to criminal convictions and offences referred to in Article 10.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-35-3-b-dpia-large-scale-processing"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "35(3)(b)"
+                  }
+                ]
+              },
+              {
+                "uuid": "b1b46dff-47bb-5f38-8a33-ef08920d6800",
+                "control-id": "control.incident_handling_capability-v1",
+                "description": "Process personal data only where the processing is necessary for the purposes of the legitimate interests pursued by the controller or by a third party, except where such interests are overridden by the interests or fundamental rights and freedoms of the data subject. The controller must be able to identify the legitimate interest, demonstrate necessity of the processing to that interest, and evidence the balancing against the data subject's rights.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_handling_capability@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-6-1-f-legitimate-interests-security-operations"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "6(1)(f)"
+                  }
+                ]
+              },
+              {
+                "uuid": "0e719ee4-6ea1-5d1a-a77a-52cae4244459",
+                "control-id": "control.detection_coverage_evidence-v1",
+                "description": "Process personal data only where the processing is necessary for the purposes of the legitimate interests pursued by the controller or by a third party, except where such interests are overridden by the interests or fundamental rights and freedoms of the data subject. The controller must be able to identify the legitimate interest, demonstrate necessity of the processing to that interest, and evidence the balancing against the data subject's rights.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.detection_coverage_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-6-1-f-legitimate-interests-security-operations"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "6(1)(f)"
+                  }
+                ]
+              },
+              {
+                "uuid": "b07f2370-5f2c-5b9c-b111-7fa8f7372262",
+                "control-id": "control.incident_handling_capability-v1",
+                "description": "Process personal data only where the processing is necessary for compliance with a legal obligation to which the controller is subject. The obligation must be laid down by Union or Member-State law, and the processing must be proportionate to the obligation pursued. For the incident-notification chain, the controlling obligation is the operator's statutory duty to report significant incidents to the competent authority under the applicable sectoral regime.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_handling_capability@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-6-1-c-legal-obligation-incident-notification"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "6(1)(c)"
+                  }
+                ]
+              },
+              {
+                "uuid": "1cb76d1f-a22e-539a-891f-298b48d8f5a3",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Process personal data only where the processing is necessary for compliance with a legal obligation to which the controller is subject. The obligation must be laid down by Union or Member-State law, and the processing must be proportionate to the obligation pursued. For the incident-notification chain, the controlling obligation is the operator's statutory duty to report significant incidents to the competent authority under the applicable sectoral regime.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-6-1-c-legal-obligation-incident-notification"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "6(1)(c)"
+                  }
+                ]
+              },
+              {
+                "uuid": "4264f1f6-0b3c-58c9-ad46-bca0cd6b3cd6",
+                "control-id": "control.control_effectiveness_test-v1",
+                "description": "Process personal data only where the processing is necessary for compliance with a legal obligation to which the controller is subject. For the periodic risk-management-effectiveness assessment lane, the controlling obligation is the operator's statutory duty to adopt appropriate and proportionate technical and organisational cybersecurity risk-management measures and to assess the effectiveness of those measures on the documented cadence, so the dated attestation the operator presents to a supervisory authority is evidenced rather than asserted.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.control_effectiveness_test@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "gdpr:art-6-1-c-legal-obligation-risk-management-assessment"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "6(1)(c)"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
