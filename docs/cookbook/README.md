@@ -34,6 +34,7 @@ narrative.
 | `data_subject_rights` | [`data_subject_rights.md`](data_subject_rights.md) | `content/playbooks/data_subject_rights/`              |
 | `data_protection_impact_assessment` | [`data_protection_impact_assessment.md`](data_protection_impact_assessment.md) | `content/playbooks/data_protection_impact_assessment/` |
 | `nis2_self_assessment` | [`nis2_self_assessment.md`](nis2_self_assessment.md) | `content/playbooks/nis2_self_assessment/`             |
+| `dora_ict_risk_selfassess` | [`dora_ict_risk_selfassess.md`](dora_ict_risk_selfassess.md) | `content/playbooks/dora_ict_risk_selfassess/`   |
 | `asset_management`    | [`asset_management.md`](asset_management.md)       | `content/playbooks/asset_management/`                 |
 
 Additional entries land alongside their content sources as workflows
