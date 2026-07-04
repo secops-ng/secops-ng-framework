@@ -1,0 +1,222 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--91a2b3c4-0000-4000-8000-000000000001",
+  "name": "NIS2 Article 21 operator self-assessment report",
+  "description": "SKELETON \u2014 CACAO v2 scaffold for the NIS2 Article 21(2) operator-side self-assessment report. Aggregates the per-clause evidence the ten Art. 21(2)(a\u2013j) obligations produce across the operator's shipped playbook set into a single dated attestation artifact so an operator can demonstrate coverage of the whole Article 21 control surface in one coherent output rather than as ten disjoint per-clause reads. Distinct from the per-clause playbooks that discharge each obligation on its own axis (infra_posture_management for (a); alert_triage / phishing_triage / identity_compromise / ransomware_containment / data_exfil for (b); backup_recovery for (c); threat_intel_ingest / contractual_obligations_tracker / supply_chain_security for (d); vuln_intake / cloud_misconfiguration / patch_management / codebase_vuln_management for (e); detection_engineering for (f); phishing_triage / cyber_hygiene_training for (g); crypto_posture_management for (h); identity_compromise / cloud_misconfiguration / iam_auditor / onboarding_offboarding_tracker / asset_management for (i); mfa_secured_comms for (j)) and from the F-CP-06 effectiveness loop (which emits per-metric snapshots on an evaluation-window cadence): this is the whole-Article roll-up an operator produces on the self-assessment cadence they document, keyed on the ten sub-clause atoms rather than the per-playbook fan-out. The lifecycle chains four steps: collect_clause_evidence against the operator's evidence store for each Art. 21(2) sub-clause, keyed on the inbound mapping atoms (nis2:art-21-2-a through nis2:art-21-2-j) \u2192 map_evidence_to_clauses under the SecOps-NG content-model overlay so each collected evidence record is bound to the sub-clause it discharges plus the playbook slug that produced it \u2192 score_per_clause_coverage against the operator's documented coverage rubric (present-and-current / present-but-stale / absent-with-declared-exception / absent-uncovered) \u2192 report_attestation as the durable per-clause attestation artifact that carries the ten sub-clause verdicts plus the whole-Article roll-up verdict and the dated attestation timestamp. Evidence outputs: nis2-self-assessment-report (one per assessment window), per-clause-attestation-record (ten per report). SKELETON only: the operator's evidence-store adapter, the coverage-rubric binding, and the attestation-artifact template are declared as adapter-bound surfaces the operator wires; a sibling CORE card lands the templates, the OSCAL binding closure across CA-2 / CA-7, and the byte-parity goldens across n8n / Temporal / LangGraph. CACAO v2 + SecOps-NG content-model extensions.",
+  "playbook_types": [
+    "investigation",
+    "notification"
+  ],
+  "created_by": "identity--5ec0075c-0000-4000-8000-000000000001",
+  "created": "2026-07-04T00:00:00Z",
+  "modified": "2026-07-04T00:00:00Z",
+  "valid_from": "2026-07-04T00:00:00Z",
+  "labels": [
+    "nis2",
+    "article-21",
+    "self-assessment",
+    "attestation",
+    "operator-reporting",
+    "effectiveness-assessment"
+  ],
+  "external_references": [
+    {
+      "name": "OASIS CACAO v2.0",
+      "description": "Workflow step types (start, action, end), variable conventions, x_ extension namespace.",
+      "source": "OASIS Open"
+    },
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 21(2) \u2014 cybersecurity risk-management measures (a\u2013j)",
+      "source": "Official Journal of the European Union",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj"
+    },
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 21(2)(f) \u2014 effectiveness assessment of risk-management measures",
+      "source": "Official Journal of the European Union",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj"
+    },
+    {
+      "name": "NIST SP 800-53 Rev. 5 \u2014 CA-2 (Control Assessments) and CA-7 (Continuous Monitoring)",
+      "source": "NIST",
+      "url": "https://csrc.nist.gov/projects/risk-management/sp800-53-controls"
+    },
+    {
+      "name": "ENISA \u2014 Technical implementation guidance for NIS2 Art. 21 cybersecurity risk-management measures",
+      "source": "ENISA"
+    }
+  ],
+  "playbook_variables": {
+    "__assessment_window__": {
+      "type": "string",
+      "description": "Identifier of the self-assessment window this run discharges (scheduled-cadence reference, on-demand attestation reference, or operator-initiated trigger such as a supervisory-authority request). Names which self-assessment cohort the run reports against rather than the run's wall-clock time; the wall-clock instant lives on the attestation artifact itself.",
+      "external": true
+    },
+    "__clause_atoms__": {
+      "type": "string",
+      "description": "Identifier of the resolved sub-clause atom set the report addresses. Always the ten Art. 21(2)(a\u2013j) atoms (mapping ids nis2:art-21-2-a through nis2:art-21-2-j) as declared in content/playbooks/nis2_self_assessment/mappings.yaml. Populated by collect_clause_evidence so the downstream map / score / report steps read against a stable atom set for the window.",
+      "external": false
+    },
+    "__evidence_set_id__": {
+      "type": "string",
+      "description": "Identifier of the per-clause evidence set the collect step composed for this window: for each of the ten sub-clause atoms, the set of evidence records emitted by the playbooks that discharge that clause (posture snapshots for (a); alert / incident records for (b); backup attestations for (c); supplier attestations for (d); patch and vulnerability evidence for (e); effectiveness snapshots for (f); training and phishing-sim records for (g); crypto-posture records for (h); IAM audit and asset-inventory records for (i); MFA-coverage records for (j)). The set may be empty for a given clause (no evidence emitted in the window) \u2014 the empty case is still carried explicitly so the downstream scoring records absent-uncovered rather than silently dropping the clause.",
+      "external": false
+    },
+    "__clause_mapping__": {
+      "type": "string",
+      "description": "Identifier of the per-clause evidence-to-obligation mapping the map step composed. Each entry binds a collected evidence record to (i) the sub-clause atom it discharges (one of nis2:art-21-2-a through nis2:art-21-2-j), (ii) the playbook slug that produced it, and (iii) the SecOps-NG content-model overlay refs (control_refs, telemetry_refs, metric_refs) that carry across from the producing playbook. The map is best-effort; evidence records that do not bind to a documented sub-clause atom are recorded as unbound and flagged on the report rather than dropped.",
+      "external": false
+    },
+    "__clause_scoring__": {
+      "type": "string",
+      "description": "Identifier of the per-clause coverage-scoring set the score step composed against the operator's documented coverage rubric (present-and-current / present-but-stale / absent-with-declared-exception / absent-uncovered). Empty when scoring could not be completed within the documented self-assessment deadline; an empty value short-circuits into an attestation-emission failure record while still recording the per-clause bucket as absent-uncovered for the whole-Article roll-up.",
+      "external": false
+    },
+    "__attestation_id__": {
+      "type": "string",
+      "description": "Identifier of the dated NIS2 Article 21 self-assessment attestation artifact published to the operator's evidence store. Always populated, including on the empty-evidence-set branch and on the unscored short-circuit branch, so the audit-evident chain is closed.",
+      "external": false
+    }
+  },
+  "workflow_start": "start--91000000-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--91000000-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "nis2_self_assessment_start",
+      "on_completion": "action--91000000-0000-4000-8000-000000000002"
+    },
+    "action--91000000-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "collect clause evidence",
+      "description": "TODO (CORE): per-clause evidence-collection primitive. The action body reads the operator's evidence store for the current self-assessment window and pulls every evidence record whose producing playbook is one of the twenty-two playbooks the ten Art. 21(2)(a\u2013j) sub-clauses currently anchor against (see content/playbooks/nis2_self_assessment/mappings.yaml). Sets __clause_atoms__ to the fixed ten-atom set nis2:art-21-2-a through nis2:art-21-2-j and __evidence_set_id__ to the durable identifier of the per-clause evidence set for the window. Read-only against the evidence store: the collection step does not write back into the source records, it composes a per-window view keyed on the ten sub-clause atoms. SKELETON pins the topology + ID + regulatory anchor refs; the deterministic per-source pull, normalisation, and sub-clause-attribution carry are owned by CORE-PRIM. Detection bindings for collection-side failures (evidence-store endpoint unreachable, partial pull inside the window, missing producing-playbook attribution on a record) are owned by CORE-FANOUT cards once upstream rule ids are selected.",
+      "on_completion": "action--91000000-0000-4000-8000-000000000003",
+      "in_args": [
+        "__assessment_window__"
+      ],
+      "out_args": [
+        "__clause_atoms__",
+        "__evidence_set_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.security_assessment@v1",
+          "control.control_effectiveness_test@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kri.control_effectiveness@v1"
+        ]
+      }
+    },
+    "action--91000000-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "map evidence to clauses",
+      "description": "TODO (CORE): per-record evidence-to-clause mapping primitive. The action body binds each evidence record in __evidence_set_id__ to (i) the Art. 21(2) sub-clause atom it discharges (one of nis2:art-21-2-a through nis2:art-21-2-j), (ii) the playbook slug that produced it, and (iii) the SecOps-NG content-model overlay refs (control_refs, telemetry_refs, metric_refs) that carry across from the producing playbook, using the outbound overlay declared at content/playbooks/<slug>/mappings.yaml as the join key. Sets __clause_mapping__. The mapping is best-effort; evidence records that do not bind to a documented sub-clause atom are recorded as unbound and flagged on the report rather than dropped so the audit trail carries the gap explicitly. Empty per-clause sub-sets are emitted explicitly (a clause with no evidence in the window is still enumerated) so the downstream scoring records absent-uncovered rather than silently dropping the clause. SKELETON pins the topology + ID + control / telemetry refs; the deterministic mapping-and-normalisation is owned by CORE-PRIM.",
+      "on_completion": "action--91000000-0000-4000-8000-000000000004",
+      "in_args": [
+        "__assessment_window__",
+        "__clause_atoms__",
+        "__evidence_set_id__"
+      ],
+      "out_args": [
+        "__clause_mapping__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.security_assessment@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kri.control_effectiveness@v1"
+        ]
+      }
+    },
+    "action--91000000-0000-4000-8000-000000000004": {
+      "type": "action",
+      "name": "score per-clause coverage",
+      "description": "TODO (CORE): per-clause coverage-scoring primitive. The action body scores each of the ten Art. 21(2)(a\u2013j) sub-clauses in __clause_mapping__ against the operator's documented coverage rubric: present-and-current (at least one evidence record in the window whose captured_at is inside the operator's declared freshness threshold for the clause), present-but-stale (evidence records exist but the freshest is past the declared freshness threshold), absent-with-declared-exception (no evidence records in the window but the operator maintains a documented, dated exception under their Art. 21(2)(a) risk-analysis policy naming the compensating measure), or absent-uncovered (no evidence records in the window and no declared exception \u2014 the gap the self-assessment surfaces). Per-clause internal consistency is enforced at the primitive boundary so an inconsistent scoring (e.g. present-and-current with an empty evidence sub-set) fails loud here rather than at the report boundary downstream. The scoring is best-effort and time-boxed; if scoring cannot be completed within the documented self-assessment deadline (so the operator is not held by a perfect-scoring stall while the attestation window slips), the primitive is invoked with deadline_missed=true and emits the sentinel per-clause bucket ['unscored']; the downstream report step records that marker while still treating the per-clause bucket as absent-uncovered for the whole-Article roll-up. Sets __clause_scoring__. SKELETON pins the topology + ID + control / telemetry / metric refs; the deterministic scoring-rubric binding is owned by CORE-PRIM.",
+      "on_completion": "action--91000000-0000-4000-8000-000000000005",
+      "in_args": [
+        "__clause_atoms__",
+        "__clause_mapping__"
+      ],
+      "out_args": [
+        "__clause_scoring__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.security_assessment@v1",
+          "control.control_effectiveness_test@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kri.control_effectiveness@v1"
+        ]
+      }
+    },
+    "action--91000000-0000-4000-8000-000000000005": {
+      "type": "action",
+      "name": "report attestation",
+      "description": "TODO (CORE): dated attestation-emission primitive. The action body composes the JSON-native NIS2 Art. 21 self-assessment attestation record shaped against a schemas/evidence/nis2-self-assessment.schema.json (stream: attestation) landing in the sibling CORE card, and pins the artifact_id as SHA-256(workflow_id|execution_id|captured_at). compile_target is intentionally NOT part of the id so the three reference compilers re-derive byte-identical bytes from the same primitive output (the byte-parity contract the F-WF-NIS2-SELF-ASSESS CORE-FANOUT siblings assert against). The record carries the assessment window, the ten sub-clause atoms with their per-clause scoring buckets, the unbound-evidence flag (if any), the whole-Article roll-up verdict (all-present-and-current / mixed-with-declared-exceptions / partial-coverage-with-gaps / uncovered), and the dated attestation timestamp. This is the audit-evident artifact NIS2 supervisory-authority reviewers read against the whole Article 21 control surface; missing or stale attestation is the failure mode the operator-side self-assessment cadence surfaces. The primitive only produces the JSON-native record; the durable emitter wiring (artifact-path, content-addressed filename, atomic write, notification of the operator's accountability owner) is owned by the per-target compilers and lands with the CORE-FANOUT sibling cards. Sets __attestation_id__.",
+      "on_completion": "end--91000000-0000-4000-8000-000000000006",
+      "in_args": [
+        "__assessment_window__",
+        "__clause_atoms__",
+        "__clause_mapping__",
+        "__clause_scoring__"
+      ],
+      "out_args": [
+        "__attestation_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.security_assessment@v1",
+          "control.control_effectiveness_test@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kri.control_effectiveness@v1"
+        ]
+      }
+    },
+    "end--91000000-0000-4000-8000-000000000006": {
+      "type": "end",
+      "name": "nis2_self_assessment_end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.nis2_self_assessment@v1",
+    "content_version": "0.1.0",
+    "maturity": "experimental",
+    "compile_targets": [
+      "n8n",
+      "temporal",
+      "langgraph"
+    ],
+    "control_refs": [
+      "control.security_assessment@v1",
+      "control.control_effectiveness_test@v1"
+    ],
+    "telemetry_refs": [
+      "telemetry.ocsf.api_activity@v1"
+    ],
+    "metric_refs": [
+      "kri.control_effectiveness@v1"
+    ],
+    "sources": [
+      "OASIS CACAO v2.0 specification \u2014 workflow step types, variable conventions, x_ extension namespace",
+      "NIS2 Directive (EU) 2022/2555, Article 21(2) \u2014 cybersecurity risk-management measures (a\u2013j)",
+      "NIS2 Directive (EU) 2022/2555, Article 21(2)(f) \u2014 effectiveness assessment",
+      "NIST SP 800-53 Rev. 5 \u2014 CA-2 (Control Assessments) and CA-7 (Continuous Monitoring)",
+      "ENISA \u2014 technical implementation guidance for NIS2 Art. 21"
+    ]
+  }
+}

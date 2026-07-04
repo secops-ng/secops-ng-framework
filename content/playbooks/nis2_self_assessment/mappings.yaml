@@ -1,0 +1,353 @@
+# Cross-references for the nis2_self_assessment playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed/emitted, and the EU regulatory clauses this playbook
+# helps operationalise. Inbound references live in
+# content/mappings/{nis2,dora,cra}/ so the graph is closed in both
+# directions.
+#
+# This playbook is the whole-Article-21 roll-up: it aggregates the
+# per-clause evidence the ten Art. 21(2)(a-j) obligations produce
+# across the operator's shipped playbook set into a single dated
+# attestation artifact. Distinct from the per-clause playbooks that
+# discharge each obligation on its own axis, and from the F-CP-06
+# effectiveness loop (which emits per-metric snapshots on an
+# evaluation-window cadence): this is the operator's self-assessment
+# roll-up keyed on the ten sub-clause atoms.
+#
+# Status: SKELETON. The SKELETON pins the ten Art. 21(2) sub-clause
+# atoms as outbound backlinks (a-j) plus the OSCAL CA-2 /
+# CA-7 control-assessment anchors and the D3-OAM D3FEND anchor on
+# the score-per-clause-coverage step. CORE-layer cards land the
+# deterministic per-step primitives (evidence collection against
+# the operator's evidence store, evidence-to-clause mapping,
+# coverage-scoring rubric, attestation-emission), the OSCAL
+# component-definition entries under
+# content/mappings/nis2/oscal-component-definition.json, and the
+# byte-parity goldens under
+# examples/{n8n,temporal,langgraph}/nis2_self_assessment/. EXTEND-
+# layer cards wire the whole-Article roll-up metric emitters
+# (kpi.nis2_self_assessment_coverage, kri.nis2_uncovered_clauses)
+# once the metric shapes are ratified.
+#
+# Deliberate OSCAL omissions:
+#   - CA-5 (Plan of Action and Milestones) is NOT pinned at the
+#     SKELETON layer: the plan-of-action authoring surface for
+#     uncovered clauses lives in the operator's governance
+#     documentation upstream of this playbook. The self-assessment
+#     surfaces the gap; the plan-of-action is the operator's
+#     downstream lever. CORE-PRIM cards may extend the OSCAL block
+#     with CA-5 once the attestation record's uncovered-clause
+#     structure is fixed and the plan-of-action authoring surface
+#     is bound.
+#   - PM-31 (Continuous Monitoring Strategy) is NOT pinned: the
+#     self-assessment cadence itself is authored upstream of this
+#     playbook in the operator's continuous-monitoring documentation;
+#     pinning PM-31 here would conflate the per-window attestation
+#     discipline with the cadence-authoring surface.
+#
+# GDPR closure: no per-workflow Records of Processing Activity entry
+# is required; this playbook operates on evidence-record identifiers,
+# sub-clause atoms, playbook slugs, and attestation-record identifiers,
+# none of which are personal data. The evidence records themselves
+# are the responsibility of the producing playbooks, each of which
+# carries its own GDPR closure entry where relevant (e.g. the
+# incident-management lane's data-flow-incident_management.md).
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.nis2_self_assessment@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the four steps of
+  # the self-assessment lifecycle. The single SKELETON pin set
+  # anchors the playbook end-to-end against CA-2 (Control
+  # Assessments) and CA-7 (Continuous Monitoring). CA-5 is held
+  # back to the CORE layer where the uncovered-clause structure
+  # binds against the operator's plan-of-action authoring surface
+  # (see header gap note).
+  - id: control.security_assessment@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CA-2
+    title: Control Assessments
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CA-2
+    notes: >-
+      Anchors the playbook end-to-end as the control-assessment
+      capability: CA-2 requires the operator to develop, review,
+      and approve a control assessment plan, assess the controls
+      in the system and its environment of operation to determine
+      the extent to which the controls are implemented correctly,
+      operating as intended, and producing the desired outcome
+      with respect to meeting established security and privacy
+      requirements, and produce a control assessment report that
+      documents the results of the assessment. The self-assessment
+      lifecycle composes the per-clause evidence set, maps records
+      to sub-clause atoms, scores coverage against the operator's
+      documented rubric, and emits the dated attestation record
+      that is the audit-evident report CA-2 reviewers consume.
+
+  - id: control.control_effectiveness_test@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CA-7
+    title: Continuous Monitoring
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CA-7
+    notes: >-
+      Covers the collect-clause-evidence, score-per-clause-coverage,
+      and report-attestation steps: CA-7 demands ongoing monitoring
+      of security controls and reporting of the security state to
+      designated officials. The self-assessment cadence is the
+      operator's continuous-monitoring discharge on the NIS2
+      Article 21 control surface specifically: per-clause evidence
+      is collected on the documented cadence, coverage is scored
+      against the documented rubric, and the dated attestation
+      record is the audit-evident report continuous-monitoring
+      reviewers consume. Mirrors the NIS2 Art. 21(2)(f)
+      effectiveness-assessment inbound-closure precedent: same
+      CA-7 anchor, here narrowed to the whole-Article roll-up
+      slice rather than the per-detection-rule effectiveness slice
+      the detection_engineering playbook discharges.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned to the real action UUIDs resolved
+  # from content/playbooks/nis2_self_assessment/playbook.cacao.json
+  # (four action bodies: collect-clause-evidence, map-evidence-to-
+  # clauses, score-per-clause-coverage, report-attestation). One
+  # step carries a per-step D3FEND pin: D3-OAM on the score-per-
+  # clause-coverage step. The collect, map, and report steps are
+  # deliberately not pinned and the gaps are documented in the
+  # comments below (mirroring the per-step gap-note precedents on
+  # patch_management, ddos_response, and asset_management —
+  # defensible technique anchors only, no weak bindings forced
+  # onto the meta-workflow discipline the playbook actually
+  # discharges).
+  #
+  # Upstream anchor: content/controls/control.security_assessment@v1.yaml
+  # already carries D3-OAM (Operational Activity Mapping) on the
+  # control-side overlay; this SKELETON is the per-step lift of
+  # the same technique onto the playbook overlay, narrowed to the
+  # per-clause coverage-scoring slice that produces the mapping
+  # the control names.
+  - step: action--91000000-0000-4000-8000-000000000004
+    d3fend_id: D3-OAM
+    d3fend_name: Operational Activity Mapping
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    notes: >-
+      score-per-clause-coverage — mapping the collected per-clause
+      evidence set onto the operator's documented coverage rubric
+      (present-and-current / present-but-stale / absent-with-
+      declared-exception / absent-uncovered) is the operational-
+      activity-mapping discipline D3-OAM names: the mapping of
+      operator activities and evidence onto a documented model of
+      the obligations the operator must discharge. D3FEND v1.0.0
+      frames D3-OAM as the operational-activity-mapping technique
+      on the assessment side specifically; the score step is the
+      per-clause coverage-rubric application slice against the
+      operator's declared thresholds, narrowed to the ten Art. 21(2)
+      sub-clause atoms rather than the per-control assessment
+      surface upstream of the playbook. Read-only against the
+      evidence set: the step composes a per-window scoring view
+      keyed on the ten sub-clause atoms, it does not write back
+      into the source evidence records or into the operator's
+      declared rubric. Mirrors the control.security_assessment@v1
+      control file's D3-OAM pin; same technique, here narrowed to
+      the whole-Article-21 self-assessment slice rather than the
+      standing security-assessment surface.
+
+  # Deliberate D3FEND omissions:
+  #   - collect-clause-evidence
+  #     (action--91000000-0000-4000-8000-000000000002) is NOT
+  #     pinned: the evidence-collection slice is a read-only pass
+  #     against the operator's evidence store, not a defensive-
+  #     technique discharge against the operator's deployed
+  #     estate. The producing playbooks (posture, alert, backup,
+  #     supplier, patch, detection, training, crypto, IAM, MFA)
+  #     already carry their own per-step D3FEND anchors where a
+  #     defensible technique exists; lifting a technique onto the
+  #     collection slice here would double-count. Mirrors the
+  #     executive_metrics evidence-collection gap-note precedent.
+  #   - map-evidence-to-clauses
+  #     (action--91000000-0000-4000-8000-000000000003) is NOT
+  #     pinned: the mapping slice is a deterministic content-
+  #     model overlay lookup, not a defensive-technique discharge.
+  #     Mirrors the patch_management evidence-capture gap-note
+  #     precedent.
+  #   - report-attestation
+  #     (action--91000000-0000-4000-8000-000000000005) is NOT
+  #     pinned: the dated attestation-emission slice produces the
+  #     audit-evident whole-Article-21 self-assessment record, it
+  #     does not itself execute a defensive technique. Mirrors the
+  #     patch_management, ddos_response, and asset_management
+  #     evidence-capture gap-note precedents.
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. The collect, map, score, and
+  # report steps interact with operator API surfaces (evidence
+  # store, content-model overlay, coverage-rubric reference, and
+  # attestation-store). Richer per-step telemetry bindings (e.g.
+  # OCSF Compliance Finding for the per-clause scoring bucket)
+  # are deferred to CORE-layer cards once stable upstream signal
+  # shapes are selected.
+  - id: telemetry.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: both
+    notes: >-
+      Consumed at the collect-clause-evidence step (reads against
+      the operator's evidence store for every producing playbook
+      the ten Art. 21(2)(a-j) sub-clauses anchor against) and at
+      the map-evidence-to-clauses / score-per-clause-coverage
+      steps (read calls against the SecOps-NG content-model
+      overlay and the operator's declared coverage rubric).
+      Emitted at the report-attestation step (write call
+      publishing the dated NIS2 Art. 21 self-assessment
+      attestation record to the operator's evidence store).
+      Schema: https://schema.ocsf.io/1.3.0/classes/api_activity
+
+nis2:
+  # Inbound entries that backlink playbook.nis2_self_assessment@v1:
+  #   - content/mappings/nis2/article-21-2-a.yaml (nis2:art-21-2-a)
+  #   - content/mappings/nis2/article-21-2-b.yaml (nis2:art-21-2-b)
+  #   - content/mappings/nis2/article-21-2-c.yaml (nis2:art-21-2-c)
+  #   - content/mappings/nis2/article-21-2-d.yaml (nis2:art-21-2-d)
+  #   - content/mappings/nis2/article-21-2-e.yaml (nis2:art-21-2-e)
+  #   - content/mappings/nis2/article-21-2-f.yaml (nis2:art-21-2-f)
+  #   - content/mappings/nis2/article-21-2-g.yaml (nis2:art-21-2-g)
+  #   - content/mappings/nis2/article-21-2-h.yaml (nis2:art-21-2-h)
+  #   - content/mappings/nis2/article-21-2-i.yaml (nis2:art-21-2-i)
+  #   - content/mappings/nis2/article-21-2-j.yaml (nis2:art-21-2-j)
+  # The matching `playbook_refs:` additions on the ten NIS2 inbound
+  # files land in this same SKELETON PR so the orphan-CI graph
+  # closes on the NIS2 axis end-to-end without a skip entry. This
+  # is the whole-Article-21 roll-up playbook, so every sub-clause
+  # atom carries the outbound entry.
+  - mapping_id: nis2:art-21-2-a
+    article: 21(2)(a)
+    notes: >-
+      Risk analysis and information-system-security policies —
+      per-clause bucket the self-assessment aggregates against.
+      The producing playbooks the collect step reads against on
+      this clause: infra_posture_management (posture evidence
+      stream) plus the operator's governance documentation for
+      the policy-authoring surface upstream of the playbook set.
+  - mapping_id: nis2:art-21-2-b
+    article: 21(2)(b)
+    notes: >-
+      Incident handling — per-clause bucket the self-assessment
+      aggregates against. The producing playbooks the collect
+      step reads against on this clause: alert_triage,
+      phishing_triage, identity_compromise, ransomware_containment,
+      data_exfil (incident-record evidence streams).
+  - mapping_id: nis2:art-21-2-c
+    article: 21(2)(c)
+    notes: >-
+      Business continuity, backup and disaster recovery — per-
+      clause bucket the self-assessment aggregates against. The
+      producing playbook the collect step reads against on this
+      clause: backup_recovery (backup-attestation evidence
+      stream).
+  - mapping_id: nis2:art-21-2-d
+    article: 21(2)(d)
+    notes: >-
+      Supply-chain security — per-clause bucket the self-
+      assessment aggregates against. The producing playbooks the
+      collect step reads against on this clause:
+      threat_intel_ingest, contractual_obligations_tracker,
+      supply_chain_security (supplier-attestation evidence
+      stream).
+  - mapping_id: nis2:art-21-2-e
+    article: 21(2)(e)
+    notes: >-
+      Security in acquisition, development and maintenance
+      (vulnerability handling) — per-clause bucket the self-
+      assessment aggregates against. The producing playbooks the
+      collect step reads against on this clause: vuln_intake,
+      cloud_misconfiguration, patch_management,
+      codebase_vuln_management (vulnerability-response and patch-
+      evidence streams).
+  - mapping_id: nis2:art-21-2-f
+    article: 21(2)(f)
+    notes: >-
+      Effectiveness assessment of risk-management measures — the
+      per-clause bucket most directly aligned with the whole-
+      Article roll-up this playbook produces. Distinct from the
+      producing playbook the collect step reads against on this
+      clause (detection_engineering, which emits the per-rule-
+      version effectiveness-snapshot evidence stream): the
+      per-rule effectiveness slice discharges (f) on the
+      detection-rule axis, and the whole-Article self-assessment
+      composes the (f) bucket at the operator level from the
+      per-clause coverage-scoring rubric applied across the ten
+      sub-clause atoms. The two are complementary, not
+      duplicative.
+  - mapping_id: nis2:art-21-2-g
+    article: 21(2)(g)
+    notes: >-
+      Basic cyber-hygiene practices and cybersecurity training —
+      per-clause bucket the self-assessment aggregates against.
+      The producing playbooks the collect step reads against on
+      this clause: phishing_triage, cyber_hygiene_training
+      (training-attestation and phishing-simulation evidence
+      streams).
+  - mapping_id: nis2:art-21-2-h
+    article: 21(2)(h)
+    notes: >-
+      Cryptography and encryption policies — per-clause bucket
+      the self-assessment aggregates against. The producing
+      playbook the collect step reads against on this clause:
+      crypto_posture_management (crypto-posture evidence stream).
+  - mapping_id: nis2:art-21-2-i
+    article: 21(2)(i)
+    notes: >-
+      Human resources security, access-control policies and
+      asset management — per-clause bucket the self-assessment
+      aggregates against. The producing playbooks the collect
+      step reads against on this clause: identity_compromise,
+      cloud_misconfiguration, iam_auditor,
+      onboarding_offboarding_tracker, asset_management (IAM
+      audit, joiner-mover-leaver, and asset-inventory evidence
+      streams).
+  - mapping_id: nis2:art-21-2-j
+    article: 21(2)(j)
+    notes: >-
+      Use of multi-factor authentication and secured
+      communications — per-clause bucket the self-assessment
+      aggregates against. The producing playbook the collect
+      step reads against on this clause: mfa_secured_comms
+      (MFA-coverage evidence stream).
+
+dora:
+  # No DORA inbound entry currently backlinks
+  # playbook.nis2_self_assessment@v1, and this is a durable,
+  # reviewed deferral rather than an open TODO. DORA's
+  # equivalent whole-framework self-assessment surface (the
+  # ICT-risk-management framework annual review under Art. 6(5)
+  # plus the digital-operational-resilience-testing programme
+  # under Art. 24) is regime-specific to financial entities and
+  # anchors on a different set of producing playbooks; a
+  # dedicated DORA self-assessment playbook is the appropriate
+  # discharge on that axis, not a cross-pin of the NIS2 roll-up.
+  # The DORA clause-by-clause review is recorded under the
+  # nis2_self_assessment entry in
+  # content/mappings/dora/_orphan_skip.yaml; the orphan-CI
+  # closure for this playbook on the DORA axis is audited there
+  # as a reviewed skip rather than a pending gap.
+  []
+
+cra:
+  # No CRA inbound entry currently backlinks
+  # playbook.nis2_self_assessment@v1, and this is a durable,
+  # reviewed deferral rather than an open TODO. CRA Annex I is
+  # product-by-product manufacturer scope; no operator-side
+  # whole-framework self-assessment clause on the CRA axis
+  # anchors against a cross-clause roll-up of the CRA obligation
+  # set at the same shape as NIS2 Art. 21(2). The CRA
+  # clause-by-clause review is recorded under the
+  # nis2_self_assessment entry in
+  # content/mappings/cra/_orphan_skip.yaml; the orphan-CI
+  # closure for this playbook on the CRA axis is audited there
+  # as a reviewed skip rather than a pending gap.
+  []
