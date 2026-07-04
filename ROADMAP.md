@@ -1271,6 +1271,40 @@ the regulatory deadline.
     follow-on card binding the KRIs to the shipped
     regulator-notification playbook chains.
 
+### F-MET-GDPR-LATENCY — GDPR Art. 33/34 data-breach notification latency KRI triad
+
+- **Status:** Shipped
+- **Priority:** P1
+- **Goal:** G-04 (KPI/KRI catalogue maturity — residual-risk latency
+  coverage across every regulator-notification gate the framework
+  targets).
+- **Acceptance criteria:**
+  - `content/metrics/` carries three KRI catalog entries covering the
+    GDPR Art. 33/34 statutory clocks for personal-data breaches:
+    - `kri.gdpr_breach_supervisory_authority_notification_latency_hours@v1`
+      — 72h clock (Art. 33(1)).
+    - `kri.gdpr_breach_data_subject_notification_latency_hours@v1` —
+      "without undue delay" clock to affected data subjects
+      (Art. 34(1)).
+    - `kri.gdpr_breach_dpa_escalation_latency_days@v1` — DPO / DPA
+      escalation clock supporting Art. 33(5) documentation duty.
+  - Each entry ships a sibling `.viz.md` reference visualisation with a
+    Mermaid rendering, an OCSF Compliance Finding
+    (`telemetry.ocsf.compliance_finding@v1`) source-data binding, and
+    warn / high / breach threshold bands.
+  - Catalog index in `content/metrics/README.md` updated to list the
+    three new entries.
+- **Sovereign-stack constraints:** —
+- **Depends on:** F-METRICS-04
+- **Source:** GDPR (EU) 2016/679 Art. 33 (supervisory-authority
+  notification) and Art. 34 (data-subject notification); enforcement
+  active since 2018.
+- **Shipped via:**
+  - SKELETON — #636 (three KRI entries + reference visualisations +
+    catalog index update). Playbook back-references deferred to a
+    follow-on card binding the KRIs to the shipped
+    breach-notification playbook chains.
+
 ---
 
 ## Epic ADOPT — Operator adoption signal
