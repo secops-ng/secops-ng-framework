@@ -1,0 +1,215 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/evidence/dpia.schema.json",
+  "title": "SecOps-NG DPIA Evidence Artifact",
+  "description": "Typed shape for one evidence artifact emitted by the data_protection_impact_assessment (DPIA) evidence stream. One artifact is produced per (workflow_id, execution_id) cycle of the F-WF-DPIA data_protection_impact_assessment workflow \u2014 the ex-ante GDPR Article 35 assessment lane, distinct from the after-the-fact breach-notification lane (Art. 33-34) and the subject-initiated rights lane (Art. 15-22). Carries the Article 35(3) screening outcome, the residual-risk verdict feeding the Article 36(1) prior-consultation gate, the Data Protection Officer consultation record (Art. 35(2)), and the boolean article_36_prior_consultation_flag toggled when residual risk crosses the operator's threshold. Public-bar artifact: operator-side strings (owner labels, submission references, DPO handle) MUST stay role-shaped or URN-shaped; individual personal names are out of scope per AGENTS.md \u00a73. Byte-parity: the compile target (n8n / Temporal / LangGraph) is deliberately absent from the artifact_id derivation so a replay under a different target produces the identical artifact_id for the same (workflow_id, execution_id, captured_at) input.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_id",
+    "stream",
+    "workflow_id",
+    "execution_id",
+    "regulation_refs",
+    "control_refs",
+    "screening_outcome",
+    "residual_risk_verdict",
+    "dpo_consultation_record",
+    "article_36_prior_consultation_flag",
+    "captured_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Pinned schema version. Lets a consumer reject artifacts produced under an older schema once breaking changes ship.",
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "artifact_id": {
+      "description": "Stable per-artifact identifier. Convention: SHA-256 hex digest of `<workflow_id>|<execution_id>|<captured_at>` (UTF-8, single pipe separators, no surrounding whitespace). MUST NOT key on compile_target \u2014 the artifact_id is the byte-parity anchor across the n8n / Temporal / LangGraph reference emitters, so a replay of the same (workflow_id, execution_id, captured_at) triple under any target produces identical bytes. Deterministic on those three inputs; dedup is trivial.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "stream": {
+      "description": "Identifies which evidence stream produced the artifact. Constant on this schema.",
+      "type": "string",
+      "const": "dpia"
+    },
+    "workflow_id": {
+      "description": "Stable workflow identifier. Fixed value `data_protection_impact_assessment` for artifacts produced by the F-WF-DPIA playbook; kept as a field (rather than a schema const) so downstream aggregators can partition evidence by workflow without a schema branch.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "execution_id": {
+      "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Re-runs of the same DPIA case produce distinct execution_ids \u2014 the operator's Article 5(2) accountability chain treats re-emission as evidentiary signal rather than dedup waste.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "regulation_refs": {
+      "description": "Pins to the upstream regulatory mapping entries this artifact helps satisfy (e.g. gdpr:art-35, gdpr:art-35-3, gdpr:art-35-7, gdpr:art-36-1, gdpr:art-5-2-accountability). At least one entry \u2014 an artifact with no regulatory anchor is not DPIA evidence in the F-WF-DPIA sense. Joins back into content/mappings/<regime>/*.yaml via the `id` field.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(nis2|dora|cra|gdpr|iso27001|soc2):[a-z0-9][a-z0-9.-]*$",
+        "maxLength": 120
+      }
+    },
+    "control_refs": {
+      "description": "Control stable-ids attested by this artifact. Same shape every other layer of the content model uses. At least one \u2014 typically `control.dpia_lifecycle@v1` and/or `control.dpia_prior_consultation@v1`.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+      }
+    },
+    "screening_outcome": {
+      "description": "Deterministic output of the F-WF-DPIA `screen_dpia_triggers` step against Article 35(3) mandatory-DPIA triggers and the operator's supervisory-authority Article 35(4) blacklist. `dpia_required` records whether the screening concluded a full DPIA is mandatory; `triggers_matched` is the ordered list of trigger stable-ids that fired (e.g. `art-35-3-a-systematic-monitoring`, `art-35-3-b-special-categories`, `art-35-3-c-public-monitoring`, `art-35-4-blacklist:<row-id>`); `screened_at` records when the screening step ran.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dpia_required", "triggers_matched", "screened_at"],
+      "properties": {
+        "dpia_required": {
+          "description": "Screening verdict. When false the workflow takes the audit-close branch and no downstream Article 35(7) assessment is produced; when true the full lifecycle continues.",
+          "type": "boolean"
+        },
+        "triggers_matched": {
+          "description": "Ordered list of trigger stable-ids that fired against the input processing description. Empty list is legal when dpia_required is false and the operator's threshold policy still requires evidence emission (e.g. a documented near-miss).",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "screened_at": {
+          "description": "ISO-8601 UTC timestamp at which the screening step ran.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "notes": {
+          "description": "Optional plain-language reviewer note. Public-bar text: no operator branding, no individual names.",
+          "type": "string",
+          "maxLength": 4000
+        }
+      }
+    },
+    "residual_risk_verdict": {
+      "description": "Deterministic output of the F-WF-DPIA `identify_and_document_mitigations` \u2192 residual-risk step. `band` is a coarse three-value bucket the Article 36(1) prior-consultation gate keys on; `rationale` is a short plain-language line the reviewer reads; `evaluated_at` records when the verdict was reached.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["band", "evaluated_at"],
+      "properties": {
+        "band": {
+          "description": "Coarse residual-risk band after mitigations. `low` and `medium` do NOT trigger Article 36(1) prior consultation; `high` does. The operator's threshold policy MAY promote `medium` to `high` \u2014 the promoted verdict is what lands here.",
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        },
+        "rationale": {
+          "description": "One-paragraph plain-language rationale for the band. Public-bar text: no operator branding, no individual names.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "evaluated_at": {
+          "description": "ISO-8601 UTC timestamp at which the residual-risk verdict was reached.",
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "dpo_consultation_record": {
+      "description": "Record of the Data Protection Officer consultation required by GDPR Article 35(2). Role-shaped: the DPO is referenced by a working-group mailbox or role handle, never by an individual personal name. `consulted` is the boolean signal; `dpo_role` and `consulted_at` are required when consulted is true; `advice_summary` is a short plain-language summary the reviewer reads.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["consulted"],
+      "properties": {
+        "consulted": {
+          "description": "Whether a DPO consultation was performed for this DPIA cycle. False is legal in the audit-close branch (dpia_required=false); Article 35(2) makes consultation mandatory when a DPO is designated and a DPIA is required.",
+          "type": "boolean"
+        },
+        "dpo_role": {
+          "description": "Role-shaped identifier for the consulted DPO (e.g. 'dpo@example.org', 'data-protection-office'). Personal names are not used.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "consulted_at": {
+          "description": "ISO-8601 UTC timestamp at which the DPO consultation was recorded.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "advice_summary": {
+          "description": "One-paragraph plain-language summary of the DPO's advice. Public-bar text: no operator branding, no individual names.",
+          "type": "string",
+          "maxLength": 4000
+        },
+        "consultation_reference": {
+          "description": "Optional operator-side reference (URN, ticket id, document handle) pointing to the durable consultation record.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        }
+      }
+    },
+    "article_36_prior_consultation_flag": {
+      "description": "Boolean flag toggled when the residual-risk verdict crosses the operator's threshold for Article 36(1) prior consultation with the supervisory authority. Downstream consumers (the pre-consultation submission chain, the KRI on consultation lead-time) key on this single boolean; the underlying rationale lives in residual_risk_verdict.",
+      "type": "boolean"
+    },
+    "captured_at": {
+      "description": "ISO-8601 UTC timestamp at which this DPIA cycle's evidence artifact was captured. Stable input to artifact_id \u2014 alongside workflow_id and execution_id, this is one of the three fields that byte-parity keys on.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "provenance": {
+      "description": "Where this artifact came from. Mirrors the provenance pattern used by content/controls/*.yaml so a reviewer can re-derive the chain back to source. Optional: audit-close artifacts MAY omit provenance when no runtime handle exists.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_url", "captured_at"],
+      "properties": {
+        "source_url": {
+          "description": "URL of the workflow run (or workflow-content source) that produced this artifact. Compile targets may use their own run-id URLs; the URL itself is opaque to this schema.",
+          "type": "string",
+          "format": "uri"
+        },
+        "captured_at": {
+          "description": "ISO-8601 date or date-time matching the artifact-level captured_at.",
+          "type": "string"
+        },
+        "commit_sha": {
+          "description": "Optional commit SHA of the content snapshot the workflow walked.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,64}$"
+        }
+      }
+    },
+    "owner": {
+      "description": "Optional dated ownership pointer. Role-shaped \u2014 a working-group mailbox, a generic role title, or a community handle. Individual personal names are out of scope per AGENTS.md \u00a73 and rejected here as a matter of schema discipline.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "assigned_at"],
+      "properties": {
+        "role": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "assigned_at": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "retention": {
+      "description": "Optional ISO-8601 duration recording the retention the operator commits this artifact to (e.g. P3Y).",
+      "type": "string",
+      "pattern": "^P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+S)?)?$"
+    }
+  }
+}
