@@ -731,7 +731,7 @@ named operator use-case. Each cookbook workflow lives under
 
 ### F-WF-DPIA — GDPR Art. 35 Data Protection Impact Assessment lifecycle
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P1
 - **Goal:** G-01 (content coverage — canonical DPIA cookbook
   playbook covering the Article 35 lifecycle from screening through
@@ -785,8 +785,15 @@ named operator use-case. Each cookbook workflow lives under
 - **Source:** GDPR Art. 35 (DPIA obligation), GDPR Art. 36 (prior
   consultation with the supervisory authority).
 - **Shipped via:**
-  - _(In progress — SKELETON, CORE, and EXTEND cards to be listed
-    here as they land.)_
+  - SKELETON — #625
+    (`content/playbooks/data_protection_impact_assessment/` CACAO v2
+    playbook + GDPR Art. 35 inbound anchor + Art. 36 prior-consultation
+    branch topology + outbound overlay).
+  - CORE — #627 (three-target compile-target emitters: n8n, Temporal,
+    LangGraph + evidence schema `schemas/evidence/dpia.schema.json` +
+    byte-parity goldens + per-target DPIA-evidence goldens).
+  - EXTEND — #628
+    (`docs/cookbook/data_protection_impact_assessment.md` walkthrough).
 
 ---
 
