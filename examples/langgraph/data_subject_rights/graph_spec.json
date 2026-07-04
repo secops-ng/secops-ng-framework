@@ -1,0 +1,96 @@
+{
+  "conditional_edges": [],
+  "edges": [
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--d5b17a15-0000-4000-8000-000000000003",
+      "src": "action--d5b17a15-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--d5b17a15-0000-4000-8000-000000000004",
+      "src": "action--d5b17a15-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--d5b17a15-0000-4000-8000-000000000005",
+      "src": "action--d5b17a15-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--d5b17a15-0000-4000-8000-000000000006",
+      "src": "action--d5b17a15-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--d5b17a15-0000-4000-8000-000000000007",
+      "src": "action--d5b17a15-0000-4000-8000-000000000006"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--d5b17a15-0000-4000-8000-000000000008",
+      "src": "action--d5b17a15-0000-4000-8000-000000000007"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--d5b17a15-0000-4000-8000-000000000008"
+    }
+  ],
+  "end_sentinel": "__END__",
+  "entry": "action--d5b17a15-0000-4000-8000-000000000002",
+  "name": "GDPR Article 15-22 data subject rights (DSR) intake and fulfilment",
+  "nodes": [
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "receive_request",
+      "name": "action--d5b17a15-0000-4000-8000-000000000002",
+      "step_id": "action--d5b17a15-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "verify_identity",
+      "name": "action--d5b17a15-0000-4000-8000-000000000003",
+      "step_id": "action--d5b17a15-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "classify_request",
+      "name": "action--d5b17a15-0000-4000-8000-000000000004",
+      "step_id": "action--d5b17a15-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "route_to_data_owners",
+      "name": "action--d5b17a15-0000-4000-8000-000000000005",
+      "step_id": "action--d5b17a15-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "compile_fulfilment_evidence",
+      "name": "action--d5b17a15-0000-4000-8000-000000000006",
+      "step_id": "action--d5b17a15-0000-4000-8000-000000000006"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "send_controller_response",
+      "name": "action--d5b17a15-0000-4000-8000-000000000007",
+      "step_id": "action--d5b17a15-0000-4000-8000-000000000007"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "record_outcome",
+      "name": "action--d5b17a15-0000-4000-8000-000000000008",
+      "step_id": "action--d5b17a15-0000-4000-8000-000000000008"
+    }
+  ],
+  "playbook_id": "playbook--d5b17a15-0000-4000-8000-000000000001",
+  "stable_id": "playbook.data_subject_rights@v1"
+}
