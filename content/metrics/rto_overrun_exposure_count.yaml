@@ -1,0 +1,113 @@
+stable_id: kri.rto_overrun_exposure_count@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: RTO overrun exposure count — count of production incidents whose observed recovery time exceeded the declared RTO objective in the trailing window
+summary: >
+  Residual-risk counterpart to `kpi.rto_compliance_rate@v1`. Where the
+  KPI reads the proportion of incidents that met their declared
+  recovery-time objective, this KRI reads *how many incidents* in the
+  trailing 90-day evaluation window actually breached the declared RTO
+  in production — the exposure count the operator's continuity
+  register accumulated even when the aggregate compliance rate still
+  looks acceptable. Anchors the risk-management-measures limb of
+  NIS2 Art. 21(2)(e) (business continuity, backup management, crisis
+  management) and the ICT-supported business-function-continuity limb
+  of DORA Art. 8 (ICT risk-management framework — identification of
+  ICT-supported business functions and dependencies) so operators see
+  RTO-overrun exposure accumulating before the aggregate compliance
+  rate drops below its benchmark. Sibling to
+  `kri.restore_drill_rto_overrun@v1` which reads the drill-side
+  residual risk; this KRI reads the production-incident-side residual
+  risk for the same continuity-posture surface. No non-EU default
+  endpoints participate in the RTO-observation chain — the
+  incident-timeline surface is an EU-hostable endpoint per the
+  sovereign-stack bias.
+unit: count
+direction: lower_is_better
+thresholds:
+  - name: warn
+    comparator: ">="
+    value: 1
+    severity: warn
+  - name: high
+    comparator: ">="
+    value: 3
+    severity: high
+  - name: breach
+    comparator: ">="
+    value: 5
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: count
+  formula: >
+    Count of incidents closed in the trailing 90-day evaluation window
+    whose observed recovery time exceeded the operator's declared RTO
+    objective on the affected service. Each overrun incident
+    contributes one to the count; a repeated overrun on the same
+    service across successive incidents registers each occurrence so
+    the exposure counter reflects the total number of production
+    breaches, not a distinct-service count. Exclude incidents that
+    closed without a declared RTO objective on the affected service —
+    the exposure classification is unknown, not overrun, and those
+    cases surface on `kpi.service_continuity_test_frequency@v1` and
+    the operator's continuity-register-coverage KRIs instead. Exclude
+    incidents whose recovery is still in flight at the moment of
+    evaluation — only closed incidents contribute; the in-flight cases
+    are covered by `kri.breach_notification_clock_margin@v1`-style
+    in-flight indicators when the operator carries one.
+    Reference visualisation: a count-headline card with warn / high /
+    breach band overlays over a per-incident overrun-margin drill-down
+    ranking incidents by the observed-over-declared RTO ratio across
+    the window. The committed reference rendering lives at
+    `content/metrics/rto_overrun_exposure_count.viz.md` — that file is
+    the contract for the chart shape; the compile target renders the
+    executable form against operator data.
+  inputs:
+    - name: observed_recovery_time
+      description: >
+        Elapsed time between incident-onset timestamp on the affected
+        service and the service-restored timestamp on the
+        incident-handling timeline, in the same unit as the declared
+        RTO objective. Carried on the OCSF Compliance Finding event
+        the incident-recovery step emits at restoration (status_id
+        transition into the recovered state); the catalog entry binds
+        to that OCSF class shape, not to a vendor-specific
+        incident-management, SOAR, or continuity-register product.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: duration
+    - name: declared_rto_objective
+      description: >
+        RTO objective declared by the operator on the affected
+        service's continuity register, in the same unit as the
+        observed_recovery_time. Carried on the OCSF Compliance
+        Finding event the incident-recovery step emits at restoration
+        as a reference field alongside the observed recovery time.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: metadata.correlation_uid
+  window:
+    duration: P90D
+    sliding: true
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+external_refs:
+  - name: NIS2 — Article 21(2)(e) business continuity, backup management, crisis management
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(e)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 8 identification of ICT-supported business functions and dependencies
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 8
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: NIST SP 800-53 Rev. 5 — CP-10 System Recovery and Reconstitution
+    source: NIST
+    external_id: NIST SP 800-53 Rev. 5 CP-10
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CP-10
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability
+  - auditability

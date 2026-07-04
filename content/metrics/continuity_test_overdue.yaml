@@ -1,0 +1,132 @@
+stable_id: kri.continuity_test_overdue@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Continuity-test overdue — count of in-scope service portfolios whose most-recent ICT business-continuity test lies outside the operator-configured recurrence window
+summary: >
+  Residual-risk counterpart to `kpi.service_continuity_test_frequency@v1`.
+  Where the KPI reads the count of continuity-plan tests attested per
+  rolling year, this KRI reads *how many portfolios are currently
+  overdue* against the operator-configured test-recurrence window —
+  the exposure the operator carries when the test-frequency KPI has
+  not accrued a fresh test inside the recurrence window. Default
+  recurrence is 12 months per NIS2 / DORA business-continuity
+  management best practice, aligned with DORA Art. 11(6) which sets
+  the annual-cadence floor for the ICT business-continuity policy;
+  operators MAY tighten the recurrence for essential-service or
+  financial-sector ICT tiers via the operator-configured recurrence
+  parameter. Anchors the risk-management-measures limb of NIS2
+  Art. 21(2)(e) (business continuity, backup management, crisis
+  management) and the ICT-supported business-function-continuity limb
+  of DORA Art. 8 (ICT risk-management framework — identification of
+  ICT-supported business functions and dependencies). Sibling to
+  `kri.restore_drill_attestation_freshness@v1` which reads the
+  drill-side attestation-freshness residual risk; this KRI reads the
+  wider continuity-plan-testing lane at portfolio level. No non-EU
+  default endpoints participate in the continuity-testing attestation
+  chain — the test-attestation surface is an EU-hostable endpoint per
+  the sovereign-stack bias.
+unit: count
+direction: lower_is_better
+thresholds:
+  - name: warn
+    comparator: ">="
+    value: 1
+    severity: warn
+  - name: high
+    comparator: ">="
+    value: 2
+    severity: high
+  - name: breach
+    comparator: ">="
+    value: 3
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: count
+  formula: >
+    Count of in-scope service portfolios whose most-recent attested
+    ICT business-continuity plan test is older than the operator-
+    configured recurrence window at the moment of evaluation. Default
+    recurrence is 12 months (P365D) per DORA Art. 11(6) annual-cadence
+    floor; operators MAY tighten this via a per-portfolio
+    recurrence-window override on the continuity register. Each
+    overdue portfolio contributes one to the count; portfolios with a
+    fresh attestation inside the recurrence window contribute zero.
+    Portfolios with no attestation on record at all also contribute
+    one to the count — the exposure classification is overdue-by-
+    absence, not unknown, so a portfolio that has never been tested
+    surfaces on this KRI rather than silently disappearing. Exclude
+    portfolios whose continuity register carries a declared
+    exemption record (e.g. decommissioned service marked out-of-scope
+    for continuity testing on the register) so the reading does not
+    conflate a governance decision with a testing shortfall; those
+    cases surface on the operator's continuity-register-governance
+    KRIs instead.
+    Reference visualisation: a count-headline card with warn / high /
+    breach band overlays over a per-portfolio staleness drill-down
+    ranking portfolios by days-since-last-attested-test across the
+    portfolio set. The committed reference rendering lives at
+    `content/metrics/continuity_test_overdue.viz.md` — that file is
+    the contract for the chart shape; the compile target renders the
+    executable form against operator data.
+  inputs:
+    - name: test_attestation
+      description: >
+        ICT business-continuity plan test attestation emitted at
+        test completion by the operator's continuity-testing
+        surface. Carried on the OCSF Compliance Finding event the
+        continuity-test attestation step emits (status_id transition
+        into the attested state); the catalog entry binds to that
+        OCSF class shape, not to a vendor-specific continuity-testing,
+        tabletop-exercise, or attestation product.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: status_id
+    - name: attestation_timestamp
+      description: >
+        Timestamp of the continuity-test attestation, used to decide
+        whether the portfolio's most-recent test lies inside or
+        outside the operator-configured recurrence window at the
+        moment of evaluation. Carried on the OCSF Compliance Finding
+        event the continuity-test attestation step emits.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: time
+    - name: recurrence_window
+      description: >
+        Operator-configured recurrence window against which the
+        most-recent attestation is compared. Default P365D per DORA
+        Art. 11(6); operators MAY override per-portfolio via the
+        continuity register. Carried on the OCSF Compliance Finding
+        event as a reference field (metadata.correlation_uid) linking
+        the attestation observation to the register entry that
+        declares the recurrence.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: metadata.correlation_uid
+  window:
+    duration: P365D
+    sliding: true
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+external_refs:
+  - name: NIS2 — Article 21(2)(e) business continuity, backup management, crisis management
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(e)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 8 identification of ICT-supported business functions and dependencies
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 8
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: DORA — Article 11(6) annual testing of ICT business continuity policy
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 11(6)
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: ENISA — NIS2 essential/important entity guidance
+    source: ENISA
+    url: https://www.enisa.europa.eu/topics/cybersecurity-policy/nis-directive-new
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability
+  - auditability
