@@ -107,3 +107,19 @@ skip:
       `content/mappings/gdpr/article-15-22-data-subject-rights.yaml`.
       A sibling CORE / EXTEND card revisits the CRA cross-regime
       graph if a documented interaction is authored.
+  - slug: data_protection_impact_assessment
+    rationale: >-
+      GDPR Article 35 data protection impact assessment (DPIA)
+      lifecycle. The playbook's outbound overlay
+      (`content/playbooks/data_protection_impact_assessment/mappings.yaml`)
+      deliberately does not pin CRA entries: CRA Article 13/14 and
+      Annex I obligations are manufacturer-side product-security
+      surfaces on products with digital elements, distinct by design
+      from the controller-side ex-ante process obligation GDPR
+      Article 35 authors. Cross-pinning the DPIA lifecycle under CRA
+      would misrepresent the obligation surface. The GDPR inbound
+      graph is closed via
+      `content/mappings/gdpr/article-35-dpia.yaml` (Article 35(1) /
+      35(3)(a) / 35(3)(b) entries). A sibling CORE / EXTEND card
+      revisits the CRA cross-regime graph if a documented
+      interaction is authored.
