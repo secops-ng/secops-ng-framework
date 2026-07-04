@@ -179,6 +179,7 @@ entries:
       - playbook.data_exfil@v1
       - playbook.identity_compromise@v1
       - playbook.ransomware_containment@v1
+      - playbook.data_protection_impact_assessment@v1
     metric_refs:
       - kpi.notification_sla_compliance@v1
       - kri.regulator_notification_overrun@v1
@@ -186,7 +187,7 @@ entries:
       - incidents
       - posture
     notes: >-
-      All three anchor playbooks operate on processing surfaces that
+      All three operational anchor playbooks operate on processing surfaces that
       meet the Art. 35(1) high-risk threshold and therefore require a
       documented DPIA ahead of production wiring. data_exfil resolves
       the affected-subjects count and data classification against the
@@ -221,6 +222,15 @@ entries:
       itself is an operator-side artifact; this YAML records the
       agentic anchors whose deployment triggers the assessment
       obligation, not the assessment document.
+      data_protection_impact_assessment is the operator-side
+      lifecycle that PRODUCES that DPIA artifact: it is the ex-ante
+      process playbook a controller runs before wiring any of the
+      three operational playbooks (or any other high-risk processing
+      envelope) into production. The four anchors sit under Art.
+      35(1) together because the general obligation names both the
+      surfaces whose deployment triggers the assessment (the three
+      operational playbooks) and the operator-side lifecycle that
+      discharges the assessment itself (the DPIA playbook).
 
   - id: gdpr:art-35-3-a-dpia-systematic-evaluation
     regulation:
@@ -242,6 +252,7 @@ entries:
       - control.risk_management_policy@v1
     playbook_refs:
       - playbook.identity_compromise@v1
+      - playbook.data_protection_impact_assessment@v1
     metric_refs:
       - kri.regulator_notification_overrun@v1
     evidence_stream_refs:
@@ -290,6 +301,7 @@ entries:
     playbook_refs:
       - playbook.data_exfil@v1
       - playbook.ransomware_containment@v1
+      - playbook.data_protection_impact_assessment@v1
     metric_refs:
       - kpi.notification_sla_compliance@v1
       - kri.regulator_notification_overrun@v1

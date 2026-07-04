@@ -56,6 +56,23 @@ skip:
       NIS2 Art. 23 incident that triggers a wave of DSR requests
       would run the incident lane and the DSR lane in parallel — the
       two lanes stay separately anchored, not cross-pinned).
+  - slug: data_protection_impact_assessment
+    rationale: >-
+      GDPR Article 35 data protection impact assessment (DPIA)
+      lifecycle. The playbook's outbound overlay
+      (`content/playbooks/data_protection_impact_assessment/mappings.yaml`)
+      deliberately does not pin NIS2 entries: NIS2 Article 21 risk-
+      management and Article 23 significant-incident reporting are
+      separate obligation surfaces distinct from the GDPR Article 35
+      ex-ante process obligation. Cross-pinning the DPIA lifecycle
+      under NIS2 would misrepresent the obligation surface. The GDPR
+      inbound graph is closed via
+      `content/mappings/gdpr/article-35-dpia.yaml` (Article 35(1) /
+      35(3)(a) / 35(3)(b) entries). A sibling CORE / EXTEND card
+      revisits the NIS2 cross-regime graph if a documented
+      interaction is authored (for example a NIS2 Art. 21(2)(f)
+      effectiveness-assessment overlap on the same processing
+      envelope).
   - slug: cra_cvd
     rationale: >-
       CRA Article 14 coordinated-vulnerability-disclosure (CVD)

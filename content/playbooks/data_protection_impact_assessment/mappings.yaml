@@ -1,0 +1,261 @@
+# Cross-references for the data_protection_impact_assessment playbook.
+#
+# Outbound view of the content model: pins OSCAL controls, MITRE
+# D3FEND defensive techniques, OCSF event classes emitted, and the EU
+# regulatory clauses this playbook helps operationalise. Inbound
+# references live in content/mappings/{gdpr,nis2,dora,cra}/ so the
+# graph is closed in both directions.
+#
+# Status: SKELETON (F-WF-DPIA SKELETON). The playbook is the
+# operator-side data-protection impact assessment lifecycle for GDPR
+# Article 35 (with Article 36 prior-consultation gating folded into
+# the determine_article_36_gate step). A sibling CORE card lands the
+# templates (DPIA document template, supervisory-authority pre-
+# consultation submission chain), the risk-taxonomy binding, and the
+# full mappings closure. This SKELETON overlay pins the GDPR Article
+# 35 clause anchors (Article 35(1), 35(3)(a-c) mandatory triggers,
+# and Article 36 prior consultation), a non-empty OSCAL block
+# (PM-9 Risk Management Strategy and RA-3 Risk Assessment anchored
+# on the risk_management_policy control cross-reference), a D3FEND
+# anchor on D3-OAM Operational Activity Mapping (inherited via the
+# risk_management_policy control), and a Compliance Finding (2003)
+# telemetry binding. The three regulatory-parallel blocks (nis2,
+# dora, cra) are declared as empty lists: the DPIA lifecycle is a
+# GDPR-specific process obligation, and cross-pinning under NIS2 /
+# DORA / CRA would misrepresent the scope until a reviewed cross-
+# regime interaction is documented. Deliberate audited exclusions
+# are recorded in content/mappings/{nis2,dora,cra}/_orphan_skip.yaml
+# in the same PR so the orphan-CI KRI stays defended.
+#
+# GDPR closure: the inbound entries live at
+# content/mappings/gdpr/article-35-dpia.yaml, which already ships as
+# CORE-8. That file's Article 35(1) general obligation, Article
+# 35(3)(a) systematic-evaluation limb, and Article 35(3)(b) large-
+# scale-special-categories limb currently pin data_exfil,
+# identity_compromise, and ransomware_containment as the operational
+# playbooks whose deployment triggers the DPIA obligation. This
+# SKELETON authors the operator-side DPIA lifecycle itself as an
+# additional inbound anchor on the same three Article 35 entries so
+# the DPIA-process playbook is closed under the GDPR inbound graph
+# (edit lands in content/mappings/gdpr/article-35-dpia.yaml in the
+# same PR).
+#
+# NIS2 / DORA / CRA closure: the DPIA lifecycle is the operator-side
+# ex-ante process obligation surface under GDPR Article 35; it is
+# not a NIS2 Article 21/23, DORA Article 5-19, or CRA Article
+# 13/14 obligation surface. Deliberate audited exclusions are
+# recorded in content/mappings/{nis2,dora,cra}/_orphan_skip.yaml so
+# the orphan-CI KRI stays defended without spurious cross-regime
+# pins. A sibling CORE / EXTEND card revisits the choice if a
+# documented cross-regime interaction is authored (for example the
+# cross-regime documented-assessment obligations under NIS2 Art.
+# 21(2)(f) effectiveness-assessment measures and DORA Art. 5-16 ICT
+# risk-management framework outputs overlap with the DPIA on the
+# same processing envelope, and a follow-on card is expected to pin
+# the harmonisation).
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.data_protection_impact_assessment@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls anchoring the DPIA lifecycle. The
+  # risk_management_policy control cross-reference exposes both PM-9
+  # (Risk Management Strategy) and RA-3 (Risk Assessment) via the
+  # framework's controls catalogue at
+  # content/controls/control.risk_management_policy@v1.yaml, so both
+  # of the anchors called out in the task brief are covered by a
+  # single control_ref binding. AU-9-shaped audit-information
+  # protection on the produced DPIA document artifact is covered via
+  # the incident_timeline_signals control cross-reference, mirroring
+  # the audited convention used on the sibling data_subject_rights
+  # playbook where the record_outcome step is the accountability-
+  # ledger surface.
+  - id: control.risk_management_policy@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: PM-9
+    title: Risk Management Strategy
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=PM-9
+    notes: >-
+      Anchors the DPIA lifecycle as an instance of the operator's
+      information-security risk-management strategy. PM-9 requires
+      the organisation to develop and disseminate an
+      organisation-wide risk-management strategy; the DPIA is the
+      per-processing-envelope discharge of that strategy against the
+      rights-and-freedoms axis GDPR Article 35 codifies. The
+      risk_management_policy control cross-reference at
+      content/controls/control.risk_management_policy@v1.yaml
+      already pins PM-9, RA-3, ISO/IEC 27001 A.5.1, and NIS2
+      Article 21(2)(a), so a single control_ref binding closes the
+      lifecycle against the framework's risk-management control
+      surface without duplicating catalog entries.
+  - id: control.risk_management_policy@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: RA-3
+    title: Risk Assessment
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=RA-3
+    notes: >-
+      Anchors identify_and_assess_risks and assess_necessity_and_
+      proportionality. RA-3 requires the organisation to conduct
+      an assessment of risk including likelihood and impact
+      determination; the Article 35(7)(c) risk-to-rights-and-
+      freedoms assessment is the personal-data axis of that
+      determination for the processing envelope under DPIA. Sibling
+      binding of the same control_ref against PM-9 above records
+      the strategy anchor; this row records the assessment anchor.
+  - id: control.incident_timeline_signals@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AU-9
+    title: Protection of Audit Information
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AU-9
+    notes: >-
+      Anchors produce_dpia_document and schedule_review_cadence.
+      AU-9 requires the organisation to protect audit information
+      from unauthorised access, modification, and deletion; the
+      DPIA document and the per-case correlation record the
+      workflow persists (case id, screening result, risk
+      assessment, mitigations, DPO advice, Article 36 gate
+      outcome, review cadence) are the audit-information surface
+      that discharges the operator's Article 5(2) accountability
+      posture and the primary response to any subsequent Article
+      58(1)(a) supervisory-authority information order.
+
+d3fend:
+  # D3FEND v1.0.0 selection for the DPIA lifecycle. The lifecycle is
+  # an assessment-and-documentation process rather than a runtime
+  # detection or response countermeasure; the D3FEND anchor
+  # inherited via the risk_management_policy control cross-reference
+  # is Operational Activity Mapping (D3-OAM), which corresponds to
+  # the systematic-description discharge Article 35(7)(a) requires
+  # and to the risk-and-mitigations mapping discharge Articles
+  # 35(7)(c)-(d) require. A sibling CORE card revisits the D3FEND
+  # selection once the risk-taxonomy binding is pinned and any
+  # additional technique anchors are audited (for example a
+  # Configuration Inventory tag on the processing-inventory adapter
+  # if the CORE card binds a canonical inventory engine).
+  - step: action--d91a35c0-0000-4000-8000-000000000006
+    d3fend_id: D3-OAM
+    d3fend_name: Operational Activity Mapping
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    notes: >-
+      D3FEND Operational Activity Mapping corresponds to the
+      systematic-description-of-processing-operations discharge
+      Article 35(7)(a) requires and to the risk-and-mitigations
+      mapping the identify_and_assess_risks and identify_and_
+      document_mitigations steps produce. Inherited via the
+      risk_management_policy control cross-reference (see
+      content/controls/control.risk_management_policy@v1.yaml
+      d3fend_refs) rather than authored as a step-local anchor;
+      pinned here on the risk-assessment step as the primary
+      surface the mapping activity discharges.
+
+ocsf:
+  # OCSF v1.3.0 telemetry binding. The DPIA lifecycle is a
+  # compliance-obligation lifecycle rather than a
+  # detection/response lifecycle; Compliance Finding (2003) is the
+  # single event class emitted at the per-milestone granularity the
+  # accountability posture needs. A sibling CORE card revisits the
+  # binding once the CORE adapter surfaces are pinned; the SKELETON
+  # binding is deliberately narrow to avoid over-fitting against a
+  # future adapter shape. Mirrors the audited convention used on
+  # the sibling data_subject_rights playbook.
+  - id: telemetry.ocsf.compliance_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2003
+    class_name: Compliance Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by screen_dpia_triggers, classify_processing_type,
+      gather_processing_description,
+      assess_necessity_and_proportionality,
+      identify_and_assess_risks,
+      identify_and_document_mitigations, dpo_consultation,
+      determine_article_36_gate, produce_dpia_document, and
+      schedule_review_cadence: one Compliance Finding per
+      lifecycle milestone, keyed to __dpia_case_id__, so the
+      operator's Article 5(2) accountability posture can be
+      computed and audited from the emitted telemetry alone.
+      Schema: https://schema.ocsf.io/1.3.0/classes/compliance_finding
+
+nis2: []
+  # SKELETON — no outbound NIS2 anchor. The DPIA lifecycle is a
+  # GDPR-specific ex-ante process obligation under Article 35;
+  # NIS2 Article 21 risk-management and Article 23 significant-
+  # incident reporting are separate obligation surfaces that
+  # anchor on the operator's incident-management and posture-
+  # management playbooks. Cross-pinning the DPIA lifecycle under
+  # NIS2 would misrepresent the scope. Deliberate audited
+  # exclusion recorded in content/mappings/nis2/_orphan_skip.yaml.
+  # A sibling CORE / EXTEND card revisits the choice if a
+  # documented cross-regime interaction is authored (for example
+  # a NIS2 Art. 21(2)(f) effectiveness-assessment overlap on the
+  # same processing envelope).
+
+dora: []
+  # SKELETON — no outbound DORA anchor. Same rationale as the
+  # nis2 block above: the DPIA lifecycle is a GDPR-specific
+  # ex-ante process obligation, not a DORA financial-entity
+  # ICT-risk or major-incident-reporting surface. Deliberate
+  # audited exclusion recorded in
+  # content/mappings/dora/_orphan_skip.yaml.
+
+cra: []
+  # SKELETON — no outbound CRA anchor. Same rationale as the
+  # nis2 and dora blocks above: the DPIA lifecycle is a GDPR-
+  # specific ex-ante process obligation, not a CRA product-
+  # security or coordinated-vulnerability-disclosure surface.
+  # Deliberate audited exclusion recorded in
+  # content/mappings/cra/_orphan_skip.yaml.
+
+gdpr:
+  # Inbound entries live at
+  # content/mappings/gdpr/article-35-dpia.yaml, which already
+  # ships as CORE-8 with Article 35(1), 35(3)(a), and 35(3)(b)
+  # entries. This SKELETON adds the operator-side DPIA lifecycle
+  # itself as an anchor on the Article 35(1) general-obligation
+  # entry and on both Article 35(3) mandatory-trigger limbs
+  # (edit lands in the same PR). Article 36 prior-consultation
+  # is folded onto the Article 35(1) entry via the
+  # determine_article_36_gate step: the gate discharges the
+  # controller-side determination that Article 36(1) requires
+  # before the processing may begin, but the article-35-dpia.yaml
+  # file records the anchor set rather than authoring a
+  # separate Art. 36 file at SKELETON.
+  - mapping_id: gdpr:art-35-1-dpia-high-risk-processing
+    article: "35(1)"
+    notes: >-
+      Outbound backlink for the general Article 35(1) obligation
+      to carry out a DPIA before processing likely to result in a
+      high risk. The playbook is the operator-side ex-ante
+      discharge of the obligation: screen_dpia_triggers evaluates
+      the Article 35(1) test and the Article 35(3)(a-c) mandatory
+      triggers; the four Article 35(7) content limbs are produced
+      by gather_processing_description (Article 35(7)(a)),
+      assess_necessity_and_proportionality (Article 35(7)(b)),
+      identify_and_assess_risks (Article 35(7)(c)), and
+      identify_and_document_mitigations (Article 35(7)(d)); DPO
+      advice is captured by dpo_consultation (Article 35(2)); the
+      Article 36(1) prior-consultation gate is determined by
+      determine_article_36_gate; produce_dpia_document assembles
+      the durable accountability artifact; schedule_review_cadence
+      pins the Article 35(11) review hook.
+  - mapping_id: gdpr:art-35-3-a-dpia-systematic-evaluation
+    article: "35(3)(a)"
+    notes: >-
+      Outbound backlink for the Article 35(3)(a) mandatory-DPIA
+      trigger (systematic and extensive evaluation of personal
+      aspects based on automated processing on which decisions
+      producing legal or similarly significant effects are
+      based). screen_dpia_triggers evaluates this limb against
+      the processing envelope; where it fires, the lifecycle
+      runs the full assessment.
+  - mapping_id: gdpr:art-35-3-b-dpia-large-scale-processing
+    article: "35(3)(b)"
+    notes: >-
+      Outbound backlink for the Article 35(3)(b) mandatory-DPIA
+      trigger (processing on a large scale of special categories
+      of data or personal data relating to criminal convictions
+      and offences). screen_dpia_triggers evaluates this limb
+      against the processing envelope; where it fires, the
+      lifecycle runs the full assessment.
