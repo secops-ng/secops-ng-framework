@@ -89,3 +89,24 @@ skip:
       NIS2 cross-regime graph once ENISA documents the interaction
       between CRA Article 14 CVD and NIS2 Article 23 parallel
       reporting for cases that cross both thresholds.
+
+  - slug: dora_ict_risk_selfassess
+    rationale: >-
+      DORA Chapter II ICT risk management whole-Chapter operator
+      self-assessment roll-up. The playbook's outbound overlay
+      (`content/playbooks/dora_ict_risk_selfassess/mappings.yaml`)
+      deliberately does not pin NIS2 entries: NIS2 Article 21(2)
+      risk-management measures already have their own whole-Article
+      operator self-assessment roll-up
+      (`playbook.nis2_self_assessment@v1`) that anchors against the
+      ten sub-clause atoms, and cross-pinning this DORA roll-up onto
+      NIS2 Article 21(2) would misrepresent the obligation surface
+      (financial-entity-specific Chapter II ICT risk management
+      framework versus the broader NIS2 essential/important-entity
+      risk-management measures). The DORA inbound graph is closed
+      via `content/mappings/dora/article-{6,7,8,10,11}.yaml` (each
+      of the five Chapter II section atoms carries the outbound
+      backlink). A sibling CORE / EXTEND card revisits the NIS2
+      cross-regime graph if a documented interaction is authored
+      (for example a shared attestation surface across
+      financial-entity operators subject to both regimes).

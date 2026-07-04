@@ -39,3 +39,20 @@ skip:
       convention for reporting playbooks across every framework.
       `content/mappings/gdpr/data-flow-executive_metrics.md` documents
       the indirect surface for this SKELETON snapshot.
+
+  - slug: dora_ict_risk_selfassess
+    rationale: >-
+      DORA Chapter II ICT risk management whole-Chapter operator
+      self-assessment roll-up. The playbook operates on
+      evidence-record identifiers, section atoms, playbook slugs,
+      and attestation-record identifiers, none of which are personal
+      data; there is no GDPR data-flow surface on the roll-up itself.
+      The producing per-section playbooks (asset_management,
+      supply_chain_security, detection_engineering, alert_triage,
+      incident_management, backup_recovery, ransomware_containment,
+      infra_posture_management, crypto_posture_management,
+      on_call_rotation) each carry their own GDPR closure entry
+      where relevant. A sibling CORE card authors the
+      per-workflow GDPR data-flow document under
+      `content/mappings/gdpr/data-flow-dora_ict_risk_selfassess.md`
+      if a documented interaction surfaces.

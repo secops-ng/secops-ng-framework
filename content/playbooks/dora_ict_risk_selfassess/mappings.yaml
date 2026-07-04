@@ -1,0 +1,375 @@
+# Cross-references for the dora_ict_risk_selfassess playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed/emitted, and the EU regulatory clauses this playbook
+# helps operationalise. Inbound references live in
+# content/mappings/{nis2,dora,cra,gdpr}/ so the graph is closed in both
+# directions.
+#
+# This playbook is the whole-Chapter II ICT risk management roll-up:
+# it aggregates the per-section evidence the five DORA ICT risk
+# management sections (Art. 6 framework, Art. 7 systems/protocols/
+# tools, Art. 8 identification, Art. 10 detection, Art. 11 response
+# and recovery) produce across the operator's shipped playbook set
+# into a single dated attestation artifact. Distinct from the per-
+# section playbooks that discharge each obligation on its own axis,
+# and from the F-CP-06 effectiveness loop (which emits per-metric
+# snapshots on an evaluation-window cadence): this is the operator's
+# self-assessment roll-up keyed on the five section atoms, discharged
+# on the Art. 6(5) annual-review cadence a financial entity documents.
+#
+# Status: SKELETON. The SKELETON pins the five Chapter II ICT risk
+# management section atoms as outbound backlinks (Art. 6/7/8/10/11)
+# plus the OSCAL CA-2 (Control Assessments) and CA-7 (Continuous
+# Monitoring) anchors and the D3-OAM D3FEND anchor on the
+# score-per-section-coverage step. CORE-layer cards land the
+# deterministic per-step primitives (evidence collection against the
+# operator's evidence store, evidence-to-section mapping, coverage-
+# scoring rubric, attestation-emission), the OSCAL component-
+# definition entries under
+# content/mappings/dora/oscal-component-definition.json, and the
+# byte-parity goldens under
+# examples/{n8n,temporal,langgraph}/dora_ict_risk_selfassess/.
+# EXTEND-layer cards wire the whole-Chapter roll-up metric emitters
+# (kpi.dora_ict_risk_selfassess_coverage,
+# kri.dora_uncovered_sections) once the metric shapes are ratified.
+#
+# Deliberate OSCAL omissions:
+#   - CA-5 (Plan of Action and Milestones) is NOT pinned at the
+#     SKELETON layer: the plan-of-action authoring surface for
+#     uncovered sections lives in the operator's governance
+#     documentation upstream of this playbook. The self-assessment
+#     surfaces the gap; the plan-of-action is the operator's
+#     downstream lever. CORE-PRIM cards may extend the OSCAL block
+#     with CA-5 once the attestation record's uncovered-section
+#     structure is fixed and the plan-of-action authoring surface
+#     is bound. Mirrors the nis2_self_assessment SKELETON precedent.
+#   - PM-31 (Continuous Monitoring Strategy) is NOT pinned: the
+#     self-assessment cadence itself (Art. 6(5) annual review plus
+#     post-major-incident review triggers) is authored upstream of
+#     this playbook in the operator's continuous-monitoring
+#     documentation; pinning PM-31 here would conflate the
+#     per-window attestation discipline with the cadence-authoring
+#     surface. Mirrors the nis2_self_assessment SKELETON precedent.
+#
+# Deliberate DORA-axis coverage boundary:
+#   - Article 9 (Protection and prevention) is intentionally not
+#     enumerated as a top-level section atom on this roll-up. Art. 9
+#     is discharged across a broad producing-playbook set spanning
+#     several sub-anchors (vulnerability and patch management,
+#     access management, cryptography, authentication, maintenance
+#     and patch rollout) that map onto NIS2 Art. 21(2)(e/h/i/j)
+#     rather than the Chapter II ICT-risk-management-framework
+#     rhythm this roll-up composes. The five section atoms pinned
+#     here (Art. 6 framework, Art. 7 systems/protocols/tools,
+#     Art. 8 identification, Art. 10 detection, Art. 11 response
+#     and recovery) are the framework-and-cycle atoms the Art. 6(5)
+#     annual review consumes; Art. 9 protection-and-prevention
+#     evidence flows through the producing per-section playbooks
+#     (asset_management under Art. 8, detection_engineering under
+#     Art. 10) rather than as a first-class self-assessment section.
+#     A sibling CORE / EXTEND card revisits an Art. 9 protection
+#     section once the DORA Art. 9 inbound graph consolidation
+#     completes and the framework fixes the per-anchor discharge
+#     boundary.
+#   - Articles 12-14 (backup, learning, response-and-recovery
+#     testing) are covered indirectly through the Art. 11 response-
+#     and-recovery section atom via the incident_management and
+#     backup_recovery producing playbooks; a dedicated per-Article
+#     atom is not lifted onto this SKELETON so the whole-Chapter
+#     roll-up stays keyed on the five framework-and-cycle sections
+#     rather than fanning out to nine sub-atoms.
+#   - Articles 15+ (digital operational resilience testing),
+#     Articles 17-19 (incident classification and reporting), and
+#     Article 28 (third-party risk) are out of scope for the
+#     Chapter II ICT risk management surface this playbook rolls
+#     up. Distinct regime obligations, discharged by distinct
+#     producing playbooks; a cross-pin onto this roll-up would
+#     misrepresent the Chapter II boundary.
+#
+# GDPR closure: no per-workflow Records of Processing Activity entry
+# is required; this playbook operates on evidence-record identifiers,
+# section atoms, playbook slugs, and attestation-record identifiers,
+# none of which are personal data. The evidence records themselves
+# are the responsibility of the producing playbooks, each of which
+# carries its own GDPR closure entry where relevant.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.dora_ict_risk_selfassess@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the four steps of
+  # the self-assessment lifecycle. The single SKELETON pin set
+  # anchors the playbook end-to-end against CA-2 (Control
+  # Assessments) and CA-7 (Continuous Monitoring). CA-5 is held
+  # back to the CORE layer where the uncovered-section structure
+  # binds against the operator's plan-of-action authoring surface
+  # (see header gap note).
+  - id: control.security_assessment@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CA-2
+    title: Control Assessments
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CA-2
+    notes: >-
+      Anchors the playbook end-to-end as the control-assessment
+      capability: CA-2 requires the operator to develop, review,
+      and approve a control assessment plan, assess the controls
+      in the system and its environment of operation to determine
+      the extent to which the controls are implemented correctly,
+      operating as intended, and producing the desired outcome
+      with respect to meeting established security and privacy
+      requirements, and produce a control assessment report that
+      documents the results of the assessment. The self-assessment
+      lifecycle composes the per-section evidence set, maps records
+      to section atoms, scores coverage against the operator's
+      documented rubric, and emits the dated attestation record
+      that is the audit-evident report CA-2 reviewers consume.
+      Mirrors the nis2_self_assessment CA-2 precedent; same
+      control-assessment anchor, here narrowed to the DORA
+      Chapter II ICT risk management surface rather than the
+      NIS2 Article 21(2) surface.
+
+  - id: control.control_effectiveness_test@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CA-7
+    title: Continuous Monitoring
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CA-7
+    notes: >-
+      Covers the collect-section-evidence, score-per-section-
+      coverage, and report-attestation steps: CA-7 demands ongoing
+      monitoring of security controls and reporting of the
+      security state to designated officials. The Art. 6(5)
+      annual-review cadence (plus the post-major-incident review
+      trigger the same paragraph names) is the operator's
+      continuous-monitoring discharge on the DORA Chapter II ICT
+      risk management surface specifically: per-section evidence
+      is collected on the documented cadence, coverage is scored
+      against the documented rubric, and the dated attestation
+      record is the audit-evident report continuous-monitoring
+      reviewers consume. Mirrors the nis2_self_assessment CA-7
+      precedent; same anchor, here narrowed to the DORA whole-
+      Chapter-II roll-up slice rather than the NIS2 whole-Article-21
+      roll-up slice.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned to the real action UUIDs resolved
+  # from content/playbooks/dora_ict_risk_selfassess/playbook.cacao.json
+  # (four action bodies: collect-section-evidence, map-evidence-to-
+  # sections, score-per-section-coverage, report-attestation). One
+  # step carries a per-step D3FEND pin: D3-OAM on the score-per-
+  # section-coverage step. The collect, map, and report steps are
+  # deliberately not pinned and the gaps are documented in the
+  # comments below (mirroring the nis2_self_assessment SKELETON
+  # per-step gap-note precedent).
+  #
+  # Upstream anchor: content/controls/control.security_assessment@v1.yaml
+  # already carries D3-OAM (Operational Activity Mapping) on the
+  # control-side overlay; this SKELETON is the per-step lift of
+  # the same technique onto the playbook overlay, narrowed to the
+  # per-section coverage-scoring slice that produces the mapping
+  # the control names.
+  - step: action--92000000-0000-4000-8000-000000000004
+    d3fend_id: D3-OAM
+    d3fend_name: Operational Activity Mapping
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    notes: >-
+      score-per-section-coverage — mapping the collected per-section
+      evidence set onto the operator's documented coverage rubric
+      (present-and-current / present-but-stale / absent-with-
+      declared-exception / absent-uncovered) is the operational-
+      activity-mapping discipline D3-OAM names: the mapping of
+      operator activities and evidence onto a documented model of
+      the obligations the operator must discharge. D3FEND v1.0.0
+      frames D3-OAM as the operational-activity-mapping technique
+      on the assessment side specifically; the score step is the
+      per-section coverage-rubric application slice against the
+      operator's declared thresholds, narrowed to the five DORA
+      Chapter II section atoms rather than the per-control
+      assessment surface upstream of the playbook. Read-only
+      against the evidence set: the step composes a per-window
+      scoring view keyed on the five section atoms, it does not
+      write back into the source evidence records or into the
+      operator's declared rubric. Mirrors the
+      nis2_self_assessment D3-OAM precedent on the same step
+      role; same technique, here narrowed to the whole-Chapter-II
+      DORA self-assessment slice rather than the whole-Article-21
+      NIS2 self-assessment slice.
+
+  # Deliberate D3FEND omissions:
+  #   - collect-section-evidence
+  #     (action--92000000-0000-4000-8000-000000000002) is NOT
+  #     pinned: the evidence-collection slice is a read-only pass
+  #     against the operator's evidence store, not a defensive-
+  #     technique discharge against the operator's deployed
+  #     estate. The producing playbooks (infra_posture_management,
+  #     on_call_rotation, crypto_posture_management,
+  #     asset_management, supply_chain_security,
+  #     detection_engineering, alert_triage, incident_management,
+  #     backup_recovery, ransomware_containment) already carry
+  #     their own per-step D3FEND anchors where a defensible
+  #     technique exists; lifting a technique onto the collection
+  #     slice here would double-count. Mirrors the
+  #     nis2_self_assessment collect-slice gap-note precedent.
+  #   - map-evidence-to-sections
+  #     (action--92000000-0000-4000-8000-000000000003) is NOT
+  #     pinned: the mapping slice is a deterministic content-
+  #     model overlay lookup, not a defensive-technique discharge.
+  #     Mirrors the nis2_self_assessment map-slice gap-note
+  #     precedent.
+  #   - report-attestation
+  #     (action--92000000-0000-4000-8000-000000000005) is NOT
+  #     pinned: the dated attestation-emission slice produces the
+  #     audit-evident whole-Chapter-II self-assessment record, it
+  #     does not itself execute a defensive technique. Mirrors
+  #     the nis2_self_assessment report-slice gap-note precedent.
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. The collect, map, score, and
+  # report steps interact with operator API surfaces (evidence
+  # store, content-model overlay, coverage-rubric reference, and
+  # attestation-store). Richer per-step telemetry bindings (e.g.
+  # OCSF Compliance Finding for the per-section scoring bucket)
+  # are deferred to CORE-layer cards once stable upstream signal
+  # shapes are selected.
+  - id: telemetry.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: both
+    notes: >-
+      Consumed at the collect-section-evidence step (reads against
+      the operator's evidence store for every producing playbook
+      the five DORA Chapter II section atoms anchor against) and
+      at the map-evidence-to-sections / score-per-section-coverage
+      steps (read calls against the SecOps-NG content-model overlay
+      and the operator's declared coverage rubric). Emitted at the
+      report-attestation step (write call publishing the dated
+      DORA Chapter II ICT risk management self-assessment
+      attestation record to the operator's evidence store).
+      Schema: https://schema.ocsf.io/1.3.0/classes/api_activity
+
+nis2:
+  # No NIS2 inbound entry currently backlinks
+  # playbook.dora_ict_risk_selfassess@v1, and this is a durable,
+  # reviewed deferral rather than an open TODO. The NIS2
+  # equivalent whole-framework self-assessment surface (Article
+  # 21(2) risk-management measures roll-up) is discharged by a
+  # sibling playbook (playbook.nis2_self_assessment@v1) that
+  # anchors against the NIS2-specific ten sub-clause atom set;
+  # cross-pinning this DORA roll-up onto NIS2 Article 21(2) would
+  # misrepresent the obligation surface (financial-entity-specific
+  # ICT risk management framework versus the broader NIS2
+  # essential/important-entity risk-management measures). The
+  # NIS2 clause-by-clause review is recorded under the
+  # dora_ict_risk_selfassess entry in
+  # content/mappings/nis2/_orphan_skip.yaml; the orphan-CI closure
+  # for this playbook on the NIS2 axis is audited there as a
+  # reviewed skip rather than a pending gap.
+  []
+
+dora:
+  # Inbound entries that backlink playbook.dora_ict_risk_selfassess@v1:
+  #   - content/mappings/dora/article-6.yaml (dora:art-6-framework)
+  #   - content/mappings/dora/article-7.yaml (dora:art-7-systems-protocols-tools)
+  #   - content/mappings/dora/article-8.yaml (dora:art-8-identification)
+  #   - content/mappings/dora/article-10.yaml (dora:art-10-detection)
+  #   - content/mappings/dora/article-11.yaml (dora:art-11-response-recovery)
+  # The matching `playbook_refs:` additions on the five DORA
+  # inbound files land in this same SKELETON PR so the orphan-CI
+  # graph closes on the DORA axis end-to-end without a skip
+  # entry. This is the whole-Chapter II roll-up playbook, so every
+  # section atom carries the outbound entry.
+  - mapping_id: dora:art-6-framework
+    article: "6"
+    notes: >-
+      ICT risk-management framework (Chapter II anchor) —
+      per-section bucket the self-assessment aggregates against.
+      The producing playbook the collect step reads against on
+      this section: infra_posture_management (posture evidence
+      stream) plus the operator's governance documentation for
+      the framework-authoring and annual-review surface upstream
+      of the playbook set. The Art. 6(5) annual-review cadence
+      is the primary trigger for this roll-up.
+  - mapping_id: dora:art-7-systems-protocols-tools
+    article: "7"
+    notes: >-
+      ICT systems, protocols and tools — per-section bucket the
+      self-assessment aggregates against. The producing playbook
+      the collect step reads against on this section:
+      crypto_posture_management (crypto-posture and protocol-
+      inventory evidence streams). Article 7 is mostly
+      architectural; the agentic slice the roll-up composes
+      against is the dated protocol-inventory-and-certificate-
+      posture evidence stream.
+  - mapping_id: dora:art-8-identification
+    article: "8"
+    notes: >-
+      Identification (ICT-supported business functions, assets,
+      interdependencies) — per-section bucket the self-assessment
+      aggregates against. The producing playbooks the collect
+      step reads against on this section: asset_management
+      (asset-inventory-delta evidence stream) and
+      supply_chain_security (supplier-inventory evidence stream).
+      Article 8's at-least-annual review cadence is the discharge
+      surface the roll-up composes against.
+  - mapping_id: dora:art-10-detection
+    article: "10"
+    notes: >-
+      Detection — per-section bucket the self-assessment
+      aggregates against. The producing playbooks the collect
+      step reads against on this section: detection_engineering
+      (per-rule-version effectiveness-snapshot evidence stream)
+      and alert_triage (alert-record evidence stream). The
+      dated detection-coverage attestation plus the per-rule
+      effectiveness snapshots discharge the multi-layered-control
+      and alert-threshold obligations Article 10 names.
+  - mapping_id: dora:art-11-response-recovery
+    article: "11"
+    notes: >-
+      Response and recovery (ICT business continuity policy and
+      response-and-recovery plans) — per-section bucket the
+      self-assessment aggregates against. The producing playbooks
+      the collect step reads against on this section:
+      incident_management (incident-record evidence stream),
+      backup_recovery (backup-attestation evidence stream), and
+      ransomware_containment (containment-action evidence
+      stream). The dated backup and restore-drill evidence
+      records are the audit-evident artifacts the roll-up
+      aggregates for the Article 11 response-and-recovery
+      section.
+
+cra:
+  # No CRA inbound entry currently backlinks
+  # playbook.dora_ict_risk_selfassess@v1, and this is a durable,
+  # reviewed deferral rather than an open TODO. CRA Annex I is
+  # product-by-product manufacturer scope; no operator-side
+  # whole-framework self-assessment clause on the CRA axis
+  # anchors against a cross-clause roll-up of the CRA obligation
+  # set at the same shape as DORA Chapter II. The CRA
+  # clause-by-clause review is recorded under the
+  # dora_ict_risk_selfassess entry in
+  # content/mappings/cra/_orphan_skip.yaml; the orphan-CI
+  # closure for this playbook on the CRA axis is audited there
+  # as a reviewed skip rather than a pending gap. Mirrors the
+  # nis2_self_assessment CRA-axis precedent.
+  []
+
+gdpr:
+  # No GDPR inbound entry currently backlinks
+  # playbook.dora_ict_risk_selfassess@v1, and this is a durable,
+  # reviewed deferral rather than an open TODO. GDPR anchors on
+  # personal-data-processing obligations (Chapter II lawful basis,
+  # Chapter IV security of processing / Art. 32); this playbook
+  # operates on evidence-record identifiers, section atoms,
+  # playbook slugs, and attestation-record identifiers, none of
+  # which are personal data. The per-workflow GDPR data-flow
+  # closure lives under
+  # content/mappings/gdpr/data-flow-dora_ict_risk_selfassess.md
+  # once authored by a sibling GDPR-axis card; until then the
+  # orphan-CI closure on the GDPR axis is audited via
+  # content/mappings/gdpr/_orphan_skip.yaml.
+  []
