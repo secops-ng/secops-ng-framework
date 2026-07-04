@@ -764,3 +764,36 @@ jobs:
       - name: Run GDPR-latency-OCSF binding assertion (text)
         run: |
           python -m tools.lint_gdpr_latency_ocsf_bindings --format text
+
+  availability-ocsf-bindings:
+    # G-04 catalogue-maturity OCSF source-data-shape dimension —
+    # asserts every metric in the availability cluster (the NIS2
+    # Article 21 / DORA Article 11 service-availability KPI/KRI
+    # sextet: three KPI-side envelope indicators plus three KRI-
+    # side residual-risk indicators) declares an OCSF telemetry_ref.
+    # Closes the F-MET-AVAILABILITY triplet (SKELETON + EXTEND) by
+    # wiring the linter into the nightly content-CI cadence
+    # alongside the sibling latency-cluster jobs. Failure signals a
+    # regression in NIS2 Art. 21 / DORA Art. 11 continuity-axis
+    # operability coverage — a metric whose upstream source-data
+    # shape has drifted away from the OCSF Compliance Finding
+    # envelope that binds this cluster's evidence artefacts.
+    name: G-04 availability-cluster OCSF binding assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML)
+        run: pip install --no-cache-dir pyyaml
+
+      - name: Run availability-OCSF binding assertion (text)
+        run: |
+          python -m tools.lint_availability_ocsf_bindings --format text
