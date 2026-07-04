@@ -1,0 +1,125 @@
+stable_id: kri.gdpr_breach_supervisory_authority_notification_latency_hours@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: GDPR supervisory-authority breach-notification (72h) dispatch latency
+summary: >
+  Elapsed hours between controller awareness of a personal-data breach
+  under the GDPR Art. 4(12) definition and dispatch of the GDPR
+  Article 33(1) notification to the competent supervisory authority.
+  Residual-risk counterpart to any future
+  `kpi.gdpr_breach_supervisory_authority_notification_on_time@v1`: the
+  on-time KPI reads whether the clock was held; this KRI reads *how
+  close to the wall* each supervisory-authority notification dispatch
+  landed, so operators can see slippage well before the ratio itself
+  falls below 1.00. The 72-hour bound is set by GDPR Art. 33(1); any
+  observation above the bound is a statutory overrun and requires the
+  Art. 33(1) "reasons for the delay" record on the supervisory-
+  authority submission. Sibling to `kri.breach_notification_clock_margin@v1`
+  which reads the in-flight margin for open cases; this KRI reads the
+  settled-dispatch latency for cases that have already notified. No
+  non-EU default endpoints participate in the notification chain — the
+  supervisory-authority submission surface is an EU-hostable endpoint
+  per the sovereign-stack bias.
+unit: hours
+direction: lower_is_better
+target:
+  value: 72
+  comparator: "<="
+  rationale: >
+    GDPR Art. 33(1) sets the 72-hour supervisory-authority notification
+    deadline anchored on the moment the controller becomes aware of a
+    personal-data breach meeting the Art. 4(12) definition. The target
+    is the statutory bound; any dispatch beyond it is an overrun the
+    controller must record on the supervisory-authority submission
+    with reasons for the delay per Art. 33(1) in fine.
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 48
+    severity: warn
+  - name: high
+    comparator: ">"
+    value: 60
+    severity: high
+  - name: breach
+    comparator: ">"
+    value: 72
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: max
+  formula: >
+    For each GDPR Art. 33(1) supervisory-authority notification
+    dispatched within the evaluation window, compute
+    latency_hours = (dispatch_timestamp - awareness_timestamp) / 3600.
+    Aggregate as `max` across dispatches — the worst-case latency the
+    controller's supervisory-authority notification pipeline delivered
+    in the window, i.e. the case that came closest to (or beyond) the
+    72-hour statutory bound. Exclude in-scope cases whose supervisory-
+    authority notification dispatch step never fired so the indicator
+    does not silently improve when the notification pipeline stalls
+    outright; those cases surface on
+    `kri.regulator_notification_overrun@v1` instead. Cases where the
+    breach is "unlikely to result in a risk to the rights and freedoms
+    of natural persons" under Art. 33(1) are out of scope for this
+    KRI — the notification obligation is not engaged, so no dispatch
+    latency is measured; the classification-time skip is recorded on
+    the case for audit but does not contribute to this indicator.
+    Reference visualisation: a horizontal bar chart of
+    dispatch_latency_hours per GDPR Art. 33(1) supervisory-authority
+    notification dispatched in the window, with vertical lines at the
+    warn / high / breach thresholds (48h / 60h / 72h) and the max
+    aggregate annotated as the headline figure; direction is
+    `lower_is_better` so a rising max is the leading signal that the
+    controller's supervisory-authority notification pipeline is
+    approaching the statutory wall. The committed reference rendering
+    lives at
+    `content/metrics/gdpr_breach_supervisory_authority_notification_latency_hours.viz.md`
+    — that file is the contract for the chart shape; the compile
+    target renders the executable form against operator data.
+  inputs:
+    - name: awareness_timestamp
+      description: >
+        Controller-awareness timestamp emitted by the breach-handling
+        process when a candidate incident crosses the Art. 4(12)
+        personal-data-breach classification threshold. Used as the
+        start of the 72-hour supervisory-authority notification clock.
+        Carried on the OCSF Compliance Finding event the supervisory-
+        authority submission emits (status_id transition into the
+        notified state); the catalog entry binds to that OCSF class
+        shape, not to a supervisory-authority-submission envelope.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: start_time
+    - name: notification_dispatch
+      description: >
+        Supervisory-authority notification chain step transition that
+        dispatches the GDPR Art. 33(1) notification to the competent
+        supervisory authority. Carried on the OCSF Compliance Finding
+        event the supervisory-authority submission emits at dispatch
+        (status_id transition into the notified state).
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: time
+  window:
+    duration: P30D
+    sliding: true
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+external_refs:
+  - name: GDPR — Article 33(1) supervisory-authority breach-notification clock (72 hours)
+    source: EU
+    external_id: Regulation (EU) 2016/679, Art. 33(1)
+    url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+  - name: GDPR — Article 4(12) personal-data-breach definition
+    source: EU
+    external_id: Regulation (EU) 2016/679, Art. 4(12)
+    url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+  - name: EDPB — Guidelines 9/2022 on personal data breach notification
+    source: EDPB
+    url: https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-92022-personal-data-breach-notification_en
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability
