@@ -1,0 +1,785 @@
+{
+  "name": "GDPR Article 35 data protection impact assessment (DPIA) lifecycle",
+  "nodes": [
+    {
+      "id": "action--d91a35c0-0000-4000-8000-000000000002",
+      "name": "screen_dpia_triggers",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.processing_ref",
+              "name": "in.processing_ref",
+              "value": "={{$workflow.variables.processing_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "out.dpia_case_id",
+              "name": "out.dpia_case_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.dpia_required",
+              "name": "out.dpia_required",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.screening_result_ref",
+              "name": "out.screening_result_ref",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.risk_management_policy@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 screen __processing_ref__ against the Article 35(3)(a-c) mandatory-DPIA triggers (systematic and extensive evaluation of personal aspects based on automated processing; large-scale processing of special categories of data or personal data relating to criminal convictions and offences; systematic monitoring of a publicly accessible area on a large scale), against the operator's supervisory-authority Article 35(4) list of processing kinds that require a DPIA in the operator's jurisdiction, and against the general Article 35(1) likely-to-result-in-a-high-risk test taking into account the nature, scope, context and purposes of the processing. Assigns __dpia_case_id__, sets __dpia_required__, and records __screening_result_ref__ on the accountability ledger. A false outcome short- circuits the lifecycle with the negative screening retained as part of the operator's Article 5(2) accountability record. TODO (CORE): pin the operator's supervisory-authority Article 35(4) list adapter and the novel-technology signal (WP248 rev.01 criteria).",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--d91a35c0-0000-4000-8000-000000000003",
+      "name": "classify_processing_type",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.dpia_case_id",
+              "name": "in.dpia_case_id",
+              "value": "={{$workflow.variables.dpia_case_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.processing_ref",
+              "name": "in.processing_ref",
+              "value": "={{$workflow.variables.processing_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.risk_management_policy@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 classify the processing envelope against the operator's processing-inventory surface (the Article 30 record of processing activities as canonical join key) so downstream steps read a common shape: personal-data categories, special-category involvement, subject categories (including vulnerable-subject axes such as children, employees, patients), controller-vs-processor role, and the lawful-basis attribution the processing relies on under Article 6 (and where applicable Article 9(2)). Anchors the assessment scope; does not itself perform the risk determination. TODO (CORE): pin the RoPA-inventory adapter and the vulnerable-subject axis catalogue.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--d91a35c0-0000-4000-8000-000000000004",
+      "name": "gather_processing_description",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.dpia_case_id",
+              "name": "in.dpia_case_id",
+              "value": "={{$workflow.variables.dpia_case_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.processing_ref",
+              "name": "in.processing_ref",
+              "value": "={{$workflow.variables.processing_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "out.processing_description_ref",
+              "name": "out.processing_description_ref",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.risk_management_policy@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 assemble the systematic description of the envisaged processing operations and their purposes per Article 35(7)(a): purposes of the processing, categories of personal data and of data subjects, recipients or categories of recipients (including any transfers to third countries or international organisations), envisaged retention periods or the criteria used to determine them, and where applicable the legitimate interests pursued by the controller. Records __processing_description_ref__ so downstream steps read a stable description surface. TODO (CORE): pin the RoPA-extraction adapter and the transfer-legs cross-reference.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--d91a35c0-0000-4000-8000-000000000005",
+      "name": "assess_necessity_and_proportionality",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.dpia_case_id",
+              "name": "in.dpia_case_id",
+              "value": "={{$workflow.variables.dpia_case_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.processing_description_ref",
+              "name": "in.processing_description_ref",
+              "value": "={{$workflow.variables.processing_description_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.risk_management_policy@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 assess the necessity and proportionality of the processing operations in relation to the purposes per Article 35(7)(b). Necessity: whether the processing is required to achieve the purpose or whether a less- intrusive alternative would suffice. Proportionality: whether the categories of data and the scope of the processing are commensurate with the purpose and not excessive. Records the reasoning on the case; the outcome feeds the risk assessment and the mitigations identification downstream. TODO (CORE): pin the necessity-and-proportionality assessment template.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--d91a35c0-0000-4000-8000-000000000006",
+      "name": "identify_and_assess_risks",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.dpia_case_id",
+              "name": "in.dpia_case_id",
+              "value": "={{$workflow.variables.dpia_case_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.processing_description_ref",
+              "name": "in.processing_description_ref",
+              "value": "={{$workflow.variables.processing_description_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "out.risk_assessment_ref",
+              "name": "out.risk_assessment_ref",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.risk_management_policy@v1, control.incident_timeline_signals@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 identify and assess the risks to the rights and freedoms of natural persons the processing generates per Article 35(7)(c). Applies the operator's declared risk taxonomy over the risk-source, risk- event, and impact axes (illegitimate access, unauthorised modification, disappearance of personal data \u2014 the three EDPB reference risk categories \u2014 plus operator-declared context-specific axes). Records per-risk likelihood and severity and the residual-risk profile that determine_article_36_gate reads downstream. Records __risk_assessment_ref__. TODO (CORE): pin the risk-taxonomy binding and the residual- risk calibration surface.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--d91a35c0-0000-4000-8000-000000000007",
+      "name": "identify_and_document_mitigations",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.dpia_case_id",
+              "name": "in.dpia_case_id",
+              "value": "={{$workflow.variables.dpia_case_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.risk_assessment_ref",
+              "name": "in.risk_assessment_ref",
+              "value": "={{$workflow.variables.risk_assessment_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "out.mitigations_ref",
+              "name": "out.mitigations_ref",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.risk_management_policy@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 identify and document the measures envisaged to address the risks per Article 35(7)(d): safeguards, security measures, and mechanisms to ensure the protection of personal data and demonstrate compliance with the Regulation, taking into account the rights and legitimate interests of data subjects and other persons concerned. Records __mitigations_ref__ and pins the per-risk mitigation attribution so determine_article_36_gate can read the residual risk after mitigation. TODO (CORE): pin the safeguards catalogue and the security-measure control-reference binding.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--d91a35c0-0000-4000-8000-000000000008",
+      "name": "dpo_consultation",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.dpia_case_id",
+              "name": "in.dpia_case_id",
+              "value": "={{$workflow.variables.dpia_case_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.processing_description_ref",
+              "name": "in.processing_description_ref",
+              "value": "={{$workflow.variables.processing_description_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "in.risk_assessment_ref",
+              "name": "in.risk_assessment_ref",
+              "value": "={{$workflow.variables.risk_assessment_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "in.mitigations_ref",
+              "name": "in.mitigations_ref",
+              "value": "={{$workflow.variables.mitigations_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "out.dpo_consultation_ref",
+              "name": "out.dpo_consultation_ref",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.risk_management_policy@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 seek the advice of the Data Protection Officer where the controller has designated one, per Article 35(2). The DPO reviews the assembled description, necessity-and-proportionality assessment, risk assessment, and mitigations documentation and records advice on the DPIA case. Where the controller has not designated a DPO because Article 37 does not require it, the record documents that fact and the alternative accountability surface the controller relies on. Records __dpo_consultation_ref__. TODO (CORE): pin the DPO-consultation intake adapter and the alternative-accountability-surface record where no DPO is designated.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--d91a35c0-0000-4000-8000-000000000009",
+      "name": "determine_article_36_gate",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2060,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.dpia_case_id",
+              "name": "in.dpia_case_id",
+              "value": "={{$workflow.variables.dpia_case_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.risk_assessment_ref",
+              "name": "in.risk_assessment_ref",
+              "value": "={{$workflow.variables.risk_assessment_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "in.mitigations_ref",
+              "name": "in.mitigations_ref",
+              "value": "={{$workflow.variables.mitigations_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "out.article_36_pre_consultation_flag",
+              "name": "out.article_36_pre_consultation_flag",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.risk_management_policy@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 determine whether the residual risk, absent measures taken by the controller to mitigate it, would result in a high risk under Article 36(1) and therefore triggers prior consultation with the supervisory authority before the processing may begin. Reads the risk assessment against the applied mitigations and sets __article_36_pre_consultation_flag__. Where the flag is true, the controller must consult the supervisory authority under Article 36(1) and the processing may not begin until the consultation window completes (Article 36(2): up to eight weeks, extendable by six weeks taking into account the complexity of the intended processing). TODO (CORE): pin the supervisory- authority pre-consultation submission chain and the Article 36(2) consultation-window gate.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--d91a35c0-0000-4000-8000-00000000000a",
+      "name": "produce_dpia_document",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2320,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.dpia_case_id",
+              "name": "in.dpia_case_id",
+              "value": "={{$workflow.variables.dpia_case_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.processing_description_ref",
+              "name": "in.processing_description_ref",
+              "value": "={{$workflow.variables.processing_description_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "in.risk_assessment_ref",
+              "name": "in.risk_assessment_ref",
+              "value": "={{$workflow.variables.risk_assessment_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "in.mitigations_ref",
+              "name": "in.mitigations_ref",
+              "value": "={{$workflow.variables.mitigations_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "in.dpo_consultation_ref",
+              "name": "in.dpo_consultation_ref",
+              "value": "={{$workflow.variables.dpo_consultation_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "in.article_36_pre_consultation_flag",
+              "name": "in.article_36_pre_consultation_flag",
+              "value": "={{$workflow.variables.article_36_pre_consultation_flag}}",
+              "type": "string"
+            },
+            {
+              "id": "out.dpia_document_ref",
+              "name": "out.dpia_document_ref",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.risk_management_policy@v1, control.incident_timeline_signals@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 produce the durable DPIA document artifact for the case. Assembles the Article 35(7)(a)-(d) content (systematic description, necessity-and- proportionality, risk assessment, mitigations), the Article 35(2) DPO advice, the Article 36 gate outcome, and the review-cadence schedule into the operator's declared DPIA-document template. Records __dpia_document_ref__ on the accountability ledger. The document is the primary response to any subsequent Article 58(1)(a) supervisory-authority information order and the operator's Article 5(2) accountability artifact for this processing envelope. TODO (CORE): pin the DPIA-document template and the evidence-store binding.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--d91a35c0-0000-4000-8000-00000000000b",
+      "name": "schedule_review_cadence",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2580,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.dpia_case_id",
+              "name": "in.dpia_case_id",
+              "value": "={{$workflow.variables.dpia_case_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.dpia_document_ref",
+              "name": "in.dpia_document_ref",
+              "value": "={{$workflow.variables.dpia_document_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "out.review_cadence",
+              "name": "out.review_cadence",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.risk_management_policy@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 schedule the DPIA review cadence per Article 35(11). At minimum, the review is triggered on any material change to the risk represented by the processing envelope (change in categories of data, subjects, recipients, retention, purpose, or underlying-technology substrate). Records __review_cadence__ as the maximum interval between reviews absent such a change, and pins the review trigger to the operator's change-management surface. TODO (CORE): pin the change-management adapter and the review-trigger evidence-emission binding.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--d91a35c0-0000-4000-8000-00000000000f",
+      "name": "dpia_end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2840,
+        240
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "start--d91a35c0-0000-4000-8000-000000000001",
+      "name": "dpia_start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        3100,
+        420
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__article_36_pre_consultation_flag__",
+              "type": "boolean",
+              "value": "",
+              "description": "Whether the assessment concludes that the residual risk, absent measures taken to mitigate it, would result in a high risk under Article 36(1) and therefore triggers prior consultation with the supervisory authority before the processing may begin. Set by determine_article_36_gate against the risk-and- mitigations pair."
+            },
+            {
+              "name": "__dpia_case_id__",
+              "type": "string",
+              "value": "",
+              "description": "DPIA case identifier assigned at screen_dpia_triggers. Correlation key across screening, description gathering, necessity assessment, risk assessment, mitigation documentation, DPO consultation, Article 36 gating, document production, and review scheduling so a reviewer can join the full assessment lifecycle into a single accountability-ledger record."
+            },
+            {
+              "name": "__dpia_document_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Reference to the durable DPIA document artifact produced by produce_dpia_document. Records the assembled Article 35(7)(a)-(d) content, the DPO advice under Article 35(2), the Article 36 gate outcome, and the review-cadence schedule; the artifact is the operator's accountability record under Article 5(2) and the primary response to any subsequent Article 58(1)(a) supervisory- authority information order."
+            },
+            {
+              "name": "__dpia_required__",
+              "type": "boolean",
+              "value": "",
+              "description": "Whether the screening step concludes that a DPIA is required for __processing_ref__. Set by screen_dpia_triggers against the Article 35(3)(a-c) mandatory-DPIA triggers, the operator's supervisory- authority Article 35(4) blacklist, and the general Article 35(1) high-risk test. A false outcome short- circuits the workflow with a documented screening result; the operator retains the negative screening as part of the Article 5(2) accountability record."
+            },
+            {
+              "name": "__dpo_consultation_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Reference to the DPO consultation record produced by dpo_consultation per Article 35(2). Where the controller has designated a Data Protection Officer, that officer's advice on the assessment is recorded on the case; where no DPO has been designated (Article 37 does not require it), the record documents that fact instead."
+            },
+            {
+              "name": "__mitigations_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Reference to the measures envisaged to address the risks documented by identify_and_document_mitigations per Article 35(7)(d): safeguards, security measures, and mechanisms to ensure the protection of personal data and demonstrate compliance with the Regulation, taking into account the rights and legitimate interests of data subjects and other persons concerned."
+            },
+            {
+              "name": "__processing_description_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Reference to the systematic description of the envisaged processing operations and their purposes assembled by gather_processing_description per Article 35(7)(a): purposes, categories of personal data and data subjects, recipients, envisaged retention, and where applicable the legitimate interest pursued by the controller."
+            },
+            {
+              "name": "__processing_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Reference to the processing operation under assessment, resolved against the operator's processing-inventory surface (the Article 30 record of processing activities is the canonical join key). Read by every downstream step to scope the assessment to a single processing envelope."
+            },
+            {
+              "name": "__review_cadence__",
+              "type": "string",
+              "value": "",
+              "description": "ISO 8601 duration recording the scheduled DPIA review cadence set by schedule_review_cadence per Article 35(11). At minimum, the review is triggered on any material change to the processing envelope; the cadence duration records the maximum interval between reviews absent such a change."
+            },
+            {
+              "name": "__risk_assessment_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Reference to the assessment of the risks to the rights and freedoms of data subjects produced by identify_and_assess_risks per Article 35(7)(c). Records the risk taxonomy applied, the per-risk likelihood-and- severity determination, and the residual-risk profile that feeds determine_article_36_gate."
+            },
+            {
+              "name": "__screening_result_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Reference to the screening-decision artifact produced by screen_dpia_triggers. Records the trigger set evaluated, the outcome, and the reasoning; retained on the accountability ledger whether or not a full DPIA is subsequently produced."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "screen_dpia_triggers": {
+      "main": [
+        [
+          {
+            "node": "classify_processing_type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classify_processing_type": {
+      "main": [
+        [
+          {
+            "node": "gather_processing_description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gather_processing_description": {
+      "main": [
+        [
+          {
+            "node": "assess_necessity_and_proportionality",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "assess_necessity_and_proportionality": {
+      "main": [
+        [
+          {
+            "node": "identify_and_assess_risks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "identify_and_assess_risks": {
+      "main": [
+        [
+          {
+            "node": "identify_and_document_mitigations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "identify_and_document_mitigations": {
+      "main": [
+        [
+          {
+            "node": "dpo_consultation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "dpo_consultation": {
+      "main": [
+        [
+          {
+            "node": "determine_article_36_gate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "determine_article_36_gate": {
+      "main": [
+        [
+          {
+            "node": "produce_dpia_document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "produce_dpia_document": {
+      "main": [
+        [
+          {
+            "node": "schedule_review_cadence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "schedule_review_cadence": {
+      "main": [
+        [
+          {
+            "node": "dpia_end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "dpia_start": {
+      "main": [
+        [
+          {
+            "node": "screen_dpia_triggers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "gdpr",
+    "article-35",
+    "article-36",
+    "dpia",
+    "data-protection-impact-assessment",
+    "accountability"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.data_protection_impact_assessment@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--d91a35c0-0000-4000-8000-000000000001"
+    },
+    "secops_ng_notes": [
+      "step 'action--d91a35c0-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--d91a35c0-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--d91a35c0-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--d91a35c0-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--d91a35c0-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--d91a35c0-0000-4000-8000-000000000007': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--d91a35c0-0000-4000-8000-000000000008': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--d91a35c0-0000-4000-8000-000000000009': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--d91a35c0-0000-4000-8000-00000000000a': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--d91a35c0-0000-4000-8000-00000000000b': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}
