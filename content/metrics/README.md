@@ -111,6 +111,9 @@ directions.
 | `kri.nis2_incident_early_warning_latency_hours@v1`       | kri | hours | lower_is_better | NIS2 Art. 23(4)(a)                           | —                                                                |
 | `kri.nis2_incident_notification_latency_hours@v1`        | kri | hours | lower_is_better | NIS2 Art. 23(4)(b)                           | —                                                                |
 | `kri.nis2_incident_final_report_latency_days@v1`         | kri | days  | lower_is_better | NIS2 Art. 23(4)(d)                           | —                                                                |
+| `kpi.service_availability_rate@v1`                       | kpi | percent | higher_is_better | NIS2 Art. 21(1)(b); DORA Art. 11             | —                                                                |
+| `kpi.rto_compliance_rate@v1`                             | kpi | percent | higher_is_better | NIS2 Art. 21(1)(c); DORA Art. 11(2)(b)       | —                                                                |
+| `kpi.service_continuity_test_frequency@v1`               | kpi | count | higher_is_better | NIS2 Art. 21(1)(c); DORA Art. 11(6)          | —                                                                |
 
 DORA-side anchors on the unscoped detect-pillar baselines (MTTD,
 detection coverage, FP rate) are intentionally absent because the
