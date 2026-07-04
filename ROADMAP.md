@@ -1409,6 +1409,46 @@ the regulatory deadline.
 
 ---
 
+## Epic MAP — Regulatory OSCAL component-definition coverage
+
+OSCAL component definitions per regulatory axis so an operator can feed
+the SecOps-NG mapping surface into an OSCAL-aware tool chain. The
+per-axis component definition is the auditable, machine-readable form
+of the article-level YAML mappings under `content/mappings/<axis>/`.
+
+### F-MAP-GDPR-OSCAL — GDPR OSCAL component definition
+
+- **Status:** Shipped
+- **Priority:** P1
+- **Goal:** G-02 (regulatory mapping coverage — closes the four-axis
+  OSCAL component-definition parity gap so an operator can feed the
+  GDPR mapping surface into an OSCAL-aware tool chain alongside CRA,
+  DORA, and NIS2).
+- **Acceptance criteria:**
+  - `content/mappings/gdpr/oscal-component-definition.json` ships an
+    OSCAL 1.1.2 component definition covering the shipped GDPR
+    article anchors (Art. 5, 6, 15-22, 25, 26-28, 32, 33-34, 35).
+  - Schema and coverage tests in
+    `tests/content/test_oscal_gdpr_component_definition.py` validate
+    the file against the vendored OSCAL 1.1.2 schema and assert every
+    `(entry, control_ref)` pair from the article YAMLs appears as an
+    `implemented-requirement`.
+  - A nightly orphan-CI lane guards the file out-of-band: schema and
+    coverage tests run on every nightly `main` build and the
+    implemented-requirement count is asserted to stay at or above the
+    SKELETON baseline (55 IRs).
+- **Sovereign-stack constraints:** —
+- **Depends on:** F-CP-01 (Risk-analysis stream) inbound anchors.
+- **Source:** GDPR (EU) 2016/679 Art. 5, 6, 15-22, 25, 26-28, 32,
+  33-34, 35.
+- **Shipped via:**
+  - SKELETON — #653 (OSCAL component definition JSON + schema and
+    coverage test).
+  - CORE — orphan-CI parity lane for the GDPR OSCAL component
+    definition and this ROADMAP entry.
+
+---
+
 ## Epic ADOPT — Operator adoption signal
 
 Public, community-owned surfaces that make operator adoption of
