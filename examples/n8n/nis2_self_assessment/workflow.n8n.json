@@ -1,0 +1,395 @@
+{
+  "name": "NIS2 Article 21 operator self-assessment report",
+  "nodes": [
+    {
+      "id": "start--91000000-0000-4000-8000-000000000001",
+      "name": "nis2_self_assessment_start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__assessment_window__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the self-assessment window this run discharges (scheduled-cadence reference, on-demand attestation reference, or operator-initiated trigger such as a supervisory-authority request). Names which self-assessment cohort the run reports against rather than the run's wall-clock time; the wall-clock instant lives on the attestation artifact itself."
+            },
+            {
+              "name": "__clause_atoms__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the resolved sub-clause atom set the report addresses. Always the ten Art. 21(2)(a\u2013j) atoms (mapping ids nis2:art-21-2-a through nis2:art-21-2-j) as declared in content/playbooks/nis2_self_assessment/mappings.yaml. Populated by collect_clause_evidence so the downstream map / score / report steps read against a stable atom set for the window."
+            },
+            {
+              "name": "__evidence_set_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the per-clause evidence set the collect step composed for this window: for each of the ten sub-clause atoms, the set of evidence records emitted by the playbooks that discharge that clause (posture snapshots for (a); alert / incident records for (b); backup attestations for (c); supplier attestations for (d); patch and vulnerability evidence for (e); effectiveness snapshots for (f); training and phishing-sim records for (g); crypto-posture records for (h); IAM audit and asset-inventory records for (i); MFA-coverage records for (j)). The set may be empty for a given clause (no evidence emitted in the window) \u2014 the empty case is still carried explicitly so the downstream scoring records absent-uncovered rather than silently dropping the clause."
+            },
+            {
+              "name": "__clause_mapping__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the per-clause evidence-to-obligation mapping the map step composed. Each entry binds a collected evidence record to (i) the sub-clause atom it discharges (one of nis2:art-21-2-a through nis2:art-21-2-j), (ii) the playbook slug that produced it, and (iii) the SecOps-NG content-model overlay refs (control_refs, telemetry_refs, metric_refs) that carry across from the producing playbook. The map is best-effort; evidence records that do not bind to a documented sub-clause atom are recorded as unbound and flagged on the report rather than dropped."
+            },
+            {
+              "name": "__clause_scoring__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the per-clause coverage-scoring set the score step composed against the operator's documented coverage rubric (present-and-current / present-but-stale / absent-with-declared-exception / absent-uncovered). Empty when scoring could not be completed within the documented self-assessment deadline; an empty value short-circuits into an attestation-emission failure record while still recording the per-clause bucket as absent-uncovered for the whole-Article roll-up."
+            },
+            {
+              "name": "__attestation_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the dated NIS2 Article 21 self-assessment attestation artifact published to the operator's evidence store. Always populated, including on the empty-evidence-set branch and on the unscored short-circuit branch, so the audit-evident chain is closed."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--91000000-0000-4000-8000-000000000002",
+      "name": "collect clause evidence",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.assessment_window",
+              "name": "in.assessment_window",
+              "value": "={{$workflow.variables.assessment_window}}",
+              "type": "string"
+            },
+            {
+              "id": "out.clause_atoms",
+              "name": "out.clause_atoms",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.evidence_set_id",
+              "name": "out.evidence_set_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.security_assessment@v1, control.control_effectiveness_test@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.control_effectiveness@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "TODO (CORE): per-clause evidence-collection primitive. The action body reads the operator's evidence store for the current self-assessment window and pulls every evidence record whose producing playbook is one of the twenty-two playbooks the ten Art. 21(2)(a\u2013j) sub-clauses currently anchor against (see content/playbooks/nis2_self_assessment/mappings.yaml). Sets __clause_atoms__ to the fixed ten-atom set nis2:art-21-2-a through nis2:art-21-2-j and __evidence_set_id__ to the durable identifier of the per-clause evidence set for the window. Read-only against the evidence store: the collection step does not write back into the source records, it composes a per-window view keyed on the ten sub-clause atoms. SKELETON pins the topology + ID + regulatory anchor refs; the deterministic per-source pull, normalisation, and sub-clause-attribution carry are owned by CORE-PRIM. Detection bindings for collection-side failures (evidence-store endpoint unreachable, partial pull inside the window, missing producing-playbook attribution on a record) are owned by CORE-FANOUT cards once upstream rule ids are selected.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--91000000-0000-4000-8000-000000000003",
+      "name": "map evidence to clauses",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.assessment_window",
+              "name": "in.assessment_window",
+              "value": "={{$workflow.variables.assessment_window}}",
+              "type": "string"
+            },
+            {
+              "id": "in.clause_atoms",
+              "name": "in.clause_atoms",
+              "value": "={{$workflow.variables.clause_atoms}}",
+              "type": "string"
+            },
+            {
+              "id": "in.evidence_set_id",
+              "name": "in.evidence_set_id",
+              "value": "={{$workflow.variables.evidence_set_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.clause_mapping",
+              "name": "out.clause_mapping",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.security_assessment@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.control_effectiveness@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "TODO (CORE): per-record evidence-to-clause mapping primitive. The action body binds each evidence record in __evidence_set_id__ to (i) the Art. 21(2) sub-clause atom it discharges (one of nis2:art-21-2-a through nis2:art-21-2-j), (ii) the playbook slug that produced it, and (iii) the SecOps-NG content-model overlay refs (control_refs, telemetry_refs, metric_refs) that carry across from the producing playbook, using the outbound overlay declared at content/playbooks/<slug>/mappings.yaml as the join key. Sets __clause_mapping__. The mapping is best-effort; evidence records that do not bind to a documented sub-clause atom are recorded as unbound and flagged on the report rather than dropped so the audit trail carries the gap explicitly. Empty per-clause sub-sets are emitted explicitly (a clause with no evidence in the window is still enumerated) so the downstream scoring records absent-uncovered rather than silently dropping the clause. SKELETON pins the topology + ID + control / telemetry refs; the deterministic mapping-and-normalisation is owned by CORE-PRIM.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--91000000-0000-4000-8000-000000000004",
+      "name": "score per-clause coverage",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.clause_atoms",
+              "name": "in.clause_atoms",
+              "value": "={{$workflow.variables.clause_atoms}}",
+              "type": "string"
+            },
+            {
+              "id": "in.clause_mapping",
+              "name": "in.clause_mapping",
+              "value": "={{$workflow.variables.clause_mapping}}",
+              "type": "string"
+            },
+            {
+              "id": "out.clause_scoring",
+              "name": "out.clause_scoring",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.security_assessment@v1, control.control_effectiveness_test@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.control_effectiveness@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "TODO (CORE): per-clause coverage-scoring primitive. The action body scores each of the ten Art. 21(2)(a\u2013j) sub-clauses in __clause_mapping__ against the operator's documented coverage rubric: present-and-current (at least one evidence record in the window whose captured_at is inside the operator's declared freshness threshold for the clause), present-but-stale (evidence records exist but the freshest is past the declared freshness threshold), absent-with-declared-exception (no evidence records in the window but the operator maintains a documented, dated exception under their Art. 21(2)(a) risk-analysis policy naming the compensating measure), or absent-uncovered (no evidence records in the window and no declared exception \u2014 the gap the self-assessment surfaces). Per-clause internal consistency is enforced at the primitive boundary so an inconsistent scoring (e.g. present-and-current with an empty evidence sub-set) fails loud here rather than at the report boundary downstream. The scoring is best-effort and time-boxed; if scoring cannot be completed within the documented self-assessment deadline (so the operator is not held by a perfect-scoring stall while the attestation window slips), the primitive is invoked with deadline_missed=true and emits the sentinel per-clause bucket ['unscored']; the downstream report step records that marker while still treating the per-clause bucket as absent-uncovered for the whole-Article roll-up. Sets __clause_scoring__. SKELETON pins the topology + ID + control / telemetry / metric refs; the deterministic scoring-rubric binding is owned by CORE-PRIM.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--91000000-0000-4000-8000-000000000005",
+      "name": "report attestation",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.assessment_window",
+              "name": "in.assessment_window",
+              "value": "={{$workflow.variables.assessment_window}}",
+              "type": "string"
+            },
+            {
+              "id": "in.clause_atoms",
+              "name": "in.clause_atoms",
+              "value": "={{$workflow.variables.clause_atoms}}",
+              "type": "string"
+            },
+            {
+              "id": "in.clause_mapping",
+              "name": "in.clause_mapping",
+              "value": "={{$workflow.variables.clause_mapping}}",
+              "type": "string"
+            },
+            {
+              "id": "in.clause_scoring",
+              "name": "in.clause_scoring",
+              "value": "={{$workflow.variables.clause_scoring}}",
+              "type": "string"
+            },
+            {
+              "id": "out.attestation_id",
+              "name": "out.attestation_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.security_assessment@v1, control.control_effectiveness_test@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.api_activity@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.control_effectiveness@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "TODO (CORE): dated attestation-emission primitive. The action body composes the JSON-native NIS2 Art. 21 self-assessment attestation record shaped against a schemas/evidence/nis2-self-assessment.schema.json (stream: attestation) landing in the sibling CORE card, and pins the artifact_id as SHA-256(workflow_id|execution_id|captured_at). compile_target is intentionally NOT part of the id so the three reference compilers re-derive byte-identical bytes from the same primitive output (the byte-parity contract the F-WF-NIS2-SELF-ASSESS CORE-FANOUT siblings assert against). The record carries the assessment window, the ten sub-clause atoms with their per-clause scoring buckets, the unbound-evidence flag (if any), the whole-Article roll-up verdict (all-present-and-current / mixed-with-declared-exceptions / partial-coverage-with-gaps / uncovered), and the dated attestation timestamp. This is the audit-evident artifact NIS2 supervisory-authority reviewers read against the whole Article 21 control surface; missing or stale attestation is the failure mode the operator-side self-assessment cadence surfaces. The primitive only produces the JSON-native record; the durable emitter wiring (artifact-path, content-addressed filename, atomic write, notification of the operator's accountability owner) is owned by the per-target compilers and lands with the CORE-FANOUT sibling cards. Sets __attestation_id__.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--91000000-0000-4000-8000-000000000006",
+      "name": "nis2_self_assessment_end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "nis2_self_assessment_start": {
+      "main": [
+        [
+          {
+            "node": "collect clause evidence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "collect clause evidence": {
+      "main": [
+        [
+          {
+            "node": "map evidence to clauses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "map evidence to clauses": {
+      "main": [
+        [
+          {
+            "node": "score per-clause coverage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "score per-clause coverage": {
+      "main": [
+        [
+          {
+            "node": "report attestation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "report attestation": {
+      "main": [
+        [
+          {
+            "node": "nis2_self_assessment_end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "nis2",
+    "article-21",
+    "self-assessment",
+    "attestation",
+    "operator-reporting",
+    "effectiveness-assessment"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.nis2_self_assessment@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--91a2b3c4-0000-4000-8000-000000000001"
+    },
+    "secops_ng_notes": [
+      "step 'action--91000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--91000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--91000000-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--91000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}
