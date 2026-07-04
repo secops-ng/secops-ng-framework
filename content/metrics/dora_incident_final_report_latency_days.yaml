@@ -1,0 +1,115 @@
+stable_id: kri.dora_incident_final_report_latency_days@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: DORA major-incident final-report (one month) dispatch latency
+summary: >
+  Elapsed days between root-cause resolution of an ICT-related major
+  incident (root-cause analysis complete) and dispatch of the DORA
+  Art. 19(4)(c) final report to the operator's competent authority.
+  Residual-risk counterpart to any future
+  `kpi.dora_final_report_on_time@v1`: the on-time KPI reads whether
+  the clock was held; this KRI reads *how close to the wall* each
+  final-report dispatch landed, so operators can see slippage well
+  before the ratio itself falls below 1.00. The one-month bound is
+  set by DORA Art. 19(4)(c) (final report no later than one month
+  after the incident is closed / root-cause analysis is complete); any
+  observation above the bound is a statutory overrun and a reportable
+  compliance exception.
+unit: days
+direction: lower_is_better
+target:
+  value: 30
+  comparator: "<="
+  rationale: >
+    DORA Art. 19(4)(c) sets a one-month final-report deadline anchored
+    on incident closure / completion of the root-cause analysis under
+    the Art. 17 management process. The target here is that statutory
+    bound (approximated as 30 days for banded evaluation); any
+    dispatch beyond it is an overrun the operator must record for the
+    competent authority with reasons for the delay.
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 20
+    severity: warn
+  - name: high
+    comparator: ">"
+    value: 25
+    severity: high
+  - name: breach
+    comparator: ">"
+    value: 30
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: max
+  formula: >
+    For each DORA Art. 19(4)(c) final-report dispatched within the
+    evaluation window, compute
+    latency_days = (dispatch_timestamp - resolution_timestamp) / 86400,
+    where `resolution_timestamp` is the incident-closure / root-cause-
+    analysis-complete timestamp emitted by the Art. 17 management
+    process. Aggregate as `max` across dispatches — the worst-case
+    latency the operator's regulator-notification pipeline delivered
+    in the window, i.e. the case that came closest to (or beyond) the
+    one-month statutory bound. Exclude in-scope cases whose final-
+    report dispatch step never fired so the indicator does not
+    silently improve when the notification pipeline stalls outright;
+    those cases surface on `kri.regulator_notification_overrun@v1`
+    instead.
+    Reference visualisation: a horizontal bar chart of
+    dispatch_latency_days per DORA Art. 19(4)(c) final-report
+    dispatched in the window, with vertical lines at the warn / high /
+    breach thresholds (20d / 25d / 30d) and the max aggregate
+    annotated as the headline figure; direction is `lower_is_better`
+    so a rising max is the leading signal that the operator's final-
+    report pipeline is approaching the statutory wall. The committed
+    reference rendering lives at
+    `content/metrics/dora_incident_final_report_latency_days.viz.md`
+    — that file is the contract for the chart shape; the compile
+    target renders the executable form against operator data.
+  inputs:
+    - name: resolution_timestamp
+      description: >
+        Incident-closure / root-cause-analysis-complete timestamp
+        emitted by the DORA Art. 17 incident-management process. Used
+        as the start of the one-month final-report clock. Carried on
+        the OCSF Compliance Finding event the final-report submission
+        emits (status_id transition into the notified state); the
+        catalog entry binds to that OCSF class shape, not to a
+        regulator-submission envelope.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: start_time
+    - name: notification_dispatch
+      description: >
+        Regulator-notification chain step transition that dispatches
+        the DORA Art. 19(4)(c) final report to the operator's
+        competent authority. Carried on the OCSF Compliance Finding
+        event the final-report submission emits at dispatch (status_id
+        transition into the notified state).
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: time
+  window:
+    duration: P30D
+    sliding: true
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+external_refs:
+  - name: DORA — Article 17 ICT-related incident management process
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 17
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: DORA — Article 19(4)(c) final-report obligation (one month after incident closure)
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 19(4)(c)
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: ESAs — Regulatory Technical Standards on DORA major-incident classification and reporting
+    source: ESAs
+    url: https://www.eiopa.europa.eu/browse/regulation-and-policy/digital-operational-resilience-act-dora_en
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability
