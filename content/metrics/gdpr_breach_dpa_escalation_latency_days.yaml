@@ -1,0 +1,135 @@
+stable_id: kri.gdpr_breach_dpa_escalation_latency_days@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: GDPR Art. 33(4) phased supplementary-report dispatch latency
+summary: >
+  Elapsed days between dispatch of the GDPR Art. 33(1) initial
+  supervisory-authority notification and dispatch of the GDPR
+  Art. 33(4) supplementary ("phased") report for cases where the
+  initial notification was made with incomplete information and
+  further information had to be provided "in phases without undue
+  further delay". Residual-risk counterpart to any future
+  `kpi.gdpr_breach_dpa_escalation_on_time@v1`: the on-time KPI reads
+  whether the operational phased-notification clock was held; this
+  KRI reads *how close to the wall* each supplementary-report dispatch
+  landed. Art. 33(4) sets no statutory hard-day cap ("without undue
+  further delay"); the 30-day value used here is an operational
+  ceiling matched to the NIS2 Art. 23(4)(d) / CRA / DORA
+  Art. 19(4)(c) final-report siblings so the four-regime latency ring
+  is uniformly banded — it is not a regulatory hard limit. No non-EU
+  default endpoints participate in the notification chain — the
+  supervisory-authority submission surface is an EU-hostable endpoint
+  per the sovereign-stack bias.
+unit: days
+direction: lower_is_better
+target:
+  value: 30
+  comparator: "<="
+  rationale: >
+    GDPR Art. 33(4) permits the controller to provide information in
+    phases where it is not possible to provide it at the same time as
+    the Art. 33(1) initial notification, provided the further
+    information is provided "without undue further delay". No
+    statutory hard-day cap is set. The 30-day target here is an
+    operational ceiling adopted for parity with the NIS2 Art. 23(4)(d)
+    one-month final-report bound, the CRA final-report bound, and the
+    DORA Art. 19(4)(c) one-month bound, so the four-regime latency
+    ring bands identically. Operators with tighter internal SLOs
+    override the target in the compile target without diverging the
+    catalog contract.
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 20
+    severity: warn
+  - name: high
+    comparator: ">"
+    value: 25
+    severity: high
+  - name: breach
+    comparator: ">"
+    value: 30
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: max
+  formula: >
+    For each GDPR Art. 33(4) supplementary-report dispatched within
+    the evaluation window, compute
+    latency_days = (dispatch_timestamp - initial_notification_dispatch_timestamp) / 86400,
+    where `initial_notification_dispatch_timestamp` is the moment the
+    controller's chain dispatched the Art. 33(1) supervisory-authority
+    notification. Aggregate as `max` across dispatches — the worst-
+    case latency the controller's supervisory-authority notification
+    pipeline delivered in the window for cases that required a phased
+    supplementary report, i.e. the case that came closest to (or
+    beyond) the 30-day operational ceiling. Exclude in-scope cases
+    whose supplementary-report dispatch step never fired so the
+    indicator does not silently improve when the notification pipeline
+    stalls outright; those cases surface on
+    `kri.regulator_notification_overrun@v1` instead. Cases whose
+    initial Art. 33(1) notification was complete on first dispatch
+    (no Art. 33(4) phasing required) are out of scope — no
+    supplementary-report obligation is engaged, so no dispatch latency
+    is measured. The 30-day breach threshold is an operational
+    ceiling, not a regulatory hard limit; a dispatch above 30 days is
+    a residual-risk signal for the operator's own governance, not a
+    statutory overrun in the Art. 33(1) sense.
+    Reference visualisation: a horizontal bar chart of
+    dispatch_latency_days per GDPR Art. 33(4) supplementary-report
+    dispatched in the window, with vertical lines at the warn / high /
+    breach thresholds (20d / 25d / 30d) and the max aggregate
+    annotated as the headline figure; direction is `lower_is_better`
+    so a rising max is the leading signal that the controller's
+    phased-notification pipeline is approaching the operational
+    ceiling. The committed reference rendering lives at
+    `content/metrics/gdpr_breach_dpa_escalation_latency_days.viz.md`
+    — that file is the contract for the chart shape; the compile
+    target renders the executable form against operator data.
+  inputs:
+    - name: initial_notification_dispatch_timestamp
+      description: >
+        Timestamp at which the controller's supervisory-authority
+        notification chain dispatched the GDPR Art. 33(1) initial
+        notification. Used as the start of the operational 30-day
+        supplementary-report clock. Carried on the OCSF Compliance
+        Finding event the supplementary-report submission emits
+        (status_id transition into the notified state); the catalog
+        entry binds to that OCSF class shape, not to a supervisory-
+        authority-submission envelope.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: start_time
+    - name: notification_dispatch
+      description: >
+        Supervisory-authority notification chain step transition that
+        dispatches the GDPR Art. 33(4) supplementary ("phased")
+        report to the competent supervisory authority. Carried on the
+        OCSF Compliance Finding event the supplementary-report
+        submission emits at dispatch (status_id transition into the
+        notified state).
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: time
+  window:
+    duration: P30D
+    sliding: true
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+external_refs:
+  - name: GDPR — Article 33(4) phased supplementary supervisory-authority notification
+    source: EU
+    external_id: Regulation (EU) 2016/679, Art. 33(4)
+    url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+  - name: GDPR — Article 33(1) supervisory-authority breach-notification clock (72 hours)
+    source: EU
+    external_id: Regulation (EU) 2016/679, Art. 33(1)
+    url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+  - name: EDPB — Guidelines 9/2022 on personal data breach notification
+    source: EDPB
+    url: https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-92022-personal-data-breach-notification_en
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability
