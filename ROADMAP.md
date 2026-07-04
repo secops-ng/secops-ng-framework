@@ -797,6 +797,55 @@ named operator use-case. Each cookbook workflow lives under
 
 ---
 
+### F-WF-NIS2-SELF-ASSESS — NIS2 Art. 21 operator self-assessment report template
+
+- **Status:** Shipped
+- **Priority:** P1
+- **Goal:** G-01 (content coverage — a whole-Article roll-up
+  playbook that lets an operator walk the ten NIS2 Art. 21(2)(a-j)
+  measure families in a single deterministic workflow and emit a
+  self-assessment report against the existing per-measure playbook
+  family), G-06 (contributor adoption — an operator-facing
+  self-assessment template lowers the barrier for a new contributor
+  verifying their own deployment against the framework before
+  proposing a change).
+- **Acceptance criteria:**
+  - `content/playbooks/nis2_self_assessment/` carries the canonical
+    CACAO v2 scaffold (`playbook.nis2_self_assessment@v1`) with the
+    ten Art. 21(2)(a-j) measure-family sections wired as
+    deterministic steps, a `mappings.yaml` pinning inbound anchors
+    for each of the ten sub-paragraphs, and a README walking the
+    operator through the roll-up structure.
+  - Inbound backlinks land on all ten per-measure Art. 21(2)(a-j)
+    map files so the roll-up is discoverable from the existing
+    NIS2 measure playbook family.
+  - Three reference-target compile examples land under
+    `examples/{n8n,temporal,langgraph}/nis2_self_assessment/` with
+    byte-parity goldens across all three targets.
+  - Cookbook entry `docs/cookbook/nis2_self_assessment.md`
+    walks an operator through running the self-assessment
+    end-to-end against a reference deployment.
+- **Sovereign-stack constraints:** CACAO v2 content only, no
+  proprietary schema. NIS2 Art. 21(2)(a-j) are the regulatory
+  anchors; operator-supplied evidence sink and no default non-EU
+  endpoint.
+- **Depends on:** — (standalone roll-up referencing the existing
+  Art. 21(2)(a-j) per-measure playbook family)
+- **Source:** NIS2 Directive (EU) 2022/2555 Art. 21(2)(a-j);
+  enforcement active July 2026.
+- **Shipped via:**
+  - SKELETON — #630
+    (`content/playbooks/nis2_self_assessment/` CACAO v2 scaffold +
+    `mappings.yaml` + README + inbound backlinks on all ten
+    Art. 21(2)(a-j) map files).
+  - CORE — #631 (three-target compile examples under
+    `examples/{n8n,temporal,langgraph}/nis2_self_assessment/`
+    + byte-parity goldens across targets).
+  - EXTEND — #632
+    (`docs/cookbook/nis2_self_assessment.md` walkthrough).
+
+---
+
 ## Epic PT — Pattern Library
 
 Reusable graph fragments and Pydantic types shared across cookbook
