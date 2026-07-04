@@ -79,6 +79,7 @@ on:
       - "tests/content/test_dora_latency_ocsf_bindings.py"
       - "tests/content/test_nis2_latency_ocsf_bindings.py"
       - "tests/content/test_gdpr_latency_ocsf_bindings.py"
+      - "tests/content/test_oscal_gdpr_component_definition.py"
       - ".github/workflows/orphan-ci.yml"
   push:
     branches: [main]
@@ -797,3 +798,65 @@ jobs:
       - name: Run availability-OCSF binding assertion (text)
         run: |
           python -m tools.lint_availability_ocsf_bindings --format text
+
+  gdpr-oscal-component-definition:
+    # G-02 regulatory-mapping coverage — GDPR OSCAL component-definition
+    # parity lane. GDPR is the fourth regulatory axis to ship an OSCAL
+    # component definition (CRA / DORA / NIS2 shipped earlier); this
+    # nightly job guards the GDPR file specifically so out-of-band
+    # regressions (schema drift, deletion, silent IR shrink) surface
+    # even when a PR does not touch it. Two invariants:
+    #   * schema + coverage tests in
+    #     `tests/content/test_oscal_gdpr_component_definition.py` pass
+    #     against the shipped component definition; and
+    #   * the OSCAL component definition ships at least 55
+    #     implemented-requirements — the baseline established by the
+    #     F-MAP-GDPR-OSCAL SKELETON (Art. 5 / 6 / 15-22 / 25 / 26-28 /
+    #     32 / 33-34 / 35 coverage). Any regression below the baseline
+    #     hard-fails the job.
+    name: G-02 GDPR OSCAL component-definition assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML, jsonschema, pytest)
+        run: pip install --no-cache-dir pyyaml jsonschema pytest
+
+      - name: Run GDPR OSCAL component-definition schema + coverage tests
+        run: |
+          python -m pytest tests/content/test_oscal_gdpr_component_definition.py -q
+
+      - name: Assert GDPR OSCAL implemented-requirement count ≥ 55 (SKELETON baseline)
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          path = Path("content/mappings/gdpr/oscal-component-definition.json")
+          if not path.is_file():
+              sys.exit(f"FAIL: {path} is missing")
+
+          doc = json.loads(path.read_text())
+          components = doc.get("component-definition", {}).get("components", [])
+          ir_count = sum(
+              len(ci.get("implemented-requirements", []) or [])
+              for c in components
+              for ci in c.get("control-implementations", []) or []
+          )
+          baseline = 55
+          if ir_count < baseline:
+              sys.exit(
+                  f"FAIL: GDPR OSCAL implemented-requirement count {ir_count} "
+                  f"regressed below SKELETON baseline {baseline}"
+              )
+          print(f"OK: GDPR OSCAL implemented-requirements = {ir_count} (≥ {baseline})")
+          PY
