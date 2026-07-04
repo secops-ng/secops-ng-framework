@@ -114,6 +114,9 @@ directions.
 | `kpi.service_availability_rate@v1`                       | kpi | percent | higher_is_better | NIS2 Art. 21(1)(b); DORA Art. 11             | —                                                                |
 | `kpi.rto_compliance_rate@v1`                             | kpi | percent | higher_is_better | NIS2 Art. 21(1)(c); DORA Art. 11(2)(b)       | —                                                                |
 | `kpi.service_continuity_test_frequency@v1`               | kpi | count | higher_is_better | NIS2 Art. 21(1)(c); DORA Art. 11(6)          | —                                                                |
+| `kri.availability_below_target_exposure@v1`              | kri | hours | lower_is_better  | NIS2 Art. 21(2)(e); DORA Art. 8              | —                                                                |
+| `kri.rto_overrun_exposure_count@v1`                      | kri | count | lower_is_better  | NIS2 Art. 21(2)(e); DORA Art. 8              | —                                                                |
+| `kri.continuity_test_overdue@v1`                         | kri | count | lower_is_better  | NIS2 Art. 21(2)(e); DORA Art. 8; DORA Art. 11(6) | —                                                            |
 
 DORA-side anchors on the unscoped detect-pillar baselines (MTTD,
 detection coverage, FP rate) are intentionally absent because the

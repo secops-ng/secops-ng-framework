@@ -1,0 +1,122 @@
+stable_id: kri.availability_below_target_exposure@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Availability-below-target exposure — count of hours the in-scope service dropped below its declared availability target within the evaluation window
+summary: >
+  Residual-risk counterpart to `kpi.service_availability_rate@v1`.
+  Where the KPI reads the aggregate availability rate against the
+  operator's declared availability envelope, this KRI reads *how many
+  hours in the evaluation window* the in-scope service was below its
+  declared target — the exposure the operator's continuity posture
+  actually accumulated even when the aggregate rate looks acceptable.
+  Anchors the risk-management-measures limb of NIS2 Art. 21(2)(e)
+  (business continuity, backup management, crisis management) and the
+  ICT-supported business-function-continuity limb of DORA Art. 8 (ICT
+  risk-management framework — identification of ICT-supported business
+  functions and dependencies) so operators can see below-target
+  exposure accumulating well before the aggregate KPI drops. Sibling
+  to `kri.rto_overrun_exposure_count@v1` (recovery-side residual risk)
+  and `kri.continuity_test_overdue@v1` (test-cadence residual risk)
+  which together close the residual-risk triad for the
+  service-availability KPI cluster. No non-EU default endpoints
+  participate in the availability-observation chain — the health-probe
+  / uptime-observation surface is an EU-hostable endpoint per the
+  sovereign-stack bias.
+unit: hours
+direction: lower_is_better
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 1
+    severity: warn
+  - name: high
+    comparator: ">"
+    value: 4
+    severity: high
+  - name: breach
+    comparator: ">"
+    value: 8
+    severity: critical
+measurement:
+  source: telemetry
+  aggregation: sum
+  formula: >
+    For each in-scope service observed in the evaluation window,
+    accumulate the total number of hours during which the observed
+    availability_rate fell below the operator's declared availability
+    target for that service. Aggregate as `sum` across services — the
+    total below-target exposure in hours the operator's continuity
+    posture accumulated across the window. Convert sub-hour dips to
+    fractional hours so short but frequent slips still register on the
+    exposure counter. Exclude planned-maintenance windows the operator
+    has pre-declared on the service's continuity register so the
+    reading does not conflate scheduled downtime with continuity
+    failure — the same exclusion contract as the sibling KPI. Where
+    an operator has not declared an availability target on a service,
+    the service is excluded from this KRI (its posture is unknown, not
+    below-target) and surfaces on the operator's
+    continuity-register-coverage KRIs instead.
+    Reference visualisation: a headline hours count with warn / high /
+    breach threshold bands, plus a per-service drill-down ranking
+    services by their below-target exposure across the window. The
+    committed reference rendering lives at
+    `content/metrics/availability_below_target_exposure.viz.md` — that
+    file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: probe_success
+      description: >
+        Health-probe observation emitted by the operator's uptime-
+        monitoring surface for the in-scope service. Carried on the
+        OCSF Compliance Finding event the service-availability
+        observation emits (status_id transition into the observed
+        state); the catalog entry binds to that OCSF class shape,
+        not to a vendor-specific uptime, synthetic-monitoring, or
+        probe product.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: status_id
+    - name: observation_timestamp
+      description: >
+        Timestamp of the availability observation used to slot the
+        observed rate into the evaluation window and accumulate the
+        below-target hours counter. Carried on the OCSF Compliance
+        Finding event the service-availability observation emits.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: time
+    - name: declared_availability_target
+      description: >
+        Availability target declared by the operator on the in-scope
+        service's continuity register, expressed as a percentage. Read
+        alongside the probe observations to decide whether an
+        observation window is above or below the declared target.
+        Carried on the OCSF Compliance Finding event the
+        service-availability observation emits as a reference field
+        (metadata.correlation_uid) linking the observation to the
+        register entry that declares the target.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: metadata.correlation_uid
+  window:
+    duration: P30D
+    sliding: true
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+external_refs:
+  - name: NIS2 — Article 21(2)(e) business continuity, backup management, crisis management
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(e)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 8 identification of ICT-supported business functions and dependencies
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 8
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: ENISA — NIS2 essential/important entity guidance
+    source: ENISA
+    url: https://www.enisa.europa.eu/topics/cybersecurity-policy/nis-directive-new
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability
+  - auditability
