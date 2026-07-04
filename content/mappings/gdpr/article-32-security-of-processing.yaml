@@ -276,6 +276,7 @@ entries:
       - playbook.infra_posture_management@v1
       - playbook.backup_recovery@v1
       - playbook.cyber_hygiene_training@v1
+      - playbook.nis2_self_assessment@v1
     metric_refs:
       - kri.control_effectiveness@v1
       - kpi.detection_coverage@v1
@@ -331,7 +332,24 @@ entries:
       `dora:art-13-training-awareness` anchor the same playbook
       against their own training-and-awareness obligations; the three
       regimes carry separate evidence requirements against the same
-      per-cycle training-attestation discipline. Periodic re-assessment
+      per-cycle training-attestation discipline. nis2_self_assessment is
+      the whole-Article roll-up counterpart on the effectiveness lens:
+      the playbook reads the operator's evidence store for the current
+      self-assessment window, binds each collected evidence record to
+      the NIS2 Art. 21(2)(a–j) sub-clause atom it discharges under the
+      operator's four-bucket coverage rubric, and emits a dated
+      attestation record whose durable form is the periodic
+      effectiveness artifact Art. 32(1)(d) names against the
+      whole-programme lens (rather than the per-detection-rule lens
+      detection_engineering anchors or the per-drill lens
+      backup_recovery anchors). The kri.control_effectiveness@v1
+      metric this clause already lists is the workflow's primary
+      metric hook, so the roll-up is atom-consistent with the clause
+      it anchors against. The NIS2 parallel under
+      `nis2:art-21-2-f` anchors the same roll-up against the
+      NIS2-side effectiveness-assessment obligation; the GDPR and
+      NIS2 regimes file separate evidence requirements against the
+      same attestation record. Periodic re-assessment
       cadence and archival of results are operator-side responsibilities
       discharged by the snapshot's captured_at and retention fields
       plus the upstream control's review_cadence.
