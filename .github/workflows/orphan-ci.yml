@@ -50,6 +50,7 @@ on:
       - "tools/lint_supply_chain_ocsf_bindings.py"
       - "tools/lint_backup_recovery_ocsf_bindings.py"
       - "tools/lint_detection_engineering_ocsf_bindings.py"
+      - "tools/lint_cra_latency_ocsf_bindings.py"
       - "tools/ocsf_cluster_lint.py"
       - "content/telemetry/**"
       - "tests/content/test_cra_playbook_orphans.py"
@@ -71,6 +72,7 @@ on:
       - "tests/content/test_supply_chain_ocsf_bindings.py"
       - "tests/content/test_backup_recovery_ocsf_bindings.py"
       - "tests/content/test_detection_engineering_ocsf_bindings.py"
+      - "tests/content/test_cra_latency_ocsf_bindings.py"
       - ".github/workflows/orphan-ci.yml"
   push:
     branches: [main]
@@ -99,6 +101,7 @@ on:
       - "tools/lint_supply_chain_ocsf_bindings.py"
       - "tools/lint_backup_recovery_ocsf_bindings.py"
       - "tools/lint_detection_engineering_ocsf_bindings.py"
+      - "tools/lint_cra_latency_ocsf_bindings.py"
       - "tools/ocsf_cluster_lint.py"
   schedule:
     # Nightly at 02:23 UTC — off-peak, off-the-hour, single slot for
@@ -634,3 +637,37 @@ jobs:
       - name: Run detection-engineering-OCSF binding assertion (text)
         run: |
           python -m tools.lint_detection_engineering_ocsf_bindings --format text
+
+  cra-latency-ocsf-bindings:
+    # G-04 catalogue-maturity OCSF source-data-shape dimension —
+    # asserts every metric in the CRA-latency cluster (the CRA
+    # Article 14 SRP dispatch-latency KRI triad) declares an OCSF
+    # telemetry_ref. Closes the F-MET-CRA-LATENCY triplet
+    # (SKELETON #622) by wiring the linter into the nightly
+    # content-CI cadence alongside the other cluster jobs; runs
+    # independently from the per-framework orphan matrix and the
+    # sibling OCSF / sovereignty / determinism / post-incident-review
+    # / regulatory-notification / identity-&-access /
+    # vulnerability-&-patch / threat-intel / incident-response /
+    # on-call-rotation / supply-chain-security / backup-recovery /
+    # detection-engineering jobs. Secondary: CRA Article 14
+    # dispatch-latency statutory clocks.
+    name: G-04 CRA-latency-cluster OCSF binding assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML)
+        run: pip install --no-cache-dir pyyaml
+
+      - name: Run CRA-latency-OCSF binding assertion (text)
+        run: |
+          python -m tools.lint_cra_latency_ocsf_bindings --format text
