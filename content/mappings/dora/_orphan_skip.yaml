@@ -122,3 +122,24 @@ skip:
       interaction is authored (for example a DORA Art. 5-16 ICT
       risk-management framework overlap on the same processing
       envelope).
+
+  - slug: nis2_self_assessment
+    rationale: >-
+      NIS2 Article 21(2) whole-Article operator self-assessment
+      roll-up. The playbook's outbound overlay
+      (`content/playbooks/nis2_self_assessment/mappings.yaml`)
+      deliberately does not pin DORA entries: DORA's equivalent
+      whole-framework self-assessment surface (the ICT-risk-
+      management framework annual review under Art. 6(5) plus the
+      digital-operational-resilience-testing programme under
+      Art. 24) is regime-specific to financial entities and
+      anchors against a different producing-playbook set; a
+      dedicated DORA self-assessment playbook is the appropriate
+      discharge on that axis, not a cross-pin of the NIS2 roll-up.
+      The NIS2 inbound graph is closed via
+      `content/mappings/nis2/article-21-2-{a..j}.yaml` (each of
+      the ten sub-clause atoms carries the outbound backlink).
+      A sibling CORE / EXTEND card revisits the DORA cross-regime
+      graph if a documented interaction is authored (for example
+      a shared attestation surface across financial-entity
+      operators subject to both regimes).
