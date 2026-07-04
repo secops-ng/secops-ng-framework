@@ -108,6 +108,9 @@ directions.
 | `kri.dora_incident_initial_report_latency_hours@v1`      | kri | hours | lower_is_better | DORA Art. 17; DORA Art. 19(4)(a)             | —                                                                |
 | `kri.dora_incident_intermediate_report_latency_hours@v1` | kri | hours | lower_is_better | DORA Art. 17; DORA Art. 19(4)(b)             | —                                                                |
 | `kri.dora_incident_final_report_latency_days@v1`         | kri | days  | lower_is_better | DORA Art. 17; DORA Art. 19(4)(c)             | —                                                                |
+| `kri.nis2_incident_early_warning_latency_hours@v1`       | kri | hours | lower_is_better | NIS2 Art. 23(4)(a)                           | —                                                                |
+| `kri.nis2_incident_notification_latency_hours@v1`        | kri | hours | lower_is_better | NIS2 Art. 23(4)(b)                           | —                                                                |
+| `kri.nis2_incident_final_report_latency_days@v1`         | kri | days  | lower_is_better | NIS2 Art. 23(4)(d)                           | —                                                                |
 
 DORA-side anchors on the unscoped detect-pillar baselines (MTTD,
 detection coverage, FP rate) are intentionally absent because the
