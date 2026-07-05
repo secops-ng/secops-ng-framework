@@ -86,7 +86,37 @@ observability stack discharges it in practice); and
 `iso27001:a-8-7-protection-against-malware` ships `control_refs: []`
 pending a dedicated anti-malware artifact, with
 `playbook.threat_intel_ingest@v1` already exercising the
-threat-intelligence ingest slice that feeds those tools. A.8 is
-the largest theme (34 controls); the remaining A.8 controls (A.8.8
-through A.8.34) land as sibling entries in that file on subsequent
-cards.
+threat-intelligence ingest slice that feeds those tools. The
+A.8.8–A.8.12 batch also lands in `annex-a-8-technological.yaml`:
+`iso27001:a-8-8-management-of-technical-vulnerabilities` wires
+`control.patch_evidence@v1` and `control.vuln_disclosure_intake@v1`
+(both already carrying A.8.8 on their `oscal_refs` block) plus the
+five-playbook operational discharge across `playbook.vuln_intake@v1`,
+`playbook.patch_management@v1`,
+`playbook.codebase_vuln_management@v1`,
+`playbook.infra_posture_management@v1`, and
+`playbook.cloud_misconfiguration@v1`;
+`iso27001:a-8-9-configuration-management` wires
+`control.configuration_settings@v1`,
+`control.baseline_configuration@v1`,
+`control.iac_policy_guardrail@v1`, and
+`control.cspm_baseline@v1` (all already carrying A.8.9) plus
+`playbook.infra_posture_management@v1` and
+`playbook.cloud_misconfiguration@v1`;
+`iso27001:a-8-10-information-deletion` ships `control_refs: []`
+pending a dedicated information-deletion / media-sanitisation
+artifact (the operator's retention-schedule enforcement and
+media-disposal procedures discharge it in practice, with GDPR
+Art. 17 erasure separately anchored under
+`playbook.data_subject_rights@v1`);
+`iso27001:a-8-11-data-masking` ships `control_refs: []` pending a
+dedicated masking / pseudonymisation artifact (the operator's
+data-classification pipeline and non-prod masking transforms
+discharge it in practice); and
+`iso27001:a-8-12-data-leakage-prevention` ships `control_refs: []`
+pending a dedicated DLP-posture control artifact, with
+`playbook.data_exfil@v1` already anchoring the response-side chain
+that consumes the DLP signal. A.8 is the largest theme (34
+controls); coverage stands at 12 of 34 entries landed; the
+remaining A.8 controls (A.8.13 through A.8.34) land as sibling
+entries in that file on subsequent cards.
