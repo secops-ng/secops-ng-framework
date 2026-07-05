@@ -8,12 +8,16 @@
 # `annex-a-7-physical.yaml`, `annex-a-8-technological.yaml`) hold their
 # respective controls as they land.
 #
-# Scope of this file: Annex A.5 organisational controls. This first
-# entry establishes the crosswalk conventions for external contributors:
-# one entry per Annex A control (identified by the numeric control ref
-# under the A.5 family), pinning the obligation paraphrase and the
-# control-model artifacts that discharge it. The remaining A.5 controls
-# (A.5.2 through A.5.37) land as sibling entries in this file on
+# Scope of this file: Annex A.5 organisational controls. The first
+# entry (A.5.1 policies) established the crosswalk conventions for
+# external contributors: one entry per Annex A control (identified by
+# the numeric control ref under the A.5 family), pinning the
+# obligation paraphrase and the control-model artifacts that
+# discharge it. The next batch (A.5.2 information-security roles,
+# A.5.3 segregation of duties, A.5.4 management responsibilities,
+# A.5.5 contact with authorities, A.5.6 contact with special interest
+# groups) lands here alongside the anchor. The remaining A.5 controls
+# (A.5.7 through A.5.37) land as sibling entries in this file on
 # subsequent cards.
 #
 # Regime scope caveat: ISO/IEC 27001:2022 is a certifiable
@@ -64,3 +68,191 @@ entries:
       against their own regime-specific obligations; the regimes
       carry separate evidence requirements against the same
       underlying policy-set artifact.
+  - id: iso27001:a-5-2-roles-and-responsibilities
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.2
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Define and allocate information-security roles and
+      responsibilities in accordance with the organisation's
+      information-security needs. Allocations must be documented,
+      accepted by role-holders, and reviewed as the organisation
+      and its risk profile change.
+    status: draft
+    control_refs:
+      - control.ict_risk_governance@v1
+    notes: >-
+      A.5.2 is the roles-and-responsibilities anchor for the whole
+      Annex A control set — the standard requires that
+      information-security responsibilities be explicitly assigned
+      rather than left implicit. control.ict_risk_governance@v1 is
+      the direct anchor: its oscal_refs block already carries
+      ISO/IEC 27001:2022 A.5.2 alongside NIST 800-53 rev5 PM-2
+      (information-security programme leadership role) and PM-29
+      (risk-management programme leadership roles) plus DORA
+      Article 5 (governance and organisation), and its governance
+      surface (management-body responsibility, documented role
+      allocations, review cadence) is the discipline A.5.2 requires.
+      Cross-regime parallels: NIS2 Art. 20 (governance —
+      management-body responsibility for cyber risk) and DORA
+      Article 5 (governance and organisation) discharge the same
+      role-allocation obligation against their own regime-specific
+      accountability regimes; the regimes carry separate evidence
+      requirements against the same underlying governance artifact.
+  - id: iso27001:a-5-3-segregation-of-duties
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.3
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Segregate conflicting duties and areas of responsibility to
+      reduce opportunities for unauthorised or unintentional
+      modification, misuse, or fraud against the organisation's
+      assets. Where full segregation is not practicable, apply
+      compensating controls such as activity monitoring, audit
+      trails, and management oversight.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a segregation-of-duties artifact as a
+    # first-class control. A.5.3 is discharged in practice today
+    # through the combination of least-privilege enforcement
+    # (control.least_privilege@v1, A.5.15/A.8.2 anchor) and
+    # privileged-access review (control.privileged_access_review@v1,
+    # A.8.2 anchor); a future dedicated artifact (e.g.
+    # control.segregation_of_duties@v1) would replace this placeholder
+    # without changing the entry id.
+    notes: >-
+      A.5.3 is the segregation-of-duties anchor within the Annex A.5
+      organisational-controls theme — the standard treats it as a
+      structural control against fraud, error, and misuse rather
+      than a purely access-technical one. The SecOps-NG control
+      catalogue currently exercises the practical surface (who can
+      execute which conflicting actions) through the least-privilege
+      and privileged-access-review controls that already carry
+      A.5.15 and A.8.2 respectively; the segregation obligation
+      itself is discharged against the operator's own role-matrix
+      and duty-separation evidence. Cross-regime parallels: NIS2
+      Art. 21(2)(i) (human-resources security — including access
+      control) touches the same discipline against the essential/
+      important-entity scope; the regimes carry separate evidence
+      requirements against the same underlying duty-separation
+      artifact.
+  - id: iso27001:a-5-4-management-responsibilities
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.4
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Management must require all personnel to apply information
+      security in accordance with the established information-security
+      policy, topic-specific policies, and procedures of the
+      organisation. The requirement must be communicated as a
+      condition of employment and reinforced through the
+      awareness-and-training programme.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+      - control.training_attestation@v1
+    notes: >-
+      A.5.4 is the management-direction anchor for personnel-level
+      policy adherence — the standard requires that management not
+      only publish policies (the A.5.1 anchor) but visibly require
+      personnel to apply them. control.risk_management_policy@v1 is
+      the policy-set anchor whose management approval and periodic
+      review discipline (P1Y baseline cadence) establishes the
+      direction personnel are required to follow; its oscal_refs
+      block already carries ISO/IEC 27001:2022 A.5.1 as the
+      policy-set surface A.5.4 references. control.training_
+      attestation@v1 is the evidence anchor that personnel have
+      received and acknowledged the policies and procedures relevant
+      to their role — its oscal_refs block carries ISO/IEC 27001:2022
+      A.6.3 (awareness and training) alongside NIST 800-53 rev5 AT-2/
+      AT-3/AT-4, and the attestation surface it produces is the
+      practical evidence that the management requirement has been
+      communicated and accepted. Cross-regime parallels: NIS2 Art.
+      20 (management-body accountability) and Art. 21(2)(g) (cyber
+      hygiene and training) discharge the same management-direction
+      discipline against essential and important entities; the
+      regimes carry separate evidence requirements against the same
+      underlying policy-and-attestation artifacts.
+  - id: iso27001:a-5-5-contact-with-authorities
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.5
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Establish and maintain appropriate contacts with relevant
+      authorities — including law-enforcement, sector supervisors,
+      data-protection regulators, and CSIRTs — so that
+      security-incident notifications, regulatory reporting, and
+      support requests can be actioned within the applicable
+      timeframes.
+    status: draft
+    control_refs:
+      - control.crisis_communication_plan@v1
+    notes: >-
+      A.5.5 is the authorities-contact anchor within the Annex A.5
+      organisational-controls theme — the standard requires that
+      contact channels to relevant authorities be pre-established
+      rather than assembled during an incident.
+      control.crisis_communication_plan@v1 is the direct anchor:
+      its oscal_refs block already carries ISO/IEC 27001:2022 A.5.5
+      alongside DORA Article 19 (incident reporting) and the
+      incident-response-plan family, and its communication surface
+      (pre-agreed channels, contact directories, notification
+      templates) is where the pre-established-contact discipline is
+      discharged in practice. Cross-regime parallels: NIS2 Art. 23
+      (incident-reporting obligations against national CSIRTs and
+      competent authorities), DORA Art. 19 (major-incident reporting
+      to sector supervisors), and GDPR Art. 33 (personal-data-breach
+      notification to supervisory authorities) all discharge the
+      same authorities-contact discipline against their own
+      regime-specific notification timelines; the regimes carry
+      separate evidence requirements against the same underlying
+      contact-directory artifact.
+  - id: iso27001:a-5-6-contact-with-special-interest-groups
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.6
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Maintain appropriate contacts with special interest groups,
+      specialist security forums, and professional associations to
+      stay current on threat intelligence, best practice, and
+      information about vulnerabilities relevant to the operator's
+      environment.
+    status: draft
+    control_refs:
+      - control.crisis_communication_plan@v1
+    playbook_refs:
+      - playbook.threat_intel_ingest@v1
+    notes: >-
+      A.5.6 is the special-interest-groups-contact anchor within the
+      Annex A.5 organisational-controls theme — the standard treats
+      it as the operational counterpart of A.5.5, addressing
+      community-level intelligence sharing rather than
+      authority-level reporting.
+      control.crisis_communication_plan@v1 is the anchor whose
+      oscal_refs block already carries ISO/IEC 27001:2022 A.5.6
+      (contact with special interest groups) alongside A.5.5; the
+      communication surface it maintains covers both the authority-
+      facing and the peer-community-facing channels the two controls
+      address. The playbook.threat_intel_ingest@v1 CACAO playbook
+      exercises the operational flow that consumes the
+      community-supplied intelligence (feeds, advisories, forum
+      exchanges) so that vulnerability and threat information from
+      special-interest-group contacts is routed into the operator's
+      detection and response surfaces. Cross-regime parallels: NIS2
+      Art. 21(2)(h) (information-sharing arrangements) and DORA
+      Art. 45 (financial-sector information-sharing arrangements)
+      anchor the same community-contact discipline against their
+      regime-specific sharing frameworks; the regimes carry separate
+      evidence requirements against the same underlying
+      community-contact artifact.
