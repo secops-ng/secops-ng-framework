@@ -61,12 +61,32 @@ A.7.14) land as sibling entries in that file on subsequent cards.
 
 The A.8 technological-controls theme file has landed with its first
 two entries (`iso27001:a-8-1-user-endpoint-devices`,
-`iso27001:a-8-2-privileged-access-rights`) in
-`annex-a-8-technological.yaml`. A.8.1 ships with empty `control_refs`
-pending an endpoint-posture control artifact; A.8.2 wires
-`control.privileged_access_review@v1`,
+`iso27001:a-8-2-privileged-access-rights`) and the A.8.3–A.8.7 batch
+in `annex-a-8-technological.yaml`. A.8.1 ships with empty
+`control_refs` pending an endpoint-posture control artifact; A.8.2
+wires `control.privileged_access_review@v1`,
 `control.account_management@v1`, and `control.least_privilege@v1`
 (all already carrying `A.8.2` on their `oscal_refs` block) plus
-`playbook.iam_auditor@v1`. A.8 is the largest theme (34 controls);
-the remaining A.8 controls (A.8.3 through A.8.34) land as sibling
-entries in that file on subsequent cards.
+`playbook.iam_auditor@v1`. In the A.8.3–A.8.7 batch:
+`iso27001:a-8-3-information-access-restriction` wires
+`control.access_enforcement@v1` (already carrying A.8.3 on its
+`oscal_refs` block) and `control.least_privilege@v1`, with
+`playbook.iam_auditor@v1` as the operational discharge;
+`iso27001:a-8-4-access-to-source-code` ships `control_refs: []`
+pending a dedicated source-code access / change-management artifact
+(the operator's version-control access matrix and CI/CD role
+bindings discharge it in practice);
+`iso27001:a-8-5-secure-authentication` wires
+`control.mfa_state_probe@v1` and
+`control.service_identification_authentication@v1` (both already
+carrying A.8.5) plus `playbook.mfa_secured_comms@v1`;
+`iso27001:a-8-6-capacity-management` ships `control_refs: []`
+pending a dedicated capacity-monitoring artifact (the operator's
+observability stack discharges it in practice); and
+`iso27001:a-8-7-protection-against-malware` ships `control_refs: []`
+pending a dedicated anti-malware artifact, with
+`playbook.threat_intel_ingest@v1` already exercising the
+threat-intelligence ingest slice that feeds those tools. A.8 is
+the largest theme (34 controls); the remaining A.8 controls (A.8.8
+through A.8.34) land as sibling entries in that file on subsequent
+cards.

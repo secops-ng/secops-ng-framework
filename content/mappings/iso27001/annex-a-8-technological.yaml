@@ -21,8 +21,11 @@
 # pair (A.8.1 user endpoint devices and A.8.2 privileged access
 # rights) opens the theme file following the crosswalk conventions
 # set by annex-a-5-organisational.yaml, annex-a-6-people.yaml, and
-# annex-a-7-physical.yaml. The remaining A.8 controls (A.8.3 through
-# A.8.34) land as sibling entries in this file on subsequent cards.
+# annex-a-7-physical.yaml. The A.8.3–A.8.7 batch (information-access
+# restriction, source-code access, secure authentication, capacity
+# management, malware protection) lands here alongside the opener.
+# The remaining A.8 controls (A.8.8 through A.8.34) land as sibling
+# entries in this file on subsequent cards.
 #
 # Coverage caveat: A.8 is the largest Annex A theme (34 controls);
 # this first-entries card lands two entries to establish the file
@@ -145,3 +148,239 @@ entries:
       allocation basis; the regimes carry separate evidence
       requirements against the same underlying privileged-access
       artifact.
+  - id: iso27001:a-8-3-information-access-restriction
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.3
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Restrict access to information and other associated assets in
+      accordance with the established topic-specific policy on access
+      control. Access must be limited to authorised individuals and
+      systems, mediated against a policy decision point, and
+      re-evaluated whenever the underlying authorisation state
+      changes.
+    status: draft
+    control_refs:
+      - control.access_enforcement@v1
+      - control.least_privilege@v1
+    playbook_refs:
+      - playbook.iam_auditor@v1
+    notes: >-
+      A.8.3 is the information-access-restriction anchor for the
+      Annex A.8 theme — the standard requires that logical access to
+      information and associated assets be mediated against the
+      operator's access-control policy on a least-privilege basis.
+      control.access_enforcement@v1 is the direct anchor: its
+      oscal_refs block already carries ISO/IEC 27001:2022 A.8.3
+      alongside NIST 800-53 rev5 AC-3 (Access Enforcement) and NIS2
+      Art. 21(2)(i) (access-control policies), and the mediation
+      discipline it encodes (every request checked against a policy
+      decision point before resources are served) is exactly the
+      information-access-restriction obligation A.8.3 requires.
+      control.least_privilege@v1 (NIST AC-6, also carrying A.8.2 and
+      A.5.15) anchors the allocation-basis side — access restricted
+      to the minimum entitlements needed for the role or task.
+      playbook.iam_auditor@v1 is the operational discharge:
+      per-execution caller-identity resolution and closed-capability
+      enumeration emit access-evidence artifacts the operator's
+      IAM-review function joins against the intended grant set.
+      Cross-regime parallels: NIS2 Art. 21(2)(i) (access-control
+      policies) covers the same restriction discipline; DORA
+      Art. 9(4)(c) (access management) operationalised by the JC RTS
+      Arts. 20–22 (Commission Delegated Regulation (EU) 2024/1774)
+      covers the need-to-know / need-to-use basis; the regimes carry
+      separate evidence requirements against the same underlying
+      access-mediation artifact.
+  - id: iso27001:a-8-4-access-to-source-code
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.4
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Manage read and write access to source code, development tools,
+      and software libraries. Access must be restricted, changes
+      must be reviewed and traceable, and the development-tool chain
+      itself must be treated as an in-scope asset — not an
+      unmanaged surface.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a dedicated source-code access / change-review
+    # artifact. A.8.4 is discharged in practice today against the
+    # operator's own version-control access matrix (branch protection,
+    # required-review rules, signed-commit posture), CI/CD pipeline
+    # role bindings, and artifact-registry entitlements. A future
+    # control (e.g. control.source_code_access@v1 or a
+    # change-management artifact) would replace this placeholder
+    # without changing the entry id; the code-scanning /
+    # vulnerability side of the development chain is separately
+    # anchored under A.8.8 via control.patch_evidence@v1 and
+    # control.vuln_disclosure_intake@v1 (landing as sibling entries
+    # on a subsequent card).
+    notes: >-
+      A.8.4 is the source-code and development-tool access anchor
+      within the Annex A.8 theme — the standard treats the
+      code-and-toolchain surface as an in-scope asset that must be
+      access-managed, change-reviewed, and traceable. The SecOps-NG
+      control catalogue does not yet carry a dedicated
+      source-code-access artifact (see the placeholder note above);
+      the obligation is discharged in practice against the operator's
+      own version-control access matrix (branch protection,
+      required-review rules, signed-commit posture), CI/CD pipeline
+      role bindings, artifact-registry entitlements, and the
+      code-review discipline that produces those artefacts. The
+      codebase-vuln-management playbook family already covers the
+      vulnerability side of the same toolchain; the access-management
+      side lands under a future dedicated control artifact.
+      Cross-regime parallels: NIS2 Art. 21(2)(e) (security in
+      network and information systems acquisition, development, and
+      maintenance) covers the development-lifecycle access
+      discipline; DORA Art. 9(2) (ICT protection and prevention)
+      reaches source-code access through the JC RTS ICT
+      risk-management framework; the regimes carry separate evidence
+      requirements against the same underlying access-management
+      artifact.
+  - id: iso27001:a-8-5-secure-authentication
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.5
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Implement secure authentication technologies and procedures.
+      Authentication must be proportionate to the sensitivity of the
+      resource, use multi-factor mechanisms where required by risk,
+      protect authentication information in transit and at rest, and
+      apply equivalent discipline to service-to-service
+      authentication as to user authentication.
+    status: draft
+    control_refs:
+      - control.mfa_state_probe@v1
+      - control.service_identification_authentication@v1
+    playbook_refs:
+      - playbook.mfa_secured_comms@v1
+    notes: >-
+      A.8.5 is the secure-authentication anchor for the Annex A.8
+      theme — the standard requires that authentication mechanisms
+      be proportionate to the sensitivity of the resource, that
+      multi-factor be used where risk demands, and that
+      service-to-service authentication carry equivalent discipline
+      to user authentication. control.mfa_state_probe@v1 is the
+      direct anchor for the user-authentication side: its
+      oscal_refs block already carries ISO/IEC 27001:2022 A.8.5
+      alongside NIST 800-53 rev5 IA-2(1) / IA-2(2) (Multi-factor
+      Authentication to Privileged / Non-privileged Accounts) and
+      NIS2 Art. 21(2)(j) (multi-factor or continuous authentication).
+      control.service_identification_authentication@v1 is the direct
+      anchor for the service-to-service side: its oscal_refs block
+      carries ISO/IEC 27001:2022 A.8.5 alongside NIST 800-53 rev5
+      IA-9 (Service Identification and Authentication) and IA-5
+      (Authenticator Management). playbook.mfa_secured_comms@v1 is
+      the operational discharge — the CACAO playbook that exercises
+      MFA-secured communication paths and emits the evidence the
+      operator's authentication-posture review function joins
+      against. Cross-regime parallels: NIS2 Art. 21(2)(j) (MFA /
+      continuous authentication) reaches the same
+      authentication-strength obligation; DORA Art. 9(4)(b)
+      (authentication mechanisms) operationalised by the JC RTS
+      (Commission Delegated Regulation (EU) 2024/1774) carries the
+      strong-authentication requirement for ICT assets; the regimes
+      carry separate evidence requirements against the same
+      underlying authentication artifact.
+  - id: iso27001:a-8-6-capacity-management
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.6
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Monitor and adjust the use of resources in line with current
+      and projected capacity requirements. Capacity must be planned
+      against the operator's availability requirements, monitored
+      through performance measures, and forecast for anticipated
+      growth so that saturation-induced outages are prevented rather
+      than reacted to.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a dedicated capacity-management /
+    # resource-monitoring artifact. A.8.6 is discharged in practice
+    # today against the operator's own observability stack (resource
+    # utilisation dashboards, autoscaling policies, SLO burn-rate
+    # alerts) and the availability-side of the ICT service portfolio.
+    # A future control (e.g. control.capacity_monitoring@v1 or an
+    # availability / SLO-management artifact) would replace this
+    # placeholder without changing the entry id; the backup-and-
+    # restore side of availability is separately anchored under
+    # A.8.13 via control.backup_attestation@v1 /
+    # control.restore_drill@v1 (landing as sibling entries on a
+    # subsequent card).
+    notes: >-
+      A.8.6 is the capacity-management anchor within the Annex A.8
+      theme — the standard treats resource saturation as an
+      availability-risk surface that must be forecast and monitored
+      rather than reacted to. The SecOps-NG control catalogue does
+      not yet carry a dedicated capacity-management artifact (see
+      the placeholder note above); the obligation is discharged in
+      practice against the operator's own observability stack
+      (resource-utilisation dashboards, autoscaling policies, SLO
+      burn-rate alerts, capacity-planning reviews). Cross-regime
+      parallels: NIS2 Art. 21(2)(c) (business continuity — backup
+      management, disaster recovery, crisis management) reaches
+      capacity planning as an availability precondition; DORA
+      Art. 9(3) (ICT protection — including availability,
+      authenticity, integrity, confidentiality) covers
+      capacity-management under the JC RTS ICT risk-management
+      framework; the regimes carry separate evidence requirements
+      against the same underlying capacity artifact.
+  - id: iso27001:a-8-7-protection-against-malware
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.7
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Implement protection against malware, supported by appropriate
+      user awareness. Detection, prevention, and recovery controls
+      against malicious code must cover endpoints, servers, email,
+      web traffic, and removable media where applicable, and must
+      be kept current against evolving threat intelligence.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a dedicated anti-malware / endpoint-
+    # protection artifact. A.8.7 is discharged in practice today
+    # against the operator's own endpoint-protection agents (EDR /
+    # EPP posture and detection state), email-gateway malware
+    # scanning, web-proxy malware scanning, and removable-media
+    # controls where the deployment surface includes them. The
+    # threat-intelligence ingest side that feeds those tools is
+    # anchored under playbook.threat_intel_ingest@v1 (already an
+    # A.5.6 anchor); a future dedicated endpoint-protection control
+    # artifact (e.g. control.endpoint_malware_protection@v1) would
+    # replace this placeholder without changing the entry id.
+    notes: >-
+      A.8.7 is the malware-protection anchor within the Annex A.8
+      theme — the standard requires detection, prevention, and
+      recovery controls against malicious code across the endpoint /
+      server / email / web / removable-media surface, kept current
+      against evolving threat intelligence and supported by user
+      awareness. The SecOps-NG control catalogue does not yet carry
+      a dedicated anti-malware artifact (see the placeholder note
+      above); the obligation is discharged in practice against the
+      operator's own endpoint-protection agents, gateway-side
+      scanning, and removable-media controls, with
+      playbook.threat_intel_ingest@v1 already exercising the
+      threat-intelligence ingest slice that feeds those tools. The
+      user-awareness side is separately anchored under A.6.3 via
+      control.training_attestation@v1 and the cyber-hygiene training
+      playbook. Cross-regime parallels: NIS2 Art. 21(2)(g) (basic
+      cyber hygiene practices and cybersecurity training) reaches
+      the awareness side; DORA Art. 9(2) (ICT protection and
+      prevention) reaches endpoint-side malware protection through
+      the JC RTS ICT risk-management framework; the regimes carry
+      separate evidence requirements against the same underlying
+      malware-protection artifact.
