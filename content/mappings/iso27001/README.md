@@ -116,7 +116,31 @@ discharge it in practice); and
 `iso27001:a-8-12-data-leakage-prevention` ships `control_refs: []`
 pending a dedicated DLP-posture control artifact, with
 `playbook.data_exfil@v1` already anchoring the response-side chain
-that consumes the DLP signal. A.8 is the largest theme (34
-controls); coverage stands at 12 of 34 entries landed; the
-remaining A.8 controls (A.8.13 through A.8.34) land as sibling
-entries in that file on subsequent cards.
+that consumes the DLP signal. The A.8.13–A.8.17 batch also lands in
+`annex-a-8-technological.yaml`:
+`iso27001:a-8-13-information-backup` wires
+`control.backup_attestation@v1` and `control.restore_drill@v1` (both
+already carrying A.8.13 on their `oscal_refs` block) plus
+`playbook.backup_recovery@v1` as the operational
+restore-drill discharge;
+`iso27001:a-8-14-redundancy-of-information-processing-facilities`
+ships `control_refs: []` pending a dedicated redundancy / failover
+artifact (the operator's infrastructure-architecture posture and DR
+failover-test evidence discharge it in practice);
+`iso27001:a-8-15-logging` ships `control_refs: []` pending a
+dedicated audit-record artifact (the operator's log-generation
+posture and SIEM / log-pipeline discharge it in practice, with the
+monitoring side that consumes the log surface separately anchored
+under A.8.16);
+`iso27001:a-8-16-monitoring-activities` wires
+`control.detection_coverage_evidence@v1` (already carrying A.8.16
+on its `oscal_refs` block) plus `playbook.detection_engineering@v1`
+(coverage-authoring lifecycle) and `playbook.alert_triage@v1`
+(signal-consumption / response-routing surface); and
+`iso27001:a-8-17-clock-synchronisation` ships `control_refs: []`
+pending a dedicated time-source artifact (the operator's NTP / PTP
+posture discharges it in practice; A.8.17 is a precondition of the
+A.8.15 / A.8.16 log-and-monitor pair). Coverage on A.8 now stands
+at 17 of 34 entries landed; the remaining A.8 controls (A.8.18
+through A.8.34) land as sibling entries in that file on subsequent
+cards.
