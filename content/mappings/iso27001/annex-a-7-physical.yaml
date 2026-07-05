@@ -1,0 +1,110 @@
+# ISO/IEC 27001:2022 — Annex A.7 Physical controls.
+#
+# First entries against the Annex A.7 physical-controls theme. Annex A.7
+# in the 2022 revision covers fourteen controls (A.7.1 through A.7.14),
+# addressing physical and environmental security: security perimeters,
+# physical entry, securing offices/rooms/facilities, monitoring,
+# protection against physical and environmental threats, working in
+# secure areas, clear desk / clear screen, equipment siting, supporting
+# utilities, cabling security, equipment maintenance, secure disposal or
+# re-use of equipment, off-premises equipment, and storage media.
+#
+# Scope of this file: Annex A.7 physical controls. This entry pair
+# (A.7.1 physical security perimeters and A.7.2 physical entry) opens
+# the theme file following the crosswalk conventions set by
+# annex-a-5-organisational.yaml and annex-a-6-people.yaml. The remaining
+# A.7 controls (A.7.3 through A.7.14) land as sibling entries in this
+# file on subsequent cards.
+#
+# Regime scope caveat: ISO/IEC 27001:2022 is a certifiable
+# information-security management standard, not an EU statutory
+# instrument. The crosswalk is a structural pointer against the
+# operator's own conformance evidence — the assertion here is that the
+# named artifacts exercise the operator-side obligation, not that they
+# constitute a legal interpretation of the standard.
+#
+# Coverage note on physical controls: the SecOps-NG control catalogue
+# under content/controls/ is currently scoped to logical / cyber
+# controls — there are no physical-security controls (perimeter,
+# badging, visitor management, environmental monitoring) in the tree
+# today. Both entries below therefore ship with empty control_refs and
+# an explanatory note; the operator's own facilities-security evidence
+# discharges the physical obligation. Physical-control artifacts land
+# as sibling entries as the catalogue grows.
+
+regime: iso27001
+entries:
+  - id: iso27001:a-7-1-physical-security-perimeters
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.7.1
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Define and use security perimeters to protect areas that contain
+      information and other associated assets. Perimeters must be
+      physically sound, with the strength commensurate with the
+      sensitivity of the information handled inside, and the location
+      and boundaries of each secure area must be documented so entry,
+      monitoring, and maintenance controls can be aligned against them.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a physical-perimeter artifact. A.7.1 is
+    # discharged against the operator's own facilities-security
+    # evidence (site plans, perimeter classification, guard-force
+    # arrangements). A future control (e.g. control.physical_perimeter@v1)
+    # would replace this placeholder without changing the entry id.
+    notes: >-
+      A.7.1 is the anchor physical-security obligation for the whole
+      Annex A.7 theme — the standard requires that any area containing
+      in-scope information sit inside a defined, documented,
+      appropriately robust perimeter, so downstream controls (physical
+      entry, monitoring, secure-area working) have a boundary they can
+      apply against. The SecOps-NG catalogue is currently scoped to
+      logical / cyber controls (see coverage note in the file header),
+      so this entry ships with empty control_refs; the operator's own
+      site-security documentation carries the evidence. Cross-regime
+      parallels: NIS2 Art. 21(2)(i) (physical and environmental
+      security) covers the same perimeter discipline against
+      essential- and important-entity facilities; the regimes carry
+      separate evidence requirements against the same underlying
+      facilities-security artifact.
+  - id: iso27001:a-7-2-physical-entry
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.7.2
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Protect secure areas by appropriate entry controls and access
+      points. Entry to areas holding information and associated assets
+      must be restricted to authorised personnel, with entry rights
+      granted on a documented basis, logged, and reviewed; visitors
+      and third parties must be identified, authorised, and escorted
+      or otherwise controlled proportionate to the sensitivity of the
+      area.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a physical-entry artifact (badging, visitor
+    # management, entry logging). A.7.2 is discharged against the
+    # operator's own physical-access-control system evidence. A future
+    # control (e.g. control.physical_entry_evidence@v1) would replace
+    # this placeholder without changing the entry id.
+    notes: >-
+      A.7.2 is the physical-access-control obligation — the standard
+      requires that the perimeter established under A.7.1 be paired
+      with entry controls (badge / PIN / biometrics / staffed entry)
+      that restrict access to authorised personnel, log entry events,
+      and handle visitors and third parties under an explicit
+      authorisation-and-escort discipline. As with A.7.1, the SecOps-NG
+      control catalogue does not yet carry a physical-entry artifact,
+      so this entry ships with empty control_refs; the operator's own
+      physical-access-control system (PACS) evidence carries the
+      obligation. Cross-regime parallels: NIS2 Art. 21(2)(i) (physical
+      and environmental security) covers the same entry-control
+      discipline; GDPR Art. 32 (security of processing) reaches
+      physical entry to the extent it protects personal data at rest
+      on-site; the regimes carry separate evidence requirements
+      against the same underlying PACS artifact.

@@ -30,3 +30,11 @@ entries (`iso27001:a-6-1-screening`, `iso27001:a-6-3-awareness`) in
 `annex-a-6-people.yaml`; the remaining A.6 controls (A.6.2, A.6.4
 through A.6.8) land as sibling entries in that file on subsequent
 cards.
+
+The A.7 physical-controls theme file has landed with its first two
+entries (`iso27001:a-7-1-physical-security-perimeters`,
+`iso27001:a-7-2-physical-entry`) in `annex-a-7-physical.yaml`; both
+ship with empty `control_refs` because the SecOps-NG control catalogue
+is currently scoped to logical / cyber controls (see the coverage note
+in the theme file header). The remaining A.7 controls (A.7.3 through
+A.7.14) land as sibling entries in that file on subsequent cards.
