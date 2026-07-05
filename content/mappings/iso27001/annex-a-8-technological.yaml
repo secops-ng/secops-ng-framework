@@ -26,8 +26,10 @@
 # management, malware protection) lands here alongside the opener,
 # followed by the A.8.8–A.8.12 batch (technical-vulnerability
 # management, configuration management, information deletion, data
-# masking, data-leakage prevention).
-# The remaining A.8 controls (A.8.13 through A.8.34) land as sibling
+# masking, data-leakage prevention), and the A.8.13–A.8.17 batch
+# (information backup, redundancy of processing facilities, logging,
+# monitoring activities, clock synchronisation).
+# The remaining A.8 controls (A.8.18 through A.8.34) land as sibling
 # entries in this file on subsequent cards.
 #
 # Coverage caveat: A.8 is the largest Annex A theme (34 controls);
@@ -666,3 +668,265 @@ entries:
       product-facing incident surface. The regimes carry separate
       evidence requirements against the same underlying DLP-signal-
       and-response artifact set.
+  - id: iso27001:a-8-13-information-backup
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.13
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Maintain backup copies of information, software, and systems, and
+      test them regularly in accordance with the agreed topic-specific
+      policy on backup. Backup coverage must match the operator's
+      declared recovery objectives, protect against loss through
+      encryption and offsite / off-network storage, and be exercised
+      against a scheduled restore-drill cadence so that recoverability
+      is evidenced rather than assumed.
+    status: draft
+    control_refs:
+      - control.backup_attestation@v1
+      - control.restore_drill@v1
+    playbook_refs:
+      - playbook.backup_recovery@v1
+    notes: >-
+      A.8.13 is the information-backup anchor for the Annex A.8 theme —
+      the standard requires that backup copies of information,
+      software, and systems be maintained in line with the operator's
+      backup policy and exercised against a scheduled restore-drill
+      cadence so that recoverability is evidenced. The SecOps-NG
+      control catalogue carries the direct-anchor pair:
+      control.backup_attestation@v1 anchors the periodic-attestation
+      side (its oscal_refs block already carries ISO/IEC 27001:2022
+      A.8.13 alongside NIST 800-53 rev5 CP-9 Information System
+      Backup and NIS2 Art. 21(2)(c) business-continuity backup
+      management), and control.restore_drill@v1 anchors the
+      restore-exercise side (its oscal_refs block also carries A.8.13
+      alongside DORA Art. 12 ICT readiness for business continuity
+      and NIS2 Art. 21(2)(c)). playbook.backup_recovery@v1 is the
+      operational discharge — the CACAO playbook that exercises the
+      restore-drill window on a scheduled or operator-initiated
+      cadence, verifies backup integrity, executes a non-destructive
+      restore against the operator's isolated drill target, and emits
+      the dated attestation + drill-evidence artifacts against the
+      backup-evidence schema the operator's continuity function joins.
+      Cross-regime parallels: NIS2 Art. 21(2)(c) (business continuity,
+      including backup management and disaster recovery) covers the
+      same discipline; DORA Art. 12 (backup policies and restoration
+      procedures) and Art. 11 (ICT business continuity policy)
+      operationalised by the JC RTS (Commission Delegated Regulation
+      (EU) 2024/1774) cover backup on ICT assets; the regimes carry
+      separate evidence requirements against the same underlying
+      backup-and-restore artifact set.
+  - id: iso27001:a-8-14-redundancy-of-information-processing-facilities
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.14
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Implement information-processing facilities with redundancy
+      sufficient to meet availability requirements. Critical
+      processing infrastructure — compute, storage, network paths,
+      and supporting utilities — must carry redundancy proportionate
+      to the operator's declared availability targets, be tested to
+      demonstrate that failover succeeds within the recovery-time
+      objective, and be reviewed as the estate evolves.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a dedicated redundancy / availability-
+    # architecture control artifact. A.8.14 is discharged in practice
+    # today against the operator's own infrastructure-architecture
+    # posture (multi-zone / multi-region deployment topology,
+    # redundant network paths, redundant power / cooling where the
+    # deployment surface includes on-premise facilities), the
+    # failover-test evidence produced by the operator's DR programme,
+    # and the availability-side of the ICT service portfolio. A
+    # future control (e.g. control.availability_redundancy@v1 or
+    # control.failover_drill@v1, keyed against NIST 800-53 rev5 CP-6
+    # Alternate Storage Site / CP-7 Alternate Processing Site and
+    # SC-36 Distributed Processing and Storage) would replace this
+    # placeholder without changing the entry id; the restore-side of
+    # availability is separately anchored under A.8.13 via
+    # control.backup_attestation@v1 / control.restore_drill@v1.
+    notes: >-
+      A.8.14 is the processing-facility-redundancy anchor within the
+      Annex A.8 theme — the standard requires that critical
+      information-processing facilities carry redundancy sufficient to
+      meet the operator's availability requirements, be tested against
+      the declared recovery-time objective, and be reviewed as the
+      estate evolves. The SecOps-NG control catalogue does not yet
+      carry a dedicated redundancy / failover artifact (see the
+      placeholder note above); the obligation is discharged in
+      practice against the operator's own infrastructure-architecture
+      posture (multi-zone / multi-region topology, redundant network
+      paths, redundant utilities on on-premise surfaces) and the
+      failover-test evidence produced by the operator's DR programme.
+      The backup / restore side of availability is separately anchored
+      under A.8.13 via control.backup_attestation@v1 and
+      control.restore_drill@v1; A.8.14 covers the running-facility
+      side of the same availability property. Cross-regime parallels:
+      NIS2 Art. 21(2)(c) (business continuity — backup management,
+      disaster recovery, crisis management) reaches redundancy as an
+      availability precondition; DORA Art. 11 (ICT business continuity
+      policy) and Art. 12 (backup policies and restoration procedures)
+      operationalised by the JC RTS (Commission Delegated Regulation
+      (EU) 2024/1774) cover redundancy of ICT assets; the regimes
+      carry separate evidence requirements against the same
+      underlying redundancy-and-failover artifact set.
+  - id: iso27001:a-8-15-logging
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.15
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Produce, store, protect, and analyse logs that record activities,
+      exceptions, faults, and other relevant events. The operator must
+      determine what to log against the risk profile of each system,
+      protect the log surface against tampering and unauthorised
+      access, retain records on a declared schedule that satisfies
+      both operational and legal requirements, and expose the log
+      surface to the monitoring and incident-response functions that
+      consume it.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a dedicated log-generation / audit-record
+    # control artifact. A.8.15 is discharged in practice today against
+    # the operator's own log-generation posture (per-system audit-
+    # event configuration, tamper-protection on the log surface,
+    # retention against the operator's declared schedule) and the
+    # SIEM / log-pipeline that consumes those records. The
+    # detection-and-monitoring side that reads the log surface is
+    # separately anchored under A.8.16 via
+    # control.detection_coverage_evidence@v1; A.8.15 covers the
+    # log-production side of the same evidence chain. A future
+    # dedicated audit-record control (e.g. control.audit_record@v1,
+    # keyed against NIST 800-53 rev5 AU-2 Event Logging, AU-3 Content
+    # of Audit Records, AU-9 Protection of Audit Information, and
+    # AU-11 Audit Record Retention) would replace this placeholder
+    # without changing the entry id.
+    notes: >-
+      A.8.15 is the logging anchor within the Annex A.8 theme — the
+      standard requires that logs recording activities, exceptions,
+      faults, and other relevant events be produced, stored, protected
+      against tampering, retained on a declared schedule, and analysed
+      by the monitoring / response chain that consumes them. The
+      SecOps-NG control catalogue does not yet carry a dedicated
+      log-generation artifact (see the placeholder note above); the
+      obligation is discharged in practice against the operator's own
+      log-generation posture, the tamper-protection controls on the
+      log surface, and the SIEM / log-pipeline that ingests the
+      records. The monitoring / detection side that reads the log
+      surface is separately anchored under A.8.16 via
+      control.detection_coverage_evidence@v1 — A.8.15 covers
+      log-production, A.8.16 covers what the operator does with the
+      resulting stream. Cross-regime parallels: NIS2 Art. 21(2)(a)
+      (policies on the security of network and information systems)
+      reaches the logging-policy anchor; DORA Art. 9(3) (ICT
+      protection — including availability, authenticity, integrity,
+      confidentiality) and Art. 10 (detection) operationalised by
+      the JC RTS ICT risk-management framework cover the log-
+      generation-and-retention discipline on ICT assets; the regimes
+      carry separate evidence requirements against the same
+      underlying audit-record artifact.
+  - id: iso27001:a-8-16-monitoring-activities
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.16
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Monitor networks, systems, and applications for anomalous
+      behaviour, and act on the results. The operator must define what
+      constitutes anomalous behaviour against a baseline, wire
+      detection coverage against that definition, tune the detection
+      surface as the environment evolves, and feed confirmed detections
+      into the incident-response chain.
+    status: draft
+    control_refs:
+      - control.detection_coverage_evidence@v1
+    playbook_refs:
+      - playbook.detection_engineering@v1
+      - playbook.alert_triage@v1
+    notes: >-
+      A.8.16 is the monitoring-activities anchor for the Annex A.8
+      theme — the standard requires that networks, systems, and
+      applications be monitored for anomalous behaviour against a
+      declared baseline, that detection coverage be wired against
+      that definition, and that confirmed detections feed the
+      incident-response chain. control.detection_coverage_evidence@v1
+      is the direct anchor: its oscal_refs block already carries
+      ISO/IEC 27001:2022 A.8.16 alongside NIST 800-53 rev5 SI-4
+      System Monitoring and AU-6 Audit Record Review, Analysis, and
+      Reporting, and DORA Art. 10 detection; the D3FEND analysis-
+      technique lineage pinned on the control expresses the
+      detection-coverage discipline A.8.16 requires.
+      playbook.detection_engineering@v1 is the operational discharge
+      on the coverage-authoring side — the four-state
+      propose/review/ship/measure lifecycle that produces the
+      rule-effectiveness evidence stream against
+      schemas/evidence/rule-effectiveness-snapshot.schema.json; and
+      playbook.alert_triage@v1 is the operational discharge on the
+      signal-consumption side — the routing surface that turns
+      confirmed detections into work for the response chain. The
+      log-production side that feeds this monitoring surface is
+      separately anchored under A.8.15. Cross-regime parallels:
+      NIS2 Art. 21(2)(f) (policies and procedures to assess the
+      effectiveness of cybersecurity risk-management measures)
+      reaches the detection-effectiveness slice; DORA Art. 10
+      (detection) operationalised by the JC RTS (Commission Delegated
+      Regulation (EU) 2024/1774) covers anomalous-activity detection
+      on ICT assets; the regimes carry separate evidence
+      requirements against the same underlying detection-and-
+      monitoring artifact set.
+  - id: iso27001:a-8-17-clock-synchronisation
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.17
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Synchronise the clocks of information-processing systems used by
+      the operator to approved time sources. All systems that produce
+      audit records, correlate events across the estate, or issue
+      time-bound credentials must reference a common, trusted time
+      source (NTP, PTP, or equivalent) so that timestamps across the
+      log-and-evidence surface can be joined coherently.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a dedicated clock-synchronisation control
+    # artifact. A.8.17 is discharged in practice today against the
+    # operator's own time-source posture: NTP / PTP client
+    # configuration across the estate, choice of trusted upstream
+    # time sources, monotonic-clock discipline on systems that issue
+    # short-lived credentials, and the audit-record timestamp field
+    # produced by the log-generation surface anchored under A.8.15.
+    # A future control (e.g. control.time_source_attestation@v1,
+    # keyed against NIST 800-53 rev5 AU-8 Time Stamps) would replace
+    # this placeholder without changing the entry id.
+    notes: >-
+      A.8.17 is the clock-synchronisation anchor within the Annex A.8
+      theme — the standard requires that systems producing audit
+      records, correlating events, or issuing time-bound credentials
+      reference a common, trusted time source so that timestamps
+      across the log-and-evidence surface can be joined coherently.
+      The SecOps-NG control catalogue does not yet carry a dedicated
+      time-source artifact (see the placeholder note above); the
+      obligation is discharged in practice against the operator's own
+      NTP / PTP posture, the choice of trusted upstream time sources,
+      and the timestamp field produced by the log-generation surface
+      anchored under A.8.15. Clock synchronisation is a precondition
+      of A.8.15 (audit records need coherent timestamps to be
+      analysable) and A.8.16 (event correlation across systems
+      requires a shared time base) — the three controls form a
+      coherent log / monitor / time-base triple. Cross-regime
+      parallels: NIS2 Art. 21(2)(a) (policies on the security of
+      network and information systems) reaches the time-source
+      policy anchor; DORA Art. 9(3) (ICT protection — including
+      authenticity and integrity) reaches the timestamp-integrity
+      slice through the JC RTS ICT risk-management framework; the
+      regimes carry separate evidence requirements against the same
+      underlying time-synchronisation artifact.
