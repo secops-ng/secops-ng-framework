@@ -24,3 +24,9 @@ for artifact refs.
 Draft. First entry (`iso27001:a-5-1-policies`, Annex A.5.1 Policies for
 information security) establishes the conventions; sibling entries and
 theme files land as subsequent cards close them.
+
+The A.6 people-controls theme file has landed with its first two
+entries (`iso27001:a-6-1-screening`, `iso27001:a-6-3-awareness`) in
+`annex-a-6-people.yaml`; the remaining A.6 controls (A.6.2, A.6.4
+through A.6.8) land as sibling entries in that file on subsequent
+cards.
