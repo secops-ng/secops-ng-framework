@@ -1,0 +1,66 @@
+# ISO/IEC 27001:2022 — Annex A.5 Organisational controls.
+#
+# First entry against the ISO/IEC 27001:2022 Annex A crosswalk. Annex A
+# in the 2022 revision is organised into four themes: A.5 Organisational
+# (37 controls), A.6 People (8 controls), A.7 Physical (14 controls),
+# and A.8 Technological (34 controls). This file holds the A.5
+# organisational family; sibling per-theme files (`annex-a-6-people.yaml`,
+# `annex-a-7-physical.yaml`, `annex-a-8-technological.yaml`) hold their
+# respective controls as they land.
+#
+# Scope of this file: Annex A.5 organisational controls. This first
+# entry establishes the crosswalk conventions for external contributors:
+# one entry per Annex A control (identified by the numeric control ref
+# under the A.5 family), pinning the obligation paraphrase and the
+# control-model artifacts that discharge it. The remaining A.5 controls
+# (A.5.2 through A.5.37) land as sibling entries in this file on
+# subsequent cards.
+#
+# Regime scope caveat: ISO/IEC 27001:2022 is a certifiable
+# information-security management standard, not an EU statutory
+# instrument. The crosswalk is a structural pointer against the
+# operator's own conformance evidence — the assertion here is that the
+# named artifacts exercise the operator-side obligation, not that they
+# constitute a legal interpretation of the standard.
+
+regime: iso27001
+entries:
+  - id: iso27001:a-5-1-policies
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.1
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Define an information security policy and topic-specific
+      policies. The policy set must be approved by management,
+      published, communicated to and acknowledged by relevant
+      personnel and interested parties, and reviewed at planned
+      intervals or when significant changes occur.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+    notes: >-
+      A.5.1 is the anchor organisational-policy obligation for the
+      whole Annex A control set — the standard cites it as the
+      overall information-security policy plus the topic-specific
+      policies that operationalise it. control.risk_management_policy@v1
+      is the direct anchor: its oscal_refs block already carries
+      ISO/IEC 27001:2022 A.5.1 as one of its target controls
+      alongside NIST 800-53 rev5 PM-9 / RA-3 and NIS2 Art. 21(2)(a),
+      and its review_cadence field (P1Y baseline) is the periodic-
+      review discipline A.5.1 requires. Topic-specific policies land
+      as sibling entries against their respective A.5 controls
+      (A.5.9 asset inventory / A.5.13 labelling / A.5.15 access
+      control / A.5.17 authentication information / A.5.24
+      incident-management planning / etc.); the review-and-approval
+      discipline this entry anchors is the whole-programme roll-up
+      that governs each of them.
+      Cross-regime parallels: the NIS2 parallel under
+      `nis2:art-21-2-a` (risk analysis and information-system-security
+      policies) and the GDPR parallel through
+      control.risk_management_policy@v1's role under Art. 24
+      controller-accountability anchor the same policy discipline
+      against their own regime-specific obligations; the regimes
+      carry separate evidence requirements against the same
+      underlying policy-set artifact.
