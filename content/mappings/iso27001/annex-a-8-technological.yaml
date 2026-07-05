@@ -21,10 +21,13 @@
 # pair (A.8.1 user endpoint devices and A.8.2 privileged access
 # rights) opens the theme file following the crosswalk conventions
 # set by annex-a-5-organisational.yaml, annex-a-6-people.yaml, and
-# annex-a-7-physical.yaml. The A.8.3–A.8.7 batch (information-access
+# The A.8.3–A.8.7 batch (information-access
 # restriction, source-code access, secure authentication, capacity
-# management, malware protection) lands here alongside the opener.
-# The remaining A.8 controls (A.8.8 through A.8.34) land as sibling
+# management, malware protection) lands here alongside the opener,
+# followed by the A.8.8–A.8.12 batch (technical-vulnerability
+# management, configuration management, information deletion, data
+# masking, data-leakage prevention).
+# The remaining A.8 controls (A.8.13 through A.8.34) land as sibling
 # entries in this file on subsequent cards.
 #
 # Coverage caveat: A.8 is the largest Annex A theme (34 controls);
@@ -384,3 +387,282 @@ entries:
       the JC RTS ICT risk-management framework; the regimes carry
       separate evidence requirements against the same underlying
       malware-protection artifact.
+  - id: iso27001:a-8-8-management-of-technical-vulnerabilities
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.8
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Obtain information about technical vulnerabilities of the
+      information systems in use in a timely fashion, evaluate the
+      operator's exposure, and take appropriate measures. The
+      operator must run a documented vulnerability-management
+      programme: identify sources of advisories, ingest and
+      classify findings, scan the estate on a declared cadence,
+      prioritise remediation against risk, apply patches or
+      compensating controls, and retain evidence that the loop
+      closes.
+    status: draft
+    control_refs:
+      - control.patch_evidence@v1
+      - control.vuln_disclosure_intake@v1
+    playbook_refs:
+      - playbook.vuln_intake@v1
+      - playbook.patch_management@v1
+      - playbook.codebase_vuln_management@v1
+      - playbook.infra_posture_management@v1
+      - playbook.cloud_misconfiguration@v1
+    notes: >-
+      A.8.8 is the technical-vulnerability-management anchor for the
+      Annex A.8 theme — the standard requires a documented programme
+      that identifies advisory sources, evaluates operator-side
+      exposure against tracked assets, drives remediation on a
+      risk-prioritised basis, and retains evidence that the loop
+      closes. control.patch_evidence@v1 is the direct anchor for the
+      remediation-evidence side (its oscal_refs block already carries
+      ISO/IEC 27001:2022 A.8.8 alongside the corresponding NIST
+      800-53 rev5 RA-5 / SI-2 lineage and the CRA Annex I update-
+      handling row). control.vuln_disclosure_intake@v1 is the direct
+      anchor for the inbound-advisory side (its oscal_refs block also
+      carries A.8.8, wired against the coordinated-disclosure
+      surface). The operational discharge splits across five
+      playbooks: playbook.vuln_intake@v1 (advisory ingest and
+      classification), playbook.patch_management@v1 (ring-based
+      rollout with per-application evidence), and the estate-scan
+      family — playbook.codebase_vuln_management@v1 (source /
+      dependency surface), playbook.infra_posture_management@v1
+      (infrastructure-posture attestation), and
+      playbook.cloud_misconfiguration@v1 (cloud-side scan). Cross-
+      regime parallels: NIS2 Art. 21(2)(e) (security in acquisition,
+      development, and maintenance) reaches the maintenance-patch
+      slice; DORA Art. 9(2) (ICT protection and prevention)
+      operationalised by the JC RTS (Commission Delegated Regulation
+      (EU) 2024/1774) covers vulnerability-management inside the ICT
+      risk-management framework; CRA Art. 13(3) and Annex I §2
+      cover the security-updates side for products with digital
+      elements. The regimes carry separate evidence requirements
+      against the same underlying vulnerability-and-patch artifact
+      set.
+  - id: iso27001:a-8-9-configuration-management
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.9
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Establish, document, implement, monitor, and review
+      configurations, including security configurations, of
+      hardware, software, services, and networks. Configurations
+      must sit inside a documented baseline, be gated by a change-
+      control decision before drift is admitted, and be re-attested
+      on a declared cadence so that saturation, drift, or unmanaged
+      exceptions do not silently erode the operator's security
+      posture.
+    status: draft
+    control_refs:
+      - control.configuration_settings@v1
+      - control.baseline_configuration@v1
+      - control.iac_policy_guardrail@v1
+      - control.cspm_baseline@v1
+    playbook_refs:
+      - playbook.infra_posture_management@v1
+      - playbook.cloud_misconfiguration@v1
+    notes: >-
+      A.8.9 is the configuration-management anchor for the Annex A.8
+      theme — the standard requires that hardware, software,
+      service, and network configurations sit inside a documented
+      baseline, be gated by change-control, and be re-attested on a
+      declared cadence. control.configuration_settings@v1 and
+      control.baseline_configuration@v1 are the direct anchors for
+      the baseline-and-settings side (both already carry ISO/IEC
+      27001:2022 A.8.9 on their oscal_refs block alongside NIST
+      800-53 rev5 CM-6 and CM-2 respectively).
+      control.iac_policy_guardrail@v1 anchors the infrastructure-as-
+      code policy-gate side (drift and change-control expressed in
+      the IaC surface), and control.cspm_baseline@v1 anchors the
+      cloud-side baseline-attestation slice; both already carry
+      A.8.9. playbook.infra_posture_management@v1 is the operational
+      discharge for the on-premise / hybrid infrastructure surface
+      (per-execution posture-evidence artifact against the declared
+      baseline); playbook.cloud_misconfiguration@v1 discharges the
+      cloud-configuration slice. Cross-regime parallels: NIS2
+      Art. 21(2)(a) (policies on the security of network and
+      information systems) reaches baseline configuration through
+      the security-policy anchor; DORA Art. 9(3) (ICT protection —
+      including availability, authenticity, integrity,
+      confidentiality) operationalised by the JC RTS ICT risk-
+      management framework covers hardened baselines and change
+      control on ICT assets; the regimes carry separate evidence
+      requirements against the same underlying configuration
+      artifact.
+  - id: iso27001:a-8-10-information-deletion
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.10
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Delete information stored in information systems, devices, or
+      any other storage media when no longer required. Deletion
+      must be executed against the operator's declared retention
+      schedule, cover primary storage, backups, and any replicated
+      or exported copies, and be evidenced against the record it
+      discharges — including secure erasure or media sanitisation
+      where the medium is disposed of or repurposed.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a dedicated information-deletion / media-
+    # sanitisation artifact. A.8.10 is discharged in practice today
+    # against the operator's own retention-schedule enforcement
+    # (per-record deletion or archival on schedule expiry), backup
+    # retention policy, secure-erasure procedures for decommissioned
+    # media, and disposal / re-use controls for storage devices.
+    # A future control (e.g. control.information_deletion@v1 or
+    # control.media_sanitisation@v1, keyed against NIST 800-53 rev5
+    # MP-6 Media Sanitization and SI-12 Information Management and
+    # Retention) would replace this placeholder without changing
+    # the entry id. The GDPR-side of the same discipline (Art. 17
+    # right to erasure) is separately anchored under
+    # playbook.data_subject_rights@v1.
+    notes: >-
+      A.8.10 is the information-deletion anchor within the Annex A.8
+      theme — the standard requires that information no longer
+      required be deleted from primary storage, backups, and any
+      replicated or exported copies, on the operator's declared
+      retention schedule, and that secure erasure or media
+      sanitisation cover the disposal / re-use surface. The
+      SecOps-NG control catalogue does not yet carry a dedicated
+      deletion / sanitisation artifact (see the placeholder note
+      above); the obligation is discharged in practice against the
+      operator's own retention-schedule enforcement,
+      backup-retention policy, and media-disposal procedures.
+      Cross-regime parallels: GDPR Art. 5(1)(e) (storage limitation)
+      and Art. 17 (right to erasure) reach the personal-data slice
+      through the data-subject-rights surface — the SecOps-NG
+      playbook.data_subject_rights@v1 already operationalises the
+      Art. 17 erasure request path against the operator's inventory.
+      NIS2 Art. 21(2)(a) (policies on the security of network and
+      information systems) reaches the retention / disposal policy
+      side; DORA Art. 9(3) (ICT protection) reaches the ICT-asset
+      disposal side through the JC RTS ICT risk-management
+      framework. The regimes carry separate evidence requirements
+      against the same underlying deletion / sanitisation artifact.
+  - id: iso27001:a-8-11-data-masking
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.11
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Use data masking in accordance with the operator's topic-
+      specific policy on access control and other related topic-
+      specific policies, and business requirements, taking
+      applicable legislation into consideration. Sensitive and
+      personal data used outside the production surface — in
+      development, test, analytics, or training environments —
+      must be masked, pseudonymised, tokenised, or otherwise
+      transformed so that the risk profile of the non-prod copy
+      matches the classification of the transformed data, not the
+      classification of the original record.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a dedicated data-masking / pseudonymisation
+    # artifact. A.8.11 is discharged in practice today against the
+    # operator's own data-classification pipeline (identify the
+    # personal / sensitive fields), the masking / tokenisation
+    # transform library used when replicating data into non-prod
+    # environments, and the access-control policy on the non-prod
+    # environments themselves (masking is a defence-in-depth layer,
+    # not a replacement for the environment-access controls A.8.3
+    # anchors). A future control (e.g.
+    # control.data_masking@v1 or control.pseudonymisation@v1, keyed
+    # against NIST 800-53 rev5 SC-28 Protection of Information at
+    # Rest and MP-6-family sanitisation lineage) would replace this
+    # placeholder without changing the entry id.
+    notes: >-
+      A.8.11 is the data-masking anchor within the Annex A.8 theme —
+      the standard requires that sensitive and personal data used
+      outside the production surface be masked, pseudonymised,
+      tokenised, or otherwise transformed so the non-prod risk
+      profile matches the transformed classification. The SecOps-NG
+      control catalogue does not yet carry a dedicated masking
+      artifact (see the placeholder note above); the obligation is
+      discharged in practice against the operator's own
+      data-classification pipeline, the masking / tokenisation
+      transform library used when replicating data into non-prod,
+      and the environment-access controls anchored under A.8.3.
+      Cross-regime parallels: GDPR Art. 25 (data protection by
+      design and by default) names pseudonymisation as an example
+      of an appropriate technical measure and Art. 32(1)(a) names
+      it explicitly among the security-of-processing measures; the
+      GDPR-side surface is operationalised in the SecOps-NG content
+      through the data-protection-impact-assessment playbook family.
+      NIS2 Art. 21(2)(h) (policies and procedures regarding the use
+      of cryptography and, where appropriate, encryption) reaches
+      the transform / at-rest side; DORA Art. 9(4)(b) (data and
+      system integrity) reaches the non-prod / test-data slice
+      through the JC RTS ICT risk-management framework. The regimes
+      carry separate evidence requirements against the same
+      underlying masking / pseudonymisation artifact.
+  - id: iso27001:a-8-12-data-leakage-prevention
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.12
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Apply data leakage prevention measures to systems, networks,
+      and any other devices that process, store, or transmit
+      sensitive information. Detection, monitoring, and — where
+      warranted — blocking of unauthorised disclosure or
+      exfiltration of sensitive data must cover the egress surface
+      (email, web upload, cloud sync, endpoint peripherals), be
+      tuned against the operator's data-classification scheme, and
+      feed the incident-response chain when a confirmed exfiltration
+      is detected.
+    status: draft
+    control_refs: []
+    playbook_refs:
+      - playbook.data_exfil@v1
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a dedicated DLP / egress-monitoring control
+    # artifact. A.8.12 is discharged in practice today against the
+    # operator's own DLP stack (email-gateway, web-proxy, endpoint,
+    # and cloud-sync inspection agents) tuned against the operator's
+    # data-classification scheme; the SecOps-NG side operationalises
+    # the response chain that consumes the DLP signal via
+    # playbook.data_exfil@v1 (triage, scope assessment, containment
+    # via egress filter and session / token revocation, and
+    # regulator / affected-party notification where the threshold
+    # is met). A future dedicated DLP-posture control (e.g.
+    # control.dlp_posture@v1, keyed against NIST 800-53 rev5 SC-7
+    # Boundary Protection and AC-4 Information Flow Enforcement)
+    # would replace this placeholder without changing the entry id.
+    notes: >-
+      A.8.12 is the data-leakage-prevention anchor within the Annex
+      A.8 theme — the standard requires detection, monitoring, and,
+      where warranted, blocking of unauthorised disclosure of
+      sensitive data across the egress surface, tuned against the
+      data-classification scheme and wired into the incident-
+      response chain. The SecOps-NG control catalogue does not yet
+      carry a dedicated DLP-posture control artifact (see the
+      placeholder note above); the obligation is discharged on the
+      detection side against the operator's own DLP stack (email,
+      web, endpoint, cloud-sync inspection), and on the response
+      side against playbook.data_exfil@v1 — the SecOps-NG
+      operational engine for the DLP / egress-signal response
+      chain, which triages the signal, assesses scope, contains
+      confirmed exfiltration (egress filter, session / token
+      revocation), and gates regulator / affected-party notification
+      on the affected-subjects threshold. Cross-regime parallels:
+      GDPR Art. 33 / 34 (personal-data breach notification) reaches
+      the confirmed-exfiltration branch through the same response
+      chain; NIS2 Art. 23 (significant-incident reporting) and DORA
+      Art. 19 (major ICT-related incident reporting) reach the
+      regulator-notification threshold; CRA Art. 14(3) reaches the
+      product-facing incident surface. The regimes carry separate
+      evidence requirements against the same underlying DLP-signal-
+      and-response artifact set.
