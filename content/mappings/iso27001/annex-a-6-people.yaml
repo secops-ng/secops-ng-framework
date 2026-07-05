@@ -1,0 +1,99 @@
+# ISO/IEC 27001:2022 — Annex A.6 People controls.
+#
+# First entries against the Annex A.6 people-controls theme. Annex A.6
+# in the 2022 revision covers eight controls (A.6.1 through A.6.8),
+# addressing personnel security across the employment lifecycle:
+# screening before hire, terms and conditions, awareness/education and
+# training, disciplinary process, responsibilities after termination or
+# change of employment, confidentiality/NDAs, remote working, and
+# information-security event reporting.
+#
+# Scope of this file: Annex A.6 people controls. This entry pair
+# (A.6.1 screening and A.6.3 awareness/training) establishes the
+# theme file following the crosswalk conventions set by
+# annex-a-5-organisational.yaml. The remaining A.6 controls (A.6.2,
+# A.6.4 through A.6.8) land as sibling entries in this file on
+# subsequent cards.
+#
+# Regime scope caveat: ISO/IEC 27001:2022 is a certifiable
+# information-security management standard, not an EU statutory
+# instrument. The crosswalk is a structural pointer against the
+# operator's own conformance evidence — the assertion here is that the
+# named artifacts exercise the operator-side obligation, not that they
+# constitute a legal interpretation of the standard.
+
+regime: iso27001
+entries:
+  - id: iso27001:a-6-1-screening
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.6.1
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Perform background verification checks on candidates for
+      employment prior to joining, and on an ongoing basis for
+      personnel in roles where the risk profile changes. Checks must
+      be proportionate to the classification of information the role
+      will access, to applicable laws, and to the assessed risk, and
+      the evidence of screening must be retained.
+    status: draft
+    control_refs:
+      - control.jml_evidence@v1
+    playbook_refs:
+      - playbook.onboarding_offboarding_tracker@v1
+    notes: >-
+      A.6.1 is the joiner-side personnel-security anchor: the standard
+      requires that screening happen before an individual is granted
+      access to in-scope information, proportionate to the sensitivity
+      of that access. control.jml_evidence@v1 is the direct anchor —
+      its oscal_refs block already carries ISO/IEC 27001:2022 A.6.1
+      alongside NIST 800-53 rev5 PS-4 and the AC-2 account-management
+      family, and its evidence discipline (join / move / leave
+      lifecycle events processed within policy windows) is where
+      screening-before-provisioning is discharged in practice. The
+      playbook.onboarding_offboarding_tracker@v1 CACAO playbook
+      exercises the joiner-side flow that consumes the screening
+      evidence before access provisioning proceeds. Cross-regime
+      parallels: NIS2 Art. 21(2)(i) (human-resources security) covers
+      the same personnel-security discipline; the regimes carry
+      separate evidence requirements against the same underlying
+      lifecycle artifact.
+  - id: iso27001:a-6-3-awareness
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.6.3
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Provide information-security awareness, education, and training
+      to personnel and, where relevant, interested parties, appropriate
+      to their role. The programme must cover the organisation's
+      information-security policy, topic-specific policies, and
+      procedures relevant to each role, and it must be refreshed on a
+      declared cadence and when significant changes occur.
+    status: draft
+    control_refs:
+      - control.training_attestation@v1
+      - control.phishing_simulation@v1
+    playbook_refs:
+      - playbook.cyber_hygiene_training@v1
+    notes: >-
+      A.6.3 is the awareness-and-training anchor for the whole Annex A
+      control set — the standard requires both baseline literacy for
+      all personnel and role-specific training for personnel in roles
+      with elevated access or specialised responsibilities.
+      control.training_attestation@v1 is the direct evidence anchor:
+      its oscal_refs block already carries ISO/IEC 27001:2022 A.6.3
+      alongside NIST 800-53 rev5 AT-2 (literacy), AT-3 (role-based),
+      and AT-4 (training records), and its cadence field is the
+      periodic-refresh discipline A.6.3 requires.
+      control.phishing_simulation@v1 discharges the applied
+      social-engineering resilience aspect of A.6.3 (also carrying
+      A.6.3 in its oscal_refs alongside NIST AT-2(3)). The
+      playbook.cyber_hygiene_training@v1 CACAO playbook exercises the
+      scheduled-training flow that produces the attestation evidence
+      those controls check for. Cross-regime parallels: NIS2 Art.
+      21(2)(g) (cyber hygiene and training) is already wired against
+      the same controls; the regimes carry separate evidence
+      requirements against the same underlying training artifact.
