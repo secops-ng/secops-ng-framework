@@ -1,0 +1,147 @@
+# ISO/IEC 27001:2022 — Annex A.8 Technological controls.
+#
+# First entries against the Annex A.8 technological-controls theme.
+# Annex A.8 in the 2022 revision covers thirty-four controls (A.8.1
+# through A.8.34), the largest of the four themes: user endpoint
+# devices, privileged access, information-access restriction, source-
+# code access, secure authentication, capacity management, malware
+# protection, technical vulnerability management, configuration
+# management, information deletion, data masking, data-leakage
+# prevention, backup, redundancy, logging, monitoring, clock
+# synchronisation, privileged-utility programs, installation of
+# software, network security, network-services security, segregation
+# of networks, web filtering, cryptography, secure development
+# lifecycle, application-security requirements, secure system
+# architecture and engineering, secure coding, security testing in
+# development and acceptance, outsourced development, separation of
+# environments, change management, test information, and protection
+# of information systems during audit testing.
+#
+# Scope of this file: Annex A.8 technological controls. This entry
+# pair (A.8.1 user endpoint devices and A.8.2 privileged access
+# rights) opens the theme file following the crosswalk conventions
+# set by annex-a-5-organisational.yaml, annex-a-6-people.yaml, and
+# annex-a-7-physical.yaml. The remaining A.8 controls (A.8.3 through
+# A.8.34) land as sibling entries in this file on subsequent cards.
+#
+# Coverage caveat: A.8 is the largest Annex A theme (34 controls);
+# this first-entries card lands two entries to establish the file
+# and the schema pattern. Many downstream A.8 controls already have
+# direct anchors in the SecOps-NG control catalogue under
+# content/controls/ (see e.g. A.8.5 → control.mfa_state_probe /
+# service_identification_authentication, A.8.8 → patch_evidence /
+# vuln_disclosure_intake, A.8.9 → configuration_settings /
+# baseline_configuration / iac_policy_guardrail / cspm_baseline,
+# A.8.13 → backup_attestation / restore_drill, A.8.16 →
+# detection_coverage_evidence, A.8.24 → crypto_policy_inventory /
+# cert_posture_scan / key_rotation_evidence, A.8.30 → sbom_capture,
+# A.8.32 → iac_policy_guardrail); those wire-ups land on subsequent
+# cards as sibling entries in this file, one control at a time to
+# keep review surfaces bounded.
+#
+# Regime scope caveat: ISO/IEC 27001:2022 is a certifiable
+# information-security management standard, not an EU statutory
+# instrument. The crosswalk is a structural pointer against the
+# operator's own conformance evidence — the assertion here is that
+# the named artifacts exercise the operator-side obligation, not
+# that they constitute a legal interpretation of the standard.
+
+regime: iso27001
+entries:
+  - id: iso27001:a-8-1-user-endpoint-devices
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.1
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Protect information stored on, processed by, or accessible via
+      user endpoint devices. The operator must define a topic-specific
+      policy for user endpoint devices (laptops, mobiles, tablets,
+      remote-access clients), and support it with configuration,
+      protection, and usage measures proportionate to the sensitivity
+      of the information the devices handle and the risk of loss or
+      compromise off-premises.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # is currently scoped to logical / cyber controls at the workflow-
+    # and identity-plane layer and does not yet carry an endpoint-
+    # device posture / MDM-attestation artifact. A.8.1 is discharged
+    # against the operator's own endpoint-management evidence (MDM /
+    # UEM enrolment status, disk-encryption posture, endpoint-
+    # protection agent state, patch state on the endpoint fleet). A
+    # future control (e.g. control.endpoint_posture@v1) would replace
+    # this placeholder without changing the entry id; the endpoint-
+    # side vulnerability / patch discipline that A.8.1 partially
+    # depends on is separately anchored under A.8.8 via
+    # control.patch_evidence@v1 (landing as a sibling entry on a
+    # subsequent card).
+    notes: >-
+      A.8.1 is the endpoint-device obligation for the whole Annex A.8
+      theme — the standard requires that user endpoint devices sit
+      inside a topic-specific policy backed by configuration and
+      protection measures proportionate to the information they
+      handle. The obligation spans device configuration baselines,
+      disk encryption, endpoint-protection tooling, remote-wipe and
+      loss-handling procedures, and BYOD arrangements where present.
+      The SecOps-NG control catalogue does not yet carry an endpoint-
+      device posture artifact (see coverage note in the file header),
+      so this entry ships with empty control_refs; the operator's
+      own endpoint-management evidence (MDM/UEM posture, disk-
+      encryption state, endpoint-protection agent state) carries the
+      obligation. Cross-regime parallels: NIS2 Art. 21(2)(i)
+      (access-control policies) reaches endpoint enrolment as the
+      access-plane precondition; DORA Art. 9 (ICT protection) covers
+      endpoint hardening under the JC RTS ICT risk-management
+      framework; the regimes carry separate evidence requirements
+      against the same underlying endpoint-management artifact.
+  - id: iso27001:a-8-2-privileged-access-rights
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.2
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Restrict and manage the allocation and use of privileged access
+      rights. Privileged accounts and elevated entitlements must be
+      granted on a documented, least-privilege basis, separated from
+      standard user identities where practicable, logged, reviewed
+      on a declared cadence, and recertified or revoked when the
+      justifying role or task changes.
+    status: draft
+    control_refs:
+      - control.privileged_access_review@v1
+      - control.account_management@v1
+      - control.least_privilege@v1
+    playbook_refs:
+      - playbook.iam_auditor@v1
+    notes: >-
+      A.8.2 is the privileged-access anchor for the Annex A.8 theme —
+      the standard requires that elevated entitlements be allocated
+      on a least-privilege basis, separated from standard identities
+      where practicable, reviewed on a declared cadence, and
+      recertified or revoked when the justifying role or task
+      changes. control.privileged_access_review@v1 is the direct
+      anchor — its oscal_refs block already carries ISO/IEC
+      27001:2022 A.8.2 alongside NIST 800-53 rev5 AC-2(7)
+      (Privileged User Accounts) and AC-6(7) (Review of User
+      Privileges), and its periodic-review discipline is exactly
+      the recertification cadence A.8.2 requires.
+      control.account_management@v1 (NIST AC-2, also carrying A.8.2)
+      anchors the account-lifecycle side, and control.least_privilege@v1
+      (NIST AC-6, also carrying A.8.2) anchors the allocation-basis
+      side. The playbook.iam_auditor@v1 CACAO playbook is the
+      operational discharge of the continuous-access-attestation
+      slice: per-execution caller-identity resolution and closed-
+      capability enumeration emit one access-evidence artifact per
+      execution against schemas/evidence/access.schema.json, which
+      the operator's IAM-review function joins against the intended
+      grant set. Cross-regime parallels: NIS2 Art. 21(2)(i)
+      (access-control policies) covers the same privileged-access
+      discipline; DORA Art. 9(4)(c) (access management) operationalised
+      by the JC RTS Arts. 20–22 (Commission Delegated Regulation (EU)
+      2024/1774) covers the need-to-know, need-to-use, least-privilege
+      allocation basis; the regimes carry separate evidence
+      requirements against the same underlying privileged-access
+      artifact.
