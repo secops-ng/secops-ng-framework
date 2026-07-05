@@ -666,3 +666,300 @@ entries:
       product-facing incident surface. The regimes carry separate
       evidence requirements against the same underlying DLP-signal-
       and-response artifact set.
+  - id: iso27001:a-8-18-use-of-privileged-utility-programs
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.18
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Restrict and tightly control the use of utility programs that
+      might be capable of overriding system and application controls.
+      Diagnostic tools, system-administration utilities, and any
+      software able to bypass logical access controls must sit under
+      an explicit authorisation regime, be logged when invoked, be
+      removed from systems where they are not required, and be
+      separated from application software wherever practicable.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a dedicated privileged-utility-programs /
+    # break-glass-tool artifact. A.8.18 is discharged in practice
+    # today against the operator's own admin-tool inventory
+    # (allow-listed diagnostic and system-administration utilities),
+    # invocation-logging on privileged-tool execution, and the
+    # least-privilege discipline that governs which identities may
+    # invoke them (already anchored under A.8.2 via
+    # control.privileged_access_review@v1 /
+    # control.account_management@v1 / control.least_privilege@v1).
+    # A future control (e.g. control.privileged_utility_control@v1,
+    # keyed against NIST 800-53 rev5 AC-6(9) Log Use of Privileged
+    # Functions and AC-6(10) Prohibit Non-privileged Users from
+    # Executing Privileged Functions) would replace this placeholder
+    # without changing the entry id.
+    notes: >-
+      A.8.18 is the privileged-utility-programs anchor within the
+      Annex A.8 theme — the standard treats diagnostic and
+      system-administration utilities capable of bypassing logical
+      access controls as an elevated-risk surface that must be
+      authorisation-gated, invocation-logged, removed where not
+      required, and separated from application software. The
+      SecOps-NG control catalogue does not yet carry a dedicated
+      privileged-utility artifact (see the placeholder note above);
+      the obligation is discharged in practice against the
+      operator's admin-tool inventory, invocation logging, and the
+      least-privilege / privileged-access discipline anchored under
+      A.8.2 (control.privileged_access_review@v1,
+      control.account_management@v1, control.least_privilege@v1),
+      with the audit-record generation slice anchored under A.8.15
+      and the monitoring-consumption slice under A.8.16.
+      Cross-regime parallels: NIS2 Art. 21(2)(i) (access-control
+      policies) reaches the privileged-tool authorisation surface as
+      an access-plane obligation; DORA Art. 9(4)(c) (access
+      management) operationalised by the JC RTS (Commission Delegated
+      Regulation (EU) 2024/1774) covers the need-to-know / need-to-
+      use basis for privileged utilities; the regimes carry separate
+      evidence requirements against the same underlying
+      privileged-utility-invocation artifact.
+  - id: iso27001:a-8-19-installation-of-software-on-operational-systems
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.19
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Implement procedures and measures to securely manage software
+      installation on operational systems. Installations on
+      production systems must sit under a documented change-control
+      regime, be sourced from allow-listed and integrity-verified
+      repositories, be attributable to an authorised principal, and
+      leave an evidence trail that ties the installed artefact back
+      to a reviewed change request.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a dedicated operational-software-installation
+    # / change-control artifact. A.8.19 is discharged in practice
+    # today against the operator's own change-management process
+    # (approved-change ticket, deployment-pipeline attribution),
+    # signed-artefact / provenance verification at install time
+    # (SBOM signature, package-manager signature, container-image
+    # signature), configuration-baseline enforcement (anchored under
+    # A.8.9 via control.configuration_settings@v1 /
+    # control.baseline_configuration@v1 /
+    # control.iac_policy_guardrail@v1 / control.cspm_baseline@v1),
+    # and the patch-management discharge already anchored under
+    # A.8.8 via control.patch_evidence@v1 and
+    # playbook.patch_management@v1. A future dedicated
+    # software-installation-control artifact (e.g.
+    # control.software_installation_control@v1, keyed against
+    # NIST 800-53 rev5 CM-11 User-Installed Software and CM-7(4/5)
+    # Least Functionality — Unauthorized Software) would replace
+    # this placeholder without changing the entry id.
+    notes: >-
+      A.8.19 is the software-installation-on-operational-systems
+      anchor within the Annex A.8 theme — the standard requires that
+      production installations sit inside a documented change-control
+      regime, be sourced from allow-listed and integrity-verified
+      repositories, and leave an attributable evidence trail. The
+      SecOps-NG control catalogue does not yet carry a dedicated
+      installation-control artifact (see the placeholder note
+      above); the obligation is discharged in practice against the
+      operator's change-management process, signed-artefact /
+      provenance verification at install time, the configuration-
+      baseline discipline anchored under A.8.9, and the
+      patch-management discipline anchored under A.8.8 via
+      control.patch_evidence@v1 and playbook.patch_management@v1.
+      The source-code / development-tool access side of the same
+      software-supply-chain is separately anchored under A.8.4.
+      Cross-regime parallels: NIS2 Art. 21(2)(e) (security in
+      acquisition, development, and maintenance) reaches the
+      change-controlled deployment surface; DORA Art. 9(2) (ICT
+      protection and prevention) operationalised by the JC RTS
+      (Commission Delegated Regulation (EU) 2024/1774) covers
+      change-management on ICT assets; CRA Art. 13(3) and Annex I
+      §2 reach the update-handling side for products with digital
+      elements. The regimes carry separate evidence requirements
+      against the same underlying software-installation artifact
+      set.
+  - id: iso27001:a-8-20-networks-security
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.20
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Secure, manage, and control networks and network devices to
+      protect information in systems and applications. Network
+      infrastructure — routers, switches, firewalls, wireless
+      controllers, VPN concentrators, load balancers, and the
+      software-defined equivalents — must sit inside a documented
+      security architecture, be hardened against a declared
+      baseline, have management planes protected, and be operated
+      against a monitoring and change-control regime proportionate
+      to the sensitivity of the traffic they carry.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a dedicated network-device / network-
+    # infrastructure-security artifact. A.8.20 is discharged in
+    # practice today against the operator's own network-architecture
+    # documentation, device-hardening baselines (anchored under A.8.9
+    # via control.configuration_settings@v1 /
+    # control.baseline_configuration@v1), management-plane access
+    # controls (anchored under A.8.2 / A.8.3), and the monitoring /
+    # logging discipline anchored under A.8.15 / A.8.16 via
+    # control.detection_coverage_evidence@v1. A future dedicated
+    # network-security control artifact (e.g.
+    # control.network_security_posture@v1, keyed against NIST
+    # 800-53 rev5 SC-7 Boundary Protection, AC-4 Information Flow
+    # Enforcement, and CM-6 Configuration Settings applied to
+    # network devices) would replace this placeholder without
+    # changing the entry id. The network-services / third-party
+    # side is anchored in the A.8.21 sibling entry, and the
+    # network-segregation side in the A.8.22 sibling entry.
+    notes: >-
+      A.8.20 is the network-security anchor within the Annex A.8
+      theme — the standard requires that networks and network
+      devices sit inside a documented security architecture,
+      hardened baselines, protected management planes, and a
+      monitoring / change-control regime proportionate to traffic
+      sensitivity. The SecOps-NG control catalogue does not yet
+      carry a dedicated network-infrastructure-security artifact
+      (see the placeholder note above); the obligation is
+      discharged in practice against the operator's
+      network-architecture documentation, device-hardening baselines
+      (via A.8.9 anchors), management-plane access controls (via
+      A.8.2 / A.8.3 anchors), and the log-and-monitor pair anchored
+      under A.8.15 / A.8.16. The network-services / third-party
+      side lands under A.8.21 and the segregation side under
+      A.8.22. Cross-regime parallels: NIS2 Art. 21(2)(a) (policies
+      on the security of network and information systems) reaches
+      the network-security-policy surface directly; NIS2
+      Art. 21(2)(d) (supply-chain security) reaches the third-party
+      network-service side operationalised under A.8.21; DORA
+      Art. 9(3) (ICT protection — availability, authenticity,
+      integrity, confidentiality) operationalised by the JC RTS
+      (Commission Delegated Regulation (EU) 2024/1774) covers
+      network-side ICT protection; the regimes carry separate
+      evidence requirements against the same underlying
+      network-security artifact.
+  - id: iso27001:a-8-21-security-of-network-services
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.21
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Identify security mechanisms, service levels, and service
+      requirements of network services, and include them in network-
+      services agreements — whether the services are provided in-
+      house or outsourced. The operator must catalogue the network
+      services in use (connectivity, DDoS mitigation, DNS, CDN,
+      managed VPN, SD-WAN, managed firewall), record the security
+      controls the service provider commits to, and hold the
+      provider's evidence against those commitments on the same
+      cadence as its own controls.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a dedicated network-services-agreement /
+    # third-party-network-provider artifact. A.8.21 is discharged in
+    # practice today against the operator's own supplier-management
+    # process (contract-level security clauses on network-service
+    # agreements, SLA / service-level evidence, third-party attestation
+    # against the network-service scope) and joins upstream against
+    # the supplier-management surface (A.5.19 anchor family). A
+    # future dedicated network-services-security artifact (e.g.
+    # control.network_service_agreement@v1, keyed against NIST
+    # 800-53 rev5 SA-9 External System Services and SC-7 Boundary
+    # Protection at provider boundaries) would replace this
+    # placeholder without changing the entry id. The infrastructure
+    # side (device-hardening, management-plane) is anchored in the
+    # A.8.20 sibling entry, and the segregation side in the A.8.22
+    # sibling entry.
+    notes: >-
+      A.8.21 is the security-of-network-services anchor within the
+      Annex A.8 theme — the standard requires that the security
+      mechanisms, service levels, and service requirements of
+      network services (whether in-house or outsourced) be identified
+      and captured in the network-services agreement, and that the
+      operator hold provider-side evidence against those commitments.
+      The SecOps-NG control catalogue does not yet carry a dedicated
+      network-services-agreement artifact (see the placeholder note
+      above); the obligation is discharged in practice against the
+      operator's supplier-management process (contract-level clauses,
+      SLA / service-level evidence, third-party attestation over
+      the network-service scope), joined upstream against the
+      supplier-management surface anchored under A.5.19. The
+      network-infrastructure-security side lands under A.8.20 and
+      the segregation side under A.8.22. Cross-regime parallels:
+      NIS2 Art. 21(2)(d) (supply-chain security, including
+      security-related aspects concerning the relationships between
+      each entity and its direct suppliers or service providers)
+      reaches network-service providers directly; DORA Arts. 28–30
+      (ICT third-party risk management) operationalise the
+      third-party network-service surface under a dedicated regime
+      with contractual-provision, register-of-information, and
+      concentration-risk obligations; the regimes carry separate
+      evidence requirements against the same underlying
+      network-services artifact set.
+  - id: iso27001:a-8-22-segregation-of-networks
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.22
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Segregate groups of information services, users, and
+      information systems in the operator's networks. Segmentation
+      must reflect the trust, sensitivity, and function of the
+      systems it separates — production from non-production,
+      management planes from user traffic, tenant boundaries in
+      multi-tenant environments, and OT / ICS from IT networks
+      where the operator's environment carries both — and be
+      enforced at the network layer with policy-enforced flows
+      between zones rather than trust-by-default connectivity.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a dedicated network-segregation /
+    # zone-boundary artifact. A.8.22 is discharged in practice today
+    # against the operator's own network-zone architecture (VLAN /
+    # VRF / VPC / VNet boundary design), firewall / policy-enforced
+    # flow rules between zones, micro-segmentation posture on the
+    # workload plane, and the configuration-baseline discipline
+    # anchored under A.8.9 (control.configuration_settings@v1 /
+    # control.iac_policy_guardrail@v1 / control.cspm_baseline@v1
+    # apply to segmentation policy expressed as code). A future
+    # dedicated segmentation-posture artifact (e.g.
+    # control.network_segmentation@v1, keyed against NIST 800-53
+    # rev5 SC-7(5) Boundary Protection — Deny by Default, SC-7(13)
+    # Isolation of Security Tools, Mechanisms, and Support
+    # Components, and AC-4 Information Flow Enforcement) would
+    # replace this placeholder without changing the entry id.
+    notes: >-
+      A.8.22 is the network-segregation anchor within the Annex A.8
+      theme — the standard requires that information services,
+      users, and systems be separated across network zones that
+      reflect trust, sensitivity, and function, with policy-enforced
+      flow between zones rather than trust-by-default connectivity.
+      The SecOps-NG control catalogue does not yet carry a dedicated
+      segmentation artifact (see the placeholder note above); the
+      obligation is discharged in practice against the operator's
+      zone architecture (VLAN / VRF / VPC / VNet boundaries),
+      firewall / policy-enforced flow rules, micro-segmentation
+      posture on the workload plane, and the configuration-baseline
+      discipline anchored under A.8.9. The infrastructure-hardening
+      side lands under A.8.20 and the network-services-agreement
+      side under A.8.21; segregation closes the Annex A.8 network
+      triad. Cross-regime parallels: NIS2 Art. 21(2)(a) (policies on
+      the security of network and information systems) reaches
+      network-zoning as a security-architecture policy surface;
+      NIS2 Art. 21(2)(e) (security in acquisition, development, and
+      maintenance) reaches the segmentation posture through the
+      system-development lifecycle; DORA Art. 9(3) (ICT protection)
+      operationalised by the JC RTS (Commission Delegated Regulation
+      (EU) 2024/1774) covers network segmentation for ICT assets;
+      the regimes carry separate evidence requirements against the
+      same underlying network-segregation artifact.

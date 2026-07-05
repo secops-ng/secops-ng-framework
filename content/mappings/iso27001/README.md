@@ -116,7 +116,41 @@ discharge it in practice); and
 `iso27001:a-8-12-data-leakage-prevention` ships `control_refs: []`
 pending a dedicated DLP-posture control artifact, with
 `playbook.data_exfil@v1` already anchoring the response-side chain
-that consumes the DLP signal. A.8 is the largest theme (34
-controls); coverage stands at 12 of 34 entries landed; the
-remaining A.8 controls (A.8.13 through A.8.34) land as sibling
+that consumes the DLP signal. The A.8.18–A.8.22 batch also lands in
+`annex-a-8-technological.yaml`:
+`iso27001:a-8-18-use-of-privileged-utility-programs` ships
+`control_refs: []` pending a dedicated privileged-utility /
+break-glass-tool artifact (the operator's admin-tool inventory,
+invocation-logging, and the least-privilege / privileged-access
+discipline anchored under A.8.2 discharge it in practice);
+`iso27001:a-8-19-installation-of-software-on-operational-systems`
+ships `control_refs: []` pending a dedicated software-installation
+change-control artifact (the operator's change-management process,
+signed-artefact / provenance verification, the configuration-
+baseline discipline anchored under A.8.9, and the patch-management
+discipline anchored under A.8.8 discharge it in practice);
+`iso27001:a-8-20-networks-security` ships `control_refs: []`
+pending a dedicated network-infrastructure-security artifact (the
+operator's network-architecture documentation, device-hardening
+baselines via A.8.9, management-plane access controls via A.8.2 /
+A.8.3, and the log-and-monitor pair anchored under A.8.15 / A.8.16
+discharge it in practice);
+`iso27001:a-8-21-security-of-network-services` ships
+`control_refs: []` pending a dedicated network-services-agreement
+artifact (the operator's supplier-management process, joined
+upstream against the A.5.19 supplier-management surface,
+discharges it in practice); and
+`iso27001:a-8-22-segregation-of-networks` ships `control_refs: []`
+pending a dedicated segmentation-posture artifact (the operator's
+zone architecture, policy-enforced flow rules, micro-segmentation
+posture, and the configuration-baseline discipline anchored under
+A.8.9 discharge it in practice). A.8 is the largest theme (34
+controls); with the A.8.13–A.8.17 sibling batch (in review as
+`annex-a-8-technological.yaml` sibling entries on a separate PR)
+and this A.8.18–A.8.22 batch both landed on main, coverage will
+stand at 22 of 34 entries landed. If the sibling A.8.13–A.8.17
+batch has not yet merged when this batch lands, coverage stands
+at 12 landed on main plus this A.8.18–A.8.22 batch (17 of 34);
+the sibling batch will bring the total to 22 of 34 on merge. The
+remaining A.8 controls (A.8.23 through A.8.34) land as sibling
 entries in that file on subsequent cards.
