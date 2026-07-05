@@ -38,3 +38,15 @@ ship with empty `control_refs` because the SecOps-NG control catalogue
 is currently scoped to logical / cyber controls (see the coverage note
 in the theme file header). The remaining A.7 controls (A.7.3 through
 A.7.14) land as sibling entries in that file on subsequent cards.
+
+The A.8 technological-controls theme file has landed with its first
+two entries (`iso27001:a-8-1-user-endpoint-devices`,
+`iso27001:a-8-2-privileged-access-rights`) in
+`annex-a-8-technological.yaml`. A.8.1 ships with empty `control_refs`
+pending an endpoint-posture control artifact; A.8.2 wires
+`control.privileged_access_review@v1`,
+`control.account_management@v1`, and `control.least_privilege@v1`
+(all already carrying `A.8.2` on their `oscal_refs` block) plus
+`playbook.iam_auditor@v1`. A.8 is the largest theme (34 controls);
+the remaining A.8 controls (A.8.3 through A.8.34) land as sibling
+entries in that file on subsequent cards.
