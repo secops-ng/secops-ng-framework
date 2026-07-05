@@ -21,9 +21,29 @@ for artifact refs.
 
 ## Status
 
-Draft. First entry (`iso27001:a-5-1-policies`, Annex A.5.1 Policies for
-information security) establishes the conventions; sibling entries and
-theme files land as subsequent cards close them.
+Draft. The A.5 organisational-controls theme file has landed with
+its anchor entry (`iso27001:a-5-1-policies`, Annex A.5.1 Policies for
+information security) and the A.5.2–A.5.6 batch:
+`iso27001:a-5-2-roles-and-responsibilities` wires
+`control.ict_risk_governance@v1` (already carrying A.5.2 on its
+`oscal_refs` block);
+`iso27001:a-5-3-segregation-of-duties` ships `control_refs: []`
+pending a dedicated segregation-of-duties artifact, with the
+in-catalogue practical surface (`control.least_privilege@v1`,
+`control.privileged_access_review@v1`) called out in the entry note;
+`iso27001:a-5-4-management-responsibilities` wires
+`control.risk_management_policy@v1` and
+`control.training_attestation@v1` (the policy-set and
+attestation anchors that discharge the management-direction
+discipline in practice);
+`iso27001:a-5-5-contact-with-authorities` and
+`iso27001:a-5-6-contact-with-special-interest-groups` both wire
+`control.crisis_communication_plan@v1` (already carrying A.5.5 and
+A.5.6 on its `oscal_refs` block), with A.5.6 also carrying
+`playbook.threat_intel_ingest@v1` as the operational
+community-intelligence ingest surface. The remaining A.5 controls
+(A.5.7 through A.5.37) land as sibling entries in that file on
+subsequent cards.
 
 The A.6 people-controls theme file has landed with its first two
 entries (`iso27001:a-6-1-screening`, `iso27001:a-6-3-awareness`) in
