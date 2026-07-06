@@ -14,7 +14,7 @@ One YAML file per Trust Services category:
 | Security (Common Criteria) | `tsc-security.yaml` | CC1.1–CC9.2 (33) |
 | Availability | `tsc-availability.yaml` | A1.1–A1.3 (3) |
 | Confidentiality | `tsc-confidentiality.yaml` | C1.1–C1.2 (2) |
-| Processing Integrity | *future* | PI-series |
+| Processing Integrity | `tsc-processing-integrity.yaml` | PI1.1–PI1.5 (5) |
 | Privacy | *future* | P-series |
 
 Entry ids use `soc2:<cc-slug>` where the slug carries the
@@ -47,5 +47,20 @@ media-disposal procedures remain operator-owned artifacts;
 anchors here discharge the structural surfaces (asset inventory,
 leaver-side asset return, reconciliation-and-disposal flow).
 
-The remaining two Trust Services categories (Processing
-Integrity, Privacy) land as sibling files on future cards.
+The Processing Integrity category (`tsc-processing-integrity.yaml`)
+is present with the five PI-series criteria (PI1.1 through PI1.5)
+as draft entries. PI1.1 covers the quality of information that
+supports internal controls; PI1.2 covers input controls
+(completeness and accuracy); PI1.3 covers processing controls
+(complete, accurate, timely, authorised output); PI1.4 covers
+delivery of output to authorised users; PI1.5 covers storage of
+inputs, in-processing items, and outputs. Anchors here discharge
+the surfaces where security operations overlap with processing
+integrity (control-effectiveness evidence, authorised-delivery
+access enforcement, storage-completeness backup evidence and
+asset inventory); the application-layer input, processing, and
+output-accuracy controls themselves sit outside the SecOps-NG
+catalogue and ship as gap notes on the relevant entries.
+
+The remaining Trust Services category (Privacy) lands as a
+sibling file on a future card.

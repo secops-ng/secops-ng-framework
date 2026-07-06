@@ -1,0 +1,259 @@
+# SOC 2 Trust Services Criteria — Processing Integrity (PI-series).
+#
+# AICPA Trust Services Criteria for Processing Integrity (2017, as
+# revised). The Processing Integrity category is an optional
+# extension on top of the Security Common Criteria (see
+# tsc-security.yaml). It comprises five criteria (PI1.1–PI1.5) that
+# address the completeness, accuracy, timeliness, and authorisation
+# of system processing — from the quality of information feeding
+# internal controls, through input controls, processing controls,
+# output-delivery controls, and storage controls.
+#
+# Scope of this file: the Processing Integrity category (PI1.1
+# through PI1.5, 5 criteria). Security is in tsc-security.yaml,
+# Availability is in tsc-availability.yaml, Confidentiality is in
+# tsc-confidentiality.yaml; the remaining category — Privacy
+# (P-series) — lands as a sibling file on a future card.
+#
+# Regime scope caveat: SOC 2 is a private-sector assurance
+# framework (AICPA attestation standard AT-C 105 / AT-C 205), not
+# an EU statutory instrument. The crosswalk is a structural
+# pointer against the operator's own report-time evidence — the
+# assertion here is that the named artifacts exercise the
+# criterion in practice, not that they constitute a legal or
+# auditor interpretation of the TSC.
+#
+# Coverage caveat: Processing Integrity obligations rest heavily
+# on operator-owned data-quality controls (input validation,
+# processing-completeness reconciliations, output-delivery
+# workflows, storage-integrity checks) that live inside the
+# application layer of the operator's own systems. The SecOps-NG
+# control catalogue is a security-operations catalogue, not a
+# data-quality catalogue; anchors here discharge the surfaces
+# that overlap between the two disciplines (control-effectiveness
+# evidence for PI1.1, authorised-delivery access controls for
+# PI1.4, storage-completeness backup evidence and asset inventory
+# for PI1.5). Input-validation, processing-completeness, and
+# output-accuracy controls themselves sit outside the SecOps-NG
+# catalogue and ship as gap notes on the relevant entries.
+
+regime: soc2
+entries:
+
+  # ─── PI1: Processing Integrity ────────────────────────────────
+
+  - id: soc2:pi1-1-quality-information-for-internal-controls
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: PI1.1
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity obtains or generates, uses, and communicates
+      relevant, quality information regarding the objectives
+      related to processing, including definitions of data
+      processed and product and service specifications, to support
+      the use of products and services.
+    status: draft
+    control_refs:
+      - control.control_effectiveness_test@v1
+    playbook_refs:
+      - playbook.executive_metrics@v1
+    notes: >-
+      PI1.1 is the quality-of-information anchor for processing
+      integrity: the entity must generate and communicate relevant,
+      quality information so the internal controls governing
+      processing can operate. `control.control_effectiveness_test@v1`
+      carries the control-evidence-quality anchor (scheduled
+      effectiveness tests, sample results, coverage and pass-rate
+      trends) that discharges the evidence-quality slice of the
+      criterion; `playbook.executive_metrics@v1` exercises the
+      communication surface that rolls the resulting evidence up
+      into the operator's KPI/KRI catalogue. Definitions of the
+      data processed and the product/service specifications
+      themselves (data dictionaries, service catalogues, product
+      requirements) remain operator-owned artifacts that sit
+      inside the application and product-management surfaces
+      rather than the security-operations catalogue, and are not
+      anchored here.
+
+  - id: soc2:pi1-2-input-completeness-and-accuracy
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: PI1.2
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity implements policies and procedures over system
+      inputs, including controls over completeness and accuracy,
+      to result in products, services, and reporting to meet the
+      entity's objectives.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: input-completeness and
+    # input-accuracy controls (schema validation, referential
+    # integrity checks, duplicate-detection, reconciliation
+    # against source-of-record) live inside the operator's own
+    # application layer and are not present as first-class
+    # artifacts in the SecOps-NG control catalogue, which is a
+    # security-operations catalogue. PI1.2 is discharged in
+    # practice against the operator's own application-side input
+    # controls; the security-operations anchors adjacent to this
+    # surface (baseline-configuration integrity of the system
+    # accepting inputs, access-restriction of who may submit
+    # inputs) sit under CC7.1 and CC6.1 in tsc-security.yaml
+    # rather than being duplicated here.
+    playbook_refs: []
+    # playbook_refs intentionally empty: no dedicated
+    # input-validation playbook ships in the SecOps-NG catalogue.
+    # Input-completeness / accuracy is an application-domain
+    # concern upstream of the CACAO playbook layer, which handles
+    # security-operations flows rather than transaction
+    # processing.
+    notes: >-
+      PI1.2 is the input-controls anchor for processing integrity
+      — the entity must exercise policies and procedures over
+      system inputs to ensure completeness and accuracy. Neither
+      the SecOps-NG control catalogue nor the SecOps-NG playbook
+      catalogue currently carries a dedicated input-validation
+      artifact (see the placeholder notes above); the obligation
+      is discharged in practice against the operator's own
+      application-side input controls (schema validation,
+      referential integrity checks, duplicate detection,
+      completeness reconciliation against source-of-record) that
+      sit inside the application layer of the operator's systems
+      rather than inside the security-operations catalogue. The
+      security-operations disciplines adjacent to the input
+      boundary — baseline-configuration integrity of the systems
+      accepting inputs and access-restriction of who may submit
+      inputs — are anchored under the SOC 2 Common Criteria
+      (CC6.1 access enforcement, CC7.1 configuration baselines)
+      and are not duplicated here.
+
+  - id: soc2:pi1-3-processing-completeness-accuracy-timeliness-authorisation
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: PI1.3
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity implements policies and procedures over system
+      processing to result in products, services, and reporting to
+      meet the entity's objectives.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: processing-completeness,
+    # processing-accuracy, processing-timeliness, and
+    # processing-authorisation controls (batch reconciliation,
+    # transaction-integrity checks, timing SLAs against declared
+    # processing windows, authorisation-gate enforcement inside
+    # the transaction flow) live inside the operator's own
+    # application layer and are not present as first-class
+    # artifacts in the SecOps-NG control catalogue. PI1.3 is
+    # discharged in practice against the operator's own
+    # application-side processing controls; the security-
+    # operations anchors adjacent to this surface (change-
+    # management gates on the systems performing processing,
+    # least-privilege enforcement on the processing service
+    # identities) sit under CC8.1 and CC6.3 in tsc-security.yaml.
+    playbook_refs: []
+    # playbook_refs intentionally empty: no dedicated
+    # processing-integrity playbook ships in the SecOps-NG
+    # catalogue. Processing controls are an application-domain
+    # concern upstream of the CACAO playbook layer.
+    notes: >-
+      PI1.3 is the processing-controls anchor for processing
+      integrity — the entity must exercise policies and procedures
+      over system processing so that output is complete, accurate,
+      timely, and authorised. Neither the SecOps-NG control
+      catalogue nor the SecOps-NG playbook catalogue currently
+      carries a dedicated processing-integrity artifact (see the
+      placeholder notes above); the obligation is discharged in
+      practice against the operator's own application-side
+      processing controls (batch reconciliation, transaction-
+      integrity checks, timing SLAs, authorisation gates inside
+      the transaction flow) that sit inside the application layer
+      rather than the security-operations catalogue. The
+      security-operations disciplines adjacent to the processing
+      boundary — change-management gates on the systems that
+      perform processing, and least-privilege enforcement on the
+      service identities that execute processing — are anchored
+      under the SOC 2 Common Criteria (CC6.3 least privilege,
+      CC8.1 change management) and are not duplicated here.
+
+  - id: soc2:pi1-4-output-delivery-to-authorised-users
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: PI1.4
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity implements policies and procedures to make
+      available or deliver output completely, accurately, and
+      timely in accordance with specifications to meet the
+      entity's objectives.
+    status: draft
+    control_refs:
+      - control.access_enforcement@v1
+      - control.least_privilege@v1
+    playbook_refs: []
+    # playbook_refs intentionally empty: no dedicated
+    # output-delivery playbook ships in the SecOps-NG catalogue.
+    # Output-delivery workflows (report distribution, API-based
+    # data hand-off, file-transfer pipelines) sit inside the
+    # operator's application-and-integration layer rather than
+    # the CACAO playbook layer, which handles security-operations
+    # flows.
+    notes: >-
+      PI1.4 is the output-delivery anchor for processing integrity
+      — the entity must make output available or deliver it to
+      authorised users completely, accurately, and timely.
+      `control.access_enforcement@v1` and `control.least_privilege@v1`
+      discharge the authorised-users slice: they anchor the
+      access-control discipline that governs who may retrieve or
+      receive processing output, ensuring delivery is scoped to
+      users authorised to hold that output. The completeness /
+      accuracy / timeliness slice of the delivery (delivery-batch
+      reconciliation, delivery-SLA monitoring, delivery-format
+      conformance to specifications) sits inside the operator's
+      own application-and-integration layer and is not anchored
+      in the SecOps-NG control catalogue; those disciplines
+      remain operator-owned artifacts under this criterion.
+
+  - id: soc2:pi1-5-storage-of-inputs-processing-and-outputs
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: PI1.5
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity implements policies and procedures to store
+      inputs, items in processing, and outputs completely,
+      accurately, and timely in accordance with system
+      specifications to meet the entity's objectives.
+    status: draft
+    control_refs:
+      - control.backup_attestation@v1
+      - control.asset_inventory_delta@v1
+    playbook_refs:
+      - playbook.backup_recovery@v1
+    notes: >-
+      PI1.5 is the storage anchor for processing integrity — the
+      entity must store inputs, items in processing, and outputs
+      completely, accurately, and timely. `control.backup_attestation@v1`
+      discharges the storage-completeness-and-recoverability
+      slice (backup evidence that stored data can be relied on
+      across the processing lifecycle); `control.asset_inventory_delta@v1`
+      anchors the storage-footprint discipline (inventory of the
+      systems holding stored inputs, in-processing items, and
+      outputs, and the change signal against that footprint);
+      `playbook.backup_recovery@v1` exercises the operational
+      surface. Application-level storage-integrity checks
+      themselves (row-level checksums, referential integrity of
+      persisted state, storage-tier SLA conformance) sit inside
+      the operator's own application layer and are not anchored
+      in the SecOps-NG catalogue; they remain operator-owned
+      artifacts under this criterion. The parallel SOC 2 CC6.7
+      (transmission of information) and A1.2 (backup infrastructure)
+      entries carry adjacent slices of the storage surface under
+      the Common Criteria and Availability categories.
