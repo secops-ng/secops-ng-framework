@@ -1,34 +1,28 @@
 # CORE overlay for the eu_ai_act_risk_management playbook.
 #
 # Playbook-side outbound overlay. Pins the OSCAL / D3FEND anchors this
-# playbook exercises step-by-step. Regulatory inbound edges (EU AI Act
-# per-article YAMLs, NIS2 Art. 21(2)(a) risk-analysis edge, GDPR Art. 35
-# DPIA interaction) remain deferred to sibling G-02 cards; this file
-# retains the NIS2 anchor as a SKELETON placeholder so the graph closure
-# work is programmatically discoverable while landing the OSCAL / D3FEND
-# CORE surface.
+# playbook exercises step-by-step and the regulatory inbound edges
+# landed under the sibling G-02 mapping directory:
 #
-# Deferred to sibling G-02 cards:
-#   - content/mappings/eu_ai_act/*.yaml  — inbound mapping ids for
-#     Art. 9(1)-(6), Art. 11 + Annex IV, Art. 13, Art. 72. The
-#     eu_ai_act inbound directory does not yet exist; the sibling
-#     G-02 card lands it and pins playbook.eu_ai_act_risk_management@v1
-#     in each entry's playbook_refs list.
-#   - content/mappings/nis2/article-21-2-a.yaml — inbound edge for
-#     NIS2 Art. 21(2)(a) policies on risk analysis. Anchored on the
-#     Art. 9(2) risk-analysis step of this playbook; deferred to the
-#     same G-02 card.
-#   - content/mappings/gdpr/*.yaml — Art. 35 DPIA interaction for
-#     high-risk AI systems processing personal data (Recital 9 of
-#     Regulation (EU) 2024/1689 preserves GDPR obligations). Deferred
-#     to the G-02 card that opens the eu_ai_act ↔ gdpr edge.
-#   - DORA / CRA — reviewed for scope during G-02. AI Act Art. 9 is a
-#     product-lifecycle risk-management obligation on providers; DORA
-#     Art. 6 ICT risk-management and CRA Annex I product-security are
-#     adjacent-but-distinct regimes. If the G-02 card finds a
-#     documented interaction it lands an inbound edge; otherwise the
-#     absence is documented and this file's dora / cra arrays stay
-#     empty.
+#   - content/mappings/eu_ai_act/*.yaml — inbound mapping ids for
+#     Art. 9(1)-(6), Art. 11 + Annex IV, Art. 13, Art. 72; each entry
+#     backlinks to playbook.eu_ai_act_risk_management@v1.
+#   - content/mappings/nis2/article-21-2-a.yaml — NIS2 Art. 21(2)(a)
+#     risk-analysis-policy inbound edge; the Art. 9(2) risk-analysis
+#     step is the AI-system-specific execution surface.
+#   - content/mappings/gdpr/article-35-dpia.yaml — Art. 35(1)
+#     high-risk-processing DPIA edge for high-risk AI systems that
+#     process personal data (Recital 9 of Regulation (EU) 2024/1689
+#     preserves GDPR obligations).
+#
+# DORA / CRA scope review (G-02): the AI Act Art. 9 risk-management
+# discipline is a product-lifecycle obligation on providers of
+# high-risk AI systems; DORA Art. 6 ICT risk-management operates on
+# ICT operations of financial entities and CRA Annex I on product
+# security of products with digital elements. Neither has a
+# documented interaction with the AI Act provider-side risk-
+# management obligation that would justify a direct inbound edge, so
+# the `dora` / `cra` arrays stay empty on this overlay.
 #
 # Schema: schemas/playbook-mappings.schema.json
 playbook: playbook.eu_ai_act_risk_management@v1
@@ -231,25 +225,70 @@ ocsf:
       https://schema.ocsf.io/1.3.0/classes/detection_finding
 
 nis2:
-  # SKELETON placeholder — the inbound edge on
-  # content/mappings/nis2/article-21-2-a.yaml adding
-  # playbook.eu_ai_act_risk_management@v1 to its playbook_refs list is
-  # deferred to a sibling G-02 card. NIS2 Art. 21(2)(a) (policies on
-  # risk analysis and information-system security) is the anticipated
-  # inbound anchor: the Art. 9(2) risk-analysis step of this playbook
-  # is the AI-system-specific execution surface for the risk-analysis
-  # policy obligation NIS2 imposes on essential and important
-  # entities.
-  - mapping_id: nis2:todo-ai-risk-analysis
-    todo: true
+  # Inbound edge on content/mappings/nis2/article-21-2-a.yaml pins
+  # playbook.eu_ai_act_risk_management@v1 in its playbook_refs list.
+  # NIS2 Art. 21(2)(a) (policies on risk analysis and information-
+  # system security) is the anchor: the Art. 9(2) risk-analysis step
+  # of this playbook is the AI-system-specific execution surface for
+  # the risk-analysis policy obligation NIS2 imposes on essential
+  # and important entities operating high-risk AI systems.
+  - mapping_id: nis2:art-21-2-a
+    article: 21(2)(a)
     notes: >-
-      Placeholder pending the sibling G-02 card. Anticipated inbound
-      anchor is nis2:art-21-2-a (policies on risk analysis and
-      information-system security). The Art. 9(2) risk-analysis step
-      of this playbook is the AI-system-specific execution surface
-      for the risk-analysis policy obligation NIS2 imposes on
-      essential and important entities under Art. 21(2)(a).
+      The Art. 9(2) risk-analysis step of this playbook is the
+      AI-system-specific execution surface for the risk-analysis
+      policy obligation NIS2 imposes on essential and important
+      entities under Art. 21(2)(a).
 
 dora: []
 
 cra: []
+
+gdpr:
+  # Inbound edge on content/mappings/gdpr/article-35-dpia.yaml adds
+  # playbook.eu_ai_act_risk_management@v1 to the Art. 35(1) high-risk-
+  # processing entry. Recital 9 of Regulation (EU) 2024/1689 preserves
+  # the GDPR obligations that apply to processing of personal data;
+  # a high-risk AI system that falls within Annex III and processes
+  # personal data operates on a high-risk processing profile the
+  # controller's DPIA must document ahead of production wiring.
+  - mapping_id: gdpr:art-35-1-dpia-high-risk-processing
+    article: 35(1)
+    notes: >-
+      The Art. 9(2) risk-assessment step of this playbook operates on
+      an AI-system profile that, when personal data is in scope, is a
+      high-risk processing envelope under GDPR Art. 35(1). The
+      operator's DPIA is the ex-ante artifact documenting the
+      proportionality of the AI-system risk-management envelope on
+      that processing surface.
+
+eu_ai_act:
+  # Inbound edges under content/mappings/eu_ai_act/*.yaml land this
+  # playbook against the four SKELETON-scoped high-risk-provider
+  # obligations covered by the sibling per-article YAMLs.
+  - mapping_id: eu_ai_act:art-9-risk-management
+    article: "9"
+    notes: >-
+      Art. 9(1)-(6) risk-management system on high-risk AI systems.
+      Exercised end-to-end by the four action steps of this playbook
+      (identify / assess / assemble / monitor).
+  - mapping_id: eu_ai_act:art-11-technical-documentation
+    article: "11"
+    notes: >-
+      Art. 11 + Annex IV technical documentation. Authored by the
+      assemble-technical-documentation step of this playbook.
+  - mapping_id: eu_ai_act:art-13-transparency
+    article: "13"
+    notes: >-
+      Art. 13 transparency and information duties toward deployers.
+      The instructions-for-use bundle is authored alongside the
+      Art. 11 + Annex IV bundle on the assemble-technical-
+      documentation step.
+  - mapping_id: eu_ai_act:art-72-post-market-monitoring
+    article: "72"
+    notes: >-
+      Art. 72 post-market monitoring plan. Operationalised by the
+      monitor-post-market-signals step of this playbook, which emits
+      the Detection Finding trigger for the next Art. 9(2)(c)
+      re-assessment iteration.
+
