@@ -143,3 +143,22 @@ skip:
       graph if a documented interaction is authored (for example
       a shared attestation surface across financial-entity
       operators subject to both regimes).
+
+  - slug: agentic_threat_response
+    rationale: >-
+      SKELETON — agentic-threat detection and response scaffold.
+      The playbook's outbound overlay
+      (`content/playbooks/agentic_threat_response/mappings.yaml`)
+      deliberately does not pin DORA entries at SKELETON time:
+      the DORA major-incident classification (Art. 18) and
+      reporting (Art. 19) engine is already anchored on
+      `playbook.incident_management@v1`, which this scaffold
+      hands off to via the escalate step. Cross-pinning the
+      agentic-threat scaffold under DORA Art. 18 / 19 at SKELETON
+      time would duplicate the incident-management anchor without
+      adding an obligation-surface distinction. A sibling CORE /
+      EXTEND card revisits the DORA cross-regime graph once the
+      JC RTS on ICT risk management framework (Commission
+      Delegated Regulation (EU) 2024/1774) coverage is extended
+      to the agentic-tradecraft indicator class.
+

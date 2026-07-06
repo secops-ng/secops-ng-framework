@@ -1,0 +1,163 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8",
+  "name": "Agentic-threat detection and response",
+  "description": "SKELETON \u2014 CACAO v2 scaffold for detecting and initially responding to fully-agentic adversary activity (autonomous LLM-driven credential harvest, lateral movement, and encryption chains observed at machine-speed decision cadence). The playbook ingests an agentic-threat indicator, isolates the affected credential set, contains the lateral-movement path, hands off the case envelope to the incident-management engine for the regulator-notification chain, and preserves evidence for the NIS2 Article 23 notification obligation. Portable content; runtime is the operator's choice \u2014 n8n, Temporal, or LangGraph. SKELETON status: workflow shape and content-model anchors are pinned; sibling CORE and EXTEND cards refine detection references, telemetry bindings, KPI hooks, and the compile-target emissions.",
+  "playbook_types": [
+    "detection",
+    "investigation",
+    "mitigation"
+  ],
+  "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+  "created": "2026-07-06T00:00:00Z",
+  "modified": "2026-07-06T00:00:00Z",
+  "labels": [
+    "agentic-threat",
+    "machine-speed",
+    "credential-harvest",
+    "lateral-movement",
+    "nis2"
+  ],
+  "playbook_variables": {
+    "__indicator_id__": {
+      "type": "string",
+      "description": "Identifier of the originating agentic-threat indicator delivered by the detection layer (anomalous LLM API call volume, rapid credential enumeration pattern, or lateral movement within a short (~31s) self-correction window).",
+      "external": true
+    },
+    "__affected_principal__": {
+      "type": "string",
+      "description": "Identity or service-account principal implicated by the indicator; drives the credential-isolation step.",
+      "external": false
+    },
+    "__lateral_path__": {
+      "type": "string",
+      "description": "Resolved lateral-movement path (source-to-destination network / identity edges) the containment step must interrupt.",
+      "external": false
+    },
+    "__evidence_bundle__": {
+      "type": "string",
+      "description": "Identifier of the preserved evidence bundle handed to the NIS2 Article 23 notification chain (LLM API call logs, credential-enumeration timeline, lateral-movement graph).",
+      "external": false
+    }
+  },
+  "workflow_start": "start--30000000-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--30000000-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "agentic-threat-start",
+      "on_completion": "action--30000000-0000-4000-8000-000000000002"
+    },
+    "action--30000000-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "ingest agentic-threat indicator",
+      "description": "Receive the agentic-threat indicator from the detection layer and hydrate it with originating principal, source / destination context, and the observed self-correction cadence. The indicator classes this step is authored against are: anomalous LLM API call volume from a workload principal, rapid credential-enumeration bursts inside a sub-minute window, and lateral movement across identity / network edges within a short self-correction window observed in fully-agentic operations.",
+      "on_completion": "action--30000000-0000-4000-8000-000000000003",
+      "in_args": [
+        "__indicator_id__"
+      ],
+      "out_args": [
+        "__affected_principal__",
+        "__lateral_path__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.todo_agentic_indicator_ingest@v0"
+        ],
+        "telemetry_refs": [],
+        "metric_refs": []
+      }
+    },
+    "action--30000000-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "isolate affected credential set",
+      "description": "Revoke live sessions, refresh and access tokens for __affected_principal__ at the IdP, disable the principal for the containment window, and dispatch an alert to the IAM auditor lane so the credential-scope audit and forced-rotation follow-on run in parallel. This step is the credential-side cut-out on the agentic operator; the deeper IdP-side audit lives on playbook.identity_compromise@v1.",
+      "on_completion": "action--30000000-0000-4000-8000-000000000004",
+      "in_args": [
+        "__affected_principal__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.todo_credential_isolation@v0"
+        ],
+        "telemetry_refs": [],
+        "metric_refs": []
+      }
+    },
+    "action--30000000-0000-4000-8000-000000000004": {
+      "type": "action",
+      "name": "contain lateral-movement path",
+      "description": "Apply a network micro-segmentation call along the resolved __lateral_path__ so the agentic operator cannot pivot off the implicated edge to continue the encryption / staging chain during the containment window. Bounded by the operator-supplied authorisation policy.",
+      "on_completion": "action--30000000-0000-4000-8000-000000000005",
+      "in_args": [
+        "__lateral_path__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.todo_lateral_movement_containment@v0"
+        ],
+        "telemetry_refs": [],
+        "metric_refs": []
+      }
+    },
+    "action--30000000-0000-4000-8000-000000000005": {
+      "type": "action",
+      "name": "escalate to incident-management",
+      "description": "Hand off the case envelope to playbook.incident_management@v1 as the upstream-playbook intake so the regulator-submission timeline (NIS2 Article 23 early-warning and 72-hour notification) is dispatched by the incident-management engine. Cross-playbook reference; this playbook does not itself render the regulator notification.",
+      "on_completion": "action--30000000-0000-4000-8000-000000000006",
+      "x_secops_ng": {
+        "control_refs": [
+          "control.todo_incident_management_handoff@v0"
+        ],
+        "telemetry_refs": [],
+        "metric_refs": []
+      }
+    },
+    "action--30000000-0000-4000-8000-000000000006": {
+      "type": "action",
+      "name": "preserve evidence for notification chain",
+      "description": "Persist an evidence bundle for the NIS2 Article 23 notification chain: LLM API call logs, credential-enumeration timeline, lateral-movement graph, and the containment-action ledger. The bundle identifier is emitted as __evidence_bundle__ and consumed by the downstream incident-management engine.",
+      "on_completion": "end--30000000-0000-4000-8000-000000000007",
+      "out_args": [
+        "__evidence_bundle__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.todo_evidence_preservation@v0"
+        ],
+        "telemetry_refs": [],
+        "metric_refs": []
+      }
+    },
+    "end--30000000-0000-4000-8000-000000000007": {
+      "type": "end",
+      "name": "agentic-threat-end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.agentic_threat_response@v1",
+    "content_version": "0.1.0",
+    "maturity": "skeleton",
+    "compile_targets": [
+      "n8n",
+      "temporal",
+      "langgraph"
+    ],
+    "control_refs": [
+      "control.todo_agentic_indicator_ingest@v0",
+      "control.todo_credential_isolation@v0",
+      "control.todo_lateral_movement_containment@v0",
+      "control.todo_incident_management_handoff@v0",
+      "control.todo_evidence_preservation@v0"
+    ],
+    "telemetry_refs": [],
+    "metric_refs": [],
+    "sources": [
+      "OASIS CACAO v2.0 specification \u2014 workflow step types, variable conventions, x_ extension namespace",
+      "NIS2 Directive (EU) 2022/2555, Article 21(2)(b) \u2014 incident-handling capability",
+      "NIS2 Directive (EU) 2022/2555, Article 21(2)(e) \u2014 security in acquisition, development and maintenance (agentic-tool supply-chain surface)",
+      "NIS2 Directive (EU) 2022/2555, Article 23 \u2014 significant-incident notification obligations",
+      "ENISA \u2014 Threat Landscape reporting on autonomous / agentic adversary tradecraft"
+    ]
+  }
+}
