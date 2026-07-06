@@ -1,0 +1,300 @@
+# EU AI Act orphan-CI assertion skip manifest.
+#
+# Used by `tools.lint_playbook_orphans --framework eu_ai_act` (and the
+# nightly multi-framework workflow) to allow a finalized playbook to
+# stay without an inbound `playbook_refs:` citation under
+# `content/mappings/eu_ai_act/` without tripping the G-02 KRI.
+#
+# Each entry is a deliberate, audited exclusion. The rationale is
+# committed history; the SKELETON guard rejects any entry that lacks
+# the two required fields. Removing a slug from this list re-arms the
+# assertion against it immediately.
+#
+# A slug listed here MUST refer to a directory under
+# `content/playbooks/` that carries a CACAO finalization marker
+# (`playbook.cacao.json` or `playbook.cacao.yaml`). Listing a
+# non-finalized or non-existent slug is a hard error.
+#
+# Scope note. The EU AI Act inbound mapping surface anchors on
+# obligations applied to *providers and deployers of high-risk AI
+# systems* (Art. 9 risk-management, Art. 11 technical documentation,
+# Art. 13 transparency, Art. 72 post-market monitoring). The
+# operational execution surface for those obligations lives on the
+# `eu_ai_act_risk_management` playbook, which is the only inbound-
+# cited playbook at this stage. The playbooks listed below are
+# framework-agnostic SecOps operational surfaces that do not
+# operationalise any Art. 9 / 11 / 13 / 72 obligation directly; their
+# EU AI Act relevance (if any) is indirect and would misrepresent the
+# obligation surface if pinned via `playbook_refs:`. A sibling EXTEND
+# card revisits any cross-regime edges as ENISA / AI Office
+# implementation guidance is published.
+
+skip:
+  - slug: agentic_threat_response
+    rationale: >-
+      Framework-agnostic agentic threat-response lifecycle. The
+      EU AI Act obligation surface for Art. 9 / 11 / 13 / 72 anchors
+      on the operator's high-risk AI system risk-management playbook
+      (`eu_ai_act_risk_management`), which is the only surface that
+      operationalises those clauses. Cross-pinning a general
+      threat-response playbook under Art. 9 risk-management would
+      misrepresent the obligation surface: threat-response is a
+      SecOps operational lifecycle, not an AI-system-specific
+      risk-management process. A sibling EXTEND card revisits the
+      cross-regime edge if ENISA / AI Office guidance documents a
+      documented interaction (for example a serious incident under
+      Art. 73 arising from an AI-system compromise).
+
+  - slug: alert_triage
+    rationale: >-
+      Framework-agnostic alert-triage lifecycle. Not an AI-system
+      risk-management process — it is a general SOC operational
+      surface. Cross-pinning under Art. 9 / 11 / 13 / 72 would
+      misrepresent the obligation surface. The AI-system execution
+      surface anchors on `eu_ai_act_risk_management`.
+
+  - slug: asset_management
+    rationale: >-
+      Framework-agnostic asset-management posture. Not an AI-system-
+      specific process. The EU AI Act does not impose a general
+      asset-management obligation on providers or deployers of
+      high-risk AI systems; Art. 11 technical documentation covers
+      the AI system's own component and design record separately.
+
+  - slug: backup_recovery
+    rationale: >-
+      Framework-agnostic backup and recovery lifecycle. Not an
+      AI-system risk-management process. Cross-pinning under Art. 9
+      would misrepresent the obligation surface.
+
+  - slug: cloud_misconfiguration
+    rationale: >-
+      Framework-agnostic cloud-misconfiguration detection and
+      remediation. Not an AI-system risk-management process; the
+      Art. 9 execution surface anchors on the AI-system's own
+      documented risk-management system.
+
+  - slug: codebase_vuln_management
+    rationale: >-
+      Framework-agnostic source-code vulnerability management. Not
+      an AI-system risk-management process. Vulnerability handling
+      in the AI-system supply chain (Art. 15 accuracy / robustness
+      / cybersecurity) is a separate obligation surface not yet
+      mapped; a sibling CORE card revisits Art. 15 once the inbound
+      layer is authored.
+
+  - slug: contractual_obligations_tracker
+    rationale: >-
+      Framework-agnostic contractual-obligation tracking. Not an
+      AI-system risk-management process. Provider / deployer
+      contractual obligations under the EU AI Act (Art. 25 supply-
+      chain responsibilities) are a separate obligation surface not
+      yet mapped; a sibling CORE card revisits Art. 25 when the
+      inbound layer is authored.
+
+  - slug: cra_cvd
+    rationale: >-
+      CRA Article 14 coordinated-vulnerability-disclosure (CVD)
+      lifecycle. The playbook's outbound overlay
+      (`content/playbooks/cra_cvd/mappings.yaml`) deliberately does
+      not pin EU AI Act entries: CRA CVD anchors on product-level
+      vulnerability handling for products with digital elements,
+      which is a distinct obligation surface from EU AI Act Art. 9
+      / 11 / 13 / 72 AI-system provider / deployer duties. Cross-
+      pinning would misrepresent the obligation surface.
+
+  - slug: cra_srp_notify
+    rationale: >-
+      CRA Article 14 Single Reporting Platform (SRP) notification
+      chain. The playbook's outbound overlay
+      (`content/playbooks/cra_srp_notify/mappings.yaml`) deliberately
+      does not pin EU AI Act entries: SRP notification is a CRA
+      product-level regulator submission workflow, distinct from
+      Art. 73 EU AI Act serious-incident reporting to the market-
+      surveillance authority. A sibling EXTEND card revisits Art. 73
+      once the AI Office incident-reporting intake schema is
+      documented.
+
+  - slug: crypto_posture_management
+    rationale: >-
+      Framework-agnostic cryptographic-posture management. Not an
+      AI-system risk-management process. The Art. 15 accuracy /
+      robustness / cybersecurity obligation on high-risk AI systems
+      is a separate inbound surface not yet mapped.
+
+  - slug: cyber_hygiene_training
+    rationale: >-
+      Framework-agnostic cyber-hygiene training. Not an AI-system-
+      specific process; deployer instruction-for-use obligations
+      under Art. 13(3)(b)(vi) are documentation-side, not training-
+      programme-side. A sibling EXTEND card revisits Art. 13 if a
+      deployer-facing training obligation surface is authored.
+
+  - slug: data_exfil
+    rationale: >-
+      Framework-agnostic data-exfiltration response lifecycle. Not
+      an AI-system risk-management process. Cross-pinning under
+      Art. 9 or Art. 72 would misrepresent the obligation surface.
+
+  - slug: data_protection_impact_assessment
+    rationale: >-
+      GDPR Article 35 data-protection impact assessment (DPIA)
+      lifecycle. The playbook's outbound overlay
+      (`content/playbooks/data_protection_impact_assessment/mappings.yaml`)
+      deliberately does not pin EU AI Act entries: the AI Act
+      Fundamental-Rights Impact Assessment (Art. 27, deployer
+      obligation) is a distinct instrument from the GDPR DPIA, and
+      cross-pinning the DPIA lifecycle under Art. 9 / 11 / 13 / 72
+      would misrepresent the obligation surface. A sibling EXTEND
+      card revisits Art. 27 when the deployer FRIA inbound surface
+      is authored.
+
+  - slug: data_subject_rights
+    rationale: >-
+      GDPR Chapter III data-subject-rights (DSR) intake and
+      fulfilment lifecycle. Not an AI-system risk-management
+      process. Cross-pinning under Art. 9 / 11 / 13 / 72 would
+      misrepresent the obligation surface; DSR obligations are
+      GDPR-anchored and cross-regime only when Recital 9 is engaged
+      via an Art. 35 DPIA-adjacent processing envelope, which is
+      already handled by the DPIA playbook's own exclusion.
+
+  - slug: ddos_response
+    rationale: >-
+      Framework-agnostic DDoS response lifecycle. Not an AI-system
+      risk-management process; the Art. 15 cybersecurity obligation
+      on high-risk AI systems anchors on AI-system-specific attack
+      surfaces (data poisoning, adversarial examples, model
+      inversion), not on general DDoS response.
+
+  - slug: detection_engineering
+    rationale: >-
+      Framework-agnostic detection-engineering lifecycle. Not an
+      AI-system risk-management process.
+
+  - slug: dora_ict_risk_selfassess
+    rationale: >-
+      DORA Chapter II ICT risk-management whole-Chapter operator
+      self-assessment roll-up. The playbook's outbound overlay
+      deliberately does not pin EU AI Act entries: DORA ICT risk
+      management is a financial-entity-specific obligation surface
+      distinct from EU AI Act high-risk AI-system provider /
+      deployer duties. A sibling EXTEND card revisits the cross-
+      regime graph if a documented shared attestation surface
+      emerges (for example a financial-entity operator subject to
+      both DORA and EU AI Act Annex III use-case duties).
+
+  - slug: executive_metrics
+    rationale: >-
+      Reporting playbook that aggregates KPI / KRI evidence for
+      board-level review; it is not the operational object of any
+      single EU AI Act Article 9 / 11 / 13 / 72 obligation. It
+      surfaces indirectly via the `metric_refs:` on each clause's
+      mapping rather than via `playbook_refs:`, which is the
+      audited convention for reporting playbooks across every
+      framework.
+
+  - slug: iam_auditor
+    rationale: >-
+      Framework-agnostic IAM audit lifecycle. Not an AI-system-
+      specific process; deployer human-oversight obligations under
+      Art. 14 are a separate inbound surface not yet mapped.
+
+  - slug: identity_compromise
+    rationale: >-
+      Framework-agnostic identity-compromise response lifecycle.
+      Not an AI-system risk-management process.
+
+  - slug: incident_management
+    rationale: >-
+      Framework-agnostic incident-management lifecycle. Not an
+      AI-system-specific process. Art. 73 serious-incident
+      reporting to the market-surveillance authority is a distinct
+      obligation surface not yet mapped; a sibling EXTEND card
+      revisits Art. 73 once the AI Office incident-reporting intake
+      schema is documented.
+
+  - slug: infra_posture_management
+    rationale: >-
+      Framework-agnostic infrastructure-posture management. Not an
+      AI-system risk-management process.
+
+  - slug: it_security_support_agent
+    rationale: >-
+      Framework-agnostic IT-security support-desk agent lifecycle.
+      Not an AI-system-specific process.
+
+  - slug: mfa_secured_comms
+    rationale: >-
+      Framework-agnostic MFA-secured-communications lifecycle. Not
+      an AI-system risk-management process.
+
+  - slug: nis2_self_assessment
+    rationale: >-
+      NIS2 Art. 21 risk-management whole-Article operator self-
+      assessment roll-up. The playbook's outbound overlay
+      deliberately does not pin EU AI Act entries: NIS2 essential /
+      important-entity risk-management measures are a distinct
+      obligation surface from EU AI Act high-risk AI-system
+      provider / deployer duties. Cross-pinning would misrepresent
+      the obligation surface; the NIS2 Art. 21(2)(a) inbound edge
+      to Art. 9 is already recorded at the mapping-layer cross-
+      regime edge in `article-9-risk-management.yaml`.
+
+  - slug: on_call_rotation
+    rationale: >-
+      Framework-agnostic on-call-rotation lifecycle. Not an
+      AI-system-specific process.
+
+  - slug: onboarding_offboarding_tracker
+    rationale: >-
+      Framework-agnostic identity onboarding / offboarding
+      lifecycle. Not an AI-system-specific process.
+
+  - slug: patch_management
+    rationale: >-
+      Framework-agnostic patch-management lifecycle. Not an
+      AI-system-specific process; the Art. 15 accuracy / robustness
+      / cybersecurity obligation anchors on AI-system-specific
+      component and model update surfaces, not on general OS /
+      application patch management.
+
+  - slug: phishing_triage
+    rationale: >-
+      Framework-agnostic phishing-triage lifecycle. Not an
+      AI-system risk-management process.
+
+  - slug: post_incident_review
+    rationale: >-
+      Framework-agnostic post-incident-review lifecycle. Not an
+      AI-system-specific process. Art. 73 serious-incident
+      reporting has its own review surface not yet mapped; a
+      sibling EXTEND card revisits Art. 73 when the AI Office
+      incident-reporting intake schema is documented.
+
+  - slug: ransomware_containment
+    rationale: >-
+      Framework-agnostic ransomware-containment lifecycle. Not an
+      AI-system risk-management process.
+
+  - slug: supply_chain_security
+    rationale: >-
+      Framework-agnostic supply-chain-security lifecycle. Not an
+      AI-system-specific process; the Art. 25 supply-chain
+      responsibilities of providers / deployers are a distinct
+      obligation surface not yet mapped, and pinning the general
+      supply-chain playbook under Art. 9 / 11 / 13 / 72 would
+      misrepresent the obligation surface. A sibling CORE card
+      revisits Art. 25 when the inbound layer is authored.
+
+  - slug: threat_intel_ingest
+    rationale: >-
+      Framework-agnostic threat-intelligence ingest lifecycle. Not
+      an AI-system risk-management process.
+
+  - slug: vuln_intake
+    rationale: >-
+      Framework-agnostic vulnerability-intake lifecycle. Not an
+      AI-system-specific process; the Art. 15 accuracy / robustness
+      / cybersecurity obligation anchors on AI-system-specific
+      vulnerability surfaces distinct from general vuln intake.
