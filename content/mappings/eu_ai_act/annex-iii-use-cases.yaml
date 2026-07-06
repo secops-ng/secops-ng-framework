@@ -1,0 +1,285 @@
+# EU AI Act — Annex III high-risk AI use-case enumeration.
+#
+# Annex III of Regulation (EU) 2024/1689 enumerates eight areas in which
+# AI systems are classified as high-risk under Art. 6(2) irrespective of
+# any Annex II product-safety intersection. Each area is landed as one
+# entry below; each entry cites the Annex III paragraph reference and
+# the EUR-Lex authoritative permalink of Regulation (EU) 2024/1689.
+#
+# Scope note: the Annex III paragraph text names specific sub-classes
+# of AI systems within each area (for example, remote biometric
+# identification systems under paragraph (1), or AI systems used to
+# evaluate creditworthiness under paragraph (5)(b)); this SKELETON
+# entry captures the area-level classification atom only. Per-sub-class
+# enumeration lands on a sibling card when the compiler needs a
+# fine-grained overlay surface.
+#
+# The Art. 6(3) provider derogation on the Annex III presumption and
+# the Art. 6(4)-(6) Commission delegated-act track are recorded on the
+# sibling article-6-classification.yaml file as out-of-scope for this
+# SKELETON.
+regime: eu_ai_act
+entries:
+  - id: eu_ai_act:annex-iii-1-biometrics
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: Annex III(1)
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      AI systems in the biometrics area, in so far as their use is
+      permitted under Union or national law: remote biometric
+      identification systems (excluding AI systems intended to be used
+      for biometric verification whose sole purpose is to confirm that
+      a specific natural person is the person they claim to be);
+      AI systems intended to be used for biometric categorisation
+      according to sensitive or protected attributes or characteristics
+      based on the inference of those attributes or characteristics;
+      and AI systems intended to be used for emotion recognition.
+    status: draft
+    control_refs: []
+    playbook_refs:
+      - playbook.eu_ai_act_risk_management@v1
+    metric_refs: []
+    evidence_stream_refs: []
+    notes: >-
+      Annex III paragraph (1) — biometrics area. Classification atom
+      exercised by the identify-high-risk-AI-system step of the
+      eu_ai_act_risk_management playbook when the operator inventory
+      surfaces a biometric identification, categorisation, or emotion-
+      recognition system. Recital 54 records the interaction with the
+      Art. 5 prohibitions on real-time remote biometric identification
+      in publicly accessible spaces for law enforcement; that
+      prohibition surface is out of scope for this SKELETON entry
+      and lands on a sibling card.
+
+  - id: eu_ai_act:annex-iii-2-critical-infrastructure
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: Annex III(2)
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      AI systems intended to be used as safety components in the
+      management and operation of critical digital infrastructure, road
+      traffic, or in the supply of water, gas, heating or electricity.
+    status: draft
+    control_refs: []
+    playbook_refs:
+      - playbook.eu_ai_act_risk_management@v1
+    metric_refs: []
+    evidence_stream_refs: []
+    notes: >-
+      Annex III paragraph (2) — critical infrastructure area. The
+      overlap with NIS2 essential-entity sectors (Annex I of Directive
+      (EU) 2022/2555) is real but distinct: NIS2 applies to the
+      operator of the critical-infrastructure service, while Annex III
+      paragraph (2) applies to the AI system used as a safety
+      component in that operation. Cross-regime enforcement of Art. 9
+      / 11 / 13 / 72 on such an AI system stacks on top of the NIS2
+      Art. 21 risk-management measures on the operator; the NIS2
+      cross-regime edge is recorded on
+      content/mappings/eu_ai_act/article-9-risk-management.yaml.
+
+  - id: eu_ai_act:annex-iii-3-education-vocational-training
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: Annex III(3)
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      AI systems intended to be used in education and vocational
+      training: to determine access, admission or assignment of natural
+      persons to educational and vocational training institutions at
+      all levels; to evaluate learning outcomes, including where those
+      outcomes are used to steer the learning process of natural
+      persons; to assess the appropriate level of education a natural
+      person will receive or will be able to access; and to monitor
+      and detect prohibited behaviour of students during tests.
+    status: draft
+    control_refs: []
+    playbook_refs:
+      - playbook.eu_ai_act_risk_management@v1
+    metric_refs: []
+    evidence_stream_refs: []
+    notes: >-
+      Annex III paragraph (3) — education and vocational training area.
+      Classification atom exercised when the operator inventory
+      surfaces admission-decision, outcome-evaluation, level-assessment
+      or behaviour-monitoring AI systems in an education or vocational-
+      training setting.
+
+  - id: eu_ai_act:annex-iii-4-employment-workers-management
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: Annex III(4)
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      AI systems intended to be used in employment, workers management
+      and access to self-employment: for the recruitment or selection
+      of natural persons, in particular to place targeted job
+      advertisements, to analyse and filter job applications, and to
+      evaluate candidates; and to make decisions affecting terms of
+      work-related relationships, the promotion or termination of
+      work-related contractual relationships, to allocate tasks based
+      on individual behaviour or personal traits or characteristics,
+      or to monitor and evaluate the performance and behaviour of
+      persons in such relationships.
+    status: draft
+    control_refs: []
+    playbook_refs:
+      - playbook.eu_ai_act_risk_management@v1
+    metric_refs: []
+    evidence_stream_refs: []
+    notes: >-
+      Annex III paragraph (4) — employment and workers management area.
+      Classification atom exercised when the operator inventory
+      surfaces recruitment-screening, task-allocation, or
+      performance-monitoring AI systems used in employment or
+      self-employment contexts.
+
+  - id: eu_ai_act:annex-iii-5-essential-services
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: Annex III(5)
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      AI systems intended to be used to evaluate eligibility of natural
+      persons for essential public assistance benefits and services,
+      including healthcare services, as well as to grant, reduce,
+      revoke, or reclaim such benefits and services; to evaluate the
+      creditworthiness of natural persons or establish their credit
+      score (with the exception of AI systems used for the purpose of
+      detecting financial fraud); to be used for risk assessment and
+      rate-setting in relation to natural persons in the case of life
+      and health insurance; and to evaluate and classify emergency calls
+      by natural persons or to be used to dispatch, or to establish
+      priority in the dispatching of, emergency first response
+      services and emergency healthcare patient triage systems.
+    status: draft
+    control_refs: []
+    playbook_refs:
+      - playbook.eu_ai_act_risk_management@v1
+    metric_refs: []
+    evidence_stream_refs: []
+    notes: >-
+      Annex III paragraph (5) — access to and enjoyment of essential
+      private services and essential public services and benefits.
+      Covers benefits eligibility, credit scoring, life / health
+      insurance rate-setting, and emergency-response dispatch and triage.
+      The financial-fraud-detection carve-out on credit scoring is
+      the only in-paragraph exemption and is captured verbatim in the
+      obligation text.
+
+  - id: eu_ai_act:annex-iii-6-law-enforcement
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: Annex III(6)
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      AI systems intended to be used by or on behalf of law enforcement
+      authorities, or by Union institutions, bodies, offices or agencies
+      in support of law enforcement authorities, in so far as their
+      use is permitted under Union or national law: to assess the risk
+      of a natural person becoming the victim of criminal offences; as
+      polygraphs and similar tools; to evaluate the reliability of
+      evidence in the course of investigation or prosecution of
+      criminal offences; to assess the risk of a natural person of
+      offending or reoffending not solely on the basis of profiling of
+      natural persons or to assess personality traits and
+      characteristics or past criminal behaviour of natural persons or
+      groups; and for profiling of natural persons in the course of
+      detection, investigation or prosecution of criminal offences.
+    status: draft
+    control_refs: []
+    playbook_refs:
+      - playbook.eu_ai_act_risk_management@v1
+    metric_refs: []
+    evidence_stream_refs: []
+    notes: >-
+      Annex III paragraph (6) — law-enforcement area. Recital 59
+      records that the use of AI systems in law enforcement raises
+      distinct risks of function creep and discriminatory impact; the
+      Art. 5 prohibitions (predictive policing based solely on
+      profiling, untargeted scraping of facial images from the
+      internet or CCTV footage to create facial-recognition databases)
+      apply upstream of this classification and are out of scope for
+      this SKELETON entry.
+
+  - id: eu_ai_act:annex-iii-7-migration-asylum-border
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: Annex III(7)
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      AI systems intended to be used by or on behalf of competent
+      public authorities, or by Union institutions, bodies, offices or
+      agencies in the areas of migration, asylum and border-control
+      management, in so far as their use is permitted under Union or
+      national law: as polygraphs and similar tools; to assess a risk,
+      including a security risk, a risk of irregular migration, or a
+      health risk, posed by a natural person who intends to enter or
+      has entered the territory of a Member State; to assist competent
+      public authorities for the examination of applications for
+      asylum, visa or residence permits and for associated complaints
+      with regard to the eligibility of the natural persons applying
+      for a status, including related assessments of the reliability
+      of evidence; and for the purpose of detecting, recognising or
+      identifying natural persons in the context of migration, asylum
+      or border-control management, with the exception of the
+      verification of travel documents.
+    status: draft
+    control_refs: []
+    playbook_refs:
+      - playbook.eu_ai_act_risk_management@v1
+    metric_refs: []
+    evidence_stream_refs: []
+    notes: >-
+      Annex III paragraph (7) — migration, asylum and border-control
+      management area. The travel-document verification carve-out is
+      the only in-paragraph exemption and is captured verbatim in the
+      obligation text.
+
+  - id: eu_ai_act:annex-iii-8-justice-democratic-processes
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: Annex III(8)
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      AI systems intended to be used by a judicial authority or on its
+      behalf to assist a judicial authority in researching and
+      interpreting facts and the law and in applying the law to a
+      concrete set of facts, or to be used in a similar way in
+      alternative dispute resolution; and AI systems intended to be
+      used for influencing the outcome of an election or referendum or
+      the voting behaviour of natural persons in the exercise of their
+      vote in elections or referenda (with the exception of AI systems
+      to the output of which natural persons are not directly exposed,
+      such as tools used to organise, optimise or structure political
+      campaigns from an administrative or logistical point of view).
+    status: draft
+    control_refs: []
+    playbook_refs:
+      - playbook.eu_ai_act_risk_management@v1
+    metric_refs: []
+    evidence_stream_refs: []
+    notes: >-
+      Annex III paragraph (8) — administration of justice and
+      democratic processes area. Covers judicial-decision-support
+      systems and election / referendum influencing systems. The
+      campaign-logistics carve-out on the election-influencing
+      sub-class is the only in-paragraph exemption and is captured
+      verbatim in the obligation text.
