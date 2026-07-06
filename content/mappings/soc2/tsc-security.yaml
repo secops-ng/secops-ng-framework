@@ -1,0 +1,872 @@
+# SOC 2 Trust Services Criteria — Security (Common Criteria).
+#
+# AICPA Trust Services Criteria for Security (2017, as revised).
+# The Security category is the mandatory baseline for any SOC 2
+# report and comprises the Common Criteria (CC series), organised
+# against the COSO 2013 internal-control framework and extended
+# with technology-focused criteria. CC1–CC5 mirror the five COSO
+# components (control environment, communication and information,
+# risk assessment, monitoring activities, control activities);
+# CC6–CC9 are the extensions specific to information systems
+# (logical/physical access, system operations, change management,
+# risk mitigation).
+#
+# Scope of this file: the Security category (CC1.1 through CC9.2,
+# 33 criteria). The other four Trust Services categories —
+# Availability (A-series), Confidentiality (C-series), Processing
+# Integrity (PI-series), and Privacy (P-series) — land as sibling
+# files under content/mappings/soc2/ on future cards.
+#
+# Regime scope caveat: SOC 2 is a private-sector assurance
+# framework (AICPA attestation standard AT-C 105 / AT-C 205), not
+# an EU statutory instrument. The crosswalk is a structural
+# pointer against the operator's own report-time evidence — the
+# assertion here is that the named artifacts exercise the
+# criterion in practice, not that they constitute a legal or
+# auditor interpretation of the TSC.
+#
+# Coverage caveat: many CC criteria are governance / process
+# obligations discharged against operator-owned artifacts (board
+# minutes, org charts, HR records, vendor contracts) rather than
+# against the SecOps-NG content catalogue directly. Those entries
+# ship `control_refs: []` with an explanatory gap note; the
+# operator's own evidence discharges the criterion in practice.
+
+regime: soc2
+entries:
+
+  # ─── CC1: Control Environment ─────────────────────────────────
+
+  - id: soc2:cc1-1-integrity-and-ethical-values
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC1.1
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity demonstrates a commitment to integrity and ethical
+      values. Standards of conduct, tone at the top, and processes
+      that evaluate adherence to those standards must exist and be
+      documented across the workforce and outsourced providers.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+      - control.training_attestation@v1
+    playbook_refs:
+      - playbook.cyber_hygiene_training@v1
+    notes: >-
+      CC1.1 is a governance / tone-at-the-top obligation. The
+      SecOps-NG policy-set anchor (risk_management_policy) plus the
+      workforce acknowledgement-of-policy surface
+      (training_attestation, exercised via cyber_hygiene_training)
+      discharge the operator-side evidence slice; the code-of-conduct
+      instrument itself is out of scope of the SecOps-NG catalogue.
+
+  - id: soc2:cc1-2-board-oversight
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC1.2
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The board of directors (or equivalent governance body)
+      demonstrates independence from management and exercises
+      oversight of the development and performance of internal
+      control over the systems in scope.
+    status: draft
+    control_refs:
+      - control.ict_risk_governance@v1
+    playbook_refs: []
+    notes: >-
+      ict_risk_governance carries the governance-and-oversight
+      anchor that a reviewer joins against the operator's own board
+      minutes / committee charters. No operational playbook is
+      wired: CC1.2 is a governance-only obligation.
+
+  - id: soc2:cc1-3-organizational-structure-and-authority
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC1.3
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      Management establishes, with board oversight, structures,
+      reporting lines, and appropriate authorities and
+      responsibilities in the pursuit of the entity's objectives.
+    status: draft
+    control_refs:
+      - control.ict_risk_governance@v1
+      - control.jml_evidence@v1
+    playbook_refs:
+      - playbook.onboarding_offboarding_tracker@v1
+    notes: >-
+      ict_risk_governance anchors the reporting-line and authority
+      slice; jml_evidence exercises the assignment-of-role slice
+      through the joiner-mover-leaver lifecycle. The operator's org
+      chart / RACI is the source instrument.
+
+  - id: soc2:cc1-4-commitment-to-competence
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC1.4
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity demonstrates a commitment to attract, develop, and
+      retain competent individuals in alignment with its objectives.
+      Training, background verification, and performance evaluation
+      processes must be evidenced.
+    status: draft
+    control_refs:
+      - control.training_attestation@v1
+      - control.jml_evidence@v1
+    playbook_refs:
+      - playbook.cyber_hygiene_training@v1
+      - playbook.onboarding_offboarding_tracker@v1
+    notes: >-
+      training_attestation carries the workforce-competence anchor;
+      jml_evidence carries the pre-hire verification slice. Formal
+      performance evaluation is out of scope of the SecOps-NG
+      catalogue and discharges against HR records.
+
+  - id: soc2:cc1-5-accountability-for-internal-control
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC1.5
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity holds individuals accountable for their internal
+      control responsibilities in the pursuit of objectives.
+      Performance measures, incentives, and corrective actions
+      relative to those responsibilities must be evidenced.
+    status: draft
+    control_refs:
+      - control.control_effectiveness_test@v1
+      - control.ict_risk_framework_review@v1
+    playbook_refs: []
+    notes: >-
+      control_effectiveness_test and ict_risk_framework_review
+      exercise the periodic effectiveness-review discipline that
+      surfaces accountability gaps to management. Individual
+      performance / incentive instruments are out of scope of the
+      SecOps-NG catalogue.
+
+  # ─── CC2: Communication and Information ──────────────────────
+
+  - id: soc2:cc2-1-information-quality
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC2.1
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity obtains or generates and uses relevant, quality
+      information to support the functioning of internal control,
+      including information necessary to design, implement, and
+      operate controls over the systems in scope.
+    status: draft
+    control_refs:
+      - control.detection_coverage_evidence@v1
+    playbook_refs:
+      - playbook.executive_metrics@v1
+    notes: >-
+      detection_coverage_evidence exercises the security-relevant
+      information-quality slice (what signals the operator generates
+      to inform control operation); executive_metrics is the
+      rollup surface that carries the resulting information to
+      governance. Broader business-information quality is discharged
+      against the operator's own data-governance posture.
+
+  - id: soc2:cc2-2-internal-communication
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC2.2
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity internally communicates information, including
+      objectives and responsibilities for internal control, necessary
+      to support the functioning of internal control. Communication
+      to personnel about their responsibilities and to management for
+      oversight must be evidenced.
+    status: draft
+    control_refs:
+      - control.crisis_communication_plan@v1
+      - control.training_attestation@v1
+    playbook_refs:
+      - playbook.on_call_rotation@v1
+      - playbook.cyber_hygiene_training@v1
+    notes: >-
+      crisis_communication_plan carries the incident-time internal
+      communication anchor; training_attestation and
+      cyber_hygiene_training carry the steady-state
+      responsibilities-communication slice. on_call_rotation
+      exercises the operational escalation channel.
+
+  - id: soc2:cc2-3-external-communication
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC2.3
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity communicates with external parties regarding matters
+      affecting the functioning of internal control, including
+      customer commitments, vendor requirements, regulatory reporting
+      channels, and channels for external parties to report issues.
+    status: draft
+    control_refs:
+      - control.crisis_communication_plan@v1
+      - control.vuln_disclosure_intake@v1
+    playbook_refs:
+      - playbook.contractual_obligations_tracker@v1
+      - playbook.cra_srp_notify@v1
+    notes: >-
+      crisis_communication_plan carries the external-notification
+      anchor; vuln_disclosure_intake carries the third-party
+      vulnerability-reporting inbound channel;
+      contractual_obligations_tracker carries the downstream-party
+      and vendor commitment surface; cra_srp_notify exercises the
+      regulatory-notification slice against the EU CRA regime.
+
+  # ─── CC3: Risk Assessment ────────────────────────────────────
+
+  - id: soc2:cc3-1-objectives-with-clarity
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC3.1
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity specifies objectives with sufficient clarity to
+      enable the identification and assessment of risks relating to
+      those objectives, including operations, external reporting,
+      internal reporting, and compliance objectives.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+    playbook_refs: []
+    notes: >-
+      risk_management_policy carries the policy-set anchor that a
+      reviewer joins against the operator's own objective-setting
+      artifacts. CC3.1 is a governance obligation with no
+      operational playbook surface.
+
+  - id: soc2:cc3-2-risk-identification-and-analysis
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC3.2
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity identifies risks to the achievement of its
+      objectives across the entity and analyzes risks as a basis for
+      determining how the risks should be managed. Risk assessment
+      must consider likelihood, impact, and the resulting response.
+    status: draft
+    control_refs:
+      - control.ict_risk_governance@v1
+      - control.ict_risk_framework_review@v1
+    playbook_refs:
+      - playbook.dora_ict_risk_selfassess@v1
+      - playbook.nis2_self_assessment@v1
+    notes: >-
+      ict_risk_governance and ict_risk_framework_review carry the
+      risk-identification / analysis / framework-review anchors;
+      the two self-assessment playbooks (dora_ict_risk_selfassess,
+      nis2_self_assessment) exercise the periodic assessment
+      discipline against the operator's own risk register.
+
+  - id: soc2:cc3-3-fraud-risk
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC3.3
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity considers the potential for fraud in assessing risks
+      to the achievement of objectives, including opportunities,
+      pressures, and rationalizations that could result in
+      inappropriate management override or misuse of the system.
+    status: draft
+    control_refs: []
+    playbook_refs: []
+    notes: >-
+      CC3.3 is discharged against a dedicated fraud-risk assessment
+      artifact, not present in the SecOps-NG catalogue. The
+      operator's own fraud-risk register, joined against the
+      privileged-access-review anchor (which exercises the
+      management-override-detection slice) and the segregation-of-
+      duties discipline anchored under ISO 27001 A.5.3, discharges
+      it in practice.
+
+  - id: soc2:cc3-4-change-risk-assessment
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC3.4
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity identifies and assesses changes that could
+      significantly impact the system of internal control, including
+      changes in the external environment, business model, leadership,
+      and information systems.
+    status: draft
+    control_refs:
+      - control.ict_risk_framework_review@v1
+      - control.iac_policy_guardrail@v1
+    playbook_refs:
+      - playbook.infra_posture_management@v1
+      - playbook.patch_management@v1
+    notes: >-
+      ict_risk_framework_review carries the periodic
+      framework-level change-review discipline;
+      iac_policy_guardrail carries the infrastructure-change
+      guardrail; infra_posture_management and patch_management
+      exercise the operational infrastructure-change surface.
+
+  # ─── CC4: Monitoring Activities ──────────────────────────────
+
+  - id: soc2:cc4-1-ongoing-and-separate-evaluations
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC4.1
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity selects, develops, and performs ongoing and/or
+      separate evaluations to ascertain whether the components of
+      internal control are present and functioning.
+    status: draft
+    control_refs:
+      - control.control_effectiveness_test@v1
+      - control.security_assessment@v1
+    playbook_refs:
+      - playbook.executive_metrics@v1
+    notes: >-
+      control_effectiveness_test carries the per-control
+      ongoing-evaluation anchor; security_assessment carries the
+      independent-separate-evaluation anchor;
+      executive_metrics is the rollup surface that carries the
+      evaluation results to governance.
+
+  - id: soc2:cc4-2-evaluation-and-communication-of-deficiencies
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC4.2
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity evaluates and communicates internal control
+      deficiencies in a timely manner to those parties responsible
+      for taking corrective action, including senior management and
+      the board of directors, as appropriate.
+    status: draft
+    control_refs:
+      - control.post_incident_learning@v1
+      - control.recurring_incident_correlator@v1
+    playbook_refs:
+      - playbook.post_incident_review@v1
+    notes: >-
+      post_incident_learning and recurring_incident_correlator carry
+      the deficiency-identification-and-communication anchors;
+      post_incident_review exercises the operational lessons-learned
+      and corrective-action-communication flow.
+
+  # ─── CC5: Control Activities ─────────────────────────────────
+
+  - id: soc2:cc5-1-selection-and-development-of-control-activities
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC5.1
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity selects and develops control activities that
+      contribute to the mitigation of risks to the achievement of
+      objectives to acceptable levels.
+    status: draft
+    control_refs: []
+    playbook_refs: []
+    notes: >-
+      CC5.1 is the meta-obligation that control activities exist —
+      the SecOps-NG catalogue as a whole (content/controls/ plus
+      content/playbooks/), joined against the risk-analysis
+      discipline anchored under CC3.2 and the review discipline
+      anchored under CC4.1, discharges it in practice. No single
+      artifact anchor is meaningful for this meta-obligation.
+
+  - id: soc2:cc5-2-technology-general-controls
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC5.2
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity also selects and develops general control activities
+      over technology to support the achievement of objectives,
+      including technology infrastructure control activities, security
+      management process controls, and technology acquisition,
+      development, and maintenance process controls.
+    status: draft
+    control_refs:
+      - control.configuration_settings@v1
+      - control.baseline_configuration@v1
+      - control.iac_policy_guardrail@v1
+    playbook_refs:
+      - playbook.infra_posture_management@v1
+    notes: >-
+      configuration_settings, baseline_configuration, and
+      iac_policy_guardrail carry the technology-general-control
+      anchors; infra_posture_management exercises the operational
+      posture-drift surface that ties them together.
+
+  - id: soc2:cc5-3-deployment-of-policies-and-procedures
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC5.3
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity deploys control activities through policies that
+      establish what is expected and through procedures that put
+      policies into action.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+      - control.training_attestation@v1
+    playbook_refs:
+      - playbook.cyber_hygiene_training@v1
+    notes: >-
+      risk_management_policy carries the policy-deployment anchor;
+      training_attestation and cyber_hygiene_training carry the
+      workforce-awareness-of-procedures slice. The procedures
+      themselves are the content/playbooks/ set.
+
+  # ─── CC6: Logical and Physical Access Controls ───────────────
+
+  - id: soc2:cc6-1-logical-access-controls
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC6.1
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity implements logical access security software,
+      infrastructure, and architectures over protected information
+      assets to protect them from security events to meet the
+      entity's objectives. Access is restricted to authorised users
+      through identification, authentication, and authorisation
+      controls.
+    status: draft
+    control_refs:
+      - control.access_enforcement@v1
+      - control.least_privilege@v1
+      - control.cloud_identity_least_privilege@v1
+    playbook_refs:
+      - playbook.iam_auditor@v1
+    notes: >-
+      access_enforcement, least_privilege, and
+      cloud_identity_least_privilege carry the logical-access-control
+      anchors across on-prem and cloud; iam_auditor exercises the
+      operational access-audit surface.
+
+  - id: soc2:cc6-2-user-registration-and-authorization
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC6.2
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      Prior to issuing system credentials and granting system access,
+      the entity registers and authorises new internal and external
+      users whose access is administered by the entity. For those
+      users whose access is administered by the entity, user system
+      credentials are removed when user access is no longer
+      authorised.
+    status: draft
+    control_refs:
+      - control.jml_evidence@v1
+      - control.account_management@v1
+    playbook_refs:
+      - playbook.onboarding_offboarding_tracker@v1
+    notes: >-
+      jml_evidence carries the joiner-side pre-issuance
+      authorisation anchor and the leaver-side removal anchor;
+      account_management carries the credential-lifecycle anchor;
+      onboarding_offboarding_tracker exercises the operational
+      lifecycle flow.
+
+  - id: soc2:cc6-3-authorization-modification-and-removal-of-access
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC6.3
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity authorises, modifies, or removes access to data,
+      software, functions, and other protected information assets
+      based on roles, responsibilities, or the system design and
+      changes, giving consideration to the concepts of least
+      privilege and segregation of duties, to meet the entity's
+      objectives.
+    status: draft
+    control_refs:
+      - control.account_management@v1
+      - control.privileged_access_review@v1
+      - control.jml_evidence@v1
+    playbook_refs:
+      - playbook.iam_auditor@v1
+      - playbook.onboarding_offboarding_tracker@v1
+    notes: >-
+      account_management carries the modification anchor;
+      privileged_access_review carries the periodic-recertification
+      anchor including the segregation-of-duties surface;
+      jml_evidence carries the mover / leaver lifecycle. iam_auditor
+      and onboarding_offboarding_tracker exercise the operational
+      flows.
+
+  - id: soc2:cc6-4-physical-access
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC6.4
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity restricts physical access to facilities and
+      protected information assets (for example, data centre
+      facilities, back-up media storage, and other sensitive
+      locations) to authorised personnel to meet the entity's
+      objectives.
+    status: draft
+    control_refs: []
+    playbook_refs: []
+    notes: >-
+      SecOps-NG control catalogue is scoped to logical / cyber
+      controls; physical-access enforcement is out of scope. The
+      operator's own facilities-security evidence (badge-access
+      logs, visitor-management records, data-centre provider
+      attestations) discharges CC6.4 in practice, joined against
+      the physical-controls crosswalk under ISO 27001 A.7 and the
+      supplier-attestation anchor for outsourced hosting.
+
+  - id: soc2:cc6-5-asset-removal-and-secure-disposal
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC6.5
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity discontinues logical and physical protections over
+      physical assets only after the ability to read or recover data
+      and software from those assets has been diminished and is no
+      longer required to meet the entity's objectives.
+    status: draft
+    control_refs:
+      - control.asset_inventory_delta@v1
+      - control.jml_evidence@v1
+    playbook_refs:
+      - playbook.asset_management@v1
+    notes: >-
+      asset_inventory_delta carries the asset-tracking anchor;
+      jml_evidence carries the endpoint-return leaver-side slice;
+      asset_management exercises the reconciliation-and-disposal
+      flow. Sanitisation of decommissioned media itself is
+      discharged against the operator's own media-disposal
+      procedures, joined against ISO 27001 A.7.14 and A.8.10.
+
+  - id: soc2:cc6-6-boundary-protection
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC6.6
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity implements logical access security measures to
+      protect against threats from sources outside its system
+      boundaries, including boundary protection systems,
+      authentication of external users and processes, and protection
+      of communication sessions against interception and replay.
+    status: draft
+    control_refs:
+      - control.mfa_state_probe@v1
+      - control.service_identification_authentication@v1
+      - control.access_enforcement@v1
+    playbook_refs:
+      - playbook.mfa_secured_comms@v1
+    notes: >-
+      mfa_state_probe carries the external-user authentication
+      anchor; service_identification_authentication carries the
+      external-process authentication anchor; access_enforcement
+      carries the boundary-enforcement anchor. mfa_secured_comms
+      exercises the operational secured-session surface.
+
+  - id: soc2:cc6-7-transmission-and-movement-of-information
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC6.7
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity restricts the transmission, movement, and removal
+      of information to authorised internal and external users and
+      processes, and protects it during transmission, movement, or
+      removal to meet the entity's objectives.
+    status: draft
+    control_refs:
+      - control.crypto_policy_inventory@v1
+      - control.cert_posture_scan@v1
+      - control.key_rotation_evidence@v1
+    playbook_refs:
+      - playbook.crypto_posture_management@v1
+      - playbook.data_exfil@v1
+    notes: >-
+      The crypto-posture trio (crypto_policy_inventory,
+      cert_posture_scan, key_rotation_evidence) carries the
+      in-transit protection anchors; crypto_posture_management
+      exercises the operational posture-review surface;
+      data_exfil exercises the exfiltration-detection / response
+      slice for unauthorised movement.
+
+  - id: soc2:cc6-8-malicious-software-prevention
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC6.8
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity implements controls to prevent or detect and act
+      upon the introduction of unauthorised or malicious software to
+      meet the entity's objectives.
+    status: draft
+    control_refs:
+      - control.sbom_capture@v1
+    playbook_refs:
+      - playbook.threat_intel_ingest@v1
+      - playbook.codebase_vuln_management@v1
+    notes: >-
+      sbom_capture carries the software-inventory / provenance
+      anchor for the unauthorised-software slice;
+      threat_intel_ingest exercises the malware-signal-intake
+      surface; codebase_vuln_management exercises the
+      dependency-hygiene slice. A dedicated anti-malware artifact
+      is not present in the SecOps-NG catalogue (same gap noted
+      under ISO 27001 A.8.7); the operator's endpoint / server
+      anti-malware tooling discharges the detect-and-act slice.
+
+  # ─── CC7: System Operations ──────────────────────────────────
+
+  - id: soc2:cc7-1-detection-of-configuration-changes
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC7.1
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      To meet its objectives, the entity uses detection and
+      monitoring procedures to identify (1) changes to configurations
+      that result in the introduction of new vulnerabilities and (2)
+      susceptibilities to newly discovered vulnerabilities.
+    status: draft
+    control_refs:
+      - control.configuration_settings@v1
+      - control.baseline_configuration@v1
+      - control.cspm_baseline@v1
+      - control.patch_evidence@v1
+    playbook_refs:
+      - playbook.infra_posture_management@v1
+      - playbook.cloud_misconfiguration@v1
+    notes: >-
+      The configuration trio (configuration_settings,
+      baseline_configuration, cspm_baseline) carries the
+      configuration-drift-detection anchors; patch_evidence carries
+      the newly-disclosed-vulnerability response anchor;
+      infra_posture_management and cloud_misconfiguration
+      exercise the operational posture-drift surfaces.
+
+  - id: soc2:cc7-2-monitoring-of-system-components
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC7.2
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity monitors system components and the operation of
+      those components for anomalies that are indicative of malicious
+      acts, natural disasters, and errors affecting the entity's
+      ability to meet its objectives; anomalies are analysed to
+      determine whether they represent security events.
+    status: draft
+    control_refs:
+      - control.detection_coverage_evidence@v1
+    playbook_refs:
+      - playbook.detection_engineering@v1
+      - playbook.alert_triage@v1
+    notes: >-
+      detection_coverage_evidence carries the monitoring-coverage
+      anchor; detection_engineering exercises the
+      coverage-authoring lifecycle; alert_triage exercises the
+      anomaly-analysis / event-classification surface.
+
+  - id: soc2:cc7-3-evaluation-of-security-events
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC7.3
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity evaluates security events to determine whether they
+      could or have resulted in a failure of the entity to meet its
+      objectives (security incidents) and, if so, takes actions to
+      prevent or address such failures.
+    status: draft
+    control_refs:
+      - control.incident_timeline_signals@v1
+      - control.incident_handling_capability@v1
+    playbook_refs:
+      - playbook.alert_triage@v1
+      - playbook.incident_management@v1
+    notes: >-
+      incident_timeline_signals carries the event-to-incident
+      evaluation anchor; incident_handling_capability carries the
+      response-capability anchor; alert_triage and
+      incident_management exercise the operational surfaces.
+
+  - id: soc2:cc7-4-security-incident-response
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC7.4
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity responds to identified security incidents by
+      executing a defined incident response programme to understand,
+      contain, remediate, and communicate security incidents, as
+      appropriate.
+    status: draft
+    control_refs:
+      - control.incident_handling_capability@v1
+      - control.incident_timeline_signals@v1
+      - control.crisis_communication_plan@v1
+      - control.oob_channel_probe@v1
+    playbook_refs:
+      - playbook.incident_management@v1
+      - playbook.on_call_rotation@v1
+    notes: >-
+      incident_handling_capability is the response-programme anchor;
+      incident_timeline_signals carries the timeline-reconstruction
+      anchor; crisis_communication_plan and oob_channel_probe
+      carry the communication anchors including the
+      out-of-band channel required when in-band comms are
+      compromised; incident_management and on_call_rotation
+      exercise the operational surfaces.
+
+  - id: soc2:cc7-5-recovery-from-incidents
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC7.5
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity identifies, develops, and implements activities to
+      recover from identified security incidents.
+    status: draft
+    control_refs:
+      - control.restore_drill@v1
+      - control.backup_attestation@v1
+      - control.post_incident_learning@v1
+    playbook_refs:
+      - playbook.backup_recovery@v1
+      - playbook.post_incident_review@v1
+    notes: >-
+      restore_drill and backup_attestation carry the
+      recovery-capability anchors; post_incident_learning carries
+      the lessons-learned anchor that feeds the next iteration;
+      backup_recovery and post_incident_review exercise the
+      operational surfaces.
+
+  # ─── CC8: Change Management ──────────────────────────────────
+
+  - id: soc2:cc8-1-change-management
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC8.1
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity authorises, designs, develops or acquires,
+      configures, documents, tests, approves, and implements changes
+      to infrastructure, data, software, and procedures to meet its
+      objectives.
+    status: draft
+    control_refs:
+      - control.iac_policy_guardrail@v1
+      - control.configuration_settings@v1
+      - control.baseline_configuration@v1
+    playbook_refs:
+      - playbook.infra_posture_management@v1
+      - playbook.patch_management@v1
+    notes: >-
+      iac_policy_guardrail carries the infrastructure-change
+      guardrail anchor (already carrying ISO 27001 A.8.32 on its
+      oscal_refs block); configuration_settings and
+      baseline_configuration carry the configuration-state anchors;
+      infra_posture_management and patch_management exercise the
+      operational change surfaces.
+
+  # ─── CC9: Risk Mitigation ────────────────────────────────────
+
+  - id: soc2:cc9-1-risk-mitigation-activities
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC9.1
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity identifies, selects, and develops risk mitigation
+      activities for risks arising from potential business
+      disruptions, including insurance coverage where appropriate
+      and business-continuity planning.
+    status: draft
+    control_refs:
+      - control.ict_risk_governance@v1
+      - control.ict_risk_framework_review@v1
+      - control.restore_drill@v1
+    playbook_refs:
+      - playbook.dora_ict_risk_selfassess@v1
+      - playbook.backup_recovery@v1
+    notes: >-
+      ict_risk_governance and ict_risk_framework_review carry the
+      risk-selection and framework-review anchors; restore_drill
+      carries the exercised-recovery anchor for the
+      business-continuity slice; dora_ict_risk_selfassess and
+      backup_recovery exercise the operational surfaces. Insurance
+      coverage itself is out of scope of the SecOps-NG catalogue.
+
+  - id: soc2:cc9-2-vendor-and-business-partner-risk-management
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: CC9.2
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity assesses and manages risks associated with vendors
+      and business partners, including selection, due diligence,
+      contractual commitments, ongoing monitoring, and termination
+      of vendor and business-partner relationships.
+    status: draft
+    control_refs:
+      - control.supplier_inventory@v1
+      - control.provider_attestation@v1
+      - control.sbom_capture@v1
+    playbook_refs:
+      - playbook.supply_chain_security@v1
+      - playbook.contractual_obligations_tracker@v1
+    notes: >-
+      supplier_inventory carries the vendor-registry anchor;
+      provider_attestation carries the ongoing-monitoring anchor
+      for outsourced-service assertions; sbom_capture carries the
+      component-provenance anchor for the ICT-supply-chain slice;
+      supply_chain_security and contractual_obligations_tracker
+      exercise the operational surfaces.
