@@ -1,0 +1,117 @@
+# SKELETON overlay for the eu_ai_act_risk_management playbook.
+#
+# Playbook-side outbound overlay. Per the AGENTS.md convention every
+# finalized playbook (one carrying a playbook.cacao.json) must ship a
+# mappings.yaml so the orphan-CI guard in
+# tests/content/test_playbook_mapping_coverage.py stays green.
+#
+# SKELETON scope: this file pins the shape of the overlay and the
+# regulatory anchors the playbook operationalises, using placeholder
+# ids where the CORE-phase surface (real OSCAL / D3FEND / OCSF pins
+# and the inbound EU-AI-Act mapping ids) is deferred to a sibling
+# G-02 card. Every placeholder carries todo: true so the schema
+# validator in tests/content/test_playbook_mappings.py accepts the
+# scaffold today and downstream reviewers can locate the deferred
+# work programmatically.
+#
+# Deferred to sibling CORE / G-02 cards:
+#   - content/mappings/eu_ai_act/*.yaml  — inbound mapping ids for
+#     Art. 9(1)-(6), Art. 11 + Annex IV, Art. 13, Art. 72. The
+#     eu_ai_act inbound directory does not yet exist; the sibling
+#     G-02 card lands it and pins playbook.eu_ai_act_risk_management@v1
+#     in each entry's playbook_refs list.
+#   - content/mappings/nis2/article-21-2-a.yaml — inbound edge for
+#     NIS2 Art. 21(2)(a) policies on risk analysis. Anchored on the
+#     Art. 9(2) risk-analysis step of this playbook; deferred to the
+#     same G-02 card.
+#   - content/mappings/gdpr/*.yaml — Art. 35 DPIA interaction for
+#     high-risk AI systems processing personal data (Recital 9 of
+#     Regulation (EU) 2024/1689 preserves GDPR obligations). Deferred
+#     to the G-02 card that opens the eu_ai_act ↔ gdpr edge.
+#   - DORA / CRA — reviewed for scope during G-02. AI Act Art. 9 is a
+#     product-lifecycle risk-management obligation on providers; DORA
+#     Art. 6 ICT risk-management and CRA Annex I product-security are
+#     adjacent-but-distinct regimes. If the G-02 card finds a
+#     documented interaction it lands an inbound edge; otherwise the
+#     absence is documented and this file's dora / cra arrays stay
+#     empty.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.eu_ai_act_risk_management@v1
+
+oscal:
+  # SKELETON — placeholder. NIST SP 800-53 Rev. 5 RA-3 (Risk
+  # Assessment) and PM-9 (Risk Management Strategy) are the
+  # anticipated CORE pins for the Art. 9(2) risk-analysis and
+  # Art. 9(1) risk-management-system-establishment surfaces, and
+  # PL-2 (System Security and Privacy Plans) is anticipated for the
+  # Art. 11 / Annex IV technical documentation surface. CORE selects
+  # the final set once the eu_ai_act inbound mapping directory
+  # exists and the control-file semantics are aligned with the
+  # AI-Act-specific vocabulary (system risks vs. information-system
+  # security risks).
+  - id: control.todo_ai_risk_management@v0
+    todo: true
+    notes: >-
+      Placeholder pending the CORE card. Anticipated pins are NIST
+      SP 800-53 Rev. 5 RA-3 (Risk Assessment) for the Art. 9(2)
+      identification / estimation / evaluation surface, PM-9 (Risk
+      Management Strategy) for the Art. 9(1) establishment /
+      documentation / maintenance surface, and PL-2 (System Security
+      and Privacy Plans) for the Art. 11 / Annex IV technical
+      documentation surface. NIST AI RMF (AI 100-1) Govern / Map /
+      Measure / Manage functions are the AI-specific companion
+      surface the CORE card reviews alongside the 800-53 anchors.
+
+d3fend:
+  # SKELETON — placeholder. D3FEND v1.0.0 frames defensive techniques
+  # as runtime countermeasures against adversary behaviours; the AI-
+  # Act Art. 9 risk-management surface is a lifecycle governance
+  # discipline rather than a runtime countermeasure. The CORE card
+  # either selects the closest-fitting D3FEND technique (candidate:
+  # D3-OSM Operational Activity Mapping for the Art. 72 post-market
+  # monitoring loop) or documents the deliberate absence the way the
+  # cra_srp_notify overlay documents its notify-only gap.
+  - d3fend_id: D3-TODO
+    d3fend_name: TODO (SKELETON — CORE card selects the D3FEND tag or documents the deliberate gap)
+    todo: true
+    notes: >-
+      Placeholder pending the CORE card. Lifecycle governance
+      obligations under AI Act Art. 9 do not map cleanly onto
+      D3FEND's runtime-countermeasure taxonomy; the CORE card
+      selects the closest fit (candidate: D3-OSM for the Art. 72
+      post-market monitoring feedback loop) or documents the
+      deliberate absence.
+
+ocsf: []
+# SKELETON — no OCSF binding at this stage. AI Act Art. 9 is a
+# lifecycle discipline whose evidence lives in the technical
+# documentation bundle (Art. 11 / Annex IV) rather than in an OCSF
+# event stream. If the CORE card lands a runtime telemetry surface
+# (candidate: the Detection Finding class recording residual-risk
+# threshold breaches produced by an Art. 72 post-market monitoring
+# signal), it pins the class here.
+
+nis2:
+  # SKELETON — placeholder. NIS2 Art. 21(2)(a) (policies on risk
+  # analysis and information-system security) is the anticipated
+  # inbound anchor: the Art. 9(2) risk-analysis step of this playbook
+  # is the AI-system-specific execution surface for the same
+  # risk-analysis policy obligation NIS2 imposes on essential and
+  # important entities. The inbound file
+  # content/mappings/nis2/article-21-2-a.yaml already exists; the
+  # sibling G-02 card adds playbook.eu_ai_act_risk_management@v1 to
+  # its playbook_refs list and pins the real mapping id here.
+  - mapping_id: nis2:todo-ai-risk-analysis
+    todo: true
+    notes: >-
+      Placeholder pending the sibling G-02 card. Anticipated inbound
+      anchor is nis2:art-21-2-a (policies on risk analysis and
+      information-system security). The Art. 9(2) risk-analysis step
+      of this playbook is the AI-system-specific execution surface
+      for the risk-analysis policy obligation NIS2 imposes on
+      essential and important entities under Art. 21(2)(a).
+
+dora: []
+
+cra: []
