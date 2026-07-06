@@ -1,0 +1,113 @@
+stable_id: kri.residual_risk_threshold_breach_count@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Residual-risk threshold breach count — EU AI Act Art. 9(5)
+summary: >
+  Count of distinct residual-risk observations that crossed the
+  operator-scoped acceptability threshold within the evaluation
+  window. EU AI Act (Regulation (EU) 2024/1689) Article 9(5) requires
+  the residual risks of a high-risk AI system to be judged
+  acceptable; a breach observation is a signal that either the
+  Article 9(2)(d) risk-management measures have to be tightened
+  before the next iteration or the system's intended-purpose scope
+  has to be revised. SecOps-NG does not set the acceptability
+  threshold — that judgement is the provider's under Art. 9(5) and
+  operator-scoped against Art. 9(3) state of the art — the catalog
+  entry names the breach shape and the observation source.
+
+unit: count
+direction: lower_is_better
+
+measurement:
+  source: composite
+  aggregation: count
+  formula: >
+    For each residual-risk observation recorded on the risk-management
+    system during the evaluation window, evaluate the observation
+    against the operator's acceptability threshold policy. A breach
+    is a residual-risk observation whose scored value exceeds the
+    operator-scoped threshold for the pinned Annex III use-case
+    category. Count distinct breach observations per closed
+    Art. 9(2) iteration; roll up as a simple count across iterations
+    in the window. Exclude observations that are re-scored copies of
+    an earlier breach on the same risk register entry within the
+    same iteration so the indicator does not double-count. The
+    breach signal is fed back into the next Art. 9(2)(c) iteration
+    via the Art. 72 post-market monitoring loop; a persistent
+    non-zero value on this KRI is the operator-side flag that the
+    Art. 9(2)(d) targeted-measures set is not converging. Reference
+    visualisation: a bar chart of breach counts per closed Art. 9(2)
+    iteration in the window with the aggregate total annotated as
+    the headline figure. The committed reference rendering lives at
+    `content/metrics/residual_risk_threshold_breach_count.viz.md` —
+    that file is the contract for the chart shape; the compile
+    target renders the executable form against operator data.
+  inputs:
+    - name: residual_risk_observation
+      description: >
+        A residual-risk observation carried on an OCSF Compliance
+        Finding (class_uid 2003) emitted by the Art. 9(2) assessment
+        step of the eu_ai_act_risk_management playbook. The finding
+        carries the scored residual-risk value, the pinned
+        Annex III use-case category, and the reference to the risk
+        register entry the observation belongs to. The catalog
+        entry binds to that OCSF class shape, not to a vendor-
+        specific risk-register object.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: finding_info.uid
+      playbook_ref: playbook.eu_ai_act_risk_management@v1
+      playbook_step: assess risk under Art. 9(2)
+    - name: post_market_signal
+      description: >
+        A post-market monitoring signal emitted on the Art. 72 plan
+        operation step of the eu_ai_act_risk_management playbook.
+        Carried on an OCSF Detection Finding (class_uid 2004) when
+        the signal represents an anomaly that pushes a residual-risk
+        observation across the acceptability threshold; the
+        Detection Finding is the machine-readable trigger for the
+        next Art. 9(2)(c) iteration to re-score the affected risk
+        register entries. Catalog entry is detection-vendor-neutral.
+      telemetry_ref: telemetry.ocsf.detection_finding@v1
+      field: finding_info.uid
+      playbook_ref: playbook.eu_ai_act_risk_management@v1
+      playbook_step: monitor post-market signals
+  window:
+    duration: P90D
+    sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+  - telemetry.ocsf.detection_finding@v1
+
+playbook_refs:
+  - playbook_id: playbook.eu_ai_act_risk_management@v1
+    step_id: action--40000000-0000-4000-8000-000000000003
+  - playbook_id: playbook.eu_ai_act_risk_management@v1
+    step_id: action--40000000-0000-4000-8000-000000000005
+
+external_refs:
+  - name: EU AI Act — Article 9(5) residual-risk acceptability
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 9(5)
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: EU AI Act — Article 9(2)(c) evaluation of post-market signals
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 9(2)(c)
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: EU AI Act — Article 72 post-market monitoring by providers
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 72
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: NIST AI Risk Management Framework — Measure and Manage functions
+    source: NIST
+    external_id: NIST AI 100-1
+    url: https://airc.nist.gov/AI_RMF_Knowledge_Base/AI_RMF
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability
+  - auditability

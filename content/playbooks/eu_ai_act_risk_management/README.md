@@ -11,13 +11,20 @@ feedback Art. 9(2)(c) reads together with Art. 72.
 
 ## Status
 
-SKELETON (content version `0.1.0`). Ships the CACAO scaffold and a
-placeholder mappings overlay only. No compiled examples, no metric
-wiring, no inbound-regulator YAML edges yet — those land on sibling
-CORE / EXTEND / G-02 cards. The AI Act enforcement wave that
-motivates this scaffold begins with the July 2026 provisions
-following OJ entry-into-force under Art. 113 (staggered application
-of the Chapters).
+EXTEND (content version `0.3.0`). Ships the CACAO scaffold, the CORE
+outbound overlay (real OSCAL pins on RA-3 / PM-9 / PL-2, D3FEND
+`D3-OAM` on the risk-assessment step, three-target compile examples
+with byte-parity goldens), and the EXTEND wiring (OCSF Compliance
+Finding + Detection Finding bindings on the assessment,
+documentation-assembly and post-market-monitoring steps; two KRI
+catalogue entries — `kri.residual_risk_threshold_breach_count@v1` and
+`kri.transparency_doc_freshness_age@v1` — with committed reference
+visualisations). Inbound regulator-side YAML edges
+(`content/mappings/eu_ai_act/`, `content/mappings/nis2/article-21-2-a.yaml`,
+`content/mappings/gdpr/`) remain deferred to sibling G-02 cards.
+The AI Act enforcement wave that motivates this scaffold begins with
+the July 2026 provisions following OJ entry-into-force under
+Art. 113 (staggered application of the Chapters).
 
 ## Purpose
 
@@ -113,15 +120,8 @@ human oversight (Art. 14), accuracy / robustness / cybersecurity
   whether a cross-regime edge is warranted; the current reading is
   that they are adjacent-but-distinct.
 
-## Out of scope (this SKELETON)
+## Out of scope (this EXTEND)
 
-- Per-target compiled emissions (n8n / Temporal / LangGraph). The
-  `compile_targets` array is deliberately empty; the CORE card
-  populates it once the stub actions carry compilable action
-  bodies.
-- KPI / KRI metric wiring. `metric_refs` is empty; the EXTEND card
-  lands metric catalogue entries for residual-risk-acceptability
-  and post-market-signal-turnaround measurements.
 - Inbound regulator-side YAML edges (`content/mappings/eu_ai_act/`,
   `content/mappings/nis2/article-21-2-a.yaml`,
   `content/mappings/gdpr/`). Deferred to sibling G-02 cards.
