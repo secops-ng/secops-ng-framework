@@ -1,0 +1,169 @@
+# AUTO-GENERATED — do not edit by hand.
+# Source: SecOps-NG CACAO v2 playbook (see x_secops_ng.stable_id below).
+# Regenerate via `python -m compilers.temporal <playbook.cacao.json>`.
+#
+# This file is a stub. Workflow control flow and activity bodies are
+# intentionally NotImplementedError until a human integrator wires them
+# to the operator's runtime.
+"""Generated Temporal stub. See module-level metadata in the workflow docstring."""
+from __future__ import annotations
+
+from datetime import timedelta
+
+from temporalio import activity, workflow
+from temporalio.common import RetryPolicy
+
+from opentelemetry import trace
+
+_TRACER = trace.get_tracer(__name__)
+
+from ._audit_mirror import AuditRecord, AuditTrail
+
+@activity.defn
+async def ingest_agentic_threat_indicator(indicator_id: str) -> dict[str, object]:
+    """Receive the agentic-threat indicator from the detection layer and hydrate it with originating principal, source / destination context, and the observed self-correction cadence. The indicator classes this step is authored against are: anomalous LLM API call volume from a workload principal, rapid credential-enumeration bursts inside a sub-minute window, and lateral movement across identity / network edges within a short self-correction window observed in fully-agentic operations.
+
+    CACAO step_id: action--30000000-0000-4000-8000-000000000002
+    """
+    with _TRACER.start_as_current_span(
+        name='activity.action--30000000-0000-4000-8000-000000000002',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest agentic-threat indicator', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_agentic_threat_indicator'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest agentic-threat indicator', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_agentic_threat_indicator'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000002'"
+        )
+
+INGEST_AGENTIC_THREAT_INDICATOR_RETRY_POLICY = RetryPolicy(
+    initial_interval=timedelta(seconds=1),
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
+)
+
+@activity.defn
+async def isolate_affected_credential_set(affected_principal: str) -> None:
+    """Revoke live sessions, refresh and access tokens for __affected_principal__ at the IdP, disable the principal for the containment window, and dispatch an alert to the IAM auditor lane so the credential-scope audit and forced-rotation follow-on run in parallel. This step is the credential-side cut-out on the agentic operator; the deeper IdP-side audit lives on playbook.identity_compromise@v1.
+
+    CACAO step_id: action--30000000-0000-4000-8000-000000000003
+    """
+    with _TRACER.start_as_current_span(
+        name='activity.action--30000000-0000-4000-8000-000000000003',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'isolate affected credential set', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'isolate_affected_credential_set'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'isolate affected credential set', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'isolate_affected_credential_set'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000003'"
+        )
+
+ISOLATE_AFFECTED_CREDENTIAL_SET_RETRY_POLICY = RetryPolicy(
+    initial_interval=timedelta(seconds=1),
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
+)
+
+@activity.defn
+async def contain_lateral_movement_path(lateral_path: str) -> None:
+    """Apply a network micro-segmentation call along the resolved __lateral_path__ so the agentic operator cannot pivot off the implicated edge to continue the encryption / staging chain during the containment window. Bounded by the operator-supplied authorisation policy.
+
+    CACAO step_id: action--30000000-0000-4000-8000-000000000004
+    """
+    with _TRACER.start_as_current_span(
+        name='activity.action--30000000-0000-4000-8000-000000000004',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'contain lateral-movement path', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'contain_lateral_movement_path'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'contain lateral-movement path', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'contain_lateral_movement_path'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000004'"
+        )
+
+CONTAIN_LATERAL_MOVEMENT_PATH_RETRY_POLICY = RetryPolicy(
+    initial_interval=timedelta(seconds=1),
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
+)
+
+@activity.defn
+async def escalate_to_incident_management() -> None:
+    """Hand off the case envelope to playbook.incident_management@v1 as the upstream-playbook intake so the regulator-submission timeline (NIS2 Article 23 early-warning and 72-hour notification) is dispatched by the incident-management engine. Cross-playbook reference; this playbook does not itself render the regulator notification.
+
+    CACAO step_id: action--30000000-0000-4000-8000-000000000005
+    """
+    with _TRACER.start_as_current_span(
+        name='activity.action--30000000-0000-4000-8000-000000000005',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'escalate to incident-management', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'escalate_to_incident_management'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'escalate to incident-management', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'escalate_to_incident_management'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000005'"
+        )
+
+ESCALATE_TO_INCIDENT_MANAGEMENT_RETRY_POLICY = RetryPolicy(
+    initial_interval=timedelta(seconds=1),
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
+)
+
+@activity.defn
+async def preserve_evidence_for_notification_chain() -> str:
+    """Persist an evidence bundle for the NIS2 Article 23 notification chain: LLM API call logs, credential-enumeration timeline, lateral-movement graph, and the containment-action ledger. The bundle identifier is emitted as __evidence_bundle__ and consumed by the downstream incident-management engine.
+
+    CACAO step_id: action--30000000-0000-4000-8000-000000000006
+    """
+    with _TRACER.start_as_current_span(
+        name='activity.action--30000000-0000-4000-8000-000000000006',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'preserve evidence for notification chain', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'preserve_evidence_for_notification_chain'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'preserve evidence for notification chain', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'preserve_evidence_for_notification_chain'})
+        )
+        raise NotImplementedError(
+            f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000006'"
+        )
+
+PRESERVE_EVIDENCE_FOR_NOTIFICATION_CHAIN_RETRY_POLICY = RetryPolicy(
+    initial_interval=timedelta(seconds=1),
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
+)
+
+@workflow.defn
+class PlaybookAgenticThreatResponseV1Workflow:
+    """CACAO v2 scaffold for detecting and initially responding to fully-agentic adversary activity (autonomous LLM-driven credential harvest, lateral movement, and encryption chains observed at machine-speed decision cadence). The playbook ingests an agentic-threat indicator, isolates the affected credential set, contains the lateral-movement path, hands off the case envelope to the incident-management engine for the regulator-notification chain, and preserves evidence for the NIS2 Article 23 notification obligation. Portable content; runtime is the operator's choice — n8n, Temporal, or LangGraph.
+
+    CACAO playbook id : playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8
+    stable_id         : playbook.agentic_threat_response@v1
+    content_version   : 0.2.0
+    maturity          : experimental
+    workflow_start    : start--30000000-0000-4000-8000-000000000001
+    activities        : ingest_agentic_threat_indicator, isolate_affected_credential_set, contain_lateral_movement_path, escalate_to_incident_management, preserve_evidence_for_notification_chain
+    """
+
+    @workflow.run
+    async def run(self) -> None:
+        with _TRACER.start_as_current_span(
+            name='workflow.playbook.agentic_threat_response@v1',
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0'},
+        ):
+            AuditTrail.current().append(
+                AuditRecord(span_name='workflow.playbook.agentic_threat_response@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0'})
+            )
+            raise NotImplementedError(
+                f"CACAO workflow lowering not implemented: stable_id='playbook.agentic_threat_response@v1'"
+            )
+
+WORKFLOW = PlaybookAgenticThreatResponseV1Workflow
+ACTIVITIES = (ingest_agentic_threat_indicator, isolate_affected_credential_set, contain_lateral_movement_path, escalate_to_incident_management, preserve_evidence_for_notification_chain,)
+RETRY_POLICIES = (INGEST_AGENTIC_THREAT_INDICATOR_RETRY_POLICY, ISOLATE_AFFECTED_CREDENTIAL_SET_RETRY_POLICY, CONTAIN_LATERAL_MOVEMENT_PATH_RETRY_POLICY, ESCALATE_TO_INCIDENT_MANAGEMENT_RETRY_POLICY, PRESERVE_EVIDENCE_FOR_NOTIFICATION_CHAIN_RETRY_POLICY,)
