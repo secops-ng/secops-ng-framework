@@ -1,6 +1,6 @@
-# agentic_threat_response (SKELETON)
+# agentic_threat_response
 
-CACAO v2 scaffold for detecting and initially responding to fully-
+CACAO v2 playbook for detecting and initially responding to fully-
 agentic adversary activity — autonomous LLM-driven credential harvest,
 lateral movement, and encryption chains observed at machine-speed
 decision cadence. The playbook ingests an agentic-threat indicator,
@@ -11,10 +11,11 @@ NIS2 Article 23 notification obligation.
 
 ## Status
 
-SKELETON. This directory ships the CACAO workflow shape and
-structural content-model anchors only. Sibling CORE and EXTEND cards
-pin real OSCAL / D3FEND / OCSF identifiers, KPI hooks, and the
-per-target compile emissions under
+Experimental. Content version `0.3.0`: CACAO workflow shape, real
+OSCAL / D3FEND / OCSF identifiers, and KPI hooks are wired end-to-end
+against the shipped `content/metrics/` catalogue and
+`content/telemetry/` OCSF class artifacts. Byte-parity goldens for
+the n8n / Temporal / LangGraph compile targets live under
 `examples/{n8n,temporal,langgraph}/agentic_threat_response/`.
 
 ## Motivation
@@ -76,16 +77,20 @@ top-5 NIS2 Article 21 control family set.
   by the downstream `playbook.incident_management@v1` engine from the
   case envelope this playbook hands off.
 
-## Out of scope (this SKELETON)
+## Out of scope (this playbook)
 
-- Compile-target emissions under
-  `examples/{n8n,temporal,langgraph}/agentic_threat_response/` — CORE
-  card.
-- Real OSCAL control pins and MITRE D3FEND technique tags — CORE card.
-- OCSF telemetry bindings (Detection Finding consumed shape; Account
-  Change and Incident Finding emitted shapes) — EXTEND card.
-- KPI / KRI hooks — EXTEND card.
-- Byte-parity golden tests — EXTEND card.
+- The DORA cross-regime inbound edge is deferred until the JC RTS on
+  ICT risk management framework (Commission Delegated Regulation (EU)
+  2024/1774) coverage is extended to the agentic-tradecraft indicator
+  class. Skip entry lives at
+  `content/mappings/dora/_orphan_skip.yaml`.
+- The CRA cross-regime inbound edge is deferred pending a documented
+  product-security interaction. Skip entry lives at
+  `content/mappings/cra/_orphan_skip.yaml`.
+- The GDPR data-flow surface (Article 30 RoPA) for this playbook is
+  deferred to a follow-on card that authors
+  `content/mappings/gdpr/data-flow-agentic_threat_response.md`. Skip
+  entry lives at `content/mappings/gdpr/_orphan_skip.yaml`.
 
 ## Sources
 

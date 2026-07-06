@@ -78,6 +78,18 @@
               "name": "x_secops_ng.control_refs",
               "value": "control.system_monitoring@v1, control.incident_handling@v1",
               "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.detection_finding@v1, telemetry.ocsf.api_activity@v1, telemetry.ocsf.authentication@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.mttd_agentic_threat@v1",
+              "type": "string"
             }
           ]
         },
@@ -108,6 +120,18 @@
               "id": "x_secops_ng.control_refs",
               "name": "x_secops_ng.control_refs",
               "value": "control.account_management_disable_accounts@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.account_change@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kpi.mttc_agentic_threat@v1",
               "type": "string"
             }
           ]
@@ -302,7 +326,7 @@
   "meta": {
     "secops_ng": {
       "stable_id": "playbook.agentic_threat_response@v1",
-      "content_version": "0.2.0",
+      "content_version": "0.3.0",
       "maturity": "experimental",
       "source_playbook_id": "playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8"
     },
