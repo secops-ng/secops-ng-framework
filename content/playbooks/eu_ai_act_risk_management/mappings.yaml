@@ -169,14 +169,66 @@ d3fend:
   #     pin on the assess step, and pinning the monitoring loop
   #     separately would double-count the technique.
 
-ocsf: []
-# CORE — no OCSF binding at this stage. AI Act Art. 9 is a lifecycle
-# discipline whose evidence lives in the technical documentation
-# bundle (Art. 11 / Annex IV) rather than in an OCSF event stream. If
-# an EXTEND card lands a runtime telemetry surface (candidate: the
-# Detection Finding class recording residual-risk threshold breaches
-# produced by an Art. 72 post-market monitoring signal), it pins the
-# class here.
+ocsf:
+  # OCSF v1.3.0 telemetry bindings landed by the EXTEND card. AI Act
+  # Art. 9 is a lifecycle discipline whose primary evidence lives in
+  # the technical documentation bundle (Art. 11 / Annex IV) rather
+  # than in a runtime event stream, but the operator-side observable
+  # surface is real: the assessment step scores residual-risk
+  # observations against the Art. 9(5) acceptability line and emits
+  # a Compliance Finding record per observation; the assemble-
+  # technical-documentation step emits a Compliance Finding per
+  # committed Art. 11 + Annex IV / Art. 13 bundle so the freshness
+  # KRI can measure the age of the latest committed bundle; the
+  # monitor-post-market-signals step emits a Detection Finding when
+  # an Art. 72 signal represents an anomaly that pushes a residual-
+  # risk observation across the acceptability threshold and is
+  # therefore the machine-readable trigger for the next Art. 9(2)(c)
+  # iteration to re-score the affected risk register entries.
+  - id: telemetry.ocsf.compliance_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2003
+    class_name: Compliance Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted on two steps of the playbook. On assess-risk-under-
+      Art.-9(2): one Compliance Finding per scored residual-risk
+      observation, carrying the scored value, the pinned Annex III
+      use-case category, and the reference to the risk register
+      entry the observation belongs to; the observation stream is
+      the input to kri.residual_risk_threshold_breach_count@v1 which
+      counts observations above the operator-scoped Art. 9(5)
+      acceptability threshold. On assemble-technical-documentation:
+      one Compliance Finding per committed Art. 11 + Annex IV or
+      Art. 13 bundle, carrying the bundle identifier and the
+      assembly time; the assembly-time stream is the input to
+      kri.transparency_doc_freshness_age@v1 which measures the age
+      of the latest committed bundle in scope. Same class the
+      cra_srp_notify / cyber_hygiene_training / dpia overlays use
+      for their regulator-facing compliance evidence surface.
+      Schema: https://schema.ocsf.io/1.3.0/classes/compliance_finding
+
+  - id: telemetry.ocsf.detection_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2004
+    class_name: Detection Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by the monitor-post-market-signals step when an Art. 72
+      post-market monitoring signal represents an anomaly that pushes
+      a residual-risk observation across the operator-scoped Art. 9(5)
+      acceptability threshold. The Detection Finding is the machine-
+      readable trigger for the next Art. 9(2)(c) iteration to re-score
+      the affected risk register entries, and it is a second input
+      into kri.residual_risk_threshold_breach_count@v1 alongside the
+      Compliance Finding observation stream. Catalog entry is
+      detection-vendor-neutral; the framework binds the class shape,
+      not the rule engine that produces it. Schema:
+      https://schema.ocsf.io/1.3.0/classes/detection_finding
 
 nis2:
   # SKELETON placeholder — the inbound edge on

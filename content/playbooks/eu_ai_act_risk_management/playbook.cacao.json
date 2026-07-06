@@ -87,8 +87,12 @@
           "control.risk_assessment@v1",
           "control.risk_management_strategy@v1"
         ],
-        "telemetry_refs": [],
-        "metric_refs": []
+        "telemetry_refs": [
+          "telemetry.ocsf.compliance_finding@v1"
+        ],
+        "metric_refs": [
+          "kri.residual_risk_threshold_breach_count@v1"
+        ]
       }
     },
     "action--40000000-0000-4000-8000-000000000004": {
@@ -106,8 +110,12 @@
         "control_refs": [
           "control.system_security_privacy_plan@v1"
         ],
-        "telemetry_refs": [],
-        "metric_refs": []
+        "telemetry_refs": [
+          "telemetry.ocsf.compliance_finding@v1"
+        ],
+        "metric_refs": [
+          "kri.transparency_doc_freshness_age@v1"
+        ]
       }
     },
     "action--40000000-0000-4000-8000-000000000005": {
@@ -122,8 +130,12 @@
         "control_refs": [
           "control.risk_assessment@v1"
         ],
-        "telemetry_refs": [],
-        "metric_refs": []
+        "telemetry_refs": [
+          "telemetry.ocsf.detection_finding@v1"
+        ],
+        "metric_refs": [
+          "kri.residual_risk_threshold_breach_count@v1"
+        ]
       }
     },
     "end--40000000-0000-4000-8000-000000000006": {
@@ -133,7 +145,7 @@
   },
   "x_secops_ng": {
     "stable_id": "playbook.eu_ai_act_risk_management@v1",
-    "content_version": "0.2.0",
+    "content_version": "0.3.0",
     "maturity": "experimental",
     "compile_targets": [
       "n8n",
@@ -145,8 +157,14 @@
       "control.risk_assessment@v1",
       "control.system_security_privacy_plan@v1"
     ],
-    "telemetry_refs": [],
-    "metric_refs": [],
+    "telemetry_refs": [
+      "telemetry.ocsf.compliance_finding@v1",
+      "telemetry.ocsf.detection_finding@v1"
+    ],
+    "metric_refs": [
+      "kri.residual_risk_threshold_breach_count@v1",
+      "kri.transparency_doc_freshness_age@v1"
+    ],
     "sources": [
       "OASIS CACAO v2.0 specification \u2014 workflow step types, variable conventions, x_ extension namespace",
       "Regulation (EU) 2024/1689 \u2014 EU Artificial Intelligence Act, Article 6 \u2014 classification rules for high-risk AI systems",
