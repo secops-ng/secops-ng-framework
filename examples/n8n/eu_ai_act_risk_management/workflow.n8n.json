@@ -1,0 +1,292 @@
+{
+  "name": "EU AI Act Art.9 risk-management system",
+  "nodes": [
+    {
+      "id": "start--40000000-0000-4000-8000-000000000001",
+      "name": "eu-ai-act-rm-start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__ai_system_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the AI system under assessment. Resolved against the operator's AI-system inventory."
+            },
+            {
+              "name": "__annex_iii_use_case__",
+              "type": "string",
+              "value": "",
+              "description": "Annex III high-risk use-case category the system falls under (e.g. biometric identification, critical infrastructure management, employment screening). SKELETON: string; CORE tightens to an enum against the Annex III eight-area catalogue."
+            },
+            {
+              "name": "__risk_register_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the risk register emitted by the Art. 9(2)(a)-(b) identification / estimation step and consumed by the Art. 9(2)(d) risk-treatment step."
+            },
+            {
+              "name": "__technical_documentation_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the technical documentation bundle assembled per Art. 11 read with Annex IV. Consumed by conformity assessment."
+            },
+            {
+              "name": "__post_market_signal__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the post-market monitoring signal fed back into the iterative risk-management cycle under Art. 9(2)(c) read with Art. 72."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--40000000-0000-4000-8000-000000000002",
+      "name": "identify high-risk AI system",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.ai_system_id",
+              "name": "in.ai_system_id",
+              "value": "={{$workflow.variables.ai_system_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.annex_iii_use_case",
+              "name": "out.annex_iii_use_case",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.risk_management_strategy@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Inventory the AI system, resolve whether it is a high-risk AI system under Art. 6 read with Annex III (or against a Union harmonisation-legislation entry per Art. 6(1) and Annex I), and pin the Annex III use-case category the risk-management system will be operated against. SKELETON: stub action; CORE wires the Annex III inventory join, the provider / deployer role determination under Art. 3(3) and (4), and the Art. 6(3) derogation self-declaration.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--40000000-0000-4000-8000-000000000003",
+      "name": "assess risk under Art. 9(2)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.annex_iii_use_case",
+              "name": "in.annex_iii_use_case",
+              "value": "={{$workflow.variables.annex_iii_use_case}}",
+              "type": "string"
+            },
+            {
+              "id": "out.risk_register_id",
+              "name": "out.risk_register_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.risk_assessment@v1, control.risk_management_strategy@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Iterate the Art. 9(2) risk-management cycle for the pinned use case: identification and analysis of known and reasonably foreseeable risks under Art. 9(2)(a); estimation and evaluation of risks that may emerge when the system is used in accordance with its intended purpose and under conditions of reasonably foreseeable misuse under Art. 9(2)(b); evaluation of other risks possibly arising, based on the analysis of data gathered from the post-market monitoring system, under Art. 9(2)(c); adoption of appropriate and targeted risk-management measures under Art. 9(2)(d), giving effect to the requirements of Chapter III Section 2. SKELETON: stub action; CORE wires the risk-analysis evidence artifact and the metric hooks measuring residual-risk acceptability under Art. 9(5).",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--40000000-0000-4000-8000-000000000004",
+      "name": "assemble technical documentation",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.risk_register_id",
+              "name": "in.risk_register_id",
+              "value": "={{$workflow.variables.risk_register_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.technical_documentation_id",
+              "name": "out.technical_documentation_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.system_security_privacy_plan@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Assemble the technical documentation the provider draws up before the high-risk AI system is placed on the market or put into service and keeps up to date under Art. 11 read with Annex IV: general description of the AI system, detailed description of its elements and of the process for its development, information about the monitoring, functioning and control of the AI system, description of the appropriateness of the performance metrics, detailed description of the risk-management system per Art. 9, and a list of the harmonised standards applied. SKELETON: stub action; CORE wires the Annex IV section-by-section bundle assembly and the conformity-assessment intake handoff under Art. 43.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--40000000-0000-4000-8000-000000000005",
+      "name": "monitor post-market signals",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "out.post_market_signal",
+              "name": "out.post_market_signal",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.risk_assessment@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Operate the post-market monitoring feedback loop the iterative Art. 9(2)(c) cycle depends on: the provider establishes and documents a post-market monitoring system under Art. 72, actively and systematically collects, documents and analyses relevant data on the performance of the high-risk AI system throughout its lifetime, and feeds the resulting signals back into the Art. 9 iteration so residual-risk acceptability under Art. 9(5) stays defended. SKELETON: stub action; CORE wires the Art. 72 post-market monitoring plan template and the loop-back edge into the Art. 9(2)(c) step of the next iteration.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--40000000-0000-4000-8000-000000000006",
+      "name": "eu-ai-act-rm-end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "eu-ai-act-rm-start": {
+      "main": [
+        [
+          {
+            "node": "identify high-risk AI system",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "identify high-risk AI system": {
+      "main": [
+        [
+          {
+            "node": "assess risk under Art. 9(2)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "assess risk under Art. 9(2)": {
+      "main": [
+        [
+          {
+            "node": "assemble technical documentation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "assemble technical documentation": {
+      "main": [
+        [
+          {
+            "node": "monitor post-market signals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "monitor post-market signals": {
+      "main": [
+        [
+          {
+            "node": "eu-ai-act-rm-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "eu-ai-act",
+    "risk-management",
+    "high-risk-ai-system",
+    "annex-iii",
+    "technical-documentation"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.eu_ai_act_risk_management@v1",
+      "content_version": "0.2.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8"
+    },
+    "secops_ng_notes": [
+      "step 'action--40000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--40000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--40000000-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--40000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}
