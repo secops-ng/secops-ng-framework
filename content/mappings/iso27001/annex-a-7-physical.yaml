@@ -9,12 +9,12 @@
 # utilities, cabling security, equipment maintenance, secure disposal or
 # re-use of equipment, off-premises equipment, and storage media.
 #
-# Scope of this file: Annex A.7 physical controls. This entry pair
-# (A.7.1 physical security perimeters and A.7.2 physical entry) opens
-# the theme file following the crosswalk conventions set by
-# annex-a-5-organisational.yaml and annex-a-6-people.yaml. The remaining
-# A.7 controls (A.7.3 through A.7.14) land as sibling entries in this
-# file on subsequent cards.
+# Scope of this file: Annex A.7 physical controls. The theme file
+# opens with the A.7.1 physical security perimeters and A.7.2 physical
+# entry pair (crosswalk conventions set by annex-a-5-organisational.yaml
+# and annex-a-6-people.yaml) and now carries the remaining A.7.3 through
+# A.7.14 controls as sibling entries, closing the A.7 theme at 14 of
+# 14 entries landed.
 #
 # Regime scope caveat: ISO/IEC 27001:2022 is a certifiable
 # information-security management standard, not an EU statutory
@@ -25,12 +25,20 @@
 #
 # Coverage note on physical controls: the SecOps-NG control catalogue
 # under content/controls/ is currently scoped to logical / cyber
-# controls — there are no physical-security controls (perimeter,
-# badging, visitor management, environmental monitoring) in the tree
-# today. Both entries below therefore ship with empty control_refs and
-# an explanatory note; the operator's own facilities-security evidence
-# discharges the physical obligation. Physical-control artifacts land
-# as sibling entries as the catalogue grows.
+# controls — there are no dedicated physical-security controls
+# (perimeter, badging, visitor management, environmental monitoring,
+# equipment siting, cabling, physical maintenance, secure disposal) in
+# the tree today. The A.7 entries therefore ship with empty
+# control_refs and an explanatory gap note in most cases; the
+# operator's own facilities-security evidence discharges the physical
+# obligation. Two entries (A.7.9 off-premises equipment, A.7.10 storage
+# media) wire the shared asset-inventory anchor
+# (control.asset_inventory_delta@v1) because the standard's asset-
+# tracking discipline for those two controls overlaps directly with the
+# logical inventory the catalogue already carries — the physical-
+# handling and environmental-protection slices still fall to the
+# operator's own procedures. Physical-control artifacts land as sibling
+# entries as the catalogue grows.
 
 regime: iso27001
 entries:
@@ -108,3 +116,422 @@ entries:
       physical entry to the extent it protects personal data at rest
       on-site; the regimes carry separate evidence requirements
       against the same underlying PACS artifact.
+  - id: iso27001:a-7-3-securing-offices-rooms-and-facilities
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.7.3
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Design and apply physical security to offices, rooms and
+      facilities. The physical protection of premises hosting
+      information and associated assets must be planned proportionate
+      to identified risks, with room-level construction, layout,
+      signage, and directory practices chosen so the existence and
+      purpose of sensitive processing spaces are not disclosed to
+      unauthorised parties.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a facilities-design artifact (room hardening,
+    # signage discipline, unmarked-space policy). A.7.3 is discharged
+    # against the operator's own facilities-security procedures.
+    notes: >-
+      A.7.3 extends the A.7.1 perimeter and A.7.2 entry pair inward,
+      requiring that the offices, rooms and facilities inside a secure
+      area be themselves designed and operated so the presence of
+      sensitive processing is not casually inferable — internal walls,
+      doors, directories, signage, and reception routing all form part
+      of the control. The SecOps-NG catalogue does not yet carry a
+      facilities-design artifact, so this entry ships with empty
+      control_refs; the operator's own site plans, room-classification
+      register, and signage/directory rules carry the evidence.
+      Cross-regime parallels: NIS2 Art. 21(2)(i) (physical and
+      environmental security) covers the same facilities-hardening
+      discipline; the regimes carry separate evidence requirements
+      against the same underlying facilities-security artifact.
+  - id: iso27001:a-7-4-physical-security-monitoring
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.7.4
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Continuously monitor premises for unauthorised physical access.
+      Secure areas must be observed by appropriate means (guard patrol,
+      intrusion detection, video surveillance, alarm systems) so
+      unauthorised presence or attempted entry is detected in time to
+      respond, with monitoring records retained and reviewed
+      proportionate to the sensitivity of the space.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a physical-monitoring artifact (CCTV, intrusion
+    # detection, guard-tour). A.7.4 is discharged against the operator's
+    # own physical-monitoring system evidence.
+    notes: >-
+      A.7.4 is the physical-detection counterpart to the A.8.16 logical
+      monitoring obligation — the standard requires that the perimeter
+      and entry controls established under A.7.1 and A.7.2 be paired
+      with continuous physical observation (CCTV, alarms, staffed
+      monitoring, intrusion sensors) so unauthorised presence is
+      detected, alerted, and reviewed. The SecOps-NG catalogue does not
+      yet carry a physical-monitoring artifact, so this entry ships
+      with empty control_refs; the operator's own physical-monitoring
+      posture (CCTV retention, alarm-response procedures, monitoring-
+      log review) carries the evidence. Cross-regime parallels: NIS2
+      Art. 21(2)(i) covers the same physical-detection discipline;
+      GDPR Art. 32 reaches physical monitoring to the extent it
+      protects personal data on-site and separately imposes GDPR
+      Art. 6 lawfulness and Art. 13 transparency obligations on the
+      monitoring itself (CCTV signage, retention limits).
+  - id: iso27001:a-7-5-protecting-against-physical-and-environmental-threats
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.7.5
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Design and apply protection against physical and environmental
+      threats — natural (fire, flood, earthquake, storm) and
+      human-driven (civil unrest, deliberate damage). The protection
+      must be proportionate to a documented threat assessment of the
+      premises and must cover both preventive measures (site
+      selection, structural hardening) and detection/response
+      arrangements (fire suppression, flood sensors, evacuation
+      procedures).
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry an environmental-protection artifact (fire
+    # suppression, flood detection, seismic hardening, BCM alignment).
+    # A.7.5 is discharged against the operator's own facilities
+    # environmental-protection evidence.
+    notes: >-
+      A.7.5 is the environmental-threats leg of Annex A.7 — the
+      standard requires that the physical premises be assessed for
+      natural and human-driven environmental threats and protected
+      proportionate to that assessment (fire suppression, flood
+      sensors, seismic bracing, site selection). The obligation joins
+      against the A.5.29 ISMS-continuity and A.5.30 ICT-readiness
+      anchors on the ISMS side and against the operator's own BCM /
+      site-risk assessment on the facilities side. The SecOps-NG
+      catalogue does not yet carry an environmental-protection
+      artifact, so this entry ships with empty control_refs; the
+      operator's own environmental-protection evidence carries it.
+      Cross-regime parallels: NIS2 Art. 21(2)(i) (physical and
+      environmental security) and DORA Art. 12(2)/(3) (ICT business
+      continuity) reach the same environmental-protection discipline
+      from adjacent angles.
+  - id: iso27001:a-7-6-working-in-secure-areas
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.7.6
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Design and apply security measures for working in secure areas.
+      Personnel working inside a secure area must observe rules that
+      match the sensitivity of the space — unsupervised work
+      restrictions, prohibited items (personal recording devices,
+      unregistered removable media), sign-in / sign-out discipline,
+      and awareness of the specific handling procedures that apply
+      inside the area.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a secure-area working-rules artifact. A.7.6 is
+    # discharged against the operator's own secure-area procedures,
+    # joined against the A.6.3 awareness anchor on the ISMS side.
+    notes: >-
+      A.7.6 is the behaviour-inside-the-secure-area obligation — the
+      standard requires that the perimeter, entry, and monitoring
+      established under A.7.1 through A.7.4 be paired with rules for
+      personnel operating inside the area (prohibited items, unsupervised
+      work restrictions, sign-in discipline, area-specific handling
+      procedures). The SecOps-NG catalogue does not yet carry a
+      secure-area working-rules artifact, so this entry ships with empty
+      control_refs; the operator's own procedures carry it, with the
+      A.6.3 information-security awareness anchor providing the
+      training slice. Cross-regime parallels: NIS2 Art. 21(2)(i)
+      reaches the same secure-area behavioural discipline; DORA
+      Art. 13 (learning and evolving) covers the awareness slice at
+      the financial-sector scope.
+  - id: iso27001:a-7-7-clear-desk-and-clear-screen
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.7.7
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Define and enforce clear-desk rules for paper and removable
+      storage media, and clear-screen rules for information-processing
+      facilities. Documents and media not in active use must be stored
+      or secured when the workstation is unattended; screens must
+      lock or blank automatically after a defined inactivity period
+      and when unattended, to reduce the risk of unauthorised
+      observation or opportunistic collection.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a clear-desk / clear-screen enforcement
+    # artifact (screen-lock policy, workstation-audit posture). A.7.7
+    # is discharged against the operator's own endpoint-hardening and
+    # workstation-hygiene procedures, joined against the A.8.1
+    # user-endpoint-devices anchor and the A.6.3 awareness anchor.
+    notes: >-
+      A.7.7 pairs a physical discipline (papers and removable media
+      stored when unattended) with a logical discipline (auto-lock /
+      auto-blank on inactivity). The logical slice will eventually join
+      against an endpoint-hardening control (A.8.1 in the catalogue
+      ships empty for the moment); the physical slice discharges
+      against the operator's clear-desk procedures. This entry ships
+      with empty control_refs pending both anchors landing. Cross-
+      regime parallels: NIS2 Art. 21(2)(i) touches the same
+      workspace-hygiene discipline; GDPR Art. 32 reaches clear-desk /
+      clear-screen where personal data is at risk of casual
+      unauthorised observation.
+  - id: iso27001:a-7-8-equipment-siting-and-protection
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.7.8
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Site and protect equipment so that risks from physical and
+      environmental threats, and from unauthorised access, are
+      reduced. Equipment must be placed to minimise unnecessary
+      access to work areas, screens must be positioned to reduce
+      shoulder-surfing, and equipment handling sensitive information
+      must be shielded from environmental exposure (heat, humidity,
+      dust) proportionate to its sensitivity.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry an equipment-siting artifact. A.7.8 is
+    # discharged against the operator's own siting standards (rack
+    # layout, screen orientation, environmental-conditioning
+    # specifications), joined against the A.7.5 environmental-threats
+    # anchor.
+    notes: >-
+      A.7.8 covers where equipment sits and how it is shielded — a
+      physical discipline that overlaps with A.7.5 (environmental
+      threats) and A.7.3 (facilities design). The SecOps-NG catalogue
+      does not yet carry an equipment-siting artifact, so this entry
+      ships with empty control_refs; the operator's siting standards
+      (rack layout, screen orientation, environmental conditioning)
+      carry the evidence. Cross-regime parallels: NIS2 Art. 21(2)(i)
+      (physical and environmental security) covers the same siting
+      discipline; DORA Art. 12(2)/(3) reaches equipment siting at the
+      financial-sector scope through its ICT operational-continuity
+      obligation.
+  - id: iso27001:a-7-9-security-of-assets-off-premises
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.7.9
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Protect off-premises assets. Devices and media taken outside the
+      organisation's premises (laptops, mobile devices, removable
+      media, home-working equipment) must be protected proportionate
+      to the risks of the location and mode of use, tracked in the
+      asset inventory, and subject to authorisation and handling rules
+      that address loss, theft, and unauthorised access in transit or
+      at the remote site.
+    status: draft
+    control_refs:
+      - control.asset_inventory_delta@v1
+    # control.asset_inventory_delta@v1 anchors the asset-tracking
+    # discipline that carries off-premises devices as inventory items
+    # (CM-8 / CM-8(2) discipline). The physical-handling slice of
+    # A.7.9 (encryption at rest for portable media, off-premises use
+    # authorisation, loss reporting procedures) still discharges
+    # against the operator's own procedures.
+    notes: >-
+      A.7.9 has two slices — asset-tracking discipline (the off-
+      premises device must be visible on the operator's inventory,
+      with movement recorded) and physical-handling discipline
+      (portable-media encryption, secure carriage, remote-site rules).
+      This entry wires control.asset_inventory_delta@v1 for the
+      tracking slice; the physical-handling slice is discharged
+      against the operator's own procedures. Cross-regime parallels:
+      NIS2 Art. 21(2)(i) reaches off-premises-device security; GDPR
+      Art. 32 imposes an at-rest encryption obligation on personal
+      data on portable devices; DORA Art. 12 covers off-premises ICT
+      assets at the financial-sector scope.
+  - id: iso27001:a-7-10-storage-media
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.7.10
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Manage storage media through its full life cycle — acquisition,
+      use, transportation and disposal — in accordance with the
+      information's classification and handling requirements. Storage
+      media (fixed and removable) must be tracked as assets, protected
+      against unauthorised access, transported securely when moved,
+      and disposed of or sanitised so residual data cannot be
+      recovered when the media leaves the organisation's control.
+    status: draft
+    control_refs:
+      - control.asset_inventory_delta@v1
+    # control.asset_inventory_delta@v1 anchors the asset-tracking
+    # discipline for storage media (fixed and removable) at the
+    # inventory layer. The classification-driven handling and secure
+    # transport slices of A.7.10 discharge against the operator's own
+    # media-management procedures; the disposal slice joins against
+    # A.7.14 (secure disposal or re-use) and the logical A.8.10
+    # information-deletion anchor.
+    notes: >-
+      A.7.10 is a full-life-cycle discipline for storage media —
+      acquisition, use, transport, disposal — with the tracking slice
+      overlapping the shared asset-inventory anchor. This entry wires
+      control.asset_inventory_delta@v1; the classification-driven
+      handling and secure-transport slices discharge against the
+      operator's own media-management procedures, and the disposal
+      slice joins downstream against A.7.14 and the A.8.10
+      information-deletion discipline. Cross-regime parallels: NIS2
+      Art. 21(2)(i) reaches media-handling; GDPR Art. 32 covers
+      personal-data-bearing media across its life cycle, with GDPR
+      Art. 17 (right to erasure) exercising the disposal slice for
+      personal data.
+  - id: iso27001:a-7-11-supporting-utilities
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.7.11
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Protect information-processing facilities from failure of
+      supporting utilities — electricity, telecommunications, water,
+      gas, sewerage, ventilation, air-conditioning. Supporting
+      utilities must be adequate for the equipment they support,
+      monitored for continued availability, and paired with redundancy
+      or failover arrangements proportionate to the criticality of
+      the processing depending on them.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a utilities-protection artifact (UPS / genset
+    # posture, HVAC-monitoring, telecommunications redundancy). A.7.11
+    # is discharged against the operator's own facilities-continuity
+    # evidence, joined against A.5.30 (ICT readiness for BCM) and
+    # A.8.14 (redundancy of information-processing facilities).
+    notes: >-
+      A.7.11 is a facilities-continuity discipline — supporting
+      utilities must be protected against failure to a level
+      proportionate to the criticality of the processing. The SecOps-NG
+      catalogue does not yet carry a utilities-protection artifact, so
+      this entry ships with empty control_refs; the operator's own
+      facilities-continuity evidence carries it, with A.5.30 ICT
+      readiness and A.8.14 processing-facility redundancy joining the
+      obligation from the ISMS side. Cross-regime parallels: NIS2
+      Art. 21(2)(c) (business-continuity and crisis management) and
+      DORA Art. 12(2)/(3) (ICT business continuity) reach the same
+      utilities-continuity discipline.
+  - id: iso27001:a-7-12-cabling-security
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.7.12
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Protect cables carrying power, data, or supporting information
+      services against interception, interference, and damage. Cable
+      routing, shielding, segregation of power and data cabling, and
+      access controls to cable termination points must be designed to
+      match the sensitivity of the information the cabling supports.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a cabling-security artifact. A.7.12 is
+    # discharged against the operator's own cabling design (routing,
+    # shielding, patch-panel access, segregation of power vs data).
+    notes: >-
+      A.7.12 is a physical-layer confidentiality-and-availability
+      discipline — cabling must be routed, shielded, and access-
+      controlled proportionate to the sensitivity of what it carries.
+      The SecOps-NG catalogue does not yet carry a cabling-security
+      artifact, so this entry ships with empty control_refs; the
+      operator's own cabling design and installation standards carry
+      the evidence. Cross-regime parallels: NIS2 Art. 21(2)(i)
+      (physical and environmental security) reaches cabling security;
+      the standard's logical-layer counterpart is A.8.20 (networks
+      security) and A.8.22 (segregation of networks), which discharge
+      the logical routing / segregation discipline against the same
+      network fabric.
+  - id: iso27001:a-7-13-equipment-maintenance
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.7.13
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Maintain equipment correctly to ensure its continued availability
+      and integrity. Maintenance must be carried out at intervals and
+      by personnel authorised for the sensitivity of the equipment,
+      with maintenance records retained, and with supervision or
+      sanitisation arrangements applied when equipment is serviced by
+      third parties or moved off-site for repair.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry an equipment-maintenance artifact. A.7.13 is
+    # discharged against the operator's own maintenance procedures,
+    # joined against A.5.19 (supplier relationships) for third-party
+    # maintenance and A.8.32 (change management) for the change-control
+    # slice of scheduled maintenance windows.
+    notes: >-
+      A.7.13 is the physical-maintenance discipline — equipment must be
+      serviced on schedule by authorised personnel, with records kept
+      and third-party maintenance supervised or sanitisation applied
+      when equipment leaves the site. The SecOps-NG catalogue does
+      not yet carry an equipment-maintenance artifact, so this entry
+      ships with empty control_refs; the operator's own maintenance
+      procedures carry it, with A.5.19 supplier-relationships anchoring
+      the third-party slice and A.8.32 change-management anchoring the
+      change-window slice. Cross-regime parallels: NIS2 Art. 21(2)(d)
+      (supply-chain security) reaches third-party maintenance; DORA
+      Art. 28-30 (ICT third-party risk) covers the same discipline at
+      the financial-sector scope.
+  - id: iso27001:a-7-14-secure-disposal-or-re-use-of-equipment
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.7.14
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Verify that equipment containing storage media is sanitised or
+      physically destroyed before disposal or re-use. Any equipment
+      leaving the organisation's control (donation, resale, warranty
+      return, disposal) must have all stored information removed to a
+      level appropriate to the sensitivity of that information, with
+      the sanitisation or destruction recorded so the discharge of
+      the obligation can be audited.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a media-sanitisation artifact (parallel to the
+    # empty A.8.10 information-deletion anchor). A.7.14 is discharged
+    # against the operator's own sanitisation-and-disposal procedures,
+    # joined against A.7.10 storage-media, A.8.10 information-deletion,
+    # and the operator's own audit records of the disposal chain.
+    notes: >-
+      A.7.14 is the terminal step of the storage-media life cycle
+      opened under A.7.10 — equipment carrying storage media must be
+      sanitised or physically destroyed before disposal or re-use,
+      with records kept. The physical-sanitisation slice mirrors the
+      logical A.8.10 information-deletion discipline (also empty
+      pending a dedicated artifact); together they exercise the
+      erase-before-release obligation on the physical and logical
+      layers. The SecOps-NG catalogue does not yet carry a
+      sanitisation artifact, so this entry ships with empty
+      control_refs; the operator's own procedures and disposal-chain
+      audit records carry it. Cross-regime parallels: GDPR Art. 17
+      (right to erasure) and GDPR Art. 32 (security of processing)
+      reach media sanitisation for personal-data-bearing equipment;
+      NIS2 Art. 21(2)(i) covers the same physical-disposal
+      discipline; DORA Art. 12 reaches ICT-asset disposal at the
+      financial-sector scope.
