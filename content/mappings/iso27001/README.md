@@ -101,9 +101,50 @@ key-rotation, and A.5.1 policy-set, discharge it in practice); and
 `control.cloud_identity_least_privilege@v1` (already carrying
 A.5.18 alongside A.5.15) and `control.privileged_access_review@v1`
 plus `playbook.iam_auditor@v1` and
-`playbook.onboarding_offboarding_tracker@v1`. The remaining A.5
-controls (A.5.19 through A.5.37) land as sibling entries in that
-file on subsequent cards.
+`playbook.onboarding_offboarding_tracker@v1`. The A.5.19–A.5.25
+batch also lands in `annex-a-5-organisational.yaml`, bringing the
+theme to 25 of 37 entries:
+`iso27001:a-5-19-information-security-in-supplier-relationships`
+wires `control.supplier_inventory@v1` and
+`control.provider_attestation@v1` (both already carrying A.5.19 on
+their `oscal_refs` block) plus `playbook.supply_chain_security@v1`
+and `playbook.contractual_obligations_tracker@v1`;
+`iso27001:a-5-20-addressing-information-security-within-supplier-agreements`
+ships `control_refs: []` pending a dedicated supplier-agreement
+artifact, with `playbook.contractual_obligations_tracker@v1` and
+`playbook.supply_chain_security@v1` as the contract-time and
+relationship-time discharges;
+`iso27001:a-5-21-managing-information-security-in-the-ict-supply-chain`
+wires `control.sbom_capture@v1` (the component-visibility anchor)
+plus `playbook.supply_chain_security@v1` and
+`playbook.codebase_vuln_management@v1` as the relationship-side and
+component-side discharges;
+`iso27001:a-5-22-monitoring-review-and-change-management-of-supplier-services`
+wires `control.provider_attestation@v1` (already carrying A.5.22 on
+its `oscal_refs` block) plus `playbook.supply_chain_security@v1`
+and `playbook.contractual_obligations_tracker@v1` for the
+change-management discharge;
+`iso27001:a-5-23-information-security-for-use-of-cloud-services`
+wires `control.cspm_baseline@v1` and
+`control.cloud_identity_least_privilege@v1` (the configuration and
+identity slices of the shared-responsibility surface) plus
+`playbook.cloud_misconfiguration@v1` and
+`playbook.infra_posture_management@v1`;
+`iso27001:a-5-24-information-security-incident-management-planning-and-preparation`
+wires `control.incident_handling_capability@v1`,
+`control.incident_timeline_signals@v1`, and
+`control.oob_channel_probe@v1` (all already carrying A.5.24 on
+their `oscal_refs` block) plus `playbook.incident_management@v1`
+and `playbook.on_call_rotation@v1`; and
+`iso27001:a-5-25-assessment-and-decision-on-information-security-events`
+wires `control.incident_timeline_signals@v1`,
+`control.dora_major_classifier@v1`,
+`control.cra_submission_templates@v1`, and
+`control.dora_submission_templates@v1` (all already carrying
+A.5.25 on their `oscal_refs` block) plus
+`playbook.alert_triage@v1` and `playbook.incident_management@v1`.
+The remaining A.5 controls (A.5.26 through A.5.37) land as sibling
+entries in that file on subsequent cards.
 
 The A.6 people-controls theme file has landed with its first two
 entries (`iso27001:a-6-1-screening`, `iso27001:a-6-3-awareness`) in
