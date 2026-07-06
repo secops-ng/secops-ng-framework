@@ -1,41 +1,40 @@
 # Cross-references for the agentic_threat_response playbook.
 #
-# SKELETON overlay — pins the outbound view of the content model for
-# the agentic-threat detection and response scaffold. This directory
-# ships CACAO workflow shape and structural anchors only; sibling CORE
-# and EXTEND cards replace the todo-flagged placeholders with real
-# OSCAL / D3FEND / OCSF identifiers, KPI hooks, and compile-target
-# emissions.
+# Playbook-side outbound overlay. Pins the OSCAL / D3FEND anchors this
+# playbook exercises step-by-step, and the inbound NIS2 mapping ids
+# that backlink to `playbook.agentic_threat_response@v1`. OCSF
+# telemetry bindings and KPI / KRI hooks are deferred to a sibling
+# EXTEND card; the placeholder OCSF entry stays in place until then.
 #
-# Inbound closure at SKELETON time:
+# Inbound closure at CORE time:
 #   - NIS2:  playbook.agentic_threat_response@v1 is added to the
 #            playbook_refs list on content/mappings/nis2/article-21-2-b.yaml
 #            (incident-handling capability, id nis2:art-21-2-b) and on
 #            content/mappings/nis2/article-21-2-e.yaml (security in
 #            acquisition, development and maintenance — the agentic-
 #            tool supply-chain surface, id nis2:art-21-2-e).
-#   - DORA:  no inbound YAML edge at SKELETON time. The DORA major-
+#   - DORA:  no inbound YAML edge at CORE time. The DORA major-
 #            incident-classification and reporting engine is already
 #            anchored on playbook.incident_management@v1, which this
 #            playbook hands off to via the escalate step. A sibling
-#            CORE / EXTEND card revisits the DORA cross-regime graph
-#            once the JC RTS on ICT risk management framework
-#            (Commission Delegated Regulation (EU) 2024/1774) coverage
-#            is extended to the agentic-tradecraft indicator class.
-#            Skip entry (with SKELETON rationale) lives at
+#            EXTEND card revisits the DORA cross-regime graph once the
+#            JC RTS on ICT risk management framework (Commission
+#            Delegated Regulation (EU) 2024/1774) coverage is extended
+#            to the agentic-tradecraft indicator class. Skip entry
+#            (with SKELETON rationale) lives at
 #            content/mappings/dora/_orphan_skip.yaml.
-#   - CRA:   no inbound YAML edge at SKELETON time. CRA Annex I §1(d)
+#   - CRA:   no inbound YAML edge at CORE time. CRA Annex I §1(d)
 #            access-control obligations are already anchored on the
 #            operator-side identity_compromise / iam_auditor lane; the
 #            agentic-threat-response scaffold is the incident-response
 #            side, not the product-security side CRA governs. A sibling
-#            CORE / EXTEND card revisits the CRA cross-regime graph if
-#            a documented product-security interaction surfaces. Skip
+#            EXTEND card revisits the CRA cross-regime graph if a
+#            documented product-security interaction surfaces. Skip
 #            entry (with SKELETON rationale) lives at
 #            content/mappings/cra/_orphan_skip.yaml.
-#   - GDPR:  no inbound YAML edge at SKELETON time. The GDPR data-flow
+#   - GDPR:  no inbound YAML edge at CORE time. The GDPR data-flow
 #            surface (Article 30 RoPA) for this playbook is deferred to
-#            the CORE card that authors
+#            the EXTEND card that authors
 #            content/mappings/gdpr/data-flow-agentic_threat_response.md.
 #            Skip entry lives at content/mappings/gdpr/_orphan_skip.yaml.
 #
@@ -43,78 +42,158 @@
 playbook: playbook.agentic_threat_response@v1
 
 oscal:
-  # SKELETON placeholders. Real NIST SP 800-53 Rev. 5 control IDs are
-  # authored by the sibling CORE card once the D3FEND-mapped step
-  # bindings are pinned.
-  - id: control.todo_agentic_indicator_ingest@v0
-    todo: true
+  # NIST SP 800-53 Rev. 5 controls exercised by the ingest,
+  # credential-isolation, lateral-movement-containment, escalate, and
+  # evidence-preservation steps. Anchored on the operator-side control
+  # cross-reference files under content/controls/.
+  - id: control.system_monitoring@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SI-4
+    title: System Monitoring
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-4
     notes: >-
-      Placeholder — CORE card pins the SI-4 (System Monitoring) /
-      IR-4 (Incident Handling) axis for the agentic-threat indicator
-      ingest step.
+      Covers the ingest step: the agentic-threat indicator arrives
+      from the detection layer as anomalous LLM API call volume,
+      rapid credential enumeration, or a lateral-movement burst
+      inside a sub-minute self-correction window. SI-4 is the
+      system-monitoring surface that produced the signal the
+      playbook hydrates.
 
-  - id: control.todo_credential_isolation@v0
-    todo: true
+  - id: control.incident_handling@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-4
+    title: Incident Handling
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-4
     notes: >-
-      Placeholder — CORE card pins the AC-2(13) (Disable Accounts
-      for High-Risk Individuals) axis for the credential-isolation
-      step.
+      Anchors the playbook end-to-end as the incident-handling
+      capability for the machine-speed-agentic case set:
+      ingest, credential isolation, lateral-movement containment,
+      escalate, and evidence preservation exercised step-by-step.
 
-  - id: control.todo_lateral_movement_containment@v0
-    todo: true
+  - id: control.account_management_disable_accounts@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AC-2(13)
+    title: Account Management | Disable Accounts for High-Risk Individuals
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AC-2(13)
     notes: >-
-      Placeholder — CORE card pins the AC-4 (Information Flow
-      Enforcement) / SC-7 (Boundary Protection) axis for the
-      lateral-movement micro-segmentation step.
+      Covers the credential-isolation step: revocation of live
+      sessions, refresh and access tokens for the implicated
+      principal and disable at the IdP for the duration of the
+      containment window — the operational analogue of disabling
+      a high-risk account against the agentic operator.
 
-  - id: control.todo_incident_management_handoff@v0
-    todo: true
+  - id: control.information_flow_enforcement@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AC-4
+    title: Information Flow Enforcement
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AC-4
     notes: >-
-      Placeholder — CORE card pins the IR-6 (Incident Reporting)
-      axis for the escalate-to-incident-management handoff.
+      Covers the lateral-movement containment step's information-
+      flow layer: the resolved lateral edge is interrupted by a
+      micro-segmentation call that denies the implicated
+      source→destination information flow so the agentic operator
+      cannot pivot off the compromised edge.
 
-  - id: control.todo_evidence_preservation@v0
-    todo: true
+  - id: control.boundary_protection@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SC-7
+    title: Boundary Protection
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SC-7
     notes: >-
-      Placeholder — CORE card pins the AU-9 (Protection of Audit
-      Information) / IR-4(4) (Incident Handling | Information
-      Correlation) axis for the evidence-preservation step.
+      Covers the lateral-movement containment step at the network
+      boundary: the operator's network-boundary layer applies the
+      micro-segmentation policy that severs the implicated lateral
+      edge during the containment window.
+
+  - id: control.incident_reporting@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-6
+    title: Incident Reporting
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-6
+    notes: >-
+      Covers the escalate step: hand-off of the case envelope to
+      playbook.incident_management@v1 so the NIS2 Article 23
+      early-warning and 72-hour notification chain is dispatched
+      by the downstream incident-management engine. This playbook
+      does not itself render the regulator notification.
+
+  - id: control.audit_review_analysis_reporting@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AU-6
+    title: Audit Record Review, Analysis, and Reporting
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AU-6
+    notes: >-
+      Covers the evidence-preservation step: correlated review of
+      LLM API call logs, credential-enumeration timeline, lateral-
+      movement graph, and containment-action ledger persisted as
+      the evidence bundle consumed by the downstream notification
+      chain.
 
 d3fend:
-  # SKELETON placeholders. MITRE D3FEND v1.0.0 technique tags per step
-  # are pinned by the sibling CORE card once the step semantics are
-  # frozen against the JADEPUFFER-class indicator set.
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned where the technique applies to a
+  # single step.
   - step: action--30000000-0000-4000-8000-000000000002
-    d3fend_id: D3-TODO
-    d3fend_name: Placeholder — Incident Response Analysis axis
-    todo: true
+    d3fend_id: D3-IRA
+    d3fend_name: Incident Response Analysis
+    url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
     notes: >-
-      Placeholder — CORE card pins D3-IRA (Incident Response
-      Analysis) or the closest applicable technique for the
-      agentic-threat indicator ingest step.
+      ingest agentic-threat indicator — analysis of the incoming
+      indicator (anomalous LLM API call volume, rapid credential
+      enumeration burst, lateral-movement inside the observed
+      self-correction window) and hydration with principal /
+      source-destination context so the downstream steps act on a
+      confirmed case.
+
+  - step: action--30000000-0000-4000-8000-000000000002
+    d3fend_id: D3-UBA
+    d3fend_name: User Behavior Analysis
+    url: https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/
+    notes: >-
+      ingest agentic-threat indicator — behavior-analysis surface
+      on the implicated workload / user principal: the sub-minute
+      self-correction cadence and enumeration burst are the
+      behavior fingerprints an autonomous adversary leaves that
+      classical rule-based triage misses.
 
   - step: action--30000000-0000-4000-8000-000000000003
-    d3fend_id: D3-TODO
-    d3fend_name: Placeholder — Authentication Cache Invalidation axis
-    todo: true
+    d3fend_id: D3-ACI
+    d3fend_name: Authentication Cache Invalidation
+    url: https://d3fend.mitre.org/technique/d3f:AuthenticationCacheInvalidation/
     notes: >-
-      Placeholder — CORE card pins D3-ACI (Authentication Cache
-      Invalidation) and D3-AL (Account Locking) for the
-      credential-isolation step.
+      isolate affected credential set — invalidation of live
+      sessions, refresh and access tokens for the implicated
+      principal so the agentic operator cannot continue to act on
+      the compromised credential material during the containment
+      window.
+
+  - step: action--30000000-0000-4000-8000-000000000003
+    d3fend_id: D3-AL
+    d3fend_name: Account Locking
+    url: https://d3fend.mitre.org/technique/d3f:AccountLocking/
+    notes: >-
+      isolate affected credential set — disable of the implicated
+      principal at the IdP for the duration of the containment
+      window so no new authentication path is available pending
+      the parallel IAM-auditor scope audit and forced-rotation
+      follow-on.
 
   - step: action--30000000-0000-4000-8000-000000000004
-    d3fend_id: D3-TODO
-    d3fend_name: Placeholder — Network Isolation axis
-    todo: true
+    d3fend_id: D3-NI
+    d3fend_name: Network Isolation
+    url: https://d3fend.mitre.org/technique/d3f:NetworkIsolation/
     notes: >-
-      Placeholder — CORE card pins D3-NI (Network Isolation) or a
-      more specific micro-segmentation technique for the
-      lateral-movement containment step.
+      contain lateral-movement path — micro-segmentation call
+      along the resolved lateral edge so the agentic operator
+      cannot pivot off the implicated path to continue the
+      encryption / staging chain during the containment window.
 
 ocsf:
-  # SKELETON placeholder. OCSF v1.3.0 bindings for the indicator ingest,
-  # account-change (credential isolation), and incident-finding
-  # (evidence bundle) events are pinned by the sibling EXTEND card.
+  # SKELETON placeholder retained at CORE time. OCSF v1.3.0 bindings
+  # for the indicator ingest, account-change (credential isolation),
+  # and incident-finding (evidence bundle) events are pinned by the
+  # sibling EXTEND card once the operator-side telemetry contract is
+  # frozen.
   - id: telemetry.todo_agentic_indicator@v0
     class_uid: 0
     todo: true

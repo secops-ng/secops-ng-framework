@@ -1,0 +1,72 @@
+{
+  "conditional_edges": [],
+  "edges": [
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--30000000-0000-4000-8000-000000000003",
+      "src": "action--30000000-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--30000000-0000-4000-8000-000000000004",
+      "src": "action--30000000-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--30000000-0000-4000-8000-000000000005",
+      "src": "action--30000000-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--30000000-0000-4000-8000-000000000006",
+      "src": "action--30000000-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--30000000-0000-4000-8000-000000000006"
+    }
+  ],
+  "end_sentinel": "__END__",
+  "entry": "action--30000000-0000-4000-8000-000000000002",
+  "name": "Agentic-threat detection and response",
+  "nodes": [
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "ingest agentic-threat indicator",
+      "name": "action--30000000-0000-4000-8000-000000000002",
+      "step_id": "action--30000000-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "isolate affected credential set",
+      "name": "action--30000000-0000-4000-8000-000000000003",
+      "step_id": "action--30000000-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "contain lateral-movement path",
+      "name": "action--30000000-0000-4000-8000-000000000004",
+      "step_id": "action--30000000-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "escalate to incident-management",
+      "name": "action--30000000-0000-4000-8000-000000000005",
+      "step_id": "action--30000000-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "preserve evidence for notification chain",
+      "name": "action--30000000-0000-4000-8000-000000000006",
+      "step_id": "action--30000000-0000-4000-8000-000000000006"
+    }
+  ],
+  "playbook_id": "playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8",
+  "stable_id": "playbook.agentic_threat_response@v1"
+}

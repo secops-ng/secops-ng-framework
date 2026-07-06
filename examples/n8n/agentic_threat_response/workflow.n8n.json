@@ -1,0 +1,317 @@
+{
+  "name": "Agentic-threat detection and response",
+  "nodes": [
+    {
+      "id": "start--30000000-0000-4000-8000-000000000001",
+      "name": "agentic-threat-start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__indicator_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the originating agentic-threat indicator delivered by the detection layer (anomalous LLM API call volume, rapid credential enumeration pattern, or lateral movement within a short (~31s) self-correction window)."
+            },
+            {
+              "name": "__affected_principal__",
+              "type": "string",
+              "value": "",
+              "description": "Identity or service-account principal implicated by the indicator; drives the credential-isolation step."
+            },
+            {
+              "name": "__lateral_path__",
+              "type": "string",
+              "value": "",
+              "description": "Resolved lateral-movement path (source-to-destination network / identity edges) the containment step must interrupt."
+            },
+            {
+              "name": "__evidence_bundle__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the preserved evidence bundle handed to the NIS2 Article 23 notification chain (LLM API call logs, credential-enumeration timeline, lateral-movement graph)."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--30000000-0000-4000-8000-000000000002",
+      "name": "ingest agentic-threat indicator",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.indicator_id",
+              "name": "in.indicator_id",
+              "value": "={{$workflow.variables.indicator_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.affected_principal",
+              "name": "out.affected_principal",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.lateral_path",
+              "name": "out.lateral_path",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.system_monitoring@v1, control.incident_handling@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Receive the agentic-threat indicator from the detection layer and hydrate it with originating principal, source / destination context, and the observed self-correction cadence. The indicator classes this step is authored against are: anomalous LLM API call volume from a workload principal, rapid credential-enumeration bursts inside a sub-minute window, and lateral movement across identity / network edges within a short self-correction window observed in fully-agentic operations.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--30000000-0000-4000-8000-000000000003",
+      "name": "isolate affected credential set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.affected_principal",
+              "name": "in.affected_principal",
+              "value": "={{$workflow.variables.affected_principal}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.account_management_disable_accounts@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Revoke live sessions, refresh and access tokens for __affected_principal__ at the IdP, disable the principal for the containment window, and dispatch an alert to the IAM auditor lane so the credential-scope audit and forced-rotation follow-on run in parallel. This step is the credential-side cut-out on the agentic operator; the deeper IdP-side audit lives on playbook.identity_compromise@v1.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--30000000-0000-4000-8000-000000000004",
+      "name": "contain lateral-movement path",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.lateral_path",
+              "name": "in.lateral_path",
+              "value": "={{$workflow.variables.lateral_path}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.information_flow_enforcement@v1, control.boundary_protection@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Apply a network micro-segmentation call along the resolved __lateral_path__ so the agentic operator cannot pivot off the implicated edge to continue the encryption / staging chain during the containment window. Bounded by the operator-supplied authorisation policy.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--30000000-0000-4000-8000-000000000005",
+      "name": "escalate to incident-management",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_reporting@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Hand off the case envelope to playbook.incident_management@v1 as the upstream-playbook intake so the regulator-submission timeline (NIS2 Article 23 early-warning and 72-hour notification) is dispatched by the incident-management engine. Cross-playbook reference; this playbook does not itself render the regulator notification.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--30000000-0000-4000-8000-000000000006",
+      "name": "preserve evidence for notification chain",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "out.evidence_bundle",
+              "name": "out.evidence_bundle",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.audit_review_analysis_reporting@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Persist an evidence bundle for the NIS2 Article 23 notification chain: LLM API call logs, credential-enumeration timeline, lateral-movement graph, and the containment-action ledger. The bundle identifier is emitted as __evidence_bundle__ and consumed by the downstream incident-management engine.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--30000000-0000-4000-8000-000000000007",
+      "name": "agentic-threat-end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "agentic-threat-start": {
+      "main": [
+        [
+          {
+            "node": "ingest agentic-threat indicator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ingest agentic-threat indicator": {
+      "main": [
+        [
+          {
+            "node": "isolate affected credential set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "isolate affected credential set": {
+      "main": [
+        [
+          {
+            "node": "contain lateral-movement path",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "contain lateral-movement path": {
+      "main": [
+        [
+          {
+            "node": "escalate to incident-management",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "escalate to incident-management": {
+      "main": [
+        [
+          {
+            "node": "preserve evidence for notification chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "preserve evidence for notification chain": {
+      "main": [
+        [
+          {
+            "node": "agentic-threat-end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "agentic-threat",
+    "machine-speed",
+    "credential-harvest",
+    "lateral-movement",
+    "nis2"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.agentic_threat_response@v1",
+      "content_version": "0.2.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8"
+    },
+    "secops_ng_notes": [
+      "step 'action--30000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--30000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}
