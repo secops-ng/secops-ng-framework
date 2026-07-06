@@ -73,9 +73,37 @@ referenced by the JML flow); and
 `control_refs: []` and `playbook_refs: []` pending a dedicated
 classification-scheme artifact (the operator's own scheme, joined
 against A.5.9 inventory, A.5.1 policy-set, and A.5.10 acceptable-use,
-discharges it in practice). The remaining A.5 controls
-(A.5.13 through A.5.37) land as sibling entries in that file on
-subsequent cards.
+discharges it in practice). The A.5.13–A.5.18 batch also lands in
+`annex-a-5-organisational.yaml`, bringing the theme to 18 of 37
+entries: `iso27001:a-5-13-labelling-of-information` ships
+`control_refs: []` and `playbook_refs: []` pending a dedicated
+labelling-scheme artifact (the operator's labelling procedures,
+joined against the A.5.12 classification anchor, the A.5.9
+asset-inventory pair, and the A.5.10 acceptable-use anchor,
+discharge it in practice); `iso27001:a-5-14-information-transfer`
+wires `control.risk_management_policy@v1` as the policy-set anchor
+that governs the operator's transfer rules (crypto-posture under
+A.8.24 exercises the confidentiality-in-transit slice);
+`iso27001:a-5-15-access-control` wires
+`control.access_enforcement@v1` and `control.least_privilege@v1`
+(both already carrying A.5.15 on their `oscal_refs` block) plus
+`playbook.iam_auditor@v1`; `iso27001:a-5-16-identity-management`
+wires `control.jml_evidence@v1` and
+`control.account_management@v1` (both already carrying A.5.16)
+plus `playbook.onboarding_offboarding_tracker@v1` and
+`playbook.iam_auditor@v1`;
+`iso27001:a-5-17-authentication-information` ships
+`control_refs: []` and `playbook_refs: []` pending a dedicated
+credential-management artifact (the operator's credential
+procedures, joined against A.8.5 secure-authentication, A.8.24
+key-rotation, and A.5.1 policy-set, discharge it in practice); and
+`iso27001:a-5-18-access-rights` wires
+`control.cloud_identity_least_privilege@v1` (already carrying
+A.5.18 alongside A.5.15) and `control.privileged_access_review@v1`
+plus `playbook.iam_auditor@v1` and
+`playbook.onboarding_offboarding_tracker@v1`. The remaining A.5
+controls (A.5.19 through A.5.37) land as sibling entries in that
+file on subsequent cards.
 
 The A.6 people-controls theme file has landed with its first two
 entries (`iso27001:a-6-1-screening`, `iso27001:a-6-3-awareness`) in

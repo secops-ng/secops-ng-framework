@@ -522,3 +522,290 @@ entries:
       regime-specific scopes; the regimes carry separate evidence
       requirements against the same underlying classification-scheme
       artifact.
+  - id: iso27001:a-5-13-labelling-of-information
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.13
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Develop and implement an appropriate set of procedures for
+      information labelling in accordance with the information
+      classification scheme adopted by the organisation. Labels must
+      be applied consistently across the information landscape so
+      that downstream handling, transfer, and access-control rules
+      can key on them.
+    status: draft
+    control_refs: []
+    playbook_refs: []
+    # control_refs and playbook_refs intentionally empty: the
+    # SecOps-NG content catalogue does not yet carry a dedicated
+    # information-labelling artifact as a first-class control or
+    # playbook. A.5.13 is discharged in practice against the
+    # operator's own labelling procedures, joined against the
+    # A.5.12 classification-scheme anchor (labels are the projection
+    # of the classification scheme onto individual information
+    # assets), the A.5.9 asset-inventory pair
+    # (`control.asset_inventory_delta@v1`, `playbook.asset_management@v1`)
+    # for the assets against which labels are applied, and the
+    # A.5.10 acceptable-use anchor for the handling rules that key
+    # on labels. A future dedicated artifact
+    # (e.g. `control.information_labelling_scheme@v1`) would replace
+    # this placeholder without changing the entry id.
+    notes: >-
+      A.5.13 is the information-labelling anchor within the Annex
+      A.5 organisational-controls theme — the standard treats it as
+      the projection of the A.5.12 classification scheme onto
+      individual information assets, so downstream obligations that
+      key on classification labels (A.5.14 information transfer,
+      A.5.10 acceptable-use handling rules, A.5.15 access control)
+      have a consistent identifier to reference. Labels themselves
+      are an operator-side artifact; the SecOps-NG catalogue anchors
+      the discipline structurally through the A.5.12 classification-
+      scheme anchor (labels are meaningless without the scheme they
+      project), the A.5.9 asset-inventory pair (the assets against
+      which labels are applied), and the A.5.10 acceptable-use
+      anchor (the handling rules that reference labels). Cross-regime
+      parallels: NIS2 Art. 21(2)(i) (human-resources security,
+      including data-handling rules) and GDPR Art. 5(1)(f) (integrity
+      and confidentiality principle) anchor the same
+      classification-and-labelling discipline against their
+      regime-specific scopes; the regimes carry separate evidence
+      requirements against the same underlying labelling artifact.
+  - id: iso27001:a-5-14-information-transfer
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.14
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Establish rules, procedures, and controls for the transfer of
+      information within the organisation and with external parties,
+      across electronic, physical, and verbal channels. Transfer
+      controls must address the confidentiality and integrity of the
+      information in transit and be aligned with the classification
+      of the information being transferred.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+    playbook_refs: []
+    # control_refs wires control.risk_management_policy@v1 as the
+    # policy-set anchor that governs the topic-specific
+    # information-transfer rules the operator adopts (transfer
+    # agreements, secure-channel requirements, media-in-transit
+    # protection). The SecOps-NG catalogue does not yet carry a
+    # dedicated information-transfer artifact as a first-class
+    # control; the discipline is discharged in practice against the
+    # operator's own transfer procedures, joined against the A.5.13
+    # labelling anchor (transfer rules key on classification
+    # labels), the A.8.24 cryptography anchor
+    # (`control.crypto_policy_inventory@v1`,
+    # `playbook.crypto_posture_management@v1`) for the
+    # confidentiality-in-transit slice, and the A.5.20 supplier-
+    # relationships anchor (future batch) for the external-party
+    # transfer-agreement slice. playbook_refs is intentionally
+    # empty: information transfer is a policy-set discipline rather
+    # than a single operational flow; the crypto-posture playbook
+    # already anchored under A.8.24 exercises the technical slice
+    # that carries a subset of the transfer surface.
+    notes: >-
+      A.5.14 is the information-transfer anchor within the Annex
+      A.5 organisational-controls theme — the 2022 revision
+      consolidated the earlier transfer-agreement and
+      media-in-transit obligations into this single control.
+      control.risk_management_policy@v1 is the policy-set anchor
+      the operator's transfer-rules discipline hangs against; the
+      topic-specific transfer procedures are the operator's own
+      artifact but sit inside the policy-set governance the anchor
+      names. Cross-regime parallels: NIS2 Art. 21(2)(g) (basic
+      cyber-hygiene practices, including data-in-transit
+      protection) and GDPR Art. 32 (security of processing,
+      including transfer safeguards) anchor the same
+      transfer-protection discipline against their regime-specific
+      scopes; the regimes carry separate evidence requirements
+      against the same underlying transfer-rules artifact.
+  - id: iso27001:a-5-15-access-control
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.15
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Establish and implement rules to control physical and logical
+      access to information and other associated assets, based on
+      the business and information-security requirements of the
+      organisation. The access-control rules must be topic-specific,
+      documented, and reviewed as the business and threat landscape
+      change.
+    status: draft
+    control_refs:
+      - control.access_enforcement@v1
+      - control.least_privilege@v1
+    playbook_refs:
+      - playbook.iam_auditor@v1
+    notes: >-
+      A.5.15 is the access-control anchor within the Annex A.5
+      organisational-controls theme — the standard treats it as the
+      umbrella obligation that governs the topic-specific access
+      rules an operator adopts across information, systems, and
+      other associated assets. control.access_enforcement@v1 (its
+      oscal_refs block already carries ISO/IEC 27001:2022 A.5.15
+      alongside A.8.3) and control.least_privilege@v1 (also
+      carrying A.5.15 on its oscal_refs block) are the direct
+      anchors: access-enforcement carries the point-of-access rule
+      evaluation, least-privilege carries the entitlement-shaping
+      discipline that keeps the rules minimal. The
+      playbook.iam_auditor@v1 CACAO playbook is the operational
+      discharge — the periodic identity-and-access review that keeps
+      the rules current as roles change. Cross-regime parallels:
+      NIS2 Art. 21(2)(i) (human-resources security, including
+      access-control rules) and DORA Art. 9 (identification and
+      classification of ICT-supported business functions, including
+      access-control rules) anchor the same access-control
+      discipline against their regime-specific scopes; the regimes
+      carry separate evidence requirements against the same
+      underlying access-enforcement and least-privilege artifacts.
+  - id: iso27001:a-5-16-identity-management
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.16
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Manage the full lifecycle of identities so that only
+      authorised principals hold accounts, entitlements track the
+      current role of the principal, and dormant or terminated
+      identities are removed. The lifecycle covers human, service,
+      and non-person identities and their joiner, mover, and leaver
+      transitions.
+    status: draft
+    control_refs:
+      - control.jml_evidence@v1
+      - control.account_management@v1
+    playbook_refs:
+      - playbook.onboarding_offboarding_tracker@v1
+      - playbook.iam_auditor@v1
+    notes: >-
+      A.5.16 is the identity-management anchor within the Annex
+      A.5 organisational-controls theme — the standard treats it as
+      the full-lifecycle obligation covering account creation,
+      modification, and revocation across the joiner-mover-leaver
+      transitions. control.jml_evidence@v1 (its oscal_refs block
+      already carries ISO/IEC 27001:2022 A.5.16 alongside NIST
+      800-53 rev5 PS-4 personnel-termination) and
+      control.account_management@v1 (also carrying A.5.16 on its
+      oscal_refs block) are the direct anchors: jml_evidence
+      carries the lifecycle-events surface (access provisioned on
+      join, adjusted on role change, revoked on departure),
+      account_management carries the account-inventory and
+      dormancy-detection discipline. The
+      playbook.onboarding_offboarding_tracker@v1 CACAO playbook is
+      the operational join-and-leaver discharge, and
+      playbook.iam_auditor@v1 is the periodic identity-and-access
+      review that keeps the account surface current between
+      lifecycle events. Cross-regime parallels: NIS2 Art. 21(2)(i)
+      (human-resources security, including identity-lifecycle
+      controls) and DORA Art. 9 (identification and classification
+      of ICT-supported business functions, including identity
+      management) anchor the same identity-lifecycle discipline
+      against their regime-specific scopes; the regimes carry
+      separate evidence requirements against the same underlying
+      JML and account-management artifacts.
+  - id: iso27001:a-5-17-authentication-information
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.17
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Control the allocation and management of authentication
+      information (passwords, keys, tokens, biometric enrolments)
+      through documented procedures for generation, distribution,
+      storage, replacement, and revocation. Users and services must
+      be advised of their obligations for safeguarding
+      authentication information.
+    status: draft
+    control_refs: []
+    playbook_refs: []
+    # control_refs and playbook_refs intentionally empty: the
+    # SecOps-NG content catalogue does not yet carry a dedicated
+    # authentication-information-management artifact as a
+    # first-class control or playbook. A.5.17 is discharged in
+    # practice against the operator's own credential-management
+    # procedures, joined against the A.8.5 secure-authentication
+    # anchor (`control.mfa_state_probe@v1`,
+    # `control.service_identification_authentication@v1`,
+    # `playbook.mfa_secured_comms@v1`) for the enforcement-side
+    # surface that consumes the authentication information, the
+    # A.8.24 cryptography anchor
+    # (`control.key_rotation_evidence@v1`,
+    # `playbook.crypto_posture_management@v1`) for the key-material
+    # slice of the credential surface, and the A.5.1 policy-set
+    # anchor (`control.risk_management_policy@v1`) for the
+    # top-level credential-handling policy. A future dedicated
+    # artifact (e.g. `control.credential_management@v1`) would
+    # replace this placeholder without changing the entry id.
+    notes: >-
+      A.5.17 is the authentication-information-management anchor
+      within the Annex A.5 organisational-controls theme — the
+      standard treats it as the credential-lifecycle counterpart
+      to the A.5.16 identity-lifecycle obligation and the A.8.5
+      secure-authentication enforcement obligation. The
+      credential-management procedures themselves are the
+      operator's own artifact; the SecOps-NG catalogue anchors
+      the discipline structurally through the A.8.5
+      authentication-enforcement anchors (which exercise the
+      credentials once they exist), the A.8.24 cryptography
+      anchor (which governs the key-material slice), and the
+      A.5.1 policy-set anchor (the top-level credential-handling
+      policy). Cross-regime parallels: NIS2 Art. 21(2)(i)
+      (human-resources security, including access-credential
+      handling) and DORA Art. 9 (identification and
+      classification, including authentication-information
+      management) anchor the same credential-lifecycle
+      discipline against their regime-specific scopes; the
+      regimes carry separate evidence requirements against the
+      same underlying credential-management artifact.
+  - id: iso27001:a-5-18-access-rights
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.18
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Provision, review, modify, and remove access rights to
+      information and other associated assets in accordance with
+      the organisation's topic-specific policy on and rules for
+      access control. Access rights must track the current role of
+      the principal and be removed when no longer required.
+    status: draft
+    control_refs:
+      - control.cloud_identity_least_privilege@v1
+      - control.privileged_access_review@v1
+    playbook_refs:
+      - playbook.iam_auditor@v1
+      - playbook.onboarding_offboarding_tracker@v1
+    notes: >-
+      A.5.18 is the access-rights anchor within the Annex A.5
+      organisational-controls theme — the standard treats it as
+      the entitlement-lifecycle counterpart to the A.5.15 access-
+      control umbrella (which defines the rules) and the A.5.16
+      identity-management obligation (which manages the principals
+      the rights attach to). control.cloud_identity_least_privilege@v1
+      (its oscal_refs block already carries ISO/IEC 27001:2022
+      A.5.18 alongside A.5.15) is the direct anchor: its
+      least-privilege posture-check surface is exactly the
+      provision-review-modify-remove discipline A.5.18 imposes on
+      cloud-identity entitlements. control.privileged_access_review@v1
+      is the review-side anchor for the elevated-entitlement slice.
+      The playbook.iam_auditor@v1 CACAO playbook is the periodic
+      review discharge, and playbook.onboarding_offboarding_tracker@v1
+      is the lifecycle-event discharge that provisions on join and
+      removes on leave. Cross-regime parallels: NIS2 Art. 21(2)(i)
+      (human-resources security, including entitlement lifecycle)
+      and DORA Art. 9 (identification and classification, including
+      access-rights management) anchor the same entitlement-
+      lifecycle discipline against their regime-specific scopes;
+      the regimes carry separate evidence requirements against the
+      same underlying least-privilege and privileged-access-review
+      artifacts.
