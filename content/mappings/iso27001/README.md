@@ -144,7 +144,84 @@ wires `control.incident_timeline_signals@v1`,
 A.5.25 on their `oscal_refs` block) plus
 `playbook.alert_triage@v1` and `playbook.incident_management@v1`.
 The remaining A.5 controls (A.5.26 through A.5.37) land as sibling
-entries in that file on subsequent cards.
+artifacts.
+The A.5.26–A.5.37 batch closes the theme, bringing the A.5
+organisational-controls coverage to 37 of 37 entries:
+`iso27001:a-5-26-response-to-information-security-incidents` wires
+`control.incident_handling_capability@v1` (already carrying A.5.26
+on its `oscal_refs` block alongside A.5.24) and
+`control.incident_timeline_signals@v1` plus
+`playbook.incident_management@v1` and `playbook.on_call_rotation@v1`;
+`iso27001:a-5-27-learning-from-information-security-incidents`
+wires `control.post_incident_learning@v1` and
+`control.recurring_incident_correlator@v1` (both already carrying
+A.5.27 on their `oscal_refs` block) plus
+`playbook.post_incident_review@v1` and
+`playbook.incident_management@v1`;
+`iso27001:a-5-28-collection-of-evidence` ships `control_refs: []`
+pending a dedicated evidence-custody artifact (the operator's
+forensic-readiness procedures, joined against the A.5.24 case-
+record anchors, the A.5.33 records-protection surface, and the
+`playbook.incident_management@v1` / `playbook.post_incident_review@v1`
+discharges, exercise it in practice);
+`iso27001:a-5-29-information-security-during-disruption` ships
+`control_refs: []` pending a dedicated ISMS-continuity artifact
+(the operator's BCM posture, joined against the A.5.30 restore-
+drill anchor, the A.8.13 backup anchors, and the A.5.24 incident-
+management planning anchors, exercises it in practice), with
+`playbook.backup_recovery@v1` and `playbook.incident_management@v1`
+as the operational discharges;
+`iso27001:a-5-30-ict-readiness-for-business-continuity` wires
+`control.restore_drill@v1` (already carrying A.5.30 on its
+`oscal_refs` block alongside A.8.13) plus
+`playbook.backup_recovery@v1` as the exercised-recovery discharge;
+`iso27001:a-5-31-legal-statutory-regulatory-and-contractual-requirements`
+ships `control_refs: []` pending a dedicated legal-register
+artifact (the operator's own legal-and-compliance register,
+joined against the A.5.1 policy-set, the A.5.20 supplier-
+agreements surface, and the community-authored crosswalk under
+`content/mappings/`, exercises it in practice), with
+`playbook.contractual_obligations_tracker@v1` as the contract-
+tracking discharge;
+`iso27001:a-5-32-intellectual-property-rights` ships
+`control_refs: []` and `playbook_refs: []` pending a dedicated
+IPR artifact (the operator's IPR governance, joined against the
+A.5.1 policy-set, the A.5.9 licensed-software inventory, the
+A.5.20 supplier-agreements surface, and the A.5.31 legal-register
+discipline, exercises it in practice);
+`iso27001:a-5-33-protection-of-records` ships `control_refs: []`
+and `playbook_refs: []` pending a dedicated records-retention
+artifact (the operator's retention schedule and record-store
+integrity posture, joined against the A.5.12 classification
+surface, the A.8.10 information-deletion discipline, the A.8.13
+backup anchors, and the A.5.31 legal-register discipline,
+exercises it in practice);
+`iso27001:a-5-34-privacy-and-protection-of-pii` ships
+`control_refs: []` pending a dedicated privacy-programme artifact
+(the operator's DPO / ROPA / privacy-programme surface exercises
+the substantive privacy discipline in practice), with
+`playbook.data_subject_rights@v1` and
+`playbook.data_protection_impact_assessment@v1` as the two
+GDPR-anchored operational discharges;
+`iso27001:a-5-35-independent-review-of-information-security` wires
+`control.security_assessment@v1` (already carrying A.5.35 on its
+`oscal_refs` block) as the independent-assessment anchor, with
+`playbook_refs: []` (A.5.35 is a governance-and-audit obligation
+rather than an operational flow);
+`iso27001:a-5-36-compliance-with-policies-rules-and-standards`
+wires `control.ict_risk_framework_review@v1` and
+`control.control_effectiveness_test@v1` (both already carrying
+A.5.36 on their `oscal_refs` block) as the framework-level and
+per-control review surfaces, with `playbook_refs: []`; and
+`iso27001:a-5-37-documented-operating-procedures` ships
+`control_refs: []` and `playbook_refs: []` because A.5.37 is the
+meta-obligation that documented procedures exist — the SecOps-NG
+catalogue as a whole (the `content/playbooks/` set and the
+`content/controls/` set together, joined against the A.5.1
+policy-set, the A.8.32 change-management anchor, and the A.5.36
+compliance-review discipline) exercises the obligation.
+Coverage on A.5 now stands at 37 of 37 entries landed, closing
+the A.5 organisational-controls theme.
 
 The A.6 people-controls theme file has landed with its first two
 entries (`iso27001:a-6-1-screening`, `iso27001:a-6-3-awareness`) in
