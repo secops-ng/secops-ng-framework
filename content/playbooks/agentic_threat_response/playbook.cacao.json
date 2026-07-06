@@ -65,8 +65,14 @@
           "control.system_monitoring@v1",
           "control.incident_handling@v1"
         ],
-        "telemetry_refs": [],
-        "metric_refs": []
+        "telemetry_refs": [
+          "telemetry.ocsf.detection_finding@v1",
+          "telemetry.ocsf.api_activity@v1",
+          "telemetry.ocsf.authentication@v1"
+        ],
+        "metric_refs": [
+          "kpi.mttd_agentic_threat@v1"
+        ]
       }
     },
     "action--30000000-0000-4000-8000-000000000003": {
@@ -81,8 +87,12 @@
         "control_refs": [
           "control.account_management_disable_accounts@v1"
         ],
-        "telemetry_refs": [],
-        "metric_refs": []
+        "telemetry_refs": [
+          "telemetry.ocsf.account_change@v1"
+        ],
+        "metric_refs": [
+          "kpi.mttc_agentic_threat@v1"
+        ]
       }
     },
     "action--30000000-0000-4000-8000-000000000004": {
@@ -138,7 +148,7 @@
   },
   "x_secops_ng": {
     "stable_id": "playbook.agentic_threat_response@v1",
-    "content_version": "0.2.0",
+    "content_version": "0.3.0",
     "maturity": "experimental",
     "compile_targets": [
       "n8n",
@@ -154,8 +164,17 @@
       "control.incident_reporting@v1",
       "control.audit_review_analysis_reporting@v1"
     ],
-    "telemetry_refs": [],
-    "metric_refs": [],
+    "telemetry_refs": [
+      "telemetry.ocsf.detection_finding@v1",
+      "telemetry.ocsf.api_activity@v1",
+      "telemetry.ocsf.authentication@v1",
+      "telemetry.ocsf.account_change@v1",
+      "telemetry.ocsf.incident_finding@v1"
+    ],
+    "metric_refs": [
+      "kpi.mttd_agentic_threat@v1",
+      "kpi.mttc_agentic_threat@v1"
+    ],
     "sources": [
       "OASIS CACAO v2.0 specification \u2014 workflow step types, variable conventions, x_ extension namespace",
       "NIS2 Directive (EU) 2022/2555, Article 21(2)(b) \u2014 incident-handling capability",

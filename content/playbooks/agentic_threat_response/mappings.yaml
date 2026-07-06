@@ -1,10 +1,10 @@
 # Cross-references for the agentic_threat_response playbook.
 #
 # Playbook-side outbound overlay. Pins the OSCAL / D3FEND anchors this
-# playbook exercises step-by-step, and the inbound NIS2 mapping ids
-# that backlink to `playbook.agentic_threat_response@v1`. OCSF
-# telemetry bindings and KPI / KRI hooks are deferred to a sibling
-# EXTEND card; the placeholder OCSF entry stays in place until then.
+# playbook exercises step-by-step, the OCSF v1.3.0 telemetry classes
+# consumed at the ingest step and emitted at the credential-isolation
+# and escalate steps, and the inbound NIS2 mapping ids that backlink
+# to `playbook.agentic_threat_response@v1`.
 #
 # Inbound closure at CORE time:
 #   - NIS2:  playbook.agentic_threat_response@v1 is added to the
@@ -189,20 +189,95 @@ d3fend:
       encryption / staging chain during the containment window.
 
 ocsf:
-  # SKELETON placeholder retained at CORE time. OCSF v1.3.0 bindings
-  # for the indicator ingest, account-change (credential isolation),
-  # and incident-finding (evidence bundle) events are pinned by the
-  # sibling EXTEND card once the operator-side telemetry contract is
-  # frozen.
-  - id: telemetry.todo_agentic_indicator@v0
-    class_uid: 0
-    todo: true
+  # OCSF v1.3.0 telemetry bindings. The ingest step consumes the
+  # Detection Finding meta-finding (upstream agentic-indicator rule
+  # match), API Activity (LLM API call volume and cadence), and
+  # Authentication (rapid credential-enumeration burst) event
+  # classes. The credential-isolation step emits Account Change
+  # records for each session / token / account action on the
+  # implicated principal. The escalate step emits an Incident
+  # Finding carrying the case envelope handed off to the downstream
+  # incident-management engine for the NIS2 Article 23 chain.
+  - id: telemetry.ocsf.detection_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2004
+    class_name: Detection Finding
+    ocsf_version: "1.3.0"
+    direction: consumes
     notes: >-
-      Placeholder — EXTEND card pins the Detection Finding
-      (class_uid 2004) consumed shape and the Account Change
-      (class_uid 3001) and Incident Finding (class_uid 2005)
-      emitted shapes once the operator-side telemetry contract is
-      frozen.
+      Consumed at the ingest step: the originating agentic-threat
+      indicator (anomalous LLM API call volume, rapid credential-
+      enumeration burst, lateral-movement inside a sub-minute
+      self-correction window) is delivered as a Detection Finding
+      produced by the upstream detection layer. Schema:
+      https://schema.ocsf.io/1.3.0/classes/detection_finding
+
+  - id: telemetry.ocsf.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: consumes
+    notes: >-
+      Consumed at the ingest step: LLM API call traces attributable
+      to the implicated workload principal carry the machine-speed
+      volume and self-correction cadence fingerprints that classical
+      rule-based triage misses. The api.service.name and
+      api.operation fields resolve the tool-composition surface a
+      fully-agentic operator exercises against the operator's
+      environment. Schema:
+      https://schema.ocsf.io/1.3.0/classes/api_activity
+
+  - id: telemetry.ocsf.authentication@v1
+    category_uid: 3
+    category_name: Identity & Access Management
+    class_uid: 3002
+    class_name: Authentication
+    ocsf_version: "1.3.0"
+    direction: consumes
+    notes: >-
+      Consumed at the ingest step: sign-in metadata for the
+      implicated principal across the observed self-correction
+      window — the rapid credential-enumeration burst pattern is
+      the behaviour fingerprint that lateralises through the
+      Authentication event stream before the lateral-movement
+      surface is visible on API Activity. Schema:
+      https://schema.ocsf.io/1.3.0/classes/authentication
+
+  - id: telemetry.ocsf.account_change@v1
+    category_uid: 3
+    category_name: Identity & Access Management
+    class_uid: 3001
+    class_name: Account Change
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by the credential-isolation step: each containment
+      action on the implicated principal (session revocation,
+      refresh / access token revocation, IdP disable for the
+      containment window) is recorded as an Account Change event
+      so the timeline-signal controls can audit on-time containment
+      KPIs and the parallel IAM-auditor lane can reconcile the
+      forced-rotation follow-on. Schema:
+      https://schema.ocsf.io/1.3.0/classes/account_change
+
+  - id: telemetry.ocsf.incident_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2005
+    class_name: Incident Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by the escalate step: the case envelope handed off
+      to playbook.incident_management@v1 is recorded as an
+      Incident Finding so the downstream regulator-notification
+      engine (NIS2 Article 23 early-warning and 72-hour
+      notification chain) reads the case shape from a portable
+      artifact rather than an engine-specific case object. Schema:
+      https://schema.ocsf.io/1.3.0/classes/incident_finding
 
 nis2:
   # Inbound entries live at:

@@ -1,0 +1,92 @@
+stable_id: kpi.mttd_agentic_threat@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Mean time to detect — agentic threat activity
+summary: >
+  Time elapsed between the earliest observable evidence in the
+  operator's telemetry stream (anomalous LLM API call volume, rapid
+  credential-enumeration burst, or lateral-movement inside the
+  observed sub-minute self-correction window) and the first
+  authoritative agentic-threat Detection Finding that opens the
+  incident record. Scoped to incidents whose causal chain originates
+  in fully-agentic adversary activity — autonomous LLM-driven
+  credential harvest, lateral movement, and encryption chains observed
+  at machine-speed decision cadence. Measured end-to-end across the
+  detection pipeline so that ingestion, enrichment, and rule-
+  evaluation latency all contribute. SecOps-NG does not pick a
+  detection vendor; the catalog entry is vendor-neutral and the
+  compile target is the source of truth for the executable form.
+
+unit: minutes
+direction: lower_is_better
+
+measurement:
+  source: composite
+  aggregation: p95
+  formula: >
+    For each agentic-threat-rooted incident closed within the
+    evaluation window, compute (first_detection_fire_timestamp -
+    earliest_telemetry_event_timestamp) in minutes and aggregate as
+    p95. Exclude incidents where the earliest telemetry timestamp is
+    unknown so the indicator does not silently improve when
+    ingestion breaks. Reference visualisation: a horizontal bar
+    chart of detection_latency_minutes per closed agentic-threat
+    incident in the window with the p95 aggregate annotated as the
+    headline figure. The committed reference rendering lives at
+    `content/metrics/mttd_agentic_threat.viz.md` — that file is the
+    contract for the chart shape; the compile target renders the
+    executable form against operator data.
+  inputs:
+    - name: earliest_telemetry_event
+      description: >
+        Earliest event in the telemetry stream that, in hindsight, was
+        part of the incident's causal chain. Bound to OCSF API
+        Activity (class_uid 6003) — the earliest LLM API call trace
+        whose api.service.name / api.operation / cadence pattern is
+        the causal-chain origin for the machine-speed decision-
+        cadence case set. The agentic_threat_response playbook's
+        ingest step consumes this class.
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+      field: time
+    - name: first_detection_fire
+      description: >
+        First authoritative agentic-threat Detection Finding that
+        opened the incident record. Carried on the OCSF Detection
+        Finding meta-finding the detection layer emits when the
+        agentic-threat indicator rule matches; the catalog entry
+        binds to that OCSF class shape, not to a vendor-specific
+        rule object. Catalog entry is detection-vendor-neutral.
+      telemetry_ref: telemetry.ocsf.detection_finding@v1
+      field: finding_info.uid
+  window:
+    duration: P30D
+    sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.api_activity@v1
+  - telemetry.ocsf.detection_finding@v1
+
+playbook_refs:
+  - playbook_id: playbook.agentic_threat_response@v1
+    step_id: action--30000000-0000-4000-8000-000000000002
+
+external_refs:
+  - name: NIS2 — Article 21(2)(b) incident-handling capability
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(b)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: NIS2 — Article 21(2)(e) security in acquisition, development and maintenance
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(e)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ENISA — Threat Landscape reporting on autonomous / agentic adversary tradecraft
+    source: ENISA
+    url: https://www.enisa.europa.eu/publications/enisa-threat-landscape
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability

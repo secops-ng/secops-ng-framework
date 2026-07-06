@@ -27,10 +27,10 @@ async def ingest_agentic_threat_indicator(indicator_id: str) -> dict[str, object
     """
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest agentic-threat indicator', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_agentic_threat_indicator'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.3.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest agentic-threat indicator', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_agentic_threat_indicator'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest agentic-threat indicator', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_agentic_threat_indicator'})
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.3.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest agentic-threat indicator', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_agentic_threat_indicator'})
         )
         raise NotImplementedError(
             f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000002'"
@@ -51,10 +51,10 @@ async def isolate_affected_credential_set(affected_principal: str) -> None:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'isolate affected credential set', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'isolate_affected_credential_set'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.3.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'isolate affected credential set', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'isolate_affected_credential_set'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'isolate affected credential set', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'isolate_affected_credential_set'})
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.3.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'isolate affected credential set', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'isolate_affected_credential_set'})
         )
         raise NotImplementedError(
             f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000003'"
@@ -75,10 +75,10 @@ async def contain_lateral_movement_path(lateral_path: str) -> None:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'contain lateral-movement path', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'contain_lateral_movement_path'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.3.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'contain lateral-movement path', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'contain_lateral_movement_path'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'contain lateral-movement path', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'contain_lateral_movement_path'})
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.3.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'contain lateral-movement path', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'contain_lateral_movement_path'})
         )
         raise NotImplementedError(
             f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000004'"
@@ -99,10 +99,10 @@ async def escalate_to_incident_management() -> None:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'escalate to incident-management', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'escalate_to_incident_management'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.3.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'escalate to incident-management', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'escalate_to_incident_management'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'escalate to incident-management', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'escalate_to_incident_management'})
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.3.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'escalate to incident-management', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'escalate_to_incident_management'})
         )
         raise NotImplementedError(
             f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000005'"
@@ -123,10 +123,10 @@ async def preserve_evidence_for_notification_chain() -> str:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000006',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'preserve evidence for notification chain', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'preserve_evidence_for_notification_chain'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.3.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'preserve evidence for notification chain', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'preserve_evidence_for_notification_chain'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'preserve evidence for notification chain', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'preserve_evidence_for_notification_chain'})
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.3.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'preserve evidence for notification chain', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'preserve_evidence_for_notification_chain'})
         )
         raise NotImplementedError(
             f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000006'"
@@ -145,7 +145,7 @@ class PlaybookAgenticThreatResponseV1Workflow:
 
     CACAO playbook id : playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8
     stable_id         : playbook.agentic_threat_response@v1
-    content_version   : 0.2.0
+    content_version   : 0.3.0
     maturity          : experimental
     workflow_start    : start--30000000-0000-4000-8000-000000000001
     activities        : ingest_agentic_threat_indicator, isolate_affected_credential_set, contain_lateral_movement_path, escalate_to_incident_management, preserve_evidence_for_notification_chain
@@ -155,10 +155,10 @@ class PlaybookAgenticThreatResponseV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.agentic_threat_response@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.3.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.agentic_threat_response@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.2.0'})
+                AuditRecord(span_name='workflow.playbook.agentic_threat_response@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.3.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.agentic_threat_response@v1'"
