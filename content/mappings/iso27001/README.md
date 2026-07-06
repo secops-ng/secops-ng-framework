@@ -140,7 +140,39 @@ on its `oscal_refs` block) plus `playbook.detection_engineering@v1`
 `iso27001:a-8-17-clock-synchronisation` ships `control_refs: []`
 pending a dedicated time-source artifact (the operator's NTP / PTP
 posture discharges it in practice; A.8.17 is a precondition of the
-A.8.15 / A.8.16 log-and-monitor pair). Coverage on A.8 now stands
-at 17 of 34 entries landed; the remaining A.8 controls (A.8.18
-through A.8.34) land as sibling entries in that file on subsequent
-cards.
+A.8.15 / A.8.16 log-and-monitor pair). The A.8.23–A.8.27 batch also
+lands in `annex-a-8-technological.yaml`:
+`iso27001:a-8-23-web-filtering` ships `control_refs: []` and
+`playbook_refs: []` pending a dedicated web-filtering artifact (the
+operator's egress-filtering enforcement point, joined against the
+malware-protection discipline anchored under A.8.7 and the
+log-and-monitor pair anchored under A.8.15 / A.8.16, discharges it
+in practice);
+`iso27001:a-8-24-use-of-cryptography` wires
+`control.crypto_policy_inventory@v1`,
+`control.cert_posture_scan@v1`, and
+`control.key_rotation_evidence@v1` (all already carrying A.8.24 on
+their `oscal_refs` block) plus `playbook.crypto_posture_management@v1`
+as the operational cryptography-posture discharge;
+`iso27001:a-8-25-secure-development-life-cycle` ships
+`control_refs: []` and `playbook_refs: []` pending a dedicated
+secure-SDLC artifact (the operator's SDLC governance, joined against
+A.8.4 source-code access, A.8.8 technical vulnerabilities, A.8.9
+configuration management, and A.8.19 software installation,
+discharges it in practice);
+`iso27001:a-8-26-application-security-requirements` ships
+`control_refs: []` and `playbook_refs: []` pending a dedicated
+application-security-requirements artifact (the operator's
+requirements-engineering process, joined against the A.8.25
+secure-SDLC umbrella and the A.8.8 / A.8.3 / A.8.5 anchors,
+discharges it in practice); and
+`iso27001:a-8-27-secure-system-architecture-and-engineering-principles`
+ships `control_refs: []` and `playbook_refs: []` pending a dedicated
+architecture-principles artifact (the operator's architecture-
+governance posture, joined against A.8.25 secure-SDLC, A.8.9
+configuration management, A.8.2 / A.8.3 least-privilege, A.8.20
+networks security, and A.8.22 segregation-of-networks, discharges
+it in practice). Coverage on A.8 now stands at 27 of 34 entries
+landed (pending the A.8.18–A.8.22 batch on a companion card); the
+remaining A.8 controls (A.8.28 through A.8.34) land as sibling
+entries in that file on subsequent cards.

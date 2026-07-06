@@ -26,10 +26,15 @@
 # management, malware protection) lands here alongside the opener,
 # followed by the A.8.8–A.8.12 batch (technical-vulnerability
 # management, configuration management, information deletion, data
-# masking, data-leakage prevention), and the A.8.13–A.8.17 batch
+# masking, data-leakage prevention), the A.8.13–A.8.17 batch
 # (information backup, redundancy of processing facilities, logging,
-# monitoring activities, clock synchronisation).
-# The remaining A.8 controls (A.8.18 through A.8.34) land as sibling
+# monitoring activities, clock synchronisation), and the A.8.23–A.8.27
+# batch (web filtering, use of cryptography, secure development life
+# cycle, application-security requirements, secure system
+# architecture and engineering principles). The A.8.18–A.8.22 batch
+# (privileged-utility programs through segregation of networks) lands
+# on a companion card and is intentionally not present in this file.
+# The remaining A.8 controls (A.8.28 through A.8.34) land as sibling
 # entries in this file on subsequent cards.
 #
 # Coverage caveat: A.8 is the largest Annex A theme (34 controls);
@@ -930,3 +935,346 @@ entries:
       slice through the JC RTS ICT risk-management framework; the
       regimes carry separate evidence requirements against the same
       underlying time-synchronisation artifact.
+  - id: iso27001:a-8-23-web-filtering
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.23
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Manage access from the operator's systems to external websites
+      so as to reduce exposure to malicious content. The operator
+      determines the categories of external content that must be
+      blocked, restricted, or allowed against a documented rationale,
+      wires that decision into the enforcement point (DNS filtering,
+      egress web proxy, secure-web-gateway, browser policy), and
+      exposes the resulting deny / allow decisions to the log-and-
+      monitor surface so that policy violations and category-drift
+      are visible to the response chain.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a dedicated web-filtering / egress-content
+    # control artifact. A.8.23 is discharged in practice today against
+    # the operator's own egress-filtering posture (DNS-layer filtering,
+    # egress web proxy or secure-web-gateway policy, browser-managed
+    # policy where the endpoint is enrolled) and the malware-protection
+    # discipline anchored under A.8.7, with the log-and-monitor pair
+    # anchored under A.8.15 / A.8.16 carrying the resulting deny /
+    # allow decisions into the response chain. A future dedicated
+    # web-filtering control (e.g. control.egress_web_filter@v1, keyed
+    # against NIST 800-53 rev5 SC-7 Boundary Protection and the
+    # SI-3 Malicious Code Protection family) would replace this
+    # placeholder without changing the entry id.
+    playbook_refs: []
+    # playbook_refs intentionally empty: the SecOps-NG playbook
+    # catalogue does not yet carry a dedicated web-filtering
+    # operational playbook. The operational surface is discharged in
+    # practice by the operator's egress-filtering enforcement point
+    # and by the response-side routing that consumes the deny-decision
+    # signal via playbook.alert_triage@v1 (anchored under A.8.16).
+    notes: >-
+      A.8.23 is the web-filtering anchor within the Annex A.8 theme —
+      the standard requires that access to external websites be
+      managed to reduce exposure to malicious content, that filtering
+      categories be declared against a documented rationale, and that
+      the resulting decisions be visible to the log-and-monitor
+      surface. Neither the SecOps-NG control catalogue nor the
+      SecOps-NG playbook catalogue currently carries a dedicated
+      web-filtering artifact (see the placeholder notes above); the
+      obligation is discharged in practice against the operator's
+      own egress-filtering posture (DNS-layer filtering, egress web
+      proxy or secure-web-gateway policy, endpoint-managed browser
+      policy) joined against the malware-protection discipline
+      anchored under A.8.7, with the log-and-monitor pair anchored
+      under A.8.15 / A.8.16 routing category-violation and
+      denied-request signals into the response chain. Adjacent
+      Annex A.8 anchors that scope this obligation: A.8.7
+      (protection against malware) as the sibling discipline the
+      filtering layer supports, A.8.20 (networks security) as the
+      network-perimeter anchor the egress filter sits inside, and
+      A.8.16 (monitoring activities) as the consumer of the
+      filter-decision stream. Cross-regime parallels: NIS2 Art.
+      21(2)(a) (policies on the security of network and information
+      systems) reaches the egress-filtering-policy anchor; DORA Art.
+      9(3) (ICT protection — including confidentiality and integrity)
+      operationalised by the JC RTS (Commission Delegated Regulation
+      (EU) 2024/1774) ICT risk-management framework covers the
+      malicious-content-exposure-reduction discipline on ICT assets;
+      the regimes carry separate evidence requirements against the
+      same underlying web-filtering artifact.
+  - id: iso27001:a-8-24-use-of-cryptography
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.24
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Define and implement rules for the effective use of cryptography,
+      including cryptographic key management. The operator maintains a
+      documented cryptography policy (permitted algorithms, minimum
+      key sizes, allowed protocols and cipher suites), an inventory of
+      the assets in scope of that policy, a key-management lifecycle
+      that covers generation, distribution, storage, rotation, and
+      destruction, and a periodic-review cadence that keeps the
+      declared floor aligned with the state of the art and with the
+      regulatory instruments that pin cryptographic protection.
+    status: draft
+    control_refs:
+      - control.crypto_policy_inventory@v1
+      - control.key_rotation_evidence@v1
+      - control.cert_posture_scan@v1
+    playbook_refs:
+      - playbook.crypto_posture_management@v1
+    notes: >-
+      A.8.24 is the use-of-cryptography anchor for the Annex A.8
+      theme — the standard requires that rules for the effective use
+      of cryptography (permitted algorithms, minimum key sizes,
+      allowed protocols) and the key-management lifecycle be defined
+      and implemented against a periodic-review cadence. The
+      SecOps-NG control catalogue carries the direct-anchor triple:
+      control.crypto_policy_inventory@v1 anchors the declared-policy
+      side (the algorithm-and-key-size floor and the cryptography-
+      scope catalogue), control.cert_posture_scan@v1 anchors the
+      transport-layer measurement side (per-endpoint certificate
+      validity, negotiated TLS version, negotiated cipher suite
+      against the declared floor), and control.key_rotation_evidence@v1
+      anchors the key-management-lifecycle side (per-key rotation
+      cadence against the declared per-key-class schedule); all three
+      already carry ISO/IEC 27001:2022 A.8.24 on their oscal_refs
+      block alongside NIST 800-53 rev5 SC-8 Transmission
+      Confidentiality and Integrity, SC-12 Cryptographic Key
+      Establishment and Management, and SC-13 Cryptographic
+      Protection, and both NIS2 Art. 21(2)(h) and DORA Art. 9(2)/(3)
+      via the JC RTS (Commission Delegated Regulation (EU) 2024/1774)
+      Art. 6 encryption-and-cryptographic-controls clause.
+      playbook.crypto_posture_management@v1 is the operational
+      discharge — the CACAO playbook that snapshots the declared
+      cryptography policy, probes the certificate posture of the
+      declared endpoints, checks key-rotation cadence against the
+      declared schedule, emits the dated posture-attestation record,
+      and notifies the cryptography owner along the pre-bound
+      channel. Cross-regime parallels: NIS2 Art. 21(2)(h) (policies
+      and procedures regarding the use of cryptography and, where
+      appropriate, encryption) covers the same discipline; DORA
+      Art. 9(2) reinforced by Art. 9(3), operationalised by the JC
+      RTS (Commission Delegated Regulation (EU) 2024/1774) Art. 6
+      on encryption and cryptographic controls, covers the
+      cryptography-and-key-management surface on ICT assets; CRA
+      Annex I §1(e) confidentiality-of-processed-data anchors the
+      cryptographic-posture lane on the product-facing side; the
+      regimes carry separate evidence requirements against the same
+      underlying cryptography-and-key-management artifact set.
+  - id: iso27001:a-8-25-secure-development-life-cycle
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.25
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Establish and apply rules for the secure development of software
+      and systems across the full software-development life cycle.
+      The operator documents the security discipline that applies at
+      each SDLC phase (requirements, design, implementation, testing,
+      deployment, maintenance, retirement), pins the responsibilities
+      that carry those disciplines, wires them into the change-and-
+      release process, and evidences the resulting decisions against
+      the same evidence surface the operational security controls
+      already read.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a dedicated secure-SDLC control artifact.
+    # A.8.25 is discharged in practice today against the operator's
+    # own SDLC posture (documented per-phase security discipline, the
+    # code-review and threat-modelling gates baked into the change
+    # process, the source-code access matrix anchored under A.8.4,
+    # the software-installation change-control discipline anchored
+    # under A.8.19, the configuration-baseline discipline anchored
+    # under A.8.9, and the technical-vulnerability-management
+    # discipline anchored under A.8.8). A future dedicated
+    # secure-SDLC control (e.g. control.secure_sdlc_policy@v1,
+    # keyed against NIST 800-53 rev5 SA-3 System Development Life
+    # Cycle, SA-8 Security and Privacy Engineering Principles, and
+    # SA-15 Development Process, Standards, and Tools) would replace
+    # this placeholder without changing the entry id.
+    playbook_refs: []
+    # playbook_refs intentionally empty: the SecOps-NG playbook
+    # catalogue does not yet carry a dedicated secure-SDLC governance
+    # playbook. The operational discharge on the code-vulnerability
+    # side sits under A.8.8 via playbook.codebase_vuln_management@v1
+    # and the sibling patch / infra / cloud posture playbooks; the
+    # SDLC-policy-authoring surface itself belongs to the operator's
+    # engineering governance, not to a CACAO playbook.
+    notes: >-
+      A.8.25 is the secure-development-life-cycle anchor within the
+      Annex A.8 theme — the standard requires that rules for the
+      secure development of software and systems be established and
+      applied across the full life cycle, that per-phase security
+      discipline be documented and wired into the change-and-release
+      process, and that responsibilities be pinned. Neither the
+      SecOps-NG control catalogue nor the SecOps-NG playbook
+      catalogue currently carries a dedicated secure-SDLC artifact
+      (see the placeholder notes above); the obligation is
+      discharged in practice against the operator's own SDLC posture
+      joined against several adjacent Annex A.8 anchors that already
+      carry the concrete disciplines: A.8.4 (access to source code)
+      for the version-control access matrix, A.8.8 (technical
+      vulnerability management) for the codebase-vulnerability
+      surface, A.8.9 (configuration management) for the
+      configuration-baseline discipline that flows into build and
+      release, and A.8.19 (installation of software on operational
+      systems) for the software-installation change-control
+      discipline. A.8.25 is the umbrella under which A.8.26
+      (application-security requirements), A.8.27 (secure system
+      architecture and engineering principles), and the downstream
+      A.8.28–A.8.34 development-and-testing controls sit; the
+      standard positions A.8.25 as the SDLC-policy anchor those
+      subsequent controls specialise against. Cross-regime
+      parallels: NIS2 Art. 21(2)(e) (security in network and
+      information systems acquisition, development and maintenance)
+      reaches the SDLC-policy anchor directly; DORA Art. 9(3) (ICT
+      protection — including on the acquisition and development of
+      ICT systems) operationalised by the JC RTS (Commission
+      Delegated Regulation (EU) 2024/1774) ICT risk-management
+      framework covers the secure-acquisition-and-development
+      discipline on ICT assets; CRA Annex I §1(b) and the
+      Article 13(1) essential-cybersecurity-requirements surface
+      reach the product-development side of the same discipline;
+      the regimes carry separate evidence requirements against the
+      same underlying SDLC artifact.
+  - id: iso27001:a-8-26-application-security-requirements
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.26
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Identify, specify, and approve information-security requirements
+      when developing or acquiring applications. Security requirements
+      are captured against the application's risk profile at the
+      requirements phase, propagated into design and implementation,
+      exercised against acceptance testing, and re-visited when the
+      application, its exposure, or the regulatory instruments that
+      apply to it change.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a dedicated application-security-requirements
+    # control artifact. A.8.26 is discharged in practice today against
+    # the operator's own requirements-engineering process joined
+    # against the secure-SDLC umbrella anchored under A.8.25, the
+    # technical-vulnerability-management discipline anchored under
+    # A.8.8, the access-restriction discipline anchored under A.8.3,
+    # and the authentication discipline anchored under A.8.5. A
+    # future dedicated application-security-requirements control
+    # (e.g. control.appsec_requirements@v1, keyed against NIST
+    # 800-53 rev5 SA-4 Acquisition Process and SA-11 Developer
+    # Testing and Evaluation) would replace this placeholder
+    # without changing the entry id.
+    playbook_refs: []
+    # playbook_refs intentionally empty: the SecOps-NG playbook
+    # catalogue does not yet carry a dedicated application-security-
+    # requirements playbook. The requirements-engineering surface is
+    # a governance discipline upstream of the CACAO playbook layer;
+    # the downstream operational discharge sits under
+    # playbook.codebase_vuln_management@v1 (anchored under A.8.8)
+    # for the code-vulnerability side of the acceptance surface.
+    notes: >-
+      A.8.26 is the application-security-requirements anchor within
+      the Annex A.8 theme — the standard requires that information-
+      security requirements be identified, specified, and approved
+      when applications are developed or acquired, that those
+      requirements be propagated through design and implementation,
+      and that they be exercised against acceptance testing. Neither
+      the SecOps-NG control catalogue nor the SecOps-NG playbook
+      catalogue currently carries a dedicated application-security-
+      requirements artifact (see the placeholder notes above); the
+      obligation is discharged in practice against the operator's
+      own requirements-engineering process joined against the
+      secure-SDLC umbrella anchored under A.8.25 (which A.8.26
+      specialises against at the requirements phase), the
+      technical-vulnerability-management discipline anchored under
+      A.8.8, the access-restriction discipline anchored under A.8.3,
+      and the authentication discipline anchored under A.8.5.
+      Cross-regime parallels: NIS2 Art. 21(2)(e) (security in
+      network and information systems acquisition, development and
+      maintenance) reaches the acquisition-requirements anchor;
+      DORA Art. 9(3) (ICT protection) via the JC RTS (Commission
+      Delegated Regulation (EU) 2024/1774) covers the ICT-acquisition
+      and secure-development discipline; CRA Article 13 essential
+      cybersecurity requirements and Annex I §1 (security-by-design
+      properties) reach the product-application-requirements side of
+      the same discipline; the regimes carry separate evidence
+      requirements against the same underlying application-security-
+      requirements artifact.
+  - id: iso27001:a-8-27-secure-system-architecture-and-engineering-principles
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.8.27
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Establish, document, maintain, and apply principles for
+      engineering secure systems to any system-development activity.
+      The operator declares the architectural principles that apply
+      (defence-in-depth, least privilege, secure defaults, separation
+      of duties across the system boundary, minimisation of attack
+      surface, fail-secure behaviour), keeps those principles under
+      review against the state of the art, and evidences their
+      application against the architecture decisions the operator
+      records for systems in scope.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a dedicated architecture-and-engineering-
+    # principles control artifact. A.8.27 is discharged in practice
+    # today against the operator's own architecture-governance
+    # posture (declared principles, architecture-decision records,
+    # per-system security-architecture review) joined against the
+    # secure-SDLC umbrella anchored under A.8.25, the configuration-
+    # baseline discipline anchored under A.8.9, the least-privilege
+    # discipline anchored under A.8.2 / A.8.3, the network-security
+    # discipline anchored under A.8.20, and the segregation-of-
+    # networks discipline anchored under A.8.22. A future dedicated
+    # control (e.g. control.security_engineering_principles@v1,
+    # keyed against NIST 800-53 rev5 SA-8 Security and Privacy
+    # Engineering Principles and SA-17 Developer Security
+    # Architecture and Design) would replace this placeholder
+    # without changing the entry id.
+    playbook_refs: []
+    # playbook_refs intentionally empty: the SecOps-NG playbook
+    # catalogue does not yet carry a dedicated security-architecture
+    # playbook. Architecture governance is upstream of the CACAO
+    # playbook layer; the downstream operational disciplines sit on
+    # the adjacent Annex A.8 anchors named above.
+    notes: >-
+      A.8.27 is the secure-system-architecture-and-engineering-
+      principles anchor within the Annex A.8 theme — the standard
+      requires that principles for engineering secure systems be
+      established, documented, maintained, and applied to any
+      system-development activity. Neither the SecOps-NG control
+      catalogue nor the SecOps-NG playbook catalogue currently
+      carries a dedicated architecture-principles artifact (see the
+      placeholder notes above); the obligation is discharged in
+      practice against the operator's own architecture-governance
+      posture (declared principles, architecture-decision records,
+      per-system security-architecture review) joined against the
+      secure-SDLC umbrella anchored under A.8.25 (which A.8.27
+      specialises against at the architecture-and-engineering
+      phase), the configuration-baseline discipline anchored under
+      A.8.9, the least-privilege and access-restriction disciplines
+      anchored under A.8.2 / A.8.3, the network-security discipline
+      anchored under A.8.20, and the segregation-of-networks
+      discipline anchored under A.8.22. Cross-regime parallels:
+      NIS2 Art. 21(2)(e) (security in network and information
+      systems acquisition, development and maintenance) reaches
+      the architecture-principles anchor; DORA Art. 9(3) (ICT
+      protection) via the JC RTS (Commission Delegated Regulation
+      (EU) 2024/1774) covers the secure-engineering discipline on
+      ICT assets, with the Level 2 detail on ICT security policies,
+      procedures, protocols and tools reaching the architectural
+      declaration side; CRA Article 13 and Annex I §1 reach the
+      product-architecture side of the same discipline; the regimes
+      carry separate evidence requirements against the same
+      underlying architecture-and-engineering-principles artifact.
