@@ -56,19 +56,3 @@ skip:
       per-workflow GDPR data-flow document under
       `content/mappings/gdpr/data-flow-dora_ict_risk_selfassess.md`
       if a documented interaction surfaces.
-
-  - slug: agentic_threat_response
-    rationale: >-
-      SKELETON — agentic-threat detection and response scaffold.
-      The playbook's outbound overlay
-      (`content/playbooks/agentic_threat_response/mappings.yaml`)
-      does not pin GDPR entries at SKELETON time (the shipped
-      `content/mappings/gdpr/` tree carries only per-workflow
-      data-flow markdown, not per-clause `playbook_refs:` YAML;
-      this playbook's data-flow doc lands at
-      `content/mappings/gdpr/data-flow-agentic_threat_response.md`
-      as interim coverage). As real per-clause YAML lands for the
-      GDPR axis, this skip entry MUST be removed in the same PR so
-      the orphan-CI assertion re-arms against regressions in the
-      wired-up coverage.
-
