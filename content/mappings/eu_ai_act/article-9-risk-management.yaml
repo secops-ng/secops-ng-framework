@@ -1,0 +1,67 @@
+# EU AI Act — Article 9 risk-management system for high-risk AI systems.
+#
+# Anchor for the eu_ai_act_risk_management playbook: Art. 9(1)–(6) require
+# providers of high-risk AI systems to establish, implement, document and
+# maintain a risk-management system as a continuous iterative process
+# planned and run throughout the entire lifecycle of the high-risk AI
+# system, including identification / estimation / evaluation of known and
+# reasonably foreseeable risks, evaluation of risks that may emerge post-
+# market, adoption of appropriate and targeted risk-management measures,
+# and testing across foreseeable-misuse conditions against a documented
+# residual-risk acceptability ceiling.
+#
+# Companion inbound edges landing under sibling files:
+#   - article-11-technical-documentation.yaml — Art. 11 + Annex IV.
+#   - article-13-transparency.yaml — Art. 13 transparency.
+#   - article-72-post-market-monitoring.yaml — Art. 72 post-market.
+#
+# Cross-regime edges:
+#   - content/mappings/nis2/article-21-2-a.yaml records the NIS2
+#     risk-analysis-policy inbound edge; Art. 9(2) is the AI-system
+#     execution surface for that policy obligation on essential /
+#     important entities operating high-risk AI systems.
+#   - content/mappings/gdpr/article-35-dpia.yaml records the GDPR Art. 35
+#     DPIA duty triggered by Recital 9 for high-risk AI systems that
+#     process personal data.
+regime: eu_ai_act
+entries:
+  - id: eu_ai_act:art-9-risk-management
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "9"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      Providers of high-risk AI systems shall establish, implement,
+      document and maintain a risk-management system as a continuous
+      iterative process planned and run throughout the entire
+      lifecycle of the high-risk AI system. The system shall include
+      identification and analysis of known and reasonably foreseeable
+      risks the AI system can pose to health, safety or fundamental
+      rights when used in accordance with its intended purpose;
+      estimation and evaluation of risks that may emerge when the
+      system is used under conditions of reasonably foreseeable
+      misuse; evaluation of other possibly arising risks on the basis
+      of the analysis of data gathered from the post-market monitoring
+      system referred to in Article 72; and adoption of appropriate
+      and targeted risk-management measures. Residual risk shall be
+      judged acceptable against the state of the art.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+    playbook_refs:
+      - playbook.eu_ai_act_risk_management@v1
+    metric_refs:
+      - kri.residual_risk_threshold_breach_count@v1
+    evidence_stream_refs:
+      - risk-analysis
+    notes: >-
+      Anchored on the assess-risk-under-Art.-9(2) and identify-high-risk-
+      AI-system steps of the eu_ai_act_risk_management playbook. The
+      Art. 9(1) lifecycle-iteration discipline is exercised by the
+      recurring re-assessment cadence; the Art. 9(2)(a)–(c)
+      identify / estimate / evaluate cycle is exercised by the
+      risk-assessment step; the Art. 9(5) acceptability line is the
+      threshold `kri.residual_risk_threshold_breach_count@v1` reads
+      residual-risk observations against.

@@ -1,0 +1,117 @@
+{
+  "$schema": "http://csrc.nist.gov/ns/oscal/1.1.2/oscal-component-definition-schema.json",
+  "component-definition": {
+    "uuid": "1bd30642-e9dc-5804-b9a3-9cd494300427",
+    "metadata": {
+      "title": "SecOps-NG — EU AI Act Article-Level Component Definition",
+      "last-modified": "2026-07-06T00:00:00Z",
+      "version": "0.1.0",
+      "oscal-version": "1.1.2"
+    },
+    "components": [
+      {
+        "uuid": "3d52f633-0c23-58b4-9536-c58d0184e4e9",
+        "type": "process-procedure",
+        "title": "SecOps-NG",
+        "description": "SecOps-NG is a community-driven Digital Commons of portable security operations content (CACAO playbooks, OSCAL/D3FEND control mappings, OCSF data shapes, KPI/KRI catalog) plus reference compilers to n8n, Temporal, and LangGraph. This component definition exposes how the SecOps-NG content set addresses EU AI Act (Regulation (EU) 2024/1689) provider-side obligations on high-risk AI systems covered by the shipped per-article mapping YAMLs under content/mappings/eu_ai_act/ — Art. 9 risk-management system, Art. 11 + Annex IV technical documentation, Art. 13 transparency and information duties toward deployers, and Art. 72 post-market monitoring.",
+        "control-implementations": [
+          {
+            "uuid": "1b8d6f14-7550-5a9a-bc04-979d2d21f3a9",
+            "source": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+            "description": "Coverage of EU AI Act (Regulation (EU) 2024/1689) provider-side obligations as mapped in the per-article YAMLs under content/mappings/eu_ai_act/article-*.yaml. One implemented-requirement per (entry, control_ref) pair. This SKELETON pass is anchored on the eu_ai_act_risk_management playbook; the Art. 6 classification, Annex III use-case enumeration, and Art. 43 conformity-assessment integration remain scoped to sibling cards.",
+            "implemented-requirements": [
+              {
+                "uuid": "60cf364e-fba1-5dbc-be2e-eb93de306781",
+                "control-id": "control.risk_management_policy-v1",
+                "description": "Providers of high-risk AI systems shall establish, implement, document and maintain a risk-management system as a continuous iterative process planned and run throughout the entire lifecycle of the high-risk AI system. The system shall include identification and analysis of known and reasonably foreseeable risks the AI system can pose to health, safety or fundamental rights when used in accordance with its intended purpose; estimation and evaluation of risks that may emerge when the system is used under conditions of reasonably foreseeable misuse; evaluation of other possibly arising risks on the basis of the analysis of data gathered from the post-market monitoring system referred to in Article 72; and adoption of appropriate and targeted risk-management measures. Residual risk shall be judged acceptable against the state of the art.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.risk_management_policy@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "eu_ai_act:art-9-risk-management"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "9"
+                  }
+                ]
+              },
+              {
+                "uuid": "42962547-7288-5683-963a-6f2a247c45a6",
+                "control-id": "control.risk_management_policy-v1",
+                "description": "The technical documentation of a high-risk AI system shall be drawn up before that system is placed on the market or put into service and shall be kept up to date. The technical documentation shall be drawn up in such a way as to demonstrate that the high-risk AI system complies with the requirements set out in this Chapter and to provide national competent authorities and notified bodies with the necessary information in a clear and comprehensive form to assess the compliance of the AI system with those requirements. It shall contain, at a minimum, the elements set out in Annex IV.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.risk_management_policy@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "eu_ai_act:art-11-technical-documentation"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "11"
+                  }
+                ]
+              },
+              {
+                "uuid": "4eff34f8-8bce-591c-882e-751cc3048a45",
+                "control-id": "control.risk_management_policy-v1",
+                "description": "High-risk AI systems shall be designed and developed in such a way as to ensure that their operation is sufficiently transparent to enable deployers to interpret the system's output and use it appropriately. An appropriate type and degree of transparency shall be ensured with a view to achieving compliance with the relevant obligations of the provider and deployer set out in Section 3. High-risk AI systems shall be accompanied by instructions for use in an appropriate digital format or otherwise that include concise, complete, correct and clear information that is relevant, accessible and comprehensible to deployers.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.risk_management_policy@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "eu_ai_act:art-13-transparency"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "13"
+                  }
+                ]
+              },
+              {
+                "uuid": "c8784587-1eb8-5d0e-8289-390acf72e0ef",
+                "control-id": "control.risk_management_policy-v1",
+                "description": "Providers shall establish and document a post-market monitoring system in a manner that is proportionate to the nature of the AI technology and the risks of the high-risk AI system. The post-market monitoring system shall actively and systematically collect, document and analyse relevant data which may be provided by deployers or which may be collected through other sources on the performance of high-risk AI systems throughout their lifetime, and which allow the provider to evaluate the continuous compliance of AI systems with the requirements set out in Chapter III, Section 2.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.risk_management_policy@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "eu_ai_act:art-72-post-market-monitoring"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "72"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

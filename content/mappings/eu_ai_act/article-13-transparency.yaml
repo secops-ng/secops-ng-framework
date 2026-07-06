@@ -1,0 +1,50 @@
+# EU AI Act — Article 13 transparency and provision of information to deployers.
+#
+# Art. 13(1) requires high-risk AI systems to be designed and developed
+# in such a way as to ensure their operation is sufficiently transparent
+# to enable deployers to interpret the system's output and use it
+# appropriately. Art. 13(2)-(3) require accompanying instructions for
+# use containing concise, complete, correct and clear information that
+# is relevant, accessible and comprehensible to deployers, including
+# the identity and contact details of the provider, characteristics /
+# capabilities / performance limitations of the AI system, and the
+# human-oversight measures.
+regime: eu_ai_act
+entries:
+  - id: eu_ai_act:art-13-transparency
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "13"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      High-risk AI systems shall be designed and developed in such a
+      way as to ensure that their operation is sufficiently
+      transparent to enable deployers to interpret the system's
+      output and use it appropriately. An appropriate type and degree
+      of transparency shall be ensured with a view to achieving
+      compliance with the relevant obligations of the provider and
+      deployer set out in Section 3. High-risk AI systems shall be
+      accompanied by instructions for use in an appropriate digital
+      format or otherwise that include concise, complete, correct and
+      clear information that is relevant, accessible and
+      comprehensible to deployers.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+    playbook_refs:
+      - playbook.eu_ai_act_risk_management@v1
+    metric_refs: []
+    evidence_stream_refs:
+      - risk-analysis
+    notes: >-
+      The Art. 13 instructions-for-use bundle is authored on the
+      assemble-technical-documentation step of the
+      eu_ai_act_risk_management playbook alongside the Art. 11 +
+      Annex IV bundle, and the freshness KRI reads against the
+      combined bundle's assembly time. Art. 13 information duties
+      toward deployers are documentation-surface obligations rather
+      than runtime-countermeasure obligations, which is why the
+      shipped control anchor is the risk-management-policy control
+      that carries the authoring-and-maintenance discipline.
