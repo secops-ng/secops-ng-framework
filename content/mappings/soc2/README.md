@@ -13,7 +13,7 @@ One YAML file per Trust Services category:
 |----------|------|----------|
 | Security (Common Criteria) | `tsc-security.yaml` | CC1.1–CC9.2 (33) |
 | Availability | `tsc-availability.yaml` | A1.1–A1.3 (3) |
-| Confidentiality | *future* | C-series |
+| Confidentiality | `tsc-confidentiality.yaml` | C1.1–C1.2 (2) |
 | Processing Integrity | *future* | PI-series |
 | Privacy | *future* | P-series |
 
@@ -38,6 +38,14 @@ planning; A1.2 covers environmental protections, backup, and
 recovery infrastructure; A1.3 covers testing of the recovery plan
 procedures.
 
-The remaining three Trust Services categories (Confidentiality,
-Processing Integrity, Privacy) land as sibling files on future
-cards.
+The Confidentiality category (`tsc-confidentiality.yaml`) is
+present with the two C-series criteria (C1.1 through C1.2) as
+draft entries. C1.1 covers identification and maintenance of
+confidential information; C1.2 covers disposal of confidential
+information. The classification scheme itself and the
+media-disposal procedures remain operator-owned artifacts;
+anchors here discharge the structural surfaces (asset inventory,
+leaver-side asset return, reconciliation-and-disposal flow).
+
+The remaining two Trust Services categories (Processing
+Integrity, Privacy) land as sibling files on future cards.
