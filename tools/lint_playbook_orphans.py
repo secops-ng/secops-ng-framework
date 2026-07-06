@@ -77,7 +77,13 @@ GRACE_DAYS_DEFAULT = 7
 # G-02 KRI tag — same id across every framework; the ``kri_name`` and
 # ``regime`` fields carry the framework axis.
 KRI_ID = "G-02"
-SUPPORTED_FRAMEWORKS: tuple[str, ...] = ("cra", "nis2", "dora", "gdpr")
+SUPPORTED_FRAMEWORKS: tuple[str, ...] = (
+    "cra",
+    "nis2",
+    "dora",
+    "gdpr",
+    "eu_ai_act",
+)
 
 
 def kri_name_for(framework: str) -> str:

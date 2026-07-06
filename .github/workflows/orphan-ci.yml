@@ -32,6 +32,7 @@ on:
       - "content/mappings/dora/**"
       - "content/mappings/gdpr/**"
       - "content/mappings/nis2/**"
+      - "content/mappings/eu_ai_act/**"
       - "content/metrics/**"
       - "tools/lint_playbook_orphans.py"
       - "tools/lint_cra_playbook_orphans.py"
@@ -60,6 +61,7 @@ on:
       - "tests/content/test_dora_playbook_orphans.py"
       - "tests/content/test_gdpr_playbook_orphans.py"
       - "tests/content/test_nis2_playbook_orphans.py"
+      - "tests/content/test_eu_ai_act_playbook_orphans.py"
       - "tests/content/test_posture_ocsf_bindings.py"
       - "tests/content/test_detection_ocsf_bindings.py"
       - "tests/content/test_catalogue_ocsf_bindings.py"
@@ -89,6 +91,7 @@ on:
       - "content/mappings/dora/**"
       - "content/mappings/gdpr/**"
       - "content/mappings/nis2/**"
+      - "content/mappings/eu_ai_act/**"
       - "content/metrics/**"
       - "content/telemetry/**"
       - "tools/lint_playbook_orphans.py"
@@ -129,7 +132,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        framework: [cra, dora, gdpr, nis2]
+        framework: [cra, dora, gdpr, nis2, eu_ai_act]
     steps:
       - name: Checkout (full history for baseline diff)
         uses: actions/checkout@v4
