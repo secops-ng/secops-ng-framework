@@ -1,0 +1,113 @@
+# SOC 2 Trust Services Criteria — Confidentiality (C-series).
+#
+# AICPA Trust Services Criteria for Confidentiality (2017, as
+# revised). The Confidentiality category is an optional extension
+# on top of the Security Common Criteria (see tsc-security.yaml).
+# It comprises two criteria (C1.1–C1.2) that address the
+# identification / maintenance and the disposal of information
+# designated as confidential by the entity's own policies and
+# commitments.
+#
+# Scope of this file: the Confidentiality category (C1.1 through
+# C1.2, 2 criteria). Security is in tsc-security.yaml, Availability
+# is in tsc-availability.yaml; the remaining categories — Processing
+# Integrity (PI-series) and Privacy (P-series) — land as sibling
+# files on future cards.
+#
+# Regime scope caveat: SOC 2 is a private-sector assurance
+# framework (AICPA attestation standard AT-C 105 / AT-C 205), not
+# an EU statutory instrument. The crosswalk is a structural
+# pointer against the operator's own report-time evidence — the
+# assertion here is that the named artifacts exercise the
+# criterion in practice, not that they constitute a legal or
+# auditor interpretation of the TSC.
+#
+# Coverage caveat: Confidentiality obligations rest heavily on
+# operator-owned classification schemes, contractual
+# confidentiality commitments, and media-disposal procedures.
+# Anchors here discharge the structural surfaces (asset inventory
+# joined against the classification scheme; leaver-side asset
+# return; disposal reconciliation); the classification scheme
+# text itself, the confidentiality commitments to third parties,
+# and the physical-media sanitisation procedures sit outside the
+# SecOps-NG catalogue and ship as gap notes on the relevant
+# entries.
+
+regime: soc2
+entries:
+
+  # ─── C1: Confidentiality ──────────────────────────────────────
+
+  - id: soc2:c1-1-identification-and-maintenance-of-confidential-information
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: C1.1
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity identifies and maintains confidential information
+      to meet the entity's objectives related to confidentiality.
+    status: draft
+    control_refs: []
+    playbook_refs:
+      - playbook.asset_management@v1
+    # control_refs intentionally empty: the SecOps-NG content
+    # catalogue does not yet carry a dedicated
+    # information-classification-scheme artifact as a first-class
+    # control. C1.1 is discharged in practice against the
+    # operator's own classification scheme, joined against the
+    # asset-inventory anchor for the scope the scheme applies
+    # against. The parallel ISO 27001 A.5.12 entry treats this
+    # gap the same way (empty control_refs with a gap note).
+    # A future dedicated artifact (e.g.
+    # `control.information_classification_scheme@v1`) would
+    # populate control_refs without changing the entry id.
+    notes: >-
+      C1.1 is the identification-and-maintenance anchor for
+      confidential information: the entity must know which
+      information is confidential and keep that designation
+      current as the information landscape and confidentiality
+      commitments evolve. The classification scheme itself is
+      the operator's own artifact; the SecOps-NG catalogue
+      anchors the discipline structurally through the
+      asset-management playbook (the assets against which the
+      classification is projected) and joins against the ISO
+      27001 A.5.12 (classification of information) and A.5.13
+      (labelling of information) crosswalk entries which discharge
+      the same structural obligation under the ISO regime.
+      Contractual confidentiality commitments to third parties
+      (NDAs, customer commitments in service agreements) remain
+      operator-owned artifacts under this criterion.
+
+  - id: soc2:c1-2-disposal-of-confidential-information
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: C1.2
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity disposes of confidential information to meet the
+      entity's objectives related to confidentiality.
+    status: draft
+    control_refs:
+      - control.asset_inventory_delta@v1
+      - control.jml_evidence@v1
+    playbook_refs:
+      - playbook.asset_management@v1
+    notes: >-
+      asset_inventory_delta carries the asset-tracking anchor
+      that scopes what has to be disposed of and reconciles the
+      inventory across the disposal event; jml_evidence carries
+      the leaver-side endpoint-return slice for confidential
+      information held on user endpoints; asset_management
+      exercises the reconciliation-and-disposal flow. The
+      criterion parallels the SOC 2 CC6.5 asset-removal /
+      secure-disposal Common Criterion and the ISO 27001 A.8.10
+      (information deletion) and A.7.14 (secure disposal or
+      re-use of equipment) entries; C1.2 narrows the same
+      obligation to information the entity has designated as
+      confidential. Sanitisation of decommissioned media itself
+      (media-destruction certificates, cryptographic-erase
+      attestations, third-party disposal vendor evidence) sits
+      outside the SecOps-NG catalogue and remains an
+      operator-owned artifact under this criterion.
