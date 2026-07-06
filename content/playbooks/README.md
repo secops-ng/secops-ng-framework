@@ -15,6 +15,7 @@ by separate cards.
 | Slug                      | Stable ID                              | Mappings overlay                                            |
 |---------------------------|----------------------------------------|-------------------------------------------------------------|
 | `data_exfil`              | `playbook.data_exfil@v1`               | _pending_                                                   |
+| `agentic_threat_response` | `playbook.agentic_threat_response@v1`  | [`mappings.yaml`](agentic_threat_response/mappings.yaml) (SKELETON — placeholders) |
 | `threat_intel_ingest`     | `playbook.threat_intel_ingest@v1`      | [`mappings.yaml`](threat_intel_ingest/mappings.yaml) (SKELETON — placeholders) |
 
 The mappings overlay column links to the per-playbook `mappings.yaml`

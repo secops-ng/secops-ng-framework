@@ -1,0 +1,156 @@
+# Cross-references for the agentic_threat_response playbook.
+#
+# SKELETON overlay — pins the outbound view of the content model for
+# the agentic-threat detection and response scaffold. This directory
+# ships CACAO workflow shape and structural anchors only; sibling CORE
+# and EXTEND cards replace the todo-flagged placeholders with real
+# OSCAL / D3FEND / OCSF identifiers, KPI hooks, and compile-target
+# emissions.
+#
+# Inbound closure at SKELETON time:
+#   - NIS2:  playbook.agentic_threat_response@v1 is added to the
+#            playbook_refs list on content/mappings/nis2/article-21-2-b.yaml
+#            (incident-handling capability, id nis2:art-21-2-b) and on
+#            content/mappings/nis2/article-21-2-e.yaml (security in
+#            acquisition, development and maintenance — the agentic-
+#            tool supply-chain surface, id nis2:art-21-2-e).
+#   - DORA:  no inbound YAML edge at SKELETON time. The DORA major-
+#            incident-classification and reporting engine is already
+#            anchored on playbook.incident_management@v1, which this
+#            playbook hands off to via the escalate step. A sibling
+#            CORE / EXTEND card revisits the DORA cross-regime graph
+#            once the JC RTS on ICT risk management framework
+#            (Commission Delegated Regulation (EU) 2024/1774) coverage
+#            is extended to the agentic-tradecraft indicator class.
+#            Skip entry (with SKELETON rationale) lives at
+#            content/mappings/dora/_orphan_skip.yaml.
+#   - CRA:   no inbound YAML edge at SKELETON time. CRA Annex I §1(d)
+#            access-control obligations are already anchored on the
+#            operator-side identity_compromise / iam_auditor lane; the
+#            agentic-threat-response scaffold is the incident-response
+#            side, not the product-security side CRA governs. A sibling
+#            CORE / EXTEND card revisits the CRA cross-regime graph if
+#            a documented product-security interaction surfaces. Skip
+#            entry (with SKELETON rationale) lives at
+#            content/mappings/cra/_orphan_skip.yaml.
+#   - GDPR:  no inbound YAML edge at SKELETON time. The GDPR data-flow
+#            surface (Article 30 RoPA) for this playbook is deferred to
+#            the CORE card that authors
+#            content/mappings/gdpr/data-flow-agentic_threat_response.md.
+#            Skip entry lives at content/mappings/gdpr/_orphan_skip.yaml.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.agentic_threat_response@v1
+
+oscal:
+  # SKELETON placeholders. Real NIST SP 800-53 Rev. 5 control IDs are
+  # authored by the sibling CORE card once the D3FEND-mapped step
+  # bindings are pinned.
+  - id: control.todo_agentic_indicator_ingest@v0
+    todo: true
+    notes: >-
+      Placeholder — CORE card pins the SI-4 (System Monitoring) /
+      IR-4 (Incident Handling) axis for the agentic-threat indicator
+      ingest step.
+
+  - id: control.todo_credential_isolation@v0
+    todo: true
+    notes: >-
+      Placeholder — CORE card pins the AC-2(13) (Disable Accounts
+      for High-Risk Individuals) axis for the credential-isolation
+      step.
+
+  - id: control.todo_lateral_movement_containment@v0
+    todo: true
+    notes: >-
+      Placeholder — CORE card pins the AC-4 (Information Flow
+      Enforcement) / SC-7 (Boundary Protection) axis for the
+      lateral-movement micro-segmentation step.
+
+  - id: control.todo_incident_management_handoff@v0
+    todo: true
+    notes: >-
+      Placeholder — CORE card pins the IR-6 (Incident Reporting)
+      axis for the escalate-to-incident-management handoff.
+
+  - id: control.todo_evidence_preservation@v0
+    todo: true
+    notes: >-
+      Placeholder — CORE card pins the AU-9 (Protection of Audit
+      Information) / IR-4(4) (Incident Handling | Information
+      Correlation) axis for the evidence-preservation step.
+
+d3fend:
+  # SKELETON placeholders. MITRE D3FEND v1.0.0 technique tags per step
+  # are pinned by the sibling CORE card once the step semantics are
+  # frozen against the JADEPUFFER-class indicator set.
+  - step: action--30000000-0000-4000-8000-000000000002
+    d3fend_id: D3-TODO
+    d3fend_name: Placeholder — Incident Response Analysis axis
+    todo: true
+    notes: >-
+      Placeholder — CORE card pins D3-IRA (Incident Response
+      Analysis) or the closest applicable technique for the
+      agentic-threat indicator ingest step.
+
+  - step: action--30000000-0000-4000-8000-000000000003
+    d3fend_id: D3-TODO
+    d3fend_name: Placeholder — Authentication Cache Invalidation axis
+    todo: true
+    notes: >-
+      Placeholder — CORE card pins D3-ACI (Authentication Cache
+      Invalidation) and D3-AL (Account Locking) for the
+      credential-isolation step.
+
+  - step: action--30000000-0000-4000-8000-000000000004
+    d3fend_id: D3-TODO
+    d3fend_name: Placeholder — Network Isolation axis
+    todo: true
+    notes: >-
+      Placeholder — CORE card pins D3-NI (Network Isolation) or a
+      more specific micro-segmentation technique for the
+      lateral-movement containment step.
+
+ocsf:
+  # SKELETON placeholder. OCSF v1.3.0 bindings for the indicator ingest,
+  # account-change (credential isolation), and incident-finding
+  # (evidence bundle) events are pinned by the sibling EXTEND card.
+  - id: telemetry.todo_agentic_indicator@v0
+    class_uid: 0
+    todo: true
+    notes: >-
+      Placeholder — EXTEND card pins the Detection Finding
+      (class_uid 2004) consumed shape and the Account Change
+      (class_uid 3001) and Incident Finding (class_uid 2005)
+      emitted shapes once the operator-side telemetry contract is
+      frozen.
+
+nis2:
+  # Inbound entries live at:
+  # - content/mappings/nis2/article-21-2-b.yaml (id nis2:art-21-2-b)
+  # - content/mappings/nis2/article-21-2-e.yaml (id nis2:art-21-2-e)
+  # Both backlink to playbook.agentic_threat_response@v1.
+  - mapping_id: nis2:art-21-2-b
+    article: 21(2)(b)
+    notes: >-
+      NIS2 Art. 21(2)(b) requires an operational incident-handling
+      capability. The agentic-threat-response playbook is the
+      detect-through-contain slice for the machine-speed
+      adversary decision-cadence case set; the notify tail hands
+      off to playbook.incident_management@v1 for the Article 23
+      regulator-notification chain.
+
+  - mapping_id: nis2:art-21-2-e
+    article: 21(2)(e)
+    notes: >-
+      NIS2 Art. 21(2)(e) covers security in acquisition,
+      development, and maintenance — including the agentic-tool
+      supply-chain surface (LLM API endpoints, agent frameworks,
+      and downstream toolchains an autonomous adversary composes
+      against). The indicator-ingest step's anomalous-LLM-API-
+      call-volume signal is the operator-side observable that
+      this obligation demands surveillance over.
+
+dora: []
+
+cra: []
