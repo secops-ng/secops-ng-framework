@@ -229,13 +229,33 @@ entries (`iso27001:a-6-1-screening`, `iso27001:a-6-3-awareness`) in
 through A.6.8) land as sibling entries in that file on subsequent
 cards.
 
-The A.7 physical-controls theme file has landed with its first two
-entries (`iso27001:a-7-1-physical-security-perimeters`,
-`iso27001:a-7-2-physical-entry`) in `annex-a-7-physical.yaml`; both
-ship with empty `control_refs` because the SecOps-NG control catalogue
-is currently scoped to logical / cyber controls (see the coverage note
-in the theme file header). The remaining A.7 controls (A.7.3 through
-A.7.14) land as sibling entries in that file on subsequent cards.
+The A.7 physical-controls theme file closes at 14 of 14 entries
+landed in `annex-a-7-physical.yaml`. The theme opens with
+`iso27001:a-7-1-physical-security-perimeters` and
+`iso27001:a-7-2-physical-entry`; the A.7.3–A.7.14 batch closes it:
+`iso27001:a-7-3-securing-offices-rooms-and-facilities`,
+`iso27001:a-7-4-physical-security-monitoring`,
+`iso27001:a-7-5-protecting-against-physical-and-environmental-threats`,
+`iso27001:a-7-6-working-in-secure-areas`,
+`iso27001:a-7-7-clear-desk-and-clear-screen`,
+`iso27001:a-7-8-equipment-siting-and-protection`,
+`iso27001:a-7-11-supporting-utilities`,
+`iso27001:a-7-12-cabling-security`,
+`iso27001:a-7-13-equipment-maintenance`, and
+`iso27001:a-7-14-secure-disposal-or-re-use-of-equipment` all ship with
+empty `control_refs` and an explanatory gap note because the SecOps-NG
+control catalogue is currently scoped to logical / cyber controls (see
+the coverage note in the theme file header); the operator's own
+facilities-security evidence discharges the physical obligation.
+Two entries do wire an existing anchor:
+`iso27001:a-7-9-security-of-assets-off-premises` and
+`iso27001:a-7-10-storage-media` wire
+`control.asset_inventory_delta@v1` for the asset-tracking slice that
+overlaps directly with the logical inventory the catalogue already
+carries — the physical-handling, secure-transport, and disposal
+slices still discharge against the operator's own procedures (with
+A.7.14 and the logical A.8.10 information-deletion discipline joining
+the disposal slice from the ISMS side).
 
 The A.8 technological-controls theme file has landed with its first
 two entries (`iso27001:a-8-1-user-endpoint-devices`,
