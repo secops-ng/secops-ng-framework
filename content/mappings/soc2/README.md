@@ -12,7 +12,7 @@ One YAML file per Trust Services category:
 | Category | File | Criteria |
 |----------|------|----------|
 | Security (Common Criteria) | `tsc-security.yaml` | CC1.1–CC9.2 (33) |
-| Availability | *future* | A-series |
+| Availability | `tsc-availability.yaml` | A1.1–A1.3 (3) |
 | Confidentiality | *future* | C-series |
 | Processing Integrity | *future* | PI-series |
 | Privacy | *future* | P-series |
@@ -31,6 +31,13 @@ monitoring activities, control activities); CC6–CC9 are the
 technology-specific extensions (logical/physical access, system
 operations, change management, risk mitigation).
 
-The other four Trust Services categories (Availability,
-Confidentiality, Processing Integrity, Privacy) land as sibling
-files on future cards.
+The Availability category (`tsc-availability.yaml`) is present
+with the three A-series criteria (A1.1 through A1.3) as draft
+entries. A1.1 covers availability commitments and capacity
+planning; A1.2 covers environmental protections, backup, and
+recovery infrastructure; A1.3 covers testing of the recovery plan
+procedures.
+
+The remaining three Trust Services categories (Confidentiality,
+Processing Integrity, Privacy) land as sibling files on future
+cards.

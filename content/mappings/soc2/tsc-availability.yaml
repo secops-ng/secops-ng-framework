@@ -1,0 +1,123 @@
+# SOC 2 Trust Services Criteria — Availability (A-series).
+#
+# AICPA Trust Services Criteria for Availability (2017, as revised).
+# The Availability category is an optional extension on top of the
+# Security Common Criteria (see tsc-security.yaml). It comprises
+# three criteria (A1.1–A1.3) that address availability commitments,
+# environmental / backup / recovery infrastructure, and recovery
+# plan procedures.
+#
+# Scope of this file: the Availability category (A1.1 through
+# A1.3, 3 criteria). Security is in tsc-security.yaml; the
+# remaining categories — Confidentiality (C-series), Processing
+# Integrity (PI-series), and Privacy (P-series) — land as sibling
+# files on future cards.
+#
+# Regime scope caveat: SOC 2 is a private-sector assurance
+# framework (AICPA attestation standard AT-C 105 / AT-C 205), not
+# an EU statutory instrument. The crosswalk is a structural
+# pointer against the operator's own report-time evidence — the
+# assertion here is that the named artifacts exercise the
+# criterion in practice, not that they constitute a legal or
+# auditor interpretation of the TSC.
+#
+# Coverage caveat: Availability obligations rest heavily on
+# operator-owned capacity forecasts, environmental / facility
+# controls, and business-continuity documentation. Anchors here
+# discharge the technical evidence slices (posture, backup, restore
+# drill); non-technical artifacts (SLA commitments, facility DR
+# contracts, insurance) sit outside the SecOps-NG catalogue and
+# ship as gap notes on the relevant entries.
+
+regime: soc2
+entries:
+
+  # ─── A1: Availability ─────────────────────────────────────────
+
+  - id: soc2:a1-1-availability-commitments-and-capacity
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: A1.1
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity maintains, monitors, and evaluates current
+      processing capacity and use of system components
+      (infrastructure, data, and software) to manage capacity
+      demand and to enable the implementation of additional
+      capacity to help meet its availability commitments and system
+      requirements, including planning for environmental threats
+      that affect availability.
+    status: draft
+    control_refs:
+      - control.baseline_configuration@v1
+      - control.asset_inventory_delta@v1
+      - control.cspm_baseline@v1
+    playbook_refs:
+      - playbook.infra_posture_management@v1
+    notes: >-
+      baseline_configuration and cspm_baseline carry the
+      infrastructure-posture anchors that exercise capacity-relevant
+      configuration state; asset_inventory_delta anchors the
+      change-of-footprint signal that drives capacity re-forecasts;
+      infra_posture_management exercises the operational surface.
+      Availability commitments themselves (SLA text, contractual
+      uptime targets) and environmental-threat modelling for the
+      physical facility sit outside the SecOps-NG catalogue and
+      remain operator-owned artifacts under this criterion.
+
+  - id: soc2:a1-2-environmental-and-backup-infrastructure
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: A1.2
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity authorises, designs, develops or acquires,
+      implements, operates, approves, maintains, and monitors
+      environmental protections, software, data backup processes,
+      and recovery infrastructure to meet its availability
+      commitments and system requirements.
+    status: draft
+    control_refs:
+      - control.backup_attestation@v1
+      - control.baseline_configuration@v1
+    playbook_refs:
+      - playbook.backup_recovery@v1
+      - playbook.infra_posture_management@v1
+    notes: >-
+      backup_attestation carries the data-backup-evidence anchor;
+      baseline_configuration carries the recovery-infrastructure
+      configuration-state anchor for the environmental-surface
+      slice; backup_recovery and infra_posture_management exercise
+      the operational surfaces. Environmental / facility controls
+      (power, HVAC, fire suppression) themselves sit outside the
+      SecOps-NG catalogue and remain operator-owned artifacts under
+      this criterion.
+
+  - id: soc2:a1-3-recovery-plan-procedures
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: A1.3
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity tests recovery plan procedures supporting system
+      recovery to meet its availability commitments and system
+      requirements.
+    status: draft
+    control_refs:
+      - control.restore_drill@v1
+      - control.crisis_communication_plan@v1
+    playbook_refs:
+      - playbook.backup_recovery@v1
+      - playbook.incident_management@v1
+    notes: >-
+      restore_drill carries the exercised-recovery anchor that
+      directly discharges the plan-testing obligation;
+      crisis_communication_plan carries the stakeholder-comms
+      anchor for the invocation surface; backup_recovery and
+      incident_management exercise the operational surfaces. The
+      recovery-plan document itself (RTO/RPO targets, invocation
+      criteria, roles matrix) is an operator-owned artifact and
+      sits outside the SecOps-NG catalogue.
