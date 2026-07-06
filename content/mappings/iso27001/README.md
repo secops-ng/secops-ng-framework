@@ -223,11 +223,31 @@ compliance-review discipline) exercises the obligation.
 Coverage on A.5 now stands at 37 of 37 entries landed, closing
 the A.5 organisational-controls theme.
 
-The A.6 people-controls theme file has landed with its first two
-entries (`iso27001:a-6-1-screening`, `iso27001:a-6-3-awareness`) in
-`annex-a-6-people.yaml`; the remaining A.6 controls (A.6.2, A.6.4
-through A.6.8) land as sibling entries in that file on subsequent
-cards.
+The A.6 people-controls theme file is complete: all eight controls
+(A.6.1 through A.6.8) are present in `annex-a-6-people.yaml`.
+A.6.1 (screening), A.6.2 (terms and conditions of employment), A.6.4
+(disciplinary process), and A.6.5 (responsibilities after termination
+or change of employment) wire `control.jml_evidence@v1` against the
+join/move/leave lifecycle surface, joined against
+`playbook.onboarding_offboarding_tracker@v1`. A.6.2 additionally
+wires `control.training_attestation@v1` for the
+acknowledgement-of-policy surface. A.6.3 (awareness/education and
+training) wires `control.training_attestation@v1` and
+`control.phishing_simulation@v1` against
+`playbook.cyber_hygiene_training@v1`. A.6.6 (confidentiality / NDAs)
+ships `control_refs: []` and `playbook_refs: []` — the instrument is
+the operator's own legal artifact, out of scope of the SecOps-NG
+control catalogue; the signed-instrument evidence is captured in
+practice against the joiner-side lifecycle already anchored on A.6.1
+and A.6.2. A.6.7 (remote working) wires
+`control.baseline_configuration@v1`, `control.least_privilege@v1`,
+and `control.mfa_state_probe@v1` against
+`playbook.mfa_secured_comms@v1`. A.6.8 (event reporting) wires
+`control.incident_handling_capability@v1` and
+`control.vuln_disclosure_intake@v1` (the latter's `oscal_refs`
+block already carrying A.6.8) against
+`playbook.incident_management@v1`. Coverage on A.6 now stands at
+8 of 8 entries landed, closing the A.6 people-controls theme.
 
 The A.7 physical-controls theme file closes at 14 of 14 entries
 landed in `annex-a-7-physical.yaml`. The theme opens with
