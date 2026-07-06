@@ -8,12 +8,9 @@
 # change of employment, confidentiality/NDAs, remote working, and
 # information-security event reporting.
 #
-# Scope of this file: Annex A.6 people controls. This entry pair
-# (A.6.1 screening and A.6.3 awareness/training) establishes the
-# theme file following the crosswalk conventions set by
-# annex-a-5-organisational.yaml. The remaining A.6 controls (A.6.2,
-# A.6.4 through A.6.8) land as sibling entries in this file on
-# subsequent cards.
+# Scope of this file: Annex A.6 people controls. All eight A.6
+# controls (A.6.1 through A.6.8) are present in this file, following
+# the crosswalk conventions set by annex-a-5-organisational.yaml.
 #
 # Regime scope caveat: ISO/IEC 27001:2022 is a certifiable
 # information-security management standard, not an EU statutory
@@ -59,6 +56,51 @@ entries:
       the same personnel-security discipline; the regimes carry
       separate evidence requirements against the same underlying
       lifecycle artifact.
+  - id: iso27001:a-6-2-terms-and-conditions-of-employment
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.6.2
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      State information-security responsibilities in the employment
+      contractual agreements, so that personnel and, where relevant,
+      other interested parties understand their information-security
+      obligations and the consequences of failing to meet them, both
+      during the engagement and after it ends.
+    status: draft
+    control_refs:
+      - control.jml_evidence@v1
+      - control.training_attestation@v1
+    playbook_refs:
+      - playbook.onboarding_offboarding_tracker@v1
+    notes: >-
+      A.6.2 is the contractual-anchoring obligation within the Annex
+      A.6 people-controls theme — the standard requires that the
+      information-security responsibilities the operator relies on
+      later (screening evidence, training completion, acceptable use,
+      confidentiality, post-employment obligations) be stated in
+      the terms of the engagement, not left implicit.
+      control.jml_evidence@v1 is the joiner-side evidence anchor:
+      its join/move/leave lifecycle events include the contractual
+      artifact that binds the responsibilities in the first place,
+      alongside the ISO/IEC 27001:2022 A.6.1 screening evidence it
+      already anchors. control.training_attestation@v1 is the
+      complementary anchor for the acknowledgement-of-policy surface
+      the terms typically incorporate by reference (the
+      information-security policy set and topic-specific policies
+      that A.5.1 and A.6.3 establish). The
+      playbook.onboarding_offboarding_tracker@v1 CACAO playbook
+      exercises the joiner-side flow where the contractual artifact
+      is captured and linked to the personnel record. The
+      contractual instrument itself is the operator's own legal
+      artifact; the crosswalk anchors the evidence that the
+      responsibilities named in it have been discharged, not the
+      drafting of the instrument.
+      Cross-regime parallels: NIS2 Art. 21(2)(i) (human-resources
+      security) covers the same personnel-security discipline; the
+      regimes carry separate evidence requirements against the
+      same underlying employment-terms artifact.
   - id: iso27001:a-6-3-awareness
     regulation:
       name: ISO/IEC 27001:2022
@@ -97,3 +139,221 @@ entries:
       21(2)(g) (cyber hygiene and training) is already wired against
       the same controls; the regimes carry separate evidence
       requirements against the same underlying training artifact.
+  - id: iso27001:a-6-4-disciplinary-process
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.6.4
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Formalise and communicate a disciplinary process to take
+      action against personnel and, where relevant, other interested
+      parties who have committed an information-security policy
+      violation, so that the response to a violation is consistent,
+      proportionate, and evidence-based.
+    status: draft
+    control_refs:
+      - control.jml_evidence@v1
+    playbook_refs:
+      - playbook.onboarding_offboarding_tracker@v1
+    notes: >-
+      A.6.4 is the response-to-violation anchor within the Annex
+      A.6 people-controls theme — the standard treats it as the
+      formal-consequence surface that gives the acceptable-use,
+      confidentiality, and remote-working obligations teeth. The
+      disciplinary instrument itself is the operator's own HR
+      artifact and is out of scope of the SecOps-NG control
+      catalogue; what the crosswalk anchors is the
+      leaver-side evidence surface that carries the outcome when
+      a violation results in a change of status.
+      control.jml_evidence@v1 is the direct anchor: its
+      join/move/leave lifecycle events cover the mover- and
+      leaver-side transitions a disciplinary outcome typically
+      produces (role change, access revocation, employment
+      termination) with the same policy-window evidence discipline
+      applied to routine transitions. The
+      playbook.onboarding_offboarding_tracker@v1 CACAO playbook
+      exercises the leaver- and mover-side flow that consumes the
+      HR decision and produces the durable evidence.
+      Cross-regime parallels: NIS2 Art. 21(2)(i) (human-resources
+      security) recognises the same disciplinary discipline as
+      part of the personnel-security surface; the regimes carry
+      separate evidence requirements against the same underlying
+      HR-outcome artifact.
+  - id: iso27001:a-6-5-responsibilities-after-termination-or-change-of-employment
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.6.5
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Define, enforce, and communicate the information-security
+      responsibilities and duties that remain valid after
+      termination or change of employment, so that obligations
+      such as confidentiality, return of assets, and non-use of
+      information persist beyond the end of the engagement.
+    status: draft
+    control_refs:
+      - control.jml_evidence@v1
+    playbook_refs:
+      - playbook.onboarding_offboarding_tracker@v1
+    notes: >-
+      A.6.5 is the post-employment obligation anchor within the
+      Annex A.6 people-controls theme — the standard requires
+      that certain information-security responsibilities (most
+      notably confidentiality and non-use of information the
+      individual accessed during the engagement) survive the
+      end of the employment relationship, and that the
+      termination or change-of-role transition is discharged
+      cleanly (asset return, access revocation, handover of
+      obligations). control.jml_evidence@v1 is the direct
+      leaver-side anchor: its join/move/leave lifecycle events
+      cover access revocation, asset return, and the
+      timestamped evidence that the transition happened within
+      the operator's declared policy window. The
+      playbook.onboarding_offboarding_tracker@v1 CACAO
+      playbook exercises the leaver-side flow that produces
+      that evidence. The confidentiality instrument that binds
+      the post-employment obligations themselves is anchored
+      on A.6.6 (NDAs / confidentiality agreements); A.6.5 is
+      about the transition evidence.
+      Cross-regime parallels: NIS2 Art. 21(2)(i) (human-resources
+      security) covers the same personnel-security lifecycle;
+      the regimes carry separate evidence requirements against
+      the same underlying leaver-transition artifact.
+  - id: iso27001:a-6-6-confidentiality-or-non-disclosure-agreements
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.6.6
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Identify, document, regularly review, and have signed the
+      confidentiality or non-disclosure agreements that reflect the
+      organisation's needs for the protection of information,
+      applicable to personnel and other relevant interested
+      parties.
+    status: draft
+    control_refs: []
+    playbook_refs: []
+    notes: >-
+      A.6.6 is the confidentiality-instrument anchor within the
+      Annex A.6 people-controls theme — the standard requires
+      that the operator maintain the signed confidentiality
+      or non-disclosure agreements that bind personnel and
+      other relevant interested parties. The instrument itself
+      is the operator's own legal artifact, drafted against the
+      operator's jurisdiction and information classifications;
+      it is out of scope of the SecOps-NG control catalogue
+      (the catalogue is currently scoped to logical / cyber
+      controls, not legal-instrument drafting), which is why
+      this entry ships with empty control_refs and empty
+      playbook_refs. The signed-instrument evidence surface is
+      captured in practice against the joiner-side lifecycle
+      the operator already runs (see A.6.1 screening and A.6.2
+      terms-and-conditions, both anchored on
+      control.jml_evidence@v1), and the periodic-review
+      discipline A.6.6 requires is discharged against the
+      operator's own contract-management surface.
+      Cross-regime parallels: NIS2 Art. 21(2)(i) (human-resources
+      security) recognises the same confidentiality obligation
+      as part of the personnel-security surface, and the GDPR
+      Art. 28 processor-controller relationship attaches its
+      own confidentiality clauses to the same operator-side
+      instrument; the regimes carry separate evidence
+      requirements against the same underlying NDA / DPA
+      artifact.
+  - id: iso27001:a-6-7-remote-working
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.6.7
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Implement security measures when personnel are working
+      remotely to protect information accessed, processed, or
+      stored outside the organisation's premises, including
+      endpoint configuration, network access, and physical
+      handling of information at the remote location.
+    status: draft
+    control_refs:
+      - control.baseline_configuration@v1
+      - control.least_privilege@v1
+      - control.mfa_state_probe@v1
+    playbook_refs:
+      - playbook.mfa_secured_comms@v1
+    notes: >-
+      A.6.7 is the remote-working anchor within the Annex A.6
+      people-controls theme — the standard treats it as the
+      operator's obligation to extend the same protections that
+      apply on premises to the endpoints and network paths
+      personnel use from anywhere else. The obligation is
+      discharged in practice against the logical-control surface
+      the catalogue already anchors, not against a dedicated
+      remote-working artifact.
+      control.baseline_configuration@v1 is the direct anchor
+      for the endpoint-configuration slice — the same hardened
+      baseline the operator applies on premises must apply on
+      the devices personnel take home. control.least_privilege@v1
+      is the direct anchor for the access-scope slice — a
+      remote session must not carry more privilege than the
+      role requires. control.mfa_state_probe@v1 is the direct
+      anchor for the authentication slice that becomes load-
+      bearing when the network path is not the operator's own
+      LAN. The playbook.mfa_secured_comms@v1 CACAO playbook
+      exercises the operational discharge of the strong-
+      authentication and secure-channel discipline on which
+      remote working depends. The physical-handling slice A.6.7
+      also names (screen privacy, secure storage of removable
+      media at the remote location) is the operator's own
+      workplace-policy surface, incorporated by reference
+      through the acceptable-use obligations A.6.2 binds.
+      Cross-regime parallels: NIS2 Art. 21(2)(i) (human-resources
+      security) covers the personnel-side of remote working;
+      the regimes carry separate evidence requirements against
+      the same underlying endpoint- and access-control artifacts.
+  - id: iso27001:a-6-8-information-security-event-reporting
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.6.8
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Provide a mechanism for personnel to report observed or
+      suspected information-security events through appropriate
+      channels in a timely manner, so that events reach the
+      assessment and incident-management process at A.5.24 and
+      A.5.25.
+    status: draft
+    control_refs:
+      - control.incident_handling_capability@v1
+      - control.vuln_disclosure_intake@v1
+    playbook_refs:
+      - playbook.incident_management@v1
+    notes: >-
+      A.6.8 is the personnel-side reporting anchor within the
+      Annex A.6 people-controls theme — the standard requires
+      that observed or suspected information-security events
+      have a declared reporting channel with a declared
+      response time, so the assessment and classification
+      obligation at A.5.25 can attach to a real event stream.
+      control.incident_handling_capability@v1 is the direct
+      anchor: its incident-response-plan artifact defines the
+      declared reporting channel, the responsible role, and
+      the time discipline A.6.8 requires, and its oscal_refs
+      block already carries the incident-management surface
+      A.6.8 feeds. control.vuln_disclosure_intake@v1 (its
+      oscal_refs block already carries ISO/IEC 27001:2022
+      A.6.8) is the direct anchor for the specialised
+      reporting channel that receives vulnerability reports
+      from personnel and external parties alike, with the
+      same intake discipline applied. The
+      playbook.incident_management@v1 CACAO playbook is the
+      downstream engine that consumes reported events and
+      discharges the response.
+      Cross-regime parallels: NIS2 Art. 21(2)(b) (incident
+      handling) and DORA Art. 17 (ICT-related-incident
+      management process) both depend on a functioning
+      event-reporting channel; the regimes carry separate
+      evidence requirements against the same underlying
+      reporting artifact.
