@@ -172,7 +172,50 @@ architecture-principles artifact (the operator's architecture-
 governance posture, joined against A.8.25 secure-SDLC, A.8.9
 configuration management, A.8.2 / A.8.3 least-privilege, A.8.20
 networks security, and A.8.22 segregation-of-networks, discharges
-it in practice). Coverage on A.8 now stands at 27 of 34 entries
-landed (pending the A.8.18–A.8.22 batch on a companion card); the
-remaining A.8 controls (A.8.28 through A.8.34) land as sibling
-entries in that file on subsequent cards.
+it in practice). The A.8.28–A.8.34 batch closes the theme:
+`iso27001:a-8-28-secure-coding` ships `control_refs: []` pending a
+dedicated secure-coding standards artifact (the operator's in-build
+static-analysis / dependency-scanning / secret-scanning enforcement
+posture, joined against the A.8.25 secure-SDLC umbrella, A.8.4
+source-code access, and A.8.8 technical vulnerabilities, discharges
+it in practice) plus `playbook.codebase_vuln_management@v1` as the
+downstream code-vulnerability triage surface;
+`iso27001:a-8-29-security-testing-in-development-and-acceptance`
+ships `control_refs: []` pending a dedicated security-testing
+acceptance-gate artifact (the operator's in-CI SAST / DAST / SCA /
+secret-scanning execution joined against A.8.25 and A.8.28
+discharges it in practice) plus `playbook.codebase_vuln_management@v1`
+as the downstream triage surface;
+`iso27001:a-8-30-outsourced-development` wires
+`control.sbom_capture@v1` (already carrying A.8.30 on its
+`oscal_refs` block) as the concrete provenance-and-composition
+artifact against which outsourced software delivery is exercised,
+with the wider outsourced-supervision surface discharged against
+the operator's supplier-management posture;
+`iso27001:a-8-31-separation-of-development-test-and-production-environments`
+ships `control_refs: []` and `playbook_refs: []` pending a
+dedicated environment-separation artifact (the operator's
+environment topology, joined against A.8.3 access-restriction,
+A.8.9 configuration management, A.8.11 data masking, A.8.22
+segregation of networks, and A.8.32 change management, discharges
+it in practice);
+`iso27001:a-8-32-change-management` wires
+`control.iac_policy_guardrail@v1` (already carrying A.8.32 on its
+`oscal_refs` block) plus `playbook.infra_posture_management@v1` and
+`playbook.patch_management@v1` for the posture-drift and patch-
+release change slices;
+`iso27001:a-8-33-test-information` ships `control_refs: []` and
+`playbook_refs: []` pending a dedicated test-information protection
+artifact (the operator's test-data posture, joined against A.8.3,
+A.8.11 masking, and A.8.31 separation, discharges it in practice,
+with `playbook.data_subject_rights@v1` as the erasure surface
+against inadvertently landed personal data); and
+`iso27001:a-8-34-protection-of-information-systems-during-audit-testing`
+ships `control_refs: []` and `playbook_refs: []` pending a dedicated
+audit-testing governance artifact (the operator's audit-engagement
+posture, joined against A.8.3, A.8.15 / A.8.16 log-and-monitor,
+A.8.31 environment separation, and A.8.32 change management,
+discharges it in practice). Coverage on A.8 now stands at 34 of 34
+entries landed (pending #664 A.8.18–A.8.22 which is on a sibling
+in-flight branch); once #664 merges, the A.8 theme file will carry
+the full 34-entry surface with no gaps.
