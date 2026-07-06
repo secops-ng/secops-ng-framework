@@ -41,7 +41,8 @@
 #   - gdpr:art-32-1-b — ensuring the ongoing confidentiality,
 #     integrity, availability, and resilience of processing systems
 #     and services. Eight technical-security playbooks are agentic
-#     anchors: cloud_misconfiguration and infra_posture_management
+#     anchors on the omnibus continuous-baseline entry:
+#     cloud_misconfiguration and infra_posture_management
 #     hold the cloud-posture confidentiality / integrity / baseline
 #     surface; iam_auditor and it_security_support_agent hold the
 #     access-control / operator-support confidentiality surface;
@@ -58,7 +59,13 @@
 #     (early warning, 72-hour full notification, final report) to
 #     the main-establishment CSIRT and ENISA through the Single
 #     Reporting Platform under the same integrity /
-#     confidentiality-of-processing limb.
+#     confidentiality-of-processing limb. A dedicated per-event
+#     agentic-threat sub-entry (`gdpr:art-32-1-b-agentic-threat-response`,
+#     agentic_threat_response) anchors the machine-speed detect-
+#     through-contain discipline against a fully-agentic adversary
+#     — kept atom-per-obligation from the omnibus continuous-baseline
+#     surface above, mirroring the Art. 32(1)(c) restore-availability
+#     / availability-incident-response pair.
 #
 #   - gdpr:art-32-1-d — process for regularly testing, assessing, and
 #     evaluating the effectiveness of technical and organisational
@@ -663,3 +670,94 @@ entries:
       CORE precedent) does not characterise per-update rollout as a
       runtime countermeasure, and no defensible D3FEND or Sigma
       surface is available without misrepresenting it as one.
+
+  - id: gdpr:art-32-1-b-agentic-threat-response
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "32"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Implement appropriate technical and organisational measures to
+      ensure a level of security appropriate to the risk, including
+      the ability to ensure the ongoing confidentiality, integrity,
+      availability, and resilience of processing systems and services.
+      Specifically, the per-event detect-through-contain discipline
+      against a fully-agentic adversary operating at machine-speed
+      decision cadence — autonomous LLM-driven credential harvest,
+      lateral movement, and encryption chains observed inside a
+      sub-minute self-correction window — that classical rule-based
+      triage is miscalibrated to intercept. The measure must be
+      exercisable on the operator's documented identity and network-
+      control surface, not merely documented, so the machine-speed
+      containment capability is evidenced rather than asserted.
+    status: draft
+    control_refs:
+      - control.incident_handling_capability@v1
+    playbook_refs:
+      - playbook.agentic_threat_response@v1
+    metric_refs:
+      - kpi.mttd_agentic_threat@v1
+      - kpi.mttc_agentic_threat@v1
+    evidence_stream_refs:
+      - incidents
+    notes: >-
+      agentic_threat_response is the agentic anchor for the
+      machine-speed adversary detect-through-contain slice of
+      Art. 32(1)(b). On an agentic-threat indicator (anomalous LLM
+      API call volume from a workload principal, rapid credential-
+      enumeration burst inside a sub-minute self-correction window,
+      or lateral movement across identity / network edges within
+      the observed self-correction window), the playbook isolates
+      the affected credential set at the operator's IdP (session
+      and token revocation, IdP disable for the containment window
+      — OSCAL AC-2(13), D3FEND D3-ACI + D3-AL) and severs the
+      resolved lateral edge via a micro-segmentation call at the
+      operator's network-controls surface (OSCAL AC-4 + SC-7,
+      D3FEND D3-NI). Together these restore the ongoing-
+      confidentiality and ongoing-integrity dimensions the clause
+      names against the autonomous-adversary decision-cadence case
+      set. The kpi.mttd_agentic_threat@v1 and
+      kpi.mttc_agentic_threat@v1 metrics audit detection and
+      containment latency against the machine-speed threshold and
+      are the GDPR-visible failure indicators for the clause's
+      per-event agentic-threat slice. This entry is the per-event
+      agentic-threat-response counterpart to the
+      ongoing-confidentiality-integrity-availability omnibus entry
+      above (which anchors the continuous-baseline surface: cloud-
+      posture, IAM, codebase / disclosure vulnerability handling,
+      CVD and SRP channel security); both anchor on Art. 32(1)(b)
+      but discharge independent operational disciplines — the
+      omnibus entry operationalises the ongoing-baseline
+      disciplines, while this slice operationalises the per-event
+      detect-isolate-contain discharge against the autonomous-
+      adversary surface. The two are kept atom-per-obligation
+      rather than overloaded onto a single entry, mirroring the
+      established shape Art. 32(1)(c) carries across
+      restore-availability (backup_recovery periodic drill
+      discipline) and availability-incident-response (ddos_response
+      per-event discharge) above. The escalate step hands the case
+      envelope off to playbook.incident_management@v1 for the
+      Art. 33 regulator-notification chain (scored under
+      content/mappings/gdpr/article-33-34-personal-data-breach-notification.yaml),
+      so the workflow's Art. 32(1)(b) surface here is bounded to
+      the detect-contain restoration of confidentiality / integrity
+      and does not extend into the notification submission itself.
+      Per content/mappings/gdpr/data-flow-agentic_threat_response.md
+      §3, the workflow reads authentication and network-flow
+      metadata plus identity attributes on the implicated principal
+      — no content of personal communications, no special-category
+      data on the happy path — so this clause anchors the workflow
+      as a security measure protecting the confidentiality /
+      integrity dimension of personal-data processing on the
+      operator's identity and network surfaces. The NIS2 parallel
+      under `nis2:art-21-2-b` (incident-handling capability) and
+      `nis2:art-21-2-e` (security in acquisition, development and
+      maintenance — the agentic-tool supply-chain surface the
+      indicator-ingest step surveils) anchor the same playbook
+      against their own regime-specific obligations; the two
+      regimes carry separate evidence requirements against the
+      same detect-contain discipline. DORA and CRA cross-regime
+      anchors remain deferred per the playbook's outbound overlay
+      at content/playbooks/agentic_threat_response/mappings.yaml.

@@ -32,11 +32,30 @@
 #            documented product-security interaction surfaces. Skip
 #            entry (with SKELETON rationale) lives at
 #            content/mappings/cra/_orphan_skip.yaml.
-#   - GDPR:  no inbound YAML edge at CORE time. The GDPR data-flow
-#            surface (Article 30 RoPA) for this playbook is deferred to
-#            the EXTEND card that authors
+#   - GDPR:  playbook.agentic_threat_response@v1 is added to the
+#            playbook_refs list on
+#            content/mappings/gdpr/article-32-security-of-processing.yaml
+#            (Art. 32(1)(b) per-event machine-speed detect-through-
+#            contain surface, id gdpr:art-32-1-b-agentic-threat-response
+#            — credential-set isolation at the IdP and micro-segmentation
+#            of the resolved lateral edge restore the ongoing-
+#            confidentiality and integrity dimensions the clause names)
+#            and on
+#            content/mappings/gdpr/article-33-34-personal-data-breach-notification.yaml
+#            (Art. 33 notification of a personal data breach,
+#            id gdpr:art-33-notification-personal-data-breach — the
+#            playbook is an upstream event-generation lane whose
+#            credential-isolation step's implicated-principal set
+#            can meet the Art. 4(12) breach-of-confidentiality
+#            definition; the escalate step hands the case envelope
+#            off to playbook.incident_management@v1 which owns the
+#            Art. 33(3) submission). The Art. 30 RoPA per-workflow
+#            data-flow surface remains anchored on
 #            content/mappings/gdpr/data-flow-agentic_threat_response.md.
-#            Skip entry lives at content/mappings/gdpr/_orphan_skip.yaml.
+#            Art. 34 (high-risk subject notification) is not wired for
+#            this playbook — the workflow's data-flow doc does not
+#            name Art. 34 by number and any subject-notification
+#            dispatch routes through incident_management.
 #
 # Schema: schemas/playbook-mappings.schema.json
 playbook: playbook.agentic_threat_response@v1
