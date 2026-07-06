@@ -264,8 +264,67 @@ gdpr:
 
 eu_ai_act:
   # Inbound edges under content/mappings/eu_ai_act/*.yaml land this
-  # playbook against the four SKELETON-scoped high-risk-provider
-  # obligations covered by the sibling per-article YAMLs.
+  # playbook against the SKELETON-scoped high-risk-provider
+  # obligations covered by the sibling per-article YAMLs, plus the
+  # Art. 6 / Annex III classification gate that determines
+  # applicability of the Art. 9 / 11 / 13 / 72 obligations.
+  - mapping_id: eu_ai_act:art-6-1-annex-ii-product-safety
+    article: "6(1)"
+    notes: >-
+      Annex II product-safety intersection route into the high-risk
+      category. Gate condition on the identify-high-risk-AI-system
+      step of this playbook; the downstream Art. 9 / 11 / 13 / 72
+      obligations only apply once this classification is confirmed.
+  - mapping_id: eu_ai_act:art-6-2-annex-iii-standalone
+    article: "6(2)"
+    notes: >-
+      Standalone Annex III route into the high-risk category. Gate
+      condition on the identify-high-risk-AI-system step; per-area
+      enumeration lands on the annex-iii-use-cases.yaml sibling
+      inbound file.
+  - mapping_id: eu_ai_act:annex-iii-1-biometrics
+    article: Annex III(1)
+    notes: >-
+      Annex III biometrics area. Per-area classification atom
+      exercised by the identify-high-risk-AI-system step when the
+      operator inventory surfaces a biometric identification,
+      categorisation, or emotion-recognition system.
+  - mapping_id: eu_ai_act:annex-iii-2-critical-infrastructure
+    article: Annex III(2)
+    notes: >-
+      Annex III critical-infrastructure area. Overlaps with NIS2
+      essential-entity sectors on the operator side; the NIS2
+      cross-regime edge to Art. 9 remains the primary risk-analysis
+      anchor.
+  - mapping_id: eu_ai_act:annex-iii-3-education-vocational-training
+    article: Annex III(3)
+    notes: >-
+      Annex III education and vocational training area.
+  - mapping_id: eu_ai_act:annex-iii-4-employment-workers-management
+    article: Annex III(4)
+    notes: >-
+      Annex III employment and workers-management area.
+  - mapping_id: eu_ai_act:annex-iii-5-essential-services
+    article: Annex III(5)
+    notes: >-
+      Annex III essential-services area (benefits eligibility, credit
+      scoring, life / health insurance rate-setting, emergency-response
+      dispatch and triage).
+  - mapping_id: eu_ai_act:annex-iii-6-law-enforcement
+    article: Annex III(6)
+    notes: >-
+      Annex III law-enforcement area. Art. 5 prohibitions (predictive
+      policing based solely on profiling, untargeted facial-image
+      scraping) apply upstream of the Art. 6(2) classification.
+  - mapping_id: eu_ai_act:annex-iii-7-migration-asylum-border
+    article: Annex III(7)
+    notes: >-
+      Annex III migration, asylum and border-control area.
+  - mapping_id: eu_ai_act:annex-iii-8-justice-democratic-processes
+    article: Annex III(8)
+    notes: >-
+      Annex III administration of justice and democratic processes
+      area.
   - mapping_id: eu_ai_act:art-9-risk-management
     article: "9"
     notes: >-

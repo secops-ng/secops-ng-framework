@@ -13,13 +13,22 @@ Art. 13 transparency, and Art. 72 post-market-monitoring surfaces the
   control, playbook, and metric IDs the AI Act risk-management
   playbook backlinks. One YAML per article; each entry cites the
   authoritative EUR-Lex permalink.
-- **Out:** Art. 6 classification and Annex III use-case enumeration
-  (separate SKELETON card), Annex I prohibited practices, the GPAI
-  chapter of the Regulation, and Art. 43 conformity-assessment
-  integration. Those land as sibling cards.
+- **Out:** Annex I prohibited practices, the GPAI chapter of the
+  Regulation, Art. 43 conformity-assessment integration, and the
+  Art. 6(3)–(6) provider derogation / Commission delegated-act track
+  on the Annex III presumption. Those land as sibling cards.
 
 ## Files
 
+- `article-6-classification.yaml` — Art. 6(1) Annex II product-safety
+  intersection route and Art. 6(2) standalone Annex III route into
+  the high-risk category. Gate condition on the identify-high-risk-
+  AI-system step of the eu_ai_act_risk_management playbook.
+- `annex-iii-use-cases.yaml` — Annex III enumeration (eight areas:
+  biometrics; critical infrastructure; education and vocational
+  training; employment and workers management; essential services;
+  law enforcement; migration, asylum and border control;
+  administration of justice and democratic processes).
 - `article-9-risk-management.yaml` — Art. 9(1)–(6) risk-management
   system obligations on high-risk AI providers (lifecycle iteration,
   identify / estimate / evaluate cycle, residual-risk acceptability
@@ -33,7 +42,10 @@ Art. 13 transparency, and Art. 72 post-market-monitoring surfaces the
   monitoring plan and feedback into the Art. 9 risk-management cycle.
 - `oscal-component-definition.json` — OSCAL 1.1.2 component definition
   mirroring the GDPR / CRA siblings; one implemented-requirement per
-  (entry, control_ref) pair.
+  (entry, control_ref) pair. Art. 6 classification and Annex III
+  enumeration entries carry no `control_refs` (deterministic overlay
+  lookup rather than an OSCAL control anchor) and are consequently
+  not reflected in the OSCAL component definition.
 
 ## Citation policy
 
@@ -42,9 +54,12 @@ is Regulation (EU) 2024/1689 (CELEX 32024R1689).
 
 ## ID conventions
 
-Mapping IDs are `eu_ai_act:art-<n>[-<sub>]` (e.g.
-`eu_ai_act:art-9-risk-management`, `eu_ai_act:art-72-post-market`).
-Slug parts use kebab-case.
+Mapping IDs are `eu_ai_act:art-<n>[-<sub>]` for article-anchored
+entries (e.g. `eu_ai_act:art-9-risk-management`,
+`eu_ai_act:art-6-2-annex-iii-standalone`) and
+`eu_ai_act:annex-<roman>-<paragraph>-<slug>` for Annex-anchored
+entries (e.g. `eu_ai_act:annex-iii-1-biometrics`). Slug parts use
+kebab-case.
 
 ## Cross-regime edges
 
