@@ -42,7 +42,39 @@ discipline in practice);
 A.5.6 on its `oscal_refs` block), with A.5.6 also carrying
 `playbook.threat_intel_ingest@v1` as the operational
 community-intelligence ingest surface. The remaining A.5 controls
-(A.5.7 through A.5.37) land as sibling entries in that file on
+(A.5.7 through A.5.12) also land in `annex-a-5-organisational.yaml`,
+bringing the theme to 12 of 37 entries:
+`iso27001:a-5-7-threat-intelligence` ships `control_refs: []` pending
+a dedicated threat-intelligence-management artifact, with
+`playbook.threat_intel_ingest@v1` as the operational analyse-and-route
+discharge (the community-intelligence contact surface anchored under
+A.5.6 feeds it);
+`iso27001:a-5-8-isms-in-project-management` ships `control_refs: []`
+and `playbook_refs: []` pending a dedicated project-security-
+integration artifact (the operator's project-management framework,
+joined against the A.5.1 policy-set anchor and the A.8.32 change-
+management anchor, discharges it in practice);
+`iso27001:a-5-9-inventory-of-assets` wires
+`control.asset_inventory_delta@v1` (already carrying A.5.9 on its
+`oscal_refs` block) plus `playbook.asset_management@v1` as the
+reconciliation-and-tagging discharge;
+`iso27001:a-5-10-acceptable-use-of-assets` wires
+`control.risk_management_policy@v1` as the policy-set anchor that
+governs the topic-specific acceptable-use rules, with
+`playbook_refs: []` (the discipline is policy-set rather than
+operational-flow);
+`iso27001:a-5-11-return-of-assets` wires `control.jml_evidence@v1`
+(the leaver leg of the joiner-mover-leaver flow, PS-4 personnel-
+termination discipline) as the practical anchor, with
+`playbook_refs: []` (the physical-asset-return discipline is
+discharged against the operator's own leaver-checklist evidence
+referenced by the JML flow); and
+`iso27001:a-5-12-classification-of-information` ships
+`control_refs: []` and `playbook_refs: []` pending a dedicated
+classification-scheme artifact (the operator's own scheme, joined
+against A.5.9 inventory, A.5.1 policy-set, and A.5.10 acceptable-use,
+discharges it in practice). The remaining A.5 controls
+(A.5.13 through A.5.37) land as sibling entries in that file on
 subsequent cards.
 
 The A.6 people-controls theme file has landed with its first two

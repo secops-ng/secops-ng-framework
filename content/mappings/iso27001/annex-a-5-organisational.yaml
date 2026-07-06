@@ -16,8 +16,11 @@
 # discharge it. The next batch (A.5.2 information-security roles,
 # A.5.3 segregation of duties, A.5.4 management responsibilities,
 # A.5.5 contact with authorities, A.5.6 contact with special interest
-# groups) lands here alongside the anchor. The remaining A.5 controls
-# (A.5.7 through A.5.37) land as sibling entries in this file on
+# groups) landed alongside the anchor, and the A.5.7–A.5.12 batch
+# (threat intelligence, ISMS in project management, inventory of
+# assets, acceptable use of assets, return of assets, classification
+# of information) lands in this batch. The remaining A.5 controls
+# (A.5.13 through A.5.37) land as sibling entries in this file on
 # subsequent cards.
 #
 # Regime scope caveat: ISO/IEC 27001:2022 is a certifiable
@@ -256,3 +259,266 @@ entries:
       regime-specific sharing frameworks; the regimes carry separate
       evidence requirements against the same underlying
       community-contact artifact.
+  - id: iso27001:a-5-7-threat-intelligence
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.7
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Collect and analyse information relating to information-security
+      threats to produce threat intelligence. The intelligence output
+      must be actionable — routed into risk-treatment decisions,
+      detection engineering, and vulnerability-management prioritisation
+      rather than held as a passive feed.
+    status: draft
+    control_refs: []
+    playbook_refs:
+      - playbook.threat_intel_ingest@v1
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a dedicated threat-intelligence-management
+    # artifact as a first-class control. The operational discharge is
+    # anchored on the playbook side (`playbook.threat_intel_ingest@v1`)
+    # which exercises the ingest / normalisation / routing flow into
+    # the detection and vulnerability surfaces; a future dedicated
+    # artifact (e.g. `control.threat_intelligence_programme@v1`) would
+    # replace this placeholder without changing the entry id.
+    notes: >-
+      A.5.7 is the threat-intelligence anchor within the Annex A.5
+      organisational-controls theme — the 2022 revision introduced it
+      as a new organisational control, treating threat intelligence
+      as a discipline governed at the ISMS level rather than a purely
+      technical activity. The community-supplied threat-intelligence
+      contact surface anchored under A.5.6 feeds the discipline; A.5.7
+      governs the analysis-and-routing pipeline that turns the
+      inbound signal into actionable outputs. The playbook.threat_
+      intel_ingest@v1 CACAO playbook is the direct operational anchor
+      — its normalisation, prioritisation, and downstream-routing
+      steps discharge the analyse-and-act obligation A.5.7 imposes,
+      with the detection-engineering pipeline (A.8.16 anchor) and the
+      vulnerability-management pipeline (A.8.8 anchor) as the two
+      primary consumers.
+      Cross-regime parallels: NIS2 Art. 21(2)(h) (information-sharing
+      arrangements) and DORA Art. 45 (financial-sector information-
+      sharing arrangements) anchor the same intelligence-flow
+      discipline against their regime-specific sharing frameworks;
+      the regimes carry separate evidence requirements against the
+      same underlying intelligence-management artifact.
+  - id: iso27001:a-5-8-isms-in-project-management
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.8
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Integrate information security into project management, so that
+      information-security risks are identified, assessed, and treated
+      as part of the project lifecycle rather than retrofitted after
+      delivery. Applies to projects of any type — technical,
+      organisational, and business-process change.
+    status: draft
+    control_refs: []
+    playbook_refs: []
+    # control_refs and playbook_refs intentionally empty: the SecOps-NG
+    # content catalogue does not yet carry a project-management
+    # integration artifact as a first-class control or playbook. A.5.8
+    # is discharged in practice today against the operator's own
+    # project-management framework, joined against the risk-management
+    # policy anchor under A.5.1 (`control.risk_management_policy@v1`)
+    # for the top-level risk discipline and the change-management
+    # anchor under A.8.32 (`control.iac_policy_guardrail@v1`) for the
+    # technical-change slice. A future dedicated artifact (e.g.
+    # `control.project_security_integration@v1`) would replace this
+    # placeholder without changing the entry id.
+    notes: >-
+      A.5.8 is the project-management integration anchor within the
+      Annex A.5 organisational-controls theme — the 2022 revision
+      consolidated the earlier project-lifecycle-security controls
+      into this single obligation. The discipline is structural: the
+      operator's project-management framework must include
+      security-risk identification, assessment, and treatment as a
+      standard step rather than an optional add-on. The A.5.1
+      policy-set anchor (`control.risk_management_policy@v1`) governs
+      the top-level risk discipline projects inherit; the A.8.32
+      change-management anchor (`control.iac_policy_guardrail@v1`)
+      governs the technical-change slice through which project
+      outputs land. Cross-regime parallels: NIS2 Art. 21(2)(a)
+      (policies on risk analysis and information-system security)
+      and DORA Art. 6 (ICT risk management framework) anchor the
+      same risk-integration discipline against their regime-specific
+      scopes; the regimes carry separate evidence requirements
+      against the same underlying project-governance artifact.
+  - id: iso27001:a-5-9-inventory-of-assets
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.9
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Identify information and other associated assets and develop an
+      inventory of them, including ownership assignments, so that
+      protection responsibilities can be allocated and asset
+      lifecycle events (acquisition, change, disposal) are tracked.
+    status: draft
+    control_refs:
+      - control.asset_inventory_delta@v1
+    playbook_refs:
+      - playbook.asset_management@v1
+    notes: >-
+      A.5.9 is the asset-inventory anchor within the Annex A.5
+      organisational-controls theme — the 2022 revision consolidated
+      the earlier inventory-and-ownership obligations into this single
+      control. control.asset_inventory_delta@v1 is the direct anchor:
+      its oscal_refs block already carries ISO/IEC 27001:2022 A.5.9
+      alongside NIST 800-53 rev5 CM-8 / CM-8(2), and its
+      delta-capture surface (authoritative inventory + scheduled-
+      snapshot delta so unmanaged assets surface as exceptions) is
+      exactly the ownership-and-lifecycle discipline A.5.9 requires.
+      The playbook.asset_management@v1 CACAO playbook is the
+      operational discharge — the reconciliation-and-tagging flow
+      that keeps ownership assignments current as assets move through
+      their lifecycle. Cross-regime parallels: NIS2 Art. 21(2)(i)
+      (human-resources security, including asset management) and
+      DORA Art. 8 (ICT-asset identification and classification)
+      anchor the same inventory-and-ownership discipline against
+      their regime-specific scopes; the regimes carry separate
+      evidence requirements against the same underlying inventory
+      artifact.
+  - id: iso27001:a-5-10-acceptable-use-of-assets
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.10
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Identify, document, and implement rules for the acceptable use
+      and handling of information and other associated assets. The
+      rules must be communicated to personnel and other interested
+      parties who use the assets, and reviewed as the asset landscape
+      and risk profile change.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+    playbook_refs: []
+    # playbook_refs intentionally empty: A.5.10 is a policy-set
+    # obligation rather than an operational-flow one. The rules
+    # discipline it imposes is discharged through the topic-specific
+    # acceptable-use policy issued under the A.5.1 policy-set
+    # umbrella (`control.risk_management_policy@v1`), with awareness
+    # and acceptance evidence anchored under the A.5.4 management-
+    # direction pair (`control.training_attestation@v1`); no dedicated
+    # acceptable-use playbook is currently in the catalogue.
+    notes: >-
+      A.5.10 is the acceptable-use-of-assets anchor within the Annex
+      A.5 organisational-controls theme — the standard treats it as
+      a topic-specific policy issued under the overall policy-set
+      obligation anchored at A.5.1. control.risk_management_policy@v1
+      is the policy-set anchor whose management-approval and
+      periodic-review discipline (P1Y baseline cadence) governs the
+      acceptable-use rules issued against it; the A.5.9 asset-
+      inventory pair (`control.asset_inventory_delta@v1`,
+      `playbook.asset_management@v1`) is the inventory-scope surface
+      the rules apply against, and the A.5.4 management-direction
+      attestation evidence (`control.training_attestation@v1`)
+      records that personnel have received and acknowledged the
+      rules. Cross-regime parallels: NIS2 Art. 21(2)(g) (cyber
+      hygiene practices) and Art. 21(2)(i) (human-resources
+      security, including access-control policies) anchor the same
+      acceptable-use discipline against essential and important
+      entities; the regimes carry separate evidence requirements
+      against the same underlying acceptable-use policy artifact.
+  - id: iso27001:a-5-11-return-of-assets
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.11
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Ensure that personnel and other interested parties return all
+      information and other associated assets in their possession
+      upon termination of employment, contract, or role change. The
+      obligation includes physical assets, digital credentials, and
+      access to information holdings.
+    status: draft
+    control_refs:
+      - control.jml_evidence@v1
+    playbook_refs: []
+    # playbook_refs intentionally empty: A.5.11 is a lifecycle-event
+    # obligation discharged in practice at the leaver leg of the
+    # joiner-mover-leaver flow. control.jml_evidence@v1 is the
+    # evidence anchor whose lifecycle-events surface (access
+    # provisioned on join, adjusted on role change, revoked on
+    # departure) already carries the ISO/IEC 27001:2022 A.5.16
+    # identity-management control and the NIST 800-53 rev5 PS-4
+    # personnel-termination control; the physical-asset-return
+    # discipline A.5.11 additionally imposes is discharged against
+    # the operator's own leaver-checklist evidence (device return,
+    # badge return, key return) that the JML flow references.
+    notes: >-
+      A.5.11 is the return-of-assets anchor within the Annex A.5
+      organisational-controls theme — the standard treats it as the
+      termination-time counterpart of the A.5.9 inventory-and-
+      ownership obligation and the A.5.16 identity-management
+      obligation. control.jml_evidence@v1 is the practical anchor:
+      the leaver leg of the joiner-mover-leaver flow (access
+      revocation on departure, PS-4 personnel-termination discipline
+      on its oscal_refs block) is where the digital-asset-return
+      discipline is discharged, and the operator's leaver-checklist
+      evidence the flow references is where the physical-asset-return
+      discipline is discharged. Cross-regime parallels: NIS2 Art.
+      21(2)(i) (human-resources security) anchors the same
+      termination-time asset-return discipline against essential and
+      important entities; the regimes carry separate evidence
+      requirements against the same underlying leaver-lifecycle
+      artifact.
+  - id: iso27001:a-5-12-classification-of-information
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.12
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Classify information according to the organisation's
+      information-security needs, based on confidentiality, integrity,
+      availability, and relevant interested-party requirements. The
+      classification scheme must be documented, applied to information
+      assets, and reviewed as the information landscape and risk
+      profile change.
+    status: draft
+    control_refs: []
+    playbook_refs: []
+    # control_refs and playbook_refs intentionally empty: the SecOps-NG
+    # content catalogue does not yet carry a dedicated
+    # information-classification-scheme artifact as a first-class
+    # control or playbook. A.5.12 is discharged in practice today
+    # against the operator's own classification scheme, joined
+    # against the A.5.9 asset-inventory anchor
+    # (`control.asset_inventory_delta@v1`, `playbook.asset_management@v1`)
+    # for the assets the scheme applies against, the A.5.1 policy-set
+    # anchor (`control.risk_management_policy@v1`) for the top-level
+    # classification-policy discipline, and the A.5.10 acceptable-use
+    # anchor for the handling-rules surface that references the
+    # classification labels. A.5.13 labelling of information and
+    # A.5.14 information transfer land in a later batch and both
+    # depend on this classification anchor. A future dedicated
+    # artifact (e.g. `control.information_classification_scheme@v1`)
+    # would replace this placeholder without changing the entry id.
+    notes: >-
+      A.5.12 is the information-classification anchor within the
+      Annex A.5 organisational-controls theme — the standard treats
+      it as a structural prerequisite for the labelling (A.5.13),
+      handling (A.5.10 acceptable-use), and transfer (A.5.14)
+      obligations that reference classification labels. The
+      classification scheme itself is the operator's own artifact;
+      the SecOps-NG catalogue anchors it structurally through the
+      A.5.9 asset-inventory pair (the assets the scheme applies
+      against), the A.5.1 policy-set anchor (the top-level
+      classification-policy discipline), and the A.5.10 acceptable-
+      use anchor (the handling rules that reference labels).
+      Cross-regime parallels: NIS2 Art. 21(2)(i) (human-resources
+      security, including data-handling rules) and GDPR Art. 5(1)(f)
+      (integrity and confidentiality principle) anchor the same
+      classification-and-protection discipline against their
+      regime-specific scopes; the regimes carry separate evidence
+      requirements against the same underlying classification-scheme
+      artifact.
