@@ -15,7 +15,7 @@ One YAML file per Trust Services category:
 | Availability | `tsc-availability.yaml` | A1.1–A1.3 (3) |
 | Confidentiality | `tsc-confidentiality.yaml` | C1.1–C1.2 (2) |
 | Processing Integrity | `tsc-processing-integrity.yaml` | PI1.1–PI1.5 (5) |
-| Privacy | *future* | P-series |
+| Privacy | `tsc-privacy.yaml` | P1.1, P2.1, P3.1, P4.1–P4.3, P5.1, P6.1, P6.7, P7.1 (10) |
 
 Entry ids use `soc2:<cc-slug>` where the slug carries the
 criterion number and a kebab-case phrase, e.g.
@@ -62,5 +62,26 @@ asset inventory); the application-layer input, processing, and
 output-accuracy controls themselves sit outside the SecOps-NG
 catalogue and ship as gap notes on the relevant entries.
 
-The remaining Trust Services category (Privacy) lands as a
-sibling file on a future card.
+The Privacy category (`tsc-privacy.yaml`) is present with ten
+P-series criteria as draft entries, spanning notice (P1.1),
+choice and consent (P2.1), collection limitation (P3.1),
+use / retention / disposal (P4.1–P4.3), data-subject access
+(P5.1), disclosure and breach notification (P6.1, P6.7), and
+personal-information quality (P7.1). Anchors here discharge
+the operations-layer overlap where the SecOps-NG catalogue
+already carries an artifact — access enforcement for
+authorised disclosure, incident-management for breach
+notification, data-subject-rights for access and rectification,
+DPIA for purpose and necessity assessment, and asset
+management for secure disposal. The operator-owned privacy-
+programme surface (privacy notice text, consent-capture and
+preference-management tooling, purpose register, retention
+schedule, and accuracy-management procedures) sits upstream
+of the SecOps-NG catalogue and ships as gap notes on the
+relevant entries. The parallel GDPR entries in
+content/mappings/gdpr/ remain the authoritative regulatory
+pointer for the EU statutory surface where a P-criterion
+overlaps a GDPR obligation.
+
+With the Privacy category present, the SOC 2 crosswalk covers
+all five Trust Services categories.

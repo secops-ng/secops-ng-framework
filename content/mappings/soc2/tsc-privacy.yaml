@@ -1,0 +1,445 @@
+# SOC 2 Trust Services Criteria — Privacy (P-series).
+#
+# AICPA Trust Services Criteria for Privacy (2017, as revised).
+# The Privacy category is an optional extension on top of the
+# Security Common Criteria (see tsc-security.yaml). It comprises
+# the P-series criteria that address the lifecycle of personal
+# information across notice, choice and consent, collection, use
+# and retention and disposal, access, disclosure and notification,
+# quality, and monitoring and enforcement.
+#
+# Scope of this file: the Privacy category. Ten P-series criteria
+# are anchored below — the subset for which the SecOps-NG catalogue
+# carries either a direct anchor or a documented structural gap
+# note. The remaining P-criteria (P8.1 monitoring and enforcement,
+# and the second-order criteria under P1–P7) sit inside the
+# operator's own privacy-programme surface (privacy policy text,
+# consent-capture tooling, purpose registers, quality-management
+# controls, complaint handling) which is upstream of the
+# security-operations catalogue and is not anchored here. Security
+# is in tsc-security.yaml, Availability is in tsc-availability.yaml,
+# Confidentiality is in tsc-confidentiality.yaml, Processing
+# Integrity is in tsc-processing-integrity.yaml; Privacy completes
+# the five-category set.
+#
+# Regime scope caveat: SOC 2 is a private-sector assurance
+# framework (AICPA attestation standard AT-C 105 / AT-C 205), not
+# an EU statutory instrument. Where a P-criterion parallels a
+# statutory GDPR obligation (data-subject access under P5.1 and
+# GDPR Article 15; personal-data breach notification under P6.7
+# and GDPR Articles 33/34), the crosswalk here is a structural
+# pointer against the same artifact under both regimes rather than
+# a claim that SOC 2 discharges the statutory obligation. The GDPR
+# entries in content/mappings/gdpr/ remain the authoritative
+# regulatory pointer for the EU statutory surface.
+#
+# Coverage caveat: Privacy obligations rest heavily on
+# operator-owned artifacts — the privacy notice text, the
+# consent-capture and preference-management tooling, the purpose
+# register, the data-classification scheme, the retention
+# schedule, and the accuracy-management procedures — that live
+# inside the operator's own privacy-programme surface upstream of
+# the security-operations catalogue. Anchors here discharge the
+# structural surfaces where security operations overlap with the
+# privacy programme (access enforcement for authorised disclosure,
+# breach-notification workflow, data-subject-rights fulfilment,
+# secure disposal of personal information, DPIA-style
+# purpose/necessity assessment). The privacy-programme artifacts
+# themselves ship as gap notes on the relevant entries.
+
+regime: soc2
+entries:
+
+  # ─── P1: Notice and Communication ─────────────────────────────
+
+  - id: soc2:p1-1-notice-of-privacy-practices
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: P1.1
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity provides notice to data subjects about its
+      privacy practices to meet the entity's objectives related
+      to privacy. The notice is updated and communicated to data
+      subjects in a timely manner for changes to the entity's
+      privacy practices, including changes in the use of personal
+      information, to meet the entity's objectives related to
+      privacy.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the privacy notice itself
+    # (privacy policy text, notice-timing procedures, notice-of-
+    # change communication mechanisms) is an operator-owned
+    # artifact that lives inside the operator's own privacy-
+    # programme and legal-communications surface, upstream of the
+    # SecOps-NG security-operations catalogue. P1.1 is discharged
+    # in practice against the operator's published privacy notice
+    # and its change-communication procedures; no first-class
+    # SecOps-NG anchor is applicable.
+    playbook_refs: []
+    # playbook_refs intentionally empty: no privacy-notice
+    # publication or communication playbook ships in the SecOps-NG
+    # CACAO catalogue. Notice publication is a
+    # legal-communications workflow rather than a security-
+    # operations flow.
+    notes: >-
+      P1.1 is the notice anchor for the privacy programme — the
+      entity must publish and maintain a privacy notice describing
+      its personal-information practices, and communicate changes
+      to that notice to data subjects. The privacy notice text,
+      the notice-publication channel, and the notice-of-change
+      communication procedures remain operator-owned artifacts
+      under this criterion. The SecOps-NG catalogue does not
+      duplicate the operator's privacy-programme surface; P1.1 is
+      recorded here as a structural pointer against those
+      operator-owned artifacts so the criterion is visible in the
+      crosswalk rather than silently dropped.
+
+  # ─── P2: Choice and Consent ───────────────────────────────────
+
+  - id: soc2:p2-1-choice-and-consent-for-personal-information
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: P2.1
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity communicates choices available regarding the
+      collection, use, retention, disclosure, and disposal of
+      personal information to data subjects and the consequences,
+      if any, of each choice. Explicit consent for the collection,
+      use, retention, disclosure, and disposal of personal
+      information is obtained from data subjects or other
+      authorised persons, if required.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: consent capture and
+    # preference management (consent-record storage, preference-
+    # centre UI, consent-withdrawal handling, lawful-basis
+    # bookkeeping) are operator-owned artifacts that live inside
+    # the operator's own privacy-programme and application-
+    # experience surface upstream of the security-operations
+    # catalogue. P2.1 is discharged in practice against the
+    # operator's own consent tooling.
+    playbook_refs: []
+    # playbook_refs intentionally empty: no consent-capture or
+    # preference-management playbook ships in the SecOps-NG CACAO
+    # catalogue. Consent management is an application-layer
+    # workflow rather than a security-operations flow.
+    notes: >-
+      P2.1 is the choice-and-consent anchor for the privacy
+      programme — the entity must communicate the choices data
+      subjects have over their personal information and obtain
+      explicit consent where required. Consent-capture tooling,
+      the preference centre, and the lawful-basis record remain
+      operator-owned artifacts under this criterion. The parallel
+      GDPR Article 6 (lawful basis of processing) entry treats
+      the lawful-basis record the same way; the SecOps-NG
+      catalogue anchors adjacent structural surfaces (asset and
+      data-subject-rights flows) rather than duplicating the
+      consent-management surface.
+
+  # ─── P3: Collection ───────────────────────────────────────────
+
+  - id: soc2:p3-1-collection-limited-to-purpose
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: P3.1
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      Personal information is collected consistent with the
+      entity's objectives related to privacy. Collection of
+      personal information is limited to that which is necessary
+      to meet the entity's objectives related to privacy.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: purpose registers,
+    # data-minimisation policies, and collection-scope
+    # justifications are operator-owned artifacts inside the
+    # privacy-programme surface. The SecOps-NG catalogue does not
+    # carry a first-class purpose-register control.
+    playbook_refs:
+      - playbook.data_protection_impact_assessment@v1
+    notes: >-
+      P3.1 is the collection-limitation anchor for the privacy
+      programme — personal information collected must be limited
+      to what is necessary for the stated purpose.
+      `playbook.data_protection_impact_assessment@v1` exercises
+      the structural surface where necessity and proportionality
+      of processing are recorded against a specific purpose, and
+      is the closest adjacent anchor in the SecOps-NG catalogue;
+      it does not replace the operator's own purpose register or
+      data-minimisation policy, which remain operator-owned
+      artifacts under this criterion. The parallel GDPR Article
+      35 (DPIA) entries anchor the same playbook.
+
+  # ─── P4: Use, Retention, and Disposal ─────────────────────────
+
+  - id: soc2:p4-1-use-of-personal-information-limited-to-purpose
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: P4.1
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      Personal information is used only for the purposes
+      identified in the notice and only if the data subject has
+      granted implicit or explicit consent, unless a law or
+      regulation specifically requires otherwise.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: purpose-limitation
+    # enforcement (application-layer authorisation policies keyed
+    # to declared processing purposes, downstream use-audit
+    # trails, purpose-bound access controls) is an operator-owned
+    # application-domain concern upstream of the security-
+    # operations catalogue.
+    playbook_refs:
+      - playbook.data_protection_impact_assessment@v1
+    notes: >-
+      P4.1 is the purpose-limitation anchor for the privacy
+      programme — personal information must be used only for the
+      purpose identified in the notice.
+      `playbook.data_protection_impact_assessment@v1` exercises
+      the structural surface where processing purposes are
+      declared and assessed against the personal information in
+      scope, and is the closest adjacent anchor here; the
+      application-layer enforcement of purpose limitation
+      (authorisation policies bound to declared purposes, use-
+      audit logging) remains an operator-owned artifact under
+      this criterion.
+
+  - id: soc2:p4-2-retention-of-personal-information
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: P4.2
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      Personal information is retained consistent with the
+      entity's objectives related to privacy and only as long as
+      necessary to fulfil the stated purposes.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: retention schedules,
+    # retention-clock enforcement, and scheduled-erasure jobs are
+    # operator-owned artifacts inside the operator's own privacy-
+    # programme and application-persistence surface. The
+    # SecOps-NG catalogue does not carry a first-class retention-
+    # schedule control.
+    playbook_refs: []
+    # playbook_refs intentionally empty: no dedicated retention-
+    # enforcement playbook ships in the SecOps-NG CACAO catalogue.
+    # Retention-clock enforcement lives at the application-
+    # persistence layer.
+    notes: >-
+      P4.2 is the retention-limitation anchor for the privacy
+      programme — personal information must be retained only as
+      long as necessary. The retention schedule text and the
+      scheduled-erasure jobs that enforce it remain operator-owned
+      artifacts under this criterion; the security-operations
+      disciplines adjacent to retention (asset inventory of
+      systems holding personal information, secure disposal on
+      leaver events) are anchored under P4.3 below rather than
+      duplicated here.
+
+  - id: soc2:p4-3-disposal-of-personal-information
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: P4.3
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      Personal information is securely disposed of, in accordance
+      with the entity's privacy policies and procedures, once the
+      purpose for its collection has been fulfilled or when
+      retention is no longer required.
+    status: draft
+    control_refs:
+      - control.asset_inventory_delta@v1
+      - control.jml_evidence@v1
+    playbook_refs:
+      - playbook.asset_management@v1
+      - playbook.data_subject_rights@v1
+    notes: >-
+      P4.3 is the disposal anchor for the privacy programme —
+      personal information must be securely disposed of when its
+      retention period ends. `control.asset_inventory_delta@v1`
+      anchors the asset-tracking discipline that scopes what has
+      to be disposed of and reconciles the inventory across the
+      disposal event; `control.jml_evidence@v1` carries the
+      leaver-side endpoint-return slice for personal information
+      held on user endpoints; `playbook.asset_management@v1`
+      exercises the reconciliation-and-disposal flow; and
+      `playbook.data_subject_rights@v1` carries the erasure-on-
+      request slice where disposal is driven by an Article 17
+      right-to-erasure request rather than by scheduled retention
+      expiry. The criterion parallels the SOC 2 C1.2 disposal-of-
+      confidential-information Common-Criteria-adjacent entry and
+      the ISO 27001 A.8.10 (information deletion) and A.7.14
+      (secure disposal or re-use of equipment) entries. Sanitisation
+      of decommissioned media itself (media-destruction
+      certificates, cryptographic-erase attestations, third-party
+      disposal-vendor evidence) sits outside the SecOps-NG
+      catalogue and remains an operator-owned artifact under this
+      criterion.
+
+  # ─── P5: Access ───────────────────────────────────────────────
+
+  - id: soc2:p5-1-data-subject-access-to-personal-information
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: P5.1
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity grants identified and authenticated data
+      subjects the ability to access their stored personal
+      information for review and, upon request, provides physical
+      or electronic copies of that information to data subjects to
+      meet the entity's objectives related to privacy. If access
+      is denied, data subjects are informed of the denial and
+      reason for such denial in a timely manner.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: the data-subject access
+    # discipline is anchored at the playbook layer in the
+    # SecOps-NG catalogue (see playbook_refs). No first-class
+    # control artifact carries the access-fulfilment slice
+    # separately from the playbook that operationalises it.
+    playbook_refs:
+      - playbook.data_subject_rights@v1
+    notes: >-
+      P5.1 is the data-subject-access anchor for the privacy
+      programme — data subjects must be able to obtain a copy of
+      their stored personal information, or a timely denial with
+      reason. `playbook.data_subject_rights@v1` operationalises
+      the full data-subject-rights workflow (Articles 15
+      access, 16 rectification, 17 erasure, and 18 restriction
+      under the parallel GDPR anchor) including the request-
+      intake, identity-verification, response-composition, and
+      timeliness-tracking surfaces. The parallel GDPR Articles
+      15–22 entries anchor the same playbook. The application-
+      layer data-retrieval surface itself (the machinery that
+      collates the personal information for delivery) sits inside
+      the operator's own systems and is exercised by the playbook
+      rather than duplicated as a first-class SecOps-NG artifact.
+
+  # ─── P6: Disclosure and Notification ──────────────────────────
+
+  - id: soc2:p6-1-disclosure-to-authorised-parties
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: P6.1
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity discloses personal information to third parties
+      only for the purposes for which consent has been obtained
+      and with the implicit or explicit consent of the data
+      subject to meet the entity's objectives related to privacy.
+    status: draft
+    control_refs:
+      - control.access_enforcement@v1
+      - control.least_privilege@v1
+      - control.supplier_inventory@v1
+    playbook_refs: []
+    # playbook_refs intentionally empty: no dedicated third-party
+    # disclosure playbook ships in the SecOps-NG CACAO catalogue.
+    # The consent-tracking surface for third-party disclosure is
+    # an operator-owned privacy-programme artifact upstream of
+    # the security-operations catalogue.
+    notes: >-
+      P6.1 is the authorised-disclosure anchor for the privacy
+      programme — personal information may be disclosed only to
+      parties for whom disclosure is consented or otherwise
+      lawful. `control.access_enforcement@v1` and
+      `control.least_privilege@v1` discharge the technical
+      access-control slice that ensures only authorised
+      identities (internal or third-party) can retrieve personal
+      information; `control.supplier_inventory@v1` anchors the
+      third-party inventory against which disclosure decisions
+      are recorded and reviewed. The consent-to-disclose record
+      itself (which specific third-party recipients are covered
+      by which specific consent) is an operator-owned artifact
+      under the P2.1 consent surface and is not duplicated here.
+
+  - id: soc2:p6-7-notification-of-privacy-incidents
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: P6.7
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity provides notification of breaches and incidents
+      involving personal information to affected data subjects,
+      regulators, and others to meet the entity's objectives
+      related to privacy.
+    status: draft
+    control_refs:
+      - control.incident_handling_capability@v1
+      - control.incident_timeline_signals@v1
+      - control.crisis_communication_plan@v1
+    playbook_refs:
+      - playbook.incident_management@v1
+    notes: >-
+      P6.7 is the privacy-incident notification anchor —
+      breaches involving personal information must be notified to
+      affected data subjects, regulators, and other required
+      parties on a timely basis. `control.incident_handling_capability@v1`
+      anchors the incident-response capability that recognises
+      and triages personal-data incidents;
+      `control.incident_timeline_signals@v1` carries the
+      timeline-and-clock discipline that discharges the
+      timeliness slice of notification;
+      `control.crisis_communication_plan@v1` anchors the
+      external-communication surface for notifying data subjects
+      and regulators; `playbook.incident_management@v1` runs the
+      workflow. The criterion parallels the statutory GDPR
+      Article 33 (notification to the supervisory authority) and
+      Article 34 (communication to the data subject) obligations,
+      whose entries in content/mappings/gdpr/ carry the
+      authoritative regulatory pointer for the EU statutory
+      surface; P6.7 crosswalks the same operational artifacts
+      under the SOC 2 assurance regime.
+
+  # ─── P7: Quality ──────────────────────────────────────────────
+
+  - id: soc2:p7-1-quality-of-personal-information
+    regulation:
+      name: SOC 2
+      instrument: AICPA Trust Services Criteria (2017, as revised)
+      article: P7.1
+      url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+    obligation: >-
+      The entity collects and maintains accurate, up-to-date,
+      complete, and relevant personal information to meet the
+      entity's objectives related to privacy.
+    status: draft
+    control_refs: []
+    # control_refs intentionally empty: data-quality controls for
+    # personal information (accuracy checks, staleness detection,
+    # rectification workflows keyed off data-subject requests or
+    # authoritative-source reconciliation) are operator-owned
+    # application-layer artifacts upstream of the security-
+    # operations catalogue. The SecOps-NG catalogue does not
+    # carry a first-class personal-information-quality control.
+    playbook_refs:
+      - playbook.data_subject_rights@v1
+    notes: >-
+      P7.1 is the data-quality anchor for the privacy programme —
+      personal information must be accurate, up-to-date, complete,
+      and relevant. `playbook.data_subject_rights@v1` exercises
+      the rectification slice of quality maintenance (the
+      Article 16 rectification workflow under the parallel GDPR
+      entries); the accuracy-management surface itself
+      (application-layer accuracy checks, staleness detection,
+      authoritative-source reconciliation) is an operator-owned
+      artifact upstream of the CACAO playbook layer and is not
+      anchored as a first-class SecOps-NG control. The parallel
+      SOC 2 PI1.1 processing-integrity entry carries the
+      information-quality anchor for internal controls more
+      broadly; P7.1 narrows that surface to personal information
+      specifically.
