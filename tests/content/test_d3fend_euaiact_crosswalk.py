@@ -1,11 +1,10 @@
 """Schema-shape validation for the D3FEND ↔ EU AI Act crosswalk.
 
-The D3FEND crosswalks under ``content/mappings/d3fend/`` are SKELETON-stage
-(they intentionally sit outside ``schemas/mapping.schema.json`` — see
-``_SKELETON_REGIMES`` in ``test_mappings.py``). This module is the shape
-gate for ``content/mappings/d3fend/eu_ai_act.yaml`` while the regime is
-SKELETON, and the nightly CI lane that owns G-02 for the EU AI Act
-crosswalk.
+The D3FEND crosswalks under ``content/mappings/d3fend/`` sit outside
+``schemas/mapping.schema.json`` (see ``_SKELETON_REGIMES`` in
+``test_mappings.py``). This module is the shape gate for
+``content/mappings/d3fend/eu_ai_act.yaml`` and the nightly CI lane that
+owns G-02 for the EU AI Act crosswalk.
 
 It asserts:
 
@@ -15,7 +14,7 @@ It asserts:
 * each entry's ``regulation_refs[*].entry_id`` resolves to a real entry
   ``id`` under ``content/mappings/eu_ai_act/*.yaml``;
 * each entry's ``technique.d3fend_id`` is non-empty;
-* the crosswalk carries at least the SKELETON baseline of 8 entries.
+* the crosswalk carries at least the CORE baseline of 22 entries.
 
 Pure stdlib + PyYAML. No network.
 """
@@ -32,10 +31,10 @@ CROSSWALK_PATH = REPO_ROOT / "content" / "mappings" / "d3fend" / "eu_ai_act.yaml
 CONTROLS_DIR = REPO_ROOT / "content" / "controls"
 EU_AI_ACT_MAPPINGS_DIR = REPO_ROOT / "content" / "mappings" / "eu_ai_act"
 
-# SKELETON baseline pinned at branch time (2026-07-07): 8 entries covering
-# Art. 9 / Art. 11 / Art. 13 / Art. 72. Any regression below the baseline
-# fails the assertion lane.
-SKELETON_MIN_ENTRIES = 8
+# CORE baseline pinned 2026-07-07: 22 entries covering Art. 6 / Art. 9 /
+# Art. 11 / Art. 13 / Art. 72. Any regression below the baseline fails
+# the assertion lane.
+SKELETON_MIN_ENTRIES = 22
 
 
 # ---------------------------------------------------------------------------
