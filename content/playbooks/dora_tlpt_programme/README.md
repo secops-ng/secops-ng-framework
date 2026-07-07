@@ -18,15 +18,20 @@ the four programme-lifecycle atoms the operator discharges on the
 mandatory-TLPT cadence prescribed by the competent authority against
 the operator's designated critical-or-important functions.
 
-Status: **SKELETON**. Action steps are scaffolded as CACAO v2 actions
-with `control_refs` / `telemetry_refs` stubs; the per-step primitives
-(scope-catalogue composition, TLPT trigger-and-planning gate,
-competent-authority notification adapter, red-team scoping-submission
-adapter, findings-register schema, remediation-attestation emitter,
-byte-parity examples) are placeholders that a sibling CORE card lands.
-The cookbook walkthrough (TIBER-EU red-team choreography,
-threat-intelligence-source binding, purple-team lessons-learned loop
-into `detection_engineering`) is owned by a sibling EXTEND card.
+Status: **CORE**. Action steps are scaffolded as CACAO v2 actions
+with `control_refs` / `telemetry_refs` bound; the compile-target
+parity lane is materialised as three worked examples under
+`examples/{n8n,temporal,langgraph}/dora_tlpt_programme/` with
+byte-parity goldens under
+`tests/examples/{n8n,temporal,langgraph}/dora_tlpt_programme/`. The
+per-step primitives (scope-catalogue composition, TLPT
+trigger-and-planning gate, competent-authority notification adapter,
+red-team scoping-submission adapter, findings-register schema,
+remediation-attestation emitter) remain adapter-bound placeholders
+that a sibling EXTEND card lands together with the cookbook
+walkthrough (TIBER-EU red-team choreography, threat-intelligence-
+source binding, purple-team lessons-learned loop into
+`detection_engineering`).
 
 ## Contents
 
@@ -36,18 +41,23 @@ into `detection_engineering`) is owned by a sibling EXTEND card.
   counted as finalised).
 - `mappings.yaml` — outbound cross-references to the OSCAL controls,
   MITRE D3FEND techniques, OCSF event classes, and EU regulatory
-  clauses this playbook operationalises. The SKELETON overlay pins
-  the DORA Chapter IV testing-programme atom
+  clauses this playbook operationalises. The CORE overlay pins the
+  DORA Chapter IV testing-programme atom
   (`dora:art-24-26-dort-tlpt-programme`), the OSCAL CA-2 (Control
-  Assessments) and CA-8 (Penetration Testing) anchors, and the OCSF
-  API Activity binding.
+  Assessments) anchor with CA-8 (Penetration Testing) absorbed into
+  the effectiveness-testing slice, the D3-OAM (Operational Activity
+  Mapping) technique on the remediation-tracking step, the OCSF API
+  Activity binding, and the NIS2 Art. 21(2)(f) +
+  GDPR Art. 32(1)(d) effectiveness-testing cross-references.
 
 ## Compile targets
 
 `compile_targets` declares `[n8n, temporal, langgraph]`. Emitted
-artifacts under `examples/{n8n,temporal,langgraph}/dora_tlpt_programme/`
-land in a follow-on CORE card once the per-step primitives are
-populated.
+artifacts ship at CORE under
+`examples/{n8n,temporal,langgraph}/dora_tlpt_programme/`, each with
+its own regenerate script, mirrored CACAO source, and byte-parity
+drift guards under
+`tests/examples/{n8n,temporal,langgraph}/dora_tlpt_programme/`.
 
 ## Step outline
 
@@ -89,15 +99,19 @@ populated.
 
 Inbound mapping lives at
 [`content/mappings/dora/article-24-26.yaml`](../../mappings/dora/article-24-26.yaml)
-(`dora:art-24-26-dort-tlpt-programme`). The clause is regime-specific
-to financial entities under DORA; NIS2, CRA, and GDPR axes are recorded
-as reviewed skips in the respective `_orphan_skip.yaml` files (see
-`mappings.yaml` header notes).
+(`dora:art-24-26-dort-tlpt-programme`) for the primary DORA anchor,
+with CORE-added cross-regime edges under
+[`content/mappings/nis2/article-21-2-f.yaml`](../../mappings/nis2/article-21-2-f.yaml)
+(NIS2 effectiveness-assessment adjacent anchor) and
+[`content/mappings/gdpr/article-32-security-of-processing.yaml`](../../mappings/gdpr/article-32-security-of-processing.yaml)
+(GDPR Art. 32(1)(d) regular-testing lane). CRA and EU AI Act axes
+are recorded as reviewed skips in the respective
+`_orphan_skip.yaml` files (see `mappings.yaml` header notes).
 
 ## Operator integration notes
 
-The SKELETON declares the following adapter-bound surfaces the operator
-wires; the CORE and EXTEND cards land the reference bindings under
+The CORE tier declares the following adapter-bound surfaces the operator
+wires; the sibling EXTEND card lands the reference bindings under
 `patterns.dora_tlpt_programme`:
 
 - **Business-service register** — the operator's declared register of

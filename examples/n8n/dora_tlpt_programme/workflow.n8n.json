@@ -1,0 +1,367 @@
+{
+  "name": "DORA digital operational resilience testing / TLPT programme",
+  "nodes": [
+    {
+      "id": "start--55000000-0000-4000-8000-000000000001",
+      "name": "dora_tlpt_programme_start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__testing_window__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the testing-programme window this run discharges. Names which programme cohort the run reports against (e.g. the operator's declared three-year TLPT cycle per Art. 26(1), or a mandatory ad-hoc supervisory trigger). The wall-clock instant lives on the emitted attestation artifact itself; this variable names the cohort rather than the run's wall-clock time."
+            },
+            {
+              "name": "__entity_significance_tier__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the operator's declared tier-of-significance under the JC Joint Guidelines on TLPT identification criteria (JC 2022 03). Names the criteria the operator asserts itself against for the TLPT-mandatory decision at the trigger gate. Read-only against the operator's declared tier; the primitive does not itself judge the tier."
+            },
+            {
+              "name": "__dort_scope_catalogue__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the resolved DORT-scope catalogue for the window: the ICT-supported critical or important functions the operator has designated in scope, the supporting ICT assets pinned to each function, and the ICT third-party service providers whose services are in scope for the testing programme under Art. 24 general requirements. Produced by define_dort_scope; consumed by every downstream step so scope drift between the trigger-gate submission and the red-team scoping submission is caught at the primitive boundary."
+            },
+            {
+              "name": "__tlpt_trigger_decision__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the TLPT-mandatory decision record composed at the trigger-and-planning gate: (a) whether TLPT is mandatory in this window against the JC 2022 03 criteria and the operator's __entity_significance_tier__, (b) the declared programme cadence (per Art. 26(1) the mandatory TLPT cycle is at least every three years unless the competent authority prescribes otherwise), (c) the competent-authority notification reference, and (d) the operator's declared threat-intelligence source and internal-versus-external tester selection posture. The trigger-decision record is the audit-evident artifact the competent authority reads for the mandatory-TLPT decision."
+            },
+            {
+              "name": "__red_team_scoping_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the red-team scoping submission the operator packages for competent-authority approval per Art. 26(3): scope statement bound to __dort_scope_catalogue__, tester selection (internal / external) against the certification and independence criteria the JC RTS names, threat-intelligence source, and the operator's declared engagement rules of engagement. Populated with the competent-authority approval outcome (approved / deferred / rejected) once the response is bound."
+            },
+            {
+              "name": "__findings_register_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the findings register the red-team engagement produced: per-finding (id, severity against the operator's declared severity rubric, affected function, affected ICT asset, evidence pointer, initial remediation timeline). Composed at the remediation-tracking step; consumed by the remediation-attestation emitter downstream."
+            },
+            {
+              "name": "__remediation_attestation_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the dated competent-authority remediation attestation record published to the operator's evidence store per Art. 26(8): remediation-status roll-up per finding, aggregated closure rate, remaining-open backlog against the declared severity thresholds, and the attestation timestamp. This is the audit-evident write-side artifact the competent authority reads for the remediation-tracking obligation. Always populated so the audit-evident chain is closed even on the empty-findings-register branch."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--55000000-0000-4000-8000-000000000002",
+      "name": "define DORT scope",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.testing_window",
+              "name": "in.testing_window",
+              "value": "={{$workflow.variables.testing_window}}",
+              "type": "string"
+            },
+            {
+              "id": "out.dort_scope_catalogue",
+              "name": "out.dort_scope_catalogue",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.security_assessment@v1, control.control_effectiveness_test@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "TODO (CORE): DORT-scope-definition primitive. The action body reads the operator's business-service register, ICT-asset register, and ICT third-party service-provider register to compose the DORT-scope catalogue for the current testing-programme window against DORA Art. 24 general-requirements-for-testing scope: the ICT-supported critical or important functions the operator has designated in scope, the supporting ICT assets pinned to each function, and the ICT third-party service providers whose services are in scope. Sets __dort_scope_catalogue__ to a durable identifier of the resolved scope so every downstream step reads against the same catalogue and scope drift is caught at the primitive boundary. Read-only against the operator's declared registers; the primitive does not itself designate functions as critical or important \u2014 that is the operator's governance surface upstream. SKELETON pins the topology, the ID, and the regulatory anchor refs; the deterministic per-register pull, function-to-asset-to-provider join, and coverage-review binding are owned by CORE-PRIM.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--55000000-0000-4000-8000-000000000003",
+      "name": "TLPT trigger and planning gate",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.testing_window",
+              "name": "in.testing_window",
+              "value": "={{$workflow.variables.testing_window}}",
+              "type": "string"
+            },
+            {
+              "id": "in.entity_significance_tier",
+              "name": "in.entity_significance_tier",
+              "value": "={{$workflow.variables.entity_significance_tier}}",
+              "type": "string"
+            },
+            {
+              "id": "in.dort_scope_catalogue",
+              "name": "in.dort_scope_catalogue",
+              "value": "={{$workflow.variables.dort_scope_catalogue}}",
+              "type": "string"
+            },
+            {
+              "id": "out.tlpt_trigger_decision",
+              "name": "out.tlpt_trigger_decision",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.security_assessment@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "TODO (CORE): TLPT-mandatory decision and planning-gate primitive. The action body evaluates whether threat-led penetration testing is mandatory for the operator in the current window against the criteria the JC Joint Guidelines on TLPT (JC 2022 03) name and the operator's declared __entity_significance_tier__ per DORA Art. 26(1). On the mandatory branch the primitive: (a) emits the competent-authority notification (the identifier of the notification adapter binding lives in the sibling CORE card), (b) records the declared programme cadence (per Art. 26(1) the mandatory TLPT cycle is at least every three years unless the competent authority prescribes otherwise), and (c) binds the operator's declared threat-intelligence source and internal-versus-external tester selection posture. On the not-mandatory branch the primitive still emits a dated decision record naming the criteria evaluated so the audit-evident chain is closed rather than silently short-circuiting the programme. Sets __tlpt_trigger_decision__. SKELETON pins the topology, the ID, and the regulatory anchor refs; the deterministic criteria evaluation and the competent-authority notification adapter are owned by CORE-PRIM.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--55000000-0000-4000-8000-000000000004",
+      "name": "red-team scoping approval",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.dort_scope_catalogue",
+              "name": "in.dort_scope_catalogue",
+              "value": "={{$workflow.variables.dort_scope_catalogue}}",
+              "type": "string"
+            },
+            {
+              "id": "in.tlpt_trigger_decision",
+              "name": "in.tlpt_trigger_decision",
+              "value": "={{$workflow.variables.tlpt_trigger_decision}}",
+              "type": "string"
+            },
+            {
+              "id": "out.red_team_scoping_id",
+              "name": "out.red_team_scoping_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.security_assessment@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "TODO (CORE): red-team scoping submission and approval-binding primitive. The action body packages the red-team scoping submission per DORA Art. 26(3): scope statement bound to __dort_scope_catalogue__, tester selection (internal or external) against the certification and independence criteria the JC RTS on ICT risk-management framework names (external testers must satisfy the reputation, expertise, technical-and-organisational-standards, and professional-indemnity-insurance criteria), the declared threat-intelligence source, and the operator's rules of engagement. The submission package is dispatched to the competent authority against the adapter binding declared under patterns.dora_tlpt_programme (owned by the sibling EXTEND card); the primitive records the competent-authority response (approved / deferred / rejected) into __red_team_scoping_id__ once the response is bound. On the deferred / rejected branches the primitive emits the response record and short-circuits the downstream engagement \u2014 the operator does not proceed with the red-team engagement without competent-authority approval on the scoping document. SKELETON pins the topology, the ID, and the regulatory anchor refs; the deterministic scoping-submission packaging and the approval-binding adapter are owned by CORE-PRIM and EXTEND respectively.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--55000000-0000-4000-8000-000000000005",
+      "name": "remediation tracking",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.dort_scope_catalogue",
+              "name": "in.dort_scope_catalogue",
+              "value": "={{$workflow.variables.dort_scope_catalogue}}",
+              "type": "string"
+            },
+            {
+              "id": "in.red_team_scoping_id",
+              "name": "in.red_team_scoping_id",
+              "value": "={{$workflow.variables.red_team_scoping_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.findings_register_id",
+              "name": "out.findings_register_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.remediation_attestation_id",
+              "name": "out.remediation_attestation_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.security_assessment@v1, control.control_effectiveness_test@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "TODO (CORE): findings-register composition and dated remediation-attestation emission primitive. The action body composes the findings register from the red-team engagement bound to __red_team_scoping_id__: per-finding record with id, severity against the operator's declared severity rubric, affected critical or important function, affected ICT asset, evidence pointer into the operator's evidence store, and initial remediation timeline. Sets __findings_register_id__. The primitive then composes the dated competent-authority remediation attestation per DORA Art. 26(8): remediation-status roll-up per finding, aggregated closure rate, remaining-open backlog against the declared severity thresholds, and the attestation timestamp. The attestation record is published to the operator's evidence store; the artifact_id is SHA-256(workflow_id|execution_id|captured_at) so compile_target does not enter the identifier and the three reference compilers re-derive byte-identical bytes from the same primitive output. Sets __remediation_attestation_id__. The primitive is idempotent per (workflow_id, execution_id): re-running the remediation-tracking step against the same engagement produces the same artifact_id, updating the per-finding status roll-up in place rather than emitting a duplicate attestation. SKELETON pins the topology, the ID, and the regulatory anchor refs; the deterministic findings-register schema, severity-rubric binding, and attestation-emitter wiring are owned by CORE-PRIM and land alongside the byte-parity examples.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--55000000-0000-4000-8000-000000000006",
+      "name": "dora_tlpt_programme_end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "dora_tlpt_programme_start": {
+      "main": [
+        [
+          {
+            "node": "define DORT scope",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "define DORT scope": {
+      "main": [
+        [
+          {
+            "node": "TLPT trigger and planning gate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TLPT trigger and planning gate": {
+      "main": [
+        [
+          {
+            "node": "red-team scoping approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "red-team scoping approval": {
+      "main": [
+        [
+          {
+            "node": "remediation tracking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "remediation tracking": {
+      "main": [
+        [
+          {
+            "node": "dora_tlpt_programme_end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "dora",
+    "chapter-iv",
+    "digital-operational-resilience-testing",
+    "tlpt",
+    "threat-led-penetration-testing",
+    "tiber-eu",
+    "article-24",
+    "article-26"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.dora_tlpt_programme@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f"
+    },
+    "secops_ng_notes": [
+      "step 'action--55000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--55000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--55000000-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--55000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}

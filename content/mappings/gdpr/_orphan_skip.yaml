@@ -56,22 +56,3 @@ skip:
       per-workflow GDPR data-flow document under
       `content/mappings/gdpr/data-flow-dora_ict_risk_selfassess.md`
       if a documented interaction surfaces.
-
-  - slug: dora_tlpt_programme
-    rationale: >-
-      DORA Chapter IV digital operational resilience testing (DORT)
-      programme and threat-led penetration testing (TLPT) programme
-      lifecycle. The playbook's outbound overlay
-      (`content/playbooks/dora_tlpt_programme/mappings.yaml`)
-      deliberately does not pin GDPR clause entries: personal data
-      flow through the workflow is limited to accountability-owner
-      attribution, tester-roster attribution, and attestation-
-      signatory attribution — the per-workflow ROPA entry lives at
-      `content/mappings/gdpr/data-flow-dora_tlpt_programme.md` (seven
-      canonical sections filled) rather than via a clause-level
-      inbound mapping. Red-team engagement outputs may incidentally
-      carry personal data where an in-scope critical or important
-      function processes personal data; that discharge is on the
-      producing surface (the in-scope function's own playbook and
-      its own data-flow record), not on this testing-programme
-      lifecycle.

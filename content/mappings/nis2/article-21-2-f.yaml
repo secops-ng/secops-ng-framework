@@ -22,6 +22,14 @@ entries:
       # `schemas/evidence/rule-effectiveness-snapshot.schema.json`.
       - playbook.detection_engineering@v1
       - playbook.nis2_self_assessment@v1
+      # F-WF-DORA-TLPT CORE: dora_tlpt_programme adds the threat-led-
+      # penetration-testing effectiveness lane on top of the existing
+      # detection-rule and whole-Article-21 self-assessment lanes.
+      # The competent-authority-notified TLPT programme is a
+      # specialised form of the Art. 21(2)(f) effectiveness-
+      # assessment discipline for financial entities in scope of
+      # both DORA Chapter IV and NIS2 Art. 21.
+      - playbook.dora_tlpt_programme@v1
     metric_refs:
       - kri.control_effectiveness@v1
       - kpi.control_effectiveness_coverage@v1
