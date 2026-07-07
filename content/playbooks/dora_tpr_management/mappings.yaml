@@ -1,0 +1,274 @@
+# Cross-references for the dora_tpr_management playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed/emitted, and the EU regulatory clauses this playbook
+# helps operationalise. Inbound references live in
+# content/mappings/{nis2,dora,cra,gdpr}/ so the graph is closed in both
+# directions.
+#
+# This playbook is the DORA Chapter V ICT third-party risk management
+# contract-lifecycle spine: onboarding pre-contractual risk assessment
+# (Art. 28(4)) → Article 30(2)/(3) clause-presence check → Article 28
+# register-of-information entry → periodic review with runtime supply-
+# chain-evidence drift join → Article 28(8) exit-strategy attestation.
+# Distinct from playbook.supply_chain_security@v1 (runtime supply-
+# chain-signal spine, NIS2 Art. 21(2)(d)) and from
+# playbook.contractual_obligations_tracker@v1 (per-obligation clause-
+# attestation cadence across all counterparty types); both are
+# composed against rather than absorbed by this playbook.
+#
+# Status: SKELETON. The SKELETON pins the OSCAL SR-3 (Supply Chain
+# Controls and Processes) and SR-6 (Supplier Assessments and Reviews)
+# anchors as the two anchors the whole five-step lifecycle exercises,
+# plus an OCSF API-Activity stub for the register-emission surface.
+# The DORA inbound wiring (an added playbook_refs entry on the
+# existing dora:art-28-third-party-register atom under
+# content/mappings/dora/article-19-and-28.yaml, plus a new
+# content/mappings/dora/article-30.yaml entry for the Art. 30 axis)
+# lands in the CORE-EXTEND sibling card. CORE-PRIM lands the
+# deterministic per-step primitives (pre-contractual risk-assessment
+# rubric, Art. 30 clause-presence check, register-row composition,
+# periodic-review drift detection, exit-assessment attestation
+# emission). EXTEND-layer cards wire the whole-lifecycle metric
+# emitters (kpi.dora_tpr_register_freshness,
+# kri.dora_tpr_criticality_drift, kri.dora_tpr_clause_incomplete)
+# once the metric shapes are ratified.
+#
+# Deliberate OSCAL omissions:
+#   - SR-2 (Supply Chain Risk Management Plan) is NOT pinned at the
+#     SKELETON layer: the SCRM plan itself is authored upstream of
+#     this playbook in the operator's governance documentation.
+#     This playbook operationalises the SCRM plan against ICT
+#     third-party service providers; it does not author the plan.
+#     A CORE-EXTEND card may lift SR-2 onto the periodic_review
+#     step once the drift-detection surface is bound.
+#   - SR-4 (Provenance) and SR-5 (Acquisition Strategies) are NOT
+#     pinned: the software-provenance and acquisition-strategy
+#     surfaces are runtime concerns discharged by
+#     playbook.supply_chain_security@v1 (SBOM correlation,
+#     supplier-attestation lookup). Cross-pinning them here would
+#     conflate the contract-lifecycle spine with the runtime
+#     supply-chain-signal spine.
+#
+# Deliberate DORA-axis coverage boundary:
+#   - Articles 29 (preliminary assessment of ICT concentration
+#     risk at entity level), 31-33 (critical ICT third-party
+#     service provider designation and Union oversight regime),
+#     and 34-44 (Union-level oversight of critical ICT third-
+#     party service providers) are out of scope for the operator-
+#     side lifecycle this playbook composes against. Article 29
+#     is a distinct entity-level concentration-risk-assessment
+#     surface (the operator's whole-portfolio view, not the
+#     per-provider onboarding view this playbook covers); a
+#     sibling playbook may lift it once the whole-portfolio
+#     scope is authored. Articles 31-44 govern ESA / Lead
+#     Overseer actions against critical ICT third-party service
+#     providers themselves and are not the operational object of
+#     an operator-side playbook.
+#   - Article 28(9) sub-contracting conditions of critical or
+#     important functions are carried on the contractual-provisions-
+#     check step (Article 30(2)(a) sub-contracting clause) and on
+#     the periodic-review step (sub-outsourcing chain re-scoring)
+#     rather than as a first-class lifecycle step; the sub-
+#     outsourcing surface is a per-clause and per-review axis, not
+#     a distinct workflow branch on the operator side.
+#
+# GDPR closure: no per-workflow Records of Processing Activity entry
+# is required; this playbook operates on provider handles, criticality
+# determinations, contract references, and register-row identifiers,
+# none of which are personal data. Personal-data-processing obligations
+# in ICT third-party contracts (Article 28 GDPR data-processor
+# arrangements) are the concern of the sibling GDPR-axis mapping
+# closure and are audited separately.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.dora_tpr_management@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the five steps of the
+  # DORA Chapter V contract-lifecycle spine. The SKELETON pin set
+  # anchors the playbook end-to-end against SR-3 (Supply Chain
+  # Controls and Processes) and SR-6 (Supplier Assessments and
+  # Reviews). SR-2 / SR-4 / SR-5 are held back to CORE-EXTEND per
+  # the deliberate-omissions block in the header.
+  - id: control.supplier_inventory@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SR-3
+    title: Supply Chain Controls and Processes
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SR-3
+    notes: >-
+      Anchors the playbook end-to-end as the supply-chain controls-
+      and-processes capability. SR-3 requires the organization to
+      establish a process for identifying and addressing weaknesses
+      or deficiencies in the supply chain elements and processes,
+      employ acquisition strategies, contract tools, and procurement
+      methods to protect against supply chain risks, and document
+      supply chain processes. The DORA Chapter V lifecycle composes
+      the pre-contractual risk assessment, the Article 30 clause-
+      presence check, the Article 28 register row, the periodic-
+      review cycle, and the Article 28(8) exit-strategy attestation
+      into one closed operator-side process against every ICT third-
+      party service provider. The SR-3 anchor carries onto every
+      step; the per-step primitive bodies (owned by CORE-PRIM) bind
+      the deterministic implementation for each axis.
+  - id: control.provider_attestation@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SR-6
+    title: Supplier Assessments and Reviews
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SR-6
+    notes: >-
+      Covers the onboarding-risk-assessment, contractual-provisions-
+      check, periodic-review, and exit-assessment steps: SR-6
+      demands the organization assess and review the supply chain-
+      related risks associated with suppliers or contractors and
+      the systems, system components, or system services they
+      provide, at a defined frequency. The DORA Article 28(1)(a)
+      monitoring cadence, the Article 28(4) pre-contractual risk
+      assessment, and the Article 28(8) exit-strategy discipline
+      are the DORA-specific discharge of the same SR-6 assessment-
+      and-review discipline, narrowed to the ICT third-party
+      service provider surface financial entities are obligated
+      against. Article 30(2)/(3) clause-presence checks are the
+      contract-time assessment slice on the same axis. The
+      provider_attestation control anchor already carries onto
+      the sibling playbook.supply_chain_security@v1 and
+      playbook.contractual_obligations_tracker@v1 outbound
+      overlays; here it is narrowed to the DORA Chapter V
+      contract-lifecycle spine.
+
+d3fend:
+  # No per-step D3FEND pin at the SKELETON layer. The DORA Chapter V
+  # contract-lifecycle steps are governance-side disciplines (pre-
+  # contractual risk assessment, clause-presence check, register
+  # composition, periodic review, exit-strategy attestation) rather
+  # than defensive-technique discharges against the operator's
+  # deployed estate. D3FEND v1.0.0 does not currently carry a
+  # third-party-governance technique atom that matches these steps
+  # without stretching the taxonomy; the CORE-EXTEND sibling
+  # revisits the D3FEND overlay once a supplier-assessment defensive-
+  # technique atom is authored upstream or a documented mapping
+  # onto D3-OAM (Operational Activity Mapping) is added for the
+  # periodic-review drift-detection slice.
+  []
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. The onboarding, clause-check,
+  # register-entry, periodic-review, and exit-assessment steps
+  # interact with operator API surfaces (function register, contract
+  # repository, register sink, runtime supply-chain-evidence stream,
+  # attestation store). Richer per-step bindings (e.g. OCSF
+  # Compliance Finding for the per-clause status on the
+  # contractual-provisions-check step) are deferred to CORE-layer
+  # cards once stable upstream signal shapes are selected.
+  - id: telemetry.ocsf.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: both
+    notes: >-
+      Consumed at the onboarding_risk_assessment step (reads against
+      the operator's critical-or-important-function register and the
+      declared pre-contractual risk-assessment rubric), at the
+      contractual_provisions_check step (reads against the contract
+      repository for the negotiated contract instance), and at the
+      periodic_review step (reads against the register sink for the
+      standing row plus the runtime supply-chain-evidence stream
+      emitted by playbook.supply_chain_security@v1 against the
+      provider handle). Emitted at the register_entry step (write
+      call publishing the Article 28 register-of-information row)
+      and at the exit_assessment step (write call publishing the
+      dated Article 28(8) exit-strategy attestation record to the
+      operator's evidence store).
+      Schema: https://schema.ocsf.io/1.3.0/classes/api_activity
+
+nis2:
+  # No NIS2 inbound entry currently backlinks
+  # playbook.dora_tpr_management@v1, and this is a durable, reviewed
+  # deferral rather than an open TODO. NIS2 Article 21(2)(d)
+  # (supply-chain security) is discharged by
+  # playbook.supply_chain_security@v1 as the runtime supply-chain-
+  # signal spine; the DORA Chapter V contract-lifecycle spine
+  # operates on a different obligation surface (EU financial-entity-
+  # specific ICT third-party governance under DORA Chapter V) that
+  # does not have a direct NIS2 equivalent at the same shape.
+  # Cross-pinning this DORA playbook onto NIS2 Art. 21(2)(d) would
+  # misrepresent the obligation surface. The NIS2 clause-by-clause
+  # review is recorded under the dora_tpr_management entry in
+  # content/mappings/nis2/_orphan_skip.yaml (added in the CORE-EXTEND
+  # sibling once the inbound wiring lands); the orphan-CI closure
+  # for this playbook on the NIS2 axis is audited there as a
+  # reviewed skip rather than a pending gap. Mirrors the
+  # dora_ict_risk_selfassess NIS2-axis precedent.
+  []
+
+dora:
+  # Inbound wiring under content/mappings/dora/ is deferred to the
+  # CORE-EXTEND sibling card so the SKELETON stays scoped to the
+  # single-directory deliverable-per-card convention. The two
+  # inbound entries that will land in the CORE-EXTEND sibling are:
+  #   - content/mappings/dora/article-19-and-28.yaml — add
+  #     `playbook.dora_tpr_management@v1` to the `playbook_refs:`
+  #     list on the `dora:art-28-third-party-register` atom.
+  #     The atom already carries
+  #     `playbook.contractual_obligations_tracker@v1` and
+  #     `playbook.supply_chain_security@v1`; this playbook joins
+  #     as the Chapter V contract-lifecycle spine backlink.
+  #   - content/mappings/dora/article-30.yaml (new file) — new
+  #     inbound entry `dora:art-30-contractual-clauses`
+  #     backlinking `playbook.dora_tpr_management@v1` and
+  #     `playbook.contractual_obligations_tracker@v1` for the
+  #     Article 30(2)/(3) closed clause set. Note: an atom with
+  #     id `dora:art-30-contractual-clauses` already exists inside
+  #     article-19-and-28.yaml with a narrow-scope backlink to
+  #     contractual_obligations_tracker only; the CORE-EXTEND card
+  #     resolves the collision (either lift the entry into a
+  #     dedicated article-30.yaml and expand the playbook_refs,
+  #     or extend the existing entry in place — the CORE-EXTEND
+  #     specifier decides).
+  # The SKELETON is deliberately orphan-tolerant for the G-02
+  # orphan-CI 7-day grace window while the CORE-EXTEND card is
+  # in flight; the orphan-CI lane tolerates a net-new finalized
+  # playbook without inbound citation for up to seven days from
+  # the CACAO finalization-marker mtime, so the SKELETON→CORE-EXTEND
+  # sequencing has a documented tolerance envelope.
+  []
+
+cra:
+  # No CRA inbound entry currently backlinks
+  # playbook.dora_tpr_management@v1, and this is a durable, reviewed
+  # deferral rather than an open TODO. CRA Annex I is product-by-
+  # product manufacturer scope; no operator-side ICT third-party
+  # governance clause on the CRA axis anchors against a contract-
+  # lifecycle roll-up at the same shape as DORA Chapter V. The CRA
+  # clause-by-clause review is recorded under the dora_tpr_management
+  # entry in content/mappings/cra/_orphan_skip.yaml (added in the
+  # CORE-EXTEND sibling once the inbound wiring lands); the orphan-
+  # CI closure for this playbook on the CRA axis is audited there
+  # as a reviewed skip rather than a pending gap. Mirrors the
+  # dora_ict_risk_selfassess CRA-axis precedent.
+  []
+
+gdpr:
+  # No GDPR inbound entry currently backlinks
+  # playbook.dora_tpr_management@v1, and this is a durable, reviewed
+  # deferral rather than an open TODO. GDPR anchors on personal-data-
+  # processing obligations (Chapter II lawful basis, Chapter IV
+  # security of processing / Art. 32, Article 28 data-processor
+  # arrangements). This playbook operates on provider handles,
+  # criticality determinations, contract references, and register-
+  # row identifiers, none of which are personal data. The GDPR
+  # Article 28 data-processor arrangement surface within an ICT
+  # third-party contract is a distinct axis discharged by the
+  # sibling GDPR-axis mapping closure and is audited separately;
+  # cross-pinning this DORA playbook onto GDPR Art. 28 would
+  # conflate the DORA financial-entity ICT-service-provider surface
+  # with the GDPR data-processor surface. The per-workflow GDPR
+  # data-flow closure lives under
+  # content/mappings/gdpr/data-flow-dora_tpr_management.md once
+  # authored by a sibling GDPR-axis card; until then the orphan-CI
+  # closure on the GDPR axis is audited via
+  # content/mappings/gdpr/_orphan_skip.yaml.
+  []
