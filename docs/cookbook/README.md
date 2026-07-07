@@ -44,6 +44,16 @@ Additional entries land alongside their content sources as workflows
 flip from In Progress to Shipped on
 [`ROADMAP.md`](../../ROADMAP.md).
 
+## Crosswalks
+
+Cookbook entries that walk a **regulatory / framework crosswalk**
+under `content/mappings/<axis>/` rather than a workflow under
+`content/playbooks/<workflow>/`:
+
+| Crosswalk | Cookbook walkthrough | Canonical mapping |
+|-----------|----------------------|-------------------|
+| NIST CSF 2.0 | [`nist_csf_crosswalk.md`](nist_csf_crosswalk.md) | `content/mappings/nist_csf/` |
+
 ## Structure of an entry
 
 Each entry follows the same outline so a reader can scan across
