@@ -358,7 +358,37 @@ on its `oscal_refs` block) plus `playbook.detection_engineering@v1`
 `iso27001:a-8-17-clock-synchronisation` ships `control_refs: []`
 pending a dedicated time-source artifact (the operator's NTP / PTP
 posture discharges it in practice; A.8.17 is a precondition of the
-A.8.15 / A.8.16 log-and-monitor pair). The A.8.23–A.8.27 batch also
+A.8.15 / A.8.16 log-and-monitor pair). The A.8.18–A.8.22 batch also
+lands in `annex-a-8-technological.yaml`:
+`iso27001:a-8-18-use-of-privileged-utility-programs` ships
+`control_refs: []` pending a dedicated privileged-utility /
+break-glass-tool artifact (the operator's admin-tool inventory,
+invocation-logging, and the least-privilege / privileged-access
+discipline anchored under A.8.2 discharge it in practice);
+`iso27001:a-8-19-installation-of-software-on-operational-systems`
+ships `control_refs: []` pending a dedicated software-installation
+change-control artifact (the operator's change-management process,
+signed-artefact / provenance verification, the configuration-
+baseline discipline anchored under A.8.9, and the patch-management
+discipline anchored under A.8.8 discharge it in practice);
+`iso27001:a-8-20-networks-security` ships `control_refs: []`
+pending a dedicated network-infrastructure-security artifact (the
+operator's network-architecture documentation, device-hardening
+baselines via A.8.9, management-plane access controls via A.8.2 /
+A.8.3, and the log-and-monitor pair anchored under A.8.15 / A.8.16
+discharge it in practice);
+`iso27001:a-8-21-security-of-network-services` ships
+`control_refs: []` pending a dedicated network-services-agreement
+artifact (the operator's supplier-management process, joined
+upstream against the A.5.19 supplier-management surface,
+discharges it in practice); and
+`iso27001:a-8-22-segregation-of-networks` ships `control_refs: []`
+pending a dedicated segmentation-posture artifact (the operator's
+zone architecture, policy-enforced flow rules, micro-segmentation
+posture, and the configuration-baseline discipline anchored under
+A.8.9 discharge it in practice). The A.8 network triad closes with
+this batch (A.8.20 infrastructure + A.8.21 services + A.8.22
+segregation). The A.8.23–A.8.27 batch also
 lands in `annex-a-8-technological.yaml`:
 `iso27001:a-8-23-web-filtering` ships `control_refs: []` and
 `playbook_refs: []` pending a dedicated web-filtering artifact (the
@@ -434,9 +464,7 @@ audit-testing governance artifact (the operator's audit-engagement
 posture, joined against A.8.3, A.8.15 / A.8.16 log-and-monitor,
 A.8.31 environment separation, and A.8.32 change management,
 discharges it in practice). Coverage on A.8 now stands at 34 of 34
-entries landed (pending #664 A.8.18–A.8.22 which is on a sibling
-in-flight branch); once #664 merges, the A.8 theme file will carry
-the full 34-entry surface with no gaps.
+entries landed, closing the A.8 technological-controls theme.
 
 ## OSCAL component-definition
 
@@ -458,14 +486,6 @@ the OSCAL component schema vendored under
 `tests/fixtures/oscal/oscal_component_schema-v1.1.2.json`. The CRA,
 GDPR, NIS2, DORA, and EU AI Act OSCAL component-definitions are sibling
 artifacts tracked separately.
-
-A.8.18–A.8.22 are pending against a sibling in-flight branch (PR
-#664 on the crosswalk YAMLs). At SKELETON time those entries are
-absent from `main` and therefore absent from this component definition;
-once the pending PR merges, the generator is re-run and the SKELETON
-baseline in
-`tests/content/test_oscal_iso27001_component_definition.py` is
-revised alongside the regenerated component definition.
 
 ## OSCAL EXTEND — round-trip cross-reference assertion
 
