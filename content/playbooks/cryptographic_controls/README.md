@@ -1,6 +1,8 @@
 # cryptographic_controls — NIS2 Art. 21(2)(h) lifecycle
 
-CORE tier of the F-WF-CRYPTOMGMT trilogy. This playbook is the
+EXTEND tier of the F-WF-CRYPTOMGMT trilogy (cookbook walkthrough shipped
+at [`docs/cookbook/cryptographic_controls.md`](../../../docs/cookbook/cryptographic_controls.md)).
+This playbook is the
 operator-side lifecycle materialisation of the NIS2 Art. 21(2)(h)
 cryptography-and-encryption obligation: resolve the declared
 cryptography policy, discharge the key-lifecycle branch (generate /
@@ -52,13 +54,15 @@ drift guards under
 ## Trilogy
 
 - **SKELETON:** scaffold + mappings + compile-target declaration.
-- **CORE (this card):** three-target compiled examples + byte-parity
+- **CORE:** three-target compiled examples + byte-parity
   goldens, full mappings closure (D3-SKT / D3-CM D3FEND selection,
   GDPR Art. 32(1)(a) inbound edge, NIS2 + DORA inbound edges).
-- **EXTEND:** cookbook walkthrough + adapter Protocols under
-  `patterns.cryptographic_controls` + advanced features
-  (HSM-backed key ceremonies, post-quantum rollover choreography,
-  per-Member-State CA-trust posture).
+- **EXTEND (this card):** cookbook walkthrough at
+  [`docs/cookbook/cryptographic_controls.md`](../../../docs/cookbook/cryptographic_controls.md).
+  Adapter Protocols under `patterns.cryptographic_controls` and
+  advanced features (HSM-backed key ceremonies, post-quantum
+  rollover choreography, per-Member-State CA-trust posture) land
+  on a sibling EXTEND card.
 
 ## Prerequisites
 
