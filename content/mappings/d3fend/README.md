@@ -44,6 +44,15 @@ the M0 milestone: OSCAL is covered by the per-regulation
   left open (A.5.7 / A.5.8 / A.5.12 / A.5.37, the four A.7 entries
   with empty `control_refs`, A.6.7, and A.8.18–A.8.22 pending PR
   #664).
+- `soc2.yaml` — D3FEND techniques anchored to SOC 2 Trust Services
+  Criteria entries (AICPA 2017, as revised). SKELETON coverage across
+  the Security Common Criteria cluster (CC6.1, CC6.6, CC6.8, CC7.1,
+  CC7.2, CC9.2), Availability (A1.1), and Processing Integrity
+  (PI1.1) — 14 entries total, sourced from the `d3fend_refs` blocks
+  of the cited controls. SOC 2 is a private-sector assurance
+  framework, not an EU statutory instrument; the crosswalk is a
+  structural pointer against operator-owned report-time evidence, not
+  a legal or auditor interpretation of the TSC.
 
 ## Entry schema (interim, not validated)
 
