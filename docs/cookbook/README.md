@@ -27,6 +27,7 @@ narrative.
 | `contractual_obligations_tracker` | [`contractual_obligations_tracker.md`](contractual_obligations_tracker.md) | `content/playbooks/contractual_obligations_tracker/` |
 | `detection_engineering` | [`detection_engineering.md`](detection_engineering.md) | `content/playbooks/detection_engineering/`            |
 | `backup_recovery`     | [`backup_recovery.md`](backup_recovery.md)         | `content/playbooks/backup_recovery/`                  |
+| `business_continuity` | [`business_continuity.md`](business_continuity.md) | `content/playbooks/business_continuity/`              |
 | `cyber_hygiene_training` | [`cyber_hygiene_training.md`](cyber_hygiene_training.md) | `content/playbooks/cyber_hygiene_training/`     |
 | `cra_srp_notify`      | [`cra_srp_notify.md`](cra_srp_notify.md)           | `content/playbooks/cra_srp_notify/`                   |
 | `cra_cvd`             | [`cra_cvd.md`](cra_cvd.md)                         | `content/playbooks/cra_cvd/`                          |
