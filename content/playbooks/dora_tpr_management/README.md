@@ -50,9 +50,10 @@ sibling playbooks without absorbing their scope:
   contractual_provisions_check → register_entry → periodic_review →
   exit_assessment → workflow_end`) plus the per-step
   `x_secops_ng.control_refs` joins into the SecOps-NG content model.
-  `regulatory_anchors` declares `dora:art-28` and `dora:art-30`;
-  `evidence_streams` declares the `vendor_assessment` stream stub the
-  CORE-PRIM primitive body wires.
+  Regulatory anchoring (`dora:art-28`, `dora:art-30`) and the
+  `vendor_assessment` evidence stream stub live in the outbound
+  `mappings.yaml` overlay (below); the CORE-PRIM primitive body wires
+  the same stream.
 - `mappings.yaml` — outbound playbook-mappings overlay. Ships with the
   OSCAL `SR-3` (Supply Chain Controls and Processes) and `SR-6`
   (Supplier Assessments and Reviews) anchors, an OCSF API-Activity
