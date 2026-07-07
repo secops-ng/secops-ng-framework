@@ -35,6 +35,11 @@ the M0 milestone: OSCAL is covered by the per-regulation
 - `gdpr.yaml` — D3FEND techniques anchored to GDPR Art. 25 / Art. 32 /
   Art. 33 / Art. 34 / Art. 35 entries (SKELETON coverage of the
   security-of-processing and protection-by-design / DPIA clusters).
+- `iso27001.yaml` — D3FEND techniques anchored to ISO/IEC 27001:2022
+  Annex A control entries. SKELETON coverage of A.5.15 and a cluster
+  of the A.8 technological theme (A.8.1, A.8.5, A.8.8, A.8.13, A.8.16,
+  A.8.24) — 11 entries, sourced from the `d3fend_refs` blocks of the
+  cited controls.
 
 ## Entry schema (interim, not validated)
 

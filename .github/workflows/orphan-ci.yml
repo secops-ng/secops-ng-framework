@@ -95,6 +95,7 @@ on:
       - "tests/content/test_d3fend_dora_crosswalk.py"
       - "tests/content/test_d3fend_cra_crosswalk.py"
       - "tests/content/test_d3fend_euaiact_crosswalk.py"
+      - "tests/content/test_d3fend_iso27001_crosswalk.py"
       - ".github/workflows/orphan-ci.yml"
   push:
     branches: [main]
@@ -1486,6 +1487,72 @@ jobs:
           path: content/mappings/d3fend/eu_ai_act.yaml
           if-no-files-found: warn
           retention-days: 30
+
+  d3fend-iso27001-crosswalk:
+    # G-06 contributor-adoption — D3FEND ↔ ISO/IEC 27001:2022 crosswalk
+    # assertion lane. Sibling of d3fend-euaiact-crosswalk; shape-checks
+    # `content/mappings/d3fend/iso27001.yaml` (SKELETON crosswalk) on
+    # every PR touching the d3fend tree and every night. Two invariants:
+    #   * schema-shape tests in
+    #     `tests/content/test_d3fend_iso27001_crosswalk.py` pass — every
+    #     `control_refs[*]` resolves to a real `content/controls/*.yaml`
+    #     stable_id, and every `regulation_refs[*].entry_id` resolves to
+    #     a real entry under `content/mappings/iso27001/annex-a-*.yaml`;
+    #   * the crosswalk ships at least 8 entries — the SKELETON baseline
+    #     established by F-MAP-D3FEND-ISO27001. Any regression below the
+    #     baseline hard-fails the job.
+    name: G-06 D3FEND↔ISO 27001 crosswalk assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML, pytest)
+        run: pip install --no-cache-dir pyyaml pytest
+
+      - name: Run D3FEND↔ISO 27001 crosswalk schema-shape tests
+        run: |
+          python -m pytest tests/content/test_d3fend_iso27001_crosswalk.py -q
+
+      - name: Assert D3FEND↔ISO 27001 crosswalk entry count ≥ 8 (SKELETON baseline)
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+
+          import yaml
+
+          path = Path("content/mappings/d3fend/iso27001.yaml")
+          if not path.is_file():
+              sys.exit(f"FAIL: {path} is missing")
+
+          doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+          entries = doc.get("entries") or []
+          baseline = 8
+          if len(entries) < baseline:
+              sys.exit(
+                  f"FAIL: D3FEND↔ISO 27001 crosswalk entry count {len(entries)} "
+                  f"regressed below SKELETON baseline {baseline}"
+              )
+          print(f"OK: D3FEND↔ISO 27001 crosswalk entries = {len(entries)} (≥ {baseline})")
+          PY
+
+      - name: Upload D3FEND↔ISO 27001 crosswalk artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g-06-d3fend-iso27001-crosswalk
+          path: content/mappings/d3fend/iso27001.yaml
+          if-no-files-found: warn
+          retention-days: 30
+
 
   iso27001-oscal-extend:
     # G-06 contributor-adoption — ISO 27001 OSCAL component-definition

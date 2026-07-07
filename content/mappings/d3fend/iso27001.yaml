@@ -1,0 +1,273 @@
+# D3FEND techniques anchored to ISO/IEC 27001:2022 Annex A controls.
+#
+# SKELETON — representative D3FEND defensive-technique crosswalk against
+# a cross-section of the Annex A control set. Coverage spans the
+# organisational access-control anchor (A.5.15) and a cluster of the
+# technological theme (A.8.1 user endpoint devices, A.8.5 secure
+# authentication, A.8.8 management of technical vulnerabilities,
+# A.8.13 information backup, A.8.16 monitoring activities, A.8.24 use
+# of cryptography).
+#
+# One entry per (ISO 27001 Annex A control entry, D3FEND technique)
+# pair. Each entry round-trips through `regulation_refs.entry_id` to a
+# real entry under content/mappings/iso27001/annex-a-*.yaml, and each
+# `control_refs[*]` to a real `stable_id` under content/controls/.
+# Technique anchors are sourced verbatim from the `d3fend_refs` blocks
+# of the cited controls — no invented ids.
+#
+# Entries are grouped by Annex A control id (A.5 before A.8, ascending
+# within each theme), then ordered by D3FEND technique slug.
+#
+# Sibling coverage in this tree:
+#   * nis2.yaml       — NIS2 Art. 21(2) / Art. 23 (CORE)
+#   * dora.yaml       — DORA Art. 5–14, Art. 18–19, Art. 28–30 (CORE)
+#   * cra.yaml        — CRA Annex I §1 / §2 / Art. 13 / Art. 14 (CORE)
+#   * gdpr.yaml       — GDPR Art. 25 / 32 / 33 / 34 / 35 (CORE)
+#   * eu_ai_act.yaml  — EU AI Act Art. 6 / 9 / 11 / 13 / 72 (CORE)
+#
+# CORE-depth expansion (broader Annex A coverage, playbook_refs,
+# OCSF field bindings) is out of scope for this tier — a sibling CORE
+# card broadens the crosswalk once this SKELETON lands.
+regime: d3fend
+entries:
+  # -------------------------------------------------------------------
+  # A.5 Organisational controls
+  # -------------------------------------------------------------------
+
+  - id: d3fend:iso27001:a-5-15-access-control:access-mediation
+    technique:
+      d3fend_id: d3f:AccessMediation
+      technique_name: Access Mediation
+      url: https://d3fend.mitre.org/technique/d3f:AccessMediation/
+    control_refs:
+      - control.access_enforcement@v1
+    regulation_refs:
+      - regime: iso27001
+        instrument: ISO/IEC 27001:2022 Annex A
+        article: A.5.15
+        entry_id: iso27001:a-5-15-access-control
+    status: draft
+    notes: >-
+      A.5.15 requires the operator to establish and enforce rules that
+      control logical and physical access to information and associated
+      assets. `AccessMediation` is the D3FEND anchor named by
+      `control.access_enforcement@v1`, which carries the operator's
+      evidence that the access-control rules are enforced at request
+      time by the authorisation plane.
+
+  - id: d3fend:iso27001:a-5-15-access-control:local-file-permissions
+    technique:
+      d3fend_id: d3f:LocalFilePermissions
+      technique_name: Local File Permissions
+      url: https://d3fend.mitre.org/technique/d3f:LocalFilePermissions/
+    control_refs:
+      - control.least_privilege@v1
+    regulation_refs:
+      - regime: iso27001
+        instrument: ISO/IEC 27001:2022 Annex A
+        article: A.5.15
+        entry_id: iso27001:a-5-15-access-control
+    status: draft
+    notes: >-
+      A.5.15's access-control umbrella covers the least-privilege
+      obligation on assignments. `LocalFilePermissions` is the D3FEND
+      anchor on `control.least_privilege@v1`, tracking the object-level
+      permission posture that discharges the "minimum necessary access"
+      side of the A.5.15 obligation.
+
+  # -------------------------------------------------------------------
+  # A.8 Technological controls
+  # -------------------------------------------------------------------
+
+  - id: d3fend:iso27001:a-8-1-user-endpoint-devices:asset-inventory
+    technique:
+      d3fend_id: d3f:AssetInventory
+      technique_name: Asset Inventory
+      url: https://d3fend.mitre.org/technique/d3f:AssetInventory/
+    control_refs:
+      - control.asset_inventory_delta@v1
+    regulation_refs:
+      - regime: iso27001
+        instrument: ISO/IEC 27001:2022 Annex A
+        article: A.8.1
+        entry_id: iso27001:a-8-1-user-endpoint-devices
+    status: draft
+    notes: >-
+      A.8.1 requires user endpoint devices (laptops, mobiles, tablets,
+      remote-access clients) to be governed by a topic-specific policy
+      backed by configuration and protection measures. `AssetInventory`
+      is the D3FEND anchor on `control.asset_inventory_delta@v1`, which
+      tracks the endpoint fleet whose posture the A.8.1 obligation is
+      discharged against. The ISO entry itself ships with empty
+      `control_refs` pending a dedicated endpoint-posture control (see
+      the file-level note in annex-a-8-technological.yaml); the D3FEND
+      crosswalk names the closest existing anchor.
+
+  - id: d3fend:iso27001:a-8-5-secure-authentication:certificate-based-authentication
+    technique:
+      d3fend_id: d3f:Certificate-basedAuthentication
+      technique_name: Certificate-based Authentication
+      url: https://d3fend.mitre.org/technique/d3f:Certificate-basedAuthentication/
+    control_refs:
+      - control.service_identification_authentication@v1
+    regulation_refs:
+      - regime: iso27001
+        instrument: ISO/IEC 27001:2022 Annex A
+        article: A.8.5
+        entry_id: iso27001:a-8-5-secure-authentication
+    status: draft
+    notes: >-
+      A.8.5 requires strong authentication techniques proportionate to
+      the classification of the information and the risk of the access
+      channel — reaching non-human identities (services, workloads)
+      alongside users. `Certificate-basedAuthentication` is the D3FEND
+      anchor on `control.service_identification_authentication@v1`,
+      covering the service/workload-identity side of the obligation.
+
+  - id: d3fend:iso27001:a-8-5-secure-authentication:multi-factor-authentication
+    technique:
+      d3fend_id: d3f:Multi-factorAuthentication
+      technique_name: Multi-factor Authentication
+      url: https://d3fend.mitre.org/technique/d3f:Multi-factorAuthentication/
+    control_refs:
+      - control.mfa_state_probe@v1
+    regulation_refs:
+      - regime: iso27001
+        instrument: ISO/IEC 27001:2022 Annex A
+        article: A.8.5
+        entry_id: iso27001:a-8-5-secure-authentication
+    status: draft
+    notes: >-
+      A.8.5's requirement for strong authentication techniques is
+      anchored by MFA on the user-identity plane.
+      `Multi-factorAuthentication` is the D3FEND technique on
+      `control.mfa_state_probe@v1`, whose posture probe carries the
+      evidence that MFA is enrolled and active across the in-scope
+      identity fleet.
+
+  - id: d3fend:iso27001:a-8-8-management-of-technical-vulnerabilities:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.vuln_disclosure_intake@v1
+    regulation_refs:
+      - regime: iso27001
+        instrument: ISO/IEC 27001:2022 Annex A
+        article: A.8.8
+        entry_id: iso27001:a-8-8-management-of-technical-vulnerabilities
+    status: draft
+    notes: >-
+      A.8.8 covers not only patch discipline but also the intake side
+      of the vulnerability lifecycle — a coordinated channel for
+      external reports feeding triage. `IncidentResponseAnalysis` is
+      the D3FEND anchor on `control.vuln_disclosure_intake@v1`, which
+      models the analysis pipeline that receives disclosed
+      vulnerabilities and routes them into remediation.
+
+  - id: d3fend:iso27001:a-8-8-management-of-technical-vulnerabilities:software-update
+    technique:
+      d3fend_id: d3f:SoftwareUpdate
+      technique_name: Software Update
+      url: https://d3fend.mitre.org/technique/d3f:SoftwareUpdate/
+    control_refs:
+      - control.patch_evidence@v1
+    regulation_refs:
+      - regime: iso27001
+        instrument: ISO/IEC 27001:2022 Annex A
+        article: A.8.8
+        entry_id: iso27001:a-8-8-management-of-technical-vulnerabilities
+    status: draft
+    notes: >-
+      A.8.8 mandates timely management of technical vulnerabilities,
+      including receipt of information, evaluation of exposure, and
+      appropriate remediation. `SoftwareUpdate` is the D3FEND anchor on
+      `control.patch_evidence@v1`, which carries the dated evidence
+      that security updates are produced and disseminated for the
+      declared support window.
+
+  - id: d3fend:iso27001:a-8-13-information-backup:system-recovery-analysis
+    technique:
+      d3fend_id: d3f:SystemRecoveryAnalysis
+      technique_name: System Recovery Analysis
+      url: https://d3fend.mitre.org/technique/d3f:SystemRecoveryAnalysis/
+    control_refs:
+      - control.restore_drill@v1
+    regulation_refs:
+      - regime: iso27001
+        instrument: ISO/IEC 27001:2022 Annex A
+        article: A.8.13
+        entry_id: iso27001:a-8-13-information-backup
+    status: draft
+    notes: >-
+      A.8.13 requires backups of information, software, and systems
+      taken and tested regularly in accordance with an agreed
+      topic-specific policy. `SystemRecoveryAnalysis` is the D3FEND
+      anchor on `control.restore_drill@v1`, whose evidence of tested
+      restores discharges the "backup that actually restores" arm of
+      the A.8.13 obligation.
+
+  - id: d3fend:iso27001:a-8-16-monitoring-activities:network-traffic-analysis
+    technique:
+      d3fend_id: d3f:NetworkTrafficAnalysis
+      technique_name: Network Traffic Analysis
+      url: https://d3fend.mitre.org/technique/d3f:NetworkTrafficAnalysis/
+    control_refs:
+      - control.detection_coverage_evidence@v1
+    regulation_refs:
+      - regime: iso27001
+        instrument: ISO/IEC 27001:2022 Annex A
+        article: A.8.16
+        entry_id: iso27001:a-8-16-monitoring-activities
+    status: draft
+    notes: >-
+      A.8.16 requires networks, systems, and applications to be
+      monitored for anomalous behaviour and appropriate actions taken
+      to evaluate potential information-security incidents.
+      `NetworkTrafficAnalysis` is the D3FEND anchor on
+      `control.detection_coverage_evidence@v1`, covering the
+      network-plane side of the monitoring obligation.
+
+  - id: d3fend:iso27001:a-8-16-monitoring-activities:user-behavior-analysis
+    technique:
+      d3fend_id: d3f:UserBehaviorAnalysis
+      technique_name: User Behavior Analysis
+      url: https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/
+    control_refs:
+      - control.detection_coverage_evidence@v1
+    regulation_refs:
+      - regime: iso27001
+        instrument: ISO/IEC 27001:2022 Annex A
+        article: A.8.16
+        entry_id: iso27001:a-8-16-monitoring-activities
+    status: draft
+    notes: >-
+      A.8.16's monitoring obligation reaches identity-plane
+      anomalies alongside network-plane ones. `UserBehaviorAnalysis`
+      is the second D3FEND anchor on
+      `control.detection_coverage_evidence@v1`, covering the
+      user/identity side of the monitoring obligation.
+
+  - id: d3fend:iso27001:a-8-24-use-of-cryptography:key-management
+    technique:
+      d3fend_id: d3f:KeyManagement
+      technique_name: Key Management
+      url: https://d3fend.mitre.org/technique/d3f:KeyManagement/
+    control_refs:
+      - control.crypto_policy_inventory@v1
+      - control.key_rotation_evidence@v1
+    regulation_refs:
+      - regime: iso27001
+        instrument: ISO/IEC 27001:2022 Annex A
+        article: A.8.24
+        entry_id: iso27001:a-8-24-use-of-cryptography
+    status: draft
+    notes: >-
+      A.8.24 requires rules for the effective use of cryptography,
+      including cryptographic key management. `KeyManagement` is the
+      D3FEND anchor on both `control.crypto_policy_inventory@v1`
+      (policy inventory of algorithms and key uses) and
+      `control.key_rotation_evidence@v1` (dated evidence of rotation
+      cadence), which together discharge the key-lifecycle arm of
+      A.8.24.
