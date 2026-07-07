@@ -1,0 +1,1613 @@
+{
+  "$schema": "http://csrc.nist.gov/ns/oscal/1.1.2/oscal-component-definition-schema.json",
+  "component-definition": {
+    "uuid": "df856da0-9f6c-5425-be3c-551b5dbbbcad",
+    "metadata": {
+      "title": "SecOps-NG — ISO/IEC 27001:2022 Annex A Component Definition",
+      "last-modified": "2026-07-07T00:00:00Z",
+      "version": "0.1.0",
+      "oscal-version": "1.1.2"
+    },
+    "components": [
+      {
+        "uuid": "6defa801-9d46-5081-b5a1-7731547f108a",
+        "type": "process-procedure",
+        "title": "SecOps-NG",
+        "description": "SecOps-NG is a community-driven Digital Commons of portable security operations content (CACAO playbooks, OSCAL/D3FEND control mappings, OCSF data shapes, KPI/KRI catalog) plus reference compilers to n8n, Temporal, and LangGraph. This component definition exposes how the SecOps-NG content set addresses ISO/IEC 27001:2022 Annex A controls covered by the shipped per-theme mapping YAMLs under content/mappings/iso27001/ — A.5 organisational (37 controls), A.6 people (8 controls), A.7 physical (14 controls), and A.8 technological (34 controls). ISO/IEC 27001:2022 is a certifiable information-security management standard, not an EU statutory instrument; the crosswalk is a structural pointer against the operator's own conformance evidence — the assertion is that the named artifacts exercise the operator-side obligation, not that they constitute a legal interpretation of the standard.",
+        "control-implementations": [
+          {
+            "uuid": "08b0c9d1-4ae4-5009-9b7f-007b9d6a4249",
+            "source": "https://www.iso.org/standard/27001",
+            "description": "Coverage of ISO/IEC 27001:2022 Annex A controls as mapped in the per-theme YAMLs under content/mappings/iso27001/annex-a-*.yaml. One implemented-requirement per (entry, control_ref) pair. Entries whose control_refs list is empty are principle-level or discharged indirectly through companion artifacts and are not reflected in the OSCAL surface — see content/mappings/iso27001/README.md for the per-control prose. A.8.18–A.8.22 are pending against a sibling pull request on the crosswalk YAMLs and are absent from this SKELETON emission; the sibling CORE card will re-emit once those entries land on main.",
+            "implemented-requirements": [
+              {
+                "uuid": "8eee2eb9-a609-56c4-b1a1-698f2170426c",
+                "control-id": "control.risk_management_policy-v1",
+                "description": "Define an information security policy and topic-specific policies. The policy set must be approved by management, published, communicated to and acknowledged by relevant personnel and interested parties, and reviewed at planned intervals or when significant changes occur.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.risk_management_policy@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-1-policies"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.1"
+                  }
+                ]
+              },
+              {
+                "uuid": "e1c63b17-879c-579d-9012-14374042f31a",
+                "control-id": "control.ict_risk_governance-v1",
+                "description": "Define and allocate information-security roles and responsibilities in accordance with the organisation's information-security needs. Allocations must be documented, accepted by role-holders, and reviewed as the organisation and its risk profile change.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.ict_risk_governance@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-2-roles-and-responsibilities"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.2"
+                  }
+                ]
+              },
+              {
+                "uuid": "32ee7ae8-f468-5f28-b030-837043e10edf",
+                "control-id": "control.risk_management_policy-v1",
+                "description": "Management must require all personnel to apply information security in accordance with the established information-security policy, topic-specific policies, and procedures of the organisation. The requirement must be communicated as a condition of employment and reinforced through the awareness-and-training programme.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.risk_management_policy@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-4-management-responsibilities"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.4"
+                  }
+                ]
+              },
+              {
+                "uuid": "f0e9602b-dbf2-591c-8739-2bfd0a4e9d51",
+                "control-id": "control.training_attestation-v1",
+                "description": "Management must require all personnel to apply information security in accordance with the established information-security policy, topic-specific policies, and procedures of the organisation. The requirement must be communicated as a condition of employment and reinforced through the awareness-and-training programme.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.training_attestation@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-4-management-responsibilities"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.4"
+                  }
+                ]
+              },
+              {
+                "uuid": "445ab971-3b42-5227-984f-fb93bfde7a50",
+                "control-id": "control.crisis_communication_plan-v1",
+                "description": "Establish and maintain appropriate contacts with relevant authorities — including law-enforcement, sector supervisors, data-protection regulators, and CSIRTs — so that security-incident notifications, regulatory reporting, and support requests can be actioned within the applicable timeframes.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.crisis_communication_plan@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-5-contact-with-authorities"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.5"
+                  }
+                ]
+              },
+              {
+                "uuid": "701527d8-bb49-5822-8299-cff5aef6a68e",
+                "control-id": "control.crisis_communication_plan-v1",
+                "description": "Maintain appropriate contacts with special interest groups, specialist security forums, and professional associations to stay current on threat intelligence, best practice, and information about vulnerabilities relevant to the operator's environment.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.crisis_communication_plan@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-6-contact-with-special-interest-groups"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.6"
+                  }
+                ]
+              },
+              {
+                "uuid": "37eb5874-20f6-5adb-be3a-e521abd2cc57",
+                "control-id": "control.asset_inventory_delta-v1",
+                "description": "Identify information and other associated assets and develop an inventory of them, including ownership assignments, so that protection responsibilities can be allocated and asset lifecycle events (acquisition, change, disposal) are tracked.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.asset_inventory_delta@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-9-inventory-of-assets"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.9"
+                  }
+                ]
+              },
+              {
+                "uuid": "6bc402cf-262f-5917-95ee-24eda1a13e6f",
+                "control-id": "control.risk_management_policy-v1",
+                "description": "Identify, document, and implement rules for the acceptable use and handling of information and other associated assets. The rules must be communicated to personnel and other interested parties who use the assets, and reviewed as the asset landscape and risk profile change.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.risk_management_policy@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-10-acceptable-use-of-assets"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.10"
+                  }
+                ]
+              },
+              {
+                "uuid": "d00186ba-e442-5841-9fbe-edbb000f0013",
+                "control-id": "control.jml_evidence-v1",
+                "description": "Ensure that personnel and other interested parties return all information and other associated assets in their possession upon termination of employment, contract, or role change. The obligation includes physical assets, digital credentials, and access to information holdings.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.jml_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-11-return-of-assets"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.11"
+                  }
+                ]
+              },
+              {
+                "uuid": "91666748-e2e4-5355-a70a-3424cd5a090e",
+                "control-id": "control.risk_management_policy-v1",
+                "description": "Establish rules, procedures, and controls for the transfer of information within the organisation and with external parties, across electronic, physical, and verbal channels. Transfer controls must address the confidentiality and integrity of the information in transit and be aligned with the classification of the information being transferred.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.risk_management_policy@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-14-information-transfer"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.14"
+                  }
+                ]
+              },
+              {
+                "uuid": "51c85ee1-af2a-50ef-bd16-2a310ccbb553",
+                "control-id": "control.access_enforcement-v1",
+                "description": "Establish and implement rules to control physical and logical access to information and other associated assets, based on the business and information-security requirements of the organisation. The access-control rules must be topic-specific, documented, and reviewed as the business and threat landscape change.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.access_enforcement@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-15-access-control"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.15"
+                  }
+                ]
+              },
+              {
+                "uuid": "d89975b3-6837-52dc-a71a-2b9e511e3451",
+                "control-id": "control.least_privilege-v1",
+                "description": "Establish and implement rules to control physical and logical access to information and other associated assets, based on the business and information-security requirements of the organisation. The access-control rules must be topic-specific, documented, and reviewed as the business and threat landscape change.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.least_privilege@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-15-access-control"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.15"
+                  }
+                ]
+              },
+              {
+                "uuid": "ca3096de-202b-5921-84f3-c7b955774120",
+                "control-id": "control.jml_evidence-v1",
+                "description": "Manage the full lifecycle of identities so that only authorised principals hold accounts, entitlements track the current role of the principal, and dormant or terminated identities are removed. The lifecycle covers human, service, and non-person identities and their joiner, mover, and leaver transitions.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.jml_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-16-identity-management"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.16"
+                  }
+                ]
+              },
+              {
+                "uuid": "af870dab-0558-5ec6-8241-dd3a7862130b",
+                "control-id": "control.account_management-v1",
+                "description": "Manage the full lifecycle of identities so that only authorised principals hold accounts, entitlements track the current role of the principal, and dormant or terminated identities are removed. The lifecycle covers human, service, and non-person identities and their joiner, mover, and leaver transitions.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.account_management@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-16-identity-management"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.16"
+                  }
+                ]
+              },
+              {
+                "uuid": "f9c2b5d0-5c57-5794-b473-a5ec067d62d2",
+                "control-id": "control.cloud_identity_least_privilege-v1",
+                "description": "Provision, review, modify, and remove access rights to information and other associated assets in accordance with the organisation's topic-specific policy on and rules for access control. Access rights must track the current role of the principal and be removed when no longer required.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cloud_identity_least_privilege@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-18-access-rights"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.18"
+                  }
+                ]
+              },
+              {
+                "uuid": "73919ddd-4b49-5dca-9240-e58badc36abd",
+                "control-id": "control.privileged_access_review-v1",
+                "description": "Provision, review, modify, and remove access rights to information and other associated assets in accordance with the organisation's topic-specific policy on and rules for access control. Access rights must track the current role of the principal and be removed when no longer required.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.privileged_access_review@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-18-access-rights"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.18"
+                  }
+                ]
+              },
+              {
+                "uuid": "693277fc-7a89-57f7-bdf1-e53af38d9747",
+                "control-id": "control.supplier_inventory-v1",
+                "description": "Define and implement processes and procedures to manage the information-security risks associated with the use of suppliers' products and services, covering the full supplier lifecycle from selection through onboarding, ongoing operation, and exit.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.supplier_inventory@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-19-information-security-in-supplier-relationships"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.19"
+                  }
+                ]
+              },
+              {
+                "uuid": "f358122c-bff0-5e89-a239-ab64e47771bf",
+                "control-id": "control.provider_attestation-v1",
+                "description": "Define and implement processes and procedures to manage the information-security risks associated with the use of suppliers' products and services, covering the full supplier lifecycle from selection through onboarding, ongoing operation, and exit.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.provider_attestation@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-19-information-security-in-supplier-relationships"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.19"
+                  }
+                ]
+              },
+              {
+                "uuid": "4015bb75-ca41-5e08-8298-2d3229fe9d96",
+                "control-id": "control.sbom_capture-v1",
+                "description": "Define and implement processes and procedures to manage the information-security risks associated with the ICT products and services supply chain, including sub-supplier risk and the components and dependencies delivered as part of ICT products.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.sbom_capture@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-21-managing-information-security-in-the-ict-supply-chain"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.21"
+                  }
+                ]
+              },
+              {
+                "uuid": "eceab730-2f52-588a-9c33-f4589971df27",
+                "control-id": "control.provider_attestation-v1",
+                "description": "Regularly monitor, review, evaluate, and manage changes to the information-security practices and service delivery of suppliers so that the contracted security posture continues to hold as the relationship evolves.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.provider_attestation@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-22-monitoring-review-and-change-management-of-supplier-services"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.22"
+                  }
+                ]
+              },
+              {
+                "uuid": "c461a136-137a-5f9e-bcfd-2959d0890b41",
+                "control-id": "control.cspm_baseline-v1",
+                "description": "Establish processes for the acquisition, use, management, and exit from cloud services in accordance with the organisation's information-security requirements, so the shared-responsibility surface between operator and cloud provider is understood, contracted, and continuously verified.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cspm_baseline@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-23-information-security-for-use-of-cloud-services"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.23"
+                  }
+                ]
+              },
+              {
+                "uuid": "aae28f84-ab19-5cf5-9059-f67bfaf48b95",
+                "control-id": "control.cloud_identity_least_privilege-v1",
+                "description": "Establish processes for the acquisition, use, management, and exit from cloud services in accordance with the organisation's information-security requirements, so the shared-responsibility surface between operator and cloud provider is understood, contracted, and continuously verified.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cloud_identity_least_privilege@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-23-information-security-for-use-of-cloud-services"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.23"
+                  }
+                ]
+              },
+              {
+                "uuid": "2c658566-1c74-5e8f-a73e-eb5d9cf51505",
+                "control-id": "control.incident_handling_capability-v1",
+                "description": "Plan and prepare for managing information-security incidents by defining, establishing, and communicating the incident- management process, roles, and responsibilities so the organisation can respond in a consistent and effective manner when incidents occur.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_handling_capability@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-24-information-security-incident-management-planning-and-preparation"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.24"
+                  }
+                ]
+              },
+              {
+                "uuid": "cf64828d-45f2-5cab-a647-b4bf7d62f625",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Plan and prepare for managing information-security incidents by defining, establishing, and communicating the incident- management process, roles, and responsibilities so the organisation can respond in a consistent and effective manner when incidents occur.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-24-information-security-incident-management-planning-and-preparation"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.24"
+                  }
+                ]
+              },
+              {
+                "uuid": "44ba0110-5ffe-5086-b848-eab49413b75f",
+                "control-id": "control.oob_channel_probe-v1",
+                "description": "Plan and prepare for managing information-security incidents by defining, establishing, and communicating the incident- management process, roles, and responsibilities so the organisation can respond in a consistent and effective manner when incidents occur.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.oob_channel_probe@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-24-information-security-incident-management-planning-and-preparation"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.24"
+                  }
+                ]
+              },
+              {
+                "uuid": "3d38694e-1fd4-50df-bf7b-1d336c4b21b3",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Assess information-security events and decide whether they are to be classified as information-security incidents so that downstream response, notification, and learning obligations attach to the right subset of the event stream.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-25-assessment-and-decision-on-information-security-events"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.25"
+                  }
+                ]
+              },
+              {
+                "uuid": "32ab794a-5805-57df-951e-d5632e3bce2a",
+                "control-id": "control.dora_major_classifier-v1",
+                "description": "Assess information-security events and decide whether they are to be classified as information-security incidents so that downstream response, notification, and learning obligations attach to the right subset of the event stream.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.dora_major_classifier@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-25-assessment-and-decision-on-information-security-events"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.25"
+                  }
+                ]
+              },
+              {
+                "uuid": "86810858-dbd2-5e83-9cf1-111bbe7d7f0d",
+                "control-id": "control.cra_submission_templates-v1",
+                "description": "Assess information-security events and decide whether they are to be classified as information-security incidents so that downstream response, notification, and learning obligations attach to the right subset of the event stream.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cra_submission_templates@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-25-assessment-and-decision-on-information-security-events"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.25"
+                  }
+                ]
+              },
+              {
+                "uuid": "9850d4dc-83e8-55f8-b5a3-612185aea580",
+                "control-id": "control.dora_submission_templates-v1",
+                "description": "Assess information-security events and decide whether they are to be classified as information-security incidents so that downstream response, notification, and learning obligations attach to the right subset of the event stream.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.dora_submission_templates@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-25-assessment-and-decision-on-information-security-events"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.25"
+                  }
+                ]
+              },
+              {
+                "uuid": "73f1c46c-ee7e-5013-ba9a-a6103822ea90",
+                "control-id": "control.incident_handling_capability-v1",
+                "description": "Respond to information-security incidents in accordance with the documented procedures established under the A.5.24 incident-management planning obligation, so that classified incidents are contained, eradicated, and recovered from with the roles, communications, and evidence trails the plan requires.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_handling_capability@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-26-response-to-information-security-incidents"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.26"
+                  }
+                ]
+              },
+              {
+                "uuid": "ac84adb4-b204-5a0b-ac65-e92aad3897cf",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Respond to information-security incidents in accordance with the documented procedures established under the A.5.24 incident-management planning obligation, so that classified incidents are contained, eradicated, and recovered from with the roles, communications, and evidence trails the plan requires.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-26-response-to-information-security-incidents"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.26"
+                  }
+                ]
+              },
+              {
+                "uuid": "0ea6345e-3b41-5c79-b990-44e42dc63c6b",
+                "control-id": "control.post_incident_learning-v1",
+                "description": "Use knowledge gained from information-security incidents to strengthen and improve the information-security controls, so that lessons captured from one case reduce the likelihood or impact of similar cases in future.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.post_incident_learning@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-27-learning-from-information-security-incidents"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.27"
+                  }
+                ]
+              },
+              {
+                "uuid": "9369170a-3b75-5733-9f4d-d134ad764880",
+                "control-id": "control.recurring_incident_correlator-v1",
+                "description": "Use knowledge gained from information-security incidents to strengthen and improve the information-security controls, so that lessons captured from one case reduce the likelihood or impact of similar cases in future.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.recurring_incident_correlator@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-27-learning-from-information-security-incidents"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.27"
+                  }
+                ]
+              },
+              {
+                "uuid": "edb6b8e3-d620-5316-a053-982e69d62886",
+                "control-id": "control.restore_drill-v1",
+                "description": "Plan, implement, maintain and test ICT readiness for business continuity so that the ICT services underpinning critical business processes can be recovered within the recovery-time and recovery-point objectives the operator has committed to.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.restore_drill@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-30-ict-readiness-for-business-continuity"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.30"
+                  }
+                ]
+              },
+              {
+                "uuid": "4006f0f8-ebc2-53a2-be63-97493be27705",
+                "control-id": "control.security_assessment-v1",
+                "description": "Review the operator's approach to managing information security and its implementation (including people, processes and technologies) independently at planned intervals or when significant changes occur, so that the ISMS receives an external assurance signal that is not produced by the teams that operate it.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.security_assessment@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-35-independent-review-of-information-security"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.35"
+                  }
+                ]
+              },
+              {
+                "uuid": "5dabde97-07d9-506c-9ad6-78dd9ba20a47",
+                "control-id": "control.ict_risk_framework_review-v1",
+                "description": "Regularly review the compliance of information processing and procedures within the operator's area of responsibility with the information-security policy, topic-specific policies, rules and standards that the ISMS asserts, so that drift between documented posture and operating posture is surfaced before it becomes a finding.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.ict_risk_framework_review@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-36-compliance-with-policies-rules-and-standards"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.36"
+                  }
+                ]
+              },
+              {
+                "uuid": "ee43d482-7e24-5d1e-9add-38141a15415d",
+                "control-id": "control.control_effectiveness_test-v1",
+                "description": "Regularly review the compliance of information processing and procedures within the operator's area of responsibility with the information-security policy, topic-specific policies, rules and standards that the ISMS asserts, so that drift between documented posture and operating posture is surfaced before it becomes a finding.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.control_effectiveness_test@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-5-36-compliance-with-policies-rules-and-standards"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.5.36"
+                  }
+                ]
+              },
+              {
+                "uuid": "6dd3b7a5-a57b-57ce-8a45-254a0dc588dd",
+                "control-id": "control.jml_evidence-v1",
+                "description": "Perform background verification checks on candidates for employment prior to joining, and on an ongoing basis for personnel in roles where the risk profile changes. Checks must be proportionate to the classification of information the role will access, to applicable laws, and to the assessed risk, and the evidence of screening must be retained.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.jml_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-6-1-screening"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.6.1"
+                  }
+                ]
+              },
+              {
+                "uuid": "0ad33954-c89e-5a04-93bd-a3e059bc7900",
+                "control-id": "control.jml_evidence-v1",
+                "description": "State information-security responsibilities in the employment contractual agreements, so that personnel and, where relevant, other interested parties understand their information-security obligations and the consequences of failing to meet them, both during the engagement and after it ends.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.jml_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-6-2-terms-and-conditions-of-employment"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.6.2"
+                  }
+                ]
+              },
+              {
+                "uuid": "a4d37e8b-3236-58a4-94dd-ab6bb72e70f1",
+                "control-id": "control.training_attestation-v1",
+                "description": "State information-security responsibilities in the employment contractual agreements, so that personnel and, where relevant, other interested parties understand their information-security obligations and the consequences of failing to meet them, both during the engagement and after it ends.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.training_attestation@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-6-2-terms-and-conditions-of-employment"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.6.2"
+                  }
+                ]
+              },
+              {
+                "uuid": "6aa13139-f6d8-559e-a1c5-dd30560a5eac",
+                "control-id": "control.training_attestation-v1",
+                "description": "Provide information-security awareness, education, and training to personnel and, where relevant, interested parties, appropriate to their role. The programme must cover the organisation's information-security policy, topic-specific policies, and procedures relevant to each role, and it must be refreshed on a declared cadence and when significant changes occur.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.training_attestation@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-6-3-awareness"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.6.3"
+                  }
+                ]
+              },
+              {
+                "uuid": "15128402-c974-522f-b21f-43e366c55502",
+                "control-id": "control.phishing_simulation-v1",
+                "description": "Provide information-security awareness, education, and training to personnel and, where relevant, interested parties, appropriate to their role. The programme must cover the organisation's information-security policy, topic-specific policies, and procedures relevant to each role, and it must be refreshed on a declared cadence and when significant changes occur.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.phishing_simulation@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-6-3-awareness"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.6.3"
+                  }
+                ]
+              },
+              {
+                "uuid": "d6b32378-8bc9-55a2-9865-c173e5759a0d",
+                "control-id": "control.jml_evidence-v1",
+                "description": "Formalise and communicate a disciplinary process to take action against personnel and, where relevant, other interested parties who have committed an information-security policy violation, so that the response to a violation is consistent, proportionate, and evidence-based.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.jml_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-6-4-disciplinary-process"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.6.4"
+                  }
+                ]
+              },
+              {
+                "uuid": "c804e460-f6b4-52a1-a047-e06435daa25f",
+                "control-id": "control.jml_evidence-v1",
+                "description": "Define, enforce, and communicate the information-security responsibilities and duties that remain valid after termination or change of employment, so that obligations such as confidentiality, return of assets, and non-use of information persist beyond the end of the engagement.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.jml_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-6-5-responsibilities-after-termination-or-change-of-employment"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.6.5"
+                  }
+                ]
+              },
+              {
+                "uuid": "53cedabc-64f2-590e-8d4a-2898ee7c694c",
+                "control-id": "control.baseline_configuration-v1",
+                "description": "Implement security measures when personnel are working remotely to protect information accessed, processed, or stored outside the organisation's premises, including endpoint configuration, network access, and physical handling of information at the remote location.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.baseline_configuration@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-6-7-remote-working"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.6.7"
+                  }
+                ]
+              },
+              {
+                "uuid": "01564345-3507-5c5f-af55-772a8bc525eb",
+                "control-id": "control.least_privilege-v1",
+                "description": "Implement security measures when personnel are working remotely to protect information accessed, processed, or stored outside the organisation's premises, including endpoint configuration, network access, and physical handling of information at the remote location.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.least_privilege@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-6-7-remote-working"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.6.7"
+                  }
+                ]
+              },
+              {
+                "uuid": "96033ca0-391b-52e0-9e43-a3c9d764259a",
+                "control-id": "control.mfa_state_probe-v1",
+                "description": "Implement security measures when personnel are working remotely to protect information accessed, processed, or stored outside the organisation's premises, including endpoint configuration, network access, and physical handling of information at the remote location.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.mfa_state_probe@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-6-7-remote-working"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.6.7"
+                  }
+                ]
+              },
+              {
+                "uuid": "bf0d6ca5-27fd-543f-849a-3a86008377a0",
+                "control-id": "control.incident_handling_capability-v1",
+                "description": "Provide a mechanism for personnel to report observed or suspected information-security events through appropriate channels in a timely manner, so that events reach the assessment and incident-management process at A.5.24 and A.5.25.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_handling_capability@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-6-8-information-security-event-reporting"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.6.8"
+                  }
+                ]
+              },
+              {
+                "uuid": "86a6c520-baf7-5d90-bc31-7a6c6e8aca57",
+                "control-id": "control.vuln_disclosure_intake-v1",
+                "description": "Provide a mechanism for personnel to report observed or suspected information-security events through appropriate channels in a timely manner, so that events reach the assessment and incident-management process at A.5.24 and A.5.25.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.vuln_disclosure_intake@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-6-8-information-security-event-reporting"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.6.8"
+                  }
+                ]
+              },
+              {
+                "uuid": "40672f55-01b8-5e08-bfb5-1ef73b63e03c",
+                "control-id": "control.asset_inventory_delta-v1",
+                "description": "Protect off-premises assets. Devices and media taken outside the organisation's premises (laptops, mobile devices, removable media, home-working equipment) must be protected proportionate to the risks of the location and mode of use, tracked in the asset inventory, and subject to authorisation and handling rules that address loss, theft, and unauthorised access in transit or at the remote site.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.asset_inventory_delta@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-7-9-security-of-assets-off-premises"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.7.9"
+                  }
+                ]
+              },
+              {
+                "uuid": "79f1e0ab-a6b6-53e4-8baf-83b2cf9054ad",
+                "control-id": "control.asset_inventory_delta-v1",
+                "description": "Manage storage media through its full life cycle — acquisition, use, transportation and disposal — in accordance with the information's classification and handling requirements. Storage media (fixed and removable) must be tracked as assets, protected against unauthorised access, transported securely when moved, and disposed of or sanitised so residual data cannot be recovered when the media leaves the organisation's control.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.asset_inventory_delta@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-7-10-storage-media"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.7.10"
+                  }
+                ]
+              },
+              {
+                "uuid": "fe0984bf-5127-5a7d-90d6-1611d0b979e0",
+                "control-id": "control.privileged_access_review-v1",
+                "description": "Restrict and manage the allocation and use of privileged access rights. Privileged accounts and elevated entitlements must be granted on a documented, least-privilege basis, separated from standard user identities where practicable, logged, reviewed on a declared cadence, and recertified or revoked when the justifying role or task changes.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.privileged_access_review@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-2-privileged-access-rights"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.2"
+                  }
+                ]
+              },
+              {
+                "uuid": "005e820a-4d81-57fa-a960-41fd8c798eec",
+                "control-id": "control.account_management-v1",
+                "description": "Restrict and manage the allocation and use of privileged access rights. Privileged accounts and elevated entitlements must be granted on a documented, least-privilege basis, separated from standard user identities where practicable, logged, reviewed on a declared cadence, and recertified or revoked when the justifying role or task changes.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.account_management@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-2-privileged-access-rights"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.2"
+                  }
+                ]
+              },
+              {
+                "uuid": "b0f43503-aa5f-520f-9de5-026dac89d163",
+                "control-id": "control.least_privilege-v1",
+                "description": "Restrict and manage the allocation and use of privileged access rights. Privileged accounts and elevated entitlements must be granted on a documented, least-privilege basis, separated from standard user identities where practicable, logged, reviewed on a declared cadence, and recertified or revoked when the justifying role or task changes.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.least_privilege@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-2-privileged-access-rights"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.2"
+                  }
+                ]
+              },
+              {
+                "uuid": "256eb04b-7b76-5ca3-b0cc-58d9f585767e",
+                "control-id": "control.access_enforcement-v1",
+                "description": "Restrict access to information and other associated assets in accordance with the established topic-specific policy on access control. Access must be limited to authorised individuals and systems, mediated against a policy decision point, and re-evaluated whenever the underlying authorisation state changes.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.access_enforcement@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-3-information-access-restriction"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.3"
+                  }
+                ]
+              },
+              {
+                "uuid": "420d19ff-ead8-52c4-8455-c18a5f66776a",
+                "control-id": "control.least_privilege-v1",
+                "description": "Restrict access to information and other associated assets in accordance with the established topic-specific policy on access control. Access must be limited to authorised individuals and systems, mediated against a policy decision point, and re-evaluated whenever the underlying authorisation state changes.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.least_privilege@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-3-information-access-restriction"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.3"
+                  }
+                ]
+              },
+              {
+                "uuid": "2edd11a2-cbab-50c1-89b8-f19c831a8f58",
+                "control-id": "control.mfa_state_probe-v1",
+                "description": "Implement secure authentication technologies and procedures. Authentication must be proportionate to the sensitivity of the resource, use multi-factor mechanisms where required by risk, protect authentication information in transit and at rest, and apply equivalent discipline to service-to-service authentication as to user authentication.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.mfa_state_probe@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-5-secure-authentication"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.5"
+                  }
+                ]
+              },
+              {
+                "uuid": "8f32434c-2149-5cc0-8856-178de1d0e32d",
+                "control-id": "control.service_identification_authentication-v1",
+                "description": "Implement secure authentication technologies and procedures. Authentication must be proportionate to the sensitivity of the resource, use multi-factor mechanisms where required by risk, protect authentication information in transit and at rest, and apply equivalent discipline to service-to-service authentication as to user authentication.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.service_identification_authentication@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-5-secure-authentication"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.5"
+                  }
+                ]
+              },
+              {
+                "uuid": "b96ffdd7-1a1a-5532-be05-fb87d0f78ee2",
+                "control-id": "control.patch_evidence-v1",
+                "description": "Obtain information about technical vulnerabilities of the information systems in use in a timely fashion, evaluate the operator's exposure, and take appropriate measures. The operator must run a documented vulnerability-management programme: identify sources of advisories, ingest and classify findings, scan the estate on a declared cadence, prioritise remediation against risk, apply patches or compensating controls, and retain evidence that the loop closes.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.patch_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-8-management-of-technical-vulnerabilities"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.8"
+                  }
+                ]
+              },
+              {
+                "uuid": "ebc1a9ca-0ddd-5828-bf74-a53137cdee16",
+                "control-id": "control.vuln_disclosure_intake-v1",
+                "description": "Obtain information about technical vulnerabilities of the information systems in use in a timely fashion, evaluate the operator's exposure, and take appropriate measures. The operator must run a documented vulnerability-management programme: identify sources of advisories, ingest and classify findings, scan the estate on a declared cadence, prioritise remediation against risk, apply patches or compensating controls, and retain evidence that the loop closes.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.vuln_disclosure_intake@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-8-management-of-technical-vulnerabilities"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.8"
+                  }
+                ]
+              },
+              {
+                "uuid": "36198b7e-f336-5106-9765-d1f05b5e0dee",
+                "control-id": "control.configuration_settings-v1",
+                "description": "Establish, document, implement, monitor, and review configurations, including security configurations, of hardware, software, services, and networks. Configurations must sit inside a documented baseline, be gated by a change- control decision before drift is admitted, and be re-attested on a declared cadence so that saturation, drift, or unmanaged exceptions do not silently erode the operator's security posture.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.configuration_settings@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-9-configuration-management"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.9"
+                  }
+                ]
+              },
+              {
+                "uuid": "bb988bad-ea32-5a6f-bfa7-957870f610e1",
+                "control-id": "control.baseline_configuration-v1",
+                "description": "Establish, document, implement, monitor, and review configurations, including security configurations, of hardware, software, services, and networks. Configurations must sit inside a documented baseline, be gated by a change- control decision before drift is admitted, and be re-attested on a declared cadence so that saturation, drift, or unmanaged exceptions do not silently erode the operator's security posture.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.baseline_configuration@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-9-configuration-management"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.9"
+                  }
+                ]
+              },
+              {
+                "uuid": "5b93ba00-8c1a-58e2-aa47-0a5dc70964b5",
+                "control-id": "control.iac_policy_guardrail-v1",
+                "description": "Establish, document, implement, monitor, and review configurations, including security configurations, of hardware, software, services, and networks. Configurations must sit inside a documented baseline, be gated by a change- control decision before drift is admitted, and be re-attested on a declared cadence so that saturation, drift, or unmanaged exceptions do not silently erode the operator's security posture.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.iac_policy_guardrail@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-9-configuration-management"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.9"
+                  }
+                ]
+              },
+              {
+                "uuid": "a5506369-fcd8-5efd-b5b0-6e339e519696",
+                "control-id": "control.cspm_baseline-v1",
+                "description": "Establish, document, implement, monitor, and review configurations, including security configurations, of hardware, software, services, and networks. Configurations must sit inside a documented baseline, be gated by a change- control decision before drift is admitted, and be re-attested on a declared cadence so that saturation, drift, or unmanaged exceptions do not silently erode the operator's security posture.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cspm_baseline@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-9-configuration-management"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.9"
+                  }
+                ]
+              },
+              {
+                "uuid": "c35464be-f34a-50cd-bc17-3bfba7f53af9",
+                "control-id": "control.backup_attestation-v1",
+                "description": "Maintain backup copies of information, software, and systems, and test them regularly in accordance with the agreed topic-specific policy on backup. Backup coverage must match the operator's declared recovery objectives, protect against loss through encryption and offsite / off-network storage, and be exercised against a scheduled restore-drill cadence so that recoverability is evidenced rather than assumed.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.backup_attestation@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-13-information-backup"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.13"
+                  }
+                ]
+              },
+              {
+                "uuid": "055b50fe-275d-5484-9883-34ca01980b82",
+                "control-id": "control.restore_drill-v1",
+                "description": "Maintain backup copies of information, software, and systems, and test them regularly in accordance with the agreed topic-specific policy on backup. Backup coverage must match the operator's declared recovery objectives, protect against loss through encryption and offsite / off-network storage, and be exercised against a scheduled restore-drill cadence so that recoverability is evidenced rather than assumed.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.restore_drill@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-13-information-backup"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.13"
+                  }
+                ]
+              },
+              {
+                "uuid": "15448590-00d7-5494-b30b-6be171929fae",
+                "control-id": "control.detection_coverage_evidence-v1",
+                "description": "Monitor networks, systems, and applications for anomalous behaviour, and act on the results. The operator must define what constitutes anomalous behaviour against a baseline, wire detection coverage against that definition, tune the detection surface as the environment evolves, and feed confirmed detections into the incident-response chain.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.detection_coverage_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-16-monitoring-activities"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.16"
+                  }
+                ]
+              },
+              {
+                "uuid": "2349989d-7411-59af-81df-b0607428ed7e",
+                "control-id": "control.crypto_policy_inventory-v1",
+                "description": "Define and implement rules for the effective use of cryptography, including cryptographic key management. The operator maintains a documented cryptography policy (permitted algorithms, minimum key sizes, allowed protocols and cipher suites), an inventory of the assets in scope of that policy, a key-management lifecycle that covers generation, distribution, storage, rotation, and destruction, and a periodic-review cadence that keeps the declared floor aligned with the state of the art and with the regulatory instruments that pin cryptographic protection.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.crypto_policy_inventory@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-24-use-of-cryptography"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.24"
+                  }
+                ]
+              },
+              {
+                "uuid": "ad235b62-e157-5845-81a9-7f40244eef91",
+                "control-id": "control.key_rotation_evidence-v1",
+                "description": "Define and implement rules for the effective use of cryptography, including cryptographic key management. The operator maintains a documented cryptography policy (permitted algorithms, minimum key sizes, allowed protocols and cipher suites), an inventory of the assets in scope of that policy, a key-management lifecycle that covers generation, distribution, storage, rotation, and destruction, and a periodic-review cadence that keeps the declared floor aligned with the state of the art and with the regulatory instruments that pin cryptographic protection.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.key_rotation_evidence@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-24-use-of-cryptography"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.24"
+                  }
+                ]
+              },
+              {
+                "uuid": "01f0575f-2e7b-52b3-9f09-2112a3b15f0c",
+                "control-id": "control.cert_posture_scan-v1",
+                "description": "Define and implement rules for the effective use of cryptography, including cryptographic key management. The operator maintains a documented cryptography policy (permitted algorithms, minimum key sizes, allowed protocols and cipher suites), an inventory of the assets in scope of that policy, a key-management lifecycle that covers generation, distribution, storage, rotation, and destruction, and a periodic-review cadence that keeps the declared floor aligned with the state of the art and with the regulatory instruments that pin cryptographic protection.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.cert_posture_scan@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-24-use-of-cryptography"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.24"
+                  }
+                ]
+              },
+              {
+                "uuid": "72feb991-2ab3-5ccf-a2bf-5e1422a7283c",
+                "control-id": "control.sbom_capture-v1",
+                "description": "Direct, monitor, and review activities related to outsourced system development. The operator pins the security requirements the third-party developer is contractually held against (secure-coding standards, security-testing evidence, vulnerability-disclosure obligations, provenance and SBOM obligations, right-to-audit), keeps those activities under supervision across the engagement, exercises acceptance gates against delivered artifacts, and evidences the resulting decisions against the same supplier-management trail the operator already keeps against the wider third-party posture.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.sbom_capture@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-30-outsourced-development"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.30"
+                  }
+                ]
+              },
+              {
+                "uuid": "bd300c9c-7da5-586b-a9ea-cfb54f7a1139",
+                "control-id": "control.iac_policy_guardrail-v1",
+                "description": "Subject changes to information-processing facilities and information systems to change-management procedures. The operator declares the change-management shape that applies (proposal, security-impact assessment, authorisation gate, test-and-verification step, roll-out plan and roll-back plan, post-change review), routes changes through it, exercises it against emergency changes as well as routine ones, and evidences the resulting decisions against the same audit trail the configuration and vulnerability controls already read.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.iac_policy_guardrail@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "iso27001:a-8-32-change-management"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "A.8.32"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
