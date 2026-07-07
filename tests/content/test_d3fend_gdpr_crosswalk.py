@@ -1,10 +1,10 @@
 """Schema-shape validation for the D3FEND ↔ GDPR crosswalk.
 
-The D3FEND crosswalks under ``content/mappings/d3fend/`` are SKELETON-stage
-(they intentionally sit outside ``schemas/mapping.schema.json`` — see
+The D3FEND crosswalks under ``content/mappings/d3fend/`` sit outside
+``schemas/mapping.schema.json`` while the regime settles (see
 ``_SKELETON_REGIMES`` in ``test_mappings.py``). This module is the shape
-gate for ``content/mappings/d3fend/gdpr.yaml`` while the regime is
-SKELETON, and the nightly CI lane that owns G-02 for the GDPR crosswalk.
+gate for ``content/mappings/d3fend/gdpr.yaml`` and the nightly CI lane
+that owns G-02 for the GDPR crosswalk.
 
 It asserts:
 
@@ -14,7 +14,7 @@ It asserts:
 * each entry's ``regulation_refs[*].entry_id`` resolves to a real entry
   ``id`` under ``content/mappings/gdpr/*.yaml``;
 * each entry's ``technique.d3fend_id`` is non-empty;
-* the crosswalk carries at least the SKELETON baseline of 10 entries.
+* the crosswalk carries at least the CORE-coverage floor of 20 entries.
 
 Pure stdlib + PyYAML. No network.
 """
@@ -31,7 +31,7 @@ CROSSWALK_PATH = REPO_ROOT / "content" / "mappings" / "d3fend" / "gdpr.yaml"
 CONTROLS_DIR = REPO_ROOT / "content" / "controls"
 GDPR_MAPPINGS_DIR = REPO_ROOT / "content" / "mappings" / "gdpr"
 
-SKELETON_MIN_ENTRIES = 10
+SKELETON_MIN_ENTRIES = 20
 
 
 # ---------------------------------------------------------------------------
