@@ -18,9 +18,11 @@ the four programme-lifecycle atoms the operator discharges on the
 mandatory-TLPT cadence prescribed by the competent authority against
 the operator's designated critical-or-important functions.
 
-Status: **CORE**. Action steps are scaffolded as CACAO v2 actions
-with `control_refs` / `telemetry_refs` bound; the compile-target
-parity lane is materialised as three worked examples under
+Status: **EXTEND** (cookbook walkthrough shipped at
+[`docs/cookbook/dora_tlpt_programme.md`](../../../docs/cookbook/dora_tlpt_programme.md)).
+Action steps are scaffolded as CACAO v2 actions with `control_refs` /
+`telemetry_refs` bound; the compile-target parity lane is
+materialised as three worked examples under
 `examples/{n8n,temporal,langgraph}/dora_tlpt_programme/` with
 byte-parity goldens under
 `tests/examples/{n8n,temporal,langgraph}/dora_tlpt_programme/`. The
@@ -28,10 +30,23 @@ per-step primitives (scope-catalogue composition, TLPT
 trigger-and-planning gate, competent-authority notification adapter,
 red-team scoping-submission adapter, findings-register schema,
 remediation-attestation emitter) remain adapter-bound placeholders
-that a sibling EXTEND card lands together with the cookbook
-walkthrough (TIBER-EU red-team choreography, threat-intelligence-
-source binding, purple-team lessons-learned loop into
-`detection_engineering`).
+that a sibling EXTEND card lands alongside the TIBER-EU red-team
+choreography, the threat-intelligence-source binding, and the
+purple-team lessons-learned loop into `detection_engineering`.
+
+## Trilogy
+
+- **SKELETON:** scaffold + mappings + compile-target declaration (PR #714).
+- **CORE:** three-target compiled examples + byte-parity goldens,
+  full mappings closure (D3-OAM D3FEND selection, NIS2 Art. 21(2)(f) +
+  GDPR Art. 32(1)(d) inbound edges, CRA + EU AI Act reviewed skips)
+  (PR #715).
+- **EXTEND (this card):** cookbook walkthrough at
+  [`docs/cookbook/dora_tlpt_programme.md`](../../../docs/cookbook/dora_tlpt_programme.md).
+  Adapter Protocols under `patterns.dora_tlpt_programme`, the
+  TIBER-EU red-team choreography, threat-intelligence-source
+  binding, and the purple-team lessons-learned loop into
+  `detection_engineering` land on a sibling EXTEND card.
 
 ## Contents
 
