@@ -437,3 +437,32 @@ discharges it in practice). Coverage on A.8 now stands at 34 of 34
 entries landed (pending #664 A.8.18–A.8.22 which is on a sibling
 in-flight branch); once #664 merges, the A.8 theme file will carry
 the full 34-entry surface with no gaps.
+
+## OSCAL component-definition
+
+`oscal-component-definition.json` is an OSCAL 1.1.2 component-definition
+document that exposes the ISO/IEC 27001:2022 Annex A crosswalk in the
+NIST OSCAL serialization. One component (SecOps-NG) carries one
+control-implementation set whose `implemented-requirements` mirror the
+entries in `annex-a-5-organisational.yaml`, `annex-a-6-people.yaml`,
+`annex-a-7-physical.yaml`, and `annex-a-8-technological.yaml`: one
+implemented-requirement per `(entry, control_ref)` pair across the four
+theme files. Entries whose `control_refs` list is empty are
+principle-level or discharged indirectly through companion artifacts
+(described in the per-control prose above) and are consequently not
+reflected in the OSCAL surface. Statement text is borrowed verbatim
+from each entry's `obligation` field. Schema-validation and
+YAML-coverage parity are enforced by
+`tests/content/test_oscal_iso27001_component_definition.py` against
+the OSCAL component schema vendored under
+`tests/fixtures/oscal/oscal_component_schema-v1.1.2.json`. The CRA,
+GDPR, NIS2, DORA, and EU AI Act OSCAL component-definitions are sibling
+artifacts tracked separately.
+
+A.8.18–A.8.22 are pending against a sibling in-flight branch (PR
+#664 on the crosswalk YAMLs). At SKELETON time those entries are
+absent from `main` and therefore absent from this component definition;
+once the pending PR merges, the generator is re-run and the SKELETON
+baseline in
+`tests/content/test_oscal_iso27001_component_definition.py` is
+revised alongside the regenerated component definition.
