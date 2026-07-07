@@ -1,0 +1,289 @@
+# Cross-references for the cryptographic_controls playbook.
+#
+# Outbound view of the content model: pins OSCAL controls, MITRE
+# D3FEND defensive techniques (TODO at SKELETON tier — sibling CORE
+# card resolves), OCSF event classes emitted / consumed, and the EU
+# regulatory clauses this playbook helps operationalise. Inbound
+# references live in content/mappings/{nis2,dora,cra,gdpr}/ so the
+# graph is closed in both directions.
+#
+# Status: SKELETON (F-WF-CRYPTOMGMT SKELETON). The playbook is the
+# operator-side lifecycle materialisation of NIS2 Art. 21(2)(h) —
+# the write-side lane of the cryptography-and-encryption surface:
+# resolve the declared policy, discharge the key-lifecycle branch
+# (generate / rotate / revoke), evaluate the encryption-enforcement
+# gate, discharge the certificate-lifecycle branch (issue / renew /
+# revoke), record the lifecycle attestation, notify the cryptography
+# owner. A sibling CORE card lands the adapter bindings (KMS
+# backend, CA backend, storage-encryption backend, TLS-endpoint
+# backend) under patterns.cryptographic_controls, the D3FEND
+# selection, and the compiled examples; a sibling EXTEND card lands
+# the cookbook walkthrough and advanced features.
+#
+# Sibling relationship with crypto_posture_management: both overlays
+# pin nis2:art-21-2-h and co-anchor the clause. crypto_posture_management
+# operates the read-only posture-attestation lane (per-cycle inventory
+# + probe + rotation-status check + dated posture attestation). This
+# overlay operates the write-side lifecycle lane (generate / rotate /
+# revoke keys, issue / renew / revoke certs, enforce at-rest and
+# in-transit floors, record the lifecycle attestation). The two
+# lanes stay separately anchored on the same clause; the posture
+# lane measures what the lifecycle lane produces.
+#
+# CRA closure: CRA Annex I §1 names three adjacent lanes that this
+# playbook's lifecycle branches partially discharge — §1(e) on
+# confidentiality (encryption of relevant data at rest / in transit
+# by state-of-the-art mechanisms), §1(d) on access control (which
+# includes the key-material and certificate-lifecycle keys the
+# access-control surface relies on), and the umbrella
+# §1 essential-cybersecurity anchor. SKELETON pins the umbrella
+# anchor as a placeholder; the sibling CORE card selects the exact
+# sub-clause(s) once the adapter surfaces are pinned. The sibling
+# crypto_posture_management overlay already pins
+# cra:annex-i-1-e-confidentiality-crypto-posture on the read-side
+# lane; cross-pinning the same anchor here without the CORE-tier
+# adapter resolution would double-count, so this overlay records
+# the CRA anchor as todo pending CORE.
+#
+# DORA closure: DORA Art. 9 (protection and prevention) covers the
+# cryptography-and-encryption surface via the JC RTS on ICT risk
+# management framework (Commission Delegated Regulation (EU)
+# 2024/1774) Art. 6 on encryption and cryptographic controls. The
+# sibling crypto_posture_management overlay already pins
+# dora:art-9-crypto on the read-side lane; this overlay pins the
+# same anchor on the write-side lifecycle lane (both lanes
+# discharge the same Art. 9 obligation, posture-attestation vs
+# key-and-cert-lifecycle).
+#
+# GDPR closure: TODO at SKELETON tier — GDPR Art. 32(1)(a)
+# (pseudonymisation and encryption of personal data) is the
+# obvious anchor for the encryption-enforcement gate where the
+# workload processes personal data. The sibling CORE card selects
+# the specific inbound entry once the adapter surface is pinned.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.cryptographic_controls@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls anchoring the cryptographic-
+  # controls lifecycle. SKELETON pins the family (SC-8, SC-12,
+  # SC-13, SC-17, SC-28) that the six action steps exercise. A
+  # sibling CORE card revisits step-level pinning once the adapter
+  # bindings under patterns.cryptographic_controls are landed.
+  - id: control.cryptographic_key_establishment_management@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SC-12
+    title: Cryptographic Key Establishment and Management
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SC-12
+    notes: >-
+      Anchors the key-lifecycle step. SC-12 requires the organisation
+      to establish and manage cryptographic keys when cryptography is
+      employed within the system, in accordance with organisation-
+      defined requirements for key generation, distribution, storage,
+      access, rotation, and destruction. The key-lifecycle branch is
+      the operational discharge of that obligation: generation
+      against the declared algorithm and key-size floor, rotation
+      against the declared per-key-class cadence, and revocation on
+      compromise or scope exit. The __key_lifecycle_record__ artifact
+      is the audit-evident record SC-12 reviewers read.
+
+  - id: control.cryptographic_protection@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SC-13
+    title: Cryptographic Protection
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SC-13
+    notes: >-
+      Anchors the resolve-policy-inventory and enforce-encryption
+      steps. SC-13 requires the organisation to determine the
+      cryptographic uses and to implement the types of cryptography
+      required for each use in accordance with applicable laws,
+      directives, regulations, policies, standards, and guidelines.
+      The policy-inventory snapshot resolved at the start of the
+      lifecycle is the operator's declared algorithm floor; the
+      enforcement-gate decision is the per-workload measurement of
+      the at-rest and in-transit conditions against that floor.
+
+  - id: control.public_key_infrastructure_certificates@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SC-17
+    title: Public Key Infrastructure Certificates
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SC-17
+    notes: >-
+      Anchors the certificate-lifecycle step. SC-17 requires the
+      organisation to issue public key certificates under an
+      organisation-defined certificate policy or obtain them from
+      an approved service provider. The certificate-lifecycle branch
+      is the operational discharge of that obligation: issue against
+      the operator's declared CA / trust anchors, renew ahead of the
+      declared expiry buffer, and revoke on compromise or scope exit.
+      The __cert_lifecycle_record__ artifact is the audit-evident
+      record SC-17 reviewers read.
+
+  - id: control.protection_of_information_at_rest@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SC-28
+    title: Protection of Information at Rest
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SC-28
+    notes: >-
+      Anchors the at-rest half of the enforce-encryption step.
+      SC-28 requires the organisation to protect the confidentiality
+      and integrity of information at rest. The enforcement-gate's
+      at-rest condition is the per-workload measurement of the
+      persistent-storage encryption surface against the declared
+      at-rest algorithm and key-material binding.
+
+  - id: control.transmission_confidentiality_integrity@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SC-8
+    title: Transmission Confidentiality and Integrity
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SC-8
+    notes: >-
+      Anchors the in-transit half of the enforce-encryption step.
+      SC-8 requires the organisation to protect the confidentiality
+      and integrity of transmitted information. The enforcement-
+      gate's in-transit condition is the per-workload measurement
+      of the negotiated TLS version and cipher suite against the
+      declared floor. SC-8(1) (Cryptographic Protection) is
+      satisfied via the cryptographic-floor link to SC-13.
+
+d3fend:
+  # SKELETON — D3FEND selection deferred to the sibling CORE card.
+  # The read-side sibling (crypto_posture_management) pins D3-CA
+  # (Certificate Analysis) on its probe-cert-posture and
+  # check-key-rotation steps; on the write-side lifecycle here the
+  # candidate technique is not the analysis surface but a
+  # key-management / certificate-management surface D3FEND v1.0.0
+  # does not carry as a distinct technique. The CORE card selects
+  # the anchor (or documents the deliberate gap on the write-side
+  # lane in the same shape as the crypto_posture_management
+  # inventory / emission / delivery gap notes) once the adapter
+  # surfaces under patterns.cryptographic_controls are pinned.
+  - d3fend_id: D3-TODO
+    todo: true
+    notes: >-
+      SKELETON placeholder pending the sibling CORE card. The
+      write-side lifecycle lane's D3FEND anchor is deferred until
+      the adapter surfaces (KMS backend, CA backend, storage-
+      encryption backend, TLS-endpoint backend) are pinned; the
+      selection follows the pin-where-it-fits / document-the-gap
+      pattern the sibling crypto_posture_management overlay
+      already applies on its inventory-crypto-policy,
+      evidence-capture, and notify-crypto-owner steps.
+
+ocsf:
+  # OCSF v1.3.0 telemetry binding. All six action steps interact
+  # with operator API surfaces (the governance policy store, the
+  # KMS backend, the storage-encryption backend, the TLS-endpoint
+  # backend, the CA backend, the evidence store, the notification
+  # channel). API Activity (6003) is the consistent class across
+  # both consumed and emitted records for these read/write
+  # surfaces. A sibling CORE card revisits the class selection
+  # (and adds Compliance Finding 2003 on the enforcement-gate
+  # deny branch) once the adapter surfaces are pinned.
+  - id: telemetry.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: both
+    notes: >-
+      Consumed at the resolve-policy-inventory step (read calls
+      against the operator's policy store and the cryptography-
+      scope catalogue), at the key-lifecycle step (KMS backend
+      calls for the generate / rotate / revoke branch), at the
+      enforce-encryption step (read calls against the storage-
+      encryption backend for the at-rest condition and against the
+      TLS-endpoint backend for the in-transit condition), and at
+      the certificate-lifecycle step (CA backend calls for the
+      issue / renew / revoke branch). Emitted at the record-
+      lifecycle-evidence step (write call publishing the dated
+      lifecycle-attestation record to the operator's evidence
+      store) and at the notify-crypto-owner step (delivery
+      dispatch to the cryptography owner's pre-bound channel).
+      Schema:
+      https://schema.ocsf.io/1.3.0/classes/api_activity
+
+nis2:
+  # Inbound entry that backlinks playbook.cryptographic_controls@v1
+  # (co-anchored with playbook.crypto_posture_management@v1):
+  #   - content/mappings/nis2/article-21-2-h.yaml
+  #     (id nis2:art-21-2-h — policies and procedures regarding the
+  #     use of cryptography and, where appropriate, encryption)
+  # Pinned outbound below to close the graph. The sibling
+  # crypto_posture_management overlay pins the read-side posture-
+  # attestation lane; this overlay pins the write-side lifecycle
+  # lane. Both lanes discharge the same clause; the sibling CORE
+  # card lands the inbound edit on article-21-2-h.yaml that adds
+  # playbook.cryptographic_controls@v1 to the playbook_refs.
+  - mapping_id: nis2:art-21-2-h
+    article: 21(2)(h)
+    notes: >-
+      NIS2 Art. 21(2)(h) requires essential and important entities
+      to operate policies and procedures regarding the use of
+      cryptography and, where appropriate, encryption. This
+      playbook is the write-side lifecycle materialisation of that
+      obligation: resolve the declared policy, discharge the
+      key-lifecycle branch (generate / rotate / revoke), evaluate
+      the encryption-enforcement gate against the declared at-rest
+      and in-transit floors, discharge the certificate-lifecycle
+      branch (issue / renew / revoke), record the lifecycle
+      attestation, notify the cryptography owner. Co-anchored with
+      the sibling crypto_posture_management playbook which pins
+      the read-side posture-attestation lane on the same clause.
+
+dora:
+  # Inbound entry that backlinks playbook.cryptographic_controls@v1:
+  #   - content/mappings/dora/article-9-crypto.yaml
+  #     (id dora:art-9-crypto — DORA Art. 9(2)/(3) ICT security
+  #     policies anchored to Commission Delegated Regulation (EU)
+  #     2024/1774 Art. 6 on encryption and cryptographic controls)
+  # Pinned outbound below to close the graph. Co-anchored with the
+  # sibling crypto_posture_management overlay which already pins
+  # dora:art-9-crypto on the read-side lane; this overlay pins the
+  # same anchor on the write-side lifecycle lane.
+  - mapping_id: dora:art-9-crypto
+    article: "9(2)"
+    notes: >-
+      DORA Art. 9(2) (reinforced by Art. 9(3)) requires financial
+      entities to implement ICT security policies, procedures,
+      protocols and tools that protect the confidentiality,
+      integrity and authenticity of data; the Level 2 detail in
+      the JC RTS on ICT risk management framework (Commission
+      Delegated Regulation (EU) 2024/1774) Art. 6 prescribes a
+      documented cryptography and encryption policy, algorithm
+      and key-size floors, the key-management lifecycle, and a
+      periodic review cadence. This playbook is the write-side
+      lifecycle materialisation of the key-management-lifecycle
+      slice of Art. 6; the sibling crypto_posture_management
+      overlay pins the periodic-review slice on the read side.
+
+cra:
+  # SKELETON — CRA anchor deferred to the sibling CORE card. CRA
+  # Annex I §1 names three adjacent lanes this playbook's lifecycle
+  # branches partially discharge:
+  #   - §1(e) confidentiality — encryption of relevant data at rest
+  #     and in transit by state-of-the-art mechanisms
+  #     (already pinned on the sibling crypto_posture_management
+  #     overlay as cra:annex-i-1-e-confidentiality-crypto-posture,
+  #     read-side lane);
+  #   - §1(d) access control — key material and certificate
+  #     lifecycle underpins the access-control surface;
+  #   - the umbrella §1 essential-cybersecurity anchor.
+  # Cross-pinning the same §1(e) anchor here without the CORE-tier
+  # adapter resolution would double-count against the read-side
+  # lane; the CORE card selects the exact sub-clause(s) once the
+  # adapter surfaces under patterns.cryptographic_controls are
+  # pinned.
+  - mapping_id: cra:todo-cryptographic-controls-lifecycle
+    todo: true
+    notes: >-
+      Placeholder pending the CORE / EXTEND card. Candidate anchors
+      are CRA Annex I §1(e) confidentiality (write-side lane
+      companion to the read-side lane the sibling
+      crypto_posture_management overlay pins), §1(d) access control
+      (key material and certificate lifecycle underpin access
+      control), and the umbrella §1 essential-cybersecurity anchor.
+      The CORE card pins the real inbound CRA mapping id once the
+      adapter surfaces are landed, mirroring the read-side lane's
+      SKELETON→CORE pattern.
