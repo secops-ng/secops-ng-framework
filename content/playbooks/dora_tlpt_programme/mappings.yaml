@@ -1,0 +1,273 @@
+# Cross-references for the dora_tlpt_programme playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed / emitted, and the EU regulatory clauses this
+# playbook helps operationalise. Inbound references live in
+# content/mappings/{nis2,dora,cra,gdpr}/ so the graph is closed in
+# both directions.
+#
+# This playbook is the operator-side DORA Chapter IV digital
+# operational resilience testing (DORT) programme discipline — Art. 24
+# (general requirements for the testing of digital operational
+# resilience) and Art. 26 (advanced testing of ICT tools, systems and
+# processes based on threat-led penetration testing, anchored on the
+# ECB TIBER-EU framework as the implementation reference). Distinct
+# from the dora_ict_risk_selfassess whole-Chapter II roll-up and from
+# the per-section producing playbooks the roll-up aggregates.
+#
+# Status: SKELETON (F-WF-DORA-TLPT SKELETON). The SKELETON pins the
+# DORA Chapter IV testing-programme atom (dora:art-24-26-dort-tlpt-
+# programme) as the outbound backlink, the OSCAL CA-2 (Control
+# Assessments) anchor via the existing control.security_assessment@v1
+# overlay, and the OCSF API Activity binding across the four
+# lifecycle steps. D3FEND selection is deferred to the sibling CORE
+# card (D3FEND v1.0.0 does not carry a distinct threat-led-
+# penetration-testing technique; CORE selects the closest available
+# assessment-side anchor or documents the deliberate gap on the same
+# per-step pin-where-it-fits / document-the-gap pattern the
+# dora_ict_risk_selfassess overlay applies). CRA / NIS2 / GDPR /
+# EU AI Act axes are recorded as reviewed skips against the
+# respective _orphan_skip.yaml manifests — rationale carried below.
+#
+# Deliberate OSCAL notes:
+#   - NIST SP 800-53 Rev. 5 CA-8 (Penetration Testing) is the direct
+#     penetration-testing anchor for the red-team engagement lane;
+#     the SKELETON does NOT introduce a new content/controls/
+#     control.penetration_testing@v1 entry so the SKELETON tier stays
+#     scoped to structural scaffolding. The sibling CORE card either
+#     lifts CA-8 onto a new control overlay or documents the
+#     deliberate absorption of CA-8 into the existing
+#     control.control_effectiveness_test@v1 surface (CA-8 is a
+#     specialised control-effectiveness discipline on the
+#     penetration-testing sub-slice). Recording the deferral here so
+#     reviewers see the CORE handoff shape explicitly.
+#   - CA-7 (Continuous Monitoring) is NOT pinned: the TLPT programme
+#     is a cadenced, competent-authority-gated engagement discipline
+#     rather than a continuous-monitoring discipline. Continuous
+#     monitoring lives on the dora_ict_risk_selfassess and F-CP-06
+#     effectiveness-loop surfaces. Pinning CA-7 here would misrepresent
+#     the mandatory-TLPT-cycle rhythm.
+#
+# Deliberate DORA-axis coverage boundary:
+#   - Article 25 (Testing of ICT tools and systems), which sits
+#     between Art. 24 and Art. 26 in Chapter IV, prescribes the
+#     specific-testing-methodology surface (vulnerability
+#     assessments, scenario-based tests, compatibility testing,
+#     performance testing, end-to-end testing, penetration testing)
+#     the operator discharges under the broader Art. 24 general-
+#     requirements umbrella. This playbook anchors on the Art. 24
+#     scope + Art. 26 TLPT-programme axes; the Art. 25 per-methodology
+#     axis is either absorbed onto sibling per-methodology playbooks
+#     (e.g. vuln_intake for vulnerability-assessment testing,
+#     detection_engineering for detection-rule effectiveness testing)
+#     or lifted onto its own SKELETON in a follow-on card. Recording
+#     the boundary here so reviewers see the intentional Art. 25
+#     handoff shape rather than a silent gap.
+#   - Article 27 (Requirements for testers for the carrying out of
+#     TLPT) prescribes the tester-selection criteria (certification,
+#     independence, professional-indemnity insurance) the operator
+#     applies at the red-team-scoping-approval step. This playbook
+#     consumes the Art. 27 criteria at the scoping-approval step but
+#     does not itself lift Art. 27 as a top-level atom on the
+#     inbound mapping; the criteria are cited in the mapping's
+#     notes body against the dora:art-24-26-dort-tlpt-programme
+#     entry.
+#
+# NIS2 closure: no NIS2 inbound entry currently backlinks
+# playbook.dora_tlpt_programme@v1, and this is a durable, reviewed
+# deferral rather than an open TODO. NIS2 does not carry a direct
+# threat-led-penetration-testing programme obligation on the
+# essential/important-entity surface at the shape of DORA Art. 26;
+# NIS2 Art. 21(2)(f) (policies and procedures to assess the
+# effectiveness of cybersecurity risk-management measures) is the
+# adjacent effectiveness-testing anchor but is discharged by the
+# effectiveness-loop surface, not by a TLPT programme. The NIS2
+# clause-by-clause review is recorded under the dora_tlpt_programme
+# entry in content/mappings/nis2/_orphan_skip.yaml. Mirrors the
+# dora_ict_risk_selfassess NIS2-axis precedent.
+#
+# CRA closure: no CRA inbound entry currently backlinks
+# playbook.dora_tlpt_programme@v1, and this is a durable, reviewed
+# deferral rather than an open TODO. CRA Annex I is product-by-
+# product manufacturer scope; the operator-side TLPT programme
+# discipline is regime-specific to financial entities under DORA
+# and does not cross-map onto the CRA product-lifecycle surface.
+# The CRA clause-by-clause review is recorded under the
+# dora_tlpt_programme entry in content/mappings/cra/_orphan_skip.yaml.
+# Mirrors the dora_ict_risk_selfassess CRA-axis precedent.
+#
+# GDPR closure: no GDPR inbound entry currently backlinks
+# playbook.dora_tlpt_programme@v1, and this is a durable, reviewed
+# deferral rather than an open TODO. The playbook operates on
+# scope-catalogue identifiers, trigger-decision records, scoping-
+# submission identifiers, findings-register identifiers, and
+# attestation-record identifiers; personal data flow is limited to
+# accountability-owner attribution, tester-roster attribution, and
+# attestation-signatory attribution — captured in the per-workflow
+# GDPR data-flow record at
+# content/mappings/gdpr/data-flow-dora_tlpt_programme.md rather than
+# via a clause-level inbound mapping. Red-team engagement outputs may
+# incidentally carry personal data where an in-scope critical or
+# important function processes personal data; that discharge is on
+# the producing surface, not on this playbook. The GDPR
+# clause-by-clause review is recorded under the dora_tlpt_programme
+# entry in content/mappings/gdpr/_orphan_skip.yaml.
+#
+# EU AI Act closure: no EU AI Act inbound entry currently backlinks
+# playbook.dora_tlpt_programme@v1, and this is a durable, reviewed
+# deferral rather than an open TODO. EU AI Act Art. 15 accuracy /
+# robustness / cybersecurity is the closest neighbouring
+# testing-discipline anchor, but is a product-lifecycle obligation
+# on providers of high-risk AI systems rather than an operator-side
+# TLPT programme obligation. The EU AI Act clause-by-clause review
+# is recorded under the dora_tlpt_programme entry in
+# content/mappings/eu_ai_act/_orphan_skip.yaml.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.dora_tlpt_programme@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 control anchoring the four steps of the
+  # TLPT programme lifecycle. The SKELETON pins CA-2 (Control
+  # Assessments) via the existing control.security_assessment@v1
+  # overlay end-to-end; CA-8 (Penetration Testing) is the direct
+  # anchor for the red-team engagement lane and is deferred to the
+  # sibling CORE card per the header note.
+  - id: control.security_assessment@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CA-2
+    title: Control Assessments
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CA-2
+    notes: >-
+      Anchors the playbook end-to-end as the control-assessment
+      capability against the operator's ICT operations: CA-2 requires
+      the operator to develop, review, and approve a control
+      assessment plan, assess the controls in the system and its
+      environment of operation to determine the extent to which the
+      controls are implemented correctly, operating as intended, and
+      producing the desired outcome, and produce a control assessment
+      report. The DORT programme lifecycle composes the scope
+      catalogue, discharges the TLPT trigger-and-planning gate,
+      packages the red-team scoping submission for competent-authority
+      approval, and emits the dated remediation attestation — the
+      audit-evident report CA-2 reviewers consume, here narrowed to
+      the DORA Chapter IV testing-programme surface. CA-8
+      (Penetration Testing) is the direct anchor for the red-team
+      engagement lane and is deferred to the sibling CORE card per
+      the header-note handoff shape.
+
+  - id: control.control_effectiveness_test@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CA-2
+    title: Control Assessments (effectiveness-testing slice)
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CA-2
+    notes: >-
+      Covers the remediation-tracking step specifically: the findings
+      register the red-team engagement produces plus the dated
+      remediation attestation together discharge the effectiveness-
+      testing slice of CA-2, narrowed to the DORA Art. 26(8)
+      remediation-tracking obligation. The attestation is the
+      audit-evident output the competent authority reads for the
+      remediation lane of the TLPT programme.
+
+d3fend:
+  # SKELETON — D3FEND selection deferred to the sibling CORE card.
+  # D3FEND v1.0.0 does not carry a distinct threat-led-penetration-
+  # testing programme technique; the closest candidates are on the
+  # assessment side (D3-OAM Operational Activity Mapping — the
+  # dora_ict_risk_selfassess overlay's per-section coverage-scoring
+  # anchor) or on the exercise-side surface a red-team engagement
+  # implicitly exercises. The CORE card either selects a per-step
+  # D3FEND anchor or documents the deliberate gap on the same
+  # per-step pin-where-it-fits / document-the-gap pattern the
+  # dora_ict_risk_selfassess overlay applies.
+  - step: action--55000000-0000-4000-8000-000000000005
+    d3fend_id: D3-OAM
+    d3fend_name: Operational Activity Mapping
+    todo: true
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    notes: >-
+      Candidate SKELETON anchor on the remediation-tracking step —
+      mapping the red-team engagement findings onto the operator's
+      declared severity rubric and remediation-timeline model is an
+      operational-activity-mapping discipline. Deferred to CORE for
+      confirmation (the write-side lifecycle framing here differs
+      from the read-side assessment framing dora_ict_risk_selfassess
+      applied on D3-OAM); the primitive-topology-only SKELETON
+      records the candidate anchor as todo so the CORE reviewer
+      sees the shape rather than a silent gap.
+
+ocsf:
+  # OCSF v1.3.0 telemetry binding. All four action steps interact
+  # with operator API surfaces (business-service / ICT-asset /
+  # ICT third-party registers at the scope step, competent-authority
+  # notification / approval channel at the trigger and scoping-approval
+  # steps, evidence store at the remediation-tracking step). API
+  # Activity (6003) is the consistent class across both consumed and
+  # emitted records for these read / write surfaces. Richer per-step
+  # telemetry bindings (e.g. OCSF Compliance Finding on the
+  # remediation-status roll-up) are deferred to CORE-layer cards once
+  # stable upstream signal shapes are selected.
+  - id: telemetry.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: both
+    notes: >-
+      Consumed at the define-DORT-scope step (reads against the
+      operator's business-service register, ICT-asset register, and
+      ICT third-party service-provider register). Consumed and
+      emitted at the TLPT-trigger-and-planning-gate step (reads
+      against the operator's declared __entity_significance_tier__
+      and the JC 2022 03 criteria model; emits the competent-authority
+      notification against the adapter binding declared under
+      patterns.dora_tlpt_programme on the sibling EXTEND card).
+      Consumed and emitted at the red-team-scoping-approval step
+      (packages the scoping submission and dispatches to the
+      competent-authority approval channel; records the approval
+      or deferral outcome). Emitted at the remediation-tracking step
+      (write call publishing the dated competent-authority
+      remediation attestation record to the operator's evidence
+      store). Schema:
+      https://schema.ocsf.io/1.3.0/classes/api_activity
+
+nis2: []
+
+dora:
+  # Inbound entry that backlinks playbook.dora_tlpt_programme@v1:
+  #   - content/mappings/dora/article-24-26.yaml
+  #     (dora:art-24-26-dort-tlpt-programme — Art. 24 general
+  #     requirements for the testing of digital operational
+  #     resilience and Art. 26 advanced testing based on TLPT)
+  # The matching playbook_refs: entry on the new inbound file lands
+  # in this same SKELETON PR so the orphan-CI graph closes on the
+  # DORA axis end-to-end without a skip entry.
+  - mapping_id: dora:art-24-26-dort-tlpt-programme
+    article: "24; 26"
+    notes: >-
+      DORA Chapter IV digital operational resilience testing — the
+      Art. 24 general-requirements-for-testing surface (identify the
+      critical or important functions, supporting ICT assets, and
+      third-party dependencies in scope; discharge a periodic
+      testing programme) and the Art. 26 advanced-testing-based-on-
+      TLPT surface (mandatory-TLPT decision under the JC 2022 03
+      criteria; competent-authority notification and scoping
+      approval; findings-register and dated remediation attestation).
+      This playbook is the operator-side lifecycle materialisation
+      of both surfaces on the mandatory-TLPT-cycle cadence
+      prescribed by the competent authority. The Art. 27
+      testers-requirements criteria are consumed at the scoping-
+      approval step and cited in the inbound file's notes body
+      without a separate top-level atom (a single-clause child that
+      only gates a step on this playbook does not warrant a fan-out
+      to a per-Article inbound file). Level 2 detail on the
+      testing-programme scope lives in the JC RTS on ICT
+      risk-management framework (Commission Delegated Regulation
+      (EU) 2024/1774) Articles 25 and 26; the TIBER-EU framework is
+      the implementation reference the TLPT-lifecycle steps read
+      against.
+
+cra: []
