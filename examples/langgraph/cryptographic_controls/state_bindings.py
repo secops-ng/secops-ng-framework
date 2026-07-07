@@ -31,7 +31,7 @@ class PlaybookCryptographicControlsV1State(TypedDict, total=False):
       - bookkeeping:       added by the compiler for graph control
     """
     # playbook_variable: __lifecycle_event__
-    # Identifier of the lifecycle event that triggers this run: 'key-generate', 'key-rotate', 'key-revoke', 'cert-issue', 'cert-renew', 'cert-revoke', or 'enforcement-gate'. Supplied by the scheduler, the KMS/CA control plane, or an operator-initiated trigger. SKELETON: the branching on this variable across the seven lifecycle branches is authored on the sibling CORE card; the workflow shape below chains the disciplines linearly.
+    # Identifier of the lifecycle event that triggers this run: 'key-generate', 'key-rotate', 'key-revoke', 'cert-issue', 'cert-renew', 'cert-revoke', or 'enforcement-gate'. Supplied by the scheduler, the KMS/CA control plane, or an operator-initiated trigger. The branching on this variable across the seven lifecycle branches is a linear scaffold at the CACAO layer; the branch-selection logic and adapter Protocols land on the sibling EXTEND card under patterns.cryptographic_controls.
     lifecycle_event: str
     # playbook_variable: __crypto_scope__
     # Identifier of the in-scope cryptography surface for this run (matches a row in the operator's documented cryptography-scope catalogue: which key classes, which certificate classes, which storage surfaces, and which TLS endpoints are subject to the declared policy). Shared with the sibling crypto_posture_management playbook so both surfaces read from the same declared scope.
@@ -81,7 +81,7 @@ async def resolve_policy_inventory(crypto_scope: str, lifecycle_event: str) -> s
 
 @tool
 async def key_lifecycle(crypto_scope: str, lifecycle_event: str, policy_inventory_id: str) -> str:
-    """Discharge the key-lifecycle branch of __lifecycle_event__: generation of a new key against the algorithm / key-size floor carried in __policy_inventory_id__ (key-generate); rotation of an existing key against the per-key-class cadence, keying a new material and backreferencing the previous key (key-rotate); revocation of a key on compromise or scope exit, emitting the revocation reason (key-revoke). SKELETON: the branching on __lifecycle_event__ across the three sub-branches is a linear scaffold here; the sibling CORE card lands the branch-selection logic and the adapter Protocols against the operator's KMS backend under patterns.cryptographic_controls. Per-branch evidence is aggregated into __key_lifecycle_record__.
+    """Discharge the key-lifecycle branch of __lifecycle_event__: generation of a new key against the algorithm / key-size floor carried in __policy_inventory_id__ (key-generate); rotation of an existing key against the per-key-class cadence, keying a new material and backreferencing the previous key (key-rotate); revocation of a key on compromise or scope exit, emitting the revocation reason (key-revoke). The branching on __lifecycle_event__ across the three sub-branches is a linear scaffold at the CACAO layer; the sibling EXTEND card lands the branch-selection logic and the adapter Protocols against the operator's KMS backend under patterns.cryptographic_controls. Per-branch evidence is aggregated into __key_lifecycle_record__.
 
     CACAO step_id : action--52000000-0000-4000-8000-000000000003
     CACAO type    : action
@@ -117,7 +117,7 @@ async def enforce_encryption(crypto_scope: str, policy_inventory_id: str) -> str
 
 @tool
 async def certificate_lifecycle(crypto_scope: str, lifecycle_event: str, policy_inventory_id: str) -> str:
-    """Discharge the certificate-lifecycle branch of __lifecycle_event__: issue a new certificate against the operator's declared CA / trust anchors (cert-issue); renew an existing certificate ahead of the declared expiry buffer, backreferencing the previous certificate (cert-renew); revoke a certificate on compromise or scope exit, emitting the revocation reason and updating the operator's revocation list surface (cert-revoke). SKELETON: the branching on __lifecycle_event__ across the three sub-branches is a linear scaffold here; the sibling CORE card lands the branch-selection logic and the adapter Protocols against the operator's CA backend under patterns.cryptographic_controls. Per-branch evidence is aggregated into __cert_lifecycle_record__.
+    """Discharge the certificate-lifecycle branch of __lifecycle_event__: issue a new certificate against the operator's declared CA / trust anchors (cert-issue); renew an existing certificate ahead of the declared expiry buffer, backreferencing the previous certificate (cert-renew); revoke a certificate on compromise or scope exit, emitting the revocation reason and updating the operator's revocation list surface (cert-revoke). The branching on __lifecycle_event__ across the three sub-branches is a linear scaffold at the CACAO layer; the sibling EXTEND card lands the branch-selection logic and the adapter Protocols against the operator's CA backend under patterns.cryptographic_controls. Per-branch evidence is aggregated into __cert_lifecycle_record__.
 
     CACAO step_id : action--52000000-0000-4000-8000-000000000005
     CACAO type    : action

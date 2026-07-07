@@ -43,23 +43,22 @@ declared scope.
 
 ## Compile targets
 
-`compile_targets` declares `["n8n", "temporal", "langgraph"]`. Emitted
-artifacts and golden tests are owned by a sibling CORE-layer card;
-this directory ships the portable content only.
+`compile_targets` declares `["n8n", "temporal", "langgraph"]`.
+Byte-parity compiled examples ship under
+`examples/{n8n,temporal,langgraph}/cryptographic_controls/` with
+drift guards under
+`tests/examples/{n8n,temporal,langgraph}/cryptographic_controls/`.
 
 ## Trilogy
 
-- **SKELETON (this card):** scaffold + mappings + compile-target
-  declaration.
-- **CORE:** full workflow logic — adapter Protocols under
-  `patterns.cryptographic_controls`, the branch-selection evaluator
-  on `__lifecycle_event__`, the enforcement-gate policy evaluator,
-  the three-target dispatch wrappers, the golden compiled examples
-  (byte-parity tests under `tests/examples/{n8n,temporal,langgraph}/cryptographic_controls/`),
-  and the D3FEND / GDPR / final CRA-anchor selection.
-- **EXTEND:** cookbook walkthrough + advanced features (HSM-backed
-  key ceremonies, post-quantum rollover choreography, per-Member-
-  State CA-trust posture).
+- **SKELETON:** scaffold + mappings + compile-target declaration.
+- **CORE (this card):** three-target compiled examples + byte-parity
+  goldens, full mappings closure (D3-SKT / D3-CM D3FEND selection,
+  GDPR Art. 32(1)(a) inbound edge, NIS2 + DORA inbound edges).
+- **EXTEND:** cookbook walkthrough + adapter Protocols under
+  `patterns.cryptographic_controls` + advanced features
+  (HSM-backed key ceremonies, post-quantum rollover choreography,
+  per-Member-State CA-trust posture).
 
 ## Prerequisites
 
