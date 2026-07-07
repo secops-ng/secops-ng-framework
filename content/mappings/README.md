@@ -8,6 +8,7 @@ Regulatory crosswalks. One subdirectory per regime:
 - `gdpr/`        GDPR articles relevant to security operations
 - `iso27001/`    ISO/IEC 27001 / 27002 controls
 - `soc2/`        SOC 2 trust services criteria
+- `nist_csf/`    NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
 
 ## Document shape
 
@@ -33,7 +34,7 @@ entries:
 ```
 
 Mapping IDs use the regime as a prefix (`nis2:`, `dora:`, `cra:`,
-`gdpr:`, `iso27001:`, `soc2:`). Artifact references use the canonical
+`gdpr:`, `iso27001:`, `soc2:`, `nist_csf:`). Artifact references use the canonical
 content-model **long-form stable-ID URN**:
 
 ```

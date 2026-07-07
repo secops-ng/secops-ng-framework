@@ -1,0 +1,593 @@
+# NIST Cybersecurity Framework 2.0 — Core Functions crosswalk (SKELETON).
+#
+# NIST Cybersecurity Framework 2.0 (CSF 2.0), published as NIST CSWP 29
+# on 26 February 2024, restructures the CSF Core around six Functions
+# (Govern, Identify, Protect, Detect, Respond, Recover) and 22
+# Categories. This file carries one entry per Category — 22 in total,
+# grouped by Function in the on-disk order the CSF specifies. The
+# CSF Subcategory level (CSF's finest-grained abstraction, e.g.
+# GV.OC-01) is deliberately out of scope for the SKELETON and will
+# land in a sibling CORE card.
+#
+# Scope of this file: the CSF 2.0 Core at Category granularity across
+# all six Functions. The GV Function was newly introduced in CSF 2.0
+# and subsumes the old CSF 1.1 ID.GV Category (governance concerns
+# were promoted out of Identify into their own Function). This file
+# reflects the 2.0 layout only; no CSF 1.1 anchors ship here.
+#
+# Regime scope caveat: CSF 2.0 is a US-origin voluntary framework
+# maintained by NIST, not an EU statutory instrument. The crosswalk
+# is a structural pointer against the operator's own control
+# catalogue — the assertion is that the named artifacts exercise the
+# Category outcomes in practice, not that they constitute a legal or
+# regulator interpretation of CSF. Where a CSF Category outcome
+# overlaps an EU obligation already carried by content/mappings/nis2/
+# or content/mappings/dora/, those regime-specific crosswalks remain
+# the authoritative pointer for the statutory surface.
+#
+# Coverage caveat: several Category outcomes (e.g. GV.OC organisational
+# mission, GV.OV oversight of the programme by senior leadership) are
+# governance obligations discharged against operator-owned artifacts
+# (mission statements, board minutes, risk appetite statements) rather
+# than against the SecOps-NG content catalogue directly. Those entries
+# ship a partial anchor set with an explanatory gap note; the operator's
+# own evidence discharges the outcome in practice.
+#
+# Reference: NIST CSWP 29, "The NIST Cybersecurity Framework (CSF)
+# 2.0", February 26, 2024. https://doi.org/10.6028/NIST.CSWP.29
+
+regime: nist_csf
+entries:
+
+  # ─── GOVERN (GV) ──────────────────────────────────────────────
+
+  - id: nist_csf:gv-oc-organizational-context
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: GV.OC
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Understand the circumstances — mission, stakeholder expectations,
+      dependencies, and legal, regulatory, and contractual requirements
+      — surrounding the organisation's cybersecurity risk management
+      decisions, and use that understanding to inform cybersecurity
+      risk management.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+      - control.ict_risk_governance@v1
+    playbook_refs:
+      - playbook.dora_ict_risk_selfassess@v1
+      - playbook.nis2_self_assessment@v1
+    notes: >-
+      Organisational-mission and stakeholder-expectation surfaces
+      (GV.OC-01, GV.OC-02) are operator-owned governance artifacts
+      that sit upstream of the SecOps-NG catalogue. The catalogue
+      anchors discharge the "understanding of legal, regulatory, and
+      contractual requirements" slice (GV.OC-03) via the regulatory
+      self-assessment playbooks and the risk-management policy
+      surface. Dependency-mapping outcomes (GV.OC-04, GV.OC-05) are
+      partially exercised via the supplier inventory captured under
+      GV.SC and the asset inventory captured under ID.AM.
+
+  - id: nist_csf:gv-rm-risk-management-strategy
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: GV.RM
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Establish, communicate, and use the organisation's priorities,
+      constraints, risk tolerance and risk appetite statements, and
+      assumptions to support operational cybersecurity risk decisions.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+      - control.ict_risk_framework_review@v1
+    playbook_refs:
+      - playbook.dora_ict_risk_selfassess@v1
+    notes: >-
+      Risk-appetite and risk-tolerance statements (GV.RM-02) are
+      operator-owned board-level artifacts; the catalogue anchors
+      discharge the "framework in place, reviewed on a cadence"
+      slice of the Category via the ICT risk-framework review
+      control and the DORA ICT-risk self-assessment playbook.
+
+  - id: nist_csf:gv-rr-roles-responsibilities-authorities
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: GV.RR
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Establish cybersecurity roles, responsibilities, and authorities
+      to foster accountability, performance assessment, and continuous
+      improvement.
+    status: draft
+    control_refs:
+      - control.ict_risk_governance@v1
+    playbook_refs:
+      - playbook.on_call_rotation@v1
+    notes: >-
+      Named-owner and accountability surfaces sit primarily in the
+      operator's HR and org-chart layer; the catalogue anchors
+      discharge the "on-call ownership is defined and rotated" slice
+      of GV.RR via the on-call rotation playbook, and the "programme
+      ownership is named at governance level" slice via the ICT risk
+      governance control.
+
+  - id: nist_csf:gv-po-policy
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: GV.PO
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Establish, communicate, and enforce organisational cybersecurity
+      policy so that expectations are visible to the workforce and
+      third parties.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+      - control.crypto_policy_inventory@v1
+    playbook_refs:
+      - playbook.cyber_hygiene_training@v1
+    notes: >-
+      Policy-instrument text itself is operator-owned. The catalogue
+      anchors discharge the "policy inventory is captured and
+      reviewed" slice (via risk-management-policy and
+      crypto-policy-inventory) and the "workforce is trained on the
+      policy" slice (via the cyber-hygiene-training playbook).
+
+  - id: nist_csf:gv-ov-oversight
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: GV.OV
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Use the results of enterprise cybersecurity risk management
+      activities and performance to inform, improve, and adjust the
+      risk management strategy.
+    status: draft
+    control_refs:
+      - control.control_effectiveness_test@v1
+      - control.security_assessment@v1
+    playbook_refs:
+      - playbook.executive_metrics@v1
+      - playbook.post_incident_review@v1
+    notes: >-
+      Executive-oversight of the programme is exercised via the
+      executive metrics playbook (periodic reporting to the
+      governance body) and the post-incident review playbook (lessons
+      learned feeding programme adjustment); the catalogue anchors
+      discharge the "control effectiveness is tested and evidenced"
+      slice.
+
+  - id: nist_csf:gv-sc-cybersecurity-supply-chain-risk-management
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: GV.SC
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Identify, establish, manage, monitor, and improve cyber supply
+      chain risk management processes among organisational stakeholders,
+      including suppliers, partners, and service providers.
+    status: draft
+    control_refs:
+      - control.supplier_inventory@v1
+      - control.provider_attestation@v1
+    playbook_refs:
+      - playbook.supply_chain_security@v1
+      - playbook.contractual_obligations_tracker@v1
+    notes: >-
+      GV.SC is the CSF 2.0 anchor for C-SCRM and consolidates the
+      supply-chain outcomes previously scattered across CSF 1.1
+      Categories. The catalogue anchors carry both the inventory /
+      attestation surface (supplier_inventory, provider_attestation)
+      and the contract-obligation-tracking surface, discharging the
+      operational slice; upstream vendor selection and contract text
+      remain operator-owned.
+
+  # ─── IDENTIFY (ID) ────────────────────────────────────────────
+
+  - id: nist_csf:id-am-asset-management
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: ID.AM
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Identify and manage the assets — hardware, software, services,
+      systems, facilities, personnel, and data — that enable the
+      organisation to achieve business purposes, consistent with their
+      relative importance to objectives and risk strategy.
+    status: draft
+    control_refs:
+      - control.asset_inventory_delta@v1
+      - control.sbom_capture@v1
+    playbook_refs:
+      - playbook.asset_management@v1
+    notes: >-
+      Asset-inventory ownership is a primary CSF 2.0 outcome and maps
+      directly to the SecOps-NG asset-management surface. The
+      hardware / software / data inventory sub-outcomes are all
+      exercised by the asset-management playbook plus the
+      asset-inventory delta and SBOM controls.
+
+  - id: nist_csf:id-ra-risk-assessment
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: ID.RA
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Understand the cybersecurity risk to the organisation, its assets,
+      and its individuals, including exposure to threats,
+      vulnerabilities, likelihoods, and impacts.
+    status: draft
+    control_refs:
+      - control.security_assessment@v1
+      - control.vuln_disclosure_intake@v1
+    playbook_refs:
+      - playbook.threat_intel_ingest@v1
+      - playbook.dora_ict_risk_selfassess@v1
+      - playbook.codebase_vuln_management@v1
+    notes: >-
+      ID.RA is exercised by the composite threat-intel + vulnerability
+      + risk-assessment surfaces. Threat identification lands in the
+      threat-intel playbook, vulnerability identification in the
+      codebase-vuln-management playbook and disclosure-intake control,
+      and risk aggregation in the DORA ICT-risk self-assessment.
+
+  - id: nist_csf:id-im-improvement
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: ID.IM
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Identify improvements to organisational cybersecurity risk
+      management processes, procedures, and activities across all six
+      Functions of the CSF.
+    status: draft
+    control_refs:
+      - control.post_incident_learning@v1
+      - control.control_effectiveness_test@v1
+    playbook_refs:
+      - playbook.post_incident_review@v1
+      - playbook.detection_engineering@v1
+    notes: >-
+      ID.IM is the CSF 2.0 continuous-improvement Category. The
+      catalogue anchors discharge the "lessons learned feed the
+      programme" slice via post-incident learning and review; the
+      detection-engineering playbook exercises the detection-side
+      improvement loop.
+
+  # ─── PROTECT (PR) ─────────────────────────────────────────────
+
+  - id: nist_csf:pr-aa-identity-management-authentication-and-access-control
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: PR.AA
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Manage access to physical and logical assets and associated
+      facilities so that it is limited to authorised users, services,
+      and hardware, and managed commensurate with the assessed risk of
+      unauthorised access.
+    status: draft
+    control_refs:
+      - control.access_enforcement@v1
+      - control.account_management@v1
+      - control.mfa_state_probe@v1
+      - control.least_privilege@v1
+      - control.cloud_identity_least_privilege@v1
+      - control.privileged_access_review@v1
+      - control.jml_evidence@v1
+      - control.service_identification_authentication@v1
+    playbook_refs:
+      - playbook.iam_auditor@v1
+      - playbook.onboarding_offboarding_tracker@v1
+      - playbook.mfa_secured_comms@v1
+    notes: >-
+      PR.AA is the largest single Category by control surface. The
+      catalogue anchors carry the identity / authentication /
+      authorisation slice end-to-end: joiner-mover-leaver evidence,
+      MFA state, least-privilege review, privileged-access review,
+      service-identity authentication, and the IAM audit playbook.
+
+  - id: nist_csf:pr-at-awareness-and-training
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: PR.AT
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Ensure the organisation's personnel and partners are provided
+      cybersecurity awareness education and are trained to perform
+      their cybersecurity-related duties consistent with related
+      policies, procedures, and agreements.
+    status: draft
+    control_refs:
+      - control.training_attestation@v1
+      - control.phishing_simulation@v1
+    playbook_refs:
+      - playbook.cyber_hygiene_training@v1
+      - playbook.phishing_triage@v1
+    notes: >-
+      Training-content authoring itself is operator-owned. The
+      catalogue anchors discharge the "training attendance is
+      attested" and "phishing exposure is exercised in-practice"
+      slices.
+
+  - id: nist_csf:pr-ds-data-security
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: PR.DS
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Manage data consistent with the organisation's risk strategy to
+      protect the confidentiality, integrity, and availability of
+      information.
+    status: draft
+    control_refs:
+      - control.crypto_policy_inventory@v1
+      - control.key_rotation_evidence@v1
+      - control.backup_attestation@v1
+    playbook_refs:
+      - playbook.cryptographic_controls@v1
+      - playbook.crypto_posture_management@v1
+      - playbook.data_exfil@v1
+    notes: >-
+      PR.DS spans data-at-rest, data-in-transit, and integrity
+      protections. The catalogue anchors carry the crypto surface
+      (policy inventory, key rotation evidence, crypto-controls and
+      posture-management playbooks) and the availability slice via
+      the backup-attestation control. The data-exfil playbook covers
+      the loss-prevention slice.
+
+  - id: nist_csf:pr-ps-platform-security
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: PR.PS
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Manage the hardware, software (firmware, operating systems,
+      applications), and services of physical and virtual platforms
+      consistent with the organisation's risk strategy to protect their
+      confidentiality, integrity, and availability.
+    status: draft
+    control_refs:
+      - control.configuration_settings@v1
+      - control.baseline_configuration@v1
+      - control.patch_evidence@v1
+      - control.iac_policy_guardrail@v1
+      - control.sbom_capture@v1
+    playbook_refs:
+      - playbook.patch_management@v1
+      - playbook.infra_posture_management@v1
+      - playbook.codebase_vuln_management@v1
+    notes: >-
+      PR.PS is the CSF 2.0 successor to the CSF 1.1
+      Information-Protection-Processes-and-Procedures / Protective
+      Technology grouping and now consolidates hardening,
+      patching, and secure-development outcomes. Catalogue anchors
+      exercise baseline configuration, patch evidence, IaC policy
+      guardrails, SBOM capture, and the patch / infra-posture
+      playbooks.
+
+  - id: nist_csf:pr-ir-technology-infrastructure-resilience
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: PR.IR
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Manage security architectures with the organisation's risk
+      strategy to protect asset confidentiality, integrity, and
+      availability and organisational resilience.
+    status: draft
+    control_refs:
+      - control.cspm_baseline@v1
+      - control.backup_attestation@v1
+      - control.restore_drill@v1
+    playbook_refs:
+      - playbook.business_continuity@v1
+      - playbook.backup_recovery@v1
+      - playbook.cloud_misconfiguration@v1
+      - playbook.ddos_response@v1
+    notes: >-
+      PR.IR is new in CSF 2.0 and consolidates resilience-of-
+      infrastructure outcomes. Catalogue anchors exercise the
+      cloud-posture baseline (segmentation and network-boundary
+      controls), the backup + restore-drill surface (recovery
+      capacity), and DDoS response.
+
+  # ─── DETECT (DE) ──────────────────────────────────────────────
+
+  - id: nist_csf:de-cm-continuous-monitoring
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: DE.CM
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Monitor assets to find anomalies, indicators of compromise, and
+      other potentially adverse events.
+    status: draft
+    control_refs:
+      - control.detection_coverage_evidence@v1
+      - control.cert_posture_scan@v1
+      - control.cspm_baseline@v1
+    playbook_refs:
+      - playbook.detection_engineering@v1
+      - playbook.threat_intel_ingest@v1
+    notes: >-
+      DE.CM is exercised by the detection-coverage evidence trail
+      (which detections are live against which telemetry surfaces),
+      the periodic cert / cloud-posture scans, and the
+      detection-engineering playbook lifecycle.
+
+  - id: nist_csf:de-ae-adverse-event-analysis
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: DE.AE
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Analyse anomalies, indicators of compromise, and other potentially
+      adverse events to characterise the events and detect cybersecurity
+      incidents.
+    status: draft
+    control_refs:
+      - control.incident_timeline_signals@v1
+      - control.recurring_incident_correlator@v1
+    playbook_refs:
+      - playbook.alert_triage@v1
+      - playbook.agentic_threat_response@v1
+    notes: >-
+      DE.AE is the CSF 2.0 analysis-of-detected-events Category. The
+      catalogue anchors exercise the alert-triage lifecycle,
+      incident-timeline-signal capture, and the recurring-incident
+      correlator that discharges the "characterise the events" slice.
+
+  # ─── RESPOND (RS) ─────────────────────────────────────────────
+
+  - id: nist_csf:rs-ma-incident-management
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: RS.MA
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Manage responses to detected cybersecurity incidents.
+    status: draft
+    control_refs:
+      - control.incident_handling_capability@v1
+    playbook_refs:
+      - playbook.incident_management@v1
+    notes: >-
+      RS.MA is the CSF 2.0 anchor for the incident-management
+      capability itself — programmatic response, not
+      technique-specific mitigation. Directly discharged by the
+      incident-handling capability control and the incident-management
+      playbook.
+
+  - id: nist_csf:rs-an-incident-analysis
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: RS.AN
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Conduct analysis to ensure effective response and support recovery
+      activities.
+    status: draft
+    control_refs:
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.identity_compromise@v1
+      - playbook.ransomware_containment@v1
+      - playbook.data_exfil@v1
+    notes: >-
+      RS.AN covers investigation and forensic characterisation
+      during a live incident. Catalogue anchors exercise the
+      technique-specific investigation playbooks (identity compromise,
+      ransomware, data exfiltration) plus the timeline-signals control
+      that discharges the reconstruction slice.
+
+  - id: nist_csf:rs-co-incident-response-reporting-and-communication
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: RS.CO
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Coordinate response activities with internal and external
+      stakeholders as required by laws, regulations, or policies.
+    status: draft
+    control_refs:
+      - control.crisis_communication_plan@v1
+      - control.oob_channel_probe@v1
+      - control.dora_submission_templates@v1
+      - control.cra_submission_templates@v1
+    playbook_refs:
+      - playbook.cra_srp_notify@v1
+      - playbook.mfa_secured_comms@v1
+    notes: >-
+      RS.CO overlaps the EU statutory notification surface (NIS2
+      Art. 23, DORA Art. 19, CRA Art. 14). The regime-specific
+      crosswalks under content/mappings/nis2/ and dora/ remain the
+      authoritative pointer for the statutory obligations; the
+      catalogue anchors here carry the CSF-slice reporting artifacts.
+
+  - id: nist_csf:rs-mi-incident-mitigation
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: RS.MI
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Perform activities to prevent expansion of an event and mitigate
+      its effects.
+    status: draft
+    control_refs:
+      - control.incident_handling_capability@v1
+    playbook_refs:
+      - playbook.ransomware_containment@v1
+      - playbook.cloud_misconfiguration@v1
+      - playbook.data_exfil@v1
+    notes: >-
+      RS.MI covers containment and eradication actions during an
+      active incident. Catalogue anchors exercise the technique-
+      specific containment playbooks.
+
+  # ─── RECOVER (RC) ─────────────────────────────────────────────
+
+  - id: nist_csf:rc-rp-incident-recovery-plan-execution
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: RC.RP
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Execute recovery activities to restore systems and services
+      affected by cybersecurity incidents.
+    status: draft
+    control_refs:
+      - control.restore_drill@v1
+      - control.backup_attestation@v1
+    playbook_refs:
+      - playbook.backup_recovery@v1
+      - playbook.business_continuity@v1
+    notes: >-
+      RC.RP is exercised by the periodic restore-drill control (the
+      tested-recovery-capability slice) plus the backup-recovery and
+      business-continuity playbooks (the plan-execution slice).
+
+  - id: nist_csf:rc-co-incident-recovery-communication
+    regulation:
+      name: NIST CSF 2.0
+      instrument: NIST Cybersecurity Framework 2.0 (NIST CSWP 29)
+      article: RC.CO
+      url: https://doi.org/10.6028/NIST.CSWP.29
+    obligation: >-
+      Coordinate restoration activities with internal and external
+      parties.
+    status: draft
+    control_refs:
+      - control.crisis_communication_plan@v1
+    playbook_refs:
+      - playbook.business_continuity@v1
+    notes: >-
+      RC.CO covers the recovery-side communication surface
+      (customer notifications, public statements, coordination with
+      recovery partners). The crisis-communication-plan control plus
+      the business-continuity playbook discharge the catalogue-side
+      slice; public-messaging content itself is operator-owned.
