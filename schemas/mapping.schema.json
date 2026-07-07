@@ -10,7 +10,7 @@
     "regime": {
       "description": "Regime key matching the directory name under content/mappings/.",
       "type": "string",
-      "enum": ["nis2", "dora", "cra", "gdpr", "eu_ai_act", "iso27001", "soc2"]
+      "enum": ["nis2", "dora", "cra", "gdpr", "eu_ai_act", "iso27001", "soc2", "nist_csf"]
     },
     "entries": {
       "type": "array",
@@ -30,9 +30,9 @@
   ],
   "properties": {
     "id": {
-      "description": "Stable mapping identifier. Format: `<regime>:<slug>` where <regime> is the lowercase regime key (nis2, dora, cra, gdpr, iso27001, soc2) and <slug> is a short kebab-case obligation slug, typically derived from the article/section number plus a subpoint.",
+      "description": "Stable mapping identifier. Format: `<regime>:<slug>` where <regime> is the lowercase regime key (nis2, dora, cra, gdpr, iso27001, soc2, nist_csf) and <slug> is a short kebab-case obligation slug, typically derived from the article/section number plus a subpoint.",
       "type": "string",
-      "pattern": "^(nis2|dora|cra|gdpr|eu_ai_act|iso27001|soc2):[a-z0-9][a-z0-9.-]*$",
+      "pattern": "^(nis2|dora|cra|gdpr|eu_ai_act|iso27001|soc2|nist_csf):[a-z0-9][a-z0-9.-]*$",
       "minLength": 3,
       "maxLength": 120
     },
