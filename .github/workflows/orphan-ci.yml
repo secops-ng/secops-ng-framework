@@ -85,6 +85,7 @@ on:
       - "tests/content/test_oscal_gdpr_component_definition.py"
       - "tests/content/test_oscal_eu_ai_act_component_definition.py"
       - "tests/content/test_oscal_soc2_component_definition.py"
+      - "tests/content/test_oscal_soc2_component_definition_roundtrip.py"
       - "tests/content/test_oscal_iso27001_component_definition.py"
       - "tests/content/test_oscal_iso27001_component_definition_roundtrip.py"
       - "content/controls/**"
@@ -1014,6 +1015,76 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: g-06-soc2-oscal-component-definition
+          path: content/mappings/soc2/oscal-component-definition.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  soc2-oscal-extend:
+    # G-06 contributor-adoption — SOC 2 OSCAL component-definition
+    # EXTEND lane. Complements the sibling
+    # `soc2-oscal-component-definition` job (SKELETON+CORE parity)
+    # with a round-trip cross-reference check: every OSCAL
+    # `implemented-requirement` must point at a real `stable_id` shipped
+    # under `content/controls/`, no component may ship zero
+    # implemented-requirements, and the IR count may not regress below
+    # the SKELETON baseline (90 as of PR #692). Runs on the same nightly
+    # cadence as the sibling lane; on PRs it fires on changes to the
+    # SOC 2 mapping tree, the control catalogue, or the round-trip
+    # test module. Mirrors `iso27001-oscal-extend`.
+    name: G-06 SOC 2 OSCAL component-definition EXTEND (round-trip)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML, pytest)
+        run: pip install --no-cache-dir pyyaml pytest
+
+      - name: Run SOC 2 OSCAL round-trip assertion tests
+        run: |
+          python -m pytest tests/content/test_oscal_soc2_component_definition_roundtrip.py -q
+
+      - name: Assert no orphan components in SOC 2 OSCAL surface
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          path = Path("content/mappings/soc2/oscal-component-definition.json")
+          if not path.is_file():
+              sys.exit(f"FAIL: {path} is missing")
+
+          doc = json.loads(path.read_text())
+          components = doc.get("component-definition", {}).get("components", []) or []
+          orphans = []
+          for c in components:
+              total = 0
+              for ci in c.get("control-implementations", []) or []:
+                  total += len(ci.get("implemented-requirements", []) or [])
+              if total == 0:
+                  orphans.append(c.get("title") or c.get("uuid", "<unknown>"))
+          if orphans:
+              sys.exit(
+                  "FAIL: SOC 2 OSCAL component-definition ships "
+                  f"{len(orphans)} orphan component(s) with zero "
+                  f"implemented-requirements: {', '.join(orphans)}"
+              )
+          print(f"OK: {len(components)} component(s), zero orphan(s)")
+          PY
+
+      - name: Upload SOC 2 OSCAL EXTEND artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g-06-soc2-oscal-extend
           path: content/mappings/soc2/oscal-component-definition.json
           if-no-files-found: warn
           retention-days: 30
