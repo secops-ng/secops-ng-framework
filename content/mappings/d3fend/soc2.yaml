@@ -1,0 +1,340 @@
+# D3FEND techniques anchored to SOC 2 Trust Services Criteria.
+#
+# SKELETON — representative D3FEND defensive-technique crosswalk against
+# a cross-section of the AICPA Trust Services Criteria (2017, as
+# revised). Coverage spans the Security Common Criteria anchor cluster
+# (CC6.1 logical access, CC6.6 boundary protection, CC6.8 malicious
+# software, CC7.1 configuration monitoring, CC7.2 anomaly detection,
+# CC9.2 vendor risk) plus the Availability (A1.1) and Processing
+# Integrity (PI1.1) neighbours.
+#
+# One entry per (SOC 2 TSC criterion, D3FEND technique) pair. Each
+# entry round-trips through `regulation_refs.entry_id` to a real entry
+# under content/mappings/soc2/tsc-*.yaml, and each `control_refs[*]`
+# to a real `stable_id` under content/controls/. Technique anchors are
+# sourced verbatim from the `d3fend_refs` blocks of the cited controls
+# — no invented ids.
+#
+# Entries are grouped by TSC category (Common Criteria before category-
+# specific criteria), then by criterion id (ascending), then by D3FEND
+# technique slug.
+#
+# Regime scope caveat: SOC 2 is a private-sector assurance framework
+# (AICPA attestation standard AT-C 105 / AT-C 205), not an EU statutory
+# instrument. The crosswalk is a structural pointer against the
+# operator's own report-time evidence — the assertion here is that the
+# named artifacts exercise the criterion in practice, not that they
+# constitute a legal or auditor interpretation of the TSC.
+#
+# Sibling coverage in this tree:
+#   * nis2.yaml       — NIS2 Art. 21(2) / Art. 23 (CORE)
+#   * dora.yaml       — DORA Art. 5–14, Art. 18–19, Art. 28–30 (CORE)
+#   * cra.yaml        — CRA Annex I §1 / §2 / Art. 13 / Art. 14 (CORE)
+#   * gdpr.yaml       — GDPR Art. 25 / 32 / 33 / 34 / 35 (CORE)
+#   * eu_ai_act.yaml  — EU AI Act Art. 6 / 9 / 11 / 13 / 72 (CORE)
+#   * iso27001.yaml   — ISO/IEC 27001:2022 Annex A (SKELETON)
+#
+# CORE-depth expansion (broader TSC coverage across Confidentiality and
+# Privacy categories, playbook_refs, OCSF field bindings) is out of
+# scope for this tier — a sibling CORE card broadens the crosswalk
+# once this SKELETON lands.
+regime: d3fend
+entries:
+  # -------------------------------------------------------------------
+  # CC6 — Logical and Physical Access Controls
+  # -------------------------------------------------------------------
+
+  - id: d3fend:soc2:cc6-1-logical-access-controls:access-mediation
+    technique:
+      d3fend_id: d3f:AccessMediation
+      technique_name: Access Mediation
+      url: https://d3fend.mitre.org/technique/d3f:AccessMediation/
+    control_refs:
+      - control.access_enforcement@v1
+    regulation_refs:
+      - regime: soc2
+        instrument: AICPA Trust Services Criteria (2017, as revised)
+        article: CC6.1
+        entry_id: soc2:cc6-1-logical-access-controls
+    status: draft
+    notes: >-
+      CC6.1 requires the entity to implement logical access security
+      software, infrastructure, and architectures over protected
+      information assets. `AccessMediation` is the D3FEND anchor named
+      by `control.access_enforcement@v1`, which carries the operator's
+      evidence that authorisation decisions are enforced at request
+      time by the access-control plane.
+
+  - id: d3fend:soc2:cc6-1-logical-access-controls:local-account-monitoring
+    technique:
+      d3fend_id: d3f:LocalAccountMonitoring
+      technique_name: Local Account Monitoring
+      url: https://d3fend.mitre.org/technique/d3f:LocalAccountMonitoring/
+    control_refs:
+      - control.cloud_identity_least_privilege@v1
+    regulation_refs:
+      - regime: soc2
+        instrument: AICPA Trust Services Criteria (2017, as revised)
+        article: CC6.1
+        entry_id: soc2:cc6-1-logical-access-controls
+    status: draft
+    notes: >-
+      CC6.1's logical-access umbrella includes the ongoing review of
+      account posture in cloud identity providers.
+      `LocalAccountMonitoring` is the D3FEND anchor on
+      `control.cloud_identity_least_privilege@v1`, tracking the
+      privilege-drift signal that discharges the recurring
+      access-review side of the CC6.1 obligation.
+
+  - id: d3fend:soc2:cc6-1-logical-access-controls:local-file-permissions
+    technique:
+      d3fend_id: d3f:LocalFilePermissions
+      technique_name: Local File Permissions
+      url: https://d3fend.mitre.org/technique/d3f:LocalFilePermissions/
+    control_refs:
+      - control.least_privilege@v1
+    regulation_refs:
+      - regime: soc2
+        instrument: AICPA Trust Services Criteria (2017, as revised)
+        article: CC6.1
+        entry_id: soc2:cc6-1-logical-access-controls
+    status: draft
+    notes: >-
+      CC6.1 subsumes the least-privilege obligation on access rights.
+      `LocalFilePermissions` is the D3FEND anchor on
+      `control.least_privilege@v1`, tracking the object-level
+      permission posture that discharges the "minimum necessary
+      access" side of the CC6.1 criterion.
+
+  - id: d3fend:soc2:cc6-6-boundary-protection:certificate-based-authentication
+    technique:
+      d3fend_id: d3f:Certificate-basedAuthentication
+      technique_name: Certificate-based Authentication
+      url: https://d3fend.mitre.org/technique/d3f:Certificate-basedAuthentication/
+    control_refs:
+      - control.service_identification_authentication@v1
+    regulation_refs:
+      - regime: soc2
+        instrument: AICPA Trust Services Criteria (2017, as revised)
+        article: CC6.6
+        entry_id: soc2:cc6-6-boundary-protection
+    status: draft
+    notes: >-
+      CC6.6 requires the entity to implement logical access-security
+      measures to protect against threats from outside the system
+      boundaries. `Certificate-basedAuthentication` is the D3FEND
+      anchor on `control.service_identification_authentication@v1`,
+      covering the service-to-service authentication posture that
+      discharges the identity side of the boundary-protection
+      obligation.
+
+  - id: d3fend:soc2:cc6-6-boundary-protection:multi-factor-authentication
+    technique:
+      d3fend_id: d3f:Multi-factorAuthentication
+      technique_name: Multi-factor Authentication
+      url: https://d3fend.mitre.org/technique/d3f:Multi-factorAuthentication/
+    control_refs:
+      - control.mfa_state_probe@v1
+    regulation_refs:
+      - regime: soc2
+        instrument: AICPA Trust Services Criteria (2017, as revised)
+        article: CC6.6
+        entry_id: soc2:cc6-6-boundary-protection
+    status: draft
+    notes: >-
+      CC6.6 covers protection against unauthorised external access.
+      `Multi-factorAuthentication` is the D3FEND anchor on
+      `control.mfa_state_probe@v1`, carrying the recurring MFA-coverage
+      evidence that discharges the credential-strength side of the
+      CC6.6 boundary-protection criterion.
+
+  - id: d3fend:soc2:cc6-8-malicious-software-prevention:software-inventory
+    technique:
+      d3fend_id: d3f:SoftwareInventory
+      technique_name: Software Inventory
+      url: https://d3fend.mitre.org/technique/d3f:SoftwareInventory/
+    control_refs:
+      - control.sbom_capture@v1
+    regulation_refs:
+      - regime: soc2
+        instrument: AICPA Trust Services Criteria (2017, as revised)
+        article: CC6.8
+        entry_id: soc2:cc6-8-malicious-software-prevention
+    status: draft
+    notes: >-
+      CC6.8 requires the entity to prevent, detect, and act on the
+      introduction of unauthorised or malicious software.
+      `SoftwareInventory` is the D3FEND anchor on
+      `control.sbom_capture@v1`, giving the operator the known-good
+      inventory baseline against which unauthorised software is
+      recognised.
+
+  # -------------------------------------------------------------------
+  # CC7 — System Operations
+  # -------------------------------------------------------------------
+
+  - id: d3fend:soc2:cc7-1-detection-of-configuration-changes:software-update
+    technique:
+      d3fend_id: d3f:SoftwareUpdate
+      technique_name: Software Update
+      url: https://d3fend.mitre.org/technique/d3f:SoftwareUpdate/
+    control_refs:
+      - control.patch_evidence@v1
+    regulation_refs:
+      - regime: soc2
+        instrument: AICPA Trust Services Criteria (2017, as revised)
+        article: CC7.1
+        entry_id: soc2:cc7-1-detection-of-configuration-changes
+    status: draft
+    notes: >-
+      CC7.1 requires the entity to use detection and monitoring
+      procedures to identify changes to configurations that result in
+      the introduction of new vulnerabilities. `SoftwareUpdate` is the
+      D3FEND anchor on `control.patch_evidence@v1`, tracking the
+      remediation timeline that closes vulnerabilities surfaced by the
+      configuration-change signal.
+
+  - id: d3fend:soc2:cc7-1-detection-of-configuration-changes:system-configuration-permissions
+    technique:
+      d3fend_id: d3f:SystemConfigurationPermissions
+      technique_name: System Configuration Permissions
+      url: https://d3fend.mitre.org/technique/d3f:SystemConfigurationPermissions/
+    control_refs:
+      - control.configuration_settings@v1
+      - control.cspm_baseline@v1
+    regulation_refs:
+      - regime: soc2
+        instrument: AICPA Trust Services Criteria (2017, as revised)
+        article: CC7.1
+        entry_id: soc2:cc7-1-detection-of-configuration-changes
+    status: draft
+    notes: >-
+      CC7.1's monitoring obligation attaches to the baseline
+      configuration posture. `SystemConfigurationPermissions` is the
+      D3FEND anchor on both `control.configuration_settings@v1` (the
+      declared baseline) and `control.cspm_baseline@v1` (the cloud
+      posture-management signal), giving the operator the drift
+      detection surface CC7.1 requires.
+
+  - id: d3fend:soc2:cc7-2-monitoring-of-system-components:network-traffic-analysis
+    technique:
+      d3fend_id: d3f:NetworkTrafficAnalysis
+      technique_name: Network Traffic Analysis
+      url: https://d3fend.mitre.org/technique/d3f:NetworkTrafficAnalysis/
+    control_refs:
+      - control.detection_coverage_evidence@v1
+    regulation_refs:
+      - regime: soc2
+        instrument: AICPA Trust Services Criteria (2017, as revised)
+        article: CC7.2
+        entry_id: soc2:cc7-2-monitoring-of-system-components
+    status: draft
+    notes: >-
+      CC7.2 requires the entity to monitor system components and the
+      operation of those components for anomalies indicative of
+      malicious acts, natural disasters, and errors.
+      `NetworkTrafficAnalysis` is one of the D3FEND anchors on
+      `control.detection_coverage_evidence@v1`, evidencing the
+      detection-surface coverage that discharges the anomaly-detection
+      side of the CC7.2 criterion.
+
+  # -------------------------------------------------------------------
+  # CC9 — Risk Mitigation
+  # -------------------------------------------------------------------
+
+  - id: d3fend:soc2:cc9-2-vendor-and-business-partner-risk-management:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.supplier_inventory@v1
+      - control.provider_attestation@v1
+    regulation_refs:
+      - regime: soc2
+        instrument: AICPA Trust Services Criteria (2017, as revised)
+        article: CC9.2
+        entry_id: soc2:cc9-2-vendor-and-business-partner-risk-management
+    status: draft
+    notes: >-
+      CC9.2 requires the entity to assess and manage risks associated
+      with vendors and business partners. `OperationalActivityMapping`
+      is the D3FEND anchor on both `control.supplier_inventory@v1` (the
+      known-vendor register) and `control.provider_attestation@v1` (the
+      recurring attestation-freshness signal), which together
+      discharge the ongoing third-party-risk obligation.
+
+  # -------------------------------------------------------------------
+  # A1 — Availability
+  # -------------------------------------------------------------------
+
+  - id: d3fend:soc2:a1-1-availability-commitments-and-capacity:asset-inventory
+    technique:
+      d3fend_id: d3f:AssetInventory
+      technique_name: Asset Inventory
+      url: https://d3fend.mitre.org/technique/d3f:AssetInventory/
+    control_refs:
+      - control.asset_inventory_delta@v1
+    regulation_refs:
+      - regime: soc2
+        instrument: AICPA Trust Services Criteria (2017, as revised)
+        article: A1.1
+        entry_id: soc2:a1-1-availability-commitments-and-capacity
+    status: draft
+    notes: >-
+      A1.1 requires the entity to maintain, monitor, and evaluate
+      current processing capacity and use of system components to
+      manage capacity demand and enable additional capacity to help
+      meet its availability objectives. `AssetInventory` is the D3FEND
+      anchor on `control.asset_inventory_delta@v1`, giving the
+      operator the current-state inventory signal against which
+      capacity commitments are evaluated.
+
+  - id: d3fend:soc2:a1-1-availability-commitments-and-capacity:system-configuration-permissions
+    technique:
+      d3fend_id: d3f:SystemConfigurationPermissions
+      technique_name: System Configuration Permissions
+      url: https://d3fend.mitre.org/technique/d3f:SystemConfigurationPermissions/
+    control_refs:
+      - control.baseline_configuration@v1
+      - control.cspm_baseline@v1
+    regulation_refs:
+      - regime: soc2
+        instrument: AICPA Trust Services Criteria (2017, as revised)
+        article: A1.1
+        entry_id: soc2:a1-1-availability-commitments-and-capacity
+    status: draft
+    notes: >-
+      A1.1's availability obligation depends on the declared baseline
+      configuration and its drift-detection posture.
+      `SystemConfigurationPermissions` is the D3FEND anchor on both
+      `control.baseline_configuration@v1` and
+      `control.cspm_baseline@v1`, which together evidence the
+      configuration-stability surface that underpins availability
+      commitments.
+
+  # -------------------------------------------------------------------
+  # PI1 — Processing Integrity
+  # -------------------------------------------------------------------
+
+  - id: d3fend:soc2:pi1-1-quality-information-for-internal-controls:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.control_effectiveness_test@v1
+    regulation_refs:
+      - regime: soc2
+        instrument: AICPA Trust Services Criteria (2017, as revised)
+        article: PI1.1
+        entry_id: soc2:pi1-1-quality-information-for-internal-controls
+    status: draft
+    notes: >-
+      PI1.1 requires the entity to obtain or generate, use, and
+      communicate relevant, quality information regarding the
+      objectives related to processing to support the functioning of
+      internal control. `OperationalActivityMapping` is the D3FEND
+      anchor on `control.control_effectiveness_test@v1`, evidencing
+      the recurring proof that the operator's internal controls are
+      exercised end-to-end.
