@@ -33,6 +33,7 @@ on:
       - "content/mappings/gdpr/**"
       - "content/mappings/nis2/**"
       - "content/mappings/eu_ai_act/**"
+      - "content/mappings/d3fend/**"
       - "content/metrics/**"
       - "tools/lint_playbook_orphans.py"
       - "tools/lint_cra_playbook_orphans.py"
@@ -85,6 +86,8 @@ on:
       - "tests/content/test_oscal_eu_ai_act_component_definition.py"
       - "tests/content/test_oscal_soc2_component_definition.py"
       - "tests/content/test_oscal_iso27001_component_definition.py"
+      - "content/mappings/d3fend/**"
+      - "tests/content/test_d3fend_gdpr_crosswalk.py"
       - ".github/workflows/orphan-ci.yml"
   push:
     branches: [main]
@@ -95,6 +98,7 @@ on:
       - "content/mappings/gdpr/**"
       - "content/mappings/nis2/**"
       - "content/mappings/eu_ai_act/**"
+      - "content/mappings/d3fend/**"
       - "content/metrics/**"
       - "content/telemetry/**"
       - "tools/lint_playbook_orphans.py"
@@ -1077,5 +1081,71 @@ jobs:
         with:
           name: g-06-iso27001-oscal-component-definition
           path: content/mappings/iso27001/oscal-component-definition.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  d3fend-gdpr-crosswalk:
+    # G-02 regulatory-mapping coverage — D3FEND ↔ GDPR crosswalk
+    # assertion lane. Complements the per-framework orphan-CI matrix by
+    # shape-checking `content/mappings/d3fend/gdpr.yaml` (the SKELETON
+    # crosswalk) on every PR touching the d3fend tree and every night.
+    # Two invariants:
+    #   * schema-shape tests in
+    #     `tests/content/test_d3fend_gdpr_crosswalk.py` pass — every
+    #     `control_refs[*]` resolves to a real `content/controls/*.yaml`
+    #     stable_id, and every `regulation_refs[*].entry_id` resolves
+    #     to a real entry under `content/mappings/gdpr/*.yaml`; and
+    #   * the crosswalk ships at least 10 entries — the baseline
+    #     established by the F-MAP-D3FEND-GDPR SKELETON. Any regression
+    #     below the baseline hard-fails the job.
+    name: G-02 D3FEND↔GDPR crosswalk assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML, pytest)
+        run: pip install --no-cache-dir pyyaml pytest
+
+      - name: Run D3FEND↔GDPR crosswalk schema-shape tests
+        run: |
+          python -m pytest tests/content/test_d3fend_gdpr_crosswalk.py -q
+
+      - name: Assert D3FEND↔GDPR crosswalk entry count ≥ 10 (SKELETON baseline)
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+
+          import yaml
+
+          path = Path("content/mappings/d3fend/gdpr.yaml")
+          if not path.is_file():
+              sys.exit(f"FAIL: {path} is missing")
+
+          doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+          entries = doc.get("entries") or []
+          baseline = 10
+          if len(entries) < baseline:
+              sys.exit(
+                  f"FAIL: D3FEND↔GDPR crosswalk entry count {len(entries)} "
+                  f"regressed below SKELETON baseline {baseline}"
+              )
+          print(f"OK: D3FEND↔GDPR crosswalk entries = {len(entries)} (≥ {baseline})")
+          PY
+
+      - name: Upload D3FEND↔GDPR crosswalk artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g-02-d3fend-gdpr-crosswalk
+          path: content/mappings/d3fend/gdpr.yaml
           if-no-files-found: warn
           retention-days: 30
