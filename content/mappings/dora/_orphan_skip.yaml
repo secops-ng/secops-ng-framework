@@ -143,3 +143,46 @@ skip:
       graph if a documented interaction is authored (for example
       a shared attestation surface across financial-entity
       operators subject to both regimes).
+
+  - slug: eu_ai_act_risk_management
+    rationale: >-
+      EU AI Act Art. 9 provider-side risk-management lifecycle for
+      high-risk AI systems. The playbook's outbound overlay
+      (`content/playbooks/eu_ai_act_risk_management/mappings.yaml`,
+      top-of-file scope-review block and `dora: []` array) deliberately
+      does not pin DORA entries: Art. 9 is a product-lifecycle
+      obligation on providers of high-risk AI systems under Regulation
+      (EU) 2024/1689, while DORA Art. 6 ICT risk-management framework
+      operates on the ICT operations of financial entities and Art. 8
+      covers ICT-system protection on the same operator surface.
+      Neither DORA anchor has a documented interaction with the AI
+      Act provider-side risk-management obligation that would justify
+      a direct inbound edge — the two regimes address different
+      obligated parties across the AI-system value chain. The EU AI
+      Act inbound graph is closed via
+      `content/mappings/eu_ai_act/article-09-*.yaml` (Art. 9(1)-(6)
+      atoms) with sibling Art. 11 + Annex IV, Art. 13, and Art. 72
+      entries. A sibling CORE / EXTEND card revisits the DORA cross-
+      regime graph once the ESAs or the AI Office document a
+      documented interaction (for example a financial-entity provider
+      of a high-risk AI system whose Art. 9 lifecycle discipline
+      overlaps DORA Art. 6 framework review on the same ICT surface).
+
+  - slug: agentic_threat_response
+    rationale: >-
+      SKELETON — agentic-threat detection and response scaffold.
+      The playbook's outbound overlay
+      (`content/playbooks/agentic_threat_response/mappings.yaml`)
+      deliberately does not pin DORA entries at SKELETON time:
+      the DORA major-incident classification (Art. 18) and
+      reporting (Art. 19) engine is already anchored on
+      `playbook.incident_management@v1`, which this scaffold
+      hands off to via the escalate step. Cross-pinning the
+      agentic-threat scaffold under DORA Art. 18 / 19 at SKELETON
+      time would duplicate the incident-management anchor without
+      adding an obligation-surface distinction. A sibling CORE /
+      EXTEND card revisits the DORA cross-regime graph once the
+      JC RTS on ICT risk management framework (Commission
+      Delegated Regulation (EU) 2024/1774) coverage is extended
+      to the agentic-tradecraft indicator class.
+

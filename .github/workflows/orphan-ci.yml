@@ -32,6 +32,8 @@ on:
       - "content/mappings/dora/**"
       - "content/mappings/gdpr/**"
       - "content/mappings/nis2/**"
+      - "content/mappings/eu_ai_act/**"
+      - "content/mappings/d3fend/**"
       - "content/metrics/**"
       - "tools/lint_playbook_orphans.py"
       - "tools/lint_cra_playbook_orphans.py"
@@ -60,6 +62,7 @@ on:
       - "tests/content/test_dora_playbook_orphans.py"
       - "tests/content/test_gdpr_playbook_orphans.py"
       - "tests/content/test_nis2_playbook_orphans.py"
+      - "tests/content/test_eu_ai_act_playbook_orphans.py"
       - "tests/content/test_posture_ocsf_bindings.py"
       - "tests/content/test_detection_ocsf_bindings.py"
       - "tests/content/test_catalogue_ocsf_bindings.py"
@@ -80,6 +83,19 @@ on:
       - "tests/content/test_nis2_latency_ocsf_bindings.py"
       - "tests/content/test_gdpr_latency_ocsf_bindings.py"
       - "tests/content/test_oscal_gdpr_component_definition.py"
+      - "tests/content/test_oscal_eu_ai_act_component_definition.py"
+      - "tests/content/test_oscal_soc2_component_definition.py"
+      - "tests/content/test_oscal_soc2_component_definition_roundtrip.py"
+      - "tests/content/test_oscal_iso27001_component_definition.py"
+      - "tests/content/test_oscal_iso27001_component_definition_roundtrip.py"
+      - "content/controls/**"
+      - "content/mappings/d3fend/**"
+      - "tests/content/test_d3fend_gdpr_crosswalk.py"
+      - "tests/content/test_d3fend_nis2_crosswalk.py"
+      - "tests/content/test_d3fend_dora_crosswalk.py"
+      - "tests/content/test_d3fend_cra_crosswalk.py"
+      - "tests/content/test_d3fend_euaiact_crosswalk.py"
+      - "tests/content/test_d3fend_iso27001_crosswalk.py"
       - ".github/workflows/orphan-ci.yml"
   push:
     branches: [main]
@@ -89,6 +105,8 @@ on:
       - "content/mappings/dora/**"
       - "content/mappings/gdpr/**"
       - "content/mappings/nis2/**"
+      - "content/mappings/eu_ai_act/**"
+      - "content/mappings/d3fend/**"
       - "content/metrics/**"
       - "content/telemetry/**"
       - "tools/lint_playbook_orphans.py"
@@ -129,7 +147,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        framework: [cra, dora, gdpr, nis2]
+        framework: [cra, dora, gdpr, nis2, eu_ai_act]
     steps:
       - name: Checkout (full history for baseline diff)
         uses: actions/checkout@v4
@@ -860,3 +878,748 @@ jobs:
               )
           print(f"OK: GDPR OSCAL implemented-requirements = {ir_count} (≥ {baseline})")
           PY
+
+  eu-ai-act-oscal-component-definition:
+    # G-02 regulatory-mapping coverage — EU AI Act OSCAL component-definition
+    # parity lane. EU AI Act is the fifth regulatory axis to ship an OSCAL
+    # component definition (CRA / DORA / NIS2 / GDPR shipped earlier); this
+    # nightly job guards the EU AI Act file specifically so out-of-band
+    # regressions (schema drift, deletion, silent IR shrink) surface
+    # even when a PR does not touch it. Two invariants:
+    #   * schema + coverage tests in
+    #     `tests/content/test_oscal_eu_ai_act_component_definition.py` pass
+    #     against the shipped component definition; and
+    #   * the OSCAL component definition ships at least 4
+    #     implemented-requirements — the baseline established by the
+    #     F-MAP-G02-EUAIACT SKELETON (Art. 9 / 11 / 13 / 72 coverage).
+    #     Any regression below the baseline hard-fails the job.
+    name: G-02 EU AI Act OSCAL component-definition assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML, jsonschema, pytest)
+        run: pip install --no-cache-dir pyyaml jsonschema pytest
+
+      - name: Run EU AI Act OSCAL component-definition schema + coverage tests
+        run: |
+          python -m pytest tests/content/test_oscal_eu_ai_act_component_definition.py -q
+
+      - name: Assert EU AI Act OSCAL implemented-requirement count ≥ 4 (SKELETON baseline)
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          path = Path("content/mappings/eu_ai_act/oscal-component-definition.json")
+          if not path.is_file():
+              sys.exit(f"FAIL: {path} is missing")
+
+          doc = json.loads(path.read_text())
+          components = doc.get("component-definition", {}).get("components", [])
+          ir_count = sum(
+              len(ci.get("implemented-requirements", []) or [])
+              for c in components
+              for ci in c.get("control-implementations", []) or []
+          )
+          baseline = 4
+          if ir_count < baseline:
+              sys.exit(
+                  f"FAIL: EU AI Act OSCAL implemented-requirement count {ir_count} "
+                  f"regressed below SKELETON baseline {baseline}"
+              )
+          print(f"OK: EU AI Act OSCAL implemented-requirements = {ir_count} (≥ {baseline})")
+          PY
+
+      - name: Upload EU AI Act OSCAL component-definition artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g-02-eu-ai-act-oscal-component-definition
+          path: content/mappings/eu_ai_act/oscal-component-definition.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  soc2-oscal-component-definition:
+    # G-06 contributor-adoption — SOC 2 OSCAL component-definition
+    # parity lane. SOC 2 rounds out the OSCAL component-definition
+    # coverage set (CRA / DORA / NIS2 / GDPR / EU AI Act / ISO 27001
+    # shipped earlier) so operators running SOC 2 audits alongside EU
+    # regulatory work get the same nightly KRI instrumentation.
+    # Two invariants:
+    #   * schema + coverage tests in
+    #     `tests/content/test_oscal_soc2_component_definition.py` pass
+    #     against the shipped component definition; and
+    #   * the OSCAL component definition ships at least 90
+    #     implemented-requirements — the baseline established by the
+    #     F-SOC2-OSCAL SKELETON (five Trust Services Criteria
+    #     categories: Security, Availability, Confidentiality,
+    #     Processing Integrity, Privacy). Any regression below the
+    #     baseline hard-fails the job.
+    name: G-06 SOC 2 OSCAL component-definition assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML, jsonschema, pytest)
+        run: pip install --no-cache-dir pyyaml jsonschema pytest
+
+      - name: Run SOC 2 OSCAL component-definition schema + coverage tests
+        run: |
+          python -m pytest tests/content/test_oscal_soc2_component_definition.py -q
+
+      - name: Assert SOC 2 OSCAL implemented-requirement count ≥ 90 (SKELETON baseline)
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          path = Path("content/mappings/soc2/oscal-component-definition.json")
+          if not path.is_file():
+              sys.exit(f"FAIL: {path} is missing")
+
+          doc = json.loads(path.read_text())
+          components = doc.get("component-definition", {}).get("components", [])
+          ir_count = sum(
+              len(ci.get("implemented-requirements", []) or [])
+              for c in components
+              for ci in c.get("control-implementations", []) or []
+          )
+          baseline = 90
+          if ir_count < baseline:
+              sys.exit(
+                  f"FAIL: SOC 2 OSCAL implemented-requirement count {ir_count} "
+                  f"regressed below SKELETON baseline {baseline}"
+              )
+          print(f"OK: SOC 2 OSCAL implemented-requirements = {ir_count} (≥ {baseline})")
+          PY
+
+      - name: Upload SOC 2 OSCAL component-definition artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g-06-soc2-oscal-component-definition
+          path: content/mappings/soc2/oscal-component-definition.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  soc2-oscal-extend:
+    # G-06 contributor-adoption — SOC 2 OSCAL component-definition
+    # EXTEND lane. Complements the sibling
+    # `soc2-oscal-component-definition` job (SKELETON+CORE parity)
+    # with a round-trip cross-reference check: every OSCAL
+    # `implemented-requirement` must point at a real `stable_id` shipped
+    # under `content/controls/`, no component may ship zero
+    # implemented-requirements, and the IR count may not regress below
+    # the SKELETON baseline (90 as of PR #692). Runs on the same nightly
+    # cadence as the sibling lane; on PRs it fires on changes to the
+    # SOC 2 mapping tree, the control catalogue, or the round-trip
+    # test module. Mirrors `iso27001-oscal-extend`.
+    name: G-06 SOC 2 OSCAL component-definition EXTEND (round-trip)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML, pytest)
+        run: pip install --no-cache-dir pyyaml pytest
+
+      - name: Run SOC 2 OSCAL round-trip assertion tests
+        run: |
+          python -m pytest tests/content/test_oscal_soc2_component_definition_roundtrip.py -q
+
+      - name: Assert no orphan components in SOC 2 OSCAL surface
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          path = Path("content/mappings/soc2/oscal-component-definition.json")
+          if not path.is_file():
+              sys.exit(f"FAIL: {path} is missing")
+
+          doc = json.loads(path.read_text())
+          components = doc.get("component-definition", {}).get("components", []) or []
+          orphans = []
+          for c in components:
+              total = 0
+              for ci in c.get("control-implementations", []) or []:
+                  total += len(ci.get("implemented-requirements", []) or [])
+              if total == 0:
+                  orphans.append(c.get("title") or c.get("uuid", "<unknown>"))
+          if orphans:
+              sys.exit(
+                  "FAIL: SOC 2 OSCAL component-definition ships "
+                  f"{len(orphans)} orphan component(s) with zero "
+                  f"implemented-requirements: {', '.join(orphans)}"
+              )
+          print(f"OK: {len(components)} component(s), zero orphan(s)")
+          PY
+
+      - name: Upload SOC 2 OSCAL EXTEND artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g-06-soc2-oscal-extend
+          path: content/mappings/soc2/oscal-component-definition.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  iso27001-oscal-component-definition:
+    # G-06 contributor-adoption — ISO 27001 OSCAL component-definition
+    # parity lane. ISO 27001 is the community-standard information-
+    # security management framework; nightly CI guards the OSCAL
+    # surface alongside the CRA / DORA / NIS2 / GDPR / EU AI Act /
+    # SOC 2 lanes so regressions in the Annex A crosswalk surface
+    # immediately.
+    # Two invariants:
+    #   * schema + coverage tests in
+    #     `tests/content/test_oscal_iso27001_component_definition.py`
+    #     pass against the shipped component definition; and
+    #   * the OSCAL component definition ships at least 72
+    #     implemented-requirements — the baseline established by the
+    #     F-MAP-ISO27001-OSCAL SKELETON (Annex A controls). Any
+    #     regression below the baseline hard-fails the job.
+    name: G-06 ISO 27001 OSCAL component-definition assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML, jsonschema, pytest)
+        run: pip install --no-cache-dir pyyaml jsonschema pytest
+
+      - name: Run ISO 27001 OSCAL component-definition schema + coverage tests
+        run: |
+          python -m pytest tests/content/test_oscal_iso27001_component_definition.py -q
+
+      - name: Assert ISO 27001 OSCAL implemented-requirement count ≥ 72 (SKELETON baseline)
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          path = Path("content/mappings/iso27001/oscal-component-definition.json")
+          if not path.is_file():
+              sys.exit(f"FAIL: {path} is missing")
+
+          doc = json.loads(path.read_text())
+          components = doc.get("component-definition", {}).get("components", [])
+          ir_count = sum(
+              len(ci.get("implemented-requirements", []) or [])
+              for c in components
+              for ci in c.get("control-implementations", []) or []
+          )
+          baseline = 72
+          if ir_count < baseline:
+              sys.exit(
+                  f"FAIL: ISO 27001 OSCAL implemented-requirement count {ir_count} "
+                  f"regressed below SKELETON baseline {baseline}"
+              )
+          print(f"OK: ISO 27001 OSCAL implemented-requirements = {ir_count} (≥ {baseline})")
+          PY
+
+      - name: Upload ISO 27001 OSCAL component-definition artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g-06-iso27001-oscal-component-definition
+          path: content/mappings/iso27001/oscal-component-definition.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  d3fend-gdpr-crosswalk:
+    # G-02 regulatory-mapping coverage — D3FEND ↔ GDPR crosswalk
+    # assertion lane. Complements the per-framework orphan-CI matrix by
+    # shape-checking `content/mappings/d3fend/gdpr.yaml` (the SKELETON
+    # crosswalk) on every PR touching the d3fend tree and every night.
+    # Two invariants:
+    #   * schema-shape tests in
+    #     `tests/content/test_d3fend_gdpr_crosswalk.py` pass — every
+    #     `control_refs[*]` resolves to a real `content/controls/*.yaml`
+    #     stable_id, and every `regulation_refs[*].entry_id` resolves
+    #     to a real entry under `content/mappings/gdpr/*.yaml`; and
+    #   * the crosswalk ships at least 10 entries — the baseline
+    #     established by the F-MAP-D3FEND-GDPR SKELETON. Any regression
+    #     below the baseline hard-fails the job.
+    name: G-02 D3FEND↔GDPR crosswalk assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML, pytest)
+        run: pip install --no-cache-dir pyyaml pytest
+
+      - name: Run D3FEND↔GDPR crosswalk schema-shape tests
+        run: |
+          python -m pytest tests/content/test_d3fend_gdpr_crosswalk.py -q
+
+      - name: Assert D3FEND↔GDPR crosswalk entry count ≥ 10 (SKELETON baseline)
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+
+          import yaml
+
+          path = Path("content/mappings/d3fend/gdpr.yaml")
+          if not path.is_file():
+              sys.exit(f"FAIL: {path} is missing")
+
+          doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+          entries = doc.get("entries") or []
+          baseline = 10
+          if len(entries) < baseline:
+              sys.exit(
+                  f"FAIL: D3FEND↔GDPR crosswalk entry count {len(entries)} "
+                  f"regressed below SKELETON baseline {baseline}"
+              )
+          print(f"OK: D3FEND↔GDPR crosswalk entries = {len(entries)} (≥ {baseline})")
+          PY
+
+      - name: Upload D3FEND↔GDPR crosswalk artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g-02-d3fend-gdpr-crosswalk
+          path: content/mappings/d3fend/gdpr.yaml
+          if-no-files-found: warn
+          retention-days: 30
+
+  d3fend-nis2-crosswalk:
+    # G-02 regulatory-mapping coverage — D3FEND ↔ NIS2 crosswalk
+    # assertion lane. Sibling of d3fend-gdpr-crosswalk; shape-checks
+    # `content/mappings/d3fend/nis2.yaml` (CORE crosswalk) on every PR
+    # touching the d3fend tree and every night. Two invariants:
+    #   * schema-shape tests in
+    #     `tests/content/test_d3fend_nis2_crosswalk.py` pass — every
+    #     `control_refs[*]` resolves to a real `content/controls/*.yaml`
+    #     stable_id, and every `regulation_refs[*].entry_id` resolves
+    #     to a real entry under `content/mappings/nis2/*.yaml`; and
+    #   * the crosswalk ships at least 22 entries — the CORE baseline
+    #     established by F-MAP-D3FEND-NIS2. Any regression below the
+    #     baseline hard-fails the job.
+    name: G-02 D3FEND↔NIS2 crosswalk assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML, pytest)
+        run: pip install --no-cache-dir pyyaml pytest
+
+      - name: Run D3FEND↔NIS2 crosswalk schema-shape tests
+        run: |
+          python -m pytest tests/content/test_d3fend_nis2_crosswalk.py -q
+
+      - name: Assert D3FEND↔NIS2 crosswalk entry count ≥ 22 (CORE baseline)
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+
+          import yaml
+
+          path = Path("content/mappings/d3fend/nis2.yaml")
+          if not path.is_file():
+              sys.exit(f"FAIL: {path} is missing")
+
+          doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+          entries = doc.get("entries") or []
+          baseline = 22
+          if len(entries) < baseline:
+              sys.exit(
+                  f"FAIL: D3FEND↔NIS2 crosswalk entry count {len(entries)} "
+                  f"regressed below CORE baseline {baseline}"
+              )
+          print(f"OK: D3FEND↔NIS2 crosswalk entries = {len(entries)} (≥ {baseline})")
+          PY
+
+      - name: Upload D3FEND↔NIS2 crosswalk artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g-02-d3fend-nis2-crosswalk
+          path: content/mappings/d3fend/nis2.yaml
+          if-no-files-found: warn
+          retention-days: 30
+
+  d3fend-dora-crosswalk:
+    # G-02 regulatory-mapping coverage — D3FEND ↔ DORA crosswalk
+    # assertion lane. Sibling of d3fend-gdpr-crosswalk; shape-checks
+    # `content/mappings/d3fend/dora.yaml` (CORE crosswalk) on every PR
+    # touching the d3fend tree and every night. Two invariants:
+    #   * schema-shape tests in
+    #     `tests/content/test_d3fend_dora_crosswalk.py` pass — every
+    #     `control_refs[*]` resolves to a real `content/controls/*.yaml`
+    #     stable_id, and every `regulation_refs[*].entry_id` resolves
+    #     to a real entry under `content/mappings/dora/*.yaml`; and
+    #   * the crosswalk ships at least 28 entries — the CORE baseline
+    #     established by F-MAP-D3FEND-DORA. Any regression below the
+    #     baseline hard-fails the job.
+    name: G-02 D3FEND↔DORA crosswalk assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML, pytest)
+        run: pip install --no-cache-dir pyyaml pytest
+
+      - name: Run D3FEND↔DORA crosswalk schema-shape tests
+        run: |
+          python -m pytest tests/content/test_d3fend_dora_crosswalk.py -q
+
+      - name: Assert D3FEND↔DORA crosswalk entry count ≥ 28 (CORE baseline)
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+
+          import yaml
+
+          path = Path("content/mappings/d3fend/dora.yaml")
+          if not path.is_file():
+              sys.exit(f"FAIL: {path} is missing")
+
+          doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+          entries = doc.get("entries") or []
+          baseline = 28
+          if len(entries) < baseline:
+              sys.exit(
+                  f"FAIL: D3FEND↔DORA crosswalk entry count {len(entries)} "
+                  f"regressed below CORE baseline {baseline}"
+              )
+          print(f"OK: D3FEND↔DORA crosswalk entries = {len(entries)} (≥ {baseline})")
+          PY
+
+      - name: Upload D3FEND↔DORA crosswalk artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g-02-d3fend-dora-crosswalk
+          path: content/mappings/d3fend/dora.yaml
+          if-no-files-found: warn
+          retention-days: 30
+
+  d3fend-cra-crosswalk:
+    # G-02 regulatory-mapping coverage — D3FEND ↔ CRA crosswalk
+    # assertion lane. Sibling of d3fend-gdpr-crosswalk; shape-checks
+    # `content/mappings/d3fend/cra.yaml` (CORE crosswalk) on every PR
+    # touching the d3fend tree and every night. Two invariants:
+    #   * schema-shape tests in
+    #     `tests/content/test_d3fend_cra_crosswalk.py` pass — every
+    #     `control_refs[*]` resolves to a real `content/controls/*.yaml`
+    #     stable_id, and every `regulation_refs[*].entry_id` resolves
+    #     to a real entry under `content/mappings/cra/*.yaml`; and
+    #   * the crosswalk ships at least 28 entries — the CORE baseline
+    #     established by F-MAP-D3FEND-CRA. Any regression below the
+    #     baseline hard-fails the job.
+    name: G-02 D3FEND↔CRA crosswalk assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML, pytest)
+        run: pip install --no-cache-dir pyyaml pytest
+
+      - name: Run D3FEND↔CRA crosswalk schema-shape tests
+        run: |
+          python -m pytest tests/content/test_d3fend_cra_crosswalk.py -q
+
+      - name: Assert D3FEND↔CRA crosswalk entry count ≥ 28 (CORE baseline)
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+
+          import yaml
+
+          path = Path("content/mappings/d3fend/cra.yaml")
+          if not path.is_file():
+              sys.exit(f"FAIL: {path} is missing")
+
+          doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+          entries = doc.get("entries") or []
+          baseline = 28
+          if len(entries) < baseline:
+              sys.exit(
+                  f"FAIL: D3FEND↔CRA crosswalk entry count {len(entries)} "
+                  f"regressed below CORE baseline {baseline}"
+              )
+          print(f"OK: D3FEND↔CRA crosswalk entries = {len(entries)} (≥ {baseline})")
+          PY
+
+      - name: Upload D3FEND↔CRA crosswalk artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g-02-d3fend-cra-crosswalk
+          path: content/mappings/d3fend/cra.yaml
+          if-no-files-found: warn
+          retention-days: 30
+
+  d3fend-euaiact-crosswalk:
+    # G-02 regulatory-mapping coverage — D3FEND ↔ EU AI Act crosswalk
+    # assertion lane. Sibling of d3fend-gdpr-crosswalk; shape-checks
+    # `content/mappings/d3fend/eu_ai_act.yaml` (SKELETON crosswalk) on
+    # every PR touching the d3fend tree and every night. Two invariants:
+    #   * schema-shape tests in
+    #     `tests/content/test_d3fend_euaiact_crosswalk.py` pass — every
+    #     `control_refs[*]` resolves to a real `content/controls/*.yaml`
+    #     stable_id, and every `regulation_refs[*].entry_id` resolves
+    #     to a real entry under `content/mappings/eu_ai_act/*.yaml`; and
+    #   * the crosswalk ships at least 8 entries — the SKELETON
+    #     baseline established by F-MAP-D3FEND-EUAIACT. Any regression
+    #     below the baseline hard-fails the job.
+    name: G-02 D3FEND↔EU AI Act crosswalk assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML, pytest)
+        run: pip install --no-cache-dir pyyaml pytest
+
+      - name: Run D3FEND↔EU AI Act crosswalk schema-shape tests
+        run: |
+          python -m pytest tests/content/test_d3fend_euaiact_crosswalk.py -q
+
+      - name: Assert D3FEND↔EU AI Act crosswalk entry count ≥ 8 (SKELETON baseline)
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+
+          import yaml
+
+          path = Path("content/mappings/d3fend/eu_ai_act.yaml")
+          if not path.is_file():
+              sys.exit(f"FAIL: {path} is missing")
+
+          doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+          entries = doc.get("entries") or []
+          baseline = 8
+          if len(entries) < baseline:
+              sys.exit(
+                  f"FAIL: D3FEND↔EU AI Act crosswalk entry count {len(entries)} "
+                  f"regressed below SKELETON baseline {baseline}"
+              )
+          print(f"OK: D3FEND↔EU AI Act crosswalk entries = {len(entries)} (≥ {baseline})")
+          PY
+
+      - name: Upload D3FEND↔EU AI Act crosswalk artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g-02-d3fend-euaiact-crosswalk
+          path: content/mappings/d3fend/eu_ai_act.yaml
+          if-no-files-found: warn
+          retention-days: 30
+
+  d3fend-iso27001-crosswalk:
+    # G-06 contributor-adoption — D3FEND ↔ ISO/IEC 27001:2022 crosswalk
+    # assertion lane. Sibling of d3fend-euaiact-crosswalk; shape-checks
+    # `content/mappings/d3fend/iso27001.yaml` (SKELETON crosswalk) on
+    # every PR touching the d3fend tree and every night. Two invariants:
+    #   * schema-shape tests in
+    #     `tests/content/test_d3fend_iso27001_crosswalk.py` pass — every
+    #     `control_refs[*]` resolves to a real `content/controls/*.yaml`
+    #     stable_id, and every `regulation_refs[*].entry_id` resolves to
+    #     a real entry under `content/mappings/iso27001/annex-a-*.yaml`;
+    #   * the crosswalk ships at least 8 entries — the SKELETON baseline
+    #     established by F-MAP-D3FEND-ISO27001. Any regression below the
+    #     baseline hard-fails the job.
+    name: G-06 D3FEND↔ISO 27001 crosswalk assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML, pytest)
+        run: pip install --no-cache-dir pyyaml pytest
+
+      - name: Run D3FEND↔ISO 27001 crosswalk schema-shape tests
+        run: |
+          python -m pytest tests/content/test_d3fend_iso27001_crosswalk.py -q
+
+      - name: Assert D3FEND↔ISO 27001 crosswalk entry count ≥ 8 (SKELETON baseline)
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+
+          import yaml
+
+          path = Path("content/mappings/d3fend/iso27001.yaml")
+          if not path.is_file():
+              sys.exit(f"FAIL: {path} is missing")
+
+          doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+          entries = doc.get("entries") or []
+          baseline = 8
+          if len(entries) < baseline:
+              sys.exit(
+                  f"FAIL: D3FEND↔ISO 27001 crosswalk entry count {len(entries)} "
+                  f"regressed below SKELETON baseline {baseline}"
+              )
+          print(f"OK: D3FEND↔ISO 27001 crosswalk entries = {len(entries)} (≥ {baseline})")
+          PY
+
+      - name: Upload D3FEND↔ISO 27001 crosswalk artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g-06-d3fend-iso27001-crosswalk
+          path: content/mappings/d3fend/iso27001.yaml
+          if-no-files-found: warn
+          retention-days: 30
+
+
+  iso27001-oscal-extend:
+    # G-06 contributor-adoption — ISO 27001 OSCAL component-definition
+    # EXTEND lane. Complements the sibling
+    # `iso27001-oscal-component-definition` job (SKELETON+CORE parity)
+    # with a round-trip cross-reference check: every OSCAL
+    # `implemented-requirement` must point at a real `stable_id` shipped
+    # under `content/controls/`, no component may ship zero
+    # implemented-requirements, and the IR count may not regress below
+    # the CORE baseline (72 as of PR #694). Runs on the same nightly
+    # cadence as the sibling lane; on PRs it fires on changes to the
+    # ISO 27001 mapping tree, the control catalogue, or the round-trip
+    # test module.
+    name: G-06 ISO 27001 OSCAL component-definition EXTEND (round-trip)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML, pytest)
+        run: pip install --no-cache-dir pyyaml pytest
+
+      - name: Run ISO 27001 OSCAL round-trip assertion tests
+        run: |
+          python -m pytest tests/content/test_oscal_iso27001_component_definition_roundtrip.py -q
+
+      - name: Assert no orphan components in ISO 27001 OSCAL surface
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          path = Path("content/mappings/iso27001/oscal-component-definition.json")
+          if not path.is_file():
+              sys.exit(f"FAIL: {path} is missing")
+
+          doc = json.loads(path.read_text())
+          components = doc.get("component-definition", {}).get("components", []) or []
+          orphans = []
+          for c in components:
+              total = 0
+              for ci in c.get("control-implementations", []) or []:
+                  total += len(ci.get("implemented-requirements", []) or [])
+              if total == 0:
+                  orphans.append(c.get("title") or c.get("uuid", "<unknown>"))
+          if orphans:
+              sys.exit(
+                  "FAIL: ISO 27001 OSCAL component-definition ships "
+                  f"{len(orphans)} orphan component(s) with zero "
+                  f"implemented-requirements: {', '.join(orphans)}"
+              )
+          print(f"OK: {len(components)} component(s), zero orphan(s)")
+          PY
+
+      - name: Upload ISO 27001 OSCAL EXTEND artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g-06-iso27001-oscal-extend
+          path: content/mappings/iso27001/oscal-component-definition.json
+          if-no-files-found: warn
+          retention-days: 30

@@ -1,0 +1,652 @@
+# D3FEND techniques anchored to GDPR obligations.
+#
+# CORE — D3FEND defensive-technique crosswalk against the GDPR
+# obligation surface. Coverage spans the Art. 5 processing principles
+# (purpose limitation, data minimisation, storage limitation), Art. 6
+# lawful-basis record-keeping (security operations, incident
+# notification, risk-management assessment), Art. 15-22 data-subject
+# rights response tooling (access, rectification, erasure, restriction,
+# portability, objection), the security-of-processing cluster
+# (Art. 32 all limbs + Art. 33/34 personal-data-breach notifications),
+# and the Art. 25 protection-by-design / Art. 35 DPIA cluster.
+#
+# One entry per (GDPR article entry, D3FEND technique) pair. Each entry
+# round-trips through `regulation_refs.entry_id` to a real entry in
+# content/mappings/gdpr/*.yaml, and each `control_refs[*]` to a real
+# stable_id under content/controls/.
+#
+# Technique anchors are sourced from the `d3fend_refs` blocks of the
+# cited controls. Entries are ordered by GDPR article entry id, then
+# D3FEND technique slug.
+regime: d3fend
+entries:
+  - id: d3fend:gdpr:art-15-access:asset-inventory
+    technique:
+      d3fend_id: d3f:AssetInventory
+      technique_name: Asset Inventory
+      url: https://d3fend.mitre.org/technique/d3f:AssetInventory/
+    control_refs:
+      - control.asset_inventory_delta@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "15"
+        entry_id: gdpr:art-15-access
+    status: draft
+    notes: >-
+      Art. 15 requires the controller to confirm whether personal data
+      concerning the data subject are being processed and, if so, to
+      provide a copy. Answering the request presupposes that the
+      controller can enumerate the systems and datasets that hold that
+      personal data. `AssetInventory` is the D3FEND anchor on
+      `control.asset_inventory_delta@v1`, whose dated inventory delta
+      is the substrate that access-request responders read from.
+
+  - id: d3fend:gdpr:art-16-rectification:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.security_assessment@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "16"
+        entry_id: gdpr:art-16-rectification
+    status: draft
+    notes: >-
+      Art. 16 gives the data subject the right to obtain rectification
+      of inaccurate personal data. `OperationalActivityMapping` is the
+      D3FEND anchor on `control.security_assessment@v1`, modelling the
+      processing activities that must be walked to locate every copy
+      of the inaccurate data before the rectification is applied.
+
+  - id: d3fend:gdpr:art-17-erasure:asset-inventory
+    technique:
+      d3fend_id: d3f:AssetInventory
+      technique_name: Asset Inventory
+      url: https://d3fend.mitre.org/technique/d3f:AssetInventory/
+    control_refs:
+      - control.asset_inventory_delta@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "17"
+        entry_id: gdpr:art-17-erasure
+    status: draft
+    notes: >-
+      Art. 17 (the right to erasure) is only discharged if every system
+      holding the personal data is reached. `AssetInventory` on
+      `control.asset_inventory_delta@v1` is the D3FEND anchor that
+      makes the erasure request enumerable, since a delta-tracked
+      inventory names each processing location the erasure must
+      propagate to.
+
+  - id: d3fend:gdpr:art-18-restriction:access-mediation
+    technique:
+      d3fend_id: d3f:AccessMediation
+      technique_name: Access Mediation
+      url: https://d3fend.mitre.org/technique/d3f:AccessMediation/
+    control_refs:
+      - control.access_enforcement@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "18"
+        entry_id: gdpr:art-18-restriction
+    status: draft
+    notes: >-
+      Art. 18 obliges the controller, on the data subject's request, to
+      restrict processing of the personal data at issue.
+      `AccessMediation` on `control.access_enforcement@v1` is the
+      D3FEND anchor at the access-decision point, where the
+      restriction is enforced by refusing further processing paths for
+      the flagged records.
+
+  - id: d3fend:gdpr:art-20-portability:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.security_assessment@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "20"
+        entry_id: gdpr:art-20-portability
+    status: draft
+    notes: >-
+      Art. 20 requires the controller to provide the personal data in a
+      structured, commonly used, machine-readable format.
+      `OperationalActivityMapping` on `control.security_assessment@v1`
+      is the D3FEND anchor that names each processing activity holding
+      the exportable data — the assessment surface the portability
+      pipeline reads its export scope from.
+
+  - id: d3fend:gdpr:art-21-objection:access-mediation
+    technique:
+      d3fend_id: d3f:AccessMediation
+      technique_name: Access Mediation
+      url: https://d3fend.mitre.org/technique/d3f:AccessMediation/
+    control_refs:
+      - control.access_enforcement@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "21"
+        entry_id: gdpr:art-21-objection
+    status: draft
+    notes: >-
+      Art. 21 gives the data subject the right to object to processing
+      of their personal data. Once the objection stands, further
+      processing must be blocked at the mediation point.
+      `AccessMediation` on `control.access_enforcement@v1` is the
+      D3FEND anchor that carries the enforcement decision.
+
+  - id: d3fend:gdpr:art-25-1-data-protection-by-design:access-mediation
+    technique:
+      d3fend_id: d3f:AccessMediation
+      technique_name: Access Mediation
+      url: https://d3fend.mitre.org/technique/d3f:AccessMediation/
+    control_refs:
+      - control.access_enforcement@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "25(1)"
+        entry_id: gdpr:art-25-1-data-protection-by-design
+    status: draft
+    notes: >-
+      GDPR Art. 25(1) requires the controller to implement appropriate
+      technical measures designed to give effect to data-protection
+      principles by default. `AccessMediation` is the design-time
+      D3FEND anchor named by `control.access_enforcement@v1`,
+      restricting personal-data reach to authorised subjects at the
+      access-decision point.
+
+  - id: d3fend:gdpr:art-25-1-data-protection-by-design:local-account-monitoring
+    technique:
+      d3fend_id: d3f:LocalAccountMonitoring
+      technique_name: Local Account Monitoring
+      url: https://d3fend.mitre.org/technique/d3f:LocalAccountMonitoring/
+    control_refs:
+      - control.account_management@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "25(1)"
+        entry_id: gdpr:art-25-1-data-protection-by-design
+    status: draft
+    notes: >-
+      Art. 25(1) data-minimisation-by-default extends to identity
+      lifecycle: only accounts that need personal-data reach are
+      provisioned. `LocalAccountMonitoring` is the D3FEND anchor on
+      `control.account_management@v1`, tracking joiner/mover/leaver
+      transitions against the minimum-necessary access set.
+
+  - id: d3fend:gdpr:art-32-1-a-encryption:disk-encryption
+    technique:
+      d3fend_id: d3f:DiskEncryption
+      technique_name: Disk Encryption
+      url: https://d3fend.mitre.org/technique/d3f:DiskEncryption/
+    control_refs:
+      - control.backup_attestation@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "32(1)(a)"
+        entry_id: gdpr:art-32-1-a-encryption
+    status: draft
+    notes: >-
+      Art. 32(1)(a) names encryption of personal data as an appropriate
+      technical measure. `DiskEncryption` is the D3FEND anchor named by
+      `control.backup_attestation@v1`, exercised by every backup
+      attestation limb that carries personal data at rest.
+
+  - id: d3fend:gdpr:art-32-1-a-encryption:key-management
+    technique:
+      d3fend_id: d3f:KeyManagement
+      technique_name: Key Management
+      url: https://d3fend.mitre.org/technique/d3f:KeyManagement/
+    control_refs:
+      - control.crypto_policy_inventory@v1
+      - control.key_rotation_evidence@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "32(1)(a)"
+        entry_id: gdpr:art-32-1-a-encryption
+    status: draft
+    notes: >-
+      Art. 32(1)(a) encryption is only meaningful if key material is
+      inventoried and rotated. `KeyManagement` is the D3FEND anchor
+      shared by `control.crypto_policy_inventory@v1` (catalogue and
+      policy) and `control.key_rotation_evidence@v1` (dated rotation
+      evidence), together discharging the operator side of the
+      encryption obligation.
+
+  - id: d3fend:gdpr:art-32-1-b-asset-baseline-and-inventory:asset-inventory
+    technique:
+      d3fend_id: d3f:AssetInventory
+      technique_name: Asset Inventory
+      url: https://d3fend.mitre.org/technique/d3f:AssetInventory/
+    control_refs:
+      - control.asset_inventory_delta@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "32(1)(b)"
+        entry_id: gdpr:art-32-1-b-asset-baseline-and-inventory
+    status: draft
+    notes: >-
+      The ongoing-integrity limb of Art. 32(1)(b) presumes the
+      controller knows what processing assets carry personal data.
+      `AssetInventory` on `control.asset_inventory_delta@v1` is the
+      D3FEND anchor that supplies the baseline the integrity obligation
+      is measured against.
+
+  - id: d3fend:gdpr:art-32-1-b-maintenance-and-security-updates:software-update
+    technique:
+      d3fend_id: d3f:SoftwareUpdate
+      technique_name: Software Update
+      url: https://d3fend.mitre.org/technique/d3f:SoftwareUpdate/
+    control_refs:
+      - control.patch_evidence@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "32(1)(b)"
+        entry_id: gdpr:art-32-1-b-maintenance-and-security-updates
+    status: draft
+    notes: >-
+      Ongoing confidentiality and integrity under Art. 32(1)(b) breaks
+      down when known vulnerabilities in processing systems are left
+      unpatched. `SoftwareUpdate` on `control.patch_evidence@v1` is the
+      D3FEND anchor whose dated patch evidence discharges the
+      maintenance limb of the security-of-processing obligation.
+
+  - id: d3fend:gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability:network-traffic-analysis
+    technique:
+      d3fend_id: d3f:NetworkTrafficAnalysis
+      technique_name: Network Traffic Analysis
+      url: https://d3fend.mitre.org/technique/d3f:NetworkTrafficAnalysis/
+    control_refs:
+      - control.detection_coverage_evidence@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "32(1)(b)"
+        entry_id: gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability
+    status: draft
+    notes: >-
+      Art. 32(1)(b) requires ongoing confidentiality, integrity, and
+      availability of processing systems. `NetworkTrafficAnalysis` is
+      one of the two D3FEND anchors on
+      `control.detection_coverage_evidence@v1`, providing the network
+      surface of that ongoing-detection obligation.
+
+  - id: d3fend:gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability:user-behavior-analysis
+    technique:
+      d3fend_id: d3f:UserBehaviorAnalysis
+      technique_name: User Behavior Analysis
+      url: https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/
+    control_refs:
+      - control.detection_coverage_evidence@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "32(1)(b)"
+        entry_id: gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability
+    status: draft
+    notes: >-
+      `UserBehaviorAnalysis` is the identity-side D3FEND anchor on
+      `control.detection_coverage_evidence@v1`, discharging the
+      confidentiality limb of Art. 32(1)(b) by surfacing anomalous
+      access to personal data.
+
+  - id: d3fend:gdpr:art-32-1-c-availability-incident-response:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.incident_handling_capability@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "32(1)(c)"
+        entry_id: gdpr:art-32-1-c-availability-incident-response
+    status: draft
+    notes: >-
+      The availability limb of Art. 32(1)(c) is exercised at the moment
+      an incident degrades personal-data processing. `IncidentResponseAnalysis`
+      on `control.incident_handling_capability@v1` is the D3FEND anchor
+      that names the response capability restoring service.
+
+  - id: d3fend:gdpr:art-32-1-c-restore-availability:system-recovery-analysis
+    technique:
+      d3fend_id: d3f:SystemRecoveryAnalysis
+      technique_name: System Recovery Analysis
+      url: https://d3fend.mitre.org/technique/d3f:SystemRecoveryAnalysis/
+    control_refs:
+      - control.restore_drill@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "32(1)(c)"
+        entry_id: gdpr:art-32-1-c-restore-availability
+    status: draft
+    notes: >-
+      Art. 32(1)(c) mandates the ability to restore availability and
+      access to personal data in a timely manner following an incident.
+      `SystemRecoveryAnalysis` is the D3FEND anchor named by
+      `control.restore_drill@v1`, exercised by every dated restore
+      drill.
+
+  - id: d3fend:gdpr:art-32-1-d-regular-testing-and-effectiveness:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.control_effectiveness_test@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "32(1)(d)"
+        entry_id: gdpr:art-32-1-d-regular-testing-and-effectiveness
+    status: draft
+    notes: >-
+      Art. 32(1)(d) requires a process for regularly testing, assessing,
+      and evaluating the effectiveness of technical and organisational
+      measures. `OperationalActivityMapping` on
+      `control.control_effectiveness_test@v1` is the D3FEND anchor
+      whose dated effectiveness tests supply that evaluation record.
+
+  - id: d3fend:gdpr:art-33-notification-personal-data-breach:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.incident_handling_capability@v1
+      - control.incident_timeline_signals@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "33"
+        entry_id: gdpr:art-33-notification-personal-data-breach
+    status: draft
+    notes: >-
+      Art. 33 requires the controller to notify the supervisory
+      authority of a personal-data breach within 72 hours where
+      feasible. `IncidentResponseAnalysis` is the D3FEND anchor named
+      by both `control.incident_handling_capability@v1` (the response
+      capability itself) and `control.incident_timeline_signals@v1`
+      (the dated-signal evidence trail that establishes awareness time,
+      the 72-hour clock's origin).
+
+  - id: d3fend:gdpr:art-34-communication-data-subject:forensic-analysis
+    technique:
+      d3fend_id: d3f:ForensicAnalysis
+      technique_name: Forensic Analysis
+      url: https://d3fend.mitre.org/technique/d3f:ForensicAnalysis/
+    control_refs:
+      - control.post_incident_learning@v1
+      - control.incident_handling_capability@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "34"
+        entry_id: gdpr:art-34-communication-data-subject
+    status: draft
+    notes: >-
+      Art. 34 requires communication of a personal-data breach to the
+      data subject where the breach is likely to result in a high risk
+      to rights and freedoms. `ForensicAnalysis` is the D3FEND anchor
+      shared by `control.incident_handling_capability@v1` and
+      `control.post_incident_learning@v1`, establishing the categories
+      of personal data affected and the likely consequences — the
+      substantive content Art. 34(2) mandates in the notice.
+
+  - id: d3fend:gdpr:art-35-1-dpia-high-risk-processing:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.risk_management_policy@v1
+      - control.security_assessment@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "35(1)"
+        entry_id: gdpr:art-35-1-dpia-high-risk-processing
+    status: draft
+    notes: >-
+      Art. 35(1) requires a data protection impact assessment where a
+      type of processing is likely to result in a high risk to rights
+      and freedoms of natural persons. `OperationalActivityMapping` is
+      the D3FEND anchor shared by `control.risk_management_policy@v1`
+      and `control.security_assessment@v1`, modelling the processing
+      activities and their risk surface that the DPIA is drafted
+      against.
+
+  - id: d3fend:gdpr:art-35-3-a-dpia-systematic-evaluation:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.security_assessment@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "35(3)(a)"
+        entry_id: gdpr:art-35-3-a-dpia-systematic-evaluation
+    status: draft
+    notes: >-
+      Art. 35(3)(a) triggers the DPIA obligation for systematic and
+      extensive evaluation of personal aspects based on automated
+      processing. `OperationalActivityMapping` on
+      `control.security_assessment@v1` is the D3FEND anchor that names
+      each evaluated processing activity for the DPIA input surface.
+
+  - id: d3fend:gdpr:art-35-3-b-dpia-large-scale-processing:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.risk_management_policy@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "35(3)(b)"
+        entry_id: gdpr:art-35-3-b-dpia-large-scale-processing
+    status: draft
+    notes: >-
+      Art. 35(3)(b) triggers the DPIA obligation for large-scale
+      processing of special-category data. `OperationalActivityMapping`
+      on `control.risk_management_policy@v1` is the D3FEND anchor that
+      names the risk-management framing the DPIA is drafted through.
+
+  - id: d3fend:gdpr:art-5-1-b-purpose-limitation:local-file-permissions
+    technique:
+      d3fend_id: d3f:LocalFilePermissions
+      technique_name: Local File Permissions
+      url: https://d3fend.mitre.org/technique/d3f:LocalFilePermissions/
+    control_refs:
+      - control.least_privilege@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "5(1)(b)"
+        entry_id: gdpr:art-5-1-b-purpose-limitation
+    status: draft
+    notes: >-
+      Art. 5(1)(b) requires that personal data are collected for
+      specified, explicit and legitimate purposes and not further
+      processed in a manner incompatible with those purposes.
+      `LocalFilePermissions` on `control.least_privilege@v1` is the
+      D3FEND anchor that mechanically caps reach at the file-system
+      level, preventing casual repurposing of personal-data stores
+      outside the declared purpose.
+
+  - id: d3fend:gdpr:art-5-1-c-data-minimisation:asset-inventory
+    technique:
+      d3fend_id: d3f:AssetInventory
+      technique_name: Asset Inventory
+      url: https://d3fend.mitre.org/technique/d3f:AssetInventory/
+    control_refs:
+      - control.asset_inventory_delta@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "5(1)(c)"
+        entry_id: gdpr:art-5-1-c-data-minimisation
+    status: draft
+    notes: >-
+      Art. 5(1)(c) requires personal data to be adequate, relevant, and
+      limited to what is necessary. `AssetInventory` on
+      `control.asset_inventory_delta@v1` is the D3FEND anchor that
+      surfaces each personal-data-carrying asset so the controller can
+      test the minimisation claim against ground truth rather than a
+      declared design.
+
+  - id: d3fend:gdpr:art-5-1-e-storage-limitation:disk-encryption
+    technique:
+      d3fend_id: d3f:DiskEncryption
+      technique_name: Disk Encryption
+      url: https://d3fend.mitre.org/technique/d3f:DiskEncryption/
+    control_refs:
+      - control.backup_attestation@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "5(1)(e)"
+        entry_id: gdpr:art-5-1-e-storage-limitation
+    status: draft
+    notes: >-
+      Art. 5(1)(e) requires personal data to be kept in a form
+      permitting identification of data subjects for no longer than is
+      necessary. `DiskEncryption` on `control.backup_attestation@v1`
+      is the D3FEND anchor that carries the retention side of that
+      obligation — each attested backup limb records a bounded
+      retention window against which storage-limitation compliance is
+      measured.
+
+  - id: d3fend:gdpr:art-6-1-c-legal-obligation-incident-notification:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.incident_handling_capability@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "6(1)(c)"
+        entry_id: gdpr:art-6-1-c-legal-obligation-incident-notification
+    status: draft
+    notes: >-
+      Art. 6(1)(c) legitimises processing that is necessary for
+      compliance with a legal obligation, including the Art. 33
+      breach-notification duty itself. `IncidentResponseAnalysis` on
+      `control.incident_handling_capability@v1` is the D3FEND anchor
+      whose response-record output is the accountability trail that
+      substantiates the lawful basis for that processing.
+
+  - id: d3fend:gdpr:art-6-1-c-legal-obligation-risk-management-assessment:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.risk_management_policy@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "6(1)(c)"
+        entry_id: gdpr:art-6-1-c-legal-obligation-risk-management-assessment
+    status: draft
+    notes: >-
+      Where Art. 6(1)(c) is anchored to a sectoral risk-management
+      obligation (e.g. NIS2, DORA), the processing is only lawful if a
+      matching risk-management activity is documented.
+      `OperationalActivityMapping` on `control.risk_management_policy@v1`
+      is the D3FEND anchor that names that activity and its scope in
+      accountable form.
+
+  - id: d3fend:gdpr:art-6-1-f-legitimate-interests-security-operations:account-monitoring
+    technique:
+      d3fend_id: d3f:AccountMonitoring
+      technique_name: Account Monitoring
+      url: https://d3fend.mitre.org/technique/d3f:AccountMonitoring/
+    control_refs:
+      - control.jml_evidence@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "6(1)(f)"
+        entry_id: gdpr:art-6-1-f-legitimate-interests-security-operations
+    status: draft
+    notes: >-
+      The legitimate-interests basis in Art. 6(1)(f) (as read with
+      recital 49 on network and information security) covers
+      processing needed for security operations. `AccountMonitoring`
+      on `control.jml_evidence@v1` is the D3FEND anchor whose dated
+      joiner-mover-leaver evidence is the necessity record backing the
+      lawful-basis assessment for identity-side monitoring.
+
+  - id: d3fend:gdpr:art-6-1-f-legitimate-interests-security-operations:user-behavior-analysis
+    technique:
+      d3fend_id: d3f:UserBehaviorAnalysis
+      technique_name: User Behavior Analysis
+      url: https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/
+    control_refs:
+      - control.detection_coverage_evidence@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "6(1)(f)"
+        entry_id: gdpr:art-6-1-f-legitimate-interests-security-operations
+    status: draft
+    notes: >-
+      Detection tooling that processes personal data (log lines, user
+      identifiers) as part of security operations is the paradigm case
+      for Art. 6(1)(f) read with recital 49. `UserBehaviorAnalysis` on
+      `control.detection_coverage_evidence@v1` is the D3FEND anchor
+      whose coverage evidence documents the scope of that processing —
+      the substrate the necessity and balancing tests are argued from.

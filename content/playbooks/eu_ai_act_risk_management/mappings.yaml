@@ -1,0 +1,353 @@
+# CORE overlay for the eu_ai_act_risk_management playbook.
+#
+# Playbook-side outbound overlay. Pins the OSCAL / D3FEND anchors this
+# playbook exercises step-by-step and the regulatory inbound edges
+# landed under the sibling G-02 mapping directory:
+#
+#   - content/mappings/eu_ai_act/*.yaml — inbound mapping ids for
+#     Art. 9(1)-(6), Art. 11 + Annex IV, Art. 13, Art. 72; each entry
+#     backlinks to playbook.eu_ai_act_risk_management@v1.
+#   - content/mappings/nis2/article-21-2-a.yaml — NIS2 Art. 21(2)(a)
+#     risk-analysis-policy inbound edge; the Art. 9(2) risk-analysis
+#     step is the AI-system-specific execution surface.
+#   - content/mappings/gdpr/article-35-dpia.yaml — Art. 35(1)
+#     high-risk-processing DPIA edge for high-risk AI systems that
+#     process personal data (Recital 9 of Regulation (EU) 2024/1689
+#     preserves GDPR obligations).
+#
+# DORA / CRA scope review (G-02): the AI Act Art. 9 risk-management
+# discipline is a product-lifecycle obligation on providers of
+# high-risk AI systems; DORA Art. 6 ICT risk-management operates on
+# ICT operations of financial entities and CRA Annex I on product
+# security of products with digital elements. Neither has a
+# documented interaction with the AI Act provider-side risk-
+# management obligation that would justify a direct inbound edge, so
+# the `dora` / `cra` arrays stay empty on this overlay.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.eu_ai_act_risk_management@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the four action steps
+  # of the AI Act Art. 9 risk-management lifecycle. Anchored on the
+  # operator-side control cross-reference files under
+  # content/controls/ (control.risk_management_policy@v1 pins PM-9 and
+  # RA-3; PL-2 is the additional documentation-surface anchor lifted
+  # onto the assemble-technical-documentation step for Art. 11 +
+  # Annex IV).
+  - id: control.risk_management_strategy@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: PM-9
+    title: Risk Management Strategy
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=PM-9
+    notes: >-
+      Covers the identify-high-risk-AI-system and assess-risk-under-
+      Art.-9(2) steps' establishment surface: PM-9 requires the
+      organisation to develop a comprehensive strategy to manage
+      security, privacy, and supply-chain risk that is implemented
+      consistently across the organisation. Art. 9(1) of the EU AI
+      Act requires providers of high-risk AI systems to establish,
+      implement, document and maintain a risk-management system as
+      a continuous iterative process planned and run throughout the
+      entire lifecycle of the high-risk AI system; PM-9 is the
+      programme-level anchor for that discipline on the operator's
+      NIST 800-53 catalogue. Mirrors the executive_metrics
+      PM-9 precedent (score-control-effectiveness step); same
+      strategy anchor, here narrowed to the AI-system lifecycle
+      surface rather than the whole-programme rollup surface.
+
+  - id: control.risk_assessment@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: RA-3
+    title: Risk Assessment
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=RA-3
+    notes: >-
+      Anchors the assess-risk-under-Art.-9(2) and monitor-post-market-
+      signals steps: RA-3 requires the organisation to assess risk to
+      organisational operations, assets, and individuals on a
+      recurring basis. Art. 9(2)(a)-(c) names the identification,
+      estimation, and evaluation cycle the risk-management system
+      iterates against, and Art. 9(2)(c) reads together with Art. 72
+      pins the post-market-monitoring feedback loop as an ongoing
+      re-assessment trigger. RA-3 is the recurring-risk-assessment
+      anchor for both the initial pre-market pass and the post-
+      market re-assessment iterations. Mirrors the
+      executive_metrics RA-3 precedent (resolve-catalog / evaluate-
+      metrics steps); same recurring-assessment anchor, here
+      narrowed to the AI-system Art. 9(2) cycle rather than the
+      KPI/KRI catalogue-scoring surface.
+
+  - id: control.system_security_privacy_plan@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: PL-2
+    title: System Security and Privacy Plans
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=PL-2
+    notes: >-
+      Covers the assemble-technical-documentation step: PL-2 requires
+      the organisation to develop, document, and periodically update
+      security and privacy plans for the system that describe the
+      system, the operational environment, the security and privacy
+      requirements, the controls, and the plans for review and
+      approval. Art. 11 of the EU AI Act read with Annex IV requires
+      the provider to draw up and keep up to date the technical
+      documentation for the high-risk AI system before it is placed
+      on the market or put into service — a general description of
+      the system, its elements and development process, information
+      on monitoring / functioning / control, performance metrics,
+      the risk-management system per Art. 9, and the harmonised
+      standards applied. PL-2 is the closest 800-53 anchor for that
+      document-authoring-and-maintenance discipline; the AI-Act-
+      specific detail (Annex IV section-by-section bundle assembly
+      and Art. 43 conformity-assessment intake handoff) is CORE-
+      wired downstream of the SKELETON stub action.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive technique tag on the risk-assessment
+  # step. D3-OAM (Operational Activity Mapping) is the closest-fitting
+  # technique for the Art. 9(2) identify / estimate / evaluate cycle:
+  # the mapping of operator activities and evidence onto a documented
+  # model of the obligations the operator must discharge is exactly
+  # the operational-activity-mapping discipline D3-OAM names, applied
+  # to the AI-system risk-management surface rather than the NIS2 /
+  # DORA self-assessment surface D3-OAM is already anchored against
+  # upstream. The identify / documentation / post-market steps are
+  # lifecycle-governance surfaces that D3FEND's runtime-countermeasure
+  # taxonomy does not cover cleanly, and are deliberately not pinned
+  # (see gap-note comments below) rather than force-fit onto D3-OAM.
+  #
+  # Upstream anchor: content/controls/control.risk_management_policy@v1.yaml
+  # already carries D3-OAM on the control-side overlay; this CORE lift
+  # is the per-step pin of the same technique onto the playbook
+  # overlay, narrowed to the Art. 9(2) risk-assessment cycle slice.
+  - step: action--40000000-0000-4000-8000-000000000003
+    d3fend_id: D3-OAM
+    d3fend_name: Operational Activity Mapping
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    notes: >-
+      assess-risk-under-Art.-9(2) — the Art. 9(2)(a)-(c) identification
+      / estimation / evaluation cycle for the pinned Annex III use
+      case maps operator activities and evidence (known and
+      reasonably foreseeable risks, misuse conditions, post-market
+      monitoring data) onto the operator's documented risk-management
+      model. D3FEND v1.0.0 frames D3-OAM as the operational-activity-
+      mapping technique on the assessment side specifically; the
+      risk-assessment step here is the per-iteration application of
+      that discipline against the AI-system surface, narrowed to the
+      Art. 9(2) cycle rather than the whole-Article-21 NIS2 or the
+      Chapter-II DORA self-assessment surface D3-OAM is already
+      anchored against upstream.
+
+  # Deliberate D3FEND omissions:
+  #   - identify-high-risk-AI-system
+  #     (action--40000000-0000-4000-8000-000000000002) is NOT pinned:
+  #     the Annex III inventory-classification slice is a
+  #     deterministic content-model overlay lookup (Art. 6 read with
+  #     Annex III, plus Art. 3(3)/(4) provider/deployer role
+  #     determination), not a defensive-technique discharge against
+  #     the operator's deployed estate. Mirrors the
+  #     dora_ict_risk_selfassess map-slice gap-note precedent.
+  #   - assemble-technical-documentation
+  #     (action--40000000-0000-4000-8000-000000000004) is NOT pinned:
+  #     the Art. 11 + Annex IV documentation-assembly slice is a
+  #     document-authoring-and-maintenance discipline that D3FEND's
+  #     runtime-countermeasure taxonomy does not cover; PL-2 is the
+  #     correct anchor on the OSCAL side and no D3FEND technique
+  #     applies cleanly. Mirrors the executive_metrics D3FEND
+  #     omission rationale on report-emission steps.
+  #   - monitor-post-market-signals
+  #     (action--40000000-0000-4000-8000-000000000005) is NOT pinned:
+  #     the Art. 72 post-market-monitoring plan operation is a
+  #     lifecycle-governance loop that produces the re-assessment
+  #     trigger consumed by the next Art. 9(2)(c) iteration; the
+  #     re-assessment discipline itself is covered by the D3-OAM
+  #     pin on the assess step, and pinning the monitoring loop
+  #     separately would double-count the technique.
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings landed by the EXTEND card. AI Act
+  # Art. 9 is a lifecycle discipline whose primary evidence lives in
+  # the technical documentation bundle (Art. 11 / Annex IV) rather
+  # than in a runtime event stream, but the operator-side observable
+  # surface is real: the assessment step scores residual-risk
+  # observations against the Art. 9(5) acceptability line and emits
+  # a Compliance Finding record per observation; the assemble-
+  # technical-documentation step emits a Compliance Finding per
+  # committed Art. 11 + Annex IV / Art. 13 bundle so the freshness
+  # KRI can measure the age of the latest committed bundle; the
+  # monitor-post-market-signals step emits a Detection Finding when
+  # an Art. 72 signal represents an anomaly that pushes a residual-
+  # risk observation across the acceptability threshold and is
+  # therefore the machine-readable trigger for the next Art. 9(2)(c)
+  # iteration to re-score the affected risk register entries.
+  - id: telemetry.ocsf.compliance_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2003
+    class_name: Compliance Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted on two steps of the playbook. On assess-risk-under-
+      Art.-9(2): one Compliance Finding per scored residual-risk
+      observation, carrying the scored value, the pinned Annex III
+      use-case category, and the reference to the risk register
+      entry the observation belongs to; the observation stream is
+      the input to kri.residual_risk_threshold_breach_count@v1 which
+      counts observations above the operator-scoped Art. 9(5)
+      acceptability threshold. On assemble-technical-documentation:
+      one Compliance Finding per committed Art. 11 + Annex IV or
+      Art. 13 bundle, carrying the bundle identifier and the
+      assembly time; the assembly-time stream is the input to
+      kri.transparency_doc_freshness_age@v1 which measures the age
+      of the latest committed bundle in scope. Same class the
+      cra_srp_notify / cyber_hygiene_training / dpia overlays use
+      for their regulator-facing compliance evidence surface.
+      Schema: https://schema.ocsf.io/1.3.0/classes/compliance_finding
+
+  - id: telemetry.ocsf.detection_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2004
+    class_name: Detection Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by the monitor-post-market-signals step when an Art. 72
+      post-market monitoring signal represents an anomaly that pushes
+      a residual-risk observation across the operator-scoped Art. 9(5)
+      acceptability threshold. The Detection Finding is the machine-
+      readable trigger for the next Art. 9(2)(c) iteration to re-score
+      the affected risk register entries, and it is a second input
+      into kri.residual_risk_threshold_breach_count@v1 alongside the
+      Compliance Finding observation stream. Catalog entry is
+      detection-vendor-neutral; the framework binds the class shape,
+      not the rule engine that produces it. Schema:
+      https://schema.ocsf.io/1.3.0/classes/detection_finding
+
+nis2:
+  # Inbound edge on content/mappings/nis2/article-21-2-a.yaml pins
+  # playbook.eu_ai_act_risk_management@v1 in its playbook_refs list.
+  # NIS2 Art. 21(2)(a) (policies on risk analysis and information-
+  # system security) is the anchor: the Art. 9(2) risk-analysis step
+  # of this playbook is the AI-system-specific execution surface for
+  # the risk-analysis policy obligation NIS2 imposes on essential
+  # and important entities operating high-risk AI systems.
+  - mapping_id: nis2:art-21-2-a
+    article: 21(2)(a)
+    notes: >-
+      The Art. 9(2) risk-analysis step of this playbook is the
+      AI-system-specific execution surface for the risk-analysis
+      policy obligation NIS2 imposes on essential and important
+      entities under Art. 21(2)(a).
+
+dora: []
+
+cra: []
+
+gdpr:
+  # Inbound edge on content/mappings/gdpr/article-35-dpia.yaml adds
+  # playbook.eu_ai_act_risk_management@v1 to the Art. 35(1) high-risk-
+  # processing entry. Recital 9 of Regulation (EU) 2024/1689 preserves
+  # the GDPR obligations that apply to processing of personal data;
+  # a high-risk AI system that falls within Annex III and processes
+  # personal data operates on a high-risk processing profile the
+  # controller's DPIA must document ahead of production wiring.
+  - mapping_id: gdpr:art-35-1-dpia-high-risk-processing
+    article: 35(1)
+    notes: >-
+      The Art. 9(2) risk-assessment step of this playbook operates on
+      an AI-system profile that, when personal data is in scope, is a
+      high-risk processing envelope under GDPR Art. 35(1). The
+      operator's DPIA is the ex-ante artifact documenting the
+      proportionality of the AI-system risk-management envelope on
+      that processing surface.
+
+eu_ai_act:
+  # Inbound edges under content/mappings/eu_ai_act/*.yaml land this
+  # playbook against the SKELETON-scoped high-risk-provider
+  # obligations covered by the sibling per-article YAMLs, plus the
+  # Art. 6 / Annex III classification gate that determines
+  # applicability of the Art. 9 / 11 / 13 / 72 obligations.
+  - mapping_id: eu_ai_act:art-6-1-annex-ii-product-safety
+    article: "6(1)"
+    notes: >-
+      Annex II product-safety intersection route into the high-risk
+      category. Gate condition on the identify-high-risk-AI-system
+      step of this playbook; the downstream Art. 9 / 11 / 13 / 72
+      obligations only apply once this classification is confirmed.
+  - mapping_id: eu_ai_act:art-6-2-annex-iii-standalone
+    article: "6(2)"
+    notes: >-
+      Standalone Annex III route into the high-risk category. Gate
+      condition on the identify-high-risk-AI-system step; per-area
+      enumeration lands on the annex-iii-use-cases.yaml sibling
+      inbound file.
+  - mapping_id: eu_ai_act:annex-iii-1-biometrics
+    article: Annex III(1)
+    notes: >-
+      Annex III biometrics area. Per-area classification atom
+      exercised by the identify-high-risk-AI-system step when the
+      operator inventory surfaces a biometric identification,
+      categorisation, or emotion-recognition system.
+  - mapping_id: eu_ai_act:annex-iii-2-critical-infrastructure
+    article: Annex III(2)
+    notes: >-
+      Annex III critical-infrastructure area. Overlaps with NIS2
+      essential-entity sectors on the operator side; the NIS2
+      cross-regime edge to Art. 9 remains the primary risk-analysis
+      anchor.
+  - mapping_id: eu_ai_act:annex-iii-3-education-vocational-training
+    article: Annex III(3)
+    notes: >-
+      Annex III education and vocational training area.
+  - mapping_id: eu_ai_act:annex-iii-4-employment-workers-management
+    article: Annex III(4)
+    notes: >-
+      Annex III employment and workers-management area.
+  - mapping_id: eu_ai_act:annex-iii-5-essential-services
+    article: Annex III(5)
+    notes: >-
+      Annex III essential-services area (benefits eligibility, credit
+      scoring, life / health insurance rate-setting, emergency-response
+      dispatch and triage).
+  - mapping_id: eu_ai_act:annex-iii-6-law-enforcement
+    article: Annex III(6)
+    notes: >-
+      Annex III law-enforcement area. Art. 5 prohibitions (predictive
+      policing based solely on profiling, untargeted facial-image
+      scraping) apply upstream of the Art. 6(2) classification.
+  - mapping_id: eu_ai_act:annex-iii-7-migration-asylum-border
+    article: Annex III(7)
+    notes: >-
+      Annex III migration, asylum and border-control area.
+  - mapping_id: eu_ai_act:annex-iii-8-justice-democratic-processes
+    article: Annex III(8)
+    notes: >-
+      Annex III administration of justice and democratic processes
+      area.
+  - mapping_id: eu_ai_act:art-9-risk-management
+    article: "9"
+    notes: >-
+      Art. 9(1)-(6) risk-management system on high-risk AI systems.
+      Exercised end-to-end by the four action steps of this playbook
+      (identify / assess / assemble / monitor).
+  - mapping_id: eu_ai_act:art-11-technical-documentation
+    article: "11"
+    notes: >-
+      Art. 11 + Annex IV technical documentation. Authored by the
+      assemble-technical-documentation step of this playbook.
+  - mapping_id: eu_ai_act:art-13-transparency
+    article: "13"
+    notes: >-
+      Art. 13 transparency and information duties toward deployers.
+      The instructions-for-use bundle is authored alongside the
+      Art. 11 + Annex IV bundle on the assemble-technical-
+      documentation step.
+  - mapping_id: eu_ai_act:art-72-post-market-monitoring
+    article: "72"
+    notes: >-
+      Art. 72 post-market monitoring plan. Operationalised by the
+      monitor-post-market-signals step of this playbook, which emits
+      the Detection Finding trigger for the next Art. 9(2)(c)
+      re-assessment iteration.
+

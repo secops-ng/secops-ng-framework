@@ -1,0 +1,648 @@
+# D3FEND techniques anchored to EU AI Act obligations.
+#
+# CORE — D3FEND defensive-technique crosswalk against the high-risk AI
+# obligation surface of Regulation (EU) 2024/1689. Coverage spans:
+#
+#   * Art. 6  — high-risk classification triggers (Annex II product
+#     safety, Annex III standalone use cases);
+#   * Art. 9  — risk-management system throughout the lifecycle of a
+#     high-risk AI system (identification, evaluation, mitigation,
+#     testing, and the post-market feedback loop);
+#   * Art. 11 — technical documentation and record-keeping (Annex IV
+#     description of the system, its components, architecture, and the
+#     evidence trail of its logs);
+#   * Art. 13 — transparency and provision of information to deployers;
+#   * Art. 72 — post-market monitoring by providers, feeding Art. 73
+#     serious-incident reporting.
+#
+# One entry per (EU AI Act article entry, D3FEND technique) pair. Each
+# entry round-trips through `regulation_refs.entry_id` to a real entry
+# under content/mappings/eu_ai_act/*.yaml, and each `control_refs[*]`
+# to a real `stable_id` under content/controls/. Technique anchors are
+# sourced from the `d3fend_refs` blocks of the cited controls — no
+# invented ids.
+#
+# Entries are grouped by article, then ordered by D3FEND technique
+# slug. EXTEND (playbook_refs, OCSF field bindings) is out of scope for
+# this tier.
+regime: d3fend
+entries:
+  # -------------------------------------------------------------------
+  # Art. 6 — classification of AI systems as high-risk
+  # -------------------------------------------------------------------
+
+  - id: d3fend:eu_ai_act:art-6-1-annex-ii-product-safety:software-inventory
+    technique:
+      d3fend_id: d3f:SoftwareInventory
+      technique_name: Software Inventory
+      url: https://d3fend.mitre.org/technique/d3f:SoftwareInventory/
+    control_refs:
+      - control.sbom_capture@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "6"
+        entry_id: eu_ai_act:art-6-1-annex-ii-product-safety
+    status: draft
+    notes: >-
+      Art. 6(1) classifies an AI system as high-risk when it is a
+      safety component of, or is itself, a product covered by the
+      Union harmonisation legislation listed in Annex II.
+      `SoftwareInventory` is the D3FEND anchor named by
+      `control.sbom_capture@v1`, giving the provider the software
+      bill of materials needed to demonstrate which software component
+      of the regulated product is the AI system and to satisfy the
+      companion Annex II sectoral conformity-assessment record.
+
+  - id: d3fend:eu_ai_act:art-6-2-annex-iii-standalone:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.security_assessment@v1
+      - control.risk_management_policy@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "6"
+        entry_id: eu_ai_act:art-6-2-annex-iii-standalone
+    status: draft
+    notes: >-
+      Art. 6(2) classifies an AI system as high-risk when it falls
+      within one of the Annex III standalone use cases. Determining
+      whether a system is in scope is itself an operational-activity
+      mapping exercise: the provider must characterise the system's
+      intended purpose against the Annex III area descriptions.
+      `OperationalActivityMapping` is the D3FEND anchor shared by
+      `control.security_assessment@v1` (dated classification
+      assessment) and `control.risk_management_policy@v1` (the
+      governing policy under which the classification is recorded).
+
+  # -------------------------------------------------------------------
+  # Art. 9 — risk management system
+  # -------------------------------------------------------------------
+
+  - id: d3fend:eu_ai_act:art-9-risk-management:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.risk_management_policy@v1
+      - control.ict_risk_governance@v1
+      - control.ict_risk_framework_review@v1
+      - control.security_assessment@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "9"
+        entry_id: eu_ai_act:art-9-risk-management
+    status: draft
+    notes: >-
+      Art. 9 requires the provider of a high-risk AI system to establish,
+      implement, document, and maintain a risk management system as a
+      continuous iterative process running throughout the lifecycle.
+      `OperationalActivityMapping` is the D3FEND anchor shared by the
+      risk-governance controls that carry the policy layer
+      (`control.risk_management_policy@v1`,
+      `control.ict_risk_governance@v1`), the periodic-review layer
+      (`control.ict_risk_framework_review@v1`), and the assessment
+      layer (`control.security_assessment@v1`) — together modelling the
+      processing activities and their risk surface that Art. 9 requires
+      to be identified, evaluated, and treated.
+
+  - id: d3fend:eu_ai_act:art-9-risk-management:asset-inventory
+    technique:
+      d3fend_id: d3f:AssetInventory
+      technique_name: Asset Inventory
+      url: https://d3fend.mitre.org/technique/d3f:AssetInventory/
+    control_refs:
+      - control.asset_inventory_delta@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "9"
+        entry_id: eu_ai_act:art-9-risk-management
+    status: draft
+    notes: >-
+      Art. 9(2)(a) requires the identification and analysis of the known
+      and reasonably foreseeable risks that the high-risk AI system can
+      pose. `AssetInventory` is the D3FEND anchor named by
+      `control.asset_inventory_delta@v1`, providing the dated inventory
+      of the assets that carry or depend on the AI system — the scope
+      against which the Art. 9(2)(a) risk identification exercise is
+      conducted.
+
+  - id: d3fend:eu_ai_act:art-9-risk-management:network-traffic-analysis
+    technique:
+      d3fend_id: d3f:NetworkTrafficAnalysis
+      technique_name: Network Traffic Analysis
+      url: https://d3fend.mitre.org/technique/d3f:NetworkTrafficAnalysis/
+    control_refs:
+      - control.detection_coverage_evidence@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "9"
+        entry_id: eu_ai_act:art-9-risk-management
+    status: draft
+    notes: >-
+      Art. 9(2)(b) requires the estimation and evaluation of risks that
+      may emerge when the high-risk AI system is used in accordance
+      with its intended purpose. `NetworkTrafficAnalysis` is one of
+      the two D3FEND anchors on `control.detection_coverage_evidence@v1`,
+      providing the network-surface telemetry that lets the provider
+      characterise the operational risk envelope of the deployed
+      system.
+
+  - id: d3fend:eu_ai_act:art-9-risk-management:software-update
+    technique:
+      d3fend_id: d3f:SoftwareUpdate
+      technique_name: Software Update
+      url: https://d3fend.mitre.org/technique/d3f:SoftwareUpdate/
+    control_refs:
+      - control.patch_evidence@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "9"
+        entry_id: eu_ai_act:art-9-risk-management
+    status: draft
+    notes: >-
+      Art. 9(2)(d) requires the adoption of appropriate and targeted
+      risk-management measures designed to address the risks identified
+      under 9(2)(a). `SoftwareUpdate` is the D3FEND anchor named by
+      `control.patch_evidence@v1`, giving the provider the dated
+      evidence trail that vulnerability-driven risks are being closed
+      by the software-maintenance limb of the risk-management system.
+
+  - id: d3fend:eu_ai_act:art-9-risk-management:system-recovery-analysis
+    technique:
+      d3fend_id: d3f:SystemRecoveryAnalysis
+      technique_name: System Recovery Analysis
+      url: https://d3fend.mitre.org/technique/d3f:SystemRecoveryAnalysis/
+    control_refs:
+      - control.restore_drill@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "9"
+        entry_id: eu_ai_act:art-9-risk-management
+    status: draft
+    notes: >-
+      Art. 9(6)-(8) require the provider to test the high-risk AI system
+      to identify the most appropriate targeted risk-management measures
+      and to verify that the system performs consistently for its
+      intended purpose. `SystemRecoveryAnalysis` is the D3FEND anchor
+      named by `control.restore_drill@v1`, providing dated evidence
+      that the recovery limb of the risk-management measures actually
+      restores the system to a known-good state under test.
+
+  - id: d3fend:eu_ai_act:art-9-risk-management:forensic-analysis
+    technique:
+      d3fend_id: d3f:ForensicAnalysis
+      technique_name: Forensic Analysis
+      url: https://d3fend.mitre.org/technique/d3f:ForensicAnalysis/
+    control_refs:
+      - control.post_incident_learning@v1
+      - control.incident_handling_capability@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "9"
+        entry_id: eu_ai_act:art-9-risk-management
+    status: draft
+    notes: >-
+      Art. 9(2)(c) requires evaluation of risks that may emerge based on
+      data gathered from the post-market monitoring system. Recovering
+      that evaluation from a real incident is a forensic activity.
+      `ForensicAnalysis` is the D3FEND anchor shared by
+      `control.post_incident_learning@v1` (the structured retrospective
+      that feeds the next iteration of the risk assessment) and
+      `control.incident_handling_capability@v1` (the response capability
+      that captures the substantive evidence), together closing the
+      post-market feedback loop into Art. 9's iterative risk process.
+
+  - id: d3fend:eu_ai_act:art-9-risk-management:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.recurring_incident_correlator@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "9"
+        entry_id: eu_ai_act:art-9-risk-management
+    status: draft
+    notes: >-
+      Art. 9(2)(c) requires evaluation of risks that may emerge based on
+      data gathered from the post-market monitoring system.
+      `IncidentResponseAnalysis` is the D3FEND anchor named by
+      `control.recurring_incident_correlator@v1`, feeding recurrent
+      incident signals back into the iterative risk assessment loop.
+
+  # -------------------------------------------------------------------
+  # Art. 11 — technical documentation
+  # -------------------------------------------------------------------
+
+  - id: d3fend:eu_ai_act:art-11-technical-documentation:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.control_effectiveness_test@v1
+      - control.provider_attestation@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "11"
+        entry_id: eu_ai_act:art-11-technical-documentation
+    status: draft
+    notes: >-
+      Art. 11 and Annex IV require technical documentation demonstrating
+      that a high-risk AI system complies with Chapter III, Section 2 —
+      including descriptions of the monitoring, functioning, and control
+      of the system, and of the measures put in place.
+      `OperationalActivityMapping` is the D3FEND anchor shared by
+      `control.control_effectiveness_test@v1` (evidence of the control
+      environment's operating effectiveness) and
+      `control.provider_attestation@v1` (upstream-provider attestations
+      that feed the documentation), together discharging the
+      record-keeping surface of Art. 11.
+
+  - id: d3fend:eu_ai_act:art-11-technical-documentation:asset-inventory
+    technique:
+      d3fend_id: d3f:AssetInventory
+      technique_name: Asset Inventory
+      url: https://d3fend.mitre.org/technique/d3f:AssetInventory/
+    control_refs:
+      - control.asset_inventory_delta@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "11"
+        entry_id: eu_ai_act:art-11-technical-documentation
+    status: draft
+    notes: >-
+      Annex IV(1) requires a general description of the AI system,
+      including the hardware on which it is intended to run.
+      `AssetInventory` is the D3FEND anchor named by
+      `control.asset_inventory_delta@v1`, providing the dated inventory
+      surface that keeps the Art. 11 technical documentation current as
+      the underlying infrastructure changes.
+
+  - id: d3fend:eu_ai_act:art-11-technical-documentation:software-inventory
+    technique:
+      d3fend_id: d3f:SoftwareInventory
+      technique_name: Software Inventory
+      url: https://d3fend.mitre.org/technique/d3f:SoftwareInventory/
+    control_refs:
+      - control.sbom_capture@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "11"
+        entry_id: eu_ai_act:art-11-technical-documentation
+    status: draft
+    notes: >-
+      Annex IV(2)(b) requires the technical documentation to describe
+      the software components on which the AI system depends.
+      `SoftwareInventory` is the D3FEND anchor named by
+      `control.sbom_capture@v1`, keeping the software bill of materials
+      current as a first-class artefact of the Art. 11 record.
+
+  - id: d3fend:eu_ai_act:art-11-technical-documentation:system-configuration-permissions
+    technique:
+      d3fend_id: d3f:SystemConfigurationPermissions
+      technique_name: System Configuration Permissions
+      url: https://d3fend.mitre.org/technique/d3f:SystemConfigurationPermissions/
+    control_refs:
+      - control.baseline_configuration@v1
+      - control.configuration_settings@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "11"
+        entry_id: eu_ai_act:art-11-technical-documentation
+    status: draft
+    notes: >-
+      Annex IV(2)(c) requires the technical documentation to describe
+      the system architecture and the design specifications, including
+      the general logic of the AI system and its interaction with
+      hardware and other software. `SystemConfigurationPermissions` is
+      the D3FEND anchor shared by `control.baseline_configuration@v1`
+      (the recorded baseline configuration of the operating environment)
+      and `control.configuration_settings@v1` (the dated settings
+      evidence), together giving the Art. 11 architecture description
+      a machine-verifiable configuration anchor.
+
+  - id: d3fend:eu_ai_act:art-11-technical-documentation:forensic-analysis
+    technique:
+      d3fend_id: d3f:ForensicAnalysis
+      technique_name: Forensic Analysis
+      url: https://d3fend.mitre.org/technique/d3f:ForensicAnalysis/
+    control_refs:
+      - control.incident_handling_capability@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "11"
+        entry_id: eu_ai_act:art-11-technical-documentation
+    status: draft
+    notes: >-
+      Annex IV(3) requires a detailed description of the risk-management
+      system in accordance with Art. 9 and, where applicable, a
+      description of any change made to the system through its
+      lifecycle — including the substantive record of incidents.
+      `ForensicAnalysis` is one of the two D3FEND anchors on
+      `control.incident_handling_capability@v1`, providing the
+      reconstruction capability whose outputs are what the Art. 11
+      documentation records.
+
+  - id: d3fend:eu_ai_act:art-11-technical-documentation:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.incident_timeline_signals@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "11"
+        entry_id: eu_ai_act:art-11-technical-documentation
+    status: draft
+    notes: >-
+      Annex IV(5) requires a description of the appropriateness of the
+      performance metrics and, alongside Art. 12, the logs generated by
+      the high-risk AI system. `IncidentResponseAnalysis` is the D3FEND
+      anchor named by `control.incident_timeline_signals@v1`, providing
+      the dated-signal evidence trail that the Art. 11 record cites
+      when describing the log surface of the system in operation.
+
+  # -------------------------------------------------------------------
+  # Art. 13 — transparency and information for deployers
+  # -------------------------------------------------------------------
+
+  - id: d3fend:eu_ai_act:art-13-transparency:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.incident_timeline_signals@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "13"
+        entry_id: eu_ai_act:art-13-transparency
+    status: draft
+    notes: >-
+      Art. 13 requires high-risk AI systems to be designed and developed
+      such that their operation is sufficiently transparent to enable
+      deployers to interpret the output and use it appropriately —
+      including access to a record of the events (logs) generated
+      during use. `IncidentResponseAnalysis` is the D3FEND anchor named
+      by `control.incident_timeline_signals@v1`, providing the
+      dated-signal evidence trail that a deployer can consult when
+      interpreting an anomaly surfaced by the system.
+
+  - id: d3fend:eu_ai_act:art-13-transparency:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.training_attestation@v1
+      - control.supplier_inventory@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "13"
+        entry_id: eu_ai_act:art-13-transparency
+    status: draft
+    notes: >-
+      Art. 13(3)(b) requires the instructions for use to identify the
+      provider and describe the system's characteristics, capabilities,
+      and limitations. `OperationalActivityMapping` is the D3FEND
+      anchor shared by `control.training_attestation@v1` (dated
+      attestations that deployer-facing personnel understand the
+      system's intended purpose and limits) and
+      `control.supplier_inventory@v1` (the upstream-provider surface
+      identified in the transparency notice), together giving the
+      Art. 13 information the operational scaffolding it names.
+
+  - id: d3fend:eu_ai_act:art-13-transparency:asset-inventory
+    technique:
+      d3fend_id: d3f:AssetInventory
+      technique_name: Asset Inventory
+      url: https://d3fend.mitre.org/technique/d3f:AssetInventory/
+    control_refs:
+      - control.asset_inventory_delta@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "13"
+        entry_id: eu_ai_act:art-13-transparency
+    status: draft
+    notes: >-
+      Art. 13(3)(b)(v) requires the instructions for use to describe,
+      where applicable, the hardware and computational resources needed,
+      the expected lifetime of the high-risk AI system, and any
+      necessary maintenance and care measures. `AssetInventory` is the
+      D3FEND anchor named by `control.asset_inventory_delta@v1`,
+      keeping the hardware description in the transparency notice
+      grounded in a dated inventory rather than a stale manual list.
+
+  # -------------------------------------------------------------------
+  # Art. 72 — post-market monitoring
+  # -------------------------------------------------------------------
+
+  - id: d3fend:eu_ai_act:art-72-post-market-monitoring:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.security_assessment@v1
+      - control.control_effectiveness_test@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "72"
+        entry_id: eu_ai_act:art-72-post-market-monitoring
+    status: draft
+    notes: >-
+      Art. 72(1) requires providers to establish and document a
+      post-market monitoring system proportionate to the nature of
+      the AI technologies and the risks of the high-risk AI system.
+      `OperationalActivityMapping` is the D3FEND anchor shared by
+      `control.security_assessment@v1` (dated post-market assessment
+      activity) and `control.control_effectiveness_test@v1` (evidence
+      that the monitoring controls themselves operate as designed),
+      together modelling the recurring activity that Art. 72(1)
+      requires to be established, documented, and maintained.
+
+  - id: d3fend:eu_ai_act:art-72-post-market-monitoring:network-traffic-analysis
+    technique:
+      d3fend_id: d3f:NetworkTrafficAnalysis
+      technique_name: Network Traffic Analysis
+      url: https://d3fend.mitre.org/technique/d3f:NetworkTrafficAnalysis/
+    control_refs:
+      - control.detection_coverage_evidence@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "72"
+        entry_id: eu_ai_act:art-72-post-market-monitoring
+    status: draft
+    notes: >-
+      Art. 72 requires providers to establish and document a
+      post-market monitoring system that actively and systematically
+      collects, documents, and analyses relevant data on the
+      performance of high-risk AI systems throughout their lifetime.
+      `NetworkTrafficAnalysis` is one of the two D3FEND anchors on
+      `control.detection_coverage_evidence@v1`, providing the
+      network-surface telemetry that feeds the monitoring loop.
+
+  - id: d3fend:eu_ai_act:art-72-post-market-monitoring:user-behavior-analysis
+    technique:
+      d3fend_id: d3f:UserBehaviorAnalysis
+      technique_name: User Behavior Analysis
+      url: https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/
+    control_refs:
+      - control.detection_coverage_evidence@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "72"
+        entry_id: eu_ai_act:art-72-post-market-monitoring
+    status: draft
+    notes: >-
+      `UserBehaviorAnalysis` is the identity-side D3FEND anchor on
+      `control.detection_coverage_evidence@v1`, surfacing anomalous
+      interaction patterns with the deployed high-risk system that
+      Art. 72's continuous performance-monitoring obligation is
+      designed to catch.
+
+  - id: d3fend:eu_ai_act:art-72-post-market-monitoring:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.recurring_incident_correlator@v1
+      - control.incident_timeline_signals@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "72"
+        entry_id: eu_ai_act:art-72-post-market-monitoring
+    status: draft
+    notes: >-
+      Art. 72(1) requires the post-market monitoring system to enable
+      the provider to evaluate continuous compliance and to identify
+      any need for immediate corrective action.
+      `IncidentResponseAnalysis` is the D3FEND anchor shared by
+      `control.recurring_incident_correlator@v1` (recurrent-pattern
+      surface across incidents) and
+      `control.incident_timeline_signals@v1` (dated-signal trail),
+      together feeding the monitoring loop with structured incident
+      evidence.
+
+  - id: d3fend:eu_ai_act:art-72-post-market-monitoring:forensic-analysis
+    technique:
+      d3fend_id: d3f:ForensicAnalysis
+      technique_name: Forensic Analysis
+      url: https://d3fend.mitre.org/technique/d3f:ForensicAnalysis/
+    control_refs:
+      - control.incident_handling_capability@v1
+      - control.post_incident_learning@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "72"
+        entry_id: eu_ai_act:art-72-post-market-monitoring
+    status: draft
+    notes: >-
+      Art. 72 feeds Art. 73's serious-incident reporting obligation:
+      post-market monitoring must be able to reconstruct what
+      happened. `ForensicAnalysis` is the D3FEND anchor shared by
+      `control.incident_handling_capability@v1` (the response
+      capability itself) and `control.post_incident_learning@v1`
+      (the structured retrospective), together establishing the
+      substantive content the provider needs to characterise a
+      post-market incident.
+
+  - id: d3fend:eu_ai_act:art-72-post-market-monitoring:software-update
+    technique:
+      d3fend_id: d3f:SoftwareUpdate
+      technique_name: Software Update
+      url: https://d3fend.mitre.org/technique/d3f:SoftwareUpdate/
+    control_refs:
+      - control.patch_evidence@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "72"
+        entry_id: eu_ai_act:art-72-post-market-monitoring
+    status: draft
+    notes: >-
+      Art. 72(1) requires post-market monitoring to enable the provider
+      to identify any need for immediate corrective action; where the
+      corrective action is a software update, the update itself must
+      leave a dated trail. `SoftwareUpdate` is the D3FEND anchor named
+      by `control.patch_evidence@v1`, closing the corrective-action
+      limb of the Art. 72 loop with machine-verifiable update
+      evidence.
+
+  - id: d3fend:eu_ai_act:art-72-post-market-monitoring:system-recovery-analysis
+    technique:
+      d3fend_id: d3f:SystemRecoveryAnalysis
+      technique_name: System Recovery Analysis
+      url: https://d3fend.mitre.org/technique/d3f:SystemRecoveryAnalysis/
+    control_refs:
+      - control.restore_drill@v1
+    regulation_refs:
+      - regime: eu_ai_act
+        instrument: Regulation (EU) 2024/1689
+        celex: 32024R1689
+        article: "72"
+        entry_id: eu_ai_act:art-72-post-market-monitoring
+    status: draft
+    notes: >-
+      Art. 72(1) requires that the post-market monitoring loop enable
+      immediate corrective action; the recoverability of the system
+      after such an action is itself part of the continuous-compliance
+      story. `SystemRecoveryAnalysis` is the D3FEND anchor named by
+      `control.restore_drill@v1`, providing dated evidence that the
+      system can be restored to a known-good state as part of the
+      Art. 72 monitoring surface.

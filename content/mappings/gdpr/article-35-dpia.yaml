@@ -180,6 +180,7 @@ entries:
       - playbook.identity_compromise@v1
       - playbook.ransomware_containment@v1
       - playbook.data_protection_impact_assessment@v1
+      - playbook.eu_ai_act_risk_management@v1
     metric_refs:
       - kpi.notification_sla_compliance@v1
       - kri.regulator_notification_overrun@v1
@@ -231,6 +232,18 @@ entries:
       surfaces whose deployment triggers the assessment (the three
       operational playbooks) and the operator-side lifecycle that
       discharges the assessment itself (the DPIA playbook).
+      eu_ai_act_risk_management is the fifth anchor added under
+      G-02: Recital 9 of Regulation (EU) 2024/1689 preserves the
+      GDPR obligations that apply to processing of personal data,
+      and Art. 9(2) of the AI Act names risk assessment against
+      the "rights and freedoms of natural persons" as an explicit
+      dimension of the AI-system risk-management cycle. When a
+      high-risk AI system falls within Annex III and processes
+      personal data, the Art. 9(2) risk-assessment step operates on
+      a high-risk processing profile Art. 35(1) requires a DPIA
+      for; the eu_ai_act_risk_management playbook is the
+      AI-system-specific execution surface Art. 35(1) reads against
+      on that path.
 
   - id: gdpr:art-35-3-a-dpia-systematic-evaluation
     regulation:

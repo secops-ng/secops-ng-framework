@@ -16,9 +16,14 @@
 # discharge it. The next batch (A.5.2 information-security roles,
 # A.5.3 segregation of duties, A.5.4 management responsibilities,
 # A.5.5 contact with authorities, A.5.6 contact with special interest
-# groups) lands here alongside the anchor. The remaining A.5 controls
-# (A.5.7 through A.5.37) land as sibling entries in this file on
-# subsequent cards.
+# groups) landed alongside the anchor, and the A.5.7–A.5.12 batch
+# (threat intelligence, ISMS in project management, inventory of
+# assets, acceptable use of assets, return of assets, classification
+# of information) lands in this batch. The remaining A.5 controls
+# (A.5.13 through A.5.37) land as sibling entries in this file on
+# subsequent cards. The final A.5.26–A.5.37 batch also lands in this
+# file, closing the A.5 organisational-controls theme at 37 of 37
+# entries.
 #
 # Regime scope caveat: ISO/IEC 27001:2022 is a certifiable
 # information-security management standard, not an EU statutory
@@ -256,3 +261,1475 @@ entries:
       regime-specific sharing frameworks; the regimes carry separate
       evidence requirements against the same underlying
       community-contact artifact.
+  - id: iso27001:a-5-7-threat-intelligence
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.7
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Collect and analyse information relating to information-security
+      threats to produce threat intelligence. The intelligence output
+      must be actionable — routed into risk-treatment decisions,
+      detection engineering, and vulnerability-management prioritisation
+      rather than held as a passive feed.
+    status: draft
+    control_refs: []
+    playbook_refs:
+      - playbook.threat_intel_ingest@v1
+    # control_refs intentionally empty: the SecOps-NG control catalogue
+    # does not yet carry a dedicated threat-intelligence-management
+    # artifact as a first-class control. The operational discharge is
+    # anchored on the playbook side (`playbook.threat_intel_ingest@v1`)
+    # which exercises the ingest / normalisation / routing flow into
+    # the detection and vulnerability surfaces; a future dedicated
+    # artifact (e.g. `control.threat_intelligence_programme@v1`) would
+    # replace this placeholder without changing the entry id.
+    notes: >-
+      A.5.7 is the threat-intelligence anchor within the Annex A.5
+      organisational-controls theme — the 2022 revision introduced it
+      as a new organisational control, treating threat intelligence
+      as a discipline governed at the ISMS level rather than a purely
+      technical activity. The community-supplied threat-intelligence
+      contact surface anchored under A.5.6 feeds the discipline; A.5.7
+      governs the analysis-and-routing pipeline that turns the
+      inbound signal into actionable outputs. The playbook.threat_
+      intel_ingest@v1 CACAO playbook is the direct operational anchor
+      — its normalisation, prioritisation, and downstream-routing
+      steps discharge the analyse-and-act obligation A.5.7 imposes,
+      with the detection-engineering pipeline (A.8.16 anchor) and the
+      vulnerability-management pipeline (A.8.8 anchor) as the two
+      primary consumers.
+      Cross-regime parallels: NIS2 Art. 21(2)(h) (information-sharing
+      arrangements) and DORA Art. 45 (financial-sector information-
+      sharing arrangements) anchor the same intelligence-flow
+      discipline against their regime-specific sharing frameworks;
+      the regimes carry separate evidence requirements against the
+      same underlying intelligence-management artifact.
+  - id: iso27001:a-5-8-isms-in-project-management
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.8
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Integrate information security into project management, so that
+      information-security risks are identified, assessed, and treated
+      as part of the project lifecycle rather than retrofitted after
+      delivery. Applies to projects of any type — technical,
+      organisational, and business-process change.
+    status: draft
+    control_refs: []
+    playbook_refs: []
+    # control_refs and playbook_refs intentionally empty: the SecOps-NG
+    # content catalogue does not yet carry a project-management
+    # integration artifact as a first-class control or playbook. A.5.8
+    # is discharged in practice today against the operator's own
+    # project-management framework, joined against the risk-management
+    # policy anchor under A.5.1 (`control.risk_management_policy@v1`)
+    # for the top-level risk discipline and the change-management
+    # anchor under A.8.32 (`control.iac_policy_guardrail@v1`) for the
+    # technical-change slice. A future dedicated artifact (e.g.
+    # `control.project_security_integration@v1`) would replace this
+    # placeholder without changing the entry id.
+    notes: >-
+      A.5.8 is the project-management integration anchor within the
+      Annex A.5 organisational-controls theme — the 2022 revision
+      consolidated the earlier project-lifecycle-security controls
+      into this single obligation. The discipline is structural: the
+      operator's project-management framework must include
+      security-risk identification, assessment, and treatment as a
+      standard step rather than an optional add-on. The A.5.1
+      policy-set anchor (`control.risk_management_policy@v1`) governs
+      the top-level risk discipline projects inherit; the A.8.32
+      change-management anchor (`control.iac_policy_guardrail@v1`)
+      governs the technical-change slice through which project
+      outputs land. Cross-regime parallels: NIS2 Art. 21(2)(a)
+      (policies on risk analysis and information-system security)
+      and DORA Art. 6 (ICT risk management framework) anchor the
+      same risk-integration discipline against their regime-specific
+      scopes; the regimes carry separate evidence requirements
+      against the same underlying project-governance artifact.
+  - id: iso27001:a-5-9-inventory-of-assets
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.9
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Identify information and other associated assets and develop an
+      inventory of them, including ownership assignments, so that
+      protection responsibilities can be allocated and asset
+      lifecycle events (acquisition, change, disposal) are tracked.
+    status: draft
+    control_refs:
+      - control.asset_inventory_delta@v1
+    playbook_refs:
+      - playbook.asset_management@v1
+    notes: >-
+      A.5.9 is the asset-inventory anchor within the Annex A.5
+      organisational-controls theme — the 2022 revision consolidated
+      the earlier inventory-and-ownership obligations into this single
+      control. control.asset_inventory_delta@v1 is the direct anchor:
+      its oscal_refs block already carries ISO/IEC 27001:2022 A.5.9
+      alongside NIST 800-53 rev5 CM-8 / CM-8(2), and its
+      delta-capture surface (authoritative inventory + scheduled-
+      snapshot delta so unmanaged assets surface as exceptions) is
+      exactly the ownership-and-lifecycle discipline A.5.9 requires.
+      The playbook.asset_management@v1 CACAO playbook is the
+      operational discharge — the reconciliation-and-tagging flow
+      that keeps ownership assignments current as assets move through
+      their lifecycle. Cross-regime parallels: NIS2 Art. 21(2)(i)
+      (human-resources security, including asset management) and
+      DORA Art. 8 (ICT-asset identification and classification)
+      anchor the same inventory-and-ownership discipline against
+      their regime-specific scopes; the regimes carry separate
+      evidence requirements against the same underlying inventory
+      artifact.
+  - id: iso27001:a-5-10-acceptable-use-of-assets
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.10
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Identify, document, and implement rules for the acceptable use
+      and handling of information and other associated assets. The
+      rules must be communicated to personnel and other interested
+      parties who use the assets, and reviewed as the asset landscape
+      and risk profile change.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+    playbook_refs: []
+    # playbook_refs intentionally empty: A.5.10 is a policy-set
+    # obligation rather than an operational-flow one. The rules
+    # discipline it imposes is discharged through the topic-specific
+    # acceptable-use policy issued under the A.5.1 policy-set
+    # umbrella (`control.risk_management_policy@v1`), with awareness
+    # and acceptance evidence anchored under the A.5.4 management-
+    # direction pair (`control.training_attestation@v1`); no dedicated
+    # acceptable-use playbook is currently in the catalogue.
+    notes: >-
+      A.5.10 is the acceptable-use-of-assets anchor within the Annex
+      A.5 organisational-controls theme — the standard treats it as
+      a topic-specific policy issued under the overall policy-set
+      obligation anchored at A.5.1. control.risk_management_policy@v1
+      is the policy-set anchor whose management-approval and
+      periodic-review discipline (P1Y baseline cadence) governs the
+      acceptable-use rules issued against it; the A.5.9 asset-
+      inventory pair (`control.asset_inventory_delta@v1`,
+      `playbook.asset_management@v1`) is the inventory-scope surface
+      the rules apply against, and the A.5.4 management-direction
+      attestation evidence (`control.training_attestation@v1`)
+      records that personnel have received and acknowledged the
+      rules. Cross-regime parallels: NIS2 Art. 21(2)(g) (cyber
+      hygiene practices) and Art. 21(2)(i) (human-resources
+      security, including access-control policies) anchor the same
+      acceptable-use discipline against essential and important
+      entities; the regimes carry separate evidence requirements
+      against the same underlying acceptable-use policy artifact.
+  - id: iso27001:a-5-11-return-of-assets
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.11
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Ensure that personnel and other interested parties return all
+      information and other associated assets in their possession
+      upon termination of employment, contract, or role change. The
+      obligation includes physical assets, digital credentials, and
+      access to information holdings.
+    status: draft
+    control_refs:
+      - control.jml_evidence@v1
+    playbook_refs: []
+    # playbook_refs intentionally empty: A.5.11 is a lifecycle-event
+    # obligation discharged in practice at the leaver leg of the
+    # joiner-mover-leaver flow. control.jml_evidence@v1 is the
+    # evidence anchor whose lifecycle-events surface (access
+    # provisioned on join, adjusted on role change, revoked on
+    # departure) already carries the ISO/IEC 27001:2022 A.5.16
+    # identity-management control and the NIST 800-53 rev5 PS-4
+    # personnel-termination control; the physical-asset-return
+    # discipline A.5.11 additionally imposes is discharged against
+    # the operator's own leaver-checklist evidence (device return,
+    # badge return, key return) that the JML flow references.
+    notes: >-
+      A.5.11 is the return-of-assets anchor within the Annex A.5
+      organisational-controls theme — the standard treats it as the
+      termination-time counterpart of the A.5.9 inventory-and-
+      ownership obligation and the A.5.16 identity-management
+      obligation. control.jml_evidence@v1 is the practical anchor:
+      the leaver leg of the joiner-mover-leaver flow (access
+      revocation on departure, PS-4 personnel-termination discipline
+      on its oscal_refs block) is where the digital-asset-return
+      discipline is discharged, and the operator's leaver-checklist
+      evidence the flow references is where the physical-asset-return
+      discipline is discharged. Cross-regime parallels: NIS2 Art.
+      21(2)(i) (human-resources security) anchors the same
+      termination-time asset-return discipline against essential and
+      important entities; the regimes carry separate evidence
+      requirements against the same underlying leaver-lifecycle
+      artifact.
+  - id: iso27001:a-5-12-classification-of-information
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.12
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Classify information according to the organisation's
+      information-security needs, based on confidentiality, integrity,
+      availability, and relevant interested-party requirements. The
+      classification scheme must be documented, applied to information
+      assets, and reviewed as the information landscape and risk
+      profile change.
+    status: draft
+    control_refs: []
+    playbook_refs: []
+    # control_refs and playbook_refs intentionally empty: the SecOps-NG
+    # content catalogue does not yet carry a dedicated
+    # information-classification-scheme artifact as a first-class
+    # control or playbook. A.5.12 is discharged in practice today
+    # against the operator's own classification scheme, joined
+    # against the A.5.9 asset-inventory anchor
+    # (`control.asset_inventory_delta@v1`, `playbook.asset_management@v1`)
+    # for the assets the scheme applies against, the A.5.1 policy-set
+    # anchor (`control.risk_management_policy@v1`) for the top-level
+    # classification-policy discipline, and the A.5.10 acceptable-use
+    # anchor for the handling-rules surface that references the
+    # classification labels. A.5.13 labelling of information and
+    # A.5.14 information transfer land in a later batch and both
+    # depend on this classification anchor. A future dedicated
+    # artifact (e.g. `control.information_classification_scheme@v1`)
+    # would replace this placeholder without changing the entry id.
+    notes: >-
+      A.5.12 is the information-classification anchor within the
+      Annex A.5 organisational-controls theme — the standard treats
+      it as a structural prerequisite for the labelling (A.5.13),
+      handling (A.5.10 acceptable-use), and transfer (A.5.14)
+      obligations that reference classification labels. The
+      classification scheme itself is the operator's own artifact;
+      the SecOps-NG catalogue anchors it structurally through the
+      A.5.9 asset-inventory pair (the assets the scheme applies
+      against), the A.5.1 policy-set anchor (the top-level
+      classification-policy discipline), and the A.5.10 acceptable-
+      use anchor (the handling rules that reference labels).
+      Cross-regime parallels: NIS2 Art. 21(2)(i) (human-resources
+      security, including data-handling rules) and GDPR Art. 5(1)(f)
+      (integrity and confidentiality principle) anchor the same
+      classification-and-protection discipline against their
+      regime-specific scopes; the regimes carry separate evidence
+      requirements against the same underlying classification-scheme
+      artifact.
+  - id: iso27001:a-5-13-labelling-of-information
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.13
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Develop and implement an appropriate set of procedures for
+      information labelling in accordance with the information
+      classification scheme adopted by the organisation. Labels must
+      be applied consistently across the information landscape so
+      that downstream handling, transfer, and access-control rules
+      can key on them.
+    status: draft
+    control_refs: []
+    playbook_refs: []
+    # control_refs and playbook_refs intentionally empty: the
+    # SecOps-NG content catalogue does not yet carry a dedicated
+    # information-labelling artifact as a first-class control or
+    # playbook. A.5.13 is discharged in practice against the
+    # operator's own labelling procedures, joined against the
+    # A.5.12 classification-scheme anchor (labels are the projection
+    # of the classification scheme onto individual information
+    # assets), the A.5.9 asset-inventory pair
+    # (`control.asset_inventory_delta@v1`, `playbook.asset_management@v1`)
+    # for the assets against which labels are applied, and the
+    # A.5.10 acceptable-use anchor for the handling rules that key
+    # on labels. A future dedicated artifact
+    # (e.g. `control.information_labelling_scheme@v1`) would replace
+    # this placeholder without changing the entry id.
+    notes: >-
+      A.5.13 is the information-labelling anchor within the Annex
+      A.5 organisational-controls theme — the standard treats it as
+      the projection of the A.5.12 classification scheme onto
+      individual information assets, so downstream obligations that
+      key on classification labels (A.5.14 information transfer,
+      A.5.10 acceptable-use handling rules, A.5.15 access control)
+      have a consistent identifier to reference. Labels themselves
+      are an operator-side artifact; the SecOps-NG catalogue anchors
+      the discipline structurally through the A.5.12 classification-
+      scheme anchor (labels are meaningless without the scheme they
+      project), the A.5.9 asset-inventory pair (the assets against
+      which labels are applied), and the A.5.10 acceptable-use
+      anchor (the handling rules that reference labels). Cross-regime
+      parallels: NIS2 Art. 21(2)(i) (human-resources security,
+      including data-handling rules) and GDPR Art. 5(1)(f) (integrity
+      and confidentiality principle) anchor the same
+      classification-and-labelling discipline against their
+      regime-specific scopes; the regimes carry separate evidence
+      requirements against the same underlying labelling artifact.
+  - id: iso27001:a-5-14-information-transfer
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.14
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Establish rules, procedures, and controls for the transfer of
+      information within the organisation and with external parties,
+      across electronic, physical, and verbal channels. Transfer
+      controls must address the confidentiality and integrity of the
+      information in transit and be aligned with the classification
+      of the information being transferred.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+    playbook_refs: []
+    # control_refs wires control.risk_management_policy@v1 as the
+    # policy-set anchor that governs the topic-specific
+    # information-transfer rules the operator adopts (transfer
+    # agreements, secure-channel requirements, media-in-transit
+    # protection). The SecOps-NG catalogue does not yet carry a
+    # dedicated information-transfer artifact as a first-class
+    # control; the discipline is discharged in practice against the
+    # operator's own transfer procedures, joined against the A.5.13
+    # labelling anchor (transfer rules key on classification
+    # labels), the A.8.24 cryptography anchor
+    # (`control.crypto_policy_inventory@v1`,
+    # `playbook.crypto_posture_management@v1`) for the
+    # confidentiality-in-transit slice, and the A.5.20 supplier-
+    # relationships anchor (future batch) for the external-party
+    # transfer-agreement slice. playbook_refs is intentionally
+    # empty: information transfer is a policy-set discipline rather
+    # than a single operational flow; the crypto-posture playbook
+    # already anchored under A.8.24 exercises the technical slice
+    # that carries a subset of the transfer surface.
+    notes: >-
+      A.5.14 is the information-transfer anchor within the Annex
+      A.5 organisational-controls theme — the 2022 revision
+      consolidated the earlier transfer-agreement and
+      media-in-transit obligations into this single control.
+      control.risk_management_policy@v1 is the policy-set anchor
+      the operator's transfer-rules discipline hangs against; the
+      topic-specific transfer procedures are the operator's own
+      artifact but sit inside the policy-set governance the anchor
+      names. Cross-regime parallels: NIS2 Art. 21(2)(g) (basic
+      cyber-hygiene practices, including data-in-transit
+      protection) and GDPR Art. 32 (security of processing,
+      including transfer safeguards) anchor the same
+      transfer-protection discipline against their regime-specific
+      scopes; the regimes carry separate evidence requirements
+      against the same underlying transfer-rules artifact.
+  - id: iso27001:a-5-15-access-control
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.15
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Establish and implement rules to control physical and logical
+      access to information and other associated assets, based on
+      the business and information-security requirements of the
+      organisation. The access-control rules must be topic-specific,
+      documented, and reviewed as the business and threat landscape
+      change.
+    status: draft
+    control_refs:
+      - control.access_enforcement@v1
+      - control.least_privilege@v1
+    playbook_refs:
+      - playbook.iam_auditor@v1
+    notes: >-
+      A.5.15 is the access-control anchor within the Annex A.5
+      organisational-controls theme — the standard treats it as the
+      umbrella obligation that governs the topic-specific access
+      rules an operator adopts across information, systems, and
+      other associated assets. control.access_enforcement@v1 (its
+      oscal_refs block already carries ISO/IEC 27001:2022 A.5.15
+      alongside A.8.3) and control.least_privilege@v1 (also
+      carrying A.5.15 on its oscal_refs block) are the direct
+      anchors: access-enforcement carries the point-of-access rule
+      evaluation, least-privilege carries the entitlement-shaping
+      discipline that keeps the rules minimal. The
+      playbook.iam_auditor@v1 CACAO playbook is the operational
+      discharge — the periodic identity-and-access review that keeps
+      the rules current as roles change. Cross-regime parallels:
+      NIS2 Art. 21(2)(i) (human-resources security, including
+      access-control rules) and DORA Art. 9 (identification and
+      classification of ICT-supported business functions, including
+      access-control rules) anchor the same access-control
+      discipline against their regime-specific scopes; the regimes
+      carry separate evidence requirements against the same
+      underlying access-enforcement and least-privilege artifacts.
+  - id: iso27001:a-5-16-identity-management
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.16
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Manage the full lifecycle of identities so that only
+      authorised principals hold accounts, entitlements track the
+      current role of the principal, and dormant or terminated
+      identities are removed. The lifecycle covers human, service,
+      and non-person identities and their joiner, mover, and leaver
+      transitions.
+    status: draft
+    control_refs:
+      - control.jml_evidence@v1
+      - control.account_management@v1
+    playbook_refs:
+      - playbook.onboarding_offboarding_tracker@v1
+      - playbook.iam_auditor@v1
+    notes: >-
+      A.5.16 is the identity-management anchor within the Annex
+      A.5 organisational-controls theme — the standard treats it as
+      the full-lifecycle obligation covering account creation,
+      modification, and revocation across the joiner-mover-leaver
+      transitions. control.jml_evidence@v1 (its oscal_refs block
+      already carries ISO/IEC 27001:2022 A.5.16 alongside NIST
+      800-53 rev5 PS-4 personnel-termination) and
+      control.account_management@v1 (also carrying A.5.16 on its
+      oscal_refs block) are the direct anchors: jml_evidence
+      carries the lifecycle-events surface (access provisioned on
+      join, adjusted on role change, revoked on departure),
+      account_management carries the account-inventory and
+      dormancy-detection discipline. The
+      playbook.onboarding_offboarding_tracker@v1 CACAO playbook is
+      the operational join-and-leaver discharge, and
+      playbook.iam_auditor@v1 is the periodic identity-and-access
+      review that keeps the account surface current between
+      lifecycle events. Cross-regime parallels: NIS2 Art. 21(2)(i)
+      (human-resources security, including identity-lifecycle
+      controls) and DORA Art. 9 (identification and classification
+      of ICT-supported business functions, including identity
+      management) anchor the same identity-lifecycle discipline
+      against their regime-specific scopes; the regimes carry
+      separate evidence requirements against the same underlying
+      JML and account-management artifacts.
+  - id: iso27001:a-5-17-authentication-information
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.17
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Control the allocation and management of authentication
+      information (passwords, keys, tokens, biometric enrolments)
+      through documented procedures for generation, distribution,
+      storage, replacement, and revocation. Users and services must
+      be advised of their obligations for safeguarding
+      authentication information.
+    status: draft
+    control_refs: []
+    playbook_refs: []
+    # control_refs and playbook_refs intentionally empty: the
+    # SecOps-NG content catalogue does not yet carry a dedicated
+    # authentication-information-management artifact as a
+    # first-class control or playbook. A.5.17 is discharged in
+    # practice against the operator's own credential-management
+    # procedures, joined against the A.8.5 secure-authentication
+    # anchor (`control.mfa_state_probe@v1`,
+    # `control.service_identification_authentication@v1`,
+    # `playbook.mfa_secured_comms@v1`) for the enforcement-side
+    # surface that consumes the authentication information, the
+    # A.8.24 cryptography anchor
+    # (`control.key_rotation_evidence@v1`,
+    # `playbook.crypto_posture_management@v1`) for the key-material
+    # slice of the credential surface, and the A.5.1 policy-set
+    # anchor (`control.risk_management_policy@v1`) for the
+    # top-level credential-handling policy. A future dedicated
+    # artifact (e.g. `control.credential_management@v1`) would
+    # replace this placeholder without changing the entry id.
+    notes: >-
+      A.5.17 is the authentication-information-management anchor
+      within the Annex A.5 organisational-controls theme — the
+      standard treats it as the credential-lifecycle counterpart
+      to the A.5.16 identity-lifecycle obligation and the A.8.5
+      secure-authentication enforcement obligation. The
+      credential-management procedures themselves are the
+      operator's own artifact; the SecOps-NG catalogue anchors
+      the discipline structurally through the A.8.5
+      authentication-enforcement anchors (which exercise the
+      credentials once they exist), the A.8.24 cryptography
+      anchor (which governs the key-material slice), and the
+      A.5.1 policy-set anchor (the top-level credential-handling
+      policy). Cross-regime parallels: NIS2 Art. 21(2)(i)
+      (human-resources security, including access-credential
+      handling) and DORA Art. 9 (identification and
+      classification, including authentication-information
+      management) anchor the same credential-lifecycle
+      discipline against their regime-specific scopes; the
+      regimes carry separate evidence requirements against the
+      same underlying credential-management artifact.
+  - id: iso27001:a-5-18-access-rights
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.18
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Provision, review, modify, and remove access rights to
+      information and other associated assets in accordance with
+      the organisation's topic-specific policy on and rules for
+      access control. Access rights must track the current role of
+      the principal and be removed when no longer required.
+    status: draft
+    control_refs:
+      - control.cloud_identity_least_privilege@v1
+      - control.privileged_access_review@v1
+    playbook_refs:
+      - playbook.iam_auditor@v1
+      - playbook.onboarding_offboarding_tracker@v1
+    notes: >-
+      A.5.18 is the access-rights anchor within the Annex A.5
+      organisational-controls theme — the standard treats it as
+      the entitlement-lifecycle counterpart to the A.5.15 access-
+      control umbrella (which defines the rules) and the A.5.16
+      identity-management obligation (which manages the principals
+      the rights attach to). control.cloud_identity_least_privilege@v1
+      (its oscal_refs block already carries ISO/IEC 27001:2022
+      A.5.18 alongside A.5.15) is the direct anchor: its
+      least-privilege posture-check surface is exactly the
+      provision-review-modify-remove discipline A.5.18 imposes on
+      cloud-identity entitlements. control.privileged_access_review@v1
+      is the review-side anchor for the elevated-entitlement slice.
+      The playbook.iam_auditor@v1 CACAO playbook is the periodic
+      review discharge, and playbook.onboarding_offboarding_tracker@v1
+      is the lifecycle-event discharge that provisions on join and
+      removes on leave. Cross-regime parallels: NIS2 Art. 21(2)(i)
+      (human-resources security, including entitlement lifecycle)
+      and DORA Art. 9 (identification and classification, including
+      access-rights management) anchor the same entitlement-
+      lifecycle discipline against their regime-specific scopes;
+      the regimes carry separate evidence requirements against the
+      same underlying least-privilege and privileged-access-review
+      artifacts.
+  - id: iso27001:a-5-19-information-security-in-supplier-relationships
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.19
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Define and implement processes and procedures to manage the
+      information-security risks associated with the use of suppliers'
+      products and services, covering the full supplier lifecycle from
+      selection through onboarding, ongoing operation, and exit.
+    status: draft
+    control_refs:
+      - control.supplier_inventory@v1
+      - control.provider_attestation@v1
+    playbook_refs:
+      - playbook.supply_chain_security@v1
+      - playbook.contractual_obligations_tracker@v1
+    notes: >-
+      A.5.19 is the supplier-relationships anchor within the Annex
+      A.5 organisational-controls theme — the standard treats it as
+      the umbrella obligation covering the third-party surface,
+      from which A.5.20 (supplier agreements), A.5.21 (ICT
+      supply-chain), and A.5.22 (monitoring and change management
+      of supplier services) hang. control.supplier_inventory@v1
+      (its oscal_refs block already carries ISO/IEC 27001:2022
+      A.5.19 alongside NIS2 Art. 21(2)(d) supply-chain security)
+      is the direct anchor for the who-are-our-suppliers surface:
+      the register of suppliers and the ICT-service dependencies
+      that A.5.19 requires an operator to keep visible.
+      control.provider_attestation@v1 (also carrying A.5.19 on its
+      oscal_refs block, alongside A.5.22) is the direct anchor for
+      the ongoing-assurance surface: the periodic evidence stream
+      that the supplier's security posture still meets the
+      contracted requirements. The playbook.supply_chain_security@v1
+      CACAO playbook is the operational discharge that walks the
+      supplier register, ingests threat-intelligence signals, and
+      routes findings to the contract-time and posture-time
+      surfaces; playbook.contractual_obligations_tracker@v1 is the
+      contract-time discharge that keeps the supplier-agreement
+      obligations tracked against the relationship. Cross-regime
+      parallels: NIS2 Art. 21(2)(d) (supply-chain security) and
+      DORA Art. 28 (third-party ICT-risk management, including the
+      register of third-party arrangements) anchor the same
+      supplier-relationships discipline against their regime-
+      specific scopes; the regimes carry separate evidence
+      requirements against the same underlying supplier-register
+      and provider-attestation artifacts.
+  - id: iso27001:a-5-20-addressing-information-security-within-supplier-agreements
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.20
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Identify and agree the relevant information-security
+      requirements with each supplier in writing, and reflect them
+      in the supplier agreement so both parties are bound to a
+      consistent security baseline for the goods or services
+      exchanged.
+    status: draft
+    control_refs: []
+    playbook_refs:
+      - playbook.contractual_obligations_tracker@v1
+      - playbook.supply_chain_security@v1
+    # control_refs intentionally empty: the SecOps-NG content
+    # catalogue does not yet carry a dedicated supplier-agreement
+    # artifact as a first-class control. A.5.20 is discharged in
+    # practice against the operator's own contract-drafting and
+    # supplier-agreement procedures, joined against the A.5.19
+    # supplier-relationships anchor
+    # (`control.supplier_inventory@v1`,
+    # `control.provider_attestation@v1`) for the relationship
+    # surface the agreement binds, and the A.5.1 policy-set anchor
+    # (`control.risk_management_policy@v1`) for the top-level
+    # supplier-security policy that the agreements operationalise.
+    # A future dedicated artifact
+    # (e.g. `control.supplier_agreement_register@v1`) would replace
+    # this placeholder without changing the entry id.
+    notes: >-
+      A.5.20 is the supplier-agreements anchor within the Annex
+      A.5 organisational-controls theme — the standard treats it
+      as the contract-time complement to the A.5.19 relationship-
+      wide obligation: the security requirements identified in
+      A.5.19 must be written into the agreements A.5.20 governs so
+      both parties are bound. Agreements themselves are an
+      operator-side artifact; the SecOps-NG catalogue anchors the
+      discipline structurally through the A.5.19 supplier-
+      relationships anchors (the register and the ongoing
+      attestation surface) and the A.5.1 policy-set anchor (the
+      top-level supplier-security policy). The
+      playbook.contractual_obligations_tracker@v1 CACAO playbook
+      is the operational discharge that tracks the supplier-
+      agreement obligation clocks against the relationship, and
+      playbook.supply_chain_security@v1 is the relationship-side
+      discharge that closes the loop against the register.
+      Cross-regime parallels: NIS2 Art. 21(2)(d) (supply-chain
+      security, including contractual arrangements) and DORA
+      Art. 30 (key contractual provisions for ICT services)
+      anchor the same supplier-agreement discipline against their
+      regime-specific scopes; the regimes carry separate evidence
+      requirements against the same underlying supplier-agreement
+      artifact.
+  - id: iso27001:a-5-21-managing-information-security-in-the-ict-supply-chain
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.21
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Define and implement processes and procedures to manage the
+      information-security risks associated with the ICT products
+      and services supply chain, including sub-supplier risk and
+      the components and dependencies delivered as part of ICT
+      products.
+    status: draft
+    control_refs:
+      - control.sbom_capture@v1
+    playbook_refs:
+      - playbook.supply_chain_security@v1
+      - playbook.codebase_vuln_management@v1
+    notes: >-
+      A.5.21 is the ICT-supply-chain anchor within the Annex A.5
+      organisational-controls theme — the standard narrows the
+      A.5.19 supplier-relationships obligation onto the ICT
+      products-and-services slice, including the sub-supplier and
+      component surface that a monolithic supplier view would
+      miss. control.sbom_capture@v1 is the direct anchor for the
+      component-visibility surface: pinning the software-bill-of-
+      materials for a delivered ICT product is the pre-condition
+      for reasoning about sub-supplier and component risk. The
+      playbook.supply_chain_security@v1 CACAO playbook is the
+      relationship-side discharge (ingesting threat-intelligence
+      signals against the supplier register and routing findings
+      to the contract-time and posture-time surfaces), and
+      playbook.codebase_vuln_management@v1 is the component-side
+      discharge that walks the pinned SBOM against vulnerability
+      databases to surface the ICT-supply-chain risks A.5.21
+      requires to be managed. Cross-regime parallels: NIS2
+      Art. 21(2)(d) (supply-chain security, including direct and
+      indirect suppliers) and CRA Art. 13 (component due-diligence
+      and supplier-attestation obligations) anchor the same
+      ICT-supply-chain discipline against their regime-specific
+      scopes; the regimes carry separate evidence requirements
+      against the same underlying SBOM and supplier-register
+      artifacts.
+  - id: iso27001:a-5-22-monitoring-review-and-change-management-of-supplier-services
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.22
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Regularly monitor, review, evaluate, and manage changes to
+      the information-security practices and service delivery of
+      suppliers so that the contracted security posture continues
+      to hold as the relationship evolves.
+    status: draft
+    control_refs:
+      - control.provider_attestation@v1
+    playbook_refs:
+      - playbook.supply_chain_security@v1
+      - playbook.contractual_obligations_tracker@v1
+    notes: >-
+      A.5.22 is the supplier-monitoring anchor within the Annex
+      A.5 organisational-controls theme — the standard treats it
+      as the ongoing counterpart to the contract-time A.5.20
+      obligation: the security requirements agreed at contract
+      time must be continuously re-verified as the supplier's
+      delivery, personnel, and sub-supplier chain change.
+      control.provider_attestation@v1 (its oscal_refs block
+      already carries ISO/IEC 27001:2022 A.5.22 alongside A.5.19)
+      is the direct anchor: the periodic evidence stream that the
+      supplier's security posture still meets the contracted
+      requirements is exactly the monitoring-and-review discipline
+      A.5.22 imposes. The playbook.supply_chain_security@v1 CACAO
+      playbook is the operational discharge that walks the
+      supplier register, ingests posture and threat-intelligence
+      signals, and routes deviations to the contract-time and
+      posture-time surfaces; playbook.contractual_obligations_tracker@v1
+      is the change-management discharge that tracks the
+      supplier-agreement obligation clocks as the relationship
+      evolves. Cross-regime parallels: NIS2 Art. 21(2)(d)
+      (supply-chain security, including ongoing supplier
+      monitoring) and DORA Art. 28 (third-party ICT-risk
+      management, including monitoring of third-party
+      arrangements) anchor the same supplier-monitoring
+      discipline against their regime-specific scopes; the
+      regimes carry separate evidence requirements against the
+      same underlying provider-attestation artifact.
+  - id: iso27001:a-5-23-information-security-for-use-of-cloud-services
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.23
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Establish processes for the acquisition, use, management,
+      and exit from cloud services in accordance with the
+      organisation's information-security requirements, so the
+      shared-responsibility surface between operator and cloud
+      provider is understood, contracted, and continuously
+      verified.
+    status: draft
+    control_refs:
+      - control.cspm_baseline@v1
+      - control.cloud_identity_least_privilege@v1
+    playbook_refs:
+      - playbook.cloud_misconfiguration@v1
+      - playbook.infra_posture_management@v1
+    notes: >-
+      A.5.23 is the cloud-services anchor within the Annex A.5
+      organisational-controls theme — the standard treats it as
+      the cloud-specific specialisation of the A.5.19 supplier-
+      relationships obligation, calling out the shared-
+      responsibility surface where the operator retains
+      accountability for configuration, identity, and data even
+      when the runtime is provider-operated. control.cspm_baseline@v1
+      is the direct anchor for the configuration-posture surface:
+      cloud-service-posture baselines and drift detection are the
+      operator-controlled slice of the shared-responsibility model
+      that A.5.23 requires to be continuously verified.
+      control.cloud_identity_least_privilege@v1 is the direct
+      anchor for the identity-and-entitlement slice of cloud
+      usage, where entitlements against provider APIs are the
+      dominant risk surface once the workload is running. The
+      playbook.cloud_misconfiguration@v1 CACAO playbook is the
+      response-time discharge (posture finding to attested
+      remediation to re-verified fix), and playbook.infra_posture_management@v1
+      is the scheduled-re-execution discharge that walks the
+      in-scope cloud infrastructure and attests the current
+      state against the baseline. Cross-regime parallels: NIS2
+      Art. 21(2)(d) (supply-chain security, including cloud-
+      service dependencies) and DORA Art. 28-30 (third-party
+      ICT-risk management, including contractual and monitoring
+      obligations against cloud providers) anchor the same
+      cloud-services discipline against their regime-specific
+      scopes; the regimes carry separate evidence requirements
+      against the same underlying CSPM and cloud-identity
+      artifacts.
+  - id: iso27001:a-5-24-information-security-incident-management-planning-and-preparation
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.24
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Plan and prepare for managing information-security incidents
+      by defining, establishing, and communicating the incident-
+      management process, roles, and responsibilities so the
+      organisation can respond in a consistent and effective
+      manner when incidents occur.
+    status: draft
+    control_refs:
+      - control.incident_handling_capability@v1
+      - control.incident_timeline_signals@v1
+      - control.oob_channel_probe@v1
+    playbook_refs:
+      - playbook.incident_management@v1
+      - playbook.on_call_rotation@v1
+    notes: >-
+      A.5.24 is the incident-management-planning anchor within
+      the Annex A.5 organisational-controls theme — the standard
+      treats it as the pre-incident readiness obligation that
+      makes the A.5.25 event-assessment obligation and the
+      downstream A.5.26 (incident response) and A.5.27 (learning
+      from incidents) obligations executable.
+      control.incident_handling_capability@v1 (its oscal_refs
+      block already carries ISO/IEC 27001:2022 A.5.24) is the
+      direct anchor for the incident-response-plan artifact and
+      the role-and-responsibility surface it defines.
+      control.incident_timeline_signals@v1 (also carrying A.5.24
+      on its oscal_refs block, alongside A.5.25) is the direct
+      anchor for the timeline-evidence surface the response-plan
+      produces on execution. control.oob_channel_probe@v1
+      (also carrying A.5.24 on its oscal_refs block) is the
+      direct anchor for the out-of-band-communication readiness
+      slice — a prepared alternative channel that survives the
+      incident conditions the primary channel may be degraded
+      by. The playbook.incident_management@v1 CACAO playbook is
+      the operational engine that discharges the plan against a
+      live incident, and playbook.on_call_rotation@v1 is the
+      readiness-time discharge that keeps the responder-roster
+      state durable so the plan has someone to route to.
+      Cross-regime parallels: NIS2 Art. 21(2)(b) (incident
+      handling) and DORA Art. 17 (ICT-related-incident management
+      process) anchor the same incident-management-planning
+      discipline against their regime-specific scopes; the
+      regimes carry separate evidence requirements against the
+      same underlying incident-response-plan artifact.
+  - id: iso27001:a-5-25-assessment-and-decision-on-information-security-events
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.25
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Assess information-security events and decide whether they
+      are to be classified as information-security incidents so
+      that downstream response, notification, and learning
+      obligations attach to the right subset of the event stream.
+    status: draft
+    control_refs:
+      - control.incident_timeline_signals@v1
+      - control.dora_major_classifier@v1
+      - control.cra_submission_templates@v1
+      - control.dora_submission_templates@v1
+    playbook_refs:
+      - playbook.alert_triage@v1
+      - playbook.incident_management@v1
+    notes: >-
+      A.5.25 is the event-assessment anchor within the Annex A.5
+      organisational-controls theme — the standard treats it as
+      the classification gate between the raw event stream and
+      the incident lifecycle: only classified incidents attach
+      to the A.5.24 response-plan and to the regime-specific
+      notification clocks. control.incident_timeline_signals@v1
+      (its oscal_refs block already carries ISO/IEC 27001:2022
+      A.5.25 alongside A.5.24) is the direct anchor for the
+      timeline-evidence surface that captures the assess-and-
+      classify decision on the case.
+      control.dora_major_classifier@v1 (also carrying A.5.25 on
+      its oscal_refs block) is the direct anchor for the
+      significance/major-classification verdict on the DORA
+      side, which is the concrete regime-anchored form the
+      A.5.25 classification decision takes for financial-sector
+      operators. control.cra_submission_templates@v1 and
+      control.dora_submission_templates@v1 (both carrying A.5.25
+      on their oscal_refs blocks) are the downstream submission
+      anchors that only fire once an event has been classified
+      as an incident. The playbook.alert_triage@v1 CACAO playbook
+      is the operational discharge for the assess step (routing
+      raw signals into priority lanes), and
+      playbook.incident_management@v1 is the classify-and-decide
+      discharge that carries the case through the Art. 18-style
+      significance verdict onto the response chain.
+      Cross-regime parallels: NIS2 Art. 23 (early-warning and
+      significant-incident classification) and DORA Art. 18
+      (major-incident classification) anchor the same
+      event-assessment discipline against their regime-specific
+      scopes; the regimes carry separate evidence requirements
+      against the same underlying timeline and classifier
+      artifacts.
+  - id: iso27001:a-5-26-response-to-information-security-incidents
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.26
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Respond to information-security incidents in accordance with
+      the documented procedures established under the A.5.24
+      incident-management planning obligation, so that classified
+      incidents are contained, eradicated, and recovered from with
+      the roles, communications, and evidence trails the plan
+      requires.
+    status: draft
+    control_refs:
+      - control.incident_handling_capability@v1
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.incident_management@v1
+      - playbook.on_call_rotation@v1
+    notes: >-
+      A.5.26 is the incident-response anchor within the Annex A.5
+      organisational-controls theme — the standard treats it as the
+      execution-time complement to the A.5.24 planning-and-
+      preparation obligation and the A.5.25 assessment-and-decision
+      gate: once an event has been classified as an incident, A.5.26
+      is what actually gets run against it.
+      control.incident_handling_capability@v1 (its oscal_refs block
+      already carries ISO/IEC 27001:2022 A.5.26 alongside A.5.24) is
+      the direct anchor for the response-capability surface — the
+      roles, procedures, and coordination points the response
+      procedure exercises on a live incident.
+      control.incident_timeline_signals@v1 is the direct anchor for
+      the timeline-evidence surface the response produces on
+      execution: the durable case record that carries the
+      containment, eradication, and recovery actions the responders
+      took. The playbook.incident_management@v1 CACAO playbook is
+      the operational engine that discharges the response against a
+      live case, and playbook.on_call_rotation@v1 is the readiness-
+      time discharge that keeps the responder roster durable so
+      A.5.26 always has a routable owner.
+      Cross-regime parallels: NIS2 Art. 21(2)(b) (incident handling)
+      and DORA Art. 17 (ICT-related-incident management process)
+      anchor the same incident-response discipline against their
+      regime-specific scopes; the regimes carry separate evidence
+      requirements against the same underlying case-record and
+      response-plan artifacts.
+  - id: iso27001:a-5-27-learning-from-information-security-incidents
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.27
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Use knowledge gained from information-security incidents to
+      strengthen and improve the information-security controls, so
+      that lessons captured from one case reduce the likelihood or
+      impact of similar cases in future.
+    status: draft
+    control_refs:
+      - control.post_incident_learning@v1
+      - control.recurring_incident_correlator@v1
+    playbook_refs:
+      - playbook.post_incident_review@v1
+      - playbook.incident_management@v1
+    notes: >-
+      A.5.27 is the learning-from-incidents anchor within the Annex
+      A.5 organisational-controls theme — the standard treats it as
+      the closure discipline that turns individual A.5.26 response
+      executions into durable improvements to the control surface.
+      control.post_incident_learning@v1 (its oscal_refs block
+      already carries ISO/IEC 27001:2022 A.5.27) is the direct
+      anchor for the per-case blameless-review discipline and the
+      corrective-action register that captures what changed as a
+      result. control.recurring_incident_correlator@v1 (also
+      carrying A.5.27 on its oscal_refs block) is the direct anchor
+      for the cross-case-pattern surface: aggregating recurring
+      cause signatures across the incident stream to escalate them
+      onto the improvement backlog rather than treating each case
+      in isolation. The playbook.post_incident_review@v1 CACAO
+      playbook is the operational discharge that walks the blameless
+      review against the case timeline and registers the corrective
+      actions; playbook.incident_management@v1 is the case-lifecycle
+      discharge that carries the learning step through onto the
+      response chain. Cross-regime parallels: NIS2 Art. 21(2)(b)
+      (incident handling, including lessons-learned) and DORA
+      Art. 13 (learning and evolving) anchor the same learning
+      discipline against their regime-specific scopes; the regimes
+      carry separate evidence requirements against the same
+      underlying review and corrective-action-register artifacts.
+  - id: iso27001:a-5-28-collection-of-evidence
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.28
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Establish and implement procedures for the identification,
+      collection, acquisition and preservation of evidence related
+      to information-security events, so that evidence retains its
+      integrity and admissibility for downstream disciplinary,
+      legal, or regulatory processes.
+    status: draft
+    control_refs: []
+    playbook_refs:
+      - playbook.incident_management@v1
+      - playbook.post_incident_review@v1
+    # control_refs intentionally empty: the SecOps-NG content
+    # catalogue does not yet carry a dedicated evidence-custody or
+    # forensic-preservation artifact as a first-class control. A.5.28
+    # is discharged in practice against the operator's own forensic-
+    # readiness procedures, joined against the A.5.24 incident-
+    # management planning anchors (`control.incident_handling_capability@v1`,
+    # `control.incident_timeline_signals@v1`) that carry the case
+    # record the evidence attaches to, and the A.5.33 records-
+    # protection surface for the storage-integrity slice. A future
+    # dedicated artifact (e.g. `control.evidence_custody_register@v1`)
+    # would replace this placeholder without changing the entry id.
+    notes: >-
+      A.5.28 is the evidence-collection anchor within the Annex A.5
+      organisational-controls theme — the standard treats it as the
+      forensic-readiness complement to the A.5.24 planning
+      obligation and the A.5.26 response obligation: incident
+      response and post-incident learning both depend on evidence
+      whose integrity survives the case. The SecOps-NG catalogue
+      currently anchors the discipline structurally through the
+      A.5.24 case-record artifacts (the incident-handling capability
+      that runs the case and the timeline-signals surface that
+      captures the chronology of responder actions) rather than a
+      dedicated custody artifact. The playbook.incident_management@v1
+      CACAO playbook is the case-lifecycle discharge that produces
+      the timeline artifacts A.5.28 governs; playbook.post_incident_review@v1
+      is the review-time discharge that consumes those artifacts to
+      register corrective actions. Cross-regime parallels: NIS2
+      Art. 21(2)(b) (incident handling, including evidence
+      preservation) and DORA Art. 17(3) (recording of ICT-related
+      incidents with sufficient information to support later
+      analysis) anchor the same evidence-preservation discipline
+      against their regime-specific scopes; the regimes carry
+      separate evidence requirements against the same underlying
+      case-record and timeline artifacts.
+  - id: iso27001:a-5-29-information-security-during-disruption
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.29
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Plan how to maintain information security at an appropriate
+      level during disruption, so that the confidentiality,
+      integrity, and availability posture the ISMS asserts under
+      steady state does not silently degrade when the operator is
+      exercising alternate arrangements.
+    status: draft
+    control_refs: []
+    playbook_refs:
+      - playbook.backup_recovery@v1
+      - playbook.incident_management@v1
+    # control_refs intentionally empty: the SecOps-NG content
+    # catalogue does not yet carry a dedicated business-continuity /
+    # ISMS-during-disruption artifact as a first-class control.
+    # A.5.29 is discharged in practice against the operator's own
+    # business-continuity management posture, joined against the
+    # A.5.30 ICT-readiness anchor (`control.restore_drill@v1`) for
+    # the exercised-recovery slice, the A.8.13 backup anchors
+    # (`control.backup_attestation@v1`, `control.restore_drill@v1`)
+    # for the data-availability slice, and the A.5.24 incident-
+    # management planning anchors for the response-side leg. A
+    # future dedicated artifact (e.g. `control.isms_continuity_plan@v1`)
+    # would replace this placeholder without changing the entry id.
+    notes: >-
+      A.5.29 is the ISMS-during-disruption anchor within the Annex
+      A.5 organisational-controls theme — the standard treats it as
+      the security-posture leg of business-continuity management,
+      paired with A.5.30 (ICT readiness for business continuity)
+      which handles the availability-of-services leg. The SecOps-NG
+      catalogue currently anchors the discipline structurally
+      through the A.5.30 restore-drill anchor and the A.8.13 backup
+      anchors (data-availability during disruption) plus the A.5.24
+      incident-management planning anchors (response-side execution
+      during disruption). The playbook.backup_recovery@v1 CACAO
+      playbook is the exercised-recovery discharge that keeps the
+      restore capability durable; playbook.incident_management@v1 is
+      the case-lifecycle discharge that runs the response during
+      the disruption itself. Cross-regime parallels: NIS2
+      Art. 21(2)(c) (business continuity, backup management and
+      disaster recovery) and DORA Art. 11 (ICT business continuity
+      policy) anchor the same continuity-of-security discipline
+      against their regime-specific scopes; the regimes carry
+      separate evidence requirements against the same underlying
+      continuity-plan and exercised-recovery artifacts.
+  - id: iso27001:a-5-30-ict-readiness-for-business-continuity
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.30
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Plan, implement, maintain and test ICT readiness for business
+      continuity so that the ICT services underpinning critical
+      business processes can be recovered within the recovery-time
+      and recovery-point objectives the operator has committed to.
+    status: draft
+    control_refs:
+      - control.restore_drill@v1
+    playbook_refs:
+      - playbook.backup_recovery@v1
+    notes: >-
+      A.5.30 is the ICT-readiness anchor within the Annex A.5
+      organisational-controls theme — the standard treats it as the
+      availability-of-services complement to the A.5.29 security-
+      posture leg of business-continuity management: A.5.29 asserts
+      the ISMS survives disruption, A.5.30 asserts the ICT services
+      the ISMS protects can be restored within committed
+      objectives. control.restore_drill@v1 (its oscal_refs block
+      already carries ISO/IEC 27001:2022 A.5.30 alongside A.8.13) is
+      the direct anchor for the exercised-recovery surface: the
+      periodic recovery-drill evidence that RTO/RPO commitments are
+      currently discharged in practice, not just documented. The
+      playbook.backup_recovery@v1 CACAO playbook is the operational
+      engine that discharges the drill against the backup surface
+      and produces the restore-drill evidence stream. Cross-regime
+      parallels: NIS2 Art. 21(2)(c) (business continuity, backup
+      management and disaster recovery) and DORA Art. 11 (ICT
+      business continuity policy, including recovery objectives)
+      anchor the same ICT-readiness discipline against their
+      regime-specific scopes; the regimes carry separate evidence
+      requirements against the same underlying restore-drill
+      artifact.
+  - id: iso27001:a-5-31-legal-statutory-regulatory-and-contractual-requirements
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.31
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Identify, document and keep up to date the legal, statutory,
+      regulatory and contractual requirements relevant to
+      information security, and the operator's approach to meeting
+      them, so that the ISMS remains anchored against its actual
+      external obligation surface.
+    status: draft
+    control_refs: []
+    playbook_refs:
+      - playbook.contractual_obligations_tracker@v1
+    # control_refs intentionally empty: the SecOps-NG content
+    # catalogue does not yet carry a dedicated legal-and-regulatory
+    # register artifact as a first-class control. A.5.31 is
+    # discharged in practice against the operator's own legal /
+    # compliance register (typically maintained outside the ISMS
+    # toolset), joined against the A.5.1 policy-set anchor
+    # (`control.risk_management_policy@v1`) for the top-level
+    # policy that acknowledges the register, and the A.5.20
+    # supplier-agreements surface for the contractual slice. The
+    # crosswalk itself — the ISO 27001, NIS2, DORA, GDPR, CRA
+    # mapping files under `content/mappings/` — is the SecOps-NG
+    # community-facing substrate that supports the operator's
+    # register-building for the statutory and regulatory slice. A
+    # future dedicated artifact (e.g. `control.legal_register@v1`)
+    # would replace this placeholder without changing the entry id.
+    notes: >-
+      A.5.31 is the legal-and-regulatory-register anchor within the
+      Annex A.5 organisational-controls theme — the standard treats
+      it as the outward-facing obligation-tracking discipline: the
+      ISMS must know which external requirements bind it and how
+      each one is met. Registers themselves are an operator-side
+      artifact; the SecOps-NG catalogue anchors the discipline
+      structurally through the A.5.1 policy-set (the top-level
+      acknowledgement of the register) and the A.5.20 supplier-
+      agreements surface (the contractual slice of the register).
+      The community-authored crosswalk under `content/mappings/`
+      exercises the statutory and regulatory slice: giving an
+      operator the ISO 27001, NIS2, DORA, GDPR, CRA parallels for
+      each obligation. The playbook.contractual_obligations_tracker@v1
+      CACAO playbook is the operational discharge for the
+      contractual leg — tracking the contract-time obligations
+      against the supplier relationships and internal owners.
+      Cross-regime parallels: NIS2 Art. 21(2)(f) (basic cyber
+      hygiene practices, including policies covering the operator's
+      obligations) and DORA Arts. 6–14 (the ICT risk management
+      framework, which explicitly requires the operator to track
+      legal and regulatory requirements) anchor the same legal-
+      register discipline against their regime-specific scopes; the
+      regimes carry separate evidence requirements against the same
+      underlying legal-and-regulatory-register artifact.
+  - id: iso27001:a-5-32-intellectual-property-rights
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.32
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Implement appropriate procedures to protect intellectual
+      property rights, covering both the operator's own intellectual
+      property assets and the third-party intellectual property the
+      operator uses under licence or contract.
+    status: draft
+    control_refs: []
+    playbook_refs: []
+    # control_refs and playbook_refs intentionally empty: the
+    # SecOps-NG content catalogue does not carry a dedicated
+    # intellectual-property-rights artifact. A.5.32 is discharged in
+    # practice against the operator's own IPR-management posture
+    # (licence register, software-usage policy, IP-ownership
+    # clauses in employment and supplier agreements), joined
+    # against the A.5.1 policy-set anchor
+    # (`control.risk_management_policy@v1`) for the top-level IPR
+    # policy, the A.5.9 asset-inventory anchor
+    # (`control.asset_inventory_delta@v1`) for the licensed-
+    # software-inventory slice, the A.5.20 supplier-agreements
+    # surface for the third-party-IPR contractual slice, and the
+    # A.5.31 legal-register discipline for the statutory slice.
+    # A.5.32 is a governance-and-legal obligation rather than a
+    # security-operations flow; a future artifact would only be
+    # appropriate if the SecOps-NG catalogue extended into IPR
+    # governance.
+    notes: >-
+      A.5.32 is the intellectual-property-rights anchor within the
+      Annex A.5 organisational-controls theme — the standard treats
+      it as a governance-and-legal obligation adjacent to the
+      information-security discipline: the operator must protect
+      both its own IPR and any third-party IPR it uses. IPR is
+      primarily an operator-side legal-and-procurement concern; the
+      SecOps-NG catalogue anchors the discipline structurally
+      through the A.5.1 policy-set (the top-level acknowledgement
+      that IPR is in scope), the A.5.9 asset-inventory anchor (the
+      licensed-software inventory that supports IPR-management),
+      the A.5.20 supplier-agreements surface (the contractual slice
+      that binds third-party IPR terms), and the A.5.31 legal-
+      register discipline (the statutory slice). Cross-regime
+      parallels: the EU Copyright Directive (2001/29/EC, 2019/790)
+      and the Trade Secrets Directive (2016/943) anchor the
+      operator's IPR obligations at the statutory layer; the
+      regimes carry separate evidence requirements against the same
+      underlying licence-register and IPR-policy artifacts.
+  - id: iso27001:a-5-33-protection-of-records
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.33
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Protect records from loss, destruction, falsification,
+      unauthorised access and unauthorised release, in accordance
+      with legislative, regulatory, contractual and business
+      requirements, throughout the required retention period.
+    status: draft
+    control_refs: []
+    playbook_refs: []
+    # control_refs and playbook_refs intentionally empty: the
+    # SecOps-NG content catalogue does not yet carry a dedicated
+    # records-management or retention-scheme artifact as a first-
+    # class control. A.5.33 is discharged in practice against the
+    # operator's own records-management posture (retention schedule,
+    # storage-integrity controls, access-restriction on record
+    # stores), joined against the A.5.12 classification anchor for
+    # the sensitivity-of-record slice, the A.8.10 information-
+    # deletion discipline for the end-of-retention slice, the
+    # A.8.13 backup anchors
+    # (`control.backup_attestation@v1`, `control.restore_drill@v1`)
+    # for the loss-of-record slice, and the A.5.31 legal-register
+    # discipline for the statutory-retention-period slice. A future
+    # dedicated artifact (e.g. `control.records_retention_schedule@v1`)
+    # would replace this placeholder without changing the entry id.
+    notes: >-
+      A.5.33 is the records-protection anchor within the Annex A.5
+      organisational-controls theme — the standard treats it as the
+      records-management complement to A.5.34 (PII protection):
+      A.5.33 governs the record surface at large, A.5.34 narrows it
+      onto personal data. Records-management is primarily an
+      operator-side legal-and-archival concern; the SecOps-NG
+      catalogue anchors the discipline structurally through the
+      A.5.12 classification surface (the sensitivity layer that
+      determines the required protection), the A.8.10 information-
+      deletion discipline (end-of-retention disposal), the A.8.13
+      backup anchors (loss-of-record protection), and the A.5.31
+      legal-register discipline (retention-period sources).
+      Cross-regime parallels: GDPR Arts. 5(1)(e) (storage
+      limitation) and 30 (records of processing activities) anchor
+      the personal-data slice of records-management at the
+      statutory layer, and sector-specific retention regimes (SOX,
+      MiFID, HIPAA-equivalent EU rules) anchor the domain slices;
+      the regimes carry separate evidence requirements against the
+      same underlying retention-schedule and record-store-integrity
+      artifacts.
+  - id: iso27001:a-5-34-privacy-and-protection-of-pii
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.34
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Identify and meet the requirements regarding the preservation
+      of privacy and protection of personally identifiable
+      information according to applicable laws and regulations and
+      contractual requirements.
+    status: draft
+    control_refs: []
+    playbook_refs:
+      - playbook.data_subject_rights@v1
+      - playbook.data_protection_impact_assessment@v1
+    # control_refs intentionally empty: the SecOps-NG content
+    # catalogue does not yet carry a dedicated privacy-programme
+    # control artifact as a first-class control (the operator's
+    # data-protection officer role, the ROPA under GDPR Art. 30,
+    # and the privacy-impact assessment lifecycle are the operator-
+    # side surfaces that discharge A.5.34 in practice). A.5.34 is
+    # discharged operationally through the GDPR-anchored playbooks
+    # named on `playbook_refs`, joined against the A.5.12
+    # classification surface for the PII-tagging slice, the A.5.14
+    # information-transfer surface for the cross-border-transfer
+    # slice, the A.5.33 records-protection surface for the general
+    # records-integrity slice, and the A.5.31 legal-register
+    # discipline for the statutory-source slice. A future dedicated
+    # artifact (e.g. `control.privacy_programme@v1`) would replace
+    # this placeholder without changing the entry id.
+    notes: >-
+      A.5.34 is the privacy-and-PII-protection anchor within the
+      Annex A.5 organisational-controls theme — the standard treats
+      it as the personal-data-specific narrowing of the A.5.33
+      records-protection obligation, deferring the substantive
+      privacy discipline to the applicable statutory instrument
+      (which in the EU is the GDPR). The SecOps-NG catalogue
+      exercises the discipline operationally through the two
+      GDPR-anchored playbooks: playbook.data_subject_rights@v1
+      discharges the rights-request surface (access, rectification,
+      erasure, portability, objection), and
+      playbook.data_protection_impact_assessment@v1 discharges the
+      DPIA lifecycle for high-risk processing under GDPR Art. 35.
+      Structural joins run against the A.5.12 classification
+      surface (PII tagging), the A.5.14 information-transfer
+      surface (cross-border transfers), the A.5.33 records-
+      protection surface (record-integrity), and the A.5.31 legal-
+      register discipline (statutory source). Cross-regime
+      parallels: the GDPR at large is the direct statutory anchor;
+      the ePrivacy Directive (2002/58/EC) narrows the
+      communications-metadata slice; and ISO/IEC 27701 (extension
+      of ISO 27001 for privacy information management) is the
+      certifiable management-system parallel that some operators
+      lift onto the same A.5.34 obligation surface.
+  - id: iso27001:a-5-35-independent-review-of-information-security
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.35
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Review the operator's approach to managing information
+      security and its implementation (including people, processes
+      and technologies) independently at planned intervals or when
+      significant changes occur, so that the ISMS receives an
+      external assurance signal that is not produced by the teams
+      that operate it.
+    status: draft
+    control_refs:
+      - control.security_assessment@v1
+    playbook_refs: []
+    notes: >-
+      A.5.35 is the independent-review anchor within the Annex A.5
+      organisational-controls theme — the standard treats it as
+      the external-assurance discipline that sits alongside the
+      A.5.36 compliance-with-policies obligation: A.5.35 asks
+      whether the ISMS as a whole is fit for purpose, judged from
+      outside the operating team; A.5.36 asks whether the ISMS is
+      being followed as documented. control.security_assessment@v1
+      (its oscal_refs block already carries ISO/IEC 27001:2022
+      A.5.35) is the direct anchor for the independent-assessment
+      surface: the periodic third-party or internal-audit review
+      that produces an external opinion on the ISMS. A.5.35 is a
+      governance-and-audit obligation rather than an operational
+      flow, so no CACAO playbook is anchored here; the
+      discipline is discharged against the audit programme that
+      the control artifact governs. Cross-regime parallels: NIS2
+      Art. 21(2)(f) (basic cyber hygiene, including policies for
+      information-system security assessments) and DORA Art. 6(6)
+      (ICT risk-management framework subject to internal audit)
+      anchor the same independent-review discipline against their
+      regime-specific scopes; the regimes carry separate evidence
+      requirements against the same underlying security-assessment
+      artifact.
+  - id: iso27001:a-5-36-compliance-with-policies-rules-and-standards
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.36
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Regularly review the compliance of information processing
+      and procedures within the operator's area of responsibility
+      with the information-security policy, topic-specific
+      policies, rules and standards that the ISMS asserts, so that
+      drift between documented posture and operating posture is
+      surfaced before it becomes a finding.
+    status: draft
+    control_refs:
+      - control.ict_risk_framework_review@v1
+      - control.control_effectiveness_test@v1
+    playbook_refs: []
+    notes: >-
+      A.5.36 is the compliance-with-policies anchor within the
+      Annex A.5 organisational-controls theme — the standard treats
+      it as the internal-assurance complement to the A.5.35
+      independent-review obligation: A.5.36 is the ongoing
+      management review that closes the loop between the
+      documented ISMS and the operating ISMS, run by the operator's
+      own governance function. control.ict_risk_framework_review@v1
+      (its oscal_refs block already carries ISO/IEC 27001:2022
+      A.5.36) is the direct anchor for the framework-level review
+      surface: the periodic top-level review that A.5.36 requires.
+      control.control_effectiveness_test@v1 (also carrying A.5.36
+      on its oscal_refs block) is the direct anchor for the per-
+      control operating-effectiveness surface: the concrete-tests
+      layer that produces the evidence the framework-level review
+      consumes. A.5.36 is a governance-and-review obligation rather
+      than an operational flow, so no CACAO playbook is anchored
+      here; the discipline is discharged against the review
+      programme that the control artifacts govern. Cross-regime
+      parallels: NIS2 Art. 21(2)(f) (basic cyber hygiene, including
+      policies for information-system security) and DORA Art. 6
+      (ICT risk-management framework, subject to review) anchor
+      the same internal-review discipline against their regime-
+      specific scopes; the regimes carry separate evidence
+      requirements against the same underlying framework-review
+      and control-effectiveness-test artifacts.
+  - id: iso27001:a-5-37-documented-operating-procedures
+    regulation:
+      name: ISO/IEC 27001:2022
+      instrument: ISO/IEC 27001:2022 Annex A
+      article: A.5.37
+      url: https://www.iso.org/standard/27001
+    obligation: >-
+      Document and make available to all personnel who need them
+      the operating procedures for information processing
+      facilities, so that operational activities are executed
+      consistently against a known written procedure rather than
+      against ad-hoc individual practice.
+    status: draft
+    control_refs: []
+    playbook_refs: []
+    # control_refs and playbook_refs intentionally empty: A.5.37 is
+    # the meta-obligation that documented operating procedures
+    # exist, rather than an obligation over any specific procedure.
+    # The SecOps-NG catalogue as a whole discharges A.5.37 in
+    # practice: every CACAO playbook under `content/playbooks/` is
+    # itself a documented, machine-readable operating procedure,
+    # and every control artifact under `content/controls/` names
+    # the operational surface the procedure exercises. Structural
+    # joins run against the A.5.1 policy-set anchor
+    # (`control.risk_management_policy@v1`) as the top-level
+    # container of the documented procedures, the A.8.32 change-
+    # management anchor (`control.iac_policy_guardrail@v1`) as the
+    # surface that governs procedure updates, and the A.5.36
+    # compliance-review discipline as the closure signal that the
+    # documented procedures are followed. A future dedicated
+    # artifact would not add value here: A.5.37 is best read as
+    # asserting the existence of the very catalogue that this
+    # crosswalk indexes.
+    notes: >-
+      A.5.37 is the documented-operating-procedures anchor within
+      the Annex A.5 organisational-controls theme — the standard
+      closes the theme with a meta-obligation that the ISMS's
+      documented posture is written down in a form personnel can
+      execute against. The SecOps-NG catalogue exercises A.5.37
+      structurally: the CACAO playbook set under
+      `content/playbooks/` and the control-artifact set under
+      `content/controls/` together constitute the documented,
+      machine-readable operating-procedures surface, joined
+      against the A.5.1 policy-set (top-level container), the
+      A.8.32 change-management anchor (procedure-update
+      governance), and the A.5.36 compliance-review discipline
+      (are the documented procedures being followed?). Cross-
+      regime parallels: NIS2 Art. 21(2)(a) (policies on risk
+      analysis and information-system security, whose
+      documentation A.5.37 supports) and DORA Art. 6(2) (ICT
+      risk-management framework, comprising, inter alia,
+      documented policies, procedures and protocols) anchor the
+      same documented-procedures discipline against their
+      regime-specific scopes; the regimes carry separate evidence
+      requirements against the same underlying procedure-set.

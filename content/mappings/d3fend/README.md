@@ -14,9 +14,9 @@ the M0 milestone: OSCAL is covered by the per-regulation
 
 - **In:** structural mapping `D3FEND technique → control_refs →
   regulation entry id`. One YAML file per regulation already carried by
-  the OSCAL side: `nis2.yaml`, `dora.yaml`, `cra.yaml`. Each is a stub
-  containing 2–3 representative technique anchors that already appear in
-  the playbook CACAO files or control definitions.
+  the OSCAL side: `nis2.yaml`, `dora.yaml`, `cra.yaml`, `gdpr.yaml`.
+  Each is a stub containing 2–3 representative technique anchors that
+  already appear in the playbook CACAO files or control definitions.
 - **Out:** no schema enforcement, no compiler integration, no
   exhaustive coverage. Those land in CORE / EXTEND siblings to this
   SKELETON. References to D3FEND inside CACAO playbook JSON and inside
@@ -32,6 +32,27 @@ the M0 milestone: OSCAL is covered by the per-regulation
   Art. 15–16 / Art. 20–23 / Art. 24–27 / Art. 29 omissions).
 - `cra.yaml` — D3FEND techniques anchored to CRA Annex I §1 / Annex I §2
   / Art. 13 / Art. 14 entries (CORE coverage).
+- `gdpr.yaml` — D3FEND techniques anchored to GDPR Art. 25 / Art. 32 /
+  Art. 33 / Art. 34 / Art. 35 entries (SKELETON coverage of the
+  security-of-processing and protection-by-design / DPIA clusters).
+- `iso27001.yaml` — D3FEND techniques anchored to ISO/IEC 27001:2022
+  Annex A control entries. CORE coverage across all four Annex A
+  themes: A.5 organisational (17 entries), A.6 people (5 entries),
+  A.7 physical (4 entries), A.8 technological (19 entries) — 45
+  entries total, sourced from the `d3fend_refs` blocks of the cited
+  controls. See the file header for the coverage gaps intentionally
+  left open (A.5.7 / A.5.8 / A.5.12 / A.5.37, the four A.7 entries
+  with empty `control_refs`, A.6.7, and A.8.18–A.8.22 pending PR
+  #664).
+- `soc2.yaml` — D3FEND techniques anchored to SOC 2 Trust Services
+  Criteria entries (AICPA 2017, as revised). SKELETON coverage across
+  the Security Common Criteria cluster (CC6.1, CC6.6, CC6.8, CC7.1,
+  CC7.2, CC9.2), Availability (A1.1), and Processing Integrity
+  (PI1.1) — 13 entries total, sourced from the `d3fend_refs` blocks
+  of the cited controls. SOC 2 is a private-sector assurance
+  framework, not an EU statutory instrument; the crosswalk is a
+  structural pointer against operator-owned report-time evidence, not
+  a legal or auditor interpretation of the TSC.
 
 ## Entry schema (interim, not validated)
 

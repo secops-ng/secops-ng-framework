@@ -1,0 +1,296 @@
+# Cross-references for the business_continuity playbook.
+#
+# Outbound view of the content model: pins OSCAL controls, MITRE
+# D3FEND defensive techniques, OCSF event classes emitted, and the EU
+# regulatory clauses this playbook helps operationalise. Inbound
+# references live in content/mappings/{nis2,dora,gdpr}/ so the graph
+# is closed in both directions.
+#
+# Status: SKELETON (F-NIS2-BCP SKELETON). The playbook is the
+# operator-side NIS2 Art. 21(2)(c) business-continuity lifecycle —
+# the plan-lifecycle side of the continuity surface: detect and
+# declare, activate the BCM plan, isolate, failover, notify the
+# competent authority (Art. 23 significant-incident path), restore
+# and verify, and record the post-incident review. A sibling CORE
+# card lands the adapter bindings (BCM-plan store, isolation surface,
+# failover surface, competent-authority notification surface) and
+# the full D3FEND closure; a sibling EXTEND card lands the cookbook
+# walkthrough and advanced features.
+#
+# Sibling relationship with backup_recovery: both overlays pin
+# nis2:art-21-2-c and co-anchor the clause. backup_recovery pins the
+# periodic non-destructive restore-drill lane (continuous evidence
+# that the backup-and-recovery apparatus remains exercisable on the
+# operator's documented isolated drill target). This overlay pins
+# the plan-lifecycle lane — the event-driven activation, failover,
+# notification, and recovery envelope. The two lanes stay separately
+# anchored on the same clause; the drill exercises what this lane
+# activates.
+#
+# GDPR closure: GDPR Art. 32(1)(c) requires the controller to
+# implement measures to ensure the ability to restore the
+# availability of, and access to, personal data in a timely manner
+# in the event of a physical or technical incident — the backup /
+# resilience / restoration technical-measure surface. This lifecycle
+# is the plan-lifecycle materialisation of that ability where the
+# affected service processes personal data; the outbound gdpr entry
+# pins the existing inbound anchor gdpr:art-32-1-c-restore-
+# availability under content/mappings/gdpr/article-32-security-of-
+# processing.yaml.
+#
+# CRA closure: CRA Annex I §1(h) frames availability of essential
+# and basic functions in a product-security context; the plan-
+# lifecycle materialisation of NIS2 Art. 21(2)(c) is an operator-
+# side obligation surface (essential/important entities), not a
+# manufacturer product-security surface. Deliberate audited exclusion
+# is recorded on this overlay as a todo entry pending review; the
+# sibling backup_recovery playbook already pins the CRA
+# annex-i-1-h-availability-restore-drill anchor for the drill lane.
+#
+# DORA closure: DORA Art. 11 (response and recovery, RTO / RPO
+# objectives) is the upstream obligation the plan-lifecycle
+# discharges; the periodic-testing slice Art. 12 names is anchored
+# on the sibling backup_recovery overlay. This overlay pins
+# dora:art-11-response-recovery.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.business_continuity@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls anchoring the BCM lifecycle. The
+  # SKELETON overlay pins CP-2 (Contingency Plan) on the plan-
+  # activation surface and CP-10 (System Recovery and
+  # Reconstitution) on the failover / restore-and-verify surface.
+  # CP-9 (System Backup) is deliberately NOT pinned here — the
+  # backup-management leg of Art. 21(2)(c) is anchored on the
+  # sibling backup_recovery overlay so the two overlays cover the
+  # triplet (backup + disaster recovery + crisis management)
+  # without cross-pinning the same control on both.
+  - id: control.contingency_plan@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CP-2
+    title: Contingency Plan
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CP-2
+    notes: >-
+      Anchors the activate-bcm-plan, detect-and-declare, and
+      post-incident-review steps. CP-2 requires the organisation
+      to develop, coordinate, disseminate, review, and test a
+      contingency plan for the system that identifies essential
+      mission and business functions, contingency roles, and
+      recovery objectives. This lifecycle is the plan-activation
+      envelope that reads the operator's documented BCM plan
+      artifact and executes it; the PIR record it emits is the
+      audit-evident record CP-2 review cycles read.
+  - id: control.system_recovery_reconstitution@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CP-10
+    title: System Recovery and Reconstitution
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CP-10
+    notes: >-
+      Anchors the switch-to-backup and restore-and-verify steps.
+      CP-10 requires the organisation to provide for the recovery
+      and reconstitution of the system to a known state within
+      the documented recovery objectives after a disruption. The
+      failover to __failover_target__ and the cutback validation
+      captured into __recovery_result__ are the exercise of that
+      recovery capability against the documented RTO / RPO.
+  - id: control.incident_timeline_signals@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-6
+    title: Incident Reporting
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-6
+    notes: >-
+      Anchors the notify-competent-authority step. IR-6 requires
+      the organisation to report incidents to the designated
+      authorities within organisation-defined time periods. The
+      NIS2 Art. 23 24h early-warning / 72h incident-notification /
+      one-month final-report cascade discharged from this step is
+      the sector-specific timing schedule IR-6 anchors on.
+
+d3fend:
+  # D3FEND v1.0.0 selection for the BCM lifecycle. The SKELETON
+  # overlay pins System Recovery Analysis (D3-SRA) on the
+  # restore-and-verify step — the same technique the sibling
+  # backup_recovery overlay pins on its drill lane, applied here
+  # to the event-driven recovery envelope rather than the
+  # periodic-drill envelope. Other steps (declare, activate,
+  # isolate, switch-to-backup, notify, PIR) are coordination /
+  # activation / notification / evidence-compilation activities
+  # without a dedicated D3FEND runtime countermeasure at SKELETON
+  # tier; a sibling CORE card revisits the selection once the
+  # adapter surfaces are pinned. The gap-note discipline mirrors
+  # the precedents on data_subject_rights (D3-IAA only on the
+  # verify-identity step) and backup_recovery (per-step
+  # pin-where-it-fits / document-the-gap pattern).
+  - step: action--b17c0072-0000-4000-8000-000000000007
+    d3fend_id: D3-SRA
+    d3fend_name: System Recovery Analysis
+    url: https://d3fend.mitre.org/technique/d3f:SystemRecoveryAnalysis/
+    notes: >-
+      restore-and-verify — the cutback of the affected service
+      from __failover_target__ to the primary, the dependency
+      revalidation, and the health-signal check against the
+      documented recovery objectives with the observed RTO /
+      RPO recorded into __recovery_result__ is the event-driven
+      exercise discipline D3-SRA names. D3FEND frames System
+      Recovery Analysis as the analysis of system recovery from
+      a known-good state; the playbook narrows that lens to the
+      operator's event-driven recovery envelope. Same technique
+      as the sibling backup_recovery overlay's periodic drill
+      lane, applied here to the event-driven envelope. Detection
+      bindings for cutback misconfiguration (partial cutback,
+      health-signal false-positive) are owned by the sibling
+      CORE / EXTEND cards once stable upstream rule ids are
+      selected.
+
+ocsf:
+  # OCSF v1.3.0 telemetry binding. The BCM lifecycle emits two
+  # event classes: Availability Activity (4004) at the
+  # detect / activate / isolate / switch / restore-and-verify
+  # milestones (the operational availability-management surface)
+  # and Incident Finding (2005) at the notify-competent-authority
+  # and post-incident-review milestones (the incident-reporting
+  # and lessons-learned surface). A sibling CORE card revisits
+  # the binding once the CORE adapter surfaces are pinned.
+  - id: telemetry.ocsf.availability_activity@v1
+    category_uid: 4
+    category_name: Network Activity
+    class_uid: 4004
+    class_name: HTTP Activity
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted at detect-and-declare-bcm-event, activate-bcm-plan,
+      isolate-affected-systems, switch-to-backup, and
+      restore-and-verify: one availability-activity record per
+      milestone keyed to __event_id__, so the operator's
+      availability-management surface and the observed RTO /
+      RPO delta against the documented objectives can be
+      computed and audited from the emitted telemetry alone.
+      The class binding is intentional at SKELETON tier —
+      class_uid 4004 (HTTP Activity) is the OCSF v1.3.0
+      network-activity class the reference wiring emits; a
+      sibling CORE card revisits the class selection if a more
+      specific availability class lands in a future OCSF
+      release. Schema:
+      https://schema.ocsf.io/1.3.0/classes/http_activity
+  - id: telemetry.ocsf.incident_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2005
+    class_name: Incident Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted at notify-competent-authority (the NIS2 Art. 23
+      24h / 72h / one-month cascade) and post-incident-review
+      (the lessons-learned record). One incident-finding record
+      per notification and per PIR milestone keyed to
+      __event_id__; the on-time-vs-deadline delta feeds the
+      operator's Art. 23 timeliness posture. Schema:
+      https://schema.ocsf.io/1.3.0/classes/incident_finding
+
+nis2:
+  # Inbound entry that backlinks playbook.business_continuity@v1
+  # (co-anchored with playbook.backup_recovery@v1):
+  #   - content/mappings/nis2/article-21-2-c.yaml
+  #     (id nis2:art-21-2-c — business continuity, backup
+  #     management, disaster recovery, and crisis management)
+  # Pinned outbound below to close the graph.
+  - mapping_id: nis2:art-21-2-c
+    article: 21(2)(c)
+    notes: >-
+      NIS2 Art. 21(2)(c) requires essential and important entities
+      to operate business-continuity arrangements covering backup
+      management, disaster recovery, and crisis management. This
+      playbook is the plan-lifecycle materialisation of that
+      obligation: activate the documented BCM plan on event
+      declaration, isolate affected systems where applicable,
+      failover to the documented backup capacity, notify the
+      competent authority on the Art. 23 path when the event
+      crosses the significant-incident threshold, restore and
+      verify against the documented recovery objectives, and
+      persist the post-incident-review record. Co-anchored with
+      the sibling backup_recovery playbook which pins the
+      periodic-drill lane; this overlay pins the event-driven
+      plan-lifecycle lane. Together the two overlays cover the
+      backup + disaster-recovery + crisis-management triplet the
+      clause names.
+
+dora:
+  # Inbound entry that backlinks playbook.business_continuity@v1:
+  #   - content/mappings/dora/article-11.yaml
+  #     (id dora:art-11-response-recovery — DORA Art. 11 response
+  #     and recovery, RTO / RPO objectives, activation of the
+  #     response-and-recovery plan)
+  # Pinned outbound below to close the graph. Art. 12 (backup
+  # policies and periodic testing) is anchored on the sibling
+  # backup_recovery overlay's drill lane; this overlay pins Art.
+  # 11's response-and-recovery activation lane.
+  - mapping_id: dora:art-11-response-recovery
+    article: "11"
+    notes: >-
+      DORA Art. 11 requires financial entities to put in place a
+      response and recovery plan that specifies RTO / RPO
+      objectives for the recovery of ICT systems and services,
+      identifies the actions to be taken during and after an
+      ICT-related incident, and provides for the periodic testing
+      of that plan. This playbook is the plan-lifecycle
+      materialisation of that obligation for the operator: the
+      activate-bcm-plan step reads the documented plan and the
+      restore-and-verify step records the observed RTO / RPO
+      delta against the documented objectives on the event-driven
+      envelope. The sibling backup_recovery overlay pins Art. 12
+      (backup policies and periodic testing) on its drill lane;
+      this overlay pins Art. 11 (response and recovery,
+      activation lane) to keep the inbound graph atom-per-
+      obligation.
+
+gdpr:
+  # Inbound entry that backlinks playbook.business_continuity@v1
+  # for the availability leg of GDPR Art. 32(1)(c):
+  #   - content/mappings/gdpr/article-32-security-of-processing.yaml
+  #     (id gdpr:art-32-1-c-restore-availability — Art. 32(1)(c)
+  #     ability to restore availability and access to personal
+  #     data in a timely manner)
+  # Pinned outbound below to close the graph.
+  - mapping_id: gdpr:art-32-1-c-restore-availability
+    article: 32(1)(c)
+    notes: >-
+      GDPR Art. 32(1)(c) requires the controller to implement
+      technical and organisational measures ensuring the ability
+      to restore the availability of, and access to, personal
+      data in a timely manner in the event of a physical or
+      technical incident. Where the affected service under this
+      lifecycle processes personal data, the failover to
+      __failover_target__ and the cutback validation captured
+      into __recovery_result__ are the technical-measure
+      discharge of that obligation on the plan-lifecycle side;
+      the sibling backup_recovery overlay discharges the
+      periodic-testing leg on Art. 32(1)(d). The observed
+      RTO / RPO delta against the documented objectives is the
+      "timely manner" audit-evident signal.
+
+cra:
+  # SKELETON — no outbound CRA anchor. CRA Annex I §1(h) frames
+  # availability of essential and basic functions in a product-
+  # security context (manufacturer-side product resilience);
+  # NIS2 Art. 21(2)(c) is an operator-side essential/important-
+  # entity obligation surface. Cross-pinning the plan-lifecycle
+  # here to the CRA Annex I §1(h) anchor would misrepresent the
+  # scope, and the drill-lane CRA anchor is already pinned on
+  # the sibling backup_recovery overlay
+  # (cra:annex-i-1-h-availability-restore-drill). Deliberate
+  # audited exclusion pending the CORE / EXTEND card revisit.
+  - mapping_id: cra:todo-nis2-art21c-parallel
+    todo: true
+    notes: >-
+      Placeholder pending the CORE / EXTEND card. No documented
+      CRA Annex I / Art. 13-14 parallel-obligation interaction
+      with the operator-side NIS2 Art. 21(2)(c) plan-lifecycle
+      as of 2026-07-07; the sibling backup_recovery overlay
+      already pins cra:annex-i-1-h-availability-restore-drill
+      on the drill lane, and cross-pinning the plan-lifecycle
+      here would double-count. CORE card either pins a real
+      inbound CRA mapping id or documents the deliberate
+      absence.

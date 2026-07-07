@@ -1,0 +1,96 @@
+stable_id: kpi.mttc_agentic_threat@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Mean time to contain — agentic threat activity
+summary: >
+  Time elapsed between the first authoritative agentic-threat
+  Detection Finding that opens the incident record and the first
+  containment action recorded on the response playbook — credential
+  isolation (session and token revocation, IdP disable) or lateral-
+  movement micro-segmentation call along the resolved lateral edge.
+  Scoped to incidents whose causal chain originates in fully-agentic
+  adversary activity. Measured end-to-end across the response
+  pipeline so that triage latency, credential-isolation orchestration
+  latency, and network-boundary-call latency all contribute. SecOps-NG
+  does not pick a response vendor; the catalog entry is vendor-
+  neutral and the compile target is the source of truth for the
+  executable form.
+
+unit: minutes
+direction: lower_is_better
+
+measurement:
+  source: composite
+  aggregation: p95
+  formula: >
+    For each agentic-threat-rooted incident closed within the
+    evaluation window, compute (first_containment_action_timestamp -
+    first_detection_fire_timestamp) in minutes. Aggregate as p95
+    across incidents. Exclude incidents where the containment step
+    never fired (record-keeping gap) so the indicator does not
+    silently improve when the response pipeline stalls. Reference
+    visualisation: a horizontal bar chart of
+    remediation_latency_minutes per closed agentic-threat incident in
+    the window with the p95 aggregate annotated as the headline
+    figure. The committed reference rendering lives at
+    `content/metrics/mttc_agentic_threat.viz.md` — that file is the
+    contract for the chart shape; the compile target renders the
+    executable form against operator data.
+  inputs:
+    - name: first_detection_fire
+      description: >
+        First authoritative agentic-threat Detection Finding that
+        opened the incident record. Carried on the OCSF Detection
+        Finding meta-finding the detection layer emits when the
+        agentic-threat indicator rule matches; the catalog entry
+        binds to that OCSF class shape, not to a vendor-specific
+        rule object.
+      telemetry_ref: telemetry.ocsf.detection_finding@v1
+      field: finding_info.uid
+    - name: first_containment_action
+      description: >
+        First playbook step transition in the response workflow
+        whose purpose is to limit blast radius on the agentic
+        operator. Bound to the canonical credential-isolation step
+        of the compiled agentic_threat_response playbook. The
+        containment-action timestamp is carried on the OCSF Account
+        Change event the credential-isolation step emits when the
+        implicated principal is revoked, session-invalidated, and
+        disabled at the IdP for the containment window; the catalog
+        entry binds to that OCSF class shape, not to a vendor-
+        specific case-management object.
+      playbook_step: isolate affected credential set
+      telemetry_ref: telemetry.ocsf.account_change@v1
+      field: time
+  window:
+    duration: P30D
+    sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.detection_finding@v1
+  - telemetry.ocsf.account_change@v1
+
+playbook_refs:
+  - playbook_id: playbook.agentic_threat_response@v1
+    step_id: action--30000000-0000-4000-8000-000000000003
+
+external_refs:
+  - name: NIS2 — Article 21(2)(b) incident-handling capability (respond)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(b)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: NIS2 — Article 23 incident reporting timelines (motivating context)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 23
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ENISA — Threat Landscape reporting on autonomous / agentic adversary tradecraft
+    source: ENISA
+    url: https://www.enisa.europa.eu/publications/enisa-threat-landscape
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability

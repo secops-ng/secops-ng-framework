@@ -155,3 +155,48 @@ skip:
       the five Chapter II section atoms carries the outbound
       backlink). A sibling CORE / EXTEND card revisits the CRA
       cross-regime graph if a documented interaction is authored.
+
+  - slug: agentic_threat_response
+    rationale: >-
+      SKELETON — agentic-threat detection and response scaffold.
+      The playbook's outbound overlay
+      (`content/playbooks/agentic_threat_response/mappings.yaml`)
+      deliberately does not pin CRA entries at SKELETON time: the
+      scaffold is the operator-side incident-response slice, not
+      the manufacturer product-security surface CRA Annex I
+      governs. The credential-isolation and lateral-movement
+      containment steps already anchor operator-side on the
+      identity_compromise / iam_auditor lane that carries the CRA
+      Annex I §1(d) inbound edges. A sibling CORE / EXTEND card
+      revisits the CRA cross-regime graph if a documented
+      product-security interaction surfaces.
+
+  - slug: eu_ai_act_risk_management
+    rationale: >-
+      EU AI Act Art. 9 provider-side risk-management lifecycle for
+      high-risk AI systems. The playbook's outbound overlay
+      (`content/playbooks/eu_ai_act_risk_management/mappings.yaml`,
+      top-of-file scope-review block and `cra: []` array) deliberately
+      does not pin CRA entries: Art. 9 is a product-lifecycle
+      obligation on providers of high-risk AI systems under Regulation
+      (EU) 2024/1689, while CRA Annex I is a product-security
+      obligation on manufacturers of products with digital elements
+      under Regulation (EU) 2024/2847. Neither CRA anchor has a
+      documented interaction with the AI Act provider-side risk-
+      management obligation that would justify a direct inbound edge —
+      the two regimes address different product categories across
+      distinct conformity-assessment surfaces, and the AI Act Art. 9
+      risk-management discipline is not an Annex I §1 essential-
+      cybersecurity requirement discharge. The EU AI Act inbound graph
+      is closed via `content/mappings/eu_ai_act/article-09-*.yaml`
+      (Art. 9(1)-(6) atoms) with sibling Art. 11 + Annex IV, Art. 13,
+      and Art. 72 entries. A sibling CORE / EXTEND card revisits the
+      CRA cross-regime graph once ENISA or the AI Office document a
+      documented interaction (for example a manufacturer of a high-
+      risk AI system embedded in a product with digital elements
+      whose Art. 9 lifecycle discipline overlaps CRA Annex I §1
+      essential-cybersecurity requirements on the same product
+      surface). Direct DORA sibling closure: PR #689
+      (F-MAP-G02-DORA eu_ai_act_risk_management skip manifest,
+      squash-merged b6dc174 on 2026-07-06).
+

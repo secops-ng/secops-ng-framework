@@ -114,6 +114,7 @@ entries:
       - playbook.phishing_triage@v1
       - playbook.post_incident_review@v1
       - playbook.ransomware_containment@v1
+      - playbook.agentic_threat_response@v1
     metric_refs:
       - kpi.notification_sla_compliance@v1
       - kri.regulator_notification_overrun@v1
@@ -172,7 +173,21 @@ entries:
       extended for these three readiness playbooks because their
       data-flow docs do not name Art. 34 by number — the subject-
       notification leg of the cluster remains anchored on data_exfil
-      in the Art-34 entry below.
+      in the Art-34 entry below. agentic_threat_response is the
+      machine-speed adversary event-generation lane: its detect-
+      through-contain slice against a fully-agentic operator meets
+      the Art. 4(12) personal-data-breach definition under the
+      breach-of-confidentiality limb the moment the credential-
+      isolation step's implicated-principal set carries identity
+      records backing accounts that hold personal data (the same
+      limb identity_compromise anchors, extended to the autonomous-
+      adversary decision-cadence case set NIS2 Art. 21(2)(b)
+      recognises). The escalate step hands off to
+      incident_management for the Art. 33(3) submission;
+      agentic_threat_response's role is event-generation, not
+      notification. Art. 34 is not extended here — its data-flow
+      doc does not name Art. 34 by number, and any subject-
+      notification dispatch routes through incident_management.
 
   - id: gdpr:art-34-communication-data-subject
     regulation:

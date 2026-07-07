@@ -1,0 +1,111 @@
+stable_id: kri.transparency_doc_freshness_age@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Technical documentation freshness age — EU AI Act Art. 11 and Art. 13
+summary: >
+  Age of the freshest committed technical documentation bundle
+  assembled under EU AI Act (Regulation (EU) 2024/1689) Article 11
+  read with Annex IV, and of the deployer-facing instructions for
+  use required under Article 13. Article 11 requires the provider
+  to draw up the technical documentation before the high-risk AI
+  system is placed on the market and to keep it up to date; a
+  freshness age that drifts above the operator-scoped policy is the
+  signal that the last risk-management iteration is no longer
+  reflected in the documentation set and the Article 43 conformity-
+  assessment intake handoff is running against stale material.
+  Measured as the age in days of the latest committed bundle at the
+  end of the evaluation window.
+
+unit: days
+direction: lower_is_better
+
+measurement:
+  source: composite
+  aggregation: max
+  formula: >
+    For each high-risk AI system in scope, compute the age in days
+    at the end of the evaluation window of the latest committed
+    Article 11 + Annex IV technical documentation bundle and of the
+    latest committed Article 13 instructions-for-use bundle. Take
+    the maximum of the two ages as the per-system freshness age.
+    Roll up across systems as the maximum so a single stale system
+    is visible on the KRI; operators with a large AI-system estate
+    typically also render the p95 across systems as a secondary
+    figure but the KRI headline is the worst-observed age. A
+    freshness age above the operator-scoped policy (typically
+    aligned with the pinned Annex III use-case category's Article 9
+    iteration cadence) is the operator-side flag that the
+    documentation set is drifting behind the risk-management system.
+    Reference visualisation: a horizontal bar chart of
+    documentation_age_days per high-risk AI system in scope with
+    the maximum across systems annotated as the headline figure.
+    The committed reference rendering lives at
+    `content/metrics/transparency_doc_freshness_age.viz.md` — that
+    file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: technical_documentation_bundle
+      description: >
+        Latest committed Article 11 + Annex IV technical
+        documentation bundle for the high-risk AI system. Emitted
+        by the assemble-technical-documentation step of the
+        eu_ai_act_risk_management playbook. Carried on an OCSF
+        Compliance Finding (class_uid 2003) whose finding_info
+        references the bundle identifier and whose time field
+        pins the bundle assembly time. The freshness age is
+        computed against the window closing time.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: time
+      playbook_ref: playbook.eu_ai_act_risk_management@v1
+      playbook_step: assemble technical documentation
+    - name: instructions_for_use_bundle
+      description: >
+        Latest committed Article 13 instructions-for-use bundle for
+        the high-risk AI system. Emitted alongside the technical
+        documentation bundle on the same assemble-technical-
+        documentation step (the two share the Article 11 read with
+        Article 13 documentation surface). Carried on an OCSF
+        Compliance Finding (class_uid 2003) whose finding_info
+        references the instructions bundle identifier and whose
+        time field pins the bundle assembly time.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: time
+      playbook_ref: playbook.eu_ai_act_risk_management@v1
+      playbook_step: assemble technical documentation
+  window:
+    duration: P30D
+    sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+
+playbook_refs:
+  - playbook_id: playbook.eu_ai_act_risk_management@v1
+    step_id: action--40000000-0000-4000-8000-000000000004
+
+external_refs:
+  - name: EU AI Act — Article 11 read with Annex IV technical documentation
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 11 + Annex IV
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: EU AI Act — Article 13 transparency and provision of information to deployers
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 13
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: EU AI Act — Article 43 conformity assessment
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 43
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: NIST AI Risk Management Framework — Govern function (documentation discipline)
+    source: NIST
+    external_id: NIST AI 100-1
+    url: https://airc.nist.gov/AI_RMF_Knowledge_Base/AI_RMF
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability
+  - operability

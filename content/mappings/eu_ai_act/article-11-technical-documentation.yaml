@@ -1,0 +1,46 @@
+# EU AI Act — Article 11 + Annex IV technical documentation.
+#
+# Art. 11(1) requires the provider to draw up the technical
+# documentation of a high-risk AI system before that system is placed on
+# the market or put into service and to keep it up to date. Annex IV
+# enumerates the minimum contents: a general description of the AI
+# system, its elements and development process, information on
+# monitoring / functioning / control, performance metrics, the
+# risk-management system per Art. 9, and the harmonised standards
+# applied.
+regime: eu_ai_act
+entries:
+  - id: eu_ai_act:art-11-technical-documentation
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "11"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      The technical documentation of a high-risk AI system shall be
+      drawn up before that system is placed on the market or put into
+      service and shall be kept up to date. The technical
+      documentation shall be drawn up in such a way as to demonstrate
+      that the high-risk AI system complies with the requirements set
+      out in this Chapter and to provide national competent
+      authorities and notified bodies with the necessary information
+      in a clear and comprehensive form to assess the compliance of
+      the AI system with those requirements. It shall contain, at a
+      minimum, the elements set out in Annex IV.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+    playbook_refs:
+      - playbook.eu_ai_act_risk_management@v1
+    metric_refs: []
+    evidence_stream_refs:
+      - risk-analysis
+    notes: >-
+      Anchored on the assemble-technical-documentation step of the
+      eu_ai_act_risk_management playbook. The step assembles the
+      Annex IV section-by-section bundle and emits a Compliance
+      Finding per committed bundle so the freshness KRI can measure
+      the age of the latest committed technical documentation. The
+      Art. 43 conformity-assessment intake handoff is separately
+      scoped and lives on a follow-on card.
