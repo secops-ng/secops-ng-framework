@@ -1,19 +1,24 @@
-# NIST Cybersecurity Framework 2.0 — Core Functions crosswalk (SKELETON).
+# NIST Cybersecurity Framework 2.0 — Core Functions crosswalk (CORE).
 #
 # NIST Cybersecurity Framework 2.0 (CSF 2.0), published as NIST CSWP 29
 # on 26 February 2024, restructures the CSF Core around six Functions
-# (Govern, Identify, Protect, Detect, Respond, Recover) and 22
-# Categories. This file carries one entry per Category — 22 in total,
-# grouped by Function in the on-disk order the CSF specifies. The
-# CSF Subcategory level (CSF's finest-grained abstraction, e.g.
-# GV.OC-01) is deliberately out of scope for the SKELETON and will
-# land in a sibling CORE card.
+# (Govern, Identify, Protect, Detect, Respond, Recover), 22 Categories,
+# and 106 Subcategories. This file carries one entry per Category — 22
+# in total, grouped by Function in the on-disk order the CSF specifies.
+# The SKELETON layer landed the 22 Category-level entries. The CORE
+# layer (this file) extends each Category entry with a
+# `subcategory_entries` block that carries all 106 CSF Subcategories,
+# each with the outcome text (verbatim per CSWP 29) plus either
+# playbook_refs (where SecOps-NG artifacts exercise the outcome) or a
+# gap_note (governance / board / physical-facility outcomes discharged
+# by operator-owned evidence, not by the SecOps-NG catalogue).
 #
-# Scope of this file: the CSF 2.0 Core at Category granularity across
-# all six Functions. The GV Function was newly introduced in CSF 2.0
-# and subsumes the old CSF 1.1 ID.GV Category (governance concerns
-# were promoted out of Identify into their own Function). This file
-# reflects the 2.0 layout only; no CSF 1.1 anchors ship here.
+# Scope of this file: the CSF 2.0 Core at Category + Subcategory
+# granularity across all six Functions. The GV Function was newly
+# introduced in CSF 2.0 and subsumes the old CSF 1.1 ID.GV Category
+# (governance concerns were promoted out of Identify into their own
+# Function). This file reflects the 2.0 layout only; no CSF 1.1 anchors
+# ship here.
 #
 # Regime scope caveat: CSF 2.0 is a US-origin voluntary framework
 # maintained by NIST, not an EU statutory instrument. The crosswalk
@@ -70,6 +75,49 @@ entries:
       surface. Dependency-mapping outcomes (GV.OC-04, GV.OC-05) are
       partially exercised via the supplier inventory captured under
       GV.SC and the asset inventory captured under ID.AM.
+    subcategory_entries:
+      - id: GV.OC-01
+        outcome: >-
+          The organizational mission is understood and informs cybersecurity
+          risk management
+        gap_note: >-
+          Organisational-mission articulation is an operator-owned governance
+          artifact upstream of the SecOps-NG catalogue; discharged by the
+          operator's mission / charter documents.
+      - id: GV.OC-02
+        outcome: >-
+          Internal and external stakeholders are understood, and their needs
+          and expectations regarding cybersecurity risk management are
+          understood and considered
+        gap_note: >-
+          Stakeholder-expectation capture (customers, regulators, board,
+          staff) is operator-owned; discharged by the operator's stakeholder
+          register and engagement records.
+      - id: GV.OC-03
+        outcome: >-
+          Legal, regulatory, and contractual requirements regarding
+          cybersecurity — including privacy and civil liberties obligations —
+          are understood and managed
+        playbook_refs:
+          - playbook.dora_ict_risk_selfassess@v1
+          - playbook.nis2_self_assessment@v1
+          - playbook.eu_ai_act_risk_management@v1
+          - playbook.data_protection_impact_assessment@v1
+      - id: GV.OC-04
+        outcome: >-
+          Critical objectives, capabilities, and services that external
+          stakeholders depend on or expect from the organization are
+          understood and communicated
+        playbook_refs:
+          - playbook.contractual_obligations_tracker@v1
+          - playbook.executive_metrics@v1
+      - id: GV.OC-05
+        outcome: >-
+          Outcomes, capabilities, and services that the organization depends
+          on are understood and communicated
+        playbook_refs:
+          - playbook.asset_management@v1
+          - playbook.supply_chain_security@v1
 
   - id: nist_csf:gv-rm-risk-management-strategy
     regulation:
@@ -93,6 +141,58 @@ entries:
       discharge the "framework in place, reviewed on a cadence"
       slice of the Category via the ICT risk-framework review
       control and the DORA ICT-risk self-assessment playbook.
+    subcategory_entries:
+      - id: GV.RM-01
+        outcome: >-
+          Risk management objectives are established and agreed to by
+          organizational stakeholders
+        gap_note: >-
+          Risk-management objective-setting is a board / executive artifact;
+          discharged by the operator's risk-management framework document.
+      - id: GV.RM-02
+        outcome: >-
+          Risk appetite and risk tolerance statements are established,
+          communicated, and maintained
+        gap_note: >-
+          Risk-appetite / risk-tolerance statements are board-level artifacts;
+          discharged by the operator's risk-appetite statement.
+      - id: GV.RM-03
+        outcome: >-
+          Cybersecurity risk management activities and outcomes are included
+          in enterprise risk management processes
+        playbook_refs:
+          - playbook.dora_ict_risk_selfassess@v1
+          - playbook.executive_metrics@v1
+      - id: GV.RM-04
+        outcome: >-
+          Strategic direction that describes appropriate risk response options
+          is established and communicated
+        gap_note: >-
+          Strategic risk-response direction is operator-owned governance
+          output; the DORA ICT-risk framework review control exercises the
+          periodic-review slice.
+      - id: GV.RM-05
+        outcome: >-
+          Lines of communication across the organization are established for
+          cybersecurity risks, including risks from suppliers and other third
+          parties
+        playbook_refs:
+          - playbook.executive_metrics@v1
+          - playbook.supply_chain_security@v1
+          - playbook.mfa_secured_comms@v1
+      - id: GV.RM-06
+        outcome: >-
+          A standardized method for calculating, documenting, categorizing,
+          and prioritizing cybersecurity risks is established and communicated
+        playbook_refs:
+          - playbook.dora_ict_risk_selfassess@v1
+      - id: GV.RM-07
+        outcome: >-
+          Strategic opportunities (i.e., positive risks) are characterized and
+          are included in organizational cybersecurity risk discussions
+        gap_note: >-
+          Positive-risk / opportunity characterisation is operator-owned
+          strategy work; not exercised by the current catalogue.
 
   - id: nist_csf:gv-rr-roles-responsibilities-authorities
     regulation:
@@ -116,6 +216,37 @@ entries:
       of GV.RR via the on-call rotation playbook, and the "programme
       ownership is named at governance level" slice via the ICT risk
       governance control.
+    subcategory_entries:
+      - id: GV.RR-01
+        outcome: >-
+          Organizational leadership is responsible and accountable for
+          cybersecurity risk and fosters a culture that is risk-aware,
+          ethical, and continually improving
+        gap_note: >-
+          Executive accountability for cybersecurity risk is a board /
+          senior-leadership posture; discharged by the operator's governance
+          charter.
+      - id: GV.RR-02
+        outcome: >-
+          Roles, responsibilities, and authorities related to cybersecurity
+          risk management are established, communicated, understood, and
+          enforced
+        playbook_refs:
+          - playbook.on_call_rotation@v1
+          - playbook.incident_management@v1
+      - id: GV.RR-03
+        outcome: >-
+          Adequate resources are allocated commensurate with the cybersecurity
+          risk strategy, roles, responsibilities, and policies
+        gap_note: >-
+          Resource-allocation adequacy is an operator-owned budgeting
+          decision; not exercised by the catalogue directly.
+      - id: GV.RR-04
+        outcome: >-
+          Cybersecurity is included in human resources practices
+        playbook_refs:
+          - playbook.onboarding_offboarding_tracker@v1
+          - playbook.cyber_hygiene_training@v1
 
   - id: nist_csf:gv-po-policy
     regulation:
@@ -139,6 +270,24 @@ entries:
       reviewed" slice (via risk-management-policy and
       crypto-policy-inventory) and the "workforce is trained on the
       policy" slice (via the cyber-hygiene-training playbook).
+    subcategory_entries:
+      - id: GV.PO-01
+        outcome: >-
+          Policy for managing cybersecurity risks is established based on
+          organizational context, cybersecurity strategy, and priorities and
+          is communicated and enforced
+        gap_note: >-
+          Policy-instrument authoring is operator-owned; the catalogue
+          exercises policy-inventory capture (risk_management_policy,
+          crypto_policy_inventory controls) but not the policy text itself.
+      - id: GV.PO-02
+        outcome: >-
+          Policy for managing cybersecurity risks is reviewed, updated,
+          communicated, and enforced to reflect changes in requirements,
+          threats, technology, and organizational mission
+        gap_note: >-
+          Policy review-and-refresh cadence is operator-owned; the catalogue
+          exercises the policy-inventory surface but not the review workflow.
 
   - id: nist_csf:gv-ov-oversight
     regulation:
@@ -164,6 +313,27 @@ entries:
       learned feeding programme adjustment); the catalogue anchors
       discharge the "control effectiveness is tested and evidenced"
       slice.
+    subcategory_entries:
+      - id: GV.OV-01
+        outcome: >-
+          Cybersecurity risk management strategy outcomes are reviewed to
+          inform and adjust strategy and direction
+        playbook_refs:
+          - playbook.executive_metrics@v1
+          - playbook.post_incident_review@v1
+      - id: GV.OV-02
+        outcome: >-
+          The cybersecurity risk management strategy is reviewed and adjusted
+          to ensure coverage of organizational requirements and risks
+        playbook_refs:
+          - playbook.executive_metrics@v1
+          - playbook.dora_ict_risk_selfassess@v1
+      - id: GV.OV-03
+        outcome: >-
+          Organizational cybersecurity risk management performance is
+          evaluated and reviewed for adjustments needed
+        playbook_refs:
+          - playbook.executive_metrics@v1
 
   - id: nist_csf:gv-sc-cybersecurity-supply-chain-risk-management
     regulation:
@@ -190,6 +360,81 @@ entries:
       and the contract-obligation-tracking surface, discharging the
       operational slice; upstream vendor selection and contract text
       remain operator-owned.
+    subcategory_entries:
+      - id: GV.SC-01
+        outcome: >-
+          A cybersecurity supply chain risk management program, strategy,
+          objectives, policies, and processes are established and agreed to by
+          organizational stakeholders
+        playbook_refs:
+          - playbook.supply_chain_security@v1
+      - id: GV.SC-02
+        outcome: >-
+          Cybersecurity roles and responsibilities for suppliers, customers,
+          and partners are established, communicated, and coordinated
+          internally and externally
+        playbook_refs:
+          - playbook.supply_chain_security@v1
+          - playbook.contractual_obligations_tracker@v1
+      - id: GV.SC-03
+        outcome: >-
+          Cybersecurity supply chain risk management is integrated into
+          cybersecurity and enterprise risk management, risk assessment, and
+          improvement processes
+        playbook_refs:
+          - playbook.supply_chain_security@v1
+          - playbook.dora_ict_risk_selfassess@v1
+      - id: GV.SC-04
+        outcome: >-
+          Suppliers are known and prioritized by criticality
+        playbook_refs:
+          - playbook.supply_chain_security@v1
+      - id: GV.SC-05
+        outcome: >-
+          Requirements to address cybersecurity risks in supply chains are
+          established, prioritized, and integrated into contracts and other
+          types of agreements with suppliers and other relevant third parties
+        playbook_refs:
+          - playbook.contractual_obligations_tracker@v1
+          - playbook.supply_chain_security@v1
+      - id: GV.SC-06
+        outcome: >-
+          Planning and due diligence are performed to reduce risks before
+          entering into formal supplier or other third-party relationships
+        playbook_refs:
+          - playbook.supply_chain_security@v1
+          - playbook.contractual_obligations_tracker@v1
+      - id: GV.SC-07
+        outcome: >-
+          The risks posed by a supplier, their products and services, and
+          other third parties are understood, recorded, prioritized, assessed,
+          responded to, and monitored over the course of the relationship
+        playbook_refs:
+          - playbook.supply_chain_security@v1
+      - id: GV.SC-08
+        outcome: >-
+          Relevant suppliers and other third parties are included in incident
+          planning, response, and recovery activities
+        playbook_refs:
+          - playbook.supply_chain_security@v1
+          - playbook.incident_management@v1
+          - playbook.business_continuity@v1
+      - id: GV.SC-09
+        outcome: >-
+          Supply chain security practices are integrated into cybersecurity
+          and enterprise risk management programs, and their performance is
+          monitored throughout the technology product and service life cycle
+        playbook_refs:
+          - playbook.supply_chain_security@v1
+          - playbook.executive_metrics@v1
+      - id: GV.SC-10
+        outcome: >-
+          Cybersecurity supply chain risk management plans include provisions
+          for activities that occur after the conclusion of a partnership or
+          service agreement
+        playbook_refs:
+          - playbook.contractual_obligations_tracker@v1
+          - playbook.supply_chain_security@v1
 
   # ─── IDENTIFY (ID) ────────────────────────────────────────────
 
@@ -216,6 +461,53 @@ entries:
       hardware / software / data inventory sub-outcomes are all
       exercised by the asset-management playbook plus the
       asset-inventory delta and SBOM controls.
+    subcategory_entries:
+      - id: ID.AM-01
+        outcome: >-
+          Inventories of hardware managed by the organization are maintained
+        playbook_refs:
+          - playbook.asset_management@v1
+      - id: ID.AM-02
+        outcome: >-
+          Inventories of software, services, and systems managed by the
+          organization are maintained
+        playbook_refs:
+          - playbook.asset_management@v1
+          - playbook.codebase_vuln_management@v1
+      - id: ID.AM-03
+        outcome: >-
+          Representations of the organization's authorized network
+          communication and internal and external network data flows are
+          maintained
+        playbook_refs:
+          - playbook.asset_management@v1
+          - playbook.infra_posture_management@v1
+      - id: ID.AM-04
+        outcome: >-
+          Inventories of services provided by suppliers are maintained
+        playbook_refs:
+          - playbook.supply_chain_security@v1
+          - playbook.asset_management@v1
+      - id: ID.AM-05
+        outcome: >-
+          Assets are prioritized based on classification, criticality,
+          resources, and impact on the mission
+        playbook_refs:
+          - playbook.asset_management@v1
+      - id: ID.AM-07
+        outcome: >-
+          Inventories of data and corresponding metadata for designated data
+          types are maintained
+        playbook_refs:
+          - playbook.asset_management@v1
+          - playbook.data_protection_impact_assessment@v1
+      - id: ID.AM-08
+        outcome: >-
+          Systems, hardware, software, services, and data are managed
+          throughout their life cycles
+        playbook_refs:
+          - playbook.asset_management@v1
+          - playbook.patch_management@v1
 
   - id: nist_csf:id-ra-risk-assessment
     regulation:
@@ -241,6 +533,72 @@ entries:
       threat-intel playbook, vulnerability identification in the
       codebase-vuln-management playbook and disclosure-intake control,
       and risk aggregation in the DORA ICT-risk self-assessment.
+    subcategory_entries:
+      - id: ID.RA-01
+        outcome: >-
+          Vulnerabilities in assets are identified, validated, and recorded
+        playbook_refs:
+          - playbook.codebase_vuln_management@v1
+          - playbook.vuln_intake@v1
+          - playbook.infra_posture_management@v1
+      - id: ID.RA-02
+        outcome: >-
+          Cyber threat intelligence is received from information sharing
+          forums and sources
+        playbook_refs:
+          - playbook.threat_intel_ingest@v1
+      - id: ID.RA-03
+        outcome: >-
+          Internal and external threats to the organization are identified and
+          recorded
+        playbook_refs:
+          - playbook.threat_intel_ingest@v1
+          - playbook.dora_ict_risk_selfassess@v1
+      - id: ID.RA-04
+        outcome: >-
+          Potential impacts and likelihoods of threats exploiting
+          vulnerabilities are identified and recorded
+        playbook_refs:
+          - playbook.dora_ict_risk_selfassess@v1
+          - playbook.threat_intel_ingest@v1
+      - id: ID.RA-05
+        outcome: >-
+          Threats, vulnerabilities, likelihoods, and impacts are used to
+          understand inherent risk and inform risk response prioritization
+        playbook_refs:
+          - playbook.dora_ict_risk_selfassess@v1
+      - id: ID.RA-06
+        outcome: >-
+          Risk responses are chosen, prioritized, planned, tracked, and
+          communicated
+        playbook_refs:
+          - playbook.dora_ict_risk_selfassess@v1
+          - playbook.executive_metrics@v1
+      - id: ID.RA-07
+        outcome: >-
+          Changes and exceptions are managed, assessed for risk impact,
+          recorded, and tracked
+        playbook_refs:
+          - playbook.infra_posture_management@v1
+          - playbook.dora_ict_risk_selfassess@v1
+      - id: ID.RA-08
+        outcome: >-
+          Processes for receiving, analyzing, and responding to vulnerability
+          disclosures are established
+        playbook_refs:
+          - playbook.vuln_intake@v1
+          - playbook.cra_cvd@v1
+      - id: ID.RA-09
+        outcome: >-
+          The authenticity and integrity of hardware and software are assessed
+          prior to acquisition and use
+        playbook_refs:
+          - playbook.supply_chain_security@v1
+      - id: ID.RA-10
+        outcome: >-
+          Critical suppliers are assessed prior to acquisition
+        playbook_refs:
+          - playbook.supply_chain_security@v1
 
   - id: nist_csf:id-im-improvement
     regulation:
@@ -265,6 +623,35 @@ entries:
       programme" slice via post-incident learning and review; the
       detection-engineering playbook exercises the detection-side
       improvement loop.
+    subcategory_entries:
+      - id: ID.IM-01
+        outcome: >-
+          Improvements are identified from evaluations
+        playbook_refs:
+          - playbook.dora_ict_risk_selfassess@v1
+          - playbook.post_incident_review@v1
+      - id: ID.IM-02
+        outcome: >-
+          Improvements are identified from security tests and exercises,
+          including those done in coordination with suppliers and relevant
+          third parties
+        playbook_refs:
+          - playbook.dora_tlpt_programme@v1
+          - playbook.supply_chain_security@v1
+      - id: ID.IM-03
+        outcome: >-
+          Improvements are identified from execution of operational processes,
+          procedures, and activities
+        playbook_refs:
+          - playbook.post_incident_review@v1
+          - playbook.detection_engineering@v1
+      - id: ID.IM-04
+        outcome: >-
+          Incident response plans and other cybersecurity plans that affect
+          operations are established, communicated, maintained, and improved
+        playbook_refs:
+          - playbook.incident_management@v1
+          - playbook.business_continuity@v1
 
   # ─── PROTECT (PR) ─────────────────────────────────────────────
 
@@ -299,6 +686,47 @@ entries:
       authorisation slice end-to-end: joiner-mover-leaver evidence,
       MFA state, least-privilege review, privileged-access review,
       service-identity authentication, and the IAM audit playbook.
+    subcategory_entries:
+      - id: PR.AA-01
+        outcome: >-
+          Identities and credentials for authorized users, services, and
+          hardware are managed by the organization
+        playbook_refs:
+          - playbook.iam_auditor@v1
+          - playbook.onboarding_offboarding_tracker@v1
+      - id: PR.AA-02
+        outcome: >-
+          Identities are proofed and bound to credentials based on the context
+          of interactions
+        playbook_refs:
+          - playbook.iam_auditor@v1
+          - playbook.onboarding_offboarding_tracker@v1
+      - id: PR.AA-03
+        outcome: >-
+          Users, services, and hardware are authenticated
+        playbook_refs:
+          - playbook.iam_auditor@v1
+          - playbook.mfa_secured_comms@v1
+      - id: PR.AA-04
+        outcome: >-
+          Identity assertions are protected, conveyed, and verified
+        playbook_refs:
+          - playbook.iam_auditor@v1
+      - id: PR.AA-05
+        outcome: >-
+          Access permissions, entitlements, and authorizations are defined in
+          a policy, managed, enforced, and reviewed, and incorporate the
+          principles of least privilege and separation of duties
+        playbook_refs:
+          - playbook.iam_auditor@v1
+          - playbook.onboarding_offboarding_tracker@v1
+      - id: PR.AA-06
+        outcome: >-
+          Physical access to assets is managed, monitored, and enforced
+          commensurate with risk
+        gap_note: >-
+          Physical-access management is operator-owned facilities work; not
+          exercised by the current SecOps-NG catalogue.
 
   - id: nist_csf:pr-at-awareness-and-training
     regulation:
@@ -323,6 +751,22 @@ entries:
       catalogue anchors discharge the "training attendance is
       attested" and "phishing exposure is exercised in-practice"
       slices.
+    subcategory_entries:
+      - id: PR.AT-01
+        outcome: >-
+          Personnel are provided with awareness and training so that they
+          possess the knowledge and skills to perform general tasks with
+          cybersecurity risks in mind
+        playbook_refs:
+          - playbook.cyber_hygiene_training@v1
+          - playbook.phishing_triage@v1
+      - id: PR.AT-02
+        outcome: >-
+          Individuals in specialized roles are provided with awareness and
+          training so that they possess the knowledge and skills to perform
+          relevant tasks with cybersecurity risks in mind
+        playbook_refs:
+          - playbook.cyber_hygiene_training@v1
 
   - id: nist_csf:pr-ds-data-security
     regulation:
@@ -350,6 +794,33 @@ entries:
       posture-management playbooks) and the availability slice via
       the backup-attestation control. The data-exfil playbook covers
       the loss-prevention slice.
+    subcategory_entries:
+      - id: PR.DS-01
+        outcome: >-
+          The confidentiality, integrity, and availability of data-at-rest are
+          protected
+        playbook_refs:
+          - playbook.cryptographic_controls@v1
+          - playbook.crypto_posture_management@v1
+      - id: PR.DS-02
+        outcome: >-
+          The confidentiality, integrity, and availability of data-in-transit
+          are protected
+        playbook_refs:
+          - playbook.cryptographic_controls@v1
+          - playbook.mfa_secured_comms@v1
+      - id: PR.DS-10
+        outcome: >-
+          The confidentiality, integrity, and availability of data-in-use are
+          protected
+        playbook_refs:
+          - playbook.cryptographic_controls@v1
+          - playbook.data_exfil@v1
+      - id: PR.DS-11
+        outcome: >-
+          Backups of data are created, protected, maintained, and tested
+        playbook_refs:
+          - playbook.backup_recovery@v1
 
   - id: nist_csf:pr-ps-platform-security
     regulation:
@@ -381,6 +852,46 @@ entries:
       exercise baseline configuration, patch evidence, IaC policy
       guardrails, SBOM capture, and the patch / infra-posture
       playbooks.
+    subcategory_entries:
+      - id: PR.PS-01
+        outcome: >-
+          Configuration management practices are established and applied
+        playbook_refs:
+          - playbook.infra_posture_management@v1
+          - playbook.cloud_misconfiguration@v1
+      - id: PR.PS-02
+        outcome: >-
+          Software is maintained, replaced, and removed commensurate with risk
+        playbook_refs:
+          - playbook.patch_management@v1
+          - playbook.codebase_vuln_management@v1
+      - id: PR.PS-03
+        outcome: >-
+          Hardware is maintained, replaced, and removed commensurate with risk
+        playbook_refs:
+          - playbook.asset_management@v1
+          - playbook.patch_management@v1
+      - id: PR.PS-04
+        outcome: >-
+          Log records are generated and made available for continuous
+          monitoring
+        playbook_refs:
+          - playbook.detection_engineering@v1
+          - playbook.alert_triage@v1
+      - id: PR.PS-05
+        outcome: >-
+          Installation and execution of unauthorized software are prevented
+        playbook_refs:
+          - playbook.infra_posture_management@v1
+          - playbook.asset_management@v1
+      - id: PR.PS-06
+        outcome: >-
+          Secure software development practices are integrated, and their
+          performance is monitored throughout the software development life
+          cycle
+        playbook_refs:
+          - playbook.codebase_vuln_management@v1
+          - playbook.cra_cvd@v1
 
   - id: nist_csf:pr-ir-technology-infrastructure-resilience
     regulation:
@@ -408,6 +919,35 @@ entries:
       cloud-posture baseline (segmentation and network-boundary
       controls), the backup + restore-drill surface (recovery
       capacity), and DDoS response.
+    subcategory_entries:
+      - id: PR.IR-01
+        outcome: >-
+          Networks and environments are protected from unauthorized logical
+          access and usage
+        playbook_refs:
+          - playbook.infra_posture_management@v1
+          - playbook.cloud_misconfiguration@v1
+      - id: PR.IR-02
+        outcome: >-
+          The organization's technology assets are protected from
+          environmental threats
+        gap_note: >-
+          Environmental protection of physical assets (fire, flood, power) is
+          operator-owned facilities work; not exercised by the SecOps-NG
+          catalogue.
+      - id: PR.IR-03
+        outcome: >-
+          Mechanisms are implemented to achieve resilience requirements in
+          normal and adverse situations
+        playbook_refs:
+          - playbook.business_continuity@v1
+          - playbook.ddos_response@v1
+      - id: PR.IR-04
+        outcome: >-
+          Adequate resource capacity to ensure availability is maintained
+        playbook_refs:
+          - playbook.business_continuity@v1
+          - playbook.backup_recovery@v1
 
   # ─── DETECT (DE) ──────────────────────────────────────────────
 
@@ -433,6 +973,43 @@ entries:
       (which detections are live against which telemetry surfaces),
       the periodic cert / cloud-posture scans, and the
       detection-engineering playbook lifecycle.
+    subcategory_entries:
+      - id: DE.CM-01
+        outcome: >-
+          Networks and network services are monitored to find potentially
+          adverse events
+        playbook_refs:
+          - playbook.detection_engineering@v1
+          - playbook.infra_posture_management@v1
+      - id: DE.CM-02
+        outcome: >-
+          The physical environment is monitored to find potentially adverse
+          events
+        gap_note: >-
+          Physical-environment monitoring is operator-owned facilities work;
+          not exercised by the SecOps-NG catalogue.
+      - id: DE.CM-03
+        outcome: >-
+          Personnel activity and technology usage are monitored to find
+          potentially adverse events
+        playbook_refs:
+          - playbook.iam_auditor@v1
+          - playbook.detection_engineering@v1
+      - id: DE.CM-06
+        outcome: >-
+          External service provider activities and services are monitored to
+          find potentially adverse events
+        playbook_refs:
+          - playbook.supply_chain_security@v1
+          - playbook.detection_engineering@v1
+      - id: DE.CM-09
+        outcome: >-
+          Computing hardware and software, runtime environments, and their
+          data are monitored to find potentially adverse events
+        playbook_refs:
+          - playbook.detection_engineering@v1
+          - playbook.infra_posture_management@v1
+          - playbook.crypto_posture_management@v1
 
   - id: nist_csf:de-ae-adverse-event-analysis
     regulation:
@@ -456,6 +1033,47 @@ entries:
       catalogue anchors exercise the alert-triage lifecycle,
       incident-timeline-signal capture, and the recurring-incident
       correlator that discharges the "characterise the events" slice.
+    subcategory_entries:
+      - id: DE.AE-02
+        outcome: >-
+          Potentially adverse events are analyzed to better understand
+          associated activities
+        playbook_refs:
+          - playbook.alert_triage@v1
+          - playbook.agentic_threat_response@v1
+      - id: DE.AE-03
+        outcome: >-
+          Information is correlated from multiple sources
+        playbook_refs:
+          - playbook.alert_triage@v1
+          - playbook.agentic_threat_response@v1
+      - id: DE.AE-04
+        outcome: >-
+          The estimated impact and scope of adverse events are understood
+        playbook_refs:
+          - playbook.alert_triage@v1
+          - playbook.incident_management@v1
+      - id: DE.AE-06
+        outcome: >-
+          Information on adverse events is provided to authorized staff and
+          tools
+        playbook_refs:
+          - playbook.alert_triage@v1
+          - playbook.incident_management@v1
+      - id: DE.AE-07
+        outcome: >-
+          Cyber threat intelligence and other contextual information are
+          integrated into the analysis
+        playbook_refs:
+          - playbook.threat_intel_ingest@v1
+          - playbook.alert_triage@v1
+      - id: DE.AE-08
+        outcome: >-
+          Incidents are declared when adverse events meet the defined incident
+          criteria
+        playbook_refs:
+          - playbook.alert_triage@v1
+          - playbook.incident_management@v1
 
   # ─── RESPOND (RS) ─────────────────────────────────────────────
 
@@ -478,6 +1096,36 @@ entries:
       technique-specific mitigation. Directly discharged by the
       incident-handling capability control and the incident-management
       playbook.
+    subcategory_entries:
+      - id: RS.MA-01
+        outcome: >-
+          The incident response plan is executed in coordination with relevant
+          third parties once an incident is declared
+        playbook_refs:
+          - playbook.incident_management@v1
+      - id: RS.MA-02
+        outcome: >-
+          Incident reports are triaged and validated
+        playbook_refs:
+          - playbook.alert_triage@v1
+          - playbook.incident_management@v1
+      - id: RS.MA-03
+        outcome: >-
+          Incidents are categorized and prioritized
+        playbook_refs:
+          - playbook.incident_management@v1
+          - playbook.alert_triage@v1
+      - id: RS.MA-04
+        outcome: >-
+          Incidents are escalated or elevated as needed
+        playbook_refs:
+          - playbook.incident_management@v1
+      - id: RS.MA-05
+        outcome: >-
+          The criteria for initiating incident recovery are applied
+        playbook_refs:
+          - playbook.incident_management@v1
+          - playbook.backup_recovery@v1
 
   - id: nist_csf:rs-an-incident-analysis
     regulation:
@@ -501,6 +1149,34 @@ entries:
       technique-specific investigation playbooks (identity compromise,
       ransomware, data exfiltration) plus the timeline-signals control
       that discharges the reconstruction slice.
+    subcategory_entries:
+      - id: RS.AN-03
+        outcome: >-
+          Analysis is performed to establish what has taken place during an
+          incident and the root cause of the incident
+        playbook_refs:
+          - playbook.identity_compromise@v1
+          - playbook.ransomware_containment@v1
+          - playbook.data_exfil@v1
+      - id: RS.AN-06
+        outcome: >-
+          Actions performed during an investigation are recorded, and the
+          records' integrity and provenance are preserved
+        playbook_refs:
+          - playbook.incident_management@v1
+      - id: RS.AN-07
+        outcome: >-
+          Incident data and metadata are collected, and their integrity and
+          provenance are preserved
+        playbook_refs:
+          - playbook.incident_management@v1
+          - playbook.alert_triage@v1
+      - id: RS.AN-08
+        outcome: >-
+          An incident's magnitude is estimated and validated
+        playbook_refs:
+          - playbook.incident_management@v1
+          - playbook.alert_triage@v1
 
   - id: nist_csf:rs-co-incident-response-reporting-and-communication
     regulation:
@@ -526,6 +1202,21 @@ entries:
       crosswalks under content/mappings/nis2/ and dora/ remain the
       authoritative pointer for the statutory obligations; the
       catalogue anchors here carry the CSF-slice reporting artifacts.
+    subcategory_entries:
+      - id: RS.CO-02
+        outcome: >-
+          Internal and external stakeholders are notified of incidents
+        playbook_refs:
+          - playbook.incident_management@v1
+          - playbook.cra_srp_notify@v1
+          - playbook.mfa_secured_comms@v1
+      - id: RS.CO-03
+        outcome: >-
+          Information is shared with designated internal and external
+          stakeholders
+        playbook_refs:
+          - playbook.cra_srp_notify@v1
+          - playbook.mfa_secured_comms@v1
 
   - id: nist_csf:rs-mi-incident-mitigation
     regulation:
@@ -547,6 +1238,21 @@ entries:
       RS.MI covers containment and eradication actions during an
       active incident. Catalogue anchors exercise the technique-
       specific containment playbooks.
+    subcategory_entries:
+      - id: RS.MI-01
+        outcome: >-
+          Incidents are contained
+        playbook_refs:
+          - playbook.ransomware_containment@v1
+          - playbook.cloud_misconfiguration@v1
+          - playbook.data_exfil@v1
+      - id: RS.MI-02
+        outcome: >-
+          Incidents are eradicated
+        playbook_refs:
+          - playbook.ransomware_containment@v1
+          - playbook.identity_compromise@v1
+          - playbook.data_exfil@v1
 
   # ─── RECOVER (RC) ─────────────────────────────────────────────
 
@@ -570,6 +1276,47 @@ entries:
       RC.RP is exercised by the periodic restore-drill control (the
       tested-recovery-capability slice) plus the backup-recovery and
       business-continuity playbooks (the plan-execution slice).
+    subcategory_entries:
+      - id: RC.RP-01
+        outcome: >-
+          The recovery portion of the incident response plan is executed once
+          initiated from the incident response process
+        playbook_refs:
+          - playbook.business_continuity@v1
+          - playbook.backup_recovery@v1
+      - id: RC.RP-02
+        outcome: >-
+          Recovery actions are selected, scoped, prioritized, and performed
+        playbook_refs:
+          - playbook.business_continuity@v1
+          - playbook.backup_recovery@v1
+      - id: RC.RP-03
+        outcome: >-
+          The integrity of backups and other restoration assets is verified
+          before using them for restoration
+        playbook_refs:
+          - playbook.backup_recovery@v1
+      - id: RC.RP-04
+        outcome: >-
+          Critical mission functions and cybersecurity risk management are
+          considered to establish post-incident operational norms
+        playbook_refs:
+          - playbook.business_continuity@v1
+          - playbook.post_incident_review@v1
+      - id: RC.RP-05
+        outcome: >-
+          The integrity of restored assets is verified, systems and services
+          are restored, and normal operating status is confirmed
+        playbook_refs:
+          - playbook.backup_recovery@v1
+          - playbook.business_continuity@v1
+      - id: RC.RP-06
+        outcome: >-
+          The end of incident recovery is declared based on criteria, and
+          incident- related documentation is completed
+        playbook_refs:
+          - playbook.incident_management@v1
+          - playbook.post_incident_review@v1
 
   - id: nist_csf:rc-co-incident-recovery-communication
     regulation:
@@ -591,3 +1338,20 @@ entries:
       recovery partners). The crisis-communication-plan control plus
       the business-continuity playbook discharge the catalogue-side
       slice; public-messaging content itself is operator-owned.
+    subcategory_entries:
+      - id: RC.CO-03
+        outcome: >-
+          Recovery activities and progress in restoring operational
+          capabilities are communicated to designated internal and external
+          stakeholders
+        playbook_refs:
+          - playbook.business_continuity@v1
+          - playbook.mfa_secured_comms@v1
+      - id: RC.CO-04
+        outcome: >-
+          Public updates on incident recovery are shared using approved
+          methods and messaging
+        gap_note: >-
+          Public-messaging content authoring is operator-owned communications
+          work; the crisis_communication_plan control exercises the
+          plan-in-place slice, not the message text.
