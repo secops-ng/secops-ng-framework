@@ -1415,6 +1415,10 @@ OSCAL component definitions per regulatory axis so an operator can feed
 the SecOps-NG mapping surface into an OSCAL-aware tool chain. The
 per-axis component definition is the auditable, machine-readable form
 of the article-level YAML mappings under `content/mappings/<axis>/`.
+This epic also carries structural crosswalks against frameworks that
+sit alongside the EU statutory surface (for example NIST CSF 2.0),
+where the deliverable is a YAML crosswalk rather than an OSCAL
+component definition.
 
 ### F-MAP-GDPR-OSCAL — GDPR OSCAL component definition
 
@@ -1446,6 +1450,51 @@ of the article-level YAML mappings under `content/mappings/<axis>/`.
     coverage test).
   - CORE — orphan-CI parity lane for the GDPR OSCAL component
     definition and this ROADMAP entry.
+
+---
+
+### F-MAP-NIST-CSF-20 — NIST CSF 2.0 crosswalk
+
+- **Status:** Shipped
+- **Priority:** P2
+- **Goal:** G-06 (contributor adoption — a NIST CSF 2.0 crosswalk
+  provides a second axis of navigation into the SecOps-NG catalogue
+  for practitioners who already frame their reasoning around the
+  CSF, widening community reach beyond EU-only readers).
+- **Acceptance criteria:**
+  - `content/mappings/nist_csf/csf-core-functions.yaml` ships a
+    crosswalk against the CSF 2.0 Core at Category granularity
+    (22 Categories across Govern / Identify / Protect / Detect /
+    Respond / Recover) and at Subcategory granularity (all 106
+    Subcategories per NIST CSWP 29), each anchored on
+    `content/controls/` and `content/playbooks/` references or an
+    explicit `gap_note` for outcomes the SecOps-NG catalogue does
+    not exercise.
+  - Shape gates in `tests/content/test_nist_csf_crosswalk.py`
+    validate the YAML structure, the Subcategory ids against the
+    CSF 2.0 layout, and the mutual exclusivity of
+    `playbook_refs` / `gap_note` at the Subcategory level.
+  - `docs/cookbook/nist_csf_crosswalk.md` is a practitioner
+    walkthrough covering navigation, a worked example, and the
+    cross-reference to the EU regime mappings.
+- **Sovereign-stack constraints:** The crosswalk is a structural
+  pointer against the operator's own catalogue; it does not carry
+  the CSF Informative References (mappings to SP 800-53r5,
+  ISO/IEC 27001:2022, CIS Controls v8) and does not constitute a
+  legal or regulator interpretation of the CSF. The EU regime
+  mappings under `content/mappings/{nis2,dora,cra,gdpr}/` remain
+  authoritative for statutory obligations.
+- **Depends on:** —
+- **Source:** NIST CSWP 29, "The NIST Cybersecurity Framework (CSF)
+  2.0", 26 February 2024.
+- **Shipped via:**
+  - SKELETON — PR #717 (22 Category-level entries across
+    GV / ID / PR / DE / RS / RC).
+  - CORE — PR #718 (all 106 Subcategory-level entries nested under
+    their parent Categories, each with `playbook_refs` or
+    `gap_note`; schema extension and shape tests).
+  - EXTEND — PR #<this> (practitioner cookbook walkthrough and
+    ROADMAP `Shipped` flip).
 
 ---
 
