@@ -1,0 +1,96 @@
+{
+  "conditional_edges": [],
+  "edges": [
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--b17c0072-0000-4000-8000-000000000003",
+      "src": "action--b17c0072-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--b17c0072-0000-4000-8000-000000000004",
+      "src": "action--b17c0072-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--b17c0072-0000-4000-8000-000000000005",
+      "src": "action--b17c0072-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--b17c0072-0000-4000-8000-000000000006",
+      "src": "action--b17c0072-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--b17c0072-0000-4000-8000-000000000007",
+      "src": "action--b17c0072-0000-4000-8000-000000000006"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--b17c0072-0000-4000-8000-000000000008",
+      "src": "action--b17c0072-0000-4000-8000-000000000007"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--b17c0072-0000-4000-8000-000000000008"
+    }
+  ],
+  "end_sentinel": "__END__",
+  "entry": "action--b17c0072-0000-4000-8000-000000000002",
+  "name": "Business Continuity \u2014 NIS2 Art.21(2)(c)",
+  "nodes": [
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "detect_and_declare_bcm_event",
+      "name": "action--b17c0072-0000-4000-8000-000000000002",
+      "step_id": "action--b17c0072-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "activate_bcm_plan",
+      "name": "action--b17c0072-0000-4000-8000-000000000003",
+      "step_id": "action--b17c0072-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "isolate_affected_systems",
+      "name": "action--b17c0072-0000-4000-8000-000000000004",
+      "step_id": "action--b17c0072-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "switch_to_backup",
+      "name": "action--b17c0072-0000-4000-8000-000000000005",
+      "step_id": "action--b17c0072-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "notify_competent_authority",
+      "name": "action--b17c0072-0000-4000-8000-000000000006",
+      "step_id": "action--b17c0072-0000-4000-8000-000000000006"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "restore_and_verify",
+      "name": "action--b17c0072-0000-4000-8000-000000000007",
+      "step_id": "action--b17c0072-0000-4000-8000-000000000007"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "post_incident_review",
+      "name": "action--b17c0072-0000-4000-8000-000000000008",
+      "step_id": "action--b17c0072-0000-4000-8000-000000000008"
+    }
+  ],
+  "playbook_id": "playbook--b17c0072-0000-4000-8000-000000000001",
+  "stable_id": "playbook.business_continuity@v1"
+}

@@ -1,0 +1,572 @@
+{
+  "name": "Business Continuity \u2014 NIS2 Art.21(2)(c)",
+  "nodes": [
+    {
+      "id": "action--b17c0072-0000-4000-8000-000000000002",
+      "name": "detect_and_declare_bcm_event",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "out.event_id",
+              "name": "out.event_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.event_declared_ts",
+              "name": "out.event_declared_ts",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.contingency_plan@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.availability_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 receive a business-continuity trigger on the operator's declared event-declaration surface (major outage escalation from the incident-management lane, ransomware containment escalation from the containment lane, upstream-dependency failure signal, or facility- loss declaration). Assign __event_id__ and stamp __event_declared_ts__ against the NIS2 Art. 23 clock. TODO (CORE): pin the trigger-surface adapter shape and the initial evidence-capture record.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--b17c0072-0000-4000-8000-000000000003",
+      "name": "activate_bcm_plan",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.event_id",
+              "name": "in.event_id",
+              "value": "={{$workflow.variables.event_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.bcm_plan_ref",
+              "name": "out.bcm_plan_ref",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.significant_incident",
+              "name": "out.significant_incident",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.contingency_plan@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.availability_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 retrieve the documented BCM plan artifact for the affected service from the operator's BCM-plan store and activate it. Reads the documented isolation targets, failover targets, and recovery objectives (RTO / RPO) into workflow state. Evaluates the event against the operator's declared significance-threshold policy and sets __significant_incident__ accordingly. TODO (CORE): pin the BCM-plan store adapter, the plan-artifact schema, and the significance-threshold evaluator.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--b17c0072-0000-4000-8000-000000000004",
+      "name": "isolate_affected_systems",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.event_id",
+              "name": "in.event_id",
+              "value": "={{$workflow.variables.event_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.bcm_plan_ref",
+              "name": "in.bcm_plan_ref",
+              "value": "={{$workflow.variables.bcm_plan_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "out.isolation_scope",
+              "name": "out.isolation_scope",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.contingency_plan@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.availability_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 where the event and the activated plan call for it, contain the failure surface by isolating the affected primary systems, network segments, or upstream dependencies against the operator's isolation surface per __bcm_plan_ref__. Records __isolation_scope__ for the downstream recovery-and-verification cutback discipline. Skipped (empty __isolation_scope__) where the plan documents no isolation step for the event class (e.g. a pure availability outage with no compromise indicator). TODO (CORE): pin the isolation-surface adapter and the isolation-scope schema.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--b17c0072-0000-4000-8000-000000000005",
+      "name": "switch_to_backup",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.event_id",
+              "name": "in.event_id",
+              "value": "={{$workflow.variables.event_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.bcm_plan_ref",
+              "name": "in.bcm_plan_ref",
+              "value": "={{$workflow.variables.bcm_plan_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "in.isolation_scope",
+              "name": "in.isolation_scope",
+              "value": "={{$workflow.variables.isolation_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "out.failover_target",
+              "name": "out.failover_target",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.system_recovery_reconstitution@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.availability_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 failover the affected service to the documented backup site, data replica, or standby capacity per __bcm_plan_ref__. The failover is the disaster- recovery leg of the Art. 21(2)(c) triplet (backup + disaster recovery + crisis management); backup integrity the failover reads is exercised on the sibling backup_recovery playbook's periodic restore-drill lane. Records __failover_target__ for the downstream restore-and-verify cutback discipline. TODO (CORE): pin the failover-surface adapter, the recovery-objective evaluator (observed vs documented RTO / RPO), and the cutover-evidence record.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--b17c0072-0000-4000-8000-000000000006",
+      "name": "notify_competent_authority",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.event_id",
+              "name": "in.event_id",
+              "value": "={{$workflow.variables.event_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.event_declared_ts",
+              "name": "in.event_declared_ts",
+              "value": "={{$workflow.variables.event_declared_ts}}",
+              "type": "string"
+            },
+            {
+              "id": "in.significant_incident",
+              "name": "in.significant_incident",
+              "value": "={{$workflow.variables.significant_incident}}",
+              "type": "string"
+            },
+            {
+              "id": "out.notification_ref",
+              "name": "out.notification_ref",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_timeline_signals@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.incident_finding@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 where __significant_incident__ is true, dispatch the NIS2 Art. 23 significant-incident notification to the operator's competent authority (national cybersecurity authority per the entity's establishment Member State) on the Art. 23 timeline: 24h early warning, 72h incident notification, one-month final report. The envelope carries __event_id__, __event_declared_ts__, the preliminary assessment, the impact scope, and the cross- border-effect indicator. Where __significant_incident__ is false, the step records a locally-logged no-notification determination (retained for accountability) and short-circuits to restore-and-verify. Records __notification_ref__ for the post-incident-review record. TODO (CORE): pin the competent-authority adapter (per-Member- State delivery surface), the Art. 23 envelope templates (early-warning, incident-notification, final-report), and the significance-determination evidence discipline.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--b17c0072-0000-4000-8000-000000000007",
+      "name": "restore_and_verify",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.event_id",
+              "name": "in.event_id",
+              "value": "={{$workflow.variables.event_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.bcm_plan_ref",
+              "name": "in.bcm_plan_ref",
+              "value": "={{$workflow.variables.bcm_plan_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "in.failover_target",
+              "name": "in.failover_target",
+              "value": "={{$workflow.variables.failover_target}}",
+              "type": "string"
+            },
+            {
+              "id": "out.recovery_result",
+              "name": "out.recovery_result",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.system_recovery_reconstitution@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.availability_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 return the primary service to a known-good state per __bcm_plan_ref__ (cutback from __failover_target__ where applicable, dependency revalidation, and health-signal check against the documented recovery objectives). Records __recovery_result__ with the observed RTO / RPO delta against the documented objectives and the primary-service health signal. TODO (CORE): pin the health-signal adapter, the cutback procedure, and the recovery-attestation evidence discipline.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--b17c0072-0000-4000-8000-000000000008",
+      "name": "post_incident_review",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.event_id",
+              "name": "in.event_id",
+              "value": "={{$workflow.variables.event_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.recovery_result",
+              "name": "in.recovery_result",
+              "value": "={{$workflow.variables.recovery_result}}",
+              "type": "string"
+            },
+            {
+              "id": "in.notification_ref",
+              "name": "in.notification_ref",
+              "value": "={{$workflow.variables.notification_ref}}",
+              "type": "string"
+            },
+            {
+              "id": "out.pir_ref",
+              "name": "out.pir_ref",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.contingency_plan@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.incident_finding@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 persist the post-incident-review record for the event: lessons learned, corrective actions, and any BCM-plan revisions surfaced by the event. Records __pir_ref__ on the operator's evidence store keyed to __event_id__. Feeds the operator's accountability posture and any downstream regulator query (Art. 23 final-report supplement, Art. 32 supervisory-authority information request). TODO (CORE): pin the PIR record schema, the evidence-store retention discipline, and the BCM-plan revision handoff.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--b17c0072-0000-4000-8000-00000000000a",
+      "name": "bcm_end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2060,
+        420
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "start--b17c0072-0000-4000-8000-000000000001",
+      "name": "bcm_start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        2320,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__bcm_plan_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Reference to the activated BCM plan artifact resolved from the operator's BCM-plan store. Enumerates the documented isolation targets, failover targets, and recovery objectives (RTO / RPO) the workflow reads at switch-to-backup and restore-and-verify."
+            },
+            {
+              "name": "__event_declared_ts__",
+              "type": "string",
+              "value": "",
+              "description": "ISO 8601 timestamp of the business-continuity event declaration. Anchors the NIS2 Art. 23 24h early-warning / 72h incident-notification / 1-month final-report clock when the significant-incident threshold is crossed."
+            },
+            {
+              "name": "__event_id__",
+              "type": "string",
+              "value": "",
+              "description": "Business-continuity event identifier assigned at declaration. Correlation key across activate, isolate, switch-to-backup, notify, restore-and-verify, and post-incident-review so a reviewer can join the full continuity lifecycle into a single reportable-event ledger keyed to the operator's accountability surface."
+            },
+            {
+              "name": "__failover_target__",
+              "type": "string",
+              "value": "",
+              "description": "Reference to the failover target resolved by switch-to-backup against __bcm_plan_ref__ (the documented backup site, data replica, or standby capacity the service is switched to). Feeds restore-and-verify for the cutback validation."
+            },
+            {
+              "name": "__isolation_scope__",
+              "type": "string",
+              "value": "",
+              "description": "Reference to the isolation scope resolved by isolate-affected-systems against __bcm_plan_ref__ (the affected primary systems, network segments, or upstream dependencies contained to prevent cascade). Empty when the event does not require isolation."
+            },
+            {
+              "name": "__notification_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Reference to the NIS2 Art. 23 notification artifact emitted by notify-competent-authority when the event crosses the significant-incident threshold. Empty otherwise."
+            },
+            {
+              "name": "__pir_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Reference to the post-incident-review record persisted at post-incident-review. The audit-evident record of lessons learned, corrective actions, and BCM-plan revisions the operator's accountability posture reads."
+            },
+            {
+              "name": "__recovery_result__",
+              "type": "string",
+              "value": "",
+              "description": "Reference to the recovery-and-verification result produced by restore-and-verify \u2014 the observed RTO / RPO against the documented objectives, the primary-service health signal, and the cutback outcome. Feeds post-incident-review."
+            },
+            {
+              "name": "__significant_incident__",
+              "type": "boolean",
+              "value": "",
+              "description": "Whether the event crosses the NIS2 Art. 23 significant- incident threshold. When true, notify-competent-authority dispatches the Art. 23 24h early warning; when false, the notify step short-circuits to a locally-logged no-notification record. Set at activate-bcm-plan against the operator's declared significance-threshold policy."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "detect_and_declare_bcm_event": {
+      "main": [
+        [
+          {
+            "node": "activate_bcm_plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "activate_bcm_plan": {
+      "main": [
+        [
+          {
+            "node": "isolate_affected_systems",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "isolate_affected_systems": {
+      "main": [
+        [
+          {
+            "node": "switch_to_backup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "switch_to_backup": {
+      "main": [
+        [
+          {
+            "node": "notify_competent_authority",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "notify_competent_authority": {
+      "main": [
+        [
+          {
+            "node": "restore_and_verify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "restore_and_verify": {
+      "main": [
+        [
+          {
+            "node": "post_incident_review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "post_incident_review": {
+      "main": [
+        [
+          {
+            "node": "bcm_end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "bcm_start": {
+      "main": [
+        [
+          {
+            "node": "detect_and_declare_bcm_event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "nis2",
+    "article-21-2-c",
+    "business-continuity",
+    "disaster-recovery",
+    "crisis-management",
+    "backup-management"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.business_continuity@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--b17c0072-0000-4000-8000-000000000001"
+    },
+    "secops_ng_notes": [
+      "step 'action--b17c0072-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--b17c0072-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--b17c0072-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--b17c0072-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--b17c0072-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--b17c0072-0000-4000-8000-000000000007': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--b17c0072-0000-4000-8000-000000000008': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}
