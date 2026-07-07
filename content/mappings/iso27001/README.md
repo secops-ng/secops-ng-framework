@@ -466,3 +466,23 @@ once the pending PR merges, the generator is re-run and the SKELETON
 baseline in
 `tests/content/test_oscal_iso27001_component_definition.py` is
 revised alongside the regenerated component definition.
+
+## OSCAL EXTEND — round-trip cross-reference assertion
+
+The F-MAP-ISO27001-OSCAL triplet closes with an EXTEND-step lane that
+checks the OSCAL surface in the reverse direction from the SKELETON /
+CORE parity tests: from the shipped
+`oscal-component-definition.json` back to the SecOps-NG content
+catalogue. Sibling test module
+`tests/content/test_oscal_iso27001_component_definition_roundtrip.py`
+asserts that every `implemented-requirement`'s `source-control-ref`
+prop resolves to a real `stable_id` under `content/controls/`, that
+no component ships zero `implemented-requirement` entries (no orphan
+components), that the IR count meets or exceeds the CORE baseline
+(72 as of PR #694), and that every YAML entry with a non-empty
+`control_refs` list produces at least one IR on the OSCAL side.
+Nightly CI job `iso27001-oscal-extend` in
+`.github/workflows/orphan-ci.yml` runs the round-trip tests and a
+standalone orphan-component gate alongside the sibling SKELETON /
+CORE lane. Trilogy status: SKELETON done (PR #691), CORE done
+(PR #694), EXTEND done.
