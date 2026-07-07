@@ -83,6 +83,7 @@ on:
       - "tests/content/test_gdpr_latency_ocsf_bindings.py"
       - "tests/content/test_oscal_gdpr_component_definition.py"
       - "tests/content/test_oscal_eu_ai_act_component_definition.py"
+      - "tests/content/test_oscal_soc2_component_definition.py"
       - ".github/workflows/orphan-ci.yml"
   push:
     branches: [main]
@@ -932,5 +933,77 @@ jobs:
         with:
           name: g-02-eu-ai-act-oscal-component-definition
           path: content/mappings/eu_ai_act/oscal-component-definition.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  soc2-oscal-component-definition:
+    # G-06 contributor-adoption — SOC 2 OSCAL component-definition
+    # parity lane. SOC 2 rounds out the OSCAL component-definition
+    # coverage set (CRA / DORA / NIS2 / GDPR / EU AI Act / ISO 27001
+    # shipped earlier) so operators running SOC 2 audits alongside EU
+    # regulatory work get the same nightly KRI instrumentation.
+    # Two invariants:
+    #   * schema + coverage tests in
+    #     `tests/content/test_oscal_soc2_component_definition.py` pass
+    #     against the shipped component definition; and
+    #   * the OSCAL component definition ships at least 90
+    #     implemented-requirements — the baseline established by the
+    #     F-SOC2-OSCAL SKELETON (five Trust Services Criteria
+    #     categories: Security, Availability, Confidentiality,
+    #     Processing Integrity, Privacy). Any regression below the
+    #     baseline hard-fails the job.
+    name: G-06 SOC 2 OSCAL component-definition assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML, jsonschema, pytest)
+        run: pip install --no-cache-dir pyyaml jsonschema pytest
+
+      - name: Run SOC 2 OSCAL component-definition schema + coverage tests
+        run: |
+          python -m pytest tests/content/test_oscal_soc2_component_definition.py -q
+
+      - name: Assert SOC 2 OSCAL implemented-requirement count ≥ 90 (SKELETON baseline)
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          path = Path("content/mappings/soc2/oscal-component-definition.json")
+          if not path.is_file():
+              sys.exit(f"FAIL: {path} is missing")
+
+          doc = json.loads(path.read_text())
+          components = doc.get("component-definition", {}).get("components", [])
+          ir_count = sum(
+              len(ci.get("implemented-requirements", []) or [])
+              for c in components
+              for ci in c.get("control-implementations", []) or []
+          )
+          baseline = 90
+          if ir_count < baseline:
+              sys.exit(
+                  f"FAIL: SOC 2 OSCAL implemented-requirement count {ir_count} "
+                  f"regressed below SKELETON baseline {baseline}"
+              )
+          print(f"OK: SOC 2 OSCAL implemented-requirements = {ir_count} (≥ {baseline})")
+          PY
+
+      - name: Upload SOC 2 OSCAL component-definition artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g-06-soc2-oscal-component-definition
+          path: content/mappings/soc2/oscal-component-definition.json
           if-no-files-found: warn
           retention-days: 30
