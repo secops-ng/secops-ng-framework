@@ -1498,6 +1498,63 @@ component definition.
 
 ---
 
+### F-MAP-SOC2 — SOC 2 Trust Services Criteria crosswalk
+
+- **Status:** Shipped
+- **Priority:** P2
+- **Goal:** G-06 (contributor adoption — a SOC 2 crosswalk provides
+  a structural interoperability layer between the SecOps-NG
+  catalogue and the AICPA Trust Services Criteria vocabulary,
+  widening community reach to practitioners answering US-vendor
+  due-diligence questionnaires or reasoning across SOC 2 and the
+  EU statutory regimes). G-07 (operator adoption signal —
+  practitioners evaluating for US-to-EU posture gaps have a
+  criterion-by-criterion pointer from the TSC into the shipped
+  catalogue).
+- **Acceptance criteria:**
+  - `content/mappings/soc2/tsc-*.yaml` ships a crosswalk against
+    all five Trust Services categories (Security 33 Common
+    Criteria, Availability 3, Confidentiality 2, Processing
+    Integrity 5, Privacy 10), each anchored on
+    `content/controls/` and `content/playbooks/` references or an
+    explanatory `notes` block for criteria the SecOps-NG catalogue
+    does not exercise operationally.
+  - `content/mappings/soc2/oscal-component-definition.json` ships
+    an OSCAL 1.1.2 component definition covering the SOC 2 surface,
+    guarded by `tests/content/test_oscal_soc2_component_definition.py`
+    and a round-trip test at
+    `tests/content/test_oscal_soc2_component_definition_roundtrip.py`.
+  - `content/mappings/d3fend/soc2.yaml` ships the D3FEND crosswalk
+    against SOC 2, guarded by
+    `tests/content/test_d3fend_soc2_crosswalk.py`.
+  - `docs/cookbook/soc2_crosswalk.md` is a practitioner walkthrough
+    covering navigation, a worked example on CC6.1 (logical access
+    controls), the cross-reference to the EU regime mappings, and
+    the boundary the crosswalk does not cover (AICPA Informative
+    References, Type I / Type II opinion scoping, auditor
+    workpapers, TSP 100 guidance).
+- **Sovereign-stack constraints:** The crosswalk is a structural
+  pointer against the operator's own catalogue; it does not carry
+  the AICPA Informative References (mappings to SP 800-53r5,
+  ISO/IEC 27001:2022, HIPAA, NIST CSF 2.0), does not constitute a
+  SOC 2 attestation or a service auditor's report, and does not
+  constitute a legal or regulator interpretation of the TSC. The
+  EU regime mappings under `content/mappings/{nis2,dora,cra,gdpr}/`
+  remain authoritative for statutory obligations.
+- **Depends on:** —
+- **Source:** AICPA Trust Services Criteria (2017, as revised),
+  delivered under attestation standards AT-C 105 / AT-C 205.
+- **Shipped via:**
+  - Per-category YAML surface across the five Trust Services
+    categories (Security, Availability, Confidentiality,
+    Processing Integrity, Privacy).
+  - OSCAL 1.1.2 component definition + round-trip test.
+  - D3FEND ↔ SOC 2 crosswalk.
+  - SKELETON — PR #<this> (practitioner cookbook walkthrough
+    and ROADMAP `Shipped` flip).
+
+---
+
 ## Epic ADOPT — Operator adoption signal
 
 Public, community-owned surfaces that make operator adoption of

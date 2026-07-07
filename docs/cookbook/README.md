@@ -53,6 +53,7 @@ under `content/mappings/<axis>/` rather than a workflow under
 | Crosswalk | Cookbook walkthrough | Canonical mapping |
 |-----------|----------------------|-------------------|
 | NIST CSF 2.0 | [`nist_csf_crosswalk.md`](nist_csf_crosswalk.md) | `content/mappings/nist_csf/` |
+| SOC 2 (TSC) | [`soc2_crosswalk.md`](soc2_crosswalk.md) | `content/mappings/soc2/` |
 
 ## Structure of an entry
 
