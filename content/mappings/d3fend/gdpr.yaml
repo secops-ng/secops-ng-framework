@@ -1,0 +1,239 @@
+# D3FEND techniques anchored to GDPR obligations.
+#
+# SKELETON — representative crosswalk of D3FEND defensive techniques
+# against the security-of-processing cluster (Art. 32 + Art. 33/34) and
+# the personal-data protection-by-design / DPIA cluster (Art. 25 +
+# Art. 35). One entry per (GDPR article entry, D3FEND technique) pair.
+# Each entry round-trips through `regulation_refs.entry_id` to a real
+# entry in content/mappings/gdpr/*.yaml, and each `control_refs[*]` to
+# a real file under content/controls/.
+#
+# Technique anchors are sourced from the `d3fend_refs` blocks of the
+# cited controls. Entries are ordered by GDPR article entry id, then
+# D3FEND technique slug.
+#
+# CORE will broaden coverage to Art. 5 principles (accuracy, storage
+# limitation, integrity/confidentiality), Art. 6 lawful-basis
+# security-operations record-keeping, and Art. 15-22 data-subject
+# rights response tooling.
+regime: d3fend
+entries:
+  - id: d3fend:gdpr:art-25-1-data-protection-by-design:access-mediation
+    technique:
+      d3fend_id: d3f:AccessMediation
+      technique_name: Access Mediation
+      url: https://d3fend.mitre.org/technique/d3f:AccessMediation/
+    control_refs:
+      - control.access_enforcement@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "25(1)"
+        entry_id: gdpr:art-25-1-data-protection-by-design
+    status: draft
+    notes: >-
+      GDPR Art. 25(1) requires the controller to implement appropriate
+      technical measures designed to give effect to data-protection
+      principles by default. `AccessMediation` is the design-time
+      D3FEND anchor named by `control.access_enforcement@v1`,
+      restricting personal-data reach to authorised subjects at the
+      access-decision point.
+
+  - id: d3fend:gdpr:art-25-1-data-protection-by-design:local-account-monitoring
+    technique:
+      d3fend_id: d3f:LocalAccountMonitoring
+      technique_name: Local Account Monitoring
+      url: https://d3fend.mitre.org/technique/d3f:LocalAccountMonitoring/
+    control_refs:
+      - control.account_management@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "25(1)"
+        entry_id: gdpr:art-25-1-data-protection-by-design
+    status: draft
+    notes: >-
+      Art. 25(1) data-minimisation-by-default extends to identity
+      lifecycle: only accounts that need personal-data reach are
+      provisioned. `LocalAccountMonitoring` is the D3FEND anchor on
+      `control.account_management@v1`, tracking joiner/mover/leaver
+      transitions against the minimum-necessary access set.
+
+  - id: d3fend:gdpr:art-32-1-a-encryption:disk-encryption
+    technique:
+      d3fend_id: d3f:DiskEncryption
+      technique_name: Disk Encryption
+      url: https://d3fend.mitre.org/technique/d3f:DiskEncryption/
+    control_refs:
+      - control.backup_attestation@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "32(1)(a)"
+        entry_id: gdpr:art-32-1-a-encryption
+    status: draft
+    notes: >-
+      Art. 32(1)(a) names encryption of personal data as an appropriate
+      technical measure. `DiskEncryption` is the D3FEND anchor named by
+      `control.backup_attestation@v1`, exercised by every backup
+      attestation limb that carries personal data at rest.
+
+  - id: d3fend:gdpr:art-32-1-a-encryption:key-management
+    technique:
+      d3fend_id: d3f:KeyManagement
+      technique_name: Key Management
+      url: https://d3fend.mitre.org/technique/d3f:KeyManagement/
+    control_refs:
+      - control.crypto_policy_inventory@v1
+      - control.key_rotation_evidence@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "32(1)(a)"
+        entry_id: gdpr:art-32-1-a-encryption
+    status: draft
+    notes: >-
+      Art. 32(1)(a) encryption is only meaningful if key material is
+      inventoried and rotated. `KeyManagement` is the D3FEND anchor
+      shared by `control.crypto_policy_inventory@v1` (catalogue and
+      policy) and `control.key_rotation_evidence@v1` (dated rotation
+      evidence), together discharging the operator side of the
+      encryption obligation.
+
+  - id: d3fend:gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability:network-traffic-analysis
+    technique:
+      d3fend_id: d3f:NetworkTrafficAnalysis
+      technique_name: Network Traffic Analysis
+      url: https://d3fend.mitre.org/technique/d3f:NetworkTrafficAnalysis/
+    control_refs:
+      - control.detection_coverage_evidence@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "32(1)(b)"
+        entry_id: gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability
+    status: draft
+    notes: >-
+      Art. 32(1)(b) requires ongoing confidentiality, integrity, and
+      availability of processing systems. `NetworkTrafficAnalysis` is
+      one of the two D3FEND anchors on
+      `control.detection_coverage_evidence@v1`, providing the network
+      surface of that ongoing-detection obligation.
+
+  - id: d3fend:gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability:user-behavior-analysis
+    technique:
+      d3fend_id: d3f:UserBehaviorAnalysis
+      technique_name: User Behavior Analysis
+      url: https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/
+    control_refs:
+      - control.detection_coverage_evidence@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "32(1)(b)"
+        entry_id: gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability
+    status: draft
+    notes: >-
+      `UserBehaviorAnalysis` is the identity-side D3FEND anchor on
+      `control.detection_coverage_evidence@v1`, discharging the
+      confidentiality limb of Art. 32(1)(b) by surfacing anomalous
+      access to personal data.
+
+  - id: d3fend:gdpr:art-32-1-c-restore-availability:system-recovery-analysis
+    technique:
+      d3fend_id: d3f:SystemRecoveryAnalysis
+      technique_name: System Recovery Analysis
+      url: https://d3fend.mitre.org/technique/d3f:SystemRecoveryAnalysis/
+    control_refs:
+      - control.restore_drill@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "32(1)(c)"
+        entry_id: gdpr:art-32-1-c-restore-availability
+    status: draft
+    notes: >-
+      Art. 32(1)(c) mandates the ability to restore availability and
+      access to personal data in a timely manner following an incident.
+      `SystemRecoveryAnalysis` is the D3FEND anchor named by
+      `control.restore_drill@v1`, exercised by every dated restore
+      drill.
+
+  - id: d3fend:gdpr:art-33-notification-personal-data-breach:incident-response-analysis
+    technique:
+      d3fend_id: d3f:IncidentResponseAnalysis
+      technique_name: Incident Response Analysis
+      url: https://d3fend.mitre.org/technique/d3f:IncidentResponseAnalysis/
+    control_refs:
+      - control.incident_handling_capability@v1
+      - control.incident_timeline_signals@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "33"
+        entry_id: gdpr:art-33-notification-personal-data-breach
+    status: draft
+    notes: >-
+      Art. 33 requires the controller to notify the supervisory
+      authority of a personal-data breach within 72 hours where
+      feasible. `IncidentResponseAnalysis` is the D3FEND anchor named
+      by both `control.incident_handling_capability@v1` (the response
+      capability itself) and `control.incident_timeline_signals@v1`
+      (the dated-signal evidence trail that establishes awareness time,
+      the 72-hour clock's origin).
+
+  - id: d3fend:gdpr:art-34-communication-data-subject:forensic-analysis
+    technique:
+      d3fend_id: d3f:ForensicAnalysis
+      technique_name: Forensic Analysis
+      url: https://d3fend.mitre.org/technique/d3f:ForensicAnalysis/
+    control_refs:
+      - control.post_incident_learning@v1
+      - control.incident_handling_capability@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "34"
+        entry_id: gdpr:art-34-communication-data-subject
+    status: draft
+    notes: >-
+      Art. 34 requires communication of a personal-data breach to the
+      data subject where the breach is likely to result in a high risk
+      to rights and freedoms. `ForensicAnalysis` is the D3FEND anchor
+      shared by `control.incident_handling_capability@v1` and
+      `control.post_incident_learning@v1`, establishing the categories
+      of personal data affected and the likely consequences — the
+      substantive content Art. 34(2) mandates in the notice.
+
+  - id: d3fend:gdpr:art-35-1-dpia-high-risk-processing:operational-activity-mapping
+    technique:
+      d3fend_id: d3f:OperationalActivityMapping
+      technique_name: Operational Activity Mapping
+      url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    control_refs:
+      - control.risk_management_policy@v1
+      - control.security_assessment@v1
+    regulation_refs:
+      - regime: gdpr
+        instrument: Regulation (EU) 2016/679
+        celex: 32016R0679
+        article: "35(1)"
+        entry_id: gdpr:art-35-1-dpia-high-risk-processing
+    status: draft
+    notes: >-
+      Art. 35(1) requires a data protection impact assessment where a
+      type of processing is likely to result in a high risk to rights
+      and freedoms of natural persons. `OperationalActivityMapping` is
+      the D3FEND anchor shared by `control.risk_management_policy@v1`
+      and `control.security_assessment@v1`, modelling the processing
+      activities and their risk surface that the DPIA is drafted
+      against.

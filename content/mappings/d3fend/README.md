@@ -14,9 +14,9 @@ the M0 milestone: OSCAL is covered by the per-regulation
 
 - **In:** structural mapping `D3FEND technique → control_refs →
   regulation entry id`. One YAML file per regulation already carried by
-  the OSCAL side: `nis2.yaml`, `dora.yaml`, `cra.yaml`. Each is a stub
-  containing 2–3 representative technique anchors that already appear in
-  the playbook CACAO files or control definitions.
+  the OSCAL side: `nis2.yaml`, `dora.yaml`, `cra.yaml`, `gdpr.yaml`.
+  Each is a stub containing 2–3 representative technique anchors that
+  already appear in the playbook CACAO files or control definitions.
 - **Out:** no schema enforcement, no compiler integration, no
   exhaustive coverage. Those land in CORE / EXTEND siblings to this
   SKELETON. References to D3FEND inside CACAO playbook JSON and inside
@@ -32,6 +32,9 @@ the M0 milestone: OSCAL is covered by the per-regulation
   Art. 15–16 / Art. 20–23 / Art. 24–27 / Art. 29 omissions).
 - `cra.yaml` — D3FEND techniques anchored to CRA Annex I §1 / Annex I §2
   / Art. 13 / Art. 14 entries (CORE coverage).
+- `gdpr.yaml` — D3FEND techniques anchored to GDPR Art. 25 / Art. 32 /
+  Art. 33 / Art. 34 / Art. 35 entries (SKELETON coverage of the
+  security-of-processing and protection-by-design / DPIA clusters).
 
 ## Entry schema (interim, not validated)
 
