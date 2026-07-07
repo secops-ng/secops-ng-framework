@@ -1,6 +1,6 @@
 # cryptographic_controls — NIS2 Art. 21(2)(h) lifecycle
 
-SKELETON tier of the F-WF-CRYPTOMGMT trilogy. This playbook is the
+CORE tier of the F-WF-CRYPTOMGMT trilogy. This playbook is the
 operator-side lifecycle materialisation of the NIS2 Art. 21(2)(h)
 cryptography-and-encryption obligation: resolve the declared
 cryptography policy, discharge the key-lifecycle branch (generate /
@@ -32,32 +32,33 @@ declared scope.
 - `mappings.yaml` — outbound view of the content model: OSCAL
   (SC-12 key management, SC-13 cryptographic protection, SC-17
   PKI certificates, SC-28 protection of information at rest, SC-8
-  transmission confidentiality and integrity), OCSF (API Activity
-  6003), and the inbound regulatory anchors (NIS2 Art. 21(2)(h),
-  DORA Art. 9, CRA Annex I §1 encryption/confidentiality/access
-  lanes — see the header note on the CRA anchor). D3FEND, GDPR,
-  and the final CRA sub-clause selection are TODO markers a sibling
-  CORE card resolves.
+  transmission confidentiality and integrity), D3FEND (D3-SKT
+  Software Key Takeout on the key-lifecycle branch, D3-CM
+  Cryptographic Module on the enforcement-gate branch), OCSF (API
+  Activity 6003), and the inbound regulatory anchors (NIS2 Art.
+  21(2)(h), DORA Art. 9, GDPR Art. 32(1)(a)). The CRA §1(e)
+  write-side companion anchor is deliberately deferred to a
+  sibling CRA mapping card so the read-side and write-side lane
+  entries land together — see the header note on the CRA anchor.
 
 ## Compile targets
 
-`compile_targets` declares `["n8n", "temporal", "langgraph"]`. Emitted
-artifacts and golden tests are owned by a sibling CORE-layer card;
-this directory ships the portable content only.
+`compile_targets` declares `["n8n", "temporal", "langgraph"]`.
+Byte-parity compiled examples ship under
+`examples/{n8n,temporal,langgraph}/cryptographic_controls/` with
+drift guards under
+`tests/examples/{n8n,temporal,langgraph}/cryptographic_controls/`.
 
 ## Trilogy
 
-- **SKELETON (this card):** scaffold + mappings + compile-target
-  declaration.
-- **CORE:** full workflow logic — adapter Protocols under
-  `patterns.cryptographic_controls`, the branch-selection evaluator
-  on `__lifecycle_event__`, the enforcement-gate policy evaluator,
-  the three-target dispatch wrappers, the golden compiled examples
-  (byte-parity tests under `tests/examples/{n8n,temporal,langgraph}/cryptographic_controls/`),
-  and the D3FEND / GDPR / final CRA-anchor selection.
-- **EXTEND:** cookbook walkthrough + advanced features (HSM-backed
-  key ceremonies, post-quantum rollover choreography, per-Member-
-  State CA-trust posture).
+- **SKELETON:** scaffold + mappings + compile-target declaration.
+- **CORE (this card):** three-target compiled examples + byte-parity
+  goldens, full mappings closure (D3-SKT / D3-CM D3FEND selection,
+  GDPR Art. 32(1)(a) inbound edge, NIS2 + DORA inbound edges).
+- **EXTEND:** cookbook walkthrough + adapter Protocols under
+  `patterns.cryptographic_controls` + advanced features
+  (HSM-backed key ceremonies, post-quantum rollover choreography,
+  per-Member-State CA-trust posture).
 
 ## Prerequisites
 
