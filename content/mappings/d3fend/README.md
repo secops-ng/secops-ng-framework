@@ -48,7 +48,7 @@ the M0 milestone: OSCAL is covered by the per-regulation
   Criteria entries (AICPA 2017, as revised). SKELETON coverage across
   the Security Common Criteria cluster (CC6.1, CC6.6, CC6.8, CC7.1,
   CC7.2, CC9.2), Availability (A1.1), and Processing Integrity
-  (PI1.1) — 14 entries total, sourced from the `d3fend_refs` blocks
+  (PI1.1) — 13 entries total, sourced from the `d3fend_refs` blocks
   of the cited controls. SOC 2 is a private-sector assurance
   framework, not an EU statutory instrument; the crosswalk is a
   structural pointer against operator-owned report-time evidence, not
