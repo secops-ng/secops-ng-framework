@@ -1,0 +1,280 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--d07a7970-0000-4000-8000-000000000001",
+  "name": "DORA ICT third-party risk management",
+  "description": "SKELETON \u2014 CACAO v2 scaffold for the DORA Chapter V ICT third-party risk management workflow an EU financial entity operates against every ICT third-party service provider it contracts with. Anchored on DORA Regulation (EU) 2022/2554 Article 28 (general principles for the use of ICT third-party service providers \u2014 the third-party register, pre-contractual risk assessment, criticality determination, sub-outsourcing surface, and concentration-risk discipline) and Article 30 (key contractual provisions \u2014 the closed clause set every ICT third-party contract must carry). Distinct in scope from playbook.supply_chain_security@v1: supply_chain_security is the runtime supply-chain-signal spine (SBOM correlation, supplier-attestation lookup, per-execution supply-chain-evidence emission against NIS2 Article 21(2)(d)); this playbook is the contract-lifecycle third-party governance spine keyed on the DORA Chapter V financial-entity obligation set. Distinct in cadence from playbook.contractual_obligations_tracker@v1: contractual_obligations_tracker is the per-obligation clause-attestation cadence a financial entity runs against every declared contractual obligation regardless of counterparty type; this playbook is the whole-lifecycle third-party governance workflow the DORA register anchors, keyed on the five DORA Chapter V lifecycle atoms onboarding-risk-assessment \u2192 contractual-provisions-check \u2192 register-entry \u2192 periodic-review \u2192 exit-assessment. The lifecycle chains five steps: onboarding-risk-assessment scores a candidate ICT third-party service provider against the operator's documented pre-contractual risk-assessment rubric (function criticality, sub-outsourcing chain, data-location, concentration exposure) \u2192 contractual-provisions-check verifies the negotiated contract carries the Article 30(2) and 30(3) closed clause set (service description, data-processing locations, exit-strategy obligations, audit rights, termination rights, sub-contracting conditions) \u2192 register-entry composes and publishes the Article 28 register-of-information row for the provider, joined to the criticality determination and the accepted-clause set \u2192 periodic-review re-reads the register row on the operator's documented review cadence and re-scores criticality against the current runtime supply-chain-evidence stream so drift on the supplier surface re-enters the register \u2192 exit-assessment discharges the Article 28(8) exit-strategy discipline when the operator elects to terminate the arrangement or the provider fails a review, emitting the dated exit-assessment attestation the operator's evidence store consumes. SKELETON pins the topology + ID + regulatory anchor refs; the per-step primitive bodies (deterministic rubric application for the risk assessment, deterministic clause-presence check for the contractual-provisions verification, register-row composition against the Article 28 shape, drift detection against the runtime supply-chain-evidence stream, exit-assessment attestation emission) land in the CORE-PRIM sibling. Compile-target fan-out (n8n / Temporal / LangGraph) and per-target byte-parity goldens land in the CORE-FANOUT sibling. Inbound wiring under content/mappings/dora/ (article-19-and-28.yaml + a new article-30.yaml entry) lands in the CORE-EXTEND sibling; the SKELETON is deliberately orphan-tolerant for the 7-day grace window the G-02 orphan-CI lane declares.",
+  "playbook_types": [
+    "investigation",
+    "notification"
+  ],
+  "created_by": "identity--d07a7970-0000-4000-8000-000000000001",
+  "created": "2026-07-07T00:00:00Z",
+  "modified": "2026-07-07T00:00:00Z",
+  "valid_from": "2026-07-07T00:00:00Z",
+  "labels": [
+    "dora",
+    "chapter-v",
+    "third-party-risk",
+    "ict-third-party-service-providers",
+    "register-of-information",
+    "contractual-provisions"
+  ],
+  "external_references": [
+    {
+      "name": "OASIS CACAO v2.0",
+      "description": "Workflow step types (start, action, end), variable conventions, x_ extension namespace.",
+      "source": "OASIS Open"
+    },
+    {
+      "name": "DORA \u2014 Regulation (EU) 2022/2554, Chapter V (ICT third-party risk), Articles 28\u201344",
+      "source": "Official Journal of the European Union",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+    },
+    {
+      "name": "DORA \u2014 Regulation (EU) 2022/2554, Article 28 \u2014 general principles for the use of ICT third-party service providers (register of information; pre-contractual risk assessment; criticality; sub-outsourcing; exit strategy)",
+      "source": "Official Journal of the European Union",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+    },
+    {
+      "name": "DORA \u2014 Regulation (EU) 2022/2554, Article 30 \u2014 key contractual provisions",
+      "source": "Official Journal of the European Union",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+    },
+    {
+      "name": "Commission Implementing Regulation (EU) 2024/2956 \u2014 ITS on the standard templates for the register of information",
+      "source": "European Commission"
+    }
+  ],
+  "playbook_variables": {
+    "__provider_handle__": {
+      "type": "string",
+      "description": "Stable operator-side ICT third-party service provider identifier in `provider.<id>@v<n>` shape \u2014 mirrors the F-CP-03 dependencies[].provider_id vocabulary so the register row and the runtime supply-chain-evidence stream join on the same key without re-canonicalisation. Personal names and contact-shaped strings fail loud at the onboarding-risk-assessment primitive boundary per the public-bar discipline.",
+      "external": true
+    },
+    "__function_supported__": {
+      "type": "string",
+      "description": "Short operator-defined token naming the business or ICT function the third-party service provider supports (for example `payments_settlement`, `identity_provider`, `cloud_iaas`). Consumed by the onboarding risk assessment to key the criticality determination against the operator's documented critical-or-important-function register, and carried onto the Article 28 register row.",
+      "external": true
+    },
+    "__criticality_determination__": {
+      "type": "string",
+      "description": "Identifier of the criticality determination the onboarding step composed for the provider on the current lifecycle window against the operator's documented pre-contractual risk-assessment rubric. Values are drawn from the operator's declared bucket set (typically {non_critical, important, critical} plus a supporting-critical bucket where the supported function itself is a critical-or-important function). Carried onto the register row and re-scored on every periodic-review invocation.",
+      "external": false
+    },
+    "__risk_assessment_ref__": {
+      "type": "string",
+      "description": "Pointer to the closed pre-contractual risk-assessment block produced by onboarding-risk-assessment \u2014 criticality-determination keyed, sub-outsourcing-chain enumerated, data-location declared, concentration-exposure scored against the operator's documented concentration-risk rubric. Consumed by register-entry and by exit-assessment.",
+      "external": false
+    },
+    "__contract_ref__": {
+      "type": "string",
+      "description": "Operator-side pointer to the negotiated ICT third-party contract instance (contract identifier, version, effective date) contractual-provisions-check reads against for the Article 30(2)/(3) closed clause set. Free string, <= 200 chars. Pinned by the compile target's contract-repository binding.",
+      "external": true
+    },
+    "__clause_check_ref__": {
+      "type": "string",
+      "description": "Pointer to the closed clause-presence check produced by contractual-provisions-check \u2014 per-clause status (present / present_with_deviation / absent) against the Article 30(2) and 30(3) closed clause set (service description, data-processing locations, exit-strategy obligations, audit rights, termination rights, sub-contracting conditions, service-level descriptions, insolvency and resolution provisions). Consumed by register-entry.",
+      "external": false
+    },
+    "__register_row_id__": {
+      "type": "string",
+      "description": "Identifier of the Article 28 register-of-information row register-entry composed and published for the provider on the current lifecycle window, joined to the criticality determination, the accepted-clause set, the sub-outsourcing chain, and the data-location indicators. Populated on both the net-new-provider onboarding branch and the periodic-review re-emission branch so the register carries a per-window row for every ICT third-party service provider in scope.",
+      "external": false
+    },
+    "__review_window__": {
+      "type": "string",
+      "description": "Identifier of the periodic-review window this run discharges. For DORA, the primary anchor is the operator's documented periodic-review cadence for the criticality bucket the provider sits in (typically annual for critical, biennial for important, on-change for non-critical) plus the on-change trigger (material change to the contract, the sub-outsourcing chain, the function supported, or the supply-chain-evidence stream). Pinned by the compile target's boot config; not derived in the workflow.",
+      "external": true
+    },
+    "__runtime_supply_chain_evidence_ref__": {
+      "type": "string",
+      "description": "Pointer to the current supply-chain-evidence artifact set the runtime supply-chain-security workflow has emitted against this provider handle since the last periodic-review invocation. Consumed by periodic-review so drift on the runtime surface (a `watch` or `confirmed_compromise` verdict from playbook.supply_chain_security@v1 against `__provider_handle__`) re-enters the register and re-scores criticality. Empty when no supply-chain-evidence has been emitted against the provider in the window; the empty case is still carried explicitly so the review records `no_runtime_drift` rather than silently dropping the join.",
+      "external": true
+    },
+    "__periodic_review_ref__": {
+      "type": "string",
+      "description": "Pointer to the closed periodic-review block produced by periodic-review \u2014 re-scored criticality, re-emitted register row identifier, runtime-drift verdict, and the operator's declared next-review-window anchor. Consumed by exit-assessment when the review triggers an exit decision.",
+      "external": false
+    },
+    "__exit_trigger__": {
+      "type": "string",
+      "description": "Reason the operator invokes the exit-assessment step for the provider. One of `operator_election`, `periodic_review_failure`, `contractual_termination`, `provider_insolvency`, `regulatory_direction`. Pinned by the compile target's exit-decision path; the framework ships no default policy \u2014 exit is always an operator decision anchored on the operator's documented exit-strategy discipline.",
+      "external": true
+    },
+    "__exit_attestation_id__": {
+      "type": "string",
+      "description": "Identifier of the dated exit-assessment attestation artifact exit-assessment publishes to the operator's evidence store, joined to the register row identifier, the risk-assessment block, the clause-check block, and the periodic-review block. Discharges the Article 28(8) exit-strategy obligation on the operator side; the destination sink is operator-configured (no default non-EU endpoint).",
+      "external": false
+    },
+    "__captured_at__": {
+      "type": "string",
+      "description": "ISO-8601 UTC second-precision timestamp (`...Z`) pinned at each attestation-emission time by the upstream runtime. Part of the deterministic register-row-id and exit-attestation-id derivations alongside workflow_id and execution_id.",
+      "external": true
+    }
+  },
+  "workflow_start": "start--d07a7970-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--d07a7970-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "dora_tpr_management_start",
+      "on_completion": "action--d07a7970-0000-4000-8000-000000000002"
+    },
+    "action--d07a7970-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "onboarding risk assessment",
+      "description": "TODO (CORE): pre-contractual risk-assessment primitive. The action body scores a candidate ICT third-party service provider against the operator's documented pre-contractual risk-assessment rubric, keyed on the function the provider supports (`__function_supported__`) and the provider handle (`__provider_handle__`). The rubric axes DORA Article 28(4) names \u2014 function criticality (does the function this provider supports qualify as critical or important under the operator's declared critical-or-important-function register), sub-outsourcing chain (declared sub-outsourcing depth and per-node criticality carry), data-location (EU / EEA / third-country processing locations declared by the provider), and concentration exposure (the operator's current concentration on this provider on the same function axis) \u2014 are composed into the closed risk-assessment block the register row consumes. Sets `__criticality_determination__` and `__risk_assessment_ref__`. Read-only against the provider's declared shape: the assessment step does not mutate the provider's declared attestations, it composes an operator-side view keyed on the rubric axes. SKELETON pins the topology + ID + regulatory anchor refs; the deterministic rubric application, sub-outsourcing chain traversal, and concentration-risk scoring are owned by CORE-PRIM.",
+      "on_completion": "action--d07a7970-0000-4000-8000-000000000003",
+      "in_args": [
+        "__provider_handle__",
+        "__function_supported__"
+      ],
+      "out_args": [
+        "__criticality_determination__",
+        "__risk_assessment_ref__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.supplier_inventory@v1",
+          "control.provider_attestation@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--d07a7970-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "contractual provisions check",
+      "description": "TODO (CORE): Article 30 clause-presence verification primitive. The action body reads the negotiated ICT third-party contract instance (`__contract_ref__`) and verifies the DORA Article 30(2) and 30(3) closed clause set is present \u2014 service description, data-processing locations, exit-strategy obligations, audit rights, termination rights, sub-contracting conditions, service-level descriptions, insolvency and resolution provisions. Each clause is scored present / present_with_deviation / absent against the operator's declared clause-shape rubric; the block carries the per-clause status plus the deviation notes for downstream register-row composition. Sets `__clause_check_ref__`. Absent-clause status is a hard signal onto the register row: the row is still composed (the register carries an entry for every ICT third-party service provider under contract, per Article 28), but the row is flagged as clause-incomplete so the operator's governance surface can drive the negotiation lever. SKELETON pins the topology + ID + regulatory anchor refs; the deterministic clause-presence check body, deviation-note capture, and per-clause-status vocabulary binding are owned by CORE-PRIM.",
+      "on_completion": "action--d07a7970-0000-4000-8000-000000000004",
+      "in_args": [
+        "__provider_handle__",
+        "__contract_ref__"
+      ],
+      "out_args": [
+        "__clause_check_ref__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.provider_attestation@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--d07a7970-0000-4000-8000-000000000004": {
+      "type": "action",
+      "name": "register entry",
+      "description": "TODO (CORE): Article 28 register-of-information row-composition primitive. The action body composes and publishes the Article 28 register row for the provider on the current lifecycle window, joining `__provider_handle__`, `__function_supported__`, `__criticality_determination__`, `__risk_assessment_ref__`, and `__clause_check_ref__` into the register-row shape the Commission Implementing Regulation (EU) 2024/2956 ITS on standard templates for the register of information declares. The row is content-addressed against the artifact_id derivation SHA-256(workflow_id|execution_id|captured_at) so a replay of the same window re-derives byte-identical bytes (the byte-parity contract the CORE-FANOUT siblings assert against). Sets `__register_row_id__`. The primitive only produces the JSON-native register row; the durable emitter wiring (register-artifact-path, content-addressed filename, atomic write, notification of the operator's accountability owner) is owned by the per-target compilers and lands with the CORE-FANOUT sibling cards. Read-only against the risk-assessment and clause-check blocks by contract; the row composition does not mutate the upstream blocks.",
+      "on_completion": "action--d07a7970-0000-4000-8000-000000000005",
+      "in_args": [
+        "__provider_handle__",
+        "__function_supported__",
+        "__criticality_determination__",
+        "__risk_assessment_ref__",
+        "__clause_check_ref__",
+        "__captured_at__"
+      ],
+      "out_args": [
+        "__register_row_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.supplier_inventory@v1",
+          "control.provider_attestation@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--d07a7970-0000-4000-8000-000000000005": {
+      "type": "action",
+      "name": "periodic review",
+      "description": "TODO (CORE): periodic-review-and-drift-detection primitive. The action body re-reads the published register row (`__register_row_id__`) on the operator's documented periodic-review cadence (`__review_window__`) and re-scores criticality against the current runtime supply-chain-evidence stream (`__runtime_supply_chain_evidence_ref__` \u2014 the artifact set playbook.supply_chain_security@v1 has emitted against this provider handle since the last invocation). The re-score composes three inputs: (i) the standing risk-assessment block, (ii) any material change declared on the contract, the sub-outsourcing chain, or the function supported since the last invocation, and (iii) the runtime-drift verdict derived from the supply-chain-evidence stream (an active `watch` or `confirmed_compromise` verdict against the provider re-enters the register on this join). The primitive emits a re-scored criticality determination, re-emits the register row on the current window, and pins the operator's declared next-review-window anchor for the next invocation. Sets `__periodic_review_ref__`. When a re-scored criticality bucket crosses a documented exit-decision threshold, the operator's governance surface consumes the review block to invoke exit-assessment; the review primitive itself does not auto-invoke exit \u2014 exit is always an operator decision. SKELETON pins the topology + ID + regulatory anchor refs; the deterministic re-scoring, runtime-drift join, and next-window anchor derivation are owned by CORE-PRIM.",
+      "on_completion": "action--d07a7970-0000-4000-8000-000000000006",
+      "in_args": [
+        "__provider_handle__",
+        "__register_row_id__",
+        "__review_window__",
+        "__runtime_supply_chain_evidence_ref__"
+      ],
+      "out_args": [
+        "__periodic_review_ref__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.supplier_inventory@v1",
+          "control.provider_attestation@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "action--d07a7970-0000-4000-8000-000000000006": {
+      "type": "action",
+      "name": "exit assessment",
+      "description": "TODO (CORE): Article 28(8) exit-strategy attestation-emission primitive. The action body composes and publishes the dated exit-assessment attestation for the provider when the operator invokes the step against a documented exit trigger (`__exit_trigger__`) \u2014 operator election, periodic-review failure, contractual termination, provider insolvency, or regulatory direction. The attestation joins the register row identifier, the standing risk-assessment block, the clause-check block, and the periodic-review block so the audit-evident chain from onboarding to exit is closed in one artifact. The artifact_id is derived SHA-256(workflow_id|execution_id|captured_at) so the byte-parity contract carries onto the exit surface. Sets `__exit_attestation_id__`. The primitive only produces the JSON-native attestation record; the durable emitter wiring is owned by the per-target compilers. The record discharges the Article 28(8) exit-strategy discipline the operator carries against every critical-or-important-function ICT third-party service provider; the destination sink is operator-configured (no default non-EU endpoint per the public-bar discipline).",
+      "on_completion": "end--d07a7970-0000-4000-8000-000000000007",
+      "in_args": [
+        "__provider_handle__",
+        "__register_row_id__",
+        "__risk_assessment_ref__",
+        "__clause_check_ref__",
+        "__periodic_review_ref__",
+        "__exit_trigger__",
+        "__captured_at__"
+      ],
+      "out_args": [
+        "__exit_attestation_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.supplier_inventory@v1",
+          "control.provider_attestation@v1"
+        ],
+        "telemetry_refs": [
+          "telemetry.ocsf.api_activity@v1"
+        ]
+      }
+    },
+    "end--d07a7970-0000-4000-8000-000000000007": {
+      "type": "end",
+      "name": "dora_tpr_management_end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.dora_tpr_management@v1",
+    "content_version": "0.1.0",
+    "maturity": "experimental",
+    "compile_targets": [
+      "n8n",
+      "temporal",
+      "langgraph"
+    ],
+    "control_refs": [
+      "control.supplier_inventory@v1",
+      "control.provider_attestation@v1"
+    ],
+    "telemetry_refs": [
+      "telemetry.ocsf.api_activity@v1"
+    ],
+    "regulatory_anchors": [
+      "dora:art-28",
+      "dora:art-30"
+    ],
+    "evidence_streams": [
+      "vendor_assessment"
+    ],
+    "sources": [
+      "OASIS CACAO v2.0 specification \u2014 workflow step types, variable conventions, x_ extension namespace",
+      "DORA \u2014 Regulation (EU) 2022/2554, Chapter V (Articles 28\u201344) ICT third-party risk management",
+      "DORA \u2014 Regulation (EU) 2022/2554, Article 28 general principles for the use of ICT third-party service providers",
+      "DORA \u2014 Regulation (EU) 2022/2554, Article 30 key contractual provisions",
+      "Commission Implementing Regulation (EU) 2024/2956 \u2014 ITS on the standard templates for the register of information"
+    ]
+  }
+}
