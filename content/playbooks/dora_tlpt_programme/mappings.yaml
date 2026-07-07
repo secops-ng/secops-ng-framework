@@ -16,32 +16,39 @@
 # from the dora_ict_risk_selfassess whole-Chapter II roll-up and from
 # the per-section producing playbooks the roll-up aggregates.
 #
-# Status: SKELETON (F-WF-DORA-TLPT SKELETON). The SKELETON pins the
-# DORA Chapter IV testing-programme atom (dora:art-24-26-dort-tlpt-
-# programme) as the outbound backlink, the OSCAL CA-2 (Control
-# Assessments) anchor via the existing control.security_assessment@v1
-# overlay, and the OCSF API Activity binding across the four
-# lifecycle steps. D3FEND selection is deferred to the sibling CORE
-# card (D3FEND v1.0.0 does not carry a distinct threat-led-
-# penetration-testing technique; CORE selects the closest available
-# assessment-side anchor or documents the deliberate gap on the same
-# per-step pin-where-it-fits / document-the-gap pattern the
-# dora_ict_risk_selfassess overlay applies). CRA / NIS2 / GDPR /
-# EU AI Act axes are recorded as reviewed skips against the
-# respective _orphan_skip.yaml manifests — rationale carried below.
+# Status: CORE (F-WF-DORA-TLPT CORE). The CORE tier layers the
+# compile-target parity lane (three worked examples + byte-parity
+# goldens under examples/{n8n,temporal,langgraph}/dora_tlpt_programme/
+# and tests/examples/{n8n,temporal,langgraph}/dora_tlpt_programme/)
+# on top of the SKELETON scaffold, absorbs the CA-8 (Penetration
+# Testing) OSCAL anchor into the existing control.control_
+# effectiveness_test@v1 overlay per the SKELETON handoff option,
+# confirms the SKELETON's D3-OAM candidate on the remediation-
+# tracking step, and closes the NIS2 + GDPR outbound graph on the
+# effectiveness-testing lane (nis2:art-21-2-f, gdpr:art-32-1-d).
+# The CRA / EU AI Act axes stay as reviewed skips against the
+# respective _orphan_skip.yaml manifests — rationale unchanged from
+# SKELETON.
 #
 # Deliberate OSCAL notes:
 #   - NIST SP 800-53 Rev. 5 CA-8 (Penetration Testing) is the direct
-#     penetration-testing anchor for the red-team engagement lane;
-#     the SKELETON does NOT introduce a new content/controls/
-#     control.penetration_testing@v1 entry so the SKELETON tier stays
-#     scoped to structural scaffolding. The sibling CORE card either
-#     lifts CA-8 onto a new control overlay or documents the
-#     deliberate absorption of CA-8 into the existing
-#     control.control_effectiveness_test@v1 surface (CA-8 is a
-#     specialised control-effectiveness discipline on the
-#     penetration-testing sub-slice). Recording the deferral here so
-#     reviewers see the CORE handoff shape explicitly.
+#     penetration-testing anchor for the red-team engagement lane. At
+#     CORE, CA-8 is deliberately absorbed into the existing
+#     control.control_effectiveness_test@v1 surface (already pinned
+#     end-to-end via the CA-2 anchor) rather than lifted onto a new
+#     control.penetration_testing@v1 overlay: CA-8 is a specialised
+#     control-effectiveness discipline on the penetration-testing
+#     sub-slice, and the TLPT programme's audit-evident output (the
+#     findings register + dated competent-authority remediation
+#     attestation) is the same evidence surface CA-2's Control
+#     Assessments anchor and the CA-2 effectiveness slice both read
+#     against. The CA-2 entry below carries the CA-8 rationale in
+#     its notes body; a new content/controls/control.penetration_
+#     testing@v1 overlay is deliberately NOT introduced at CORE to
+#     keep the controls catalogue lean around a single well-scoped
+#     effectiveness-testing surface. Reviewers who prefer a separate
+#     top-level CA-8 pin can lift it in a follow-on sibling card
+#     without altering the outbound-edge graph.
 #   - CA-7 (Continuous Monitoring) is NOT pinned: the TLPT programme
 #     is a cadenced, competent-authority-gated engagement discipline
 #     rather than a continuous-monitoring discipline. Continuous
@@ -74,18 +81,29 @@
 #     notes body against the dora:art-24-26-dort-tlpt-programme
 #     entry.
 #
-# NIS2 closure: no NIS2 inbound entry currently backlinks
-# playbook.dora_tlpt_programme@v1, and this is a durable, reviewed
-# deferral rather than an open TODO. NIS2 does not carry a direct
-# threat-led-penetration-testing programme obligation on the
-# essential/important-entity surface at the shape of DORA Art. 26;
-# NIS2 Art. 21(2)(f) (policies and procedures to assess the
-# effectiveness of cybersecurity risk-management measures) is the
-# adjacent effectiveness-testing anchor but is discharged by the
-# effectiveness-loop surface, not by a TLPT programme. The NIS2
-# clause-by-clause review is recorded under the dora_tlpt_programme
-# entry in content/mappings/nis2/_orphan_skip.yaml. Mirrors the
-# dora_ict_risk_selfassess NIS2-axis precedent.
+# NIS2 closure: CORE pins the outbound edge to
+# nis2:art-21-2-f (policies and procedures to assess the effectiveness
+# of cybersecurity risk-management measures) on the effectiveness-
+# testing lane. NIS2 does not carry a direct threat-led-penetration-
+# testing programme obligation at the shape of DORA Art. 26, but
+# Art. 21(2)(f) is the adjacent effectiveness-testing anchor and the
+# TLPT programme is a specialised form of effectiveness testing —
+# competent-authority-notified, cadenced against JC 2022 03, and
+# discharged by an independent red-team engagement against the
+# operator's declared critical or important functions. The audit-
+# evident findings register and dated remediation attestation the
+# TLPT programme emits are the same effectiveness-evidence shape
+# Art. 21(2)(f) requires operators to keep. Co-anchored with the
+# sibling detection_engineering + nis2_self_assessment playbooks
+# already pinned on nis2:art-21-2-f: the three playbooks together
+# cover detection-rule effectiveness, whole-Article-21 self-
+# assessment, and threat-led-penetration-testing effectiveness on
+# the same clause. The matching playbook_refs: entry on
+# content/mappings/nis2/article-21-2-f.yaml lands in this same CORE
+# PR so the graph is closed in both directions. The
+# dora_tlpt_programme entry in content/mappings/nis2/_orphan_skip.yaml
+# is removed in the same PR so the orphan-CI assertion re-arms
+# against regressions.
 #
 # CRA closure: no CRA inbound entry currently backlinks
 # playbook.dora_tlpt_programme@v1, and this is a durable, reviewed
@@ -97,22 +115,42 @@
 # dora_tlpt_programme entry in content/mappings/cra/_orphan_skip.yaml.
 # Mirrors the dora_ict_risk_selfassess CRA-axis precedent.
 #
-# GDPR closure: no GDPR inbound entry currently backlinks
-# playbook.dora_tlpt_programme@v1, and this is a durable, reviewed
-# deferral rather than an open TODO. The playbook operates on
-# scope-catalogue identifiers, trigger-decision records, scoping-
-# submission identifiers, findings-register identifiers, and
-# attestation-record identifiers; personal data flow is limited to
-# accountability-owner attribution, tester-roster attribution, and
-# attestation-signatory attribution — captured in the per-workflow
-# GDPR data-flow record at
-# content/mappings/gdpr/data-flow-dora_tlpt_programme.md rather than
-# via a clause-level inbound mapping. Red-team engagement outputs may
+# GDPR closure: CORE pins the outbound edge to
+# gdpr:art-32-1-d-regular-testing-and-effectiveness on the periodic-
+# testing / effectiveness-evaluation lane. GDPR Art. 32(1)(d)
+# requires the controller and processor to implement a process for
+# regularly testing, assessing, and evaluating the effectiveness of
+# technical and organisational measures for ensuring the security
+# of the processing. The TLPT programme, discharged on the
+# mandatory-TLPT cycle prescribed by the competent authority under
+# DORA Art. 26(1), is a specialised form of that regular-testing-
+# and-effectiveness discipline for financial entities in scope of
+# both regimes — the same red-team engagement and its findings
+# register / remediation-attestation output that discharge DORA
+# Art. 26(8) also discharge the periodic-testing limb of GDPR
+# Art. 32(1)(d) where in-scope critical or important functions
+# process personal data. Co-anchored with the sibling
+# detection_engineering, infra_posture_management, backup_recovery,
+# cyber_hygiene_training, and nis2_self_assessment playbooks
+# already pinned on gdpr:art-32-1-d — the six playbooks together
+# cover the detection, configuration-baseline, backup-restore,
+# training-organisational-measures, whole-NIS2-Article-21 self-
+# assessment, and threat-led-penetration-testing lanes of the
+# regular-testing discipline. The per-workflow GDPR data-flow record
+# at content/mappings/gdpr/data-flow-dora_tlpt_programme.md remains
+# authoritative for the per-workflow ROPA surface (accountability-
+# owner attribution, tester-roster attribution, attestation-
+# signatory attribution). Red-team engagement outputs may
 # incidentally carry personal data where an in-scope critical or
 # important function processes personal data; that discharge is on
-# the producing surface, not on this playbook. The GDPR
-# clause-by-clause review is recorded under the dora_tlpt_programme
-# entry in content/mappings/gdpr/_orphan_skip.yaml.
+# the producing surface (the in-scope function's own playbook and
+# its own data-flow record), not on this testing-programme
+# lifecycle. The matching playbook_refs: entry on
+# content/mappings/gdpr/article-32-security-of-processing.yaml lands
+# in this same CORE PR so the graph is closed in both directions.
+# The dora_tlpt_programme entry in
+# content/mappings/gdpr/_orphan_skip.yaml is removed in the same PR
+# so the orphan-CI assertion re-arms against regressions.
 #
 # EU AI Act closure: no EU AI Act inbound entry currently backlinks
 # playbook.dora_tlpt_programme@v1, and this is a durable, reviewed
@@ -160,7 +198,7 @@ oscal:
   - id: control.control_effectiveness_test@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: CA-2
-    title: Control Assessments (effectiveness-testing slice)
+    title: Control Assessments (effectiveness-testing slice; absorbs CA-8 Penetration Testing)
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CA-2
     notes: >-
       Covers the remediation-tracking step specifically: the findings
@@ -170,33 +208,94 @@ oscal:
       remediation-tracking obligation. The attestation is the
       audit-evident output the competent authority reads for the
       remediation lane of the TLPT programme.
+      At CORE this overlay also absorbs NIST SP 800-53 Rev. 5 CA-8
+      (Penetration Testing) as a deliberate scope-widening rather
+      than lifting a separate control.penetration_testing@v1 entry:
+      CA-8 requires the operator to conduct penetration testing on
+      the system and its environment of operation, and the TLPT
+      programme's red-team engagement (packaged for competent-
+      authority approval at red_team_scoping_approval and discharged
+      into the findings register at remediation-tracking) is the
+      DORA-narrowed application of that discipline. CA-8's specific
+      demands (independent tester posture, defined rules of
+      engagement, remediation follow-up) are all present on the
+      TLPT lifecycle steps this control anchors, so the effectiveness-
+      testing slice is the natural home. A follow-on sibling card
+      may lift CA-8 onto its own overlay if a downstream reviewer
+      needs a discrete pin — the outbound-edge graph does not change.
 
 d3fend:
-  # SKELETON — D3FEND selection deferred to the sibling CORE card.
+  # MITRE D3FEND v1.0.0 defensive technique pin per playbook step.
+  # CORE confirms the SKELETON candidate: D3-OAM (Operational
+  # Activity Mapping) on the remediation-tracking step is the correct
+  # defensive-technique anchor for the write-side lifecycle framing —
+  # mapping the red-team engagement findings onto the operator's
+  # declared severity rubric and remediation-timeline model IS the
+  # operational-activity-mapping discipline D3FEND v1.0.0 names.
   # D3FEND v1.0.0 does not carry a distinct threat-led-penetration-
-  # testing programme technique; the closest candidates are on the
-  # assessment side (D3-OAM Operational Activity Mapping — the
-  # dora_ict_risk_selfassess overlay's per-section coverage-scoring
-  # anchor) or on the exercise-side surface a red-team engagement
-  # implicitly exercises. The CORE card either selects a per-step
-  # D3FEND anchor or documents the deliberate gap on the same
-  # per-step pin-where-it-fits / document-the-gap pattern the
-  # dora_ict_risk_selfassess overlay applies.
+  # testing programme technique, so the other three action steps
+  # (define_dort_scope, tlpt_trigger_and_planning_gate,
+  # red_team_scoping_approval) are deliberately NOT pinned and the
+  # gaps are documented per step below, mirroring the per-step
+  # pin-where-it-fits / document-the-gap pattern the sibling
+  # dora_ict_risk_selfassess overlay applies on D3-OAM.
   - step: action--55000000-0000-4000-8000-000000000005
     d3fend_id: D3-OAM
     d3fend_name: Operational Activity Mapping
-    todo: true
     url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
     notes: >-
-      Candidate SKELETON anchor on the remediation-tracking step —
-      mapping the red-team engagement findings onto the operator's
-      declared severity rubric and remediation-timeline model is an
-      operational-activity-mapping discipline. Deferred to CORE for
-      confirmation (the write-side lifecycle framing here differs
-      from the read-side assessment framing dora_ict_risk_selfassess
-      applied on D3-OAM); the primitive-topology-only SKELETON
-      records the candidate anchor as todo so the CORE reviewer
-      sees the shape rather than a silent gap.
+      remediation tracking — mapping the red-team engagement findings
+      onto the operator's declared severity rubric and remediation-
+      timeline model is the operational-activity-mapping discipline
+      D3-OAM names. The findings-register composition step reads the
+      engagement output against __red_team_scoping_id__ and produces
+      per-finding records with id, severity, affected function,
+      affected ICT asset, evidence pointer, and initial remediation
+      timeline; the downstream dated competent-authority remediation
+      attestation is the audit-evident summary of that mapping.
+      D3-OAM here names the write-side activity-mapping discipline
+      (composing the operational-activity view from the engagement
+      output), distinct from the read-side assessment framing the
+      dora_ict_risk_selfassess overlay applied on the same technique
+      — the two overlays anchor D3-OAM on adjacent but non-
+      overlapping surfaces (read-side coverage-scoring vs write-side
+      findings-mapping) and both are legitimate under the D3FEND
+      technique definition.
+  #
+  # define DORT scope (action--55000000-0000-4000-8000-000000000002)
+  # is deliberately NOT pinned to a D3FEND technique. D3FEND v1.0.0
+  # does not carry a defensive technique for scope-catalogue
+  # composition against the operator's business-service / ICT-asset
+  # / ICT third-party registers distinct from the downstream
+  # activity-mapping surface it feeds; the scope catalogue is the
+  # upstream of the operational-activity-mapping discipline rather
+  # than the mapping itself. This step is anchored on the CA-2
+  # OSCAL control above where the control-assessment planning
+  # obligation actually lives. Mirrors the sibling
+  # dora_ict_risk_selfassess overlay's per-step gap-note pattern.
+  #
+  # TLPT trigger and planning gate (action--55000000-0000-4000-8000-000000000003)
+  # is deliberately NOT pinned to a D3FEND technique. D3FEND v1.0.0
+  # does not carry a defensive technique for mandatory-testing-
+  # decision governance distinct from the downstream engagement
+  # discipline it feeds — the JC 2022 03 criteria evaluation and
+  # the competent-authority notification are a compliance-governance
+  # surface, not a runtime countermeasure. This step is anchored on
+  # the CA-2 OSCAL control above.
+  #
+  # red-team scoping approval (action--55000000-0000-4000-8000-000000000004)
+  # is deliberately NOT pinned to a D3FEND technique. D3FEND v1.0.0
+  # does not carry a distinct threat-led-penetration-testing
+  # programme technique on either the Deceive or Isolate tactics
+  # that would capture the operator-side scoping-submission
+  # discipline; the closest candidate is on the offensive
+  # ATT&CK-adjacent side of the framework rather than on the
+  # defensive-technique catalogue this file pins. This step is
+  # anchored on the CA-2 OSCAL control above (which absorbs CA-8
+  # per the header note) — the OSCAL surface carries the
+  # penetration-testing-scoping anchor, and the D3FEND surface
+  # picks up on the downstream activity-mapping step where the
+  # defensive discipline actually applies.
 
 ocsf:
   # OCSF v1.3.0 telemetry binding. All four action steps interact
@@ -234,7 +333,41 @@ ocsf:
       store). Schema:
       https://schema.ocsf.io/1.3.0/classes/api_activity
 
-nis2: []
+nis2:
+  # Inbound entry that backlinks playbook.dora_tlpt_programme@v1:
+  #   - content/mappings/nis2/article-21-2-f.yaml
+  #     (nis2:art-21-2-f — policies and procedures to assess the
+  #     effectiveness of cybersecurity risk-management measures)
+  # Pinned outbound below to close the graph. Co-anchored with the
+  # sibling detection_engineering + nis2_self_assessment playbooks
+  # already pinned on nis2:art-21-2-f: the three playbooks together
+  # cover detection-rule effectiveness, whole-Article-21 self-
+  # assessment, and threat-led-penetration-testing effectiveness on
+  # the same clause. The matching playbook_refs: entry on
+  # content/mappings/nis2/article-21-2-f.yaml lands in this same CORE
+  # PR so the graph is closed in both directions.
+  - mapping_id: nis2:art-21-2-f
+    article: 21(2)(f)
+    notes: >-
+      NIS2 Art. 21(2)(f) requires essential and important entities to
+      operate policies and procedures to assess the effectiveness of
+      cybersecurity risk-management measures. This playbook is the
+      threat-led-penetration-testing effectiveness lane of that
+      obligation for financial entities in scope of both regimes: the
+      TLPT programme discharges the effectiveness-assessment
+      discipline on the operator's ICT tools and systems supporting
+      critical or important functions via an independent red-team
+      engagement, and the findings register + dated competent-
+      authority remediation attestation are the effectiveness-
+      evidence artifacts Art. 21(2)(f) names. Co-anchored with the
+      sibling detection_engineering playbook (detection-rule
+      effectiveness lane, per-rule-version effectiveness snapshots)
+      and the sibling nis2_self_assessment playbook (whole-Article-21
+      self-assessment roll-up); this playbook adds the TLPT-
+      effectiveness lane on top. NIS2 does not carry a direct TLPT-
+      programme obligation at the shape of DORA Art. 26, so this pin
+      is the adjacent-effectiveness-anchor closure rather than a
+      direct threat-led-penetration-testing atom.
 
 dora:
   # Inbound entry that backlinks playbook.dora_tlpt_programme@v1:
@@ -271,3 +404,47 @@ dora:
       against.
 
 cra: []
+
+gdpr:
+  # Inbound entry that backlinks playbook.dora_tlpt_programme@v1:
+  #   - content/mappings/gdpr/article-32-security-of-processing.yaml
+  #     (gdpr:art-32-1-d-regular-testing-and-effectiveness —
+  #     regular testing, assessing, and evaluating the effectiveness
+  #     of technical and organisational measures)
+  # Pinned outbound below to close the graph. Co-anchored with the
+  # sibling detection_engineering, infra_posture_management,
+  # backup_recovery, cyber_hygiene_training, and nis2_self_assessment
+  # playbooks already pinned on gdpr:art-32-1-d — the six playbooks
+  # together cover the detection, configuration-baseline,
+  # backup-restore, training-organisational-measures, whole-NIS2-
+  # Article-21 self-assessment, and threat-led-penetration-testing
+  # lanes of the regular-testing discipline. The matching
+  # playbook_refs: entry on
+  # content/mappings/gdpr/article-32-security-of-processing.yaml lands
+  # in this same CORE PR so the graph is closed in both directions.
+  - mapping_id: gdpr:art-32-1-d-regular-testing-and-effectiveness
+    article: "32(1)(d)"
+    notes: >-
+      GDPR Art. 32(1)(d) requires the controller and processor to
+      implement a process for regularly testing, assessing, and
+      evaluating the effectiveness of technical and organisational
+      measures for ensuring the security of the processing. The TLPT
+      programme, discharged on the mandatory-TLPT cycle prescribed
+      by the competent authority under DORA Art. 26(1), is a
+      specialised form of that regular-testing-and-effectiveness
+      discipline for financial entities in scope of both regimes:
+      the red-team engagement exercises the operator's security
+      measures on the in-scope critical or important functions, the
+      findings register records the effectiveness gaps discovered,
+      and the dated remediation attestation is the audit-evident
+      record that the security measures continue to meet the
+      level-of-security-appropriate-to-the-risk threshold over time.
+      Where in-scope critical or important functions process
+      personal data, the same engagement + attestation output
+      discharges the Art. 32(1)(d) periodic-testing limb alongside
+      the DORA Art. 26(8) remediation-tracking obligation. The
+      per-workflow GDPR data-flow record at
+      content/mappings/gdpr/data-flow-dora_tlpt_programme.md remains
+      authoritative for the per-workflow ROPA surface
+      (accountability-owner attribution, tester-roster attribution,
+      attestation-signatory attribution).

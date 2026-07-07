@@ -284,6 +284,15 @@ entries:
       - playbook.backup_recovery@v1
       - playbook.cyber_hygiene_training@v1
       - playbook.nis2_self_assessment@v1
+      # F-WF-DORA-TLPT CORE: dora_tlpt_programme adds the threat-led-
+      # penetration-testing lane of the regular-testing discipline
+      # for financial entities in scope of both DORA Chapter IV and
+      # GDPR Art. 32. The competent-authority-notified TLPT
+      # programme's findings register + dated remediation attestation
+      # are the effectiveness-evidence artifacts Art. 32(1)(d) names
+      # where in-scope critical or important functions process
+      # personal data.
+      - playbook.dora_tlpt_programme@v1
     metric_refs:
       - kri.control_effectiveness@v1
       - kpi.detection_coverage@v1
