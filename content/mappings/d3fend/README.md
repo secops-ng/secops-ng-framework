@@ -36,10 +36,14 @@ the M0 milestone: OSCAL is covered by the per-regulation
   Art. 33 / Art. 34 / Art. 35 entries (SKELETON coverage of the
   security-of-processing and protection-by-design / DPIA clusters).
 - `iso27001.yaml` — D3FEND techniques anchored to ISO/IEC 27001:2022
-  Annex A control entries. SKELETON coverage of A.5.15 and a cluster
-  of the A.8 technological theme (A.8.1, A.8.5, A.8.8, A.8.13, A.8.16,
-  A.8.24) — 11 entries, sourced from the `d3fend_refs` blocks of the
-  cited controls.
+  Annex A control entries. CORE coverage across all four Annex A
+  themes: A.5 organisational (17 entries), A.6 people (5 entries),
+  A.7 physical (4 entries), A.8 technological (19 entries) — 45
+  entries total, sourced from the `d3fend_refs` blocks of the cited
+  controls. See the file header for the coverage gaps intentionally
+  left open (A.5.7 / A.5.8 / A.5.12 / A.5.37, the four A.7 entries
+  with empty `control_refs`, A.6.7, and A.8.18–A.8.22 pending PR
+  #664).
 
 ## Entry schema (interim, not validated)
 

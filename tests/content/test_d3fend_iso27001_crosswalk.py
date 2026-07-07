@@ -1,25 +1,28 @@
-"""Schema-shape validation for the D3FEND ↔ ISO/IEC 27001:2022 crosswalk.
+"""Schema-shape validation for the D3FEND ↔ ISO/IEC 27001 crosswalk.
 
-The D3FEND crosswalks under ``content/mappings/d3fend/`` sit outside
-``schemas/mapping.schema.json`` while the regime settles (see
-``_SKELETON_REGIMES`` in ``test_mappings.py``). This module is the shape
-gate for ``content/mappings/d3fend/iso27001.yaml`` and the nightly CI
-lane that owns G-06 for the ISO 27001 crosswalk.
+Sibling of ``test_d3fend_nis2_crosswalk.py``. Shape gate for
+``content/mappings/d3fend/iso27001.yaml`` at CORE coverage, and the
+nightly CI lane that owns G-06 for the ISO 27001 Annex A crosswalk.
 
 It asserts:
 
 * the file parses as YAML;
-* each entry's ``control_refs[*]`` resolves to a real ``stable_id``
-  under ``content/controls/control.*@v1.yaml``;
+* the top-level ``regime`` is ``d3fend``;
+* each entry's ``control_refs[*]`` resolves to a real ``stable_id`` under
+  ``content/controls/control.*@v1.yaml``;
 * each entry's ``regulation_refs[*].entry_id`` resolves to a real entry
-  ``id`` under ``content/mappings/iso27001/annex-a-*.yaml``;
-* each entry's ``technique.d3fend_id`` is non-empty;
-* the crosswalk carries at least the SKELETON floor of 8 entries.
+  ``id`` under ``content/mappings/iso27001/annex-a-*.yaml`` and each ref
+  carries ``regime: iso27001``;
+* each entry's ``technique.d3fend_id`` is non-empty and appears in at
+  least one ``d3fend_refs`` block across ``content/controls/`` or
+  ``content/mappings/iso27001/annex-a-*.yaml``;
+* the crosswalk carries at least the CORE baseline entry count.
 
 Pure stdlib + PyYAML. No network.
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Iterable
 
@@ -29,9 +32,13 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CROSSWALK_PATH = REPO_ROOT / "content" / "mappings" / "d3fend" / "iso27001.yaml"
 CONTROLS_DIR = REPO_ROOT / "content" / "controls"
-ISO27001_MAPPINGS_DIR = REPO_ROOT / "content" / "mappings" / "iso27001"
+REGULATION_MAPPINGS_DIR = REPO_ROOT / "content" / "mappings" / "iso27001"
 
-SKELETON_MIN_ENTRIES = 8
+REGULATION_REGIME = "iso27001"
+# CORE baseline pinned at branch time (2026-07-07): 45 entries across
+# A.5 (17), A.6 (5), A.7 (4), A.8 (19). The floor is set below the
+# actual count so trivial additive follow-ups do not force a bump.
+CORE_MIN_ENTRIES = 30
 
 
 # ---------------------------------------------------------------------------
@@ -69,14 +76,15 @@ def control_stable_ids() -> set[str]:
 
 
 @pytest.fixture(scope="module")
-def iso27001_entry_ids() -> set[str]:
+def regulation_entry_ids() -> set[str]:
     """Every ``entries[*].id`` under ``content/mappings/iso27001/``.
 
-    Excludes underscore-prefixed manifests, matching the convention used
-    by ``test_mappings.py`` and the orphan linter.
+    Excludes underscore-prefixed manifests (``_orphan_skip.yaml`` etc.),
+    matching the convention used by ``test_mappings.py`` and the orphan
+    linter.
     """
     ids: set[str] = set()
-    for path in sorted(ISO27001_MAPPINGS_DIR.glob("*.yaml")):
+    for path in sorted(REGULATION_MAPPINGS_DIR.glob("*.yaml")):
         if path.name.startswith("_"):
             continue
         doc = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -85,7 +93,58 @@ def iso27001_entry_ids() -> set[str]:
         for entry in doc.get("entries") or []:
             if isinstance(entry, dict) and "id" in entry:
                 ids.add(str(entry["id"]))
-    assert ids, "no ISO 27001 mapping entries discovered"
+    assert ids, f"no {REGULATION_REGIME.upper()} mapping entries discovered"
+    return ids
+
+
+@pytest.fixture(scope="module")
+def anchored_d3fend_ids() -> set[str]:
+    """Union of D3FEND technique IDs referenced from anchor blocks.
+
+    Sources scanned:
+
+    * ``content/controls/control.*.yaml`` — ``d3fend_refs[*]``
+    * ``content/mappings/iso27001/annex-a-*.yaml`` — ``entries[*].d3fend_refs[*]``
+
+    In both sources the technique ID is derived from the URL tail
+    ``.../technique/d3f:<TechniqueName>/`` — the source blocks use
+    ``d3f_id`` (short form) while the crosswalk carries the fully
+    qualified ``d3f:<TechniqueName>`` label. The URL is the stable
+    bridge between the two.
+    """
+    ids: set[str] = set()
+    url_pat = re.compile(r"technique/(d3f:[^/]+)")
+
+    def _scan_refs(refs: object) -> None:
+        if not isinstance(refs, list):
+            return
+        for r in refs:
+            if not isinstance(r, dict):
+                continue
+            url = r.get("url") or ""
+            m = url_pat.search(str(url))
+            if m:
+                ids.add(m.group(1))
+                continue
+            # fallback: some sources may already emit d3f:<Name> directly
+            direct = r.get("d3fend_id") or r.get("technique_id")
+            if isinstance(direct, str) and direct.startswith("d3f:"):
+                ids.add(direct)
+
+    for path in sorted(CONTROLS_DIR.glob("control.*.yaml")):
+        doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if isinstance(doc, dict):
+            _scan_refs(doc.get("d3fend_refs"))
+
+    for path in sorted(REGULATION_MAPPINGS_DIR.glob("annex-a-*.yaml")):
+        doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if not isinstance(doc, dict):
+            continue
+        for entry in doc.get("entries") or []:
+            if isinstance(entry, dict):
+                _scan_refs(entry.get("d3fend_refs"))
+
+    assert ids, "no anchored D3FEND technique IDs discovered"
     return ids
 
 
@@ -102,9 +161,9 @@ def test_regime_is_d3fend(crosswalk: dict) -> None:
     assert crosswalk.get("regime") == "d3fend"
 
 
-def test_entry_count_meets_skeleton_baseline(entries: list[dict]) -> None:
-    assert len(entries) >= SKELETON_MIN_ENTRIES, (
-        f"expected >= {SKELETON_MIN_ENTRIES} entries, found {len(entries)}"
+def test_entry_count_meets_core_baseline(entries: list[dict]) -> None:
+    assert len(entries) >= CORE_MIN_ENTRIES, (
+        f"expected >= {CORE_MIN_ENTRIES} entries, found {len(entries)}"
     )
 
 
@@ -144,7 +203,7 @@ def test_control_refs_resolve(
 
 
 def test_regulation_refs_resolve(
-    entries: list[dict], iso27001_entry_ids: set[str]
+    entries: list[dict], regulation_entry_ids: set[str]
 ) -> None:
     unresolved: list[tuple[str, str]] = []
     for e in entries:
@@ -157,14 +216,37 @@ def test_regulation_refs_resolve(
             assert isinstance(ref, dict), (
                 f"entry {eid!r} regulation_refs entry must be a mapping"
             )
-            assert ref.get("regime") == "iso27001", (
-                f"entry {eid!r} regulation_refs regime must be 'iso27001', "
-                f"got {ref.get('regime')!r}"
+            assert ref.get("regime") == REGULATION_REGIME, (
+                f"entry {eid!r} regulation_refs regime must be "
+                f"{REGULATION_REGIME!r}, got {ref.get('regime')!r}"
             )
             target = ref.get("entry_id")
-            if not (isinstance(target, str) and target in iso27001_entry_ids):
+            if not (isinstance(target, str) and target in regulation_entry_ids):
                 unresolved.append((eid, str(target)))
     assert not unresolved, (
         "regulation_refs.entry_id values that do not resolve to a real "
-        f"entry under content/mappings/iso27001/: {unresolved}"
+        f"entry under content/mappings/{REGULATION_REGIME}/: {unresolved}"
+    )
+
+
+def test_technique_ids_are_anchored(
+    entries: list[dict], anchored_d3fend_ids: set[str]
+) -> None:
+    """Every technique.d3fend_id in the crosswalk must appear in at least
+    one d3fend_refs block across content/controls/ or
+    content/mappings/iso27001/annex-a-*.yaml. No invented IDs.
+    """
+    orphans: list[tuple[str, str]] = []
+    for e in entries:
+        tech = e.get("technique") or {}
+        did = tech.get("d3fend_id")
+        if not isinstance(did, str):
+            continue
+        if did not in anchored_d3fend_ids:
+            orphans.append((str(e.get("id", "<unknown>")), did))
+    assert not orphans, (
+        "technique.d3fend_id values that do not appear in any "
+        "d3fend_refs block across content/controls/ or "
+        "content/mappings/iso27001/annex-a-*.yaml: "
+        f"{orphans}"
     )
