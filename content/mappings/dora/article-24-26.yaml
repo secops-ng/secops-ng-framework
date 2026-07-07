@@ -1,0 +1,103 @@
+# DORA — Chapter IV digital operational resilience testing.
+# Article 24 (general requirements for the testing of digital
+# operational resilience) and Article 26 (advanced testing of ICT
+# tools, systems and processes based on threat-led penetration
+# testing). Companion to article-5.yaml through article-14.yaml
+# (Chapter II ICT risk management) and article-19-and-28.yaml
+# (Chapter III incident reporting; Chapter V third-party risk).
+#
+# Chapter IV comprises Articles 24–27:
+#   - Art. 24 general requirements for the testing of digital
+#     operational resilience — scope of the testing programme, at
+#     least once a year for ICT tools and systems supporting critical
+#     or important functions, risk-based coverage review.
+#   - Art. 25 testing of ICT tools and systems — per-methodology
+#     testing surface (vulnerability assessments, scenario-based
+#     tests, compatibility testing, performance testing, end-to-end
+#     testing, penetration testing). Out of scope for this file — the
+#     per-methodology axis either lands on sibling per-methodology
+#     playbooks (vuln_intake for vulnerability-assessment testing,
+#     detection_engineering for detection-rule effectiveness testing)
+#     or on its own follow-on SKELETON. Recording the boundary
+#     explicitly so reviewers see the intentional handoff shape
+#     rather than a silent gap.
+#   - Art. 26 advanced testing of ICT tools, systems and processes
+#     based on TLPT — the operator-side threat-led-penetration-
+#     testing programme lifecycle anchored on the ECB TIBER-EU
+#     framework as the implementation reference.
+#   - Art. 27 requirements for testers for the carrying out of TLPT
+#     — tester-selection criteria (certification, independence,
+#     professional-indemnity insurance). Consumed at the scoping-
+#     approval step of playbook.dora_tlpt_programme@v1 and cited in
+#     the notes body of the dora:art-24-26-dort-tlpt-programme entry
+#     below without a separate top-level atom (a single-clause
+#     child that only gates a step on one playbook does not warrant
+#     a fan-out to a per-Article inbound file).
+#
+# Out of scope for this file: Chapter II ICT risk management (Arts.
+# 5–14 in companion files), Chapter III incident classification and
+# reporting (Arts. 17–19), Chapter V third-party risk (Arts. 28–30),
+# Chapter VI information-sharing arrangements (Arts. 45–46).
+regime: dora
+entries:
+  - id: dora:art-24-26-dort-tlpt-programme
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "24; 26"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Establish, maintain and review a sound and comprehensive
+      digital operational resilience testing programme as an integral
+      part of the ICT risk-management framework, covering the ICT
+      tools and systems supporting the operator's critical or
+      important functions on a risk-based cadence with at least
+      annual coverage; and, for financial entities identified by the
+      competent authority against the criteria in the ESAs Joint
+      Committee guidelines on TLPT identification (JC 2022 03),
+      discharge the mandatory threat-led-penetration-testing
+      programme on the prescribed cycle — notify the competent
+      authority, submit the red-team scoping document for approval,
+      run the TLPT engagement against the declared scope using
+      testers meeting the Art. 27 requirements (certification,
+      independence, professional-indemnity insurance), compose the
+      findings register, and deliver the dated competent-authority
+      remediation attestation with the remediation-status roll-up.
+    status: draft
+    control_refs:
+      - control.security_assessment@v1
+      - control.control_effectiveness_test@v1
+    playbook_refs:
+      - playbook.dora_tlpt_programme@v1
+    metric_refs: []
+    notes: >-
+      Level 1 anchors are DORA Art. 24 (general requirements for the
+      testing of digital operational resilience) and Art. 26
+      (advanced testing of ICT tools, systems and processes based on
+      TLPT); the operative Level 2 detail on the testing-programme
+      scope lives in the JC RTS on ICT risk-management framework
+      (Commission Delegated Regulation (EU) 2024/1774) Articles 25
+      and 26. The Art. 26 TLPT lifecycle reads against the ECB
+      TIBER-EU framework as the implementation reference. The Art. 27
+      testers-requirements criteria (certification, independence,
+      professional-indemnity insurance) are consumed at the
+      red-team-scoping-approval step of playbook.dora_tlpt_programme@v1
+      and are not lifted to a separate top-level atom on this file
+      — a single-clause child that only gates a step on one playbook
+      does not warrant a fan-out to a per-Article inbound file.
+      Article 25 (per-methodology testing surface — vulnerability
+      assessments, scenario-based tests, compatibility testing,
+      performance testing, end-to-end testing, penetration testing)
+      is deliberately out of scope for this entry: the per-methodology
+      axis either lands on sibling per-methodology playbooks
+      (vuln_intake for vulnerability-assessment testing,
+      detection_engineering for detection-rule effectiveness testing)
+      or on its own follow-on SKELETON. Recording the boundary
+      explicitly so reviewers see the intentional Art. 25 handoff
+      shape rather than a silent gap. The agentic slice this atom
+      composes against is the dated competent-authority remediation
+      attestation the operator publishes to its evidence store on
+      the mandatory-TLPT cycle — the audit-evident artifact that
+      demonstrates the testing programme is discharged rather than
+      declared.

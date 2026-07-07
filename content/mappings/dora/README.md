@@ -5,9 +5,12 @@ content-model artifacts. Focus is on the **major-ICT-incident reporting**
 lane (Art. 17–19 and the ESAs RTS/ITS), the **ICT third-party risk** lane
 (Art. 28–30), and the **vulnerability and patch management** lane
 (Art. 9 anchored to the JC RTS on ICT risk management framework,
-Commission Delegated Regulation (EU) 2024/1774, Art. 10). Out of scope
-here: TLPT (Art. 26–27), CTPP designation watch (Art. 31 — a KB concern
-in the private repos).
+Commission Delegated Regulation (EU) 2024/1774, Art. 10), and the
+**digital operational resilience testing** lane (Chapter IV, Art. 24
+and Art. 26 TLPT anchored on the ECB TIBER-EU framework and the ESAs
+Joint Committee guidelines on TLPT identification (JC 2022 03)). Out
+of scope here: CTPP designation watch (Art. 31 — a KB concern in the
+private repos).
 
 ## Scope
 
@@ -67,6 +70,15 @@ in the private repos).
   post-incident-review slice).
 - `article-14.yaml` — Art. 14 communication (crisis communication
   plans).
+- `article-24-26.yaml` — Art. 24 general requirements for the testing
+  of digital operational resilience and Art. 26 advanced testing based
+  on threat-led penetration testing (Chapter IV DORT / TLPT programme
+  anchor). The Art. 27 testers-requirements criteria are consumed at
+  the scoping-approval step of `playbook.dora_tlpt_programme@v1` and
+  cited in that entry's notes rather than lifted to a separate atom;
+  Art. 25 (per-methodology testing surface) is deliberately out of
+  scope on the same file and lands on sibling per-methodology
+  playbooks or a follow-on SKELETON.
 - `article-19-and-28.yaml` — Art. 17–19 reporting milestones, Art. 28/30
   third-party risk register and contractual clauses.
 
