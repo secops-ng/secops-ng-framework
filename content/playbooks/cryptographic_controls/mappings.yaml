@@ -7,18 +7,22 @@
 # references live in content/mappings/{nis2,dora,cra,gdpr}/ so the
 # graph is closed in both directions.
 #
-# Status: SKELETON (F-WF-CRYPTOMGMT SKELETON). The playbook is the
-# operator-side lifecycle materialisation of NIS2 Art. 21(2)(h) —
-# the write-side lane of the cryptography-and-encryption surface:
-# resolve the declared policy, discharge the key-lifecycle branch
-# (generate / rotate / revoke), evaluate the encryption-enforcement
-# gate, discharge the certificate-lifecycle branch (issue / renew /
-# revoke), record the lifecycle attestation, notify the cryptography
-# owner. A sibling CORE card lands the adapter bindings (KMS
-# backend, CA backend, storage-encryption backend, TLS-endpoint
-# backend) under patterns.cryptographic_controls, the D3FEND
-# selection, and the compiled examples; a sibling EXTEND card lands
-# the cookbook walkthrough and advanced features.
+# Status: CORE (F-WF-CRYPTOMGMT CORE). The SKELETON tier landed the
+# playbook shape, the OSCAL anchors on the key-lifecycle,
+# cryptographic-protection, PKI-certificate, at-rest, and in-transit
+# controls, the OCSF API-Activity binding, and the NIS2 + DORA
+# outbound edges. This CORE tier resolves the D3FEND selection on the
+# write-side lifecycle lane (D3-CM Cryptographic Module on the
+# encryption-enforcement gate, D3-SKT Software Key Takeout on the
+# key-lifecycle branch), closes the GDPR outbound edge on Art. 32(1)(a)
+# encryption of personal data, and ships the three-target compiled
+# examples (n8n, Temporal, LangGraph) under
+# examples/{n8n,temporal,langgraph}/cryptographic_controls/ with
+# byte-parity goldens under
+# tests/examples/{n8n,temporal,langgraph}/cryptographic_controls/. A
+# sibling EXTEND card lands the cookbook walkthrough and the adapter
+# Protocols under patterns.cryptographic_controls (KMS backend, CA
+# backend, storage-encryption backend, TLS-endpoint backend).
 #
 # Sibling relationship with crypto_posture_management: both overlays
 # pin nis2:art-21-2-h and co-anchor the clause. crypto_posture_management
@@ -36,14 +40,17 @@
 # by state-of-the-art mechanisms), §1(d) on access control (which
 # includes the key-material and certificate-lifecycle keys the
 # access-control surface relies on), and the umbrella
-# §1 essential-cybersecurity anchor. SKELETON pins the umbrella
-# anchor as a placeholder; the sibling CORE card selects the exact
-# sub-clause(s) once the adapter surfaces are pinned. The sibling
+# §1 essential-cybersecurity anchor. The sibling
 # crypto_posture_management overlay already pins
 # cra:annex-i-1-e-confidentiality-crypto-posture on the read-side
-# lane; cross-pinning the same anchor here without the CORE-tier
-# adapter resolution would double-count, so this overlay records
-# the CRA anchor as todo pending CORE.
+# lane; the write-side lifecycle-lane companion anchor
+# cra:annex-i-1-e-confidentiality-crypto-lifecycle lands in a
+# sibling CRA mapping card (F-WF-CRYPTOMGMT-CRA-EDGE) alongside
+# the inbound entry that pins playbook.cryptographic_controls@v1
+# there. CORE keeps the CRA slot as todo so the read-side and
+# write-side companion anchors ship together and reviewers see the
+# same shape the crypto_posture_management overlay applied on its
+# §1(e) split.
 #
 # DORA closure: DORA Art. 9 (protection and prevention) covers the
 # cryptography-and-encryption surface via the JC RTS on ICT risk
@@ -55,21 +62,31 @@
 # discharge the same Art. 9 obligation, posture-attestation vs
 # key-and-cert-lifecycle).
 #
-# GDPR closure: TODO at SKELETON tier — GDPR Art. 32(1)(a)
-# (pseudonymisation and encryption of personal data) is the
-# obvious anchor for the encryption-enforcement gate where the
-# workload processes personal data. The sibling CORE card selects
-# the specific inbound entry once the adapter surface is pinned.
+# GDPR closure: GDPR Art. 32(1)(a) requires the pseudonymisation and
+# encryption of personal data as one of the technical-and-
+# organisational measures the operator implements. This playbook is
+# the write-side lifecycle anchor for the encryption limb: the
+# key-lifecycle branch, the encryption-enforcement gate, and the
+# certificate-lifecycle branch together produce the material the
+# operator's encryption-of-personal-data capability relies on, and
+# the dated lifecycle attestation is the audit-evident artifact that
+# makes the encryption limb evidenced rather than asserted.
+# Companion to the sibling crypto_posture_management overlay which
+# pins the same clause on the read-side posture-attestation lane;
+# together the two overlays discharge the encryption limb of
+# Art. 32(1)(a). The pseudonymisation limb is not anchored by any
+# finalized playbook and remains an out-of-scope gap flagged in the
+# GDPR mapping's notes section.
 #
 # Schema: schemas/playbook-mappings.schema.json
 playbook: playbook.cryptographic_controls@v1
 
 oscal:
   # NIST SP 800-53 Rev. 5 controls anchoring the cryptographic-
-  # controls lifecycle. SKELETON pins the family (SC-8, SC-12,
-  # SC-13, SC-17, SC-28) that the six action steps exercise. A
-  # sibling CORE card revisits step-level pinning once the adapter
-  # bindings under patterns.cryptographic_controls are landed.
+  # controls lifecycle. Pins the family (SC-8, SC-12, SC-13, SC-17,
+  # SC-28) that the six action steps exercise. A sibling EXTEND card
+  # revisits step-level pinning once the adapter bindings under
+  # patterns.cryptographic_controls are landed.
   - id: control.cryptographic_key_establishment_management@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: SC-12
@@ -147,28 +164,116 @@ oscal:
       satisfied via the cryptographic-floor link to SC-13.
 
 d3fend:
-  # SKELETON — D3FEND selection deferred to the sibling CORE card.
-  # The read-side sibling (crypto_posture_management) pins D3-CA
-  # (Certificate Analysis) on its probe-cert-posture and
-  # check-key-rotation steps; on the write-side lifecycle here the
-  # candidate technique is not the analysis surface but a
-  # key-management / certificate-management surface D3FEND v1.0.0
-  # does not carry as a distinct technique. The CORE card selects
-  # the anchor (or documents the deliberate gap on the write-side
-  # lane in the same shape as the crypto_posture_management
-  # inventory / emission / delivery gap notes) once the adapter
-  # surfaces under patterns.cryptographic_controls are pinned.
-  - d3fend_id: D3-TODO
-    todo: true
+  # MITRE D3FEND v1.0.0 defensive technique tags per playbook step.
+  # CACAO step UUIDs are pinned to the real action UUIDs resolved from
+  # content/playbooks/cryptographic_controls/playbook.cacao.json (six
+  # action bodies: resolve-policy-inventory, key-lifecycle,
+  # enforce-encryption, certificate-lifecycle, record-lifecycle-
+  # evidence, notify-crypto-owner). The Harden and Isolate tactics in
+  # D3FEND v1.0.0 carry Cryptographic Module (D3-CM) — hardware- or
+  # software-backed cryptographic operations on protected material —
+  # and Software Key Takeout (D3-SKT) — controlled generation, rotation,
+  # and revocation of cryptographic keys — which are the two write-side
+  # disciplines this playbook operates on the lifecycle lane.
+  #
+  # Sibling read-side lane (crypto_posture_management) anchors on D3-CA
+  # (Certificate Analysis) because the discipline there is the dated
+  # examination of certificate properties against the declared policy;
+  # the write-side lane here anchors on D3-CM / D3-SKT because the
+  # discipline is the controlled operation on cryptographic material
+  # (module invocation for the enforcement gate, key takeout for the
+  # key-lifecycle branch) rather than the analysis of the result. The
+  # resolve-policy-inventory, certificate-lifecycle, record-lifecycle-
+  # evidence, and notify-crypto-owner steps are deliberately NOT pinned
+  # to a D3FEND technique and the gaps are documented per step below,
+  # mirroring the per-step pin-where-it-fits / document-the-gap pattern
+  # the read-side sibling overlay applies.
+  - step: action--52000000-0000-4000-8000-000000000003
+    d3fend_id: D3-SKT
+    d3fend_name: Software Key Takeout
+    url: https://d3fend.mitre.org/technique/d3f:SoftwareKeyTakeout/
     notes: >-
-      SKELETON placeholder pending the sibling CORE card. The
-      write-side lifecycle lane's D3FEND anchor is deferred until
-      the adapter surfaces (KMS backend, CA backend, storage-
-      encryption backend, TLS-endpoint backend) are pinned; the
-      selection follows the pin-where-it-fits / document-the-gap
-      pattern the sibling crypto_posture_management overlay
-      already applies on its inventory-crypto-policy,
-      evidence-capture, and notify-crypto-owner steps.
+      key lifecycle — the controlled generation of a new key against
+      the algorithm / key-size floor carried in
+      __policy_inventory_id__, the controlled rotation of an existing
+      key against the per-key-class cadence with a backreference to
+      the previous key, and the controlled revocation of a key on
+      compromise or scope exit is the software-key-takeout discipline
+      D3-SKT names — the operator retains custody and lifecycle
+      control of the key material at every branch. The
+      __key_lifecycle_record__ artifact is the audit-evident output
+      of the key-takeout pass and is the write-side counterpart the
+      sibling crypto_posture_management overlay's D3-CA rotation-status
+      check reads against. Read-only-by-contract does not apply on
+      this step: the key-lifecycle branch is the write-side lifecycle
+      lane by definition, and the adapter Protocol against the
+      operator's KMS backend is the seam where the takeout is actually
+      dispatched (landed on the sibling EXTEND card under
+      patterns.cryptographic_controls).
+  - step: action--52000000-0000-4000-8000-000000000004
+    d3fend_id: D3-CM
+    d3fend_name: Cryptographic Module
+    url: https://d3fend.mitre.org/technique/d3f:CryptographicModule/
+    notes: >-
+      enforce encryption — the at-rest and in-transit gate on the
+      target workload evaluates whether the operator's cryptographic
+      module (the storage-encryption backend and the TLS-endpoint
+      backend under patterns.cryptographic_controls) is engaged on
+      the pair of conditions the policy names. D3-CM names the
+      cryptographic-module discipline; the enforcement-gate decision
+      is the per-workload measurement of that module's engagement
+      against the declared floor. The gate is a read-and-decide
+      surface — the actual admission or blocking of the workload is
+      discharged by the operator's provisioning control plane against
+      the emitted decision, so the read-only-by-contract framing that
+      scopes the enforcement-gate step is preserved; D3-CM here names
+      the discipline of measuring that the module is engaged, not the
+      discipline of engaging it. Compliance Finding (2003) records on
+      the enforcement-gate deny branch land on the sibling CORE-tier
+      OCSF binding follow-on (currently the OCSF section below carries
+      the API-Activity anchor only).
+  #
+  # resolve policy inventory (action--52000000-0000-4000-8000-000000000002)
+  # is deliberately NOT pinned to a D3FEND technique. D3FEND v1.0.0
+  # does not carry a defensive technique for governance-policy inventory
+  # distinct from the downstream cryptographic-module or key-takeout
+  # surface it feeds; the policy snapshot is the upstream of the
+  # cryptographic-operation discipline rather than the operation itself.
+  # This step is anchored on the SC-13 OSCAL control above where the
+  # cryptographic-uses inventory obligation actually lives. Mirrors the
+  # sibling crypto_posture_management overlay's inventory-crypto-policy
+  # gap note.
+  #
+  # certificate lifecycle (action--52000000-0000-4000-8000-000000000005)
+  # is deliberately NOT pinned to a D3FEND technique. D3FEND v1.0.0
+  # carries Certificate Analysis (D3-CA) on the Detect tactic —
+  # dated examination of certificate properties — but not a
+  # certificate-issuance / renewal / revocation technique distinct
+  # from the underlying PKI governance surface. D3-CM is the module
+  # discipline for cryptographic-primitive invocation, not the
+  # per-certificate lifecycle discipline; D3-SKT is the software-
+  # key-takeout discipline and covers key material, not certificates.
+  # Cross-pinning D3-CA here would misrepresent the write-side
+  # lifecycle lane as a read-side analysis lane (that is the sibling
+  # crypto_posture_management overlay's role). This step is anchored
+  # on the SC-17 OSCAL control above where the PKI-certificate
+  # obligation actually lives.
+  #
+  # record lifecycle evidence (action--52000000-0000-4000-8000-000000000006)
+  # is deliberately NOT pinned to a D3FEND technique. Per-execution
+  # artifact emission of the dated cryptographic-controls lifecycle
+  # attestation for downstream audit consumption is an evidence-stream
+  # emission discipline, not a runtime countermeasure or a detection
+  # step, and forcing it onto a D3FEND tag would misrepresent the
+  # technique. Mirrors the sibling crypto_posture_management overlay's
+  # evidence-capture gap note.
+  #
+  # notify crypto owner (action--52000000-0000-4000-8000-000000000007)
+  # is deliberately NOT pinned to a D3FEND technique. Delivery of an
+  # attestation reference to the cryptography owner along the operator's
+  # pre-bound channel is a notification discipline, not a defensive
+  # technique. Mirrors the sibling crypto_posture_management overlay's
+  # notify-crypto-owner gap note.
 
 ocsf:
   # OCSF v1.3.0 telemetry binding. All six action steps interact
@@ -177,7 +282,7 @@ ocsf:
   # backend, the CA backend, the evidence store, the notification
   # channel). API Activity (6003) is the consistent class across
   # both consumed and emitted records for these read/write
-  # surfaces. A sibling CORE card revisits the class selection
+  # surfaces. A sibling EXTEND card revisits the class selection
   # (and adds Compliance Finding 2003 on the enforcement-gate
   # deny branch) once the adapter surfaces are pinned.
   - id: telemetry.api_activity@v1
@@ -213,9 +318,10 @@ nis2:
   # Pinned outbound below to close the graph. The sibling
   # crypto_posture_management overlay pins the read-side posture-
   # attestation lane; this overlay pins the write-side lifecycle
-  # lane. Both lanes discharge the same clause; the sibling CORE
-  # card lands the inbound edit on article-21-2-h.yaml that adds
-  # playbook.cryptographic_controls@v1 to the playbook_refs.
+  # lane. Both lanes discharge the same clause; the same PR that
+  # lands this overlay adds playbook.cryptographic_controls@v1 to
+  # the playbook_refs on article-21-2-h.yaml so the graph is closed
+  # in both directions.
   - mapping_id: nis2:art-21-2-h
     article: 21(2)(h)
     notes: >-
@@ -259,31 +365,64 @@ dora:
       overlay pins the periodic-review slice on the read side.
 
 cra:
-  # SKELETON — CRA anchor deferred to the sibling CORE card. CRA
-  # Annex I §1 names three adjacent lanes this playbook's lifecycle
-  # branches partially discharge:
-  #   - §1(e) confidentiality — encryption of relevant data at rest
-  #     and in transit by state-of-the-art mechanisms
-  #     (already pinned on the sibling crypto_posture_management
-  #     overlay as cra:annex-i-1-e-confidentiality-crypto-posture,
-  #     read-side lane);
-  #   - §1(d) access control — key material and certificate
-  #     lifecycle underpins the access-control surface;
-  #   - the umbrella §1 essential-cybersecurity anchor.
-  # Cross-pinning the same §1(e) anchor here without the CORE-tier
-  # adapter resolution would double-count against the read-side
-  # lane; the CORE card selects the exact sub-clause(s) once the
-  # adapter surfaces under patterns.cryptographic_controls are
-  # pinned.
+  # CORE — CRA outbound edge kept as an explicit todo. The sibling
+  # crypto_posture_management overlay already pins the read-side
+  # posture lane at cra:annex-i-1-e-confidentiality-crypto-posture;
+  # the write-side lifecycle-lane companion anchor
+  # cra:annex-i-1-e-confidentiality-crypto-lifecycle plus the
+  # matching inbound entry pinning playbook.cryptographic_controls@v1
+  # land together in a sibling CRA mapping card
+  # (F-WF-CRYPTOMGMT-CRA-EDGE) so both anchors ship in one PR against
+  # content/mappings/cra/. Recording the deferral here explicitly so
+  # reviewers see the same shape the read-side overlay used on its
+  # own §1(e) split.
   - mapping_id: cra:todo-cryptographic-controls-lifecycle
     todo: true
     notes: >-
-      Placeholder pending the CORE / EXTEND card. Candidate anchors
-      are CRA Annex I §1(e) confidentiality (write-side lane
-      companion to the read-side lane the sibling
-      crypto_posture_management overlay pins), §1(d) access control
-      (key material and certificate lifecycle underpin access
-      control), and the umbrella §1 essential-cybersecurity anchor.
-      The CORE card pins the real inbound CRA mapping id once the
-      adapter surfaces are landed, mirroring the read-side lane's
-      SKELETON→CORE pattern.
+      Deferred to sibling CRA mapping card F-WF-CRYPTOMGMT-CRA-EDGE.
+      That card lands the companion anchor
+      cra:annex-i-1-e-confidentiality-crypto-lifecycle (write-side
+      lifecycle lane companion to cra:annex-i-1-e-confidentiality-
+      crypto-posture on the read-side lane) along with the inbound
+      entry that pins playbook.cryptographic_controls@v1 into
+      content/mappings/cra/. §1(d) access control and the umbrella
+      §1 essential-cybersecurity anchor remain candidate secondary
+      anchors on the same CRA card if the reviewer selects them.
+
+gdpr:
+  # CORE — GDPR outbound edge on Art. 32(1)(a) (encryption of personal
+  # data). The sibling crypto_posture_management overlay pins the
+  # read-side posture-attestation lane on the same clause; this
+  # overlay pins the write-side lifecycle lane. Both lanes together
+  # discharge the encryption limb of Art. 32(1)(a); the
+  # pseudonymisation limb is not anchored by any finalized playbook
+  # in the current framework and remains an out-of-scope gap
+  # documented in content/mappings/gdpr/article-32-1-a-encryption-
+  # pseudonymisation.yaml. Inbound entry addition on that file lands
+  # in the same PR as this overlay so the graph is closed in both
+  # directions.
+  - mapping_id: gdpr:art-32-1-a-encryption
+    article: "32(1)(a)"
+    notes: >-
+      GDPR Art. 32(1)(a) names pseudonymisation and encryption of
+      personal data as one of the technical-and-organisational
+      measures the operator implements under Art. 32(1) appropriate
+      to the risk. This playbook is the write-side lifecycle anchor
+      for the encryption limb: the key-lifecycle branch produces
+      the key material against the declared algorithm and key-size
+      floor, the encryption-enforcement gate measures the operator's
+      cryptographic module against the declared at-rest and
+      in-transit floors on workloads processing personal data, the
+      certificate-lifecycle branch produces the certificate material
+      the TLS floor relies on, and the dated lifecycle attestation
+      is the audit-evident artifact that makes the encryption
+      capability evidenced rather than asserted. Companion to the
+      sibling crypto_posture_management playbook which pins the
+      read-side posture-attestation lane on the same clause; together
+      the two overlays discharge the encryption limb of Art. 32(1)(a).
+      The pseudonymisation limb is NOT anchored by this playbook —
+      cryptographic_controls operates encryption-key and certificate
+      lifecycle disciplines, not a pseudonymisation transform against
+      subject data; the GDPR mapping's notes section documents the
+      pseudonymisation gap explicitly.
+

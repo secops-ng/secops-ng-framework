@@ -1,6 +1,6 @@
 # cryptographic_controls — NIS2 Art. 21(2)(h) lifecycle
 
-SKELETON tier of the F-WF-CRYPTOMGMT trilogy. This playbook is the
+CORE tier of the F-WF-CRYPTOMGMT trilogy. This playbook is the
 operator-side lifecycle materialisation of the NIS2 Art. 21(2)(h)
 cryptography-and-encryption obligation: resolve the declared
 cryptography policy, discharge the key-lifecycle branch (generate /
@@ -32,12 +32,14 @@ declared scope.
 - `mappings.yaml` — outbound view of the content model: OSCAL
   (SC-12 key management, SC-13 cryptographic protection, SC-17
   PKI certificates, SC-28 protection of information at rest, SC-8
-  transmission confidentiality and integrity), OCSF (API Activity
-  6003), and the inbound regulatory anchors (NIS2 Art. 21(2)(h),
-  DORA Art. 9, CRA Annex I §1 encryption/confidentiality/access
-  lanes — see the header note on the CRA anchor). D3FEND, GDPR,
-  and the final CRA sub-clause selection are TODO markers a sibling
-  CORE card resolves.
+  transmission confidentiality and integrity), D3FEND (D3-SKT
+  Software Key Takeout on the key-lifecycle branch, D3-CM
+  Cryptographic Module on the enforcement-gate branch), OCSF (API
+  Activity 6003), and the inbound regulatory anchors (NIS2 Art.
+  21(2)(h), DORA Art. 9, GDPR Art. 32(1)(a)). The CRA §1(e)
+  write-side companion anchor is deliberately deferred to a
+  sibling CRA mapping card so the read-side and write-side lane
+  entries land together — see the header note on the CRA anchor.
 
 ## Compile targets
 

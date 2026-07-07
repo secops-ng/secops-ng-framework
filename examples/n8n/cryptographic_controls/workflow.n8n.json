@@ -1,0 +1,507 @@
+{
+  "name": "Cryptographic controls and key lifecycle",
+  "nodes": [
+    {
+      "id": "start--52000000-0000-4000-8000-000000000001",
+      "name": "cryptographic_controls_start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__lifecycle_event__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the lifecycle event that triggers this run: 'key-generate', 'key-rotate', 'key-revoke', 'cert-issue', 'cert-renew', 'cert-revoke', or 'enforcement-gate'. Supplied by the scheduler, the KMS/CA control plane, or an operator-initiated trigger. SKELETON: the branching on this variable across the seven lifecycle branches is authored on the sibling CORE card; the workflow shape below chains the disciplines linearly."
+            },
+            {
+              "name": "__crypto_scope__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the in-scope cryptography surface for this run (matches a row in the operator's documented cryptography-scope catalogue: which key classes, which certificate classes, which storage surfaces, and which TLS endpoints are subject to the declared policy). Shared with the sibling crypto_posture_management playbook so both surfaces read from the same declared scope."
+            },
+            {
+              "name": "__policy_inventory_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the resolved cryptography-policy inventory snapshot: declared algorithm floor (symmetric and asymmetric), key-size floor, per-key-class rotation cadence, TLS-version floor, declared CA / trust anchors, and expiry buffer for certificate renewal. Resolved against __crypto_scope__."
+            },
+            {
+              "name": "__key_lifecycle_record__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the key-lifecycle evidence record emitted by the key-generate / key-rotate / key-revoke branch: (key id, key class, algorithm, key size, generation timestamp, rotation timestamp if any, revocation timestamp if any, previous-key backreference on rotation, revocation reason on revocation). Feeds the sibling crypto_posture_management overlay's rotation-status check."
+            },
+            {
+              "name": "__cert_lifecycle_record__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the certificate-lifecycle evidence record emitted by the cert-issue / cert-renew / cert-revoke branch: (certificate id, endpoint, issuer, issued-at, not-before, not-after, renewal backreference on renew, revocation reason and revocation-list update on revoke)."
+            },
+            {
+              "name": "__enforcement_decision__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the encryption-enforcement gate decision record: (workload id, at-rest condition observed vs required, in-transit condition observed vs required, gate outcome \u2014 admit or deny, reason on deny). The gate is a read-and-decide surface; the workload's actual admission or blocking is discharged by the operator's provisioning control plane against the emitted decision."
+            },
+            {
+              "name": "__lifecycle_attestation_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the dated cryptographic-controls lifecycle attestation record published to the operator's evidence store. Carries the policy-inventory snapshot, the key-lifecycle record (when set), the certificate-lifecycle record (when set), the enforcement-gate decision (when set), and the __lifecycle_event__ context. This is the audit-evident write-side counterpart to the read-side attestation the crypto_posture_management playbook emits."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--52000000-0000-4000-8000-000000000002",
+      "name": "resolve policy inventory",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.crypto_scope",
+              "name": "in.crypto_scope",
+              "value": "={{$workflow.variables.crypto_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "in.lifecycle_event",
+              "name": "in.lifecycle_event",
+              "value": "={{$workflow.variables.lifecycle_event}}",
+              "type": "string"
+            },
+            {
+              "id": "out.policy_inventory_id",
+              "name": "out.policy_inventory_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.crypto_policy_inventory@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Resolve the operator's declared cryptography policy at the start of the lifecycle event: algorithm floor (symmetric and asymmetric), minimum key sizes, per-key-class rotation cadence, TLS-version floor, declared CA / trust anchors, and expiry buffer for certificate renewal. Emits __policy_inventory_id__ \u2014 the snapshot every downstream branch measures its lifecycle action against. If no policy is declared for __crypto_scope__ the step emits an inventory artifact with the gap explicitly flagged; the downstream lifecycle branches still run and record the missing-policy condition on the attestation rather than proceeding silently.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--52000000-0000-4000-8000-000000000003",
+      "name": "key lifecycle",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.crypto_scope",
+              "name": "in.crypto_scope",
+              "value": "={{$workflow.variables.crypto_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "in.lifecycle_event",
+              "name": "in.lifecycle_event",
+              "value": "={{$workflow.variables.lifecycle_event}}",
+              "type": "string"
+            },
+            {
+              "id": "in.policy_inventory_id",
+              "name": "in.policy_inventory_id",
+              "value": "={{$workflow.variables.policy_inventory_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.key_lifecycle_record",
+              "name": "out.key_lifecycle_record",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.key_lifecycle_management@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Discharge the key-lifecycle branch of __lifecycle_event__: generation of a new key against the algorithm / key-size floor carried in __policy_inventory_id__ (key-generate); rotation of an existing key against the per-key-class cadence, keying a new material and backreferencing the previous key (key-rotate); revocation of a key on compromise or scope exit, emitting the revocation reason (key-revoke). SKELETON: the branching on __lifecycle_event__ across the three sub-branches is a linear scaffold here; the sibling CORE card lands the branch-selection logic and the adapter Protocols against the operator's KMS backend under patterns.cryptographic_controls. Per-branch evidence is aggregated into __key_lifecycle_record__.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--52000000-0000-4000-8000-000000000004",
+      "name": "enforce encryption",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.crypto_scope",
+              "name": "in.crypto_scope",
+              "value": "={{$workflow.variables.crypto_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "in.policy_inventory_id",
+              "name": "in.policy_inventory_id",
+              "value": "={{$workflow.variables.policy_inventory_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.enforcement_decision",
+              "name": "out.enforcement_decision",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.encryption_enforcement_gate@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Evaluate the encryption-enforcement gate on the pair of at-rest and in-transit conditions the policy names: (a) does the target workload's persistent-storage surface satisfy the declared at-rest algorithm and key-material binding, and (b) do the target workload's declared network endpoints negotiate the declared TLS-version and cipher-suite floor. Emit __enforcement_decision__ as a decision record (admit / deny + reason). The gate is a read-and-decide surface \u2014 the actual admission or blocking of the workload is discharged by the operator's provisioning control plane against the emitted decision, so the read-only-by-contract framing that scopes this playbook is preserved.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--52000000-0000-4000-8000-000000000005",
+      "name": "certificate lifecycle",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.crypto_scope",
+              "name": "in.crypto_scope",
+              "value": "={{$workflow.variables.crypto_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "in.lifecycle_event",
+              "name": "in.lifecycle_event",
+              "value": "={{$workflow.variables.lifecycle_event}}",
+              "type": "string"
+            },
+            {
+              "id": "in.policy_inventory_id",
+              "name": "in.policy_inventory_id",
+              "value": "={{$workflow.variables.policy_inventory_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.cert_lifecycle_record",
+              "name": "out.cert_lifecycle_record",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.certificate_lifecycle_management@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Discharge the certificate-lifecycle branch of __lifecycle_event__: issue a new certificate against the operator's declared CA / trust anchors (cert-issue); renew an existing certificate ahead of the declared expiry buffer, backreferencing the previous certificate (cert-renew); revoke a certificate on compromise or scope exit, emitting the revocation reason and updating the operator's revocation list surface (cert-revoke). SKELETON: the branching on __lifecycle_event__ across the three sub-branches is a linear scaffold here; the sibling CORE card lands the branch-selection logic and the adapter Protocols against the operator's CA backend under patterns.cryptographic_controls. Per-branch evidence is aggregated into __cert_lifecycle_record__.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--52000000-0000-4000-8000-000000000006",
+      "name": "record lifecycle evidence",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.policy_inventory_id",
+              "name": "in.policy_inventory_id",
+              "value": "={{$workflow.variables.policy_inventory_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.key_lifecycle_record",
+              "name": "in.key_lifecycle_record",
+              "value": "={{$workflow.variables.key_lifecycle_record}}",
+              "type": "string"
+            },
+            {
+              "id": "in.cert_lifecycle_record",
+              "name": "in.cert_lifecycle_record",
+              "value": "={{$workflow.variables.cert_lifecycle_record}}",
+              "type": "string"
+            },
+            {
+              "id": "in.enforcement_decision",
+              "name": "in.enforcement_decision",
+              "value": "={{$workflow.variables.enforcement_decision}}",
+              "type": "string"
+            },
+            {
+              "id": "in.lifecycle_event",
+              "name": "in.lifecycle_event",
+              "value": "={{$workflow.variables.lifecycle_event}}",
+              "type": "string"
+            },
+            {
+              "id": "out.lifecycle_attestation_id",
+              "name": "out.lifecycle_attestation_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.crypto_policy_inventory@v1, control.key_lifecycle_management@v1, control.certificate_lifecycle_management@v1, control.encryption_enforcement_gate@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Compose and publish the dated cryptographic-controls lifecycle attestation to the operator's evidence store. The record carries the policy-inventory snapshot, the key-lifecycle record (when set), the certificate-lifecycle record (when set), the enforcement-gate decision (when set), and the __lifecycle_event__ context. This is the audit-evident write-side counterpart the sibling crypto_posture_management playbook's read-side attestation then measures against; a lifecycle action executed but not recorded is itself a posture gap the sibling surface will surface.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--52000000-0000-4000-8000-000000000007",
+      "name": "notify crypto owner",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.lifecycle_attestation_id",
+              "name": "in.lifecycle_attestation_id",
+              "value": "={{$workflow.variables.lifecycle_attestation_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.crypto_scope",
+              "name": "in.crypto_scope",
+              "value": "={{$workflow.variables.crypto_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "in.lifecycle_event",
+              "name": "in.lifecycle_event",
+              "value": "={{$workflow.variables.lifecycle_event}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.api_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Deliver the lifecycle-attestation reference to the cryptography owner along the operator's pre-bound channel (ticketing system, chat thread, email). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; a lifecycle action executed and recorded but never delivered to the owner is itself a posture gap.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--52000000-0000-4000-8000-000000000008",
+      "name": "cryptographic_controls_end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2060,
+        420
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "cryptographic_controls_start": {
+      "main": [
+        [
+          {
+            "node": "resolve policy inventory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "resolve policy inventory": {
+      "main": [
+        [
+          {
+            "node": "key lifecycle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "key lifecycle": {
+      "main": [
+        [
+          {
+            "node": "enforce encryption",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "enforce encryption": {
+      "main": [
+        [
+          {
+            "node": "certificate lifecycle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "certificate lifecycle": {
+      "main": [
+        [
+          {
+            "node": "record lifecycle evidence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "record lifecycle evidence": {
+      "main": [
+        [
+          {
+            "node": "notify crypto owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "notify crypto owner": {
+      "main": [
+        [
+          {
+            "node": "cryptographic_controls_end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "nis2",
+    "article-21-2-h",
+    "cryptography",
+    "encryption",
+    "key-lifecycle",
+    "key-rotation",
+    "key-revocation",
+    "certificate-lifecycle"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.cryptographic_controls@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--7c9d0e1f-2a3b-4c5d-8e6f-1a2b3c4d5e6f"
+    },
+    "secops_ng_notes": [
+      "step 'action--52000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--52000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--52000000-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--52000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--52000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--52000000-0000-4000-8000-000000000007': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}
