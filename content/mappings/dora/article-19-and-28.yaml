@@ -189,6 +189,7 @@ entries:
     playbook_refs:
       - playbook.contractual_obligations_tracker@v1
       - playbook.supply_chain_security@v1
+      - playbook.dora_tpr_management@v1
     metric_refs:
       - kri.suppliers_attestation_stale@v1
     notes: >-
@@ -196,7 +197,7 @@ entries:
       a living artifact, not a one-shot inventory: the supplier set,
       criticality assessments, sub-contracting chains, and
       data-location indicators all drift as contracts are signed,
-      amended, and terminated. Two playbooks compose against this
+      amended, and terminated. Three playbooks compose against this
       surface. `playbook.contractual_obligations_tracker@v1` is the
       contract-time obligation-evidence stream — per-supplier accepted
       obligations and per-clause review cadence — and is the
@@ -210,6 +211,14 @@ entries:
       assessment block the register's criticality and re-attestation
       surface consumes, so any drift on a direct supplier the runtime
       surface flags re-enters the same register the Article anchors.
+      `playbook.dora_tpr_management@v1` is the DORA Chapter V
+      contract-lifecycle spine (onboarding pre-contractual risk
+      assessment under Art. 28(4) → Art. 30(2)/(3) clause-presence
+      check → Art. 28 register-of-information entry → periodic review
+      with runtime supply-chain-evidence drift join → Art. 28(8)
+      exit-strategy attestation); the register-entry step of that
+      spine is the write surface that composes this atom into a
+      closed operator-side lifecycle.
       control_refs and metric_refs are not extended here: the
       orchestration playbook declares only
       `control.supplier_inventory@v1` (already on this entry) and no
@@ -217,26 +226,3 @@ entries:
       article-10.yaml and article-9-and-rts-vuln-mgmt.yaml (inbound
       backlink + reuse of existing controls/metrics, additional
       control/metric lifts deferred to follow-on cards).
-
-  - id: dora:art-30-contractual-clauses
-    regulation:
-      name: DORA
-      instrument: Regulation (EU) 2022/2554
-      celex: 32022R2554
-      article: "30(2)"
-      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
-    obligation: >-
-      Ensure that contractual arrangements with ICT third-party service
-      providers include the elements specified in Article 30(2) and (3)
-      — including service description, data-processing locations,
-      exit-strategy obligations, audit rights, and termination rights.
-    status: draft
-    control_refs:
-      - control.provider_attestation@v1
-    playbook_refs:
-      - playbook.contractual_obligations_tracker@v1
-    metric_refs: []
-    notes: >-
-      Contract clauses themselves are documentary; the agentic slice is
-      periodic re-attestation that the provider continues to meet the
-      declared clauses (provider_attestation pattern).

@@ -215,3 +215,27 @@ skip:
       interaction is authored (for example a manufacturer-side
       product-security-testing cadence overlap on the same operator
       surface).
+
+  - slug: dora_tpr_management
+    rationale: >-
+      DORA Chapter V ICT third-party risk management contract-lifecycle
+      spine (onboarding pre-contractual risk assessment under
+      Art. 28(4) → Art. 30(2)/(3) clause-presence check → Art. 28
+      register-of-information entry → periodic review with runtime
+      supply-chain-evidence drift join → Art. 28(8) exit-strategy
+      attestation). The playbook's outbound overlay
+      (`content/playbooks/dora_tpr_management/mappings.yaml`)
+      deliberately does not pin CRA entries: CRA Annex I is
+      product-by-product manufacturer scope, and no operator-side
+      ICT third-party governance clause on the CRA axis anchors
+      against a contract-lifecycle roll-up at the same shape as
+      DORA Chapter V. The DORA inbound graph is closed via
+      `content/mappings/dora/article-19-and-28.yaml`
+      (`dora:art-28-third-party-register`) and
+      `content/mappings/dora/article-30.yaml`
+      (`dora:art-30-contractual-clauses`). A sibling CORE / EXTEND
+      card revisits the CRA cross-regime graph if a documented
+      interaction is authored (for example a manufacturer-side
+      component due-diligence cadence overlap on the same operator
+      contract surface). Mirrors the dora_ict_risk_selfassess
+      CRA-axis precedent.
