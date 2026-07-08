@@ -896,6 +896,67 @@ named operator use-case. Each cookbook workflow lives under
 
 ---
 
+### F-WF-DORA-TPR — DORA Chapter V ICT third-party risk management contract-lifecycle spine
+
+- **Status:** Shipped
+- **Priority:** P1
+- **Goal:** G-01 (content coverage — a portable contract-lifecycle
+  workflow that lets a DORA-in-scope financial entity discharge the
+  Article 28 / Article 30 obligation set against every ICT third-party
+  service provider, from pre-contractual risk assessment through
+  register-of-information maintenance and periodic re-scoring to a
+  dated Article 28(8) exit-strategy attestation) and G-02 (regulatory
+  mapping — inbound anchors on the DORA Article 28 register atom and
+  a new Article 30 clause-set atom).
+- **Acceptance criteria:**
+  - `content/playbooks/dora_tpr_management/` carries the canonical
+    CACAO v2 scaffold (`playbook.dora_tpr_management@v1`) with the
+    five DORA Chapter V lifecycle atoms wired as deterministic steps
+    (onboarding_risk_assessment → contractual_provisions_check →
+    register_entry → periodic_review → exit_assessment), a
+    `mappings.yaml` pinning outbound OSCAL SR-3 / SR-6 anchors and
+    the OCSF API-Activity binding, and a README walking the operator
+    through the lifecycle structure.
+  - Inbound backlinks land on the DORA Article 28 register atom in
+    `content/mappings/dora/article-19-and-28.yaml` and on a new
+    `content/mappings/dora/article-30.yaml` entry for the Article 30
+    closed clause set.
+  - Three reference-target compile examples land under
+    `examples/{n8n,temporal,langgraph}/dora_tpr_management/` with
+    byte-parity goldens across all three targets.
+  - Cookbook entry `docs/cookbook/dora_tpr_management.md` walks an
+    operator through running the lifecycle end-to-end against a
+    reference deployment, including the runtime supply-chain-evidence
+    join into the periodic-review step and the target-agnostic
+    `artifact_id` derivation for the register row and the exit
+    attestation.
+- **Sovereign-stack constraints:** CACAO v2 content only, no
+  proprietary schema. DORA Chapter V (Articles 28 and 30) are the
+  regulatory anchors; operator-supplied evidence sink and no default
+  non-EU endpoint. Register-row shape follows Commission Implementing
+  Regulation (EU) 2024/2956 (ITS on the standard templates for the
+  register of information).
+- **Depends on:** F-WF-SCS (runtime supply-chain-signal spine — the
+  periodic-review step joins against its per-execution supply-chain-
+  evidence stream on the shared `provider.<id>@v<n>` handle).
+- **Source:** DORA — Regulation (EU) 2022/2554 Chapter V, Articles
+  28 (general principles for the use of ICT third-party service
+  providers) and 30 (key contractual provisions); Commission
+  Implementing Regulation (EU) 2024/2956 (ITS on the register of
+  information).
+- **Shipped via:**
+  - SKELETON — #721
+    (`content/playbooks/dora_tpr_management/` CACAO v2 scaffold
+    + `mappings.yaml` + README).
+  - CORE — #722 (three-target compile examples under
+    `examples/{n8n,temporal,langgraph}/dora_tpr_management/`
+    + byte-parity goldens across targets + inbound DORA anchor
+    wiring).
+  - EXTEND — PR #<this> (practitioner cookbook walkthrough and
+    ROADMAP `Shipped` flip).
+
+---
+
 ## Epic PT — Pattern Library
 
 Reusable graph fragments and Pydantic types shared across cookbook
