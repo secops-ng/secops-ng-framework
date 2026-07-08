@@ -23,16 +23,18 @@ forks a sibling `cra_srp_notify` run keyed on the same `__case_id__`
 so the regulator submission chain runs in parallel with the
 coordinated-disclosure lifecycle here.
 
-Status: **SKELETON**. Action steps are scaffolded as CACAO v2 sources
-with `control_refs` / `telemetry_refs` / `metric_refs` stubs. The
-acknowledgement-letter template, advisory template (including CSAF
-2.0 emission), CVE-request adapter, and CSIRT-coordination adapter
-are placeholders. Per-target worked examples under
-`examples/{n8n,temporal,langgraph}/cra_cvd/` land in a follow-on
-CORE / EXTEND card together with the schema-conformant advisory
-builder. This walkthrough is the narrative reference operators use to
-understand the shape of the discharge; the runnable emitters come
-next.
+Status: **CORE**. The seven-step CVD lifecycle is scaffolded as a
+CACAO v2 source; two steps (`ack_to_reporter` and `publish_advisory`)
+now bind against CORE primitives that emit deterministic
+envelope shapes — the CRA Article 14 §6 acknowledgement envelope and
+the CSAF 2.0 advisory shape — with the SMTP / advisory-portal
+endpoints operator-supplied at compile-target config time. The
+CVE-request adapter and CSIRT-coordination adapter remain EXTEND
+scope; the acknowledgement-letter and advisory human-readable
+templates remain operator-owned by design. Per-target worked
+examples under `examples/{n8n,temporal,langgraph}/cra_cvd/` compile
+byte-deterministically from the canonical CACAO source; the goldens
+guard the ring on every PR.
 
 > The framework is framework-agnostic by construction. n8n / Temporal
 > / LangGraph are *three of three* reference targets; once CORE lands
