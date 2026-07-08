@@ -1001,6 +1001,100 @@ named operator use-case. Each cookbook workflow lives under
 
 ---
 
+### F-WF-CRA-CVD — CRA Article 14 coordinated vulnerability disclosure lifecycle
+
+- **Status:** Shipped
+- **Priority:** P1
+- **Goal:** G-01 (content coverage — a portable operator-side
+  coordinated vulnerability disclosure lifecycle discharging CRA
+  Article 14 §1 (CVD policy operation) and §6 (acknowledgement to the
+  reporter), from reporter intake through public advisory publication;
+  advances the Q4 2026 target of ≥ 25 CACAO v2 playbooks) and G-02
+  (regulatory-graph closure — CRA Article 14 primary anchor, Annex I
+  §2(2) / §2(5) inbound anchors, GDPR Art. 32(1)(b) channel-security
+  overlay, GDPR Art. 30 ROPA entry).
+- **Acceptance criteria:**
+  - `content/playbooks/cra_cvd/` carries the canonical CACAO v2
+    scaffold (`playbook.cra_cvd@v1`) — seven action steps (intake →
+    ack_to_reporter → triage → develop_fix → validate_fix →
+    coordinate_disclosure → publish_advisory) plus start / end edge
+    wiring, deterministic transitions, eight workflow-scope variables
+    (`__case_id__`, `__reporter_contact__`, `__reporter_ack_ts__`,
+    `__triage_verdict__`, `__actively_exploited__`, `__fix_ref__`,
+    `__disclosure_target_date__`, `__advisory_id__`), a
+    `mappings.yaml` pinning outbound OSCAL SI-5 / RA-5, OCSF
+    Vulnerability Finding + Compliance Finding, and CRA Annex I §2
+    overlay entries, plus a workflow-local README.
+  - Two CORE primitives land under
+    `content/playbooks/cra_cvd/primitives/`
+    (`reporter.send_acknowledgement`,
+    `disclosure.build_advisory_artifact`) with `core_body` bindings on
+    the `ack_to_reporter` and `publish_advisory` action steps;
+    `coordinate_disclosure` binding is CORE-DEFERRED pending the
+    two-variable `out_args` collapse (revisited in EXTEND).
+  - Three Jinja2 templates under
+    `content/playbooks/cra_cvd/templates/`: `ack_letter.j2`,
+    `advisory.md.j2` (human-readable), and `advisory.csaf2.json.j2`
+    (machine-readable CSAF 2.0). Templates are reference forms;
+    per-operator forking is expected.
+  - Three reference-target compile examples land under
+    `examples/{n8n,temporal,langgraph}/cra_cvd/` with byte-parity
+    goldens under `tests/examples/cra_cvd/test_golden.py` guarding
+    the ring across all three targets on every PR.
+  - Inbound anchors land on `cra:annex-i-2-vuln-handling` and
+    `cra:annex-i-2-cvd-policy` in
+    `content/mappings/cra/article-14-and-annex-i.yaml`. Overlap with
+    `codebase_vuln_management` is anchored at
+    `cra:annex-i-2-codebase-vuln-mgmt`.
+  - GDPR Art. 32(1)(b) channel-security anchor lands on
+    `content/mappings/gdpr/article-32-security-of-processing.yaml`;
+    per-workflow ROPA entry at
+    `content/mappings/gdpr/data-flow-cra_cvd.md`. NIS2 Art. 23 and
+    GDPR Art. 33 overlaps are recorded as audited exclusions in the
+    respective `_orphan_skip.yaml` files (the parallel-notification
+    chains belong to `incident_management` / a GDPR-scoped breach
+    playbook).
+  - Cookbook entry `docs/cookbook/cra_cvd.md` walks an operator
+    through the CVD lifecycle end-to-end against a compiled example
+    (n8n / Temporal / LangGraph), including the prerequisites the
+    operator wires (SMTP endpoint handle, CSIRT endpoint handle,
+    advisory-publishing hook), the step-by-step operator playbook,
+    the evidence-record shape (CSAF 2.0 envelope, acknowledgement
+    envelope, per-step OCSF records), and the sovereign-stack note
+    on operator-supplied endpoints.
+- **Sovereign-stack constraints:** CACAO v2 content only, no
+  proprietary schema. CRA Article 14 is the regulatory anchor. No
+  hardcoded SMTP / CSIRT / advisory-publishing endpoint — the
+  operator wires each at the compile-target config layer. CSAF 2.0
+  is the machine-readable advisory shape.
+- **Depends on:** F-WF-01 (vulnerability triage — shared operator-
+  side vulnerability-management surface anchored on OSCAL RA-5),
+  F-WF-07 (codebase vulnerability management — adjacent
+  outbound-scan leg of the shared vulnerability discipline).
+- **Source:** Cyber Resilience Act (Regulation (EU) 2024/2847)
+  Article 14 §1 (CVD policy obligation) and §6 (acknowledgement-to-
+  reporter obligation); CRA Annex I §2(2) (vulnerability-handling
+  requirements) and §2(5) (CVD policy with single point of contact);
+  CSAF 2.0 (Common Security Advisory Framework, OASIS); ISO/IEC
+  29147:2018 (vulnerability disclosure guidance); RFC 9116
+  (`security.txt`).
+- **Shipped via:**
+  - SKELETON — #591 / #592 (CACAO v2 scaffold + outbound overlay +
+    cookbook narrative + regulatory-anchor sidebar).
+  - CORE-A — #595 / #596 (D3-IRA + IR-6/SI-2 + Art.14§6
+    acknowledgement-SLA KPI wiring + three-target compiled examples).
+  - CORE-B-PRIM — #741 (three primitives at
+    `content/playbooks/cra_cvd/primitives/` + `core_body` bindings on
+    `ack_to_reporter` and `publish_advisory`).
+  - CORE-B-EXAMPLES — #743 (three-target examples/goldens regenerated
+    from the CORE-B-PRIM source + cookbook status flipped to CORE +
+    GDPR data-flow ROPA entry lifted to CORE).
+  - EXTEND — PR #<this> (operator-facing cookbook walkthrough:
+    prerequisites, step-by-step, worked example, evidence-record
+    shape, sovereign-stack note; ROADMAP `Shipped` flip).
+
+---
+
 ## Epic PT — Pattern Library
 
 Reusable graph fragments and Pydantic types shared across cookbook
