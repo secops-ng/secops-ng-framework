@@ -600,7 +600,7 @@ named operator use-case. Each cookbook workflow lives under
 
 ### F-WF-VULN-MGMT — Vulnerability and patch management
 
-- **Status:** SKELETON
+- **Status:** Shipped
 - **Priority:** P1
 - **Goal:** G-01 (≥25 canonical CACAO v2 playbooks by Q4 2026 —
   vulnerability management closes a top-5 NIS2 Art. 21(2) control-
