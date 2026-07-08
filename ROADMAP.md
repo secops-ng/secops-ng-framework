@@ -588,10 +588,13 @@ named operator use-case. Each cookbook workflow lives under
   - CORE-FANOUT-LANGGRAPH — #422 (LangGraph node adapter + worked
     example under `examples/langgraph/supply_chain_security/`
     closing the three-target byte-parity ring).
-- EXTEND-mappings (OSCAL / D3FEND / OCSF / NIS2 / DORA / CRA inbound
-  + outbound regulatory closure) and EXTEND-metrics
-  (supplier-attestation-staleness KRI and supply-chain-coverage KPI
-  pinning) fan out into sibling cards tracked separately.
+- EXTEND-mappings (OSCAL / D3FEND / OCSF outbound closure on the
+  supply_chain_security overlay, NIS2 / DORA / CRA inbound already
+  landed via #431 / #438 / #440) and EXTEND-metrics
+  (`kri.supplier_attestation_staleness@v1` and
+  `kpi.supply_chain_coverage@v1` catalog entries pinning the emit
+  step of the runtime supply-chain signal spine) shipped in the
+  supply-chain EXTEND card.
 
 ---
 

@@ -1,0 +1,139 @@
+stable_id: kri.supplier_attestation_staleness@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Supplier-attestation staleness — count of direct suppliers whose most-recent attestation exceeds the operator's documented cadence threshold
+summary: >
+  Residual-exposure indicator derived from the supply_chain_security
+  playbook per-execution supply-chain-evidence stream. For each direct
+  supplier in the operator's declared supplier register, the indicator
+  asks whether the most-recent attestation observed on the
+  supply-chain-evidence record set is older than the operator's
+  documented staleness threshold (community-recommended default:
+  90 days). Rising values indicate the NIS2 Art. 21(2)(d) periodic
+  re-attestation surface is drifting out of date — the failure mode
+  reviewers surface against the direct-supplier security-
+  characteristics obligation.
+
+unit: count
+direction: lower_is_better
+
+target:
+  value: 0
+  comparator: "=="
+  rationale: >
+    Community-recommended starting point for the unscoped baseline. A
+    well-disciplined supply-chain-security practice keeps every direct
+    supplier's attestation record inside the documented staleness
+    window; the unscoped baseline target is zero stale suppliers.
+    Operators under scoped programmes set a non-zero tolerance with
+    documented rationale in their scoped variants (e.g. a measured
+    allowance for suppliers newly onboarded whose first attestation
+    has not yet been received).
+
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 0
+    severity: warn
+  - name: breach
+    comparator: ">"
+    value: 3
+    severity: high
+  - name: critical
+    comparator: ">"
+    value: 10
+    severity: critical
+
+measurement:
+  source: workflow
+  aggregation: max
+  formula: >
+    For each direct supplier in the operator's declared supplier
+    register, resolve the most-recent supply-chain-evidence artifact
+    emitted by the supply_chain_security playbook emit step
+    (action--5c5c5c5c-0000-4000-8000-000000000003) whose
+    `affected_supplier_handle` matches the supplier. The supplier
+    counts as stale if the record's `captured_at` timestamp is older
+    than the operator's documented staleness threshold (unscoped
+    baseline: 90 days) OR no supply-chain-evidence record is on file
+    for that supplier at all. Aggregate across the window with `max`
+    so a brief clean interval does not hide a persistent stale
+    supplier: operators read the worst-case observation, then drill
+    down to the contributing supplier via the evidence store.
+    Reference visualisation: a count-headline gauge with warn /
+    breach / critical band overlays over a per-supplier attestation-
+    age drill-down; the committed reference rendering lives at
+    `content/metrics/supplier_attestation_staleness.viz.md` — that
+    file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: affected_supplier_handle
+      description: >
+        Canonical direct-supplier handle emitted by the
+        assess-supplier-signal step on the closed assessment block
+        (schemas/evidence/supply-chain.schema.json, stream:
+        `supply-chain`). The catalog entry binds to that evidence
+        artifact field, not to a vendor-specific supplier-registry
+        API. Upstream OCSF source data shape: the API Activity
+        (class_uid 6003) observation carried by the emit step at
+        write-time to the evidence sink; the affected supplier
+        handle is the identity axis the staleness calculation keys
+        against.
+      playbook_ref: playbook.supply_chain_security@v1
+      playbook_step: action--5c5c5c5c-0000-4000-8000-000000000003
+      field: assessment.affected_supplier_handle
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+    - name: captured_at
+      description: >
+        Publish timestamp on the per-execution supply-chain-evidence
+        record; the ISO-8601 instant fixed by the emit step's
+        deterministic primitive
+        (artifact.build_supply_chain_evidence_artifact). Carried on
+        the same evidence artifact. The staleness calculation
+        subtracts this value from the evaluation-window right edge
+        and compares against the operator's documented threshold.
+        Upstream OCSF source data shape: the `time` field on the
+        API Activity (class_uid 6003) observation the emit step
+        writes at attestation publication.
+      playbook_ref: playbook.supply_chain_security@v1
+      playbook_step: action--5c5c5c5c-0000-4000-8000-000000000003
+      field: captured_at
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+  window:
+    duration: P90D
+    sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.api_activity@v1
+
+playbook_refs:
+  - playbook_id: playbook.supply_chain_security@v1
+    step_id: action--5c5c5c5c-0000-4000-8000-000000000003
+
+external_refs:
+  - name: NIS2 — Article 21(2)(d) supply-chain security
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(d)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 28 register of information for ICT third-party service providers
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 28
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: CRA — Article 13(4) component due diligence
+    source: EU
+    external_id: Regulation (EU) 2024/2847, Art. 13(4)
+    url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+  - name: NIST SP 800-53 Rev. 5 — SR-6 Supplier Assessments and Reviews
+    source: NIST
+    external_id: NIST SP 800-53 Rev. 5 SR-6
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SR-6
+  - name: ENISA — Good practices for supply-chain security
+    source: ENISA
+    url: https://www.enisa.europa.eu/topics/risk-management
+
+maintainer: metrics-wg@secops-ng.org
+
+foundation_property:
+  - auditability
+  - operability

@@ -1,32 +1,164 @@
 # Outbound playbook-mappings overlay for supply_chain_security.
 #
 # Per the schema's `additionalProperties: false`, all six structural
-# keys must be present; empty arrays mark surfaces whose closure is
-# delegated to sibling EXTEND-mappings cards per the ROADMAP fan-out
-# (one standard at a time). The NIS2 Art. 21(2)(d) closure landed
-# in this overlay alongside the matching addition of
-# playbook.supply_chain_security@v1 to the inbound playbook_refs at
-# content/mappings/nis2/article-21-2-d.yaml. The DORA Art. 28
-# (third-party register) closure landed alongside the matching
-# addition of playbook.supply_chain_security@v1 to the inbound
-# playbook_refs at content/mappings/dora/article-19-and-28.yaml
-# (id dora:art-28-third-party-register). The CRA Art. 13(4)
-# (component due-diligence, supplier-attestation channel)
-# closure landed alongside the matching addition of
-# playbook.supply_chain_security@v1 to the inbound playbook_refs
-# at content/mappings/cra/article-13-4-component-due-diligence-contracts.yaml
-# (id cra:art-13-4-component-due-diligence-contracts). OSCAL,
-# D3FEND, and OCSF closures remain delegated to their own
-# sibling cards.
+# keys must be present. The NIS2 Art. 21(2)(d), DORA Art. 28
+# (third-party register), and CRA Art. 13(4) (component due-diligence,
+# supplier-attestation channel) closures landed alongside the matching
+# inbound backlinks at
+# content/mappings/nis2/article-21-2-d.yaml,
+# content/mappings/dora/article-19-and-28.yaml
+# (id dora:art-28-third-party-register), and
+# content/mappings/cra/article-13-4-component-due-diligence-contracts.yaml
+# (id cra:art-13-4-component-due-diligence-contracts).
+#
+# EXTEND-mappings closure (this card):
+#   - OSCAL: SR-3 (Supply Chain Controls and Processes) and SR-6
+#     (Supplier Assessments and Reviews) anchor the two playbook
+#     steps end-to-end. The dora_tpr_management overlay pins the
+#     same two anchors on the DORA Chapter V contract-lifecycle
+#     axis; here they are narrowed to the runtime supply-chain
+#     signal spine.
+#   - D3FEND: per-step atoms — D3-SBV (Software Bill of Materials
+#     Verification) on assess-supplier-signal, D3-OAM (Operational
+#     Activity Mapping) on emit-supply-chain-evidence. Cross-lifted
+#     with the dora_tpr_management deliberate-omissions block's
+#     D3-OAM candidacy note for the operational-activity slice.
+#   - OCSF: API Activity (uid 6003) binds the emit-supply-chain-
+#     evidence step's write call publishing the per-execution
+#     supply-chain-evidence record to the operator's evidence sink.
+#     Direction is emits: the assess-supplier-signal step's reads
+#     against operator signal feeds and supplier-attestation stores
+#     are declared on sibling metric catalog entries rather than as
+#     a second OCSF binding here (the emit step is the one write
+#     surface this playbook owns).
 #
 # Schema: schemas/playbook-mappings.schema.json
 playbook: playbook.supply_chain_security@v1
 
-oscal: []
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the two-step runtime
+  # supply-chain signal spine. SR-3 and SR-6 anchor the whole spine;
+  # narrower per-step control lifts (e.g. SR-11 Component Authenticity
+  # against the SBOM-correlation slice, RA-3 against the risk
+  # classification slice) are deferred to a follow-on card once the
+  # scoped variants stabilise. Sibling coverage: the
+  # dora_tpr_management overlay pins the same two anchors on the
+  # DORA Chapter V contract-lifecycle spine.
+  - id: control.supplier_inventory@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SR-3
+    title: Supply Chain Controls and Processes
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SR-3
+    notes: >-
+      Anchors the playbook end-to-end as the supply-chain controls-
+      and-processes capability. SR-3 requires the organization to
+      establish a process for identifying and addressing weaknesses
+      or deficiencies in the supply chain elements and processes,
+      and to document supply-chain processes. The runtime supply-
+      chain signal spine composes the assess-supplier-signal step
+      (classify a raw supplier signal against the operator's
+      declared attestation and criticality posture) with the
+      emit-supply-chain-evidence step (write the per-execution
+      supply-chain-evidence record to the operator's evidence
+      sink); the SR-3 anchor carries onto both steps. Convention
+      follows the dora_tpr_management overlay pin on the same
+      control; per-step primitive bodies live under
+      content/playbooks/supply_chain_security/primitives/.
+  - id: control.provider_attestation@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SR-6
+    title: Supplier Assessments and Reviews
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SR-6
+    notes: >-
+      Covers the assess-supplier-signal step: SR-6 demands the
+      organization assess and review the supply-chain-related risks
+      associated with suppliers or contractors and the systems,
+      system components, or system services they provide. The
+      assess-supplier-signal step is the runtime per-signal
+      assessment slice of that discipline — it joins a raw supplier
+      signal against the operator's declared attestation record
+      set and criticality posture, produces the closed assessment
+      block (verdict / signal_class / affected_supplier_handle /
+      affected_component_set) and hands off to the emit step for
+      the durable evidence record. The provider_attestation anchor
+      is also carried by playbook.contractual_obligations_tracker@v1
+      (contract-time obligation channel) and by
+      playbook.dora_tpr_management@v1 (DORA Chapter V lifecycle);
+      here it is narrowed to the runtime NIS2 Art. 21(2)(d) supply-
+      chain signal spine.
 
-d3fend: []
+d3fend:
+  # Per-step MITRE D3FEND defensive-technique bindings. The two-step
+  # topology pins one atom per step: D3-SBV on the assess slice
+  # (SBOM/attestation verification against a raw supplier signal),
+  # D3-OAM on the emit slice (operational-activity mapping of the
+  # per-execution supply-chain-evidence write against the operator's
+  # evidence sink). Narrower supply-chain atoms (e.g. software-
+  # provenance or dependency-graph analysis techniques) are deferred
+  # to a follow-on card once the D3FEND taxonomy stabilises on
+  # SBOM-specific atoms suited to a runtime signal spine rather than
+  # a governance-time provenance review.
+  - step: action--5c5c5c5c-0000-4000-8000-000000000002
+    d3fend_id: D3-SBV
+    d3fend_name: Software Bill of Materials Verification
+    url: https://d3fend.mitre.org/technique/d3f:SoftwareBillOfMaterialsVerification/
+    notes: >-
+      The assess-supplier-signal step joins a raw supplier signal
+      against the operator's declared supplier-attestation record
+      set and criticality posture; the SBOM Verification atom is
+      the closest D3FEND defensive-technique match for the
+      attestation-verification slice on that join. The step's
+      deterministic primitive
+      (assess.assess_supplier_signal) is where the atom's
+      verification discipline is discharged: canonicalised supplier
+      handle → attestation lookup → closed verdict on the raw
+      signal.
+  - step: action--5c5c5c5c-0000-4000-8000-000000000003
+    d3fend_id: D3-OAM
+    d3fend_name: Operational Activity Mapping
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    notes: >-
+      The emit-supply-chain-evidence step's write of the per-
+      execution supply-chain-evidence record to the operator's
+      evidence sink is the operational-activity-mapping slice of
+      the runtime supply-chain signal spine: it records what
+      supplier signal the assess step classified, against which
+      operator-declared attestation record set, and with what
+      closed verdict, so a reviewer can reconstruct the runtime
+      supply-chain disposition from the emitted artifact set. The
+      step's deterministic primitive
+      (artifact.build_supply_chain_evidence_artifact) is where the
+      atom's activity-mapping discipline is discharged: canonical
+      artifact_id derivation → closed regulation_refs / control_refs
+      pins → sink write.
 
-ocsf: []
+ocsf:
+  # OCSF v1.3.0 telemetry binding on the emit step's write surface.
+  # The assess-supplier-signal step's reads against operator signal
+  # feeds and supplier-attestation stores are named on sibling
+  # metric catalog entries (kri.supplier_attestation_staleness@v1
+  # and kpi.supply_chain_coverage@v1) rather than as a second OCSF
+  # binding here; the emit step is the one write surface this
+  # playbook owns and the API-Activity binding pins that surface.
+  - id: telemetry.ocsf.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted at the emit-supply-chain-evidence step
+      (action--5c5c5c5c-0000-4000-8000-000000000003): the write
+      call publishing the per-execution supply-chain-evidence
+      record to the operator's evidence sink is the API-Activity
+      observation. The record itself is emitted against
+      schemas/evidence/supply-chain.schema.json (stream:
+      supply-chain); the OCSF binding here is the telemetry-shape
+      pin for the write call, not the evidence-record schema.
+      Convention follows the dora_tpr_management overlay's
+      API-Activity binding on the register_entry step.
+      Schema: https://schema.ocsf.io/1.3.0/classes/api_activity
 
 nis2:
   # Inbound entry backlinks playbook.supply_chain_security@v1:
