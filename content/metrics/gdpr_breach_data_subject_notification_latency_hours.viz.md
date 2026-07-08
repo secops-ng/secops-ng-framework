@@ -120,6 +120,20 @@ The latency samples that drive the max headline are
 `notification_dispatch.time - awareness_timestamp.start_time`
 converted to hours.
 
+## Playbook linkage
+
+The dispatch-latency observations this chart plots originate from the
+regulator-notification chain step declared on the sibling
+`gdpr_breach_data_subject_notification_latency_hours.yaml` in `playbook_refs`:
+
+- `playbook.data_exfil@v1` step `action--20000000-0000-4000-8000-000000000008` — the affected-data-subject (GDPR Art. 34(1) without-undue-delay) notification-gate step of the data-exfiltration containment chain.
+
+Compile targets render that playbook-step boundary as the terminal
+transition of the statutory clock this KRI reads; this reference
+visualisation shows where dispatches fall against that boundary. The
+catalog entry's `playbook_refs` is the source of truth for the link
+direction — this visualisation surface only labels it.
+
 ## Operator override
 
 Operators are expected to render this metric in their own dashboard

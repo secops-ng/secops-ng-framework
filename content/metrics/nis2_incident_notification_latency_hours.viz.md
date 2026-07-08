@@ -113,6 +113,20 @@ The latency samples that drive the max headline are
 `notification_dispatch.time - awareness_timestamp.start_time`
 converted to hours.
 
+## Playbook linkage
+
+The dispatch-latency observations this chart plots originate from the
+regulator-notification chain step declared on the sibling
+`nis2_incident_notification_latency_hours.yaml` in `playbook_refs`:
+
+- `playbook.incident_management@v1` step `action--50000000-0000-4000-8000-000000000007` — the NIS2 Art. 23(4)(b) 72-hour incident-notification dispatch step (co-anchored with the DORA Art. 19(4)(b) intermediate report) of the dual-mandate incident-management chain.
+
+Compile targets render that playbook-step boundary as the terminal
+transition of the statutory clock this KRI reads; this reference
+visualisation shows where dispatches fall against that boundary. The
+catalog entry's `playbook_refs` is the source of truth for the link
+direction — this visualisation surface only labels it.
+
 ## Operator override
 
 Operators are expected to render this metric in their own dashboard

@@ -112,6 +112,20 @@ The latency samples that drive the max headline are
 `notification_dispatch.time - resolution_timestamp.start_time`
 converted to days.
 
+## Playbook linkage
+
+The dispatch-latency observations this chart plots originate from the
+regulator-notification chain step declared on the sibling
+`dora_incident_final_report_latency_days.yaml` in `playbook_refs`:
+
+- `playbook.incident_management@v1` step `action--50000000-0000-4000-8000-000000000009` — the DORA Art. 19(4)(c) final-report dispatch step (co-anchored with the NIS2 Art. 23 one-month final report) of the dual-mandate incident-management chain.
+
+Compile targets render that playbook-step boundary as the terminal
+transition of the statutory clock this KRI reads; this reference
+visualisation shows where dispatches fall against that boundary. The
+catalog entry's `playbook_refs` is the source of truth for the link
+direction — this visualisation surface only labels it.
+
 ## Operator override
 
 Operators are expected to render this metric in their own dashboard

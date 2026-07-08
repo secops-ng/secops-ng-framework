@@ -118,6 +118,39 @@ directions.
 | `kri.rto_overrun_exposure_count@v1`                      | kri | count | lower_is_better  | NIS2 Art. 21(2)(e); DORA Art. 8              | —                                                                |
 | `kri.continuity_test_overdue@v1`                         | kri | count | lower_is_better  | NIS2 Art. 21(2)(e); DORA Art. 8; DORA Art. 11(6) | —                                                            |
 
+### Statutory-clock latency KRIs — playbook back-refs
+
+The nine statutory-clock latency KRIs (DORA Art. 19 triad, NIS2 Art. 23
+triad, GDPR Art. 33/34 triad) shipped in EXTEND-2 sit as `—` in the
+`mapping back-refs` column above because they read directly against the
+regulator-notification steps of their shipped playbooks rather than
+through a `content/mappings/{nis2,dora}/` `metric_refs:` slot. Their
+playbook back-references are declared on the per-entry YAML
+`playbook_refs:` and cross-referenced here so the cross-check is
+visible on the catalog surface:
+
+| stable_id                                                        | playbook_refs                                              |
+|------------------------------------------------------------------|------------------------------------------------------------|
+| `kri.dora_incident_initial_report_latency_hours@v1`              | `playbook.incident_management@v1` step `…000006` — DORA Art. 19(4)(a) initial-notification dispatch (co-anchored with the NIS2 Art. 23 24h early warning) |
+| `kri.dora_incident_intermediate_report_latency_hours@v1`         | `playbook.incident_management@v1` step `…000007` — DORA Art. 19(4)(b) intermediate-report dispatch (co-anchored with the NIS2 Art. 23 72h notification) |
+| `kri.dora_incident_final_report_latency_days@v1`                 | `playbook.incident_management@v1` step `…000009` — DORA Art. 19(4)(c) final-report dispatch (co-anchored with the NIS2 Art. 23 one-month final report) |
+| `kri.nis2_incident_early_warning_latency_hours@v1`               | `playbook.incident_management@v1` step `…000006` — NIS2 Art. 23(4)(a) 24-hour early-warning dispatch |
+| `kri.nis2_incident_notification_latency_hours@v1`                | `playbook.incident_management@v1` step `…000007` — NIS2 Art. 23(4)(b) 72-hour incident-notification dispatch |
+| `kri.nis2_incident_final_report_latency_days@v1`                 | `playbook.incident_management@v1` step `…000009` — NIS2 Art. 23(4)(d) one-month final-report dispatch |
+| `kri.gdpr_breach_supervisory_authority_notification_latency_hours@v1` | `playbook.data_exfil@v1` step `…000007` — GDPR Art. 33(1) supervisory-authority notification gate |
+| `kri.gdpr_breach_data_subject_notification_latency_hours@v1`     | `playbook.data_exfil@v1` step `…000008` — GDPR Art. 34(1) affected-data-subject notification gate |
+| `kri.gdpr_breach_dpa_escalation_latency_days@v1`                 | `playbook.data_exfil@v1` step `…000007` — GDPR Art. 33(5) documentation-duty trail on the supervisory-authority notification gate |
+
+The step ids above are abbreviated to their last six hex digits for
+readability; the full `action--<uuid>` values are on each entry's
+`playbook_refs[0].step_id`. The dual-mandate incident-management chain
+carries DORA and NIS2 anchors on the same dispatch steps by design
+(one operator process serving both regulators). The GDPR triad rides
+the data-exfiltration containment chain's notification-gate steps
+because breach-notification timelines are governed by the affected-
+subject / regulator gate on the exfil chain, not by the account-
+takeover containment path.
+
 DORA-side anchors on the unscoped detect-pillar baselines (MTTD,
 detection coverage, FP rate) are intentionally absent because the
 DORA Art. 19 clocks start at classification-as-major, not at first
