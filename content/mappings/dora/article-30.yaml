@@ -1,0 +1,64 @@
+# DORA — Article 30, Chapter V (ICT third-party risk management —
+# contractual clauses).
+# Companion to article-19-and-28.yaml (Chapter V register of information
+# and contract-lifecycle anchor atoms). Split out into a dedicated file
+# because the Art. 30 obligation surface (the closed clause set of
+# Art. 30(2)/(3) that every contractual arrangement with an ICT third-
+# party service provider supporting a critical or important function
+# must include) is authored by a distinct pair of playbooks — the
+# contract-time obligation-evidence tracker
+# (`playbook.contractual_obligations_tracker@v1`) and the DORA Chapter V
+# contract-lifecycle spine (`playbook.dora_tpr_management@v1`) — and
+# lifting the entry into its own file lets both outbound overlays pin a
+# stable inbound file location. Out of scope for this file: Art. 28
+# register-of-information composition and periodic-review cadence
+# (article-19-and-28.yaml), Art. 29 entity-level ICT concentration-risk
+# assessment (deferred to a sibling file authored once the whole-
+# portfolio scope is written), Art. 31–44 Union oversight regime for
+# critical ICT third-party service providers (out of operator-side
+# scope).
+regime: dora
+entries:
+  - id: dora:art-30-contractual-clauses
+    regulation:
+      name: DORA
+      instrument: Regulation (EU) 2022/2554
+      celex: 32022R2554
+      article: "30(2)"
+      url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+    obligation: >-
+      Ensure that contractual arrangements with ICT third-party service
+      providers include the elements specified in Article 30(2) and (3)
+      — including service description, data-processing locations,
+      exit-strategy obligations, audit rights, and termination rights.
+    status: draft
+    control_refs:
+      - control.provider_attestation@v1
+    playbook_refs:
+      - playbook.contractual_obligations_tracker@v1
+      - playbook.dora_tpr_management@v1
+    metric_refs: []
+    notes: >-
+      Article 30(2) sets the mandatory contractual clauses for every
+      ICT third-party arrangement; Article 30(3) extends the closed
+      clause set for arrangements supporting critical or important
+      functions (sub-contracting conditions, audit-and-inspection
+      rights against sub-outsourcers, dated exit-strategy obligations,
+      participation in threat-led penetration testing where
+      applicable). Two playbooks compose against this obligation
+      surface. `playbook.contractual_obligations_tracker@v1` is the
+      contract-time obligation-evidence stream: per-supplier accepted
+      obligations, per-clause review cadence, and periodic re-
+      attestation that the provider continues to meet the declared
+      clauses (provider_attestation pattern).
+      `playbook.dora_tpr_management@v1` is the DORA Chapter V
+      contract-lifecycle spine; its contractual_provisions_check step
+      is the deterministic per-clause presence/consistency check
+      against the negotiated contract instance ahead of the Article
+      28 register-of-information entry, and its periodic_review step
+      re-runs the same clause-presence check on the review cadence.
+      control_refs are not extended here: both playbooks declare
+      `control.provider_attestation@v1` already; additional control
+      lifts (audit-rights coverage, sub-outsourcing clause coverage)
+      are deferred to follow-on cards once the per-clause primitive
+      set is fully authored on the CORE-PRIM sibling.

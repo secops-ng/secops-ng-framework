@@ -111,3 +111,30 @@ skip:
       (for example a shared attestation surface across
       financial-entity operators subject to both regimes).
 
+  - slug: dora_tpr_management
+    rationale: >-
+      DORA Chapter V ICT third-party risk management contract-lifecycle
+      spine (onboarding pre-contractual risk assessment under
+      Art. 28(4) → Art. 30(2)/(3) clause-presence check → Art. 28
+      register-of-information entry → periodic review with runtime
+      supply-chain-evidence drift join → Art. 28(8) exit-strategy
+      attestation). The playbook's outbound overlay
+      (`content/playbooks/dora_tpr_management/mappings.yaml`)
+      deliberately does not pin NIS2 entries: NIS2 Article 21(2)(d)
+      supply-chain security is discharged by
+      `playbook.supply_chain_security@v1` as the runtime supply-
+      chain-signal spine, and cross-pinning this DORA financial-
+      entity-specific ICT third-party governance lifecycle onto
+      NIS2 Art. 21(2)(d) would misrepresent the obligation surface
+      (Chapter V DORA is a distinct financial-entity contract-
+      lifecycle discipline that does not have a same-shape NIS2
+      equivalent). The DORA inbound graph is closed via
+      `content/mappings/dora/article-19-and-28.yaml`
+      (`dora:art-28-third-party-register`) and
+      `content/mappings/dora/article-30.yaml`
+      (`dora:art-30-contractual-clauses`). A sibling CORE / EXTEND
+      card revisits the NIS2 cross-regime graph if a documented
+      interaction is authored (for example a shared supply-chain-
+      evidence attestation surface across financial-entity operators
+      subject to both regimes). Mirrors the dora_ict_risk_selfassess
+      NIS2-axis precedent.
