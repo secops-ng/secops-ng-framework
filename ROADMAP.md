@@ -598,6 +598,47 @@ named operator use-case. Each cookbook workflow lives under
 
 ---
 
+### F-WF-VULN-MGMT — Vulnerability and patch management
+
+- **Status:** SKELETON
+- **Priority:** P1
+- **Goal:** G-01 (≥25 canonical CACAO v2 playbooks by Q4 2026 —
+  vulnerability management closes a top-5 NIS2 Art. 21(2) control-
+  family bar); G-02 (100% mapping coverage by Q3 2026 — the inbound
+  anchor at `content/mappings/nis2/article-21-2-e.yaml` lands with
+  the sibling EXTEND card so the outbound edge pinned in the
+  playbook overlay closes the regulatory graph on the NIS2 axis).
+- **Acceptance criteria (SKELETON):**
+  - `content/playbooks/vulnerability_management/` carries the CACAO
+    v2 scaffold (`playbook.vulnerability_management@v1`) with five
+    action steps covering the discovery-to-audit lifecycle
+    (`trigger_vulnerability_scan`, `triage_severity`,
+    `decide_remediation`, `verify_remediation`,
+    `emit_audit_evidence`) plus the outbound mappings overlay
+    (`mappings.yaml`) pinning the NIS2 Art. 21(2)(e) anchor and the
+    OSCAL RA-5 / SI-2 control + OCSF Vulnerability Finding /
+    Compliance Finding surface.
+  - Schema-validity test at
+    `tests/content/test_vulnerability_management_playbook_schema.py`
+    pins the CACAO artifact against `content-model/playbook.schema.json`,
+    the mappings overlay against
+    `schemas/playbook-mappings.schema.json`, and asserts the
+    workflow-shape and primary NIS2 anchor.
+- **Sovereign-stack constraints:** Operator-supplied scan surface
+  (network / host / container / cloud-config scanner adapter),
+  advisory-feed source (CVSS / EPSS / exploit-status enrichment),
+  and evidence sink; no hosted vulnerability-management SaaS
+  dependency, no default vendor SDK bundled. The scan adapter, the
+  triage-signal source, and the evidence-record destination are
+  operator-configured; the framework ships no default endpoint.
+- **Depends on:** —
+- **Source:** NIS2 Art. 21(2)(e). Overlaps CRA Art. 13(4)–13(5)
+  (product vulnerability handling and security-updates
+  distribution) and DORA Art. 25 (ICT vulnerability management);
+  the EXTEND card closes the CRA / DORA overlap graph.
+
+---
+
 ### F-WF-ASSET — Asset and configuration management
 
 - **Status:** Shipped
