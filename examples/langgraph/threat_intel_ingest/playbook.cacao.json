@@ -3,7 +3,7 @@
   "spec_version": "2.0",
   "id": "playbook--7c1e2b3a-4d5f-4a8b-9c0d-1e2f3a4b5c6d",
   "name": "Threat intelligence ingest",
-  "description": "Portable response for ingesting external cyber threat intelligence. Pulls an upstream feed (STIX 2.1 / TAXII or OCSF Threat Intelligence), normalises indicators against the OCSF Threat Intelligence Inference event class, and propagates the result to detection (Sigma rule activation in the operator's SIEM) and blocking (perimeter / DNS / EDR blocklist) controls. CACAO v2 portable artifact; runtime is the operator's choice — n8n, Temporal, or LangGraph.",
+  "description": "Portable response for ingesting external cyber threat intelligence. Pulls an upstream STIX 2.1 / TAXII feed, normalises indicators into a canonical record (cross-references in mappings.yaml; the released OCSF v1.3.0 catalogue has no dedicated threat-intel ingest class), and propagates the result to detection (Sigma rule activation in the operator's SIEM, emitting OCSF Detection Finding class_uid 2004 on match) and blocking (perimeter / DNS / EDR blocklist) controls. CACAO v2 portable artifact; runtime is the operator's choice — n8n, Temporal, or LangGraph.",
   "playbook_types": [
     "detection",
     "prevention",
@@ -67,9 +67,7 @@
         "control_refs": [
           "control.threat_intel.feed_ingest@v1"
         ],
-        "telemetry_refs": [
-          "telemetry.ocsf.threat_intelligence_inference@v1"
-        ],
+        "telemetry_refs": [],
         "metric_refs": [
           "kpi.coverage_threat_intel_feed@v1"
         ]
@@ -78,7 +76,7 @@
     "action--10000000-0000-4000-8000-000000000003": {
       "type": "action",
       "name": "normalise STIX to OCSF",
-      "description": "Map STIX 2.1 SDOs (Indicator, Malware, Threat-Actor) to the OCSF Threat Intelligence Inference event class. Persist normalised records keyed by indicator value; deduplicate against records seen within the last 24 hours.",
+      "description": "Map STIX 2.1 SDOs (Indicator, Malware, Threat-Actor) into the playbook's canonical normalised-indicator record. The released OCSF v1.3.0 catalogue does not contain a dedicated threat-intel ingest event class, so no OCSF class is asserted here on the consumed side (see mappings.yaml — ocsf section). Persist normalised records keyed by indicator value; deduplicate against records seen within the last 24 hours.",
       "on_completion": "if-condition--10000000-0000-4000-8000-000000000004",
       "out_args": [
         "__indicator_count__",
@@ -88,9 +86,7 @@
         "control_refs": [
           "control.threat_intel.normalisation@v1"
         ],
-        "telemetry_refs": [
-          "telemetry.ocsf.threat_intelligence_inference@v1"
-        ]
+        "telemetry_refs": []
       }
     },
     "if-condition--10000000-0000-4000-8000-000000000004": {
@@ -113,7 +109,7 @@
           "control.blocklist.propagation@v1"
         ],
         "telemetry_refs": [
-          "telemetry.ocsf.security_finding@v1"
+          "telemetry.ocsf.detection_finding@v1"
         ],
         "metric_refs": [
           "kpi.mttr_blocklist_propagation@v1"
@@ -130,7 +126,7 @@
           "control.detection.sigma_deployment@v1"
         ],
         "telemetry_refs": [
-          "telemetry.ocsf.security_finding@v1"
+          "telemetry.ocsf.detection_finding@v1"
         ],
         "metric_refs": [
           "kpi.mttd_threat_intel_indicator@v1"
@@ -158,8 +154,7 @@
       "control.detection.sigma_deployment@v1"
     ],
     "telemetry_refs": [
-      "telemetry.ocsf.threat_intelligence_inference@v1",
-      "telemetry.ocsf.security_finding@v1"
+      "telemetry.ocsf.detection_finding@v1"
     ],
     "metric_refs": [
       "kpi.mttd_threat_intel_indicator@v1",
@@ -167,11 +162,11 @@
       "kpi.coverage_threat_intel_feed@v1"
     ],
     "sources": [
-      "OASIS CACAO v2.0 specification \u2014 workflow step types, variable conventions, x_ extension namespace",
-      "OASIS STIX 2.1 specification \u2014 Indicator, Malware, Threat-Actor SDOs consumed by the normalisation step",
-      "OCSF v1.3 \u2014 Threat Intelligence Inference (5005) and Security Finding (2001) event classes",
-      "SigmaHQ \u2014 upstream rule IDs referenced in the README (rule bodies remain upstream; this repo ships pointers only)",
-      "ENISA \u2014 EU CSIRTs network operational guidance"
+      "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
+      "OASIS STIX 2.1 specification — Indicator, Malware, Threat-Actor SDOs consumed by the normalisation step",
+      "OCSF v1.3.0 — Detection Finding (class_uid 2004) event class emitted on Sigma-rule match; see content/playbooks/threat_intel_ingest/mappings.yaml for the OCSF binding (no dedicated threat-intel ingest class exists in the released catalogue)",
+      "SigmaHQ — upstream rule IDs referenced in the README (rule bodies remain upstream; this repo ships pointers only)",
+      "ENISA — EU CSIRTs network operational guidance"
     ]
   }
 }
