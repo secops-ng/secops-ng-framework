@@ -39,6 +39,7 @@ narrative.
 | `eu_ai_act_risk_management` | [`eu_ai_act_risk_management.md`](eu_ai_act_risk_management.md) | `content/playbooks/eu_ai_act_risk_management/` |
 | `asset_management`    | [`asset_management.md`](asset_management.md)       | `content/playbooks/asset_management/`                 |
 | `agentic_threat_response` | [`agentic_threat_response.md`](agentic_threat_response.md) | `content/playbooks/agentic_threat_response/`     |
+| `vulnerability_management` | [`vulnerability_management.md`](vulnerability_management.md) | `content/playbooks/vulnerability_management/`   |
 
 Additional entries land alongside their content sources as workflows
 flip from In Progress to Shipped on
