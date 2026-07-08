@@ -21,6 +21,8 @@ of each playbook overlay.
 | `cloud_misconfiguration` | `cra:annex-i-1-secure-by-default` |
 | `codebase_vuln_management` | `cra:annex-i-2-codebase-vuln-mgmt` |
 | `contractual_obligations_tracker` | `cra:art-13-4-component-due-diligence-contracts` |
+| `crypto_posture_management` | `cra:annex-i-1-confidentiality`, `cra:annex-i-1-e-confidentiality-crypto-posture` |
+| `cryptographic_controls` | `cra:annex-i-1-e-confidentiality-crypto-lifecycle` |
 | `data_exfil` | `cra:art-14-severe-incident` |
 | `detection_engineering` | `cra:annex-i-1-l-logging-monitoring-detection-engineering` |
 | `executive_metrics` | `cra:art-13-2-3-risk-assessment-metrics` |
