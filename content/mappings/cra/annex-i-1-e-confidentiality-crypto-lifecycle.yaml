@@ -1,0 +1,126 @@
+# CRA — Annex I §1(e) confidentiality — cryptographic-lifecycle lane.
+#
+# Companion to `cra:annex-i-1-e-confidentiality-crypto-posture`
+# (annex-i-1-e-confidentiality-crypto-posture.yaml, read-side
+# posture-attestation lane on crypto_posture_management) and to
+# `cra:annex-i-1-confidentiality` in
+# annex-i-1-essential-cybersecurity.yaml (the §1(e) clause itself).
+#
+# The §1(e) obligation to protect the confidentiality of stored and
+# transmitted data by encrypting it at rest or in transit with
+# state-of-the-art mechanisms decomposes into two operational
+# disciplines against the same cryptographic surface: (i) the
+# read-side posture-attestation lane — continuous evidence that the
+# deployed cryptographic surface matches the declared policy across
+# the support period (pinned on `cra:annex-i-1-e-confidentiality-
+# crypto-posture` → crypto_posture_management), and (ii) the
+# write-side lifecycle lane — controlled generation, rotation, and
+# revocation of keys, controlled issuance, renewal, and revocation
+# of certificates, per-workload enforcement of the at-rest and
+# in-transit floors on data covered by the §1(e) obligation, and a
+# dated cryptographic-controls lifecycle attestation retained as
+# audit evidence. This file pins the write-side lifecycle lane onto
+# the cryptographic_controls playbook, which is the framework's
+# write-side lifecycle materialisation of the same clause the
+# posture lane measures.
+#
+# Read-side vs write-side split rationale. Pinning both lanes on the
+# same clause but on separate mapping-id atoms mirrors the pattern
+# already applied on NIS2 Art. 21(2)(h) (both playbook.crypto_posture_
+# management@v1 and playbook.cryptographic_controls@v1 sit under
+# `nis2:art-21-2-h.playbook_refs`) and on DORA Art. 9(2) (both cited
+# under `dora:art-9-crypto.playbook_refs`). The CRA axis pins them on
+# two separate mapping-id atoms because the §1(e) inbound tree already
+# uses the sibling-atom convention: annex-i-1-e-confidentiality-crypto-
+# posture carries the posture lane, this file carries the lifecycle
+# lane, and the parent umbrella `cra:annex-i-1-confidentiality` in
+# annex-i-1-essential-cybersecurity.yaml carries the clause itself.
+regime: cra
+entries:
+  - id: cra:annex-i-1-e-confidentiality-crypto-lifecycle
+    regulation:
+      name: CRA
+      instrument: Regulation (EU) 2024/2847
+      celex: 32024R2847
+      article: Annex I §1(e)
+      url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+    obligation: >-
+      Products with digital elements shall protect the confidentiality
+      of stored, transmitted or otherwise processed data, personal or
+      other, including by encrypting relevant data at rest or in
+      transit by state-of-the-art mechanisms, and by using other
+      technical means — the cryptographic-lifecycle lane: controlled
+      generation, rotation and revocation of the key material that
+      backs the declared cryptographic policy, controlled issuance,
+      renewal and revocation of the certificates the transport-
+      encryption floor relies on, per-workload enforcement of the
+      at-rest and in-transit floors on data covered by the clause,
+      and a dated cryptographic-controls lifecycle attestation
+      retained as audit evidence that the write-side operations that
+      keep the encryption capability live have actually been
+      performed against the operator's cryptographic surface across
+      the support period.
+    status: draft
+    control_refs:
+      - control.crypto_policy_inventory@v1
+      - control.cert_posture_scan@v1
+      - control.key_rotation_evidence@v1
+    playbook_refs:
+      - playbook.cryptographic_controls@v1
+    metric_refs:
+      - kri.expiring_tls_certs@v1
+      - kri.overdue_key_rotations@v1
+    evidence_stream_refs:
+      - attestations
+    notes: >-
+      Companion to `cra:annex-i-1-e-confidentiality-crypto-posture`
+      (annex-i-1-e-confidentiality-crypto-posture.yaml) — the two
+      entries co-anchor the §1(e) confidentiality clause on
+      complementary lanes. The posture lane pins crypto_posture_
+      management on the read-side posture-attestation surface
+      (per-cycle inventory + certificate-posture probe + rotation
+      check + dated posture attestation); this lifecycle lane pins
+      cryptographic_controls on the write-side lifecycle surface
+      (key generate / rotate / revoke, certificate issue / renew /
+      revoke, per-workload enforcement-gate evaluation, dated
+      lifecycle attestation). The two playbooks operate distinct
+      disciplines against the same cryptographic surface: the posture
+      lane measures what the lifecycle lane produces, and the
+      lifecycle lane produces the key and certificate material the
+      posture lane later attests against. Pinning both lanes under
+      the same §1(e) obligation on separate mapping-id atoms mirrors
+      the sibling-atom convention already used across the CRA §1(e)
+      subtree (see annex-i-1-e-confidentiality-crypto-posture.yaml)
+      and preserves the atom-per-obligation shape reviewers expect.
+
+      The `control_refs:` set on this entry mirrors the sibling
+      `cra:annex-i-1-e-confidentiality-crypto-posture` control set
+      (`control.crypto_policy_inventory@v1`,
+      `control.cert_posture_scan@v1`,
+      `control.key_rotation_evidence@v1`) because the CRA-side
+      control-xref layer anchors the whole §1(e) cryptographic
+      surface on that shared set; the write-side lifecycle-lane
+      OSCAL fan-out (SC-8, SC-12, SC-13, SC-17, SC-28 on the
+      cryptographic_controls playbook overlay) is pinned via the
+      playbook overlay at
+      `content/playbooks/cryptographic_controls/mappings.yaml` and
+      is exercised on the same D3FEND crosswalk (D3-CM Cryptographic
+      Module on the encryption-enforcement gate, D3-SKT Software Key
+      Takeout on the key-lifecycle branch).
+
+      The NIS2 parallel is `nis2:art-21-2-h` (cryptography and
+      encryption policies and procedures — Art. 21(2)(h) already
+      co-anchors both playbooks under `playbook_refs:`; the CRA
+      per-clause atoms split the two lanes onto separate ids).
+      The DORA parallel is `dora:art-9-crypto` (cryptography slice
+      of the Art. 9 protection-and-prevention surface under the JC
+      RTS on ICT risk management framework — Art. 9 already
+      co-anchors both playbooks under `playbook_refs:`). The GDPR
+      parallel is `gdpr:art-32-1-a-encryption` (encryption of
+      personal data — Art. 32(1)(a) already co-anchors both
+      playbooks under `playbook_refs:`). The `kri.expiring_tls_
+      certs@v1` metric trips on certificate-expiry regressions;
+      the `kri.overdue_key_rotations@v1` metric trips on rotation-
+      cadence regressions — both metrics are visible to both lanes
+      because a failure on the lifecycle lane surfaces on the
+      posture lane's next attestation window.

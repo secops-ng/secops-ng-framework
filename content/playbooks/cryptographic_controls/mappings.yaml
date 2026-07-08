@@ -41,16 +41,18 @@
 # includes the key-material and certificate-lifecycle keys the
 # access-control surface relies on), and the umbrella
 # §1 essential-cybersecurity anchor. The sibling
-# crypto_posture_management overlay already pins
+# crypto_posture_management overlay pins
 # cra:annex-i-1-e-confidentiality-crypto-posture on the read-side
-# lane; the write-side lifecycle-lane companion anchor
-# cra:annex-i-1-e-confidentiality-crypto-lifecycle lands in a
-# sibling CRA mapping card (F-WF-CRYPTOMGMT-CRA-EDGE) alongside
-# the inbound entry that pins playbook.cryptographic_controls@v1
-# there. CORE keeps the CRA slot as todo so the read-side and
-# write-side companion anchors ship together and reviewers see the
-# same shape the crypto_posture_management overlay applied on its
-# §1(e) split.
+# posture-attestation lane; this overlay pins the write-side
+# lifecycle-lane companion anchor
+# cra:annex-i-1-e-confidentiality-crypto-lifecycle
+# (content/mappings/cra/annex-i-1-e-confidentiality-crypto-
+# lifecycle.yaml). The two per-clause atoms co-anchor the §1(e)
+# obligation on complementary lanes and mirror the sibling-atom
+# convention the CRA §1(e) subtree already uses. §1(d) access
+# control and the umbrella §1 essential-cybersecurity anchor
+# remain candidate secondary CRA anchors on a later EXTEND card
+# if a reviewer selects them.
 #
 # DORA closure: DORA Art. 9 (protection and prevention) covers the
 # cryptography-and-encryption surface via the JC RTS on ICT risk
@@ -365,29 +367,55 @@ dora:
       overlay pins the periodic-review slice on the read side.
 
 cra:
-  # CORE — CRA outbound edge kept as an explicit todo. The sibling
-  # crypto_posture_management overlay already pins the read-side
-  # posture lane at cra:annex-i-1-e-confidentiality-crypto-posture;
+  # CORE — CRA outbound edge on Annex I §1(e) confidentiality,
+  # write-side cryptographic-lifecycle lane. Companion to the sibling
+  # crypto_posture_management overlay which pins the read-side
+  # posture-attestation lane at
+  # cra:annex-i-1-e-confidentiality-crypto-posture. This overlay pins
   # the write-side lifecycle-lane companion anchor
-  # cra:annex-i-1-e-confidentiality-crypto-lifecycle plus the
-  # matching inbound entry pinning playbook.cryptographic_controls@v1
-  # land together in a sibling CRA mapping card
-  # (F-WF-CRYPTOMGMT-CRA-EDGE) so both anchors ship in one PR against
-  # content/mappings/cra/. Recording the deferral here explicitly so
-  # reviewers see the same shape the read-side overlay used on its
-  # own §1(e) split.
-  - mapping_id: cra:todo-cryptographic-controls-lifecycle
-    todo: true
+  # cra:annex-i-1-e-confidentiality-crypto-lifecycle, landed in
+  # content/mappings/cra/annex-i-1-e-confidentiality-crypto-
+  # lifecycle.yaml. The two per-clause atoms co-anchor the §1(e)
+  # confidentiality obligation on complementary lanes; the umbrella
+  # `cra:annex-i-1-confidentiality` in annex-i-1-essential-
+  # cybersecurity.yaml carries the clause itself and inherits both
+  # agentic anchors via its parent link. §1(d) access control and
+  # the umbrella §1 essential-cybersecurity anchor remain candidate
+  # secondary anchors on a later EXTEND card.
+  - mapping_id: cra:annex-i-1-e-confidentiality-crypto-lifecycle
+    article: Annex I §1(e)
     notes: >-
-      Deferred to sibling CRA mapping card F-WF-CRYPTOMGMT-CRA-EDGE.
-      That card lands the companion anchor
-      cra:annex-i-1-e-confidentiality-crypto-lifecycle (write-side
-      lifecycle lane companion to cra:annex-i-1-e-confidentiality-
-      crypto-posture on the read-side lane) along with the inbound
-      entry that pins playbook.cryptographic_controls@v1 into
-      content/mappings/cra/. §1(d) access control and the umbrella
-      §1 essential-cybersecurity anchor remain candidate secondary
-      anchors on the same CRA card if the reviewer selects them.
+      CRA Annex I §1(e) requires products with digital elements to
+      protect the confidentiality of stored, transmitted or
+      otherwise processed data — personal or other — including by
+      encrypting relevant data at rest or in transit by
+      state-of-the-art mechanisms, and by using other technical
+      means. The §1(e) obligation decomposes into two operational
+      disciplines against the same cryptographic surface: (i) the
+      read-side posture-attestation lane — continuous evidence that
+      the deployed cryptographic surface (TLS endpoints, cipher
+      suites, key-rotation cadence) matches the declared policy
+      across the support period — and (ii) the write-side lifecycle
+      lane — controlled generation, rotation, and revocation of the
+      key material that backs the declared policy, controlled
+      issuance, renewal, and revocation of the certificates the
+      transport-encryption floor relies on, per-workload enforcement
+      of the at-rest and in-transit floors on data covered by the
+      clause, and a dated cryptographic-controls lifecycle
+      attestation retained as audit evidence. This playbook is the
+      write-side lifecycle materialisation: resolve the declared
+      policy, discharge the key-lifecycle branch, evaluate the
+      encryption-enforcement gate against the declared at-rest and
+      in-transit floors on workloads processing §1(e) data,
+      discharge the certificate-lifecycle branch, record the
+      lifecycle attestation, notify the cryptography owner.
+      Co-anchored with the sibling crypto_posture_management
+      playbook which pins the read-side posture-attestation lane on
+      the companion atom
+      `cra:annex-i-1-e-confidentiality-crypto-posture`; the two
+      lanes together discharge the §1(e) obligation on the same
+      cryptographic surface, with the lifecycle lane producing the
+      material the posture lane later attests against.
 
 gdpr:
   # CORE — GDPR outbound edge on Art. 32(1)(a) (encryption of personal
