@@ -168,6 +168,9 @@ VIZ_REQUIRED_STEMS = (
     "service_availability_rate",
     "rto_compliance_rate",
     "service_continuity_test_frequency",
+    # F-WF-SCS EXTEND-metrics — supply_chain_security catalog closeout (G-04)
+    "supplier_attestation_staleness",
+    "supply_chain_coverage",
 )
 
 

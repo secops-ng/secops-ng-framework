@@ -66,16 +66,20 @@ def test_shipped_tree_has_no_unbound_supply_chain_metrics() -> None:
 
 
 def test_real_tree_supply_chain_classification_baseline() -> None:
-    """Baseline anchor: on SKELETON the classifier is expected to find
-    ZERO exclusive-membership supply-chain-security metrics on main.
+    """Baseline anchor for the supply-chain-cluster classifier.
 
-    Every current metric that references
-    ``playbook.supply_chain_security@v1`` also references pipeline /
-    executive-catch-all playbooks, so the exclusivity gate correctly
-    excludes them from the cluster. The moment CORE (or a follow-on
-    content PR) lands an exclusive-membership supply-chain metric,
-    this baseline must be updated to the expected set — treating the
-    silent transition as a bug prevents no-op degradation.
+    F-WF-SCS EXTEND-metrics landed two exclusive-membership metrics
+    that reference only ``playbook.supply_chain_security@v1``:
+
+    * ``kri.supplier_attestation_staleness@v1``
+    * ``kpi.supply_chain_coverage@v1``
+
+    Both carry a ``telemetry.ocsf.api_activity@v1`` binding so the
+    real-tree pass case above still returns zero findings. Any
+    future exclusive-membership metric added to the cluster must be
+    added here explicitly and confirmed to carry a ``telemetry.ocsf.*``
+    ref — treating the silent transition as a bug prevents no-op
+    degradation.
     """
     classified: set[str] = set()
     for path in sorted((REPO_ROOT / "content" / "metrics").glob("*.yaml")):
@@ -91,10 +95,14 @@ def test_real_tree_supply_chain_classification_baseline() -> None:
             sid = doc.get("stable_id")
             if isinstance(sid, str):
                 classified.add(sid)
-    assert classified == set(), (
-        "supply-chain-security-cluster classifier now identifies "
-        f"exclusive-membership metrics on main (classified={sorted(classified)}) "
-        "— update this baseline to the expected set and confirm every "
+    expected = {
+        "kri.supplier_attestation_staleness@v1",
+        "kpi.supply_chain_coverage@v1",
+    }
+    assert classified == expected, (
+        "supply-chain-security-cluster classifier drift: "
+        f"classified={sorted(classified)} expected={sorted(expected)}. "
+        "Update this baseline to the expected set and confirm every "
         "listed metric carries a telemetry.ocsf.* binding."
     )
 
