@@ -239,3 +239,33 @@ skip:
       component due-diligence cadence overlap on the same operator
       contract surface). Mirrors the dora_ict_risk_selfassess
       CRA-axis precedent.
+
+  - slug: business_continuity
+    rationale: >-
+      NIS2 Art. 21(2)(c) plan-lifecycle materialisation — event-
+      driven activation of the operator's documented BCM plan
+      (detect and declare, activate, isolate, failover, notify
+      the competent authority on the Art. 23 significant-incident
+      path, restore and verify, post-incident review). The
+      playbook's outbound overlay
+      (`content/playbooks/business_continuity/mappings.yaml`)
+      deliberately does not pin CRA entries: CRA Annex I §1(h)
+      frames availability of essential and basic functions in a
+      product-security context (manufacturer-side product
+      resilience) while NIS2 Art. 21(2)(c) is an operator-side
+      essential/important-entity obligation surface. Cross-pinning
+      the plan-lifecycle here to the CRA Annex I §1(h) anchor
+      would misrepresent the scope, and the drill-lane CRA anchor
+      is already pinned on the sibling backup_recovery overlay
+      (`cra:annex-i-1-h-availability-restore-drill`) — adding the
+      plan-lifecycle to the same CRA anchor would double-count on
+      a manufacturer-side surface. Mirrors the shape of the
+      backup_recovery / business_continuity split already recorded
+      on the NIS2 axis (drill lane on backup_recovery, plan-
+      lifecycle lane on business_continuity, both co-anchored on
+      `nis2:art-21-2-c`) and the dora_ict_risk_selfassess CRA
+      precedent. A sibling CORE / EXTEND card revisits the CRA
+      cross-regime graph if a documented interaction is authored
+      (for example a manufacturer-side product-continuity clause
+      that overlaps the operator-side plan-lifecycle on the same
+      surface).
