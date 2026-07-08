@@ -75,7 +75,7 @@ async def pull_upstream_feed(feed_url: str, feed_id: str) -> None:
 
 @tool
 async def normalise_stix_to_ocsf() -> dict[str, object]:
-    """Map STIX 2.1 SDOs (Indicator, Malware, Threat-Actor) to the OCSF Threat Intelligence Inference event class. Persist normalised records keyed by indicator value; deduplicate against records seen within the last 24 hours.
+    """Map STIX 2.1 SDOs (Indicator, Malware, Threat-Actor) into the playbook's canonical normalised-indicator record. The released OCSF v1.3.0 catalogue does not contain a dedicated threat-intel ingest event class, so no OCSF class is asserted here on the consumed side (see mappings.yaml — ocsf section). Persist normalised records keyed by indicator value; deduplicate against records seen within the last 24 hours.
 
     CACAO step_id : action--10000000-0000-4000-8000-000000000003
     CACAO type    : action

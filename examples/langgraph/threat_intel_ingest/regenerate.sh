@@ -1,14 +1,21 @@
 #!/usr/bin/env bash
-# Regenerate the committed worked-example artefacts from the CACAO playbook.
-# Run from the repo root after any change to compilers/langgraph/*.
+# Regenerate the committed LangGraph worked-example artefacts from the
+# canonical CACAO playbook. Run from the repo root after any change to
+# the playbook or to compilers/langgraph/*.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
-PLAYBOOK="${HERE}/playbook.cacao.json"
+REPO_ROOT="$(cd "${HERE}/../../.." && pwd)"
+CANON="${REPO_ROOT}/content/playbooks/threat_intel_ingest/playbook.cacao.json"
 
-python -m compilers.langgraph.emit  "${PLAYBOOK}" > "${HERE}/graph_spec.json"
-python -m compilers.langgraph.state "${PLAYBOOK}" > "${HERE}/state_bindings.py"
+# Keep the mirrored CACAO source byte-identical to the canonical playbook.
+cp "${CANON}" "${HERE}/playbook.cacao.json"
+
+# Emit GraphSpec + generated state bindings from the canonical playbook.
+PYTHONPATH="${REPO_ROOT}" python -m compilers.langgraph.emit  "${CANON}" > "${HERE}/graph_spec.json"
+PYTHONPATH="${REPO_ROOT}" python -m compilers.langgraph.state "${CANON}" > "${HERE}/state_bindings.py"
 
 # Materialise the dependency-free audit-mirror sibling. See
 # docs/observability/audit-mirror.md for the co-location rationale.
-python -m compilers._shared.audit_mirror_cli --out "${HERE}/_audit_mirror.py"
+PYTHONPATH="${REPO_ROOT}" python -m compilers._shared.audit_mirror_cli \
+    --out "${HERE}/_audit_mirror.py"
