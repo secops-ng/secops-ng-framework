@@ -12,13 +12,25 @@ coordinated-vulnerability-disclosure (CVD) lifecycle runs.
 Workflow source of truth:
 [`content/playbooks/cra_cvd/`](../../playbooks/cra_cvd/).
 
-Status: SKELETON. The action bodies for acknowledgement to reporter,
-coordinate-disclosure, and publish-advisory carry placeholder
-templates; the ROPA entry below scopes the personal-data surface
-that is stable across those templates (reporter contact, reporter-
-credit attribution, manufacturer sign-off contact). A sibling CORE
-card revisits this doc once the acknowledgement-letter and advisory
-templates land.
+Status: CORE. The seven-step CVD lifecycle now binds two of its
+action steps against CORE primitives: the `ack_to_reporter` step
+against
+[`content.playbooks.cra_cvd.primitives.reporter.send_acknowledgement`](../../playbooks/cra_cvd/primitives/reporter.py),
+which emits a deterministic CRA Article 14 §6 acknowledgement
+envelope keyed on `__case_id__` with reporter contact carried on
+the operator-supplied SMTP endpoint handle; and the
+`publish_advisory` step against
+[`content.playbooks.cra_cvd.primitives.disclosure.build_advisory_artifact`](../../playbooks/cra_cvd/primitives/disclosure.py),
+which emits a CSAF 2.0-shaped advisory envelope with
+`__reporter_credit_display__` rendered into the CSAF acknowledgments
+block only when the reporter has consented (the literal
+`reporter chose to remain anonymous` marker otherwise). The
+personal-data surface those two primitives operate against —
+reporter contact for the acknowledgement envelope, reporter-credit
+display for the advisory — is stable across CORE and EXTEND; the
+acknowledgement-letter human-readable body, the CVE-request adapter,
+and the CSIRT-coordination adapter remain EXTEND scope and do not
+widen the ROPA below.
 
 ---
 

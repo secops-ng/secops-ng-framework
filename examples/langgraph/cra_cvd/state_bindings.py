@@ -87,7 +87,7 @@ async def intake() -> dict[str, object]:
 
 @tool
 async def ack_to_reporter(case_id: str, reporter_contact: str) -> str:
-    """SKELETON — CRA Article 14 §6 acknowledgement to the reporter within the operator CVD policy window (3 working days on the operator baseline). Send a durable acknowledgement carrying __case_id__ and the operator's CVD policy reference so the reporter has a citable receipt and the case has a stamped __reporter_ack_ts__ for the acknowledgement-SLA KPI. TODO (CORE): acknowledgement-letter template selection and PGP-signed delivery adapter.
+    """CRA Article 14 §6 acknowledgement to the reporter within the operator CVD policy window (3 working days on the operator baseline). Sends a durable acknowledgement carrying __case_id__ and the operator's CVD policy reference so the reporter has a citable receipt and the case has a stamped __reporter_ack_ts__ for the acknowledgement-SLA KPI. Binds against content.playbooks.cra_cvd.primitives.reporter.send_acknowledgement: canonicalises the ack inputs and returns the JSON-native ack envelope carrying the operator-supplied SMTP endpoint handle (framework ships no default endpoint; the operator wires the concrete endpoint at the compile target's config layer, typically via env-var indirection resolved to the smtp_endpoint argument). Template rendering (ack_letter.j2) and PGP-signed delivery are owned by the per-target compiler adapters.
 
     CACAO step_id : action--c7d51014-0000-4000-8000-000000000003
     CACAO type    : action
@@ -99,9 +99,8 @@ async def ack_to_reporter(case_id: str, reporter_contact: str) -> str:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--c7d51014-0000-4000-8000-000000000003', attributes={'secops_ng.playbook.id': 'playbook--c7d51014-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--c7d51014-0000-4000-8000-000000000003', 'secops_ng.step.name': 'ack_to_reporter', 'secops_ng.tool.name': 'ack_to_reporter', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--c7d51014-0000-4000-8000-000000000003'"
-        )
+        from content.playbooks.cra_cvd.primitives.reporter import send_acknowledgement
+        __reporter_ack_ts__ = send_acknowledgement(case_id=__case_id__, reporter_contact=__reporter_contact__)
 
 @tool
 async def triage(case_id: str) -> dict[str, object]:
@@ -159,7 +158,7 @@ async def validate_fix(case_id: str, fix_ref: str) -> None:
 
 @tool
 async def coordinate_disclosure(case_id: str, reporter_contact: str, fix_ref: str) -> dict[str, object]:
-    """SKELETON — agree the coordinated public-disclosure date with the reporter and, where applicable, the coordinating CSIRT. Records __disclosure_target_date__ and captures the reporter-credit consent decision into __reporter_credit_display__ (opt-in attribution string or the anonymous marker) so the publish_advisory step can render both the human-readable and CSAF 2.0 advisory templates without a second reporter round-trip. Coordinates with the sibling cra_srp_notify run when one is active so the public-advisory publication does not front-run a regulator submission the SRP notification chain has not yet completed. TODO (CORE): CSIRT-coordination adapter and embargo-hold state machine.
+    """# CORE-DEFERRED: out_args collapse to single __coordinate_disclosure_ref__ pending EXTEND scope. Agree the coordinated public-disclosure date with the reporter and, where applicable, the coordinating CSIRT. Records __disclosure_target_date__ and captures the reporter-credit consent decision into __reporter_credit_display__ (opt-in attribution string or the anonymous marker) so the publish_advisory step can render both the human-readable and CSAF 2.0 advisory templates without a second reporter round-trip. Coordinates with the sibling cra_srp_notify run when one is active so the public-advisory publication does not front-run a regulator submission the SRP notification chain has not yet completed. Left CACAO-only in the CORE-B-PRIM scope because binding a single core_body primitive here would collapse the two-variable out_args (__disclosure_target_date__, __reporter_credit_display__) into a single __coordinate_disclosure_ref__ ref, which changes the workflow variable contract; the primitive surface (content.playbooks.cra_cvd.primitives.csirt.notify_national_csirt) is landed for the EXTEND scope to wire once the contract collapse is scoped.
 
     CACAO step_id : action--c7d51014-0000-4000-8000-000000000007
     CACAO type    : action
@@ -177,7 +176,7 @@ async def coordinate_disclosure(case_id: str, reporter_contact: str, fix_ref: st
 
 @tool
 async def publish_advisory(case_id: str, fix_ref: str, disclosure_target_date: str, reporter_credit_display: str) -> str:
-    """SKELETON — publish the public advisory at the agreed disclosure date. Advisory carries the affected products / versions, the fix reference, credit to the reporter (rendered from __reporter_credit_display__ populated at coordinate_disclosure, either the reporter's opted-in attribution string or the anonymous marker), and, when a CVE identifier has been assigned, the CVE id. Both the human-readable form (content/playbooks/cra_cvd/templates/advisory.md.j2) and the CSAF 2.0 machine-readable form (content/playbooks/cra_cvd/templates/advisory.csaf2.json.j2) are emitted. Records __advisory_id__. TODO (CORE): advisory-template selection binding and CVE-request adapter.
+    """Publish the public advisory at the agreed disclosure date. Advisory carries the affected products / versions, the fix reference, credit to the reporter (rendered from __reporter_credit_display__ populated at coordinate_disclosure, either the reporter's opted-in attribution string or the anonymous marker), and, when a CVE identifier has been assigned, the CVE id. Both the human-readable form (content/playbooks/cra_cvd/templates/advisory.md.j2) and the CSAF 2.0 machine-readable form (content/playbooks/cra_cvd/templates/advisory.csaf2.json.j2) are emitted. Records __advisory_id__. Binds against content.playbooks.cra_cvd.primitives.disclosure.build_advisory_artifact: canonicalises the advisory inputs and returns the JSON-native CSAF 2.0 shape stub envelope both templates render from. Template rendering (Jinja2) is owned by the per-target compiler adapters.
 
     CACAO step_id : action--c7d51014-0000-4000-8000-000000000008
     CACAO type    : action
@@ -189,9 +188,8 @@ async def publish_advisory(case_id: str, fix_ref: str, disclosure_target_date: s
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--c7d51014-0000-4000-8000-000000000008', attributes={'secops_ng.playbook.id': 'playbook--c7d51014-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--c7d51014-0000-4000-8000-000000000008', 'secops_ng.step.name': 'publish_advisory', 'secops_ng.tool.name': 'publish_advisory', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--c7d51014-0000-4000-8000-000000000008'"
-        )
+        from content.playbooks.cra_cvd.primitives.disclosure import build_advisory_artifact
+        __advisory_id__ = build_advisory_artifact(case_id=__case_id__, fix_reference=__fix_ref__, disclosure_date_iso=__disclosure_target_date__, credit_display=__reporter_credit_display__)
 
 async def llm_step(state: PlaybookCraCvdV1State) -> dict:
     """Agentic-extension hook.
