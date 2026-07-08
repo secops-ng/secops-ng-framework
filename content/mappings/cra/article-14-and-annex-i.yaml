@@ -38,6 +38,7 @@ entries:
     playbook_refs:
       - playbook.vuln_intake@v1
       - playbook.cra_cvd@v1
+      - playbook.vulnerability_management@v1
     metric_refs:
       - kpi.vuln_disclosure_sla@v1
     evidence_stream_refs:
@@ -47,7 +48,15 @@ entries:
       is Art 9(4)(a) operationalised by the JC RTS on ICT risk management
       framework (Commission Delegated Regulation (EU) 2024/1774) Art 10
       — see mappings/dora/article-9-and-rts-vuln-mgmt.yaml entry
-      `dora:art-9-vuln-mgmt`.
+      `dora:art-9-vuln-mgmt`. `playbook.vulnerability_management@v1`
+      is the operator-side deployed-estate discharge for cases where
+      the operator is also the manufacturer of a product placed on the
+      market: the scan-triage-remediate-verify-audit lifecycle on the
+      deployed instances composes with the product-side handling
+      already anchored on `playbook.vuln_intake@v1` and
+      `playbook.cra_cvd@v1`. See the cookbook walkthrough at
+      docs/cookbook/vulnerability_management.md §Regulatory anchors
+      for the CRA overlap rationale.
 
   - id: cra:annex-i-2-cvd-policy
     regulation:
