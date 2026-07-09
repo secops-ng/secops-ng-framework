@@ -1,0 +1,138 @@
+stable_id: kpi.nis2_cyber_awareness_training_completion_rate@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: NIS2 cyber-awareness training completion rate
+summary: >
+  Proportion of in-scope staff who completed the mandatory cyber-
+  hygiene awareness training within the declared training cycle.
+  Operationalises NIS2 Art. 21(2)(g) — basic cyber-hygiene practices
+  and cybersecurity training for staff, including phishing-simulation
+  exercises with completion tracked — and the ISO/IEC 27001:2022
+  Annex A.6.3 information-security awareness, education and training
+  control. The catalog entry binds against the Compliance Finding
+  (2003) records the cyber_hygiene_training playbook emits at the
+  track-completion step for each per-staff completion deviation; the
+  ratio reads how many of the in-scope roster have no completion
+  deviation open at cycle close. A higher-is-better completion-rate
+  KPI: a persistently low reading is the failure mode NIS2 reviewers
+  surface against the training obligation.
+
+unit: ratio
+direction: higher_is_better
+
+target:
+  value: 0.95
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point for the unscoped baseline.
+    Essential and important entities under NIS2 running mature
+    awareness programmes typically hold cyber-hygiene training
+    completion above the 0.95 floor at cycle close; operators with
+    stricter role-based-training obligations (financial entities
+    under DORA Art. 13(6) staff training schemes, operators of
+    essential services with regulator-declared training targets)
+    set higher scoped variants of this KPI in their own catalogues.
+
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 0.95
+    severity: warn
+  - name: high
+    comparator: "<"
+    value: 0.85
+    severity: high
+  - name: breach
+    comparator: "<"
+    value: 0.70
+    severity: critical
+
+measurement:
+  source: workflow
+  aggregation: ratio
+  formula: >
+    Let R = the operator's declared in-scope training roster for the
+    evaluation cycle (staff subject to mandatory awareness training
+    per __training_scope__ on the cyber_hygiene_training playbook).
+    Let D = the set of Compliance Finding (2003) records emitted by
+    the track-completion step whose finding_info.title carries the
+    mandatory-awareness-training-overdue deviation shape and whose
+    status_id is still open at cycle close. Report
+    completion_rate = (|R| - |D|) / max(|R|, 1). Staff with no
+    declared training requirement (policy-gap branch) are excluded
+    from R so the indicator does not silently drift when the
+    operator's training policy is incomplete; the policy-gap surface
+    is reported separately on kri.control_effectiveness@v1 against
+    control.training_attestation@v1. Reference visualisation: a
+    ratio-headline gauge with warn / high / breach threshold bands
+    over a per-department drill-down bar chart of completion rate by
+    quarter (as declared on the training-roster snapshot); the
+    committed reference rendering lives at
+    `content/metrics/nis2_cyber_awareness_training_completion_rate.viz.md`
+    — that file is the contract for the chart shape; the compile
+    target renders the executable form against operator data.
+  inputs:
+    - name: in_scope_roster
+      description: >
+        Per-staff record of the in-scope training roster the
+        inventory-training-roster step emits at cycle start. Carried
+        on the same OCSF API Activity (6003) request-metadata the
+        LMS read-call produces against the operator's HR / identity
+        source; the catalog entry binds against the playbook step
+        output (__roster_id__) rather than a vendor-specific HR
+        object.
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+      playbook_ref: playbook.cyber_hygiene_training@v1
+      playbook_step: action--53000000-0000-4000-8000-000000000002
+      field: resources.uid
+    - name: completion_deviation
+      description: >
+        Per-staff mandatory-awareness-training-overdue Compliance
+        Finding (2003) the track-completion step emits when the
+        cycle assignment is past its due date without a completed
+        state. Carried on the OCSF Compliance Finding class the
+        cyber_hygiene_training playbook mappings pin at emit-time;
+        the catalog entry binds against that OCSF class shape, not
+        against a vendor-specific LMS completion object.
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      playbook_ref: playbook.cyber_hygiene_training@v1
+      playbook_step: action--53000000-0000-4000-8000-000000000005
+      field: finding_info.uid
+  window:
+    duration: P90D
+    sliding: false
+
+telemetry_refs:
+  - telemetry.ocsf.api_activity@v1
+  - telemetry.ocsf.compliance_finding@v1
+
+playbook_refs:
+  - playbook_id: playbook.cyber_hygiene_training@v1
+    step_id: action--53000000-0000-4000-8000-000000000005
+  - playbook_id: playbook.cyber_hygiene_training@v1
+    step_id: action--53000000-0000-4000-8000-000000000006
+
+control_refs:
+  - control.training_attestation@v1
+
+external_refs:
+  - name: NIS2 — Article 21(2)(g) basic cyber-hygiene practices and cybersecurity training
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(g)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ISO/IEC 27001:2022 — Annex A.6.3 Information security awareness, education and training
+    source: ISO
+    external_id: ISO/IEC 27001:2022 Annex A.6.3
+    url: https://www.iso.org/standard/27001
+  - name: ENISA — Awareness raising and training guidelines for essential and important entities
+    source: ENISA
+    url: https://www.enisa.europa.eu/topics/cybersecurity-education/awareness
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability
+  - auditability
