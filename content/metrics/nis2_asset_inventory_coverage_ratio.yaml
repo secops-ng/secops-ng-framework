@@ -1,0 +1,155 @@
+stable_id: kri.nis2_asset_inventory_coverage_ratio@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: NIS2 asset-inventory coverage ratio
+summary: >
+  Residual-exposure indicator on the coverage of the operator's
+  authoritative asset register against the network-visible estate.
+  Reads the share of discovered live assets that carry a current
+  entry in the operator-authoritative inventory as reconciled by
+  the asset_management playbook; a low value is the failure mode
+  NIS2 Art. 21(2)(a) reviewers surface against the risk-management
+  basis (an ICT-risk-management framework cannot bind controls to
+  assets it does not know about). Complementary to
+  `kri.asset_inventory_drift@v1` (which reads per-window delta rate
+  against the previous documented snapshot): drift measures how
+  fast the register changes; coverage measures how much of the
+  live estate the register represents at all. A higher value on
+  this indicator is a healthier posture; the direction is inverted
+  from most KRIs in the catalogue and is documented on the target
+  and threshold rationales below.
+
+unit: ratio
+direction: higher_is_better
+
+target:
+  value: 0.98
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point for the unscoped baseline.
+    Mature asset-management programmes hold discovered-live-asset
+    coverage above 0.98 at steady state — the residual 0.02 covers
+    ephemeral compute (short-lived cloud instances mid-scale-out),
+    fresh-onboarding assets in the grace window before authoritative
+    entry, and reconciliation-window skew. Essential entities under
+    NIS2 with regulator-declared inventory-completeness obligations
+    typically set higher scoped variants of this KRI in their own
+    catalogues. Note: this indicator uses `higher_is_better`
+    semantics (rising coverage is healthy) even though it is a KRI
+    — the residual-risk shape is `100% - coverage`, and the
+    catalogue expresses the coverage side directly so operator
+    dashboards can render the ratio against the target without a
+    subtraction step.
+
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 0.98
+    severity: warn
+  - name: high
+    comparator: "<"
+    value: 0.90
+    severity: high
+  - name: breach
+    comparator: "<"
+    value: 0.75
+    severity: critical
+
+measurement:
+  source: workflow
+  aggregation: ratio
+  formula: >
+    For each asset_management reconciliation the playbook emits in
+    the evaluation window, let D be the set of network-visible live
+    assets observed by the ingest-inventory-sources step against the
+    operator's documented discovery sources (network-visible probe
+    output, cloud-provider asset-API surface, endpoint-management
+    agent fleet). Let R be the subset of D that carry a current
+    entry in the reconciled operator-authoritative snapshot the
+    reconcile-authoritative-inventory step emits (asset present on
+    the snapshot and NOT flagged as unclassified / stale-source on
+    the compute-delta step). Report
+    coverage_ratio = |R| / max(|D|, 1).
+    Aggregate across the evaluation window with the arithmetic mean
+    of per-reconciliation ratios so a single noisy reconciliation
+    does not dominate the indicator; reconciliations whose evidence-
+    capture step never fired are excluded so the indicator does not
+    silently improve when the pipeline stalls (mirrors the
+    `kri.asset_inventory_drift@v1` exclusion discipline). The
+    per-reconciliation ratio is preserved on the evidence artifact
+    so downstream compile targets can render the per-window series;
+    the aggregate is what the KRI headline reads. Reference
+    visualisation: a coverage-gauge headline with warn / high /
+    breach threshold band overlays over a per-asset-class drill-
+    down bar chart (server / workstation / container / cloud-
+    instance / iot-device / other) sliced by registered-versus-
+    discovered counts; the committed reference rendering lives at
+    `content/metrics/nis2_asset_inventory_coverage_ratio.viz.md` —
+    that file is the contract for the chart shape; the compile
+    target renders the executable form against operator data.
+  inputs:
+    - name: discovered_assets
+      description: >
+        Discovered-live-asset set the ingest-inventory-sources step
+        emits at reconciliation. Carried on the OCSF Device
+        Inventory Info (5001) observations the operator's asset-
+        management surface emits at each reconciliation against
+        the documented discovery sources; the catalog entry binds
+        against that OCSF class shape, not against a vendor-
+        specific CMDB or asset-API object.
+      telemetry_ref: telemetry.ocsf.device_inventory_info@v1
+      playbook_ref: playbook.asset_management@v1
+      playbook_step: action--80000000-0000-4000-8000-000000000002
+      field: device.uid
+    - name: registered_assets
+      description: >
+        Registered-asset subset the reconcile-authoritative-inventory
+        step emits after resolving the discovered set against the
+        operator-authoritative asset register. Carried on the same
+        OCSF Device Inventory Info (5001) class as the discovered
+        set; the reconciled record adds the authoritative-source
+        attribution so the coverage ratio can be computed off a
+        single OCSF class shape without a vendor-specific join.
+      telemetry_ref: telemetry.ocsf.device_inventory_info@v1
+      playbook_ref: playbook.asset_management@v1
+      playbook_step: action--80000000-0000-4000-8000-000000000003
+      field: device.uid
+  window:
+    duration: P30D
+    sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.device_inventory_info@v1
+
+playbook_refs:
+  - playbook_id: playbook.asset_management@v1
+    step_id: action--80000000-0000-4000-8000-000000000003
+  - playbook_id: playbook.asset_management@v1
+    step_id: action--80000000-0000-4000-8000-000000000006
+
+external_refs:
+  - name: NIS2 — Article 21(2)(a) policies on risk analysis and information system security (risk-management basis, asset-inventory precondition)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(a)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: NIS2 — Article 21(2)(i) basic cyber-hygiene practices, asset-management surface
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(i)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ISO/IEC 27001:2022 — Annex A.5.9 Inventory of information and other associated assets
+    source: ISO
+    external_id: ISO/IEC 27001:2022 Annex A.5.9
+    url: https://www.iso.org/standard/27001
+  - name: CIS Controls v8 — Control 1 Inventory and Control of Enterprise Assets
+    source: CIS
+    external_id: CIS Controls v8, Control 1
+    url: https://www.cisecurity.org/controls
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability
+  - auditability

@@ -1,0 +1,169 @@
+stable_id: kpi.nis2_patch_cadence_compliance_rate@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: NIS2 patch-cadence SLA compliance rate
+summary: >
+  Proportion of in-scope patches whose rollout closed inside the
+  operator's documented patch-cadence SLA window, sliced by advisory
+  severity band (security-critical, security-routine, feature-only).
+  Operationalises NIS2 Art. 21(2)(e) — security in acquisition,
+  development and maintenance — on the maintenance limb and the
+  CRA Annex I §2 security-updates obligation on the manufacturer-
+  distributed-estate slice. Complementary to
+  `kpi.patch_disseminated_on_time@v1` (which reads the manufacturer-
+  side dissemination cadence on the CRA Annex I §2(7) advisory-out
+  surface): this KPI reads the operator-side rollout cadence against
+  the operator's own deployed estate. A higher-is-better SLA-hit KPI:
+  the classified patch-criticality band conditions the per-severity
+  SLA window the operator's patch-management policy declares, and
+  the ratio reads how many rollouts closed inside that window.
+
+unit: ratio
+direction: higher_is_better
+
+target:
+  value: 0.90
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point for the unscoped baseline.
+    Mature patch-management programmes under NIS2 typically hold the
+    critical-severity SLA above 0.95 and the aggregate across
+    severity bands above 0.90 at steady state; the target reflects
+    the aggregate floor operators can hold once the staged-rollout
+    ring topology is disciplined against the documented cadence.
+    Essential entities with regulator-declared per-severity SLAs
+    (financial entities under DORA JC RTS Art. 10, operators of
+    essential services with sector-specific patch obligations) set
+    stricter scoped variants of this KPI in their own catalogues.
+
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 0.90
+    severity: warn
+  - name: high
+    comparator: "<"
+    value: 0.75
+    severity: high
+  - name: breach
+    comparator: "<"
+    value: 0.50
+    severity: critical
+
+measurement:
+  source: workflow
+  aggregation: ratio
+  formula: >
+    For each patch rollout closed inside the evaluation window on the
+    patch_management playbook (rollouts whose evidence-capture step
+    emitted a dated patch-application evidence record, either with a
+    populated __broad_rollout_id__ or with the deterministic
+    broad_rollout_skip_reason='canary_unhealthy' marker), classify
+    the rollout by the __patch_criticality__ recorded on the
+    classify-patch-criticality step and compute
+    within_sla = (rollout_close_timestamp - advisory_awareness_timestamp)
+                 <= per_severity_sla_window[patch_criticality].
+    The per-severity SLA windows are the operator's documented
+    patch-cadence policy (canonical starting-point defaults:
+    security-critical <= 7 days, security-routine <= 30 days,
+    feature-only <= 90 days); the catalog entry does not author the
+    operator's cadence policy, it names the ratio-shape the policy
+    is measured against. Report
+    compliance_rate = |{rollouts within_sla}| / |{rollouts closed}|.
+    Rollouts skipped on an unhealthy canary count against the
+    denominator (the skip is a rollout outcome the operator's
+    posture-management layer treats as an overdue exposure), and
+    rollouts whose classification carries the deterministic
+    'unclassified' sentinel are scheduled under the security-
+    critical SLA per the primitive contract so they do not silently
+    disappear from the ratio. Reference visualisation: a ratio-
+    headline gauge with warn / high / breach threshold bands over
+    a stacked-bar drill-down of SLA-met versus overdue counts
+    sliced by severity band; the committed reference rendering
+    lives at
+    `content/metrics/nis2_patch_cadence_compliance_rate.viz.md` —
+    that file is the contract for the chart shape; the compile
+    target renders the executable form against operator data.
+  inputs:
+    - name: advisory_awareness
+      description: >
+        Advisory-observation timestamp emitted by the detect-patch-
+        availability step when the operator's advisory-intake
+        surface first surfaces the update against the tracked
+        deployment-inventory. Carried on the OCSF API Activity
+        (6003) request-metadata the read call against the advisory-
+        intake surface produces; the catalog entry binds against
+        the playbook step start-timestamp, not against a vendor-
+        specific advisory-feed object.
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+      playbook_ref: playbook.patch_management@v1
+      playbook_step: action--70000000-0000-4000-8000-000000000002
+      field: time
+    - name: patch_criticality
+      description: >
+        Classified patch-criticality band the classify-patch-
+        criticality step emits against the operator's documented
+        patch-criticality taxonomy. Values are one of
+        security-critical, security-routine, feature-only, or the
+        deterministic 'unclassified' sentinel; each value conditions
+        the per-severity SLA window the operator's cadence policy
+        declares.
+      playbook_ref: playbook.patch_management@v1
+      playbook_step: action--70000000-0000-4000-8000-000000000003
+    - name: rollout_close
+      description: >
+        Rollout-close timestamp emitted by the evidence-capture step
+        when the dated patch-application evidence record is
+        published. Carried on the OCSF Operating System Patch State
+        (5004) observation the operator's patch-management surface
+        emits at each patch-application observation; the catalog
+        entry binds to that OCSF class shape, not to a vendor-
+        specific patch-management API object.
+      telemetry_ref: telemetry.ocsf.patch_state@v1
+      playbook_ref: playbook.patch_management@v1
+      playbook_step: action--70000000-0000-4000-8000-000000000007
+      field: time
+  window:
+    duration: P30D
+    sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.api_activity@v1
+  - telemetry.ocsf.patch_state@v1
+
+playbook_refs:
+  - playbook_id: playbook.patch_management@v1
+    step_id: action--70000000-0000-4000-8000-000000000004
+  - playbook_id: playbook.patch_management@v1
+    step_id: action--70000000-0000-4000-8000-000000000006
+  - playbook_id: playbook.patch_management@v1
+    step_id: action--70000000-0000-4000-8000-000000000007
+
+control_refs:
+  - control.patch_evidence@v1
+
+external_refs:
+  - name: NIS2 — Article 21(2)(e) security in acquisition, development and maintenance (maintenance limb)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(e)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: CRA — Annex I §2 essential cybersecurity requirements, security-updates obligation
+    source: EU
+    external_id: Regulation (EU) 2024/2847, Annex I §2
+    url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+  - name: DORA — JC RTS on ICT risk management framework, Art. 10 vulnerability and patch management procedures
+    source: EU
+    external_id: Commission Delegated Regulation (EU) 2024/1774, Art. 10
+    url: https://eur-lex.europa.eu/eli/reg_del/2024/1774/oj
+  - name: ENISA — Good practices on the patch-management lifecycle
+    source: ENISA
+    url: https://www.enisa.europa.eu/publications
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability
+  - determinism
