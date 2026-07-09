@@ -105,7 +105,14 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.nis2_art20_governance.primitives.cycle.resolve_governance_cycle",
+          "in": {
+            "governance_cycle": "__governance_cycle__"
+          },
+          "out": "__review_id__"
+        }
       }
     },
     "action--a2000000-0000-4000-8000-000000000003": {
@@ -126,7 +133,14 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.nis2_art20_governance.primitives.review.conduct_art20_review",
+          "in": {
+            "governance_cycle": "__governance_cycle__"
+          },
+          "out": "__posture_snapshot_id__"
+        }
       }
     },
     "action--a2000000-0000-4000-8000-000000000004": {
@@ -149,7 +163,16 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.nis2_art20_governance.primitives.approval.record_management_approval",
+          "in": {
+            "governance_cycle": "__governance_cycle__",
+            "review_id": "__review_id__",
+            "posture_snapshot_id": "__posture_snapshot_id__"
+          },
+          "out": "__approval_record_id__"
+        }
       }
     },
     "action--a2000000-0000-4000-8000-000000000005": {
@@ -173,7 +196,18 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.nis2_art20_governance.primitives.evidence.emit_governance_evidence",
+          "in": {
+            "governance_cycle": "__governance_cycle__",
+            "review_id": "__review_id__",
+            "posture_snapshot_id": "__posture_snapshot_id__",
+            "approval_record_id": "__approval_record_id__",
+            "captured_at": "__captured_at__"
+          },
+          "out": "__evidence_id__"
+        }
       }
     },
     "end--a2000000-0000-4000-8000-000000000006": {
