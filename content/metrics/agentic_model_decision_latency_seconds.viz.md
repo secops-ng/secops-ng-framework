@@ -84,6 +84,37 @@ The bands match the `thresholds` array on
 `agentic_model_decision_latency_seconds.yaml`; the catalog entry is
 the source of truth, this file is the visualisation surface.
 
+## Reference rendering — P95 trend line (Mermaid)
+
+Complementary time-series view. The line chart plots the daily P95
+across the P7D window so operators can see the tail-latency
+trajectory (not just the point-in-time reading), which is the shape
+that actually surfaces the sub-minute self-correction wall being
+approached over successive days rather than in a single spike.
+
+```mermaid
+---
+config:
+    xyChart:
+        showTitle: true
+title: "kri.agentic_model_decision_latency_seconds@v1 — daily P95 trajectory"
+---
+xychart-beta
+    title "P95 LLM decision latency (seconds) per day across the P7D window"
+    x-axis "day" ["d-6", "d-5", "d-4", "d-3", "d-2", "d-1", "d-0"]
+    y-axis "P95 latency (seconds)" 0 --> 15
+    line [1.5, 1.8, 2.3, 2.9, 4.1, 6.2, 8.0]
+```
+
+The illustrative trajectory crosses the `warn` (2s) bound at day
+`d-4`, the `high` (5s) bound between `d-2` and `d-1`, and lands at
+`8s` on `d-0` — the same headline figure the bar-chart panel above
+reads at the tail contributor. The catalog aggregation
+`measurement.aggregation: p95` resolves to the terminal reading;
+the trajectory is the operability signal that the sub-minute
+self-correction window is narrowing over the week rather than a
+single-spike outlier.
+
 ## OCSF source-data shape
 
 The chart's underlying observations are derived from the OCSF
@@ -101,6 +132,67 @@ in the SecOps-NG metrics schema is `seconds`; operators typically read
 this at sub-second granularity on their dashboard by scaling the
 rendered value for display (compile target's responsibility), and the
 P95 aggregate here is invariant under that rescale.
+
+### OCSF source-data example (`class_uid: 6003`)
+
+Illustrative OCSF API Activity record shape the metric formula reads.
+Field names follow OCSF 1.x; the shape is the contract for what the
+model-serving surface emits at inference request / response boundary,
+not a vendor-specific model-server envelope.
+
+```yaml
+# One LLM inference decision observed as an API Activity (6003) record.
+# The metric reads latency_seconds = (time - start_time) per event
+# whose disposition_id encodes inference-complete, and aggregates P95.
+metadata:
+  version: "1.3.0"
+  product:
+    vendor_name: "<operator's model-serving surface>"
+class_uid: 6003                            # API Activity
+class_name: "API Activity"
+category_uid: 6                            # Application Activity
+type_uid: 600301                           # API Activity: Create
+activity_id: 1                             # Create
+start_time: 1783600000                     # request-side boundary
+time: 1783600002                           # response-side boundary; delta = 2s
+disposition_id: 1                          # Success — inference complete
+api:
+  operation: "inference.decide"
+  request:
+    uid: "req-2026-07-09-000042"           # decision identity
+  response:
+    code: 200
+  service:
+    name: "agentic-decision-model"         # per-model drill-down bucket
+resources:
+  - type: "model"
+    name: "on-prem / llm-api-volume"       # per-pair drill-down label
+```
+
+## Cross-regime regulatory anchors
+
+The KRI's tail-latency reading on the agentic-decision surface is
+durable across the three EU regimes an operator carries at once:
+
+- **DORA Art. 16** — simplified ICT risk management framework. The
+  KRI is the ICT-operational-latency signal on financial-entity
+  agentic-decision surfaces; a rising P95 is a residual-risk read
+  that ICT-related incidents on those surfaces will not be contained
+  inside the sub-minute self-correction window.
+- **EU AI Act Art. 13** — transparency and provision of information
+  to deployers of high-risk AI systems. Decision-latency P95 is a
+  first-class operational-transparency signal on the deployed AI
+  surface; operators lift this reading into their deployer-facing
+  telemetry without re-defining the measurement.
+- **NIS2 Art. 21(2)(b)** — incident-handling capability. The KRI
+  reads the detect-through-contain timing on the machine-speed case
+  set; the sub-minute self-correction wall is the operability floor
+  the incident-handling loop is held to on this case set.
+
+The catalog entry stays regime-neutral (one reading, three
+regime-scoped uses); the `external_refs[]` on the YAML enumerate the
+anchors so operators can lift the KRI into a regime-scoped variant
+without translating the measurement.
 
 ## Operator override
 
