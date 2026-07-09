@@ -14,6 +14,9 @@ subpoints (a)–(j) plus Article 23 incident-notification milestones).
 
 ## Files
 
+- `article-20.yaml` — Art. 20(1) management-body approval of
+  cybersecurity risk-management measures and Art. 20(2)
+  cybersecurity training for management-body members.
 - `article-21-2-a.yaml` — Art. 21(2)(a) risk-analysis and
   information-system-security policies.
 - `article-21-2-b.yaml` — Art. 21(2)(b) incident-handling capability.

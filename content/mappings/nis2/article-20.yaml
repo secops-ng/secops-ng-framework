@@ -1,0 +1,84 @@
+# NIS2 — Article 20 management-body cybersecurity governance.
+#
+# Article 20(1) requires the management bodies of essential and important
+# entities to approve the cybersecurity risk-management measures taken by
+# those entities to comply with Article 21, oversee their implementation,
+# and be held liable for infringements. Article 20(2) requires the members
+# of the management body to follow cybersecurity training on a regular
+# basis so they gain sufficient knowledge and skills to identify risks
+# and assess cybersecurity risk-management practices and their impact on
+# the services provided by the entity, and to encourage the entity to
+# offer similar training to all employees on a regular basis.
+#
+# Article 20 is the governance anchor for every downstream Article 21
+# obligation; this file opens the inbound mapping surface on that anchor.
+# The general-staff training obligation carried by Article 20(2)'s
+# "similar training to all employees" clause is discharged under Article
+# 21(2)(g) via playbook.cyber_hygiene_training@v1, which is the workforce-
+# wide training-programme lane and is intentionally not re-pinned here.
+regime: nis2
+entries:
+  - id: nis2:art-20-1
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 20(1)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      The management bodies of essential and important entities approve
+      the cybersecurity risk-management measures taken by those entities
+      to comply with Article 21, oversee their implementation, and are
+      held liable for infringements. Discharged on the operator's
+      documented management-body governance cadence: convene the
+      cybersecurity review cycle, present the current Article 21(2)(a)-(j)
+      risk-posture and compliance status to the management body, record
+      the approval or referral outcome, and emit the dated governance-
+      record evidence artifact.
+    status: draft
+    playbook_refs:
+      - playbook.nis2_art20_governance@v1
+    notes: >-
+      SKELETON: the outbound overlay at
+      content/playbooks/nis2_art20_governance/mappings.yaml pins the
+      OSCAL PM-2 (Information Security Program Leadership Role) and
+      SA-2 (Allocation of Resources) anchors plus the D3FEND D3-PSEP
+      (Policy and Standards Enforcement Process) technique on the
+      approve_risk_measures step. The control_refs list on this
+      inbound entry is intentionally left off at SKELETON: the
+      PM-2 / SA-2 control-xref surface consolidates around the
+      existing control.ict_risk_governance@v1 anchor (which already
+      pins PM-2), and CORE-layer cards decide whether to author
+      dedicated control.information_security_program_plan@v1 and
+      control.resource_allocation@v1 xref files or fold both anchors
+      into the ict_risk_governance URN. Either resolution lands the
+      inbound control_refs list in the sibling CORE PR.
+
+  - id: nis2:art-20-2
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 20(2)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Members of the management body of essential and important entities
+      follow training on a regular basis so they gain sufficient
+      knowledge and skills to identify risks and assess cybersecurity
+      risk-management practices and their impact on the services
+      provided by the entity. Essential and important entities encourage
+      similar training for all employees on a regular basis. Discharged
+      on the management-body axis by the training-completion attestation
+      carried on the approve_risk_measures step's approval-record
+      artifact.
+    status: draft
+    playbook_refs:
+      - playbook.nis2_art20_governance@v1
+    notes: >-
+      Management-body training-completion attestation is carried on the
+      nis2_art20_governance approve_risk_measures step for management-
+      body members specifically. The workforce-wide "similar training
+      to all employees" clause is discharged under Article 21(2)(g)
+      via playbook.cyber_hygiene_training@v1 and is intentionally not
+      re-pinned here to avoid double-anchoring the workforce-training
+      surface.
