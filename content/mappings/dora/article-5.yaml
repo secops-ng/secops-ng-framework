@@ -26,7 +26,18 @@ entries:
     control_refs:
       - control.ict_risk_governance@v1
       - control.risk_management_policy@v1
-    playbook_refs: []
+    playbook_refs:
+      # F-WF-EIDAS2-IDENTITY EXTEND: Art. 5(2)(a) digital-identity
+      # governance is the DORA anchor for the eIDAS 2.0 EUDIW
+      # identity-verification cycle. The playbook is the operational
+      # discharge of the digital-identity-governance leg for
+      # EUDIW-enabled principals: the dated Account Change (OCSF 3001)
+      # audit-evidence record is the per-onboarding artifact the
+      # management-body-approved ICT risk-management framework rests
+      # on. Companion outbound entry in
+      # content/playbooks/eidas2_identity_verification/mappings.yaml
+      # pins the reverse edge.
+      - playbook.eidas2_identity_verification@v1
     metric_refs:
       - kri.risk_register_staleness@v1
     evidence_stream_refs:

@@ -168,6 +168,19 @@ entries:
       - playbook.codebase_vuln_management@v1
       - playbook.cra_cvd@v1
       - playbook.cra_srp_notify@v1
+      # F-WF-EIDAS2-IDENTITY EXTEND: the eIDAS 2.0 EUDIW identity-
+      # verification cycle is anchored on the ongoing-confidentiality
+      # limb of Art. 32(1)(b). The playbook produces the dated
+      # Account Change (OCSF 3001) audit-evidence record that gates
+      # joiner-side capability provisioning against a cryptographically
+      # verified PID credential and a resolved Level of Assurance;
+      # that record is a primary ongoing-confidentiality artifact for
+      # the access-management leg of the ongoing-security baseline.
+      # NIS2 parallel: content/mappings/nis2/article-21-2-i.yaml
+      # (access management). DORA parallel:
+      # content/mappings/dora/article-5.yaml (digital-identity
+      # governance).
+      - playbook.eidas2_identity_verification@v1
       - playbook.iam_auditor@v1
       - playbook.infra_posture_management@v1
       - playbook.it_security_support_agent@v1
