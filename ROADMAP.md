@@ -1321,7 +1321,7 @@ named operator use-case. Each cookbook workflow lives under
     the programme-governance layer and the operational layer share
     the compile ring rather than forking the NIS2 Art. 21(2)(g)
     surface into two synonymous rings.
-  - EXTEND — #TBD_EXTEND_PR
+  - EXTEND — #768
     (`docs/cookbook/security_awareness_training.md` operator
     walkthrough covering programme-governance vs operational-
     delivery scoping, step-by-step CACAO walkthrough with OSCAL /
