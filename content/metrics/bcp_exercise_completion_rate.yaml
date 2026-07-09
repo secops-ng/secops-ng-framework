@@ -1,0 +1,162 @@
+stable_id: kpi.bcp_exercise_completion_rate@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: BCP exercise completion rate — ratio of scheduled business-continuity plan exercises completed on cadence
+summary: >
+  Ratio of scheduled business-continuity plan (BCP) exercises that
+  were completed on the operator's declared cadence within the
+  rolling 12-month evaluation window over the total scheduled BCP
+  exercises in the same window. Operationalises the periodic-testing
+  limb of NIS2 Art. 21(2)(c) (business-continuity, backup management,
+  disaster-recovery, crisis-management arrangements) and the annual
+  testing obligation under DORA Art. 11(6) (ICT business-continuity
+  policy shall be tested at least once a year and after every
+  substantive change) on the exercise-attempt surface — i.e. did the
+  scheduled exercise fire and close on cadence, not whether the
+  RTO / RPO delta inside a closed exercise met the operator's
+  recovery objectives. Complementary to
+  `kpi.service_continuity_test_frequency@v1` (count of continuity
+  plan tests attested per rolling year, portfolio-wide floor
+  reading) and to the drill-lane readings
+  (`kpi.restore_drill_cadence@v1`, `kri.restore_drill_rto_overrun@v1`,
+  `kri.restore_drill_attestation_freshness@v1`) which read the
+  backup-recovery drill lane. This KPI reads the plan-lifecycle
+  exercise lane on the business_continuity playbook: each scheduled
+  exercise emits an API Activity request against the exercise
+  scheduler (activate_bcm_plan step) and closes with a
+  compliance-finding attestation carrying the exercise outcome; the
+  ratio reads how many of the scheduled exercises closed on
+  cadence. Higher-is-better on-cadence-completion KPI. No non-EU
+  default endpoints participate in the exercise-scheduling attestation
+  chain — the scheduler surface is an EU-hostable endpoint per the
+  sovereign-stack bias.
+
+unit: ratio
+direction: higher_is_better
+
+target:
+  value: 0.90
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point for the unscoped baseline.
+    Essential and important entities under NIS2 running mature
+    business-continuity programmes typically hold on-cadence
+    exercise completion above 0.90 at the annual review; operators
+    with stricter regulator-declared exercise-cadence obligations
+    (financial entities under DORA Art. 11(6) after-substantive-
+    change testing, sector-specific competent-authority exercise
+    schemes) set higher scoped variants of this KPI in their own
+    catalogues. A persistently below-target reading signals the
+    exercise-scheduling surface itself is stalling, which is a
+    NIS2 Art. 21(2)(c) periodic-testing shortfall.
+
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 0.90
+    severity: warn
+  - name: high
+    comparator: "<"
+    value: 0.75
+    severity: high
+  - name: breach
+    comparator: "<"
+    value: 0.50
+    severity: critical
+
+measurement:
+  source: workflow
+  aggregation: ratio
+  formula: >
+    Let S = the set of BCP exercises scheduled on the operator's
+    business_continuity exercise-scheduling surface (activate_bcm_plan
+    step of the business_continuity playbook) whose scheduled-start
+    timestamp falls inside the rolling 12-month evaluation window.
+    Each scheduled exercise is observed as one OCSF API Activity
+    (6003) record emitted at exercise-scheduler call time carrying
+    the schedule reference on `api.request.uid` and the target
+    scheduled-start on `time`. Let C = the subset of S that closed
+    on cadence — the corresponding exercise-close Compliance Finding
+    (2003) record carries a completed-status transition
+    (`status_id` == completed) with an observed-close timestamp no
+    later than the operator's cadence tolerance from the
+    scheduled-start. Report
+    completion_rate = |C| / max(|S|, 1). Scheduled exercises whose
+    scheduler call itself failed (pipeline stall) are retained in S
+    so the ratio does not silently improve when the exercise surface
+    stalls outright; the pipeline-stall surface is reported
+    separately on `kri.restore_drill_attestation_freshness@v1` for
+    the drill lane. Exercises re-scheduled inside the window count
+    against the original scheduled-start slot; the re-scheduled
+    slot is retained in S at its new timestamp. Reference
+    visualisation: ratio-headline gauge with warn / high / breach
+    threshold bands over a per-quarter drill-down bar chart of the
+    on-cadence completion rate; the committed reference rendering
+    lives at
+    `content/metrics/bcp_exercise_completion_rate.viz.md` — that
+    file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: scheduled_exercise
+      description: >
+        Per-exercise scheduler-call record carried on the OCSF API
+        Activity (6003) event the activate_bcm_plan step emits when
+        the operator's exercise-scheduling surface accepts the
+        scheduled BCP exercise. The catalog entry binds against the
+        OCSF class shape (API Activity request-metadata) rather
+        than a vendor-specific exercise-scheduling, tabletop, or
+        continuity-test-management product.
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+      playbook_ref: playbook.business_continuity@v1
+      playbook_step: action--b17c0072-0000-4000-8000-000000000003
+      field: api.request.uid
+    - name: exercise_close_attestation
+      description: >
+        Per-exercise close-attestation record the operator's
+        exercise-closure surface emits at exercise-close time.
+        Carried on the OCSF Compliance Finding (2003) event the
+        business_continuity playbook attestation step emits
+        (status_id transition into the completed state) with the
+        observed-close timestamp on `time`. The cadence-tolerance
+        interval is read against the corresponding scheduled-start
+        record to classify the exercise as on-cadence (contributes
+        to C) or overdue (retained in S but not in C).
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      playbook_ref: playbook.business_continuity@v1
+      playbook_step: action--b17c0072-0000-4000-8000-000000000008
+      field: status_id
+  window:
+    duration: P365D
+    sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.api_activity@v1
+  - telemetry.ocsf.compliance_finding@v1
+
+playbook_refs:
+  - playbook_id: playbook.business_continuity@v1
+    step_id: action--b17c0072-0000-4000-8000-000000000003
+  - playbook_id: playbook.business_continuity@v1
+    step_id: action--b17c0072-0000-4000-8000-000000000008
+
+external_refs:
+  - name: NIS2 — Article 21(2)(c) business continuity, backup management, disaster recovery, crisis management
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(c)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 11(6) annual testing of ICT business continuity policy
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 11(6)
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: ENISA — NIS2 essential/important entity guidance
+    source: ENISA
+    url: https://www.enisa.europa.eu/topics/cybersecurity-policy/nis-directive-new
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability
+  - auditability

@@ -1,0 +1,149 @@
+stable_id: kri.backup_integrity_failure_rate@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Backup integrity failure rate — proportion of backup-verify jobs reporting integrity errors in a rolling 30-day window
+summary: >
+  Risk indicator derived from the backup_recovery playbook
+  validate-backup-integrity step, read as a ratio rather than an
+  absolute count. Every backup-verify job that reaches the
+  integrity-check step emits a boolean `__integrity_ok__` outcome;
+  this indicator reads the ratio of executions whose outcome was
+  false over the total executions reaching the step in the rolling
+  30-day window. Complementary to the count-shaped sibling
+  `kri.backup_integrity_failures@v1` (which reads absolute
+  occurrences and anchors the warn / breach severity on the
+  count scale) and to the pass-side sibling
+  `kpi.backup_integrity_pass_rate@v1` (higher-is-better ratio,
+  same file-hashing binding). The count sibling is the right
+  signal for small backup-scope populations where a single failure
+  is the operator's actionable event; the ratio here is the right
+  signal for larger populations where the failure rate itself
+  drifts and the count reading becomes a floor. Rising values
+  indicate the backup surface is drifting away from a recoverable
+  state — the failure mode the "tested restore drill" clauses under
+  NIS2 Art. 21(2)(c) and DORA Art. 12 surface when the reviewer
+  reads the operator's attestation stream and finds integrity
+  failures the operator has not yet remediated. No non-EU default
+  endpoints participate in the backup-verify attestation chain —
+  the verify surface is an EU-hostable endpoint per the sovereign-
+  stack bias.
+
+unit: ratio
+direction: lower_is_better
+
+thresholds:
+  - name: warn
+    comparator: ">="
+    value: 0.02
+    severity: warn
+  - name: high
+    comparator: ">="
+    value: 0.05
+    severity: high
+  - name: breach
+    comparator: ">="
+    value: 0.10
+    severity: critical
+
+measurement:
+  source: workflow
+  aggregation: ratio
+  formula: >
+    Let E = the set of backup_recovery executions in the rolling
+    30-day evaluation window that reached the
+    validate-backup-integrity step
+    (action--50000000-0000-4000-8000-000000000003). Let F ⊆ E be
+    the subset whose validate-backup-integrity step set
+    `__integrity_ok__ == False`, short-circuiting the drill into
+    the failure-attestation branch. Report
+    failure_rate = |F| / max(|E|, 1). Executions whose
+    validate-backup-integrity step never fired (pipeline stall)
+    are excluded from E so the KRI does not silently drift when
+    the pipeline itself fails; the pipeline-stall surface is
+    reported separately on
+    `kri.restore_drill_attestation_freshness@v1`. Executions are
+    counted at (backup-scope, drill-window) granularity — a
+    repeated failure on the same scope across successive drill
+    windows registers each occurrence rather than being
+    deduplicated, matching the count sibling's convention.
+    Reference visualisation: ratio-headline gauge with
+    warn / high / breach threshold bands over a per-backup-scope
+    drill-down bar chart of failure rate; the committed reference
+    rendering lives at
+    `content/metrics/backup_integrity_failure_rate.viz.md` — that
+    file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: integrity_ok
+      description: >
+        Boolean integrity-check outcome emitted by the
+        validate-backup-integrity step of the backup_recovery
+        playbook. Carried on the OCSF File System Activity event
+        the validate-backup-integrity step emits when it hashes
+        the candidate backup artifact and matches the result
+        against the documented integrity baseline (checksum,
+        manifest, decryption-key availability). The step is
+        anchored on D3FEND File Hashing (D3-FH) per the playbook's
+        mappings.yaml, and the OCSF File System Activity class
+        (uid 1001) is the source-data shape the integrity check
+        emits (activity_id transitions for the hash / read
+        operation, matched-hash file payload on file.hashes). The
+        catalog entry binds to that OCSF class shape, not to a
+        vendor-specific backup product or integrity tool. The
+        numerator reads `__integrity_ok__ == False`; the
+        denominator reads every execution that reached the step
+        regardless of outcome.
+      telemetry_ref: telemetry.ocsf.file_activity@v1
+      playbook_ref: playbook.backup_recovery@v1
+      playbook_step: action--50000000-0000-4000-8000-000000000003
+      field: file.hashes
+    - name: verify_attempt
+      description: >
+        Reference population of backup-verify executions that
+        reached the validate-backup-integrity step in the
+        evaluation window. Carried on the same OCSF File System
+        Activity event the validate-backup-integrity step emits
+        per attempt — one event per verify attempt against the
+        backup-catalogue record anchors the denominator on the
+        same OCSF class as the numerator, matching the sibling
+        `kpi.backup_integrity_pass_rate@v1` convention.
+      telemetry_ref: telemetry.ocsf.file_activity@v1
+      playbook_ref: playbook.backup_recovery@v1
+      playbook_step: action--50000000-0000-4000-8000-000000000003
+      field: time
+  window:
+    duration: P30D
+    sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.file_activity@v1
+
+playbook_refs:
+  - playbook_id: playbook.backup_recovery@v1
+    step_id: action--50000000-0000-4000-8000-000000000003
+
+external_refs:
+  - name: NIS2 — Article 21(2)(c) business continuity, backup management, disaster recovery, crisis management
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(c)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 12 backup policies and procedures, restoration and recovery procedures and methods
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 12
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: NIST SP 800-53 Rev. 5 — CP-9(1) System Backup | Testing for Reliability and Integrity
+    source: NIST
+    external_id: NIST SP 800-53 Rev. 5 CP-9(1)
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CP-9
+  - name: MITRE D3FEND — D3-FH File Hashing
+    source: MITRE
+    url: https://d3fend.mitre.org/technique/d3f:FileHashing/
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability
+  - operability
