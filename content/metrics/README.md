@@ -117,6 +117,9 @@ directions.
 | `kri.availability_below_target_exposure@v1`              | kri | hours | lower_is_better  | NIS2 Art. 21(2)(e); DORA Art. 8              | —                                                                |
 | `kri.rto_overrun_exposure_count@v1`                      | kri | count | lower_is_better  | NIS2 Art. 21(2)(e); DORA Art. 8              | —                                                                |
 | `kri.continuity_test_overdue@v1`                         | kri | count | lower_is_better  | NIS2 Art. 21(2)(e); DORA Art. 8; DORA Art. 11(6) | —                                                            |
+| `kpi.agentic_threat_detection_rate@v1`                   | kpi | ratio   | higher_is_better | NIS2 Art. 21(2)(b); NIS2 Art. 21(2)(e); MITRE ATLAS | —                                                            |
+| `kri.agentic_model_decision_latency_seconds@v1`          | kri | seconds | lower_is_better  | NIS2 Art. 21(2)(b); NIS2 Art. 21(2)(e); MITRE ATLAS | —                                                            |
+| `kri.agentic_false_positive_rate@v1`                     | kri | ratio   | lower_is_better  | NIS2 Art. 21(2)(b); NIS2 Art. 21(2)(e); MITRE ATLAS | —                                                            |
 
 ### Statutory-clock latency KRIs — playbook back-refs
 
