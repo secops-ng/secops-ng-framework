@@ -1334,7 +1334,7 @@ named operator use-case. Each cookbook workflow lives under
 
 ### F-DORA-ART19 — DORA Art. 19 major-ICT-related incident reporting lifecycle
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P1
 - **Goal:** G-01 (content coverage — dedicated DORA-flavoured major-
   ICT-related-incident reporting playbook closing the Chapter III
@@ -1385,17 +1385,25 @@ named operator use-case. Each cookbook workflow lives under
   (Directive (EU) 2022/2555) Art. 23; GDPR (Regulation (EU)
   2016/679) Art. 33-34.
 - **Shipped via:**
-  - SKELETON — pending PR
+  - SKELETON — #769
     (`content/playbooks/dora_major_incident_reporting/` CACAO v2
     scaffold + `mappings.yaml` pinning outbound OSCAL IR-8 / IR-6
     / IR-5 controls, the DORA Art. 19 and Art. 18 overlays, the
     NIS2 Art. 23 and GDPR Art. 33 cross-regime sibling anchors,
     plus the workflow-local README).
-  - CORE — deferred (three-target compiled examples for n8n,
-    Temporal, LangGraph).
-  - EXTEND — deferred (byte-parity golden tests, per-milestone
-    submission-adapter bindings, missed-milestone KRI, and ROADMAP
-    status flip from In Progress to Shipped).
+  - CORE — #770
+    (`examples/{n8n,temporal,langgraph}/dora_major_incident_reporting/`
+    three-target compile examples plus byte-parity goldens under
+    `tests/examples/{n8n,temporal,langgraph}/dora_major_incident_reporting/`
+    guarding the per-milestone submission ring across all three
+    targets on every PR).
+  - EXTEND — PR #<this>
+    (`docs/cookbook/dora_major_incident_reporting.md` operator
+    walkthrough covering the Art. 18 classification gate and the
+    Art. 19 three-milestone reporting cycle with the three-target
+    hand-off and the cross-target `artifact_id` invariant; cookbook
+    index entry; ROADMAP F-DORA-ART19 status flip from In Progress
+    to Shipped).
 
 ---
 

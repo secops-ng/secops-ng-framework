@@ -30,6 +30,7 @@ narrative.
 | `business_continuity` | [`business_continuity.md`](business_continuity.md) | `content/playbooks/business_continuity/`              |
 | `cyber_hygiene_training` | [`cyber_hygiene_training.md`](cyber_hygiene_training.md) | `content/playbooks/cyber_hygiene_training/`     |
 | `security_awareness_training` | [`security_awareness_training.md`](security_awareness_training.md) | `content/playbooks/security_awareness_training/` |
+| `dora_major_incident_reporting` | [`dora_major_incident_reporting.md`](dora_major_incident_reporting.md) | `content/playbooks/dora_major_incident_reporting/` |
 | `cra_srp_notify`      | [`cra_srp_notify.md`](cra_srp_notify.md)           | `content/playbooks/cra_srp_notify/`                   |
 | `cra_cvd`             | [`cra_cvd.md`](cra_cvd.md)                         | `content/playbooks/cra_cvd/`                          |
 | `mfa_secured_comms`   | [`mfa_secured_comms.md`](mfa_secured_comms.md)     | `content/playbooks/mfa_secured_comms/`                |
