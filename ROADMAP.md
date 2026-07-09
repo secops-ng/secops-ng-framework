@@ -1261,6 +1261,54 @@ named operator use-case. Each cookbook workflow lives under
 
 ---
 
+### F-WF-SECAWARENESS — Security-awareness training programme lifecycle
+
+- **Status:** In Progress
+- **Priority:** P1
+- **Goal:** G-01 (content coverage — a portable operator-side
+  programme-lifecycle workflow for the structured security-
+  awareness training programme required by NIS2 Art. 21(2)(g);
+  companion to the operational `cyber_hygiene_training` playbook
+  and the reactive `phishing_triage` playbook under the same
+  clause; advances the Q4 2026 target of ≥ 25 CACAO v2 playbooks),
+  G-02 (regulatory-graph closure — NIS2 Art. 21(2)(g) primary
+  anchor for the programme-governance surface, with sibling
+  references to GDPR Art. 32(1)(b) staff-training organisational
+  measures and ISO/IEC 27001 Annex A.6.3).
+- **Acceptance criteria:**
+  - `content/playbooks/security_awareness_training/` carries the
+    canonical CACAO v2 scaffold
+    (`playbook.security_awareness_training@v1`) — the schedule-
+    assessment → design-content → deliver-training → record-
+    completion → report-gaps → review-cycle chain, plus
+    `mappings.yaml` pinning outbound OSCAL controls, an OCSF
+    telemetry stub, the NIS2 Art. 21(2)(g) overlay, and the GDPR
+    Art. 32(1)(b) sibling reference, plus a workflow-local README.
+    Read-only and side-effect-free against operator
+    infrastructure; the delivery step writes delivery-intent
+    records to the learning-management surface, and the LMS owns
+    final scheduling and per-staff dispatch.
+  - Three reference-target compile examples land under
+    `examples/{n8n,temporal,langgraph}/security_awareness_training/`
+    with byte-parity goldens under
+    `tests/examples/{n8n,temporal,langgraph}/security_awareness_training/test_golden.py`
+    guarding the ring across all three targets on every PR.
+  - Cookbook entry
+    `docs/cookbook/security_awareness_training.md` walks an
+    operator through the programme-lifecycle cycle end-to-end
+    against a compiled example (n8n / Temporal / LangGraph).
+- **Sovereign-stack constraints:** CACAO v2 content only, no
+  proprietary schema. NIS2 Art. 21(2)(g) is the primary regulatory
+  anchor. No hardcoded LMS / HR endpoint — the operator wires each
+  at the compile-target config layer.
+- **Depends on:** F-WF-CYBERHYG (the operational per-cycle
+  materialisation this programme-lifecycle workflow feeds).
+- **Source:** NIS2 (Directive (EU) 2022/2555) Art. 21(2)(g); GDPR
+  (Regulation (EU) 2016/679) Art. 32(1)(b); ISO/IEC 27001:2022
+  Annex A.6.3.
+
+---
+
 ## Epic PT — Pattern Library
 
 Reusable graph fragments and Pydantic types shared across cookbook
