@@ -54,7 +54,7 @@ title: "kpi.nis2_cyber_awareness_training_completion_rate@v1 — completion rate
 ---
 xychart-beta horizontal
     title "cyber-awareness training completion rate by department (Q ending)"
-    x-axis "department" ["security", "engineering", "operations", "sales", "finance", "hr"]
+    x-axis "department" ["security", "engineering", "operations", "legal", "finance", "hr"]
     y-axis "completion rate" 0 --> 1
     bar [0.98, 0.94, 0.91, 0.83, 0.77, 0.68]
 ```
@@ -69,7 +69,7 @@ cycle close):
 | security     | 40       | 39        | 0.98  | above target                        |
 | engineering  | 120      | 113       | 0.94  | warn band                           |
 | operations   | 80       | 73        | 0.91  | warn band                           |
-| sales        | 100      | 83        | 0.83  | high band                           |
+| legal        | 100      | 83        | 0.83  | high band                           |
 | finance      | 60       | 46        | 0.77  | high band                           |
 | hr           | 80       | 54        | 0.68  | breach band                         |
 
