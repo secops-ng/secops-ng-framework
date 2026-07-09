@@ -1,0 +1,224 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d",
+  "name": "DORA Art. 19 major-ICT-related incident reporting lifecycle",
+  "description": "SKELETON — CACAO v2 scaffold for the DORA Chapter III major-ICT-related incident reporting lifecycle a financial entity discharges to its competent authority per DORA Regulation (EU) 2022/2554 Article 19. Composes the operator-side notification cycle keyed on the three DORA-specific milestones (initial notification within 4h of major classification / no later than 24h from awareness per Art. 19(4)(a); intermediate report within 72h of major classification per Art. 19(4)(b); final report no later than one month after the intermediate report per Art. 19(4)(c)) plus a closing archival step. Distinct from playbook.incident_management@v1 which is the NIS2 Art. 23 shaped notification engine (early-warning within 24h, notification within 72h, final report within one month against the CSIRT / competent authority chain); this playbook is the DORA-flavoured lifecycle keyed on the ESA / NCA authority chain and the Commission ITS content shape (Commission Implementing Regulation (EU) 2024/2956). Distinct also from playbook.dora_tlpt_programme@v1 which is the Chapter IV testing-programme discipline. Chapter III classification is handled upstream by the deterministic classifier (Commission Delegated Regulation (EU) 2024/1772); this playbook consumes a classified-as-major decision at the detect-and-classify step and drives the three-milestone reporting cycle to closure. SKELETON only — the deterministic per-milestone submission adapters, the competent-authority notification channel bindings, and the per-target compile examples are owned by CORE / EXTEND sibling cards.",
+  "playbook_types": [
+    "notification"
+  ],
+  "created_by": "identity--55e05575-0000-4000-8000-000000000002",
+  "created": "2026-07-09T00:00:00Z",
+  "modified": "2026-07-09T00:00:00Z",
+  "valid_from": "2026-07-09T00:00:00Z",
+  "labels": [
+    "dora",
+    "chapter-iii",
+    "major-ict-related-incident",
+    "incident-reporting",
+    "article-19",
+    "regulatory-notification"
+  ],
+  "external_references": [
+    {
+      "name": "OASIS CACAO v2.0",
+      "description": "Workflow step types (start, action, end), variable conventions, x_ extension namespace.",
+      "source": "OASIS Open"
+    },
+    {
+      "name": "DORA — Regulation (EU) 2022/2554, Article 19 — Reporting of major ICT-related incidents and voluntary notification of significant cyber threats",
+      "source": "Official Journal of the European Union",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+    },
+    {
+      "name": "DORA — Regulation (EU) 2022/2554, Article 18 — Classification of ICT-related incidents and cyber threats",
+      "source": "Official Journal of the European Union",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+    },
+    {
+      "name": "Commission Delegated Regulation (EU) 2024/1772 — RTS on the criteria for the classification of ICT-related incidents and cyber threats",
+      "source": "European Commission"
+    },
+    {
+      "name": "Commission Implementing Regulation (EU) 2024/2956 — ITS on the standard forms, templates and procedures for reporting major ICT-related incidents",
+      "source": "European Commission"
+    },
+    {
+      "name": "NIS2 Directive (EU) 2022/2555, Article 23 — Reporting obligations (cross-regime parallel notification)",
+      "source": "Official Journal of the European Union"
+    },
+    {
+      "name": "GDPR Regulation (EU) 2016/679, Articles 33-34 — Notification of a personal data breach",
+      "source": "Official Journal of the European Union"
+    }
+  ],
+  "playbook_variables": {
+    "__incident_id__": {
+      "type": "string",
+      "description": "Identifier of the ICT-related incident this reporting cycle discharges. Read against the operator's incident register; upstream classification is done by the deterministic Art. 18 classifier under Commission Delegated Regulation (EU) 2024/1772.",
+      "external": true
+    },
+    "__reporting_window__": {
+      "type": "string",
+      "description": "Identifier of the DORA Art. 19 reporting cycle window this run discharges — names which incident-cycle cohort the run reports against. Wall-clock timestamps live on each emitted submission artifact.",
+      "external": true
+    },
+    "__classification_decision_id__": {
+      "type": "string",
+      "description": "Identifier of the Art. 18 classification-decision record composed at the detect-and-classify step: whether the incident is classified as MAJOR against Commission Delegated Regulation (EU) 2024/1772 criteria (seven primary criteria plus materiality thresholds; recurring-incident rule per Art. 18(2)). On the not-major branch the primitive still emits a dated decision record so the audit-evident chain is closed rather than silently short-circuiting.",
+      "external": false
+    },
+    "__initial_notification_id__": {
+      "type": "string",
+      "description": "Identifier of the initial notification submission composed for the competent authority at the notify-authority-initial step per DORA Art. 19(4)(a): submitted as soon as possible, within 4 hours of classification as major, and no later than 24 hours from awareness. Content shape follows Commission Implementing Regulation (EU) 2024/2956 (ITS). Populated with the authority acknowledgement reference once the submission response is bound.",
+      "external": false
+    },
+    "__intermediate_report_id__": {
+      "type": "string",
+      "description": "Identifier of the intermediate report submission composed at the notify-authority-intermediate step per DORA Art. 19(4)(b): submitted within 72 hours of classification of the incident as major (or earlier if regular activities have recovered). Updates the timestamps, affected functions and clients, indicators of compromise, and mitigation actions in flight against the ITS content shape.",
+      "external": false
+    },
+    "__final_report_id__": {
+      "type": "string",
+      "description": "Identifier of the final report submission composed at the notify-authority-final step per DORA Art. 19(4)(c): submitted no later than one month after the submission of the intermediate report. Carries the root-cause analysis, final impact figures, completed remediation actions, lessons learned, action plan, and residual-risk statement.",
+      "external": false
+    },
+    "__cycle_archive_id__": {
+      "type": "string",
+      "description": "Identifier of the dated cycle-archival record composed at the close-and-archive step: references the classification decision, the three submission artifacts, the authority acknowledgement references, and the cross-regime notification-chain outputs (NIS2 Art. 23, GDPR Art. 33-34 where applicable) so the audit-evident chain is closed at the primitive boundary rather than trailing across unlinked artifacts.",
+      "external": false
+    }
+  },
+  "workflow_start": "start--71000000-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--71000000-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "dora_major_incident_reporting_start",
+      "on_completion": "action--71000000-0000-4000-8000-000000000002"
+    },
+    "action--71000000-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "detect and classify",
+      "description": "TODO (CORE): Art. 18 classification-decision primitive. The action body reads the incident-register entry bound to __incident_id__ and evaluates whether the incident meets the major-ICT-related-incident threshold against the criteria the Commission Delegated Regulation (EU) 2024/1772 RTS names (seven primary criteria — clients affected, reputational impact, data-loss impact, service duration, geographical spread, economic impact, criticality of services affected — plus the materiality thresholds and the Art. 18(2) recurring-incident rule). Sets __classification_decision_id__ to a durable identifier of the classification record. On the not-major branch the primitive emits a dated decision record naming the criteria evaluated and short-circuits the downstream notification chain; on the major branch it opens the reporting window and hands off to notify-authority-initial. DORA Art. 19 anchor: this step is the entry gate to Art. 19's three-milestone reporting cycle, per Art. 19(1) which conditions the reporting obligation on the Art. 18(1) classification outcome. SKELETON pins the topology, the ID, and the regulatory anchor refs; the deterministic per-criterion evaluation is owned by CORE-PRIM and reuses the existing content.dora_major_classifier@v1 primitive.",
+      "on_completion": "action--71000000-0000-4000-8000-000000000003",
+      "in_args": [
+        "__incident_id__",
+        "__reporting_window__"
+      ],
+      "out_args": [
+        "__classification_decision_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.dora_major_classifier@v1"
+        ]
+      }
+    },
+    "action--71000000-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "notify authority initial",
+      "description": "TODO (CORE): initial-notification submission primitive per DORA Art. 19(4)(a). The action body packages the initial notification against the Commission Implementing Regulation (EU) 2024/2956 ITS content shape (initial-notification template): incident identifier, classification-decision reference, awareness timestamp, classification timestamp, affected critical or important functions, impact assessment at the initial stage, and where available a first-cut indicators-of-compromise block. The submission is dispatched to the competent authority (ESA sectoral supervisor / NCA per the operator's designated authority chain) against the adapter binding declared under patterns.dora_major_incident_reporting (owned by the sibling EXTEND card). The step MUST fire as soon as possible and within 4 hours of classification as major, and no later than 24 hours from awareness of the incident. Sets __initial_notification_id__; populated with the authority acknowledgement reference once the response is bound. DORA Art. 19 anchor: Art. 19(4)(a) initial-notification milestone.",
+      "on_completion": "action--71000000-0000-4000-8000-000000000004",
+      "in_args": [
+        "__incident_id__",
+        "__classification_decision_id__"
+      ],
+      "out_args": [
+        "__initial_notification_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.dora_submission_templates@v1",
+          "control.incident_timeline_signals@v1"
+        ]
+      }
+    },
+    "action--71000000-0000-4000-8000-000000000004": {
+      "type": "action",
+      "name": "notify authority intermediate",
+      "description": "TODO (CORE): intermediate-report submission primitive per DORA Art. 19(4)(b). The action body packages the intermediate report against the ITS content shape (intermediate-report template): updated timestamps, refreshed affected-functions and affected-clients figures, indicators of compromise, mitigation actions in flight, and any preliminary root-cause hypothesis. The step MUST fire within 72 hours of classification of the incident as major, or earlier if regular activities have recovered in the interim. Sets __intermediate_report_id__; populated with the authority acknowledgement reference once the response is bound. The primitive reads the notification-adapter binding declared under patterns.dora_major_incident_reporting so the submission channel is consistent across the three milestones on the same reporting-cycle window. DORA Art. 19 anchor: Art. 19(4)(b) intermediate-report milestone.",
+      "on_completion": "action--71000000-0000-4000-8000-000000000005",
+      "in_args": [
+        "__incident_id__",
+        "__initial_notification_id__"
+      ],
+      "out_args": [
+        "__intermediate_report_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.dora_submission_templates@v1",
+          "control.incident_timeline_signals@v1"
+        ]
+      }
+    },
+    "action--71000000-0000-4000-8000-000000000005": {
+      "type": "action",
+      "name": "notify authority final",
+      "description": "TODO (CORE): final-report submission primitive per DORA Art. 19(4)(c). The action body packages the final report against the ITS content shape (final-report template): full root-cause analysis, final impact figures on the affected critical or important functions and clients, completed remediation actions, lessons-learned narrative, action plan for the residual and structural gaps, and the operator's residual-risk statement. The step MUST fire no later than one month after the submission of the intermediate report. Sets __final_report_id__; populated with the authority acknowledgement reference once the response is bound. Consumes __intermediate_report_id__ to carry the reporting-cycle chain forward and to guarantee the ITS timeline field ordering is coherent across the three milestones. DORA Art. 19 anchor: Art. 19(4)(c) final-report milestone.",
+      "on_completion": "action--71000000-0000-4000-8000-000000000006",
+      "in_args": [
+        "__incident_id__",
+        "__intermediate_report_id__"
+      ],
+      "out_args": [
+        "__final_report_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.dora_submission_templates@v1",
+          "control.incident_timeline_signals@v1"
+        ]
+      }
+    },
+    "action--71000000-0000-4000-8000-000000000006": {
+      "type": "action",
+      "name": "close and archive",
+      "description": "TODO (CORE): cycle-archival primitive. The action body composes the dated cycle-archival record referencing __classification_decision_id__, the three submission artifacts (__initial_notification_id__, __intermediate_report_id__, __final_report_id__), the authority acknowledgement references, and any cross-regime notification-chain outputs (the NIS2 Art. 23 notification submitted in parallel where the operator is also in scope of NIS2 as an essential or important entity; the GDPR Art. 33 personal-data-breach notification where the incident involves personal data; the GDPR Art. 34 data-subject communication where the high-risk threshold is met). The archival record is published to the operator's evidence store; the artifact_id is SHA-256(workflow_id|execution_id|captured_at) so compile_target does not enter the identifier and the three reference compilers re-derive byte-identical bytes from the same primitive output. Sets __cycle_archive_id__. Always emitted so the audit-evident chain is closed even on the not-major branch. DORA Art. 19 anchor: Art. 19(3) which requires the operator to keep the reporting chain evidence-bound across the three milestones.",
+      "on_completion": "end--71000000-0000-4000-8000-000000000007",
+      "in_args": [
+        "__incident_id__",
+        "__classification_decision_id__",
+        "__initial_notification_id__",
+        "__intermediate_report_id__",
+        "__final_report_id__"
+      ],
+      "out_args": [
+        "__cycle_archive_id__"
+      ],
+      "x_secops_ng": {
+        "control_refs": [
+          "control.incident_timeline_signals@v1"
+        ]
+      }
+    },
+    "end--71000000-0000-4000-8000-000000000007": {
+      "type": "end",
+      "name": "dora_major_incident_reporting_end"
+    }
+  },
+  "x_secops_ng": {
+    "stable_id": "playbook.dora_major_incident_reporting@v1",
+    "content_version": "0.1.0",
+    "maturity": "experimental",
+    "compile_targets": [
+      "n8n",
+      "temporal",
+      "langgraph"
+    ],
+    "control_refs": [
+      "control.dora_major_classifier@v1",
+      "control.dora_submission_templates@v1",
+      "control.incident_timeline_signals@v1"
+    ],
+    "sources": [
+      "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
+      "DORA — Regulation (EU) 2022/2554, Article 19 — Reporting of major ICT-related incidents and voluntary notification of significant cyber threats",
+      "DORA — Regulation (EU) 2022/2554, Article 18 — Classification of ICT-related incidents and cyber threats",
+      "Commission Delegated Regulation (EU) 2024/1772 — RTS on classification of ICT-related incidents and cyber threats",
+      "Commission Implementing Regulation (EU) 2024/2956 — ITS on the standard forms, templates and procedures for reporting major ICT-related incidents",
+      "NIS2 Directive (EU) 2022/2555, Article 23 — Reporting obligations (cross-regime parallel notification)",
+      "GDPR Regulation (EU) 2016/679, Articles 33-34 — Notification of a personal data breach"
+    ]
+  }
+}
