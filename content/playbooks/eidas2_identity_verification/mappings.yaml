@@ -1,0 +1,208 @@
+# Cross-references for the eidas2_identity_verification playbook.
+#
+# Outbound view of the content model: pins OSCAL controls, MITRE
+# D3FEND defensive techniques, OCSF event classes emitted, and the
+# EU regulatory clauses this playbook helps operationalise. Inbound
+# references live in content/mappings/{nis2,dora}/ so the graph is
+# closed in both directions.
+#
+# Status: SKELETON. This overlay pins the primary NIS2 Art. 21(2)(i)
+# and DORA Art. 5 inbound anchors, the OSCAL access-management
+# control anchors (AC-2 account management, IA-8 identification and
+# authentication of non-organisational users), the D3FEND
+# operational-activity-mapping technique (D3-OAM) as the closest
+# defensive-technique surface for the identity-verification pass,
+# and the OCSF Account Change (3001) telemetry class the audit-
+# evidence step emits. The compile-target primitive bodies, the
+# per-step D3FEND rationale expansion, and the OCSF Compliance
+# Finding (2003) emission on the verification-failure branch land
+# in the sibling CORE / EXTEND cards.
+#
+# eIDAS 2.0 (Regulation (EU) 2024/1183) is the primary regulatory
+# anchor for this playbook but does not yet have its own inbound
+# mapping directory under content/mappings/; the closure lands via
+# the NIS2 Art. 21(2)(i) access-management umbrella and the DORA
+# Art. 5 digital-identity-governance umbrella. A sibling G-02 card
+# authors the content/mappings/eidas2/ inbound directory.
+#
+# Sovereign-stack note: the trust-anchor probe in verify_pid_credential
+# resolves against Member-State Trusted Lists and the LOTL aggregator
+# per Commission Implementing Decision (EU) 2015/1505 (as maintained
+# under eIDAS 2.0). No non-EU trust anchor is assumed, and no
+# Microsoft / Google EUDIW proxy surface is modelled: the wallet-side
+# protocol is OpenID4VP / ARF v2 against the operator's own verifier.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.eidas2_identity_verification@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 anchors for the access-management and
+  # non-organisational-user identification surface this playbook
+  # operates. AC-2 anchors the joiner-side account provisioning the
+  # trigger_access_provisioning step routes into; IA-8 anchors the
+  # non-organisational-user identification the request_eudiw_presentation
+  # and verify_pid_credential steps discharge (an EUDIW-presenting
+  # citizen is the paradigmatic non-organisational user IA-8 names).
+  - id: control.jml_evidence@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AC-2
+    title: Account Management
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AC-2
+    notes: >-
+      SKELETON anchor for the trigger_access_provisioning hand-off
+      and the emit_identity_audit_evidence step. AC-2 requires the
+      organisation to identify and select account types, assign
+      account managers, and monitor the use of accounts; the
+      identity-verification cycle produces the audit-evident
+      evidence that the joiner-side account creation was gated on a
+      verified EUDIW attestation. Reuses the same control URN
+      (control.jml_evidence@v1) already pinned by the sibling
+      onboarding_offboarding_tracker overlay so the operator's
+      access-management surface consolidates around a single AC-2
+      anchor.
+  - id: control.non_org_user_identification@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IA-8
+    title: Identification and Authentication (Non-Organizational Users)
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IA-8
+    notes: >-
+      SKELETON anchor for the request_eudiw_presentation and
+      verify_pid_credential steps. IA-8 requires the organisation
+      to uniquely identify and authenticate non-organisational
+      users (or processes acting on their behalf) accessing federal
+      information systems; an EUDIW-presenting citizen or
+      third-party user is exactly the non-organisational-user
+      surface IA-8 names. The presentation-request-and-verify
+      cycle is the eIDAS-2.0-native materialisation of that
+      obligation. The sibling EXTEND card lands the per-step
+      catalog-native control_id enhancement notes (IA-8(1) federated
+      identity, IA-8(4) FIPS-201-approved credentials analogue for
+      the EU trust-anchor registry).
+
+d3fend:
+  # MITRE D3FEND defensive-technique tags per playbook step.
+  # SKELETON pins the operational-activity-mapping (D3-OAM) technique
+  # as the closest defensive-technique surface for the identity-
+  # verification pass: the account monitoring / verification of a
+  # non-organisational user's asserted identity against a declared
+  # trust anchor is the operational-activity-mapping discipline
+  # D3-OAM names. The sibling EXTEND card adds the per-step D3FEND
+  # rationale expansion and any additional detection-binding
+  # anchors (e.g. D3-AM Account Monitoring on the verification-
+  # failure branch that emits Compliance Finding records).
+  - step: action--e1d5a520-0000-4000-8000-000000000003
+    d3fend_id: D3-OAM
+    d3fend_name: Operational Activity Mapping
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    notes: >-
+      verify_pid_credential \u2014 the cryptographic verification of the
+      EUDIW-presented PID credential against the declared EU
+      trust-anchor registry (Member-State Trusted List entry or its
+      LOTL aggregator, per Commission Implementing Decision (EU)
+      2015/1505 as maintained under eIDAS 2.0), the holder-binding
+      check (cnf claim for SD-JWT VC, device binding for mDoc per
+      ARF v2), and the status-list resolution together produce the
+      dated operational-activity-mapping record between the
+      presenting principal and the operator's declared trust
+      surface. D3FEND frames Operational Activity Mapping as the
+      identification of what activities are operationally meaningful
+      to defend; the playbook narrows that lens to the identity-
+      verification transaction the operator's access-management
+      surface gates on. Read-only-by-contract \u2014 no attribute is
+      asserted back to the wallet, no trust-list entry is mutated.
+      Additional per-step D3FEND bindings (Account Monitoring D3-AM
+      on the negative-verdict branch, Credential Rotation D3-CR on
+      the LoA-drift branch) land in the sibling EXTEND card.
+
+ocsf:
+  # OCSF v1.3.0 telemetry bindings. The emit_identity_audit_evidence
+  # step emits an Account Change (3001) record carrying the
+  # verification verdict, the resolved LoA, the mapped access tier,
+  # and the evidence_id \u2014 the audit-evident carrier the NIS2 Art.
+  # 21(2)(i) evidence-stream review reads. On the verification-
+  # failure branch the same class carries the negative record;
+  # sibling EXTEND card adds the Compliance Finding (2003) emission
+  # for the deviation-record surface.
+  - id: telemetry.account_change@v1
+    category_uid: 3
+    category_name: Identity & Access Management
+    class_uid: 3001
+    class_name: Account Change
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted by the emit_identity_audit_evidence step as the dated
+      per-principal identity-verification record: pins
+      __principal_id__, __auth_scope__, __presentation_request_id__,
+      __pid_credential_id__, __loa_verdict__, __access_tier__,
+      __verification_verdict__, and __captured_at__ so the NIS2
+      Art. 21(2)(i) auditable-lifecycle obligation is discharged on
+      every terminal path (including the verification-failed
+      branch). Reuses the existing content/telemetry/
+      telemetry.ocsf.account_change@v1.json envelope already
+      exercised by the onboarding_offboarding_tracker and
+      iam_auditor playbooks. Schema:
+      https://schema.ocsf.io/1.3.0/classes/account_change
+
+nis2:
+  # Inbound entry that backlinks playbook.eidas2_identity_verification@v1:
+  #   - content/mappings/nis2/article-21-2-i.yaml
+  #     (id nis2:art-21-2-i \u2014 human resources security, access-control
+  #     policies, and asset management)
+  # Pinned outbound below to close the graph.
+  - mapping_id: nis2:art-21-2-i
+    article: 21(2)(i)
+    notes: >-
+      NIS2 Art. 21(2)(i) requires essential and important entities
+      to operate human-resources security, access-control policies,
+      and asset management inside the entity. The
+      eidas2_identity_verification playbook is the eIDAS-2.0-native
+      materialisation of the access-control-policy leg of that
+      obligation for EUDIW-enabled principals: the presentation-
+      request-and-verify cycle produces the dated Account Change
+      record that gates joiner-side capability provisioning against
+      a cryptographically verified PID credential and a resolved
+      Level of Assurance. Companion to the sibling
+      onboarding_offboarding_tracker (per-lifecycle-event
+      grant/revoke-confirmation) and iam_auditor (per-execution
+      capability-inventory) playbooks under the same inbound entry.
+
+dora:
+  # Inbound entry that backlinks playbook.eidas2_identity_verification@v1:
+  #   - content/mappings/dora/article-5.yaml
+  #     (id dora:art-5-governance \u2014 governance and organisation, ICT
+  #     risk-management framework, digital-identity governance
+  #     surface)
+  # Pinned outbound below to close the graph. Art. 5(2)(a) is the
+  # digital-identity-governance slice of the Art. 5 governance
+  # obligation the mapping id anchors on.
+  - mapping_id: dora:art-5-governance
+    article: "5"
+    notes: >-
+      DORA Art. 5 requires financial entities to establish an
+      internal governance and control framework for ICT risk, with
+      the management body bearing ultimate responsibility for the
+      ICT risk-management framework, roles and responsibilities for
+      ICT functions, and the digital-identity governance surface
+      the framework rests on. The eidas2_identity_verification
+      playbook is the operational discharge of the digital-
+      identity-governance leg for EUDIW-enabled principals: the
+      dated identity-verification audit-evidence record is the
+      per-onboarding evidence the management-body-approved
+      framework rests on. eIDAS 2.0 (Regulation (EU) 2024/1183)
+      supplies the EU-native identity-primitive the DORA governance
+      surface consumes; the closure lands here rather than under a
+      dedicated dora:art-5-digital-identity mapping id (a sibling
+      G-02 card refines the mapping id if the digital-identity slice
+      warrants its own inbound anchor).
+
+cra:
+  # No direct CRA (Regulation (EU) 2024/2847) touchpoint on this
+  # playbook. CRA operates on product security of products with
+  # digital elements; identity-verification of EUDIW-enabled
+  # principals accessing an operator's own access surface is an
+  # access-management discipline downstream of any product-side CRA
+  # obligation. A sibling G-02 card revisits the CRA overlap if the
+  # EUDIW-verifier surface itself is later scoped as a product with
+  # digital elements.
+  []
