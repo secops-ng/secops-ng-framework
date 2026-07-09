@@ -100,6 +100,73 @@ back-referenced from the metric YAML's `telemetry_refs[]` and from
 the `agentic_detection_firings` / `triage_dispositions`
 `measurement.inputs[].telemetry_ref`.
 
+### OCSF source-data example (`class_uid: 2004`)
+
+Illustrative OCSF Detection Finding record shape at closed
+adjudication, the record the metric formula reads to compute
+`FP / (FP + TP)`. Field names follow OCSF 1.x; the shape is the
+contract for what the case-management surface stamps at close, not
+a vendor-specific case-management envelope.
+
+```yaml
+# One closed-adjudication observed as a Detection Finding (2004)
+# record with disposition_id encoding the FP / TP axis. The metric
+# reads FP from records whose disposition_id names false-positive
+# and TP from those naming true-positive, over agentic-tradecraft
+# in-window firings; unset dispositions are excluded per the formula.
+metadata:
+  version: "1.3.0"
+  product:
+    vendor_name: "<operator's case-management surface>"
+class_uid: 2004                            # Detection Finding
+class_name: "Detection Finding"
+category_uid: 2                            # Findings category
+type_uid: 200402                           # Detection Finding: Update (close)
+activity_id: 2                             # Update
+severity_id: 4                             # High (at firing)
+time: 1783609200                           # close-adjudication time
+disposition_id: 2                          # False Positive (OCSF disposition)
+finding_info:
+  uid: "df-2026-07-09-000042"              # firing identity carried at close
+  title: "Anomalous LLM API call volume — false positive on closure"
+  types:
+    - "agentic-tradecraft"                 # class scope: contributes to FP+TP
+    - "llm-api-volume"                     # per-class drill-down bucket
+  analytic:
+    uid: "analytic.agentic.llm_api_volume@v1"
+    name: "LLM API volume anomaly"
+    type_id: 3                             # Behavioral
+```
+
+## Cross-regime regulatory anchors
+
+The KRI's false-positive-rate reading on the agentic-tradecraft
+class is durable across the three EU regimes an operator carries
+at once:
+
+- **NIS2 Art. 21(2)(a)** — policies on risk analysis and information
+  system security. The signal-quality basis for the agentic-adversary
+  case set: a rising FP rate is the leading signal that the operator's
+  risk-analysis surface is misclassifying benign workloads as
+  agentic-adversary firings.
+- **NIS2 Art. 21(2)(b)** — incident-handling capability. The KRI is
+  the triage-quality read on agentic-tradecraft firings: containment
+  actions (session revocation, IdP disable, micro-segmentation cut)
+  driven by high-FP firings amplify blast radius against innocent
+  workloads.
+- **EU AI Act Art. 15** — accuracy, robustness and cybersecurity of
+  high-risk AI systems. The FP rate is a first-class accuracy signal
+  on classifier surfaces the operator deploys against agentic
+  tradecraft.
+- **DORA Art. 16** — simplified ICT risk management framework. The
+  KRI is the residual-risk read on containment actions driven by
+  agentic-tradecraft detections at financial entities.
+
+The catalog entry stays regime-neutral (one reading, four
+regime-scoped uses); the `external_refs[]` on the YAML enumerate the
+anchors so operators can lift the KRI into a regime-scoped variant
+without translating the measurement.
+
 ## Operator override
 
 Operators are expected to render this metric in their own dashboard

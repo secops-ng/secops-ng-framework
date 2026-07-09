@@ -99,6 +99,70 @@ back-referenced from the metric YAML's `telemetry_refs[]` and from
 the `detection_firings` / `agentic_class_marker`
 `measurement.inputs[].telemetry_ref`.
 
+### OCSF source-data example (`class_uid: 2004`)
+
+Illustrative OCSF Detection Finding record shape the metric formula
+reads. Field names follow OCSF 1.x; the shape is the contract for
+what the SIEM emits at agentic-tradecraft rule match, not a
+vendor-specific rule object.
+
+```yaml
+# One firing observed as a Detection Finding (2004) record.
+# The metric reads |A| from records whose category_uid names an
+# agentic-tradecraft class; |F| from all in-window records.
+metadata:
+  version: "1.3.0"
+  product:
+    vendor_name: "<operator's SIEM>"
+class_uid: 2004                            # Detection Finding
+class_name: "Detection Finding"
+category_uid: 2                            # Findings category
+type_uid: 200401                           # Detection Finding: Create
+activity_id: 1                             # Create
+severity_id: 4                             # High
+time: 1783600000                           # firing time (window scope)
+finding_info:
+  uid: "df-2026-07-09-000042"              # firing identity
+  title: "Anomalous LLM API call volume"
+  types:
+    - "agentic-tradecraft"                 # class marker read by |A|
+    - "llm-api-volume"                     # per-class drill-down bucket
+  analytic:
+    uid: "analytic.agentic.llm_api_volume@v1"
+    name: "LLM API volume anomaly"
+    type_id: 3                             # Behavioral
+observables:
+  - name: "principal.user.name"
+    type_id: 21
+    value: "svc-agent-42"
+```
+
+## Cross-regime regulatory anchors
+
+The KPI's detect-pillar coverage reading is durable across the three
+EU regimes an essential or important operator carries at once:
+
+- **NIS2 Art. 21(2)(a)** — policies on risk analysis and information
+  system security. A rising agentic-adversary share of the detection
+  population is the leading signal that the operator's risk basis
+  actually covers the machine-speed adversary case set, not just the
+  classical rule-based one.
+- **NIS2 Art. 21(2)(b)** — incident-handling capability. The KPI reads
+  how much of the detect pillar is scoped at agentic tradecraft, i.e.
+  the case set that stresses the incident-handling loop's timing.
+- **EU AI Act Art. 6 & Annex III** — for operators deploying
+  high-risk AI systems (or whose customers do), the same KPI reads
+  the detection surface around those deployments and is the durable
+  operability signal that agentic-tradecraft coverage is being held.
+- **DORA Art. 16** — for financial entities under the simplified ICT
+  risk-management framework, the KPI is the detect-pillar reading on
+  ICT-related incidents targeting agentic-decision surfaces.
+
+The catalog entry stays regime-neutral (one reading, three
+regime-scoped uses); the `external_refs[]` on the YAML enumerate the
+anchors so operators can lift the KPI into a regime-scoped variant
+without translating the measurement.
+
 ## Operator override
 
 Operators are expected to render this metric in their own dashboard
