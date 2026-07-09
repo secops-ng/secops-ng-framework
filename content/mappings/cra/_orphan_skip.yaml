@@ -304,3 +304,94 @@ skip:
       and when the EUDIW verifier surface itself is later scoped as
       a product with digital elements under CRA (sibling G-02 card
       per the outbound-overlay footnote).
+
+  - slug: dora_major_incident_reporting
+    rationale: >-
+      DORA Article 19 major-incident reporting lifecycle — the
+      financial-entity operator obligation to submit an initial /
+      intermediate / final notification to the competent authority
+      on the ICT-related major-incident surface. The playbook's
+      outbound overlay
+      (`content/playbooks/dora_major_incident_reporting/mappings.yaml`)
+      deliberately does not pin CRA entries: CRA Annex I is a
+      product-security obligation on manufacturers of products
+      with digital elements under Regulation (EU) 2024/2847, while
+      DORA Art. 19 authors an operator-side ICT-incident regulator-
+      notification chain on financial entities under Regulation
+      (EU) 2022/2554 — distinct obligation surfaces on distinct
+      regulated populations. Cross-pinning the Art. 19 milestone
+      lifecycle here to a CRA anchor would misrepresent the scope,
+      and the CRA product-vulnerability notification chain is
+      already discharged by the sibling `vuln_intake` / `cra_srp_notify`
+      lane, not by an operator-side financial-entity incident-
+      reporting playbook. Mirrors the `incident_management` CRA
+      deferral precedent in shape (framework-agnostic operator-
+      side incident chain vs manufacturer-side product-vulnerability
+      notification), and the `dora_ict_risk_selfassess` /
+      `dora_tpr_management` CRA-axis precedents in regulatory-axis
+      split (operator-side DORA stays on DORA; CRA stays on the
+      per-product manufacturer chain). The DORA inbound graph is
+      closed via `content/mappings/dora/article-19-and-28.yaml`
+      (Art. 19(1)/(4) major-incident-reporting atoms). A sibling
+      CORE / EXTEND card revisits the CRA cross-regime graph if a
+      documented interaction is authored.
+
+  - slug: security_awareness_training
+    rationale: >-
+      NIS2 Art. 21(2)(g) cyber-hygiene and security-awareness
+      training lifecycle — the operator-side HR / organisational
+      workforce-training discipline for essential and important
+      entities (curriculum design, delivery scheduling, completion
+      tracking, refresh cadence, per-audience effectiveness
+      measurement). The playbook's outbound overlay
+      (`content/playbooks/security_awareness_training/mappings.yaml`)
+      deliberately does not pin CRA entries: CRA Annex I is a
+      product-security obligation on manufacturers of products
+      with digital elements under Regulation (EU) 2024/2847, while
+      workforce security-awareness training is an operator-side HR
+      obligation surface already anchored on NIS2 Art. 21(2)(g) and
+      GDPR Art. 32(1)(b). Cross-pinning the training lifecycle here
+      to a CRA Annex I anchor would misrepresent the scope — CRA
+      Annex I does not carry an operator-side workforce-training
+      clause at the shape of NIS2 Art. 21(2)(g), and the sibling
+      `cyber_hygiene_training` overlay handles the closely-related
+      NIS2-anchored surface without a CRA edge on the same
+      rationale. Mirrors the `dora_ict_risk_selfassess` and
+      `dora_tpr_management` CRA-axis precedents (operator-side
+      workforce / process obligations stay on NIS2 / DORA / GDPR;
+      CRA stays on the per-product manufacturer chain). A sibling
+      CORE / EXTEND card revisits the CRA cross-regime graph if a
+      documented interaction is authored (for example a manufacturer-
+      side product-security training obligation on developer or
+      installer roles that overlaps the operator-side workforce-
+      training surface).
+
+  - slug: nis2_art20_governance
+    rationale: >-
+      NIS2 Art. 20 management-body governance lifecycle — the
+      operator-side approval-and-oversight cycle for management
+      bodies of essential and important entities (approval of the
+      risk-management measures, dated training records for the
+      management body, oversight of implementation, liability
+      attestation). The playbook's outbound overlay
+      (`content/playbooks/nis2_art20_governance/mappings.yaml`)
+      deliberately does not pin CRA entries: CRA Annex I is a
+      product-security obligation on manufacturers of products with
+      digital elements under Regulation (EU) 2024/2847, while
+      NIS2 Art. 20 authors an operator-side management-body
+      governance obligation on essential and important entities
+      under Directive (EU) 2022/2555 — distinct obligation surfaces
+      on distinct regulated populations, with no CRA Annex I
+      clause cross-pinning management-body approval or training to
+      a product-lifecycle anchor. Cross-pinning the governance
+      lifecycle here to a CRA Annex I anchor would misrepresent the
+      scope. Mirrors the `nis2_self_assessment` CRA-axis precedent
+      (whole-Article NIS2 operator roll-up with no CRA inbound at
+      the same shape) and the `dora_ict_risk_selfassess` /
+      `dora_tpr_management` CRA-axis precedents in regulatory-axis
+      split (operator-org governance stays on NIS2; CRA stays on
+      the per-product manufacturer chain). The NIS2 inbound graph
+      is closed via `content/mappings/nis2/article-20.yaml`
+      (Art. 20(1) approval and Art. 20(2) training-and-oversight
+      atoms). A sibling CORE / EXTEND card revisits the CRA
+      cross-regime graph if a documented interaction is authored.

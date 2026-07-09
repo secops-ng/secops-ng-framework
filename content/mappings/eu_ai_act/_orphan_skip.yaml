@@ -379,3 +379,94 @@ skip:
       procurement-side interaction (for example an Art. 25 supply-
       chain responsibility surface that shares the DORA TPR contract-
       register as evidence).
+
+  - slug: dora_major_incident_reporting
+    rationale: >-
+      DORA Article 19 major-incident reporting lifecycle — the
+      financial-entity operator obligation to submit an initial /
+      intermediate / final notification to the competent authority
+      on the ICT-related major-incident surface. The playbook's
+      outbound overlay
+      (`content/playbooks/dora_major_incident_reporting/mappings.yaml`)
+      deliberately does not pin EU AI Act entries: DORA Art. 19 is
+      a financial-entity ICT-incident regulator-notification chain
+      under Regulation (EU) 2022/2554, while the EU AI Act Art. 9
+      / 11 / 13 / 72 obligation surface anchors on provider /
+      deployer duties for high-risk AI systems under Regulation
+      (EU) 2024/1689 — distinct obligation surfaces on distinct
+      regulated populations. The closest neighbouring incident
+      anchor is Art. 73 serious-incident reporting to the market-
+      surveillance authority, which is deferred pending the AI
+      Office incident-reporting intake schema (see the
+      `incident_management` / `post_incident_review` EU-AI-Act-axis
+      precedents on the same rationale). Cross-pinning the DORA
+      Art. 19 milestone lifecycle here under Art. 9 / 11 / 13 / 72
+      would misrepresent the obligation surface. A sibling EXTEND
+      card revisits Art. 73 once the AI Office incident-reporting
+      intake schema is documented.
+
+  - slug: security_awareness_training
+    rationale: >-
+      NIS2 Art. 21(2)(g) cyber-hygiene and security-awareness
+      training lifecycle — the operator-side HR / organisational
+      workforce-training discipline for essential and important
+      entities. The playbook's outbound overlay
+      (`content/playbooks/security_awareness_training/mappings.yaml`)
+      deliberately does not pin EU AI Act entries: workforce
+      security-awareness training is not an AI-system-specific
+      process, and deployer instruction-for-use obligations under
+      Art. 13(3)(b)(vi) are documentation-side, not training-
+      programme-side. Cross-pinning the workforce training
+      lifecycle under Art. 9 / 11 / 13 / 72 would misrepresent
+      the obligation surface. Mirrors the `cyber_hygiene_training`
+      EU-AI-Act-axis precedent above (framework-agnostic training
+      surface skipped on the same rationale). A sibling EXTEND
+      card revisits Art. 13 if a deployer-facing training
+      obligation surface is authored.
+
+  - slug: nis2_art20_governance
+    rationale: >-
+      NIS2 Art. 20 management-body governance lifecycle — the
+      operator-side approval-and-oversight cycle for management
+      bodies of essential and important entities. The playbook's
+      outbound overlay
+      (`content/playbooks/nis2_art20_governance/mappings.yaml`)
+      deliberately does not pin EU AI Act entries: NIS2 Art. 20
+      authors an operator-side management-body governance
+      obligation on essential and important entities under
+      Directive (EU) 2022/2555, while the EU AI Act Art. 9 / 11
+      / 13 / 72 obligation surface anchors on provider / deployer
+      duties for high-risk AI systems under Regulation (EU)
+      2024/1689 — operator-org governance vs AI-system provider
+      lifecycle, distinct obligation surfaces on distinct
+      regulated populations. Cross-pinning the management-body
+      approval-and-oversight cycle here under Art. 9 / 11 / 13 /
+      72 would misrepresent the obligation surface. Mirrors the
+      `nis2_self_assessment` EU-AI-Act-axis precedent above
+      (whole-Article NIS2 operator roll-up skipped on the same
+      rationale). A sibling EXTEND card revisits the cross-regime
+      graph if ENISA / AI Office guidance documents a documented
+      interaction.
+
+  - slug: eidas2_identity_verification
+    rationale: >-
+      eIDAS 2.0 (Regulation (EU) 2024/1183) EUDIW identity-
+      verification cycle — the operator-side access-management
+      primitive that produces the dated Account Change (OCSF 3001)
+      audit-evidence record gating joiner-side capability
+      provisioning against a cryptographically verified PID
+      credential and a resolved Level of Assurance. The playbook's
+      outbound overlay
+      (`content/playbooks/eidas2_identity_verification/mappings.yaml`)
+      deliberately does not pin EU AI Act entries: EUDIW credential
+      presentation by an EUDIW-enabled principal against the
+      operator's own access surface is an access-management
+      discipline downstream of any EU AI Act Art. 9 / 11 / 13 / 72
+      provider / deployer obligation on high-risk AI systems, and
+      deployer human-oversight obligations under Art. 14 remain a
+      separate inbound surface not yet mapped (see the
+      `iam_auditor` EU-AI-Act-axis precedent on the same
+      rationale). Cross-pinning the identity-verification cycle
+      here under Art. 9 / 11 / 13 / 72 would misrepresent the
+      obligation surface. A sibling EXTEND card revisits Art. 14
+      when the deployer human-oversight inbound layer is authored.
