@@ -1,0 +1,249 @@
+# Cross-references for the dora_major_incident_reporting playbook.
+#
+# This file is the playbook's outbound view of the content model: it
+# pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event
+# classes consumed / emitted, and the EU regulatory clauses this
+# playbook helps operationalise. Inbound references live in
+# content/mappings/{nis2,dora,gdpr}/ so the graph is closed in both
+# directions.
+#
+# This playbook is the DORA Chapter III major-ICT-related incident
+# reporting lifecycle — Art. 19 (the three-milestone reporting cycle
+# to the competent authority: initial 4h / 24h, intermediate 72h,
+# final one-month) anchored on the Art. 18 classification decision
+# (Commission Delegated Regulation (EU) 2024/1772) and the ITS
+# content shape (Commission Implementing Regulation (EU) 2024/2956).
+# Distinct from playbook.incident_management@v1 (NIS2 Art. 23-shaped
+# notification engine) and playbook.dora_tlpt_programme@v1 (Chapter
+# IV testing-programme discipline).
+#
+# Status: SKELETON. The regulatory anchor is pinned (DORA Art. 19
+# primary; NIS2 Art. 23 and GDPR Art. 33-34 as cross-regime siblings;
+# ISO/IEC 27001 A.5.24 / A.5.25 / A.5.26 as the incident-management
+# organisational anchor). Deterministic per-milestone submission
+# adapters, competent-authority notification channel bindings, the
+# per-target compile examples, and the byte-parity goldens are owned
+# by CORE / EXTEND sibling cards.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.dora_major_incident_reporting@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 incident-reporting anchor. IR-6 (Incident
+  # Reporting) is the direct anchor for the three-milestone
+  # regulator-notification lifecycle; SKELETON pins it against the
+  # existing control.incident_timeline_signals@v1 overlay (the
+  # timeline-signals surface underlies each of the three milestones)
+  # rather than lifting a new IR-6 overlay. IR-4 (Incident Handling)
+  # is deliberately NOT pinned here: incident-handling is the
+  # upstream discipline the playbook.incident_management@v1 workflow
+  # already anchors; this playbook is the reporting lane specifically.
+  - id: control.dora_major_classifier@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-8
+    title: Incident Response Plan
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-8
+    todo: true
+    notes: >-
+      SKELETON pin for the detect-and-classify step. IR-8 anchors the
+      documented incident-response plan the operator maintains and
+      against which the Art. 18 classification decision is discharged.
+      The control.dora_major_classifier@v1 stable-id is the deterministic
+      Art. 18 classifier primitive (Commission Delegated Regulation
+      (EU) 2024/1772), reused from the DORA Art. 18/19 mapping; CORE
+      finalises whether IR-8 stays as the anchor or is replaced with
+      the IR-4 (Incident Handling) sub-slice specific to classification.
+
+  - id: control.dora_submission_templates@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-6
+    title: Incident Reporting
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-6
+    todo: true
+    notes: >-
+      SKELETON pin for the notify-authority-initial, notify-authority-
+      intermediate, and notify-authority-final steps. IR-6 anchors the
+      external-reporting discipline (report to organisational
+      officials and external authorities on the incident within
+      defined timelines); the three DORA Art. 19 milestones are the
+      DORA-specific application of that discipline against the ESA /
+      NCA authority chain and the ITS content shape (Commission
+      Implementing Regulation (EU) 2024/2956). Reused from the
+      content/controls/control.dora_submission_templates@v1 overlay.
+
+  - id: control.incident_timeline_signals@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-5
+    title: Incident Monitoring
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-5
+    todo: true
+    notes: >-
+      SKELETON pin for the close-and-archive step and for the timeline
+      signals that underpin each of the three milestone submissions.
+      IR-5 anchors the incident-monitoring discipline (tracking and
+      documenting incidents); the dated cycle-archival record composed
+      at the close step is the audit-evident IR-5 output the
+      competent authority reads at review time. Reused from the
+      existing content/controls/control.incident_timeline_signals@v1
+      overlay.
+
+d3fend:
+  - d3fend_id: D3-TODO
+    d3fend_name: SKELETON placeholder
+    todo: true
+    notes: >-
+      SKELETON placeholder. D3FEND v1.0.0 does not carry a distinct
+      regulator-notification defensive technique on either the
+      Deceive or Isolate tactics; the reporting lifecycle is a
+      compliance-notification discipline upstream of any runtime
+      countermeasure. CORE follow-on card decides whether to pin
+      D3-OAM (Operational Activity Mapping) on the close-and-archive
+      step against the incident-timeline shape (mirrors the
+      dora_tlpt_programme remediation-tracking overlay) or close the
+      block empty with a documented gap-note per step following the
+      cyber_hygiene_training precedent.
+
+ocsf:
+  # OCSF v1.3.0 telemetry binding. All four action steps interact
+  # with operator API surfaces (incident register at detect-and-
+  # classify, competent-authority submission channel at each of the
+  # three notification steps, evidence store at close-and-archive).
+  # API Activity (6003) is the consistent class across both consumed
+  # and emitted records. Richer per-step telemetry bindings (e.g.
+  # OCSF Compliance Finding on the missed-milestone lane) are
+  # deferred to CORE / EXTEND cards.
+  - id: telemetry.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.3.0"
+    direction: both
+    todo: true
+    notes: >-
+      SKELETON placeholder for the operator-API-surface read/write
+      shape. Consumed at the detect-and-classify step (reads against
+      the operator's incident register and the Art. 18 classifier
+      output). Consumed and emitted at each of the three notification
+      steps (packages the ITS submission body and dispatches to the
+      competent-authority channel; records the authority
+      acknowledgement into the submission artifact). Emitted at the
+      close-and-archive step (write call publishing the dated
+      cycle-archival record to the operator's evidence store).
+      CORE finalises consumer/emitter directionality per step;
+      EXTEND wires the Compliance Finding (2003) emit binding for
+      missed-milestone deviations if scoped.
+
+nis2:
+  # Cross-regime NIS2 Art. 23 sibling: the operator submitting a DORA
+  # Art. 19 notification chain is very likely also in scope of NIS2
+  # Art. 23 as an essential or important entity, and the two regimes
+  # file separate notifications to separate authorities against the
+  # same underlying incident. Pinned outbound below to close the
+  # graph; the inbound entry at content/mappings/nis2/article-23.yaml
+  # adds playbook.dora_major_incident_reporting@v1 as a cross-regime
+  # sibling anchor in the same PR.
+  - mapping_id: nis2:art-23-notification-72h
+    article: 23(4)(b)
+    todo: true
+    notes: >-
+      NIS2 Art. 23(4)(b) 72-hour notification is the closest NIS2
+      milestone to the DORA Art. 19(4)(b) 72-hour intermediate
+      report — both fire on the same 72-hour post-classification
+      clock against different authority chains. This playbook is the
+      DORA-flavoured discharge; the operational sibling
+      playbook.incident_management@v1 is the NIS2-flavoured discharge.
+      Cross-pinned so cross-regime reviewers can navigate the graph;
+      the matching playbook_refs: entry lands in this same SKELETON
+      PR.
+
+dora:
+  # Primary anchor. Inbound entries backlinking
+  # playbook.dora_major_incident_reporting@v1 land on the existing
+  # content/mappings/dora/article-19-and-28.yaml file (three atoms:
+  # dora:art-19-initial-4h, dora:art-19-intermediate-72h,
+  # dora:art-19-final-one-month) plus the dora:art-18-classification
+  # atom for the classification-decision step. All four inbound
+  # citations land in this same SKELETON PR so the DORA orphan-CI
+  # graph closes end-to-end without a skip entry.
+  - mapping_id: dora:art-19-initial-4h
+    article: 19(4)(a)
+    notes: >-
+      DORA Art. 19(4)(a) initial-notification milestone: submission
+      as soon as possible, within 4 hours of classification as major,
+      and no later than 24 hours from awareness. The
+      notify-authority-initial step is the audit-evident discharge
+      of this milestone; content shape per Commission Implementing
+      Regulation (EU) 2024/2956 (ITS).
+
+  - mapping_id: dora:art-19-intermediate-72h
+    article: 19(4)(b)
+    notes: >-
+      DORA Art. 19(4)(b) intermediate-report milestone: submission
+      within 72 hours of classification as major (or earlier if
+      regular activities have recovered). The
+      notify-authority-intermediate step discharges this milestone;
+      the primitive updates the timestamps, affected functions and
+      clients, indicators of compromise, and mitigation actions in
+      flight against the ITS intermediate-report template.
+
+  - mapping_id: dora:art-19-final-one-month
+    article: 19(4)(c)
+    notes: >-
+      DORA Art. 19(4)(c) final-report milestone: submission no later
+      than one month after the intermediate report. The
+      notify-authority-final step discharges this milestone; the
+      primitive carries the root-cause analysis, final impact
+      figures, completed remediation actions, lessons learned,
+      action plan, and residual-risk statement per the ITS
+      final-report template.
+
+  - mapping_id: dora:art-18-classification
+    article: 18(1)
+    notes: >-
+      DORA Art. 18(1) classification decision. Pinned as the
+      upstream gate to Art. 19's three-milestone cycle: the
+      detect-and-classify step consumes the incident-register entry
+      and evaluates the major-ICT-related-incident threshold against
+      Commission Delegated Regulation (EU) 2024/1772 criteria (seven
+      primary criteria plus materiality thresholds; Art. 18(2)
+      recurring-incident rule). Sibling deterministic classifier
+      control.dora_major_classifier@v1 already anchors this atom on
+      the existing article-19-and-28 mapping.
+
+cra: []
+  # No direct CRA touchpoint declared at SKELETON. CRA Article 14
+  # (Reporting obligations of manufacturers) is a product-lifecycle
+  # obligation on manufacturers of products with digital elements;
+  # the operator-side major-ICT-related-incident reporting lane
+  # declared here is regime-specific to financial entities under
+  # DORA and does not cross-map onto the CRA manufacturer surface.
+  # Mirrors the dora_tlpt_programme CRA-axis precedent.
+
+gdpr:
+  # Cross-regime GDPR Art. 33/34 sibling: where an in-scope major
+  # ICT-related incident involves personal data, the operator also
+  # discharges the Art. 33 supervisory-authority notification (72h)
+  # and, on the high-risk threshold, the Art. 34 data-subject
+  # communication. The Art. 19 lifecycle here is the DORA-flavoured
+  # lane; the GDPR-flavoured lane is discharged in parallel on the
+  # same underlying incident. Pinned outbound below; the inbound
+  # entry at content/mappings/gdpr/article-33-34-personal-data-
+  # breach-notification.yaml adds
+  # playbook.dora_major_incident_reporting@v1 as a cross-regime
+  # sibling anchor in the same PR.
+  - mapping_id: gdpr:art-33
+    article: "33"
+    todo: true
+    notes: >-
+      GDPR Art. 33 supervisory-authority notification (72h) runs in
+      parallel with the DORA Art. 19(4)(b) 72-hour intermediate
+      report where the incident involves personal data. This
+      playbook does not itself compose the Art. 33 submission (that
+      is playbook.incident_management@v1 and the breach-notification
+      cluster); the cross-pin surfaces the parallel-notification
+      relationship for reviewers navigating the cross-regime graph.
+      CORE follow-on card decides whether to lift a dedicated GDPR
+      data-flow doc for this playbook or fold the parallel-lane
+      relationship into the existing incident_management data-flow
+      doc.

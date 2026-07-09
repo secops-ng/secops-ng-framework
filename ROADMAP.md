@@ -1332,6 +1332,73 @@ named operator use-case. Each cookbook workflow lives under
 
 ---
 
+### F-DORA-ART19 — DORA Art. 19 major-ICT-related incident reporting lifecycle
+
+- **Status:** In Progress
+- **Priority:** P1
+- **Goal:** G-01 (content coverage — dedicated DORA-flavoured major-
+  ICT-related-incident reporting playbook closing the Chapter III
+  reporting surface upstream of the existing NIS2 Art. 23-flavoured
+  `incident_management` playbook; advances the Q4 2026 target of ≥
+  25 CACAO v2 playbooks), G-02 (regulatory-graph closure — DORA
+  Art. 19(4)(a)/(b)/(c) and Art. 18(1) primary anchors for the
+  three-milestone reporting cycle, with sibling references to NIS2
+  Art. 23 and GDPR Art. 33-34 for the cross-regime parallel-
+  notification relationship; target Q3 2026 for full DORA-axis
+  playbook coverage).
+- **Acceptance criteria:**
+  - `content/playbooks/dora_major_incident_reporting/` carries the
+    canonical CACAO v2 scaffold
+    (`playbook.dora_major_incident_reporting@v1`) — the
+    detect-and-classify → notify-authority-initial (4h/24h) →
+    notify-authority-intermediate (72h) → notify-authority-final
+    (one month) → close-and-archive chain, plus `mappings.yaml`
+    pinning outbound OSCAL IR-8 / IR-6 / IR-5 controls, an OCSF
+    telemetry stub, the DORA Art. 19(4)(a)/(b)/(c) and Art. 18(1)
+    overlays, the NIS2 Art. 23(4)(b) cross-regime sibling, and the
+    GDPR Art. 33 cross-regime sibling, plus a workflow-local README.
+    Read-only against the operator incident register upstream; each
+    notification step writes a submission-intent record and captures
+    the competent-authority acknowledgement.
+  - Three reference-target compile examples land under
+    `examples/{n8n,temporal,langgraph}/dora_major_incident_reporting/`
+    with byte-parity goldens under
+    `tests/examples/{n8n,temporal,langgraph}/dora_major_incident_reporting/test_golden.py`
+    guarding the ring across all three targets on every PR.
+- **Sovereign-stack constraints:** CACAO v2 content only, no
+  proprietary schema. DORA Art. 19 is the primary regulatory
+  anchor; content shape follows Commission Implementing Regulation
+  (EU) 2024/2956 (ITS). No hardcoded competent-authority endpoint
+  — the operator wires the ESA / NCA channel at the compile-target
+  config layer. Distinct from the NIS2 Art. 23-flavoured
+  `incident_management` lane; the two are cross-regime siblings
+  that run in parallel on the same underlying incident against
+  different authority chains.
+- **Depends on:** F-WF-INCIDENT-MANAGEMENT (the NIS2-flavoured
+  sibling this DORA-flavoured lane cross-references), and the
+  existing `content.dora_major_classifier@v1` deterministic
+  Art. 18 classifier primitive.
+- **Source:** DORA (Regulation (EU) 2022/2554) Art. 18-19;
+  Commission Delegated Regulation (EU) 2024/1772 (RTS on
+  incident classification); Commission Implementing Regulation
+  (EU) 2024/2956 (ITS on incident-reporting templates); NIS2
+  (Directive (EU) 2022/2555) Art. 23; GDPR (Regulation (EU)
+  2016/679) Art. 33-34.
+- **Shipped via:**
+  - SKELETON — pending PR
+    (`content/playbooks/dora_major_incident_reporting/` CACAO v2
+    scaffold + `mappings.yaml` pinning outbound OSCAL IR-8 / IR-6
+    / IR-5 controls, the DORA Art. 19 and Art. 18 overlays, the
+    NIS2 Art. 23 and GDPR Art. 33 cross-regime sibling anchors,
+    plus the workflow-local README).
+  - CORE — deferred (three-target compiled examples for n8n,
+    Temporal, LangGraph).
+  - EXTEND — deferred (byte-parity golden tests, per-milestone
+    submission-adapter bindings, missed-milestone KRI, and ROADMAP
+    status flip from In Progress to Shipped).
+
+---
+
 ## Epic PT — Pattern Library
 
 Reusable graph fragments and Pydantic types shared across cookbook
