@@ -940,6 +940,58 @@ named operator use-case. Each cookbook workflow lives under
 
 ---
 
+### F-CACAO-NIS2-ART20 — NIS2 Art. 20 management-body cyber-governance playbook
+
+- **Status:** Shipped
+- **Priority:** P1
+- **Goal:** G-01 (content coverage — a portable CACAO v2 playbook that
+  lets an operator discharge the NIS2 Art. 20 management-body approval,
+  oversight, and cyber-security training obligations against a
+  deterministic workflow with dated approval and training-completion
+  evidence), G-03 (compile-target parity — the same playbook emits
+  byte-identical artifacts across n8n, Temporal, and LangGraph).
+- **Acceptance criteria:**
+  - `content/playbooks/nis2_art20_governance/` carries the canonical
+    CACAO v2 scaffold (`playbook.nis2_art20_governance@v1`) with the
+    four management-body governance action steps wired as deterministic
+    primitives (management-body approval, oversight review,
+    training-completion, evidence emission), a `mappings.yaml` pinning
+    the NIS2 Art. 20 inbound anchor and the OSCAL AT-family training
+    outbound anchors, and a README walking the operator through the
+    workflow.
+  - Three reference-target compile examples land under
+    `examples/{n8n,temporal,langgraph}/nis2_art20_governance/` with
+    byte-parity goldens across all three targets and shared
+    `regenerate.sh` recipes.
+  - Per-target unit coverage on the four governance primitives plus
+    per-example byte-parity golden tests under
+    `tests/examples/nis2_art20_governance/`.
+- **Sovereign-stack constraints:** CACAO v2 content only, no proprietary
+  schema. NIS2 Art. 20 is the regulatory anchor; operator-supplied
+  training-completion source, management-body approval sink, and
+  evidence destination — the framework ships no default non-EU
+  endpoint.
+- **Depends on:** — (standalone Art. 20 governance atom; complements
+  the existing Art. 21(2)(a-j) per-measure playbook family).
+- **Source:** NIS2 Directive (EU) 2022/2555 Art. 20 (management bodies
+  — approval of cyber-security risk-management measures, oversight of
+  their implementation, and mandatory management-body training);
+  enforcement active July 2026.
+- **Shipped via:**
+  - SKELETON — #762
+    (`content/playbooks/nis2_art20_governance/` CACAO v2 scaffold +
+    `mappings.yaml` + README + NIS2 Art. 20 inbound anchor).
+  - CORE-PRIMITIVES — #764 (four deterministic primitives under
+    `content/playbooks/nis2_art20_governance/primitives/` with unit
+    coverage).
+  - CORE-FANOUT — #765 (three-target compile examples under
+    `examples/{n8n,temporal,langgraph}/nis2_art20_governance/`).
+  - CORE-GOLDENS — PR #<this> (byte-parity golden tests under
+    `tests/examples/nis2_art20_governance/` closing the three-target
+    parity ring).
+
+---
+
 ### F-WF-DORA-TPR — DORA Chapter V ICT third-party risk management contract-lifecycle spine
 
 - **Status:** Shipped
