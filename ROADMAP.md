@@ -1263,7 +1263,7 @@ named operator use-case. Each cookbook workflow lives under
 
 ### F-WF-SECAWARENESS — Security-awareness training programme lifecycle
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P1
 - **Goal:** G-01 (content coverage — a portable operator-side
   programme-lifecycle workflow for the structured security-
@@ -1306,6 +1306,29 @@ named operator use-case. Each cookbook workflow lives under
 - **Source:** NIS2 (Directive (EU) 2022/2555) Art. 21(2)(g); GDPR
   (Regulation (EU) 2016/679) Art. 32(1)(b); ISO/IEC 27001:2022
   Annex A.6.3.
+- **Shipped via:**
+  - SKELETON — #767
+    (`content/playbooks/security_awareness_training/` CACAO v2
+    scaffold + `mappings.yaml` pinning outbound OSCAL AT-2 / AT-3 /
+    AT-4 and ISO/IEC 27001 A.6.3 controls, the NIS2 Art. 21(2)(g)
+    overlay, and the GDPR Art. 32(1)(b) sibling reference, plus the
+    workflow-local README).
+  - CORE — no-op retirement: the operational-delivery scope
+    (`playbook.cyber_hygiene_training@v1`) already carries the
+    per-cohort compile-target examples and byte-parity goldens under
+    `examples/{n8n,temporal,langgraph}/cyber_hygiene_training/` and
+    `tests/examples/{n8n,temporal,langgraph}/cyber_hygiene_training/`;
+    the programme-governance layer and the operational layer share
+    the compile ring rather than forking the NIS2 Art. 21(2)(g)
+    surface into two synonymous rings.
+  - EXTEND — #768
+    (`docs/cookbook/security_awareness_training.md` operator
+    walkthrough covering programme-governance vs operational-
+    delivery scoping, step-by-step CACAO walkthrough with OSCAL /
+    NIS2 / GDPR / ISO 27001 mapping, and the wiring contract to the
+    per-cohort operational compile examples under
+    `cyber_hygiene_training`; ROADMAP F-WF-SECAWARENESS status flip
+    from In Progress to Shipped).
 
 ---
 
