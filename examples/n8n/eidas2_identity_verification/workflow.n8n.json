@@ -1,0 +1,501 @@
+{
+  "name": "eIDAS 2.0 EUDIW identity verification (NIS2 Art.21(2)(i), DORA Art.5)",
+  "nodes": [
+    {
+      "id": "start--e1d5a520-0000-4000-8000-000000000001",
+      "name": "eidas2_identity_verification_start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__principal_id__",
+              "type": "string",
+              "value": "",
+              "description": "Stable identifier of the principal being verified (operator-side account key or joiner-record correlation id). Supplied by the caller (typically the onboarding workflow) and carried across every step so the audit-evidence record joins on a single lifecycle key."
+            },
+            {
+              "name": "__auth_scope__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the access surface the principal is being onboarded to (which application / environment / privilege class). Drives the LoA-to-access-tier mapping in the assess-assurance-level step and the downstream provisioning hand-off. Sourced from the operator's documented scope catalogue."
+            },
+            {
+              "name": "__presentation_request_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the EUDIW presentation request issued in the request_eudiw_presentation step. Correlates the wallet-side response to the verifier-side transaction so the verify_pid_credential step reads a bounded response."
+            },
+            {
+              "name": "__pid_credential_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the verified PID (person identification data) credential returned by the wallet and validated by verify_pid_credential against the trust-anchor registry. Empty until verify_pid_credential passes; on verification failure the workflow proceeds to emit_identity_audit_evidence with the failure marker rather than short-circuiting."
+            },
+            {
+              "name": "__loa_verdict__",
+              "type": "string",
+              "value": "",
+              "description": "Level of Assurance returned by the EUDIW presentation and confirmed by cryptographic verification. One of: high, substantial, low. Sourced from the eIDAS 2.0 assurance-level attribute carried on the PID credential."
+            },
+            {
+              "name": "__access_tier__",
+              "type": "string",
+              "value": "",
+              "description": "Operator-side access tier the principal is provisioned into, derived from __loa_verdict__ against the documented mapping table for __auth_scope__. Empty on the verification-failure branch (the audit record is emitted but no downstream provisioning is triggered)."
+            },
+            {
+              "name": "__verification_verdict__",
+              "type": "boolean",
+              "value": "",
+              "description": "Outcome of the verify_pid_credential step: true when the PID credential is cryptographically valid, holder-bound to the presenter, and the issuer resolves against the declared EU trust-anchor registry; false otherwise. A false value routes into emit_identity_audit_evidence with the failure marker rather than the provisioning hand-off."
+            },
+            {
+              "name": "__evidence_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the dated identity-verification audit-evidence artifact published to the operator's evidence store. Always populated \u2014 including on the verification-failed branch \u2014 so the NIS2 Art.21(2)(i) auditable-lifecycle obligation is discharged on every terminal path."
+            },
+            {
+              "name": "__captured_at__",
+              "type": "string",
+              "value": "",
+              "description": "ISO-8601 UTC timestamp of the verification-capture instant. Supplied by the compile-target runtime; carried into the deterministic evidence-record derivation so the three reference compilers re-derive byte-identical bytes."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--e1d5a520-0000-4000-8000-000000000002",
+      "name": "request_eudiw_presentation",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.principal_id",
+              "name": "in.principal_id",
+              "value": "={{$workflow.variables.principal_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.auth_scope",
+              "name": "in.auth_scope",
+              "value": "={{$workflow.variables.auth_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "out.presentation_request_id",
+              "name": "out.presentation_request_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.jml_evidence@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.account_change@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 issue an EUDIW presentation request to the principal identified by __principal_id__ for the PID credential set required by __auth_scope__, per eIDAS 2.0 Art. 5c (presentation of electronic attestations of attributes and person identification data from the European Digital Identity Wallet). Records __presentation_request_id__ for correlation with the wallet-side response. Read-only against the wallet surface \u2014 no attribute is asserted or written back. TODO (CORE): presentation-request adapter binding (OpenID4VP relying-party surface the operator already runs), transaction-timeout policy, response-envelope shape.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--e1d5a520-0000-4000-8000-000000000003",
+      "name": "verify_pid_credential",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.principal_id",
+              "name": "in.principal_id",
+              "value": "={{$workflow.variables.principal_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.presentation_request_id",
+              "name": "in.presentation_request_id",
+              "value": "={{$workflow.variables.presentation_request_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.pid_credential_id",
+              "name": "out.pid_credential_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.verification_verdict",
+              "name": "out.verification_verdict",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.jml_evidence@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.account_change@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 cryptographically verify the PID (person identification data) credential returned by the wallet against the operator's declared EU trust-anchor registry: resolve the issuer to a Member-State Trusted List entry (or its LOTL aggregator, per Commission Implementing Decision (EU) 2015/1505 as maintained under eIDAS 2.0), verify the credential signature chain, confirm holder-binding to the presenting device (cnf claim for SD-JWT VC, device binding for mDoc per ARF v2), and resolve the credential's revocation / suspension status against the declared status-list surface. Records __pid_credential_id__ and __verification_verdict__. A false verdict does not short-circuit \u2014 the workflow proceeds to emit_identity_audit_evidence with the failure marker so the attestation stream carries the negative evidence. Read-only against the trust-anchor registry. TODO (CORE): trust-anchor probe binding, signature verification adapter, status-list freshness policy.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--e1d5a520-0000-4000-8000-000000000004",
+      "name": "assess_assurance_level",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.auth_scope",
+              "name": "in.auth_scope",
+              "value": "={{$workflow.variables.auth_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "in.pid_credential_id",
+              "name": "in.pid_credential_id",
+              "value": "={{$workflow.variables.pid_credential_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.verification_verdict",
+              "name": "in.verification_verdict",
+              "value": "={{$workflow.variables.verification_verdict}}",
+              "type": "string"
+            },
+            {
+              "id": "out.loa_verdict",
+              "name": "out.loa_verdict",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.access_tier",
+              "name": "out.access_tier",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.jml_evidence@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.account_change@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 read the Level of Assurance attribute (high, substantial, low) carried on the verified PID credential and map it to the operator-side access tier for __auth_scope__ per the documented assurance-to-tier table. Records __loa_verdict__ and __access_tier__. On the verification-failure branch (__verification_verdict__ = false) this step short-circuits: __loa_verdict__ is recorded as returned but __access_tier__ stays empty so downstream provisioning is not triggered. TODO (CORE): LoA-to-tier mapping-table binding per __auth_scope__, drift-detection rule when the returned LoA is below the tier's declared minimum.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--e1d5a520-0000-4000-8000-000000000005",
+      "name": "emit_identity_audit_evidence",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.principal_id",
+              "name": "in.principal_id",
+              "value": "={{$workflow.variables.principal_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.auth_scope",
+              "name": "in.auth_scope",
+              "value": "={{$workflow.variables.auth_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "in.presentation_request_id",
+              "name": "in.presentation_request_id",
+              "value": "={{$workflow.variables.presentation_request_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.pid_credential_id",
+              "name": "in.pid_credential_id",
+              "value": "={{$workflow.variables.pid_credential_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.loa_verdict",
+              "name": "in.loa_verdict",
+              "value": "={{$workflow.variables.loa_verdict}}",
+              "type": "string"
+            },
+            {
+              "id": "in.access_tier",
+              "name": "in.access_tier",
+              "value": "={{$workflow.variables.access_tier}}",
+              "type": "string"
+            },
+            {
+              "id": "in.verification_verdict",
+              "name": "in.verification_verdict",
+              "value": "={{$workflow.variables.verification_verdict}}",
+              "type": "string"
+            },
+            {
+              "id": "in.captured_at",
+              "name": "in.captured_at",
+              "value": "={{$workflow.variables.captured_at}}",
+              "type": "string"
+            },
+            {
+              "id": "out.evidence_id",
+              "name": "out.evidence_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.jml_evidence@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.account_change@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 publish the dated identity-verification audit-evidence artifact to the operator's evidence store as an OCSF Account Change (class_uid 3001) record. Record pins __principal_id__, __auth_scope__, __presentation_request_id__, __pid_credential_id__, __loa_verdict__, __access_tier__, __verification_verdict__, and __captured_at__ so the NIS2 Art.21(2)(i) auditable-lifecycle obligation is discharged on every terminal path (including the verification-failed branch, which is recorded with the failure marker rather than dropped). Records __evidence_id__. TODO (CORE): evidence-record schema pin against the existing schemas/evidence/access.schema.json envelope, evidence-sink adapter binding, deterministic evidence_id derivation from SHA-256(principal_id | presentation_request_id | captured_at).",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--e1d5a520-0000-4000-8000-000000000006",
+      "name": "trigger_access_provisioning",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.principal_id",
+              "name": "in.principal_id",
+              "value": "={{$workflow.variables.principal_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.auth_scope",
+              "name": "in.auth_scope",
+              "value": "={{$workflow.variables.auth_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "in.access_tier",
+              "name": "in.access_tier",
+              "value": "={{$workflow.variables.access_tier}}",
+              "type": "string"
+            },
+            {
+              "id": "in.verification_verdict",
+              "name": "in.verification_verdict",
+              "value": "={{$workflow.variables.verification_verdict}}",
+              "type": "string"
+            },
+            {
+              "id": "in.evidence_id",
+              "name": "in.evidence_id",
+              "value": "={{$workflow.variables.evidence_id}}",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.jml_evidence@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.account_change@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "SKELETON \u2014 hand the verified identity off to the downstream access-provisioning workflow (playbook.onboarding_offboarding_tracker@v1) so the joiner-side capability delta is applied against __auth_scope__ at __access_tier__. On the verification-failure branch this step short-circuits into the end node without triggering provisioning; the emitted __evidence_id__ still carries the negative record so the audit trail is complete. TODO (CORE): hand-off adapter binding into the onboarding_offboarding_tracker spine, correlation-key carry so the joiner-record joins on __principal_id__.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--e1d5a520-0000-4000-8000-00000000000a",
+      "name": "eidas2_identity_verification_end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "eidas2_identity_verification_start": {
+      "main": [
+        [
+          {
+            "node": "request_eudiw_presentation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "request_eudiw_presentation": {
+      "main": [
+        [
+          {
+            "node": "verify_pid_credential",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "verify_pid_credential": {
+      "main": [
+        [
+          {
+            "node": "assess_assurance_level",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "assess_assurance_level": {
+      "main": [
+        [
+          {
+            "node": "emit_identity_audit_evidence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "emit_identity_audit_evidence": {
+      "main": [
+        [
+          {
+            "node": "trigger_access_provisioning",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trigger_access_provisioning": {
+      "main": [
+        [
+          {
+            "node": "eidas2_identity_verification_end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "nis2",
+    "article-21-2-i",
+    "dora",
+    "article-5",
+    "eidas2",
+    "eudiw",
+    "identity-verification",
+    "digital-identity",
+    "access-management"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.eidas2_identity_verification@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--e1d5a520-0000-4000-8000-000000000001"
+    },
+    "secops_ng_notes": [
+      "step 'action--e1d5a520-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--e1d5a520-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--e1d5a520-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--e1d5a520-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--e1d5a520-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}
