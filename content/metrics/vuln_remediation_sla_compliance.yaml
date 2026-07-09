@@ -1,0 +1,166 @@
+stable_id: kpi.vuln_remediation_sla_compliance@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Vulnerability remediation SLA compliance rate
+summary: >
+  Proportion of triaged CVE findings whose remediation closed inside
+  the operator's documented per-severity SLA window on the
+  vulnerability_management playbook. Operationalises the maintenance
+  limb of NIS2 Art. 21(2)(e) — vulnerability handling and disclosure —
+  on the operator-side remediation cadence surface. Complementary to
+  `kpi.nis2_patch_cadence_compliance_rate@v1` (which reads the
+  patch-management estate rollout cadence on the CRA Annex I §2
+  security-updates obligation): this KPI reads the CVE-triaged
+  finding population against the operator's vulnerability-handling
+  SLA, not the patch-rollout ring topology. A higher-is-better
+  SLA-hit ratio: the triaged severity band conditions the per-severity
+  SLA window the operator's vulnerability-management policy declares,
+  and the ratio reads how many findings closed inside that window.
+
+unit: ratio
+direction: higher_is_better
+
+target:
+  value: 0.90
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point for the unscoped baseline.
+    Mature vulnerability-management programmes under NIS2 typically
+    hold the critical-severity SLA above 0.95 and the aggregate
+    across severity bands above 0.90 at steady state once the
+    triage → decide-remediation → verify-remediation lane is
+    disciplined against the documented policy. Essential entities
+    with regulator-declared per-severity remediation SLAs (financial
+    entities under DORA JC RTS Art. 10, operators of essential
+    services with sector-specific vulnerability-handling obligations)
+    set stricter scoped variants of this KPI in their own catalogues.
+
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 0.90
+    severity: warn
+  - name: high
+    comparator: "<"
+    value: 0.75
+    severity: high
+  - name: breach
+    comparator: "<"
+    value: 0.50
+    severity: critical
+
+measurement:
+  source: workflow
+  aggregation: ratio
+  formula: >
+    For each CVE finding closed inside the evaluation window on the
+    vulnerability_management playbook (findings whose
+    verify-remediation step emitted a dated remediation-verification
+    evidence record, either verified-closed on the fix path or
+    accepted-risk on the deterministic risk-acceptance path),
+    classify the finding by the __severity_band__ recorded on the
+    triage-severity step and compute
+    within_sla = (remediation_close_timestamp - triage_timestamp)
+                 <= per_severity_sla_window[severity_band].
+    The per-severity SLA windows are the operator's documented
+    vulnerability-handling policy (canonical starting-point defaults:
+    critical <= 7 days, high <= 30 days, medium <= 90 days, low
+    <= 180 days); the catalog entry does not author the operator's
+    policy, it names the ratio-shape the policy is measured against.
+    Report
+    compliance_rate = |{findings within_sla}| / |{findings closed}|.
+    Findings closed on the deterministic risk-acceptance path count
+    against the denominator (the accepted-risk outcome is a
+    vulnerability-handling closure the operator's posture-management
+    layer treats as a documented exposure), and findings whose
+    triage carries the deterministic 'unclassified' sentinel are
+    scheduled under the critical SLA per the primitive contract so
+    they do not silently disappear from the ratio. Reference
+    visualisation: a ratio-headline gauge with warn / high / breach
+    threshold bands over a stacked-bar drill-down of SLA-met versus
+    overdue counts sliced by severity band; the committed reference
+    rendering lives at
+    `content/metrics/vuln_remediation_sla_compliance.viz.md` — that
+    file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: triage_timestamp
+      description: >
+        Triage-observation timestamp emitted by the triage-severity
+        step when the operator's vulnerability-handling surface
+        first records a severity band against the incoming CVE
+        finding. Carried on the OCSF Vulnerability Finding (2002)
+        observation the triage step emits at each finding intake;
+        the catalog entry binds against the playbook step
+        start-timestamp, not against a vendor-specific
+        vulnerability-scanner object.
+      telemetry_ref: telemetry.ocsf.vulnerability_finding@v1
+      playbook_ref: playbook.vulnerability_management@v1
+      playbook_step: action--e2a4c010-0000-4000-8000-000000000003
+      field: time
+    - name: severity_band
+      description: >
+        Classified severity band the triage-severity step emits
+        against the operator's documented vulnerability-severity
+        taxonomy. Values are one of critical, high, medium, low,
+        or the deterministic 'unclassified' sentinel; each value
+        conditions the per-severity SLA window the operator's
+        vulnerability-handling policy declares.
+      playbook_ref: playbook.vulnerability_management@v1
+      playbook_step: action--e2a4c010-0000-4000-8000-000000000003
+    - name: remediation_close
+      description: >
+        Remediation-close timestamp emitted by the verify-remediation
+        step when the dated remediation-verification evidence record
+        is published (either verified-closed on the fix path or
+        accepted-risk on the deterministic risk-acceptance path).
+        Carried on the OCSF Vulnerability Finding (2002) observation
+        the verify-remediation step emits at closure; the catalog
+        entry binds to that OCSF class shape, not to a vendor-
+        specific ticketing or remediation-tracking API object.
+      telemetry_ref: telemetry.ocsf.vulnerability_finding@v1
+      playbook_ref: playbook.vulnerability_management@v1
+      playbook_step: action--e2a4c010-0000-4000-8000-000000000005
+      field: time
+  window:
+    duration: P30D
+    sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.vulnerability_finding@v1
+
+playbook_refs:
+  - playbook_id: playbook.vulnerability_management@v1
+    step_id: action--e2a4c010-0000-4000-8000-000000000003
+  - playbook_id: playbook.vulnerability_management@v1
+    step_id: action--e2a4c010-0000-4000-8000-000000000004
+  - playbook_id: playbook.vulnerability_management@v1
+    step_id: action--e2a4c010-0000-4000-8000-000000000005
+  - playbook_id: playbook.vulnerability_management@v1
+    step_id: action--e2a4c010-0000-4000-8000-000000000006
+
+external_refs:
+  - name: NIS2 — Article 21(2)(e) security in acquisition, development and maintenance (vulnerability-handling limb)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(e)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ISO/IEC 30111 — Vulnerability handling processes
+    source: ISO
+    external_id: ISO/IEC 30111:2019
+    url: https://www.iso.org/standard/69725.html
+  - name: DORA — JC RTS on ICT risk management framework, Art. 10 vulnerability and patch management procedures
+    source: EU
+    external_id: Commission Delegated Regulation (EU) 2024/1774, Art. 10
+    url: https://eur-lex.europa.eu/eli/reg_del/2024/1774/oj
+  - name: ENISA — Good practices on vulnerability disclosure and handling
+    source: ENISA
+    url: https://www.enisa.europa.eu/publications
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability
+  - determinism

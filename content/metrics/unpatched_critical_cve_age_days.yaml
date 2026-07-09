@@ -1,0 +1,160 @@
+stable_id: kri.unpatched_critical_cve_age_days@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Unpatched critical CVE age (P95 days)
+summary: >
+  Residual-exposure indicator on the age in days of unpatched
+  CRITICAL-severity CVE findings in the operator's inventory,
+  reported at the P95 of the still-open population at evaluation
+  time. Operationalises the maintenance limb of NIS2 Art. 21(2)(e)
+  — vulnerability handling and disclosure — on the risk-tail edge of
+  the vulnerability_management playbook: a high P95 age is the
+  failure mode reviewers surface when the critical-severity SLA is
+  nominally in force but a residual population of unfixed findings
+  is drifting into unbounded exposure. Complementary to
+  `kpi.vuln_remediation_sla_compliance@v1` (which reads the
+  closed-finding ratio inside SLA): compliance reads how many
+  findings closed within window; this indicator reads how old the
+  ones that did not close have grown. Lower is better.
+
+unit: days
+direction: lower_is_better
+
+target:
+  value: 7
+  comparator: "<="
+  rationale: >
+    Community-recommended starting point for the unscoped baseline.
+    Mature vulnerability-management programmes under NIS2 hold the
+    P95 age of unpatched CRITICAL findings under 7 days at steady
+    state — that is the same window the critical-severity SLA
+    declares against the closed population, and the KRI reads
+    whether the still-open tail is inside that same envelope.
+    Essential entities with regulator-declared per-severity
+    remediation SLAs (financial entities under DORA JC RTS Art. 10,
+    operators of essential services with sector-specific
+    vulnerability-handling obligations) set stricter scoped variants
+    of this KRI in their own catalogues.
+
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 7
+    severity: warn
+  - name: high
+    comparator: ">"
+    value: 14
+    severity: high
+  - name: breach
+    comparator: ">"
+    value: 30
+    severity: critical
+
+measurement:
+  source: workflow
+  aggregation: p95
+  formula: >
+    Let U be the set of CRITICAL-severity CVE findings in the
+    operator's inventory that are still open at the evaluation
+    instant — findings whose triage-severity step recorded
+    __severity_band__ = 'critical' (or the deterministic
+    'unclassified' sentinel, which is scheduled under the critical
+    SLA per the primitive contract so it does not silently disappear
+    from the population), and whose verify-remediation step has not
+    emitted a dated closure evidence record (neither verified-closed
+    on the fix path nor accepted-risk on the deterministic
+    risk-acceptance path). For each finding f in U compute
+    age_days(f) = evaluation_instant - triage_timestamp(f),
+    in whole days. Report
+    p95_age_days = P95 of { age_days(f) : f in U } over the
+    evaluation window; if |U| < 20 the P95 is not well-defined and
+    the indicator emits the deterministic sentinel value
+    reported_as = max(age_days) with a small-population marker on
+    the evidence artifact so downstream consumers do not read the
+    P95 as if it were the tail of a large population. The still-open
+    predicate is evaluated at the evaluation instant and not
+    per-observation, so an ageing finding that closes mid-window is
+    excluded from U as of the next evaluation. Findings whose triage
+    carries the deterministic 'unclassified' sentinel are included
+    per the primitive contract so silent triage drift does not
+    hide critical exposure. Reference visualisation: a P95-headline
+    number with warn / high / breach threshold-band overlays over an
+    age-histogram drill-down of the still-open critical population
+    binned by day-band; the committed reference rendering lives at
+    `content/metrics/unpatched_critical_cve_age_days.viz.md` — that
+    file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: triage_timestamp
+      description: >
+        Triage-observation timestamp emitted by the triage-severity
+        step at finding intake. Carried on the OCSF Vulnerability
+        Finding (2002) observation the triage step emits; the
+        catalog entry binds against the playbook step
+        start-timestamp, not against a vendor-specific
+        vulnerability-scanner object.
+      telemetry_ref: telemetry.ocsf.vulnerability_finding@v1
+      playbook_ref: playbook.vulnerability_management@v1
+      playbook_step: action--e2a4c010-0000-4000-8000-000000000003
+      field: time
+    - name: severity_band
+      description: >
+        Classified severity band the triage-severity step emits.
+        The indicator population U includes findings with
+        severity_band ∈ {critical, unclassified}; the unclassified
+        sentinel is scheduled under the critical SLA per the
+        primitive contract so silent triage drift does not hide
+        critical exposure.
+      playbook_ref: playbook.vulnerability_management@v1
+      playbook_step: action--e2a4c010-0000-4000-8000-000000000003
+    - name: remediation_close
+      description: >
+        Remediation-close timestamp emitted by the verify-remediation
+        step at closure (verified-closed on the fix path or
+        accepted-risk on the deterministic risk-acceptance path).
+        Absence of a dated closure evidence record on a finding is
+        the still-open predicate that qualifies membership in U.
+      telemetry_ref: telemetry.ocsf.vulnerability_finding@v1
+      playbook_ref: playbook.vulnerability_management@v1
+      playbook_step: action--e2a4c010-0000-4000-8000-000000000005
+      field: time
+  window:
+    duration: P30D
+    sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.vulnerability_finding@v1
+
+playbook_refs:
+  - playbook_id: playbook.vulnerability_management@v1
+    step_id: action--e2a4c010-0000-4000-8000-000000000003
+  - playbook_id: playbook.vulnerability_management@v1
+    step_id: action--e2a4c010-0000-4000-8000-000000000005
+  - playbook_id: playbook.vulnerability_management@v1
+    step_id: action--e2a4c010-0000-4000-8000-000000000006
+
+external_refs:
+  - name: NIS2 — Article 21(2)(e) security in acquisition, development and maintenance (vulnerability-handling limb)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(e)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ISO/IEC 30111 — Vulnerability handling processes
+    source: ISO
+    external_id: ISO/IEC 30111:2019
+    url: https://www.iso.org/standard/69725.html
+  - name: DORA — JC RTS on ICT risk management framework, Art. 10 vulnerability and patch management procedures
+    source: EU
+    external_id: Commission Delegated Regulation (EU) 2024/1774, Art. 10
+    url: https://eur-lex.europa.eu/eli/reg_del/2024/1774/oj
+  - name: ENISA — Good practices on vulnerability disclosure and handling
+    source: ENISA
+    url: https://www.enisa.europa.eu/publications
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability
+  - auditability
