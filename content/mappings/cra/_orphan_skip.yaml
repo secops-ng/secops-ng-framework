@@ -269,3 +269,38 @@ skip:
       (for example a manufacturer-side product-continuity clause
       that overlaps the operator-side plan-lifecycle on the same
       surface).
+
+  - slug: eidas2_identity_verification
+    rationale: >-
+      eIDAS 2.0 (Regulation (EU) 2024/1183) EUDIW identity-
+      verification cycle — the operator-side access-management
+      primitive that produces the dated Account Change (OCSF 3001)
+      audit-evidence record gating joiner-side capability
+      provisioning against a cryptographically verified PID
+      credential and a resolved Level of Assurance. The playbook's
+      outbound overlay
+      (`content/playbooks/eidas2_identity_verification/mappings.yaml`,
+      `cra: []` array with inline scope note) deliberately does not
+      pin CRA entries: CRA Annex I is a product-security obligation
+      on manufacturers of products with digital elements under
+      Regulation (EU) 2024/2847, while EUDIW credential presentation
+      by an EUDIW-enabled principal against the operator's own
+      access surface is an access-management discipline downstream
+      of any product-side CRA obligation. Cross-pinning the
+      identity-verification cycle here to a CRA Annex I §1(d)
+      access-control anchor would misrepresent the scope, and the
+      operator-side access-control anchors under CRA Annex I §1(d)
+      are already pinned on the sibling iam_auditor /
+      onboarding_offboarding_tracker / mfa_secured_comms triad
+      (`cra:annex-i-1-d-access-control-iam-auditor`,
+      `cra:annex-i-1-d-access-control-jml`,
+      `cra:annex-i-1-d-access-control-mfa-coverage`). Adding
+      eidas2_identity_verification to any of those anchors would
+      dilute the existing operator-side access-control triad on a
+      manufacturer-side surface. Mirrors the dora_ict_risk_selfassess
+      / dora_tpr_management CRA-axis precedents (operator-side
+      access-management stays on NIS2 / DORA / GDPR; CRA stays on
+      the per-product manufacturer chain). Re-open the review if
+      and when the EUDIW verifier surface itself is later scoped as
+      a product with digital elements under CRA (sibling G-02 card
+      per the outbound-overlay footnote).

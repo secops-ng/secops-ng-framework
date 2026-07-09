@@ -179,6 +179,24 @@ entries:
     playbook_refs:
       - playbook.threat_intel_ingest@v1
       - playbook.onboarding_offboarding_tracker@v1
+      # F-WF-EIDAS2-IDENTITY INBOUND (G-02): the eIDAS 2.0 EUDIW
+      # identity-verification cycle is anchored on Art. 5(1)(c) data-
+      # minimisation. Only the verifier-confirmed PID attribute subset
+      # the operator's declared authentication scope required is
+      # projected onto the emitted audit-evidence artifact and the
+      # OCSF Account Change (3001) record; the raw credential is
+      # dropped after verification, per the eIDAS 2.0 selective-
+      # disclosure discipline. The wallet-holder's device biometric
+      # template used for holder-to-device binding is never received
+      # by the operator (executed against the wallet's local secure
+      # element per ARF v2). The linked data-flow doc names Art. 5(1)(c)
+      # by construction across §3 (attribute subset), §5 (retention of
+      # only verifier-confirmed attributes), and §8 (per-leg egress
+      # minimisation). NIS2 parallel: content/mappings/nis2/article-21-2-i.yaml.
+      # DORA parallel: content/mappings/dora/article-5.yaml. GDPR
+      # security-of-processing parallel:
+      # content/mappings/gdpr/article-32-security-of-processing.yaml.
+      - playbook.eidas2_identity_verification@v1
     metric_refs:
       - kpi.coverage_threat_intel_feed@v1
       - kri.joiner_to_provisioned_time@v1
