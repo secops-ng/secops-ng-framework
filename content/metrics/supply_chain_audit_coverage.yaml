@@ -1,0 +1,137 @@
+stable_id: kpi.supply_chain_audit_coverage@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Supply-chain audit coverage — share of critical direct suppliers audited in the trailing 12-month window
+summary: >
+  Performance indicator derived from the supply_chain_security
+  playbook per-execution supply-chain-evidence stream, scoped to the
+  operator's critical-supplier subset (declared on the scoping
+  artifact). For each critical direct supplier, the indicator asks
+  whether at least one audit-class supply-chain-evidence artifact
+  has been emitted to the evidence stream in the trailing 12-month
+  evaluation window (evidence-kind `audit` on the closed assessment
+  block, distinct from the lighter re-attestation-class evidence the
+  sibling `kpi.supply_chain_coverage@v1` counts). Falling values are
+  the NIS2 Art. 21(2)(d) audit-cadence failure mode reviewers surface
+  against the critical-third-party surface — the audit-cadence
+  counterpart to the sibling attestation-freshness indicators.
+
+unit: ratio
+direction: higher_is_better
+
+target:
+  value: 0.95
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point for the unscoped baseline.
+    Mature critical-third-party programmes hold audit-coverage at or
+    above 0.95 across a rolling 12-month window — the residual
+    accounts for suppliers newly onboarded whose first audit cycle
+    has not yet closed, and for a small proportion of suppliers
+    whose audit slot has slipped inside the reconciliation-window
+    tolerance. Essential entities under NIS2 with regulator-declared
+    critical-supplier obligations typically tighten this target in
+    their scoped variants (a 100% coverage requirement is common
+    inside financial-services scoping under DORA Art. 28). Audit-
+    class evidence is distinct from re-attestation-class evidence:
+    an audit requires a closed audit-assessment block (auditor
+    identity, findings summary, remediation-plan pointer) that the
+    lighter attestation-refresh flow does not carry.
+
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 0.95
+    severity: warn
+  - name: high
+    comparator: "<"
+    value: 0.80
+    severity: high
+  - name: breach
+    comparator: "<"
+    value: 0.60
+    severity: critical
+
+measurement:
+  source: workflow
+  aggregation: ratio
+  formula: >
+    For each critical direct supplier in the operator's declared
+    supplier register (the `critical` subset flagged on the scoping
+    artifact), count the supplier as audited if at least one
+    supply-chain-evidence artifact emitted by the
+    supply_chain_security playbook emit step
+    (action--5c5c5c5c-0000-4000-8000-000000000003) in the trailing
+    12-month evaluation window carries an `affected_supplier_handle`
+    matching the supplier AND an `evidence_kind` of `audit` on the
+    closed assessment block. Suppliers with no audit-class evidence
+    record on file at all, or whose only in-window records are
+    lighter re-attestation-class evidence, count against the
+    denominator without contributing to the numerator. The audit-
+    coverage ratio is `audited_critical / total_critical`. Reference
+    visualisation: a ratio-headline gauge with warn / high / breach
+    band overlays over a per-supplier last-audit-date drill-down;
+    the committed reference rendering lives at
+    `content/metrics/supply_chain_audit_coverage.viz.md` — that file
+    is the contract for the chart shape; the compile target renders
+    the executable form against operator data.
+  inputs:
+    - name: audited_critical_suppliers
+      description: >
+        Count of critical direct suppliers in the operator's supplier
+        register with at least one supply-chain-evidence artifact on
+        file in the trailing 12-month window carrying an
+        `evidence_kind` of `audit` on the closed assessment block.
+        Carried on the API Activity (class_uid 6003) observation the
+        emit step writes at attestation publication; the affected
+        supplier handle and evidence-kind fields are the identity
+        and audit-class axes the count keys against. The catalog
+        entry binds to that OCSF class shape, not to a vendor-
+        specific supplier-registry API.
+      playbook_ref: playbook.supply_chain_security@v1
+      playbook_step: action--5c5c5c5c-0000-4000-8000-000000000003
+      field: assessment.affected_supplier_handle
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+    - name: total_critical_suppliers
+      description: >
+        Count of critical direct suppliers declared in the operator's
+        supplier register. Sourced from the operator's scoping
+        artifact rather than the telemetry stream so the denominator
+        is stable against evidence-store ingestion gaps, matching
+        the `kpi.supply_chain_coverage@v1` and
+        `kri.supplier_attestation_overdue_ratio@v1` conventions.
+      playbook_ref: playbook.supply_chain_security@v1
+  window:
+    duration: P365D
+    sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.api_activity@v1
+
+playbook_refs:
+  - playbook_id: playbook.supply_chain_security@v1
+    step_id: action--5c5c5c5c-0000-4000-8000-000000000003
+
+external_refs:
+  - name: NIS2 — Article 21(2)(d) supply-chain security
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(d)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: NIST SP 800-53 Rev. 5 — SR-6 Supplier Assessments and Reviews
+    source: NIST
+    external_id: NIST SP 800-53 Rev. 5 SR-6
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SR-6
+  - name: ISO/IEC 27001:2022 — Annex A.5.19 Information security in supplier relationships
+    source: ISO
+    external_id: ISO/IEC 27001:2022 Annex A.5.19
+    url: https://www.iso.org/standard/27001
+  - name: ENISA — Good practices for supply-chain security
+    source: ENISA
+    url: https://www.enisa.europa.eu/topics/risk-management
+
+maintainer: metrics-wg@secops-ng.org
+
+foundation_property:
+  - auditability
+  - operability

@@ -98,6 +98,8 @@ def test_real_tree_supply_chain_classification_baseline() -> None:
     expected = {
         "kri.supplier_attestation_staleness@v1",
         "kpi.supply_chain_coverage@v1",
+        "kri.supplier_attestation_overdue_ratio@v1",
+        "kpi.supply_chain_audit_coverage@v1",
     }
     assert classified == expected, (
         "supply-chain-security-cluster classifier drift: "
