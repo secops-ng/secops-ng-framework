@@ -12,20 +12,28 @@ operator's patch-distribution architecture.
 
 ## Status
 
-SKELETON. The playbook artifact and the NIS2 Art. 21(2)(e)
-maintenance overlay land here; CORE-layer cards add the detection
-bindings (canary-health / rollback-readiness signals) together with
-their D3FEND pins, and the per-target compiler emissions (n8n /
-Temporal / LangGraph goldens); an EXTEND card wires the time-to-patch
-and patch-coverage metric emitters against the operator's evidence
-store. DORA Art. 9 ICT-risk-management framework (operations and
-maintenance) and CRA Annex I §2 security-updates inbound entries are
-deliberately deferred to separate inbound-closure cards (see the gap
-notes in `mappings.yaml` and the audited skip entries under
-`content/mappings/dora/_orphan_skip.yaml` and
-`content/mappings/cra/_orphan_skip.yaml`). The GDPR data-flow entry is
-deferred to the same CORE-layer scope under the gdpr-orphan_skip
-manifest convention.
+Shipped (see ROADMAP.md → F-WF-PATCH). The trilogy has landed:
+
+- **SKELETON** — the CACAO v2 artifact
+  (`playbook.patch_management@v1`) and the NIS2 Art. 21(2)(e)
+  outbound overlay in `mappings.yaml`.
+- **CORE** — six primitives under `primitives/` (`detect`,
+  `classify`, `stage`, `validate`, `fanout`, `artifact`) with
+  `core_body` bindings across the action steps; three
+  reference-target compile examples under
+  `examples/{n8n,temporal,langgraph}/patch_management/` with
+  byte-parity goldens under
+  `tests/examples/{n8n,temporal,langgraph}/patch_management/test_golden.py`.
+- **EXTEND** — practitioner walkthrough at
+  `docs/cookbook/patch_management.md`.
+
+DORA Art. 9 ICT-risk-management framework (operations and
+maintenance) and CRA Annex I §2 security-updates inbound entries
+remain audited-skip / deferred to separate inbound-closure cards
+(see the gap notes in `mappings.yaml` and the audited skip entries
+under `content/mappings/dora/_orphan_skip.yaml` and
+`content/mappings/cra/_orphan_skip.yaml`). The GDPR data-flow entry
+is deferred under the same gdpr-orphan_skip manifest convention.
 
 ## Contents
 
@@ -33,9 +41,13 @@ manifest convention.
   (`playbook.patch_management@v1`).
 - `mappings.yaml` — outbound overlay (OSCAL controls, OCSF telemetry,
   NIS2 Art. 21(2)(e)).
+- `primitives/` — six CORE primitives (`detect`, `classify`, `stage`,
+  `validate`, `fanout`, `artifact`) bound to the action steps via
+  `core_body`.
 
 ## Compile targets
 
-`compile_targets` declares `["n8n", "temporal", "langgraph"]`. Emitted
-artifacts and golden tests are owned by CORE-layer sibling cards; this
-directory ships the portable content only.
+`compile_targets` declares `["n8n", "temporal", "langgraph"]`.
+Reference emissions and byte-parity goldens ship under
+`examples/{n8n,temporal,langgraph}/patch_management/` and
+`tests/examples/{n8n,temporal,langgraph}/patch_management/`.

@@ -1095,6 +1095,120 @@ named operator use-case. Each cookbook workflow lives under
 
 ---
 
+### F-WF-PATCH — Patch management lifecycle
+
+- **Status:** Shipped
+- **Priority:** P1
+- **Goal:** G-01 (content coverage — a portable operator-side
+  patch / update maintenance workflow discharging NIS2
+  Art. 21(2)(e), from update detection through canary-ring
+  validation, fan-out, evidence capture and owner notification;
+  advances the Q4 2026 target of ≥ 25 CACAO v2 playbooks), G-02
+  (regulatory-graph closure — NIS2 Art. 21(2)(e) primary anchor;
+  DORA Art. 9 ICT-risk-management (operations and maintenance)
+  and CRA Annex I §2 security-updates inbound anchors are
+  audited-skip / deferred to separate inbound-closure cards),
+  G-03 (compile-target parity — n8n / Temporal / LangGraph
+  goldens carry the ring across every PR).
+- **Acceptance criteria:**
+  - `content/playbooks/patch_management/` carries the canonical
+    CACAO v2 scaffold (`playbook.patch_management@v1`) — the
+    detect → classify → stage → validate → fan-out →
+    evidence-capture → notify chain against the operator's
+    pre-bound deployment-ring topology, plus `mappings.yaml`
+    pinning outbound OSCAL (SI-2 / CM-3), OCSF telemetry, and
+    the NIS2 Art. 21(2)(e) overlay, plus a workflow-local
+    README.
+  - Six CORE primitives under
+    `content/playbooks/patch_management/primitives/`
+    (`detect`, `classify`, `stage`, `validate`, `fanout`,
+    `artifact`) with `core_body` bindings across the action
+    steps.
+  - Three reference-target compile examples land under
+    `examples/{n8n,temporal,langgraph}/patch_management/` with
+    byte-parity goldens under
+    `tests/examples/{n8n,temporal,langgraph}/patch_management/test_golden.py`
+    guarding the ring across all three targets on every PR.
+  - Cookbook entry `docs/cookbook/patch_management.md` walks an
+    operator through the maintenance lifecycle end-to-end
+    against a compiled example (n8n / Temporal / LangGraph).
+- **Sovereign-stack constraints:** CACAO v2 content only, no
+  proprietary schema. NIS2 Art. 21(2)(e) is the regulatory
+  anchor. No hardcoded patch-distribution endpoint — the
+  operator wires the deployment-ring topology and health-gate
+  signals at the compile-target config layer.
+- **Depends on:** —
+- **Source:** NIS2 (Directive (EU) 2022/2555) Art. 21(2)(e);
+  NIST SP 800-53 SI-2, CM-3.
+- **Shipped via:**
+  - SKELETON + CORE + EXTEND landed prior to formal ROADMAP
+    entry: `content/playbooks/patch_management/` scaffold +
+    six primitives, three-target compile examples with
+    byte-parity goldens, and the operator cookbook
+    (`docs/cookbook/patch_management.md`).
+  - ROADMAP `Shipped` flip — PR #<this> (formal ROADMAP entry
+    for the already-landed trilogy; README Status flip to
+    reflect actual delivery state).
+
+---
+
+### F-WF-CYBERHYG — Security-awareness and cyber-hygiene training
+
+- **Status:** Shipped
+- **Priority:** P1
+- **Goal:** G-01 (content coverage — a portable operator-side
+  proactive security-awareness and cyber-hygiene training
+  workflow discharging NIS2 Art. 21(2)(g), companion to the
+  reactive `phishing_triage` playbook under the same article;
+  advances the Q4 2026 target of ≥ 25 CACAO v2 playbooks), G-02
+  (regulatory-graph closure — NIS2 Art. 21(2)(g) primary anchor
+  covering the training / awareness leg of the article; the
+  reactive `phishing_triage` playbook covers the incident-
+  response leg), G-03 (compile-target parity — n8n / Temporal /
+  LangGraph goldens carry the ring across every PR).
+- **Acceptance criteria:**
+  - `content/playbooks/cyber_hygiene_training/` carries the
+    canonical CACAO v2 scaffold
+    (`playbook.cyber_hygiene_training@v1`) — the roster-
+    inventory → schedule → phishing-simulation → completion-
+    tracking → attestation → notify chain, plus
+    `mappings.yaml` pinning outbound OSCAL controls, OCSF
+    telemetry, and the NIS2 Art. 21(2)(g) overlay, plus a
+    workflow-local README. Read-only and side-effect-free
+    against operator infrastructure; the simulation step is a
+    clearly-labelled exercise that does not trigger incident
+    response.
+  - Three reference-target compile examples land under
+    `examples/{n8n,temporal,langgraph}/cyber_hygiene_training/`
+    with byte-parity goldens under
+    `tests/examples/{n8n,temporal,langgraph}/cyber_hygiene_training/test_golden.py`
+    guarding the ring across all three targets on every PR.
+  - Cookbook entry `docs/cookbook/cyber_hygiene_training.md`
+    walks an operator through the training programme end-to-end
+    against a compiled example (n8n / Temporal / LangGraph).
+- **Sovereign-stack constraints:** CACAO v2 content only, no
+  proprietary schema. NIS2 Art. 21(2)(g) is the regulatory
+  anchor. No hardcoded LMS / HR / mailflow endpoint — the
+  operator wires each at the compile-target config layer. The
+  phishing-simulation step is a labelled exercise and does not
+  mutate production mailflow controls.
+- **Depends on:** F-WF-04 (phishing_triage — the reactive
+  incident-response leg of NIS2 Art. 21(2)(g); this workflow is
+  the proactive training / awareness companion).
+- **Source:** NIS2 (Directive (EU) 2022/2555) Art. 21(2)(g)
+  (basic cyber-hygiene practices and cybersecurity training).
+- **Shipped via:**
+  - SKELETON + CORE + EXTEND landed prior to formal ROADMAP
+    entry: `content/playbooks/cyber_hygiene_training/`
+    scaffold, three-target compile examples with byte-parity
+    goldens, and the operator cookbook
+    (`docs/cookbook/cyber_hygiene_training.md`).
+  - ROADMAP `Shipped` flip — PR #<this> (formal ROADMAP entry
+    for the already-landed trilogy; README Status flip to
+    reflect actual delivery state).
+
+---
+
 ## Epic PT — Pattern Library
 
 Reusable graph fragments and Pydantic types shared across cookbook

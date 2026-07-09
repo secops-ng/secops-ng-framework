@@ -19,12 +19,20 @@ discharge of the policy NIS2 Art.21(2)(g) requires.
 
 ## Status
 
-SKELETON. The playbook artifact and the regulatory + control overlay
-land here; CORE-layer cards add the detection bindings (missed-training
-and simulation-click upstream rule ids) and the per-target compiler
-emissions (n8n / Temporal / LangGraph goldens); an EXTEND card wires
-the per-cohort training-overdue KPI emitters against the operator's
-evidence store.
+Shipped (see ROADMAP.md → F-WF-CYBERHYG). The trilogy has landed:
+
+- **SKELETON** — the CACAO v2 artifact
+  (`playbook.cyber_hygiene_training@v1`) and the NIS2
+  Art. 21(2)(g) outbound overlay in `mappings.yaml`.
+- **CORE** — three reference-target compile examples under
+  `examples/{n8n,temporal,langgraph}/cyber_hygiene_training/`
+  with byte-parity goldens under
+  `tests/examples/{n8n,temporal,langgraph}/cyber_hygiene_training/test_golden.py`.
+- **EXTEND** — practitioner walkthrough at
+  `docs/cookbook/cyber_hygiene_training.md`.
+
+The per-cohort training-overdue KPI emitters against the operator's
+evidence store remain a separate metrics-layer card.
 
 ## Contents
 
@@ -36,5 +44,6 @@ evidence store.
 ## Compile targets
 
 `compile_targets` declares `["n8n", "temporal", "langgraph"]`.
-Emitted artifacts and golden tests are owned by CORE-layer sibling
-cards; this directory ships the portable content only.
+Reference emissions and byte-parity goldens ship under
+`examples/{n8n,temporal,langgraph}/cyber_hygiene_training/` and
+`tests/examples/{n8n,temporal,langgraph}/cyber_hygiene_training/`.
