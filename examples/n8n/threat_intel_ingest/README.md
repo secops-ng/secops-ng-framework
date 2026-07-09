@@ -107,6 +107,50 @@ explicit placeholder node and records the gap in
 `meta.secops_ng_notes` so a human integrator sees exactly what they
 still need to wire.
 
+## Common pitfalls when binding activity bodies
+
+The emitted `workflow.n8n.json` gives you topology and the CACAO I/O
+contract; the Set-node placeholders are where operator judgement
+lands. A short checklist of the pitfalls a maintainer already knows
+but a first-time integrator does not:
+
+- **Upstream rate-limiting and backpressure.** TAXII collections and
+  STIX bundle endpoints publish on their own cadence and often cap
+  poll frequency. n8n's HTTP Request node has no built-in
+  backpressure — schedule the trigger conservatively (a Cron or
+  Schedule Trigger at the feed's documented poll interval), and set
+  the node's *Retry On Fail* + *Wait Between Tries* under **Settings**
+  so a `429` or `503` from the feed does not cascade into the
+  downstream Set nodes. If the feed publishes an `X-RateLimit-*` or
+  `Retry-After` header, honour it explicitly in a downstream IF /
+  Wait pair rather than tuning the retry blindly.
+- **Deduplication and idempotency keys.** The CACAO playbook exposes
+  the STIX object `id` (a UUID pinned by the producer) as the stable
+  key. Bind that field — not `created`, not `modified`, not the
+  local ingest timestamp — as the idempotency key when persisting or
+  forwarding indicators. In n8n this typically means an *Item Lists*
+  node (Deduplicate) keyed on `{{$json["id"]}}` before the SIEM /
+  blocklist Set rows fire.
+- **Credentials and sovereign hosting.** Feed endpoints, SIEM API
+  keys, and blocklist-gateway tokens belong in n8n Credentials, not
+  in the exported workflow JSON. The repo's [`.env.example`](../../../.env.example)
+  documents the variable names the reference examples expect; the
+  sovereignty posture (which EU host runs n8n, which egress domain
+  the feed uses) is discussed in
+  [`docs/FOUNDATION.md`](../../../docs/FOUNDATION.md). Exported
+  `workflow.n8n.json` files are safe to commit only because the Set
+  nodes carry placeholders — do not check in workflows exported
+  after credentials have been bound.
+- **n8n gotcha — Set node coercion.** n8n's Set node stringifies
+  numeric and boolean values by default. CACAO `in_args` /
+  `out_args` such as `confidence` (integer 0–100) or
+  `high_confidence` (boolean) will arrive downstream as `"75"` and
+  `"true"` unless the *Keep Only Set* toggle is off and the value
+  type is set explicitly (Number, Boolean) on each row. A confidence
+  threshold IF node comparing `{{$json["confidence"]}} > 70` will
+  silently short-circuit on string comparison; verify the row type
+  before wiring the branch.
+
 ## Sovereignty note
 
 The artifact emitted here is a description of what the operator's own
