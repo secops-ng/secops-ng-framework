@@ -1,0 +1,143 @@
+stable_id: kri.supplier_attestation_overdue_ratio@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Supplier-attestation overdue ratio — share of critical direct suppliers whose most-recent attestation exceeds the documented staleness threshold
+summary: >
+  Residual-exposure indicator derived from the supply_chain_security
+  playbook per-execution supply-chain-evidence stream, scoped to the
+  operator's critical-supplier subset (declared on the scoping artifact).
+  For each critical direct supplier, the indicator asks whether the
+  most-recent attestation observed on the supply-chain-evidence record
+  set is older than the operator's documented staleness threshold
+  (community-recommended default: 90 days). Reports the ratio of
+  overdue-attestation suppliers to the total critical-supplier
+  denominator. Rising values are the NIS2 Art. 21(2)(d) + DORA Art. 28
+  failure mode reviewers surface against the critical-third-party
+  re-attestation cadence — the ratio-shaped counterpart to the sibling
+  `kri.supplier_attestation_staleness@v1` (raw count) that gives
+  operators a scale-normalised view against variable supplier-register
+  sizes.
+
+unit: ratio
+direction: lower_is_better
+
+target:
+  value: 0.02
+  comparator: "<="
+  rationale: >
+    Community-recommended starting point for the unscoped baseline.
+    Mature critical-third-party programmes hold overdue-attestation
+    ratios at or below 0.02 at steady state — the residual accounts
+    for suppliers newly onboarded whose first attestation has not yet
+    been received inside the documented staleness window. Essential
+    entities under NIS2 with regulator-declared critical-supplier
+    obligations, and financial entities under DORA Art. 28 with
+    ICT-third-party register obligations, typically tighten this
+    ratio in their scoped variants. The ratio shape is chosen so a
+    growing supplier register does not inflate the indicator against
+    a stable posture; the raw-count sibling
+    `kri.supplier_attestation_staleness@v1` is preserved for the
+    absolute-count reading operators want on their remediation
+    dashboards.
+
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 0.02
+    severity: warn
+  - name: high
+    comparator: ">"
+    value: 0.10
+    severity: high
+  - name: breach
+    comparator: ">"
+    value: 0.25
+    severity: critical
+
+measurement:
+  source: workflow
+  aggregation: ratio
+  formula: >
+    For each critical direct supplier in the operator's declared
+    supplier register (the `critical` subset flagged on the scoping
+    artifact), resolve the most-recent supply-chain-evidence artifact
+    emitted by the supply_chain_security playbook emit step
+    (action--5c5c5c5c-0000-4000-8000-000000000003) whose
+    `affected_supplier_handle` matches the supplier. The supplier
+    counts as overdue if the record's `captured_at` timestamp is older
+    than the operator's documented staleness threshold (unscoped
+    baseline: 90 days) OR no supply-chain-evidence record is on file
+    for that supplier at all. Report
+    overdue_ratio = overdue_critical_suppliers / max(total_critical_suppliers, 1).
+    Aggregate across the evaluation window with the arithmetic mean of
+    per-reconciliation ratios so a single noisy reconciliation does
+    not dominate the indicator; reconciliations whose evidence-capture
+    step never fired are excluded so the indicator does not silently
+    improve when the pipeline stalls (mirrors the
+    `kri.supplier_attestation_staleness@v1` exclusion discipline).
+    Reference visualisation: an overdue-ratio headline gauge with
+    warn / high / breach band overlays over a per-supplier
+    attestation-age drill-down; the committed reference rendering
+    lives at
+    `content/metrics/supplier_attestation_overdue_ratio.viz.md` —
+    that file is the contract for the chart shape; the compile
+    target renders the executable form against operator data.
+  inputs:
+    - name: overdue_critical_suppliers
+      description: >
+        Count of critical direct suppliers whose most-recent
+        supply-chain-evidence record's `captured_at` timestamp is
+        older than the operator's documented staleness threshold, OR
+        for whom no evidence record is on file. Carried on the API
+        Activity (class_uid 6003) observation the emit step writes at
+        attestation publication; the `affected_supplier_handle` and
+        `captured_at` fields are the identity and freshness axes the
+        indicator keys against. The catalog entry binds to that OCSF
+        class shape, not to a vendor-specific supplier-registry API.
+      playbook_ref: playbook.supply_chain_security@v1
+      playbook_step: action--5c5c5c5c-0000-4000-8000-000000000003
+      field: assessment.affected_supplier_handle
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+    - name: total_critical_suppliers
+      description: >
+        Count of critical direct suppliers declared in the operator's
+        supplier register. Sourced from the operator's scoping
+        artifact rather than the telemetry stream so the denominator
+        is stable against evidence-store ingestion gaps, matching
+        the `kpi.supply_chain_coverage@v1` and
+        `kpi.cloud_posture_coverage@v1` conventions.
+      playbook_ref: playbook.supply_chain_security@v1
+  window:
+    duration: P90D
+    sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.api_activity@v1
+
+playbook_refs:
+  - playbook_id: playbook.supply_chain_security@v1
+    step_id: action--5c5c5c5c-0000-4000-8000-000000000003
+
+external_refs:
+  - name: NIS2 — Article 21(2)(d) supply-chain security
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(d)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 28 register of information for ICT third-party service providers
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 28
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: NIST SP 800-53 Rev. 5 — SR-6 Supplier Assessments and Reviews
+    source: NIST
+    external_id: NIST SP 800-53 Rev. 5 SR-6
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SR-6
+  - name: ENISA — Good practices for supply-chain security
+    source: ENISA
+    url: https://www.enisa.europa.eu/topics/risk-management
+
+maintainer: metrics-wg@secops-ng.org
+
+foundation_property:
+  - auditability
+  - operability
