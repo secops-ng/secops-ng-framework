@@ -1,0 +1,122 @@
+stable_id: kpi.agentic_threat_detection_rate@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Agentic-threat detection rate
+summary: >
+  Fraction of detection firings inside the evaluation window that are
+  produced by agentic-adversary-class detections (anomalous LLM API
+  call volume, rapid credential-enumeration cadence, sub-minute self-
+  correction bursts, LLM-assisted lateral-movement fingerprints) over
+  the total detection-firing population. Reads how much of the
+  operator's detect pillar is oriented at the machine-speed adversary
+  case set the agentic_threat_response playbook is scoped to; a
+  climbing ratio is the leading signal that the detection-engineering
+  programme is closing coverage on autonomous / agentic tradecraft
+  rather than only classical rule-based cases. The catalog entry is
+  detection-vendor neutral — the class marker is carried on the OCSF
+  Detection Finding meta-finding the operator's SIEM emits, not on a
+  vendor-specific rule object.
+
+unit: ratio
+direction: higher_is_better
+
+target:
+  value: 0.05
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point for the unscoped catalog
+    baseline. The autonomous-adversary case set is a minority of
+    real-world detections today; the target reflects a floor operators
+    can hold once the agentic detection lane is stood up, not an
+    aspirational ceiling. Operators with heavier LLM-integrated
+    environments (essential entities under NIS2 running large agent
+    deployments, financial entities under DORA with LLM-assisted
+    trading or advisory surfaces) typically set this higher in their
+    own scoped variants.
+
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 0.05
+    severity: warn
+  - name: breach
+    comparator: "<"
+    value: 0.01
+    severity: high
+
+measurement:
+  source: detection
+  aggregation: ratio
+  formula: >
+    Let F = set of detection firings inside the evaluation window
+    across the operator's entire detection inventory. Let A ⊆ F =
+    subset of firings emitted by detections classed as agentic-
+    adversary detections (agentic-tradecraft class on the operator's
+    detection-catalog scoping — anomalous LLM API call volume, rapid
+    credential-enumeration cadence, sub-minute self-correction burst,
+    LLM-assisted lateral-movement fingerprint). Report |A| / |F|.
+    Exclude firings whose class is unset at evaluation time so the
+    indicator does not silently drift when detection metadata is
+    incomplete; those cases surface on
+    `kpi.detection_coverage@v1` instead. Reference visualisation: a
+    ratio-headline gauge with warn / breach threshold bands over a
+    per-agentic-detection-class drill-down bar chart so operators can
+    see which agentic-tradecraft signatures drove the headline. The
+    committed reference rendering lives at
+    `content/metrics/agentic_threat_detection_rate.viz.md` — that file
+    is the contract for the chart shape; the compile target renders
+    the executable form against operator data.
+  inputs:
+    - name: detection_firings
+      description: >
+        Full stream of detection firings inside the evaluation window,
+        bound to their detection-class stable_id. Carried on the OCSF
+        Detection Finding meta-finding that SIEM rule matches emit at
+        runtime; the catalog entry binds to that OCSF class shape, not
+        to a vendor-specific rule object.
+      telemetry_ref: telemetry.ocsf.detection_finding@v1
+      field: finding_info.uid
+    - name: agentic_class_marker
+      description: >
+        Detection-class marker naming the firing as an agentic-
+        adversary detection (agentic-tradecraft class on the operator's
+        detection-catalog scoping). Carried on the OCSF Detection
+        Finding meta-finding as a category / class field the SIEM
+        stamps at match time; the catalog entry does not name a
+        specific detection rule.
+      telemetry_ref: telemetry.ocsf.detection_finding@v1
+      field: category_uid
+  window:
+    duration: P30D
+    sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.detection_finding@v1
+
+playbook_refs:
+  - playbook_id: playbook.agentic_threat_response@v1
+    step_id: action--30000000-0000-4000-8000-000000000002
+
+external_refs:
+  - name: NIS2 — Article 21(2)(b) incident-handling capability (detect-pillar coverage of agentic-adversary case set)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(b)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: NIS2 — Article 21(2)(e) security in acquisition, development and maintenance (agentic-tool supply-chain surface)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(e)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ENISA — Threat Landscape reporting on autonomous / agentic adversary tradecraft
+    source: ENISA
+    url: https://www.enisa.europa.eu/publications/enisa-threat-landscape
+  - name: MITRE ATLAS — Adversarial Threat Landscape for AI Systems
+    source: MITRE
+    url: https://atlas.mitre.org/
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability

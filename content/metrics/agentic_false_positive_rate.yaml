@@ -1,0 +1,127 @@
+stable_id: kri.agentic_false_positive_rate@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Agentic-detection false-positive rate
+summary: >
+  Fraction of agentic-adversary-class detection firings inside the
+  evaluation window whose closed adjudication is `false_positive`,
+  over the total closed-adjudication population for that class.
+  Residual-risk counterpart to `kpi.false_positive_rate@v1`, scoped
+  specifically to the agentic-tradecraft class the
+  agentic_threat_response playbook consumes; reads how much of the
+  operator's agentic-detection lane is producing benign noise that
+  would trigger credential-isolation and micro-segmentation calls
+  against innocent workloads if the detection were trusted blindly.
+  A climbing rate is the leading signal that the determinism /
+  operability posture of the agentic-response surface is eroding —
+  the containment actions the playbook takes are irreversible for
+  the operator's users inside the window and a noisy detect pillar
+  amplifies the blast radius of that irreversibility.
+
+unit: ratio
+direction: lower_is_better
+
+target:
+  value: 0.1
+  comparator: "<="
+  rationale: >
+    Community-recommended starting point for the unscoped catalog
+    baseline. Agentic-response containment actions (session
+    revocation, IdP disable, micro-segmentation cut of the lateral
+    edge) are user-visible and disruptive; the target sits tighter
+    than the general-population `kpi.false_positive_rate@v1` target
+    (0.2) so the detect pillar is held to a stricter bar before the
+    containment loop is trusted with the machine-speed case set.
+
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 0.1
+    severity: warn
+  - name: high
+    comparator: ">"
+    value: 0.25
+    severity: high
+  - name: breach
+    comparator: ">"
+    value: 0.5
+    severity: critical
+
+measurement:
+  source: detection
+  aggregation: ratio
+  formula: >
+    For each detection firing inside the evaluation window whose
+    detection-class is agentic-tradecraft (agentic-adversary class on
+    the operator's detection-catalog scoping) and whose adjudication
+    is closed at evaluation time, let FP be the count adjudicated
+    `false_positive` and TP the count adjudicated `true_positive`.
+    Report FP / (FP + TP). Exclude firings whose disposition remains
+    unset at evaluation time so the indicator does not flap during
+    triage backlogs (mirror of the general
+    `kpi.false_positive_rate@v1` treatment). Reference visualisation:
+    a ratio-headline gauge with warn / high / breach threshold bands
+    over a per-agentic-detection-class drill-down bar chart so
+    operators can see which agentic-tradecraft signatures drove the
+    headline. The committed reference rendering lives at
+    `content/metrics/agentic_false_positive_rate.viz.md` — that file
+    is the contract for the chart shape; the compile target renders
+    the executable form against operator data.
+  inputs:
+    - name: agentic_detection_firings
+      description: >
+        Stream of detection firings inside the evaluation window whose
+        class-marker names them as agentic-adversary detections.
+        Carried on the OCSF Detection Finding meta-finding the
+        operator's SIEM emits at match time; the catalog entry binds
+        to that OCSF class shape, not to a vendor-specific rule
+        object.
+      telemetry_ref: telemetry.ocsf.detection_finding@v1
+      field: finding_info.uid
+    - name: triage_dispositions
+      description: >
+        Closed triage dispositions on those firings tagging each as
+        `false_positive` or `true_positive`. Sourced from the
+        operator's case-management surface; carried on the OCSF
+        Detection Finding event the case-management surface stamps
+        when the analyst closes the firing — disposition_id encodes
+        the false-positive / true-positive axis, and firings whose
+        disposition remains unset at evaluation time are excluded per
+        the formula.
+      telemetry_ref: telemetry.ocsf.detection_finding@v1
+      field: disposition_id
+  window:
+    duration: P30D
+    sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.detection_finding@v1
+
+playbook_refs:
+  - playbook_id: playbook.agentic_threat_response@v1
+    step_id: action--30000000-0000-4000-8000-000000000002
+
+external_refs:
+  - name: NIS2 — Article 21(2)(b) incident-handling capability (triage quality on agentic-adversary case set)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(b)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: NIS2 — Article 21(2)(e) security in acquisition, development and maintenance (agentic-tool supply-chain surface)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(e)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ENISA — Detection engineering guidance
+    source: ENISA
+    url: https://www.enisa.europa.eu/publications/enisa-threat-landscape
+  - name: MITRE ATLAS — Adversarial Threat Landscape for AI Systems
+    source: MITRE
+    url: https://atlas.mitre.org/
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability
+  - determinism
