@@ -1,0 +1,130 @@
+stable_id: kri.agentic_model_decision_latency_seconds@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Agentic-response LLM decision latency (P95)
+summary: >
+  P95 latency in seconds of LLM / agentic-model inference decisions
+  executed inside the agentic_threat_response ingest step across the
+  evaluation window. Reads the operator's detection-through-decision
+  loop against the machine-speed adversary case set: the agentic
+  operator's self-correction cadence is sub-minute, so a P95 model-
+  decision latency that climbs past a small number of seconds is the
+  leading signal that the ingest step is losing the timing race and
+  the containment window is narrowing. Note the smallest natural unit
+  in the SecOps-NG metrics schema is `seconds`; operators typically
+  read this at sub-second granularity on their dashboard by scaling
+  the rendered value for display (compile target's responsibility),
+  and the ratio-headline P95 aggregate here is invariant under that
+  rescale.
+
+unit: seconds
+direction: lower_is_better
+
+target:
+  value: 2
+  comparator: "<="
+  rationale: >
+    Community-recommended starting point for the unscoped catalog
+    baseline. Two seconds P95 on the LLM-decision step keeps the
+    end-to-end ingest → credential-isolation → lateral-movement-
+    containment loop inside a sub-minute self-correction window
+    against an autonomous adversary. Operators MAY tune tighter
+    targets (sub-second) where the underlying model surface is
+    hosted on-operator; targets slacker than the community
+    recommendation should be justified against the observed
+    adversary self-correction cadence.
+
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 2
+    severity: warn
+  - name: high
+    comparator: ">"
+    value: 5
+    severity: high
+  - name: breach
+    comparator: ">"
+    value: 15
+    severity: critical
+
+measurement:
+  source: telemetry
+  aggregation: p95
+  formula: >
+    For each LLM / agentic-model inference decision emitted at the
+    agentic_threat_response ingest step inside the evaluation window,
+    compute
+    latency_seconds = (response_time - request_time) / 1
+    (both timestamps carried on the OCSF API Activity event the
+    operator's model-serving surface emits at inference boundary;
+    seconds granularity is the schema-imposed floor and the compile
+    target rescales for sub-second display). Aggregate as `p95` across
+    the population — the 95th percentile latency the operator's
+    agentic-decision surface delivered in the window, i.e. the tail
+    case set closest to the sub-minute self-correction wall. Exclude
+    decisions whose response event is missing at evaluation time so
+    the indicator does not silently improve when the model-serving
+    surface stalls outright; those cases surface on operator-side
+    availability KRIs. Reference visualisation: a P95 headline gauge
+    with warn / high / breach threshold overlays over a per-model /
+    per-agentic-detection-class drill-down of P95 latency. The
+    committed reference rendering lives at
+    `content/metrics/agentic_model_decision_latency_seconds.viz.md`
+    — that file is the contract for the chart shape; the compile
+    target renders the executable form against operator data.
+  inputs:
+    - name: request_time
+      description: >
+        Timestamp at which the ingest step dispatched the LLM /
+        agentic-model inference request. Carried on the OCSF API
+        Activity event the operator's model-serving surface emits at
+        request boundary; the catalog entry binds to that OCSF class
+        shape, not to a vendor-specific model-server envelope.
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+      field: start_time
+    - name: response_time
+      description: >
+        Timestamp at which the LLM / agentic-model inference response
+        was received by the ingest step. Carried on the OCSF API
+        Activity event the operator's model-serving surface emits at
+        response boundary; disposition_id encodes whether the
+        inference completed vs. errored, and errored inferences are
+        excluded per the formula.
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+      field: time
+  window:
+    duration: P7D
+    sliding: true
+
+telemetry_refs:
+  - telemetry.ocsf.api_activity@v1
+
+playbook_refs:
+  - playbook_id: playbook.agentic_threat_response@v1
+    step_id: action--30000000-0000-4000-8000-000000000002
+
+external_refs:
+  - name: NIS2 — Article 21(2)(b) incident-handling capability (detect-through-contain timing on machine-speed case set)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(b)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: NIS2 — Article 21(2)(e) security in acquisition, development and maintenance (agentic-tool supply-chain surface)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(e)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ENISA — Threat Landscape reporting on autonomous / agentic adversary tradecraft
+    source: ENISA
+    url: https://www.enisa.europa.eu/publications/enisa-threat-landscape
+  - name: MITRE ATLAS — Adversarial Threat Landscape for AI Systems
+    source: MITRE
+    url: https://atlas.mitre.org/
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability
+  - determinism
