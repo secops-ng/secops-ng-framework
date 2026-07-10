@@ -78,3 +78,39 @@ entries:
       coordinated-disclosure intake). The cross-references on the CRA
       side land under `cra:annex-i-2-codebase-vuln-mgmt` in
       mappings/cra/article-14-and-annex-i.yaml.
+
+  - id: nis2:art-21-2-e-network-security
+    regulation:
+      name: NIS2
+      instrument: Directive (EU) 2022/2555
+      celex: 32022L2555
+      article: 21(2)(e)
+      url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+    obligation: >-
+      Security in network and information systems — specifically the
+      network-boundary and segmentation limb: per-window reconciliation
+      of the operator's declared segmentation policy against the
+      observed network posture on the operator's deployed estate, with
+      detection and remediation of policy violations against the
+      declared zone-transit matrix and a dated posture-evidence
+      artifact per reconciliation window.
+    status: draft
+    control_refs:
+      - control.network_boundary_protection@v1
+    playbook_refs:
+      - playbook.network_security@v1
+    metric_refs: []
+    evidence_stream_refs:
+      - network
+    notes: >-
+      SKELETON: `playbook.network_security@v1` is shipped with
+      placeholder action bodies pending the F-WF-NETWORK-SECURITY
+      CORE sibling card. Third entry on the Art. 21(2)(e) clause,
+      keyed off the operator's network-boundary observation surface
+      (distinct from the vulnerability-handling limb above and the
+      codebase-side dependency-review limb). Cross-anchored on DORA
+      under `dora:art-9-network-security` in
+      mappings/dora/article-9-network-security.yaml; the operative
+      detail on the DORA side lives in the Level 2 RTS (Commission
+      Delegated Regulation (EU) 2024/1774, JC RTS on ICT risk
+      management framework) Art. 12 network-security controls.

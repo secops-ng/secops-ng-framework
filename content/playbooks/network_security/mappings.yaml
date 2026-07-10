@@ -1,0 +1,363 @@
+# Cross-references for the network_security playbook.
+#
+# Outbound view of the content model: pins OSCAL controls, MITRE
+# D3FEND defensive techniques, OCSF event classes, and the EU
+# regulatory clauses this playbook helps operationalise. Inbound
+# references live in content/mappings/{nis2,dora,cra,gdpr}/ so the
+# graph is closed in both directions.
+#
+# Status: SKELETON (F-WF-NETWORK-SECURITY). The playbook is the
+# operator-side NIS2 Art. 21(2)(e) / DORA Art. 9 network-security and
+# segmentation posture lifecycle — inventory network segments,
+# evaluate the documented segmentation policy against observed
+# reachability, detect and classify violations against the declared
+# zone-transit matrix, engage remediation against the operator's
+# pre-bound remediation surface, and publish the dated posture-
+# evidence artifact. Adapter bindings, per-target compiler
+# emissions, and the D3FEND per-step closure land at the sibling
+# CORE card together with the deterministic per-step primitives.
+#
+# NIS2 anchor: Art. 21(2)(e) frames security in network and
+# information systems as an operator obligation. The clause already
+# anchors vulnerability handling (nis2:art-21-2-e via vuln_intake /
+# vulnerability_management / patch_management / cloud_misconfiguration)
+# and codebase-side dependency review (nis2:art-21-2-e-codebase via
+# codebase_vuln_management). This playbook is the currently-absent
+# network-boundary / segmentation limb of the same clause — the
+# per-window reconciliation of the operator's declared segmentation
+# policy against the observed network posture. A new inbound entry
+# nis2:art-21-2-e-network-security lands under
+# content/mappings/nis2/article-21-2-e.yaml alongside the existing
+# two entries so the atom-per-obligation pattern is preserved.
+#
+# DORA anchor: Art. 9 (protection and prevention) requires financial
+# entities to deploy ICT security tools, policies and procedures
+# ensuring the resilience, continuity and availability of ICT
+# systems. The operative detail for the network-security surface is
+# in the Level 2 RTS — Commission Delegated Regulation (EU) 2024/1774
+# (JC RTS on ICT risk management framework) network-security
+# articles (Art. 12 network-security controls, boundary-protection
+# and segmentation). This playbook is the per-window reconciliation
+# materialisation of that surface against the operator's deployed
+# estate. A new inbound entry dora:art-9-network-security lands
+# under content/mappings/dora/article-9-network-security.yaml
+# alongside the existing per-limb Art. 9 entries (access-mgmt,
+# authentication, crypto, maintenance-patch-rollout, vuln-mgmt) so
+# the atom-per-obligation precedent is preserved.
+#
+# CRA closure: CRA is manufacturer-scope; every operator-side
+# clause its Annex I could plausibly anchor against for network-
+# security is already pinned to the playbook that discharges it
+# (cloud_misconfiguration / infra_posture_management for
+# secure-by-default configuration under §1(b); iam_auditor /
+# mfa_secured_comms for the access-control limbs under §1(d);
+# alert_triage / detection_engineering for the logging /
+# monitoring limb under §1(l)). Estate-wide network-segmentation
+# reconciliation is materially an operator obligation surface
+# under NIS2 Art. 21(2)(e) and DORA Art. 9 (both closed above);
+# pinning it to a CRA product-security clause would misrepresent
+# the discharge. A CRA orphan-skip entry with a full clause-by-
+# clause review lands in content/mappings/cra/_orphan_skip.yaml
+# mirroring the asset_management CRA precedent.
+#
+# GDPR closure: GDPR Art. 32(1)(a) requires the controller to
+# implement technical measures such as pseudonymisation and
+# encryption of personal data; the security-of-processing surface
+# is the broader Art. 32(1) technical-and-organisational-measures
+# duty. Where the operator's segmented network carries services
+# processing personal data, this playbook's per-window boundary
+# reconciliation is a technical measure supporting Art. 32(1)(b)
+# (ability to ensure ongoing confidentiality and integrity of
+# processing systems). The workflow operates on segment
+# identifiers, policy-snapshot identifiers, violation-record
+# identifiers, and evidence-record identifiers; no personal data
+# is processed by the reconciliation itself. The
+# no-personal-data GDPR data-flow entry lands at
+# content/mappings/gdpr/data-flow-network_security.md mirroring
+# the ddos_response / patch_management / asset_management
+# no-personal-data doc precedents.
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.network_security@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the inventory /
+  # evaluate / detect / enforce / generate-evidence steps. The
+  # SKELETON overlay pins a single control-side URN
+  # (control.network_boundary_protection@v1) end-to-end against
+  # SC-7 (Boundary Protection), with additional catalog rows for
+  # SC-3 (Security Function Isolation) and CA-9 (Internal System
+  # Connections) capturing the isolation and internal-connections
+  # discipline the per-window reconciliation surfaces. The
+  # deterministic per-step OSCAL fan-out (per-step control
+  # bindings) is deferred to the CORE card once the deterministic
+  # per-step primitives are pinned. Placeholder control URN is
+  # marked todo: true — a CORE-layer content/controls/
+  # control.network_boundary_protection@v1.yaml sibling card
+  # lands the real control-side overlay and clears the flag.
+  - id: control.network_boundary_protection@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SC-7
+    title: Boundary Protection
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SC-7
+    todo: true
+    notes: >-
+      Anchors the playbook end-to-end as the boundary-protection
+      capability: monitor and control communications at the
+      external boundary of the system and at key internal
+      boundaries; implement subnetworks for publicly accessible
+      system components that are physically or logically separated
+      from internal networks; connect to external networks or
+      systems only through managed interfaces consisting of
+      boundary-protection devices arranged in accordance with an
+      organisational security architecture. The inventory /
+      evaluate / detect / enforce shape reconciles the operator's
+      documented boundary architecture against the observed
+      network posture; the generate-evidence step is the
+      audit-evident output. Placeholder URN — CORE card lands
+      the deterministic control file.
+  - id: control.network_boundary_protection@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: SC-3
+    title: Security Function Isolation
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SC-3
+    todo: true
+    notes: >-
+      Covers the segmentation-policy allowance evaluation and the
+      boundary-control-drift classification: SC-3 requires the
+      isolation of security functions from non-security functions
+      via mechanisms including physical or logical separation. The
+      declared zone-transit matrix the operator maintains is the
+      allowance-space this control anchors; the detect step
+      surfaces boundary-control drift against it. Placeholder URN
+      — CORE card lands the deterministic control file.
+  - id: control.network_boundary_protection@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: CA-9
+    title: Internal System Connections
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CA-9
+    todo: true
+    notes: >-
+      Covers the internal cross-segment reachability surface:
+      CA-9 requires the authorisation of internal connections of
+      system components and the documentation of the interface
+      characteristics, security requirements, and the nature of
+      the information communicated. The per-segment-pair
+      allowance state the evaluate step composes and the
+      undocumented-transit classification the detect step emits
+      are the audit-evident discharge of CA-9 against the
+      operator's declared internal-connection architecture.
+      Placeholder URN — CORE card lands the deterministic
+      control file.
+
+d3fend:
+  # MITRE D3FEND v1.0.0 defensive-technique tags per playbook step.
+  # SKELETON overlay pins two techniques on the observation-side
+  # steps: D3-NTA (Network Traffic Analysis) on the detect step
+  # (the reachability-observation slice) and D3-ISVA (Inbound
+  # Session Volume Analysis) as the boundary-observation
+  # candidate on the same step. The inventory / evaluate /
+  # enforce / generate-evidence steps are inventory / policy-
+  # evaluation / dispatch / evidence-emission activities without
+  # a dedicated per-step D3FEND runtime countermeasure at
+  # SKELETON tier; a sibling CORE card revisits the selection
+  # once the deterministic per-step primitives and adapter
+  # surfaces are pinned. Mirrors the pin-where-it-fits /
+  # document-the-gap precedent on asset_management and
+  # business_continuity.
+  - step: action--7e750001-0000-4000-8000-000000000004
+    d3fend_id: D3-NTA
+    d3fend_name: Network Traffic Analysis
+    url: https://d3fend.mitre.org/technique/d3f:NetworkTrafficAnalysis/
+    notes: >-
+      detect-policy-violations — pulling the observed
+      reachability posture (network-traffic observations,
+      boundary-control state, reachability probes) from the
+      operator's documented telemetry sources and comparing it
+      against the policy-snapshot allowance state is the
+      network-traffic-analysis discipline D3-NTA names.
+      D3FEND v1.0.0 frames D3-NTA as the analysis of network
+      traffic to detect deviations from expected patterns; the
+      declared zone-transit matrix and per-segment allowance
+      set are the expected-pattern reference this step
+      compares against. Read-only against the observation
+      surface: the step records the per-violation classification
+      under the operator's documented taxonomy, it does not
+      inject traffic or synthesise probes beyond what the
+      operator's documented telemetry sources emit.
+  - step: action--7e750001-0000-4000-8000-000000000004
+    d3fend_id: D3-ISVA
+    d3fend_name: Inbound Session Volume Analysis
+    url: https://d3fend.mitre.org/technique/d3f:InboundSessionVolumeAnalysis/
+    notes: >-
+      detect-policy-violations — the boundary-control-drift and
+      unauthorised-egress classifications on the violation set
+      surface deviations in inbound and outbound session
+      volumes against the declared per-segment allowance set.
+      D3-ISVA anchors the boundary-observation slice on the
+      inbound-session side; the outbound-session counterpart
+      is captured under the D3-NTA pin above. Candidate
+      technique — SKELETON pin; the CORE card revisits the
+      selection once the reachability-observation adapter is
+      pinned and the deterministic classification primitives
+      land.
+
+  # Deliberate D3FEND omissions:
+  #   - inventory-network-segments (action--7e750001-0000-4000-
+  #     8000-000000000002) is NOT pinned. D3FEND v1.0.0 does not
+  #     name a defensive technique for the inventory-composition
+  #     slice at a resolution finer than the D3-AI / D3-SWI
+  #     inventory disciplines already carried on the sibling
+  #     asset_management overlay for the asset-side; network
+  #     topology inventory is the corresponding slice on the
+  #     network-boundary side, and no D3FEND v1.0.0 technique
+  #     names it directly. CORE card revisits.
+  #   - evaluate-segmentation-policy (action--7e750001-0000-4000-
+  #     8000-000000000003) is NOT pinned. The step is a policy-
+  #     allowance-evaluation activity against the declared
+  #     zone-transit matrix; it does not itself execute a
+  #     defensive technique against the deployed estate. CORE
+  #     card revisits once the policy-evaluation algebra is
+  #     pinned.
+  #   - enforce-remediation (action--7e750001-0000-4000-8000-
+  #     000000000005) is NOT pinned. The remediation-dispatch
+  #     slice engages the operator's pre-bound remediation
+  #     surface (per-segment ACL / firewall-rule change ticket,
+  #     boundary-control posture-change ticket) — the surface
+  #     itself carries the defensive-technique discipline; this
+  #     step is the dispatch envelope. CORE card revisits once
+  #     the per-classification dispatch table is pinned.
+  #   - generate-posture-evidence-artifact (action--7e750001-
+  #     0000-4000-8000-000000000006) is NOT pinned: the dated
+  #     evidence-emission slice produces the audit-evident
+  #     posture record, it does not itself execute a defensive
+  #     technique. Mirrors the asset_management capture-evidence
+  #     and ddos_response evidence-capture gap-note precedents.
+
+ocsf:
+  # OCSF v1.3.0 telemetry binding. The reconciliation lifecycle
+  # emits Network Activity (4001) at the detect / enforce /
+  # generate-evidence milestones (the network-boundary observation
+  # and remediation surface). Richer per-step telemetry bindings
+  # (e.g. OCSF Configuration State on the boundary-control-drift
+  # slice, OCSF Detection Finding on the violation records) are
+  # deferred to the CORE card once stable upstream signal shapes
+  # are selected.
+  - id: telemetry.ocsf.network_activity@v1
+    category_uid: 4
+    category_name: Network Activity
+    class_uid: 4001
+    class_name: Network Activity
+    ocsf_version: "1.3.0"
+    direction: both
+    notes: >-
+      Consumed at the detect-policy-violations step (reads
+      against the operator's documented telemetry sources for
+      per-segment reachability posture). Emitted at the
+      enforce-remediation step (write records for each
+      remediation-surface engagement) and at the
+      generate-posture-evidence-artifact step (posture-record
+      write to the operator's evidence store). The inventory
+      and evaluate steps read against the operator's declarative
+      network-inventory and policy sources (API calls); OCSF
+      binding for those slices is a candidate for the CORE
+      card. Schema:
+      https://schema.ocsf.io/1.3.0/classes/network_activity
+
+nis2:
+  # Inbound entry that backlinks playbook.network_security@v1:
+  #   - content/mappings/nis2/article-21-2-e.yaml
+  #     (id nis2:art-21-2-e-network-security — the network-
+  #     boundary / segmentation limb of NIS2 Art. 21(2)(e))
+  # A new inbound row lands in this same SKELETON PR so the
+  # atom-per-obligation pattern is preserved alongside the
+  # existing nis2:art-21-2-e (vulnerability handling limb) and
+  # nis2:art-21-2-e-codebase (codebase-side dependency-review
+  # limb).
+  - mapping_id: nis2:art-21-2-e-network-security
+    article: 21(2)(e)
+    notes: >-
+      NIS2 Art. 21(2)(e) requires essential and important
+      entities to apply measures for security in network and
+      information systems acquisition, development, and
+      maintenance. The clause is already anchored on the
+      vulnerability-handling limb (nis2:art-21-2-e via
+      vuln_intake / vulnerability_management / patch_management
+      / cloud_misconfiguration) and the codebase-side
+      dependency-review limb (nis2:art-21-2-e-codebase via
+      codebase_vuln_management). This playbook is the currently-
+      absent network-boundary / segmentation limb of the same
+      clause: per-window reconciliation of the operator's
+      declared segmentation policy against the observed network
+      posture on the operator's deployed estate, with the
+      dated posture-evidence artifact closing the audit-evident
+      chain per reconciliation window. The three limbs together
+      cover the network-and-information-systems-security
+      surface Art. 21(2)(e) names, keyed off distinct inbound
+      channels (external CVD intake, operator SBOM, operator
+      network-boundary reconciliation).
+
+dora:
+  # Inbound entry that backlinks playbook.network_security@v1:
+  #   - content/mappings/dora/article-9-network-security.yaml
+  #     (id dora:art-9-network-security — DORA Art. 9 protection
+  #     and prevention, network-security controls, exercised
+  #     under the JC RTS on ICT risk management framework —
+  #     Commission Delegated Regulation (EU) 2024/1774 Art. 12
+  #     network-security controls)
+  # Pinned outbound below to close the graph. Mirrors the
+  # atom-per-obligation pattern on the existing per-limb Art. 9
+  # entries (access-mgmt, authentication, crypto, maintenance-
+  # patch-rollout, vuln-mgmt).
+  - mapping_id: dora:art-9-network-security
+    article: "9"
+    notes: >-
+      DORA Art. 9 (protection and prevention) requires financial
+      entities to design, procure and implement ICT security
+      policies, procedures, protocols and tools that ensure the
+      resilience, continuity and availability of ICT systems.
+      The operative detail for the network-security surface is
+      in the Level 2 RTS — Commission Delegated Regulation (EU)
+      2024/1774 (JC RTS on ICT risk management framework), Art.
+      12 (network-security controls: segmentation, boundary
+      protection, secure interconnection). This playbook is the
+      per-window reconciliation materialisation of that surface
+      against the operator's deployed estate: inventory the
+      declared segments, evaluate the segmentation policy
+      against the observed reachability posture, detect and
+      classify policy violations against the declared zone-
+      transit matrix, engage remediation on the operator's
+      pre-bound remediation surface, and publish the dated
+      posture-evidence artifact. Out of scope of this playbook's
+      discharge: the vulnerability-management limb of Art. 9
+      (anchored under dora:art-9-vuln-mgmt via vuln_intake /
+      vulnerability_management) and the access-management limb
+      (anchored under dora:art-9-access-mgmt via iam_auditor /
+      onboarding_offboarding_tracker). Atom-per-obligation
+      inbound anchor preserved.
+
+cra:
+  # No CRA inbound entry backlinks
+  # playbook.network_security@v1. The scope-mapping review
+  # concludes this is a durable, reviewed deferral rather than
+  # an open TODO. Estate-wide network-segmentation reconciliation
+  # is materially an operator obligation under NIS2 Art. 21(2)(e)
+  # and DORA Art. 9 — both axes are closed (see the nis2: and
+  # dora: blocks above). CRA Annex I is product-by-product
+  # manufacturer scope: every operator-side clause that
+  # network-boundary reconciliation could plausibly anchor
+  # against (§1(b) secure-by-default, §1(d) access control,
+  # §1(e) protection from unauthorised access, §1(l) logging /
+  # monitoring) is already pinned to the playbook that actually
+  # discharges it (cloud_misconfiguration / infra_posture_
+  # management for §1(b); iam_auditor / onboarding_offboarding_
+  # tracker / mfa_secured_comms for §1(d); crypto_posture_
+  # management / identity_compromise for §1(e); detection-
+  # engineering / alert-triage lanes for §1(l)). Adding a
+  # network_security pin to any of those would duplicate the
+  # discharge and dilute the existing inbound. The
+  # clause-by-clause review is recorded in
+  # content/mappings/cra/_orphan_skip.yaml as a reviewed skip
+  # rather than a pending gap. Mirrors the asset_management CRA
+  # skip precedent.
+  []
