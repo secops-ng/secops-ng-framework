@@ -37,6 +37,7 @@ narrative.
 | `data_subject_rights` | [`data_subject_rights.md`](data_subject_rights.md) | `content/playbooks/data_subject_rights/`              |
 | `data_protection_impact_assessment` | [`data_protection_impact_assessment.md`](data_protection_impact_assessment.md) | `content/playbooks/data_protection_impact_assessment/` |
 | `nis2_self_assessment` | [`nis2_self_assessment.md`](nis2_self_assessment.md) | `content/playbooks/nis2_self_assessment/`             |
+| `nis2_art20_governance` | [`nis2_art20_governance.md`](nis2_art20_governance.md) | `content/playbooks/nis2_art20_governance/`         |
 | `dora_ict_risk_selfassess` | [`dora_ict_risk_selfassess.md`](dora_ict_risk_selfassess.md) | `content/playbooks/dora_ict_risk_selfassess/`   |
 | `eu_ai_act_risk_management` | [`eu_ai_act_risk_management.md`](eu_ai_act_risk_management.md) | `content/playbooks/eu_ai_act_risk_management/` |
 | `asset_management`    | [`asset_management.md`](asset_management.md)       | `content/playbooks/asset_management/`                 |

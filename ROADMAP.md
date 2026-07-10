@@ -989,6 +989,9 @@ named operator use-case. Each cookbook workflow lives under
   - CORE-GOLDENS — #776 (byte-parity golden tests under
     `tests/examples/nis2_art20_governance/` closing the three-target
     parity ring).
+  - EXTEND — practitioner cookbook walkthrough at
+    `docs/cookbook/nis2_art20_governance.md` and cookbook index
+    entry under `docs/cookbook/README.md`.
 
 ---
 
