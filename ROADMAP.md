@@ -986,7 +986,7 @@ named operator use-case. Each cookbook workflow lives under
     coverage).
   - CORE-FANOUT — #765 (three-target compile examples under
     `examples/{n8n,temporal,langgraph}/nis2_art20_governance/`).
-  - CORE-GOLDENS — PR #<this> (byte-parity golden tests under
+  - CORE-GOLDENS — #776 (byte-parity golden tests under
     `tests/examples/nis2_art20_governance/` closing the three-target
     parity ring).
 
