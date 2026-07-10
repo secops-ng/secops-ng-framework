@@ -86,6 +86,12 @@ def test_real_tree_covers_full_threat_intel_cluster() -> None:
         "kpi.mttr_phishing_triage@v1",
         "kri.phishing_suppression_rate@v1",
         "kpi.phishing_sim_click_rate@v1",
+        # F-MET-G04-THREATINTEL SKELETON — threat-intelligence-operations
+        # KPI/KRI pair (NIS2 Art.23 / Art.26(2), DORA Art.19). Both pin
+        # their host chain through playbook.threat_intel_ingest@v1, so
+        # they classify into this cluster and must stay OCSF-bound.
+        "kpi.threat_intel_indicator_ingestion_rate@v1",
+        "kri.threat_intel_stale_ioc_ratio@v1",
     }
     missing = expected - classified
     assert not missing, (
@@ -230,6 +236,11 @@ THREAT_INTEL_METRICS = (
     "mttr_phishing_triage",
     "phishing_suppression_rate",
     "phishing_sim_click_rate",
+    # F-MET-G04-THREATINTEL SKELETON — threat-intelligence-operations
+    # KPI/KRI pair. Guard the OCSF binding on each catalogue entry
+    # independently so a silent detach on either file surfaces.
+    "threat_intel_indicator_ingestion_rate",
+    "threat_intel_stale_ioc_ratio",
 )
 
 

@@ -171,6 +171,10 @@ VIZ_REQUIRED_STEMS = (
     # F-WF-SCS EXTEND-metrics — supply_chain_security catalog closeout (G-04)
     "supplier_attestation_staleness",
     "supply_chain_coverage",
+    # F-MET-G04-THREATINTEL SKELETON — threat-intelligence-operations
+    # KPI/KRI pair (NIS2 Art.23 / Art.26(2), DORA Art.19; G-04)
+    "threat_intel_indicator_ingestion_rate",
+    "threat_intel_stale_ioc_ratio",
 )
 
 
