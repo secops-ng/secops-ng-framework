@@ -60,22 +60,24 @@
 # clause review lands in content/mappings/cra/_orphan_skip.yaml
 # mirroring the asset_management CRA precedent.
 #
-# GDPR closure: GDPR Art. 32(1)(a) requires the controller to
-# implement technical measures such as pseudonymisation and
-# encryption of personal data; the security-of-processing surface
-# is the broader Art. 32(1) technical-and-organisational-measures
-# duty. Where the operator's segmented network carries services
-# processing personal data, this playbook's per-window boundary
-# reconciliation is a technical measure supporting Art. 32(1)(b)
-# (ability to ensure ongoing confidentiality and integrity of
-# processing systems). The workflow operates on segment
-# identifiers, policy-snapshot identifiers, violation-record
-# identifiers, and evidence-record identifiers; no personal data
-# is processed by the reconciliation itself. The
-# no-personal-data GDPR data-flow entry lands at
-# content/mappings/gdpr/data-flow-network_security.md mirroring
-# the ddos_response / patch_management / asset_management
-# no-personal-data doc precedents.
+# GDPR anchor: GDPR Art. 32(1)(b) requires the controller to
+# implement appropriate technical and organisational measures to
+# ensure the ongoing confidentiality, integrity, availability, and
+# resilience of processing systems and services. Where the operator's
+# segmented network carries services processing personal data, this
+# playbook's per-window boundary reconciliation is a technical
+# measure supporting that limb. The workflow itself processes no
+# personal data (segment identifiers, policy-snapshot identifiers,
+# violation-record identifiers, evidence-record identifiers only —
+# see content/mappings/gdpr/data-flow-network_security.md §2),
+# mirroring the ddos_response / patch_management / asset_management
+# no-personal-data doc precedents. Anchored on the omnibus
+# `gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability`
+# entry alongside the existing cluster playbooks (cloud_misconfiguration,
+# iam_auditor, infra_posture_management, vulnerability_management, etc.)
+# rather than as a standalone atom — the network-boundary
+# reconciliation surface is one of several ongoing-baseline
+# organisational measures on the same omnibus entry.
 #
 # Schema: schemas/playbook-mappings.schema.json
 playbook: playbook.network_security@v1
@@ -361,3 +363,34 @@ cra:
   # rather than a pending gap. Mirrors the asset_management CRA
   # skip precedent.
   []
+
+gdpr:
+  # Inbound entry that backlinks playbook.network_security@v1:
+  #   - content/mappings/gdpr/article-32-security-of-processing.yaml
+  #     (id gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability —
+  #     the omnibus ongoing-C/I/A baseline entry, alongside the
+  #     existing cluster playbooks anchored on the same limb:
+  #     cloud_misconfiguration, iam_auditor, infra_posture_management,
+  #     it_security_support_agent, security_awareness_training,
+  #     vuln_intake, vulnerability_management, and others).
+  # Anchored on the omnibus entry rather than a standalone atom
+  # because the per-window boundary reconciliation is one of
+  # several ongoing-baseline organisational measures on the same
+  # limb; the same pattern the vulnerability_management outbound
+  # overlay carries on this file.
+  - mapping_id: gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability
+    article: 32(1)(b)
+    notes: >-
+      Outbound backlink for the GDPR Art. 32(1)(b) obligation to
+      ensure the ongoing confidentiality, integrity, availability
+      and resilience of processing systems and services. The
+      per-window reconciliation of the operator's declared
+      segmentation policy against the observed network posture is
+      the organisational measure that keeps deployed services on
+      the ongoing-confidentiality / integrity dimension of the
+      clause where the segmented network carries services processing
+      personal data; the workflow itself processes no personal data
+      (see content/mappings/gdpr/data-flow-network_security.md §2).
+      Inbound edge:
+      content/mappings/gdpr/article-32-security-of-processing.yaml
+      (`gdpr:art-32-1-b-ongoing-confidentiality-integrity-availability`).
