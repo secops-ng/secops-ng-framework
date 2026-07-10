@@ -1,0 +1,72 @@
+{
+  "conditional_edges": [],
+  "edges": [
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--7e750001-0000-4000-8000-000000000003",
+      "src": "action--7e750001-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--7e750001-0000-4000-8000-000000000004",
+      "src": "action--7e750001-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--7e750001-0000-4000-8000-000000000005",
+      "src": "action--7e750001-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--7e750001-0000-4000-8000-000000000006",
+      "src": "action--7e750001-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--7e750001-0000-4000-8000-000000000006"
+    }
+  ],
+  "end_sentinel": "__END__",
+  "entry": "action--7e750001-0000-4000-8000-000000000002",
+  "name": "Network security and segmentation posture",
+  "nodes": [
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "inventory_network_segments",
+      "name": "action--7e750001-0000-4000-8000-000000000002",
+      "step_id": "action--7e750001-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "evaluate_segmentation_policy",
+      "name": "action--7e750001-0000-4000-8000-000000000003",
+      "step_id": "action--7e750001-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "detect_policy_violations",
+      "name": "action--7e750001-0000-4000-8000-000000000004",
+      "step_id": "action--7e750001-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "enforce_remediation",
+      "name": "action--7e750001-0000-4000-8000-000000000005",
+      "step_id": "action--7e750001-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "generate_posture_evidence_artifact",
+      "name": "action--7e750001-0000-4000-8000-000000000006",
+      "step_id": "action--7e750001-0000-4000-8000-000000000006"
+    }
+  ],
+  "playbook_id": "playbook--7e750001-0000-4000-8000-000000000001",
+  "stable_id": "playbook.network_security@v1"
+}
