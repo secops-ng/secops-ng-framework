@@ -1,0 +1,134 @@
+# Playbook template — inline-commented skeleton
+#
+# Copy this directory to content/playbooks/<slug>/ and fill in the
+# TODO_ fields. See docs/contributing/playbook-quickstart.md for the
+# short path and docs/contributing/playbook-authoring.md § 3 for the
+# full field reference and schema.
+#
+# This file is YAML so it can carry inline comments while you draft.
+# Canonical playbooks ship JSON — convert once the fields are correct
+# and remove this YAML file before opening the PR (quickstart § 3).
+
+# CACAO v2 discriminator. Always the literal string "playbook".
+type: playbook
+
+# CACAO specification version. This project ships against 2.0.
+spec_version: "2.0"
+
+# Stable CACAO identifier. Format: playbook--<uuid v4>.
+# Generate ONCE with `python -c "import uuid; print(f'playbook--{uuid.uuid4()}')"`
+# and never regenerate — mappings and downstream compilers pin this.
+id: playbook--TODO_UUID
+
+# Human-readable title. Sentence case, no marketing verbs.
+name: TODO_HUMAN_READABLE_TITLE
+
+# 1–4 paragraphs describing the workflow. Name the regulatory or
+# operational anchor and the inputs / outputs. If the playbook is
+# SKELETON, say so in the first sentence.
+description: >-
+  TODO_ONE_TO_FOUR_PARAGRAPHS. Name the anchor (CRA/NIS2/DORA/GDPR
+  clause, OSCAL control, D3FEND technique, OCSF event class). Name the
+  inputs (trigger, source telemetry) and outputs (notifications,
+  artifacts, telemetry emissions). Mark SKELETON in the first sentence
+  if this playbook lands ahead of its templates and adapters.
+
+# One or more CACAO playbook types. Allowed values: investigation,
+# notification, remediation, prevention, detection, mitigation, attack,
+# engagement.
+playbook_types:
+  - TODO_TYPE
+
+# Stable identity for the maintainer group. Use a project identity, not
+# a person. Format: identity--<uuid>.
+created_by: identity--TODO_UUID
+
+# ISO-8601 timestamps. `created` is when the artifact was first
+# authored; `modified` is bumped on every content-affecting edit;
+# `valid_from` gates activation.
+created: TODO_ISO8601_UTC
+modified: TODO_ISO8601_UTC
+valid_from: TODO_ISO8601_UTC
+
+# Lowercase tag tokens. Include the regulatory anchor slug and any
+# tokens a searcher would use (e.g. "cra", "article-14", "cvd").
+labels:
+  - TODO_LOWERCASE_TAG
+
+# Standards lineage. At minimum cite CACAO and the primary regulatory
+# clause. Add OSCAL / D3FEND / OCSF entries where relevant.
+external_references:
+  - name: OASIS CACAO v2.0
+    description: >-
+      Workflow step types (start, action, end), variable conventions,
+      the x_ extension namespace this artifact uses.
+    source: OASIS Open
+  - name: TODO_REGULATORY_CITATION
+    source: TODO_PUBLISHER
+    # url: https://TODO
+
+# SecOps-NG extension namespace. All fields nested here are required
+# unless noted otherwise.
+x_secops_ng:
+  # Human-curated join key: playbook.<slug>@v<major>. This is what
+  # mappings and cross-references pin — it stays stable across
+  # regenerations of the CACAO `id` above.
+  stable_id: playbook.TODO_SLUG@v1
+
+  # Semantic version of the playbook BODY (not the CACAO spec_version).
+  # Bump on every content-affecting edit.
+  content_version: 0.1.0
+
+  # Maturity gate. `draft` and `experimental` are not compiled by
+  # default in production targets.
+  maturity: draft   # draft | experimental | stable | deprecated
+
+  # Optional: which reference targets this playbook compiles into.
+  # Any subset of ["n8n", "temporal", "langgraph"]. Omit or leave
+  # empty if the playbook is portable content only for now.
+  compile_targets: []
+
+  # Optional: outbound content-model references. Each entry is a
+  # stable-id string that resolves against the corresponding layer.
+  # Full outbound view (with OSCAL / D3FEND / OCSF details) lives in
+  # mappings.yaml — these arrays are the shortlist a compiler reads.
+  control_refs: []
+  telemetry_refs: []
+  metric_refs: []
+
+  # Optional: free-form provenance pointers. One line per source.
+  sources:
+    - TODO_UPSTREAM_SPEC_OR_CLAUSE_URL
+
+# CACAO workflow graph. Ordered map keyed on `step--<uuid>`. The
+# canonical shape below is a minimal three-step scaffold: start →
+# single action → end. Real playbooks expand the middle with more
+# action steps, if-condition branches, while-condition loops, and
+# playbook-action calls into sibling playbooks. See
+# content/playbooks/cra_cvd/playbook.cacao.json for a worked example.
+workflow:
+
+  step--TODO_UUID_START:
+    type: start
+    name: Start
+    description: Entry point.
+    on_completion: step--TODO_UUID_ACTION
+
+  step--TODO_UUID_ACTION:
+    type: action
+    name: TODO_ACTION_STEP_NAME
+    description: >-
+      TODO. Describe what this step does, its inputs, and its outputs.
+      Reference OSCAL controls or OCSF event classes it operationalises.
+    # `commands` names the primitives compilers will emit. Keep the
+    # step framework-agnostic — do not reference n8n / Temporal /
+    # LangGraph specifics here.
+    commands:
+      - type: manual
+        command: TODO_HUMAN_READABLE_PRIMITIVE
+    on_completion: step--TODO_UUID_END
+
+  step--TODO_UUID_END:
+    type: end
+    name: End
+    description: Terminal state.
