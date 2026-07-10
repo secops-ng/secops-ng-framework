@@ -8,19 +8,24 @@ shape is pinned alongside the internal evidence-artifact field binding.
 
 Cluster scope: the vulnerability-&-patch playbook set covers
 ``vuln_intake`` (coordinated-vulnerability-disclosure intake, SLA
-timing, SBOM release hygiene) and ``patch_management`` (patch
-dissemination and rollout tracking). A metric is treated as
-vulnerability-&-patch-class when its ``playbook_refs`` resolve
-**exclusively** to playbooks in that set. The exclusivity gate keeps
-regulatory-notification / fan-out pipeline metrics — whose source-data
-shape is non-OCSF or lives in a different cluster — out.
+timing, SBOM release hygiene), ``patch_management`` (patch
+dissemination and rollout tracking), and
+``vulnerability_management`` (operator-side vulnerability triage and
+remediation age/SLA tracking against the still-open critical
+population). A metric is treated as vulnerability-&-patch-class when
+its ``playbook_refs`` resolve **exclusively** to playbooks in that
+set. The exclusivity gate keeps regulatory-notification / fan-out
+pipeline metrics — whose source-data shape is non-OCSF or lives in a
+different cluster — out.
 
-All six currently shipping vulnerability-&-patch metrics
+All nine currently shipping vulnerability-&-patch metrics
 (``cvd_intake_aging``, ``vuln_disclosure_sla``, ``releases_without_sbom``,
 ``patch_disseminated_on_time``, ``patch_rollout_success_rate``,
-``patch_rollout_overdue_exposure``) carry at least one
-``telemetry.ocsf.*`` source-data shape, which is what arms this
-SKELETON.
+``patch_rollout_overdue_exposure``, ``unpatched_critical_cve_age_days``,
+``vuln_critical_open_age_p99``, ``vuln_remediation_sla_compliance``)
+carry at least one ``telemetry.ocsf.*`` source-data shape (OCSF
+Vulnerability Finding class 2002 for the vulnerability_management
+triad), which is what arms this assertion.
 
 Fires when any vulnerability-&-patch-cluster metric has no
 ``telemetry.ocsf.*`` entry in its ``telemetry_refs`` list. Output
@@ -52,10 +57,12 @@ from tools.ocsf_cluster_lint import (
 
 # Vulnerability-handling & patch (CRA-family) cluster: playbooks whose
 # primary purpose is to intake coordinated-vulnerability disclosures,
-# track disclosure SLAs and SBOM release hygiene, and manage patch
-# dissemination and rollout. Metrics whose playbook_refs resolve
-# EXCLUSIVELY to these playbooks are considered vulnerability-&-patch-
-# class and must declare an OCSF source-data shape.
+# track disclosure SLAs and SBOM release hygiene, manage patch
+# dissemination and rollout, or track operator-side vulnerability
+# triage/remediation age against the still-open critical population.
+# Metrics whose playbook_refs resolve EXCLUSIVELY to these playbooks
+# are considered vulnerability-&-patch-class and must declare an OCSF
+# source-data shape.
 #
 # Extending the cluster is a deliberate governance act — add a
 # playbook id here only when the corresponding vuln/patch metric lands
@@ -64,6 +71,7 @@ VULN_PATCH_PLAYBOOK_IDS: frozenset[str] = frozenset(
     {
         "playbook.vuln_intake@v1",
         "playbook.patch_management@v1",
+        "playbook.vulnerability_management@v1",
     }
 )
 

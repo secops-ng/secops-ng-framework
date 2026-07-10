@@ -85,6 +85,15 @@ def test_real_tree_covers_full_vuln_patch_cluster() -> None:
         "kpi.patch_disseminated_on_time@v1",
         "kpi.patch_rollout_success_rate@v1",
         "kri.patch_rollout_overdue_exposure@v1",
+        # F-MET-G04-VULNMGMT SKELETON / CORE — vulnerability-management
+        # KPI/KRI triad (NIS2 Art. 21(2)(e), DORA JC RTS Art. 10). All
+        # three pin their host chain through
+        # playbook.vulnerability_management@v1, so they classify into
+        # this cluster and must stay OCSF-bound to the Vulnerability
+        # Finding (2002) source-data shape.
+        "kri.unpatched_critical_cve_age_days@v1",
+        "kri.vuln_critical_open_age_p99@v1",
+        "kpi.vuln_remediation_sla_compliance@v1",
     }
     missing = expected - classified
     assert not missing, (
@@ -227,6 +236,12 @@ VULN_PATCH_METRICS = (
     "patch_disseminated_on_time",
     "patch_rollout_success_rate",
     "patch_rollout_overdue_exposure",
+    # F-MET-G04-VULNMGMT SKELETON / CORE — vulnerability-management
+    # KPI/KRI triad. Guard the OCSF binding on each catalogue entry
+    # independently so a silent detach on any one file surfaces.
+    "unpatched_critical_cve_age_days",
+    "vuln_critical_open_age_p99",
+    "vuln_remediation_sla_compliance",
 )
 
 
@@ -281,10 +296,12 @@ def test_has_ocsf_binding_helper() -> None:
 def test_is_vuln_patch_metric_helper() -> None:
     assert is_vuln_patch_metric(["playbook.vuln_intake@v1"])
     assert is_vuln_patch_metric(["playbook.patch_management@v1"])
+    assert is_vuln_patch_metric(["playbook.vulnerability_management@v1"])
     assert is_vuln_patch_metric(
         [
             "playbook.vuln_intake@v1",
             "playbook.patch_management@v1",
+            "playbook.vulnerability_management@v1",
         ]
     )
     assert not is_vuln_patch_metric([])
