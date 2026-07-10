@@ -1,0 +1,143 @@
+stable_id: kpi.identity_mfa_enforcement_rate@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Identity MFA enforcement rate
+summary: >
+  Share of the operator's user-account population whose authentication
+  posture carries multi-factor enforcement observed as active on the
+  identity source. Operationalises the multi-factor-authentication limb
+  of NIS2 Article 21(2)(j) — 'use of multi-factor authentication or
+  continuous authentication solutions' — on the aggregate account
+  surface, and reads across to the DORA Article 5(2) ICT
+  risk-management-framework requirement that ICT security policies,
+  procedures and tools include strong authentication mechanisms.
+  Complements the shipped `playbook.mfa_secured_comms@v1` (which
+  probes coverage at posture-check time) and
+  `control.mfa_state_probe@v1` (which attests the probing surface):
+  this KPI is the aggregate ratio operators read on the dashboard.
+  Closes an identity/access-management catalogue gap under G-04
+  alongside `kri.access_review_completion_rate@v1`.
+
+unit: ratio
+direction: higher_is_better
+
+target:
+  value: 0.95
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point for the unscoped catalog
+    baseline. NIS2 essential-entity guidance and ENISA authentication
+    baselines converge on MFA coverage in the mid-to-high nineties
+    percentile once break-glass and service-account exceptions are
+    documented on the operator's identity-source registry.
+    Privileged-role-scoped variants (for example an
+    admin-account-scoped MFA enforcement KPI) tighten this target
+    above 0.99 and live as separate catalog entries.
+
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 0.95
+    severity: warn
+  - name: high
+    comparator: "<"
+    value: 0.90
+    severity: high
+  - name: breach
+    comparator: "<"
+    value: 0.80
+    severity: critical
+
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: >
+    For each user account observed on the operator's identity source
+    during the evaluation window, classify the account as
+    mfa_enforced when the authentication posture recorded by the
+    mfa_secured_comms probe-mfa-coverage step matches the operator's
+    documented enforcement policy on that account's role (a factor
+    beyond the primary password credential is bound and required at
+    each authentication, or continuous-authentication posture is
+    active). Compute
+    enforcement_rate = |{accounts mfa_enforced}| / |{accounts observed}|.
+    Documented break-glass and service-account exceptions carried on
+    the operator's identity-source exception register do NOT drop out
+    of the denominator — they remain visible in the ratio so the
+    exception population itself is a first-class number on the
+    dashboard. Reference visualisation: a ratio-headline gauge with
+    warn / high / breach threshold bands over a coverage-versus-gap
+    stacked bar sliced by identity_source; the committed reference
+    rendering lives at
+    `content/metrics/identity_mfa_enforcement_rate.viz.md` — that
+    file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: authentication_event
+      description: >
+        Authentication observation carried on the OCSF Authentication
+        (class 3002) event stream the mfa_secured_comms
+        probe-mfa-coverage step reads. Provides the observed factor
+        set at each authentication, which the ratio consumer folds
+        into per-account enforcement state over the window.
+      telemetry_ref: telemetry.ocsf.authentication@v1
+      playbook_ref: playbook.mfa_secured_comms@v1
+      playbook_step: action--52000000-0000-4000-8000-000000000002
+    - name: account_population
+      description: >
+        Account-inventory observation carried on the OCSF Account
+        Change (class 3001) event stream. Bounds the denominator of
+        the enforcement ratio to accounts observed on the identity
+        source during the evaluation window; documented exception
+        accounts remain in the denominator per the formula.
+      telemetry_ref: telemetry.ocsf.account_change@v1
+    - name: mfa_posture_observation
+      description: >
+        Per-account MFA-posture record emitted by the
+        mfa_secured_comms probe-mfa-coverage step. Names whether the
+        account is mfa_enforced on the operator's declared policy
+        for that role.
+      playbook_ref: playbook.mfa_secured_comms@v1
+      playbook_step: action--52000000-0000-4000-8000-000000000002
+  window:
+    duration: P30D
+    sliding: true
+
+playbook_refs:
+  - playbook_id: playbook.mfa_secured_comms@v1
+    step_id: action--52000000-0000-4000-8000-000000000002
+  - playbook_id: playbook.mfa_secured_comms@v1
+    step_id: action--52000000-0000-4000-8000-000000000005
+
+control_refs:
+  - control.mfa_state_probe@v1
+  - control.access_enforcement@v1
+
+telemetry_refs:
+  - telemetry.ocsf.authentication@v1
+  - telemetry.ocsf.account_change@v1
+
+external_refs:
+  - name: NIS2 — Article 21(2)(j) use of multi-factor or continuous authentication
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(j)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 5(2) ICT risk management framework (strong authentication mechanisms)
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 5(2)
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: ENISA — Authentication methods baseline for essential and important entities
+    source: ENISA
+    url: https://www.enisa.europa.eu/publications
+  - name: OCSF v1.3.0 — Authentication (class 3002) event class
+    source: OCSF
+    url: https://schema.ocsf.io/1.3.0/classes/authentication
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability
+  - auditability
