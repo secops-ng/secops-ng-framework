@@ -1,0 +1,474 @@
+{
+  "name": "Security-awareness training programme lifecycle",
+  "nodes": [
+    {
+      "id": "start--54000000-0000-4000-8000-000000000001",
+      "name": "security_awareness_training_start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__training_window__",
+              "type": "string",
+              "value": "",
+              "description": "ISO 8601 interval describing the training-programme cycle window for this run. Supplied by the scheduler that triggers this playbook or by an operator-initiated cycle-review request."
+            },
+            {
+              "name": "__training_scope__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the in-scope training-programme surface for this run (matches a row in the operator's documented programme scope catalogue: which staff cohorts, which mandatory awareness tracks, which role-based tracks, and which regulatory training requirements are in scope for the programme)."
+            },
+            {
+              "name": "__assessment_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the training-needs assessment artifact emitted by the schedule-assessment step: per-cohort record of (cohort id, required tracks, identified gaps, regulatory drivers, priority)."
+            },
+            {
+              "name": "__curriculum_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the training-content curriculum artifact emitted by the design-content step: per-track record of (track id, module ids, learning objectives, source citation, review date)."
+            },
+            {
+              "name": "__delivery_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the training-delivery artifact emitted by the deliver-training step: per-cohort record of (cohort id, delivery channel, delivered at, target audience count)."
+            },
+            {
+              "name": "__completion_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the completion-record artifact emitted by the record-completion step: per-staff record of (staff id, track id, completion state, completed at, overdue-by-days) rolled up to per-cohort aggregate."
+            },
+            {
+              "name": "__gap_report_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the residual-gap report artifact emitted by the report-gaps step: structured gap summary the training owner reads at cycle close (missed-mandatory, overdue-role-based, uncovered-regulatory-requirement)."
+            },
+            {
+              "name": "__cycle_review_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the cycle-review artifact emitted by the review-cycle step: dated end-of-cycle record carrying the assessment, curriculum, delivery, completion, and gap-report references, plus programme-level recommendations for the next cycle."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--54000000-0000-4000-8000-000000000002",
+      "name": "schedule assessment",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.training_window",
+              "name": "in.training_window",
+              "value": "={{$workflow.variables.training_window}}",
+              "type": "string"
+            },
+            {
+              "id": "in.training_scope",
+              "name": "in.training_scope",
+              "value": "={{$workflow.variables.training_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "out.assessment_id",
+              "name": "out.assessment_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.training_needs_assessment@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Schedule the training-needs assessment against the in-scope programme surface: resolve the required awareness and role-based training tracks per cohort, identify residual gaps against the operator's declared training policy, and pin the per-cohort priority for this cycle. Emits __assessment_id__ as a per-cohort record. Read-only against the operator's HR / identity / policy surfaces; does not mutate roster or policy state.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--54000000-0000-4000-8000-000000000003",
+      "name": "design content",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.assessment_id",
+              "name": "in.assessment_id",
+              "value": "={{$workflow.variables.assessment_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.training_scope",
+              "name": "in.training_scope",
+              "value": "={{$workflow.variables.training_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "out.curriculum_id",
+              "name": "out.curriculum_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.training_curriculum@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Author or update the per-track training curriculum against the assessment artifact: learning objectives, module content references, source citations, and next review dates. Emits __curriculum_id__ as a per-track record. The curriculum is the programme-level content-authoring surface; individual per-cycle delivery lives downstream on this playbook and on the operational cyber_hygiene_training playbook.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--54000000-0000-4000-8000-000000000004",
+      "name": "deliver training",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.curriculum_id",
+              "name": "in.curriculum_id",
+              "value": "={{$workflow.variables.curriculum_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.training_scope",
+              "name": "in.training_scope",
+              "value": "={{$workflow.variables.training_scope}}",
+              "type": "string"
+            },
+            {
+              "id": "out.delivery_id",
+              "name": "out.delivery_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.training_delivery@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Deliver the cycle's curriculum to the in-scope cohorts along the operator's declared training channel(s) (learning-management surface, live session, self-paced module). Emits __delivery_id__ as a per-cohort delivery record. The delivery step writes delivery-intent records to the training surface; the operator's LMS owns final scheduling and per-staff dispatch.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--54000000-0000-4000-8000-000000000005",
+      "name": "record completion",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.delivery_id",
+              "name": "in.delivery_id",
+              "value": "={{$workflow.variables.delivery_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.training_window",
+              "name": "in.training_window",
+              "value": "={{$workflow.variables.training_window}}",
+              "type": "string"
+            },
+            {
+              "id": "out.completion_id",
+              "name": "out.completion_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.training_records@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Read per-staff completion state from the operator's learning-management surface against the delivery artifact and roll up to per-cohort aggregate. Emits __completion_id__ as per-staff (staff id, track id, completion state, completed at, overdue-by-days) with per-cohort completion-rate. Read-only against the LMS; does not mark completion on the operator's behalf.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--54000000-0000-4000-8000-000000000006",
+      "name": "report gaps",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.completion_id",
+              "name": "in.completion_id",
+              "value": "={{$workflow.variables.completion_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.assessment_id",
+              "name": "in.assessment_id",
+              "value": "={{$workflow.variables.assessment_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.gap_report_id",
+              "name": "out.gap_report_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.training_records@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Compose the residual-gap report for the cycle: missed-mandatory tracks, overdue role-based tracks, cohorts below the declared completion-rate target, and any uncovered regulatory training requirement the assessment surfaced but the curriculum did not close. Emits __gap_report_id__. The report is the programme-owner-facing summary of what did NOT close this cycle.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--54000000-0000-4000-8000-000000000007",
+      "name": "review cycle",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.assessment_id",
+              "name": "in.assessment_id",
+              "value": "={{$workflow.variables.assessment_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.curriculum_id",
+              "name": "in.curriculum_id",
+              "value": "={{$workflow.variables.curriculum_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.delivery_id",
+              "name": "in.delivery_id",
+              "value": "={{$workflow.variables.delivery_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.completion_id",
+              "name": "in.completion_id",
+              "value": "={{$workflow.variables.completion_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.gap_report_id",
+              "name": "in.gap_report_id",
+              "value": "={{$workflow.variables.gap_report_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.training_window",
+              "name": "in.training_window",
+              "value": "={{$workflow.variables.training_window}}",
+              "type": "string"
+            },
+            {
+              "id": "out.cycle_review_id",
+              "name": "out.cycle_review_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.training_records@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Close the cycle with a dated cycle-review record referencing the assessment, curriculum, delivery, completion, and gap-report artifacts, plus programme-level recommendations feeding the next cycle's assessment (curriculum updates, cohort-scope changes, regulatory drivers). The cycle-review record is the audit-evident programme-governance artifact NIS2 Art. 21(2)(g) reviewers read against the operator's declared training policy.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--54000000-0000-4000-8000-000000000008",
+      "name": "security_awareness_training_end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2060,
+        420
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "security_awareness_training_start": {
+      "main": [
+        [
+          {
+            "node": "schedule assessment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "schedule assessment": {
+      "main": [
+        [
+          {
+            "node": "design content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "design content": {
+      "main": [
+        [
+          {
+            "node": "deliver training",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "deliver training": {
+      "main": [
+        [
+          {
+            "node": "record completion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "record completion": {
+      "main": [
+        [
+          {
+            "node": "report gaps",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "report gaps": {
+      "main": [
+        [
+          {
+            "node": "review cycle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "review cycle": {
+      "main": [
+        [
+          {
+            "node": "security_awareness_training_end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "security-awareness",
+    "training",
+    "programme-lifecycle",
+    "governance",
+    "posture"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.security_awareness_training@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--9e4d5f60-7182-4b33-ae4f-05c6d7e8f901"
+    },
+    "secops_ng_notes": [
+      "step 'action--54000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--54000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--54000000-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--54000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--54000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--54000000-0000-4000-8000-000000000007': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}
