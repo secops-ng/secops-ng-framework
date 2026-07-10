@@ -1,0 +1,138 @@
+stable_id: kri.access_review_completion_rate@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Privileged access review completion rate
+summary: >
+  Share of privileged-access reviews the operator's declared cadence
+  scheduled inside the evaluation window that closed on time with a
+  recertify-or-revoke decision recorded against every reviewed
+  binding. A residual-risk indicator on the access-control limb of
+  NIS2 Article 21(2)(i) — 'human resources security, access control
+  policies and asset management' — read across to the GDPR
+  Article 32(1)(a) 'pseudonymisation and encryption of personal data'
+  neighbour requirement that access to processed data is restricted
+  and periodically reviewed. Bound to the
+  `control.privileged_access_review@v1` attestation surface; the
+  catalog entry is identity-vendor-neutral and the compile target
+  resolves the concrete review-record store. Closes an
+  identity/access-management catalogue gap under G-04 alongside
+  `kpi.identity_mfa_enforcement_rate@v1`.
+
+unit: ratio
+direction: higher_is_better
+
+target:
+  value: 0.90
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point for the unscoped catalog
+    baseline. Mature access-review programmes under NIS2 and
+    ISO/IEC 27001 Annex A.5.18/A.8.2 hold on-time completion above
+    0.95 at steady state once the scheduling, reminder, and
+    escalation lanes are disciplined against the documented cadence
+    policy. Privileged-role-scoped or regulator-declared cadence
+    variants set stricter scoped variants of this KRI in their own
+    catalogues.
+
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 0.90
+    severity: warn
+  - name: high
+    comparator: "<"
+    value: 0.80
+    severity: high
+  - name: breach
+    comparator: "<"
+    value: 0.60
+    severity: critical
+
+measurement:
+  source: control
+  aggregation: ratio
+  formula: >
+    For each privileged-access review the operator's documented
+    cadence policy scheduled with a review-due timestamp falling
+    inside the evaluation window, classify the review as
+    completed_on_time when the review record carries a closed_at
+    timestamp on or before the review-due timestamp AND every
+    binding in the review scope carries an explicit
+    recertify-or-revoke decision on the review record. Compute
+    completion_rate = |{reviews completed_on_time}| / |{reviews scheduled}|.
+    Reviews closed after the review-due timestamp count against the
+    denominator (a late-closed review is a completion the operator's
+    access-control posture recorded, but the cadence obligation was
+    not met — so this KRI reads the on-time slice, not the ever-
+    closed slice); reviews whose scope contains any binding without
+    a recertify-or-revoke decision are treated as not completed_on_time
+    per the primitive contract so they do not silently disappear
+    from the ratio. Reference visualisation: a ratio-headline gauge
+    with warn / high / breach threshold bands over a stacked-bar
+    drill-down of on-time-completed versus overdue-or-incomplete
+    review counts sliced by cadence-window; the committed reference
+    rendering lives at
+    `content/metrics/access_review_completion_rate.viz.md` — that
+    file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: review_scheduled
+      description: >
+        Scheduled privileged-access review declared by the operator's
+        cadence policy on the `control.privileged_access_review@v1`
+        attestation surface. Carries a review-due timestamp and the
+        binding scope the review is expected to close against.
+      control_ref: control.privileged_access_review@v1
+    - name: review_closed
+      description: >
+        Review-closure record emitted by the operator's access-review
+        surface when the reviewer signs off on the recertify-or-revoke
+        decisions across the review scope. Carries a closed_at
+        timestamp compared against the review-due timestamp to derive
+        on-time completion.
+      control_ref: control.privileged_access_review@v1
+    - name: recertify_or_revoke_decisions
+      description: >
+        Per-binding recertify or revoke decision the reviewer records
+        against each binding in the review scope. A review whose
+        scope contains any binding without an explicit decision is
+        treated as not completed_on_time per the formula.
+      control_ref: control.privileged_access_review@v1
+  window:
+    duration: P90D
+    sliding: true
+
+control_refs:
+  - control.privileged_access_review@v1
+  - control.least_privilege@v1
+  - control.access_enforcement@v1
+
+telemetry_refs:
+  - telemetry.ocsf.account_change@v1
+
+external_refs:
+  - name: NIS2 — Article 21(2)(i) human-resources security, access control, asset management
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(i)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: NIS2 — Article 21(2)(j) use of multi-factor or continuous authentication
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(j)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: GDPR — Article 32(1)(a) security of processing (access to personal data)
+    source: EU
+    external_id: Regulation (EU) 2016/679, Art. 32(1)(a)
+    url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+  - name: ISO/IEC 27001:2022 — Annex A.8.2 Privileged access rights
+    source: ISO
+    external_id: ISO/IEC 27001:2022, A.8.2
+    url: https://www.iso.org/standard/27001
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability
+  - operability
