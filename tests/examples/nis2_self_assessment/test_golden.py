@@ -1,0 +1,183 @@
+"""Byte-parity golden tests for the nis2_self_assessment worked examples (G-03).
+
+Pins the three reference-compiler outputs against the bytes that ship
+under ``examples/{n8n,temporal,langgraph}/nis2_self_assessment/``.
+Together with the per-compiler golden suites under ``tests/compilers/``,
+this guarantees that the worked example is a byte-deterministic
+regeneration of the canonical CACAO source,
+not a hand-edited copy.
+
+If an emitter change is intentional, regenerate the artifacts with the
+commands documented in each
+``examples/<target>/nis2_self_assessment/README.md`` and commit the
+new bytes alongside the emitter change.
+"""
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from compilers._shared.cacao_parser import parse_file
+from compilers.langgraph.emit import emit as emit_langgraph
+from compilers.n8n.emit import emit as emit_n8n
+from compilers.temporal.emit import emit_file as emit_temporal_file
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
+SOURCE = (
+    REPO_ROOT
+    / "content"
+    / "playbooks"
+    / "nis2_self_assessment"
+    / "playbook.cacao.json"
+)
+N8N_EXAMPLE_DIR = (
+    REPO_ROOT / "examples" / "n8n" / "nis2_self_assessment"
+)
+TEMPORAL_EXAMPLE_DIR = (
+    REPO_ROOT / "examples" / "temporal" / "nis2_self_assessment"
+)
+LANGGRAPH_EXAMPLE_DIR = (
+    REPO_ROOT / "examples" / "langgraph" / "nis2_self_assessment"
+)
+N8N_GOLDEN = N8N_EXAMPLE_DIR / "workflow.n8n.json"
+TEMPORAL_GOLDEN = TEMPORAL_EXAMPLE_DIR / "workflow.temporal.py"
+LANGGRAPH_GOLDEN = LANGGRAPH_EXAMPLE_DIR / "graph_spec.json"
+
+
+def _serialise_n8n(payload: dict) -> str:
+    """Match ``python -m tools.compile --target n8n`` (indent=2, key order preserved)."""
+    return json.dumps(payload, indent=2) + "\n"
+
+
+def _serialise_langgraph(payload: dict) -> str:
+    """Match ``python -m compilers.langgraph.emit`` (indent=2, sort_keys=True)."""
+    return json.dumps(payload, indent=2, sort_keys=True) + "\n"
+
+
+# --------------------------------------------------------------------------- #
+# Mirrored CACAO source                                                       #
+# --------------------------------------------------------------------------- #
+
+
+def test_example_artifacts_are_committed() -> None:
+    for path in (
+        N8N_GOLDEN,
+        TEMPORAL_GOLDEN,
+        LANGGRAPH_GOLDEN,
+        N8N_EXAMPLE_DIR / "playbook.cacao.json",
+        TEMPORAL_EXAMPLE_DIR / "playbook.cacao.json",
+        LANGGRAPH_EXAMPLE_DIR / "playbook.cacao.json",
+    ):
+        assert path.exists(), f"missing example artifact: {path}"
+        assert path.stat().st_size > 0, f"empty example artifact: {path}"
+
+
+def test_mirrored_cacao_matches_canonical_source() -> None:
+    for mirror in (
+        N8N_EXAMPLE_DIR / "playbook.cacao.json",
+        TEMPORAL_EXAMPLE_DIR / "playbook.cacao.json",
+        LANGGRAPH_EXAMPLE_DIR / "playbook.cacao.json",
+    ):
+        assert mirror.read_bytes() == SOURCE.read_bytes(), (
+            f"{mirror.relative_to(REPO_ROOT)} drifted from the canonical "
+            f"{SOURCE.relative_to(REPO_ROOT)}. Regenerate via the sibling "
+            "regenerate.sh."
+        )
+
+
+# --------------------------------------------------------------------------- #
+# n8n byte-parity golden                                                      #
+# --------------------------------------------------------------------------- #
+
+
+def test_n8n_workflow_matches_golden() -> None:
+    playbook = parse_file(SOURCE)
+    rendered = _serialise_n8n(emit_n8n(playbook))
+    expected = N8N_GOLDEN.read_text(encoding="utf-8")
+    assert rendered == expected, (
+        "nis2_self_assessment n8n example drifted. Regenerate via "
+        "`PYTHONPATH=. python -m tools.compile "
+        f"{SOURCE.relative_to(REPO_ROOT)} --target n8n --out "
+        f"{N8N_GOLDEN.relative_to(REPO_ROOT)}` and commit alongside the change."
+    )
+
+
+# --------------------------------------------------------------------------- #
+# Temporal byte-parity golden                                                 #
+# --------------------------------------------------------------------------- #
+
+
+def test_temporal_workflow_matches_golden() -> None:
+    rendered = emit_temporal_file(SOURCE)
+    expected = TEMPORAL_GOLDEN.read_text(encoding="utf-8")
+    assert rendered == expected, (
+        "nis2_self_assessment Temporal example drifted. Regenerate via "
+        "`PYTHONPATH=. python -m tools.compile "
+        f"{SOURCE.relative_to(REPO_ROOT)} --target temporal --out "
+        f"{TEMPORAL_GOLDEN.relative_to(REPO_ROOT)}` and commit alongside the change."
+    )
+
+
+# --------------------------------------------------------------------------- #
+# LangGraph byte-parity golden                                                #
+# --------------------------------------------------------------------------- #
+
+
+def test_langgraph_graph_spec_matches_golden() -> None:
+    playbook = parse_file(SOURCE)
+    rendered = _serialise_langgraph(emit_langgraph(playbook).to_dict())
+    expected = LANGGRAPH_GOLDEN.read_text(encoding="utf-8")
+    assert rendered == expected, (
+        "nis2_self_assessment LangGraph example drifted. Regenerate via "
+        "`PYTHONPATH=. python -m compilers.langgraph.emit "
+        f"{SOURCE.relative_to(REPO_ROOT)} > "
+        f"{LANGGRAPH_GOLDEN.relative_to(REPO_ROOT)}` and commit alongside the change."
+    )
+
+
+# --------------------------------------------------------------------------- #
+# Determinism guardrails                                                      #
+# --------------------------------------------------------------------------- #
+
+
+def test_emit_is_deterministic_across_compilers() -> None:
+    playbook = parse_file(SOURCE)
+    assert _serialise_n8n(emit_n8n(playbook)) == _serialise_n8n(emit_n8n(playbook))
+    assert emit_temporal_file(SOURCE) == emit_temporal_file(SOURCE)
+    assert _serialise_langgraph(
+        emit_langgraph(playbook).to_dict()
+    ) == _serialise_langgraph(emit_langgraph(playbook).to_dict())
+
+
+# --------------------------------------------------------------------------- #
+# CACAO step-id / node-id parity across targets                               #
+# --------------------------------------------------------------------------- #
+
+
+def test_node_ids_mirror_cacao_step_ids_across_targets() -> None:
+    """Every CACAO step id appears in each target's emitted artifact."""
+    playbook_raw = json.loads(SOURCE.read_text(encoding="utf-8"))
+    cacao_step_ids = set(playbook_raw["workflow"].keys())
+
+    # n8n: nodes carry `id` matching CACAO step ids.
+    n8n_workflow = json.loads(N8N_GOLDEN.read_text(encoding="utf-8"))
+    n8n_node_ids = {node["id"] for node in n8n_workflow["nodes"]}
+    assert n8n_node_ids == cacao_step_ids, (
+        f"n8n node ids != CACAO step ids: "
+        f"missing={sorted(cacao_step_ids - n8n_node_ids)} "
+        f"extra={sorted(n8n_node_ids - cacao_step_ids)}"
+    )
+
+    # LangGraph: GraphSpec carries `nodes` list; each has CACAO step id.
+    lg_spec = json.loads(LANGGRAPH_GOLDEN.read_text(encoding="utf-8"))
+    lg_node_ids = {node["step_id"] for node in lg_spec["nodes"]}
+    # LangGraph drops start/end sentinels; action steps must all appear.
+    action_step_ids = {
+        sid
+        for sid, step in playbook_raw["workflow"].items()
+        if step["type"] in ("action", "playbook-action")
+    }
+    missing_lg = action_step_ids - lg_node_ids
+    assert not missing_lg, (
+        f"LangGraph GraphSpec missing nodes for CACAO action steps: {sorted(missing_lg)}"
+    )
