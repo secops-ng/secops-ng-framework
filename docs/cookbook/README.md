@@ -44,6 +44,7 @@ narrative.
 | `agentic_threat_response` | [`agentic_threat_response.md`](agentic_threat_response.md) | `content/playbooks/agentic_threat_response/`     |
 | `vulnerability_management` | [`vulnerability_management.md`](vulnerability_management.md) | `content/playbooks/vulnerability_management/`   |
 | `identity_access_management_metrics` | [`identity_access_management_metrics.md`](identity_access_management_metrics.md) | `content/metrics/identity_mfa_enforcement_rate.yaml` + `content/metrics/access_review_completion_rate.yaml` |
+| `threat_intel_operations_metrics` | [`threat_intel_operations_metrics.md`](threat_intel_operations_metrics.md) | `content/metrics/coverage_threat_intel_feed.yaml` + `content/metrics/mttd_threat_intel_indicator.yaml` + `content/metrics/threat_intel_indicator_ingestion_rate.yaml` + `content/metrics/threat_intel_stale_ioc_ratio.yaml` |
 | `eidas2_identity_verification` | [`eidas2_identity_verification.md`](eidas2_identity_verification.md) | `content/playbooks/eidas2_identity_verification/` |
 
 Additional entries land alongside their content sources as workflows
