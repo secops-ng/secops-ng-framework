@@ -56,6 +56,7 @@ on:
       - "tools/lint_dora_latency_ocsf_bindings.py"
       - "tools/lint_nis2_latency_ocsf_bindings.py"
       - "tools/lint_gdpr_latency_ocsf_bindings.py"
+      - "tools/lint_identity_access_management_ocsf_bindings.py"
       - "tools/ocsf_cluster_lint.py"
       - "content/telemetry/**"
       - "tests/content/test_cra_playbook_orphans.py"
@@ -82,6 +83,7 @@ on:
       - "tests/content/test_dora_latency_ocsf_bindings.py"
       - "tests/content/test_nis2_latency_ocsf_bindings.py"
       - "tests/content/test_gdpr_latency_ocsf_bindings.py"
+      - "tests/content/test_identity_access_management_ocsf_bindings.py"
       - "tests/content/test_oscal_gdpr_component_definition.py"
       - "tests/content/test_oscal_eu_ai_act_component_definition.py"
       - "tests/content/test_oscal_soc2_component_definition.py"
@@ -130,6 +132,7 @@ on:
       - "tools/lint_dora_latency_ocsf_bindings.py"
       - "tools/lint_nis2_latency_ocsf_bindings.py"
       - "tools/lint_gdpr_latency_ocsf_bindings.py"
+      - "tools/lint_identity_access_management_ocsf_bindings.py"
       - "tools/ocsf_cluster_lint.py"
   schedule:
     # Nightly at 02:23 UTC — off-peak, off-the-hour, single slot for
@@ -783,6 +786,40 @@ jobs:
       - name: Run GDPR-latency-OCSF binding assertion (text)
         run: |
           python -m tools.lint_gdpr_latency_ocsf_bindings --format text
+
+  identity-access-management-ocsf-bindings:
+    # G-04 catalogue-maturity OCSF source-data-shape dimension —
+    # asserts every metric in the identity/access-management cluster
+    # (the NIS2 Article 21(2)(i) access-control / Article 21(2)(j)
+    # multi-factor-authentication KPI/KRI pair shipped in
+    # F-MET-G04-IDENTITYACCESS SKELETON) declares an OCSF
+    # telemetry_ref. Closes the F-MET-G04-IDENTITYACCESS triplet
+    # (SKELETON -> CORE) by wiring the linter into the nightly
+    # content-CI cadence alongside the sibling cluster jobs.
+    # Failure signals a regression in NIS2 Art. 21(2)(i)/(j) /
+    # GDPR Art. 32(1)(a) identity-and-access-management operability
+    # coverage — a metric whose upstream source-data shape has
+    # drifted away from the OCSF Authentication / Account Change
+    # envelopes that bind this cluster's evidence artefacts.
+    name: G-04 identity/access-management-cluster OCSF binding assertion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML)
+        run: pip install --no-cache-dir pyyaml
+
+      - name: Run identity/access-management-OCSF binding assertion (text)
+        run: |
+          python -m tools.lint_identity_access_management_ocsf_bindings --format text
 
   availability-ocsf-bindings:
     # G-04 catalogue-maturity OCSF source-data-shape dimension —
