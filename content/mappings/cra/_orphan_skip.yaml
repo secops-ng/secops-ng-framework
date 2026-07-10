@@ -395,3 +395,57 @@ skip:
       (Art. 20(1) approval and Art. 20(2) training-and-oversight
       atoms). A sibling CORE / EXTEND card revisits the CRA
       cross-regime graph if a documented interaction is authored.
+
+  - slug: network_security
+    rationale: >-
+      Network-boundary and segmentation posture reconciliation.
+      Scope-mapping review against CRA Annex I was completed and
+      concluded that no defensible operator-side CRA inbound
+      exists for this playbook on the current substrate; this
+      entry is therefore a reviewed, durable deferral rather
+      than an open TODO. Clauses considered, with the reason
+      each is manufacturer-scoped or already-pinned-elsewhere:
+        - §1(b) secure-by-default configuration: already pinned
+          to `cloud_misconfiguration` and
+          `infra_posture_management` under
+          `cra:annex-i-1-secure-by-default` and
+          `cra:annex-i-1-b-secure-by-default-infra-posture`.
+          The network-boundary reconciliation this playbook owns
+          reads the operator's declared segmentation policy;
+          the operator-side continuous-attestation surface for
+          misconfiguration is already covered.
+        - §1(d) access control: already pinned to `iam_auditor`
+          / `onboarding_offboarding_tracker` / `mfa_secured_
+          comms` under the three
+          `cra:annex-i-1-d-access-control-*` inbounds.
+          Network-boundary reconciliation does not own an
+          identity-side access-control evaluation surface;
+          pinning it here would dilute the existing JML /
+          MFA / IAM-auditor triad.
+        - §1(e) protection from unauthorised access: already
+          pinned to `crypto_posture_management` and
+          `identity_compromise` under
+          `cra:annex-i-1-e-confidentiality-*` and
+          `cra:annex-i-1-access-control`. Network-boundary
+          reconciliation surfaces boundary-control drift as
+          part of the operator's zone-transit posture; the
+          unauthorised-access incident lane is a distinct
+          discharge.
+        - §1(l) logging and monitoring: already pinned to the
+          alert-triage and detection-engineering lanes;
+          network-posture reconciliation is upstream of (not
+          part of) the security-monitoring discharge.
+      Estate-wide network-segmentation reconciliation is
+      materially an operator obligation under NIS2 Art. 21(2)(e)
+      and DORA Art. 9 — both axes are closed (see
+      `content/playbooks/network_security/mappings.yaml` and
+      `content/mappings/nis2/article-21-2-e.yaml` /
+      `content/mappings/dora/article-9-network-security.yaml`).
+      CRA Annex I is product-by-product manufacturer scope;
+      adding a `network_security` pin to any of the clauses
+      above would duplicate the discharge and dilute the
+      existing inbound. Mirrors the `asset_management` CRA-axis
+      precedent. Re-open the review if CRA secondary acts carve
+      an operator-side network-security anchor not already
+      covered by the pins above.
+

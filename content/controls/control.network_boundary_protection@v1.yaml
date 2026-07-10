@@ -1,0 +1,44 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.network_boundary_protection@v1
+title: Network boundary protection and segmentation
+summary: >-
+  Operator maintains a documented segmentation policy (zone-transit
+  matrix, per-segment allowance set) and reconciles it per window
+  against the observed network posture on the deployed estate, so
+  that boundary-control drift and unauthorised cross-segment
+  reachability surface as classified violations with dated evidence.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "SC-7"
+    title: "Boundary Protection"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "SC-3"
+    title: "Security Function Isolation"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "CA-9"
+    title: "Internal System Connections"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.8.22"
+    title: "Segregation of networks"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-e"
+    title: "Security in network and information systems"
+
+d3fend_refs:
+  - d3f_id: D3-NTA
+    technique_name: "Network Traffic Analysis"
+    url: https://d3fend.mitre.org/technique/d3f:NetworkTrafficAnalysis/
+    offensive_techniques_attack:
+      - T1046
+      - T1071
+  - d3f_id: D3-ISVA
+    technique_name: "Inbound Session Volume Analysis"
+    url: https://d3fend.mitre.org/technique/d3f:InboundSessionVolumeAnalysis/
+    offensive_techniques_attack:
+      - T1190
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:NetworkTrafficAnalysis/
+  captured_at: '2026-07-10'
