@@ -39,6 +39,15 @@ skip:
       convention for reporting playbooks across every framework.
       `content/mappings/gdpr/data-flow-executive_metrics.md` documents
       the indirect surface for this SKELETON snapshot.
+      Batch-2 audit (G-02 close-out) reconfirms: no GDPR Art. 5(2)
+      accountability or Art. 24 controller-responsibility clause in
+      the current `content/mappings/gdpr/` article set warrants a
+      direct `playbook_refs:` entry for `executive_metrics`. The
+      metric_refs indirection is preserved (peer parallel:
+      cra/article-13-2-3-risk-assessment-metrics.yaml,
+      soc2/tsc-security.yaml, nist_csf/csf-core-functions.yaml all
+      wire the slug as a metrics/effectiveness anchor, not a
+      personal-data-processing anchor). Skip entry stands.
 
   - slug: dora_ict_risk_selfassess
     rationale: >-
@@ -56,6 +65,18 @@ skip:
       per-workflow GDPR data-flow document under
       `content/mappings/gdpr/data-flow-dora_ict_risk_selfassess.md`
       if a documented interaction surfaces.
+      Batch-2 audit (G-02 close-out) reconfirms: no GDPR Art. 32
+      (security of processing) or Art. 24 (implementation of
+      measures) clause in the current `content/mappings/gdpr/` article
+      set warrants a direct `playbook_refs:` entry for
+      `dora_ict_risk_selfassess`. The roll-up operates on evidence-
+      record identifiers, section atoms, playbook slugs, and
+      attestation-record identifiers — none of which are personal
+      data — and cross-pinning the DORA Chapter II whole-Chapter
+      attestation onto Art. 32/24 would conflate the operational-
+      readiness axis with GDPR's personal-data-processing axis. Per-
+      section producing playbooks already carry their own GDPR
+      surface where relevant. Skip entry stands.
 
   - slug: dora_tpr_management
     rationale: >-
@@ -78,3 +99,26 @@ skip:
       `content/mappings/gdpr/data-flow-dora_tpr_management.md`
       if a documented interaction surfaces. Mirrors the
       dora_ict_risk_selfassess GDPR-axis precedent.
+      Batch-2 audit (G-02 close-out) reconfirms against GDPR Art. 28
+      (processor contracts) and Art. 32 (security obligations in
+      processor contracts): GDPR Art. 28(1)/(3)/(9) is already
+      discharged by `playbook.contractual_obligations_tracker@v1`
+      wired at `gdpr:art-28-processor-contractual-obligations` in
+      `content/mappings/gdpr/article-26-28-controller-processor.yaml`
+      — that anchor governs the per-clause processor-obligation
+      register-and-review discipline. `dora_tpr_management` operates
+      one abstraction layer outside GDPR Art. 28: it discharges the
+      DORA Chapter V ICT third-party financial-entity contract-
+      lifecycle spine (pre-contractual risk assessment, Art. 30(2)/(3)
+      clause-presence check, Art. 28 register-of-information row,
+      periodic review, Art. 28(8) exit-strategy attestation) against
+      legal-entity ICT service providers, and its outputs are provider
+      handles, criticality determinations, contract references, and
+      register-row identifiers — none of which are personal data.
+      Wiring `dora_tpr_management` into GDPR Art. 28 would double-
+      count the processor-contract obligation surface and conflate
+      the DORA financial-entity ICT-service-provider axis with the
+      GDPR controller-processor personal-data axis; the two are
+      deliberately separate agentic anchors on the same contract
+      artifact and file separate evidentiary requirements. Skip
+      entry stands.
