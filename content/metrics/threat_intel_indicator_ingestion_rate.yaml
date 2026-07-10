@@ -1,0 +1,167 @@
+stable_id: kpi.threat_intel_indicator_ingestion_rate@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Threat-intel indicator ingestion rate
+summary: >
+  Throughput of normalised threat-intelligence indicators the operator's
+  threat-intel-ingest lane admits to the internal indicator surface over
+  a rolling one-hour window. Reads the ingestion side of the shipped
+  `playbook.threat_intel_ingest@v1` starter playbook — after the
+  upstream STIX 2.1 / TAXII pull and the STIX-to-OCSF normalisation
+  step, count the indicators that landed with a normalised shape
+  operators can match against telemetry. Operationalises the
+  automated-information-sharing limb of NIS2 Article 23 (early-warning
+  and reporting obligations feed off a working ingest lane) and DORA
+  Article 19 (information-sharing arrangements on cyber-threat
+  information among financial entities); a healthy ingest rate is the
+  precondition for either regulatory clock to have anything to react
+  to. Complements `kri.threat_intel_stale_ioc_ratio@v1` (which watches
+  the freshness of what is already on the indicator surface): this KPI
+  is the aggregate arrival throughput operators read on the dashboard.
+  Closes the threat-intel-operations catalogue gap under G-04.
+
+unit: count
+direction: higher_is_better
+
+target:
+  value: 100
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point for the unscoped catalog
+    baseline (indicators admitted per rolling one-hour window across
+    the operator's aggregate feed set). ENISA and MISP community
+    guidance converge on the low-hundreds-per-hour range for a
+    minimally-plural feed portfolio once TAXII poll cadences and
+    dedup are stable; operators with a wider feed portfolio or
+    higher-cadence pull configurations set stricter scoped variants
+    of this KPI in their own catalogues. Zero-throughput hours are
+    the failure signal this KPI is meant to surface — the value drops
+    to zero when the pull, the normalisation, or the confidence gate
+    stops emitting normalised indicators onto the internal surface.
+
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 100
+    severity: warn
+  - name: high
+    comparator: "<"
+    value: 25
+    severity: high
+  - name: breach
+    comparator: "<"
+    value: 1
+    severity: critical
+
+measurement:
+  source: composite
+  aggregation: sum
+  formula: >
+    For each rolling one-hour evaluation window, count the normalised
+    threat-intel indicators the `playbook.threat_intel_ingest@v1`
+    normalise-STIX-to-OCSF step emitted onto the internal indicator
+    surface where the downstream confidence gate admitted the
+    indicator for propagation (indicators dropped at the
+    above-confidence-threshold if-condition are excluded from the
+    count so the KPI reads the admitted-throughput slice, not the
+    raw-pull slice). Compute
+    ingestion_rate = |{indicators normalised and admitted in window}|.
+    OCSF source-data shape: the ingest lane's input contract is a
+    STIX 2.1 bundle delivered over TAXII (not an OCSF event class —
+    the released OCSF v1.3.0 catalogue does not yet expose a
+    threat-intel ingest class), and the admission observation binds
+    to the OCSF Security Finding (`class_uid: 2001`) and Detection
+    Finding (`class_uid: 2004`) event classes the propagate-to-
+    blocklist and activate-detection-rule steps emit downstream. The
+    normalised indicators counted here are the ones later addressable
+    by those two OCSF-bound emission steps. Reference visualisation:
+    a throughput headline (indicators-per-hour) with warn / high /
+    breach threshold bands over a stacked-bar drill-down of admitted
+    indicators sliced by upstream feed source; the committed
+    reference rendering lives at
+    `content/metrics/threat_intel_indicator_ingestion_rate.viz.md` —
+    that file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: normalised_indicator_admission
+      description: >
+        Per-indicator admission record emitted by the
+        `playbook.threat_intel_ingest@v1` normalise-STIX-to-OCSF
+        step downstream of the confidence-threshold if-condition.
+        Names the indicator that landed on the internal indicator
+        surface for downstream propagation and detection-rule
+        activation; drives the numerator of the throughput count.
+      playbook_ref: playbook.threat_intel_ingest@v1
+      playbook_step: action--10000000-0000-4000-8000-000000000003
+    - name: detection_finding_emission
+      description: >
+        Downstream Detection Finding record the activate-detection-
+        rule step emits when the admitted indicator matches
+        subsequent telemetry. Binds the KPI's ingested-indicator
+        population to the OCSF Detection Finding (class 2004)
+        surface so operators can read across from throughput to the
+        share of admitted indicators later credited with a match.
+      telemetry_ref: telemetry.ocsf.detection_finding@v1
+      playbook_ref: playbook.threat_intel_ingest@v1
+      playbook_step: action--10000000-0000-4000-8000-000000000006
+    - name: propagation_finding_emission
+      description: >
+        Downstream propagation observation carried on the OCSF
+        Security Finding (class 2001) event class emitted by the
+        propagate-to-blocklist step. Complements the Detection
+        Finding binding so the ingested indicator's onward path
+        (perimeter / DNS / EDR blocklist enforcement) has an OCSF
+        source-data shape on the same catalog entry.
+      telemetry_ref: telemetry.ocsf.detection_finding@v1
+      playbook_ref: playbook.threat_intel_ingest@v1
+      playbook_step: action--10000000-0000-4000-8000-000000000005
+  window:
+    duration: PT1H
+    sliding: true
+
+playbook_refs:
+  - playbook_id: playbook.threat_intel_ingest@v1
+    step_id: action--10000000-0000-4000-8000-000000000003
+  - playbook_id: playbook.threat_intel_ingest@v1
+    step_id: action--10000000-0000-4000-8000-000000000005
+  - playbook_id: playbook.threat_intel_ingest@v1
+    step_id: action--10000000-0000-4000-8000-000000000006
+
+control_refs:
+  - control.threat_intel_program@v1
+  - control.threat_intel_program_automated_sharing@v1
+  - control.security_alerts_advisories_directives@v1
+
+telemetry_refs:
+  - telemetry.ocsf.detection_finding@v1
+
+external_refs:
+  - name: NIS2 — Article 23 early-warning, incident notification and information-sharing obligations
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 23
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 19 information sharing among financial entities on cyber-threat information
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 19
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: ENISA — Cyber threat intelligence practice guidance
+    source: ENISA
+    url: https://www.enisa.europa.eu/publications
+  - name: OASIS — STIX 2.1 specification (indicator, malware, threat-actor SDOs)
+    source: OASIS
+    url: https://docs.oasis-open.org/cti/stix/v2.1/stix-v2.1.html
+  - name: OCSF v1.3.0 — Detection Finding (class 2004) event class
+    source: OCSF
+    url: https://schema.ocsf.io/1.3.0/classes/detection_finding
+  - name: OCSF v1.3.0 — Security Finding (class 2001) event class
+    source: OCSF
+    url: https://schema.ocsf.io/1.3.0/classes/security_finding
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - operability
+  - auditability

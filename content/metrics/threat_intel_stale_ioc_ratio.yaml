@@ -1,0 +1,159 @@
+stable_id: kri.threat_intel_stale_ioc_ratio@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Threat-intel stale IoC ratio
+summary: >
+  Share of the operator's active indicator-of-compromise (IoC)
+  surface whose last-refresh timestamp on the internal indicator
+  store has aged past the freshness policy the operator declares
+  against the upstream feed. A residual-risk indicator on the
+  threat-intel-ingest lane's freshness axis: a rising ratio means
+  the surface downstream detection and blocklist propagation reads
+  from is drifting into a stale-indicator posture even if the
+  ingestion-rate KPI still reads healthy. Reads across NIS2
+  Article 26(2) — the reporting-obligation clause that requires
+  essential and important entities to keep the shared incident and
+  cyber-threat information current — so a stale indicator surface
+  weakens the evidence trail the operator submits when the reporting
+  clock trips. Complements `kpi.threat_intel_indicator_ingestion_rate@v1`
+  (which watches arrival throughput): this KRI is the aggregate
+  freshness slice operators read on the dashboard. Closes the
+  threat-intel-operations catalogue gap under G-04.
+
+unit: ratio
+direction: lower_is_better
+
+target:
+  value: 0.10
+  comparator: "<="
+  rationale: >
+    Community-recommended starting point for the unscoped catalog
+    baseline. ENISA cyber-threat-intelligence practice notes and
+    MISP community operational guidance converge on stale-IoC
+    ratios in the single-digit percentile once feed-refresh
+    cadences and indicator-expiry policies are disciplined against
+    the operator's declared freshness policy. Operators with
+    tighter freshness policies for regulator-facing feeds (for
+    example national-CSIRT or sector-ISAC bundles under NIS2
+    Article 26 reporting scope) set stricter scoped variants of
+    this KRI in their own catalogues.
+
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 0.10
+    severity: warn
+  - name: high
+    comparator: ">"
+    value: 0.20
+    severity: high
+  - name: breach
+    comparator: ">"
+    value: 0.35
+    severity: critical
+
+measurement:
+  source: composite
+  aggregation: ratio
+  formula: >
+    For each indicator observed as active on the operator's internal
+    indicator surface during the evaluation window (an indicator
+    admitted by `playbook.threat_intel_ingest@v1` and not
+    explicitly retired), classify the indicator as stale when its
+    last-refresh timestamp on the indicator surface has aged past
+    the freshness horizon the operator's declared feed-refresh
+    policy sets against that indicator's upstream feed (a per-feed
+    freshness horizon; the compile target resolves the concrete
+    policy value against the operator's feed registry). Compute
+    stale_ratio = |{indicators stale}| / |{indicators active}|.
+    Explicitly retired indicators drop out of the denominator — the
+    KRI reads the drift of the *active* surface, not the volume of
+    the historical archive. Indicators admitted inside the current
+    freshness horizon are counted as fresh even when no
+    subsequent refresh has arrived (their first-admission
+    timestamp is the anchoring last-refresh for the freshness
+    computation). Reference visualisation: a ratio-headline gauge
+    with warn / high / breach threshold bands over a stacked-bar
+    drill-down of fresh-versus-stale counts sliced by upstream feed;
+    the committed reference rendering lives at
+    `content/metrics/threat_intel_stale_ioc_ratio.viz.md` — that
+    file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: active_indicator_population
+      description: >
+        Snapshot of indicators the operator's internal indicator
+        surface classes as active during the evaluation window
+        (admitted by the ingest lane and not explicitly retired).
+        Bounds the denominator of the freshness ratio.
+      playbook_ref: playbook.threat_intel_ingest@v1
+      playbook_step: action--10000000-0000-4000-8000-000000000003
+    - name: last_refresh_timestamp
+      description: >
+        Per-indicator last-refresh timestamp carried on the internal
+        indicator surface, updated when the ingest lane re-admits
+        the same indicator from a subsequent upstream pull or when
+        the operator explicitly refreshes it. Drives the staleness
+        classification against the feed-scoped freshness horizon.
+      playbook_ref: playbook.threat_intel_ingest@v1
+      playbook_step: action--10000000-0000-4000-8000-000000000003
+    - name: downstream_detection_finding
+      description: >
+        Downstream Detection Finding record the activate-detection-
+        rule step emits when a matching event arrives. Anchors the
+        stale-IoC classification to the same OCSF source-data shape
+        the ingestion-rate KPI reads, so operators can read across
+        from stale-ratio to the share of stale indicators still
+        firing detections (the evidence-trail risk).
+      telemetry_ref: telemetry.ocsf.detection_finding@v1
+      playbook_ref: playbook.threat_intel_ingest@v1
+      playbook_step: action--10000000-0000-4000-8000-000000000006
+  window:
+    duration: P7D
+    sliding: true
+
+playbook_refs:
+  - playbook_id: playbook.threat_intel_ingest@v1
+    step_id: action--10000000-0000-4000-8000-000000000003
+  - playbook_id: playbook.threat_intel_ingest@v1
+    step_id: action--10000000-0000-4000-8000-000000000006
+
+control_refs:
+  - control.threat_intel_program@v1
+  - control.threat_intel_program_automated_sharing@v1
+  - control.security_alerts_advisories_directives@v1
+
+telemetry_refs:
+  - telemetry.ocsf.detection_finding@v1
+
+external_refs:
+  - name: NIS2 — Article 23 early-warning, incident notification and information-sharing obligations
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 23
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: NIS2 — Article 26(2) jurisdictional reporting and information-sharing obligations
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 26(2)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: DORA — Article 19 information sharing among financial entities on cyber-threat information
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 19
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: ENISA — Cyber threat intelligence practice guidance
+    source: ENISA
+    url: https://www.enisa.europa.eu/publications
+  - name: OASIS — STIX 2.1 indicator SDO (revoked / valid_until semantics)
+    source: OASIS
+    url: https://docs.oasis-open.org/cti/stix/v2.1/stix-v2.1.html
+  - name: OCSF v1.3.0 — Detection Finding (class 2004) event class
+    source: OCSF
+    url: https://schema.ocsf.io/1.3.0/classes/detection_finding
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability
+  - operability
