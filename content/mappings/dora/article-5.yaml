@@ -38,6 +38,22 @@ entries:
       # content/playbooks/eidas2_identity_verification/mappings.yaml
       # pins the reverse edge.
       - playbook.eidas2_identity_verification@v1
+      # F-MAP-DORA CORE (G-02): the nis2_art20_governance playbook
+      # operates the management-body approval cycle (schedule review
+      # → present posture → approve risk-management measures → log
+      # governance-record evidence). DORA Art. 5(2)(b) requires the
+      # management body of the financial entity to approve, oversee,
+      # and be accountable for the implementation of the ICT
+      # risk-management framework referred to in Art. 6(1); the same
+      # four-step governance-cadence discipline discharges that
+      # obligation for DORA-in-scope entities. The playbook's own
+      # outbound mappings.yaml documents Art. 5(2)(b) as the DORA
+      # equivalent management-body governance surface; this entry
+      # closes the inbound edge under the Art. 5 governance-and-
+      # organisation anchor. Overlaps NIS2 Art. 20(1) (management-
+      # body approval of Art. 21 measures); the same playbook is
+      # referenced from mappings/nis2/article-20.yaml.
+      - playbook.nis2_art20_governance@v1
     metric_refs:
       - kri.risk_register_staleness@v1
     evidence_stream_refs:

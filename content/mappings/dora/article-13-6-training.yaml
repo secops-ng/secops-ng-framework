@@ -45,6 +45,22 @@ entries:
       - control.phishing_simulation@v1
     playbook_refs:
       - playbook.cyber_hygiene_training@v1
+      # F-MAP-DORA CORE (G-02): the security_awareness_training
+      # playbook is the programme-lifecycle sibling under the same
+      # Art. 13(6) staff-training-and-awareness obligation. Where
+      # cyber_hygiene_training operates the per-cycle materialisation
+      # (roster snapshot → cycle assignments → phishing-simulation
+      # run → completion tracking → dated attestation record), this
+      # playbook operates the programme-authoring surface upstream
+      # (schedule-assessment → design-content → deliver-training →
+      # record-completion → report-gaps → review-cycle). Both
+      # discharge distinct halves of the same Art. 13(6) obligation
+      # — the programme design and the per-cycle execution — and
+      # both are pinned here to keep the inbound graph
+      # atom-per-obligation with all discharge surfaces enumerated.
+      # Overlaps NIS2 Art. 21(2)(g); the same playbook is referenced
+      # from mappings/nis2/article-21-2-g.yaml.
+      - playbook.security_awareness_training@v1
     metric_refs:
       - kpi.training_completion_rate@v1
       - kpi.phishing_sim_click_rate@v1
