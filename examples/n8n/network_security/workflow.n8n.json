@@ -1,0 +1,423 @@
+{
+  "name": "Network security and segmentation posture",
+  "nodes": [
+    {
+      "id": "start--7e750001-0000-4000-8000-000000000001",
+      "name": "netsec_posture_start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__reconciliation_window__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the reconciliation window this run discharges (scheduled-cadence reference, on-demand reconciliation reference, or operator-initiated trigger). Names which posture cohort the run reconciled against; the wall-clock instant lives on the evidence record itself."
+            },
+            {
+              "name": "__segment_inventory_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the reconciled segment-inventory the inventory step composed from the operator's documented network-inventory sources (declarative infrastructure-as- code records, cloud-provider VPC/subnet APIs, on-premise network-controller inventories). Consumed downstream by the policy-evaluation and violation-detection steps."
+            },
+            {
+              "name": "__policy_snapshot_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the segmentation-policy snapshot the policy-evaluation step read from the operator's documented policy source (declared zone-transit matrix, per-segment allowance set). The pinned snapshot lets the evidence artifact identify which policy revision the reconciliation was run against."
+            },
+            {
+              "name": "__violation_set_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the per-violation set the detect step emits against the segment-inventory / policy-snapshot pair. Each violation carries a segment-pair identifier, an observed- reachability marker, a policy-allowance marker, and a classification token (undocumented-transit, unauthorised- egress, boundary-control-drift). The set may be empty (no violation against the current window) \u2014 the empty case is still emitted explicitly so the audit-evident chain is closed."
+            },
+            {
+              "name": "__remediation_action_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the engaged remediation action against the operator's pre-bound remediation surface (per-segment ACL / firewall-rule change, boundary-control posture-change ticket, or short-circuit isolation of the offending path). Empty when __violation_set_id__ resolved empty. Always populated when there is at least one violation, including on the short-circuit branch."
+            },
+            {
+              "name": "__posture_evidence_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the dated network-security-posture evidence artifact the generate step published to the operator's evidence store. Always populated, including on the empty-violation-set branch \u2014 the closure record is the audit-evident output that names the segment inventory, the policy snapshot, the violation set, and the remediation action for the reconciliation window."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--7e750001-0000-4000-8000-000000000002",
+      "name": "inventory_network_segments",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.reconciliation_window",
+              "name": "in.reconciliation_window",
+              "value": "={{$workflow.variables.reconciliation_window}}",
+              "type": "string"
+            },
+            {
+              "id": "out.segment_inventory_id",
+              "name": "out.segment_inventory_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.network_boundary_protection@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.network_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Enumerate the documented network segments on the operator's own deployed estate by reading the operator's declared network-inventory sources under the operator's documented source-precedence ordering: declarative infrastructure-as- code records for VLAN / VPC / subnet / zone definitions, the cloud-provider network APIs (VPC / subnet describe endpoints keyed off the operator's account inventory), and the on- premise network-controller inventories. Read-only against each source. Composes the operator-authoritative segment record list under a canonical, source-precedence-ordered hash and pins __segment_inventory_id__ against the composed snapshot; the deterministic derivation lets replays of the same reconciliation window recover the same inventory identifier without re-hitting the sources. Each segment record carries the zone identifier, the cloud/on-premise account or controller binding, the CIDR / IP-plan allocation, and the tenancy label the policy-evaluation step reads. OCSF Network Activity (class_uid 4001) shape: an inventory-composed event is emitted at snapshot pinning naming __reconciliation_window__ and __segment_inventory_id__ for the audit-evident chain.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--7e750001-0000-4000-8000-000000000003",
+      "name": "evaluate_segmentation_policy",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.reconciliation_window",
+              "name": "in.reconciliation_window",
+              "value": "={{$workflow.variables.reconciliation_window}}",
+              "type": "string"
+            },
+            {
+              "id": "in.segment_inventory_id",
+              "name": "in.segment_inventory_id",
+              "value": "={{$workflow.variables.segment_inventory_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.policy_snapshot_id",
+              "name": "out.policy_snapshot_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.network_boundary_protection@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.network_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Read the current segmentation-policy snapshot from the operator's documented policy source (declared zone-transit matrix, per-segment allowance set, OSCAL-anchored control binding for SC-7 boundary-protection and SC-3 security- function isolation) and normalise it against the segment inventory pinned upstream. Pins __policy_snapshot_id__ against the resolved revision so the evidence artifact identifies which policy the reconciliation ran against. Records the per-segment-pair allowance state under the documented three-value allowance algebra (allowed / denied / conditional) \u2014 the conditional branch names the predicate the detect step must evaluate against observed reachability before deciding whether a per-pair violation stands. Empty allowance set is emitted explicitly so a policy-missing reconciliation window still closes with an audit-evident artifact rather than short-circuiting the chain silently.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--7e750001-0000-4000-8000-000000000004",
+      "name": "detect_policy_violations",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.segment_inventory_id",
+              "name": "in.segment_inventory_id",
+              "value": "={{$workflow.variables.segment_inventory_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.policy_snapshot_id",
+              "name": "in.policy_snapshot_id",
+              "value": "={{$workflow.variables.policy_snapshot_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.violation_set_id",
+              "name": "out.violation_set_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.network_boundary_protection@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.network_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Compute the per-segment-pair violation set by comparing the observed reachability posture against the policy-snapshot allowance state. Observed reachability is drawn from the operator's documented telemetry sources under the documented source-precedence: network-traffic observations (OCSF Network Activity 4001 events emitted by the operator's flow-log stream), boundary-control state pulled from the operator's firewall / security-group inventory, and active reachability probes where the operator's documented probe surface is bound. Each per-pair evaluation resolves to allowed-and-observed (no violation), denied- and-not-observed (no violation, evidence recorded), denied-and-observed (violation emitted), or conditional (predicate evaluated against the observed traffic fingerprint before deciding). Violations are classified against the documented taxonomy \u2014 undocumented-transit (traffic across a segment-pair not in the allowance set), unauthorised-egress (traffic to a boundary the policy denies), boundary-control-drift (the firewall / security- group state diverged from the declared zone-transit matrix) \u2014 and pinned to __violation_set_id__. The set is keyed against __segment_inventory_id__ + __policy_snapshot_id__ so the same inputs re-emit the same violation identifiers under replay. D3FEND anchor: D3-NTA (network traffic analysis) \u2014 the detect step is the operator-side network-traffic analysis primitive against the declared policy. Empty set is emitted explicitly so a clean-window reconciliation is distinguishable from a skipped step.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--7e750001-0000-4000-8000-000000000005",
+      "name": "enforce_remediation",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.violation_set_id",
+              "name": "in.violation_set_id",
+              "value": "={{$workflow.variables.violation_set_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.remediation_action_id",
+              "name": "out.remediation_action_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.network_boundary_protection@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.network_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Engage the operator's pre-bound remediation surface against each violation in __violation_set_id__ per the operator's documented per-classification remediation binding. Three documented surfaces: (a) per-segment ACL / firewall-rule change dispatched against the operator's change-management posture (undocumented-transit and unauthorised-egress classifications default here), (b) boundary-control posture-change ticket opened against the operator's documented ticketing surface (boundary-control-drift classification defaults here), (c) short-circuit isolation of the offending path where the violation's severity marker names an active-abuse fingerprint and the operator's documented isolation posture allows automated engagement. Empty when __violation_set_id__ resolved empty; the closure record still names the empty set so the audit-evident chain remains complete. Each engaged action returns a persistent identifier (change-ticket id, posture-change- ticket id, or isolation-record id) that the evidence artifact binds under __remediation_action_id__ together with a per-violation dispatch table naming which surface was engaged against which violation. The playbook does not author the remediation architecture \u2014 it dispatches against pre-bound surfaces the operator's change- management posture already documents; auditability is preserved by requiring every engaged action to return an operator-side persistent identifier before the step closes.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--7e750001-0000-4000-8000-000000000006",
+      "name": "generate_posture_evidence_artifact",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.reconciliation_window",
+              "name": "in.reconciliation_window",
+              "value": "={{$workflow.variables.reconciliation_window}}",
+              "type": "string"
+            },
+            {
+              "id": "in.segment_inventory_id",
+              "name": "in.segment_inventory_id",
+              "value": "={{$workflow.variables.segment_inventory_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.policy_snapshot_id",
+              "name": "in.policy_snapshot_id",
+              "value": "={{$workflow.variables.policy_snapshot_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.violation_set_id",
+              "name": "in.violation_set_id",
+              "value": "={{$workflow.variables.violation_set_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.remediation_action_id",
+              "name": "in.remediation_action_id",
+              "value": "={{$workflow.variables.remediation_action_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.posture_evidence_id",
+              "name": "out.posture_evidence_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.network_boundary_protection@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.network_activity@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Publish the dated network-security-posture evidence artifact to the operator's evidence store. The artifact is shaped against an OSCAL Assessment Result stub: the assessed subject is the reconciled segment inventory pinned by __segment_inventory_id__, the assessment activity is the policy-reconciliation run keyed by __reconciliation_window__ against __policy_snapshot_id__, the finding set carries one finding per violation in __violation_set_id__ (or an explicit no-findings marker when the set is empty), and the response record binds each finding to the engaged remediation action from __remediation_action_id__. The artifact closes the audit-evident chain end-to-end for the window: an auditor reading the record can trace from window identifier through inventory, policy, violation set, and remediation dispatch to the operator-side persistent identifier the remediation surface returned. Pins __posture_evidence_id__ against the persisted record. Always emitted, including on the empty-violation-set branch \u2014 the closure record is the primary audit-evident output of the reconciliation regardless of whether any violation was surfaced.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--7e750001-0000-4000-8000-000000000007",
+      "name": "netsec_posture_end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "netsec_posture_start": {
+      "main": [
+        [
+          {
+            "node": "inventory_network_segments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "inventory_network_segments": {
+      "main": [
+        [
+          {
+            "node": "evaluate_segmentation_policy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "evaluate_segmentation_policy": {
+      "main": [
+        [
+          {
+            "node": "detect_policy_violations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "detect_policy_violations": {
+      "main": [
+        [
+          {
+            "node": "enforce_remediation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "enforce_remediation": {
+      "main": [
+        [
+          {
+            "node": "generate_posture_evidence_artifact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate_posture_evidence_artifact": {
+      "main": [
+        [
+          {
+            "node": "netsec_posture_end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "nis2",
+    "article-21-2-e",
+    "dora",
+    "article-9",
+    "network-security",
+    "segmentation",
+    "boundary-protection",
+    "zone-transit",
+    "posture-management"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.network_security@v1",
+      "content_version": "0.2.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--7e750001-0000-4000-8000-000000000001"
+    },
+    "secops_ng_notes": [
+      "step 'action--7e750001-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--7e750001-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--7e750001-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--7e750001-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--7e750001-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}

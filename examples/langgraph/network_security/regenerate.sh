@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Regenerate the committed network_security LangGraph worked-example
+# artefacts from the canonical CACAO playbook. Run from the repo root
+# after any change to the playbook source or to compilers/langgraph/*.
+set -euo pipefail
+
+HERE="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(cd "${HERE}/../../.." && pwd)"
+CANON_YAML="${REPO_ROOT}/content/playbooks/network_security/playbook.cacao.yaml"
+MIRROR_JSON="${HERE}/playbook.cacao.json"
+
+# Mirror the canonical CACAO YAML into a byte-deterministic JSON form.
+PYTHONPATH="${REPO_ROOT}" python -c "
+import json
+from pathlib import Path
+import yaml
+src = Path('${CANON_YAML}')
+dst = Path('${MIRROR_JSON}')
+data = yaml.safe_load(src.read_text(encoding='utf-8'))
+dst.write_text(json.dumps(data, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+"
+
+# Emit GraphSpec + generated state bindings from the JSON mirror.
+PYTHONPATH="${REPO_ROOT}" python -m compilers.langgraph.emit  "${MIRROR_JSON}" > "${HERE}/graph_spec.json"
+PYTHONPATH="${REPO_ROOT}" python -m compilers.langgraph.state "${MIRROR_JSON}" > "${HERE}/state_bindings.py"
+
+# Materialise the dependency-free audit-mirror sibling. See
+# docs/observability/audit-mirror.md for the co-location rationale.
+PYTHONPATH="${REPO_ROOT}" python -m compilers._shared.audit_mirror_cli \
+    --out "${HERE}/_audit_mirror.py"
