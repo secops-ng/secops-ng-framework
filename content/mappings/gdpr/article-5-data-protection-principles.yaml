@@ -1,5 +1,20 @@
 # GDPR — data-protection principles cluster (Art. 5(1)(b)/(c)/(e)).
 #
+# F-MAP-GDPR CORE (nis2 governance inbound): extends this file with a
+# new `gdpr:art-5-2-accountability` entry pinning
+# `nis2_art20_governance` as the agentic anchor for the Art. 5(2)
+# accountability principle — the operator's ability to demonstrate
+# compliance with the Art. 5(1) principles via a dated,
+# management-body-approved posture record and its accountability-owner
+# metadata. This closes the G-02 grace-window inbound for the
+# playbook; the Art. 24 controller-accountability surface remains
+# operator-side and is not lifted into this YAML. The Art. 5(2) entry
+# is authored here (rather than under a dedicated Art. 24 file) because
+# the accountability principle is a limb of Art. 5, the existing
+# Art. 5 principles file is the correct home for the principle-level
+# axis, and no Art. 24 clause file exists — CORE scope forbids
+# authoring new article files.
+#
 # F-MAP-GDPR CORE-3: third per-clause GDPR mapping YAML after the
 # CORE-1 breach-notification cluster (Art. 33 / Art. 34) and CORE-2
 # security-of-processing cluster (Art. 32). Retires the matching three
@@ -70,8 +85,10 @@
 #     per-clause YAML in a later CORE slice rather than stretched
 #     into this principles file.
 #
-#   - Art. 5(2) accountability. Authored alongside Art. 24
-#     controller accountability in a later CORE slice.
+#   - Art. 5(2) accountability. Authored below as
+#     `gdpr:art-5-2-accountability` under the F-MAP-GDPR CORE nis2
+#     governance inbound slice; the Art. 24 controller-accountability
+#     entry remains a future CORE slice.
 #
 #   - Art. 25 data protection by design and by default. Several
 #     SKELETON skip rationales (codebase_vuln_management,
@@ -280,3 +297,62 @@ entries:
       / Art. 24 accountability surface; this clause records the
       agentic anchors and the enforcement mechanism, not the
       duration.
+
+  - id: gdpr:art-5-2-accountability
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "5(2)"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      The controller shall be responsible for, and be able to
+      demonstrate compliance with, the Art. 5(1) principles
+      (accountability). The demonstration surface must materialise
+      as a dated, attributable record produced on a documented
+      cadence — an approval or attestation the controller can
+      present to a supervisory authority as evidence that the
+      Art. 5(1) principles have been discharged on the schedule
+      the operator's regulatory posture requires.
+    status: draft
+    playbook_refs:
+      - playbook.nis2_art20_governance@v1
+    evidence_stream_refs:
+      - governance-records
+    notes: >-
+      nis2_art20_governance is the agentic anchor for the Art. 5(2)
+      accountability limb. The workflow drives the NIS2 Art. 20(1)
+      management-body approval cycle on the operator's documented
+      cadence and emits the dated governance-record artifact
+      (`__approval_record_id__`) that materialises the
+      demonstration surface Art. 5(2) requires: the record carries
+      the per-cycle posture snapshot, the accountability-owner
+      metadata, and the referral-condition register alongside the
+      approver / referrer identifiers on the management-body
+      roster. The data-flow doc names the Art. 20(1) /
+      Art. 20(2) supervisory-authority discipline at §2 Lawful
+      basis and pins the operator's accountability owner at §4
+      Recipients as the routing surface for a supervisory-authority
+      Art. 32 / Art. 33 (NIS2 Chapter VII) request against the
+      management-body approval discipline — the same dated
+      governance-record the operator presents under GDPR Art. 5(2)
+      as evidence the Art. 5(1) principles have been discharged
+      on the documented cadence. The playbook is a governance-
+      cadence workflow, not a personal-data-processing workflow:
+      the personal data carried on the approval-record artifact is
+      limited to the management-body member roster (approver /
+      referrer identifiers, Art. 20(2) training-completion
+      attestation subject), the audit-trail attribution on the
+      schedule / present / approve steps, and the accountability-
+      owner reference; the lower-layer per-clause evidence records
+      the roll-up reads from stay on their producing playbooks'
+      evidence stores per data-flow-nis2_art20_governance.md §3.
+      The Art. 5(2) determination itself — whether the operator's
+      Art. 5(1) posture is compliant — is operator-side under the
+      operator's Art. 24 controller-accountability surface; this
+      clause records the agentic anchor for the demonstration
+      record, not the compliance verdict. The Art. 24 controller-
+      responsibility entry that carves the operator-side
+      determination surface is a future CORE slice; the
+      accountability principle is scoped here to the Art. 5(2)
+      limb the playbook's data-flow doc anchors.

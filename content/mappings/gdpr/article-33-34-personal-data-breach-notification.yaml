@@ -5,6 +5,23 @@
 # incident_management, ransomware_containment) so the gdpr orphan-CI
 # assertion re-arms against this cluster's slugs.
 #
+# F-MAP-GDPR CORE (dora inbound): extends the Art. 33 entry's
+# `playbook_refs:` with `dora_major_incident_reporting`, closing the
+# G-02 grace-window inbound for the DORA/GDPR parallel-notification
+# obligation. For a major ICT-related incident under DORA Art. 19 that
+# also meets the Art. 4(12) personal-data-breach definition, the
+# operator files two notifications in parallel on the same underlying
+# incident timeline: the DORA Art. 19 major-ICT-incident report to the
+# competent authority, and the GDPR Art. 33 supervisory-authority
+# notification (72h). `playbook.incident_management@v1` remains the
+# Art. 33(3) notification engine; `dora_major_incident_reporting` is
+# pinned here as the cross-regime sibling anchor that materialises the
+# parallel-lane relationship the playbook's outbound `gdpr:art-33`
+# entry expects. Art. 34 (high-risk subject notification) is NOT
+# extended for this playbook — its data-flow doc names Arts. 33/34 as
+# a parallel-lane reference but does not carry the subject-
+# notification dispatch surface; that remains anchored on data_exfil.
+#
 # F-MAP-GDPR CORE-5: extends the Art. 33 entry's `playbook_refs:` with
 # the operational-readiness leg of the clause — on_call_rotation,
 # post_incident_review, and phishing_triage — and retires the matching
@@ -108,6 +125,7 @@ entries:
       - control.incident_timeline_signals@v1
     playbook_refs:
       - playbook.data_exfil@v1
+      - playbook.dora_major_incident_reporting@v1
       - playbook.identity_compromise@v1
       - playbook.incident_management@v1
       - playbook.on_call_rotation@v1
@@ -155,38 +173,41 @@ entries:
       the SLA KPI tracks the documented-reason path separately. The
       three operational-readiness playbooks (on_call_rotation,
       phishing_triage, post_incident_review) wire the upstream
-      readiness leg of the clause without themselves generating the
-      personal-data-breach event: phishing_triage classifies inbound
-      mail to the point where a confirmed credential-harvest or BEC
-      case crosses the Art. 33(1) likelihood-of-risk notifiability
-      threshold and is handed to incident_management for the
-      Art. 33(3) envelope; on_call_rotation binds the escalation
-      chain and delivers the rotation-boundary handoff brief that
-      keeps a documented responder against the 72-hour clock during
-      a clock-spanning incident, supplying the
-      incident-handling-capability evidence the `without undue delay`
-      threshold is read against; post_incident_review produces the
-      timeline artifact, blameless review document, and
-      corrective-action register that materialise Art. 33(5)'s
-      documenting-personal-data-breaches obligation against a closed
-      breach case. Art. 34 (high-risk subject notification) is not
-      extended for these three readiness playbooks because their
-      data-flow docs do not name Art. 34 by number — the subject-
-      notification leg of the cluster remains anchored on data_exfil
-      in the Art-34 entry below. agentic_threat_response is the
-      machine-speed adversary event-generation lane: its detect-
-      through-contain slice against a fully-agentic operator meets
-      the Art. 4(12) personal-data-breach definition under the
-      breach-of-confidentiality limb the moment the credential-
-      isolation step's implicated-principal set carries identity
-      records backing accounts that hold personal data (the same
-      limb identity_compromise anchors, extended to the autonomous-
-      adversary decision-cadence case set NIS2 Art. 21(2)(b)
-      recognises). The escalate step hands off to
+      readiness leg without themselves generating the breach event:
+      phishing_triage classifies inbound mail to the Art. 33(1)
+      notifiability threshold; on_call_rotation binds the escalation
+      chain and rotation-boundary handoff during the 72-hour clock;
+      post_incident_review produces the timeline, blameless review
+      document, and corrective-action register that materialise
+      Art. 33(5)'s documenting-personal-data-breaches obligation.
+      Art. 34 is not extended for these three readiness playbooks —
+      their data-flow docs do not name Art. 34 by number, and the
+      subject-notification leg remains anchored on data_exfil.
+      agentic_threat_response is the machine-speed adversary
+      event-generation lane: its detect-through-contain slice
+      meets the Art. 4(12) breach-of-confidentiality limb the
+      moment the credential-isolation step's implicated-principal
+      set carries identity records backing accounts that hold
+      personal data. The escalate step hands off to
       incident_management for the Art. 33(3) submission;
       agentic_threat_response's role is event-generation, not
-      notification. Art. 34 is not extended here — its data-flow
-      doc does not name Art. 34 by number, and any subject-
+      notification. dora_major_incident_reporting is pinned as the
+      cross-regime sibling anchor for the DORA/GDPR parallel-
+      notification obligation: where a major ICT-related incident
+      under DORA Art. 19 also meets the Art. 4(12) personal-data-
+      breach definition, the operator files two notifications in
+      parallel on the same incident timeline — the DORA Art. 19
+      major-ICT-incident report (composed by this playbook against
+      the Art. 18 classification and the 24h / 72h / 1-month
+      reporting chain) and the GDPR Art. 33 notification (composed
+      by incident_management against the 72-hour clock). The
+      playbook does not itself compose the Art. 33 envelope; it is
+      the DORA-lane counterpart, and its outbound `gdpr:art-33`
+      cross-pin references this entry as the parallel-lane anchor.
+      Art. 34 is not extended here — the readiness playbooks and
+      dora_major_incident_reporting do not carry the subject-
+      notification dispatch surface, which remains anchored on
+      data_exfil in the Art-34 entry below, and any subject-
       notification dispatch routes through incident_management.
 
   - id: gdpr:art-34-communication-data-subject
