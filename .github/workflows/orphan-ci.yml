@@ -439,16 +439,20 @@ jobs:
   vuln-patch-ocsf-bindings:
     # G-04 catalogue-maturity OCSF source-data-shape dimension —
     # asserts every metric in the vulnerability-handling & patch
-    # (CRA-family) cluster (vuln_intake, patch_management) declares
-    # an OCSF telemetry_ref. Closes the F-MET-OCSF-VULNPATCH triplet
-    # (SKELETON #551) by wiring the linter into the nightly content-CI
-    # cadence alongside the other cluster jobs; runs independently
-    # from the per-framework orphan matrix and the sibling OCSF /
+    # (CRA-family) cluster (vuln_intake, patch_management,
+    # vulnerability_management) declares an OCSF telemetry_ref.
+    # Closes the F-MET-OCSF-VULNPATCH triplet (SKELETON #551) by
+    # wiring the linter into the nightly content-CI cadence alongside
+    # the other cluster jobs; runs independently from the
+    # per-framework orphan matrix and the sibling OCSF /
     # sovereignty / determinism / post-incident-review /
     # regulatory-notification / identity-&-access jobs. Secondary:
     # G-02 regulatory-mapping coverage — the vulnerability-&-patch
     # cluster carries CRA coordinated-vulnerability-disclosure and
-    # SBOM release obligations.
+    # SBOM release obligations, plus the NIS2 Art. 21(2)(e) / DORA JC
+    # RTS Art. 10 vulnerability_management KPI/KRI triad
+    # (unpatched_critical_cve_age_days P95, vuln_critical_open_age_p99
+    # long-tail companion, vuln_remediation_sla_compliance).
     name: G-04 vulnerability-&-patch-cluster OCSF binding assertion
     runs-on: ubuntu-latest
     steps:
