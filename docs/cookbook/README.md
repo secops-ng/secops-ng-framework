@@ -42,6 +42,7 @@ narrative.
 | `asset_management`    | [`asset_management.md`](asset_management.md)       | `content/playbooks/asset_management/`                 |
 | `agentic_threat_response` | [`agentic_threat_response.md`](agentic_threat_response.md) | `content/playbooks/agentic_threat_response/`     |
 | `vulnerability_management` | [`vulnerability_management.md`](vulnerability_management.md) | `content/playbooks/vulnerability_management/`   |
+| `identity_access_management_metrics` | [`identity_access_management_metrics.md`](identity_access_management_metrics.md) | `content/metrics/identity_mfa_enforcement_rate.yaml` + `content/metrics/access_review_completion_rate.yaml` |
 
 Additional entries land alongside their content sources as workflows
 flip from In Progress to Shipped on
