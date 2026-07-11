@@ -1,9 +1,8 @@
 """Schema + coverage tests for the EU AI Act OSCAL component-definition.
 
-Mirrors ``test_oscal_gdpr_component_definition.py`` and the CRA / DORA
-siblings. Covers three source YAMLs under
-``content/mappings/eu_ai_act/`` (Art. 9, Art. 11, Art. 13, Art. 72).
 Full coverage of every entry is in scope; no deferred entries.
+Covers source YAMLs under ``content/mappings/eu_ai_act/``
+(Art. 9, Art. 11, Art. 13, Art. 72, Art. 73).
 """
 
 from __future__ import annotations
@@ -30,6 +29,7 @@ YAML_PATHS = [
     EUAI_DIR / "article-11-technical-documentation.yaml",
     EUAI_DIR / "article-13-transparency.yaml",
     EUAI_DIR / "article-72-post-market-monitoring.yaml",
+    EUAI_DIR / "article-73-serious-incident-reporting.yaml",
 ]
 
 OUT_OF_SCOPE_ENTRY_IDS: set[str] = set()
@@ -141,9 +141,18 @@ def test_implemented_requirement_descriptions_match_yaml_obligations(
 
 
 def test_playbook_backlinked_from_every_yaml(in_scope_entries: list[dict]) -> None:
-    """Every entry backlinks playbook.eu_ai_act_risk_management@v1."""
+    """Every risk-management-lifecycle entry backlinks the anchor playbook.
+
+    Art. 73 (serious-incident reporting) is exempt: its obligation surface
+    is the incident lifecycle, so it backlinks
+    ``playbook.incident_management@v1`` + ``playbook.post_incident_review@v1``
+    rather than the risk-management playbook.
+    """
     target = "playbook.eu_ai_act_risk_management@v1"
+    exempt = {"eu_ai_act:art-73-serious-incident-reporting"}
     for entry in in_scope_entries:
+        if entry["id"] in exempt:
+            continue
         refs = entry.get("playbook_refs") or []
         assert target in refs, (
             f"entry {entry['id']!r} does not backlink {target!r}"
