@@ -1,0 +1,145 @@
+# EU AI Act — Article 73 reporting of serious incidents by providers
+# of high-risk AI systems to the market-surveillance authority.
+#
+# Art. 73(1) requires providers of high-risk AI systems placed on the
+# Union market to report any serious incident to the market-surveillance
+# authorities of the Member States where that incident occurred.
+# Art. 73(2) sets the outer notification bound: the report shall be
+# made immediately after the provider has established a causal link
+# between the AI system and the serious incident, or the reasonable
+# likelihood of such a link, and, in any event, not later than 15 days
+# after the provider or, where applicable, the deployer, becomes aware
+# of the serious incident. The 15-day outer bound is shortened by
+# Art. 73(3) to two days for a serious incident consisting of a
+# widespread infringement or a serious and irreversible disruption of
+# the management or operation of critical infrastructure, and by
+# Art. 73(4) to ten days where the serious incident involves the death
+# of a person. Art. 73(5) permits an incomplete initial report followed
+# by a complete report once the provider has gathered sufficient
+# information. Art. 73(6) requires the provider, immediately after
+# becoming aware of a serious incident, to perform the necessary
+# investigations in relation to the incident and the AI system
+# concerned, including a risk assessment and corrective action, and
+# to cooperate with the competent authorities and, where applicable,
+# with the notified body concerned.
+#
+# Companion inbound edges landing under sibling files:
+#   - article-9-risk-management.yaml — Art. 9 risk-management system
+#     (an Art. 73 serious incident is a residual-risk observation the
+#     Art. 9(2)(c) re-assessment iteration must consume; the corrective
+#     action Art. 73(6) requires reads back into the acceptability line
+#     the Art. 9(5) discipline holds).
+#   - article-72-post-market-monitoring.yaml — the Art. 72 loop is the
+#     detection surface that surfaces the anomaly signal from which the
+#     provider establishes the causal link to the AI system that
+#     triggers the Art. 73 report; the Art. 72 monitor step and the
+#     Art. 73 report chain are the read-side and write-side of the
+#     same post-market observation stream.
+#   - article-15-accuracy-robustness-cybersecurity.yaml — an Art. 15(4)
+#     adversarial-resilience failure (data-poisoning, model-poisoning,
+#     model-evasion, confidentiality attack) that produces a serious
+#     harm outcome on a deployed high-risk AI system is one of the
+#     event classes that produces an Art. 73 reportable incident.
+#
+# Cross-regime edges:
+#   - content/mappings/nis2/article-23.yaml records the NIS2 Art. 23
+#     early-warning / notification / final-report chain to the CSIRT
+#     or competent authority. The two surfaces are distinct: NIS2
+#     Art. 23 reports significant ICT incidents on the essential /
+#     important-entity surface under Directive (EU) 2022/2555, while
+#     Art. 73 reports serious incidents on the high-risk AI system
+#     provider / deployer surface under Regulation (EU) 2024/1689 to
+#     the market-surveillance authority. Where an operator is both an
+#     essential-entity under NIS2 and a provider of a high-risk AI
+#     system under the EU AI Act, both chains fire on their own
+#     obligation surfaces against their own recipients — they are not
+#     substitutes.
+#   - content/mappings/dora/article-19-and-28.yaml records the DORA
+#     Art. 19 major-incident reporting chain to the financial
+#     competent authority. DORA Art. 19 is a financial-entity
+#     ICT-incident regulator-notification chain under Regulation
+#     (EU) 2022/2554; the recipient (financial competent authority)
+#     and the regulated population (financial entity) are distinct
+#     from the Art. 73 market-surveillance authority / AI-system
+#     provider surface.
+#   - content/mappings/cra/*.yaml records the CRA Art. 14 Single
+#     Reporting Platform (SRP) product-side notification chain under
+#     Regulation (EU) 2024/2847. CRA SRP is a product-level
+#     vulnerability / severe-incident notification for products with
+#     digital elements; Art. 73 reports serious incidents caused by
+#     the operation of a high-risk AI system on a distinct obligation
+#     surface. Where an AI system is also a product with digital
+#     elements, both chains fire on their own recipients.
+regime: eu_ai_act
+entries:
+  - id: eu_ai_act:art-73-serious-incident-reporting
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "73"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      Providers of high-risk AI systems shall report any serious
+      incident to the market-surveillance authorities of the Member
+      States where the incident occurred. The report shall be made
+      immediately after the provider has established a causal link
+      between the AI system and the serious incident, or the
+      reasonable likelihood of such a link, and in any event not
+      later than 15 days after the provider or, where applicable, the
+      deployer becomes aware of the incident. The outer bound is two
+      days for a widespread infringement or a serious and irreversible
+      disruption of the management or operation of critical
+      infrastructure, and ten days where the incident involves the
+      death of a person. An incomplete initial report may be
+      submitted, followed by a complete report. The provider shall
+      perform the necessary investigations, including a risk
+      assessment and corrective action, and cooperate with the
+      competent authorities and, where applicable, the notified body.
+    status: draft
+    control_refs:
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.incident_management@v1
+      - playbook.post_incident_review@v1
+    metric_refs:
+      - kri.nis2_incident_early_warning_latency_hours@v1
+      - kri.nis2_incident_notification_latency_hours@v1
+      - kpi.notification_sla_compliance@v1
+    evidence_stream_refs:
+      - incidents
+    notes: >-
+      Two playbook anchors. The primary exerciser is the
+      incident_management playbook: the detection, triage, classify,
+      contain and regulator-notification steps are the operational
+      lifecycle that lands the Art. 73(1) initial report against the
+      Art. 73(2) 15-day outer bound (or the Art. 73(3) two-day and
+      Art. 73(4) ten-day shortened bounds where the incident falls
+      into those severity classes). The secondary anchor is the
+      post_incident_review playbook: the Art. 73(5) follow-up complete
+      report and the Art. 73(6) corrective-action-and-cooperation
+      surface are the review-side and remediation-side of the same
+      serious-incident lifecycle, and the review feeds the Art. 9(2)(c)
+      re-assessment iteration through the Art. 72 post-market
+      monitoring loop. Metric anchors reuse the incident-timeline KRI
+      catalogue: the NIS2-flavoured latency KRIs
+      (kri.nis2_incident_early_warning_latency_hours@v1 and
+      kri.nis2_incident_notification_latency_hours@v1) are the closest
+      committed reference measurements for how close each Art. 73
+      report landed to its wall, pending a future Art. 73-specific
+      pair; kpi.notification_sla_compliance@v1 is the recipient-
+      neutral ratio the compile target binds to the market-
+      surveillance-authority delivery channel. Distinct-obligation
+      note: Art. 73 is neither DORA Art. 19 major-incident reporting
+      (financial-entity ICT surface, financial competent authority
+      recipient) nor NIS2 Art. 23 significant-incident reporting
+      (essential / important-entity surface, CSIRT / competent
+      authority recipient) — Art. 73 anchors on high-risk AI system
+      providers and deployers under Regulation (EU) 2024/1689, with
+      the market-surveillance authority as recipient. Where an
+      operator is subject to more than one of these regimes, each
+      chain fires on its own recipient; they are not substitutes.
+      Status is draft on this authoring pass; a sibling CORE promotes
+      to live once the market-surveillance-authority intake shape and
+      the compile-target binding to the delivery channel are
+      committed.
