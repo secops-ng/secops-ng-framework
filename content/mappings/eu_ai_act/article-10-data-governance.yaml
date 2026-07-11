@@ -1,0 +1,142 @@
+# EU AI Act — Article 10 data and data governance for high-risk AI systems.
+#
+# Art. 10(1)–(5) require providers of high-risk AI systems that use
+# techniques involving the training of AI models with data to develop
+# them on the basis of training, validation and testing data sets that
+# meet the quality criteria of the article. Art. 10(2) requires data
+# governance and management practices appropriate for the intended
+# purpose of the high-risk AI system, covering in particular design
+# choices; data-collection processes and origin of the data; relevant
+# data-preparation processing operations (annotation, labelling,
+# cleaning, updating, enrichment, aggregation); the formulation of
+# assumptions with respect to the information the data is supposed to
+# measure and represent; an assessment of the availability, quantity
+# and suitability of the data sets; examination in view of possible
+# biases likely to affect the health and safety of persons, to have
+# a negative impact on fundamental rights or to lead to discrimination
+# prohibited under Union law; appropriate measures to detect, prevent
+# and mitigate possible biases identified; and the identification of
+# relevant data gaps or shortcomings that prevent compliance with the
+# regulation and how those gaps and shortcomings can be addressed.
+# Art. 10(3) requires the training, validation and testing data sets
+# to be relevant, sufficiently representative, and to the best extent
+# possible free of errors and complete in view of the intended
+# purpose, with appropriate statistical properties, including where
+# applicable regarding the persons or groups of persons in relation to
+# whom the high-risk AI system is intended to be used. Art. 10(4)
+# requires the data sets, to the extent required by the intended
+# purpose, to take into account the characteristics or elements
+# particular to the specific geographical, contextual, behavioural or
+# functional setting within which the high-risk AI system is intended
+# to be used. Art. 10(5) permits, to the extent strictly necessary for
+# the purposes of ensuring bias detection and correction in relation
+# to the high-risk AI systems, the processing of special categories
+# of personal data referred to in Art. 9(1) GDPR, subject to
+# appropriate safeguards for the fundamental rights and freedoms of
+# natural persons, including technical limitations on re-use and
+# state-of-the-art security and privacy-preserving measures.
+#
+# Companion inbound edges landing under sibling files:
+#   - article-9-risk-management.yaml — Art. 9 risk-management system
+#     (data-governance surface is one of the risk dimensions the
+#     assess-risk-under-Art.-9(2) step scores against the Art. 9(5)
+#     acceptability line).
+#   - article-11-technical-documentation.yaml — Annex IV documents the
+#     data-governance practices, data-set characteristics, and the
+#     bias-detection and mitigation measures Art. 10 requires.
+#   - article-13-transparency.yaml — the data-set characteristics and
+#     the residual bias-mitigation posture declared under Art. 10 are
+#     summarised in the Art. 13 instructions-for-use bundle so
+#     deployers can interpret the system's output appropriately.
+#   - article-15-accuracy-robustness-cybersecurity.yaml — data-set
+#     representativeness and the Art. 10(4) contextual-fit obligation
+#     are pre-conditions for the accuracy and robustness targets
+#     Art. 15(1)–(3) require the system to achieve consistently
+#     across its lifecycle.
+#   - article-72-post-market-monitoring.yaml — the Art. 72 loop feeds
+#     production drift and bias-drift signals back into the Art. 10(2)
+#     data-governance re-assessment iteration.
+#
+# Cross-regime edges:
+#   - content/mappings/gdpr/article-5-data-protection-principles.yaml
+#     records the GDPR Art. 5(1)(c) data-minimisation principle; the
+#     Art. 10(5) permission to process Art. 9(1) GDPR special
+#     categories for bias detection and correction is a strictly-
+#     necessary carve-out that reads against the same minimisation
+#     line — the data-governance practice must document why the
+#     special-category processing is limited to what is required to
+#     detect and correct bias.
+#   - content/mappings/gdpr/article-35-dpia.yaml records the GDPR
+#     Art. 35 DPIA duty; where the Art. 10(5) special-category
+#     processing is engaged, the operator's DPIA under Recital 9 of
+#     Regulation (EU) 2024/1689 covers the Art. 35(7)(c) risk-to-
+#     rights-and-freedoms assessment for that processing surface.
+regime: eu_ai_act
+entries:
+  - id: eu_ai_act:art-10-data-governance
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "10"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      High-risk AI systems developed with training data shall use
+      training, validation and testing sets that meet the Art. 10
+      quality criteria. Providers shall apply data-governance
+      practices appropriate to the intended purpose covering design
+      choices, data collection and origin, data preparation
+      (annotation, labelling, cleaning, enrichment, aggregation),
+      assumptions the data is meant to represent, availability,
+      quantity and suitability of the sets, examination for biases
+      likely to affect health, safety or fundamental rights or lead
+      to prohibited discrimination, measures to detect, prevent and
+      mitigate identified biases, and identification of data gaps.
+      Sets shall be relevant, representative and, to the extent
+      possible, free of errors and complete for the intended purpose,
+      and shall reflect the geographical, contextual, behavioural or
+      functional setting of use. Special-category personal data may
+      be processed only as strictly necessary for bias detection
+      and correction, with safeguards.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+    playbook_refs:
+      - playbook.eu_ai_act_risk_management@v1
+      - playbook.data_protection_impact_assessment@v1
+    metric_refs:
+      - kri.residual_risk_threshold_breach_count@v1
+    evidence_stream_refs:
+      - risk-analysis
+    notes: >-
+      Two playbook anchors. The primary exerciser is the
+      eu_ai_act_risk_management playbook: the assess-risk-under-
+      Art.-9(2) step scores data-governance residual-risk observations
+      (data-set representativeness, examined bias surface, identified
+      data gaps or shortcomings, Art. 10(4) contextual-fit) against
+      the Art. 9(5) acceptability line; the assemble-technical-
+      documentation step lands the Art. 10(2) data-governance
+      practices, the data-set characteristics under Art. 10(3), the
+      Art. 10(4) contextual-fit note, and the Art. 10(5) special-
+      category safeguards into the Annex IV bundle under Art. 11 and
+      the deployer-facing summary into the Art. 13 instructions-for-
+      use bundle; and the monitor-post-market-signals step is the
+      Art. 72 loop that feeds production bias-drift and data-quality
+      drift back into the Art. 10(2) re-assessment iteration. The
+      secondary anchor is the data_protection_impact_assessment
+      playbook: the Art. 10(5) carve-out permitting processing of
+      Art. 9(1) GDPR special categories for bias detection and
+      correction is a high-risk processing surface under GDPR
+      Art. 35(1) and Art. 35(3)(b) large-scale-special-category
+      trigger, and the DPIA lifecycle is the operator-side ex-ante
+      process that documents the necessity, proportionality and
+      safeguards limb for that processing before the training data
+      set is assembled. Same threshold-breach KRI as the Art. 9 and
+      Art. 15 anchors — data-set quality gaps, unmitigated bias, and
+      contextual-fit shortcomings are residual-risk observations
+      against the same acceptability line the Art. 9(5) discipline
+      reads against. Cross-regime note: the GDPR Art. 5(1)(c)
+      minimisation principle is the reader against which the
+      Art. 10(5) strictly-necessary bound is judged, and the operator's
+      DPIA under GDPR Art. 35 documents the rights-and-freedoms
+      assessment for the special-category processing.
