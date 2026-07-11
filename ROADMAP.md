@@ -1410,6 +1410,95 @@ named operator use-case. Each cookbook workflow lives under
 
 ---
 
+### F-WF-NETWORK-SECURITY — Network-boundary and segmentation posture reconciliation lifecycle
+
+- **Status:** Shipped
+- **Priority:** P1
+- **Goal:** G-01 (content coverage — portable operator-side per-window
+  reconciliation playbook for the network-boundary / segmentation limb
+  of NIS2 Art. 21(2)(e); co-anchored with the existing vulnerability-
+  handling and codebase dependency-review limbs of the same clause;
+  advances the Q4 2026 target of ≥ 25 CACAO v2 playbooks), G-02
+  (regulatory-graph closure — NIS2 Art. 21(2)(e) network-boundary
+  primary anchor and DORA Art. 9 network-security sibling closure,
+  target Q3 2026 for full NIS2 / DORA network-layer axis coverage),
+  G-03 (compile-target parity — byte-parity goldens across the three
+  reference targets pinning the reconciliation ring on every PR).
+- **Acceptance criteria:**
+  - `content/playbooks/network_security/` carries the canonical
+    CACAO v2 scaffold (`playbook.network_security@v1`) — the
+    inventory-network-segments → evaluate-segmentation-policy →
+    detect-policy-violations → enforce-remediation →
+    generate-posture-evidence-artifact chain, plus `mappings.yaml`
+    pinning outbound OSCAL SC-7 / SC-3 / CA-9 controls, a D3FEND
+    D3-NTA + D3-ISVA binding on the detect step (per-step gap notes
+    on the other four), an OCSF Network Activity (4001) telemetry
+    stub, the NIS2 Art. 21(2)(e) network-boundary overlay, the DORA
+    Art. 9 sibling reference, and the CRA / GDPR orphan-skip
+    entries (asset_management precedent), plus a workflow-local
+    README. Read-only against the operator's declared inventory
+    and policy sources; the remediation step dispatches against
+    pre-bound operator remediation surfaces (ACL / firewall-rule
+    change, boundary-control posture-change ticket, or short-circuit
+    isolation).
+  - Three reference-target compile examples land under
+    `examples/{n8n,temporal,langgraph}/network_security/` with
+    byte-parity goldens under
+    `tests/examples/{n8n,temporal,langgraph}/network_security/test_golden.py`
+    guarding the ring across all three targets on every PR.
+  - Cookbook entry `docs/cookbook/network_security.md` walks an
+    operator through the reconciliation cycle end-to-end against a
+    compiled example (n8n / Temporal / LangGraph).
+- **Sovereign-stack constraints:** CACAO v2 content only, no
+  proprietary schema. NIS2 Art. 21(2)(e) is the primary regulatory
+  anchor; DORA Art. 9 is the financial-sector sibling. No hardcoded
+  IaC / cloud-provider / flow-log / ticketing endpoint — the operator
+  wires each adapter surface at the compile-target config layer. The
+  reconciliation operates on segment identifiers, policy-snapshot
+  identifiers, and evidence-record identifiers only; no personal data
+  is processed.
+- **Depends on:** `control.network_boundary_protection@v1`
+  placeholder control (SC-7 / SC-3 / CA-9 catalog rows resolve via
+  the mappings overlay).
+- **Source:** NIS2 (Directive (EU) 2022/2555) Art. 21(2)(e); DORA
+  (Regulation (EU) 2022/2554) Art. 9; Commission Delegated
+  Regulation (EU) 2024/1774 (JC RTS on ICT risk management
+  framework) Art. 12; NIST SP 800-53 Rev. 5 SC-7 / SC-3 / CA-9;
+  OCSF v1.3.0 Network Activity (4001); MITRE D3FEND D3-NTA /
+  D3-ISVA.
+- **Shipped via:**
+  - SKELETON — #798
+    (`content/playbooks/network_security/` CACAO v2 five-step
+    scaffold + `mappings.yaml` pinning outbound OSCAL SC-7 / SC-3 /
+    CA-9 controls, the NIS2 Art. 21(2)(e) network-boundary overlay,
+    the DORA Art. 9 sibling reference, and the CRA / GDPR
+    orphan-skip entries, plus the workflow-local README).
+  - CORE — #799
+    (deterministic per-step action bodies plus three-target
+    compile examples under
+    `examples/{n8n,temporal,langgraph}/network_security/` closing
+    the CACAO source → n8n / Temporal / LangGraph emission ring).
+  - MAPPINGS-INBOUND — #800
+    (`content/mappings/{nis2,dora,cra,gdpr}/` inbound wires —
+    NIS2 Art. 21(2)(e) network-boundary limb, DORA Art. 9
+    network-security atom, CRA orphan-skip clause-by-clause review,
+    GDPR no-personal-data data-flow doc — closing the four-regime
+    inbound-lane coverage for `playbook.network_security@v1`).
+  - EXTEND-GOLDENS — #801
+    (`tests/examples/{n8n,temporal,langgraph}/network_security/test_golden.py`
+    byte-parity goldens guarding the reconciliation ring across
+    all three targets on every PR).
+  - EXTEND-COOKBOOK — PR #<this>
+    (`docs/cookbook/network_security.md` operator walkthrough
+    covering the five-step reconciliation cycle, the three-target
+    hand-off, the OSCAL SC-7 / SC-3 anchors, the D3-NTA detect-step
+    binding, the OCSF Network Activity 4001 emission surface, and
+    the operator-wired adapter contract; cookbook index entry;
+    ROADMAP F-WF-NETWORK-SECURITY status flip from In Progress to
+    Shipped).
+
+---
+
 ## Epic PT — Pattern Library
 
 Reusable graph fragments and Pydantic types shared across cookbook
