@@ -13,7 +13,7 @@
         "uuid": "3d52f633-0c23-58b4-9536-c58d0184e4e9",
         "type": "process-procedure",
         "title": "SecOps-NG",
-        "description": "SecOps-NG is a community-driven Digital Commons of portable security operations content (CACAO playbooks, OSCAL/D3FEND control mappings, OCSF data shapes, KPI/KRI catalog) plus reference compilers to n8n, Temporal, and LangGraph. This component definition exposes how the SecOps-NG content set addresses EU AI Act (Regulation (EU) 2024/1689) provider-side obligations on high-risk AI systems covered by the shipped per-article mapping YAMLs under content/mappings/eu_ai_act/ — Art. 9 risk-management system, Art. 11 + Annex IV technical documentation, Art. 13 transparency and information duties toward deployers, and Art. 72 post-market monitoring.",
+        "description": "SecOps-NG is a community-driven Digital Commons of portable security operations content (CACAO playbooks, OSCAL/D3FEND control mappings, OCSF data shapes, KPI/KRI catalog) plus reference compilers to n8n, Temporal, and LangGraph. This component definition exposes how the SecOps-NG content set addresses EU AI Act (Regulation (EU) 2024/1689) provider-side obligations on high-risk AI systems covered by the shipped per-article mapping YAMLs under content/mappings/eu_ai_act/ — Art. 9 risk-management system, Art. 11 + Annex IV technical documentation, Art. 13 transparency and information duties toward deployers, Art. 72 post-market monitoring, and Art. 73 reporting of serious incidents.",
         "control-implementations": [
           {
             "uuid": "1b8d6f14-7550-5a9a-bc04-979d2d21f3a9",
@@ -105,6 +105,28 @@
                     "name": "source-article",
                     "ns": "https://secops-ng.org/ns/oscal",
                     "value": "72"
+                  }
+                ]
+              },
+              {
+                "uuid": "b9f4cc73-1475-5dd0-9b4a-85a30bf2dd05",
+                "control-id": "control.incident_timeline_signals-v1",
+                "description": "Providers of high-risk AI systems shall report any serious incident to the market-surveillance authorities of the Member States where the incident occurred. The report shall be made immediately after the provider has established a causal link between the AI system and the serious incident, or the reasonable likelihood of such a link, and in any event not later than 15 days after the provider or, where applicable, the deployer becomes aware of the incident. The outer bound is two days for a widespread infringement or a serious and irreversible disruption of the management or operation of critical infrastructure, and ten days where the incident involves the death of a person. An incomplete initial report may be submitted, followed by a complete report. The provider shall perform the necessary investigations, including a risk assessment and corrective action, and cooperate with the competent authorities and, where applicable, the notified body.",
+                "props": [
+                  {
+                    "name": "source-control-ref",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "control.incident_timeline_signals@v1"
+                  },
+                  {
+                    "name": "source-entry-id",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "eu_ai_act:art-73-serious-incident-reporting"
+                  },
+                  {
+                    "name": "source-article",
+                    "ns": "https://secops-ng.org/ns/oscal",
+                    "value": "73"
                   }
                 ]
               }
