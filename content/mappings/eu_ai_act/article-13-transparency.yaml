@@ -30,12 +30,15 @@ entries:
       format or otherwise that include concise, complete, correct and
       clear information that is relevant, accessible and
       comprehensible to deployers.
-    status: draft
+    status: live
     control_refs:
       - control.risk_management_policy@v1
     playbook_refs:
       - playbook.eu_ai_act_risk_management@v1
-    metric_refs: []
+      - playbook.data_protection_impact_assessment@v1
+    metric_refs:
+      - kri.residual_risk_threshold_breach_count@v1
+      - kpi.audit_log_completeness_ratio@v1
     evidence_stream_refs:
       - risk-analysis
     notes: >-
