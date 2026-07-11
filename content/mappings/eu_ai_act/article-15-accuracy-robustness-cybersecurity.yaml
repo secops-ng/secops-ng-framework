@@ -1,0 +1,97 @@
+# EU AI Act — Article 15 accuracy, robustness and cybersecurity of
+# high-risk AI systems.
+#
+# Art. 15(1)–(5) require providers of high-risk AI systems to design
+# and develop them so that they achieve an appropriate level of
+# accuracy, robustness and cybersecurity, and that they perform
+# consistently in those respects throughout their lifecycle. The
+# accuracy levels and relevant accuracy metrics are declared in the
+# accompanying instructions for use (Art. 13). Robustness shall be
+# achieved through technical and organisational measures, including
+# resilience against errors, faults or inconsistencies that may occur
+# within the system or the environment in which it operates —
+# especially where the system continues to learn after being placed
+# on the market or put into service, feedback-loop bias in the
+# outputs used as an input for future operations must be addressed.
+# Cybersecurity shall be resilient against attempts by unauthorised
+# third parties to alter the use, outputs or performance by exploiting
+# system vulnerabilities; the technical solutions shall be appropriate
+# to the relevant circumstances and risks and, where appropriate,
+# include measures to prevent, detect, respond to, resolve and control
+# for data-poisoning attacks, model-poisoning attacks, model-evasion
+# attacks, confidentiality attacks and model flaws.
+#
+# Companion inbound edges landing under sibling files:
+#   - article-9-risk-management.yaml — Art. 9 risk-management system
+#     (Art. 15 is the performance-and-security complement).
+#   - article-11-technical-documentation.yaml — Annex IV documents the
+#     accuracy metrics and the cybersecurity measures Art. 15 requires.
+#   - article-13-transparency.yaml — the accuracy metrics declared
+#     under Art. 15(3) are carried in the Art. 13 instructions for
+#     use bundle.
+#   - article-72-post-market-monitoring.yaml — the Art. 72 loop
+#     collects performance data against the Art. 15(1) consistent-
+#     performance obligation across the lifecycle.
+#
+# Cross-regime edges:
+#   - content/mappings/nis2/article-21-2-e.yaml records the NIS2
+#     vulnerability-handling inbound edge; Art. 15(4) adversarial-
+#     resilience discipline is the AI-system-specific execution
+#     surface for that vulnerability-management obligation.
+regime: eu_ai_act
+entries:
+  - id: eu_ai_act:art-15-accuracy-robustness-cybersecurity
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "15"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      High-risk AI systems shall be designed and developed in such a
+      way that they achieve an appropriate level of accuracy,
+      robustness, and cybersecurity, and that they perform
+      consistently in those respects throughout their lifecycle. The
+      levels of accuracy and the relevant accuracy metrics shall be
+      declared in the accompanying instructions for use. Robustness
+      shall be achieved through technical and organisational
+      measures, including resilience against errors, faults or
+      inconsistencies that may occur within the system or the
+      environment in which it operates, and shall address feedback
+      loops where outputs are used as inputs for future operations.
+      Cybersecurity shall be resilient against attempts by
+      unauthorised third parties to alter the use, outputs or
+      performance by exploiting vulnerabilities, including, where
+      appropriate, measures to prevent, detect, respond to, resolve
+      and control for data-poisoning, model-poisoning, model-evasion
+      and confidentiality attacks, and model flaws.
+    status: draft
+    control_refs:
+      - control.risk_management_policy@v1
+    playbook_refs:
+      - playbook.eu_ai_act_risk_management@v1
+      - playbook.vulnerability_management@v1
+    metric_refs:
+      - kri.residual_risk_threshold_breach_count@v1
+    evidence_stream_refs:
+      - risk-analysis
+    notes: >-
+      Two playbook anchors. The primary exerciser is the
+      eu_ai_act_risk_management playbook: the assess-risk-under-
+      Art.-9(2) step scores accuracy / robustness / cybersecurity
+      residual-risk observations against the Art. 9(5) acceptability
+      line, the assemble-technical-documentation step lands the
+      declared accuracy metrics into the Art. 13 instructions-for-use
+      bundle and the Annex IV bundle under Art. 11, and the monitor-
+      post-market-signals step is the Art. 72 loop that measures
+      consistent-lifecycle performance against the Art. 15(1)
+      obligation. The secondary anchor is the vulnerability_management
+      playbook: Art. 15(4) adversarial-resilience (data-poisoning,
+      model-poisoning, model-evasion, confidentiality attacks) is a
+      vulnerability-handling surface whose intake / triage / remediation
+      lifecycle is the same one NIS2 Art. 21(2)(e) and DORA Art. 9
+      already anchor against vulnerability_management, narrowed here
+      to the AI-system attack surface rather than the general ICT-
+      asset surface. Same threshold-breach KRI as the Art. 9 anchor —
+      accuracy / robustness / adversarial-resilience gaps are
+      residual-risk observations against the same acceptability line.
