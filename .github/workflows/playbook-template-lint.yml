@@ -1,0 +1,90 @@
+name: playbook-template-lint
+
+# F-CONTRIB-ONBOARD-01 EXTEND (G-06) — mechanical feedback loop for
+# external contributors submitting new playbooks under
+# content/playbooks/. Two lanes, both driven by
+# tools.lint_playbook_template:
+#
+#   1. Structural (always) — asserts the shipped playbook set stays
+#      lintable against the _template invariants (CACAO artifact
+#      present, README present, mapping-graph edge present, no
+#      _template TODO placeholders leaked). Backed by pytest so a
+#      regression on an existing playbook trips the same signal an
+#      operator would see locally via `python -m pytest`.
+#
+#   2. Strict (PR diff-mode) — applies the canonical README-heading
+#      check ONLY to playbook directories that are net-new in HEAD
+#      vs the PR base ref. Existing playbooks use varied heading
+#      styles grown historically; the strict tier holds NEW
+#      contributions to the template's four canonical sections
+#      (Overview / Regulatory anchors / How to compile /
+#      Operator customisation) without a forced-migration churn PR.
+#
+# Runs on every PR touching content/playbooks/ or the linter itself,
+# and on push to main. No matrix — the walk is fast and stateless.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "content/playbooks/**"
+      - "content/mappings/**"
+      - "tools/lint_playbook_template.py"
+      - "tests/content/test_playbook_template_conformance.py"
+      - ".github/workflows/playbook-template-lint.yml"
+  push:
+    branches: [main]
+    paths:
+      - "content/playbooks/**"
+      - "content/mappings/**"
+      - "tools/lint_playbook_template.py"
+      - "tests/content/test_playbook_template_conformance.py"
+      - ".github/workflows/playbook-template-lint.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  playbook-template-conformance:
+    name: G-06 playbook _template conformance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history for PR diff)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime deps (PyYAML, pytest)
+        run: pip install --no-cache-dir pyyaml pytest
+
+      - name: Structural tier — pytest against every shipped playbook
+        run: |
+          python -m pytest tests/content/test_playbook_template_conformance.py -q
+
+      - name: Structural tier — full text output for review readability
+        if: always()
+        run: |
+          python -m tools.lint_playbook_template --format text
+
+      - name: Resolve baseline ref for strict diff-mode
+        id: baseline
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "ref=origin/${{ github.base_ref }}" >> "$GITHUB_OUTPUT"
+          else
+            # Push on main: diff against the parent so a new playbook
+            # introduced by HEAD is still surfaced for strict check.
+            echo "ref=HEAD~1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Strict tier — apply canonical-heading check to net-new playbooks
+        run: |
+          python -m tools.lint_playbook_template \
+            --baseline-ref "${{ steps.baseline.outputs.ref }}" \
+            --format text
