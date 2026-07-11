@@ -47,6 +47,7 @@ narrative.
 | `threat_intel_operations_metrics` | [`threat_intel_operations_metrics.md`](threat_intel_operations_metrics.md) | `content/metrics/coverage_threat_intel_feed.yaml` + `content/metrics/mttd_threat_intel_indicator.yaml` + `content/metrics/threat_intel_indicator_ingestion_rate.yaml` + `content/metrics/threat_intel_stale_ioc_ratio.yaml` |
 | `vulnerability_management_metrics` | [`vulnerability_management_metrics.md`](vulnerability_management_metrics.md) | `content/metrics/vuln_remediation_sla_compliance.yaml` + `content/metrics/vuln_critical_open_age_p99.yaml` + `content/metrics/unpatched_critical_cve_age_days.yaml` |
 | `eidas2_identity_verification` | [`eidas2_identity_verification.md`](eidas2_identity_verification.md) | `content/playbooks/eidas2_identity_verification/` |
+| `network_security` | [`network_security.md`](network_security.md) | `content/playbooks/network_security/` |
 
 Additional entries land alongside their content sources as workflows
 flip from In Progress to Shipped on
