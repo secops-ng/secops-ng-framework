@@ -63,6 +63,7 @@ under `content/mappings/<axis>/` rather than a workflow under
 |-----------|----------------------|-------------------|
 | NIST CSF 2.0 | [`nist_csf_crosswalk.md`](nist_csf_crosswalk.md) | `content/mappings/nist_csf/` |
 | SOC 2 (TSC) | [`soc2_crosswalk.md`](soc2_crosswalk.md) | `content/mappings/soc2/` |
+| EU AI Act Art. 73 (serious-incident reporting) | [`eu_ai_act_art73_serious_incident_reporting.md`](eu_ai_act_art73_serious_incident_reporting.md) | `content/mappings/eu_ai_act/article-73-serious-incident-reporting.yaml` |
 
 ## Structure of an entry
 
