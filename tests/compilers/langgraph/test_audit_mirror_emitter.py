@@ -34,6 +34,12 @@ from pathlib import Path
 
 import pytest
 
+# The emitted state_bindings module imports langchain_core at exec time
+# (fixture setup), so guard the whole module the same way jsonschema is
+# guarded elsewhere — skip cleanly on minimal dev installs instead of
+# erroring at fixture setup.
+pytest.importorskip("langchain_core")
+
 from compilers._shared.cacao_parser import parse
 from compilers._shared.observability import (
     SPAN_ATTR_PLAYBOOK_ID,

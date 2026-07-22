@@ -397,9 +397,8 @@ class TestSchemaValidation:
     paths (fired / closure).
     """
 
-    @classmethod
     @pytest.fixture(scope="class")
-    def validator(cls):
+    def validator(self):
         jsonschema = pytest.importorskip("jsonschema")
         with _SCHEMA_PATH.open() as f:
             schema = json.load(f)
