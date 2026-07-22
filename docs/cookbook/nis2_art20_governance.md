@@ -181,8 +181,8 @@ The workflow is a linear four-step lifecycle. Each action step
 carries the CACAO I/O contract (`in_args` / `out_args`) plus
 `x_secops_ng` reference bundles pinning the OSCAL control anchors
 (PM-2 across all steps, SA-2 additionally on the approve step),
-the D3FEND technique (D3-PSEP on the approve step), and the OCSF
-telemetry class the log step emits.
+the D3FEND techniques (D3-PSEP on the approve step, D3-OAM on the
+log step), and the OCSF telemetry class the log step emits.
 
 | Step suffix | Step                          | Discipline                                                                                                                             | Body                              |
 |-------------|-------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------|
@@ -363,11 +363,17 @@ approval of the cybersecurity risk-management measures is the
 policy-and-standards-enforcement-process discipline on the
 governance-body axis — the decision that pins which measures the
 operator is committed to implement, on what timeline, and with
-which resource allocation. The other three action steps carry no
-D3FEND technique: schedule and present are read-only composition
-passes over the operator's cadence catalogue and evidence store,
-and the log step produces the audit-evident artifact rather than
-itself executing a defensive technique.
+which resource allocation. **D3-OAM** *(Operational Activity
+Mapping)* additionally anchors `log_governance_evidence`: emitting
+the dated governance record that joins the cycle, review,
+posture-snapshot, and approval identifiers into the evidence
+stream is the operational-activity-mapping discipline, consistent
+with the catalogue's D3-OAM anchors on the
+`dora_major_incident_reporting` and `cra_srp_notify`
+record-composition steps (this supersedes the overlay's earlier
+deliberate omission on the log step). The schedule and present
+steps carry no D3FEND technique: both are read-only composition
+passes over the operator's cadence catalogue and evidence store.
 
 **OCSF v1.3.0** — one class binding.
 **API Activity** (class_uid 6003, category Application Activity),
