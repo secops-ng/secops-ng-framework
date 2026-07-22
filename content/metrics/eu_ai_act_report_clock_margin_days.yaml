@@ -1,0 +1,156 @@
+stable_id: kri.eu_ai_act_report_clock_margin_days@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: EU AI Act Art. 73 report clock margin
+summary: >
+  Remaining margin to the EU AI Act Article 73 serious-incident
+  reporting deadline for in-flight cases, measured as
+  (awareness_timestamp + applicable_bound) - now for cases whose
+  Art. 73(1) report to the market-surveillance authority has not yet
+  been dispatched. The applicable bound is severity-classed: 15 days
+  by default (Art. 73(2)), ten days where the incident involves the
+  death of a person (Art. 73(4)), and two days for a widespread
+  infringement or a serious and irreversible disruption of the
+  management or operation of critical infrastructure (Art. 73(3)).
+  A residual-risk indicator on the market-surveillance reporting edge
+  of the incident-management chain: the smaller the worst-case margin
+  across active cases, the closer the provider's reporting pipeline
+  is to overrunning a statutory clock. Settled-case counterpart:
+  `kri.eu_ai_act_serious_incident_report_latency_days@v1` reads how
+  close each dispatched report landed. The catalog entry is
+  authority-neutral; the compile target resolves the provider's
+  concrete Member-State market-surveillance destination.
+unit: days
+direction: higher_is_better
+target:
+  value: 3
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point: hold at least three days of
+    safety buffer between the worst-case in-flight case and its
+    severity-classed Art. 73 deadline so the reporting pipeline can
+    absorb an investigation or causal-link-determination slip without
+    filing late. Note the buffer exceeds the entire Art. 73(3)
+    two-day bound by construction — cases in that class are
+    effectively always inside the warn band, which is the intended
+    posture: two-day-class incidents deserve standing attention until
+    dispatched. Providers with tighter internal SLOs override the
+    target in the compile target without diverging the catalog
+    contract.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 3
+    severity: warn
+  - name: high
+    comparator: "<"
+    value: 1
+    severity: high
+  - name: breach
+    comparator: "<"
+    value: 0
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: min
+  formula: >
+    For each open Art. 73-reportable case currently in flight in the
+    evaluation window — i.e. the classification step has determined an
+    Art. 3(49) serious incident on a high-risk AI system and the
+    Art. 73(1) report-dispatch step has not yet emitted its timeline
+    event — compute
+    margin_days = ((awareness_timestamp + applicable_bound_days) -
+    evaluation_now) / 86400, where applicable_bound_days is 2, 10, or
+    15 per the severity class the classification step recorded
+    (Art. 73(3), Art. 73(4), Art. 73(2) respectively). Aggregate as
+    the min across active cases — the worst-case in-flight margin the
+    provider can see on the dashboard, i.e. the case nearest its
+    statutory wall. Exclude cases whose Art. 73(1) report has already
+    dispatched (those are settled and tracked by
+    `kri.eu_ai_act_serious_incident_report_latency_days@v1`) so the
+    indicator does not silently improve when reports complete;
+    exclude cases whose classification step has not yet confirmed the
+    Art. 3(49) serious-incident determination so the indicator does
+    not smear over candidate-only cases. A negative margin means the
+    case has overrun its clock and the provider should expect to
+    account for the delay to the market-surveillance authority on
+    submission.
+    Reference visualisation: a horizontal bar chart of margin_days
+    per active case sliced by severity class (two-day / ten-day /
+    fifteen-day bound), with the warn / high / breach thresholds
+    (3 / 1 / 0 days) overlaid as vertical lines and the min aggregate
+    annotated as the headline figure; the bar chart is the canonical
+    operator-facing surface for this KRI and the compile target is
+    the source of truth for the executable form. The committed
+    reference rendering lives at
+    `content/metrics/eu_ai_act_report_clock_margin_days.viz.md` —
+    that file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: awareness_timestamp
+      description: >
+        Provider-awareness timestamp recorded by the incident-
+        management classification step when the Art. 3(49)
+        serious-incident determination is made, together with the
+        Art. 73(2) / 73(3) / 73(4) severity class that fixes
+        applicable_bound_days. Used as the start of the
+        severity-classed reporting clock. Carried on the Incident
+        Finding event the classification step emits (status_id
+        transition into the classified state); the catalog entry
+        binds to the OCSF class shape, not to an authority-submission
+        envelope.
+      playbook_step: action--50000000-0000-4000-8000-000000000003
+      telemetry_ref: telemetry.ocsf.incident_finding@v1
+      field: start_time
+    - name: report_dispatch
+      description: >
+        Regulator-notification step transition that emits the
+        Art. 73(1) report timeline event toward the market-
+        surveillance authority. Absence of this event for a
+        serious-incident-classified case is what marks the case as
+        in-flight for the margin computation. Carried on the Incident
+        Finding event the regulator-notification step emits
+        (status_id transition into the notified state).
+      playbook_step: action--50000000-0000-4000-8000-000000000007
+      telemetry_ref: telemetry.ocsf.incident_finding@v1
+      field: time
+    - name: evaluation_now
+      description: >
+        Timestamp at which the indicator is evaluated. Supplied by
+        the compile target's scheduler; the catalog contract is the
+        formula, not the cadence. Not bound to a telemetry class —
+        this is the scheduler clock, not an OCSF event.
+  window:
+    duration: P30D
+    sliding: true
+playbook_refs:
+  - playbook_id: playbook.incident_management@v1
+    step_id: action--50000000-0000-4000-8000-000000000003
+  - playbook_id: playbook.incident_management@v1
+    step_id: action--50000000-0000-4000-8000-000000000007
+telemetry_refs:
+  - telemetry.ocsf.incident_finding@v1
+external_refs:
+  - name: EU AI Act — Article 73 reporting of serious incidents (15-day default bound)
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 73(1)-(2)
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: EU AI Act — Article 73(3) two-day bound (widespread infringement / critical infrastructure)
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 73(3)
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: EU AI Act — Article 73(4) ten-day bound (death of a person)
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 73(4)
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: EU AI Act — Article 3(49) serious-incident definition
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 3(49)
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability

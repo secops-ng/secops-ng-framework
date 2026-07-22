@@ -1,0 +1,147 @@
+stable_id: kri.eu_ai_act_serious_incident_report_latency_days@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: EU AI Act Art. 73 serious-incident report dispatch latency
+summary: >
+  Elapsed days between provider awareness of a serious incident on a
+  high-risk AI system and dispatch of the EU AI Act Article 73(1)
+  report to the market-surveillance authority, evaluated against the
+  severity-classed outer bound the incident falls under — 15 days by
+  default (Art. 73(2)), ten days where the incident involves the death
+  of a person (Art. 73(4)), and two days for a widespread infringement
+  or a serious and irreversible disruption of the management or
+  operation of critical infrastructure (Art. 73(3)). Settled-case
+  counterpart to `kri.eu_ai_act_report_clock_margin_days@v1`: the
+  margin KRI watches in-flight cases approach their wall; this KRI
+  reads how close each *dispatched* report landed to its applicable
+  bound, so operators can see slippage trends across closed cycles.
+  Any observation above its applicable bound is a statutory overrun.
+  The market-surveillance-authority submission surface is an
+  EU-hostable endpoint per the sovereign-stack bias — no non-EU
+  default endpoints participate in the reporting chain.
+unit: days
+direction: lower_is_better
+target:
+  value: 15
+  comparator: "<="
+  rationale: >
+    EU AI Act Art. 73(2) sets the default outer bound: the report is
+    made immediately after the provider establishes the causal link
+    (or its reasonable likelihood), and in any event not later than
+    15 days after the provider or, where applicable, the deployer
+    becomes aware of the serious incident. The target carries the
+    default-class bound as the catalog contract; incidents in the
+    Art. 73(3) two-day and Art. 73(4) ten-day classes are evaluated
+    against their shortened bound in the formula, and any dispatch
+    beyond the applicable bound is an overrun the provider must be
+    able to explain to the market-surveillance authority.
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 10
+    severity: warn
+  - name: high
+    comparator: ">"
+    value: 13
+    severity: high
+  - name: breach
+    comparator: ">"
+    value: 15
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: max
+  formula: >
+    For each EU AI Act Art. 73(1) serious-incident report dispatched
+    to the market-surveillance authority within the evaluation window,
+    compute latency_days =
+    (report_dispatch_timestamp - awareness_timestamp) / 86400.
+    Evaluate each observation against the applicable severity-classed
+    bound the classification step recorded for the case — 2 days
+    (Art. 73(3) widespread infringement / critical-infrastructure
+    disruption), 10 days (Art. 73(4) death of a person), or 15 days
+    (Art. 73(2) default) — and flag any observation above its
+    applicable bound as a statutory overrun regardless of the
+    catalog-level thresholds, which are calibrated to the default
+    class. Aggregate as `max` across dispatches — the worst-case
+    latency the provider's market-surveillance reporting pipeline
+    delivered in the window. Count the Art. 73(5) *initial* report
+    dispatch (complete or declared-incomplete) as the clock-stopping
+    event; the follow-up complete report is review-side work tracked
+    on the post-incident-review chain, not on this clock. Exclude
+    in-scope cases whose report dispatch never fired so the indicator
+    does not silently improve when the reporting pipeline stalls
+    outright; those cases surface on
+    `kri.eu_ai_act_report_clock_margin_days@v1` while in flight.
+    Reference visualisation: a horizontal bar chart of latency_days
+    per dispatched report in the window, sliced by severity class
+    with each case's applicable bound overlaid, vertical lines at the
+    default-class warn / high / breach thresholds (10 / 13 / 15
+    days), and the max aggregate annotated as the headline figure;
+    direction is `lower_is_better` so a rising max is the leading
+    signal that the reporting pipeline is approaching the statutory
+    wall. The committed reference rendering lives at
+    `content/metrics/eu_ai_act_serious_incident_report_latency_days.viz.md`
+    — that file is the contract for the chart shape; the compile
+    target renders the executable form against operator data.
+  inputs:
+    - name: awareness_timestamp
+      description: >
+        Provider-awareness timestamp recorded by the incident-
+        management classification step when the case is determined to
+        be an Art. 3(49) serious incident on a high-risk AI system,
+        together with its Art. 73(2) / 73(3) / 73(4) severity class.
+        Used as the start of the severity-classed reporting clock.
+        Carried on the Incident Finding event the classification step
+        emits (status_id transition into the classified state); the
+        catalog entry binds to the OCSF class shape, not to an
+        authority-submission envelope.
+      playbook_step: action--50000000-0000-4000-8000-000000000003
+      telemetry_ref: telemetry.ocsf.incident_finding@v1
+      field: start_time
+    - name: report_dispatch
+      description: >
+        Regulator-notification chain step transition that dispatches
+        the Art. 73(1) report to the market-surveillance authority of
+        the Member State where the incident occurred. The compile
+        target binds the recipient channel; the catalog entry reads
+        the dispatch transition only. Carried on the Incident Finding
+        event the regulator-notification step emits (status_id
+        transition into the notified state).
+      playbook_step: action--50000000-0000-4000-8000-000000000007
+      telemetry_ref: telemetry.ocsf.incident_finding@v1
+      field: time
+  window:
+    duration: P90D
+    sliding: true
+playbook_refs:
+  - playbook_id: playbook.incident_management@v1
+    step_id: action--50000000-0000-4000-8000-000000000003
+  - playbook_id: playbook.incident_management@v1
+    step_id: action--50000000-0000-4000-8000-000000000007
+telemetry_refs:
+  - telemetry.ocsf.incident_finding@v1
+external_refs:
+  - name: EU AI Act — Article 73 reporting of serious incidents (15-day default bound)
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 73(1)-(2)
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: EU AI Act — Article 73(3) two-day bound (widespread infringement / critical infrastructure)
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 73(3)
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: EU AI Act — Article 73(4) ten-day bound (death of a person)
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 73(4)
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: EU AI Act — Article 3(49) serious-incident definition
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 3(49)
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability

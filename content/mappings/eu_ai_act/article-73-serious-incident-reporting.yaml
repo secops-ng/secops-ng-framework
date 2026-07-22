@@ -103,8 +103,8 @@ entries:
       - playbook.incident_management@v1
       - playbook.post_incident_review@v1
     metric_refs:
-      - kri.nis2_incident_early_warning_latency_hours@v1
-      - kri.nis2_incident_notification_latency_hours@v1
+      - kri.eu_ai_act_serious_incident_report_latency_days@v1
+      - kri.eu_ai_act_report_clock_margin_days@v1
       - kpi.notification_sla_compliance@v1
     evidence_stream_refs:
       - incidents
@@ -121,15 +121,15 @@ entries:
       surface are the review-side and remediation-side of the same
       serious-incident lifecycle, and the review feeds the Art. 9(2)(c)
       re-assessment iteration through the Art. 72 post-market
-      monitoring loop. Metric anchors reuse the incident-timeline KRI
-      catalogue: the NIS2-flavoured latency KRIs
-      (kri.nis2_incident_early_warning_latency_hours@v1 and
-      kri.nis2_incident_notification_latency_hours@v1) are the closest
-      committed reference measurements for how close each Art. 73
-      report landed to its wall, pending a future Art. 73-specific
-      pair; kpi.notification_sla_compliance@v1 is the recipient-
-      neutral ratio the compile target binds to the market-
-      surveillance-authority delivery channel. Distinct-obligation
+      monitoring loop. Metric anchors are the Art. 73-specific pair:
+      kri.eu_ai_act_serious_incident_report_latency_days@v1 reads how
+      close each dispatched report landed to its severity-classed
+      bound (15 days default, ten days on Art. 73(4), two days on
+      Art. 73(3)), and kri.eu_ai_act_report_clock_margin_days@v1
+      watches in-flight cases approach those walls;
+      kpi.notification_sla_compliance@v1 is the recipient-neutral
+      ratio the compile target binds to the market-surveillance-
+      authority delivery channel. Distinct-obligation
       note: Art. 73 is neither DORA Art. 19 major-incident reporting
       (financial-entity ICT surface, financial competent authority
       recipient) nor NIS2 Art. 23 significant-incident reporting
