@@ -88,20 +88,32 @@ oscal:
       overlay.
 
 d3fend:
-  - d3fend_id: D3-TODO
-    d3fend_name: SKELETON placeholder
-    todo: true
+  # MITRE D3FEND v1.0.0 defensive-technique tag on the
+  # close_and_archive step only. The three notification steps and
+  # the classification step are compliance-notification disciplines
+  # upstream of any runtime countermeasure — D3FEND v1.0.0 carries
+  # no regulator-notification technique atom, so they deliberately
+  # carry no pin (gap documented here, mirroring the
+  # cyber_hygiene_training per-step gap-note precedent).
+  - step: action--71000000-0000-4000-8000-000000000006
+    d3fend_id: D3-OAM
+    d3fend_name: Operational Activity Mapping
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
     notes: >-
-      SKELETON placeholder. D3FEND v1.0.0 does not carry a distinct
-      regulator-notification defensive technique on either the
-      Deceive or Isolate tactics; the reporting lifecycle is a
-      compliance-notification discipline upstream of any runtime
-      countermeasure. CORE follow-on card decides whether to pin
-      D3-OAM (Operational Activity Mapping) on the close-and-archive
-      step against the incident-timeline shape (mirrors the
-      dora_tlpt_programme remediation-tracking overlay) or close the
-      block empty with a documented gap-note per step following the
-      cyber_hygiene_training precedent.
+      close_and_archive — composing the dated cycle-archival record
+      that joins the Art. 18 classification decision, the three
+      Art. 19 submissions, the authority acknowledgements, and any
+      cross-regime parallel-notification chains is the operational-
+      activity-mapping discipline D3-OAM names: the step maps the
+      incident's operational activity (the timeline signals the
+      lifecycle emitted) onto the organisational reporting context
+      the supervisory reviewer reads against. Anchored on the
+      incident-timeline shape, following the committed D3-OAM
+      precedents on the patch_management advisory-intake and
+      vuln_intake coordinated-disclosure steps (same technique,
+      here on the archival write-side rather than the intake
+      read-side). Read-only against the operator's estate: the step
+      records and joins, it deploys no countermeasure.
 
 ocsf:
   # OCSF v1.3.0 telemetry binding. All four action steps interact

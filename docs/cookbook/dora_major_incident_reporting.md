@@ -383,17 +383,20 @@ envelope wraps it for the NCA channel.
   audit-evident IR-5 output the competent authority reads on
   supervisory review.
 
-**MITRE D3FEND v1.0.0** — no per-step D3FEND pin. The DORA Chapter
-III reporting-lifecycle steps are compliance-notification
-disciplines (classification-decision emission, three regulator
-submissions, cycle-archival composition) rather than defensive-
-technique discharges against the operator's deployed estate. D3FEND
-v1.0.0 does not currently carry a regulator-notification technique
-atom that matches these steps without stretching the taxonomy; a
-subsequent extension may lift `D3-OAM` (Operational Activity Mapping)
-onto the `close_and_archive` step against the incident-timeline shape
-once a documented mapping is authored upstream. Mirrors the
-`dora_tpr_management` precedent for governance-side workflows.
+**MITRE D3FEND v1.0.0** — one per-step pin. **D3-OAM** *(Operational
+Activity Mapping)* anchors the `close_and_archive` step: composing
+the dated cycle-archival record that joins the classification
+decision, the three submissions, the authority acknowledgements,
+and the cross-regime chains is the operational-activity-mapping
+discipline — the step maps the incident's operational activity onto
+the organisational reporting context the supervisory reviewer reads
+against, following the committed D3-OAM precedents on the
+`patch_management` advisory-intake and `vuln_intake`
+coordinated-disclosure steps. The classification and the three
+notification steps deliberately carry no pin: they are
+compliance-notification disciplines upstream of any runtime
+countermeasure, and D3FEND v1.0.0 carries no regulator-notification
+technique atom that matches them without stretching the taxonomy.
 
 **OCSF v1.3.0** — one class binding. **API Activity** (class_uid
 6003, category Application Activity), direction `both`. Consumed at

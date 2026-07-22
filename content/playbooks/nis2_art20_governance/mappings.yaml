@@ -145,10 +145,10 @@ d3fend:
   # governance decision, it does not mutate any operational control
   # surface.
   #
-  # Only the approval step carries a per-step D3FEND pin; the
-  # schedule, present, and log steps are deliberately not pinned
-  # and the gaps are documented in the comments below (mirroring
-  # the per-step gap-note precedents on nis2_self_assessment and
+  # The approval and evidence-log steps carry per-step D3FEND pins;
+  # the schedule and present steps are deliberately not pinned and
+  # the gaps are documented in the comments below (mirroring the
+  # per-step gap-note precedents on nis2_self_assessment and
   # cyber_hygiene_training).
   - step: action--a2000000-0000-4000-8000-000000000004
     d3fend_id: D3-PSEP
@@ -176,6 +176,27 @@ d3fend:
       distinct defensive technique rather than a read-only
       composition pass).
 
+  - step: action--a2000000-0000-4000-8000-000000000005
+    d3fend_id: D3-OAM
+    d3fend_name: Operational Activity Mapping
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    notes: >-
+      log_governance_evidence — emitting the dated governance record
+      that joins the cycle, review, posture-snapshot, and approval-
+      record identifiers into the audit-evident evidence stream is
+      the operational-activity-mapping discipline D3-OAM names: the
+      step maps the governance cycle's operational activity onto the
+      organisational context the NIS2 Art. 20(1) evidence review
+      reads against. Supersedes this overlay's earlier deliberate
+      omission on this step (authored before the catalogue's D3-OAM
+      lift): the archival/record-composition shape now anchors on
+      D3-OAM consistently — see the committed precedents on
+      patch_management advisory-intake, vuln_intake coordinated
+      disclosure, dora_major_incident_reporting close_and_archive,
+      and cra_srp_notify final_report. Read-only against the
+      operator's estate: the step records and joins, it deploys no
+      countermeasure.
+
   # Deliberate D3FEND omissions:
   #   - schedule_management_review
   #     (action--a2000000-0000-4000-8000-000000000002) is NOT
@@ -190,13 +211,10 @@ d3fend:
   #     view over the operator's evidence store, not a defensive-
   #     technique discharge. Mirrors the nis2_self_assessment
   #     map-evidence-to-clauses gap-note precedent.
-  #   - log_governance_evidence
-  #     (action--a2000000-0000-4000-8000-000000000005) is NOT
-  #     pinned: the dated evidence-emission slice produces the
-  #     audit-evident governance record, it does not itself
-  #     execute a defensive technique. Mirrors the
-  #     nis2_self_assessment report-attestation gap-note
-  #     precedent.
+  #   - log_governance_evidence was listed here as a deliberate
+  #     omission on the SKELETON pass; that omission is superseded
+  #     by the D3-OAM entry above (catalogue-wide D3-OAM lift for
+  #     archival / record-composition steps).
 
 ocsf:
   # OCSF v1.3.0 telemetry binding. The log_governance_evidence

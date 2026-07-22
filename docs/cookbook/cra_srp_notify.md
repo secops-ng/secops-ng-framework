@@ -288,16 +288,20 @@ periods and names the SRP as the intake surface. The same
 OSCAL anchor the `vuln_intake` playbook uses for its
 regulator-notification action.
 
-**MITRE D3FEND v1.0.0** — the outbound overlay carries a
-`D3-TODO` placeholder. D3FEND v1.0.0 frames its defensive
-techniques around runtime countermeasures against adversary
-behaviours; regulator-notification is a reporting discipline
-rather than a runtime countermeasure and the closest fit is a
-documentation / notification tag. A sibling card either
-selects the closest-fitting technique or documents the
-deliberate gap the way the `backup_recovery` and
-`crypto_posture_management` overlays document their
-notify-owner gaps.
+**MITRE D3FEND v1.0.0** — one per-step pin. **D3-OAM**
+*(Operational Activity Mapping)* anchors the `final_report` step:
+consolidating the actively-exploited-vulnerability / severe-
+incident cycle — the early-warning and 72-hour submissions, the
+corrective measures, the case closure — into the durable
+SRP-facing record is the operational-activity-mapping discipline,
+following the committed D3-OAM precedents on `patch_management`,
+`vuln_intake`, and the `dora_major_incident_reporting`
+`close_and_archive` anchor. The early-warning and
+full-notification steps deliberately carry no pin: they are
+regulator-notification disciplines rather than runtime
+countermeasures, documented the way the `backup_recovery` and
+`crypto_posture_management` overlays document their notify-owner
+gaps.
 
 **OCSF v1.3.0** — one class binding.
 `Compliance Finding` (class_uid 2003, category Findings),

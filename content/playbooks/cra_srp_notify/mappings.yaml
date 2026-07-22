@@ -68,25 +68,33 @@ oscal:
       surface.
 
 d3fend:
-  # SKELETON — placeholder D3FEND tag. D3FEND v1.0.0 frames its
-  # defensive techniques around runtime countermeasures against
-  # adversary behaviours; regulator-notification is a reporting
-  # discipline rather than a runtime countermeasure and the closest
-  # fit is a documentation / notification tag that we intentionally
-  # leave as a TODO here. A sibling CORE / EXTEND card selects the
-  # final tag (or documents the deliberate gap the way the
-  # backup_recovery overlay documents its trigger / evidence-capture
-  # / notify gaps).
-  - d3fend_id: D3-TODO
-    d3fend_name: TODO (SKELETON — CORE card selects the D3FEND tag or documents the deliberate gap)
-    todo: true
+  # MITRE D3FEND v1.0.0 defensive-technique tag on the final_report
+  # step only. The early-warning and full-notification steps are
+  # regulator-notification disciplines rather than runtime
+  # countermeasures — D3FEND v1.0.0 carries no regulator-
+  # notification technique atom, so they deliberately carry no pin
+  # (gap documented here, the way the backup_recovery /
+  # crypto_posture_management overlays document their notify-owner
+  # gaps).
+  - step: action--5a509a09-0000-4000-8000-000000000007
+    d3fend_id: D3-OAM
+    d3fend_name: Operational Activity Mapping
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
     notes: >-
-      Placeholder pending the CORE card. Regulator-notification is a
-      reporting discipline rather than a runtime countermeasure; the
-      CORE card either selects the closest-fitting D3FEND technique
-      or documents the deliberate absence the way the
-      backup_recovery / crypto_posture_management overlays document
-      their notify-owner gaps.
+      final_report — composing the CRA Art. 14 final report that
+      consolidates the actively-exploited-vulnerability / severe-
+      incident cycle (the early-warning and 72-hour submissions,
+      the corrective and mitigating measures taken, and the case
+      closure) into the durable SRP-facing record is the
+      operational-activity-mapping discipline D3-OAM names: the
+      step maps the case's operational activity onto the
+      product-security reporting context the SRP record carries.
+      Follows the committed D3-OAM precedents on the
+      patch_management advisory-intake and vuln_intake
+      coordinated-disclosure steps and the archival-side anchor on
+      dora_major_incident_reporting close_and_archive. Read-only
+      against the operator's estate: the step records and
+      consolidates, it deploys no countermeasure.
 
 ocsf:
   # OCSF v1.3.0 telemetry binding. The three submission steps each
