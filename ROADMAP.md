@@ -1497,6 +1497,89 @@ named operator use-case. Each cookbook workflow lives under
     ROADMAP F-WF-NETWORK-SECURITY status flip from In Progress to
     Shipped).
 
+### F-WF-EUAIACT-DEPLOYER — EU AI Act Art. 26 deployer-obligation lifecycle with Art. 27 fundamental-rights impact assessment
+
+- **Status:** Proposed
+- **Priority:** P1
+- **Goal:** G-01 (content coverage — the shipped EU AI Act surface is
+  provider-side end to end; an operator running a third-party high-risk
+  AI system in production is a *deployer*, and that population currently
+  has no portable playbook), G-02 (regulatory-graph closure — Art. 26
+  and Art. 27 are unmapped, the largest remaining gap on the EU AI Act
+  axis alongside the GPAI chapter), G-05 (sovereignty — deployer-side
+  monitoring and logging must be discharged on EU-resident surfaces).
+- **Acceptance criteria:**
+  - `content/mappings/eu_ai_act/article-26-deployer-obligations.yaml`
+    carries the Art. 26 atoms: use in accordance with the instructions
+    for use (26(1)), assignment of competent human oversight (26(2)),
+    input-data relevance where the deployer controls it (26(4)),
+    monitoring plus suspension-and-notification on a risk indication
+    (26(5)), retention of automatically generated logs (26(6)),
+    worker-representative information duty (26(7)), and the
+    Art. 26(5) provider/authority notification edge that hands off to
+    the shipped `eu_ai_act:art-73-serious-incident-reporting` entry.
+  - `content/mappings/eu_ai_act/article-27-fria.yaml` carries the
+    Art. 27(1)(a)–(f) fundamental-rights-impact-assessment elements and
+    the Art. 27(4) notification of the market-surveillance authority,
+    with the DPIA relationship recorded (Art. 27(4) allows the FRIA to
+    complement an existing GDPR Art. 35 DPIA rather than duplicate it —
+    the cross-reference must name `playbook.data_protection_impact_assessment@v1`).
+  - `content/playbooks/eu_ai_act_deployer_obligations/` ships the
+    canonical CACAO v2 scaffold: confirm-intended-use →
+    assign-human-oversight → monitor-operation →
+    assess-fundamental-rights-impact → retain-logs-and-evidence, with
+    `mappings.yaml` pinning outbound OSCAL, D3FEND (D3-OAM on the
+    evidence-retention step per the committed record-composition
+    precedent), and an OCSF binding, plus a workflow-local README.
+  - Three-target compile examples and byte-parity goldens (G-03), and a
+    cookbook walkthrough indexed in `docs/cookbook/README.md`.
+- **Sovereign-stack constraints:** the Art. 26(6) log-retention surface
+  is operator-owned and must remain adapter-bound — the framework
+  declares the retention contract and never ships a log store. No
+  non-EU default endpoint may participate in the monitoring or
+  notification chain.
+- **Depends on:** F-WF-DPIA (Shipped — the FRIA entry cross-references
+  the DPIA lifecycle rather than restating it).
+- **Source:** EU AI Act (Regulation (EU) 2024/1689) Art. 26, Art. 27;
+  `content/mappings/eu_ai_act/README.md` scope note (deployer track
+  recorded as a sibling card).
+
+### F-WF-AI-OVERSIGHT — EU AI Act Art. 14 human-oversight design and operation lifecycle
+
+- **Status:** Proposed
+- **Priority:** P2
+- **Goal:** G-01 (content coverage — Art. 14 is a standing high-risk
+  requirement with no playbook; the oversight measures it demands are
+  operational, not documentary, and therefore compile), G-02
+  (regulatory-graph closure — Art. 14 is unmapped and is the named
+  dependency of the Art. 26(2) deployer oversight-assignment atom).
+- **Acceptance criteria:**
+  - `content/mappings/eu_ai_act/article-14-human-oversight.yaml`
+    carries the Art. 14(1)–(5) atoms: oversight-by-design measures
+    built into the system, measures identified for the deployer to
+    implement, the Art. 14(4)(a)–(e) oversight capability set
+    (understand capacity and limits, remain aware of automation bias,
+    correctly interpret output, decide not to use or to disregard,
+    intervene or halt), and the Art. 14(5) biometric two-person
+    verification rule.
+  - `content/playbooks/ai_human_oversight/` ships the CACAO v2 scaffold
+    covering the operational loop an oversight function actually runs:
+    establish-oversight-roster → brief-oversight-personnel →
+    review-flagged-decisions → record-intervention →
+    emit-oversight-evidence, with `mappings.yaml` and a
+    workflow-local README.
+  - A KPI/KRI pair under `content/metrics/` measuring the oversight
+    loop (intervention rate and time-to-intervention on flagged
+    decisions) with committed reference visualisations (G-04).
+  - Three-target compile examples with byte-parity goldens (G-03) and a
+    cookbook walkthrough.
+- **Sovereign-stack constraints:** the oversight roster and the
+  decision-review queue are operator-owned adapter-bound surfaces; the
+  framework describes the contract and ships no personnel directory.
+- **Depends on:** F-WF-EUAIACT-DEPLOYER (the Art. 26(2)
+  oversight-assignment step hands off to this lifecycle).
+- **Source:** EU AI Act (Regulation (EU) 2024/1689) Art. 14.
+
 ---
 
 ## Epic PT — Pattern Library
@@ -2155,6 +2238,90 @@ component definition.
   - D3FEND ↔ SOC 2 crosswalk.
   - SKELETON — PR #<this> (practitioner cookbook walkthrough
     and ROADMAP `Shipped` flip).
+
+### F-MAP-EUAIACT-GPAI — EU AI Act Chapter V general-purpose AI model obligations
+
+- **Status:** Proposed
+- **Priority:** P1
+- **Goal:** G-02 (regulatory-graph closure — the GPAI chapter is the
+  single largest declared gap on the EU AI Act axis, recorded as out of
+  scope in `content/mappings/eu_ai_act/README.md` and deferred to a
+  sibling card; this is that card), G-05 (sovereignty — the Art. 55(1)(d)
+  cybersecurity-protection obligation on systemic-risk models is where
+  the sovereign-stack bias is most directly testable), G-06 (the
+  agentic-AI operator community is the population this chapter binds,
+  and it is the community least served by existing crosswalks).
+- **Scope decision required:** bringing Chapter V in scope widens the
+  addressed population from *high-risk AI system providers and
+  deployers* to *general-purpose model providers*. That is a
+  deliberate scope change, not an oversight — the entry is Proposed so
+  it is decided on the record rather than by drift. If declined, the
+  README scope note should be tightened to say the exclusion is
+  permanent rather than pending.
+- **Acceptance criteria:**
+  - `content/mappings/eu_ai_act/article-53-gpai-provider-obligations.yaml`
+    carries the Art. 53(1)(a)–(d) atoms: technical documentation of the
+    model, information and documentation made available to downstream
+    providers, the copyright policy, and the sufficiently detailed
+    public summary of training content.
+  - `content/mappings/eu_ai_act/article-55-systemic-risk-obligations.yaml`
+    carries the Art. 55(1)(a)–(d) atoms for models with systemic risk:
+    model evaluation including adversarial testing, assessment and
+    mitigation of Union-level systemic risks, tracking and reporting of
+    serious incidents with corrective measures, and an adequate level of
+    cybersecurity protection for the model and its physical
+    infrastructure.
+  - The Art. 55(1)(c) serious-incident edge cross-references the shipped
+    `eu_ai_act:art-73-serious-incident-reporting` entry, with the
+    distinct-obligation note recorded in the same style as the existing
+    NIS2 / DORA / CRA boundary notes (Chapter V reports to the AI
+    Office; Art. 73 reports to the market-surveillance authority —
+    parallel chains, not substitutes).
+  - `content/mappings/eu_ai_act/oscal-component-definition.json` gains
+    implemented-requirements for the new entries, and the existing
+    `README.md` scope note is updated to move the GPAI chapter from
+    **Out** to the shipped file list.
+  - Orphan-CI stays clean; every new entry carries an authoritative
+    EUR-Lex permalink.
+- **Sovereign-stack constraints:** the Art. 55(1)(d) cybersecurity
+  binding must anchor on existing control and telemetry IDs rather than
+  introducing a model-hosting opinion — the framework maps obligations,
+  it does not prescribe where a model runs.
+- **Depends on:** none (mapping-only entry; the existing Art. 72 / 73
+  post-market surfaces are already Shipped).
+- **Source:** EU AI Act (Regulation (EU) 2024/1689) Chapter V, Art. 53
+  and Art. 55; `content/mappings/eu_ai_act/README.md` scope note.
+
+### F-MAP-EUAIACT-LOGGING — EU AI Act Art. 12 record-keeping and automatic logging
+
+- **Status:** Proposed
+- **Priority:** P2
+- **Goal:** G-02 (regulatory-graph closure — Art. 12 is unmapped and is
+  the obligation the Art. 26(6) deployer log-retention atom depends
+  on), G-01 (the auditability foundation property is exactly what
+  Art. 12 legislates; the shipped evidence-stream model already
+  produces the artifact shape the article requires).
+- **Acceptance criteria:**
+  - `content/mappings/eu_ai_act/article-12-record-keeping.yaml` carries
+    the Art. 12(1)–(3) atoms: automatic recording of events over the
+    system lifetime, traceability appropriate to the intended purpose,
+    and the Art. 12(3)(a)–(d) minimum log content for Annex III(1)(a)
+    systems (period of each use, reference database checked, input
+    data, and identification of the natural persons involved in
+    verification).
+  - The entry binds to the shipped evidence-stream model rather than
+    proposing a new stream, naming the `incidents` and `access`
+    streams as the carriers already in the catalogue, and pins the
+    OCSF class the log records resolve against.
+  - Orphan-CI stays clean; the article-level cross-reference from
+    Art. 26(6) (once F-WF-EUAIACT-DEPLOYER lands) resolves both ways.
+- **Sovereign-stack constraints:** log retention is an operator-owned
+  surface — the mapping declares the record contract and retention
+  obligation, never a storage backend.
+- **Depends on:** F-CP-02 (incidents stream, Shipped), F-CP-07 (access
+  stream, Shipped).
+- **Source:** EU AI Act (Regulation (EU) 2024/1689) Art. 12; Annex III
+  point 1(a).
 
 ---
 
