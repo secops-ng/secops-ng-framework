@@ -45,6 +45,7 @@ the four-layer runtime that the content compiles into.
 | `examples/` | Per-workflow compiled examples (`examples/{n8n,temporal,langgraph}/<workflow>/`) used by golden tests and as runnable starting points. |
 | `tests/` | Unit, integration, and per-example byte-parity golden tests. |
 | `tools/hygiene_linter/` | The forward-public hygiene linter. Runs in CI; you can run it locally too. |
+| `.claude/skills/` | Operator-facing assistant skills. `compile-playbooks` helps an operator pick which playbooks to adopt and which target to compile into; it advises and never deploys. |
 | `docs/` | FOUNDATION, ARCHITECTURE, deployment guides, contributor references. |
 | `ROADMAP.md` | Source-of-truth feature definitions, reviewed by the community. |
 | `SECURITY.md` | Coordinated disclosure policy. |
