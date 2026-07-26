@@ -7,9 +7,12 @@ writes nothing.
 Why this exists rather than reading the playbooks by hand: the catalog has two
 traps that hand-derivation walks into every time.
 
-  1. ``alert-triage`` is stored as ``content/playbooks/alert-triage.cacao.yaml``
-     — YAML, at directory level. A ``content/playbooks/*/playbook.cacao.json``
-     glob silently misses the most complete playbook in the repo.
+  1. Canonical sources come in three layouts, and a
+     ``content/playbooks/*/playbook.cacao.json`` glob silently misses two of
+     them: ``alert-triage`` is stored as
+     ``content/playbooks/alert-triage.cacao.yaml`` (YAML, at directory level),
+     and five more keep an in-directory ``<slug>/playbook.cacao.yaml``. All
+     three layouts are collected below.
   2. ``codebase-vuln-management`` carries four ``core_body`` blocks shaped
      ``{"placeholder": true, "note": "..."}``. They look like bindings and are
      not; the schema requires ``{primitive, in, out}``. That playbook also fails
@@ -217,7 +220,17 @@ def collect(root: Path | None = None) -> dict[str, Any]:
     sources: list[tuple[Path, str]] = []
     for p in sorted(pb_dir.glob("*/playbook.cacao.json")):
         sources.append((p, p.parent.name))
-    # Trap 1: the dir-level YAML canonical source a */playbook.cacao.json glob misses.
+    # Trap 1a: in-directory YAML sources. Five shipped playbooks keep their
+    # canonical source as <slug>/playbook.cacao.yaml rather than .json
+    # (business_continuity, data_protection_impact_assessment,
+    # data_subject_rights, detection_engineering, network_security), so a
+    # JSON-only directory glob silently drops them from the catalog.
+    # `_template` and `__pycache__` are scaffolding, not playbooks.
+    for p in sorted(pb_dir.glob("*/playbook.cacao.yaml")):
+        if p.parent.name.startswith("_"):
+            continue
+        sources.append((p, p.parent.name))
+    # Trap 1b: the dir-level YAML canonical source a */playbook.cacao.json glob misses.
     for p in sorted(pb_dir.glob("*.cacao.yaml")):
         sources.append((p, p.name.replace(".cacao.yaml", "")))
 
