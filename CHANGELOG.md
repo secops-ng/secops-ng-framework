@@ -16,7 +16,7 @@ schema surface may still move before `1.0.0`.
 
 ### Added
 
-- **Playbooks** — 46 canonical CACAO v2 playbooks under
+- **Playbooks** — 45 canonical CACAO v2 playbooks under
   `content/playbooks/`, spanning operational lifecycles (vulnerability
   triage, alert triage, incident management, detection engineering, IAM
   audit, on/offboarding, supply-chain security, patch and asset
