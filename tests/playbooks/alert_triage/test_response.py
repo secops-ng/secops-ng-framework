@@ -1,7 +1,9 @@
 """Unit tests for the alert_triage response-routing primitives.
 
-Covers both :func:`escalation_route` (p1 severe) and
-:func:`notify_on_call` (p2 high) — siblings on the same input shape.
+Covers all four response bodies on the same input shape:
+:func:`escalation_route` (p1 severe), :func:`notify_on_call` (p2 high),
+:func:`route_to_review_queue` (p3 routine) and :func:`log_and_close`
+(p4 informational).
 
 For ``escalation_route``:
 
@@ -52,8 +54,10 @@ from content.playbooks.alert_triage.primitives import (
     EscalationDirective,
     INCIDENT_MANAGEMENT_PLAYBOOK_REF,
     NotificationDirective,
+    ClosureRecord,
     ReviewQueueDirective,
     escalation_route,
+    log_and_close,
     notify_on_call,
     route_to_review_queue,
 )
@@ -518,3 +522,138 @@ class TestP3DownstreamHandoff:
             == b.incident_management_playbook_ref
             == INCIDENT_MANAGEMENT_PLAYBOOK_REF
         )
+
+
+_HAPPY_P4 = dict(
+    priority="p4_informational",
+    asset_criticality="medium",
+    regulated_data=False,
+    internet_exposed=False,
+)
+
+
+class TestLogAndClose:
+    def test_p4_happy_path_shape(self) -> None:
+        record = log_and_close(**_HAPPY_P4)
+        assert isinstance(record, ClosureRecord)
+        assert record.disposition == "closed_informational"
+        assert record.regulator_notification_required is False
+        assert record.reasons[0] == "priority=p4_informational → log-and-close"
+        assert len(record.inputs_digest) == 16
+        assert record.inputs_digest == record.inputs_digest.lower()
+
+    @pytest.mark.parametrize("criticality", ["low", "medium", "high"])
+    def test_p4_non_crown_jewel_closes_plain(self, criticality: str) -> None:
+        record = log_and_close(
+            **{**_HAPPY_P4, "asset_criticality": criticality}
+        )
+        assert record.disposition == "closed_informational"
+        assert any("closed_informational" in r for r in record.reasons)
+
+    def test_p4_crown_jewel_keeps_retention_pointer(self) -> None:
+        record = log_and_close(
+            **{**_HAPPY_P4, "asset_criticality": "crown_jewel"}
+        )
+        assert record.disposition == "closed_with_retention_pointer"
+        assert any("crown_jewel" in r for r in record.reasons)
+        # A retention pointer is not a page and not a regulator clock.
+        assert record.regulator_notification_required is False
+
+    def test_p4_regulated_data_keeps_pointer_and_opens_clock(self) -> None:
+        record = log_and_close(**{**_HAPPY_P4, "regulated_data": True})
+        assert record.disposition == "closed_with_retention_pointer"
+        assert record.regulator_notification_required is True
+        assert any("regulator_notification_required" in r for r in record.reasons)
+
+    def test_p4_crown_jewel_plus_regulated_combines(self) -> None:
+        record = log_and_close(
+            **{
+                **_HAPPY_P4,
+                "asset_criticality": "crown_jewel",
+                "regulated_data": True,
+            }
+        )
+        assert record.disposition == "closed_with_retention_pointer"
+        assert record.regulator_notification_required is True
+        # Both rules fire and both are named, in order.
+        joined = "\n".join(record.reasons)
+        assert "crown_jewel" in joined and "regulated_data=true" in joined
+
+    def test_p4_record_is_frozen(self) -> None:
+        record = log_and_close(**_HAPPY_P4)
+        with pytest.raises(AttributeError):
+            record.disposition = "closed_with_retention_pointer"  # type: ignore[misc]
+
+
+class TestP4Digest:
+    def test_p4_same_inputs_same_digest(self) -> None:
+        assert (
+            log_and_close(**_HAPPY_P4).inputs_digest
+            == log_and_close(**_HAPPY_P4).inputs_digest
+        )
+
+    @pytest.mark.parametrize(
+        "override",
+        [
+            {"asset_criticality": "crown_jewel"},
+            {"regulated_data": True},
+            {"internet_exposed": True},
+        ],
+    )
+    def test_p4_single_input_change_changes_digest(
+        self, override: dict
+    ) -> None:
+        base = log_and_close(**_HAPPY_P4).inputs_digest
+        changed = log_and_close(**{**_HAPPY_P4, **override}).inputs_digest
+        assert base != changed
+
+    def test_p4_internet_exposed_changes_digest_not_disposition(self) -> None:
+        # Exposure is digest-only at p4: the close stays informational,
+        # but a replay against a changed exposure flag must be visibly
+        # a different verdict.
+        base = log_and_close(**_HAPPY_P4)
+        exposed = log_and_close(**{**_HAPPY_P4, "internet_exposed": True})
+        assert exposed.disposition == base.disposition
+        assert exposed.inputs_digest != base.inputs_digest
+
+    def test_p4_digest_differs_from_siblings(self) -> None:
+        # Priority is part of the canonical inputs digest; the p4
+        # record must not collide with p1 / p2 / p3 for the same asset.
+        p1 = escalation_route(**{**_HAPPY, "asset_criticality": "medium"})
+        p2 = notify_on_call(**{**_HAPPY_P2, "asset_criticality": "medium"})
+        p3 = route_to_review_queue(
+            **{**_HAPPY_P3, "asset_criticality": "medium"}
+        )
+        p4 = log_and_close(**_HAPPY_P4)
+        assert p4.inputs_digest not in {
+            p1.inputs_digest,
+            p2.inputs_digest,
+            p3.inputs_digest,
+        }
+
+
+class TestP4Rejection:
+    @pytest.mark.parametrize(
+        "priority",
+        ["p1_severe", "p2_high", "p3_routine", "", "P4_INFORMATIONAL"],
+    )
+    def test_non_p4_priority_rejected(self, priority: str) -> None:
+        with pytest.raises(ValueError, match="p4-informational response body"):
+            log_and_close(
+                **{**_HAPPY_P4, "priority": priority}  # type: ignore[arg-type]
+            )
+
+    def test_p4_unknown_criticality_rejected(self) -> None:
+        with pytest.raises(ValueError, match="unknown asset_criticality"):
+            log_and_close(
+                **{**_HAPPY_P4, "asset_criticality": "platinum"}  # type: ignore[arg-type]
+            )
+
+    @pytest.mark.parametrize(
+        "field", ["regulated_data", "internet_exposed"]
+    )
+    def test_p4_non_bool_flag_rejected(self, field: str) -> None:
+        with pytest.raises(TypeError, match="must be bool"):
+            log_and_close(
+                **{**_HAPPY_P4, field: "true"}  # type: ignore[arg-type]
+            )

@@ -1,4 +1,4 @@
-# SecOps-NG — Alert triage (F-WF-03) — SOURCE SKELETON
+# SecOps-NG — Alert triage (F-WF-03) — SOURCE
 #
 # Portable CACAO v2 + SecOps-NG content-model superset, expressed as YAML
 # so it doubles as the human-curated source the per-target compilers
@@ -7,17 +7,18 @@
 # `json.dumps`; the schema validator treats this file as an object and
 # does not care about the serialization format.
 #
-# Status: SKELETON. The workflow shape, step ids, and join-key
-# references are wired so downstream compilers can be primed and so
-# the schema gate passes. Action bodies (commands, agent bindings,
-# OCSF binding maturity, prioritisation policy code) land in follow-up
-# CORE/EXTEND cards. TODO comments mark every place where a join-key
-# binding is provisional pending Researcher confirmation.
+# Status: complete source. The workflow graph, join keys, and
+# metric/control references are the committed contract, and every
+# action step carries a deterministic core_body binding into
+# content/playbooks/alert_triage/primitives/. Per docs/FOUNDATION.md
+# §LLM determinism the priority decision and the response routing are
+# code; DSPy is reserved for free-text fields (analyst summary /
+# narrative) via primitives/signatures.py.
 #
-# Source brief: posture-audit-v2 Researcher brief for alert_triage
-# primitives (typed payload normalization, suppression window, intent
-# vs priority split). OCSF data shapes live in content/telemetry/.
-# Roadmap entry: ROADMAP.md § F-WF-03.
+# This file and content/playbooks/alert_triage/playbook.cacao.json are
+# maintained as semantically identical twins (yaml.safe_load(this) ==
+# json.load(that)); edit both or neither. OCSF data shapes live in
+# content/telemetry/. Roadmap entry: ROADMAP.md § F-WF-03.
 
 type: playbook
 spec_version: "2.0"
@@ -31,8 +32,9 @@ description: >-
   applies a deterministic prioritisation policy (free-text fields may
   be routed through a DSPy module, the priority decision itself stays
   in code), and routes the case onto a response branch keyed on the
-  disposition. SKELETON: action bodies are stubs; the workflow graph,
-  join keys, and metric/control references are the contract this
+  disposition. Every action step carries a deterministic core_body
+  binding into content/playbooks/alert_triage/primitives/; the workflow
+  graph, join keys, and metric/control references are the contract this
   source artifact commits to.
 
 playbook_types:
@@ -43,11 +45,10 @@ playbook_types:
 
 created_by: "identity--c0c0c0c0-c0c0-4c0c-8c0c-c0c0c0c0c0c0"
 created: "2026-06-03T00:00:00Z"
-modified: "2026-06-03T00:00:00Z"
+modified: "2026-07-27T00:00:00Z"
 
 labels:
   - alert_triage
-  - skeleton
   - source-artifact
 
 playbook_variables:
@@ -90,24 +91,23 @@ workflow:
     type: action
     name: "ingest typed alert payload"
     description: >-
-      SKELETON. Normalise the inbound alert into the SecOps-NG alert
-      envelope. Two source shapes are required by the roadmap acceptance
+      Normalise the inbound alert into the SecOps-NG alert envelope.
+      Two source shapes are required by the roadmap acceptance
       criteria (push from detection pipeline, pull from a shared alert
       store); the dispatcher branches on __alert_source_shape__.
-      Body of the normalization rules lands in the CORE-INGEST card.
     on_completion: "action--a1e47431-0000-4000-8000-000000000003"
     in_args:
       - __alert_id__
       - __alert_source_shape__
     x_secops_ng:
-      # TODO(F-WF-03 CORE-INGEST): confirm whether ingestion should also
+      # TODO(F-WF-03): confirm whether ingestion should also
       # bind control.detection_coverage_evidence@v1 once the upstream
       # detection-class enumeration lands; provisional binding here is
       # the incident-handling capability per NIS2 Art. 21(2)(b).
       control_refs:
         - "control.incident_handling_capability@v1"
       telemetry_refs:
-        # TODO(F-WF-03 CORE-INGEST): an OCSF "Security Finding"
+        # TODO(F-WF-03): an OCSF "Security Finding"
         # (class_uid 2001) telemetry stable_id is the natural home
         # for the alert envelope itself; not yet shipped in
         # content/telemetry/. Provisional binding to api_activity for
@@ -125,11 +125,12 @@ workflow:
     type: action
     name: "enrich with telemetry context"
     description: >-
-      SKELETON. Pull adjacent telemetry for the entities named in the
-      alert (subject identity, source/destination, asset) so the
+      Pull adjacent telemetry for the entities named in the alert
+      (subject identity, source/destination, asset) so the
       prioritisation policy and suppression check have evidence beyond
-      the alert envelope itself. Stubbed; the enrichment fan-out lands
-      in CORE-ENRICH.
+      the alert envelope itself. The bound body derives the canonical
+      seen-key for the suppression window; wider telemetry fan-out is
+      an operator extension point.
     on_completion: "if-condition--a1e47431-0000-4000-8000-000000000004"
     out_args:
       - __benign_or_seen__
@@ -155,9 +156,14 @@ workflow:
     type: if-condition
     name: "already-seen or known-benign?"
     description: >-
-      Suppression branch. on_success: matches a known-benign rule or
-      an already-seen case fingerprint inside the window; suppress and
-      close. on_failure: proceed to prioritisation.
+      Suppression branch on the boolean __benign_or_seen__ set by the
+      enrichment step. on_success (true): matches a known-benign rule
+      or an already-seen case fingerprint inside the window; suppress
+      and close. on_failure (false): proceed to prioritisation. The
+      condition is a bare boolean variable reference on purpose — the
+      n8n emitter compiles it to a working IF node comparator, and the
+      LangGraph consumer routes on the same state key at runtime.
+    condition: "__benign_or_seen__"
     on_success: "action--a1e47431-0000-4000-8000-000000000005"
     on_failure: "action--a1e47431-0000-4000-8000-000000000006"
 
@@ -165,7 +171,7 @@ workflow:
     type: action
     name: "suppress and close"
     description: >-
-      SKELETON. Link this alert onto the existing case (or onto the
+      Link this alert onto the existing case (or onto the
       benign-rule record), close it without paging, and account the
       suppression against the false-positive-rate KPI and (when the
       suppression covers a re-fire of a previously closed case) the
@@ -190,7 +196,7 @@ workflow:
     type: action
     name: "classify and prioritise (deterministic policy)"
     description: >-
-      SKELETON. Apply the operator's prioritisation policy. The policy
+      Apply the operator's prioritisation policy. The policy
       itself is expressed as code (the roadmap pins this: deterministic
       prioritisation, DSPy used only for free-text fields like the
       analyst summary). Output is __priority__ ∈
@@ -199,7 +205,7 @@ workflow:
     out_args:
       - __priority__
     x_secops_ng:
-      # TODO(F-WF-03 CORE-CLASSIFY): once the detection-coverage
+      # TODO(F-WF-03): once the detection-coverage
       # evidence flow is wired, also bind control.detection_coverage_evidence@v1
       # here so the prioritisation feedback loop is auditable.
       control_refs:
@@ -238,7 +244,7 @@ workflow:
     type: action
     name: "response: p1 severe — page and escalate"
     description: >-
-      SKELETON. Page the on-call responder, open the incident case,
+      Page the on-call responder, open the incident case,
       stamp the timeline-start signal, and hand off to the incident
       management playbook. Records against the MTTR-critical clock
       and the regulator-notification-overrun KRI window.
@@ -264,7 +270,7 @@ workflow:
     type: action
     name: "response: p2 high — queue for primary analyst"
     description: >-
-      SKELETON. Queue the case to the primary analyst queue with the
+      Queue the case to the primary analyst queue with the
       enriched evidence packet, no page. Records against the MTTR clock
       and the handoff-brief delivery SLA.
     on_completion: "end--a1e47431-0000-4000-8000-00000000000c"
@@ -287,7 +293,7 @@ workflow:
     type: action
     name: "response: p3 routine — queue for review"
     description: >-
-      SKELETON. Append to the review queue for batched analyst
+      Append to the review queue for batched analyst
       attention; no SLA clock beyond the routine review-completion
       SLA.
     on_completion: "end--a1e47431-0000-4000-8000-00000000000c"
@@ -309,16 +315,28 @@ workflow:
     type: action
     name: "response: p4 informational — log and close"
     description: >-
-      SKELETON. Record the alert for telemetry-coverage accounting and
+      Record the alert for telemetry-coverage accounting and
       close without further action. Feeds the false-positive-rate
-      denominator and the detection-coverage view.
+      denominator and the detection-coverage view. A crown-jewel
+      asset or regulated data upgrades the close to keep a retention
+      pointer for the recurring-incident correlator — still no page
+      and no queue entry.
     on_completion: "end--a1e47431-0000-4000-8000-00000000000c"
     x_secops_ng:
       control_refs:
         - "control.incident_handling_capability@v1"
+        - "control.recurring_incident_correlator@v1"
       metric_refs:
         - "kpi.false_positive_rate@v1"
         - "kpi.detection_coverage@v1"
+      core_body:
+        primitive: "alert_triage.primitives.response.log_and_close"
+        in:
+          priority: "__priority__"
+          asset_criticality: "__asset_context__.asset_criticality"
+          regulated_data: "__asset_context__.regulated_data"
+          internet_exposed: "__asset_context__.internet_exposed"
+        out: "__closure_record__"
 
   "end--a1e47431-0000-4000-8000-00000000000c":
     type: end
@@ -326,7 +344,7 @@ workflow:
 
 x_secops_ng:
   stable_id: "playbook.alert_triage@v1"
-  content_version: "0.1.0"
+  content_version: "0.2.0"
   maturity: "draft"
   compile_targets:
     - "n8n"

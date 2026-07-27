@@ -1,14 +1,13 @@
 {
   "created": "2026-06-03T00:00:00Z",
   "created_by": "identity--c0c0c0c0-c0c0-4c0c-8c0c-c0c0c0c0c0c0",
-  "description": "SOC alert_triage source playbook. Ingests typed alert payloads from at least two source shapes (push from detection pipeline, pull from a shared alert store), enriches with telemetry context, suppresses already-seen or known-benign hits inside a configurable window, applies a deterministic prioritisation policy (free-text fields may be routed through a DSPy module, the priority decision itself stays in code), and routes the case onto a response branch keyed on the disposition. SKELETON: action bodies are stubs; the workflow graph, join keys, and metric/control references are the contract this source artifact commits to.",
+  "description": "SOC alert_triage source playbook. Ingests typed alert payloads from at least two source shapes (push from detection pipeline, pull from a shared alert store), enriches with telemetry context, suppresses already-seen or known-benign hits inside a configurable window, applies a deterministic prioritisation policy (free-text fields may be routed through a DSPy module, the priority decision itself stays in code), and routes the case onto a response branch keyed on the disposition. Every action step carries a deterministic core_body binding into content/playbooks/alert_triage/primitives/; the workflow graph, join keys, and metric/control references are the contract this source artifact commits to.",
   "id": "playbook--a1e47431-0000-4000-8000-000000000000",
   "labels": [
     "alert_triage",
-    "skeleton",
     "source-artifact"
   ],
-  "modified": "2026-06-03T00:00:00Z",
+  "modified": "2026-07-27T00:00:00Z",
   "name": "Alert triage",
   "playbook_types": [
     "notification",
@@ -42,7 +41,7 @@
   "type": "playbook",
   "workflow": {
     "action--a1e47431-0000-4000-8000-000000000002": {
-      "description": "SKELETON. Normalise the inbound alert into the SecOps-NG alert envelope. Two source shapes are required by the roadmap acceptance criteria (push from detection pipeline, pull from a shared alert store); the dispatcher branches on __alert_source_shape__. Body of the normalization rules lands in the CORE-INGEST card.",
+      "description": "Normalise the inbound alert into the SecOps-NG alert envelope. Two source shapes are required by the roadmap acceptance criteria (push from detection pipeline, pull from a shared alert store); the dispatcher branches on __alert_source_shape__.",
       "in_args": [
         "__alert_id__",
         "__alert_source_shape__"
@@ -68,7 +67,7 @@
       }
     },
     "action--a1e47431-0000-4000-8000-000000000003": {
-      "description": "SKELETON. Pull adjacent telemetry for the entities named in the alert (subject identity, source/destination, asset) so the prioritisation policy and suppression check have evidence beyond the alert envelope itself. Stubbed; the enrichment fan-out lands in CORE-ENRICH.",
+      "description": "Pull adjacent telemetry for the entities named in the alert (subject identity, source/destination, asset) so the prioritisation policy and suppression check have evidence beyond the alert envelope itself. The bound body derives the canonical seen-key for the suppression window; wider telemetry fan-out is an operator extension point.",
       "name": "enrich with telemetry context",
       "on_completion": "if-condition--a1e47431-0000-4000-8000-000000000004",
       "out_args": [
@@ -100,7 +99,7 @@
       }
     },
     "action--a1e47431-0000-4000-8000-000000000005": {
-      "description": "SKELETON. Link this alert onto the existing case (or onto the benign-rule record), close it without paging, and account the suppression against the false-positive-rate KPI and (when the suppression covers a re-fire of a previously closed case) the recurring-incident correlator.",
+      "description": "Link this alert onto the existing case (or onto the benign-rule record), close it without paging, and account the suppression against the false-positive-rate KPI and (when the suppression covers a re-fire of a previously closed case) the recurring-incident correlator.",
       "name": "suppress and close",
       "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
       "type": "action",
@@ -125,7 +124,7 @@
       }
     },
     "action--a1e47431-0000-4000-8000-000000000006": {
-      "description": "SKELETON. Apply the operator's prioritisation policy. The policy itself is expressed as code (the roadmap pins this: deterministic prioritisation, DSPy used only for free-text fields like the analyst summary). Output is __priority__ \u2208 {p1_severe, p2_high, p3_routine, p4_informational}.",
+      "description": "Apply the operator's prioritisation policy. The policy itself is expressed as code (the roadmap pins this: deterministic prioritisation, DSPy used only for free-text fields like the analyst summary). Output is __priority__ \u2208 {p1_severe, p2_high, p3_routine, p4_informational}.",
       "name": "classify and prioritise (deterministic policy)",
       "on_completion": "switch-condition--a1e47431-0000-4000-8000-000000000007",
       "out_args": [
@@ -152,7 +151,7 @@
       }
     },
     "action--a1e47431-0000-4000-8000-000000000008": {
-      "description": "SKELETON. Page the on-call responder, open the incident case, stamp the timeline-start signal, and hand off to the incident management playbook. Records against the MTTR-critical clock and the regulator-notification-overrun KRI window.",
+      "description": "Page the on-call responder, open the incident case, stamp the timeline-start signal, and hand off to the incident management playbook. Records against the MTTR-critical clock and the regulator-notification-overrun KRI window.",
       "name": "response: p1 severe \u2014 page and escalate",
       "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
       "type": "action",
@@ -179,7 +178,7 @@
       }
     },
     "action--a1e47431-0000-4000-8000-000000000009": {
-      "description": "SKELETON. Queue the case to the primary analyst queue with the enriched evidence packet, no page. Records against the MTTR clock and the handoff-brief delivery SLA.",
+      "description": "Queue the case to the primary analyst queue with the enriched evidence packet, no page. Records against the MTTR clock and the handoff-brief delivery SLA.",
       "name": "response: p2 high \u2014 queue for primary analyst",
       "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
       "type": "action",
@@ -204,7 +203,7 @@
       }
     },
     "action--a1e47431-0000-4000-8000-00000000000a": {
-      "description": "SKELETON. Append to the review queue for batched analyst attention; no SLA clock beyond the routine review-completion SLA.",
+      "description": "Append to the review queue for batched analyst attention; no SLA clock beyond the routine review-completion SLA.",
       "name": "response: p3 routine \u2014 queue for review",
       "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
       "type": "action",
@@ -228,14 +227,25 @@
       }
     },
     "action--a1e47431-0000-4000-8000-00000000000b": {
-      "description": "SKELETON. Record the alert for telemetry-coverage accounting and close without further action. Feeds the false-positive-rate denominator and the detection-coverage view.",
+      "description": "Record the alert for telemetry-coverage accounting and close without further action. Feeds the false-positive-rate denominator and the detection-coverage view. A crown-jewel asset or regulated data upgrades the close to keep a retention pointer for the recurring-incident correlator \u2014 still no page and no queue entry.",
       "name": "response: p4 informational \u2014 log and close",
       "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
       "type": "action",
       "x_secops_ng": {
         "control_refs": [
-          "control.incident_handling_capability@v1"
+          "control.incident_handling_capability@v1",
+          "control.recurring_incident_correlator@v1"
         ],
+        "core_body": {
+          "in": {
+            "asset_criticality": "__asset_context__.asset_criticality",
+            "internet_exposed": "__asset_context__.internet_exposed",
+            "priority": "__priority__",
+            "regulated_data": "__asset_context__.regulated_data"
+          },
+          "out": "__closure_record__",
+          "primitive": "alert_triage.primitives.response.log_and_close"
+        },
         "metric_refs": [
           "kpi.false_positive_rate@v1",
           "kpi.detection_coverage@v1"
@@ -247,7 +257,8 @@
       "type": "end"
     },
     "if-condition--a1e47431-0000-4000-8000-000000000004": {
-      "description": "Suppression branch. on_success: matches a known-benign rule or an already-seen case fingerprint inside the window; suppress and close. on_failure: proceed to prioritisation.",
+      "condition": "__benign_or_seen__",
+      "description": "Suppression branch on the boolean __benign_or_seen__ set by the enrichment step. on_success (true): matches a known-benign rule or an already-seen case fingerprint inside the window; suppress and close. on_failure (false): proceed to prioritisation. The condition is a bare boolean variable reference on purpose \u2014 the n8n emitter compiles it to a working IF node comparator, and the LangGraph consumer routes on the same state key at runtime.",
       "name": "already-seen or known-benign?",
       "on_failure": "action--a1e47431-0000-4000-8000-000000000006",
       "on_success": "action--a1e47431-0000-4000-8000-000000000005",
@@ -286,7 +297,7 @@
       "temporal",
       "langgraph"
     ],
-    "content_version": "0.1.0",
+    "content_version": "0.2.0",
     "control_refs": [
       "control.incident_handling_capability@v1",
       "control.incident_timeline_signals@v1",
