@@ -6,12 +6,75 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.0] — 2026-07-24
+
+First tagged release. Everything below has been on `main` and covered by
+CI since the initial content waves; this entry gives operators a version
+they can pin and contributors a reference point to work against. The
+`0.x` series signals that content stable IDs are settled while the
+schema surface may still move before `1.0.0`.
+
 ### Added
 
-- DORA component-definition: Art.5 governance + Art.6 ICT risk framework (SKELETON layer, 0.2.0-pre).
-- DORA component-definition: Art.7 systems + Art.8 identification + Art.10 detection + Art.11 response/recovery (CORE layer, 0.2.0).
-- DORA component-definition: Art.12 backup/restore + Art.13 post-incident learning + Art.14 crisis communication (EXTEND layer, 0.2.1); README lists full DORA article roster.
-- CRA component-definition: Annex I §1 essential cybersecurity requirements (secure-by-default configuration, access control, confidentiality, integrity, availability, attack-surface limitation, logging and monitoring, and security-update capability) (CORE layer, 0.2.0); new source YAML `content/mappings/cra/annex-i-1-essential-cybersecurity.yaml` covers the secure-by-design and secure-by-default product properties.
-- DORA component-definition: Art.5 governance + Art.6 ICT risk-management framework (CORE layer, 0.2.2); Art.5/Art.6 implemented-requirements now carry `source-d3fend-technique` + `source-d3fend-entry-id` props anchoring each obligation to a D3FEND defensive technique in `content/mappings/d3fend/dora.yaml`.
-- CRA component-definition: Article 13 manufacturer obligations (risk assessment (Art.13(2)–(3)), component due diligence (Art.13(4)), vulnerability-handling process (Art.13(6)), security-update dissemination (Art.13(8)), and single point of contact (Art.13(12))) (CORE layer, 0.2.1); new source YAML `content/mappings/cra/article-13.yaml` covers the manufacturer-side obligations that wrap the Annex I §1/§2 product properties.
-- CRA component-definition: Annex I §2 vulnerability-handling essential requirements (SBOM (§2(1)), vulnerability handling (§2(2)), coordinated vulnerability disclosure policy (§2(5)), security-update dissemination (§2(7))) + Article 14 reporting obligations (early-warning (Art.14(1)), 72-hour notification + final report (Art.14(2)), severe-incident notification (Art.14(3))) promoted from SKELETON to CORE layer (0.2.2); all twelve implemented-requirements now carry `source-d3fend-technique` and `source-d3fend-entry-id` props anchoring each obligation to a defensive technique in `content/mappings/d3fend/cra.yaml`.
+- **Playbooks** — 45 canonical CACAO v2 playbooks under
+  `content/playbooks/`, spanning operational lifecycles (vulnerability
+  triage, alert triage, incident management, detection engineering, IAM
+  audit, on/offboarding, supply-chain security, patch and asset
+  management, network-boundary reconciliation) and regulation-shaped
+  lifecycles (DORA Art. 19 major-incident reporting and Chapter V
+  third-party risk, CRA Art. 14 SRP notification and coordinated
+  vulnerability disclosure, GDPR Art. 35 DPIA and data-subject rights,
+  NIS2 Art. 20 governance and Art. 21 self-assessment, EU AI Act Art. 9
+  risk management, eIDAS 2.0 identity verification).
+- **Reference compilers** — n8n, Temporal and LangGraph emitters reading
+  the same CACAO source, with worked examples under
+  `examples/{n8n,temporal,langgraph}/` and byte-parity golden tests
+  pinning cross-target determinism on every pull request.
+- **Regulatory mappings** — nine crosswalk axes under
+  `content/mappings/`: NIS2, DORA, CRA, GDPR, EU AI Act, ISO/IEC 27001
+  Annex A, NIST CSF 2.0, SOC 2 Trust Services Criteria and MITRE
+  D3FEND. Includes OSCAL component definitions for the DORA, CRA, GDPR
+  and EU AI Act obligation sets, with per-obligation D3FEND technique
+  anchors.
+- **Metrics catalogue** — 138 KPI/KRI definitions under
+  `content/metrics/`, each carrying thresholds, an OCSF source-data
+  binding and a committed reference visualisation. Covers the
+  regulator-notification latency families for CRA, DORA, NIS2, GDPR and
+  the EU AI Act, plus detection, remediation, coverage and availability
+  clusters.
+- **Compliance evidence pipeline** — evidence streams for risk analysis,
+  incidents, supply chain, vulnerabilities, crypto attestation, control
+  effectiveness and access, each with a record schema and per-target
+  emitters.
+- **Controls and telemetry** — 41 control definitions under
+  `content/controls/` and 12 OCSF telemetry class bindings under
+  `content/telemetry/`.
+- **Patterns** — reusable evidence-collector and incident-timeline
+  spines under `patterns/`.
+- **Cookbook** — 51 practitioner walkthroughs under `docs/cookbook/`,
+  one per shipped playbook plus the regulatory-crosswalk entries.
+- **Sovereign defaults** — an EU-resident inference-endpoint guard in the
+  shared compiler layer, and OpenTelemetry instrumentation with an
+  OTel-free audit-trail mirror emitted by every reference compiler.
+- **Community substrate** — Code of Conduct, consent-based
+  `GOVERNANCE.md`, a contribution guide with DCO sign-off, the playbook
+  authoring quickstart, the `content/playbooks/_template/` scaffold and
+  a pull-request template.
+- **CI** — hygiene linter, orphan-CI regulatory-coverage matrix,
+  three-target byte-parity matrix, GDPR lawful-basis guard,
+  playbook-template conformance lint, quickstart gate and USED-BY link
+  check, over a 469-file test suite.
+
+### Notes
+
+- Content stable IDs (`playbook.*@v1`, `control.*@v1`, `kpi.*@v1`,
+  `kri.*@v1`, `telemetry.ocsf.*@v1`) are the compatibility surface and
+  will not change within `0.x` without a changelog entry.
+- The framework ships no runtime, agent framework or SOAR. n8n, Temporal
+  and LangGraph are three reference compile targets, not the engine.
+- Earlier `[Unreleased]` entries covering the DORA and CRA OSCAL
+  component-definition layers are folded into the regulatory-mappings
+  item above; per-article detail lives in `content/mappings/*/README.md`.
+
+[Unreleased]: https://github.com/secops-ng/secops-ng-framework/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/secops-ng/secops-ng-framework/releases/tag/v0.1.0
