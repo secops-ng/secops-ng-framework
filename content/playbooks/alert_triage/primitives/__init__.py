@@ -44,6 +44,8 @@ from .prioritisation import (
     prioritise,
 )
 from .response import (
+    ClosureDisposition,
+    ClosureRecord,
     EscalationDirective,
     INCIDENT_MANAGEMENT_PLAYBOOK_REF,
     NotificationCadence,
@@ -53,6 +55,7 @@ from .response import (
     ReviewQueueDirective,
     ReviewTier,
     escalation_route,
+    log_and_close,
     notify_on_call,
     route_to_review_queue,
 )
@@ -68,6 +71,8 @@ __all__ = [
     "AlertPayload",
     "AssetContext",
     "AssetCriticality",
+    "ClosureDisposition",
+    "ClosureRecord",
     "DetectionClass",
     "DetectionSeverity",
     "EscalationDirective",
@@ -87,6 +92,7 @@ __all__ = [
     "SuppressionWindow",
     "canonical_seen_key",
     "escalation_route",
+    "log_and_close",
     "notify_on_call",
     "prioritise",
     "route_to_review_queue",

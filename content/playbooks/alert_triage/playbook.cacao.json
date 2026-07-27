@@ -3,7 +3,7 @@
   "spec_version": "2.0",
   "id": "playbook--a1e47431-0000-4000-8000-000000000000",
   "name": "Alert triage",
-  "description": "SOC alert_triage source playbook. Ingests typed alert payloads from at least two source shapes (push from detection pipeline, pull from a shared alert store), enriches with telemetry context, suppresses already-seen or known-benign hits inside a configurable window, applies a deterministic prioritisation policy (free-text fields may be routed through a DSPy module, the priority decision itself stays in code), and routes the case onto a response branch keyed on the disposition. SKELETON: action bodies are stubs; the workflow graph, join keys, and metric/control references are the contract this source artifact commits to.",
+  "description": "SOC alert_triage source playbook. Ingests typed alert payloads from at least two source shapes (push from detection pipeline, pull from a shared alert store), enriches with telemetry context, suppresses already-seen or known-benign hits inside a configurable window, applies a deterministic prioritisation policy (free-text fields may be routed through a DSPy module, the priority decision itself stays in code), and routes the case onto a response branch keyed on the disposition. Every action step carries a deterministic core_body binding into content/playbooks/alert_triage/primitives/; the workflow graph, join keys, and metric/control references are the contract this source artifact commits to.",
   "playbook_types": [
     "notification",
     "detection",
@@ -12,10 +12,9 @@
   ],
   "created_by": "identity--c0c0c0c0-c0c0-4c0c-8c0c-c0c0c0c0c0c0",
   "created": "2026-06-03T00:00:00Z",
-  "modified": "2026-06-03T00:00:00Z",
+  "modified": "2026-07-27T00:00:00Z",
   "labels": [
     "alert_triage",
-    "skeleton",
     "source-artifact"
   ],
   "playbook_variables": {
@@ -50,7 +49,7 @@
     "action--a1e47431-0000-4000-8000-000000000002": {
       "type": "action",
       "name": "ingest typed alert payload",
-      "description": "SKELETON. Normalise the inbound alert into the SecOps-NG alert envelope. Two source shapes are required by the roadmap acceptance criteria (push from detection pipeline, pull from a shared alert store); the dispatcher branches on __alert_source_shape__. Body of the normalization rules lands in the CORE-INGEST card.",
+      "description": "Normalise the inbound alert into the SecOps-NG alert envelope. Two source shapes are required by the roadmap acceptance criteria (push from detection pipeline, pull from a shared alert store); the dispatcher branches on __alert_source_shape__.",
       "on_completion": "action--a1e47431-0000-4000-8000-000000000003",
       "in_args": [
         "__alert_id__",
@@ -76,7 +75,7 @@
     "action--a1e47431-0000-4000-8000-000000000003": {
       "type": "action",
       "name": "enrich with telemetry context",
-      "description": "SKELETON. Pull adjacent telemetry for the entities named in the alert (subject identity, source/destination, asset) so the prioritisation policy and suppression check have evidence beyond the alert envelope itself. Stubbed; the enrichment fan-out lands in CORE-ENRICH.",
+      "description": "Pull adjacent telemetry for the entities named in the alert (subject identity, source/destination, asset) so the prioritisation policy and suppression check have evidence beyond the alert envelope itself. The bound body derives the canonical seen-key for the suppression window; wider telemetry fan-out is an operator extension point.",
       "on_completion": "if-condition--a1e47431-0000-4000-8000-000000000004",
       "out_args": [
         "__benign_or_seen__"
@@ -108,14 +107,15 @@
     "if-condition--a1e47431-0000-4000-8000-000000000004": {
       "type": "if-condition",
       "name": "already-seen or known-benign?",
-      "description": "Suppression branch. on_success: matches a known-benign rule or an already-seen case fingerprint inside the window; suppress and close. on_failure: proceed to prioritisation.",
+      "description": "Suppression branch on the boolean __benign_or_seen__ set by the enrichment step. on_success (true): matches a known-benign rule or an already-seen case fingerprint inside the window; suppress and close. on_failure (false): proceed to prioritisation. The condition is a bare boolean variable reference on purpose — the n8n emitter compiles it to a working IF node comparator, and the LangGraph consumer routes on the same state key at runtime.",
+      "condition": "__benign_or_seen__",
       "on_success": "action--a1e47431-0000-4000-8000-000000000005",
       "on_failure": "action--a1e47431-0000-4000-8000-000000000006"
     },
     "action--a1e47431-0000-4000-8000-000000000005": {
       "type": "action",
       "name": "suppress and close",
-      "description": "SKELETON. Link this alert onto the existing case (or onto the benign-rule record), close it without paging, and account the suppression against the false-positive-rate KPI and (when the suppression covers a re-fire of a previously closed case) the recurring-incident correlator.",
+      "description": "Link this alert onto the existing case (or onto the benign-rule record), close it without paging, and account the suppression against the false-positive-rate KPI and (when the suppression covers a re-fire of a previously closed case) the recurring-incident correlator.",
       "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
       "x_secops_ng": {
         "control_refs": [
@@ -140,7 +140,7 @@
     "action--a1e47431-0000-4000-8000-000000000006": {
       "type": "action",
       "name": "classify and prioritise (deterministic policy)",
-      "description": "SKELETON. Apply the operator's prioritisation policy. The policy itself is expressed as code (the roadmap pins this: deterministic prioritisation, DSPy used only for free-text fields like the analyst summary). Output is __priority__ ∈ {p1_severe, p2_high, p3_routine, p4_informational}.",
+      "description": "Apply the operator's prioritisation policy. The policy itself is expressed as code (the roadmap pins this: deterministic prioritisation, DSPy used only for free-text fields like the analyst summary). Output is __priority__ ∈ {p1_severe, p2_high, p3_routine, p4_informational}.",
       "on_completion": "switch-condition--a1e47431-0000-4000-8000-000000000007",
       "out_args": [
         "__priority__"
@@ -187,7 +187,7 @@
     "action--a1e47431-0000-4000-8000-000000000008": {
       "type": "action",
       "name": "response: p1 severe — page and escalate",
-      "description": "SKELETON. Page the on-call responder, open the incident case, stamp the timeline-start signal, and hand off to the incident management playbook. Records against the MTTR-critical clock and the regulator-notification-overrun KRI window.",
+      "description": "Page the on-call responder, open the incident case, stamp the timeline-start signal, and hand off to the incident management playbook. Records against the MTTR-critical clock and the regulator-notification-overrun KRI window.",
       "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
       "x_secops_ng": {
         "control_refs": [
@@ -214,7 +214,7 @@
     "action--a1e47431-0000-4000-8000-000000000009": {
       "type": "action",
       "name": "response: p2 high — queue for primary analyst",
-      "description": "SKELETON. Queue the case to the primary analyst queue with the enriched evidence packet, no page. Records against the MTTR clock and the handoff-brief delivery SLA.",
+      "description": "Queue the case to the primary analyst queue with the enriched evidence packet, no page. Records against the MTTR clock and the handoff-brief delivery SLA.",
       "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
       "x_secops_ng": {
         "control_refs": [
@@ -239,7 +239,7 @@
     "action--a1e47431-0000-4000-8000-00000000000a": {
       "type": "action",
       "name": "response: p3 routine — queue for review",
-      "description": "SKELETON. Append to the review queue for batched analyst attention; no SLA clock beyond the routine review-completion SLA.",
+      "description": "Append to the review queue for batched analyst attention; no SLA clock beyond the routine review-completion SLA.",
       "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
       "x_secops_ng": {
         "control_refs": [
@@ -263,16 +263,27 @@
     "action--a1e47431-0000-4000-8000-00000000000b": {
       "type": "action",
       "name": "response: p4 informational — log and close",
-      "description": "SKELETON. Record the alert for telemetry-coverage accounting and close without further action. Feeds the false-positive-rate denominator and the detection-coverage view.",
+      "description": "Record the alert for telemetry-coverage accounting and close without further action. Feeds the false-positive-rate denominator and the detection-coverage view. A crown-jewel asset or regulated data upgrades the close to keep a retention pointer for the recurring-incident correlator — still no page and no queue entry.",
       "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
       "x_secops_ng": {
         "control_refs": [
-          "control.incident_handling_capability@v1"
+          "control.incident_handling_capability@v1",
+          "control.recurring_incident_correlator@v1"
         ],
         "metric_refs": [
           "kpi.false_positive_rate@v1",
           "kpi.detection_coverage@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "alert_triage.primitives.response.log_and_close",
+          "in": {
+            "priority": "__priority__",
+            "asset_criticality": "__asset_context__.asset_criticality",
+            "regulated_data": "__asset_context__.regulated_data",
+            "internet_exposed": "__asset_context__.internet_exposed"
+          },
+          "out": "__closure_record__"
+        }
       }
     },
     "end--a1e47431-0000-4000-8000-00000000000c": {
@@ -282,7 +293,7 @@
   },
   "x_secops_ng": {
     "stable_id": "playbook.alert_triage@v1",
-    "content_version": "0.1.0",
+    "content_version": "0.2.0",
     "maturity": "draft",
     "compile_targets": [
       "n8n",

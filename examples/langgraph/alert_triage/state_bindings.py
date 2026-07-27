@@ -54,7 +54,7 @@ class PlaybookAlertTriageV1State(TypedDict, total=False):
 
 @tool
 async def ingest_typed_alert_payload(alert_id: str, alert_source_shape: str) -> None:
-    """SKELETON. Normalise the inbound alert into the SecOps-NG alert envelope. Two source shapes are required by the roadmap acceptance criteria (push from detection pipeline, pull from a shared alert store); the dispatcher branches on __alert_source_shape__. Body of the normalization rules lands in the CORE-INGEST card.
+    """Normalise the inbound alert into the SecOps-NG alert envelope. Two source shapes are required by the roadmap acceptance criteria (push from detection pipeline, pull from a shared alert store); the dispatcher branches on __alert_source_shape__.
 
     CACAO step_id : action--a1e47431-0000-4000-8000-000000000002
     CACAO type    : action
@@ -71,7 +71,7 @@ async def ingest_typed_alert_payload(alert_id: str, alert_source_shape: str) -> 
 
 @tool
 async def enrich_with_telemetry_context() -> bool:
-    """SKELETON. Pull adjacent telemetry for the entities named in the alert (subject identity, source/destination, asset) so the prioritisation policy and suppression check have evidence beyond the alert envelope itself. Stubbed; the enrichment fan-out lands in CORE-ENRICH.
+    """Pull adjacent telemetry for the entities named in the alert (subject identity, source/destination, asset) so the prioritisation policy and suppression check have evidence beyond the alert envelope itself. The bound body derives the canonical seen-key for the suppression window; wider telemetry fan-out is an operator extension point.
 
     CACAO step_id : action--a1e47431-0000-4000-8000-000000000003
     CACAO type    : action
@@ -88,7 +88,7 @@ async def enrich_with_telemetry_context() -> bool:
 
 @tool
 async def suppress_and_close() -> None:
-    """SKELETON. Link this alert onto the existing case (or onto the benign-rule record), close it without paging, and account the suppression against the false-positive-rate KPI and (when the suppression covers a re-fire of a previously closed case) the recurring-incident correlator.
+    """Link this alert onto the existing case (or onto the benign-rule record), close it without paging, and account the suppression against the false-positive-rate KPI and (when the suppression covers a re-fire of a previously closed case) the recurring-incident correlator.
 
     CACAO step_id : action--a1e47431-0000-4000-8000-000000000005
     CACAO type    : action
@@ -105,7 +105,7 @@ async def suppress_and_close() -> None:
 
 @tool
 async def classify_and_prioritise_deterministic_policy() -> str:
-    """SKELETON. Apply the operator's prioritisation policy. The policy itself is expressed as code (the roadmap pins this: deterministic prioritisation, DSPy used only for free-text fields like the analyst summary). Output is __priority__ ∈ {p1_severe, p2_high, p3_routine, p4_informational}.
+    """Apply the operator's prioritisation policy. The policy itself is expressed as code (the roadmap pins this: deterministic prioritisation, DSPy used only for free-text fields like the analyst summary). Output is __priority__ ∈ {p1_severe, p2_high, p3_routine, p4_informational}.
 
     CACAO step_id : action--a1e47431-0000-4000-8000-000000000006
     CACAO type    : action
@@ -122,7 +122,7 @@ async def classify_and_prioritise_deterministic_policy() -> str:
 
 @tool
 async def response_p1_severe_page_and_escalate() -> None:
-    """SKELETON. Page the on-call responder, open the incident case, stamp the timeline-start signal, and hand off to the incident management playbook. Records against the MTTR-critical clock and the regulator-notification-overrun KRI window.
+    """Page the on-call responder, open the incident case, stamp the timeline-start signal, and hand off to the incident management playbook. Records against the MTTR-critical clock and the regulator-notification-overrun KRI window.
 
     CACAO step_id : action--a1e47431-0000-4000-8000-000000000008
     CACAO type    : action
@@ -139,7 +139,7 @@ async def response_p1_severe_page_and_escalate() -> None:
 
 @tool
 async def response_p2_high_queue_for_primary_analyst() -> None:
-    """SKELETON. Queue the case to the primary analyst queue with the enriched evidence packet, no page. Records against the MTTR clock and the handoff-brief delivery SLA.
+    """Queue the case to the primary analyst queue with the enriched evidence packet, no page. Records against the MTTR clock and the handoff-brief delivery SLA.
 
     CACAO step_id : action--a1e47431-0000-4000-8000-000000000009
     CACAO type    : action
@@ -156,7 +156,7 @@ async def response_p2_high_queue_for_primary_analyst() -> None:
 
 @tool
 async def response_p3_routine_queue_for_review() -> None:
-    """SKELETON. Append to the review queue for batched analyst attention; no SLA clock beyond the routine review-completion SLA.
+    """Append to the review queue for batched analyst attention; no SLA clock beyond the routine review-completion SLA.
 
     CACAO step_id : action--a1e47431-0000-4000-8000-00000000000a
     CACAO type    : action
@@ -173,7 +173,7 @@ async def response_p3_routine_queue_for_review() -> None:
 
 @tool
 async def response_p4_informational_log_and_close() -> None:
-    """SKELETON. Record the alert for telemetry-coverage accounting and close without further action. Feeds the false-positive-rate denominator and the detection-coverage view.
+    """Record the alert for telemetry-coverage accounting and close without further action. Feeds the false-positive-rate denominator and the detection-coverage view. A crown-jewel asset or regulated data upgrades the close to keep a retention pointer for the recurring-incident correlator — still no page and no queue entry.
 
     CACAO step_id : action--a1e47431-0000-4000-8000-00000000000b
     CACAO type    : action
@@ -185,9 +185,8 @@ async def response_p4_informational_log_and_close() -> None:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--a1e47431-0000-4000-8000-00000000000b', attributes={'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-00000000000b', 'secops_ng.step.name': 'response: p4 informational — log and close', 'secops_ng.tool.name': 'response_p4_informational_log_and_close', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--a1e47431-0000-4000-8000-00000000000b'"
-        )
+        from alert_triage.primitives.response import log_and_close
+        __closure_record__ = log_and_close(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)
 
 async def llm_step(state: PlaybookAlertTriageV1State) -> dict:
     """Agentic-extension hook.

@@ -577,7 +577,165 @@ def route_to_review_queue(
     )
 
 
+# Closed alphabet of closure dispositions the p4 action records.
+# ``closed_informational`` is the plain close: accounted, no follow-up
+# artifact. ``closed_with_retention_pointer`` keeps a breadcrumb on the
+# case store so the recurring-incident correlator and the detection-
+# coverage view can see the hit later — still no page, no queue entry.
+ClosureDisposition = Literal[
+    "closed_informational", "closed_with_retention_pointer"
+]
+
+
+@dataclass(frozen=True)
+class ClosureRecord:
+    """Deterministic closure verdict for the p4 response action.
+
+    Sibling of :class:`EscalationDirective` / :class:`NotificationDirective`
+    / :class:`ReviewQueueDirective` — same immutability contract, p4
+    accounting policy. The p4 action closes without paging or queueing;
+    what it *must* still do is account the alert (false-positive-rate
+    denominator, detection-coverage view) and decide whether the case
+    store keeps a breadcrumb.
+
+    Attributes:
+        disposition: How the close is recorded. Closed alphabet —
+            :data:`ClosureDisposition`.
+        regulator_notification_required: True when the asset processes
+            regulated data. Same gate as p1 / p2 / p3 — the clock opens
+            on the first detection at any priority, and an
+            informational close does not close it.
+        reasons: Ordered tuple naming every rule that fired.
+        inputs_digest: Short hex digest (16 lower-hex chars) of the
+            canonical inputs — same replay contract as the siblings.
+    """
+
+    disposition: ClosureDisposition
+    regulator_notification_required: bool
+    reasons: Tuple[str, ...]
+    inputs_digest: str
+
+
+def log_and_close(
+    *,
+    priority: Priority,
+    asset_criticality: AssetCriticality,
+    regulated_data: bool,
+    internet_exposed: bool,
+) -> ClosureRecord:
+    """Resolve the p4-informational log-and-close record.
+
+    Sibling of :func:`escalation_route`, :func:`notify_on_call` and
+    :func:`route_to_review_queue` — same input shape, p4 closure policy.
+
+    Policy (deterministic, replay-safe):
+
+    * ``priority == "p4_informational"`` is the only entry-point. p1 /
+      p2 / p3 are rejected — they have their own response actions, and
+      silently degrading them through this primitive would mask a
+      wiring bug.
+    * The default disposition is ``closed_informational``: record the
+      alert for telemetry-coverage accounting and close. Every close
+      feeds the false-positive-rate denominator and the
+      detection-coverage view via the action's ``metric_refs``.
+    * ``asset_criticality == "crown_jewel"`` or ``regulated_data``
+      upgrades the disposition to ``closed_with_retention_pointer``:
+      the close keeps a breadcrumb on the case store so a later re-fire
+      on the same asset is visible to the recurring-incident
+      correlator. Still no page and no queue entry — p4 stays silent.
+    * ``regulated_data`` opens the regulator-notification SLA clock at
+      p4 just as it does at p1 / p2 / p3 — the clock starts on the
+      first detection at any priority; an informational close is not
+      permission to ignore it.
+    * The verdict carries every reason that fired (ordered) plus a
+      short hex digest over the canonical inputs.
+
+    Args:
+        priority: Priority band from the upstream prioritisation
+            primitive. Must be ``"p4_informational"`` — this primitive
+            is the body of the p4 response action only.
+        asset_criticality: Per-asset criticality band. Closed alphabet
+            — :data:`AssetCriticality`.
+        regulated_data: True when the asset stores or processes data
+            covered by a regulatory baseline.
+        internet_exposed: True when the asset is reachable from the
+            public internet. Carried into the digest so a replay
+            against a changed exposure flag is visibly a different
+            verdict, even when the disposition happens to match.
+
+    Returns:
+        :class:`ClosureRecord` naming the disposition, the
+        regulator-notification requirement, every reason that fired,
+        and a digest of the canonical inputs.
+
+    Raises:
+        ValueError: ``priority`` is not ``"p4_informational"`` or
+            ``asset_criticality`` is outside the closed alphabet.
+        TypeError: ``regulated_data`` or ``internet_exposed`` is not a
+            bool. Booleans are the contract; refusing duck-typing here
+            keeps a stray ``1`` or ``"true"`` from sliding through.
+    """
+    if priority != "p4_informational":
+        raise ValueError(
+            f"log_and_close is the p4-informational response body; "
+            f"got priority={priority!r}. p1 / p2 / p3 routing lives in "
+            f"sibling primitives."
+        )
+    if asset_criticality not in ("low", "medium", "high", "crown_jewel"):
+        raise ValueError(
+            f"unknown asset_criticality {asset_criticality!r}; "
+            f"expected one of ('low', 'medium', 'high', 'crown_jewel')"
+        )
+    if not isinstance(regulated_data, bool):
+        raise TypeError(
+            f"regulated_data must be bool, got {type(regulated_data).__name__}"
+        )
+    if not isinstance(internet_exposed, bool):
+        raise TypeError(
+            f"internet_exposed must be bool, "
+            f"got {type(internet_exposed).__name__}"
+        )
+
+    reasons: list[str] = [f"priority={priority} → log-and-close"]
+
+    # Rule 1 — disposition. A crown-jewel asset or regulated data keeps
+    # a breadcrumb on the case store; everything else closes plain.
+    disposition: ClosureDisposition = "closed_informational"
+    if asset_criticality == "crown_jewel":
+        disposition = "closed_with_retention_pointer"
+        reasons.append(
+            "asset_criticality=crown_jewel → retention pointer kept "
+            "for the recurring-incident correlator"
+        )
+    if regulated_data:
+        disposition = "closed_with_retention_pointer"
+        reasons.append(
+            "regulated_data=true → retention pointer kept; "
+            "regulator_notification_required"
+        )
+    if disposition == "closed_informational":
+        reasons.append(
+            "no retention trigger → closed_informational "
+            "(false-positive-rate denominator + detection-coverage "
+            "accounting only)"
+        )
+
+    return ClosureRecord(
+        disposition=disposition,
+        regulator_notification_required=regulated_data,
+        reasons=tuple(reasons),
+        inputs_digest=_digest(
+            priority,
+            asset_criticality,
+            regulated_data,
+            internet_exposed,
+        ),
+    )
+
+
 __all__ = [
+    "ClosureDisposition",
+    "ClosureRecord",
     "EscalationDirective",
     "INCIDENT_MANAGEMENT_PLAYBOOK_REF",
     "NotificationCadence",
@@ -587,6 +745,7 @@ __all__ = [
     "ReviewQueueDirective",
     "ReviewTier",
     "escalation_route",
+    "log_and_close",
     "notify_on_call",
     "route_to_review_queue",
 ]

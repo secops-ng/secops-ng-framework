@@ -124,7 +124,7 @@ def _entry(root: Path, source: Path, slug: str, schema_path: Path) -> dict[str, 
     bindings = 0
     placeholder_bodies = 0
     unbound_actions = 0
-    blank_predicates: list[str] = []
+    blank_predicates: list[dict[str, Any]] = []
 
     for step_id, step in workflow.items():
         if not isinstance(step, dict):
@@ -140,22 +140,52 @@ def _entry(root: Path, source: Path, slug: str, schema_path: Path) -> dict[str, 
                 if isinstance(body, dict):
                     placeholder_bodies += 1
         if stype in _CONTROL_FLOW:
-            # Every branch step in this catalog needs operator attention, and a
-            # raw expression is not sufficient to avoid it: vuln-intake's
-            # switch-condition carries switch='__severity__' yet the n8n emitter
-            # still records "no cases parsed". So flag all of them, and record
-            # whether a raw expression exists so the hand-off can be precise.
-            blank_predicates.append({
-                "step_id": step_id,
-                "type": stype,
-                "raw_expression": step.get("condition") or step.get("switch") or None,
-            })
+            # Mirror the n8n emitter's per-type note logic exactly — the
+            # prediction is only useful while it matches what the emitter
+            # actually writes into meta.secops_ng_notes:
+            #
+            #   if / while  note iff _extract_condition_expression finds no
+            #               non-empty string under condition/expression/
+            #               predicate. A playbook that carries a real
+            #               condition (alert_triage) gets NO note.
+            #   switch      note iff _extract_switch_cases parses nothing.
+            #               It requires a LIST of mappings, while CACAO's
+            #               `cases` is a dict — so a spec-shaped switch is
+            #               flagged even when its expression is real
+            #               (vuln-intake's switch='__severity__' still
+            #               records "no cases parsed"). Emitter-side gap.
+            #   parallel    always a note (n8n parallelism is implicit).
+            raw_expr = None
+            if stype in ("if-condition", "while-condition"):
+                raw_expr = next(
+                    (v for k in ("condition", "expression", "predicate")
+                     if isinstance(v := step.get(k), str) and v.strip()),
+                    None,
+                )
+                needs_operator = raw_expr is None
+            elif stype == "switch-condition":
+                raw_expr = step.get("switch") or None
+                cases = step.get("cases")
+                needs_operator = not (
+                    isinstance(cases, list)
+                    and any(isinstance(e, dict) for e in cases)
+                )
+            else:  # parallel
+                needs_operator = True
+            if needs_operator:
+                blank_predicates.append({
+                    "step_id": step_id,
+                    "type": stype,
+                    "raw_expression": raw_expr,
+                })
 
     ok, err_count, first_err = _validate(playbook, schema_path)
 
     # The n8n emitter writes one meta.secops_ng_notes entry per unbound action
-    # plus one per control-flow step. Verified exact against all 12 committed n8n
-    # examples, so the remaining-work figure needs no compile to compute.
+    # plus one per control-flow step that needs operator wiring (see the
+    # per-type mirror above). Verified exact against all 39 committed n8n
+    # examples (incident_management via its with-overlay figure), so the
+    # remaining-work figure needs no compile to compute.
     overlays_now = _overlay_bindings(root, slug)
     overlay_now = max(overlays_now.values()) if overlays_now else 0
     predicted_todos = unbound_actions + len(blank_predicates)
