@@ -67,9 +67,34 @@ git push origin v0.1.0
 gh release create v0.1.0 --title "v0.1.0" --notes-from-tag
 ```
 
-If `git tag -s` fails with "failed to sign the data", no signing key is
-configured for this checkout — set `user.signingkey` (GPG or SSH) before
-continuing rather than falling back to an unsigned `-a` tag.
+### Signing without GPG
+
+`git tag -s` defaults to GPG, so on a machine without it the tag fails with:
+
+```
+error: cannot run gpg: No such file or directory
+error: gpg failed to sign the data
+```
+
+You do not need to install GPG. Git (≥ 2.34) signs with an SSH key you
+already have — the same key you push with is fine:
+
+```bash
+git config --global gpg.format ssh
+git config --global user.signingkey ~/.ssh/<your-key>.pub
+```
+
+Then re-run the tag command. Use `--local` instead of `--global` to scope it
+to this checkout.
+
+For GitHub to show the tag as **Verified**, the public key must also be
+registered on your account as a *signing* key — at
+<https://github.com/settings/keys>, "New SSH key" with key type **Signing
+Key**. An authentication key with the same value does not count; the entry
+is separate. The tag is validly signed either way, but the badge only
+appears once the key is registered.
+
+Do not fall back to an unsigned `-a` tag to get past a signing error.
 
 To reuse the changelog section as the release body instead of the tag
 message, extract it and pass `--notes-file`.
