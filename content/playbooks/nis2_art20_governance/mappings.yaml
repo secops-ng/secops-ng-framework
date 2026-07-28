@@ -85,53 +85,52 @@ oscal:
   # allocation lever the management-body approval carries (an
   # approved risk-management measure that is not funded is not a
   # discharged measure). The SKELETON pins both anchors as
-  # placeholder control URNs; sibling CORE cards populate the
-  # control-xref files under content/controls/ if the ICT-risk-
-  # governance anchor at control.ict_risk_governance@v1 (which
-  # already pins PM-2) does not consolidate the anchor.
-  - id: control.information_security_program_plan@v1
+  # CORE layer. Both anchors below resolve to committed control-xref
+  # files under content/controls/; neither is a placeholder any longer.
+  - id: control.ict_risk_governance@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: PM-2
     title: Information Security Program Leadership Role
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=PM-2
-    todo: true
     notes: >-
-      SKELETON placeholder — anchors the schedule_management_review,
-      present_risk_posture, approve_risk_measures, and
-      log_governance_evidence steps to the PM-2 information-security
-      program leadership-role discipline. PM-2 requires the
-      organisation to appoint a senior official with the mission
-      and resources to coordinate, develop, implement, and maintain
-      an organisation-wide information security program; the
-      management-body approval cycle NIS2 Art. 20(1) names is the
+      Anchors the schedule_management_review, present_risk_posture,
+      approve_risk_measures, and log_governance_evidence steps. PM-2
+      requires the organisation to appoint a senior official with the
+      mission and resources to coordinate, develop, implement and
+      maintain an organisation-wide information security programme;
+      the management-body approval cycle NIS2 Art. 20(1) names is the
       board-level oversight discipline that closes over that
-      leadership role. CORE-layer cards resolve this placeholder
-      against either a dedicated control.information_security_program_plan
-      xref file (if the plan-authoring surface warrants its own
-      URN) or a consolidation into control.ict_risk_governance@v1
-      (which already pins PM-2). The todo flag stays set until that
-      resolution lands.
+      leadership role. The SKELETON placeholder offered two
+      resolutions — a dedicated information-security-program-plan URN,
+      or consolidation into control.ict_risk_governance@v1, which
+      already pinned PM-2. Consolidated: that control already describes
+      an internal governance framework with the management body bearing
+      ultimate responsibility, clear role assignment and an approved
+      review cadence, which is the same discipline Art. 20(1) states
+      for a different regime. It now carries a NIS2 Art. 20 oscal_ref
+      alongside its DORA Art. 5 one. A second URN for the same
+      discipline would have split the anchor without adding meaning.
   - id: control.resource_allocation@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: SA-2
     title: Allocation of Resources
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SA-2
-    todo: true
     notes: >-
-      SKELETON placeholder — anchors the approve_risk_measures step
-      to the SA-2 resource-allocation discipline. SA-2 requires the
-      organisation to determine information security and privacy
-      requirements for each system, determine, document, and
-      allocate the resources required to protect the system, and
-      establish a discrete line item for those resources in
-      organisational programming and budgeting documentation. The
-      management-body approval cycle NIS2 Art. 20(1) names is the
-      governance-body decision surface that closes over resource
-      allocation for the Art. 21 risk-management measures: an
+      Anchors the approve_risk_measures step to the SA-2
+      resource-allocation discipline. SA-2 requires the organisation to
+      determine information security and privacy requirements for each
+      system, determine, document and allocate the resources required
+      to protect it, and establish a discrete line item for those
+      resources in organisational programming and budgeting
+      documentation. The management-body approval cycle NIS2 Art. 20(1)
+      names is the governance-body decision surface that closes over
+      resource allocation for the Art. 21 risk-management measures: an
       approved measure that is not resourced is not a discharged
-      measure. CORE-layer cards resolve this placeholder against a
-      populated control.resource_allocation xref file. The todo
-      flag stays set until that resolution lands.
+      measure. SA-2 was anchored by no control in the catalogue, so
+      control.resource_allocation@v1 is authored rather than
+      consolidated — unlike the PM-2 anchor above. The two are kept
+      apart deliberately: PM-2 is who leads the programme, SA-2 is
+      whether the approved measures are funded.
 
 d3fend:
   # MITRE D3FEND v1.0.0 defensive-technique tag on the

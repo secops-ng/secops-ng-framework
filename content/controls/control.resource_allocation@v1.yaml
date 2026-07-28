@@ -1,0 +1,50 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.resource_allocation@v1
+title: Security resource allocation
+summary: >-
+  Operator determines the information-security requirements for a
+  system or measure, documents and allocates the resources required to
+  meet them, and records the allocation as a discrete line in its
+  programming and budgeting documentation, so an approved measure is
+  traceable to the resources that make it deliverable.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "SA-2"
+    title: "Allocation of Resources"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.5.1"
+    title: "Policies for information security"
+  - catalog: "NIS2 Article 20"
+    control_id: "art-20-1"
+    title: "Management-body approval and oversight of cybersecurity risk-management measures"
+
+d3fend_refs:
+  # Resource allocation is a governance and budgeting discipline rather
+  # than a countermeasure deployed against adversary behaviour, so the
+  # anchor is the mapping technique the catalogue already uses for its
+  # governance controls — control.ict_risk_governance@v1,
+  # control.ict_risk_framework_review@v1 and
+  # control.risk_management_policy@v1 all pin D3-OAM on the same
+  # reasoning. Documenting which organisational activities are funded
+  # to protect which systems is operational-activity mapping.
+  - d3f_id: D3-OAM
+    technique_name: "Operational Activity Mapping"
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+
+provenance:
+  source_url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls
+  captured_at: '2026-07-28'
+  notes: >-
+    Authored to resolve the SA-2 placeholder on the
+    nis2_art20_governance overlay, which referenced this stable id
+    before any file defined it. SA-2 was not anchored by any control in
+    the catalogue; the sibling PM-2 anchor the same overlay needed was
+    already carried by control.ict_risk_governance@v1 and was
+    consolidated there rather than duplicated. The distinction the two
+    hold apart is worth keeping: PM-2 is about who leads the programme,
+    SA-2 is about whether the approved measures are funded — an
+    approved measure that is not resourced is not a discharged measure,
+    which is the failure mode NIS2 Art. 20(1) oversight is meant to
+    catch.
