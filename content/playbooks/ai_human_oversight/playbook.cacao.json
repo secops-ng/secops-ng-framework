@@ -1,0 +1,152 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--e14a5100-0000-4000-8000-000000000001",
+  "name": "EU AI Act Article 14 human-oversight operating loop",
+  "description": "SKELETON — CACAO v2 scaffold for the deployer-side EU AI Act (Regulation (EU) 2024/1689) Article 14 human-oversight loop: the cycle an oversight function actually runs once oversight of a high-risk AI system has been assigned. Article 14 straddles the provider/deployer line — Art. 14(1) and 14(3)(a) require the provider to design the system so it can be effectively overseen and to build in what it can, while Art. 14(3)(b) and 14(4) reach the deployer, who implements the measures the provider identified and must be able to exercise five capabilities: understand the system's capacities and limitations and monitor for anomalies, remain aware of automation bias, correctly interpret output, decide not to use or to disregard, override or reverse the output, and intervene or halt through a stop button or similar procedure. This playbook is the deployer half only; it cannot discharge a provider design duty. The loop runs establish-oversight-roster (who holds oversight for this deployment, with what authority), brief-oversight-personnel (the competence limbs of Art. 14(4), evidenced against the provider's Art. 13 instructions for use), review-flagged-decisions (the standing review pass, carrying the Art. 14(5) two-person branch for Annex III(1)(a) biometric identification), record-intervention (the Art. 14(4)(d)-(e) exercise of a decision not to use, an override, or a halt), and emit-oversight-evidence (the dated cycle record). Assignment is upstream: Art. 26(2) requires the deployer to assign oversight to a competent, trained, authorised and supported natural person, and the assign_human_oversight step of playbook.eu_ai_act_deployer_obligations@v1 hands off to this loop. SKELETON scope: the oversight roster, the decision-review queue, the intervention channel and the evidence store are operator-owned adapter-bound surfaces; step bodies are declared rather than bound.",
+  "playbook_types": [
+    "prevention",
+    "investigation"
+  ],
+  "created_by": "identity--0a1b2c3d-0000-4000-8000-000000000001",
+  "created": "2026-07-28T00:00:00.000Z",
+  "modified": "2026-07-28T00:00:00.000Z",
+  "valid_from": "2026-07-28T00:00:00.000Z",
+  "labels": [
+    "eu-ai-act",
+    "article-14",
+    "human-oversight",
+    "automation-bias",
+    "high-risk-ai",
+    "deployer",
+    "skeleton"
+  ],
+  "external_references": [
+    {
+      "name": "OASIS CACAO v2.0",
+      "description": "Workflow step types (start, action, end), variable conventions, and the x_ extension namespace this artifact uses.",
+      "source": "OASIS Open"
+    },
+    {
+      "name": "EU AI Act — Regulation (EU) 2024/1689, Article 14 (human oversight)",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    },
+    {
+      "name": "EU AI Act — Regulation (EU) 2024/1689, Article 26(2) (assignment of human oversight by the deployer)",
+      "description": "Assignment is the upstream gate; this playbook is the capability loop that follows it.",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    },
+    {
+      "name": "EU AI Act — Regulation (EU) 2024/1689, Annex III point 1(a) (remote biometric identification)",
+      "description": "Scopes the Article 14(5) two-person verification branch on the review step.",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    }
+  ],
+  "x_secops_ng": {
+    "stable_id": "playbook.ai_human_oversight@v1",
+    "content_version": "0.1.0",
+    "maturity": "draft",
+    "compile_targets": [],
+    "control_refs": [
+      "control.training_attestation@v1",
+      "control.ict_risk_governance@v1"
+    ],
+    "telemetry_refs": [
+      "telemetry.ocsf.compliance_finding@v1"
+    ],
+    "metric_refs": [],
+    "sources": [
+      "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+      "OASIS CACAO v2.0 specification"
+    ]
+  },
+  "playbook_variables": {
+    "__deployment_id__": {
+      "type": "string",
+      "description": "Stable operator-side identifier of the high-risk AI system deployment this oversight cycle covers. Shared with playbook.eu_ai_act_deployer_obligations@v1 so the assignment record and this loop join on one key.",
+      "external": true
+    },
+    "__oversight_cycle__": {
+      "type": "string",
+      "description": "Reference to the review window this cycle runs against (RFC 3339 interval). Supplied by the operator's oversight cadence.",
+      "external": true
+    }
+  },
+  "workflow_start": "start--e14a5100-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--e14a5100-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "ai_human_oversight_start",
+      "description": "Entry point. Fires on the operator's oversight cadence for a deployment already in service, and on the assignment edge handed over by the Art. 26(2) step of the deployer-obligations playbook.",
+      "on_completion": "action--e14a5100-0000-4000-8000-000000000002"
+    },
+    "action--e14a5100-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "establish_oversight_roster",
+      "description": "SKELETON — resolve who holds human oversight of __deployment_id__ for __oversight_cycle__ and with what authority, and record the roster. Art. 26(2) makes the assignment; this step makes it operational for the window: which named persons or roles are on watch, what each is empowered to do, and who is reachable when an intervention is needed. The authority limb matters more than it looks — Art. 14(4)(d) and (e) require the overseer to be able to decide not to use the system, disregard or override its output, and interrupt operation, and a roster entry naming someone without that delegated power produces an overseer who cannot lawfully oversee. Read-only against the operator's governance and rota surfaces; this step records the resolved watch, it does not author the operator's delegation model.",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Resolve the oversight roster for __deployment_id__ over __oversight_cycle__ and record each named person or role with the authority delegated to them."
+        }
+      ],
+      "on_completion": "action--e14a5100-0000-4000-8000-000000000003"
+    },
+    "action--e14a5100-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "brief_oversight_personnel",
+      "description": "SKELETON — brief the rostered overseers against the provider's Art. 13 instructions for use and record the briefing, discharging the competence limbs of Art. 14(4). Three capabilities are evidenced here: that the overseer understands the system's relevant capacities and limitations and can monitor operation well enough to detect anomalies, dysfunctions and unexpected performance (14(4)(a)); that they remain aware of the tendency to automatically rely or over-rely on the system's output, which the Regulation names explicitly as automation bias and which is a briefing subject rather than a personal failing (14(4)(b)); and that they can correctly interpret the output, which depends on the interpretation aids the provider supplied (14(4)(c)). The briefing is per-system, not generic security-awareness training: an overseer briefed on a different deployment has not been briefed on this one.",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Record the per-deployment briefing for each rostered overseer against Art. 14(4)(a)-(c), citing the provider's instructions for use."
+        }
+      ],
+      "on_completion": "action--e14a5100-0000-4000-8000-000000000004"
+    },
+    "action--e14a5100-0000-4000-8000-000000000004": {
+      "type": "action",
+      "name": "review_flagged_decisions",
+      "description": "SKELETON — run the standing review pass over the outputs and decisions flagged for oversight in __oversight_cycle__, and record the disposition of each. This is the routine body of the loop: most cycles produce reviews and no interventions, and the dated record of a review that found nothing is as much evidence of oversight as an intervention is. Carries the Art. 14(5) conditional branch: where the deployment is an Annex III point 1(a) remote biometric identification system, no action or decision may be taken on the basis of an identification unless that identification has been separately verified and confirmed by at least two natural persons who each carry the necessary competence, training and authority. The branch records both verifiers separately — one person confirming twice does not satisfy it. Where the operator relies on the narrow law-enforcement, migration, border-control or asylum exemption, the step records the Union or national legal basis relied on, not merely that the exemption was taken.",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Record the review disposition for each flagged output; on an Annex III(1)(a) deployment, record the two separate verifiers or the legal basis for the exemption."
+        }
+      ],
+      "on_completion": "action--e14a5100-0000-4000-8000-000000000005"
+    },
+    "action--e14a5100-0000-4000-8000-000000000005": {
+      "type": "action",
+      "name": "record_intervention",
+      "description": "SKELETON — where the review produced an exercise of Art. 14(4)(d) or (e), record the intervention against __deployment_id__. Four distinct exercises fall here and the record names which occurred, because they carry different weight on later review: a decision not to use the system in the particular situation; a decision to disregard its output; an override or reversal of that output; and an interruption of operation through a stop button or similar procedure. The record captures who intervened, on what basis, and what the system had produced — the last of these matters because an intervention is also a signal about the system, and it is the raw material the Art. 26(5) monitoring duty and the provider's Art. 72 post-market loop consume. A cycle with no intervention closes this step with a dated nil record rather than skipping it.",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Record each intervention with its type (decline, disregard, override, halt), the intervening overseer, the basis, and the system output it acted on."
+        }
+      ],
+      "on_completion": "action--e14a5100-0000-4000-8000-000000000006"
+    },
+    "action--e14a5100-0000-4000-8000-000000000006": {
+      "type": "action",
+      "name": "emit_oversight_evidence",
+      "description": "SKELETON — compose the dated cycle-evidence artifact joining the roster, the briefings, the review dispositions and any interventions for __deployment_id__ over __oversight_cycle__, and write it to the operator's evidence store. This is what an auditor or market-surveillance authority reads to establish that oversight was not merely assigned but exercised — the distinction Art. 14 turns on, since a named overseer who never reviewed anything satisfies Art. 26(2) on paper and Art. 14 not at all. The evidence store is an operator-owned adapter-bound surface; the playbook declares the record shape and ships no store.",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Compose and persist the dated oversight-cycle evidence record for __deployment_id__ over __oversight_cycle__."
+        }
+      ],
+      "on_completion": "end--e14a5100-0000-4000-8000-000000000007"
+    },
+    "end--e14a5100-0000-4000-8000-000000000007": {
+      "type": "end",
+      "name": "ai_human_oversight_end",
+      "description": "Terminal state. The cycle closes on the dated evidence artifact; the next oversight window re-enters at the start step."
+    }
+  }
+}

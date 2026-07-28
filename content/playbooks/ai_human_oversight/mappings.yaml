@@ -1,0 +1,149 @@
+# Outbound mappings overlay — playbook.ai_human_oversight@v1
+#
+# SKELETON layer. Every control stable-id below resolves to a committed
+# file under content/controls/; this overlay introduces no forward
+# reference to a control that does not yet exist.
+#
+# Primary inbound axis:
+#   content/mappings/eu_ai_act/article-14-human-oversight.yaml
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.ai_human_oversight@v1
+
+oscal:
+  # Art. 14(4) splits cleanly into competence limbs and authority limbs,
+  # and only the competence side has a control analogue in this
+  # catalogue. That asymmetry is deliberate, not an omission — see the
+  # note on the 14(4) entry in the inbound mapping.
+  - id: control.training_attestation@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AT-3
+    title: Role-Based Training
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls
+    notes: >-
+      Anchors brief_oversight_personnel. Art. 14(4)(a)-(c) require the
+      overseer to understand the system's capacities and limitations,
+      remain aware of automation bias, and correctly interpret output.
+      Those are competence properties evidenced by a per-deployment
+      briefing record, which is what AT-3 role-based training names. The
+      briefing is per-system: an overseer briefed on another deployment
+      has not been briefed on this one, so a generic security-awareness
+      attestation does not satisfy the binding.
+
+  - id: control.ict_risk_governance@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: PM-2
+    title: Information Security Program Leadership Role
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls
+    notes: >-
+      Anchors establish_oversight_roster. The control covers the
+      operator's governance framework with clear roles and defined
+      responsibilities, which is the surface a per-cycle oversight
+      roster is drawn from. What it does NOT cover is the Art. 14(4)(d)
+      and (e) authority to disregard, override or halt — that is a
+      specific delegated power over a specific deployment, and no
+      control in this catalogue models it. The roster step records the
+      delegation; the binding here reaches only the governance
+      structure the delegation is issued under.
+
+d3fend: []
+  # No per-step D3FEND pin, and the gap is reasoned rather than
+  # deferred to a card.
+  #
+  # The five steps are a human-governance loop over an AI system's
+  # outputs — roster, brief, review, intervene, evidence. D3FEND v1.0.0
+  # describes defensive techniques executed against adversary behaviour
+  # on a deployed estate; none of these steps is one. The nearest
+  # candidate is D3-OAM (Operational Activity Mapping) on
+  # emit_oversight_evidence, on the same record-composition reasoning
+  # that put it on the archival steps of dora_major_incident_reporting
+  # and nis2_art20_governance. It is left unpinned at SKELETON because
+  # CORE decides whether the oversight-cycle record is genuinely a
+  # record-composition surface; pinning it now would prejudge that.
+  #
+  # Precedent for an empty block with per-step rationale:
+  # playbook.cyber_hygiene_training@v1.
+
+ocsf:
+  - id: telemetry.ocsf.compliance_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2003
+    class_name: Compliance Finding
+    ocsf_version: 1.3.0
+    direction: both
+    notes: >-
+      Every step emits a dated determination — the resolved roster, the
+      per-overseer briefing, each review disposition, each intervention
+      (or a nil record), and the cycle-evidence artifact. Compliance
+      Finding is the class those resolve against, consistent with the
+      other regulatory-lifecycle playbooks. Consumed at
+      review_flagged_decisions, which reads the operator's flagged-output
+      queue; emitted at every step. CORE finalises per-step
+      directionality.
+
+nis2: []
+  # Deliberately empty. NIS2 Art. 20 governs management-body oversight
+  # of cybersecurity risk-management measures at entity level, which is
+  # a different object from oversight of one AI system's outputs by a
+  # rostered operator. playbook.nis2_art20_governance@v1 already carries
+  # that surface; cross-pinning would conflate an entity-governance
+  # cadence with an operational review loop.
+
+dora: []
+  # Deliberately empty, on the same reasoning as the NIS2 block. DORA
+  # Art. 5 places ultimate ICT-risk responsibility on the management
+  # body of a financial entity; it does not speak to human oversight of
+  # an AI system's individual outputs.
+
+cra: []
+  # Deliberately empty. The CRA binds manufacturers of products with
+  # digital elements. Human oversight under Art. 14 is a duty of the
+  # party operating a high-risk AI system, not of the party that built
+  # a product.
+
+gdpr:
+  - mapping_id: gdpr:art-22
+    article: "22"
+    notes: >-
+      Adjacent and easy to conflate, recorded so the boundary is
+      explicit. GDPR Art. 22 gives a data subject the right not to be
+      subject to a decision based solely on automated processing which
+      produces legal or similarly significant effects, and the right to
+      obtain human intervention. Art. 14 oversight is one of the
+      mechanisms by which a deployer can ensure a decision is not
+      "solely" automated, so the two interact — but they are not the
+      same duty: Art. 22 is a right held by the data subject and
+      exercisable by them, while Art. 14 is a standing obligation on the
+      deployer that operates whether or not anyone objects. Satisfying
+      Art. 14 does not by itself discharge an Art. 22 request. This
+      playbook records interventions; it does not implement an Art. 22
+      response path.
+
+eu_ai_act:
+  - mapping_id: eu_ai_act:art-14-4-oversight-capabilities
+    article: "14"
+    notes: >-
+      Primary anchor. The five capabilities in Art. 14(4) are what the
+      loop exists to make exercisable and evidence.
+  - mapping_id: eu_ai_act:art-14-5-biometric-two-person-verification
+    article: "14"
+    notes: >-
+      Conditional branch on review_flagged_decisions, active only for
+      Annex III point 1(a) remote biometric identification deployments.
+  - mapping_id: eu_ai_act:art-14-1-3-oversight-measures
+    article: "14"
+    notes: >-
+      Context rather than discharge. Art. 14(1) and 14(3)(a) are
+      provider design duties this playbook cannot satisfy; the
+      14(3)(b) measures the provider identifies for the deployer are
+      the input the brief_oversight_personnel step reads.
+  - mapping_id: eu_ai_act:art-26-2-human-oversight-assignment
+    article: "26"
+    notes: >-
+      Upstream gate. Art. 26(2) assigns oversight to a competent,
+      trained, authorised and supported natural person; the
+      assign_human_oversight step of
+      playbook.eu_ai_act_deployer_obligations@v1 hands off to this loop.
+      Assignment without an exercised loop satisfies 26(2) on paper and
+      Art. 14 not at all.
