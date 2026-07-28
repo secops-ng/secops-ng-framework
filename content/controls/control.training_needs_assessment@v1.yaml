@@ -1,0 +1,56 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.training_needs_assessment@v1
+title: Security training needs assessment
+summary: >-
+  Operator determines, on a declared cadence, which staff populations
+  require which security training, on a role and risk basis rather than
+  a uniform one, and records the dated determination as the input the
+  curriculum is authored against. The assessment names the roles in
+  scope, the threats and obligations each faces, and the competences
+  the training must therefore produce.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "AT-2"
+    title: "Literacy Training and Awareness"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-g"
+    title: "Cyber hygiene and training"
+
+d3fend_refs:
+  # Determining who needs training against which threats is a planning
+  # and documentation discipline, not a countermeasure deployed against
+  # adversary behaviour, so the anchor is the mapping technique the
+  # catalogue already uses for its governance controls —
+  # control.ict_risk_governance@v1, control.risk_management_policy@v1
+  # and control.resource_allocation@v1 all pin D3-OAM on the same
+  # reasoning.
+  - d3f_id: D3-OAM
+    technique_name: "Operational Activity Mapping"
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+
+review_cadence: P1Y
+
+provenance:
+  source_url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls
+  captured_at: '2026-07-28'
+  notes: >-
+    Authored to resolve the AT-2 placeholder on the
+    security_awareness_training overlay, which referenced this stable
+    id before any file defined it. Reuse of the existing
+    control.training_attestation@v1 was considered and rejected: that
+    control is the per-person completion evidence OTHER playbooks
+    consume as a precondition — the Art. 26(2) and Art. 14(4)
+    competence limbs both bind it that way — whereas this control is
+    the programme-side production discipline that decides what
+    training should exist at all. Sharing the AT-2 anchor between the
+    two is deliberate and matches established practice in this
+    catalogue, where 44 of 114 catalogue anchors are claimed by more
+    than one control; A.6.3 and art21-2-g were already shared between
+    control.training_attestation@v1 and control.phishing_simulation@v1
+    before this card. The needs assessment is the only one of the four
+    programme controls that can fail silently — an unassessed
+    population receives no training and generates no absent-evidence
+    signal — which is why it is a control in its own right rather than
+    a preamble to the curriculum.
