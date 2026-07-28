@@ -11,17 +11,29 @@ EU. That framing sets the voice; the hygiene linter enforces a floor.
 Neither is a hazing ritual — both exist because the git history is
 permanent and searchable.
 
-## 1. Pick a card
+## 1. Pick an issue
 
-Open [`ROADMAP.md`](../../ROADMAP.md) at the repository root. Cards
-tagged `good-first` are scoped to a single sitting and self-contained
-enough that you do not need to coordinate with anyone before starting.
+Open the [issue tracker][issues] and filter to
+[`good first issue`][lbl-gfi] or [`contributor:welcome`][lbl-cw]. Those
+are scoped to a single sitting and self-contained enough that you do not
+need to coordinate with anyone before starting. [`help wanted`][lbl-hw]
+is the next step up once you have landed one.
 
-Comment on the linked issue saying you would like to take it, so two
-people do not unknowingly do the same work. A single comment is enough
-— there is no formal assignment step.
+Comment on the issue saying you would like to take it, so two people do
+not unknowingly do the same work. A single comment is enough — there is
+no formal assignment step.
 
-If nothing on the board fits your interest, opening a
+[`ROADMAP.md`](../../ROADMAP.md) is worth reading for context on why a
+piece of work matters, but it is a registry of shipped and proposed
+features rather than a list of open tasks — take the issue, not the
+roadmap entry.
+
+[issues]: https://github.com/secops-ng/secops-ng-framework/issues
+[lbl-gfi]: https://github.com/secops-ng/secops-ng-framework/labels/good%20first%20issue
+[lbl-cw]: https://github.com/secops-ng/secops-ng-framework/labels/contributor%3Awelcome
+[lbl-hw]: https://github.com/secops-ng/secops-ng-framework/labels/help%20wanted
+
+If nothing open fits your interest, opening a
 [Playbook request](../../.github/ISSUE_TEMPLATE/playbook-request.yml)
 or a
 [Good first issue](../../.github/ISSUE_TEMPLATE/good-first-issue.yml)

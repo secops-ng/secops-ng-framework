@@ -7,10 +7,13 @@ anyone. Each vector points at the directory you will work in, the
 standards the change is measured against, and the issue template you
 open first.
 
-These vectors complement — they do not replace — the cards tagged
-`good-first` on the public roadmap. If a roadmap card fits your
-interest, take that one; if nothing on the board fits, one of the
-vectors below is a safe starting point.
+These vectors complement — they do not replace — the open issues
+labelled [`good first issue`][lbl-gfi] and [`contributor:welcome`][lbl-cw].
+If an open issue fits your interest, take that one; if nothing open
+fits, one of the vectors below is a safe starting point.
+
+[lbl-gfi]: https://github.com/secops-ng/secops-ng-framework/labels/good%20first%20issue
+[lbl-cw]: https://github.com/secops-ng/secops-ng-framework/labels/contributor%3Awelcome
 
 Read [`CONTRIBUTING.md`](../../CONTRIBUTING.md) once before you begin.
 Read [`first-contribution.md`](first-contribution.md) alongside — it is

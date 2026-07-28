@@ -104,8 +104,8 @@ status is required to contribute.
 Maintainers who have additionally accepted accountability for a named
 content area (see §2.1). A chapter lead's responsibilities:
 
-- Keep at least one `good-first` card open on the public board in
-  their area at all times.
+- Keep at least one issue labelled `good first issue` open in their
+  area at all times.
 - Triage incoming pull requests in their area within a reasonable
   window.
 - Escalate cross-cutting changes to the maintainer set as a whole.

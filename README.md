@@ -29,7 +29,12 @@ documents are the whole substrate:
 - [SECURITY.md](SECURITY.md) — coordinated disclosure, response SLOs,
   the security-critical surface enumeration, and NIS2/DORA alignment.
 
-A roadmap of `good-first` cards lives in `ROADMAP.md`.
+Work open to contributors is in the
+[issue tracker](https://github.com/secops-ng/secops-ng-framework/issues) —
+start with
+[`good first issue`](https://github.com/secops-ng/secops-ng-framework/labels/good%20first%20issue).
+`ROADMAP.md` is the reviewed registry of what has shipped and what is
+proposed next.
 
 ## What is SecOps-NG
 
