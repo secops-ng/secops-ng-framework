@@ -1,0 +1,154 @@
+# EU AI Act — Chapter V, Article 53: obligations for providers of
+# general-purpose AI models.
+#
+# SCOPE NOTE — read this before adding control_refs to any entry here.
+#
+# Chapter V binds a population this framework does not serve. Art. 53
+# obligations fall on the provider of a general-purpose AI model — the
+# organisation that trains and places the model on the Union market —
+# whereas every operational artifact in this catalogue is authored for
+# the operator who runs security operations, and (since the Art. 26
+# work) for the deployer of a high-risk AI system.
+#
+# This mapping is therefore deliberately NAVIGATIONAL rather than
+# operational. It records where the model provider's duties sit so an
+# operator integrating a general-purpose model can see what its upstream
+# owes, what to require contractually, and which artifacts to demand.
+# It does not claim the framework discharges those duties, and most
+# entries carry no control_refs or playbook_refs for exactly that
+# reason. Adding a binding here because a control's title sounds
+# adjacent would misattribute a provider obligation to an operator
+# artifact — the failure mode this note exists to prevent.
+#
+# The one genuine operator-side hook is Art. 53(1)(b): that obligation
+# runs *toward* the downstream provider integrating the model, so the
+# operator is its beneficiary and the attestation it produces is
+# something the operator's third-party assurance surface can hold.
+#
+# Out of scope for this file, tracked separately if ever needed:
+#   - Art. 51/52 — the systemic-risk classification threshold and the
+#     provider's notification duty to the Commission. Classification
+#     mechanics, not an obligation surface an operator navigates.
+#   - Art. 54 — authorised representatives of third-country providers.
+#   - Art. 56 — codes of practice.
+#   - Art. 53(2) — the free-and-open-source licence exemption, which
+#     disapplies 53(1)(a) and (b) for models released under a free and
+#     open-source licence whose parameters and architecture are public,
+#     except where the model presents systemic risk. Noted here because
+#     it materially changes what an operator can demand of an
+#     open-weights upstream; the exemption is recorded in the Art. 53(1)(a)
+#     and (b) notes rather than as its own entry.
+#
+# Sibling: article-55-systemic-risk-obligations.yaml carries the
+# additional duties that attach only to models with systemic risk.
+regime: eu_ai_act
+entries:
+  - id: eu_ai_act:art-53-1-a-technical-documentation
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "53"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      Providers of general-purpose AI models shall draw up and keep
+      up-to-date the technical documentation of the model, including its
+      training and testing process and the results of its evaluation,
+      containing at a minimum the information set out in Annex XI, for
+      the purpose of providing it, upon request, to the AI Office and
+      the national competent authorities.
+    status: live
+    notes: >-
+      Provider-side; no framework artifact discharges it, so no
+      control_refs or playbook_refs are pinned. Operator relevance is
+      indirect but real: the documentation is produced for the AI Office
+      on request, not for the deployer, so an operator cannot assume
+      access to it and should not build a control that presumes access.
+      What the operator can obtain is the Art. 53(1)(b) downstream
+      package — see the sibling entry. Disapplied by Art. 53(2) for
+      models released under a free and open-source licence with public
+      parameters and architecture, unless the model presents systemic
+      risk.
+
+  - id: eu_ai_act:art-53-1-b-downstream-documentation
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "53"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      Providers of general-purpose AI models shall draw up, keep
+      up-to-date and make available information and documentation to
+      providers of AI systems who intend to integrate the
+      general-purpose AI model into their AI systems, containing at a
+      minimum the elements set out in Annex XII, so as to enable those
+      providers to have a good understanding of the capabilities and
+      limitations of the model and to comply with their own obligations.
+    status: live
+    control_refs:
+      - control.provider_attestation@v1
+    notes: >-
+      The one Art. 53 obligation with a genuine operator-side hook, and
+      the only entry in this file carrying a control_ref. The duty runs
+      *toward* the downstream provider integrating the model, so an
+      organisation building on a general-purpose model is its
+      beneficiary rather than its subject. The Annex XII package is
+      therefore something the operator can and should require, and
+      control.provider_attestation@v1 — which collects and refreshes
+      attestations from third-party providers covering the security
+      characteristics relied on under the contractual arrangement — is
+      the surface that holds it on the declared cadence. Note what the
+      binding does and does not assert: the operator does not discharge
+      the model provider's duty, it evidences receipt of what the duty
+      produces. Also disapplied by the Art. 53(2) open-source exemption
+      absent systemic risk, which is precisely when an operator has to
+      fall back on published model cards rather than a contractual
+      package.
+
+  - id: eu_ai_act:art-53-1-c-copyright-policy
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "53"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      Providers of general-purpose AI models shall put in place a policy
+      to comply with Union law on copyright and related rights, and in
+      particular to identify and comply with, including through
+      state-of-the-art technologies, a reservation of rights expressed
+      pursuant to Article 4(3) of Directive (EU) 2019/790.
+    status: live
+    notes: >-
+      Recorded for completeness of the Chapter V surface and
+      deliberately unbound. This is a copyright-compliance obligation,
+      not a security or resilience one, and no artifact in this
+      catalogue exercises it. Pinning a security control to it would
+      misrepresent both the obligation and the control. An operator's
+      interest is contractual — whether the upstream warrants that the
+      policy exists — which is a procurement question rather than a
+      control question.
+
+  - id: eu_ai_act:art-53-1-d-training-content-summary
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "53"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      Providers of general-purpose AI models shall draw up and make
+      publicly available a sufficiently detailed summary about the
+      content used for training of the general-purpose AI model,
+      according to a template provided by the AI Office.
+    status: live
+    notes: >-
+      Provider-side and unbound. Unlike Art. 53(1)(a), the artifact this
+      produces is public, so an operator can read it without a
+      contractual route — which makes it the practical starting point
+      for due diligence on an upstream model. The AI Office template
+      governs its shape; where the template has not been published for a
+      given cycle, the summary's completeness is not something an
+      operator can score against a fixed rubric, and a control that
+      presumed one would produce false assurance.
