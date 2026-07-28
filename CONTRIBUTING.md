@@ -86,28 +86,43 @@ is cheap and the answer is durable.
 
 [website-repo]: https://github.com/secops-ng/secops-ng-website
 
-## 4. Find a good-first card on the public roadmap
+## 4. Find something to work on
 
-The public roadmap is rendered from the open kanban board and lives in
-the repository as `ROADMAP.md`. Cards tagged `good-first` are scoped to
-be approachable in a single sitting and self-contained enough that you
-do not need to coordinate with anyone before starting.
+Open work lives in the [issue tracker][issues], sorted by label:
 
-Pick one. Comment on the linked issue saying you would like to take it
-so two people do not unknowingly do the same work. There is no formal
+| Label | What it means |
+|---|---|
+| [`good first issue`][lbl-gfi] | Scoped for a single sitting, self-contained, no coordination needed. Start here. |
+| [`contributor:welcome`][lbl-cw] | Held open for newcomers. A maintainer will walk you through the round-trip. |
+| [`help wanted`][lbl-hw] | Larger than a first issue — a few hours to half a day — and usually has a committed precedent in the tree to follow. |
+| [`arch`][lbl-arch] | Design decisions. Discussion is welcome; these are usually resolved by maintainers. |
+
+Pick one and comment on it saying you would like to take it, so two
+people do not unknowingly do the same work. There is no formal
 assignment dance — a comment is enough.
 
-If nothing on the board fits, opening an issue to propose your own
-change is equally welcome. Smaller, sharper proposals merge faster than
-large undirected ones.
+If nothing open fits, opening an issue to propose your own change is
+equally welcome. Smaller, sharper proposals merge faster than large
+undirected ones.
 
-If you would rather start from a curated menu of contribution vectors
-than from the roadmap,
-[`docs/contributing/good-first-issues.md`](docs/contributing/good-first-issues.md)
+For a curated menu of contribution *vectors* rather than specific
+issues, [`docs/contributing/good-first-issues.md`](docs/contributing/good-first-issues.md)
 lists four concrete starting points — a new CACAO playbook, a compiled
 example for an existing playbook, a translation, or a walkthrough
 improvement — each with the directory to work in, the standards to
 satisfy, and the issue template to open.
+
+`ROADMAP.md` is **not** a task board: it is the reviewed registry of
+what the framework has shipped and what is proposed next, and every
+entry links the goals it moves. Read it to understand why a piece of
+work matters, then take the corresponding issue. A roadmap entry marked
+`Proposed` is an invitation to discuss, not an unclaimed ticket.
+
+[issues]: https://github.com/secops-ng/secops-ng-framework/issues
+[lbl-gfi]: https://github.com/secops-ng/secops-ng-framework/labels/good%20first%20issue
+[lbl-cw]: https://github.com/secops-ng/secops-ng-framework/labels/contributor%3Awelcome
+[lbl-hw]: https://github.com/secops-ng/secops-ng-framework/labels/help%20wanted
+[lbl-arch]: https://github.com/secops-ng/secops-ng-framework/labels/arch
 
 ## 5. Open a pull request
 
