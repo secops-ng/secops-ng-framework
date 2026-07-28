@@ -1,0 +1,153 @@
+# EU AI Act — Article 14 human oversight of high-risk AI systems.
+#
+# Art. 14 sits across the provider/deployer line, which is why it needs
+# reading carefully before anything is bound to it:
+#
+#   - Art. 14(1) and 14(3)(a) are PROVIDER duties. The system must be
+#     designed and developed with human-machine interface tools such
+#     that it can be effectively overseen, and the provider builds in
+#     the oversight measures it can.
+#   - Art. 14(3)(b) and 14(4) reach the DEPLOYER. Where a measure
+#     cannot be built into the system, the provider identifies it for
+#     the deployer to implement, and the capability set in 14(4) is
+#     what the assigned overseer must actually be able to do.
+#   - Art. 14(5) is a deployer operating rule specific to the
+#     Annex III(1)(a) biometric-identification use case.
+#
+# The shipped playbook.ai_human_oversight@v1 is the deployer-side
+# operating loop: roster, brief, review, intervene, evidence. It does
+# not and cannot discharge the provider's design obligations under
+# 14(1)/14(3)(a) — a playbook cannot put a stop button into someone
+# else's product. Those entries are recorded without control_refs for
+# the same reason the Chapter V mapping records most of its entries
+# that way: this framework serves operators, and asserting coverage of
+# a provider design duty would be a false claim.
+#
+# Relationship to Art. 26(2): that obligation requires the deployer to
+# ASSIGN oversight to a competent, trained, authorised and supported
+# natural person. Art. 14(4) fixes what that person must be ABLE to do
+# once assigned. Assignment is the gate; capability is the content.
+# eu_ai_act:art-26-2-human-oversight-assignment names this entry as its
+# capability anchor, and the assign_human_oversight step of
+# playbook.eu_ai_act_deployer_obligations@v1 hands off to the loop this
+# mapping's playbook runs.
+regime: eu_ai_act
+entries:
+  - id: eu_ai_act:art-14-1-3-oversight-measures
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "14"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      High-risk AI systems shall be designed and developed in such a way,
+      including with appropriate human-machine interface tools, that they
+      can be effectively overseen by natural persons during the period in
+      which they are in use, with a view to preventing or minimising the
+      risks to health, safety or fundamental rights that may emerge when
+      the system is used in accordance with its intended purpose or under
+      conditions of reasonably foreseeable misuse. Oversight measures
+      shall be either identified and built into the system by the
+      provider before it is placed on the market or put into service, or
+      identified by the provider before that point and appropriate to be
+      implemented by the deployer.
+    status: live
+    notes: >-
+      Provider-side and deliberately unbound. The design duty in 14(1)
+      and the built-in measures in 14(3)(a) are discharged when the
+      system is built; no operator artifact reaches them, and pinning a
+      control here would assert coverage this framework does not have.
+      What the entry gives an operator is navigational: it names the
+      artifact a deployer should expect to receive — the provider's
+      identified 14(3)(b) measures, delivered through the Art. 13
+      instructions for use — and therefore what to require at
+      procurement. The deployer-side implementation of those measures is
+      the subject of the sibling 14(4) entry.
+
+  - id: eu_ai_act:art-14-4-oversight-capabilities
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "14"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      The oversight measures shall enable the natural persons to whom
+      human oversight is assigned to properly understand the relevant
+      capacities and limitations of the high-risk AI system and duly
+      monitor its operation, including to detect and address anomalies,
+      dysfunctions and unexpected performance; to remain aware of the
+      possible tendency of automatically relying or over-relying on the
+      output produced by a high-risk AI system, in particular where it
+      is used to provide information or recommendations for decisions;
+      to correctly interpret the output; to decide, in any particular
+      situation, not to use the system or otherwise to disregard,
+      override or reverse its output; and to intervene in its operation
+      or interrupt it through a stop button or a similar procedure.
+    status: live
+    control_refs:
+      - control.training_attestation@v1
+    playbook_refs:
+      - playbook.ai_human_oversight@v1
+    evidence_stream_refs:
+      - access
+    notes: >-
+      The operative deployer-side atom and the anchor for the shipped
+      oversight loop. Five independently checkable capabilities, treated
+      as a checklist rather than a general duty of care: understand
+      capacities and limitations; remain aware of automation bias;
+      correctly interpret output; decide not to use, disregard, override
+      or reverse; and intervene or halt. control.training_attestation@v1
+      binds the first three, which are competence properties evidenced
+      by briefing records. The last two are authority properties rather
+      than competence ones — the power to override or halt is a
+      delegation the operator's governance surface grants, and no
+      control in this catalogue models it, so none is pinned. Capability
+      (this entry) presupposes assignment
+      (eu_ai_act:art-26-2-human-oversight-assignment): a person cannot
+      exercise a capability they were never assigned, and an assignment
+      to someone who cannot exercise all five is not compliant.
+
+  - id: eu_ai_act:art-14-5-biometric-two-person-verification
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "14"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      For high-risk AI systems referred to in point 1(a) of Annex III,
+      the measures shall be such as to ensure that, in addition, no
+      action or decision is taken by the deployer on the basis of the
+      identification resulting from the system unless that
+      identification has been separately verified and confirmed by at
+      least two natural persons with the necessary competence, training
+      and authority. The requirement for separate verification by at
+      least two natural persons shall not apply to high-risk AI systems
+      used for the purposes of law enforcement, migration, border
+      control or asylum where Union or national law considers the
+      application of this requirement to be disproportionate.
+    status: live
+    playbook_refs:
+      - playbook.ai_human_oversight@v1
+    evidence_stream_refs:
+      - access
+    notes: >-
+      Use-case-specific: it binds only deployers of Annex III(1)(a)
+      remote biometric identification systems, so the shipped playbook
+      treats it as a conditional branch on the review step rather than
+      as a step every deployment runs. Two properties are easy to lose
+      in implementation and are called out here. First, the verification
+      must be SEPARATE and by at least TWO natural persons — a single
+      overseer confirming twice does not satisfy it, and both persons
+      must independently carry the competence, training and authority
+      the article names. Second, the exemption is narrow and is not the
+      deployer's to assert unilaterally: it applies to law-enforcement,
+      migration, border-control and asylum uses only where Union or
+      national law considers the requirement disproportionate, so the
+      operator records the legal basis relied on rather than the
+      operational inconvenience. No control_refs: the four-eyes rule is
+      a decision-procedure constraint, and the closest catalogue
+      controls model access separation on systems rather than
+      confirmation of an identification result.
