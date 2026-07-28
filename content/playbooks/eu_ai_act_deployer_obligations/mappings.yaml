@@ -1,6 +1,6 @@
 # Outbound mappings overlay — playbook.eu_ai_act_deployer_obligations@v1
 #
-# SKELETON layer. Every control stable-id referenced below resolves to a
+# CORE layer. Every control stable-id referenced below resolves to a
 # committed file under content/controls/ — this overlay deliberately
 # introduces no forward reference to a control that does not yet exist,
 # because unflagged dangling control refs are invisible to the
@@ -64,9 +64,9 @@ oscal:
       chain this playbook's serious-incident branch hands off to, which
       is what makes the two chains joinable on review.
 
-d3fend:
-  # No per-step D3FEND pin at SKELETON, and the gap is deliberate rather
-  # than deferred to a card that may never be filed.
+  # One per-step D3FEND pin, on the composition step. The remaining
+  # gaps are deliberate rather than deferred to a card that may never
+  # be filed.
   #
   # The five steps are compliance-governance disciplines over a
   # third-party system — an intended-purpose determination, an oversight
@@ -75,18 +75,46 @@ d3fend:
   # adversary behaviour on the operator's estate, which is what D3FEND
   # v1.0.0 techniques describe.
   #
-  # One candidate is worth naming so a later reader does not re-derive
-  # the analysis: D3-OAM (Operational Activity Mapping) plausibly fits
-  # retain_logs_and_evidence, on the same reasoning that put it on the
-  # record-composition steps of dora_major_incident_reporting,
-  # cra_srp_notify and nis2_art20_governance. It is not pinned here
-  # because the CORE layer decides whether the cycle-evidence artifact
-  # is genuinely a record-composition surface or merely a retention
-  # disposition; pinning it at SKELETON would prejudge that.
+  # The SKELETON left one question open for CORE: whether
+  # retain_logs_and_evidence is genuinely a record-composition surface,
+  # in which case D3-OAM (Operational Activity Mapping) fits it on the
+  # same reasoning that put D3-OAM on the record-composition steps of
+  # dora_major_incident_reporting, cra_srp_notify and
+  # nis2_art20_governance — or merely a retention disposition, in which
+  # case pinning it would overclaim.
   #
-  # Precedent for an empty block with per-step rationale:
-  # playbook.cyber_hygiene_training@v1.
-d3fend: []
+  # CORE resolves it affirmatively, and the step's own I/O contract is
+  # the evidence: retain_logs_and_evidence consumes four upstream
+  # records (the intended-use determination, the oversight assignment,
+  # the monitoring observation and the fundamental-rights
+  # determination) and emits one joined dated artifact. That is
+  # composition, not disposition. The Art. 26(6) retention decision
+  # rides along inside the same step, but it is not what the step
+  # produces.
+  #
+  # The other four steps stay unpinned for the reason given above: they
+  # are compliance-governance disciplines over a third-party system,
+  # not countermeasures D3FEND v1.0.0 techniques describe.
+d3fend:
+  - step: action--e26d1a00-0000-4000-8000-000000000006
+    d3fend_id: D3-OAM
+    d3fend_name: Operational Activity Mapping
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    notes: >-
+      retain_logs_and_evidence — composing the dated cycle-evidence
+      artifact that joins the Art. 26(1) intended-use determination,
+      the Art. 26(2) oversight assignment, the Art. 26(5) monitoring
+      observations and the Art. 27 fundamental-rights determination
+      into one record against the deployment is the
+      operational-activity-mapping discipline D3-OAM names: the step
+      maps the deployment's operational activity onto the
+      organisational accountability context a market-surveillance
+      authority reads it against. Follows the precedent set on
+      dora_major_incident_reporting (close_and_archive) and
+      cra_srp_notify (final_report). The Art. 26(6) log-control
+      determination and applied retention period are recorded by the
+      same step but are a disposition rather than a composition, and
+      are not what the D3-OAM pin covers.
 
 ocsf:
   - id: telemetry.ocsf.compliance_finding@v1
@@ -103,10 +131,18 @@ ocsf:
       assessment and its authority notification, and the retention
       disposition. Compliance Finding is the class those determinations
       resolve against, consistent with the other regulatory-lifecycle
-      playbooks in the catalogue. Consumed at confirm_intended_use and
-      assess_fundamental_rights_impact (reads against the deployment
-      register and any existing DPIA record); emitted at every step.
-      CORE finalises per-step directionality.
+      playbooks in the catalogue. Directionality finalised in CORE as
+      both, and the split is per-step rather than uniform: consumed at
+      confirm_intended_use (the deployment register and the provider's
+      instructions for use) and at assess_fundamental_rights_impact
+      (any existing GDPR Art. 35 DPIA, read so the Art. 27(4)
+      complement-rather-than-duplicate rule can be applied against real
+      overlapping elements); emitted at assign_human_oversight,
+      monitor_operation, assess_fundamental_rights_impact and
+      retain_logs_and_evidence. assess_fundamental_rights_impact is the
+      one step on both sides of the split — it reads the DPIA and emits
+      the Art. 27 determination — which is why the block resolves to
+      both rather than to a single direction.
 
 nis2:
   - mapping_id: nis2:todo-deployer-parallel

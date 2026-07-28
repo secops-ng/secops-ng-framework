@@ -1,0 +1,445 @@
+{
+  "name": "EU AI Act Article 26 deployer obligations with Article 27 fundamental-rights impact assessment",
+  "nodes": [
+    {
+      "id": "start--e26d1a00-0000-4000-8000-000000000001",
+      "name": "eu_ai_act_deployer_obligations_start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__deployment_id__",
+              "type": "string",
+              "value": "",
+              "description": "Stable operator-side identifier of the high-risk AI system deployment this cycle covers. Joins the intended-use determination, the oversight assignment, the monitoring record, the fundamental-rights assessment and the retention record on one key."
+            },
+            {
+              "name": "__system_reference__",
+              "type": "string",
+              "value": "",
+              "description": "Reference to the provider's high-risk AI system and the instructions for use accompanying it (Art. 13). External \u2014 supplied from the operator's deployment register."
+            },
+            {
+              "name": "__intended_use_determination_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the dated Art. 26(1) conformance determination emitted by the confirm-intended-use step. Carries the negative case as a first-class value: a determination recording that the declared deployment context exceeds the intended-purpose boundary, and that the deployment must not proceed on this system. Consumed by the oversight-assignment and fundamental-rights steps."
+            },
+            {
+              "name": "__oversight_assignment_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the Art. 26(2) oversight-assignment record naming the assignee or role against each of competence, training, authority and support. Consumed by the monitoring step, which is the step an assignee actually exercises oversight through, and by the retention step that joins it into the cycle evidence."
+            },
+            {
+              "name": "__monitoring_observation_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the per-window Art. 26(5) monitoring observation, carrying the Art. 26(4) input-data determination for the same window. Consumed by the retention step."
+            },
+            {
+              "name": "__escalation_trigger_class__",
+              "type": "string",
+              "value": "",
+              "description": "Trigger class the monitoring window resolved to, kept separate from the observation identifier because the three values carry different legal consequences and must not be collapsed: routine monitoring feeding the provider's Art. 72 post-market loop; an Art. 79(1) risk determination, which compels notification AND suspension of use without undue delay; and a serious-incident identification, which compels immediate sequenced notification and hands off to the provider-side Art. 73 chain. CORE: string; EXTEND tightens to an enum once the Art. 73 handoff contract is exercised end to end."
+            },
+            {
+              "name": "__fria_determination_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the Art. 27 record. Holds the in-scope determination in every case, and the Art. 27(1)(a)-(f) assessment plus the Art. 27(4) market-surveillance notification where the deployer is in scope. An out-of-scope determination is a dated record, not an absence."
+            },
+            {
+              "name": "__retention_evidence_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the dated cycle-evidence artifact emitted by the retention step, joining the intended-use determination, the oversight assignment, the monitoring observations and the fundamental-rights determination against the deployment, alongside the Art. 26(6) log-control determination and applied retention period."
+            }
+          ]
+        }
+      },
+      "notes": "Entry point. Fires on the operator's pre-deployment gate for a high-risk AI system, and on each subsequent monitoring cycle for a system already in service.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--e26d1a00-0000-4000-8000-000000000002",
+      "name": "confirm_intended_use",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.deployment_id",
+              "name": "in.deployment_id",
+              "value": "={{$workflow.variables.deployment_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.system_reference",
+              "name": "in.system_reference",
+              "value": "={{$workflow.variables.system_reference}}",
+              "type": "string"
+            },
+            {
+              "id": "out.intended_use_determination_id",
+              "name": "out.intended_use_determination_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.risk_management_policy@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "reconcile the operator's declared deployment context against the intended purpose stated in the provider's instructions for use, per Art. 26(1), and record the conformance determination against __deployment_id__. The negative case is a first-class outcome: where the declared context exceeds the intended-purpose boundary the determination records that the deployment must not proceed on this system, and no downstream step fires. Where the deployer is an employer and the deployment is at the workplace, this step also gates on the Art. 26(7) duty to inform workers' representatives and affected workers BEFORE putting the system into service \u2014 the dated notice record is a precondition of the determination, not a parallel task, because a deployment that proceeds without it cannot be remediated after the fact. Read-only against the operator's deployment register and the provider-supplied instructions; the register is an adapter-bound surface this playbook does not author.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--e26d1a00-0000-4000-8000-000000000003",
+      "name": "assign_human_oversight",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.deployment_id",
+              "name": "in.deployment_id",
+              "value": "={{$workflow.variables.deployment_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.intended_use_determination_id",
+              "name": "in.intended_use_determination_id",
+              "value": "={{$workflow.variables.intended_use_determination_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.oversight_assignment_id",
+              "name": "out.oversight_assignment_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.training_attestation@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "assign human oversight of the deployment to natural persons per Art. 26(2) and record the assignment against __deployment_id__. The obligation has four independently checkable limbs and the record names the assignee against each rather than asserting oversight generically: competence, training, authority, and the necessary support. Competence and training bind to the operator's training-attestation surface; authority is a delegation record the operator's governance surface owns. The capability set an oversight assignee must be able to exercise \u2014 understand the system's capacity and limits, remain aware of automation bias, correctly interpret output, decide not to use the system or disregard its output, and intervene or halt \u2014 is fixed by Art. 14(4) and is mapped by a sibling card; on its merge this step's reference bundle gains the Art. 14 anchor.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--e26d1a00-0000-4000-8000-000000000004",
+      "name": "monitor_operation",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.deployment_id",
+              "name": "in.deployment_id",
+              "value": "={{$workflow.variables.deployment_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.system_reference",
+              "name": "in.system_reference",
+              "value": "={{$workflow.variables.system_reference}}",
+              "type": "string"
+            },
+            {
+              "id": "in.oversight_assignment_id",
+              "name": "in.oversight_assignment_id",
+              "value": "={{$workflow.variables.oversight_assignment_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.monitoring_observation_id",
+              "name": "out.monitoring_observation_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "out.escalation_trigger_class",
+              "name": "out.escalation_trigger_class",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_timeline_signals@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.metric_refs",
+              "name": "x_secops_ng.metric_refs",
+              "value": "kri.eu_ai_act_report_clock_margin_days@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "monitor operation of the high-risk AI system on the basis of the instructions for use, per Art. 26(5), and record the per-window monitoring observation against __deployment_id__. Where the deployer exercises control over the input data, the same window records the Art. 26(4) determination that input data is relevant and sufficiently representative in view of the intended purpose; where it does not exercise that control, the dated determination of non-control is itself the evidence and no representativeness assessment is owed. This step carries the lifecycle's only escalation edge, and its three triggers have different consequences that must not be collapsed: routine observations feed the provider's Art. 72 post-market loop; a determination that use in accordance with the instructions may present a risk within the meaning of Art. 79(1) compels informing the provider or distributor and the market-surveillance authority AND suspending use, without undue delay; and identification of a serious incident compels immediate sequenced notification \u2014 provider first, then importer or distributor, then the market-surveillance authorities. The serious-incident branch hands off to the provider-side Art. 73 reporting chain; the deployer's notification is an input to that chain, never a substitute for it.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--e26d1a00-0000-4000-8000-000000000005",
+      "name": "assess_fundamental_rights_impact",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.deployment_id",
+              "name": "in.deployment_id",
+              "value": "={{$workflow.variables.deployment_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.intended_use_determination_id",
+              "name": "in.intended_use_determination_id",
+              "value": "={{$workflow.variables.intended_use_determination_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.fria_determination_id",
+              "name": "out.fria_determination_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.risk_management_policy@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "perform the Art. 27 fundamental-rights impact assessment prior to deploying, and record it against __deployment_id__. The step applies only to deployers in scope of Art. 27: bodies governed by public law, private entities providing public services, and deployers of the Annex III(5)(b)-(c) creditworthiness and life-and-health-insurance risk-assessment systems \u2014 so the first recorded output is the in-scope determination, and an out-of-scope determination closes the step with a dated record rather than an empty assessment. In scope, the emitted assessment satisfies the six Art. 27(1)(a)-(f) elements as a checklist: the processes the system will be used in, the period and frequency of intended use, the categories of natural persons and groups likely to be affected, the specific risks of harm to those categories informed by the Art. 13 provider information, the implementation of human-oversight measures, and the measures on risk materialisation including internal governance and complaint mechanisms. Per Art. 27(4) the assessment complements rather than duplicates an existing GDPR Art. 35 DPIA: where the operator holds a DPIA for the same processing, the step reads it and records which Art. 27(1) elements it already satisfies, assessing only the remainder. The step closes by notifying the market-surveillance authority of the results; the Art. 27(5) template is not yet published by the AI Office, so the notification contract is declared and the dated notification record emitted, rather than a template shape being invented.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--e26d1a00-0000-4000-8000-000000000006",
+      "name": "retain_logs_and_evidence",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "in.deployment_id",
+              "name": "in.deployment_id",
+              "value": "={{$workflow.variables.deployment_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.oversight_assignment_id",
+              "name": "in.oversight_assignment_id",
+              "value": "={{$workflow.variables.oversight_assignment_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.monitoring_observation_id",
+              "name": "in.monitoring_observation_id",
+              "value": "={{$workflow.variables.monitoring_observation_id}}",
+              "type": "string"
+            },
+            {
+              "id": "in.fria_determination_id",
+              "name": "in.fria_determination_id",
+              "value": "={{$workflow.variables.fria_determination_id}}",
+              "type": "string"
+            },
+            {
+              "id": "out.retention_evidence_id",
+              "name": "out.retention_evidence_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.control_refs",
+              "name": "x_secops_ng.control_refs",
+              "value": "control.incident_timeline_signals@v1",
+              "type": "string"
+            },
+            {
+              "id": "x_secops_ng.telemetry_refs",
+              "name": "x_secops_ng.telemetry_refs",
+              "value": "telemetry.ocsf.compliance_finding@v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "record the retention disposition for the logs the high-risk AI system generates automatically, per Art. 26(6), and emit the dated cycle-evidence artifact joining the intended-use determination, the oversight assignment, the monitoring observations, and the fundamental-rights assessment against __deployment_id__. The obligation binds only to the extent those logs are under the deployer's control, so the record states the control determination alongside the retention period applied. Six months is the floor, not the target: the governing standard is a period appropriate to the intended purpose of the system, and applicable Union or national law may require longer. The log store is an operator-owned adapter-bound surface \u2014 this step declares and evidences the retention contract and never ships a store. The content those logs must carry is fixed by Art. 12; a sibling card lands that mapping and this step's reference bundle gains the anchor on its merge.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--e26d1a00-0000-4000-8000-000000000007",
+      "name": "eu_ai_act_deployer_obligations_end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        240
+      ],
+      "parameters": {},
+      "notes": "Terminal state. The cycle closes on the dated evidence artifact; the next monitoring window re-enters at the start step.",
+      "notesInFlow": true
+    }
+  ],
+  "connections": {
+    "eu_ai_act_deployer_obligations_start": {
+      "main": [
+        [
+          {
+            "node": "confirm_intended_use",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "confirm_intended_use": {
+      "main": [
+        [
+          {
+            "node": "assign_human_oversight",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "assign_human_oversight": {
+      "main": [
+        [
+          {
+            "node": "monitor_operation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "monitor_operation": {
+      "main": [
+        [
+          {
+            "node": "assess_fundamental_rights_impact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "assess_fundamental_rights_impact": {
+      "main": [
+        [
+          {
+            "node": "retain_logs_and_evidence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "retain_logs_and_evidence": {
+      "main": [
+        [
+          {
+            "node": "eu_ai_act_deployer_obligations_end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "eu-ai-act",
+    "article-26",
+    "article-27",
+    "deployer",
+    "fria",
+    "high-risk-ai",
+    "human-oversight"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.eu_ai_act_deployer_obligations@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--e26d1a00-0000-4000-8000-000000000001"
+    },
+    "secops_ng_notes": [
+      "step 'action--e26d1a00-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--e26d1a00-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--e26d1a00-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--e26d1a00-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
+      "step 'action--e26d1a00-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
+    ]
+  }
+}
