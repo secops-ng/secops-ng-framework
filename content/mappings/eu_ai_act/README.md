@@ -13,10 +13,20 @@ Art. 13 transparency, and Art. 72 post-market-monitoring surfaces the
   control, playbook, and metric IDs the AI Act risk-management
   playbook backlinks. One YAML per article; each entry cites the
   authoritative EUR-Lex permalink.
-- **Out:** Annex I prohibited practices, the GPAI chapter of the
-  Regulation, Art. 43 conformity-assessment integration, and the
-  Art. 6(3)–(6) provider derogation / Commission delegated-act track
-  on the Annex III presumption. Those land as sibling cards.
+- **In, navigational only:** the **Chapter V general-purpose AI model
+  obligations** (Art. 53 and Art. 55). These bind model *providers*, a
+  population this framework does not serve, so the entries record where
+  those duties sit — what an operator can require of an upstream and
+  what it cannot — without claiming any artifact here discharges them.
+  Most carry no `control_refs` by design; the two that do are called out
+  in the file list below. See the scope note at the head of
+  `article-53-gpai-provider-obligations.yaml` before adding bindings.
+- **Out:** Annex I prohibited practices, Art. 43 conformity-assessment
+  integration, Art. 51/52 systemic-risk classification and notification
+  mechanics, Art. 54 authorised representatives, Art. 56 codes of
+  practice, and the Art. 6(3)–(6) provider derogation /
+  Commission delegated-act track on the Annex III presumption. Those
+  land as sibling cards.
 
 ## Files
 
@@ -40,6 +50,21 @@ Art. 13 transparency, and Art. 72 post-market-monitoring surfaces the
   (instructions for use, information duties toward deployers).
 - `article-72-post-market-monitoring.yaml` — Art. 72 post-market
   monitoring plan and feedback into the Art. 9 risk-management cycle.
+- `article-53-gpai-provider-obligations.yaml` — Chapter V Art. 53(1)(a)–(d)
+  general-purpose AI model provider duties: technical documentation,
+  the downstream Annex XII package, the copyright policy, and the public
+  training-content summary. Navigational; only Art. 53(1)(b) carries a
+  `control_ref` (`control.provider_attestation@v1`), because that duty
+  runs toward the downstream provider and the operator is its
+  beneficiary. Carries the Chapter V scope note.
+- `article-55-systemic-risk-obligations.yaml` — Chapter V Art. 55(1)(a)–(d)
+  additional duties for models with systemic risk: model evaluation and
+  adversarial testing, Union-level systemic-risk mitigation,
+  serious-incident reporting to the AI Office, and cybersecurity of the
+  model and its physical infrastructure. Only Art. 55(1)(c) carries a
+  `control_ref` (`control.incident_timeline_signals@v1`); its note draws
+  the boundary against Art. 73, which has a different obligated party
+  and a different recipient.
 - `oscal-component-definition.json` — OSCAL 1.1.2 component definition
   mirroring the GDPR / CRA siblings; one implemented-requirement per
   (entry, control_ref) pair. Art. 6 classification and Annex III

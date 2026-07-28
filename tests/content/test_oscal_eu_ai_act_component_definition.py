@@ -30,6 +30,13 @@ YAML_PATHS = [
     EUAI_DIR / "article-13-transparency.yaml",
     EUAI_DIR / "article-72-post-market-monitoring.yaml",
     EUAI_DIR / "article-73-serious-incident-reporting.yaml",
+    # Chapter V general-purpose AI model obligations. Navigational
+    # mapping: most entries carry no control_refs and are therefore
+    # absent from the component definition, exactly like the Art. 6 and
+    # Annex III entries. The two that do bind — Art. 53(1)(b) and
+    # Art. 55(1)(c) — are asserted here like any other pair.
+    EUAI_DIR / "article-53-gpai-provider-obligations.yaml",
+    EUAI_DIR / "article-55-systemic-risk-obligations.yaml",
 ]
 
 OUT_OF_SCOPE_ENTRY_IDS: set[str] = set()
@@ -143,15 +150,27 @@ def test_implemented_requirement_descriptions_match_yaml_obligations(
 def test_playbook_backlinked_from_every_yaml(in_scope_entries: list[dict]) -> None:
     """Every risk-management-lifecycle entry backlinks the anchor playbook.
 
-    Art. 73 (serious-incident reporting) is exempt: its obligation surface
-    is the incident lifecycle, so it backlinks
-    ``playbook.incident_management@v1`` + ``playbook.post_incident_review@v1``
-    rather than the risk-management playbook.
+    Two documented exemptions:
+
+    * Art. 73 (serious-incident reporting) — its obligation surface is the
+      incident lifecycle, so it backlinks ``playbook.incident_management@v1``
+      + ``playbook.post_incident_review@v1`` rather than the
+      risk-management playbook.
+    * Chapter V, Art. 53 and Art. 55 (general-purpose AI model providers) —
+      these bind model providers rather than providers or deployers of
+      high-risk AI systems, a population this framework does not serve.
+      The mapping is navigational: it records where those duties sit so an
+      operator can see what to require of an upstream, and deliberately
+      carries no ``playbook_refs``, because no artifact here discharges
+      them. Asserting a backlink would force a false claim of coverage.
+      See the scope note at the head of
+      ``article-53-gpai-provider-obligations.yaml``.
     """
     target = "playbook.eu_ai_act_risk_management@v1"
     exempt = {"eu_ai_act:art-73-serious-incident-reporting"}
+    chapter_v = ("eu_ai_act:art-53-", "eu_ai_act:art-55-")
     for entry in in_scope_entries:
-        if entry["id"] in exempt:
+        if entry["id"] in exempt or entry["id"].startswith(chapter_v):
             continue
         refs = entry.get("playbook_refs") or []
         assert target in refs, (

@@ -1,0 +1,156 @@
+# EU AI Act — Chapter V, Article 55: additional obligations for
+# providers of general-purpose AI models with systemic risk.
+#
+# The scope note on article-53-gpai-provider-obligations.yaml applies
+# here in full: Chapter V binds general-purpose AI model providers, a
+# population this framework does not serve, so this mapping is
+# navigational rather than operational and most entries carry no
+# control_refs by design.
+#
+# Art. 55 duties attach *in addition* to Art. 53 and only once a model
+# is classified as presenting systemic risk under Art. 51. Note that
+# the Art. 53(2) free-and-open-source exemption does NOT reach these —
+# an open-weights model with systemic risk carries the full Art. 55 set.
+#
+# Two of the four duties look closer to this framework's subject matter
+# than they are, and the notes below say so explicitly rather than
+# leaving the next author to re-derive it:
+#
+#   - Art. 55(1)(a) model evaluation and adversarial testing is not the
+#     same discipline as control.security_assessment@v1, which assesses
+#     whether one of the OPERATOR'S declared controls is implemented and
+#     operating. Evaluating a model against systemic-risk protocols is a
+#     provider capability with no analogue in this catalogue.
+#   - Art. 55(1)(d) cybersecurity of the model and its physical
+#     infrastructure is not reached by control.network_boundary_protection@v1,
+#     which reconciles segmentation policy on the OPERATOR'S deployed
+#     estate. The model provider's infrastructure is not the operator's
+#     estate, and binding the two would misattribute the obligation.
+#
+# The one substantive cross-regime edge is Art. 55(1)(c), which is a
+# reporting chain and therefore genuinely adjacent to the incident
+# surface this framework does operate — see that entry's note for the
+# distinct-obligation boundary against Art. 73.
+regime: eu_ai_act
+entries:
+  - id: eu_ai_act:art-55-1-a-model-evaluation
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "55"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      Providers of general-purpose AI models with systemic risk shall
+      perform model evaluation in accordance with standardised protocols
+      and tools reflecting the state of the art, including conducting
+      and documenting adversarial testing of the model with a view to
+      identifying and mitigating systemic risks.
+    status: live
+    notes: >-
+      Deliberately unbound. The adjacent-looking control,
+      control.security_assessment@v1, assesses whether one of the
+      operator's own declared controls is implemented correctly and
+      operating as intended; that is a different activity from
+      evaluating a model against state-of-the-art systemic-risk
+      protocols, and the two share only the word "assessment". No
+      artifact in this catalogue performs model evaluation or
+      adversarial testing of a model, and none should claim to. An
+      operator's practical interest is evidentiary — whether the
+      upstream can show that the evaluation happened and what it found —
+      which travels on the Art. 53(1)(b) documentation route rather than
+      here.
+
+  - id: eu_ai_act:art-55-1-b-systemic-risk-mitigation
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "55"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      Providers of general-purpose AI models with systemic risk shall
+      assess and mitigate possible systemic risks at Union level,
+      including their sources, that may stem from the development, the
+      placing on the market, or the use of general-purpose AI models
+      with systemic risk.
+    status: live
+    notes: >-
+      Unbound. The assessment surface here is Union-level systemic risk
+      — effects on public health, safety, security, fundamental rights
+      or society as a whole — which is a different object from the
+      operator-scoped risk register that control.risk_management_policy@v1
+      governs. The Art. 9 provider-side risk-management mapping is the
+      closest artifact in this catalogue and it is scoped to an
+      individual high-risk AI system, not to a model's aggregate
+      societal effect. Pinning the two together would flatten a
+      distinction the Regulation draws deliberately.
+
+  - id: eu_ai_act:art-55-1-c-serious-incident-reporting
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "55"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      Providers of general-purpose AI models with systemic risk shall
+      keep track of, document, and report without undue delay to the AI
+      Office and, as appropriate, to national competent authorities,
+      relevant information about serious incidents and possible
+      corrective measures to address them.
+    status: live
+    control_refs:
+      - control.incident_timeline_signals@v1
+    notes: >-
+      The one Art. 55 duty adjacent to a surface this framework
+      operates, and the binding is narrow. control.incident_timeline_signals@v1
+      captures the regulated clock signals — discovery, classification,
+      containment, recovery, notification — on in-scope incidents. Where
+      an operator's incident originates in a general-purpose model it
+      depends on, those captured signals are the material the upstream's
+      Art. 55(1)(c) report is assembled from, and the operator is the
+      party holding the timestamps. The binding asserts that and nothing
+      more: the duty to report to the AI Office remains the model
+      provider's, and no operator artifact discharges it.
+      Distinct-obligation note, and it matters because the two are
+      easily conflated: this is NOT Art. 73. Art. 55(1)(c) is a
+      general-purpose-model provider reporting to the **AI Office**
+      about a model with systemic risk; Art. 73 is a high-risk AI system
+      provider reporting to the **market-surveillance authority** of the
+      Member State where the incident occurred. Different obligated
+      party, different recipient, different trigger. Where a single
+      event engages both — a systemic-risk model embedded in a
+      deployed high-risk system — both chains fire on their own
+      surfaces against their own recipients, exactly as the NIS2 /
+      DORA / CRA boundary notes elsewhere in this catalogue record for
+      their regimes. See eu_ai_act:art-73-serious-incident-reporting.
+
+  - id: eu_ai_act:art-55-1-d-model-cybersecurity
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "55"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      Providers of general-purpose AI models with systemic risk shall
+      ensure an adequate level of cybersecurity protection for the
+      general-purpose AI model with systemic risk and the physical
+      infrastructure of the model.
+    status: live
+    notes: >-
+      Deliberately unbound, and this is the entry most likely to attract
+      a wrong binding later, so the reasoning is recorded here. The
+      protected asset is the model and the physical infrastructure of
+      the model — the provider's training and serving estate. It is not
+      the operator's estate, so control.network_boundary_protection@v1,
+      which reconciles a segmentation policy against the operator's
+      observed network posture, does not reach it; nor does any other
+      control in this catalogue, all of which are scoped to
+      infrastructure the operator runs. The sovereign-stack question an
+      operator does control — where the model is hosted and whether
+      inference leaves the Union — is a deployment-architecture decision
+      addressed by the EU-resident endpoint guard in the shared compiler
+      layer, not by this obligation. The framework maps the obligation;
+      it does not prescribe where a model runs.
