@@ -210,7 +210,7 @@ class PlaybookAlertTriageV1Workflow:
     CACAO playbook id : playbook--a1e47431-0000-4000-8000-000000000000
     stable_id         : playbook.alert_triage@v1
     content_version   : 0.2.0
-    maturity          : draft
+    maturity          : experimental
     workflow_start    : start--a1e47431-0000-4000-8000-000000000001
     activities        : ingest_typed_alert_payload, enrich_with_telemetry_context, suppress_and_close, classify_and_prioritise_deterministic_policy, response_p1_severe_page_and_escalate, response_p2_high_queue_for_primary_analyst, response_p3_routine_queue_for_review, response_p4_informational_log_and_close
     """
