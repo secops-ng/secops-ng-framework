@@ -1,0 +1,195 @@
+# Outbound mappings overlay — playbook.eu_ai_act_deployer_obligations@v1
+#
+# SKELETON layer. Every control stable-id referenced below resolves to a
+# committed file under content/controls/ — this overlay deliberately
+# introduces no forward reference to a control that does not yet exist,
+# because unflagged dangling control refs are invisible to the
+# control-xref lint and have accumulated silently elsewhere in the
+# catalogue.
+#
+# The primary regulatory axis for this playbook is the EU AI Act, whose
+# inbound entries live in:
+#   content/mappings/eu_ai_act/article-26-deployer-obligations.yaml
+#   content/mappings/eu_ai_act/article-27-fria.yaml
+#
+# Schema: schemas/playbook-mappings.schema.json
+playbook: playbook.eu_ai_act_deployer_obligations@v1
+
+oscal:
+  # NIST SP 800-53 Rev. 5 controls exercised by the five action steps.
+  # The deployer lifecycle is a governance-and-oversight discipline over
+  # a system the operator did not build, so the anchors are planning,
+  # personnel-training and monitoring controls rather than the
+  # system-hardening families a provider-side playbook would pin.
+  - id: control.risk_management_policy@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: PM-9
+    title: Risk Management Strategy
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls
+    notes: >-
+      Anchors confirm_intended_use, monitor_operation and
+      assess_fundamental_rights_impact. PM-9 requires an organisation-
+      wide risk-management strategy and its consistent application; the
+      Art. 26(1) intended-purpose determination, the Art. 26(4)
+      input-data relevance determination and the Art. 27 fundamental-
+      rights assessment are the deployment-scoped applications of that
+      strategy to a third-party high-risk AI system. Read-only against
+      the operator's deployment register.
+
+  - id: control.training_attestation@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: AT-3
+    title: Role-Based Training
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls
+    notes: >-
+      Anchors assign_human_oversight. Art. 26(2) requires the assignee
+      to have the necessary competence, training and authority; AT-3 is
+      the role-based-training discipline the competence and training
+      limbs discharge into. The authority and support limbs are
+      operator-side delegation and resourcing records with no NIST
+      analogue pinned here.
+
+  - id: control.incident_timeline_signals@v1
+    oscal_catalog: NIST SP 800-53 Rev. 5
+    control_id: IR-5
+    title: Incident Monitoring
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls
+    notes: >-
+      Anchors the escalation edge of monitor_operation and the
+      retain_logs_and_evidence step. IR-5 requires tracking and
+      documenting incidents; the Art. 26(5) risk and serious-incident
+      determinations are dated timeline signals, and the Art. 26(6)
+      retention record is the durable evidence those signals resolve
+      against. The same control anchors the provider-side Art. 73
+      chain this playbook's serious-incident branch hands off to, which
+      is what makes the two chains joinable on review.
+
+d3fend:
+  # No per-step D3FEND pin at SKELETON, and the gap is deliberate rather
+  # than deferred to a card that may never be filed.
+  #
+  # The five steps are compliance-governance disciplines over a
+  # third-party system — an intended-purpose determination, an oversight
+  # assignment, a monitoring observation, a rights assessment and a
+  # retention record. None of them deploys a countermeasure against
+  # adversary behaviour on the operator's estate, which is what D3FEND
+  # v1.0.0 techniques describe.
+  #
+  # One candidate is worth naming so a later reader does not re-derive
+  # the analysis: D3-OAM (Operational Activity Mapping) plausibly fits
+  # retain_logs_and_evidence, on the same reasoning that put it on the
+  # record-composition steps of dora_major_incident_reporting,
+  # cra_srp_notify and nis2_art20_governance. It is not pinned here
+  # because the CORE layer decides whether the cycle-evidence artifact
+  # is genuinely a record-composition surface or merely a retention
+  # disposition; pinning it at SKELETON would prejudge that.
+  #
+  # Precedent for an empty block with per-step rationale:
+  # playbook.cyber_hygiene_training@v1.
+d3fend: []
+
+ocsf:
+  - id: telemetry.ocsf.compliance_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2003
+    class_name: Compliance Finding
+    ocsf_version: 1.3.0
+    direction: both
+    notes: >-
+      Each of the five steps emits a dated determination — intended-use
+      conformance, oversight assignment, monitoring observation with its
+      Art. 26(4) input-data determination, the fundamental-rights
+      assessment and its authority notification, and the retention
+      disposition. Compliance Finding is the class those determinations
+      resolve against, consistent with the other regulatory-lifecycle
+      playbooks in the catalogue. Consumed at confirm_intended_use and
+      assess_fundamental_rights_impact (reads against the deployment
+      register and any existing DPIA record); emitted at every step.
+      CORE finalises per-step directionality.
+
+nis2:
+  - mapping_id: nis2:todo-deployer-parallel
+    todo: true
+    notes: >-
+      Placeholder, and flagged rather than silently omitted. An operator
+      deploying a high-risk AI system may also be an essential or
+      important entity under NIS2, in which case the Art. 26(5)
+      suspension-and-notification edge and the NIS2 Art. 23
+      significant-incident chain can fire on the same underlying event
+      against different recipients. No interaction between the two is
+      documented by ENISA as of 2026-07-28, so no inbound NIS2 mapping
+      id is pinned here. This entry is resolved by documenting the
+      deliberate absence if ENISA publishes nothing, not by inventing a
+      cross-reference.
+
+dora:
+  - mapping_id: dora:todo-deployer-parallel
+    todo: true
+    notes: >-
+      Placeholder on the same reasoning as the NIS2 entry above. A
+      financial entity deploying a high-risk AI system carries DORA
+      Chapter III ICT-incident obligations in parallel with Art. 26(5);
+      no interaction between the two regimes is documented by the ESAs
+      as of 2026-07-28. Resolved by documenting the deliberate absence
+      rather than by pinning a speculative inbound id.
+
+cra: []
+  # Deliberately empty. The CRA binds manufacturers of products with
+  # digital elements; this playbook binds the deployer of a high-risk AI
+  # system, which is the opposite end of the supply chain. Where a
+  # deployed AI system is also a product with digital elements, the CRA
+  # obligations fall on its manufacturer and are already mapped under
+  # content/mappings/cra/ — pinning them here would misattribute them to
+  # the operator.
+
+gdpr:
+  - mapping_id: gdpr:art-35
+    article: "35"
+    notes: >-
+      Art. 27(4) of the EU AI Act makes the fundamental-rights impact
+      assessment a complement to an existing GDPR Art. 35 data-protection
+      impact assessment rather than a duplicate of it. The
+      assess_fundamental_rights_impact step reads an existing DPIA where
+      the operator holds one for the same processing and records which
+      Art. 27(1) elements it already satisfies. The DPIA itself is
+      discharged by playbook.data_protection_impact_assessment@v1; this
+      playbook never composes one.
+
+eu_ai_act:
+  - mapping_id: eu_ai_act:art-26-1-instruction-conformant-use
+    article: "26"
+    notes: Primary anchor for confirm_intended_use.
+  - mapping_id: eu_ai_act:art-26-2-human-oversight-assignment
+    article: "26"
+    notes: Primary anchor for assign_human_oversight.
+  - mapping_id: eu_ai_act:art-26-4-input-data-relevance
+    article: "26"
+    notes: >-
+      Anchor for the input-data determination recorded inside
+      monitor_operation, conditional on deployer control of the input
+      surface.
+  - mapping_id: eu_ai_act:art-26-5-monitoring-and-suspension
+    article: "26"
+    notes: >-
+      Anchor for monitor_operation and its escalation edge. The
+      serious-incident branch hands off to
+      eu_ai_act:art-73-serious-incident-reporting.
+  - mapping_id: eu_ai_act:art-26-6-log-retention
+    article: "26"
+    notes: Primary anchor for retain_logs_and_evidence.
+  - mapping_id: eu_ai_act:art-26-7-worker-information
+    article: "26"
+    notes: >-
+      Pre-deployment gate inside confirm_intended_use, binding only
+      where the deployer is an employer and the deployment is at the
+      workplace.
+  - mapping_id: eu_ai_act:art-27-fria-elements
+    article: "27"
+    notes: Primary anchor for assess_fundamental_rights_impact.
+  - mapping_id: eu_ai_act:art-27-4-dpia-complementarity-and-notification
+    article: "27"
+    notes: >-
+      Anchor for the DPIA-complementarity read and the
+      market-surveillance-authority notification that closes the
+      assessment step.

@@ -1,0 +1,237 @@
+# EU AI Act — Article 26 obligations of deployers of high-risk AI systems.
+#
+# Every other EU AI Act mapping shipped in this directory anchors on the
+# PROVIDER side: Art. 9 risk management, Art. 11 technical documentation,
+# Art. 13 transparency toward deployers, Art. 15 accuracy and robustness,
+# Art. 72 post-market monitoring, Art. 73 serious-incident reporting.
+# Art. 26 is the first entry on the DEPLOYER side — the operator who runs
+# a third-party high-risk AI system in production rather than placing one
+# on the market. That population is the one an operator-side security
+# commons most directly serves, and it had no mapped surface at all.
+#
+# The obligations are kept atom-per-obligation rather than folded into a
+# single Art. 26 entry: 26(1) instruction-conformant use, 26(2) human
+# oversight assignment, 26(4) input-data relevance, 26(5) monitoring with
+# suspension and notification, 26(6) log retention, and 26(7) the
+# worker-representative information duty are independent operational
+# disciplines with different triggers and different evidence. This
+# mirrors the established shape of the GDPR Art. 32(1)(b) limb cluster.
+#
+# Paragraphs deliberately not mapped here:
+#   - Art. 26(3) — the deployer's freedom to organise its own resources
+#     and activities is a negative-scope statement, not an obligation
+#     with a discharge.
+#   - Art. 26(8)-(9) — registration duties for public-authority deployers
+#     and the Art. 27 FRIA cross-reference. The FRIA lands in the sibling
+#     article-27-fria.yaml; the Annex VIII registration surface is a
+#     public-body administrative duty outside the operator playbook.
+#   - Art. 26(10)-(11) — the law-enforcement post-remote-biometric
+#     authorisation regime and the natural-person notification duty.
+#     Both are use-case-specific to Annex III(1)(a) deployments; a
+#     sibling card revisits them if a biometric-deployment playbook is
+#     ever authored.
+#
+# Cross-regime edges:
+#   - content/mappings/gdpr/ — where the high-risk AI system processes
+#     personal data, the Art. 26(5) monitoring duty and the GDPR Art. 32
+#     security-of-processing duty run over the same estate. They are
+#     distinct obligations on distinct legal bases; neither discharges
+#     the other.
+#   - The Art. 26(5) suspension-and-notification edge hands off to
+#     eu_ai_act:art-73-serious-incident-reporting, which is the
+#     provider-side reporting chain the deployer's notification feeds.
+regime: eu_ai_act
+entries:
+  - id: eu_ai_act:art-26-1-instruction-conformant-use
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "26"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      Deployers of high-risk AI systems shall take appropriate technical
+      and organisational measures to ensure they use such systems in
+      accordance with the instructions for use accompanying the systems.
+    status: live
+    control_refs:
+      - control.risk_management_policy@v1
+    playbook_refs:
+      - playbook.eu_ai_act_deployer_obligations@v1
+    evidence_stream_refs:
+      - risk-analysis
+    notes: >-
+      Anchored on the confirm_intended_use step. The instructions for use
+      are the provider-authored artifact the Art. 13 transparency mapping
+      records; this entry is the deployer-side consumption of it. The
+      step reconciles the operator's declared deployment context against
+      the intended purpose the instructions state and records the
+      conformance decision — including the negative case, where the
+      intended-purpose boundary is exceeded and the deployment must not
+      proceed on this system.
+
+  - id: eu_ai_act:art-26-2-human-oversight-assignment
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "26"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      Deployers shall assign human oversight to natural persons who have
+      the necessary competence, training and authority, as well as the
+      necessary support.
+    status: live
+    control_refs:
+      - control.training_attestation@v1
+    playbook_refs:
+      - playbook.eu_ai_act_deployer_obligations@v1
+    evidence_stream_refs:
+      - access
+    notes: >-
+      Anchored on the assign_human_oversight step. The obligation has
+      four independently checkable limbs — competence, training,
+      authority, and support — so the assignment record names the
+      person or role against each rather than asserting oversight
+      generically. Competence and training bind to
+      control.training_attestation@v1; authority is an operator-side
+      delegation record. The oversight capability set the assignee must
+      be able to exercise is fixed by Art. 14(4); a sibling card lands
+      the Art. 14 mapping and this entry cross-references it on merge.
+
+  - id: eu_ai_act:art-26-4-input-data-relevance
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "26"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      To the extent the deployer exercises control over the input data,
+      that deployer shall ensure that input data is relevant and
+      sufficiently representative in view of the intended purpose of the
+      high-risk AI system.
+    status: live
+    control_refs:
+      - control.risk_management_policy@v1
+    playbook_refs:
+      - playbook.eu_ai_act_deployer_obligations@v1
+    evidence_stream_refs:
+      - risk-analysis
+    notes: >-
+      Anchored on the monitor_operation step. The obligation is
+      explicitly conditional — it binds only "to the extent the deployer
+      exercises control over the input data" — so the discharge begins
+      with a recorded determination of whether the deployer controls the
+      input surface at all. Where it does not, the dated determination
+      is itself the evidence; where it does, the relevance and
+      representativeness assessment attaches to it. The provider-side
+      data-governance obligations for training and validation data are
+      Art. 10 and are mapped separately; this entry covers only
+      operational input under deployer control.
+
+  - id: eu_ai_act:art-26-5-monitoring-and-suspension
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "26"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      Deployers shall monitor the operation of the high-risk AI system
+      on the basis of the instructions for use and, where relevant,
+      inform providers in accordance with Article 72. Where a deployer
+      has reason to consider that use in accordance with the
+      instructions may present a risk within the meaning of Article
+      79(1), it shall without undue delay inform the provider or
+      distributor and the relevant market-surveillance authority, and
+      shall suspend the use of that system. Where a deployer has
+      identified a serious incident, it shall also immediately inform
+      first the provider, and then the importer or distributor and the
+      relevant market-surveillance authorities of that incident.
+    status: live
+    control_refs:
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.eu_ai_act_deployer_obligations@v1
+    metric_refs:
+      - kri.eu_ai_act_report_clock_margin_days@v1
+    evidence_stream_refs:
+      - incidents
+    notes: >-
+      Anchored on the monitor_operation step and its escalation edge.
+      This is the load-bearing atom of Art. 26 — it is the only limb
+      that can require the deployer to stop using the system. Three
+      distinct triggers with different consequences are folded into one
+      paragraph and must not be collapsed in implementation: routine
+      monitoring feeding the provider's Art. 72 post-market loop; a
+      risk determination under Art. 79(1), which compels notification
+      AND suspension without undue delay; and identification of a
+      serious incident, which compels immediate sequenced notification
+      (provider first, then importer or distributor, then the
+      market-surveillance authorities). The serious-incident branch
+      hands off to eu_ai_act:art-73-serious-incident-reporting — the
+      deployer's notification is an input to the provider's Art. 73
+      chain, not a substitute for it, and the clock the deployer's
+      timeliness is measured against is the one that entry pins.
+
+  - id: eu_ai_act:art-26-6-log-retention
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "26"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      Deployers shall keep the logs automatically generated by that
+      high-risk AI system to the extent such logs are under their
+      control, for a period appropriate to the intended purpose of the
+      system, of at least six months, unless provided otherwise in
+      applicable Union or national law.
+    status: live
+    control_refs:
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.eu_ai_act_deployer_obligations@v1
+    evidence_stream_refs:
+      - incidents
+      - access
+    notes: >-
+      Anchored on the retain_logs_and_evidence step. The six-month floor
+      is a minimum, not a target — "a period appropriate to the intended
+      purpose" governs, and sector law may set a longer one. The
+      retention surface is operator-owned: the playbook declares the
+      retention contract and the dated evidence record proving it holds,
+      and never ships a log store. The record content this obligation
+      presupposes is fixed by Art. 12 (record-keeping and automatic
+      logging); a sibling card lands that mapping and this entry
+      cross-references it on merge.
+
+  - id: eu_ai_act:art-26-7-worker-information
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "26"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      Before putting into service or using a high-risk AI system at the
+      workplace, deployers who are employers shall inform workers'
+      representatives and the affected workers that they will be subject
+      to the use of the high-risk AI system.
+    status: live
+    playbook_refs:
+      - playbook.eu_ai_act_deployer_obligations@v1
+    evidence_stream_refs:
+      - risk-analysis
+    notes: >-
+      Anchored on the confirm_intended_use step as a pre-deployment
+      gate. The duty binds only deployers who are employers and only for
+      workplace deployment, and it is a precondition — the information
+      must be given BEFORE putting into service, so a deployment that
+      proceeds without the dated notice cannot be remediated after the
+      fact. No control_refs: this is an employment-law information duty
+      discharged through the operator's works-council or equivalent
+      channel, not a technical control, and pinning a security control
+      to it would misrepresent the obligation. The dated notice record
+      is the evidence.

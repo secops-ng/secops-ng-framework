@@ -1,0 +1,110 @@
+# EU AI Act — Article 27 fundamental-rights impact assessment for
+# high-risk AI systems.
+#
+# Art. 27 binds a subset of deployers: bodies governed by public law,
+# private entities providing public services, and deployers of the
+# Annex III(5)(b)-(c) creditworthiness and life-and-health-insurance
+# risk-assessment systems. It is therefore narrower than Art. 26, which
+# binds every deployer of a high-risk system. The two are sequenced —
+# the FRIA is performed BEFORE first use, so it gates the Art. 26
+# lifecycle rather than running alongside it.
+#
+# Relationship to the GDPR DPIA — the point most likely to be got wrong.
+# Art. 27(4) states that where any of the obligations in this Article is
+# already met through a data-protection impact assessment conducted
+# under GDPR Art. 35, the FRIA "shall complement that data protection
+# impact assessment". It is a complement, not a duplicate and not a
+# substitute: the DPIA asks what the processing does to personal data,
+# the FRIA asks what the deployment does to fundamental rights, and the
+# populations of affected people are not necessarily the same. The
+# shipped playbook.data_protection_impact_assessment@v1 discharges the
+# DPIA; this mapping cross-references it rather than restating it, and
+# the deployer playbook's assessment step reads an existing DPIA where
+# one exists instead of re-deriving its content.
+regime: eu_ai_act
+entries:
+  - id: eu_ai_act:art-27-fria-elements
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "27"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      Deployers that are bodies governed by public law, private entities
+      providing public services, or deployers of the high-risk AI
+      systems referred to in points 5(b) and 5(c) of Annex III shall,
+      prior to deploying a high-risk AI system, perform an assessment of
+      the impact on fundamental rights that the use may produce. That
+      assessment shall comprise the deployer's processes in which the
+      system will be used in line with its intended purpose; the period
+      and frequency of intended use; the categories of natural persons
+      and groups likely to be affected in the specific context; the
+      specific risks of harm likely to affect those categories, taking
+      into account the information given by the provider under Article
+      13; the implementation of human-oversight measures according to
+      the instructions for use; and the measures to be taken should
+      those risks materialise, including internal governance
+      arrangements and complaint mechanisms.
+    status: live
+    control_refs:
+      - control.risk_management_policy@v1
+    playbook_refs:
+      - playbook.eu_ai_act_deployer_obligations@v1
+      - playbook.data_protection_impact_assessment@v1
+    evidence_stream_refs:
+      - risk-analysis
+    notes: >-
+      Anchored on the assess_fundamental_rights_impact step. The six
+      Art. 27(1)(a)-(f) elements are the assessment's required content
+      and are treated as a checklist the emitted record must satisfy,
+      not as prose guidance. Two of them bind to surfaces already mapped
+      elsewhere: element (d) requires the provider information from
+      Art. 13, and element (e) requires the human-oversight
+      implementation whose capability set Art. 14 fixes. Secondary
+      playbook anchor: playbook.data_protection_impact_assessment@v1,
+      per the Art. 27(4) complementarity rule recorded in the sibling
+      entry below — where a DPIA exists, the FRIA reads it rather than
+      re-deriving overlapping content. Timing is a hard gate: the
+      assessment is performed "prior to deploying", so a deployment that
+      proceeds without it cannot be remediated retrospectively.
+
+  - id: eu_ai_act:art-27-4-dpia-complementarity-and-notification
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "27"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      If any of the obligations laid down in this Article is already met
+      through the data protection impact assessment conducted pursuant
+      to Article 35 of Regulation (EU) 2016/679, the fundamental rights
+      impact assessment shall complement that data protection impact
+      assessment. Once the assessment has been performed, the deployer
+      shall notify the market-surveillance authority of its results,
+      submitting the filled-out template as part of the notification.
+    status: live
+    control_refs:
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.eu_ai_act_deployer_obligations@v1
+      - playbook.data_protection_impact_assessment@v1
+    evidence_stream_refs:
+      - risk-analysis
+    notes: >-
+      Two obligations in one paragraph, both anchored on the
+      assess_fundamental_rights_impact step. First, complementarity —
+      the FRIA complements rather than repeats an existing GDPR Art. 35
+      DPIA, so the playbook reads the DPIA record where one exists and
+      records which Art. 27(1) elements it already satisfies, leaving
+      the remainder to be assessed. Second, notification — the deployer
+      notifies the market-surveillance authority of the results using
+      the template the AI Office is to provide under Art. 27(5). That
+      template is not yet published, so the notification step declares
+      the submission contract and emits the dated notification record;
+      binding a concrete template shape is deferred rather than
+      invented. Distinct-obligation note: this notification is a
+      pre-deployment assessment filing and is not the Art. 73
+      serious-incident report — different trigger, different content,
+      different clock, same recipient.
