@@ -53,6 +53,15 @@ Open `playbook.cacao.yaml` and replace every `TODO_*` placeholder. The
 inline comments explain what each field is for and which values the
 schema accepts.
 
+Replace the guidance in `README.md` while preserving these canonical
+second-level headings, which the strict template check requires for
+every new playbook:
+
+- `## Overview`
+- `## Regulatory anchors`
+- `## How to compile`
+- `## Operator customisation`
+
 ## 3. Convert the artifact to JSON
 
 Canonical playbooks ship JSON, not YAML. The template ships YAML so it

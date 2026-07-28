@@ -14,12 +14,23 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
-import pytest
+import yaml
 
 from tools import lint_playbook_template as lint_mod
 
-
 REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_template_workflow_start_resolves_to_start_step() -> None:
+    """The copied scaffold names a valid CACAO start step."""
+    template = (
+        REPO_ROOT / "content" / "playbooks" / "_template" / "playbook.cacao.yaml"
+    )
+    playbook = yaml.safe_load(template.read_text(encoding="utf-8"))
+
+    workflow_start = playbook["workflow_start"]
+    assert workflow_start == "step--TODO_UUID_START"
+    assert playbook["workflow"][workflow_start]["type"] == "start"
 
 
 def test_structural_tier_clean_on_shipped_playbooks() -> None:
