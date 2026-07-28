@@ -248,7 +248,8 @@ contributors, because the public-history bar is genuinely strict.
 
 When the change is approved, a maintainer merges it. You will see your
 name in the commit history and, if the change is user-visible, in the
-release notes for the next version.
+release notes for the next version — cut per
+[`docs/contributing/release-process.md`](docs/contributing/release-process.md).
 
 The operational companion to this section —
 [`docs/contributing/review-process.md`](docs/contributing/review-process.md)

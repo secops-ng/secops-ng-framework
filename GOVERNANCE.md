@@ -116,7 +116,8 @@ Contributors with merge rights on a SecOps-NG repository. Maintainers:
 
 - Review and merge pull requests.
 - Triage issues.
-- Cut releases.
+- Cut releases, following
+  [`docs/contributing/release-process.md`](docs/contributing/release-process.md).
 - Uphold the [Code of Conduct](CODE_OF_CONDUCT.md) and the technical
   standards in [CONTRIBUTING.md](CONTRIBUTING.md).
 

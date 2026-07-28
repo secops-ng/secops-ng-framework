@@ -17,6 +17,9 @@ tasks.
   hygiene linter: what it checks and how to escalate a false-positive.
 - [`byte-parity-testing.md`](byte-parity-testing.md) — the golden-file
   discipline that anchors every compiled example.
+- [`release-process.md`](release-process.md) — how a maintainer cuts a
+  release: versioning rules, pre-flight, signed tag, and what to do
+  afterwards.
 
 Community-driven compile targets live in
 `../../compilers/community/` and each carry their own README.
