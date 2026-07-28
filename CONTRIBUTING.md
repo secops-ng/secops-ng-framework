@@ -278,22 +278,34 @@ layout, the `regenerate.sh` pattern, and the byte-parity golden test
 that anchors each example. Compiler-surface changes themselves (new
 primitives, new emitters) still go through a scoping issue first.
 
-## 8. Adding or editing a workflow
+## 8. Adding or editing a playbook
 
-Workflows under `workflows/` follow a fixed per-directory layout —
-`README.md`, `PROMPT.md`, `primitives.py`, `example.py`, and
-`config.example.yaml`. New workflows MUST start by copying
-`workflows/_template/`:
+Playbooks live under `content/playbooks/<slug>/` and follow a fixed
+per-directory layout:
+
+| File | Required | Holds |
+|------|----------|-------|
+| `playbook.cacao.json` | yes | the canonical CACAO v2 source (a `playbook.cacao.yaml` source is also accepted — five shipped playbooks use it) |
+| `mappings.yaml` | yes | the outbound OSCAL / D3FEND / OCSF / regulatory overlay |
+| `README.md` | yes | workflow-local overview and status |
+| `examples/` | no | worked-example material, where the playbook ships any |
+
+New playbooks MUST start by copying the template, which carries every
+required file with each field annotated:
 
 ```bash
-cp -r workflows/_template workflows/<new-workflow-name>
+cp -r content/playbooks/_template content/playbooks/<slug>
 ```
 
-The full structure spec and the rationale for `PROMPT.md` (the
-single-shot reproduction prompt every workflow ships) live in
-[`workflows/README.md`](workflows/README.md). Workflow pull requests
-that are missing any required file, or that leave required files as
-`TODO` stubs, are rejected.
+The step-by-step walkthrough — choosing a slug, converting the scaffold
+to canonical JSON, adding your first mapping entry, and running the
+linter and tests locally — is
+[`docs/contributing/playbook-quickstart.md`](docs/contributing/playbook-quickstart.md).
+Read it before your first content pull request.
+
+Pull requests that are missing a required file, or that leave required
+files as `TODO` stubs, are rejected. A `_template`-conformance linter
+runs in CI, so a scaffold left half-filled fails before review.
 
 ## 9. Proposing larger changes
 

@@ -67,7 +67,7 @@ commits, code, wiki edits, issues, and other contributions that are
 not aligned with this Code of Conduct, and will communicate reasons
 for moderation decisions when appropriate.
 
-> The steward role is defined in [`GOVERNANCE.md`](GOVERNANCE.md §3.5).
+> The steward role is defined in [`GOVERNANCE.md`](GOVERNANCE.md) §3.5.
 > The current steward roster is published in `MAINTAINERS.md` once
 > that file exists; until then, the active stewards are reachable
 > through the contact channel below.
