@@ -6,10 +6,26 @@
 # playbook.cyber_hygiene_training@v1 operational per-cycle materialisation
 # and to the reactive playbook.phishing_triage@v1 under the same clause.
 #
-# Status: SKELETON. The regulatory and control surface is pinned here;
-# telemetry emit bindings, per-cohort programme-governance KPIs, and
-# per-target compile examples are owned by CORE / EXTEND siblings. The
-# d3fend block carries a SKELETON placeholder to be closed in CORE.
+# Status: CORE. Every control pin on this overlay resolves to a file
+# under content/controls/; the OCSF directionality and the GDPR
+# Art. 32(1)(b) pin are final. Per-cohort programme-governance KPI/KRI
+# pairs remain owned by an EXTEND sibling.
+#
+# The d3fend block is deliberately empty, following the precedent set
+# on playbook.cyber_hygiene_training@v1. The CORE-layer defensibility
+# analysis found no honest anchor at the playbook layer: D3FEND models
+# countermeasures deployed against adversary behaviour, and all six
+# steps here (schedule-assessment, design-content, deliver-training,
+# record-completion, report-gaps, review-cycle) are posture-readiness
+# activities upstream of any runtime countermeasure. The nearest
+# candidate, D3-UA (User Behavior Analysis), is what
+# control.phishing_simulation@v1 pins because that playbook actually
+# observes behaviour; nothing here observes anything. A forced tag
+# would assert a defensive capability this playbook does not provide.
+# The control layer is anchored — all four training controls pin
+# D3-OAM (Operational Activity Mapping), the catalogue's anchor for
+# programme and governance controls — so the D3FEND cross-walk is
+# reachable through content/controls/ without overclaiming here.
 #
 # Schema: schemas/playbook-mappings.schema.json
 playbook: playbook.security_awareness_training@v1
@@ -20,65 +36,80 @@ oscal:
     control_id: AT-2
     title: Literacy Training and Awareness
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AT-2
-    todo: true
     notes: >-
-      SKELETON pin for the schedule-assessment step. AT-2 anchors the
-      training-needs assessment surface; the stable_id
-      control.training_needs_assessment@v1 will be finalised in CORE
-      once the control_xref is authored.
+      Anchors the schedule-assessment step. The assessment is
+      role-and-risk based rather than uniform: it names the populations
+      in scope, the threats and obligations each faces, and the
+      competences the curriculum must therefore produce. This is the
+      one step in the programme that can fail silently — a population
+      that is never assessed receives no training and emits no
+      absent-evidence signal — so the dated determination is itself the
+      evidence, including the negative case where a population is
+      assessed as out of scope. Resolves to
+      content/controls/control.training_needs_assessment@v1.yaml.
 
   - id: control.training_curriculum@v1
     oscal_catalog: ISO/IEC 27001:2022
     control_id: A.6.3
     title: Information security awareness, education and training
     url: https://www.iso.org/standard/27001
-    todo: true
     notes: >-
-      SKELETON pin for the design-content step. ISO/IEC 27001 Annex
-      A.6.3 anchors the programme-level curriculum-authoring surface;
-      the stable_id control.training_curriculum@v1 will be finalised
-      in CORE once the control_xref is authored.
+      Anchors the design-content step. The anchor is ISO rather than
+      NIST because A.6.3 speaks to education and training material as
+      a programme artifact, where the NIST AT family speaks to the
+      awareness activity and its records. The load-bearing property is
+      versioning: an unversioned curriculum makes it impossible to say
+      which material a given completion record attests to, which
+      breaks the chain to the record-completion step. Modules trace to
+      the competences the schedule-assessment step identified, so a
+      change in the threat or obligation surface is visible as a
+      change in the material. Resolves to
+      content/controls/control.training_curriculum@v1.yaml.
 
   - id: control.training_delivery@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AT-3
     title: Role-based Training
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AT-3
-    todo: true
     notes: >-
-      SKELETON pin for the deliver-training step. AT-3 anchors the
-      role-based training-delivery surface; the stable_id
-      control.training_delivery@v1 will be finalised in CORE once the
-      control_xref is authored.
+      Anchors the deliver-training step. Delivery is evidenced per
+      event — cohort addressed, curriculum version delivered, date —
+      not per person; per-person completion is the record-completion
+      step's separate record. The distinction matters in the case the
+      two diverge: a session held for a cohort in which half the
+      population never attended produces a delivery record and no
+      completions, and collapsing the two would read that as an
+      absence of evidence rather than as a delivered session with a
+      coverage gap. Resolves to
+      content/controls/control.training_delivery@v1.yaml.
 
   - id: control.training_records@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AT-4
     title: Training Records
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AT-4
-    todo: true
     notes: >-
-      SKELETON pin for the record-completion, report-gaps, and
-      review-cycle steps. AT-4 anchors the training-records retention
-      surface (per-staff completion, per-cohort aggregate, dated
-      cycle-review artifact). Shared with the cyber_hygiene_training
-      overlay's AT-4 pin — the two playbooks discharge the programme
-      and operational-execution halves of the same records
-      obligation.
+      Anchors the record-completion, report-gaps, and review-cycle
+      steps — the three shapes of record the programme is accountable
+      for: per-staff completion against the curriculum version
+      delivered, per-cohort aggregate coverage against the assessed
+      population, and a dated cycle-review artifact recording the gaps
+      found and what changed in response. The aggregate limb carries
+      the regulatory weight and is a distinct field rather than a
+      derived one: a complete set of per-person records says nothing
+      about a population that was never enrolled. Shared with the
+      cyber_hygiene_training overlay's AT-4 pin — the two playbooks
+      discharge the programme and operational-execution halves of the
+      same records obligation. Resolves to
+      content/controls/control.training_records@v1.yaml.
 
-d3fend:
-  - d3fend_id: D3-TODO
-    d3fend_name: SKELETON placeholder
-    todo: true
-    notes: >-
-      SKELETON placeholder. D3FEND closure follows the precedent set
-      on playbook.cyber_hygiene_training@v1 (empty d3fend block with
-      per-step gap rationale in the header) once the CORE-layer
-      defensibility analysis is authored. The programme-lifecycle
-      steps here are posture-readiness surfaces upstream of any
-      runtime countermeasure, so a real D3FEND anchor may not exist;
-      the CORE card decides whether to carry a forced tag or close
-      the block empty with a documented gap-note.
+d3fend: []
+  # Closed empty in CORE, per the header gap-note and the
+  # playbook.cyber_hygiene_training@v1 precedent. No step on this
+  # playbook deploys a countermeasure against adversary behaviour, so
+  # no D3FEND technique describes it honestly. The D3FEND cross-walk
+  # for this discipline is carried at the control layer instead: all
+  # four training controls pin D3-OAM.
 
 ocsf:
   - id: telemetry.api_activity@v1
@@ -88,14 +119,24 @@ ocsf:
     class_name: API Activity
     ocsf_version: "1.3.0"
     direction: both
-    todo: true
     notes: >-
-      SKELETON placeholder for the operator-API-surface read/write
-      shape (HR / identity source for assessment, learning-management
-      surface for delivery and completion, evidence store for cycle
-      review). CORE finalises consumer/emitter directionality per
-      step; EXTEND wires the Compliance Finding (2003) emit binding
-      for programme-governance deviations if scoped.
+      Finalised in CORE as both, because the programme reads and
+      writes across three distinct operator API surfaces and the
+      direction differs by step. Consumed at schedule-assessment (the
+      HR or identity source that enumerates the population and its
+      roles) and at report-gaps (the learning-management surface, read
+      back to compute coverage against the assessed population).
+      Emitted at record-completion and review-cycle (the evidence
+      store the per-staff completion, the per-cohort aggregate and the
+      dated cycle-review artifact are written to). The design-content
+      and deliver-training steps carry no API binding: curriculum
+      authoring and session delivery are operator activities whose
+      evidence enters through the record-completion write rather than
+      through an API surface of their own. An emitter-only reading
+      would lose the assessment read, which is the step that makes
+      coverage computable at all. EXTEND wires the Compliance Finding
+      (2003) emit binding for programme-governance deviations if
+      scoped. Schema: https://schema.ocsf.io/1.3.0/classes/api_activity
 
 nis2:
   - mapping_id: nis2:art-21-2-g
@@ -128,13 +169,23 @@ cra: []
 gdpr:
   - mapping_id: gdpr:art-32-1-b
     article: 32(1)(b)
-    todo: true
     notes: >-
-      SKELETON pin. GDPR Art. 32(1)(b) requires the controller and
+      Finalised in CORE. Art. 32(1)(b) requires the controller and
       processor to ensure the ongoing confidentiality, integrity,
-      availability, and resilience of processing systems and services;
-      the CJEU / EDPB reading extends this to staff-training as an
-      organisational-measures effectiveness limb. The inbound entry
-      at content/mappings/gdpr/article-32-security-of-processing.yaml
+      availability and resilience of processing systems and services;
+      staff training is an organisational measure serving that duty,
+      and the ongoing limb is what this playbook's review-cycle step
+      discharges — a training programme authored once and never
+      revised does not sustain the property the word ongoing requires.
+      The pin is deliberately to 32(1)(b) alone and not to Art. 39(1)(b)
+      (the DPO's awareness-raising and training task): that provision
+      binds a designated officer's task list, not the controller's
+      security measures, and only where a DPO is designated at all.
+      Scope note: the personal data this playbook processes is staff
+      training data — completion status, role, cohort — governed by the
+      data-flow record at
+      content/mappings/gdpr/data-flow-security_awareness_training.md.
+      The inbound entry at
+      content/mappings/gdpr/article-32-security-of-processing.yaml
       backlinks playbook.security_awareness_training@v1 on the
       gdpr:art-32-1-b ongoing-C/I/A entry.

@@ -1,0 +1,47 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.training_delivery@v1
+title: Security training delivery
+summary: >-
+  Operator delivers the curriculum's modules to the populations the
+  needs assessment scoped, on the declared cadence and on joining, and
+  records each delivery event with the cohort addressed and the
+  curriculum version delivered. Delivery is evidenced per event, not
+  per person; per-person completion is a separate record.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "AT-3"
+    title: "Role-based Training"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-g"
+    title: "Cyber hygiene and training"
+
+d3fend_refs:
+  # Delivery is a scheduled organisational activity rather than a
+  # technical countermeasure. D3-OAM is the catalogue's anchor for
+  # programme activities of this shape.
+  - d3f_id: D3-OAM
+    technique_name: "Operational Activity Mapping"
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+
+review_cadence: P1Y
+
+provenance:
+  source_url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls
+  captured_at: '2026-07-28'
+  notes: >-
+    Authored to resolve the AT-3 placeholder on the
+    security_awareness_training overlay. This is the narrowest of the
+    four and the closest to control.training_attestation@v1, so the
+    boundary is stated explicitly: delivery evidence answers "was this
+    cohort taught this version of this material, when", while
+    attestation evidence answers "has this person completed their
+    mandatory training". They diverge in the case that matters — a
+    delivery event held for a cohort in which half the population never
+    attended produces a delivery record and no attestations, and an
+    operator that carried only the attestation control would read that
+    as an absence of evidence rather than as a delivered session with a
+    completion gap. AT-3 was not previously the primary anchor of any
+    control; control.training_attestation@v1 carries it among five
+    anchors as part of its completion-tracking surface.

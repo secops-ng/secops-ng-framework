@@ -1,0 +1,48 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.training_curriculum@v1
+title: Security training curriculum
+summary: >-
+  Operator maintains a versioned security-training curriculum whose
+  modules trace to the competences the needs assessment identified, so
+  that a change in the threat or obligation surface is visible as a
+  change in the material. The curriculum records, per module, the
+  population it addresses, the competence it targets, and the date and
+  version under which it was approved.
+
+oscal_refs:
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.6.3"
+    title: "Information security awareness, education and training"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-g"
+    title: "Cyber hygiene and training"
+
+d3fend_refs:
+  # Curriculum authoring is a documentary discipline: the artifact is a
+  # mapping from identified competences to the material that teaches
+  # them. D3-OAM is the anchor the catalogue uses for governance and
+  # programme-documentation controls.
+  - d3f_id: D3-OAM
+    technique_name: "Operational Activity Mapping"
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+
+review_cadence: P1Y
+
+provenance:
+  source_url: https://www.iso.org/standard/27001
+  captured_at: '2026-07-28'
+  notes: >-
+    Authored to resolve the A.6.3 placeholder on the
+    security_awareness_training overlay. The anchor is ISO rather than
+    NIST because A.6.3 is the clause that speaks to education and
+    training material as a programme artifact, where the NIST AT family
+    speaks to the awareness activity and its records. Kept distinct
+    from control.training_delivery@v1 because the traceability property
+    lives here and not there: a curriculum can be sound and unattended,
+    or attended and never revised against a changed threat surface, and
+    the two failure modes need separate evidence. The versioning
+    requirement is the load-bearing part — an unversioned curriculum
+    makes it impossible to say which material a given completion record
+    attests to, which is what breaks the chain between this control and
+    control.training_records@v1.

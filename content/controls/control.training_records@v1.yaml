@@ -1,0 +1,52 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+stable_id: control.training_records@v1
+title: Security training records
+summary: >-
+  Operator retains security-training records for the declared retention
+  period in three shapes the programme is accountable for: per-staff
+  completion against the curriculum version delivered, per-cohort
+  aggregate coverage against the population the needs assessment
+  scoped, and a dated cycle-review artifact recording the gaps found
+  and what was changed in response.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "AT-4"
+    title: "Training Records"
+  - catalog: "NIS2 Article 21(2)"
+    control_id: "art21-2-g"
+    title: "Cyber hygiene and training"
+
+d3fend_refs:
+  # Records retention and coverage reporting is a documentary
+  # discipline. D3-OAM is the catalogue's anchor for controls of this
+  # shape.
+  - d3f_id: D3-OAM
+    technique_name: "Operational Activity Mapping"
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+
+review_cadence: P1Y
+
+provenance:
+  source_url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls
+  captured_at: '2026-07-28'
+  notes: >-
+    Authored to resolve the AT-4 placeholder on the
+    security_awareness_training overlay, which pins it across three
+    steps (record-completion, report-gaps, review-cycle). It also
+    resolves one of three dangling references on the sibling
+    cyber_hygiene_training overlay, which named this stable id before
+    any file defined it; the other two on that overlay
+    (control.literacy_training_and_awareness@v1 and
+    control.role_based_training@v1) are out of scope here and remain
+    unresolved — they follow a different naming convention, mirroring
+    the catalogue control id rather than the evidence-producing
+    activity, and should be rebound rather than authored. The
+    aggregate limb is the one that carries the regulatory weight: a
+    complete set of per-person records says nothing about the
+    population that was never enrolled, so coverage against the
+    assessed population is a distinct field and not a derived one.
+    Distinct from control.training_attestation@v1, which is the
+    per-person attestation other playbooks consume as a precondition;
+    this control is the programme's retention and coverage obligation.
