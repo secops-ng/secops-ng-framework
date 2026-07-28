@@ -1,0 +1,153 @@
+{
+  "type": "playbook",
+  "spec_version": "2.0",
+  "id": "playbook--e26d1a00-0000-4000-8000-000000000001",
+  "name": "EU AI Act Article 26 deployer obligations with Article 27 fundamental-rights impact assessment",
+  "description": "SKELETON — CACAO v2 scaffold for the operator-side EU AI Act (Regulation (EU) 2024/1689) Article 26 deployer-obligation lifecycle, gated by the Article 27 fundamental-rights impact assessment. Every other EU AI Act surface in this catalogue anchors on the provider — Art. 9 risk management, Art. 11 technical documentation, Art. 13 transparency, Art. 15 robustness, Art. 72 post-market monitoring, Art. 73 serious-incident reporting. This playbook is the first on the deployer side: the operator who runs a third-party high-risk AI system in production rather than placing one on the market. The lifecycle runs confirm-intended-use (Art. 26(1) instruction-conformant use and the Art. 26(7) worker-representative information duty as a pre-deployment gate), assign-human-oversight (Art. 26(2), recording competence, training, authority and support against a named person or role), monitor-operation (Art. 26(4) input-data relevance where the deployer controls the input surface, and the Art. 26(5) monitoring duty with its escalation edge to suspension and sequenced notification), assess-fundamental-rights-impact (Art. 27(1)(a)-(f), complementing rather than duplicating an existing GDPR Art. 35 DPIA per Art. 27(4), and notifying the market-surveillance authority of the result), and retain-logs-and-evidence (Art. 26(6) retention of automatically generated logs under deployer control for a period appropriate to the intended purpose and at least six months). SKELETON scope: step bodies are declared rather than bound — the deployment register, the oversight-assignment record, the input-data control surface, the monitoring signal source, the FRIA template and the log store are all operator-owned adapter-bound surfaces. The CORE sibling binds the deterministic primitives and lands the three-target compile examples.",
+  "playbook_types": [
+    "prevention",
+    "notification"
+  ],
+  "created_by": "identity--0a1b2c3d-0000-4000-8000-000000000001",
+  "created": "2026-07-28T00:00:00.000Z",
+  "modified": "2026-07-28T00:00:00.000Z",
+  "valid_from": "2026-07-28T00:00:00.000Z",
+  "labels": [
+    "eu-ai-act",
+    "article-26",
+    "article-27",
+    "deployer",
+    "fria",
+    "high-risk-ai",
+    "human-oversight",
+    "skeleton"
+  ],
+  "external_references": [
+    {
+      "name": "OASIS CACAO v2.0",
+      "description": "Workflow step types (start, action, end), variable conventions, and the x_ extension namespace this artifact uses.",
+      "source": "OASIS Open"
+    },
+    {
+      "name": "EU AI Act — Regulation (EU) 2024/1689, Article 26 (obligations of deployers of high-risk AI systems)",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    },
+    {
+      "name": "EU AI Act — Regulation (EU) 2024/1689, Article 27 (fundamental rights impact assessment for high-risk AI systems)",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    },
+    {
+      "name": "GDPR — Regulation (EU) 2016/679, Article 35 (data protection impact assessment)",
+      "description": "Art. 27(4) makes the fundamental-rights impact assessment a complement to an existing DPIA rather than a duplicate.",
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
+    }
+  ],
+  "x_secops_ng": {
+    "stable_id": "playbook.eu_ai_act_deployer_obligations@v1",
+    "content_version": "0.1.0",
+    "maturity": "draft",
+    "compile_targets": [],
+    "control_refs": [
+      "control.risk_management_policy@v1",
+      "control.training_attestation@v1",
+      "control.incident_timeline_signals@v1"
+    ],
+    "telemetry_refs": [
+      "telemetry.ocsf.compliance_finding@v1"
+    ],
+    "metric_refs": [],
+    "sources": [
+      "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+      "OASIS CACAO v2.0 specification"
+    ]
+  },
+  "playbook_variables": {
+    "__deployment_id__": {
+      "type": "string",
+      "description": "Stable operator-side identifier of the high-risk AI system deployment this cycle covers. Joins the intended-use determination, the oversight assignment, the monitoring record, the fundamental-rights assessment and the retention record on one key.",
+      "external": true
+    },
+    "__system_reference__": {
+      "type": "string",
+      "description": "Reference to the provider's high-risk AI system and the instructions for use accompanying it (Art. 13). External — supplied from the operator's deployment register.",
+      "external": true
+    }
+  },
+  "workflow_start": "start--e26d1a00-0000-4000-8000-000000000001",
+  "workflow": {
+    "start--e26d1a00-0000-4000-8000-000000000001": {
+      "type": "start",
+      "name": "eu_ai_act_deployer_obligations_start",
+      "description": "Entry point. Fires on the operator's pre-deployment gate for a high-risk AI system, and on each subsequent monitoring cycle for a system already in service.",
+      "on_completion": "action--e26d1a00-0000-4000-8000-000000000002"
+    },
+    "action--e26d1a00-0000-4000-8000-000000000002": {
+      "type": "action",
+      "name": "confirm_intended_use",
+      "description": "SKELETON — reconcile the operator's declared deployment context against the intended purpose stated in the provider's instructions for use, per Art. 26(1), and record the conformance determination against __deployment_id__. The negative case is a first-class outcome: where the declared context exceeds the intended-purpose boundary the determination records that the deployment must not proceed on this system, and no downstream step fires. Where the deployer is an employer and the deployment is at the workplace, this step also gates on the Art. 26(7) duty to inform workers' representatives and affected workers BEFORE putting the system into service — the dated notice record is a precondition of the determination, not a parallel task, because a deployment that proceeds without it cannot be remediated after the fact. Read-only against the operator's deployment register and the provider-supplied instructions; the register is an adapter-bound surface this playbook does not author.",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Resolve the instructions for use for __system_reference__, compare the declared deployment context against the stated intended purpose, confirm the Art. 26(7) worker notice where applicable, and record the dated conformance determination."
+        }
+      ],
+      "on_completion": "action--e26d1a00-0000-4000-8000-000000000003"
+    },
+    "action--e26d1a00-0000-4000-8000-000000000003": {
+      "type": "action",
+      "name": "assign_human_oversight",
+      "description": "SKELETON — assign human oversight of the deployment to natural persons per Art. 26(2) and record the assignment against __deployment_id__. The obligation has four independently checkable limbs and the record names the assignee against each rather than asserting oversight generically: competence, training, authority, and the necessary support. Competence and training bind to the operator's training-attestation surface; authority is a delegation record the operator's governance surface owns. The capability set an oversight assignee must be able to exercise — understand the system's capacity and limits, remain aware of automation bias, correctly interpret output, decide not to use the system or disregard its output, and intervene or halt — is fixed by Art. 14(4) and is mapped by a sibling card; on its merge this step's reference bundle gains the Art. 14 anchor.",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Record the named oversight assignee or role for __deployment_id__ with evidence against each of competence, training, authority and support."
+        }
+      ],
+      "on_completion": "action--e26d1a00-0000-4000-8000-000000000004"
+    },
+    "action--e26d1a00-0000-4000-8000-000000000004": {
+      "type": "action",
+      "name": "monitor_operation",
+      "description": "SKELETON — monitor operation of the high-risk AI system on the basis of the instructions for use, per Art. 26(5), and record the per-window monitoring observation against __deployment_id__. Where the deployer exercises control over the input data, the same window records the Art. 26(4) determination that input data is relevant and sufficiently representative in view of the intended purpose; where it does not exercise that control, the dated determination of non-control is itself the evidence and no representativeness assessment is owed. This step carries the lifecycle's only escalation edge, and its three triggers have different consequences that must not be collapsed: routine observations feed the provider's Art. 72 post-market loop; a determination that use in accordance with the instructions may present a risk within the meaning of Art. 79(1) compels informing the provider or distributor and the market-surveillance authority AND suspending use, without undue delay; and identification of a serious incident compels immediate sequenced notification — provider first, then importer or distributor, then the market-surveillance authorities. The serious-incident branch hands off to the provider-side Art. 73 reporting chain; the deployer's notification is an input to that chain, never a substitute for it.",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Record the monitoring observation and the Art. 26(4) input-data determination for the window; on a risk or serious-incident determination, emit the escalation with its trigger class and suspend use where Art. 79(1) applies."
+        }
+      ],
+      "on_completion": "action--e26d1a00-0000-4000-8000-000000000005"
+    },
+    "action--e26d1a00-0000-4000-8000-000000000005": {
+      "type": "action",
+      "name": "assess_fundamental_rights_impact",
+      "description": "SKELETON — perform the Art. 27 fundamental-rights impact assessment prior to deploying, and record it against __deployment_id__. The step applies only to deployers in scope of Art. 27: bodies governed by public law, private entities providing public services, and deployers of the Annex III(5)(b)-(c) creditworthiness and life-and-health-insurance risk-assessment systems — so the first recorded output is the in-scope determination, and an out-of-scope determination closes the step with a dated record rather than an empty assessment. In scope, the emitted assessment satisfies the six Art. 27(1)(a)-(f) elements as a checklist: the processes the system will be used in, the period and frequency of intended use, the categories of natural persons and groups likely to be affected, the specific risks of harm to those categories informed by the Art. 13 provider information, the implementation of human-oversight measures, and the measures on risk materialisation including internal governance and complaint mechanisms. Per Art. 27(4) the assessment complements rather than duplicates an existing GDPR Art. 35 DPIA: where the operator holds a DPIA for the same processing, the step reads it and records which Art. 27(1) elements it already satisfies, assessing only the remainder. The step closes by notifying the market-surveillance authority of the results; the Art. 27(5) template is not yet published by the AI Office, so the notification contract is declared and the dated notification record emitted, rather than a template shape being invented.",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Record the Art. 27 in-scope determination; where in scope, emit the assessment covering Art. 27(1)(a)-(f), reading any existing DPIA for overlapping elements, and record the notification to the market-surveillance authority."
+        }
+      ],
+      "on_completion": "action--e26d1a00-0000-4000-8000-000000000006"
+    },
+    "action--e26d1a00-0000-4000-8000-000000000006": {
+      "type": "action",
+      "name": "retain_logs_and_evidence",
+      "description": "SKELETON — record the retention disposition for the logs the high-risk AI system generates automatically, per Art. 26(6), and emit the dated cycle-evidence artifact joining the intended-use determination, the oversight assignment, the monitoring observations, and the fundamental-rights assessment against __deployment_id__. The obligation binds only to the extent those logs are under the deployer's control, so the record states the control determination alongside the retention period applied. Six months is the floor, not the target: the governing standard is a period appropriate to the intended purpose of the system, and applicable Union or national law may require longer. The log store is an operator-owned adapter-bound surface — this step declares and evidences the retention contract and never ships a store. The content those logs must carry is fixed by Art. 12; a sibling card lands that mapping and this step's reference bundle gains the anchor on its merge.",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Record the log-control determination and the applied retention period for __deployment_id__, then emit the dated cycle-evidence artifact."
+        }
+      ],
+      "on_completion": "end--e26d1a00-0000-4000-8000-000000000007"
+    },
+    "end--e26d1a00-0000-4000-8000-000000000007": {
+      "type": "end",
+      "name": "eu_ai_act_deployer_obligations_end",
+      "description": "Terminal state. The cycle closes on the dated evidence artifact; the next monitoring window re-enters at the start step."
+    }
+  }
+}
