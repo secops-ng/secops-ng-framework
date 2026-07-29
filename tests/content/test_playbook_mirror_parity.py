@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+import pytest
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -43,11 +44,14 @@ def _dual_layout_sources() -> list[tuple[str, Path, Path]]:
 
 def test_dual_layout_playbook_identity_fields_match() -> None:
     pairs = _dual_layout_sources()
-    assert pairs, "expected at least one dual-layout playbook"
+    if not pairs:
+        pytest.skip("no dual-layout playbooks in content/playbooks/")
 
     for slug, source_path, mirror_path in pairs:
-        source_metadata = _load_document(source_path).get("x_secops_ng", {})
-        mirror_metadata = _load_document(mirror_path).get("x_secops_ng", {})
+        source_document = _load_document(source_path)
+        mirror_document = _load_document(mirror_path)
+        source_metadata = source_document.get("x_secops_ng", {})
+        mirror_metadata = mirror_document.get("x_secops_ng", {})
         for field in IDENTITY_FIELDS:
             source_value = source_metadata.get(field)
             mirror_value = mirror_metadata.get(field)
@@ -56,3 +60,8 @@ def test_dual_layout_playbook_identity_fields_match() -> None:
                 f"{source_path} has {source_value!r}, "
                 f"{mirror_path} has {mirror_value!r}"
             )
+        assert source_document == mirror_document, (
+            f"dual-layout playbook {slug!r} drifted outside the identity "
+            f"fields: {source_path} and {mirror_path} no longer contain "
+            f"the same document"
+        )
