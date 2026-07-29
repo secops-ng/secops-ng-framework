@@ -1,6 +1,6 @@
 # eu_ai_act_deployer_obligations
 
-**Status:** SKELETON · **Stable id:** `playbook.eu_ai_act_deployer_obligations@v1`
+**Status:** CORE · **Stable id:** `playbook.eu_ai_act_deployer_obligations@v1`
 
 ## Overview
 
@@ -65,23 +65,33 @@ Inbound mappings:
 [`article-26-deployer-obligations.yaml`](../../mappings/eu_ai_act/article-26-deployer-obligations.yaml)
 and [`article-27-fria.yaml`](../../mappings/eu_ai_act/article-27-fria.yaml).
 
-This playbook is SKELETON. Outbound OSCAL, OCSF and D3FEND closure
-lands with the sibling **CORE** card, along with the deterministic
-primitives and the three-target compile examples.
+Outbound OSCAL, OCSF and D3FEND bindings are closed. The D3FEND block
+carries a single pin — D3-OAM on `retain_logs_and_evidence`, the step
+that composes the four upstream records into one dated artifact. The
+other four steps stay unpinned: they are compliance-governance
+disciplines over a third-party system, not countermeasures D3FEND
+v1.0.0 describes. The rationale is recorded in `mappings.yaml` rather
+than left to inference.
 
 ## How to compile
 
-Not yet compilable. `x_secops_ng.compile_targets` is empty: this is
-portable content only at SKELETON, and the step bodies are declared
-rather than bound.
+Compiles to all three reference targets. From the repo root:
 
-The sibling **CORE** card binds the deterministic primitives and lands
-the emitted examples with byte-parity goldens, at which point they
-appear at:
+```bash
+PYTHONPATH=. python -m tools.compile \
+    content/playbooks/eu_ai_act_deployer_obligations/playbook.cacao.json \
+    --target n8n --out /tmp/workflow.n8n.json
+```
+
+Committed worked examples, each with its own README and a
+`regenerate.sh` that re-emits it from this playbook:
 
 - n8n — `examples/n8n/eu_ai_act_deployer_obligations/`
 - Temporal — `examples/temporal/eu_ai_act_deployer_obligations/`
 - LangGraph — `examples/langgraph/eu_ai_act_deployer_obligations/`
+
+Byte-parity between the committed examples and the emitter output is
+pinned by `tests/examples/eu_ai_act_deployer_obligations/test_golden.py`.
 
 ## Operator customisation
 
@@ -89,8 +99,22 @@ CACAO variables the playbook exposes:
 
 | Variable | Supplied by | Purpose |
 |---|---|---|
-| `__deployment_id__` | operator | Stable identifier of the high-risk AI system deployment; joins every record in the cycle |
-| `__system_reference__` | operator | Reference to the provider's system and its accompanying instructions for use |
+| `__deployment_id__` | operator (external) | Stable identifier of the high-risk AI system deployment; joins every record in the cycle |
+| `__system_reference__` | operator (external) | Reference to the provider's system and its accompanying instructions for use |
+| `__intended_use_determination_id__` | `confirm_intended_use` | Dated Art. 26(1) conformance determination; carries the negative case where the deployment must not proceed |
+| `__oversight_assignment_id__` | `assign_human_oversight` | Art. 26(2) assignment record covering competence, training, authority and support |
+| `__monitoring_observation_id__` | `monitor_operation` | Per-window Art. 26(5) observation, carrying the Art. 26(4) input-data determination |
+| `__escalation_trigger_class__` | `monitor_operation` | Which of the three Art. 26(5) triggers fired — routine, Art. 79(1) risk, or serious incident |
+| `__fria_determination_id__` | `assess_fundamental_rights_impact` | Art. 27 record; holds the in-scope determination in every case |
+| `__retention_evidence_id__` | `retain_logs_and_evidence` | Dated cycle-evidence artifact joining the four records above |
+
+`__escalation_trigger_class__` is deliberately separate from
+`__monitoring_observation_id__`: its three values carry different legal
+consequences — routine monitoring feeds the provider's Art. 72 loop, an
+Art. 79(1) risk determination compels notification *and* suspension of
+use, and a serious incident compels immediate sequenced notification
+into the provider-side Art. 73 chain. Collapsing the class into the
+observation loses the suspension trigger.
 
 Adapter-bound surfaces the operator wires — the framework declares each
 contract and ships none of them:
