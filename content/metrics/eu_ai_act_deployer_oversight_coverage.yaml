@@ -1,0 +1,134 @@
+stable_id: kpi.eu_ai_act_deployer_oversight_coverage@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: EU AI Act Art. 26(2) deployer oversight-assignment coverage
+summary: >
+  Share of the operator's active high-risk AI system deployments that
+  carry a current Article 26(2) human-oversight assignment record
+  covering all four limbs the provision names — competence, training,
+  authority, and the necessary support. Derived from the
+  assign_human_oversight step of the
+  `playbook.eu_ai_act_deployer_obligations@v1` lifecycle.
+  Art. 26(2) is unconditional for a deployer of a high-risk AI
+  system, so unlike a discretionary coverage indicator this one has no
+  legitimate steady state below 1.0: any deployment without a current
+  assignment is an undischarged obligation, not an acceptable
+  residual. The four-limb requirement is what the indicator actually
+  tests — an assignment naming a person but recording no delegated
+  authority to halt the deployment produces an overseer who cannot
+  lawfully oversee, and counts as uncovered here.
+  Residual-risk counterpart on the same lifecycle:
+  `kri.eu_ai_act_deployer_suspension_latency_hours@v1`.
+unit: ratio
+direction: higher_is_better
+target:
+  value: 1.0
+  comparator: ">="
+  rationale: >
+    Not a community-recommended starting point but the obligation
+    itself. Art. 26(2) requires deployers to assign human oversight to
+    natural persons with the necessary competence, training, authority
+    and support; it admits no threshold and no sampling. The target is
+    therefore 1.0 and the warn band opens immediately below it. This
+    differs deliberately from coverage indicators elsewhere in the
+    catalogue — `kpi.supply_chain_coverage@v1` sets 0.95 because a
+    newly onboarded supplier may legitimately not yet have returned an
+    attestation, whereas a high-risk AI deployment running without an
+    oversight assignment is not in a permissible interim state. An
+    operator whose value sits below 1.0 should read the gap as a list
+    of deployments to suspend or assign, not as a metric to tune.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 1.0
+    severity: warn
+  - name: high
+    comparator: "<"
+    value: 0.95
+    severity: high
+  - name: breach
+    comparator: "<"
+    value: 0.8
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: ratio
+  formula: >
+    Over the evaluation window, let D be the set of the operator's
+    active high-risk AI system deployments — those for which the
+    confirm_intended_use step has recorded a positive Art. 26(1)
+    conformance determination and no subsequent suspension or
+    decommission has been recorded. For each deployment in D, the
+    deployment is covered when the assign_human_oversight step has
+    emitted an oversight-assignment record that is (a) current, i.e.
+    not superseded and not older than the operator's declared
+    reassignment cadence, and (b) complete, i.e. carries a non-empty
+    value against each of the four Art. 26(2) limbs: competence,
+    training, authority, support. Compute
+    coverage = |covered| / |D|. Where |D| is zero the indicator is
+    undefined rather than 1.0 — an operator running no high-risk AI
+    deployments has nothing to cover, and reporting a perfect score
+    would misrepresent an empty estate as a discharged obligation.
+    Deployments whose intended-use determination was negative (the
+    Art. 26(1) boundary was exceeded and the deployment must not
+    proceed) are excluded from D: they are not running, so no
+    oversight is owed. Partial assignments count as uncovered rather
+    than fractionally covered, because the four limbs are
+    independently necessary and a deployment missing any one of them
+    has no lawful oversight.
+    Reference visualisation: a stacked horizontal bar showing covered
+    versus uncovered deployments, with the uncovered segment broken
+    out by which of the four limbs is missing, so an operator reads
+    both the headline ratio and the specific remediation. The
+    committed reference rendering lives at
+    `content/metrics/eu_ai_act_deployer_oversight_coverage.viz.md` —
+    that file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: intended_use_determination
+      description: >
+        Dated Art. 26(1) conformance determination emitted by the
+        confirm_intended_use step, carrying whether the declared
+        deployment context falls inside the intended purpose stated in
+        the provider's instructions for use. Defines membership of the
+        active-deployment set D; a negative determination excludes the
+        deployment rather than counting it as uncovered.
+      playbook_step: action--e26d1a00-0000-4000-8000-000000000002
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: status_id
+    - name: oversight_assignment
+      description: >
+        Art. 26(2) oversight-assignment record emitted by the
+        assign_human_oversight step, naming the assignee or role
+        against each of competence, training, authority and support.
+        Completeness across all four limbs is what the coverage test
+        reads; presence of the record alone is not sufficient.
+      playbook_step: action--e26d1a00-0000-4000-8000-000000000003
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: time
+  window:
+    duration: P90D
+    sliding: true
+playbook_refs:
+  - playbook_id: playbook.eu_ai_act_deployer_obligations@v1
+    step_id: action--e26d1a00-0000-4000-8000-000000000002
+  - playbook_id: playbook.eu_ai_act_deployer_obligations@v1
+    step_id: action--e26d1a00-0000-4000-8000-000000000003
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+external_refs:
+  - name: EU AI Act — Article 26(2) assignment of human oversight by deployers
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 26(2)
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: EU AI Act — Article 14(4) oversight capabilities the assignee must be able to exercise
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 14(4)
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability

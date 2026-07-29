@@ -175,6 +175,10 @@ VIZ_REQUIRED_STEMS = (
     # KPI/KRI pair (NIS2 Art.23 / Art.26(2), DORA Art.19; G-04)
     "threat_intel_indicator_ingestion_rate",
     "threat_intel_stale_ioc_ratio",
+    # F-WF-EUAIACT-DEPLOYER EXTEND — Art. 26 deployer-obligation
+    # KPI/KRI pair (G-04)
+    "eu_ai_act_deployer_oversight_coverage",
+    "eu_ai_act_deployer_suspension_latency_hours",
 )
 
 

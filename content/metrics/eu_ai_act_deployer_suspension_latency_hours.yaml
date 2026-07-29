@@ -1,0 +1,155 @@
+stable_id: kri.eu_ai_act_deployer_suspension_latency_hours@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: EU AI Act Art. 26(5) deployer suspension latency
+summary: >
+  Elapsed hours between a deployer determining that use of a high-risk
+  AI system in accordance with its instructions may present a risk
+  within the meaning of Article 79(1), and the recorded suspension of
+  use of that system. Derived from the monitor_operation step of the
+  `playbook.eu_ai_act_deployer_obligations@v1` lifecycle, which
+  records the determination and its escalation trigger class.
+  This is the residual-risk indicator on the only limb of Article 26
+  that can require a deployer to stop using a system. Art. 26(5)
+  couples two duties to the same trigger — inform the provider or
+  distributor and the market-surveillance authority, AND suspend the
+  use of the system — and the suspension is the one with operational
+  consequences the operator will be tempted to defer. A rising value
+  is the measurable shape of that deferral.
+  Performance counterpart on the same lifecycle:
+  `kpi.eu_ai_act_deployer_oversight_coverage@v1`.
+unit: hours
+direction: lower_is_better
+target:
+  value: 24
+  comparator: "<="
+  rationale: >
+    Operator-chosen SLO, not a statutory bound, and the distinction
+    matters enough to state plainly: Article 26(5) requires the
+    deployer to inform and suspend "without undue delay" and sets no
+    number. This differs from
+    `kri.eu_ai_act_report_clock_margin_days@v1`, whose 2 / 10 / 15-day
+    bounds are written into Art. 73(2)-(4) and are law. Twenty-four
+    hours is a community-recommended starting point chosen so the
+    indicator is actionable rather than authoritative — it is short
+    enough that a deferred suspension surfaces within one operating
+    day, and it carries no implication that twenty-five hours is
+    unlawful or that twenty-three is safe. What "undue" means is
+    decided against the circumstances of the individual case, and an
+    operator who can evidence why a longer interval was not undue has
+    met the obligation regardless of this number. Operators should
+    override the target with their own documented reasoning rather
+    than inheriting it as though it were the regulation.
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 24
+    severity: warn
+  - name: high
+    comparator: ">"
+    value: 72
+    severity: high
+  - name: breach
+    comparator: ">"
+    value: 168
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: p95
+  formula: >
+    For each monitoring window in the evaluation period whose
+    monitor_operation step recorded an escalation trigger class of
+    Art. 79(1) risk determination, compute
+    latency_hours = (suspension_recorded_at - risk_determined_at) /
+    3600. Aggregate as the p95 across those windows: the tail is the
+    quantity of interest, because a single deployment left running for
+    a week after a risk determination is the failure this indicator
+    exists to surface, and a mean would let a run of prompt
+    suspensions bury it.
+    Windows whose trigger class is routine monitoring are excluded —
+    routine observations feed the provider's Art. 72 post-market loop
+    and carry no suspension duty, so including them would dilute the
+    indicator toward zero with events that were never in scope.
+    Windows whose trigger class is a serious incident are also
+    excluded: that branch compels immediate sequenced notification
+    into the provider-side Art. 73 chain, whose timeliness is measured
+    by `kri.eu_ai_act_report_clock_margin_days@v1`, and folding the
+    two would double-count one event against two different clocks.
+    A determination for which no suspension has yet been recorded is
+    treated as open and contributes
+    (evaluation_now - risk_determined_at) rather than being excluded,
+    so the indicator cannot be improved by simply never suspending.
+    Where the deployer records a reasoned determination that
+    suspension was not owed — for instance because the risk was
+    eliminated by a configuration change inside the instructions for
+    use rather than by ceasing use — the window is excluded and the
+    dated reasoning is the evidence; this exclusion is deliberate and
+    is the one an auditor should sample.
+    Reference visualisation: a horizontal bar chart of latency_hours
+    per Art. 79(1) determination in the window, sorted descending,
+    with open (unsuspended) determinations rendered as open-ended bars
+    and the warn / high / breach thresholds (24 / 72 / 168 h) overlaid
+    as vertical lines, and the p95 annotated as the headline figure.
+    The committed reference rendering lives at
+    `content/metrics/eu_ai_act_deployer_suspension_latency_hours.viz.md`
+    — that file is the contract for the chart shape; the compile
+    target renders the executable form against operator data.
+  inputs:
+    - name: risk_determined_at
+      description: >
+        Timestamp at which the monitor_operation step recorded an
+        escalation trigger class of Art. 79(1) risk determination for
+        the window — the deployer's conclusion that use in accordance
+        with the instructions may present a risk. Starts the clock.
+        The trigger class is carried as a distinct value from the
+        monitoring observation precisely so this indicator can select
+        on it.
+      playbook_step: action--e26d1a00-0000-4000-8000-000000000004
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: start_time
+    - name: suspension_recorded_at
+      description: >
+        Timestamp of the recorded suspension of use of the high-risk
+        AI system for the deployment the determination concerned.
+        Absence of this value for a determination marks it open, and
+        the open interval accrues against the indicator rather than
+        being dropped.
+      playbook_step: action--e26d1a00-0000-4000-8000-000000000004
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: time
+    - name: evaluation_now
+      description: >
+        Timestamp at which the indicator is evaluated, used to accrue
+        the open interval for determinations with no recorded
+        suspension. Supplied by the compile target's scheduler; the
+        catalog contract is the formula, not the cadence. Not bound to
+        a telemetry class — this is the scheduler clock, not an OCSF
+        event.
+  window:
+    duration: P90D
+    sliding: true
+playbook_refs:
+  - playbook_id: playbook.eu_ai_act_deployer_obligations@v1
+    step_id: action--e26d1a00-0000-4000-8000-000000000004
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+external_refs:
+  - name: EU AI Act — Article 26(5) deployer monitoring, information and suspension duties
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 26(5)
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: EU AI Act — Article 79(1) AI systems presenting a risk
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 79(1)
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: EU AI Act — Article 72 post-market monitoring by providers
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 72
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability
