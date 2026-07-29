@@ -152,11 +152,12 @@ def _entry(root: Path, source: Path, slug: str, schema_path: Path) -> dict[str, 
             #               predicate. A playbook that carries a real
             #               condition (alert_triage) gets NO note.
             #   switch      note iff _extract_switch_cases parses nothing.
-            #               It requires a LIST of mappings, while CACAO's
-            #               `cases` is a dict — so a spec-shaped switch is
-            #               flagged even when its expression is real
-            #               (vuln-intake's switch='__severity__' still
-            #               records "no cases parsed"). Emitter-side gap.
+            #               It accepts CACAO v2's dict shape (needs a
+            #               non-empty `switch` expression AND a non-empty
+            #               `cases` mapping) and the legacy list-of-
+            #               {when,label} shape. A spec-shaped switch with
+            #               real cases gets NO note; its rules and per-case
+            #               output ports are emitted.
             #   parallel    always a note (n8n parallelism is implicit).
             raw_expr = None
             if stype in ("if-condition", "while-condition"):
@@ -169,10 +170,14 @@ def _entry(root: Path, source: Path, slug: str, schema_path: Path) -> dict[str, 
             elif stype == "switch-condition":
                 raw_expr = step.get("switch") or None
                 cases = step.get("cases")
-                needs_operator = not (
-                    isinstance(cases, list)
-                    and any(isinstance(e, dict) for e in cases)
+                has_list_cases = isinstance(cases, list) and any(
+                    isinstance(e, dict) for e in cases
                 )
+                has_dict_cases = (
+                    isinstance(cases, dict) and bool(cases)
+                    and isinstance(raw_expr, str) and bool(raw_expr.strip())
+                )
+                needs_operator = not (has_list_cases or has_dict_cases)
             else:  # parallel
                 needs_operator = True
             if needs_operator:

@@ -36,7 +36,7 @@ workflow = emit(playbook)  # dict ready for json.dumps
 | `playbook-action`   | `n8n-nodes-base.executeWorkflow`           | Sub-playbook target is operator-managed. |
 | `if-condition`      | `n8n-nodes-base.if`                        | `on_success` = true branch, `on_failure` = false branch. |
 | `while-condition`   | `n8n-nodes-base.if` + back-edge            | Lossy; n8n has no native while. |
-| `switch-condition`  | `n8n-nodes-base.switch`                    | Cases sourced from `extra.cases` (best-effort). |
+| `switch-condition`  | `n8n-nodes-base.switch`                    | CACAO's `cases` mapping (case value → step ids) compiles to one rule + one output port per case, comparing the interpolated `switch` variable against the case value; the legacy `{when, label}` list shape is still accepted. A switch with neither shape emits an empty rule set plus a lossy note. |
 | `parallel`          | `n8n-nodes-base.merge`                     | n8n parallelism is implicit (multi-edge fan-out). |
 
 ## Variables
