@@ -18,12 +18,26 @@
 # Scope note. The EU AI Act inbound mapping surface anchors on
 # obligations applied to *providers and deployers of high-risk AI
 # systems* (Art. 9 risk-management, Art. 11 technical documentation,
-# Art. 13 transparency, Art. 72 post-market monitoring). The
-# operational execution surface for those obligations lives on the
-# `eu_ai_act_risk_management` playbook, which is the only inbound-
-# cited playbook at this stage. The playbooks listed below are
+# Art. 13 transparency, Art. 14 human oversight, Art. 26 deployer
+# obligations, Art. 27 fundamental-rights impact assessment, Art. 72
+# post-market monitoring, Art. 73 serious-incident reporting).
+#
+# The operational execution surface is no longer a single playbook.
+# Inbound-cited as of 2026-07-29: `eu_ai_act_risk_management`
+# (provider-side Art. 9 / 11 / 13 / 72), `eu_ai_act_deployer_
+# obligations` (deployer-side Art. 26 / 27), `ai_human_oversight`
+# (Art. 14), plus `incident_management` and `post_incident_review`
+# (the Art. 73 reporting chain), `data_protection_impact_assessment`
+# (the Art. 27(4) DPIA complement) and `vulnerability_management`.
+# Earlier revisions of this note said `eu_ai_act_risk_management` was
+# the only cited playbook; that stopped being true when the deployer
+# and human-oversight tracks landed. The playbooks listed below are
 # framework-agnostic SecOps operational surfaces that do not
-# operationalise any Art. 9 / 11 / 13 / 72 obligation directly; their
+# operationalise any of those obligations directly; the individual
+# rationales below predate the deployer and human-oversight tracks and
+# so speak of Art. 9 / 11 / 13 / 72, but the reasoning is unchanged —
+# a general SecOps lifecycle is not an AI-system obligation surface
+# under any article. Their
 # EU AI Act relevance (if any) is indirect and would misrepresent the
 # obligation surface if pinned via `playbook_refs:`. A sibling EXTEND
 # card revisits any cross-regime edges as ENISA / AI Office
@@ -453,3 +467,22 @@ skip:
       here under Art. 9 / 11 / 13 / 72 would misrepresent the
       obligation surface. A sibling EXTEND card revisits Art. 14
       when the deployer human-oversight inbound layer is authored.
+
+  - slug: network_security
+    rationale: >-
+      Framework-agnostic network-security lifecycle, authored against
+      NIS2 Art. 21(2)(e) and wired into the NIS2 / DORA / CRA / GDPR
+      inbound lanes rather than this one. The EU AI Act imposes no
+      network-security obligation of its own: Art. 15 requires
+      high-risk AI systems to achieve an appropriate level of
+      accuracy, robustness and cybersecurity, but that duty binds the
+      *provider* in the design and conformity assessment of the
+      system, and it is discharged through the Art. 9 risk-management
+      lifecycle rather than through the operator's estate-wide network
+      controls. An operator hardening its own network is protecting
+      the environment an AI system happens to run in, which is not the
+      same obligation and would misrepresent Art. 15 coverage if
+      pinned here. Same reasoning as the `crypto_posture_management`
+      and `infra_posture_management` entries above. Should the AI
+      Office publish guidance tying deployer-side infrastructure
+      controls to Art. 26(5) monitoring, a sibling card revisits this.
