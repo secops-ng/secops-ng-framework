@@ -1,6 +1,6 @@
 # ai_human_oversight
 
-**Status:** SKELETON · **Stable id:** `playbook.ai_human_oversight@v1`
+**Status:** CORE · **Stable id:** `playbook.ai_human_oversight@v1`
 
 ## Overview
 
@@ -58,22 +58,33 @@ the second, and only the second produces evidence.
 Inbound mapping:
 [`article-14-human-oversight.yaml`](../../mappings/eu_ai_act/article-14-human-oversight.yaml).
 
-This playbook is SKELETON. Outbound OSCAL, OCSF and D3FEND closure,
-the deterministic primitives and the three-target compile examples land
-with the sibling **CORE** card.
+Outbound OSCAL, OCSF and D3FEND bindings are closed. The D3FEND block
+carries a single pin — D3-OAM on `emit_oversight_evidence`, the step
+that composes six upstream values into one dated artifact. The other
+four steps stay unpinned: they are a human-governance loop over an AI
+system's outputs, not countermeasures D3FEND v1.0.0 describes. The
+rationale is recorded in `mappings.yaml` rather than left to
+inference.
 
 ## How to compile
 
-Not yet compilable. `x_secops_ng.compile_targets` is empty: this is
-portable content only at SKELETON, and the step bodies are declared
-rather than bound.
+Compiles to all three reference targets. From the repo root:
 
-The sibling **CORE** card binds the primitives and lands the emitted
-examples with byte-parity goldens, at which point they appear at:
+```bash
+PYTHONPATH=. python -m tools.compile \
+    content/playbooks/ai_human_oversight/playbook.cacao.json \
+    --target n8n --out /tmp/workflow.n8n.json
+```
+
+Committed worked examples, each with its own README and a
+`regenerate.sh` that re-emits it from this playbook:
 
 - n8n — `examples/n8n/ai_human_oversight/`
 - Temporal — `examples/temporal/ai_human_oversight/`
 - LangGraph — `examples/langgraph/ai_human_oversight/`
+
+Byte-parity between the committed examples and the emitter output is
+pinned by `tests/examples/ai_human_oversight/test_golden.py`.
 
 ## Operator customisation
 
@@ -81,8 +92,33 @@ CACAO variables the playbook exposes:
 
 | Variable | Supplied by | Purpose |
 |---|---|---|
-| `__deployment_id__` | operator | Identifier of the high-risk AI system deployment; shared with the deployer-obligations playbook so the assignment record and this loop join on one key |
-| `__oversight_cycle__` | operator | The review window this cycle runs against (RFC 3339 interval) |
+| `__deployment_id__` | operator (external) | Identifier of the high-risk AI system deployment; shared with the deployer-obligations playbook so the assignment record and this loop join on one key |
+| `__oversight_cycle__` | operator (external) | The review window this cycle runs against (RFC 3339 interval) |
+| `__oversight_roster_id__` | `establish_oversight_roster` | Who holds oversight for the window and what each is empowered to do |
+| `__briefing_record_id__` | `brief_oversight_personnel` | Art. 14(4)(a)-(c) competence briefing against the provider's Art. 13 instructions |
+| `__review_disposition_id__` | `review_flagged_decisions` | Disposition of each output flagged for oversight; a review that found nothing is still recorded |
+| `__biometric_two_person_verification__` | `review_flagged_decisions` | Art. 14(5) record — populated only on Annex III(1)(a) deployments |
+| `__intervention_record_id__` | `record_intervention` | The intervention, or the nil record where the window produced none |
+| `__intervention_type__` | `record_intervention` | Which of the four Art. 14(4)(d)-(e) exercises occurred |
+| `__oversight_evidence_id__` | `emit_oversight_evidence` | Dated cycle-evidence artifact joining all of the above |
+
+Three of those are deliberately separate values rather than fields
+folded into a neighbouring record:
+
+- **`__intervention_type__`** — Art. 14(4)(d)-(e) name four distinct
+  exercises: decline to use, disregard the output, override or reverse
+  it, and interrupt operation. A halt is not a disregard, and an
+  aggregate count that collapses them tells a reviewer nothing about
+  severity.
+- **`__biometric_two_person_verification__`** — Art. 14(5) requires two
+  **separate** natural persons, so one overseer confirming twice does
+  not satisfy it; and where the narrow law-enforcement exemption is
+  relied on, the record must name the Union or national legal basis
+  actually relied on rather than merely flagging that an exemption was
+  taken.
+- **`__review_disposition_id__`** — emitted even when the review found
+  nothing. An empty intervention set with no review record is
+  indistinguishable from no oversight at all.
 
 Adapter-bound surfaces the operator wires — the framework declares each
 contract and ships none of them:
