@@ -1499,7 +1499,7 @@ named operator use-case. Each cookbook workflow lives under
 
 ### F-WF-EUAIACT-DEPLOYER — EU AI Act Art. 26 deployer-obligation lifecycle with Art. 27 fundamental-rights impact assessment
 
-- **Status:** Proposed
+- **Status:** Shipped
 - **Priority:** P1
 - **Goal:** G-01 (content coverage — the shipped EU AI Act surface is
   provider-side end to end; an operator running a third-party high-risk

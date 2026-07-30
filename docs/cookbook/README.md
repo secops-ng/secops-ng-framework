@@ -40,6 +40,7 @@ narrative.
 | `nis2_art20_governance` | [`nis2_art20_governance.md`](nis2_art20_governance.md) | `content/playbooks/nis2_art20_governance/`         |
 | `dora_ict_risk_selfassess` | [`dora_ict_risk_selfassess.md`](dora_ict_risk_selfassess.md) | `content/playbooks/dora_ict_risk_selfassess/`   |
 | `eu_ai_act_risk_management` | [`eu_ai_act_risk_management.md`](eu_ai_act_risk_management.md) | `content/playbooks/eu_ai_act_risk_management/` |
+| `eu_ai_act_deployer_obligations` | [`eu_ai_act_deployer_obligations.md`](eu_ai_act_deployer_obligations.md) | `content/playbooks/eu_ai_act_deployer_obligations/` |
 | `asset_management`    | [`asset_management.md`](asset_management.md)       | `content/playbooks/asset_management/`                 |
 | `agentic_threat_response` | [`agentic_threat_response.md`](agentic_threat_response.md) | `content/playbooks/agentic_threat_response/`     |
 | `vulnerability_management` | [`vulnerability_management.md`](vulnerability_management.md) | `content/playbooks/vulnerability_management/`   |
