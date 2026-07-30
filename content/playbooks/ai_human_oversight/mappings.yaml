@@ -1,6 +1,6 @@
 # Outbound mappings overlay — playbook.ai_human_oversight@v1
 #
-# SKELETON layer. Every control stable-id below resolves to a committed
+# CORE layer. Every control stable-id below resolves to a committed
 # file under content/controls/; this overlay introduces no forward
 # reference to a control that does not yet exist.
 #
@@ -46,23 +46,47 @@ oscal:
       delegation; the binding here reaches only the governance
       structure the delegation is issued under.
 
-d3fend: []
-  # No per-step D3FEND pin, and the gap is reasoned rather than
-  # deferred to a card.
-  #
-  # The five steps are a human-governance loop over an AI system's
-  # outputs — roster, brief, review, intervene, evidence. D3FEND v1.0.0
-  # describes defensive techniques executed against adversary behaviour
-  # on a deployed estate; none of these steps is one. The nearest
-  # candidate is D3-OAM (Operational Activity Mapping) on
-  # emit_oversight_evidence, on the same record-composition reasoning
-  # that put it on the archival steps of dora_major_incident_reporting
-  # and nis2_art20_governance. It is left unpinned at SKELETON because
-  # CORE decides whether the oversight-cycle record is genuinely a
-  # record-composition surface; pinning it now would prejudge that.
-  #
-  # Precedent for an empty block with per-step rationale:
-  # playbook.cyber_hygiene_training@v1.
+# One per-step D3FEND pin, on the composition step.
+#
+# Four of the five steps stay unpinned. They are a human-governance loop
+# over an AI system's outputs — roster, brief, review, intervene — and
+# D3FEND v1.0.0 describes defensive techniques executed against
+# adversary behaviour on a deployed estate. None of those four is one.
+#
+# The SKELETON left one question for CORE: whether the oversight-cycle
+# record is genuinely a record-composition surface, in which case D3-OAM
+# (Operational Activity Mapping) fits emit_oversight_evidence on the
+# same reasoning that put it on the archival steps of
+# dora_major_incident_reporting, cra_srp_notify and
+# nis2_art20_governance — or merely a persistence step, in which case
+# pinning it would overclaim.
+#
+# CORE resolves it affirmatively, and the step's own I/O contract is the
+# evidence: emit_oversight_evidence consumes six upstream values (the
+# deployment, the window, the roster, the briefing record, the review
+# disposition and the intervention record) and emits one joined dated
+# artifact. That is composition, not persistence. Same resolution, on
+# the same grounds, as retain_logs_and_evidence on
+# playbook.eu_ai_act_deployer_obligations@v1.
+d3fend:
+  - step: action--e14a5100-0000-4000-8000-000000000006
+    d3fend_id: D3-OAM
+    d3fend_name: Operational Activity Mapping
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+    notes: >-
+      emit_oversight_evidence — composing the dated cycle-evidence
+      artifact that joins the Art. 14(4) roster, the Art. 14(4)(a)-(c)
+      briefing records, the review dispositions and any Art. 14(4)(d)-(e)
+      interventions into one record against the deployment is the
+      operational-activity-mapping discipline D3-OAM names: the step maps
+      the oversight activity actually performed onto the organisational
+      accountability context an auditor or market-surveillance authority
+      reads it against. This is the artifact that distinguishes oversight
+      exercised from oversight merely assigned, which is what Art. 14
+      turns on. Follows the precedent set on
+      dora_major_incident_reporting (close_and_archive), cra_srp_notify
+      (final_report) and eu_ai_act_deployer_obligations
+      (retain_logs_and_evidence).
 
 ocsf:
   - id: telemetry.ocsf.compliance_finding@v1
