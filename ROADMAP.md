@@ -2241,7 +2241,7 @@ component definition.
 
 ### F-MAP-EUAIACT-GPAI — EU AI Act Chapter V general-purpose AI model obligations
 
-- **Status:** Proposed
+- **Status:** Shipped
 - **Priority:** P1
 - **Goal:** G-02 (regulatory-graph closure — the GPAI chapter is the
   single largest declared gap on the EU AI Act axis, recorded as out of
