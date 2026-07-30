@@ -12,6 +12,27 @@ ISO/IEC 27001) and adversary-tactic models (MITRE D3FEND / ATT&CK), each
 referenced control resolves to a **cross-reference file** under this
 directory.
 
+### Which fields this resolution rule covers
+
+The rule is a property of *reference* fields, and it is worth naming them
+explicitly, because it has been misread as catalogue-wide:
+
+| Field | Resolves to a file here? |
+|---|---|
+| `control_refs` in `content/mappings/<regime>/*.yaml` | **yes** — enforced by the resolution linter below |
+| `control_refs` in a playbook's `x_secops_ng` | **yes** by intent |
+| `control_ref` in a playbook overlay `oscal[]` entry | **yes** when present; the field is optional and omitted where no SecOps-NG control models the discipline |
+
+Nothing else. In particular, an `oscal[]` entry's catalog anchor —
+`oscal_catalog` + `control_id` + `title` — is a pointer into an external
+catalog and needs no file here. Before the decision recorded in issue
+\#853, those entries carried a required `id` URN that looked like a
+reference but had no machine consumer; in 116 of 182 entries it merely
+restated the catalog title (`control.incident_handling@v1` alongside
+`control_id: IR-4`, "Incident Handling"). That field is gone. Where the
+URN pointed at a real control it became `control_ref`; where it restated
+the catalog it was dropped.
+
 A cross-reference file:
 
 - declares the SecOps-NG `stable_id` (matches the value used in

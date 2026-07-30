@@ -38,7 +38,7 @@ oscal:
   # is deliberately NOT pinned here: incident-handling is the
   # upstream discipline the playbook.incident_management@v1 workflow
   # already anchors; this playbook is the reporting lane specifically.
-  - id: control.dora_major_classifier@v1
+  - control_ref: control.dora_major_classifier@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: IR-8
     title: Incident Response Plan
@@ -54,7 +54,7 @@ oscal:
       finalises whether IR-8 stays as the anchor or is replaced with
       the IR-4 (Incident Handling) sub-slice specific to classification.
 
-  - id: control.dora_submission_templates@v1
+  - control_ref: control.dora_submission_templates@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: IR-6
     title: Incident Reporting
@@ -71,7 +71,7 @@ oscal:
       Implementing Regulation (EU) 2024/2956). Reused from the
       content/controls/control.dora_submission_templates@v1 overlay.
 
-  - id: control.incident_timeline_signals@v1
+  - control_ref: control.incident_timeline_signals@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: IR-5
     title: Incident Monitoring

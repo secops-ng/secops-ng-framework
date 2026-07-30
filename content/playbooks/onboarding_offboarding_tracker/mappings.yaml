@@ -159,7 +159,7 @@ oscal:
   # control.privileged_access_review@v1.yaml, and
   # control.cloud_identity_least_privilege@v1.yaml — the three
   # controls this playbook's x_secops_ng.control_refs assert.
-  - id: control.account_management@v1
+  - control_ref: control.account_management@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AC-2
     title: Account Management
@@ -177,8 +177,7 @@ oscal:
       exercise disablement / removal. The control.jml_evidence@v1
       file's oscal_refs declares AC-2 for exactly this anchor.
 
-  - id: control.account_management_disable_accounts@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AC-2(3)
     title: Account Management | Disable Accounts
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AC-2(3)
@@ -197,7 +196,7 @@ oscal:
       the leaver-to-revoked SLA. The control.jml_evidence@v1 file's
       oscal_refs declares AC-2(3) for exactly this anchor.
 
-  - id: control.access_enforcement@v1
+  - control_ref: control.access_enforcement@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AC-3
     title: Access Enforcement
@@ -215,7 +214,7 @@ oscal:
       enumerate-capabilities step for the read-side observation of
       what the enforcement layer was honouring at execution time.
 
-  - id: control.least_privilege@v1
+  - control_ref: control.least_privilege@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AC-6
     title: Least Privilege
@@ -235,8 +234,7 @@ oscal:
       control.cloud_identity_least_privilege@v1.yaml declares AC-6
       for exactly this anchor.
 
-  - id: control.review_of_user_privileges@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AC-6(7)
     title: Least Privilege | Review of User Privileges
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AC-6(7)
@@ -254,8 +252,7 @@ oscal:
       control.cloud_identity_least_privilege@v1.yaml both declare
       AC-6(7) on their oscal_refs.
 
-  - id: control.personnel_termination@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: PS-4
     title: Personnel Termination
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=PS-4
@@ -276,7 +273,7 @@ oscal:
       public-bar-hygiene complement that keeps the termination
       surface in scope without naming individuals.
 
-  - id: control.service_identification_authentication@v1
+  - control_ref: control.service_identification_authentication@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: IA-9
     title: Service Identification and Authentication
@@ -294,8 +291,7 @@ oscal:
       omission note in the header. This mirrors the iam_auditor
       sibling decision on the same F-CP-07 access stream.
 
-  - id: control.system_component_inventory@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: CM-8
     title: System Component Inventory
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CM-8

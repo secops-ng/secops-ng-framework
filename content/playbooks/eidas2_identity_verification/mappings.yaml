@@ -43,7 +43,7 @@ oscal:
   # non-organisational-user identification the request_eudiw_presentation
   # and verify_pid_credential steps discharge (an EUDIW-presenting
   # citizen is the paradigmatic non-organisational user IA-8 names).
-  - id: control.jml_evidence@v1
+  - control_ref: control.jml_evidence@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AC-2
     title: Account Management
@@ -60,8 +60,7 @@ oscal:
       onboarding_offboarding_tracker overlay so the operator's
       access-management surface consolidates around a single AC-2
       anchor.
-  - id: control.non_org_user_identification@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: IA-8
     title: Identification and Authentication (Non-Organizational Users)
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IA-8

@@ -193,7 +193,7 @@ oscal:
   # NIST SP 800-53 Rev. 5 controls exercised by the collect-posture,
   # evaluate-controls, and emit-posture-evidence steps. Catalogue
   # URLs resolve to the public NIST OSCAL repository.
-  - id: control.cspm_baseline@v1
+  - control_ref: control.cspm_baseline@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: CA-7
     title: Continuous Monitoring
@@ -215,7 +215,7 @@ oscal:
       monitoring loop. The playbook's own x_secops_ng.control_refs
       declares control.cspm_baseline@v1 for exactly this anchor.
 
-  - id: control.risk_management_policy@v1
+  - control_ref: control.risk_management_policy@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: RA-3
     title: Risk Assessment
@@ -237,7 +237,7 @@ oscal:
       monitoring cadence, RA-3 anchors what the monitoring evaluates
       against.
 
-  - id: control.baseline_configuration@v1
+  - control_ref: control.baseline_configuration@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: CM-2
     title: Baseline Configuration
@@ -257,7 +257,7 @@ oscal:
       on the same snapshot and the same policy version is what makes
       this step a CM-2 evaluation rather than a heuristic check.
 
-  - id: control.configuration_settings@v1
+  - control_ref: control.configuration_settings@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: CM-6
     title: Configuration Settings
@@ -279,8 +279,7 @@ oscal:
       playbook's own x_secops_ng.control_refs (CM-8 lineage) and is
       not duplicated here.
 
-  - id: control.control_assessment@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: CA-2
     title: Control Assessments
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CA-2

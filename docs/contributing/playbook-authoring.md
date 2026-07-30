@@ -105,7 +105,7 @@ control catalogues and how it emits telemetry. The schema is at
 playbook: playbook.cra_cvd@v1
 
 oscal:
-  - id: control.vuln_disclosure_intake@v1
+  - control_ref: control.vuln_disclosure_intake@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: SI-5
     title: Security Alerts, Advisories, and Directives
@@ -137,9 +137,29 @@ cra:
 ```
 
 The top-level `playbook:` field is required and must match the
-playbook artifact's `x_secops_ng.stable_id`. `oscal[]` entries use
-`id: control.<slug>@v<n>` (URN-validated) plus `oscal_catalog` and
-`control_id`; `title`, `url`, `notes` are optional. `d3fend[]` uses
+playbook artifact's `x_secops_ng.stable_id`.
+
+`oscal[]` entries require `oscal_catalog`, `control_id` and `title` —
+the anchor into the external catalogue. `url` and `notes` are optional.
+
+`control_ref: control.<slug>@v<n>` is also optional, and the rule for it
+is worth reading before you write one:
+
+- **Add it** when a SecOps-NG control under `content/controls/` actually
+  models the discipline the step performs. It is a *reference* and must
+  resolve to a committed file.
+- **Omit it** otherwise. Do not mint a URN that restates the catalogue
+  control you already named — `control.incident_handling@v1` next to
+  `control_id: IR-4`, "Incident Handling", carries no information the
+  next two fields do not. If you find yourself slugifying the `title`
+  into a URN, that is the signal to leave the field out.
+
+This replaced a required `id` field. It was required, had no machine
+consumer, and 116 of 182 entries used it as a label restating the
+catalogue title — which read as a broken reference and produced at
+least one wrongly scoped issue. The decision is recorded in issue #853.
+
+`d3fend[]` uses
 `d3fend_id:` (pattern `D3-*`), not `id:`. `ocsf[]` uses `class_uid:`,
 not `class:`. Regulatory bindings are three separate top-level arrays
 — `nis2:`, `dora:`, `cra:` — not nested under a `regulatory:` wrapper;

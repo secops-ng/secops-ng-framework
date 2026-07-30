@@ -21,7 +21,7 @@ oscal:
   # a system the operator did not build, so the anchors are planning,
   # personnel-training and monitoring controls rather than the
   # system-hardening families a provider-side playbook would pin.
-  - id: control.risk_management_policy@v1
+  - control_ref: control.risk_management_policy@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: PM-9
     title: Risk Management Strategy
@@ -36,7 +36,7 @@ oscal:
       strategy to a third-party high-risk AI system. Read-only against
       the operator's deployment register.
 
-  - id: control.training_attestation@v1
+  - control_ref: control.training_attestation@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AT-3
     title: Role-Based Training
@@ -49,7 +49,7 @@ oscal:
       operator-side delegation and resourcing records with no NIST
       analogue pinned here.
 
-  - id: control.incident_timeline_signals@v1
+  - control_ref: control.incident_timeline_signals@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: IR-5
     title: Incident Monitoring

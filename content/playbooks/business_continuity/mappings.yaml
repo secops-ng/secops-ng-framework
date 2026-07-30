@@ -66,8 +66,7 @@ oscal:
   # sibling backup_recovery overlay so the two overlays cover the
   # triplet (backup + disaster recovery + crisis management)
   # without cross-pinning the same control on both.
-  - id: control.contingency_plan@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: CP-2
     title: Contingency Plan
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CP-2
@@ -81,8 +80,7 @@ oscal:
       envelope that reads the operator's documented BCM plan
       artifact and executes it; the PIR record it emits is the
       audit-evident record CP-2 review cycles read.
-  - id: control.system_recovery_reconstitution@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: CP-10
     title: System Recovery and Reconstitution
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CP-10
@@ -94,7 +92,7 @@ oscal:
       failover to __failover_target__ and the cutback validation
       captured into __recovery_result__ are the exercise of that
       recovery capability against the documented RTO / RPO.
-  - id: control.incident_timeline_signals@v1
+  - control_ref: control.incident_timeline_signals@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: IR-6
     title: Incident Reporting
