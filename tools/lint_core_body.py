@@ -45,9 +45,14 @@ switched off entirely, which is how the hard defects survived.
 Usage:
 
     python -m tools.lint_core_body                # walk default tree
+    python tools/lint_core_body.py                # equivalent
     python -m tools.lint_core_body --json         # machine-readable
     python -m tools.lint_core_body --strict       # soft findings fail too
-    python -m tools.lint_core_body --root /path
+    python -m tools.lint_core_body --root /path   # lints that tree, imports from it
+
+Invocation-independent: the linted ``--root`` is placed on ``sys.path`` so
+the dotted ``content.playbooks.*`` primitive paths resolve however the
+linter is started. See ``_ensure_importable``.
 
 Exit code is non-zero iff at least one HARD finding is emitted (or any
 finding, under ``--strict``).
@@ -184,7 +189,28 @@ def _check_binding(
     return out
 
 
+def _ensure_importable(root: Path) -> None:
+    """Put ``root`` on ``sys.path`` so ``content.playbooks.*`` resolves.
+
+    Primitive paths are dotted from the repo root (``content.playbooks.<slug>
+    .primitives.<mod>``), so resolving them requires the linted tree itself on
+    the import path. Without this the linter is invocation-sensitive: it works
+    under ``python -m tools.lint_core_body`` from the repo root, because that
+    puts the working directory on ``sys.path``, and reports *every* binding as
+    ``unresolvable_module`` when run as ``python tools/lint_core_body.py``,
+    from another directory, or against a ``--root`` that is not the cwd.
+
+    That is a false-positive mode worth naming: 46 spurious HARD findings
+    invite someone to "fix" content that was never broken. Tying the import
+    root to ``--root`` also makes that flag mean what it says.
+    """
+    resolved = str(root.resolve())
+    if resolved not in sys.path:
+        sys.path.insert(0, resolved)
+
+
 def check(root: Path) -> tuple[list[Finding], dict]:
+    _ensure_importable(root)
     findings: list[Finding] = []
     bindings = 0
     slugs = sorted(
