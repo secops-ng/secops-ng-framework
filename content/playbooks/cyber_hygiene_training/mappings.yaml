@@ -115,8 +115,7 @@ oscal:
   # NIST SP 800-53 Rev. 5 controls exercised by the inventory-training-
   # roster, schedule-training-cycle, run-phishing-simulation, track-
   # completion, and evidence-capture steps.
-  - id: control.literacy_training_and_awareness@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AT-2
     title: Literacy Training and Awareness
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AT-2
@@ -134,8 +133,7 @@ oscal:
       cadence; the phishing-simulation run is the AT-2(3) practical
       exercise.
 
-  - id: control.role_based_training@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AT-3
     title: Role-based Training
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AT-3
@@ -152,7 +150,7 @@ oscal:
       based overdue separately from awareness overdue so the
       attestation surfaces the two surfaces independently.
 
-  - id: control.training_records@v1
+  - control_ref: control.training_records@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AT-4
     title: Training Records

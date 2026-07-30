@@ -118,7 +118,7 @@ oscal:
   # bind-escalation, generate-handoff-brief, and notify-incoming-
   # on-call steps. Catalogue URLs resolve to the public NIST OSCAL
   # repository.
-  - id: control.account_management@v1
+  - control_ref: control.account_management@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AC-2
     title: Account Management
@@ -135,8 +135,7 @@ oscal:
       roster file) into the playbook variables the rest of the
       workflow reads.
 
-  - id: control.incident_response_plan@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: IR-8
     title: Incident Response Plan
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-8
@@ -154,8 +153,7 @@ oscal:
       handling itself is operated by the per-incident playbooks,
       not by the rotation-readiness surface.
 
-  - id: control.incident_response_assistance@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: IR-7
     title: Incident Response Assistance
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-7
@@ -172,8 +170,7 @@ oscal:
       pre-bound channel is the materialisation step that
       kpi.handoff_brief_delivery_sla@v1 audits.
 
-  - id: control.contingency_plan@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: CP-2
     title: Contingency Plan
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CP-2

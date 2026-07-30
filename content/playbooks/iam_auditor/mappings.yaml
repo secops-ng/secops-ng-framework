@@ -116,7 +116,7 @@ oscal:
   # identities, enumerate-capabilities, and emit-access-evidence
   # steps. Catalogue URLs resolve to the public NIST OSCAL
   # repository.
-  - id: control.account_management@v1
+  - control_ref: control.account_management@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AC-2
     title: Account Management
@@ -131,7 +131,7 @@ oscal:
       attestation that the running workflow was invoked by a known
       managed account.
 
-  - id: control.access_enforcement@v1
+  - control_ref: control.access_enforcement@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AC-3
     title: Access Enforcement
@@ -148,7 +148,7 @@ oscal:
       guarantee that the caller actually held those capabilities,
       and is intentionally out of scope here.
 
-  - id: control.least_privilege@v1
+  - control_ref: control.least_privilege@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AC-6
     title: Least Privilege
@@ -165,7 +165,7 @@ oscal:
       against the same artifacts to surface least-privilege
       coverage.
 
-  - id: control.service_identification_authentication@v1
+  - control_ref: control.service_identification_authentication@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: IA-9
     title: Service Identification and Authentication
@@ -182,8 +182,7 @@ oscal:
       (Identification of Organizational Users) per the deliberate-
       omission note in the header.
 
-  - id: control.system_component_inventory@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: CM-8
     title: System Component Inventory
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CM-8

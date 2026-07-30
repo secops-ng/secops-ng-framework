@@ -66,7 +66,7 @@ oscal:
   # and SI-2 (flaw remediation) so the full NIST 800-53 rev5 coverage
   # of the CVD lifecycle is auditable from the outbound overlay
   # alone, not just from the aggregate control card.
-  - id: control.vuln_disclosure_intake@v1
+  - control_ref: control.vuln_disclosure_intake@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: SI-5
     title: Security Alerts, Advisories, and Directives
@@ -77,7 +77,7 @@ oscal:
       disseminate security alerts and advisories; the CVD advisory
       publication discharges the operator side of that obligation for
       reporter-received vulnerabilities on shipped products.
-  - id: control.vuln_disclosure_intake@v1
+  - control_ref: control.vuln_disclosure_intake@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: RA-5
     title: Vulnerability Monitoring and Scanning
@@ -88,7 +88,7 @@ oscal:
       surface. RA-5 pairs with the codebase-side codebase_vuln_
       management playbook, which discharges the outbound-scan leg;
       this playbook discharges the reporter-received leg.
-  - id: control.vuln_disclosure_intake@v1
+  - control_ref: control.vuln_disclosure_intake@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: IR-6
     title: Incident Reporting
@@ -103,7 +103,7 @@ oscal:
       coordinate_disclosure step discharges the coordinated-
       disclosure agreement with the reporter and, where applicable,
       the coordinating CSIRT.
-  - id: control.vuln_disclosure_intake@v1
+  - control_ref: control.vuln_disclosure_intake@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: SI-2
     title: Flaw Remediation

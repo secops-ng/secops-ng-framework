@@ -50,7 +50,7 @@ oscal:
   # triage, CRA-trigger assessment, regulator-notification, and
   # per-severity response steps. Catalogue URLs resolve to the
   # public NIST OSCAL repository.
-  - id: control.vuln_disclosure_intake@v1
+  - control_ref: control.vuln_disclosure_intake@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: SA-15(8)
     title: Development Process, Standards, and Tools | Reuse of Threat and Vulnerability Information
@@ -62,8 +62,7 @@ oscal:
       advisories, CVE feed hits) as input to the development and
       maintenance process.
 
-  - id: control.flaw_remediation@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: SI-2
     title: Flaw Remediation
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-2
@@ -73,8 +72,7 @@ oscal:
       update shipped on the operator's SLA for the duration of the
       support period.
 
-  - id: control.security_alerts_advisories_directives@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: SI-5
     title: Security Alerts, Advisories, and Directives
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-5
@@ -83,8 +81,7 @@ oscal:
       alerts and advisories — covers the intake step on the inbound
       side and the operator-issued advisory on the outbound side.
 
-  - id: control.vulnerability_monitoring_scanning@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: RA-5
     title: Vulnerability Monitoring and Scanning
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=RA-5
@@ -93,8 +90,7 @@ oscal:
       asset-inventory correlation as the monitoring component that
       turns a disclosure into a remediation candidate.
 
-  - id: control.incident_reporting@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: IR-6
     title: Incident Reporting
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-6
@@ -104,8 +100,7 @@ oscal:
       final report, and the severe-incident notification fired when
       the actively-exploited or severe-incident branch is taken.
 
-  - id: control.software_component_inventory@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: CM-8
     title: System Component Inventory
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CM-8

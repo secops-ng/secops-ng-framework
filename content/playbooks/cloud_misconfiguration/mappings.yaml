@@ -61,7 +61,7 @@ oscal:
   # NIST SP 800-53 Rev. 5 controls exercised by the ingest, enrich,
   # suppress, notify, guided-remediation, re-scan and escalate steps.
   # Catalogue URLs resolve to the public NIST OSCAL repository.
-  - id: control.baseline_configuration@v1
+  - control_ref: control.baseline_configuration@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: CM-2
     title: Baseline Configuration
@@ -73,7 +73,7 @@ oscal:
       configuration, and the re-scan re-evaluates the same baseline
       after the guided remediation has been applied.
 
-  - id: control.configuration_settings@v1
+  - control_ref: control.configuration_settings@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: CM-6
     title: Configuration Settings
@@ -84,8 +84,7 @@ oscal:
       brings the affected resource back into conformance with the
       mandated configuration settings the deviation tripped against.
 
-  - id: control.system_component_inventory@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: CM-8
     title: System Component Inventory
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CM-8
@@ -97,7 +96,7 @@ oscal:
       discipline. The downstream owner-notification routing depends
       on this enrichment being trustworthy.
 
-  - id: control.access_enforcement@v1
+  - control_ref: control.access_enforcement@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AC-3
     title: Access Enforcement
@@ -109,7 +108,7 @@ oscal:
       tightens the access-enforcement decision so only the declared
       principals retain access to the affected resource.
 
-  - id: control.least_privilege@v1
+  - control_ref: control.least_privilege@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AC-6
     title: Least Privilege
@@ -122,8 +121,7 @@ oscal:
       the bound permissions to the documented minimum the workload
       requires.
 
-  - id: control.boundary_protection@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: SC-7
     title: Boundary Protection
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SC-7
@@ -135,8 +133,7 @@ oscal:
       restores the documented boundary so traffic to and from the
       affected resource is constrained to the declared paths.
 
-  - id: control.protection_of_information_at_rest@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: SC-28
     title: Protection of Information at Rest
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SC-28
@@ -147,8 +144,7 @@ oscal:
       disabled): the remediation enables the mandated at-rest
       protection on the affected resource.
 
-  - id: control.system_monitoring@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: SI-4
     title: System Monitoring
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-4
@@ -159,8 +155,7 @@ oscal:
       re-evaluates the rule after remediation is the operator's
       system-monitoring layer for cloud baselines.
 
-  - id: control.incident_handling@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: IR-4
     title: Incident Handling
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-4
@@ -173,8 +168,7 @@ oscal:
       security-engineering on-call so the case is not closed on an
       unverified remediation.
 
-  - id: control.incident_monitoring@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: IR-5
     title: Incident Monitoring
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-5

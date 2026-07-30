@@ -148,7 +148,7 @@ oscal:
   # version, review-rule-version, ship-rule-version, and
   # measure-rule-version steps. Catalogue URLs resolve to the public
   # NIST OSCAL repository.
-  - id: control.control_effectiveness_test@v1
+  - control_ref: control.control_effectiveness_test@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: CA-7
     title: Continuous Monitoring
@@ -168,7 +168,7 @@ oscal:
       x_secops_ng.control_refs declares this control on every action
       body for exactly this reason.
 
-  - id: control.security_assessment@v1
+  - control_ref: control.security_assessment@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: CA-2
     title: Control Assessments
@@ -188,8 +188,7 @@ oscal:
       content-effectiveness loop closes at measure; the
       control-assessment loop closes at review.
 
-  - id: control.flaw_remediation@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: SI-2
     title: Flaw Remediation
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=SI-2
@@ -208,8 +207,7 @@ oscal:
       as production because it explicitly removes a flawed detection
       from the operator's runtime surface.
 
-  - id: control.configuration_change_control@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: CM-3
     title: Configuration Change Control
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CM-3

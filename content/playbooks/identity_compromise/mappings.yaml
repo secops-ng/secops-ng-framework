@@ -34,7 +34,7 @@ oscal:
   # MFA-reset, session-revocation, lateral-movement hunt, and IAM
   # audit steps. Catalogue URLs resolve to the public NIST OSCAL
   # repository.
-  - id: control.account_management@v1
+  - control_ref: control.account_management@v1
     oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AC-2
     title: Account Management
@@ -45,8 +45,7 @@ oscal:
       residual third-party app grants or conditional-access
       exceptions left behind by the compromise.
 
-  - id: control.account_management_disable_accounts@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AC-2(13)
     title: Account Management | Disable Accounts for High-Risk Individuals
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AC-2(13)
@@ -57,8 +56,7 @@ oscal:
       of disabling a high-risk account for the duration of the
       containment window.
 
-  - id: control.identifier_management@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: IA-4
     title: Identifier Management
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IA-4
@@ -68,8 +66,7 @@ oscal:
       the IdP so downstream steps act on a unique, authoritative
       principal.
 
-  - id: control.authenticator_management@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: IA-5
     title: Authenticator Management
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IA-5
@@ -79,8 +76,7 @@ oscal:
       forced re-enrolment of authenticators for the compromised
       principal.
 
-  - id: control.multi_factor_authentication@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: IA-2(1)
     title: Identification and Authentication (Organizational Users) | Multi-Factor Authentication to Privileged Accounts
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IA-2(1)
@@ -90,8 +86,7 @@ oscal:
       operational evidence that the privileged path stays gated
       after containment.
 
-  - id: control.incident_handling@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: IR-4
     title: Incident Handling
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-4
@@ -101,8 +96,7 @@ oscal:
       sign-in cases: detection-to-containment-to-recovery exercised
       step-by-step.
 
-  - id: control.incident_reporting@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: IR-6
     title: Incident Reporting
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=IR-6
@@ -115,8 +109,7 @@ oscal:
       intermediate / final report artefacts are emitted along this
       branch.
 
-  - id: control.audit_review_analysis_reporting@v1
-    oscal_catalog: NIST SP 800-53 Rev. 5
+  - oscal_catalog: NIST SP 800-53 Rev. 5
     control_id: AU-6
     title: Audit Record Review, Analysis, and Reporting
     url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=AU-6

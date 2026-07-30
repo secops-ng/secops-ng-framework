@@ -62,10 +62,10 @@
     "oscal_entry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id"],
+      "required": ["oscal_catalog", "control_id", "title"],
       "properties": {
-        "id": {
-          "description": "Long-form control URN: `control.<slug>@v<semver>`. SKELETON placeholders use `control.todo_<slug>@v0`.",
+        "control_ref": {
+          "description": "Optional reference to the SecOps-NG control that discharges this catalog control, as `control.<slug>@v<semver>`. When present it MUST resolve to a committed file under `content/controls/` — this field is a reference, not a label. Omit it where no SecOps-NG control models the discipline: the catalog anchor is already carried by `oscal_catalog` + `control_id` + `title`, and a URN restating the catalog title adds nothing. Replaces the former `id`, which was required, had no machine consumer, and was used as a free label in 116 of 182 entries — see the arch decision recorded in issue #853.",
           "type": "string",
           "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$",
           "maxLength": 200
