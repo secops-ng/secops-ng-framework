@@ -12,7 +12,7 @@
       ],
       "parameters": {
         "language": "python",
-        "pythonCode": "from alert_triage.primitives.payloads import validate_alert_payload\n__alert_payload__ = validate_alert_payload(raw=__raw_payload__, source_shape=__alert_source_shape__)"
+        "pythonCode": "from content.playbooks.alert_triage.primitives.payloads import validate_alert_payload\n__alert_payload__ = validate_alert_payload(raw=__raw_payload__, source_shape=__alert_source_shape__)"
       },
       "notes": "Normalise the inbound alert into the SecOps-NG alert envelope. Two source shapes are required by the roadmap acceptance criteria (push from detection pipeline, pull from a shared alert store); the dispatcher branches on __alert_source_shape__.",
       "notesInFlow": true
@@ -28,7 +28,7 @@
       ],
       "parameters": {
         "language": "python",
-        "pythonCode": "from alert_triage.primitives.suppression import canonical_seen_key\n__seen_key__ = canonical_seen_key(asset_ref=__asset_ref__, classification=__classification__, detection_rule_id=__detection_rule_id__, subject_ref=__subject_ref__)"
+        "pythonCode": "from content.playbooks.alert_triage.primitives.suppression import canonical_seen_key\n__seen_key__ = canonical_seen_key(asset_ref=__asset_ref__, classification=__classification__, detection_rule_id=__detection_rule_id__, subject_ref=__subject_ref__)"
       },
       "notes": "Pull adjacent telemetry for the entities named in the alert (subject identity, source/destination, asset) so the prioritisation policy and suppression check have evidence beyond the alert envelope itself. The bound body derives the canonical seen-key for the suppression window; wider telemetry fan-out is an operator extension point.",
       "notesInFlow": true
@@ -44,7 +44,7 @@
       ],
       "parameters": {
         "language": "python",
-        "pythonCode": "from alert_triage.primitives.suppression import canonical_seen_key\n__close_record_key__ = canonical_seen_key(asset_ref=__asset_ref__, classification=__classification__, detection_rule_id=__detection_rule_id__, subject_ref=__subject_ref__)"
+        "pythonCode": "from content.playbooks.alert_triage.primitives.suppression import canonical_seen_key\n__close_record_key__ = canonical_seen_key(asset_ref=__asset_ref__, classification=__classification__, detection_rule_id=__detection_rule_id__, subject_ref=__subject_ref__)"
       },
       "notes": "Link this alert onto the existing case (or onto the benign-rule record), close it without paging, and account the suppression against the false-positive-rate KPI and (when the suppression covers a re-fire of a previously closed case) the recurring-incident correlator.",
       "notesInFlow": true
@@ -60,7 +60,7 @@
       ],
       "parameters": {
         "language": "python",
-        "pythonCode": "from alert_triage.primitives.prioritisation import prioritise\n__priority_verdict__ = prioritise(context=__asset_context__, correlates_open_case=__correlates_open_case__, detection_class=__detection_class__, detection_severity=__detection_severity__)"
+        "pythonCode": "from content.playbooks.alert_triage.primitives.prioritisation import prioritise\n__priority_verdict__ = prioritise(context=__asset_context__, correlates_open_case=__correlates_open_case__, detection_class=__detection_class__, detection_severity=__detection_severity__)"
       },
       "notes": "Apply the operator's prioritisation policy. The policy itself is expressed as code (the roadmap pins this: deterministic prioritisation, DSPy used only for free-text fields like the analyst summary). Output is __priority__ \u2208 {p1_severe, p2_high, p3_routine, p4_informational}.",
       "notesInFlow": true
@@ -76,7 +76,7 @@
       ],
       "parameters": {
         "language": "python",
-        "pythonCode": "from alert_triage.primitives.response import escalation_route\n__escalation_directive__ = escalation_route(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)"
+        "pythonCode": "from content.playbooks.alert_triage.primitives.response import escalation_route\n__escalation_directive__ = escalation_route(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)"
       },
       "notes": "Page the on-call responder, open the incident case, stamp the timeline-start signal, and hand off to the incident management playbook. Records against the MTTR-critical clock and the regulator-notification-overrun KRI window.",
       "notesInFlow": true
@@ -92,7 +92,7 @@
       ],
       "parameters": {
         "language": "python",
-        "pythonCode": "from alert_triage.primitives.response import notify_on_call\n__notification_directive__ = notify_on_call(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)"
+        "pythonCode": "from content.playbooks.alert_triage.primitives.response import notify_on_call\n__notification_directive__ = notify_on_call(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)"
       },
       "notes": "Queue the case to the primary analyst queue with the enriched evidence packet, no page. Records against the MTTR clock and the handoff-brief delivery SLA.",
       "notesInFlow": true
@@ -108,7 +108,7 @@
       ],
       "parameters": {
         "language": "python",
-        "pythonCode": "from alert_triage.primitives.response import route_to_review_queue\n__review_queue_directive__ = route_to_review_queue(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)"
+        "pythonCode": "from content.playbooks.alert_triage.primitives.response import route_to_review_queue\n__review_queue_directive__ = route_to_review_queue(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)"
       },
       "notes": "Append to the review queue for batched analyst attention; no SLA clock beyond the routine review-completion SLA.",
       "notesInFlow": true
@@ -124,7 +124,7 @@
       ],
       "parameters": {
         "language": "python",
-        "pythonCode": "from alert_triage.primitives.response import log_and_close\n__closure_record__ = log_and_close(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)"
+        "pythonCode": "from content.playbooks.alert_triage.primitives.response import log_and_close\n__closure_record__ = log_and_close(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)"
       },
       "notes": "Record the alert for telemetry-coverage accounting and close without further action. Feeds the false-positive-rate denominator and the detection-coverage view. A crown-jewel asset or regulated data upgrades the close to keep a retention pointer for the recurring-incident correlator \u2014 still no page and no queue entry.",
       "notesInFlow": true

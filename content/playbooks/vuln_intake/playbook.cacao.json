@@ -84,7 +84,7 @@
           "kri.cvd_intake_aging@v1"
         ],
         "core_body": {
-          "primitive": "vuln_intake.primitives.dedup.canonicalize_case_field",
+          "primitive": "content.playbooks.vuln_intake.primitives.dedup.canonicalize_case_field",
           "in": {
             "value": "__cve_id__"
           },
@@ -95,7 +95,7 @@
     "action--01a17a01-0000-4000-8000-000000000003": {
       "type": "action",
       "name": "triage and asset correlation",
-      "description": "Score the disclosure with CVSS (v3.1 / v4.0) and EPSS, derive the __severity__ band, and correlate the affected component against the operator's asset inventory and SBOM (PURL lookup). Outputs __severity__, __cvss_vector__, __epss_score__, and __asset_ref__. The SBOM lookup is the link between this playbook and the CRA Annex I \u00a72(1) SBOM obligation \u2014 cases on releases that lack an SBOM record are counted against the releases-without-SBOM KRI so the gap is visible to the operator.",
+      "description": "Score the disclosure with CVSS (v3.1 / v4.0) and EPSS, derive the __severity__ band, and correlate the affected component against the operator's asset inventory and SBOM (PURL lookup). Outputs __severity__, __cvss_vector__, __epss_score__, and __asset_ref__. The SBOM lookup is the link between this playbook and the CRA Annex I §2(1) SBOM obligation — cases on releases that lack an SBOM record are counted against the releases-without-SBOM KRI so the gap is visible to the operator.",
       "on_completion": "action--01a17a01-0000-4000-8000-000000000004",
       "out_args": [
         "__severity__",
@@ -114,7 +114,7 @@
           "kri.releases_without_sbom@v1"
         ],
         "core_body": {
-          "primitive": "vuln_intake.primitives.severity.severity_policy",
+          "primitive": "content.playbooks.vuln_intake.primitives.severity.severity_policy",
           "in": {
             "cvss": "__cvss__",
             "epss": "__epss__",
@@ -127,7 +127,7 @@
     "action--01a17a01-0000-4000-8000-000000000004": {
       "type": "action",
       "name": "assess CRA reporting trigger",
-      "description": "Determine whether the disclosure trips the CRA Article 14(1) actively-exploited clock (in-the-wild exploitation evidence \u2014 public PoC, observed activity, vendor confirmation) or the Article 14(3) severe-incident clock. Sets __actively_exploited__. The incident-timeline-signals control is the contract for the timestamp set the regulator submissions consume.",
+      "description": "Determine whether the disclosure trips the CRA Article 14(1) actively-exploited clock (in-the-wild exploitation evidence — public PoC, observed activity, vendor confirmation) or the Article 14(3) severe-incident clock. Sets __actively_exploited__. The incident-timeline-signals control is the contract for the timestamp set the regulator submissions consume.",
       "on_completion": "if-condition--01a17a01-0000-4000-8000-000000000005",
       "in_args": [
         "__cve_id__",
@@ -204,8 +204,8 @@
     },
     "action--01a17a01-0000-4000-8000-000000000008": {
       "type": "action",
-      "name": "response: critical \u2014 patch and advisory",
-      "description": "Critical-severity response: page the response team, ship the security update across affected releases for the duration of the support period free of charge per CRA Annex I \u00a72(7), and emit a public advisory to users. Records the dissemination event against the patch-dissemination KPI and the critical-MTTR clock.",
+      "name": "response: critical — patch and advisory",
+      "description": "Critical-severity response: page the response team, ship the security update across affected releases for the duration of the support period free of charge per CRA Annex I §2(7), and emit a public advisory to users. Records the dissemination event against the patch-dissemination KPI and the critical-MTTR clock.",
       "on_completion": "end--01a17a01-0000-4000-8000-00000000000c",
       "x_secops_ng": {
         "control_refs": [
@@ -223,7 +223,7 @@
     },
     "action--01a17a01-0000-4000-8000-000000000009": {
       "type": "action",
-      "name": "response: high \u2014 patch and advisory",
+      "name": "response: high — patch and advisory",
       "description": "High-severity response: ship the security update on the operator's high-severity SLA and emit an advisory through the same dissemination channel as the critical branch. Same dissemination KPI; the response latency is measured against the patch-dissemination clock rather than the critical-band MTTR.",
       "on_completion": "end--01a17a01-0000-4000-8000-00000000000c",
       "x_secops_ng": {
@@ -242,7 +242,7 @@
     "action--01a17a01-0000-4000-8000-00000000000a": {
       "type": "action",
       "name": "response: scheduled remediation",
-      "description": "Medium / low-severity response: schedule the security update on the operator's standard release cadence and roll the advisory into the next scheduled release note. The CRA Annex I \u00a72(7) obligation to disseminate updates without undue delay is met by the operator's documented release SLA; the patch-dissemination clock measures whether that SLA is held.",
+      "description": "Medium / low-severity response: schedule the security update on the operator's standard release cadence and roll the advisory into the next scheduled release note. The CRA Annex I §2(7) obligation to disseminate updates without undue delay is met by the operator's documented release SLA; the patch-dissemination clock measures whether that SLA is held.",
       "on_completion": "end--01a17a01-0000-4000-8000-00000000000c",
       "x_secops_ng": {
         "control_refs": [
@@ -303,17 +303,17 @@
       "kpi.mttr_critical@v1"
     ],
     "sources": [
-      "OASIS CACAO v2.0 specification \u2014 workflow step types (start, action, if-condition, switch-condition, end), variable conventions, x_ extension namespace",
-      "Cyber Resilience Act (EU) 2024/2847, Annex I \u00a72 \u2014 coordinated vulnerability disclosure policy, SBOM, and security-update obligations",
-      "Cyber Resilience Act (EU) 2024/2847, Article 14 \u2014 early-warning (24h), notification (72h), final report (14d), severe-incident reporting",
-      "NIS2 Directive (EU) 2022/2555, Article 21(2)(e) \u2014 vulnerability handling and disclosure",
-      "DORA Regulation (EU) 2022/2554, Article 9 \u2014 ICT risk management framework (vulnerability management)",
-      "Commission Delegated Regulation (EU) 2024/1774, Article 10 \u2014 JC RTS on ICT risk management (vulnerability management technical standard)",
-      "FIRST.org \u2014 CVSS v3.1 / v4.0 specification",
-      "FIRST.org \u2014 EPSS Exploit Prediction Scoring System",
-      "ISO/IEC 29147:2018 \u2014 Vulnerability disclosure",
-      "ISO/IEC 30111:2019 \u2014 Vulnerability handling processes",
-      "OCSF v1.3.0 \u2014 Vulnerability Finding (class_uid 2002) event class emitted at intake, triage, and on response disposition"
+      "OASIS CACAO v2.0 specification — workflow step types (start, action, if-condition, switch-condition, end), variable conventions, x_ extension namespace",
+      "Cyber Resilience Act (EU) 2024/2847, Annex I §2 — coordinated vulnerability disclosure policy, SBOM, and security-update obligations",
+      "Cyber Resilience Act (EU) 2024/2847, Article 14 — early-warning (24h), notification (72h), final report (14d), severe-incident reporting",
+      "NIS2 Directive (EU) 2022/2555, Article 21(2)(e) — vulnerability handling and disclosure",
+      "DORA Regulation (EU) 2022/2554, Article 9 — ICT risk management framework (vulnerability management)",
+      "Commission Delegated Regulation (EU) 2024/1774, Article 10 — JC RTS on ICT risk management (vulnerability management technical standard)",
+      "FIRST.org — CVSS v3.1 / v4.0 specification",
+      "FIRST.org — EPSS Exploit Prediction Scoring System",
+      "ISO/IEC 29147:2018 — Vulnerability disclosure",
+      "ISO/IEC 30111:2019 — Vulnerability handling processes",
+      "OCSF v1.3.0 — Vulnerability Finding (class_uid 2002) event class emitted at intake, triage, and on response disposition"
     ]
   }
 }

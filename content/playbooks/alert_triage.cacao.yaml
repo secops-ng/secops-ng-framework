@@ -115,7 +115,7 @@ workflow:
         # the security_finding telemetry artifact lands.
         - "telemetry.ocsf.api_activity@v1"
       core_body:
-        primitive: "alert_triage.primitives.payloads.validate_alert_payload"
+        primitive: "content.playbooks.alert_triage.primitives.payloads.validate_alert_payload"
         in:
           raw: "__raw_payload__"
           source_shape: "__alert_source_shape__"
@@ -144,7 +144,7 @@ workflow:
       metric_refs:
         - "kpi.mttd@v1"
       core_body:
-        primitive: "alert_triage.primitives.suppression.canonical_seen_key"
+        primitive: "content.playbooks.alert_triage.primitives.suppression.canonical_seen_key"
         in:
           detection_rule_id: "__detection_rule_id__"
           subject_ref: "__subject_ref__"
@@ -184,7 +184,7 @@ workflow:
       metric_refs:
         - "kpi.false_positive_rate@v1"
       core_body:
-        primitive: "alert_triage.primitives.suppression.canonical_seen_key"
+        primitive: "content.playbooks.alert_triage.primitives.suppression.canonical_seen_key"
         in:
           detection_rule_id: "__detection_rule_id__"
           subject_ref: "__subject_ref__"
@@ -213,7 +213,7 @@ workflow:
       metric_refs:
         - "kpi.detection_coverage@v1"
       core_body:
-        primitive: "alert_triage.primitives.prioritisation.prioritise"
+        primitive: "content.playbooks.alert_triage.primitives.prioritisation.prioritise"
         in:
           detection_class: "__detection_class__"
           detection_severity: "__detection_severity__"
@@ -258,7 +258,7 @@ workflow:
         - "kri.escalation_tier_breach@v1"
         - "kpi.notification_sla_compliance@v1"
       core_body:
-        primitive: "alert_triage.primitives.response.escalation_route"
+        primitive: "content.playbooks.alert_triage.primitives.response.escalation_route"
         in:
           priority: "__priority__"
           asset_criticality: "__asset_context__.asset_criticality"
@@ -281,7 +281,7 @@ workflow:
         - "kpi.mttr_critical@v1"
         - "kpi.handoff_brief_delivery_sla@v1"
       core_body:
-        primitive: "alert_triage.primitives.response.notify_on_call"
+        primitive: "content.playbooks.alert_triage.primitives.response.notify_on_call"
         in:
           priority: "__priority__"
           asset_criticality: "__asset_context__.asset_criticality"
@@ -303,7 +303,7 @@ workflow:
       metric_refs:
         - "kpi.review_completion_sla@v1"
       core_body:
-        primitive: "alert_triage.primitives.response.route_to_review_queue"
+        primitive: "content.playbooks.alert_triage.primitives.response.route_to_review_queue"
         in:
           priority: "__priority__"
           asset_criticality: "__asset_context__.asset_criticality"
@@ -330,7 +330,7 @@ workflow:
         - "kpi.false_positive_rate@v1"
         - "kpi.detection_coverage@v1"
       core_body:
-        primitive: "alert_triage.primitives.response.log_and_close"
+        primitive: "content.playbooks.alert_triage.primitives.response.log_and_close"
         in:
           priority: "__priority__"
           asset_criticality: "__asset_context__.asset_criticality"
