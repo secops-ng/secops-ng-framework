@@ -72,3 +72,35 @@ def test_finding_codes_are_partitioned() -> None:
         assert f.code in (HARD if f.severity == "HARD" else SOFT), (
             f"{f.code} emitted at severity {f.severity} but is not in that class"
         )
+
+
+def test_linter_is_invocation_independent(tmp_path) -> None:
+    """The linter must give the same verdict however it is started.
+
+    Regression net for a false-positive mode shipped in #865: primitive paths
+    are dotted from the repo root, so resolving them needs that root on
+    ``sys.path``. Running as ``python -m tools.lint_core_body`` from the repo
+    root supplied it accidentally via the working directory; running as
+    ``python tools/lint_core_body.py``, from another directory, or against a
+    ``--root`` that was not the cwd reported all 46 bindings as
+    ``unresolvable_module`` — 46 spurious HARD findings inviting someone to
+    "fix" content that was never broken.
+    """
+    import subprocess
+    import sys
+
+    script = REPO_ROOT / "tools" / "lint_core_body.py"
+    invocations = [
+        ([sys.executable, "-m", "tools.lint_core_body"], REPO_ROOT),
+        ([sys.executable, str(script)], REPO_ROOT),
+        ([sys.executable, str(script), "--root", str(REPO_ROOT)], tmp_path),
+    ]
+    for argv, cwd in invocations:
+        proc = subprocess.run(argv, cwd=cwd, capture_output=True, text=True)
+        assert proc.returncode == 0, (
+            f"linter failed when run as {argv[1:]} from {cwd}:\n{proc.stdout}"
+        )
+        assert "0 hard" in proc.stdout, (
+            f"invocation {argv[1:]} from {cwd} disagreed on HARD count:\n"
+            f"{proc.stdout}"
+        )
