@@ -63,7 +63,7 @@
           "telemetry.ocsf.api_activity@v1"
         ],
         "core_body": {
-          "primitive": "alert_triage.primitives.payloads.validate_alert_payload",
+          "primitive": "content.playbooks.alert_triage.primitives.payloads.validate_alert_payload",
           "in": {
             "raw": "__raw_payload__",
             "source_shape": "__alert_source_shape__"
@@ -93,7 +93,7 @@
           "kpi.mttd@v1"
         ],
         "core_body": {
-          "primitive": "alert_triage.primitives.suppression.canonical_seen_key",
+          "primitive": "content.playbooks.alert_triage.primitives.suppression.canonical_seen_key",
           "in": {
             "detection_rule_id": "__detection_rule_id__",
             "subject_ref": "__subject_ref__",
@@ -126,7 +126,7 @@
           "kpi.false_positive_rate@v1"
         ],
         "core_body": {
-          "primitive": "alert_triage.primitives.suppression.canonical_seen_key",
+          "primitive": "content.playbooks.alert_triage.primitives.suppression.canonical_seen_key",
           "in": {
             "detection_rule_id": "__detection_rule_id__",
             "subject_ref": "__subject_ref__",
@@ -153,7 +153,7 @@
           "kpi.detection_coverage@v1"
         ],
         "core_body": {
-          "primitive": "alert_triage.primitives.prioritisation.prioritise",
+          "primitive": "content.playbooks.alert_triage.primitives.prioritisation.prioritise",
           "in": {
             "detection_class": "__detection_class__",
             "detection_severity": "__detection_severity__",
@@ -200,7 +200,7 @@
           "kpi.notification_sla_compliance@v1"
         ],
         "core_body": {
-          "primitive": "alert_triage.primitives.response.escalation_route",
+          "primitive": "content.playbooks.alert_triage.primitives.response.escalation_route",
           "in": {
             "priority": "__priority__",
             "asset_criticality": "__asset_context__.asset_criticality",
@@ -225,7 +225,7 @@
           "kpi.handoff_brief_delivery_sla@v1"
         ],
         "core_body": {
-          "primitive": "alert_triage.primitives.response.notify_on_call",
+          "primitive": "content.playbooks.alert_triage.primitives.response.notify_on_call",
           "in": {
             "priority": "__priority__",
             "asset_criticality": "__asset_context__.asset_criticality",
@@ -249,7 +249,7 @@
           "kpi.review_completion_sla@v1"
         ],
         "core_body": {
-          "primitive": "alert_triage.primitives.response.route_to_review_queue",
+          "primitive": "content.playbooks.alert_triage.primitives.response.route_to_review_queue",
           "in": {
             "priority": "__priority__",
             "asset_criticality": "__asset_context__.asset_criticality",
@@ -275,7 +275,7 @@
           "kpi.detection_coverage@v1"
         ],
         "core_body": {
-          "primitive": "alert_triage.primitives.response.log_and_close",
+          "primitive": "content.playbooks.alert_triage.primitives.response.log_and_close",
           "in": {
             "priority": "__priority__",
             "asset_criticality": "__asset_context__.asset_criticality",

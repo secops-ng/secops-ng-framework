@@ -121,7 +121,7 @@ reference into the deterministic primitives package:
 
 - **`core_body` set (intake, triage).** The emitter renders the step
   as an `n8n-nodes-base.code` node whose `pythonCode` is the exact
-  primitive call (e.g. `from vuln_intake.primitives.severity import
+  primitive call (e.g. `from content.playbooks.vuln_intake.primitives.severity import
   severity_policy ; __severity_verdict__ = severity_policy(...)`).
   The deterministic policy is the same across n8n / Temporal /
   LangGraph because the three targets call the same Python function.

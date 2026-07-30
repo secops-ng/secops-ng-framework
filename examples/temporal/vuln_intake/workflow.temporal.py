@@ -32,7 +32,7 @@ async def intake_disclosure(cve_id: str, report_source: str) -> None:
         AuditTrail.current().append(
             AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000002', 'secops_ng.step.name': 'intake disclosure', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'intake_disclosure'})
         )
-        from vuln_intake.primitives.dedup import canonicalize_case_field
+        from content.playbooks.vuln_intake.primitives.dedup import canonicalize_case_field
         __cve_id_canonical__ = canonicalize_case_field(value=__cve_id__)
 
 INTAKE_DISCLOSURE_RETRY_POLICY = RetryPolicy(
@@ -55,7 +55,7 @@ async def triage_and_asset_correlation() -> dict[str, object]:
         AuditTrail.current().append(
             AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000003', 'secops_ng.step.name': 'triage and asset correlation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'triage_and_asset_correlation'})
         )
-        from vuln_intake.primitives.severity import severity_policy
+        from content.playbooks.vuln_intake.primitives.severity import severity_policy
         __severity_verdict__ = severity_policy(cvss=__cvss__, epss=__epss__, context=__asset_context__)
 
 TRIAGE_AND_ASSET_CORRELATION_RETRY_POLICY = RetryPolicy(

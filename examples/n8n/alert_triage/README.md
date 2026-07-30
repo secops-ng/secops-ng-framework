@@ -101,7 +101,7 @@ reference into the deterministic primitives package:
 - **`core_body` set (ingest, enrich, suppress, classify, p1 / p2 / p3
   response).** The emitter renders the step as an `n8n-nodes-base.code`
   node whose `pythonCode` is the exact primitive call (e.g.
-  `from alert_triage.primitives.prioritisation import prioritise ;
+  `from content.playbooks.alert_triage.primitives.prioritisation import prioritise ;
   __priority_verdict__ = prioritise(...)`). The deterministic policy
   is the same across n8n / Temporal / LangGraph because the three
   targets call the same Python function.
@@ -150,7 +150,7 @@ The Code-node body assumes `PYTHONPATH` on the n8n host resolves
 `alert_triage.primitives`. For the operator-runner wrapper pattern:
 
     # operator-supplied wiring — not emitted by the compiler
-    from alert_triage.primitives.prioritisation import prioritise
+    from content.playbooks.alert_triage.primitives.prioritisation import prioritise
     item = $input.item.json
     verdict = prioritise(
         detection_class=item['detection_class'],
