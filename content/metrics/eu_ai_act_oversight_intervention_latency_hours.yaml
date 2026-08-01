@@ -1,0 +1,143 @@
+stable_id: kri.eu_ai_act_oversight_intervention_latency_hours@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: EU AI Act Art. 14 oversight intervention latency
+summary: >
+  Elapsed hours between a decision entering the oversight review queue
+  and the human overseer's Article 14(4)(d)-(e) intervention being
+  recorded against it. Derived from the review_flagged_decisions and
+  record_intervention steps of the `playbook.ai_human_oversight@v1`
+  loop.
+  Where the sibling `kpi.eu_ai_act_oversight_intervention_rate@v1` asks
+  whether oversight is exercised at all, this asks whether it is
+  exercised in time to matter. The distinction is load-bearing for the
+  halt case: a decision to interrupt operation that lands three days
+  after the output was acted on has satisfied the letter of Art. 14(4)(e)
+  and prevented nothing.
+unit: hours
+direction: lower_is_better
+target:
+  value: 8
+  comparator: "<="
+  rationale: >
+    Operator-chosen SLO, not a statutory bound. Article 14 sets no clock
+    at all — it requires that oversight be possible and effective, and
+    says nothing about elapsed time. This is unlike
+    `kri.eu_ai_act_report_clock_margin_days@v1`, whose 2 / 10 / 15-day
+    bounds are written into Art. 73(2)-(4) and are law.
+    Eight hours is a community-recommended starting point sized to one
+    working day, so a decision flagged in the morning is dispositioned
+    before the overseer goes home. It carries no implication that nine
+    hours is unlawful. What "effective" oversight means is judged against
+    the deployment: a system whose outputs are acted on within minutes
+    needs a far tighter figure than one feeding a weekly batch, and an
+    operator in the first case who inherits this target unexamined has
+    set themselves a bound that cannot prevent anything.
+    Set it against how quickly the overseen system's output takes effect,
+    not against this number.
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 8
+    severity: warn
+  - name: high
+    comparator: ">"
+    value: 24
+    severity: high
+  - name: breach
+    comparator: ">"
+    value: 72
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: p95
+  formula: >
+    For each decision in the evaluation window that received an
+    Art. 14(4)(d)-(e) intervention, compute
+    latency_hours = (intervention_recorded_at - flagged_for_review_at) /
+    3600, where flagged_for_review_at is when the decision entered the
+    review queue and intervention_recorded_at is when the
+    record_intervention step wrote the intervention.
+    Aggregate as p95 across those decisions. The tail is the quantity of
+    interest: one output left acted-on for three days while an override
+    was pending is the failure this indicator exists to surface, and a
+    mean would let a run of prompt interventions bury it.
+    Reviews that produced no intervention are excluded. They have no
+    intervention timestamp, and including them at zero would drive the
+    indicator toward zero in exactly the rubber-stamping case the
+    sibling KPI is built to catch — the two indicators must not be able
+    to look healthy for the same wrong reason. An operator reading this
+    metric alone cannot tell a fast oversight function from an idle one;
+    that is why it ships as a pair.
+    Slice by `__intervention_type__`. Latency on a halt is the reading
+    that matters most, because a halt is the only exercise whose value
+    decays to nothing once the output has been acted on; a disregard
+    recorded late still corrects the record.
+    An intervention whose parent review has no recorded queue-entry
+    timestamp is excluded and counted, and the excluded count is
+    reported beside the headline rather than dropped — a silent
+    exclusion here would let an operator with poor queue instrumentation
+    read an artificially clean p95.
+    Reference visualisation: a horizontal bar chart of latency_hours per
+    intervention in the window, sorted descending, coloured by
+    intervention type, with the warn / high / breach thresholds
+    (8 / 24 / 72 h) overlaid and the p95 annotated as the headline. The
+    committed reference rendering lives at
+    `content/metrics/eu_ai_act_oversight_intervention_latency_hours.viz.md`
+    — that file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: flagged_for_review_at
+      description: >
+        Timestamp at which the decision entered the oversight review
+        queue, carried on the review record the review_flagged_decisions
+        step emits. Starts the clock. Absence of this timestamp excludes
+        the intervention from the aggregate and increments the reported
+        exclusion count.
+      playbook_step: action--e14a5100-0000-4000-8000-000000000004
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: start_time
+    - name: intervention_recorded_at
+      description: >
+        Timestamp of the Art. 14(4)(d)-(e) intervention record emitted by
+        the record_intervention step. Stops the clock. Nil records carry
+        no timestamp and are excluded, which is deliberate — see the
+        formula.
+      playbook_step: action--e14a5100-0000-4000-8000-000000000005
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: time
+    - name: intervention_type
+      description: >
+        Which of the four Art. 14(4)(d)-(e) exercises occurred. Used to
+        slice the distribution; latency on a halt is the reading that
+        matters most because a halt is the only exercise whose value
+        decays to nothing once the output has been acted on.
+      playbook_step: action--e14a5100-0000-4000-8000-000000000005
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: activity_id
+  window:
+    duration: P90D
+    sliding: true
+playbook_refs:
+  - playbook_id: playbook.ai_human_oversight@v1
+    step_id: action--e14a5100-0000-4000-8000-000000000004
+  - playbook_id: playbook.ai_human_oversight@v1
+    step_id: action--e14a5100-0000-4000-8000-000000000005
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+external_refs:
+  - name: EU AI Act — Article 14(4)(d)-(e) oversight powers to disregard, override and intervene
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 14(4)
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: EU AI Act — Article 14(1) human oversight of high-risk AI systems
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 14(1)
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability

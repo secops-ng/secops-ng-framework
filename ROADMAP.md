@@ -1546,7 +1546,7 @@ named operator use-case. Each cookbook workflow lives under
 
 ### F-WF-AI-OVERSIGHT — EU AI Act Art. 14 human-oversight design and operation lifecycle
 
-- **Status:** Proposed
+- **Status:** Shipped
 - **Priority:** P2
 - **Goal:** G-01 (content coverage — Art. 14 is a standing high-risk
   requirement with no playbook; the oversight measures it demands are
