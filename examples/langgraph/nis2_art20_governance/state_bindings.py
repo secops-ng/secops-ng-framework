@@ -48,6 +48,15 @@ class PlaybookNis2Art20GovernanceV1State(TypedDict, total=False):
     # playbook_variable: __captured_at__
     # ISO-8601 UTC timestamp of the governance-record capture instant. Supplied by the compile-target runtime; carried into the deterministic evidence-record derivation so the three reference compilers re-derive byte-identical bytes.
     captured_at: str
+    # playbook_variable: __workflow_id__
+    # Stable workflow identifier (matches the lowercase-dotted content-model slug 'nis2_art20_governance'). Supplied by the compile-target runtime and carried into the governance-evidence record so the artifact names the workflow that produced it.
+    workflow_id: str
+    # playbook_variable: __execution_id__
+    # Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Distinguishes one governance cycle's evidence from the next.
+    execution_id: str
+    # playbook_variable: __compile_target__
+    # Which reference compiler emitted the running workflow — n8n, temporal or langgraph. Supplied by the runtime. Recorded on the evidence artifact so a reviewer can tell which emitter produced a given record; this playbook's emit_governance_evidence primitive is the only one in the catalogue that currently asks for it.
+    compile_target: str
     # bookkeeping
     # Per-step status map keyed by CACAO step_id. Conventional values: 'pending', 'running', 'ok', 'failed', 'awaiting-human'. The graph builder writes here; conditional-edge routers read it.
     step_status: dict[str, str]
@@ -110,7 +119,7 @@ async def approve_risk_measures(governance_cycle: str, review_id: str, posture_s
         __approval_record_id__ = record_management_approval(governance_cycle=__governance_cycle__, review_id=__review_id__, posture_snapshot_id=__posture_snapshot_id__)
 
 @tool
-async def log_governance_evidence(governance_cycle: str, review_id: str, posture_snapshot_id: str, approval_record_id: str, captured_at: str) -> str:
+async def log_governance_evidence(governance_cycle: str, review_id: str, posture_snapshot_id: str, approval_record_id: str, captured_at: str, workflow_id: str, execution_id: str, compile_target: str) -> str:
     """SKELETON — publish the dated governance-record evidence artifact to the operator's evidence store as an OCSF v1.3.0 API Activity (class_uid 6003) record. Record pins __governance_cycle__, __review_id__, __posture_snapshot_id__, __approval_record_id__, and __captured_at__ so the NIS2 Directive (EU) 2022/2555 Article 20(1) auditable-lifecycle obligation is discharged on every terminal path (including the ad-hoc-trigger branch and the referral branch, which are recorded with their respective markers rather than dropped). Records __evidence_id__. The evidence artifact is a plain JSON governance-record; no proprietary governance-tooling surface is assumed. TODO (CORE): evidence-record schema pin against a schemas/evidence/governance.schema.json envelope landing in the sibling CORE card, evidence-sink adapter binding, deterministic evidence_id derivation from SHA-256(governance_cycle|review_id|captured_at).
 
     CACAO step_id : action--a2000000-0000-4000-8000-000000000005
@@ -124,7 +133,7 @@ async def log_governance_evidence(governance_cycle: str, review_id: str, posture
             AuditRecord(span_name='tool.action--a2000000-0000-4000-8000-000000000005', attributes={'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--a2000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'log_governance_evidence', 'secops_ng.tool.name': 'log_governance_evidence', 'secops_ng.workflow.run_id': ''})
         )
         from content.playbooks.nis2_art20_governance.primitives.evidence import emit_governance_evidence
-        __evidence_id__ = emit_governance_evidence(governance_cycle=__governance_cycle__, review_id=__review_id__, posture_snapshot_id=__posture_snapshot_id__, approval_record_id=__approval_record_id__, captured_at=__captured_at__)
+        __evidence_id__ = emit_governance_evidence(governance_cycle=__governance_cycle__, review_id=__review_id__, posture_snapshot_id=__posture_snapshot_id__, approval_record_id=__approval_record_id__, captured_at=__captured_at__, workflow_id=__workflow_id__, execution_id=__execution_id__, compile_target=__compile_target__)
 
 async def llm_step(state: PlaybookNis2Art20GovernanceV1State) -> dict:
     """Agentic-extension hook.
