@@ -1,0 +1,141 @@
+stable_id: kri.security_awareness_curriculum_staleness_days@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Security-awareness curriculum staleness
+summary: >
+  Age in days of the approved security-awareness curriculum version
+  against the review cadence the operator declared for it. Derived from
+  the design-content and review-cycle steps of the
+  `playbook.security_awareness_training@v1` programme lifecycle.
+  A curriculum that is delivered faithfully and never revised teaches
+  last year's threat surface to this year's staff. That failure is
+  invisible to any completion or coverage measure — both read perfectly
+  while the material decays — which is why
+  `control.training_curriculum@v1` requires the curriculum to be
+  versioned and dated in the first place. An unversioned curriculum
+  makes this measurement impossible, and makes it impossible to say
+  which material a given completion record attests to.
+  Performance counterpart on the same lifecycle:
+  `kpi.security_awareness_programme_coverage@v1`.
+unit: days
+direction: lower_is_better
+target:
+  value: 365
+  comparator: "<="
+  rationale: >
+    Anchored to the cadence the control itself declares rather than to
+    a number chosen here: `control.training_curriculum@v1` carries
+    `review_cadence: P1Y`, as do the other three training controls. The
+    target is that cadence expressed in days, so an operator who
+    shortens their declared cadence should shorten this target with it —
+    the two are the same statement and drifting them apart makes the
+    control's declaration meaningless.
+    Neither NIS2 Art. 21(2)(g) nor ISO/IEC 27001 A.6.3 sets a review
+    interval. Annual is the common practice the control encodes, not a
+    legal bound, and an operator whose threat surface moves faster —
+    a new high-risk deployment, a change of regulator, a materially
+    different phishing profile — should re-derive it rather than
+    inherit it.
+    The measurement is deliberately of the *approved version* rather
+    than of any edit. A curriculum touched continuously but never
+    re-approved is stale in the sense that matters: no one has
+    re-affirmed that it still addresses the competences the needs
+    assessment identified.
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 365
+    severity: warn
+  - name: high
+    comparator: ">"
+    value: 548
+    severity: high
+  - name: breach
+    comparator: ">"
+    value: 730
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: max
+  formula: >
+    For each curriculum module in force at evaluation time, compute
+    staleness_days = (evaluation_now - approved_at) / 86400, where
+    approved_at is the date the design-content step recorded for the
+    module's current approved version.
+    Aggregate as the max across modules — the oldest module in force is
+    the reading. A mean would let a programme that refreshed nine
+    modules last month and left the tenth untouched for three years
+    report as healthy, and the untouched module is the one teaching the
+    stale material.
+    Modules the review-cycle step recorded as retired are excluded;
+    modules recorded as in force but never approved contribute their age
+    since creation, so an unapproved module cannot hide by having no
+    approval date.
+    Where no curriculum exists the indicator is undefined rather than
+    zero. A programme with no curriculum is not maximally fresh, and the
+    absence should surface on
+    `kpi.security_awareness_programme_coverage@v1` as an uncovered
+    population rather than as a clean reading here.
+    Slice by module rather than reporting the max alone. The aggregate
+    names how bad it is; the per-module breakdown names which one to
+    revise, which is the only part an operator can act on.
+    Reference visualisation: a horizontal bar chart of staleness_days
+    per in-force module, sorted descending, with the warn / high /
+    breach thresholds (365 / 548 / 730 days) overlaid and the max
+    annotated as the headline. The committed reference rendering lives
+    at
+    `content/metrics/security_awareness_curriculum_staleness_days.viz.md`
+    — that file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: approved_at
+      description: >
+        Approval date of the curriculum module's current version,
+        recorded by the design-content step. The versioning requirement
+        on `control.training_curriculum@v1` exists so this value is
+        available; without it the module's age is unknowable and the
+        completion records that cite it cannot be tied to any specific
+        material.
+      playbook_step: action--54000000-0000-4000-8000-000000000003
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+      field: time
+    - name: module_lifecycle_state
+      description: >
+        Whether the module is in force or retired at evaluation time, as
+        recorded by the review-cycle step. Retired modules are excluded
+        so a programme is not penalised for material it has deliberately
+        withdrawn.
+      playbook_step: action--54000000-0000-4000-8000-000000000007
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+      field: status_id
+    - name: evaluation_now
+      description: >
+        Timestamp at which the indicator is evaluated. Supplied by the
+        compile target's scheduler; the catalog contract is the formula,
+        not the cadence. Not bound to a telemetry class — this is the
+        scheduler clock, not an API event.
+  window:
+    duration: P365D
+    sliding: true
+playbook_refs:
+  - playbook_id: playbook.security_awareness_training@v1
+    step_id: action--54000000-0000-4000-8000-000000000003
+  - playbook_id: playbook.security_awareness_training@v1
+    step_id: action--54000000-0000-4000-8000-000000000007
+telemetry_refs:
+  - telemetry.ocsf.api_activity@v1
+external_refs:
+  - name: NIS2 — Article 21(2)(g) basic cyber hygiene practices and cybersecurity training
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(g)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ISO/IEC 27001:2022 Annex A.6.3 — Information security awareness, education and training
+    source: ISO
+    external_id: ISO/IEC 27001:2022 A.6.3
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability

@@ -134,9 +134,22 @@ ocsf:
       evidence enters through the record-completion write rather than
       through an API surface of their own. An emitter-only reading
       would lose the assessment read, which is the step that makes
-      coverage computable at all. EXTEND wires the Compliance Finding
-      (2003) emit binding for programme-governance deviations if
-      scoped. Schema: https://schema.ocsf.io/1.3.0/classes/api_activity
+      coverage computable at all.
+      EXTEND resolved the deferred Compliance Finding (2003) question in
+      the negative. Both programme metrics are computed from retained
+      state read over this API surface — the assessed population against
+      the completion records, and each in-force module's approval date.
+      Neither consumes an event: a programme-governance deviation here
+      is a property of the record set at evaluation time, not something
+      that happens at a moment worth emitting.
+      The operational sibling marks the boundary. cyber_hygiene_training
+      does emit 2003 records at track-completion, because a per-staff
+      completion deviation is a discrete event with an open/closed
+      lifecycle that
+      kpi.nis2_cyber_awareness_training_completion_rate@v1 counts
+      directly. A 2003 emit here would duplicate that surface with no
+      distinct event to carry and invite double-counting.
+      Schema: https://schema.ocsf.io/1.3.0/classes/api_activity
 
 nis2:
   - mapping_id: nis2:art-21-2-g

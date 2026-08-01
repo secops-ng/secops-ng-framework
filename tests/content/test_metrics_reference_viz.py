@@ -184,6 +184,12 @@ VIZ_REQUIRED_STEMS = (
     # oversight is assigned, these whether it is exercised and in time.
     "eu_ai_act_oversight_intervention_rate",
     "eu_ai_act_oversight_intervention_latency_hours",
+    # security_awareness_training EXTEND — programme-lifecycle KPI/KRI
+    # pair (G-04). Denominated on the assessed population rather than
+    # the training roster, which is what separates them from
+    # kpi.nis2_cyber_awareness_training_completion_rate@v1.
+    "security_awareness_programme_coverage",
+    "security_awareness_curriculum_staleness_days",
 )
 
 
