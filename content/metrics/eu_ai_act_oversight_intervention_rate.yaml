@@ -1,0 +1,154 @@
+stable_id: kpi.eu_ai_act_oversight_intervention_rate@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: EU AI Act Art. 14 oversight intervention rate
+summary: >
+  Share of reviewed decisions in the window on which the human overseer
+  exercised one of the Article 14(4)(d)-(e) powers — declining to use
+  the system in the particular situation, disregarding its output,
+  overriding or reversing that output, or interrupting operation.
+  Derived from the review_flagged_decisions and record_intervention
+  steps of the `playbook.ai_human_oversight@v1` loop.
+  The indicator exists to detect **rubber-stamping**: an oversight
+  function that reviews steadily and never once exercises its
+  authority. That is the specific Article 14 failure mode — oversight
+  assigned on paper and not exercised in fact — and it is invisible to
+  any measure of assignment or of review volume, both of which look
+  healthy while it happens.
+  Read alongside `kri.eu_ai_act_oversight_intervention_latency_hours@v1`
+  (how fast an intervention lands once warranted) and
+  `kpi.eu_ai_act_deployer_oversight_coverage@v1`, which measures the
+  Art. 26(2) *assignment* rather than the Art. 14 *exercise* and is a
+  different obligation on a different playbook.
+unit: ratio
+direction: higher_is_better
+target:
+  value: 0.02
+  comparator: ">="
+  rationale: >
+    A floor, not a goal, and the direction needs stating plainly because
+    this indicator is not monotone in the way most KPIs are.
+    Higher is treated as better only across the low end of the range:
+    the movement from zero to a small non-zero rate is the movement from
+    "oversight that never intervenes" to "oversight that does", and that
+    is what the indicator is built to see. Two per cent of reviewed
+    decisions is a community-recommended starting floor, chosen so a
+    genuinely quiet quarter does not alarm while a standing zero does.
+    Above the floor the reading inverts, and the catalog entry says so
+    rather than leaving an operator to discover it from a dashboard: a
+    high and rising intervention rate is evidence the *AI system* is
+    degrading, not that oversight improved. The indicator deliberately
+    does not score that direction, because conflating "the overseers are
+    working hard" with "the system is fine" is exactly the confusion an
+    Art. 14 reviewer must not make. Escalating a sustained high rate is
+    an operator judgement, and the reference visualisation surfaces it
+    as an annotation rather than a threshold breach.
+    An operator whose rate sits at zero across a material number of
+    reviews should not tune this target. They should ask whether the
+    overseers named on the roster hold the delegated authority the
+    Art. 14(4)(d)-(e) powers require — a roster entry without it
+    produces someone who cannot intervene, which reads here as an
+    oversight function that chooses not to.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 0.02
+    severity: warn
+  - name: high
+    comparator: "<"
+    value: 0.005
+    severity: high
+  - name: breach
+    comparator: "<="
+    value: 0
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: ratio
+  formula: >
+    Over the evaluation window, let R be the count of decisions carried
+    on review records emitted by the review_flagged_decisions step, and
+    let I be the count of intervention records emitted by the
+    record_intervention step that name an actual Art. 14(4)(d)-(e)
+    exercise. Compute rate = I / R.
+    Nil intervention records are excluded from I and their parent
+    reviews remain in R. The record_intervention step always runs and
+    emits a nil record where the window produced no intervention, so
+    counting records rather than exercises would return 1.0 for every
+    window and measure nothing.
+    Where R is zero the indicator is undefined rather than zero. A
+    window in which nothing was flagged for review has no rate; scoring
+    it as a breach would fire the rubber-stamping alarm at an operator
+    whose system simply produced no reviewable decisions, and would
+    train them to ignore it.
+    Slice by `__intervention_type__` rather than reporting the scalar
+    alone. The four exercises carry different weight — a halt is not a
+    disregard — and an aggregate that treats them alike tells a reviewer
+    nothing about severity. A rate composed entirely of "disregard"
+    reads very differently from the same rate composed of halts.
+    Reference visualisation: a stacked bar of reviewed decisions split
+    into no-intervention and the four intervention types, with the rate
+    annotated as the headline and the warn / high / breach floors
+    overlaid. The committed reference rendering lives at
+    `content/metrics/eu_ai_act_oversight_intervention_rate.viz.md` —
+    that file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: review_disposition
+      description: >
+        Review record emitted by the review_flagged_decisions step,
+        carrying the disposition of each decision flagged for oversight
+        in the window. Supplies the denominator. A review that found
+        nothing is recorded and counts, which is what makes the
+        rubber-stamping signal computable at all.
+      playbook_step: action--e14a5100-0000-4000-8000-000000000004
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: time
+    - name: intervention_record
+      description: >
+        Intervention record emitted by the record_intervention step.
+        Supplies the numerator, counting only records that name a real
+        Art. 14(4)(d)-(e) exercise; the nil record the step emits on a
+        quiet window is excluded.
+      playbook_step: action--e14a5100-0000-4000-8000-000000000005
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: status_id
+    - name: intervention_type
+      description: >
+        Which of the four Art. 14(4)(d)-(e) exercises occurred — decline,
+        disregard, override, halt. Carried as a value distinct from the
+        intervention record precisely so this indicator can be sliced
+        rather than reported as an undifferentiated scalar.
+      playbook_step: action--e14a5100-0000-4000-8000-000000000005
+      telemetry_ref: telemetry.ocsf.compliance_finding@v1
+      field: activity_id
+  window:
+    duration: P90D
+    sliding: true
+playbook_refs:
+  - playbook_id: playbook.ai_human_oversight@v1
+    step_id: action--e14a5100-0000-4000-8000-000000000004
+  - playbook_id: playbook.ai_human_oversight@v1
+    step_id: action--e14a5100-0000-4000-8000-000000000005
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+external_refs:
+  - name: EU AI Act — Article 14(4)(d)-(e) oversight powers to disregard, override and intervene
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 14(4)
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: EU AI Act — Article 14(1) human oversight of high-risk AI systems
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 14(1)
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: EU AI Act — Article 26(2) deployer assignment of human oversight
+    source: EU
+    external_id: Regulation (EU) 2024/1689, Art. 26(2)
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability

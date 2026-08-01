@@ -179,6 +179,11 @@ VIZ_REQUIRED_STEMS = (
     # KPI/KRI pair (G-04)
     "eu_ai_act_deployer_oversight_coverage",
     "eu_ai_act_deployer_suspension_latency_hours",
+    # F-WF-AI-OVERSIGHT EXTEND — Art. 14 oversight-exercise KPI/KRI pair
+    # (G-04). Sibling to the Art. 26 pair above: those measure whether
+    # oversight is assigned, these whether it is exercised and in time.
+    "eu_ai_act_oversight_intervention_rate",
+    "eu_ai_act_oversight_intervention_latency_hours",
 )
 
 
