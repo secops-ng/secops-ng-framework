@@ -1,0 +1,139 @@
+stable_id: kpi.security_awareness_programme_coverage@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Security-awareness programme coverage against the assessed population
+summary: >
+  Share of the population the needs assessment identified as requiring
+  training that holds a completion record for the current cycle.
+  Derived from the schedule-assessment and report-gaps steps of the
+  `playbook.security_awareness_training@v1` programme lifecycle.
+  The denominator is what distinguishes this from the operational
+  sibling. `kpi.nis2_cyber_awareness_training_completion_rate@v1`
+  measures completion against the operator's **declared training
+  roster**, and reads a healthy 100% when everyone on that roster has
+  finished. This indicator measures completion against the
+  **assessed population** — the roles and groups the Art. 21(2)(g)
+  needs assessment determined require training in the first place.
+  The gap between the two is the failure this exists to catch: a
+  population correctly assessed as needing training that never reached
+  the roster receives nothing, emits no completion deviation, and is
+  invisible to a roster-denominated rate. That is precisely why
+  `control.training_records@v1` retains per-cohort aggregate coverage
+  as a distinct field rather than deriving it from per-person records —
+  a complete set of per-person records says nothing about a population
+  that was never enrolled.
+  Residual-risk counterpart on the same lifecycle:
+  `kri.security_awareness_curriculum_staleness_days@v1`.
+unit: ratio
+direction: higher_is_better
+target:
+  value: 0.95
+  comparator: ">="
+  rationale: >
+    Community-recommended starting point, and deliberately not 1.0.
+    A training programme has legitimate lag that an assignment
+    obligation does not: someone assessed into scope on Monday has not
+    failed the programme by not having completed on Tuesday, and the
+    residual five per cent accounts for joiners and role changes inside
+    the cycle.
+    Contrast `kpi.eu_ai_act_deployer_oversight_coverage@v1`, which sets
+    1.0 because EU AI Act Art. 26(2) is unconditional per deployment and
+    admits no interim state. NIS2 Art. 21(2)(g) requires the operator to
+    have and run a training programme; it does not require that every
+    individual be complete at every instant. The two targets differ
+    because the obligations differ, not because one is stricter.
+    What should not be tuned away is a *persistent* shortfall. A reading
+    stuck below the floor across consecutive cycles is not lag; it is a
+    population the programme is failing to reach, and the report-gaps
+    step exists to name which one.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 0.95
+    severity: warn
+  - name: high
+    comparator: "<"
+    value: 0.85
+    severity: high
+  - name: breach
+    comparator: "<"
+    value: 0.7
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: ratio
+  formula: >
+    Over the evaluation cycle, let A be the population the
+    schedule-assessment step recorded as requiring training — the roles
+    and groups the needs assessment scoped, not the roster later derived
+    from it. Let C be the subset of A holding a completion record at the
+    point the report-gaps step runs. Compute coverage = |C| / |A|.
+    Populations the assessment recorded as explicitly out of scope are
+    excluded from A. That determination is itself dated evidence, so
+    excluding them is not the same as ignoring them; an operator whose
+    out-of-scope set is growing should read that on the assessment
+    record rather than as a coverage movement here.
+    Where |A| is zero the indicator is undefined rather than 1.0. An
+    operator whose needs assessment scoped nobody has not achieved full
+    coverage — they have an assessment worth questioning, and reporting
+    a perfect score would hide that.
+    Report the shortfall by cohort, not only as a scalar. The
+    report-gaps step already joins the completion record to the
+    assessment for exactly this reason, and a single ratio cannot say
+    which population is uncovered — which is the only part an operator
+    can act on.
+    Reference visualisation: a stacked horizontal bar per assessed
+    cohort showing covered against uncovered, sorted by uncovered
+    descending, with the warn / high / breach floors overlaid and the
+    aggregate ratio annotated as the headline. The committed reference
+    rendering lives at
+    `content/metrics/security_awareness_programme_coverage.viz.md` —
+    that file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: assessed_population
+      description: >
+        The population recorded by the schedule-assessment step as
+        requiring training, per role and risk rather than uniformly.
+        Supplies the denominator. This is the input a roster-denominated
+        completion rate cannot see, and the reason this indicator
+        exists.
+      playbook_step: action--54000000-0000-4000-8000-000000000002
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+      field: time
+    - name: completion_records
+      description: >
+        Per-staff completion records read back at the report-gaps step
+        and joined against the assessment. Supplies the numerator.
+      playbook_step: action--54000000-0000-4000-8000-000000000006
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+      field: time
+  window:
+    duration: P365D
+    sliding: true
+playbook_refs:
+  - playbook_id: playbook.security_awareness_training@v1
+    step_id: action--54000000-0000-4000-8000-000000000002
+  - playbook_id: playbook.security_awareness_training@v1
+    step_id: action--54000000-0000-4000-8000-000000000006
+telemetry_refs:
+  - telemetry.ocsf.api_activity@v1
+external_refs:
+  - name: NIS2 — Article 21(2)(g) basic cyber hygiene practices and cybersecurity training
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(g)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+  - name: ISO/IEC 27001:2022 Annex A.6.3 — Information security awareness, education and training
+    source: ISO
+    external_id: ISO/IEC 27001:2022 A.6.3
+  - name: NIST SP 800-53 Rev. 5 — AT-4 Training Records
+    source: NIST
+    external_id: NIST SP 800-53 Rev. 5 AT-4
+    url: https://csrc.nist.gov/projects/risk-management/sp800-53-controls
+  - name: ISO/IEC 27004 — Information security measurement guidance
+    source: ISO
+    external_id: ISO/IEC 27004:2016
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability
