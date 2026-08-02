@@ -273,7 +273,7 @@ ocsf:
   # account-monitoring pass and the OOB-readiness check emit into
   # the operator's posture-management layer (the upstream of any
   # Sigma detection-binding a SIEM consumes from those deviations).
-  - id: telemetry.api_activity@v1
+  - id: telemetry.ocsf.api_activity@v1
     category_uid: 6
     category_name: Application Activity
     class_uid: 6003
@@ -296,7 +296,7 @@ ocsf:
       request metadata the kri.mfa_coverage_gaps@v1 metric reads.
       Schema: https://schema.ocsf.io/1.3.0/classes/api_activity
 
-  - id: telemetry.compliance_finding@v1
+  - id: telemetry.ocsf.compliance_finding@v1
     category_uid: 2
     category_name: Findings
     class_uid: 2003
