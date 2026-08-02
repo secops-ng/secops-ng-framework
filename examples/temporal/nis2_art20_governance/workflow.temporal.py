@@ -89,7 +89,7 @@ APPROVE_RISK_MEASURES_RETRY_POLICY = RetryPolicy(
 )
 
 @activity.defn
-async def log_governance_evidence(governance_cycle: str, review_id: str, posture_snapshot_id: str, approval_record_id: str, captured_at: str) -> str:
+async def log_governance_evidence(governance_cycle: str, review_id: str, posture_snapshot_id: str, approval_record_id: str, captured_at: str, workflow_id: str, execution_id: str, compile_target: str) -> str:
     """SKELETON — publish the dated governance-record evidence artifact to the operator's evidence store as an OCSF v1.3.0 API Activity (class_uid 6003) record. Record pins __governance_cycle__, __review_id__, __posture_snapshot_id__, __approval_record_id__, and __captured_at__ so the NIS2 Directive (EU) 2022/2555 Article 20(1) auditable-lifecycle obligation is discharged on every terminal path (including the ad-hoc-trigger branch and the referral branch, which are recorded with their respective markers rather than dropped). Records __evidence_id__. The evidence artifact is a plain JSON governance-record; no proprietary governance-tooling surface is assumed. TODO (CORE): evidence-record schema pin against a schemas/evidence/governance.schema.json envelope landing in the sibling CORE card, evidence-sink adapter binding, deterministic evidence_id derivation from SHA-256(governance_cycle|review_id|captured_at).
 
     CACAO step_id: action--a2000000-0000-4000-8000-000000000005
@@ -102,7 +102,7 @@ async def log_governance_evidence(governance_cycle: str, review_id: str, posture
             AuditRecord(span_name='activity.action--a2000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--a2000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'log_governance_evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'log_governance_evidence'})
         )
         from content.playbooks.nis2_art20_governance.primitives.evidence import emit_governance_evidence
-        __evidence_id__ = emit_governance_evidence(governance_cycle=__governance_cycle__, review_id=__review_id__, posture_snapshot_id=__posture_snapshot_id__, approval_record_id=__approval_record_id__, captured_at=__captured_at__)
+        __evidence_id__ = emit_governance_evidence(governance_cycle=__governance_cycle__, review_id=__review_id__, posture_snapshot_id=__posture_snapshot_id__, approval_record_id=__approval_record_id__, captured_at=__captured_at__, workflow_id=__workflow_id__, execution_id=__execution_id__, compile_target=__compile_target__)
 
 LOG_GOVERNANCE_EVIDENCE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),

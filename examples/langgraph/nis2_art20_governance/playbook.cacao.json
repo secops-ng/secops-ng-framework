@@ -10,7 +10,7 @@
   ],
   "created_by": "identity--a2000000-a200-4a20-8a20-a2000000a200",
   "created": "2026-07-09T00:00:00Z",
-  "modified": "2026-07-09T00:00:00Z",
+  "modified": "2026-08-01T00:00:00.000Z",
   "valid_from": "2026-07-09T00:00:00Z",
   "labels": [
     "nis2",
@@ -78,6 +78,21 @@
     "__captured_at__": {
       "type": "string",
       "description": "ISO-8601 UTC timestamp of the governance-record capture instant. Supplied by the compile-target runtime; carried into the deterministic evidence-record derivation so the three reference compilers re-derive byte-identical bytes.",
+      "external": true
+    },
+    "__workflow_id__": {
+      "type": "string",
+      "description": "Stable workflow identifier (matches the lowercase-dotted content-model slug 'nis2_art20_governance'). Supplied by the compile-target runtime and carried into the governance-evidence record so the artifact names the workflow that produced it.",
+      "external": true
+    },
+    "__execution_id__": {
+      "type": "string",
+      "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Distinguishes one governance cycle's evidence from the next.",
+      "external": true
+    },
+    "__compile_target__": {
+      "type": "string",
+      "description": "Which reference compiler emitted the running workflow — n8n, temporal or langgraph. Supplied by the runtime. Recorded on the evidence artifact so a reviewer can tell which emitter produced a given record; this playbook's emit_governance_evidence primitive is the only one in the catalogue that currently asks for it.",
       "external": true
     }
   },
@@ -185,7 +200,10 @@
         "__review_id__",
         "__posture_snapshot_id__",
         "__approval_record_id__",
-        "__captured_at__"
+        "__captured_at__",
+        "__workflow_id__",
+        "__execution_id__",
+        "__compile_target__"
       ],
       "out_args": [
         "__evidence_id__"
@@ -204,7 +222,10 @@
             "review_id": "__review_id__",
             "posture_snapshot_id": "__posture_snapshot_id__",
             "approval_record_id": "__approval_record_id__",
-            "captured_at": "__captured_at__"
+            "captured_at": "__captured_at__",
+            "workflow_id": "__workflow_id__",
+            "execution_id": "__execution_id__",
+            "compile_target": "__compile_target__"
           },
           "out": "__evidence_id__"
         }

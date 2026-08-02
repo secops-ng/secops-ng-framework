@@ -88,11 +88,56 @@ declared where relevant: `compile_targets` (subset of `n8n`,
 respective content-model layers), and `sources` (free-form provenance
 pointers to upstream specs and clauses).
 
-The step graph is the heart of the playbook. Each step carries a
-`name`, a `description`, and — for `action` steps — a `commands` array
-naming the primitives the compilers will emit. Look at
-`content/playbooks/cra_cvd/playbook.cacao.json` for a full worked
+### The step graph
+
+Each step carries a `name` and a `description`. `action` steps also
+carry the I/O contract the compilers turn into source:
+
+| Field | Notes |
+|---|---|
+| `in_args` | Playbook variables the step reads. |
+| `out_args` | Playbook variables the step produces. |
+| `x_secops_ng.control_refs` / `.telemetry_refs` / `.metric_refs` | Per-step reference bundles, same shape as the playbook-level ones. |
+| `x_secops_ng.core_body` | Optional. The deterministic primitive the step compiles to — see §&nbsp;3.1. |
+
+**Do not use a CACAO `commands` array.** No playbook in the catalogue
+does, and the compilers do not read it. Earlier revisions of this
+document recommended it; that guidance was wrong and the last two
+playbooks using it were converted in #854 and #863.
+
+`content/playbooks/cra_cvd/playbook.cacao.json` is a full worked
 example.
+
+### 3.1 Runtime-context variables
+
+Primitives that compose evidence need values the playbook author cannot
+know — which workflow ran, which execution, at what instant. **Declare
+these as ordinary `playbook_variables` with `external: true`.** There is
+no separate injection mechanism and none is planned; the compile-target
+runtime supplies them like any other external input.
+
+| Variable | Supplied by |
+|---|---|
+| `__workflow_id__` | the runtime — matches the content-model slug |
+| `__execution_id__` | the runtime — n8n execution id, Temporal run id, LangGraph thread id |
+| `__captured_at__` | the runtime — ISO-8601 UTC capture instant |
+| `__regulation_refs__` | operator — regulation anchors this execution attests against |
+| `__control_refs__` | operator — control stable-ids attested |
+| `__source_url__` | operator — provenance URL for the execution |
+
+Seven of the ten playbooks carrying primitive bindings declare all six,
+and they are exactly the seven with no `unbound_required_argument`
+findings from `python -m tools.lint_core_body`. The failure mode is
+*omitting* the convention, not following it — see issue #866.
+
+`__compile_target__` (`n8n`, `temporal` or `langgraph`) belongs to the
+same class and is declared the same way, but only one playbook's
+primitives currently ask for it, so it is not part of the standard six.
+Add it where a primitive takes it and leave it out otherwise.
+
+Declare only what your primitives actually take. `codebase_vuln_management`
+declares one of them and has no findings, because its bindings need
+no more than that; declaring the rest would be noise.
 
 ## 4. The mappings overlay
 

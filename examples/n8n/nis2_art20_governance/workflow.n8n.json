@@ -48,6 +48,24 @@
               "type": "string",
               "value": "",
               "description": "ISO-8601 UTC timestamp of the governance-record capture instant. Supplied by the compile-target runtime; carried into the deterministic evidence-record derivation so the three reference compilers re-derive byte-identical bytes."
+            },
+            {
+              "name": "__workflow_id__",
+              "type": "string",
+              "value": "",
+              "description": "Stable workflow identifier (matches the lowercase-dotted content-model slug 'nis2_art20_governance'). Supplied by the compile-target runtime and carried into the governance-evidence record so the artifact names the workflow that produced it."
+            },
+            {
+              "name": "__execution_id__",
+              "type": "string",
+              "value": "",
+              "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id). Distinguishes one governance cycle's evidence from the next."
+            },
+            {
+              "name": "__compile_target__",
+              "type": "string",
+              "value": "",
+              "description": "Which reference compiler emitted the running workflow \u2014 n8n, temporal or langgraph. Supplied by the runtime. Recorded on the evidence artifact so a reviewer can tell which emitter produced a given record; this playbook's emit_governance_evidence primitive is the only one in the catalogue that currently asks for it."
             }
           ]
         }
@@ -114,7 +132,7 @@
       ],
       "parameters": {
         "language": "python",
-        "pythonCode": "from content.playbooks.nis2_art20_governance.primitives.evidence import emit_governance_evidence\n__evidence_id__ = emit_governance_evidence(governance_cycle=__governance_cycle__, review_id=__review_id__, posture_snapshot_id=__posture_snapshot_id__, approval_record_id=__approval_record_id__, captured_at=__captured_at__)"
+        "pythonCode": "from content.playbooks.nis2_art20_governance.primitives.evidence import emit_governance_evidence\n__evidence_id__ = emit_governance_evidence(governance_cycle=__governance_cycle__, review_id=__review_id__, posture_snapshot_id=__posture_snapshot_id__, approval_record_id=__approval_record_id__, captured_at=__captured_at__, workflow_id=__workflow_id__, execution_id=__execution_id__, compile_target=__compile_target__)"
       },
       "notes": "SKELETON \u2014 publish the dated governance-record evidence artifact to the operator's evidence store as an OCSF v1.3.0 API Activity (class_uid 6003) record. Record pins __governance_cycle__, __review_id__, __posture_snapshot_id__, __approval_record_id__, and __captured_at__ so the NIS2 Directive (EU) 2022/2555 Article 20(1) auditable-lifecycle obligation is discharged on every terminal path (including the ad-hoc-trigger branch and the referral branch, which are recorded with their respective markers rather than dropped). Records __evidence_id__. The evidence artifact is a plain JSON governance-record; no proprietary governance-tooling surface is assumed. TODO (CORE): evidence-record schema pin against a schemas/evidence/governance.schema.json envelope landing in the sibling CORE card, evidence-sink adapter binding, deterministic evidence_id derivation from SHA-256(governance_cycle|review_id|captured_at).",
       "notesInFlow": true
