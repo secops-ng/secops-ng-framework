@@ -1,9 +1,18 @@
 # soc2_evidence_collector
 
+## Overview
+
 CACAO v2 playbook that aggregates the evidence an operator's other playbooks
 already emit into a dated **SOC 2 readiness attestation**, scored against the
 AICPA Trust Services Criteria crosswalk under
-[`content/mappings/soc2/`](../../mappings/soc2/README.md).
+[`content/mappings/soc2/`](../../mappings/soc2/README.md). It is triggered on the
+operator's own assessment cadence — not by an alert — and takes two inputs: the
+crosswalk entries to score against (`__crosswalk_entries__`) and the evidence
+references other playbooks have already produced (`__evidence_refs__`) for a
+stated `__assessment_window__`. It produces one artifact: a
+`soc2_readiness_input` document carrying a per-criterion coverage verdict, counts
+rolled up per Trust Services category, and the ids of every evidence artifact it
+aggregated.
 
 Four steps: collect criteria atoms → map evidence to criteria → score
 per-criterion coverage → report readiness attestation. It is the same shape as
@@ -89,10 +98,40 @@ SOC 2 is **not** an EU statutory instrument. The EU mappings remain the
 authoritative pointer for the statutory surface, and a `soc2` mapping block never
 replaces one.
 
-## Compile targets
+## How to compile
 
-`compile_targets` declares `[n8n, temporal, langgraph]`; emitted artifacts live
-under `examples/{n8n,temporal,langgraph}/soc2_evidence_collector/`.
+`x_secops_ng.compile_targets` declares all three targets. Emitted artifacts:
+
+- n8n — [`examples/n8n/soc2_evidence_collector/`](../../../examples/n8n/soc2_evidence_collector/)
+- Temporal — [`examples/temporal/soc2_evidence_collector/`](../../../examples/temporal/soc2_evidence_collector/)
+- LangGraph — [`examples/langgraph/soc2_evidence_collector/`](../../../examples/langgraph/soc2_evidence_collector/)
+
+Each directory carries a `regenerate.sh` that re-emits from the canonical
+artifact; the goldens are byte-parity checked in CI, so a change here must be
+followed by a regenerate in the same commit.
+
+## Operator customisation
+
+Everything an operator supplies is a CACAO variable marked `external: true` —
+there are no thresholds or channel names baked into the primitives:
+
+| Variable | What the operator supplies |
+|---|---|
+| `__crosswalk_entries__` | the criteria set to score against. Passed in, so a criterion added to `content/mappings/soc2/` is scored on the next run with no change here |
+| `__evidence_refs__` | the evidence references to aggregate, as emitted by the operator's other playbooks |
+| `__assessment_window__` | the period the attestation covers |
+| `__owner_role__` | the role accountable for the assessment, recorded in `provenance` |
+| `__captured_at__` | the collection instant. Supplied rather than read from a clock, which is what makes a run replayable |
+| `__workflow_id__`, `__execution_id__` | the runtime's own identifiers, recorded in `provenance` |
+
+The remaining variables (`__criteria_atoms__`, `__criteria_mapping__`,
+`__coverage_scoring__`, `__attestation_id__`) are internal — each step's verdict,
+written by a primitive and read by the next. `__attestation_id__` is derived
+deterministically from the window and the aggregated artifact ids, so re-running
+over identical inputs yields an identical id rather than a fresh document.
+
+There is deliberately **no** knob for collapsing `draft_backed` into `covered`,
+and no percentage output to configure. See the section above for why.
 
 ## Sources
 
