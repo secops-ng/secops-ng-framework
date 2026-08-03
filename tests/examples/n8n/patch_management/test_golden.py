@@ -141,11 +141,32 @@ def test_worked_example_has_valid_n8n_shape() -> None:
 
 
 def _action_without_commands_steps() -> dict[str, dict]:
+    """Command-less action steps that are also **unbound**.
+
+    A step carrying an ``x_secops_ng.core_body`` binding is lowered by the n8n
+    emitter to a Pyodide ``code`` node that calls the primitive — the CACAO
+    contract travels as the call's arguments, not as Set assignments. Only a
+    step that is command-less *and* unbound still surfaces the contract on a
+    Set node, which is what the assertions below check. Since the
+    patch_management CORE-WIRE bound six of its seven action steps, selecting
+    on command-less alone would assert the pre-binding shape.
+    """
     raw = json.loads(SOURCE.read_text(encoding="utf-8"))
     return {
         step_id: step
         for step_id, step in raw["workflow"].items()
-        if step.get("type") == "action" and not step.get("commands")
+        if step.get("type") == "action"
+        and not step.get("commands")
+        and not (step.get("x_secops_ng") or {}).get("core_body")
+    }
+
+
+def _bound_steps() -> dict[str, dict]:
+    raw = json.loads(SOURCE.read_text(encoding="utf-8"))
+    return {
+        step_id: step
+        for step_id, step in raw["workflow"].items()
+        if (step.get("x_secops_ng") or {}).get("core_body")
     }
 
 
@@ -218,4 +239,29 @@ def test_only_end_step_emits_noop() -> None:
         assert step_type == "end", (
             f"node {node['id']!r} is a noOp but its CACAO step type is "
             f"{step_type!r}; only `end` steps may emit noOp post-uplift"
+        )
+
+
+def test_bound_steps_emit_code_nodes_calling_their_primitive() -> None:
+    """Each bound step lowers to a Pyodide node that calls its own primitive.
+
+    The counterpart to the Set-node assertions above: after the CORE-WIRE,
+    six of seven action steps carry a core_body, and the emitted artifact must
+    actually invoke the bound primitive rather than restate the contract.
+    """
+    nodes_by_id = _nodes_by_id()
+    bound = _bound_steps()
+    assert bound, "expected patch_management to carry core_body bindings"
+    for step_id, step in bound.items():
+        node = nodes_by_id[step_id]
+        assert node["type"] == "n8n-nodes-base.code", (
+            f"step {step_id!r} carries a core_body binding and must emit a "
+            f"Pyodide code node, not {node['type']!r}"
+        )
+        primitive = step["x_secops_ng"]["core_body"]["primitive"]
+        code = node["parameters"]["pythonCode"]
+        leaf = primitive.rsplit(".", 1)[-1]
+        assert leaf in code, (
+            f"step {step_id!r}: emitted code does not reference the bound "
+            f"primitive {leaf!r}"
         )

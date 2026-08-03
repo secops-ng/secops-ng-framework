@@ -27,14 +27,13 @@ async def detect_patch_availability(update_subject: str, update_reference: str) 
     """
     with _TRACER.start_as_current_span(
         name='activity.action--70000000-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'detect patch availability', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_patch_availability'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'detect patch availability', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_patch_availability'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--70000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'detect patch availability', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_patch_availability'})
+            AuditRecord(span_name='activity.action--70000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'detect patch availability', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_patch_availability'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--70000000-0000-4000-8000-000000000002'"
-        )
+        from content.playbooks.patch_management.primitives.detect import detect_patch_availability
+        __detection_record__ = detect_patch_availability(update_subject=__update_subject__, update_reference=__update_reference__, advisory_kind=__advisory_kind__, tracked_inventory=__tracked_inventory__)
 
 DETECT_PATCH_AVAILABILITY_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -51,14 +50,13 @@ async def classify_patch_criticality(update_subject: str, update_reference: str)
     """
     with _TRACER.start_as_current_span(
         name='activity.action--70000000-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify patch criticality', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_patch_criticality'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify patch criticality', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_patch_criticality'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--70000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify patch criticality', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_patch_criticality'})
+            AuditRecord(span_name='activity.action--70000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify patch criticality', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_patch_criticality'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--70000000-0000-4000-8000-000000000003'"
-        )
+        from content.playbooks.patch_management.primitives.classify import classify_patch_criticality
+        __patch_criticality__ = classify_patch_criticality(update_subject=__update_subject__, severity_band=__severity_band__, exploit_observed=__exploit_observed__, is_feature_only=__is_feature_only__)
 
 CLASSIFY_PATCH_CRITICALITY_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -75,14 +73,13 @@ async def stage_rollout_to_canary_ring(update_subject: str, update_reference: st
     """
     with _TRACER.start_as_current_span(
         name='activity.action--70000000-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'stage rollout to canary ring', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'stage_rollout_to_canary_ring'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'stage rollout to canary ring', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'stage_rollout_to_canary_ring'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--70000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'stage rollout to canary ring', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'stage_rollout_to_canary_ring'})
+            AuditRecord(span_name='activity.action--70000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'stage rollout to canary ring', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'stage_rollout_to_canary_ring'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--70000000-0000-4000-8000-000000000004'"
-        )
+        from content.playbooks.patch_management.primitives.stage import stage_rollout_to_canary_ring
+        __staged_ring_id__ = stage_rollout_to_canary_ring(update_subject=__update_subject__, update_reference=__update_reference__, patch_criticality=__patch_criticality__, ring_topology=__ring_topology__)
 
 STAGE_ROLLOUT_TO_CANARY_RING_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -99,14 +96,13 @@ async def validate_canary(update_subject: str, staged_ring_id: str) -> bool:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--70000000-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'validate canary', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'validate_canary'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'validate canary', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'validate_canary'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--70000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'validate canary', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'validate_canary'})
+            AuditRecord(span_name='activity.action--70000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'validate canary', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'validate_canary'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--70000000-0000-4000-8000-000000000005'"
-        )
+        from content.playbooks.patch_management.primitives.validate import validate_canary
+        __canary_verdict__ = validate_canary(functional_probe=__functional_probe__, error_rate_within_threshold=__error_rate_within_threshold__, latency_within_threshold=__latency_within_threshold__, rollback_ready=__rollback_ready__)
 
 VALIDATE_CANARY_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -123,14 +119,13 @@ async def fan_out_to_broad_rings(update_subject: str, update_reference: str, sta
     """
     with _TRACER.start_as_current_span(
         name='activity.action--70000000-0000-4000-8000-000000000006',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'fan out to broad rings', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'fan_out_to_broad_rings'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'fan out to broad rings', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'fan_out_to_broad_rings'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--70000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'fan out to broad rings', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'fan_out_to_broad_rings'})
+            AuditRecord(span_name='activity.action--70000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'fan out to broad rings', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'fan_out_to_broad_rings'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--70000000-0000-4000-8000-000000000006'"
-        )
+        from content.playbooks.patch_management.primitives.fanout import fan_out_to_broad_rings
+        __broad_rollout_id__ = fan_out_to_broad_rings(update_subject=__update_subject__, update_reference=__update_reference__, staged_ring_id=__staged_ring_id__, canary_healthy=__canary_healthy__, broad_rings=__broad_rings__)
 
 FAN_OUT_TO_BROAD_RINGS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -147,14 +142,13 @@ async def evidence_capture(update_subject: str, update_reference: str, patch_cri
     """
     with _TRACER.start_as_current_span(
         name='activity.action--70000000-0000-4000-8000-000000000007',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'evidence capture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evidence_capture'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'evidence capture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evidence_capture'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--70000000-0000-4000-8000-000000000007', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'evidence capture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evidence_capture'})
+            AuditRecord(span_name='activity.action--70000000-0000-4000-8000-000000000007', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'evidence capture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evidence_capture'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--70000000-0000-4000-8000-000000000007'"
-        )
+        from content.playbooks.patch_management.primitives.artifact import build_patch_application_evidence_artifact
+        __evidence_id__ = build_patch_application_evidence_artifact(workflow_id=__workflow_id__, execution_id=__execution_id__, regulation_refs=__regulation_refs__, control_refs=__control_refs__, update_subject=__update_subject__, update_reference=__update_reference__, patch_criticality=__patch_criticality__, staged_ring_id=__staged_ring_id__, canary_healthy=__canary_healthy__, broad_rollout_id=__broad_rollout_id__, health_observations=__health_observations__, captured_at=__captured_at__, source_url=__source_url__)
 
 EVIDENCE_CAPTURE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -171,10 +165,10 @@ async def notify_maintenance_owner(evidence_id: str, update_subject: str, canary
     """
     with _TRACER.start_as_current_span(
         name='activity.action--70000000-0000-4000-8000-000000000008',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'notify maintenance owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_maintenance_owner'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'notify maintenance owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_maintenance_owner'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--70000000-0000-4000-8000-000000000008', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'notify maintenance owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_maintenance_owner'})
+            AuditRecord(span_name='activity.action--70000000-0000-4000-8000-000000000008', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'notify maintenance owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_maintenance_owner'})
         )
         raise NotImplementedError(
             f"CACAO action stub not implemented: step_id='action--70000000-0000-4000-8000-000000000008'"
@@ -193,7 +187,7 @@ class PlaybookPatchManagementV1Workflow:
 
     CACAO playbook id : playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc
     stable_id         : playbook.patch_management@v1
-    content_version   : 0.1.0
+    content_version   : 0.2.0
     maturity          : experimental
     workflow_start    : start--70000000-0000-4000-8000-000000000001
     activities        : detect_patch_availability, classify_patch_criticality, stage_rollout_to_canary_ring, validate_canary, fan_out_to_broad_rings, evidence_capture, notify_maintenance_owner
@@ -203,10 +197,10 @@ class PlaybookPatchManagementV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.patch_management@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.1.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.2.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.patch_management@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.1.0'})
+                AuditRecord(span_name='workflow.playbook.patch_management@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.playbook.version': '0.2.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.patch_management@v1'"
