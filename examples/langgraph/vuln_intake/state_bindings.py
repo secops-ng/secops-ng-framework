@@ -51,6 +51,21 @@ class PlaybookVulnIntakeV1State(TypedDict, total=False):
     # playbook_variable: __actively_exploited__
     # Set by the CRA reporting-trigger step: true when the disclosure meets the CRA Article 14(1) actively-exploited definition (in-the-wild exploitation evidence) or the Article 14(3) severe-incident definition, in which case the regulator-notification chain fires ahead of the severity-keyed response so the 24h / 72h / 14d submission timing starts at the same instant the operator becomes aware.
     actively_exploited: bool
+    # playbook_variable: __cve_id_canonical__
+    # Canonical form of __cve_id__ written by canonicalize_case_field at intake (trimmed, upper-cased identifier scheme, stable across reporter formatting). The dedup key and every downstream case reference read this, never the raw __cve_id__.
+    cve_id_canonical: str
+    # playbook_variable: __cvss__
+    # Parsed CVSS handle (the CVSSScore model in primitives/cvss.py: the parsed vector, its computed base score and rating) produced from __cvss_vector__ at triage. The severity policy consumes this handle rather than re-parsing the vector string, so one deterministic parse feeds both severity and the regulator-notification chain.
+    cvss: dict[str, object]
+    # playbook_variable: __epss__
+    # Parsed EPSS handle (the EPSSScore model in primitives/epss.py, Decimal-valued) produced from __epss_score__ at triage. Consumed by the severity policy alongside __cvss__.
+    epss: dict[str, object]
+    # playbook_variable: __asset_context__
+    # Business context for the affected component as read from the operator's inventory at triage (the BusinessContext model in primitives/severity.py). Distinct from __asset_ref__, which is the inventory reference this context was resolved from.
+    asset_context: dict[str, object]
+    # playbook_variable: __severity_verdict__
+    # Full severity verdict (SeverityVerdict) written by the severity policy: the severity plus the CVSS/EPSS factors and context flags that produced it. __severity__ carries the bare value for branch conditions; this carries the evidence.
+    severity_verdict: dict[str, object]
     # bookkeeping
     # Per-step status map keyed by CACAO step_id. Conventional values: 'pending', 'running', 'ok', 'failed', 'awaiting-human'. The graph builder writes here; conditional-edge routers read it.
     step_status: dict[str, str]

@@ -57,6 +57,45 @@ class PlaybookCraCvdV1State(TypedDict, total=False):
     # playbook_variable: __reporter_credit_display__
     # Credit line rendered into the public advisory (both human-readable and CSAF 2.0 forms). Populated at the coordinate_disclosure step from the reporter-credit consent capture: the reporter's chosen attribution string when they have opted in to being credited, or the literal marker "reporter chose to remain anonymous" when they have not. Empty until coordinate_disclosure records the reporter's consent decision. Consent is captured per-case at coordinate_disclosure time (rather than at intake) so the reporter has seen the draft advisory before agreeing to attribution, per ISO/IEC 29147 guidance.
     reporter_credit_display: str
+    # playbook_variable: __captured_at__
+    # ISO-8601 instant the running step observed the event it records — here, when the acknowledgement to the reporter was composed. Supplied by the runtime per the runtime-context convention (docs/contributing/playbook-authoring.md § 3.1).
+    captured_at: str
+    # playbook_variable: __operator_display__
+    # The operator's public display name as rendered in reporter-facing mail and on the published advisory (CSAF publisher name). Operator configuration, set once per deployment.
+    operator_display: str
+    # playbook_variable: __operator_namespace__
+    # The operator's stable namespace for advisory identifiers and CSAF publisher metadata (reverse-DNS or URL form). Operator configuration, set once per deployment.
+    operator_namespace: str
+    # playbook_variable: __cvd_policy_url__
+    # URL of the operator's published coordinated-vulnerability-disclosure policy, cited in the acknowledgement so the reporter can hold the operator to its own stated process. Operator configuration.
+    cvd_policy_url: str
+    # playbook_variable: __smtp_endpoint__
+    # The operator's outbound mail endpoint the acknowledgement is handed to. Operator configuration; named here so the compile target binds a concrete transport rather than assuming one.
+    smtp_endpoint: str
+    # playbook_variable: __next_update_after__
+    # ISO-8601 date by which the operator commits to sending the reporter the next status update, rendered into the acknowledgement. Operator configuration (the CVD policy's update cadence applied to the ack date).
+    next_update_after: str
+    # playbook_variable: __advisory_title__
+    # Title of the public advisory. Advisory content authored during coordinate_disclosure; carried as a variable so publish_advisory is a pure rendering of already-reviewed content.
+    advisory_title: str
+    # playbook_variable: __advisory_summary__
+    # Summary paragraph of the public advisory: what the vulnerability is and what the fix does, in the operator's public voice. Authored during coordinate_disclosure.
+    advisory_summary: str
+    # playbook_variable: __advisory_impact__
+    # Impact statement of the public advisory: what an unpatched deployment is exposed to. Authored during coordinate_disclosure.
+    advisory_impact: str
+    # playbook_variable: __affected_products__
+    # The affected-products list for the advisory: one record per product with version ranges (validated by _validate_affected_products in primitives/disclosure.py, which rejects duplicate product ids).
+    affected_products: dict[str, object]
+    # playbook_variable: __severity_cvss_v4__
+    # CVSS v4.0 vector string for the vulnerability as published on the advisory.
+    severity_cvss_v4: str
+    # playbook_variable: __severity_score__
+    # CVSS base score published on the advisory (numeric, validated by _validate_score in primitives/disclosure.py). Carried separately from the vector so the advisory renders both.
+    severity_score: str
+    # playbook_variable: __severity_label__
+    # Severity rating label published on the advisory (critical / high / medium / low), consistent with __severity_score__.
+    severity_label: str
     # bookkeeping
     # Per-step status map keyed by CACAO step_id. Conventional values: 'pending', 'running', 'ok', 'failed', 'awaiting-human'. The graph builder writes here; conditional-edge routers read it.
     step_status: dict[str, str]
@@ -86,7 +125,7 @@ async def intake() -> dict[str, object]:
         )
 
 @tool
-async def ack_to_reporter(case_id: str, reporter_contact: str) -> str:
+async def ack_to_reporter(case_id: str, reporter_contact: str, captured_at: str, operator_display: str, cvd_policy_url: str, next_update_after: str, smtp_endpoint: str) -> str:
     """CRA Article 14 §6 acknowledgement to the reporter within the operator CVD policy window (3 working days on the operator baseline). Sends a durable acknowledgement carrying __case_id__ and the operator's CVD policy reference so the reporter has a citable receipt and the case has a stamped __reporter_ack_ts__ for the acknowledgement-SLA KPI. Binds against content.playbooks.cra_cvd.primitives.reporter.send_acknowledgement: canonicalises the ack inputs and returns the JSON-native ack envelope carrying the operator-supplied SMTP endpoint handle (framework ships no default endpoint; the operator wires the concrete endpoint at the compile target's config layer, typically via env-var indirection resolved to the smtp_endpoint argument). Template rendering (ack_letter.j2) and PGP-signed delivery are owned by the per-target compiler adapters.
 
     CACAO step_id : action--c7d51014-0000-4000-8000-000000000003
@@ -100,7 +139,7 @@ async def ack_to_reporter(case_id: str, reporter_contact: str) -> str:
             AuditRecord(span_name='tool.action--c7d51014-0000-4000-8000-000000000003', attributes={'secops_ng.playbook.id': 'playbook--c7d51014-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--c7d51014-0000-4000-8000-000000000003', 'secops_ng.step.name': 'ack_to_reporter', 'secops_ng.tool.name': 'ack_to_reporter', 'secops_ng.workflow.run_id': ''})
         )
         from content.playbooks.cra_cvd.primitives.reporter import send_acknowledgement
-        __reporter_ack_ts__ = send_acknowledgement(case_id=__case_id__, reporter_contact=__reporter_contact__)
+        __reporter_ack_ts__ = send_acknowledgement(case_id=__case_id__, reporter_contact=__reporter_contact__, ack_timestamp_iso=__captured_at__, operator_display=__operator_display__, cvd_policy_url=__cvd_policy_url__, next_update_after=__next_update_after__, smtp_endpoint=__smtp_endpoint__)
 
 @tool
 async def triage(case_id: str) -> dict[str, object]:
@@ -175,7 +214,7 @@ async def coordinate_disclosure(case_id: str, reporter_contact: str, fix_ref: st
         )
 
 @tool
-async def publish_advisory(case_id: str, fix_ref: str, disclosure_target_date: str, reporter_credit_display: str) -> str:
+async def publish_advisory(case_id: str, fix_ref: str, disclosure_target_date: str, reporter_credit_display: str, advisory_id: str, advisory_title: str, advisory_summary: str, advisory_impact: str, affected_products: dict[str, object], severity_cvss_v4: str, severity_score: str, severity_label: str, operator_display: str, operator_namespace: str) -> str:
     """Publish the public advisory at the agreed disclosure date. Advisory carries the affected products / versions, the fix reference, credit to the reporter (rendered from __reporter_credit_display__ populated at coordinate_disclosure, either the reporter's opted-in attribution string or the anonymous marker), and, when a CVE identifier has been assigned, the CVE id. Both the human-readable form (content/playbooks/cra_cvd/templates/advisory.md.j2) and the CSAF 2.0 machine-readable form (content/playbooks/cra_cvd/templates/advisory.csaf2.json.j2) are emitted. Records __advisory_id__. Binds against content.playbooks.cra_cvd.primitives.disclosure.build_advisory_artifact: canonicalises the advisory inputs and returns the JSON-native CSAF 2.0 shape stub envelope both templates render from. Template rendering (Jinja2) is owned by the per-target compiler adapters.
 
     CACAO step_id : action--c7d51014-0000-4000-8000-000000000008
@@ -189,7 +228,7 @@ async def publish_advisory(case_id: str, fix_ref: str, disclosure_target_date: s
             AuditRecord(span_name='tool.action--c7d51014-0000-4000-8000-000000000008', attributes={'secops_ng.playbook.id': 'playbook--c7d51014-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--c7d51014-0000-4000-8000-000000000008', 'secops_ng.step.name': 'publish_advisory', 'secops_ng.tool.name': 'publish_advisory', 'secops_ng.workflow.run_id': ''})
         )
         from content.playbooks.cra_cvd.primitives.disclosure import build_advisory_artifact
-        __advisory_id__ = build_advisory_artifact(case_id=__case_id__, fix_reference=__fix_ref__, disclosure_date_iso=__disclosure_target_date__, credit_display=__reporter_credit_display__)
+        __advisory_id__ = build_advisory_artifact(case_id=__case_id__, fix_reference=__fix_ref__, disclosure_date_iso=__disclosure_target_date__, credit_display=__reporter_credit_display__, advisory_id=__advisory_id__, title=__advisory_title__, summary=__advisory_summary__, impact=__advisory_impact__, affected_products=__affected_products__, severity_cvss_v4=__severity_cvss_v4__, severity_score=__severity_score__, severity_label=__severity_label__, operator_display=__operator_display__, operator_namespace=__operator_namespace__)
 
 async def llm_step(state: PlaybookCraCvdV1State) -> dict:
     """Agentic-extension hook.

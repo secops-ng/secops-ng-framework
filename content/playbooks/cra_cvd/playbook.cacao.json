@@ -84,6 +84,71 @@
       "type": "string",
       "description": "Credit line rendered into the public advisory (both human-readable and CSAF 2.0 forms). Populated at the coordinate_disclosure step from the reporter-credit consent capture: the reporter's chosen attribution string when they have opted in to being credited, or the literal marker \"reporter chose to remain anonymous\" when they have not. Empty until coordinate_disclosure records the reporter's consent decision. Consent is captured per-case at coordinate_disclosure time (rather than at intake) so the reporter has seen the draft advisory before agreeing to attribution, per ISO/IEC 29147 guidance.",
       "external": false
+    },
+    "__captured_at__": {
+      "type": "string",
+      "description": "ISO-8601 instant the running step observed the event it records — here, when the acknowledgement to the reporter was composed. Supplied by the runtime per the runtime-context convention (docs/contributing/playbook-authoring.md § 3.1).",
+      "external": true
+    },
+    "__operator_display__": {
+      "type": "string",
+      "description": "The operator's public display name as rendered in reporter-facing mail and on the published advisory (CSAF publisher name). Operator configuration, set once per deployment.",
+      "external": true
+    },
+    "__operator_namespace__": {
+      "type": "string",
+      "description": "The operator's stable namespace for advisory identifiers and CSAF publisher metadata (reverse-DNS or URL form). Operator configuration, set once per deployment.",
+      "external": true
+    },
+    "__cvd_policy_url__": {
+      "type": "string",
+      "description": "URL of the operator's published coordinated-vulnerability-disclosure policy, cited in the acknowledgement so the reporter can hold the operator to its own stated process. Operator configuration.",
+      "external": true
+    },
+    "__smtp_endpoint__": {
+      "type": "string",
+      "description": "The operator's outbound mail endpoint the acknowledgement is handed to. Operator configuration; named here so the compile target binds a concrete transport rather than assuming one.",
+      "external": true
+    },
+    "__next_update_after__": {
+      "type": "string",
+      "description": "ISO-8601 date by which the operator commits to sending the reporter the next status update, rendered into the acknowledgement. Operator configuration (the CVD policy's update cadence applied to the ack date).",
+      "external": true
+    },
+    "__advisory_title__": {
+      "type": "string",
+      "description": "Title of the public advisory. Advisory content authored during coordinate_disclosure; carried as a variable so publish_advisory is a pure rendering of already-reviewed content.",
+      "external": true
+    },
+    "__advisory_summary__": {
+      "type": "string",
+      "description": "Summary paragraph of the public advisory: what the vulnerability is and what the fix does, in the operator's public voice. Authored during coordinate_disclosure.",
+      "external": true
+    },
+    "__advisory_impact__": {
+      "type": "string",
+      "description": "Impact statement of the public advisory: what an unpatched deployment is exposed to. Authored during coordinate_disclosure.",
+      "external": true
+    },
+    "__affected_products__": {
+      "type": "dictionary",
+      "description": "The affected-products list for the advisory: one record per product with version ranges (validated by _validate_affected_products in primitives/disclosure.py, which rejects duplicate product ids).",
+      "external": true
+    },
+    "__severity_cvss_v4__": {
+      "type": "string",
+      "description": "CVSS v4.0 vector string for the vulnerability as published on the advisory.",
+      "external": true
+    },
+    "__severity_score__": {
+      "type": "string",
+      "description": "CVSS base score published on the advisory (numeric, validated by _validate_score in primitives/disclosure.py). Carried separately from the vector so the advisory renders both.",
+      "external": true
+    },
+    "__severity_label__": {
+      "type": "string",
+      "description": "Severity rating label published on the advisory (critical / high / medium / low), consistent with __severity_score__.",
+      "external": true
     }
   },
   "workflow_start": "start--c7d51014-0000-4000-8000-000000000001",
@@ -122,7 +187,12 @@
       "on_completion": "action--c7d51014-0000-4000-8000-000000000004",
       "in_args": [
         "__case_id__",
-        "__reporter_contact__"
+        "__reporter_contact__",
+        "__captured_at__",
+        "__operator_display__",
+        "__cvd_policy_url__",
+        "__next_update_after__",
+        "__smtp_endpoint__"
       ],
       "out_args": [
         "__reporter_ack_ts__"
@@ -142,7 +212,12 @@
           "primitive": "content.playbooks.cra_cvd.primitives.reporter.send_acknowledgement",
           "in": {
             "case_id": "__case_id__",
-            "reporter_contact": "__reporter_contact__"
+            "reporter_contact": "__reporter_contact__",
+            "ack_timestamp_iso": "__captured_at__",
+            "operator_display": "__operator_display__",
+            "cvd_policy_url": "__cvd_policy_url__",
+            "next_update_after": "__next_update_after__",
+            "smtp_endpoint": "__smtp_endpoint__"
           },
           "out": "__reporter_ack_ts__"
         }
@@ -256,7 +331,17 @@
         "__case_id__",
         "__fix_ref__",
         "__disclosure_target_date__",
-        "__reporter_credit_display__"
+        "__reporter_credit_display__",
+        "__advisory_id__",
+        "__advisory_title__",
+        "__advisory_summary__",
+        "__advisory_impact__",
+        "__affected_products__",
+        "__severity_cvss_v4__",
+        "__severity_score__",
+        "__severity_label__",
+        "__operator_display__",
+        "__operator_namespace__"
       ],
       "out_args": [
         "__advisory_id__"
@@ -278,7 +363,17 @@
             "case_id": "__case_id__",
             "fix_reference": "__fix_ref__",
             "disclosure_date_iso": "__disclosure_target_date__",
-            "credit_display": "__reporter_credit_display__"
+            "credit_display": "__reporter_credit_display__",
+            "advisory_id": "__advisory_id__",
+            "title": "__advisory_title__",
+            "summary": "__advisory_summary__",
+            "impact": "__advisory_impact__",
+            "affected_products": "__affected_products__",
+            "severity_cvss_v4": "__severity_cvss_v4__",
+            "severity_score": "__severity_score__",
+            "severity_label": "__severity_label__",
+            "operator_display": "__operator_display__",
+            "operator_namespace": "__operator_namespace__"
           },
           "out": "__advisory_id__"
         }

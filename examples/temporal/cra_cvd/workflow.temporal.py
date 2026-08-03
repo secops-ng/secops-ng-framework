@@ -44,7 +44,7 @@ INTAKE_RETRY_POLICY = RetryPolicy(
 )
 
 @activity.defn
-async def ack_to_reporter(case_id: str, reporter_contact: str) -> str:
+async def ack_to_reporter(case_id: str, reporter_contact: str, captured_at: str, operator_display: str, cvd_policy_url: str, next_update_after: str, smtp_endpoint: str) -> str:
     """CRA Article 14 §6 acknowledgement to the reporter within the operator CVD policy window (3 working days on the operator baseline). Sends a durable acknowledgement carrying __case_id__ and the operator's CVD policy reference so the reporter has a citable receipt and the case has a stamped __reporter_ack_ts__ for the acknowledgement-SLA KPI. Binds against content.playbooks.cra_cvd.primitives.reporter.send_acknowledgement: canonicalises the ack inputs and returns the JSON-native ack envelope carrying the operator-supplied SMTP endpoint handle (framework ships no default endpoint; the operator wires the concrete endpoint at the compile target's config layer, typically via env-var indirection resolved to the smtp_endpoint argument). Template rendering (ack_letter.j2) and PGP-signed delivery are owned by the per-target compiler adapters.
 
     CACAO step_id: action--c7d51014-0000-4000-8000-000000000003
@@ -57,7 +57,7 @@ async def ack_to_reporter(case_id: str, reporter_contact: str) -> str:
             AuditRecord(span_name='activity.action--c7d51014-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--c7d51014-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--c7d51014-0000-4000-8000-000000000003', 'secops_ng.step.name': 'ack_to_reporter', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ack_to_reporter'})
         )
         from content.playbooks.cra_cvd.primitives.reporter import send_acknowledgement
-        __reporter_ack_ts__ = send_acknowledgement(case_id=__case_id__, reporter_contact=__reporter_contact__)
+        __reporter_ack_ts__ = send_acknowledgement(case_id=__case_id__, reporter_contact=__reporter_contact__, ack_timestamp_iso=__captured_at__, operator_display=__operator_display__, cvd_policy_url=__cvd_policy_url__, next_update_after=__next_update_after__, smtp_endpoint=__smtp_endpoint__)
 
 ACK_TO_REPORTER_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -163,7 +163,7 @@ COORDINATE_DISCLOSURE_RETRY_POLICY = RetryPolicy(
 )
 
 @activity.defn
-async def publish_advisory(case_id: str, fix_ref: str, disclosure_target_date: str, reporter_credit_display: str) -> str:
+async def publish_advisory(case_id: str, fix_ref: str, disclosure_target_date: str, reporter_credit_display: str, advisory_id: str, advisory_title: str, advisory_summary: str, advisory_impact: str, affected_products: dict[str, object], severity_cvss_v4: str, severity_score: str, severity_label: str, operator_display: str, operator_namespace: str) -> str:
     """Publish the public advisory at the agreed disclosure date. Advisory carries the affected products / versions, the fix reference, credit to the reporter (rendered from __reporter_credit_display__ populated at coordinate_disclosure, either the reporter's opted-in attribution string or the anonymous marker), and, when a CVE identifier has been assigned, the CVE id. Both the human-readable form (content/playbooks/cra_cvd/templates/advisory.md.j2) and the CSAF 2.0 machine-readable form (content/playbooks/cra_cvd/templates/advisory.csaf2.json.j2) are emitted. Records __advisory_id__. Binds against content.playbooks.cra_cvd.primitives.disclosure.build_advisory_artifact: canonicalises the advisory inputs and returns the JSON-native CSAF 2.0 shape stub envelope both templates render from. Template rendering (Jinja2) is owned by the per-target compiler adapters.
 
     CACAO step_id: action--c7d51014-0000-4000-8000-000000000008
@@ -176,7 +176,7 @@ async def publish_advisory(case_id: str, fix_ref: str, disclosure_target_date: s
             AuditRecord(span_name='activity.action--c7d51014-0000-4000-8000-000000000008', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--c7d51014-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--c7d51014-0000-4000-8000-000000000008', 'secops_ng.step.name': 'publish_advisory', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'publish_advisory'})
         )
         from content.playbooks.cra_cvd.primitives.disclosure import build_advisory_artifact
-        __advisory_id__ = build_advisory_artifact(case_id=__case_id__, fix_reference=__fix_ref__, disclosure_date_iso=__disclosure_target_date__, credit_display=__reporter_credit_display__)
+        __advisory_id__ = build_advisory_artifact(case_id=__case_id__, fix_reference=__fix_ref__, disclosure_date_iso=__disclosure_target_date__, credit_display=__reporter_credit_display__, advisory_id=__advisory_id__, title=__advisory_title__, summary=__advisory_summary__, impact=__advisory_impact__, affected_products=__affected_products__, severity_cvss_v4=__severity_cvss_v4__, severity_score=__severity_score__, severity_label=__severity_label__, operator_display=__operator_display__, operator_namespace=__operator_namespace__)
 
 PUBLISH_ADVISORY_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),

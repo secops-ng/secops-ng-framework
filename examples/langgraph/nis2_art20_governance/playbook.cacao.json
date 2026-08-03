@@ -94,6 +94,46 @@
       "type": "string",
       "description": "Which reference compiler emitted the running workflow — n8n, temporal or langgraph. Supplied by the runtime. Recorded on the evidence artifact so a reviewer can tell which emitter produced a given record; this playbook's emit_governance_evidence primitive is the only one in the catalogue that currently asks for it.",
       "external": true
+    },
+    "__trigger__": {
+      "type": "string",
+      "description": "What convened this governance cycle: the scheduled cadence, an incident, an audit finding, or a supervisory-authority request. Consumed by resolve_governance_cycle (which validates the value — the primitive, not this declaration, is the authority on the set) and recorded again on the evidence artifact so a reviewer can tell a routine cycle from a reactive one.",
+      "external": true
+    },
+    "__clauses__": {
+      "type": "dictionary",
+      "description": "Per-sub-clause NIS2 Article 21(2)(a)-(j) posture records the operator's evidence store supplies for present_risk_posture: one record per sub-clause atom with its coverage bucket (validated by _validate_clause in primitives/review.py).",
+      "external": true
+    },
+    "__open_exceptions__": {
+      "type": "dictionary",
+      "description": "The open exceptions inventory presented to the management body: declared, still-open deviations from the Article 21(2) measures, each with its acknowledgement state (validated by _validate_exception in primitives/review.py).",
+      "external": true
+    },
+    "__training_completion__": {
+      "type": "dictionary",
+      "description": "Article 20(2) training-completion records for management-body members — one {principal_id, status} record per member (validated by _validate_training in primitives/review.py). Feeds both the posture presentation and the approval record's training attestation.",
+      "external": true
+    },
+    "__measures__": {
+      "type": "dictionary",
+      "description": "The risk-management measures put to the management body for approval: one record per measure with its decision — approved, or referred back with conditions (validated by _validate_measure in primitives/approval.py). The referral branch is carried, not dropped.",
+      "external": true
+    },
+    "__signatories__": {
+      "type": "dictionary",
+      "description": "The management-body members recorded as signing the approval decision (validated by _validate_signatory in primitives/approval.py).",
+      "external": true
+    },
+    "__approved_at_iso__": {
+      "type": "string",
+      "description": "ISO-8601 instant of the management-body approval decision. Deliberately distinct from __captured_at__ (when the evidence record was captured): the decision instant is governance fact, the capture instant is pipeline fact, and audits compare the two.",
+      "external": true
+    },
+    "__review_outcome__": {
+      "type": "string",
+      "description": "Outcome of the management-body decision for this cycle — approved, or referred (measures sent back with conditions). Set at approve_risk_measures and recorded again on the evidence artifact; the referral branch produces a record, never an absence.",
+      "external": true
     }
   },
   "workflow_start": "start--a2000000-0000-4000-8000-000000000001",
@@ -109,7 +149,8 @@
       "description": "SKELETON — convene the management-body cybersecurity review cycle per NIS2 Directive (EU) 2022/2555 Article 20(1): resolve the operator's documented governance-cadence catalogue (which management-body forum, which agenda slot, which meeting date) against __governance_cycle__ and record the scheduled review event as __review_id__. Read-only against the governance-cadence catalogue: no calendar entry is mutated here — the operator's governance workflow owns the calendar surface; this step records the resolved slot the review will occupy. On the ad-hoc trigger branch (no scheduled slot) __review_id__ stays empty and the downstream steps proceed against the ad-hoc marker rather than short-circuiting. TODO (CORE): governance-cadence-catalogue probe binding, ad-hoc-trigger propagation, forum-specific agenda-item shape.",
       "on_completion": "action--a2000000-0000-4000-8000-000000000003",
       "in_args": [
-        "__governance_cycle__"
+        "__governance_cycle__",
+        "__trigger__"
       ],
       "out_args": [
         "__review_id__"
@@ -124,7 +165,8 @@
         "core_body": {
           "primitive": "content.playbooks.nis2_art20_governance.primitives.cycle.resolve_governance_cycle",
           "in": {
-            "governance_cycle": "__governance_cycle__"
+            "governance_cycle": "__governance_cycle__",
+            "trigger": "__trigger__"
           },
           "out": "__review_id__"
         }
@@ -137,7 +179,11 @@
       "on_completion": "action--a2000000-0000-4000-8000-000000000004",
       "in_args": [
         "__governance_cycle__",
-        "__review_id__"
+        "__review_id__",
+        "__posture_snapshot_id__",
+        "__clauses__",
+        "__open_exceptions__",
+        "__training_completion__"
       ],
       "out_args": [
         "__posture_snapshot_id__"
@@ -152,7 +198,11 @@
         "core_body": {
           "primitive": "content.playbooks.nis2_art20_governance.primitives.review.conduct_art20_review",
           "in": {
-            "governance_cycle": "__governance_cycle__"
+            "governance_cycle": "__governance_cycle__",
+            "posture_snapshot_id": "__posture_snapshot_id__",
+            "clauses": "__clauses__",
+            "open_exceptions": "__open_exceptions__",
+            "training_completion": "__training_completion__"
           },
           "out": "__posture_snapshot_id__"
         }
@@ -166,7 +216,11 @@
       "in_args": [
         "__governance_cycle__",
         "__review_id__",
-        "__posture_snapshot_id__"
+        "__posture_snapshot_id__",
+        "__review_outcome__",
+        "__measures__",
+        "__signatories__",
+        "__approved_at_iso__"
       ],
       "out_args": [
         "__approval_record_id__"
@@ -184,7 +238,11 @@
           "in": {
             "governance_cycle": "__governance_cycle__",
             "review_id": "__review_id__",
-            "posture_snapshot_id": "__posture_snapshot_id__"
+            "posture_snapshot_id": "__posture_snapshot_id__",
+            "outcome": "__review_outcome__",
+            "measures": "__measures__",
+            "signatories": "__signatories__",
+            "approved_at_iso": "__approved_at_iso__"
           },
           "out": "__approval_record_id__"
         }
@@ -197,9 +255,11 @@
       "on_completion": "end--a2000000-0000-4000-8000-000000000006",
       "in_args": [
         "__governance_cycle__",
+        "__trigger__",
         "__review_id__",
         "__posture_snapshot_id__",
         "__approval_record_id__",
+        "__review_outcome__",
         "__captured_at__",
         "__workflow_id__",
         "__execution_id__",
@@ -219,9 +279,11 @@
           "primitive": "content.playbooks.nis2_art20_governance.primitives.evidence.emit_governance_evidence",
           "in": {
             "governance_cycle": "__governance_cycle__",
+            "trigger": "__trigger__",
             "review_id": "__review_id__",
             "posture_snapshot_id": "__posture_snapshot_id__",
             "approval_record_id": "__approval_record_id__",
+            "outcome": "__review_outcome__",
             "captured_at": "__captured_at__",
             "workflow_id": "__workflow_id__",
             "execution_id": "__execution_id__",
