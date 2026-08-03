@@ -230,7 +230,100 @@
       "parameters": {
         "mode": "rules",
         "rules": {
-          "values": []
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "id": "secops_ng_case_0",
+                    "leftValue": "{{$workflow.variables.priority}}",
+                    "rightValue": "p1_severe",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "p1_severe"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "id": "secops_ng_case_1",
+                    "leftValue": "{{$workflow.variables.priority}}",
+                    "rightValue": "p2_high",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "p2_high"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "id": "secops_ng_case_2",
+                    "leftValue": "{{$workflow.variables.priority}}",
+                    "rightValue": "p3_routine",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "p3_routine"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "id": "secops_ng_case_3",
+                    "leftValue": "{{$workflow.variables.priority}}",
+                    "rightValue": "p4_informational",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "p4_informational"
+            }
+          ]
         },
         "options": {}
       },
@@ -358,7 +451,34 @@
     },
     "route on priority": {
       "main": [
-        []
+        [
+          {
+            "node": "response: p1 severe \u2014 page and escalate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "response: p2 high \u2014 queue for primary analyst",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "response: p3 routine \u2014 queue for review",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "response: p4 informational \u2014 log and close",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
@@ -379,8 +499,6 @@
       "maturity": "experimental",
       "source_playbook_id": "playbook--a1e47431-0000-4000-8000-000000000000"
     },
-    "secops_ng_notes": [
-      "step 'switch-condition--a1e47431-0000-4000-8000-000000000007' (switch-condition): no cases parsed from CACAO source \u2014 emitted Switch node with empty rule set; operator must populate cases in n8n."
-    ]
+    "secops_ng_notes": []
   }
 }

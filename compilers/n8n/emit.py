@@ -593,7 +593,78 @@ class _WorkflowBuilder:
             "options": {},
         }
 
+    def _dict_switch_cases(
+        self, step: WorkflowStep
+    ) -> list[tuple[str, tuple[str, ...]]]:
+        """CACAO v2 switch cases as ordered ``(case value, target ids)`` pairs.
+
+        The spec shape is a mapping of case value → list of step ids:
+
+            switch: "__priority__"
+            cases:
+              p1_severe: ["action--...8"]
+              p2_high:   ["action--...9"]
+
+        Order is the author's document order (dict insertion), and it is
+        load-bearing: rule *i* in the emitted Switch node routes to output
+        port *i*, so the rules builder and the connections builder must both
+        derive from this one helper or branches route to the wrong targets.
+
+        Returns [] when the shape does not parse (no ``switch`` expression,
+        or ``cases`` is not a non-empty mapping) so both call sites fall back
+        to the legacy behaviour and the lossy note fires.
+        """
+        raw = step.extra.get("cases")
+        switch_expr = str(step.extra.get("switch") or "").strip()
+        if not switch_expr or not isinstance(raw, Mapping) or not raw:
+            return []
+        out: list[tuple[str, tuple[str, ...]]] = []
+        for value, targets in raw.items():
+            if isinstance(targets, str):
+                targets = (targets,)
+            if not isinstance(targets, (list, tuple)):
+                continue
+            out.append(
+                (str(value), tuple(t for t in targets if isinstance(t, str)))
+            )
+        return out
+
     def _extract_switch_cases(self, step: WorkflowStep) -> list[dict[str, Any]]:
+        # CACAO v2 dict shape first — the spec's own `cases` property. Each
+        # case compiles to one rule comparing the interpolated switch
+        # variable against the case value; output port order follows in
+        # _emit_connections via the same helper.
+        dict_cases = self._dict_switch_cases(step)
+        if dict_cases:
+            switch_expr = self._interpolate(str(step.extra.get("switch")))
+            return [
+                {
+                    "conditions": {
+                        "options": {
+                            "caseSensitive": True,
+                            "leftValue": "",
+                            "typeValidation": "loose",
+                        },
+                        "conditions": [
+                            {
+                                "id": f"secops_ng_case_{i}",
+                                "leftValue": switch_expr,
+                                "rightValue": value,
+                                "operator": {
+                                    "type": "string",
+                                    "operation": "equals",
+                                },
+                            }
+                        ],
+                        "combinator": "and",
+                    },
+                    "renameOutput": True,
+                    "outputKey": value,
+                }
+                for i, (value, _targets) in enumerate(dict_cases)
+            ]
+
+        # Legacy list shape ({when, label} entries) kept for compatibility.
         raw = step.extra.get("cases")
         if not isinstance(raw, list):
             return []
@@ -661,8 +732,29 @@ class _WorkflowBuilder:
             false_targets = self._edge(step.on_failure)
             ports = [true_targets, false_targets]
         elif step.type is StepType.SWITCH_CONDITION:
-            for target in step.next_step_ids():
-                ports.append(self._edge(target))
+            dict_cases = self._dict_switch_cases(step)
+            if dict_cases:
+                # One output port per case, same order as the rules built in
+                # _extract_switch_cases — derived from the same helper so the
+                # alignment cannot drift. A case may fan out to several nodes.
+                case_targets: set[str] = set()
+                for _value, targets in dict_cases:
+                    port: list[dict[str, Any]] = []
+                    for target in targets:
+                        port.extend(self._edge(target))
+                        case_targets.add(target)
+                    ports.append(port)
+                for target in step.next_step_ids():
+                    if target not in case_targets:
+                        self._notes.append(
+                            f"step {step_id!r} (switch-condition): non-case "
+                            f"transition to {target!r} is not lowered — n8n's "
+                            "Switch routes only through case rules; wire a "
+                            "fallback output in n8n if this path matters."
+                        )
+            else:
+                for target in step.next_step_ids():
+                    ports.append(self._edge(target))
             if not ports:
                 ports = [[]]
         else:
