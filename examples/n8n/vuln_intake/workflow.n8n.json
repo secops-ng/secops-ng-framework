@@ -84,6 +84,72 @@
               "type": "object",
               "value": "",
               "description": "Full severity verdict (SeverityVerdict) written by the severity policy: the severity plus the CVSS/EPSS factors and context flags that produced it. __severity__ carries the bare value for branch conditions; this carries the evidence."
+            },
+            {
+              "name": "__awareness_at__",
+              "type": "string",
+              "value": "",
+              "description": "ISO-8601 UTC instant the operator became aware. Anchors the Art. 14 24h and 72h clocks."
+            },
+            {
+              "name": "__exploitation_evidence__",
+              "type": "string",
+              "value": "",
+              "description": "Observed-exploitation evidence kind. Only observed exploitation engages Art. 14(1) \u2014 a high EPSS forecast does not."
+            },
+            {
+              "name": "__remedy_available_at__",
+              "type": "string",
+              "value": "",
+              "description": "ISO-8601 UTC instant a corrective or mitigating measure became available; anchors the 14-day final-report clock."
+            },
+            {
+              "name": "__notification_destinations__",
+              "type": "object",
+              "value": "",
+              "description": "Stage -> CSIRT/ENISA recipient. Fail-closed: no default endpoint ships."
+            },
+            {
+              "name": "__triaged_at__",
+              "type": "string",
+              "value": "",
+              "description": "ISO-8601 UTC instant triage completed; anchors every remediation deadline."
+            },
+            {
+              "name": "__cvd_sla_days__",
+              "type": "number",
+              "value": "",
+              "description": "Remediation window in days from the operator's documented CVD policy (CRA Annex I \u00a72(5))."
+            },
+            {
+              "name": "__risk_accepted_by__",
+              "type": "string",
+              "value": "",
+              "description": "Named party accepting the residual risk on the None lane."
+            },
+            {
+              "name": "__risk_review_after_days__",
+              "type": "number",
+              "value": "",
+              "description": "Days until a risk acceptance must be revisited. No default \u2014 an acceptance without expiry becomes permanent by accident."
+            },
+            {
+              "name": "__cra_trigger_verdict__",
+              "type": "object",
+              "value": "",
+              "description": "CRA Art. 14 trigger verdict: whether reporting is owed and when each stage falls due."
+            },
+            {
+              "name": "__notification_chain_plan__",
+              "type": "object",
+              "value": "",
+              "description": "Ordered Art. 14 submission plan with resolved destinations."
+            },
+            {
+              "name": "__remediation_directive__",
+              "type": "object",
+              "value": "",
+              "description": "Remediation routing verdict from the lane that handled the case."
             }
           ]
         }
@@ -126,54 +192,15 @@
     {
       "id": "action--01a17a01-0000-4000-8000-000000000004",
       "name": "assess CRA reporting trigger",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1020,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.cve_id",
-              "name": "in.cve_id",
-              "value": "={{$workflow.variables.cve_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.cvss_vector",
-              "name": "in.cvss_vector",
-              "value": "={{$workflow.variables.cvss_vector}}",
-              "type": "string"
-            },
-            {
-              "id": "in.epss_score",
-              "name": "in.epss_score",
-              "value": "={{$workflow.variables.epss_score}}",
-              "type": "string"
-            },
-            {
-              "id": "out.actively_exploited",
-              "name": "out.actively_exploited",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.incident_timeline_signals@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.vulnerability_finding@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.vuln_intake.primitives.cra_trigger import assess_cra_reporting_trigger\n__cra_trigger_verdict__ = assess_cra_reporting_trigger(cve_id=__cve_id__, awareness_at=__awareness_at__, exploitation_evidence=__exploitation_evidence__, remedy_available_at=__remedy_available_at__)"
       },
       "notes": "Determine whether the disclosure trips the CRA Article 14(1) actively-exploited clock (in-the-wild exploitation evidence \u2014 public PoC, observed activity, vendor confirmation) or the Article 14(3) severe-incident clock. Sets __actively_exploited__. The incident-timeline-signals control is the contract for the timestamp set the regulator submissions consume.",
       "notesInFlow": true
@@ -197,7 +224,7 @@
           "conditions": [
             {
               "id": "secops_ng_condition",
-              "leftValue": "",
+              "leftValue": "{{$workflow.variables.actively_exploited}}",
               "rightValue": "true",
               "operator": {
                 "type": "string",
@@ -215,54 +242,15 @@
     {
       "id": "action--01a17a01-0000-4000-8000-000000000006",
       "name": "regulator-notification chain (CRA Art. 14)",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1540,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.actively_exploited",
-              "name": "in.actively_exploited",
-              "value": "={{$workflow.variables.actively_exploited}}",
-              "type": "string"
-            },
-            {
-              "id": "in.cve_id",
-              "name": "in.cve_id",
-              "value": "={{$workflow.variables.cve_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.severity",
-              "name": "in.severity",
-              "value": "={{$workflow.variables.severity}}",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.cra_submission_templates@v1, control.incident_timeline_signals@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.vulnerability_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.cra_early_warning_on_time@v1, kpi.cra_notification_72h_on_time@v1, kpi.cra_final_report_on_time@v1, kpi.cra_severe_incident_on_time@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.vuln_intake.primitives.cra_trigger import build_notification_chain\n__notification_chain_plan__ = build_notification_chain(cve_id=__cve_id__, trigger=__cra_trigger_verdict__, destinations=__notification_destinations__)"
       },
       "notes": "Emit the CRA Article 14 regulator-notification chain: the 24-hour early-warning notification to the coordinator CSIRT + ENISA, the 72-hour notification with the corrective / mitigating measures the operator has taken or recommended, and the 14-day final report after a corrective measure becomes available. The submission-template control is the contract for the payload shape; the timeline-signals control is the contract for the timestamp set the submissions consume. Hands control to the severity switch so the technical response runs in series after the regulator notifications are dispatched.",
       "notesInFlow": true
@@ -291,7 +279,7 @@
                   {
                     "id": "secops_ng_case_0",
                     "leftValue": "{{$workflow.variables.severity}}",
-                    "rightValue": "critical",
+                    "rightValue": "Critical",
                     "operator": {
                       "type": "string",
                       "operation": "equals"
@@ -301,7 +289,7 @@
                 "combinator": "and"
               },
               "renameOutput": true,
-              "outputKey": "critical"
+              "outputKey": "Critical"
             },
             {
               "conditions": {
@@ -314,7 +302,7 @@
                   {
                     "id": "secops_ng_case_1",
                     "leftValue": "{{$workflow.variables.severity}}",
-                    "rightValue": "high",
+                    "rightValue": "High",
                     "operator": {
                       "type": "string",
                       "operation": "equals"
@@ -324,7 +312,7 @@
                 "combinator": "and"
               },
               "renameOutput": true,
-              "outputKey": "high"
+              "outputKey": "High"
             },
             {
               "conditions": {
@@ -337,7 +325,7 @@
                   {
                     "id": "secops_ng_case_2",
                     "leftValue": "{{$workflow.variables.severity}}",
-                    "rightValue": "medium",
+                    "rightValue": "Medium",
                     "operator": {
                       "type": "string",
                       "operation": "equals"
@@ -347,7 +335,7 @@
                 "combinator": "and"
               },
               "renameOutput": true,
-              "outputKey": "medium"
+              "outputKey": "Medium"
             },
             {
               "conditions": {
@@ -360,7 +348,7 @@
                   {
                     "id": "secops_ng_case_3",
                     "leftValue": "{{$workflow.variables.severity}}",
-                    "rightValue": "low",
+                    "rightValue": "Low",
                     "operator": {
                       "type": "string",
                       "operation": "equals"
@@ -370,7 +358,7 @@
                 "combinator": "and"
               },
               "renameOutput": true,
-              "outputKey": "low"
+              "outputKey": "Low"
             },
             {
               "conditions": {
@@ -383,7 +371,7 @@
                   {
                     "id": "secops_ng_case_4",
                     "leftValue": "{{$workflow.variables.severity}}",
-                    "rightValue": "info",
+                    "rightValue": "None",
                     "operator": {
                       "type": "string",
                       "operation": "equals"
@@ -393,7 +381,7 @@
                 "combinator": "and"
               },
               "renameOutput": true,
-              "outputKey": "info"
+              "outputKey": "None"
             }
           ]
         },
@@ -405,36 +393,15 @@
     {
       "id": "action--01a17a01-0000-4000-8000-000000000008",
       "name": "response: critical \u2014 patch and advisory",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         2060,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.patch_evidence@v1, control.vuln_disclosure_intake@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.vulnerability_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.patch_disseminated_on_time@v1, kpi.mttr_critical@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.vuln_intake.primitives.remediation import patch_and_advisory_critical\n__remediation_directive__ = patch_and_advisory_critical(severity=__severity__, asset_criticality=__asset_context__.asset_criticality, triaged_at=__triaged_at__, sla_days=__cvd_sla_days__)"
       },
       "notes": "Critical-severity response: page the response team, ship the security update across affected releases for the duration of the support period free of charge per CRA Annex I \u00a72(7), and emit a public advisory to users. Records the dissemination event against the patch-dissemination KPI and the critical-MTTR clock.",
       "notesInFlow": true
@@ -442,36 +409,15 @@
     {
       "id": "action--01a17a01-0000-4000-8000-000000000009",
       "name": "response: high \u2014 patch and advisory",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         2320,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.patch_evidence@v1, control.vuln_disclosure_intake@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.vulnerability_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.patch_disseminated_on_time@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.vuln_intake.primitives.remediation import patch_and_advisory_high\n__remediation_directive__ = patch_and_advisory_high(severity=__severity__, asset_criticality=__asset_context__.asset_criticality, triaged_at=__triaged_at__, sla_days=__cvd_sla_days__)"
       },
       "notes": "High-severity response: ship the security update on the operator's high-severity SLA and emit an advisory through the same dissemination channel as the critical branch. Same dissemination KPI; the response latency is measured against the patch-dissemination clock rather than the critical-band MTTR.",
       "notesInFlow": true
@@ -479,36 +425,15 @@
     {
       "id": "action--01a17a01-0000-4000-8000-00000000000a",
       "name": "response: scheduled remediation",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         2580,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.patch_evidence@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.vulnerability_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.patch_disseminated_on_time@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.vuln_intake.primitives.remediation import schedule_remediation\n__remediation_directive__ = schedule_remediation(severity=__severity__, asset_criticality=__asset_context__.asset_criticality, triaged_at=__triaged_at__, sla_days=__cvd_sla_days__)"
       },
       "notes": "Medium / low-severity response: schedule the security update on the operator's standard release cadence and roll the advisory into the next scheduled release note. The CRA Annex I \u00a72(7) obligation to disseminate updates without undue delay is met by the operator's documented release SLA; the patch-dissemination clock measures whether that SLA is held.",
       "notesInFlow": true
@@ -516,24 +441,15 @@
     {
       "id": "action--01a17a01-0000-4000-8000-00000000000b",
       "name": "response: accept risk",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         2840,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.vulnerability_finding@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.vuln_intake.primitives.remediation import accept_risk\n__remediation_directive__ = accept_risk(severity=__severity__, asset_criticality=__asset_context__.asset_criticality, triaged_at=__triaged_at__, accepted_by=__risk_accepted_by__, review_after_days=__risk_review_after_days__)"
       },
       "notes": "Informational-severity response: record the disclosure on the case ledger with a documented accept-risk decision and close without paging or scheduling a release. The case still emits an OCSF Vulnerability Finding so the intake-aging KRI sees a closed disposition rather than an open backlog item.",
       "notesInFlow": true
@@ -729,14 +645,6 @@
       "maturity": "experimental",
       "source_playbook_id": "playbook--01a17a01-0000-4000-8000-000000000001"
     },
-    "secops_ng_notes": [
-      "step 'action--01a17a01-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'if-condition--01a17a01-0000-4000-8000-000000000005' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
-      "step 'action--01a17a01-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'action--01a17a01-0000-4000-8000-000000000008': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'action--01a17a01-0000-4000-8000-000000000009': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'action--01a17a01-0000-4000-8000-00000000000a': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'action--01a17a01-0000-4000-8000-00000000000b': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
-    ]
+    "secops_ng_notes": []
   }
 }
