@@ -1,0 +1,39 @@
+{
+  "stable_id": "telemetry.ocsf.process_activity@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Process Activity event (process-tree telemetry for containment and post-incident review)",
+  "summary": "OCSF Process Activity events for endpoint process lineage. ransomware_containment reads process creation and termination to identify the encrypting process and confirm it is stopped; post_incident_review reconstructs the execution chain from the artifacts responders left behind, so the timeline rests on observed process events rather than recollection. Consumed only.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 1,
+    "category_name": "System Activity",
+    "class_uid": 1007,
+    "class_name": "Process Activity"
+  },
+  "direction": "ingest",
+  "fields_used": [
+    "time",
+    "activity_id",
+    "process.pid",
+    "process.name",
+    "process.cmd_line",
+    "process.file.path",
+    "process.file.hashes",
+    "actor.process.pid",
+    "actor.user.uid",
+    "device.uid"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.ransomware_containment@v1"
+    },
+    {
+      "playbook_id": "playbook.post_incident_review@v1"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org",
+  "sources": [
+    "OCSF v1.4.0 System Activity category — Process Activity class (uid 1007)"
+  ]
+}

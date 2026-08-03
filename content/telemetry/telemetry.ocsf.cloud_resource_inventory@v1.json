@@ -1,0 +1,35 @@
+{
+  "stable_id": "telemetry.ocsf.cloud_resource_inventory@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Cloud Resources Inventory Info event (cloud-posture inventory for misconfiguration triage)",
+  "summary": "OCSF Cloud Resources Inventory Info events describing the cloud resources a posture finding refers to. cloud_misconfiguration reads them to resolve the flagged resource to its owner, exposure and configuration state before deciding whether a finding is a real exposure or an accepted pattern. Consumed only.\n\nNote the stable_id keeps the shorter `cloud_resource_inventory` form the asserting playbook already uses, while `ocsf.class_name` carries the exact upstream name — the stable_id is a join key and renaming it would break the refs it exists to resolve.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 5,
+    "category_name": "Discovery",
+    "class_uid": 5023,
+    "class_name": "Cloud Resources Inventory Info"
+  },
+  "direction": "ingest",
+  "fields_used": [
+    "time",
+    "activity_id",
+    "cloud.provider",
+    "cloud.region",
+    "cloud.account.uid",
+    "resource.uid",
+    "resource.type",
+    "resource.owner.uid",
+    "resource.labels"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.cloud_misconfiguration@v1"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org",
+  "sources": [
+    "OCSF v1.4.0 Discovery category — Cloud Resources Inventory Info class (uid 5023)"
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "stable_id": "telemetry.ocsf.network_activity@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Network Activity event (connection-level telemetry for segmentation, DDoS and containment)",
+  "summary": "OCSF Network Activity events the network-facing playbooks consume at connection granularity. network_security reconciles observed flows against the declared segmentation policy; ddos_response reads volumetric and connection-rate shifts to confirm an availability anomaly is an attack rather than organic load; ransomware_containment scopes lateral movement and confirms an isolated host has stopped talking. Consumed, never emitted — the framework observes flows and does not synthesise them.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 4,
+    "category_name": "Network Activity",
+    "class_uid": 4001,
+    "class_name": "Network Activity"
+  },
+  "direction": "ingest",
+  "fields_used": [
+    "time",
+    "activity_id",
+    "src_endpoint.ip",
+    "src_endpoint.port",
+    "dst_endpoint.ip",
+    "dst_endpoint.port",
+    "connection_info.direction",
+    "connection_info.protocol_num",
+    "traffic.bytes",
+    "traffic.packets",
+    "device.uid",
+    "disposition_id"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.network_security@v1"
+    },
+    {
+      "playbook_id": "playbook.ddos_response@v1"
+    },
+    {
+      "playbook_id": "playbook.ransomware_containment@v1"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org",
+  "sources": [
+    "OCSF v1.4.0 Network Activity category — Network Activity class (uid 4001)"
+  ]
+}

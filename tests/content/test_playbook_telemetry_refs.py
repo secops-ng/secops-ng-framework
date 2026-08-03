@@ -27,7 +27,15 @@ from tools.lint_playbook_telemetry_refs import HARD, SOFT, check
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 # Ceiling, not a target. Lower it as telemetry artifacts land; never raise it.
-MAX_SOFT_FINDINGS = 36
+#
+# 36 -> 11: the OCSF 1.4.0 check in #875 split the six undefined classes into
+# author-vs-drop. Three exist upstream and were authored (network_activity
+# 4001, process_activity 1007, cloud_resource_inventory 5023);
+# file_system_activity turned out to be a stale stable_id for the already-
+# shipped file_activity@v1. The remaining 11 are the two classes with no
+# upstream equivalent — availability_activity (7) and dlp_alert (4) — each a
+# content decision tracked in its own issue.
+MAX_SOFT_FINDINGS = 11
 
 
 def test_no_hard_findings() -> None:
