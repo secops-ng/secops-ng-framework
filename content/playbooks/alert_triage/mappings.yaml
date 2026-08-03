@@ -174,7 +174,7 @@ ocsf:
   # duplicate or known-benign. The playbook itself does not
   # emit an Incident Finding — the escalation to a downstream
   # typed-incident playbook carries that responsibility.
-  - id: telemetry.detection_finding@v1
+  - id: telemetry.ocsf.detection_finding@v1
     category_uid: 2
     category_name: Findings
     class_uid: 2004
@@ -189,7 +189,7 @@ ocsf:
       typed alert payload. Schema:
       https://schema.ocsf.io/1.3.0/classes/detection_finding
 
-  - id: telemetry.authentication@v1
+  - id: telemetry.ocsf.authentication@v1
     category_uid: 3
     category_name: Identity & Access Management
     class_uid: 3002
@@ -206,7 +206,7 @@ ocsf:
       x_secops_ng.telemetry_refs. Schema:
       https://schema.ocsf.io/1.3.0/classes/authentication
 
-  - id: telemetry.account_change@v1
+  - id: telemetry.ocsf.account_change@v1
     category_uid: 3
     category_name: Identity & Access Management
     class_uid: 3001
@@ -223,7 +223,7 @@ ocsf:
       playbook's CACAO x_secops_ng.telemetry_refs. Schema:
       https://schema.ocsf.io/1.3.0/classes/account_change
 
-  - id: telemetry.api_activity@v1
+  - id: telemetry.ocsf.api_activity@v1
     category_uid: 6
     category_name: Application Activity
     class_uid: 6003

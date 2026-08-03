@@ -116,7 +116,7 @@
       "required": ["id"],
       "properties": {
         "id": {
-          "description": "Long-form telemetry URN: `telemetry.<slug>@v<semver>`. SKELETON placeholders use `telemetry.todo_<slug>@v0`.",
+          "description": "Reference to the OCSF telemetry class this playbook consumes or emits, as `telemetry.ocsf.<class>@v<semver>`. It MUST resolve to a committed artifact under `content/telemetry/` — this is a reference, not a label, and the `ocsf` segment is part of the name. The bare `telemetry.<class>@v1` spelling is wrong: 63 of 91 entries used it until #873 normalised them, and it escaped into a metric by being copied out of an overlay. Enforced by tools/lint_playbook_telemetry_refs.py. SKELETON placeholders use `telemetry.todo_<slug>@v0`.",
           "type": "string",
           "pattern": "^telemetry\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$",
           "maxLength": 200
