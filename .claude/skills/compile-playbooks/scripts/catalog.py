@@ -4,21 +4,12 @@
 Emits JSON to stdout. Read-only: touches no file outside the repo checkout and
 writes nothing.
 
-Why this exists rather than reading the playbooks by hand: the catalog has two
-traps that hand-derivation walks into every time.
-
-  1. Canonical sources come in three layouts, and a
-     ``content/playbooks/*/playbook.cacao.json`` glob silently misses two of
-     them: ``alert-triage`` is stored as
-     ``content/playbooks/alert-triage.cacao.yaml`` (YAML, at directory level),
-     and five more keep an in-directory ``<slug>/playbook.cacao.yaml``. All
-     three layouts are collected below.
-  2. ``codebase-vuln-management`` carries four ``core_body`` blocks shaped
-     ``{"placeholder": true, "note": "..."}``. They look like bindings and are
-     not; the schema requires ``{primitive, in, out}``. That playbook also fails
-     validation outright, so it cannot be compiled by any target.
-
-Both are handled here so the caller never has to remember them.
+Why this exists rather than reading the playbooks by hand: canonical sources
+come in three layouts, and a ``content/playbooks/*/playbook.cacao.json`` glob
+silently misses two of them. ``alert_triage`` is stored as
+``content/playbooks/alert_triage.cacao.yaml`` (YAML, at directory level), and
+five more keep an in-directory ``<slug>/playbook.cacao.yaml``. All three
+layouts are collected below, so the caller never has to remember them.
 
 Usage:
     python .claude/skills/compile-playbooks/scripts/catalog.py            # all
@@ -43,6 +34,13 @@ _CONTROL_FLOW = {"if-condition", "switch-condition", "while-condition", "paralle
 # A core_body block is a real binding only with all three keys. See
 # content-model/playbook.schema.json (required: [primitive, in, out],
 # additionalProperties: false).
+#
+# codebase_vuln_management once carried four blocks shaped
+# {"placeholder": true, "note": "..."} that read as bindings but were not. They
+# are gone: every action core_body under content/playbooks/ is now a real
+# {primitive, in, out} binding, so `placeholder_bodies` is 0 catalog-wide. The
+# check stays anyway — it is one all(...) per action step, and it is what keeps
+# a re-introduced placeholder out of `real_bindings` and out of the tier.
 _BINDING_KEYS = ("primitive", "in", "out")
 
 
@@ -141,6 +139,8 @@ def _entry(root: Path, source: Path, slug: str, schema_path: Path) -> dict[str, 
             else:
                 unbound_actions += 1
                 if isinstance(body, dict):
+                    # Dict-shaped but not a binding. Currently unreachable —
+                    # see the _BINDING_KEYS note.
                     placeholder_bodies += 1
         if stype in _CONTROL_FLOW:
             # Mirror the n8n emitter's per-type note logic exactly — the
