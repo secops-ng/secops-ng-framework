@@ -142,36 +142,34 @@ d3fend:
       selected.
 
 ocsf:
-  # OCSF v1.3.0 telemetry binding. The BCM lifecycle emits two
-  # event classes: Availability Activity (4004) at the
-  # detect / activate / isolate / switch / restore-and-verify
+  # The BCM lifecycle emits two event classes: API Activity (6003)
+  # at the detect / activate / isolate / switch / restore-and-verify
   # milestones (the operational availability-management surface)
   # and Incident Finding (2005) at the notify-competent-authority
   # and post-incident-review milestones (the incident-reporting
-  # and lessons-learned surface). A sibling CORE card revisits
-  # the binding once the CORE adapter surfaces are pinned.
-  - id: telemetry.ocsf.availability_activity@v1
-    category_uid: 4
-    category_name: Network Activity
-    class_uid: 4004
-    class_name: HTTP Activity
-    ocsf_version: "1.3.0"
+  # and lessons-learned surface). The milestone surface was
+  # originally bound to an invented `availability_activity` id
+  # over class_uid 4004 (which is HTTP Activity) as a documented
+  # SKELETON-tier stand-in; no availability class exists in OCSF
+  # through 1.4.0, so it now rides API Activity — the class every
+  # other playbook in this catalogue uses for workflow-emitted
+  # milestone records. Provenance: #875.
+  - id: telemetry.ocsf.api_activity@v1
+    category_uid: 6
+    category_name: Application Activity
+    class_uid: 6003
+    class_name: API Activity
+    ocsf_version: "1.4.0"
     direction: emits
     notes: >-
       Emitted at detect-and-declare-bcm-event, activate-bcm-plan,
       isolate-affected-systems, switch-to-backup, and
-      restore-and-verify: one availability-activity record per
-      milestone keyed to __event_id__, so the operator's
-      availability-management surface and the observed RTO /
-      RPO delta against the documented objectives can be
-      computed and audited from the emitted telemetry alone.
-      The class binding is intentional at SKELETON tier —
-      class_uid 4004 (HTTP Activity) is the OCSF v1.3.0
-      network-activity class the reference wiring emits; a
-      sibling CORE card revisits the class selection if a more
-      specific availability class lands in a future OCSF
-      release. Schema:
-      https://schema.ocsf.io/1.3.0/classes/http_activity
+      restore-and-verify: one milestone record per step keyed to
+      __event_id__, so the operator's availability-management
+      surface and the observed RTO / RPO delta against the
+      documented objectives can be computed and audited from the
+      emitted telemetry alone. Schema:
+      https://schema.ocsf.io/1.4.0/classes/api_activity
   - id: telemetry.ocsf.incident_finding@v1
     category_uid: 2
     category_name: Findings

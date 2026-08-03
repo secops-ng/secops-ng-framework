@@ -3,7 +3,7 @@
   "content_version": "0.1.0",
   "maturity": "experimental",
   "title": "API Activity event (cloud control-plane and SaaS API telemetry for identity_compromise lateral hunt)",
-  "summary": "OCSF API Activity events the identity_compromise playbook reads during the lateral-movement hunt: cloud control-plane calls (STS / AssumeRole chains, cross-tenant access), SaaS API token reuse, and OAuth-grant escalation attributable to the compromised principal within the configured lookback window.",
+  "summary": "OCSF API Activity events on two surfaces. Ingest: the identity_compromise playbook reads cloud control-plane calls (STS / AssumeRole chains, cross-tenant access), SaaS API token reuse, and OAuth-grant escalation attributable to the compromised principal within the configured lookback window. Emit: the business_continuity playbook emits one API Activity record per BCM lifecycle milestone (detect-and-declare, activate-plan, isolate, switch-to-backup, restore-and-verify) keyed to its event id — the house binding for workflow-emitted milestone records, which that playbook originally asserted under an invented `availability_activity` class (no availability class exists in OCSF through 1.4.0; provenance on issue #875).",
   "ocsf": {
     "version": "1.4.0",
     "category_uid": 6,
@@ -11,7 +11,7 @@
     "class_uid": 6003,
     "class_name": "API Activity"
   },
-  "direction": "ingest",
+  "direction": "both",
   "fields_used": [
     "time",
     "activity_id",
@@ -27,6 +27,9 @@
   "playbook_refs": [
     {
       "playbook_id": "playbook.identity_compromise@v1"
+    },
+    {
+      "playbook_id": "playbook.business_continuity@v1"
     }
   ],
   "maintainer": "telemetry-wg@secops-ng.org",

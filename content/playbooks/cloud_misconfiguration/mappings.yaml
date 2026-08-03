@@ -268,16 +268,26 @@ ocsf:
   # coverage KPIs and the recurring-misconfig KRI can audit timing
   # and recurrence.
   #
-  # The CACAO playbook's external references additionally cite the
-  # OCSF Cloud Resources Inventory Info class (class_uid 5023 under
-  # OCSF v1.4.0) as the upstream class that feeds the
-  # resource-and-owner enrichment step. A telemetry binding for that
-  # class is omitted here because sibling overlays standardise on
-  # OCSF v1.3.0, and 5023 is documented in 1.4.0; once a
-  # telemetry.ocsf.cloud_resource_inventory@v1 file lands under
-  # content/telemetry/ and the operator's OCSF baseline lifts to
-  # 1.4.0, a CORE follow-up card can pin it without a schema
-  # change. See the PR body for the gap note.
+  # Cloud Resources Inventory Info (class_uid 5023, OCSF 1.4.0)
+  # feeds the resource-and-owner enrichment step. The original gap
+  # note deferred this binding until the catalogue baseline lifted
+  # to 1.4.0 — which every artifact under content/telemetry/ now
+  # pins — and anticipated the artifact under the invented name
+  # `cloud_resource_inventory`; it landed under the exact upstream
+  # class name instead. Provenance: #875.
+  - id: telemetry.ocsf.cloud_resources_inventory_info@v1
+    category_uid: 5
+    category_name: Discovery
+    class_uid: 5023
+    class_name: Cloud Resources Inventory Info
+    ocsf_version: "1.4.0"
+    direction: consumes
+    notes: >-
+      Consumed at enrich-resource-and-owner: the inventory record
+      for the misconfigured resource supplies its type, account
+      and ownership metadata so the finding routes to the owning
+      team rather than a shared queue. Schema:
+      https://schema.ocsf.io/1.4.0/classes/cloud_resources_inventory_info
   - id: telemetry.ocsf.compliance_finding@v1
     category_uid: 2
     category_name: Findings
