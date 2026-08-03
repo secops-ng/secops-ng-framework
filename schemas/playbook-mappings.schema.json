@@ -5,7 +5,15 @@
   "description": "Per-playbook outbound view of the content model: pins OSCAL controls, MITRE D3FEND defensive techniques, OCSF event classes, and the EU regulatory clauses (NIS2, DORA, CRA) this playbook helps operationalise. One file lives at content/playbooks/<slug>/mappings.yaml. Each top-level key holds an array of structural pointers; siblings in content/mappings/<regime>/ hold the inbound regulator-side view so the graph is closed in both directions. Placeholder IDs marked with `todo: true` are permitted while a playbook is still in SKELETON / CORE / EXTEND build-out.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["playbook", "oscal", "d3fend", "ocsf", "nis2", "dora", "cra"],
+  "required": [
+    "playbook",
+    "oscal",
+    "d3fend",
+    "ocsf",
+    "nis2",
+    "dora",
+    "cra"
+  ],
   "properties": {
     "playbook": {
       "description": "Long-form URN of the playbook this overlay belongs to. Must match the playbook artifact's x_secops_ng.stable_id.",
@@ -16,42 +24,65 @@
     "oscal": {
       "description": "OSCAL control pointers exercised by this playbook. Each entry pins a control catalog (typically NIST SP 800-53 Rev. 5) and a control_id. SKELETON entries may use placeholder control IDs with todo: true.",
       "type": "array",
-      "items": { "$ref": "#/$defs/oscal_entry" }
+      "items": {
+        "$ref": "#/$defs/oscal_entry"
+      }
     },
     "d3fend": {
       "description": "MITRE D3FEND defensive technique tags for individual playbook steps. Lets a reviewer see the countermeasure shape without reading runtime code. SKELETON entries may use placeholder d3fend_id with todo: true.",
       "type": "array",
-      "items": { "$ref": "#/$defs/d3fend_entry" }
+      "items": {
+        "$ref": "#/$defs/d3fend_entry"
+      }
     },
     "ocsf": {
       "description": "OCSF event classes consumed or emitted by this playbook. SKELETON entries may use placeholder class_uid with todo: true.",
       "type": "array",
-      "items": { "$ref": "#/$defs/ocsf_entry" }
+      "items": {
+        "$ref": "#/$defs/ocsf_entry"
+      }
     },
     "nis2": {
       "description": "NIS2 cross-references this playbook helps operationalise. Each entry pins a mapping id from content/mappings/nis2/*.yaml so the graph is closed in both directions. SKELETON entries may use todo: true and a placeholder mapping_id while the inbound side is being populated.",
       "type": "array",
-      "items": { "$ref": "#/$defs/regulatory_entry_nis2" }
+      "items": {
+        "$ref": "#/$defs/regulatory_entry_nis2"
+      }
     },
     "dora": {
       "description": "DORA cross-references this playbook helps operationalise. Each entry pins a mapping id from content/mappings/dora/*.yaml so the graph is closed in both directions. SKELETON entries may use todo: true and a placeholder mapping_id while the inbound side is being populated.",
       "type": "array",
-      "items": { "$ref": "#/$defs/regulatory_entry_dora" }
+      "items": {
+        "$ref": "#/$defs/regulatory_entry_dora"
+      }
     },
     "cra": {
       "description": "CRA (Cyber Resilience Act, Regulation (EU) 2024/2847) cross-references this playbook helps operationalise. Each entry pins a mapping id from content/mappings/cra/*.yaml so the graph is closed in both directions. SKELETON entries may use todo: true and a placeholder mapping_id while the inbound side is being populated.",
       "type": "array",
-      "items": { "$ref": "#/$defs/regulatory_entry_cra" }
+      "items": {
+        "$ref": "#/$defs/regulatory_entry_cra"
+      }
     },
     "gdpr": {
       "description": "GDPR (Regulation (EU) 2016/679) cross-references this playbook helps operationalise. Each entry pins a mapping id from content/mappings/gdpr/*.yaml so the graph is closed in both directions. Optional at the playbook level: absence means the playbook has no direct GDPR touchpoint. SKELETON entries may use todo: true and a placeholder mapping_id while the inbound side is being populated.",
       "type": "array",
-      "items": { "$ref": "#/$defs/regulatory_entry_gdpr" }
+      "items": {
+        "$ref": "#/$defs/regulatory_entry_gdpr"
+      }
     },
     "eu_ai_act": {
       "description": "EU AI Act (Regulation (EU) 2024/1689) cross-references this playbook helps operationalise. Each entry pins a mapping id from content/mappings/eu_ai_act/*.yaml so the graph is closed in both directions. Optional at the playbook level: absence means the playbook has no direct EU AI Act touchpoint. SKELETON entries may use todo: true and a placeholder mapping_id while the inbound side is being populated.",
       "type": "array",
-      "items": { "$ref": "#/$defs/regulatory_entry_eu_ai_act" }
+      "items": {
+        "$ref": "#/$defs/regulatory_entry_eu_ai_act"
+      }
+    },
+    "soc2": {
+      "description": "SOC 2 (AICPA Trust Services Criteria) cross-references this playbook helps operationalise. Each entry pins a mapping id from content/mappings/soc2/*.yaml so the graph is closed in both directions. Optional at the playbook level: absence means the playbook has no direct SOC 2 touchpoint. Note that SOC 2 is not an EU statutory instrument — per docs/cookbook/soc2_crosswalk.md the EU mappings remain the authoritative pointer for the statutory surface, and a soc2 block never replaces one.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/regulatory_entry_soc2"
+      }
     }
   },
   "$defs": {
@@ -62,7 +93,11 @@
     "oscal_entry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["oscal_catalog", "control_id", "title"],
+      "required": [
+        "oscal_catalog",
+        "control_id",
+        "title"
+      ],
       "properties": {
         "control_ref": {
           "description": "Optional reference to the SecOps-NG control that discharges this catalog control, as `control.<slug>@v<semver>`. When present it MUST resolve to a committed file under `content/controls/` — this field is a reference, not a label. Omit it where no SecOps-NG control models the discipline: the catalog anchor is already carried by `oscal_catalog` + `control_id` + `title`, and a URN restating the catalog title adds nothing. Replaces the former `id`, which was required, had no machine consumer, and was used as a free label in 116 of 182 entries — see the arch decision recorded in issue #853.",
@@ -82,16 +117,30 @@
           "minLength": 1,
           "maxLength": 40
         },
-        "title": { "type": "string", "minLength": 1, "maxLength": 200 },
-        "url": { "type": "string", "format": "uri" },
-        "todo": { "$ref": "#/$defs/todo_flag" },
-        "notes": { "type": "string", "maxLength": 2000 }
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "todo": {
+          "$ref": "#/$defs/todo_flag"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 2000
+        }
       }
     },
     "d3fend_entry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["d3fend_id"],
+      "required": [
+        "d3fend_id"
+      ],
       "properties": {
         "step": {
           "description": "Optional CACAO step/action UUID this technique applies to.",
@@ -104,16 +153,30 @@
           "pattern": "^D3-[A-Z0-9_-]+$",
           "maxLength": 40
         },
-        "d3fend_name": { "type": "string", "minLength": 1, "maxLength": 200 },
-        "url": { "type": "string", "format": "uri" },
-        "todo": { "$ref": "#/$defs/todo_flag" },
-        "notes": { "type": "string", "maxLength": 2000 }
+        "d3fend_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "todo": {
+          "$ref": "#/$defs/todo_flag"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 2000
+        }
       }
     },
     "ocsf_entry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id"],
+      "required": [
+        "id"
+      ],
       "properties": {
         "id": {
           "description": "Reference to the OCSF telemetry class this playbook consumes or emits, as `telemetry.ocsf.<class>@v<semver>`. It MUST resolve to a committed artifact under `content/telemetry/` — this is a reference, not a label, and the `ocsf` segment is part of the name. The bare `telemetry.<class>@v1` spelling is wrong: 63 of 91 entries used it until #873 normalised them, and it escaped into a metric by being copied out of an overlay. Enforced by tools/lint_playbook_telemetry_refs.py. SKELETON placeholders use `telemetry.todo_<slug>@v0`.",
@@ -121,10 +184,24 @@
           "pattern": "^telemetry\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$",
           "maxLength": 200
         },
-        "category_uid": { "type": "integer", "minimum": 0 },
-        "category_name": { "type": "string", "minLength": 1, "maxLength": 120 },
-        "class_uid": { "type": "integer", "minimum": 0 },
-        "class_name": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "category_uid": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "category_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "class_uid": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "class_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
         "ocsf_version": {
           "type": "string",
           "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
@@ -133,16 +210,27 @@
         "direction": {
           "description": "Whether this playbook consumes or emits the class.",
           "type": "string",
-          "enum": ["consumes", "emits", "both"]
+          "enum": [
+            "consumes",
+            "emits",
+            "both"
+          ]
         },
-        "todo": { "$ref": "#/$defs/todo_flag" },
-        "notes": { "type": "string", "maxLength": 2000 }
+        "todo": {
+          "$ref": "#/$defs/todo_flag"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 2000
+        }
       }
     },
     "regulatory_entry_nis2": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["mapping_id"],
+      "required": [
+        "mapping_id"
+      ],
       "properties": {
         "mapping_id": {
           "description": "Mapping id from content/mappings/nis2/*.yaml that this playbook backlinks to.",
@@ -157,14 +245,21 @@
           "minLength": 1,
           "maxLength": 80
         },
-        "todo": { "$ref": "#/$defs/todo_flag" },
-        "notes": { "type": "string", "maxLength": 2000 }
+        "todo": {
+          "$ref": "#/$defs/todo_flag"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 2000
+        }
       }
     },
     "regulatory_entry_dora": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["mapping_id"],
+      "required": [
+        "mapping_id"
+      ],
       "properties": {
         "mapping_id": {
           "description": "Mapping id from content/mappings/dora/*.yaml that this playbook backlinks to.",
@@ -179,14 +274,21 @@
           "minLength": 1,
           "maxLength": 80
         },
-        "todo": { "$ref": "#/$defs/todo_flag" },
-        "notes": { "type": "string", "maxLength": 2000 }
+        "todo": {
+          "$ref": "#/$defs/todo_flag"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 2000
+        }
       }
     },
     "regulatory_entry_cra": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["mapping_id"],
+      "required": [
+        "mapping_id"
+      ],
       "properties": {
         "mapping_id": {
           "description": "Mapping id from content/mappings/cra/*.yaml that this playbook backlinks to.",
@@ -201,14 +303,21 @@
           "minLength": 1,
           "maxLength": 80
         },
-        "todo": { "$ref": "#/$defs/todo_flag" },
-        "notes": { "type": "string", "maxLength": 2000 }
+        "todo": {
+          "$ref": "#/$defs/todo_flag"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 2000
+        }
       }
     },
     "regulatory_entry_gdpr": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["mapping_id"],
+      "required": [
+        "mapping_id"
+      ],
       "properties": {
         "mapping_id": {
           "description": "Mapping id from content/mappings/gdpr/*.yaml that this playbook backlinks to.",
@@ -223,14 +332,21 @@
           "minLength": 1,
           "maxLength": 80
         },
-        "todo": { "$ref": "#/$defs/todo_flag" },
-        "notes": { "type": "string", "maxLength": 2000 }
+        "todo": {
+          "$ref": "#/$defs/todo_flag"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 2000
+        }
       }
     },
     "regulatory_entry_eu_ai_act": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["mapping_id"],
+      "required": [
+        "mapping_id"
+      ],
       "properties": {
         "mapping_id": {
           "description": "Mapping id from content/mappings/eu_ai_act/*.yaml that this playbook backlinks to.",
@@ -245,8 +361,42 @@
           "minLength": 1,
           "maxLength": 80
         },
-        "todo": { "$ref": "#/$defs/todo_flag" },
-        "notes": { "type": "string", "maxLength": 2000 }
+        "todo": {
+          "$ref": "#/$defs/todo_flag"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 2000
+        }
+      }
+    },
+    "regulatory_entry_soc2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mapping_id"
+      ],
+      "properties": {
+        "mapping_id": {
+          "description": "Mapping id from content/mappings/soc2/*.yaml that this playbook backlinks to.",
+          "type": "string",
+          "pattern": "^soc2:[a-z0-9][a-z0-9.-]*$",
+          "minLength": 6,
+          "maxLength": 120
+        },
+        "article": {
+          "description": "Trust Services Criterion shorthand, e.g. 'CC6.1' or 'A1.2'. Informational; the authoritative citation lives on the inbound mapping entry.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "todo": {
+          "$ref": "#/$defs/todo_flag"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 2000
+        }
       }
     }
   }

@@ -1,0 +1,60 @@
+{
+  "conditional_edges": [],
+  "edges": [
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--b7c2e5a1-0000-4000-8000-000000000003",
+      "src": "action--b7c2e5a1-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--b7c2e5a1-0000-4000-8000-000000000004",
+      "src": "action--b7c2e5a1-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "action--b7c2e5a1-0000-4000-8000-000000000005",
+      "src": "action--b7c2e5a1-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "__END__",
+      "src": "action--b7c2e5a1-0000-4000-8000-000000000005"
+    }
+  ],
+  "end_sentinel": "__END__",
+  "entry": "action--b7c2e5a1-0000-4000-8000-000000000002",
+  "name": "SOC 2 evidence collector",
+  "nodes": [
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "collect criteria atoms",
+      "name": "action--b7c2e5a1-0000-4000-8000-000000000002",
+      "step_id": "action--b7c2e5a1-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "map evidence to criteria",
+      "name": "action--b7c2e5a1-0000-4000-8000-000000000003",
+      "step_id": "action--b7c2e5a1-0000-4000-8000-000000000003"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "score per-criterion coverage",
+      "name": "action--b7c2e5a1-0000-4000-8000-000000000004",
+      "step_id": "action--b7c2e5a1-0000-4000-8000-000000000004"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "report readiness attestation",
+      "name": "action--b7c2e5a1-0000-4000-8000-000000000005",
+      "step_id": "action--b7c2e5a1-0000-4000-8000-000000000005"
+    }
+  ],
+  "playbook_id": "playbook--b7c2e5a1-0000-4000-8000-000000000000",
+  "stable_id": "playbook.soc2_evidence_collector@v1"
+}
