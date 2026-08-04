@@ -1,0 +1,102 @@
+stable_id: kpi.soc2_evidence_ref_resolution_rate@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: SOC 2 evidence-reference resolution rate
+summary: >
+  Proportion of the `soc2:`-prefixed evidence references handed to the
+  soc2_evidence_collector playbook that resolve to a Trust Services
+  Criteria entry the shipped crosswalk actually carries. This is a
+  measure of the operator's own evidence-pipeline wiring, **not** of
+  SOC 2 conformance: it reads whether the producing playbooks are
+  citing criteria that exist, and says nothing about whether any
+  criterion is satisfied. A reference that names no crosswalk entry is
+  reported as `unmatched` rather than discarded, because the likely
+  cause is a stale or mistyped criterion ref in a producing playbook,
+  and silently dropping it would hide a broken evidence path behind an
+  apparently clean run. Deliberately not expressed as a conformance
+  percentage — see the residual-risk counterpart
+  `kri.soc2_unsupported_criteria_count@v1` for the audit gap, which is
+  reported as counts per state precisely so it cannot be read as
+  "N% SOC 2 compliant".
+unit: ratio
+direction: higher_is_better
+target:
+  value: 1.00
+  comparator: ">="
+  rationale: >
+    Every evidence reference a producing playbook emits should name a
+    criterion the crosswalk carries. There is no legitimate steady
+    state in which some do not: an unmatched reference is either a typo,
+    a criterion retired from the crosswalk without updating its
+    producers, or a producer emitting refs for a framework revision the
+    repo does not ship. All three are defects in the operator's own
+    configuration and all three are fixable, so the target is the whole
+    population rather than a tolerance band.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 0.99
+    severity: warn
+  - name: high
+    comparator: "<"
+    value: 0.95
+    severity: high
+  - name: breach
+    comparator: "<"
+    value: 0.90
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: ratio
+  formula: >
+    Over the evaluation window, let S be the count of distinct
+    `soc2:`-prefixed evidence references supplied in
+    `__evidence_refs__` and read by the map-evidence-to-criteria step,
+    and let M be the subset of S that the step matched to a criterion
+    stable-id present in `__crosswalk_entries__`. Compute
+    rate = M / S.
+
+    Count distinct references, not evidence artifacts. One artifact may
+    cite several criteria and one criterion may be cited by several
+    artifacts; counting artifacts would make the indicator move when
+    the operator's evidence volume changes rather than when their
+    wiring breaks, which is the opposite of what it is for.
+
+    Where S is zero the indicator is undefined rather than 1.0. A window
+    in which no evidence was supplied has no resolution rate, and
+    scoring it as perfect would report the healthiest possible number
+    for the least healthy possible state — an evidence pipeline that
+    produced nothing. Report it as undefined and let
+    `kri.soc2_unsupported_criteria_count@v1` carry the consequence,
+    which in that window is every criterion in the crosswalk.
+
+    Slice unmatched references by their criterion ref rather than
+    reporting the scalar alone. A rate of 0.97 arising from thirty
+    distinct mistyped refs is a systemic problem in one producer; the
+    same rate from one ref repeated thirty times is a single typo. The
+    aggregate cannot distinguish them and the remediation differs
+    entirely.
+
+    Do not read this indicator as conformance. It is bounded above by
+    the operator's wiring, not their control environment: a stack with
+    every reference resolving and no evidence behind any of them scores
+    1.00. Pairing it with the unsupported-criteria KRI is what makes it
+    interpretable.
+
+    Reference visualisation: a horizontal bar of supplied references
+    split into matched and unmatched, the unmatched portion broken out
+    by criterion ref, with the warn / high / breach floors overlaid and
+    the rate annotated as the headline. The committed reference
+    rendering lives at
+    `content/metrics/soc2_evidence_ref_resolution_rate.viz.md` — that
+    file is the contract for the chart shape; the compile target renders
+    the executable form against operator data.
+playbook_refs:
+  - playbook_id: playbook.soc2_evidence_collector@v1
+    step_id: action--b7c2e5a1-0000-4000-8000-000000000003
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+foundation_property:
+  - auditability
+maintainer: secops-ng community

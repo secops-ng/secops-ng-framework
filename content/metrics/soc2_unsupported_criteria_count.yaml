@@ -1,0 +1,107 @@
+stable_id: kri.soc2_unsupported_criteria_count@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: SOC 2 criteria without non-draft supporting evidence
+summary: >
+  Count of Trust Services Criteria in the shipped crosswalk that the
+  soc2_evidence_collector playbook did **not** score `covered` — that
+  is, the criteria scored `uncovered` (no supporting evidence at all)
+  plus those scored `draft_backed` (supporting evidence exists, but the
+  crosswalk entry it rests on is still `status: draft`). Residual-risk
+  counterpart to `kpi.soc2_evidence_ref_resolution_rate@v1`: the KPI
+  reads whether the operator's evidence references point at criteria
+  that exist, this KRI reads how much of the criteria set has no
+  defensible support behind it. Reported as a count with a mandatory
+  per-state slice rather than a coverage percentage, because
+  "N% SOC 2 compliant" is not a defensible claim and a single ratio
+  invites exactly that reading — an auditor asks about the gap, not the
+  average.
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: "<="
+  rationale: >
+    A readiness assessment is only informative when every criterion has
+    non-draft support behind it; until then the honest answer is
+    `not_ready`, which is what the playbook emits whenever this count is
+    above zero. The target is therefore the floor rather than a
+    tolerance: any non-zero value is a gap the operator can name, and
+    naming it is the whole purpose of the artifact. Note that reaching
+    zero depends partly on the repo — a criterion cannot leave
+    `draft_backed` until its crosswalk entry graduates out of
+    `status: draft` — so an operator may sit at a non-zero floor through
+    no fault of their own. That is a true reading of their evidentiary
+    position, not a false alarm.
+thresholds:
+  - name: warn
+    comparator: ">="
+    value: 1
+    severity: warn
+  - name: high
+    comparator: ">="
+    value: 8
+    severity: high
+  - name: breach
+    comparator: ">="
+    value: 16
+    severity: critical
+measurement:
+  source: workflow
+  aggregation: count
+  formula: >
+    Over the evaluation window, read the per-criterion coverage verdict
+    written by the score-per-criterion-coverage step and count the
+    criteria whose state is not `covered`. Equivalently: count =
+    uncovered + draft_backed, taken from the same three-valued scoring
+    the attestation reports.
+
+    Slice by state and never report the scalar alone. The two states
+    carry different remediation and different risk: an `uncovered`
+    criterion has no evidence and the operator must produce some, while
+    a `draft_backed` criterion has evidence whose crosswalk entry is not
+    yet audit-grade, which is a repo maturity question the operator
+    cannot close alone. Collapsing them into one number is the single
+    most misleading thing this indicator could do — it is the same
+    collapse the playbook refuses when it declines to emit a coverage
+    percentage.
+
+    Slice additionally by Trust Services category (security, privacy,
+    processing integrity, availability, confidentiality). The categories
+    are not equally sized — security carries 33 of the 53 criteria
+    currently shipped — so an absolute count says nothing about which
+    part of the control environment is thin, and a gap concentrated in
+    one category reads very differently from the same gap spread evenly.
+
+    The denominator is the crosswalk, not a constant. Criteria are
+    passed in through `__crosswalk_entries__`, so adding an entry to
+    `content/mappings/soc2/` raises the population this indicator counts
+    against on the next run. A rising count immediately after a repo
+    update is expected and is not a regression in the operator's
+    posture; compare like-for-like windows by holding the crosswalk
+    revision fixed.
+
+    Criteria referenced by evidence but absent from the crosswalk are
+    **not** counted here — they are unmatched references and belong to
+    `kpi.soc2_evidence_ref_resolution_rate@v1`. A criterion must exist
+    to be unsupported.
+
+    Reference visualisation: a stacked horizontal bar per Trust Services
+    category, each split into covered / draft_backed / uncovered, with
+    the warn / high / breach bands overlaid on the non-covered total and
+    the count annotated as the headline. The committed reference
+    rendering lives at
+    `content/metrics/soc2_unsupported_criteria_count.viz.md` — that file
+    is the contract for the chart shape; the compile target renders the
+    executable form against operator data.
+playbook_refs:
+  - playbook_id: playbook.soc2_evidence_collector@v1
+    step_id: action--b7c2e5a1-0000-4000-8000-000000000004
+  - playbook_id: playbook.soc2_evidence_collector@v1
+    step_id: action--b7c2e5a1-0000-4000-8000-000000000005
+telemetry_refs:
+  - telemetry.ocsf.compliance_finding@v1
+foundation_property:
+  - auditability
+maintainer: secops-ng community
