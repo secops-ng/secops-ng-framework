@@ -27,6 +27,11 @@ at the repo root reported 24 HIGH credential findings and exited 1, every
 one of them a planted test value. A gate that fails on a clean tree is a
 gate people stop reading, and this one guards the public bar.
 
+Individual findings may also be exempted inline with a
+``hygiene-linter: allow <rule-id>`` pragma, for the narrow case of a file
+that must contain the vocabulary a rule detects. HIGH findings are never
+suppressible that way. See ``tools/hygiene_linter/pragma.py``.
+
 Files are read as UTF-8 with ``errors="replace"``; binary files are
 skipped via a NUL-byte sniff on the first 4 KiB. This keeps the linter
 fully offline and pure-Python with no third-party deps.
@@ -41,6 +46,7 @@ import sys
 from collections.abc import Iterable, Sequence
 from pathlib import Path
 
+from tools.hygiene_linter import pragma
 from tools.hygiene_linter.findings import (
     Finding,
     Severity,
@@ -153,7 +159,11 @@ def _scan_file(path: Path, display: str) -> list[Finding]:
     out: list[Finding] = []
     for rule in RULES:
         out.extend(rule(display, lines))
-    return out
+    # Suppression is applied here rather than inside the rules: the rule
+    # design conventions require scanners to stay pure functions of
+    # (path, lines), and a rule that had to know about pragmas would not be.
+    # HIGH findings survive this regardless of any pragma — see pragma.py.
+    return pragma.apply(out, lines)
 
 
 def _filter_severity(

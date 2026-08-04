@@ -1,3 +1,4 @@
+# hygiene-linter: allow-file commercial.customer_language,commercial.pricing_language,commercial.b2b_language,commercial.gtm_language,commercial.consulting_language,commercial.sales_language,commercial.revenue_language,commercial.client_reference,commercial.strategy_doc_reference
 """Commercial-intent / strategy-language detection.
 
 This rule is the defensive counterpart to the human Custodian's
@@ -15,6 +16,13 @@ proportional to the certainty of the signal.
 Each pattern is a word-boundary match against case-folded line text.
 Multi-word patterns (``go-to-market``) are matched on the raw line so
 hyphens are preserved.
+
+This module necessarily contains every term it detects, so it matched its
+own patterns eleven times. The ``allow-file`` pragma on line 1 exempts
+those nine rules **by name**, rather than excluding the path: ``rules/`` is
+production code where a genuine credential leak would still matter, so the
+``credentials.*`` rules stay live here, and HIGH findings are
+unsuppressable by any pragma in any case.
 """
 
 from __future__ import annotations

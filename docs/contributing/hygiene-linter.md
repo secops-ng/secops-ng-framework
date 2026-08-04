@@ -58,8 +58,52 @@ Beyond anything you pass to `--exclude`, the walk always skips:
   repo reports every finding twice.
 
 A bare `python -m tools.hygiene_linter` at the repo root is expected to
-exit `0`. A test asserts it, so if it starts failing, treat it as a real
-finding to fix rather than scan scope to widen.
+exit `0`, **and to report nothing at all even at `--min-severity LOW`**.
+Tests assert both, so if either starts failing, treat it as a real finding
+to fix rather than scan scope to widen.
+
+### Inline suppression
+
+A handful of files must contain the vocabulary a rule detects: a
+`commercial.*` pattern cannot avoid spelling out the term it matches, and
+`SOUL.md` quotes the phrasing it instructs against. Those are exempted
+inline, by rule name.
+
+```python
+# Line-scoped — the finding's own line, or the line immediately after:
+Our pricing is…  # hygiene-linter: allow commercial.pricing_language
+```
+
+```markdown
+<!-- hygiene-linter: allow commercial.revenue_language -->
+Revenue framing on the next line is exempt.
+```
+
+```python
+# File-scoped — for a file that carries the vocabulary by construction.
+# Must appear in the first 20 lines, so a reader meets it in the header:
+# hygiene-linter: allow-file commercial.sales_language,commercial.gtm_language
+```
+
+Three properties make this a narrow escape hatch rather than a mute button:
+
+- **Exact rule ids only.** No wildcards, no whole-file amnesty. A pragma
+  waives the rules it names and nothing else, so adding a new rule can
+  never be pre-silenced by an existing pragma.
+- **`HIGH` findings are never suppressible.** A pragma naming a
+  `credentials.*` rule is inert — the finding still fires and still gates
+  the build. Credential leaks are irreversible once public, so there is no
+  mechanism to wave one through. Test corpora that must hold real-shaped
+  credentials are handled by path exclusion instead.
+- **It shows up in review.** The waiver is a line in the diff next to the
+  thing it waives, which a path exclusion in a config file is not.
+
+**When not to use it.** A pragma is for a file that must contain the
+pattern *by construction*. It is not for making CI quiet about your own
+phrasing — if a `MEDIUM` finding is telling you the sentence reads
+commercially, rewrite the sentence. If you believe a finding is a genuine
+false positive in ordinary prose, leave it in place and say so in the pull
+request, so the rule gets fixed rather than the symptom.
 
 The linter is pure-stdlib Python; no install step is required beyond
 the Python interpreter the framework already targets.

@@ -137,6 +137,14 @@ If the linter flags something you believe is a false positive, leave
 the finding in place and mention it in the pull request description —
 do not silence rules to make CI happy.
 
+There is an inline `hygiene-linter: allow <rule-id>` pragma, but it
+exists for a narrow case that is unlikely to be yours: a file that must
+contain the vocabulary a rule detects, such as a rule definition or
+`SOUL.md` quoting the phrasing it warns against. It cannot suppress a
+`HIGH` credential finding at all. Reach for a rewrite first and the
+pragma essentially never — see
+[`hygiene-linter.md`](./hygiene-linter.md) for when it is legitimate.
+
 ## 7. Commit with sign-off
 
 Every commit needs a
