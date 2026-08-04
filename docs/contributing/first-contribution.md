@@ -81,6 +81,36 @@ python -m tools.hygiene_linter --min-severity LOW
 Green locally is the baseline. CI runs the same checks on every pull
 request.
 
+### Skipped tests are expected; errors are not
+
+`[dev]` installs the tooling the *framework* needs. It deliberately does
+not install the orchestrator runtimes the **emitted** artifacts import —
+`temporalio`, `langchain_core`, `opentelemetry`. The framework never
+imports any of them: `compilers/_shared/observability.py` keeps the OTel
+import inside the emitted text rather than at module scope, and the same
+holds for the other two. Installing them into every contributor's
+environment would contradict that.
+
+So a minimal `[dev]` install skips the tests that execute emitted source,
+and a full run reporting skips is healthy. The convention is
+`pytest.importorskip("<runtime>")`, placed as narrowly as possible:
+
+- **at the fixture** when only some tests in the module execute emitted
+  code — the source-inspection tests in the same file must keep running,
+  since they pin the import contract and need no runtime at all;
+- **at module scope** only when every test in the file needs the runtime.
+
+If you want the skipped tests to run, install the runtime you are working
+on, for example `pip install opentelemetry-api opentelemetry-sdk`.
+
+An **error** at collection or fixture setup is a different thing and is
+always a bug — either a missing guard or a real regression. A contributor
+cannot tell those apart, which is exactly why the guard has to be there:
+`tests/compilers/langgraph/test_audit_mirror_emitter.py` guarded
+`langchain_core` but not `opentelemetry`, and a clean checkout errored on
+two tests until #888 fixed it. If you add a test that imports emitted
+source, add the guard in the same commit.
+
 ## 4. Branch from `main`
 
 Branch naming is `<area>/<short-description>`. Examples:
