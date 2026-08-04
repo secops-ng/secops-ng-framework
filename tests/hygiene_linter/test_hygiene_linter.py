@@ -7,6 +7,8 @@ fixture (must not produce findings). CLI behaviour is covered with
 
 from __future__ import annotations
 
+import contextlib
+import io
 import json
 import subprocess
 import sys
@@ -284,6 +286,112 @@ def test_egg_info_directory_is_pruned(tmp_path: Path) -> None:
     egg.mkdir()
     (egg / "SOURCES.txt").write_text("AKIAIOSFODNN7EXAMPLE\n")
     assert main([str(tmp_path), "--format", "json"]) == 0
+
+
+# --- inline suppression pragmas ---------------------------------------------
+#
+# #892: two files must contain the vocabulary the commercial rules detect —
+# the rule definitions themselves, and SOUL.md quoting the phrasing it warns
+# against. They stood as 15 permanent MEDIUM findings, a floor a reviewer had
+# to remember was "normal". Pragmas exempt them by name; the tests below pin
+# the properties that keep that from becoming a way to silence real findings.
+
+
+def _write(tmp_path: Path, name: str, body: str) -> Path:
+    p = tmp_path / name
+    p.write_text(body, encoding="utf-8")
+    return p
+
+
+def _findings(target: Path) -> list[dict]:
+    """Scan ``target`` at the lowest severity and return parsed findings.
+
+    Captures stdout directly rather than taking ``capsys``, so the assertions
+    below read as one expression per test.
+    """
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        main([str(target), "--min-severity", "LOW", "--format", "json"])
+    return json.loads(buf.getvalue())
+
+
+def test_line_pragma_suppresses_its_own_line(tmp_path: Path) -> None:
+    _write(tmp_path, "d.md",
+           "Our customers matter.  <!-- hygiene-linter: allow commercial.customer_language -->\n")
+    assert main([str(tmp_path), "--min-severity", "LOW", "--format", "json"]) == 0
+    assert not _findings(tmp_path)
+
+
+def test_line_pragma_suppresses_the_following_line(tmp_path: Path) -> None:
+    """So a pragma can sit above a line with no room for a trailing comment."""
+    _write(tmp_path, "d.md",
+           "<!-- hygiene-linter: allow commercial.revenue_language -->\n"
+           "Revenue framing appears here.\n")
+    assert not _findings(tmp_path)
+
+
+def test_line_pragma_does_not_reach_two_lines_down(tmp_path: Path) -> None:
+    _write(tmp_path, "d.md",
+           "<!-- hygiene-linter: allow commercial.revenue_language -->\n"
+           "nothing to see\n"
+           "Revenue framing appears here.\n")
+    assert [f["line"] for f in _findings(tmp_path)] == [3]
+
+
+def test_pragma_is_rule_specific_not_a_wildcard(tmp_path: Path) -> None:
+    """Naming one rule must not exempt a different rule on the same line."""
+    _write(tmp_path, "d.md",
+           "Our customers and our pricing.  "
+           "<!-- hygiene-linter: allow commercial.customer_language -->\n")
+    rules = {f["rule"] for f in _findings(tmp_path)}
+    assert rules == {"commercial.pricing_language"}
+
+
+def test_pragma_cannot_suppress_a_high_finding(tmp_path: Path) -> None:
+    """The property that makes this mechanism safe: a credential pragma is inert.
+
+    HIGH findings are irreversible leaks once public, so no pragma may hide
+    one — otherwise this becomes the easiest way to land a key.
+    """
+    _write(tmp_path, "leak.txt",
+           "AKIAIOSFODNN7EXAMPLE  # hygiene-linter: allow credentials.aws_access_key\n")
+    assert main([str(tmp_path), "--format", "json"]) == 1
+    assert [f["rule"] for f in _findings(tmp_path)] == ["credentials.aws_access_key"]
+
+
+def test_file_pragma_suppresses_throughout_the_file(tmp_path: Path) -> None:
+    _write(tmp_path, "m.py",
+           "# hygiene-linter: allow-file commercial.revenue_language\n"
+           + "x = 1\n" * 40
+           + "# revenue framing far below the header\n")
+    assert not _findings(tmp_path)
+
+
+def test_file_pragma_below_the_header_is_ignored(tmp_path: Path) -> None:
+    """Kept in the header so a reader meets it, rather than buried mid-file."""
+    _write(tmp_path, "m.py",
+           "x = 1\n" * 25
+           + "# hygiene-linter: allow-file commercial.revenue_language\n"
+           + "# revenue framing here\n")
+    assert [f["rule"] for f in _findings(tmp_path)] == ["commercial.revenue_language"]
+
+
+def test_file_pragma_is_still_rule_specific(tmp_path: Path) -> None:
+    _write(tmp_path, "m.py",
+           "# hygiene-linter: allow-file commercial.revenue_language\n"
+           "# revenue and B2B framing\n")
+    assert [f["rule"] for f in _findings(tmp_path)] == ["commercial.b2b_language"]
+
+
+def test_repo_root_scan_is_clean_at_lowest_severity() -> None:
+    """Stronger than the gate check: zero findings at --min-severity LOW.
+
+    Before #892 this reported 15 MEDIUM findings that were all legitimate
+    content. A standing floor is what hides the next real finding, so the
+    floor is now zero and this test keeps it there.
+    """
+    findings = _findings(REPO_ROOT)
+    assert findings == [], f"repo root is no longer clean at LOW: {findings}"
 
 
 # --- Finding dataclass ------------------------------------------------------

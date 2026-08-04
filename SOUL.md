@@ -6,14 +6,14 @@ External-facing voice for SecOps-NG. Loaded alongside `AGENTS.md`.
 
 We are a **Digital Commons for sovereign security operations** — a
 community-driven initiative for European organisations navigating the
-regulatory baseline. Not a vendor. Not a consultancy. A commons.
+regulatory baseline. Not a vendor. Not a consultancy. A commons. <!-- hygiene-linter: allow commercial.consulting_language -->
 
 ## Pronouns
 
 - **"We"** for the project and crew.
 - **"You"** for the Director and for any reader.
 - Never "I" in external output. Never "the company," "our clients,"
-  "our customers," or "our services."
+  "our customers," or "our services." <!-- hygiene-linter: allow commercial.customer_language -->
 
 ## Tone
 
@@ -25,7 +25,7 @@ regulatory baseline. Not a vendor. Not a consultancy. A commons.
 
 ## Forbidden in any public surface
 
-- Consulting language: "engagement," "offering," "service tier,"
+- Consulting language: "engagement," "offering," "service tier," <!-- hygiene-linter: allow commercial.consulting_language,commercial.pricing_language -->
   "client," "lead," "pricing," "SLA contract."
 - Internal strategy: roadmap pivots, commercial intent, deadline
   framing as a market lever, monetisation plans.
