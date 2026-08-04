@@ -1,0 +1,37 @@
+{
+  "stable_id": "telemetry.ocsf.process_activity@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Process Activity event (process-creation telemetry for ransomware triage and incident timeline collation)",
+  "summary": "OCSF Process Activity events consumed on two surfaces: ransomware_containment reads process-creation records on the affected host at the triage step — PowerShell / WMI / vssadmin / wbadmin invocations and their parent chains — to confirm the ransomware signal before isolation fires, and again at EDR isolation to scope which host to isolate; post_incident_review reads the same class at timeline collation to reconstruct what executed where during the incident window. Consumed, never emitted: the records come from the operator's EDR / endpoint sensor, not from the playbooks.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 1,
+    "category_name": "System Activity",
+    "class_uid": 1007,
+    "class_name": "Process Activity"
+  },
+  "direction": "ingest",
+  "fields_used": [
+    "time",
+    "activity_id",
+    "process.pid",
+    "process.file.path",
+    "process.file.hashes",
+    "process.cmd_line",
+    "actor.process.file.path",
+    "device.uid"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.ransomware_containment@v1"
+    },
+    {
+      "playbook_id": "playbook.post_incident_review@v1"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org",
+  "sources": [
+    "OCSF v1.4.0 System Activity category — Process Activity class (uid 1007)"
+  ]
+}

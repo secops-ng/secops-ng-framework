@@ -19,7 +19,7 @@ IDs:
 - `control.cspm_baseline@v1`, `control.iac_policy_guardrail@v1`,
   `control.cloud_identity_least_privilege@v1`
 - `telemetry.ocsf.compliance_finding@v1`,
-  `telemetry.ocsf.cloud_resource_inventory@v1`
+  `telemetry.ocsf.cloud_resources_inventory_info@v1`
 - `kpi.mttd_cloud_misconfig@v1`, `kpi.mttr_cloud_misconfig@v1`,
   `kpi.cloud_posture_coverage@v1`, `kri.recurring_cloud_misconfig@v1`
 

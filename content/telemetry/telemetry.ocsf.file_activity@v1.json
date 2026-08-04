@@ -2,8 +2,8 @@
   "stable_id": "telemetry.ocsf.file_activity@v1",
   "content_version": "0.1.0",
   "maturity": "experimental",
-  "title": "File System Activity event (attachment + dropped-file telemetry for phishing triage)",
-  "summary": "OCSF File System Activity events the phishing_triage playbook consumes for attachment evaluation (sandbox verdicts, hash reputation) and, in the malware-attached branch, endpoint observations of artifacts written by a clicked attachment so the endpoint-isolation step can be scoped to affected hosts.",
+  "title": "File System Activity event (attachment, dropped-file and encryption-window telemetry)",
+  "summary": "OCSF File System Activity events on two triage surfaces: phishing_triage consumes them for attachment evaluation (sandbox verdicts, hash reputation) and, in the malware-attached branch, endpoint observations of artifacts written by a clicked attachment so the endpoint-isolation step can be scoped to affected hosts; ransomware_containment consumes them at triage (mass rename / write / delete surrounding the encryption window) and at backup verification (snapshot-catalogue file-state records). The upstream class name is `file_activity` (uid 1001) — its caption is File System Activity, and a ransomware overlay briefly referenced it under the caption-derived name `file_system_activity`; provenance on issue #875.",
   "ocsf": {
     "version": "1.4.0",
     "category_uid": 1,
@@ -25,6 +25,9 @@
   "playbook_refs": [
     {
       "playbook_id": "playbook.phishing_triage@v1"
+    },
+    {
+      "playbook_id": "playbook.ransomware_containment@v1"
     }
   ],
   "maintainer": "telemetry-wg@secops-ng.org",

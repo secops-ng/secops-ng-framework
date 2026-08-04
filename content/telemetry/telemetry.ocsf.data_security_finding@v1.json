@@ -1,0 +1,34 @@
+{
+  "stable_id": "telemetry.ocsf.data_security_finding@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Data Security Finding event (DLP detection telemetry for exfiltration triage, scoping and containment verification)",
+  "summary": "OCSF Data Security Finding events the data_exfil playbook consumes at three steps: the originating DLP / data-classification detection at triage-signal, related findings for the same actor and resource set at scope-assessment, and the absence of further findings as the containment-verification signal. This is the OCSF class DLP and data-classification tooling emits (uid 2006, added to the Findings category in OCSF 1.2); the catalogue previously referenced a speculative `dlp_alert` class that does not exist upstream — provenance for that correction is on issue #875.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2006,
+    "class_name": "Data Security Finding"
+  },
+  "direction": "ingest",
+  "fields_used": [
+    "time",
+    "activity_id",
+    "severity_id",
+    "status_id",
+    "finding_info.uid",
+    "finding_info.title",
+    "actor.user.uid",
+    "device.uid"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.data_exfil@v1"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org",
+  "sources": [
+    "OCSF v1.4.0 Findings category — Data Security Finding class (uid 2006)"
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "stable_id": "telemetry.ocsf.network_activity@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Network Activity event (flow and connection telemetry for containment, DDoS response and segmentation posture)",
+  "summary": "OCSF Network Activity events consumed on three surfaces: ddos_response reads traffic-rate and endpoint-spread records at detect-availability-anomaly, classify-attack-vector and validate-service-restoration; network_security reads observed flows to inventory segments, evaluate segmentation policy, detect boundary-crossing violations and verify enforcement; ransomware_containment and data_exfil read flow records to verify the network-ACL isolation fallback and to bound observed egress volume at scope assessment. One class shape serves all four because each consumes the same flow five-tuple plus direction and byte counts — the playbooks differ in which endpoints and windows they filter, not in the record shape.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 4,
+    "category_name": "Network Activity",
+    "class_uid": 4001,
+    "class_name": "Network Activity"
+  },
+  "direction": "ingest",
+  "fields_used": [
+    "time",
+    "activity_id",
+    "src_endpoint.ip",
+    "src_endpoint.port",
+    "dst_endpoint.ip",
+    "dst_endpoint.port",
+    "connection_info.direction",
+    "connection_info.protocol_name",
+    "traffic.bytes",
+    "device.uid"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.ddos_response@v1"
+    },
+    {
+      "playbook_id": "playbook.network_security@v1"
+    },
+    {
+      "playbook_id": "playbook.ransomware_containment@v1"
+    },
+    {
+      "playbook_id": "playbook.data_exfil@v1"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org",
+  "sources": [
+    "OCSF v1.4.0 Network Activity category — Network Activity class (uid 4001)"
+  ]
+}
