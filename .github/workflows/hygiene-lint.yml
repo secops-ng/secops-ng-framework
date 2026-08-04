@@ -26,9 +26,10 @@ jobs:
 
       - name: Run hygiene linter
         # The MVP linter is pure-stdlib Python — no install step needed.
-        # The fixture directory is excluded because it intentionally
-        # contains positive fixtures for the rules under test.
+        # No --exclude here on purpose: the linter's own test corpus is
+        # skipped intrinsically, so this is byte-for-byte the command a
+        # contributor runs locally. When the exclusion lived only in this
+        # workflow, CI was green while the documented local command exited 1
+        # on 24 planted fixture values — the two must not diverge again.
         run: |
-          python -m tools.hygiene_linter . \
-            --exclude 'tests/hygiene_linter/*' \
-            --format text
+          python -m tools.hygiene_linter . --format text

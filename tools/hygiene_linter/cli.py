@@ -16,6 +16,16 @@ Default scan target is the current working directory.
 Honoured exclusions (regardless of ``--exclude``):
     .git/, .venv/, venv/, node_modules/, __pycache__/, .mypy_cache/,
     .ruff_cache/, dist/, build/, *.egg-info/
+    tests/hygiene_linter/ — this linter's own test corpus, which exists to
+        hold deliberate positives for the rules under test
+    any nested checkout — a subdirectory carrying its own ``.git`` marker
+        (a clone, a submodule, or a git worktree) is pruned with its subtree
+
+The last two exist because a scan that reports its own fixtures, or a
+worktree's copy of them, buries the real signal: before this, a bare run
+at the repo root reported 24 HIGH credential findings and exited 1, every
+one of them a planted test value. A gate that fails on a clean tree is a
+gate people stop reading, and this one guards the public bar.
 
 Files are read as UTF-8 with ``errors="replace"``; binary files are
 skipped via a NUL-byte sniff on the first 4 KiB. This keeps the linter
@@ -26,6 +36,7 @@ from __future__ import annotations
 
 import argparse
 import fnmatch
+import os
 import sys
 from collections.abc import Iterable, Sequence
 from pathlib import Path
@@ -42,6 +53,14 @@ _DEFAULT_EXCLUDES = {
     ".git", ".venv", "venv", "node_modules", "__pycache__",
     ".mypy_cache", ".ruff_cache", "dist", "build",
 }
+
+# Directory paths, relative to a scan root, that are always pruned. Unlike
+# ``_DEFAULT_EXCLUDES`` these are multi-segment, so they cannot be expressed
+# as a bare directory name without over-matching (excluding every ``tests``
+# or every ``hygiene_linter`` directory would be far too broad).
+_DEFAULT_EXCLUDE_PATHS = frozenset({
+    ("tests", "hygiene_linter"),
+})
 
 _SKIP_SUFFIXES = {
     ".pyc", ".pyo", ".so", ".o", ".a", ".dylib", ".dll", ".exe",
@@ -63,6 +82,17 @@ def _is_binary(path: Path) -> bool:
     return b"\x00" in chunk
 
 
+def _is_nested_checkout(directory: Path, root: Path) -> bool:
+    """True when ``directory`` is a checkout in its own right, not the root.
+
+    A clone has a ``.git`` directory; a submodule and a git worktree have a
+    ``.git`` *file* pointing at the parent repository. Either way the subtree
+    below it belongs to a different checkout and scanning it double-reports
+    whatever the outer tree already contains.
+    """
+    return directory != root and (directory / ".git").exists()
+
+
 def _iter_files(
     roots: Sequence[Path],
     excludes: Sequence[str],
@@ -71,23 +101,45 @@ def _iter_files(
         if root.is_file():
             yield root
             continue
-        for path in sorted(root.rglob("*")):
-            if not path.is_file():
-                continue
-            # default-exclude directories
-            if any(part in _DEFAULT_EXCLUDES for part in path.parts):
-                continue
-            # suffix skip
-            if path.suffix.lower() in _SKIP_SUFFIXES:
-                continue
-            # user-supplied glob excludes (matched against path-from-root)
-            try:
-                rel = str(path.relative_to(root))
-            except ValueError:
-                rel = str(path)
-            if any(fnmatch.fnmatch(rel, g) for g in excludes):
-                continue
-            yield path
+        # os.walk (rather than rglob) so an excluded directory is pruned with
+        # its whole subtree instead of being re-tested at every leaf.
+        for dirpath, dirnames, filenames in os.walk(root):
+            here = Path(dirpath)
+            dirnames.sort()
+            keep: list[str] = []
+            for name in dirnames:
+                child = here / name
+                # ``*.egg-info`` is a pattern rather than a fixed name, so it
+                # cannot live in the set above — the module docstring has
+                # always promised it is honoured, so honour it.
+                if name in _DEFAULT_EXCLUDES or name.endswith(".egg-info"):
+                    continue
+                try:
+                    rel_parts = child.relative_to(root).parts
+                except ValueError:
+                    rel_parts = child.parts
+                if rel_parts in _DEFAULT_EXCLUDE_PATHS:
+                    continue
+                if _is_nested_checkout(child, root):
+                    continue
+                keep.append(name)
+            dirnames[:] = keep
+
+            for name in sorted(filenames):
+                path = here / name
+                if not path.is_file():
+                    continue
+                # suffix skip
+                if path.suffix.lower() in _SKIP_SUFFIXES:
+                    continue
+                # user-supplied glob excludes (matched against path-from-root)
+                try:
+                    rel = str(path.relative_to(root))
+                except ValueError:
+                    rel = str(path)
+                if any(fnmatch.fnmatch(rel, g) for g in excludes):
+                    continue
+                yield path
 
 
 def _scan_file(path: Path, display: str) -> list[Finding]:

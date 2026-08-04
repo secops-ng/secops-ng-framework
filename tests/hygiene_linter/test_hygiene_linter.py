@@ -201,6 +201,91 @@ def test_cli_module_entrypoint_runs(tmp_path: Path) -> None:
     assert "no findings" in proc.stdout
 
 
+# --- scan scope -------------------------------------------------------------
+#
+# The linter must be clean on the repository it lives in. It was not: a bare
+# root run reported 24 HIGH credential findings — this suite's own planted
+# fixtures, plus a second copy of them from a git worktree under
+# .claude/worktrees/ — and exited 1. CI passed only because the workflow
+# carried an `--exclude` the documented local command does not, so the command
+# contributors are told to run before every PR was the broken one.
+
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_repo_root_scan_passes_the_gate() -> None:
+    """A bare scan of this repository must exit 0.
+
+    This is the command CLAUDE.md requires before a framework PR. If it fails
+    here, either a real HIGH-severity leak has landed — in which case fix the
+    leak, not this test — or the scan scope has regressed again.
+    """
+    rc = main([str(REPO_ROOT), "--format", "json"])
+    assert rc == 0
+
+
+def test_self_test_corpus_excluded_without_any_flag() -> None:
+    """The fixtures are skipped intrinsically, not via a CI-only flag.
+
+    Passing --min-severity LOW is the strongest form of the check: it would
+    surface the MEDIUM commercial fixtures too, if they were being read.
+    """
+    from tools.hygiene_linter.cli import _iter_files
+
+    scanned = {p.resolve() for p in _iter_files([REPO_ROOT], [])}
+    corpus = (REPO_ROOT / "tests" / "hygiene_linter").resolve()
+    assert not [p for p in scanned if corpus in p.parents], (
+        "the linter is reading its own positive fixtures again"
+    )
+    # sanity: the walk still reaches real content
+    assert (REPO_ROOT / "ROADMAP.md").resolve() in scanned
+
+
+@pytest.mark.parametrize(
+    "marker_is_dir",
+    [pytest.param(False, id="worktree-or-submodule-git-file"),
+     pytest.param(True, id="clone-git-directory")],
+)
+def test_nested_checkout_is_pruned(tmp_path: Path, marker_is_dir: bool) -> None:
+    """A subtree carrying its own .git belongs to another checkout.
+
+    A worktree and a submodule mark themselves with a ``.git`` *file*; a clone
+    uses a directory. Both must prune, or an agent working in a worktree sees
+    every finding twice.
+    """
+    nested = tmp_path / "wt" / "copy"
+    nested.mkdir(parents=True)
+    if marker_is_dir:
+        (nested / ".git").mkdir()
+    else:
+        (nested / ".git").write_text("gitdir: /elsewhere/.git/worktrees/copy\n")
+    (nested / "leak.txt").write_text("AKIAIOSFODNN7EXAMPLE\n")
+
+    assert main([str(tmp_path), "--format", "json"]) == 0
+
+    # the same file outside a nested checkout still fires, so the prune is
+    # scoped to the marker and has not silently disabled the rule
+    (tmp_path / "leak.txt").write_text("AKIAIOSFODNN7EXAMPLE\n")
+    assert main([str(tmp_path), "--format", "json"]) == 1
+
+
+def test_scan_root_itself_is_never_pruned_for_being_a_checkout(tmp_path: Path) -> None:
+    """Only *nested* checkouts prune — pointing the linter at a repo root
+    must still scan it, or scanning any clone would return nothing."""
+    (tmp_path / ".git").mkdir()
+    (tmp_path / "leak.txt").write_text("AKIAIOSFODNN7EXAMPLE\n")
+    assert main([str(tmp_path), "--format", "json"]) == 1
+
+
+def test_egg_info_directory_is_pruned(tmp_path: Path) -> None:
+    """The module docstring has always promised this; now it is true."""
+    egg = tmp_path / "secops_ng.egg-info"
+    egg.mkdir()
+    (egg / "SOURCES.txt").write_text("AKIAIOSFODNN7EXAMPLE\n")
+    assert main([str(tmp_path), "--format", "json"]) == 0
+
+
 # --- Finding dataclass ------------------------------------------------------
 
 
