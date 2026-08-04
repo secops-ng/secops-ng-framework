@@ -223,6 +223,24 @@ named operator use-case. Each cookbook workflow lives under
 `workflows/<name>/` with `README.md`, `PROMPT.md`, `config.yaml`,
 `example.py`, and primitives directory.
 
+**Twelve entries in this epic were backfilled** — from
+`F-WF-AGENTIC-RESPONSE` onward — for playbooks that shipped before they
+carried a feature id. Until then this document under-reported the
+catalogue by roughly a quarter: 48 playbooks on disk against 36 with an
+entry, which is part of why the roadmap read as more finished than the
+work was.
+
+Their `Status` was determined from the artifacts rather than from
+recollection, using the compile-playbooks catalogue: ten are
+`In Progress` because they ship a CACAO scaffold, mappings, a cookbook
+and three-target examples but **no `primitives/` directory**, so CORE is
+genuinely outstanding on each; two are `Shipped` because they carry bound
+primitives and their EXTEND artifacts. Acceptance criteria describe what
+the finished feature requires, and the `Shipped via` lines record which
+stage each PR actually landed — cross-cutting sweeps that touched many
+playbooks at once (#862, #874, #877) are deliberately not cited as any
+one playbook's provenance.
+
 ### F-WF-01 — Vulnerability triage
 
 - **Status:** Shipped
@@ -1579,6 +1597,352 @@ named operator use-case. Each cookbook workflow lives under
 - **Depends on:** F-WF-EUAIACT-DEPLOYER (the Art. 26(2)
   oversight-assignment step hands off to this lifecycle).
 - **Source:** EU AI Act (Regulation (EU) 2024/1689) Art. 14.
+
+### F-WF-AGENTIC-RESPONSE — Fully-agentic adversary response
+
+- **Status:** In Progress
+- **Priority:** P2
+- **Rationale:** Covers autonomous LLM-driven credential harvest, lateral
+  movement and encryption chains — an attacker capability the rest of the
+  catalogue assumes is human-paced.
+- **Acceptance criteria:**
+  - CACAO v2 artifact with `mappings.yaml` and a workflow-local README
+    (SKELETON — shipped).
+  - Three-target compile examples with byte-parity goldens (G-03) and a
+    cookbook walkthrough (shipped).
+  - Deterministic primitives under
+    `content/playbooks/agentic_threat_response/primitives/` bound to the 5
+    action steps, replay-safe and offline (CORE — **outstanding**).
+  - Detection reads the agentic-activity signals the operator's telemetry
+    already carries; the playbook mints no new sensor.
+  - The five KPI/KRI entries already under `content/metrics/` for this
+    surface (detection rate, false-positive rate, model-decision latency)
+    keep their committed reference visualisations.
+- **Sovereign-stack constraints:** The agentic-activity classifier is an
+  adapter-bound operator surface; the framework ships the contract, not a
+  model.
+- **Depends on:** F-WF-03 (alert triage supplies the enriched signal)
+- **Source:** FOUNDATION (operability); NIS2 Art. 21(2)(b); issue #890.
+- **Shipped via:**
+  - SKELETON — #678, #679, #680, #681
+  - EXTEND — #747 (cookbook + metric set)
+
+### F-WF-BACKUP-RECOVERY — Backup integrity and restore-drill lifecycle
+
+- **Status:** In Progress
+- **Priority:** P2
+- **Rationale:** NIS2 Art. 21(2)(c) requires backup management and disaster
+  recovery; an untested backup is an assertion, so the workflow is built
+  around a non-destructive restore drill rather than a backup-exists check.
+- **Acceptance criteria:**
+  - CACAO v2 artifact with `mappings.yaml` and a workflow-local README
+    (SKELETON — shipped).
+  - Three-target compile examples with byte-parity goldens (G-03) and a
+    cookbook walkthrough (shipped).
+  - Deterministic primitives under
+    `content/playbooks/backup_recovery/primitives/` bound to the 5 action
+    steps, replay-safe and offline (CORE — **outstanding**).
+  - The restore drill is non-destructive by construction — no step writes to
+    a production target.
+  - The five metric entries for this surface keep their reference
+    visualisations, including the integrity pass rate.
+- **Sovereign-stack constraints:** The backup estate and the restore target
+  are operator-owned; the framework ships no storage binding and no default
+  endpoint.
+- **Depends on:** F-WF-BCM (the continuity lifecycle this drill reports
+  into)
+- **Source:** FOUNDATION (operability); NIS2 Art. 21(2)(c); DORA Art. 12;
+  issue #890.
+- **Shipped via:**
+  - SKELETON — #478, #483
+
+### F-WF-BCM — Business-continuity event lifecycle
+
+- **Status:** In Progress
+- **Priority:** P2
+- **Rationale:** The operator-side continuity lifecycle a NIS2 essential or
+  important entity runs on a major outage, ransomware containment or
+  supplier failure. Emits one milestone record per lifecycle stage.
+- **Acceptance criteria:**
+  - CACAO v2 artifact with `mappings.yaml` and a workflow-local README
+    (SKELETON — shipped).
+  - Three-target compile examples with byte-parity goldens (G-03) and a
+    cookbook walkthrough (shipped).
+  - Deterministic primitives under
+    `content/playbooks/business_continuity/primitives/` bound to the 7
+    action steps, replay-safe and offline (CORE — **outstanding**).
+  - Each lifecycle milestone emits an `api_activity` record keyed to the
+    event id — the house binding for workflow-emitted milestones, corrected
+    from an invented availability class by #877.
+  - Declaring an event does not require the operator to have pre-registered
+    a plan; a continuity event with no plan on file is reported as such
+    rather than blocking.
+- **Sovereign-stack constraints:** The continuity plan register and the
+  recovery targets are operator-owned adapter-bound surfaces.
+- **Depends on:** F-WF-05 (incident management hands major incidents into
+  this lifecycle)
+- **Source:** FOUNDATION (operability); NIS2 Art. 21(2)(c); DORA Art. 11;
+  issue #890.
+- **Shipped via:**
+  - SKELETON — #707
+
+### F-WF-CRYPTO-POSTURE — Cryptography and encryption posture management
+
+- **Status:** In Progress
+- **Priority:** P2
+- **Rationale:** NIS2 Art. 21(2)(h) names cryptography and, where
+  appropriate, encryption. This is the posture-observation half: inventory
+  the declared policy and the assets in its scope, then probe the
+  certificate and cipher surface against it.
+- **Acceptance criteria:**
+  - CACAO v2 artifact with `mappings.yaml` and a workflow-local README
+    (SKELETON — shipped).
+  - Three-target compile examples with byte-parity goldens (G-03) and a
+    cookbook walkthrough (shipped).
+  - Deterministic primitives under
+    `content/playbooks/crypto_posture_management/primitives/` bound to the 5
+    action steps, replay-safe and offline (CORE — **outstanding**).
+  - Probing is read-only: no step rotates a key, reissues a certificate or
+    changes a cipher suite.
+  - A probe finding names the declared policy clause it contradicts, so a
+    reviewer can tell a policy gap from a drift.
+- **Sovereign-stack constraints:** Certificate and key material never enters
+  an emitted artifact — findings carry references and observed parameters
+  only.
+- **Depends on:** F-WF-CRYPTO-CONTROLS (the controls lifecycle this posture
+  feeds)
+- **Source:** FOUNDATION (auditability); NIS2 Art. 21(2)(h); issue #890.
+- **Shipped via:**
+  - SKELETON — #479, #482
+
+### F-WF-CRYPTO-CONTROLS — Cryptographic-controls lifecycle
+
+- **Status:** In Progress
+- **Priority:** P2
+- **Rationale:** The controls half of the Art. 21(2)(h) surface: the
+  operator-side lifecycle run against a documented cryptography policy,
+  covering the lifecycle disciplines the policy is expected to state.
+- **Acceptance criteria:**
+  - CACAO v2 artifact with `mappings.yaml` and a workflow-local README
+    (SKELETON — shipped).
+  - Three-target compile examples with byte-parity goldens (G-03) and a
+    cookbook walkthrough (shipped).
+  - Deterministic primitives under
+    `content/playbooks/cryptographic_controls/primitives/` bound to the 6
+    action steps, replay-safe and offline (CORE — **outstanding**).
+  - The policy is input, not content: the playbook scores against the
+    operator's documented policy and ships no default cipher baseline.
+  - A control with no documented policy clause behind it is reported as
+    undocumented rather than as compliant.
+- **Sovereign-stack constraints:** No key material, no default policy
+  baseline — a shipped baseline would become a de-facto standard the
+  framework has no authority to set.
+- **Depends on:** F-WF-CRYPTO-POSTURE (supplies the observed posture)
+- **Source:** FOUNDATION (auditability); NIS2 Art. 21(2)(h); GDPR Art.
+  32(1)(a); issue #890.
+- **Shipped via:**
+  - SKELETON — #711, #712, #713
+  - EXTEND — #726 (cookbook)
+
+### F-WF-DSR — GDPR Chapter III data-subject-rights lifecycle
+
+- **Status:** In Progress
+- **Priority:** P2
+- **Rationale:** The controller-side intake and fulfilment lifecycle for a
+  data subject exercising a Chapter III right. The one-month Art. 12(3)
+  clock makes the timing contract, not the request form, the hard part.
+- **Acceptance criteria:**
+  - CACAO v2 artifact with `mappings.yaml` and a workflow-local README
+    (SKELETON — shipped).
+  - Three-target compile examples with byte-parity goldens (G-03) and a
+    cookbook walkthrough (shipped).
+  - Deterministic primitives under
+    `content/playbooks/data_subject_rights/primitives/` bound to the 7
+    action steps, replay-safe and offline (CORE — **outstanding**).
+  - The Art. 12(3) one-month response clock is anchored on a supplied
+    awareness instant, never on a clock read inside a primitive, so a run is
+    replayable and the deadline is auditable.
+  - An extension under Art. 12(3) is recorded with its justification; an
+    unjustified extension is not representable.
+- **Sovereign-stack constraints:** Subject-supplied attributes are not
+  stored by the workflow — identity is resolved against the controller's own
+  records at runtime.
+- **Depends on:** F-WF-DPIA (shares the GDPR lawful-basis mapping surface)
+- **Source:** FOUNDATION (auditability); GDPR Arts. 12, 15–22; issue #890.
+- **Shipped via:**
+  - SKELETON — #621
+
+### F-WF-DDOS — Availability-attack detection and response
+
+- **Status:** In Progress
+- **Priority:** P2
+- **Rationale:** The availability dimension of the incident-handling
+  capability: confirm an availability anomaly is an attack rather than
+  organic load, classify the vector, and verify service restoration.
+- **Acceptance criteria:**
+  - CACAO v2 artifact with `mappings.yaml` and a workflow-local README
+    (SKELETON — shipped).
+  - Three-target compile examples with byte-parity goldens (G-03) and a
+    cookbook walkthrough (shipped).
+  - Deterministic primitives under
+    `content/playbooks/ddos_response/primitives/` bound to the 6 action
+    steps, replay-safe and offline (CORE — **outstanding**).
+  - Classification distinguishes volumetric from connection-rate and
+    application-layer vectors, because the mitigation differs and an
+    aggregate 'under attack' verdict is not actionable.
+  - Restoration is verified against observed traffic, not asserted on
+    mitigation being applied.
+- **Sovereign-stack constraints:** Mitigation is an adapter-bound operator
+  surface; the framework describes the hand-off and ships no
+  scrubbing-provider binding.
+- **Depends on:** F-WF-05 (incident management owns the declared-incident
+  path)
+- **Source:** FOUNDATION (operability); NIS2 Art. 21(2)(b); issue #890.
+- **Shipped via:**
+  - SKELETON — #501, #505
+  - EXTEND — #606 (cookbook)
+
+### F-WF-DORA-TLPT — DORA Chapter IV resilience-testing programme
+
+- **Status:** In Progress
+- **Priority:** P2
+- **Rationale:** The digital operational resilience testing programme a
+  financial entity operates against its ICT risk-management framework,
+  including threat-led penetration testing where in scope.
+- **Acceptance criteria:**
+  - CACAO v2 artifact with `mappings.yaml` and a workflow-local README
+    (SKELETON — shipped).
+  - Three-target compile examples with byte-parity goldens (G-03) and a
+    cookbook walkthrough (shipped).
+  - Deterministic primitives under
+    `content/playbooks/dora_tlpt_programme/primitives/` bound to the 4
+    action steps, replay-safe and offline (CORE — **outstanding**).
+  - The programme composes existing testing evidence rather than executing
+    tests — the framework does not run penetration tests.
+  - Scope determination is explicit: an entity out of TLPT scope produces a
+    programme record saying so, rather than an empty one.
+- **Sovereign-stack constraints:** Test findings stay in the operator's own
+  store; the emitted record carries references, never finding bodies.
+- **Depends on:** F-WF-DORA-SELFASSESS (the ICT risk-management framework
+  this tests against)
+- **Source:** FOUNDATION (auditability); DORA Arts. 24–27; issue #890.
+- **Shipped via:**
+  - SKELETON — #714, #715, #716
+
+### F-WF-EIDAS2-IDV — EU Digital Identity Wallet verification lifecycle
+
+- **Status:** In Progress
+- **Priority:** P2
+- **Rationale:** The operator-side lifecycle for onboarding an EUDIW-enabled
+  principal: consume a wallet attestation, verify it, and bind the verified
+  identity to an account without retaining more than the verification
+  outcome.
+- **Acceptance criteria:**
+  - CACAO v2 artifact with `mappings.yaml` and a workflow-local README
+    (SKELETON — shipped).
+  - Three-target compile examples with byte-parity goldens (G-03) and a
+    cookbook walkthrough (shipped).
+  - Deterministic primitives under
+    `content/playbooks/eidas2_identity_verification/primitives/` bound to
+    the 5 action steps, replay-safe and offline (CORE — **outstanding**).
+  - Verification consumes the attestation and retains the outcome plus its
+    provenance — not the attested attributes themselves.
+  - A failed or expired attestation produces an explicit refusal outcome;
+    there is no partial-trust state.
+- **Sovereign-stack constraints:** Uses Regulation (EU) 2024/1183 reference
+  schemas only, consistent with F-SV-02, and stores no wallet attribute
+  payload.
+- **Depends on:** F-SV-02 (the wallet-attestation typed-input pattern)
+- **Source:** FOUNDATION (sovereignty); Regulation (EU) 2024/1183; issue
+  #890.
+- **Shipped via:**
+  - SKELETON — #759, #761
+
+### F-WF-EUAIACT-RISKMGMT — EU AI Act Art. 9 risk-management system
+
+- **Status:** In Progress
+- **Priority:** P2
+- **Rationale:** The risk-management system Art. 9 requires providers of
+  high-risk AI systems to establish, implement, document and maintain across
+  the lifecycle — the provider-side counterpart to the shipped deployer and
+  human-oversight lifecycles.
+- **Acceptance criteria:**
+  - CACAO v2 artifact with `mappings.yaml` and a workflow-local README
+    (SKELETON — shipped).
+  - Three-target compile examples with byte-parity goldens (G-03) and a
+    cookbook walkthrough (shipped).
+  - Deterministic primitives under
+    `content/playbooks/eu_ai_act_risk_management/primitives/` bound to the 4
+    action steps, replay-safe and offline (CORE — **outstanding**).
+  - The system is documented as a continuous lifecycle, not a one-off
+    assessment, per Art. 9(2)'s iterative requirement.
+  - Residual risk is recorded per identified risk rather than aggregated, so
+    an Art. 9(5) judgement is traceable to the risk it was made about.
+- **Sovereign-stack constraints:** No default risk taxonomy — the operator's
+  own taxonomy is input, and a shipped one would become a de-facto standard.
+- **Depends on:** F-WF-EUAIACT-DEPLOYER (the deployer-side lifecycle this
+  pairs with)
+- **Source:** FOUNDATION (auditability); EU AI Act (Regulation (EU)
+  2024/1689) Art. 9; issue #890.
+- **Shipped via:**
+  - SKELETON — #682, #683, #684, #685
+  - EXTEND — #687, #806, #807 (cookbook, mappings, metric pair)
+
+### F-WF-MFA-COMMS — MFA and secured-communications posture
+
+- **Status:** Shipped
+- **Priority:** P2
+- **Acceptance criteria:**
+  - `content/playbooks/mfa_secured_comms/` carries the CACAO playbook,
+    `mappings.yaml`, primitives and a workflow-local README; compiled
+    targets land under `examples/{n8n,temporal,langgraph}/mfa_secured_comms/`.
+  - Probes the identity-provider surface to confirm enforcement rather than
+    reading declared configuration.
+  - Four deterministic primitives bind the action steps; three-target
+    compile examples carry byte-parity goldens.
+  - A cookbook walkthrough and a KPI entry under `content/metrics/` ship
+    with it.
+- **Sovereign-stack constraints:** The identity provider and the
+  secured-communications surface are operator-owned; no credential enters an
+  emitted artifact.
+- **Depends on:** F-WF-08 (IAM auditor supplies the identity inventory)
+- **Source:** FOUNDATION (auditability); NIS2 Art. 21(2)(j); DORA Art.
+  9(4)(b); issue #890.
+- **Shipped via:**
+  - SKELETON — #480, #484
+  - CORE — #577
+  - EXTEND — #604 (cookbook + metric)
+
+### F-WF-SOC2-EVIDENCE — SOC 2 readiness evidence collection
+
+- **Status:** Shipped
+- **Priority:** P1
+- **Acceptance criteria:**
+  - `content/playbooks/soc2_evidence_collector/` carries the CACAO playbook,
+    `mappings.yaml`, four primitives and a workflow-local README; compiled
+    targets land under
+    `examples/{n8n,temporal,langgraph}/soc2_evidence_collector/`.
+  - Aggregates evidence other playbooks already emit; collects no new
+    telemetry, so a criterion without evidence reports as uncovered rather
+    than triggering a scan.
+  - Coverage is three-valued (`covered` / `draft_backed` / `uncovered`) and
+    never a percentage — a ratio invites "N% SOC 2 compliant", which is not
+    a defensible claim.
+  - Emits no audit opinion: the document carries an explicit disclaimer and
+    a `soc2_readiness_input` document kind.
+  - Four deterministic primitives, three-target byte-parity examples, a
+    cookbook walkthrough and a KPI/KRI pair under `content/metrics/`.
+- **Sovereign-stack constraints:** The criteria set is runtime input, so the
+  playbook cannot claim coverage of a criterion the repo does not carry. No
+  attestation sink ships — where the document lands is a deployment
+  decision.
+- **Depends on:** F-CP-07 (access stream), F-WF-08, F-WF-11 (evidence
+  producers)
+- **Source:** FOUNDATION (auditability); AICPA Trust Services Criteria
+  (2017, as revised); issue #890.
+- **Shipped via:**
+  - SKELETON + CORE — #884
+  - EXTEND — #893 (cookbook + metric pair)
 
 ---
 
