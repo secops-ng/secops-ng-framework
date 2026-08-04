@@ -103,34 +103,30 @@ def test_mirror_matches_canonical_plus_overlay() -> None:
     )
 
 
-def test_overlay_only_touches_core_body_blocks() -> None:
-    """Bound the SKELETON divergence to ``x_secops_ng.core_body`` only.
+def test_wave_seam_is_closed_and_mirror_is_byte_identical() -> None:
+    """The F-WF-05 seam is closed: canonical carries the bindings, overlay is empty.
 
-    Nothing else is allowed to differ between the canonical source and
-    the n8n mirror; if a contributor adds a non-``core_body`` overlay
-    key the divergence stops being a closeable seam and the wave
-    contract breaks. Fail closed here so the divergence is auditable.
+    This replaces the SKELETON-wave divergence guard, at that guard's own
+    instruction — it said that once the canonical source is promoted to carry
+    the ``core_body`` blocks directly, delete it and re-pin the byte-parity
+    invariant. Which is what this does, from the other side: the overlay must
+    now contribute nothing, and the mirror must equal the canonical byte for
+    byte. A future contributor re-introducing per-target divergence trips this
+    instead of silently forking the single source of truth.
     """
     overlay_doc = json.loads(OVERLAY_JSON.read_text(encoding="utf-8"))
-    overlays = overlay_doc.get("workflow_overlays") or {}
-    assert overlays, (
-        "core_body.overlay.json carries no workflow_overlays — if the "
-        "canonical source has been promoted to carry the core_body blocks "
-        "directly, also delete this divergence guard and re-pin the "
-        "legacy byte-parity invariant."
+    assert not (overlay_doc.get("workflow_overlays") or {}), (
+        "the wave seam is closed — core_body bindings live on the canonical "
+        "playbook. Re-introducing workflow_overlays would fork the single "
+        "source of truth across compile targets."
     )
-    for step_id, step_overlay in overlays.items():
-        assert set(step_overlay) <= {"x_secops_ng"}, (
-            f"overlay step {step_id!r} touches keys outside x_secops_ng: "
-            f"{sorted(set(step_overlay) - {'x_secops_ng'})!r}; the SKELETON "
-            "wave only permits x_secops_ng.core_body divergence."
-        )
-        x_overlay = step_overlay["x_secops_ng"]
-        assert set(x_overlay) <= {"core_body"}, (
-            f"overlay step {step_id!r} touches x_secops_ng keys outside "
-            f"core_body: {sorted(set(x_overlay) - {'core_body'})!r}; the "
-            "SKELETON wave only permits x_secops_ng.core_body divergence."
-        )
+    assert MIRROR_JSON.read_text(encoding="utf-8") == CANON_JSON.read_text(
+        encoding="utf-8"
+    ), (
+        "mirror is no longer byte-identical to the canonical CACAO source. "
+        "With an empty overlay the two must match exactly; regenerate via the "
+        "example's regenerate.sh and commit the result."
+    )
 
 
 def test_worked_example_matches_emitter_output() -> None:

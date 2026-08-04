@@ -63,6 +63,30 @@ class PlaybookIncidentManagementV1State(TypedDict, total=False):
     # playbook_variable: __timeline_artefact_path__
     # Repository-relative path where the canonical timeline JSON artefact was persisted by the close-timeline action.
     timeline_artefact_path: str
+    # playbook_variable: __intake_signals__
+    # Signal bundle the significance classifier reads (impact, users affected, cross-border reach, service criticality). Operator- or runtime-supplied.
+    intake_signals: dict[str, object]
+    # playbook_variable: __timeline_opened_at__
+    # ISO-8601 UTC instant the incident timeline opened. Anchors every Article 23 stage clock — the 24h, 72h and one-month windows are all measured from it.
+    timeline_opened_at: str
+    # playbook_variable: __notification_submitted_at__
+    # ISO-8601 UTC instant the 72-hour notification was submitted; compared against the stage window to produce the clock verdict.
+    notification_submitted_at: str
+    # playbook_variable: __timeline_closed_at__
+    # ISO-8601 UTC instant the incident timeline closed.
+    timeline_closed_at: str
+    # playbook_variable: __classification_verdict__
+    # Structured significance verdict from the classification table; carries the significant and cross-border determinations plus the rules that fired.
+    classification_verdict: str
+    # playbook_variable: __early_warning_destination__
+    # Resolved regulator destination for the 24-hour early warning. Fail-closed: the framework ships no default endpoint.
+    early_warning_destination: str
+    # playbook_variable: __notification_stage_verdict__
+    # Stage-clock verdict for the 72-hour notification (within window, or by how much it overran).
+    notification_stage_verdict: str
+    # playbook_variable: __final_report_destination__
+    # Resolved regulator destination for the one-month final report. Fail-closed.
+    final_report_destination: str
     # bookkeeping
     # Per-step status map keyed by CACAO step_id. Conventional values: 'pending', 'running', 'ok', 'failed', 'awaiting-human'. The graph builder writes here; conditional-edge routers read it.
     step_status: dict[str, str]
@@ -105,7 +129,7 @@ async def classify_significance_and_cross_border_scope(incident_id: str) -> dict
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--50000000-0000-4000-8000-000000000003', attributes={'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify significance and cross-border scope', 'secops_ng.tool.name': 'classify_significance_and_cross_border_scope', 'secops_ng.workflow.run_id': ''})
         )
-        from incident_management.primitives.classification import classify_significance
+        from content.playbooks.incident_management.primitives.classification import classify_significance
         __classification_verdict__ = classify_significance(signals=__intake_signals__)
 
 @tool
@@ -122,9 +146,8 @@ async def open_incident_timeline(incident_id: str, significant: bool, cross_bord
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--50000000-0000-4000-8000-000000000005', attributes={'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'open incident timeline', 'secops_ng.tool.name': 'open_incident_timeline', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--50000000-0000-4000-8000-000000000005'"
-        )
+        from content.playbooks.incident_management.primitives.timeline_binding import open_timeline
+        __timeline_handle__ = open_timeline(incident_id=__incident_id__, opened_at=__timeline_opened_at__)
 
 @tool
 async def submit_24_hour_early_warning(incident_id: str, timeline_handle: str, significant: bool, cross_border: bool, notification_destinations: dict[str, object]) -> str:
@@ -140,7 +163,7 @@ async def submit_24_hour_early_warning(incident_id: str, timeline_handle: str, s
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--50000000-0000-4000-8000-000000000006', attributes={'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'submit 24-hour early warning', 'secops_ng.tool.name': 'submit_24_hour_early_warning', 'secops_ng.workflow.run_id': ''})
         )
-        from incident_management.primitives.regulator_submission import resolve_destination
+        from content.playbooks.incident_management.primitives.regulator_submission import resolve_destination
         __early_warning_destination__ = resolve_destination(destinations=__notification_destinations__, stage='early_warning')
 
 @tool
@@ -157,7 +180,7 @@ async def submit_72_hour_notification(incident_id: str, timeline_handle: str, si
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--50000000-0000-4000-8000-000000000007', attributes={'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'submit 72-hour notification', 'secops_ng.tool.name': 'submit_72_hour_notification', 'secops_ng.workflow.run_id': ''})
         )
-        from incident_management.primitives.stage_clock import verdict_for_submission
+        from content.playbooks.incident_management.primitives.stage_clock import verdict_for_submission
         __notification_stage_verdict__ = verdict_for_submission(stage='notification', opened_at=__timeline_opened_at__, submitted_at=__notification_submitted_at__)
 
 @tool
@@ -174,7 +197,7 @@ async def submit_1_month_final_report(incident_id: str, timeline_handle: str, si
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--50000000-0000-4000-8000-000000000009', attributes={'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000009', 'secops_ng.step.name': 'submit 1-month final report', 'secops_ng.tool.name': 'submit_1_month_final_report', 'secops_ng.workflow.run_id': ''})
         )
-        from incident_management.primitives.regulator_submission import resolve_destination
+        from content.playbooks.incident_management.primitives.regulator_submission import resolve_destination
         __final_report_destination__ = resolve_destination(destinations=__notification_destinations__, stage='final_report')
 
 @tool
@@ -191,9 +214,8 @@ async def close_incident_timeline(incident_id: str, timeline_handle: str) -> str
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--50000000-0000-4000-8000-00000000000a', attributes={'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'close incident timeline', 'secops_ng.tool.name': 'close_incident_timeline', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--50000000-0000-4000-8000-00000000000a'"
-        )
+        from content.playbooks.incident_management.primitives.timeline_binding import close_timeline
+        __timeline_artefact_path__ = close_timeline(session=__timeline_handle__, closed_at=__timeline_closed_at__)
 
 async def llm_step(state: PlaybookIncidentManagementV1State) -> dict:
     """Agentic-extension hook.
