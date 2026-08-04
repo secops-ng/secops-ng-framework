@@ -10,11 +10,16 @@ as nothing checked: ``alert_triage`` shipped 8 bindings and ``vuln_intake``
 examples under ``examples/{temporal,langgraph,n8n}/`` where an operator
 would copy it.
 
-SOFT findings are asserted as a *ceiling* rather than zero. They need
-content decisions — declare a new playbook variable, or accept the value
-as harness-injected runtime context — and pinning the current count means
-the number can only go down without someone editing this file, while a
-new binding that repeats the mistake still trips the assertion.
+Every finding code is HARD now. The three variable/argument codes
+(``unbound_required_argument``, ``unknown_in_variable``,
+``unknown_out_variable``) started SOFT with a pinned ceiling of 32 because
+each needed a content decision — declare a variable, or accept the value as
+runtime context. #866 settled both decisions: Decision 1 established the
+runtime-context convention (declared as ordinary ``playbook_variables``,
+#871), Decision 2 declared or rebound everything that remained, and the
+ceiling test that lived here was replaced by the zero assertion. A new
+binding must declare its variables and bind its required parameters in the
+same change.
 """
 from __future__ import annotations
 
@@ -24,13 +29,9 @@ from tools.lint_core_body import HARD, SOFT, check
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-# Ceiling, not a target. Lower it as the follow-up decisions land; never
-# raise it to accommodate a new binding.
-MAX_SOFT_FINDINGS = 32
-
 
 def test_no_hard_findings() -> None:
-    """Every core_body binding must import and take the arguments it is given."""
+    """Every binding imports, takes its arguments, and resolves its variables."""
     findings, summary = check(REPO_ROOT)
     hard = [f for f in findings if f.severity == "HARD"]
     assert not hard, "core_body bindings that cannot execute:\n" + "\n".join(
@@ -48,20 +49,15 @@ def test_bindings_are_actually_present() -> None:
     )
 
 
-def test_soft_findings_do_not_regress() -> None:
-    """SOFT findings may fall, never rise."""
-    findings, summary = check(REPO_ROOT)
-    soft = summary["soft"]
-    assert soft <= MAX_SOFT_FINDINGS, (
-        f"core_body SOFT findings rose to {soft} (ceiling {MAX_SOFT_FINDINGS}). "
-        "A new binding references an undeclared playbook variable or leaves a "
-        "required parameter unbound:\n"
-        + "\n".join(
-            f"  {f.slug}/{f.step} [{f.code}] {f.message}"
-            for f in findings
-            if f.severity == "SOFT"
-        )
-    )
+def test_soft_set_is_empty() -> None:
+    """#866 promoted the last three SOFT codes to HARD; none may demote silently.
+
+    If a future change adds a genuinely-SOFT code, update this test with the
+    reasoning — demotion is a decision, not a drive-by.
+    """
+    assert SOFT == ()
+    _, summary = check(REPO_ROOT)
+    assert summary["soft"] == 0
 
 
 def test_finding_codes_are_partitioned() -> None:

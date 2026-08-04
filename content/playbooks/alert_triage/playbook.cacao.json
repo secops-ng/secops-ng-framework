@@ -37,6 +37,91 @@
       "type": "string",
       "description": "Deterministic priority assigned by the prioritisation policy. One of: p1_severe, p2_high, p3_routine, p4_informational.",
       "external": false
+    },
+    "__raw_payload__": {
+      "type": "dictionary",
+      "description": "The inbound alert exactly as received — the push body from the detection pipeline or the pulled alert-store record — before any shape validation. Input to validate_alert_payload, which branches on __alert_source_shape__.",
+      "external": true
+    },
+    "__detection_rule_id__": {
+      "type": "string",
+      "description": "Identifier of the detection rule that produced the alert, as carried on the validated payload. One of the four components of the canonical suppression fingerprint.",
+      "external": false
+    },
+    "__subject_ref__": {
+      "type": "string",
+      "description": "Reference to the subject the detection fired on (principal, mailbox, service account). Fingerprint component; distinct from __asset_ref__ so a rule firing for one user across many hosts and one host across many users produce different keys.",
+      "external": false
+    },
+    "__asset_ref__": {
+      "type": "string",
+      "description": "Reference into the operator's asset inventory for the affected asset. Fingerprint component.",
+      "external": false
+    },
+    "__classification__": {
+      "type": "string",
+      "description": "Detection classification carried on the validated payload (rule taxonomy label, e.g. credential_access). Fingerprint component; suppression must not collapse different classifications that share a rule id.",
+      "external": false
+    },
+    "__detection_class__": {
+      "type": "string",
+      "description": "Detection class consumed by the prioritisation policy. Values are the DetectionClass policy enum in primitives/prioritisation.py; the policy, not this declaration, is the authority on the set.",
+      "external": false
+    },
+    "__detection_severity__": {
+      "type": "string",
+      "description": "Upstream detector severity consumed by the prioritisation policy (DetectionSeverity enum in primitives/prioritisation.py). Deliberately distinct from __priority__ — the policy output — so a detector cannot pre-assign its own triage priority.",
+      "external": false
+    },
+    "__asset_context__": {
+      "type": "dictionary",
+      "description": "Business context for the affected asset as read from the operator's inventory at enrichment: asset_criticality, regulated_data, internet_exposed (the AssetContext model in primitives/prioritisation.py). The response-step bindings read its fields dotted (__asset_context__.asset_criticality).",
+      "external": false
+    },
+    "__correlates_open_case__": {
+      "type": "boolean",
+      "description": "True when enrichment found an open case sharing the suppression fingerprint, which lifts the prioritisation floor. Defaults to false in the policy when unset.",
+      "external": false
+    },
+    "__alert_payload__": {
+      "type": "dictionary",
+      "description": "The validated, normalised alert envelope (AlertPayload) written by validate_alert_payload. Every step after ingest reads from this, never from __raw_payload__.",
+      "external": false
+    },
+    "__seen_key__": {
+      "type": "string",
+      "description": "Canonical suppression fingerprint computed at enrichment, checked against the suppression window to set __benign_or_seen__.",
+      "external": false
+    },
+    "__close_record_key__": {
+      "type": "string",
+      "description": "The same canonical fingerprint recomputed at suppress-and-close and stamped on the closure record, so a later alert with this fingerprint is attributable to this closure.",
+      "external": false
+    },
+    "__priority_verdict__": {
+      "type": "dictionary",
+      "description": "Full prioritisation verdict (PriorityVerdict): the priority plus the policy factors that produced it. __priority__ carries the bare priority for branch conditions; this carries the evidence.",
+      "external": false
+    },
+    "__escalation_directive__": {
+      "type": "dictionary",
+      "description": "Escalation directive (EscalationDirective) for the p1 branch: who to page, with what context.",
+      "external": false
+    },
+    "__notification_directive__": {
+      "type": "dictionary",
+      "description": "Notification directive (NotificationDirective) for the p2 branch: primary-analyst queue entry plus on-call notice.",
+      "external": false
+    },
+    "__review_queue_directive__": {
+      "type": "dictionary",
+      "description": "Review-queue directive (ReviewQueueDirective) for the p3 branch.",
+      "external": false
+    },
+    "__closure_record__": {
+      "type": "dictionary",
+      "description": "Closure record (ClosureRecord) for the p4 branch: the logged informational close, keyed for later suppression attribution.",
+      "external": false
     }
   },
   "workflow_start": "start--a1e47431-0000-4000-8000-000000000001",

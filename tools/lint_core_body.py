@@ -16,31 +16,28 @@ were real parameters — so a typo in a dotted path shipped as an
 ``ImportError`` inside committed worked examples, which is exactly what
 happened to ``alert_triage`` (8 bindings) and ``vuln_intake`` (2).
 
-## Two severities, on purpose
+## Six finding codes, all HARD
 
-**HARD** findings fail the build. Each is a defect with no judgement
-attached — the binding cannot execute and there is exactly one correct
+Each is a defect the binding cannot execute past, with exactly one correct
 answer:
 
 * ``unresolvable_module``  — the dotted module does not import.
 * ``missing_callable``     — the module imports; the callable is absent.
 * ``unknown_argument``     — an ``in`` key is not a parameter of the
   callable, so the generated call raises ``TypeError``.
-
-**SOFT** findings are reported with a count and do not fail. Each needs a
-content decision (usually: declare a new playbook variable, or decide the
-value is runtime context the harness injects) and there is no single
-mechanical fix:
-
 * ``unbound_required_argument`` — a required parameter has no ``in`` entry.
 * ``unknown_in_variable``       — an ``in`` expression names a ``__var__``
   the playbook does not declare.
 * ``unknown_out_variable``      — ``out`` names a ``__var__`` the playbook
   does not declare.
 
-Promoting the soft set to hard is the point of the follow-up work; until
-those decisions land, failing on them would only mean the guard is
-switched off entirely, which is how the hard defects survived.
+The last three started SOFT with a pinned ceiling of 32, because each
+needed a content decision — declare a variable, or accept the value as
+runtime context. #866 settled both halves: Decision 1 fixed the
+runtime-context convention (ordinary ``playbook_variables`` with
+``external: true``, #871), Decision 2 declared or rebound everything that
+remained, and the codes were promoted here as that issue prescribed. The
+SOFT tuple is kept (empty) so the severity partition stays explicit.
 
 Usage:
 
@@ -72,8 +69,15 @@ from pathlib import Path
 
 import yaml
 
-HARD = ("unresolvable_module", "missing_callable", "unknown_argument")
-SOFT = ("unbound_required_argument", "unknown_in_variable", "unknown_out_variable")
+HARD = (
+    "unresolvable_module",
+    "missing_callable",
+    "unknown_argument",
+    "unbound_required_argument",
+    "unknown_in_variable",
+    "unknown_out_variable",
+)
+SOFT = ()
 
 VAR_RE = re.compile(r"^__[a-z0-9_]+__$")
 
@@ -119,9 +123,6 @@ def _check_binding(
     def hard(code: str, msg: str) -> None:
         out.append(Finding(slug, step_name, code, "HARD", msg))
 
-    def soft(code: str, msg: str) -> None:
-        out.append(Finding(slug, step_name, code, "SOFT", msg))
-
     dotted = core_body.get("primitive") or ""
     module_path, _, callable_name = dotted.rpartition(".")
     in_map = core_body.get("in") or {}
@@ -164,7 +165,7 @@ def _check_binding(
             )
         unbound = sorted(required - set(in_map))
         if unbound:
-            soft(
+            hard(
                 "unbound_required_argument",
                 f"{dotted}: {len(unbound)} required parameter(s) unbound "
                 f"{unbound}.",
@@ -172,7 +173,7 @@ def _check_binding(
 
     for key, expr in in_map.items():
         if isinstance(expr, str) and VAR_RE.match(expr) and expr not in declared:
-            soft(
+            hard(
                 "unknown_in_variable",
                 f"{dotted}: `in.{key}` references {expr} which the playbook "
                 f"does not declare in playbook_variables.",
@@ -180,7 +181,7 @@ def _check_binding(
 
     target = core_body.get("out")
     if isinstance(target, str) and VAR_RE.match(target) and target not in declared:
-        soft(
+        hard(
             "unknown_out_variable",
             f"{dotted}: `out` writes {target} which the playbook does not "
             f"declare in playbook_variables.",
