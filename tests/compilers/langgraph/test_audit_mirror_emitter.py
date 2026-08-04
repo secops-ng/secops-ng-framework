@@ -172,6 +172,15 @@ def _materialise_emitted_pkg(tmp_path: Path, name: str, playbook: dict):
 
 @pytest.fixture
 def emitted_modules(tmp_path: Path):
+    # Importing the emitted source executes its `from opentelemetry import
+    # trace`, so this fixture — and only this fixture — needs OTel present.
+    # It is not a declared dependency and deliberately so: the framework
+    # never imports it, and compilers/_shared/observability.py keeps the
+    # import inside the *emitted* text. Guarding here rather than at module
+    # scope keeps the source-inspection tests below running on a minimal dev
+    # install, which is the whole point — they are what pin the sovereign-
+    # stack import contract, and they need no runtime at all.
+    pytest.importorskip("opentelemetry")
     name = "lg_emitter_audit_pkg"
     bindings_mod, mirror_mod = _materialise_emitted_pkg(
         tmp_path, name, _synthetic_playbook()
