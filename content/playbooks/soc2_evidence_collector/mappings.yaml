@@ -1,0 +1,89 @@
+# Outbound cross-references for playbook.soc2_evidence_collector@v1.
+#
+# Schema: schemas/playbook-mappings.schema.json
+#
+# Scope note. This file declares what THIS PLAYBOOK'S OWN OPERATION discharges
+# — it is a monitoring activity, so it anchors to the monitoring criteria. The
+# 53 Trust Services Criteria it *scores coverage against* are runtime data read
+# from content/mappings/soc2/*.yaml, deliberately not enumerated here: pinning
+# them would freeze the criteria set into this file and let the playbook claim
+# coverage of criteria the crosswalk no longer carries.
+#
+# SOC 2 is not an EU statutory instrument. Per docs/cookbook/soc2_crosswalk.md
+# the EU mappings remain the authoritative pointer for the statutory surface;
+# the soc2 block below never replaces one.
+
+playbook: "playbook.soc2_evidence_collector@v1"
+
+oscal:
+  - control_ref: "control.evidence_pipeline@v1"
+    oscal_catalog: "NIST SP 800-53 Rev. 5"
+    control_id: "CA-7"
+    title: "Continuous Monitoring"
+    url: "https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CA-7"
+    notes: >-
+      Anchors the playbook end to end. CA-7 requires an ongoing monitoring
+      strategy that assesses control effectiveness and reports it to named
+      officials; this playbook is the reporting half of that loop for the SOC 2
+      criteria surface, aggregating evidence the other playbooks emit rather
+      than performing its own assessment.
+  - control_ref: "control.evidence_pipeline@v1"
+    oscal_catalog: "NIST SP 800-53 Rev. 5"
+    control_id: "CA-2"
+    title: "Control Assessments"
+    url: "https://csrc.nist.gov/projects/risk-management/sp800-53-controls/release-search#!/control?version=5.1&number=CA-2"
+    notes: >-
+      The scoring step produces the per-criterion coverage record a CA-2
+      assessment consumes. Deliberately not an assessment result itself: the
+      playbook reports which criteria have supporting evidence, and a
+      practitioner decides whether that evidence is sufficient.
+
+d3fend:
+  - step: "action--b7c2e5a1-0000-4000-8000-000000000004"
+    d3fend_id: "D3-OAM"
+    d3fend_name: "Operational Activity Mapping"
+    url: "https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/"
+    notes: >-
+      score-per-criterion-coverage — mapping the collected evidence set onto the
+      Trust Services Criteria is operational-activity mapping in the D3FEND
+      sense. Same technique the nis2_self_assessment scoring step pins, because
+      it is the same operation against a different criteria set.
+
+ocsf:
+  - id: "telemetry.ocsf.compliance_finding@v1"
+    category_uid: 2
+    category_name: "Findings"
+    class_uid: 2003
+    class_name: "Compliance Finding"
+    ocsf_version: "1.3.0"
+    direction: "emits"
+    notes: >-
+      The readiness attestation is a compliance finding in OCSF terms: one
+      per-execution record stating which criteria the operator's evidence
+      supports. Emitted, not consumed — the playbook reads evidence references
+      rather than OCSF events.
+
+# NIS2 / DORA / CRA are required keys on this schema. This playbook has no
+# direct obligation under any of them: it reports against the AICPA criteria
+# set, and the EU statutory surface is discharged by the playbooks whose
+# evidence it aggregates. Recording that as a deliberate empty rather than a
+# todo, because there is nothing outstanding to pin.
+nis2: []
+dora: []
+cra: []
+
+soc2:
+  - mapping_id: "soc2:cc4-1-ongoing-and-separate-evaluations"
+    article: "CC4.1"
+    notes: >-
+      The entity selects, develops and performs ongoing evaluations to ascertain
+      whether controls are present and functioning. This playbook's own
+      operation is such an evaluation for the criteria surface, which is why
+      CC4.1 is an outbound anchor rather than something it merely scores.
+  - mapping_id: "soc2:cc4-2-evaluation-and-communication-of-deficiencies"
+    article: "CC4.2"
+    notes: >-
+      The entity evaluates and communicates control deficiencies to those
+      responsible for corrective action. The attestation surfaces uncovered and
+      draft-backed criteria at the top level and names a role-shaped owner,
+      which is the communication half of CC4.2.

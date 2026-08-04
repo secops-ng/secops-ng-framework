@@ -96,8 +96,12 @@ FAMILIES: dict[str, tuple[str, ...]] = {
         "on_call_rotation",
         "security_awareness_training",
     ),
-    # Regulation-prefixed slugs are appended here automatically.
-    REGULATORY_FAMILY: (),
+    # Regulation-prefixed slugs (dora_, nis2_, cra_, eu_ai_act_, eidas2_) are
+    # appended here automatically. soc2_evidence_collector is listed explicitly
+    # because its slug names the artifact rather than the regime — it scores
+    # coverage against the AICPA Trust Services Criteria, which makes it a
+    # regulatory-programme playbook despite carrying no regime prefix.
+    REGULATORY_FAMILY: ("soc2_evidence_collector",),
 }
 
 UNFILED = "Unfiled"

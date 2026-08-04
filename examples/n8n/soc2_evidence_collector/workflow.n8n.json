@@ -1,0 +1,246 @@
+{
+  "name": "SOC 2 evidence collector",
+  "nodes": [
+    {
+      "id": "start--b7c2e5a1-0000-4000-8000-000000000001",
+      "name": "soc2_evidence_collector_start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "values": {
+          "values": [
+            {
+              "name": "__assessment_window__",
+              "type": "string",
+              "value": "",
+              "description": "ISO-8601 interval the attestation covers. Operator-declared."
+            },
+            {
+              "name": "__evidence_refs__",
+              "type": "object",
+              "value": "",
+              "description": "Evidence references available for the window, each carrying its artifact_id, stream and the criteria refs it claims to support."
+            },
+            {
+              "name": "__criteria_atoms__",
+              "type": "string",
+              "value": "",
+              "description": "Per-criterion atoms read from the SOC 2 crosswalk, each carrying its category, control refs, playbook refs and mapping status."
+            },
+            {
+              "name": "__criteria_mapping__",
+              "type": "string",
+              "value": "",
+              "description": "Which evidence reference supports which criterion."
+            },
+            {
+              "name": "__coverage_scoring__",
+              "type": "string",
+              "value": "",
+              "description": "Per-criterion coverage verdict plus the category rollup."
+            },
+            {
+              "name": "__attestation_id__",
+              "type": "string",
+              "value": "",
+              "description": "Deterministic id of the emitted readiness attestation."
+            },
+            {
+              "name": "__workflow_id__",
+              "type": "string",
+              "value": "",
+              "description": "Runtime-supplied: content-model slug of the workflow that ran."
+            },
+            {
+              "name": "__execution_id__",
+              "type": "string",
+              "value": "",
+              "description": "Runtime-supplied per-execution id."
+            },
+            {
+              "name": "__captured_at__",
+              "type": "string",
+              "value": "",
+              "description": "Runtime-supplied ISO-8601 UTC capture instant."
+            },
+            {
+              "name": "__owner_role__",
+              "type": "string",
+              "value": "",
+              "description": "Role-shaped owner of the readiness posture; a role, never a person."
+            },
+            {
+              "name": "__crosswalk_entries__",
+              "type": "object",
+              "value": "",
+              "description": "The SOC 2 crosswalk entries to score against, read from content/mappings/soc2/*.yaml by the adapter. Passed in as data so the criteria set is not hard-coded in this playbook."
+            }
+          ]
+        }
+      },
+      "notes": "",
+      "notesInFlow": false
+    },
+    {
+      "id": "action--b7c2e5a1-0000-4000-8000-000000000002",
+      "name": "collect criteria atoms",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.soc2_evidence_collector.primitives.criteria import collect_criteria_atoms\n__criteria_atoms__ = collect_criteria_atoms(crosswalk_entries=__crosswalk_entries__)"
+      },
+      "notes": "Read the Trust Services Criteria crosswalk under content/mappings/soc2/ into per-criterion atoms. The criteria set is data, not a constant in this playbook, so a criterion added to the crosswalk is scored on the next run without a content change here.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--b7c2e5a1-0000-4000-8000-000000000003",
+      "name": "map evidence to criteria",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        240
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.soc2_evidence_collector.primitives.mapping import map_evidence_to_criteria\n__criteria_mapping__ = map_evidence_to_criteria(atoms=__criteria_atoms__, evidence_refs=__evidence_refs__)"
+      },
+      "notes": "Join the evidence references available for the window onto the criteria they support. An evidence reference naming a criterion the crosswalk does not carry is reported as unmatched rather than silently dropped.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--b7c2e5a1-0000-4000-8000-000000000004",
+      "name": "score per-criterion coverage",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        420
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.soc2_evidence_collector.primitives.scoring import score_criterion_coverage\n__coverage_scoring__ = score_criterion_coverage(atoms=__criteria_atoms__, mapping=__criteria_mapping__)"
+      },
+      "notes": "Score each criterion as covered, partially covered or uncovered, and roll the result up per Trust Services category. Coverage resting on a draft mapping is counted separately \u2014 a draft crosswalk entry is not audit-ready evidence.",
+      "notesInFlow": true
+    },
+    {
+      "id": "action--b7c2e5a1-0000-4000-8000-000000000005",
+      "name": "report readiness attestation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from content.playbooks.soc2_evidence_collector.primitives.attestation import build_readiness_attestation\n__attestation_id__ = build_readiness_attestation(workflow_id=__workflow_id__, execution_id=__execution_id__, captured_at=__captured_at__, assessment_window=__assessment_window__, scoring=__coverage_scoring__, owner_role=__owner_role__)"
+      },
+      "notes": "Emit one dated readiness attestation naming covered, partially covered and uncovered criteria, the draft-backed subset, and the owner. It is readiness input for an auditor, never an audit opinion.",
+      "notesInFlow": true
+    },
+    {
+      "id": "end--b7c2e5a1-0000-4000-8000-000000000006",
+      "name": "soc2_evidence_collector_end",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        420
+      ],
+      "parameters": {},
+      "notes": "",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "soc2_evidence_collector_start": {
+      "main": [
+        [
+          {
+            "node": "collect criteria atoms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "collect criteria atoms": {
+      "main": [
+        [
+          {
+            "node": "map evidence to criteria",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "map evidence to criteria": {
+      "main": [
+        [
+          {
+            "node": "score per-criterion coverage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "score per-criterion coverage": {
+      "main": [
+        [
+          {
+            "node": "report readiness attestation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "report readiness attestation": {
+      "main": [
+        [
+          {
+            "node": "soc2_evidence_collector_end",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    "soc2",
+    "trust-services-criteria",
+    "attestation",
+    "evidence-aggregation",
+    "operator-reporting",
+    "source-artifact"
+  ],
+  "pinData": {},
+  "meta": {
+    "secops_ng": {
+      "stable_id": "playbook.soc2_evidence_collector@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "source_playbook_id": "playbook--b7c2e5a1-0000-4000-8000-000000000000"
+    },
+    "secops_ng_notes": []
+  }
+}
