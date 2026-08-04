@@ -1840,7 +1840,18 @@ not a separate documentation chore.
 ## Epic SV — Sovereign Defaults
 
 Operator-facing defaults that enforce FOUNDATION property #3 without
-manual configuration.
+manual configuration, and the artifacts that let an operator
+*demonstrate* the resulting posture rather than assert it.
+
+The first three features landed the defaults. What followed them was
+measurement: the catalogue now carries 21 sovereignty-tagged indicators
+(15 KPIs, 6 KRIs) under `content/metrics/`. What it does not carry is any
+way to turn an observation of those indicators into a dated, validated
+artifact — sovereignty is the only FOUNDATION property with no evidence
+stream, while the F-CP epic shipped seven for other surfaces. F-SV-04
+through F-SV-06 close that, in that order: emit the evidence, declare
+what the evidence has to show, then stop coverage indicators from
+shipping without their residual-risk counterpart.
 
 ### F-SV-01 — EU-resident LM default refusal
 
@@ -1899,6 +1910,103 @@ manual configuration.
 - **Depends on:** F-WF-05
 - **Source:** Research `2026-05-15-dora-incident-reporting.md`
   (private; available on request).
+
+### F-SV-04 — Sovereignty posture evidence stream
+
+- **Status:** Proposed
+- **Priority:** P1
+- **Rationale:** The catalogue measures the sovereign posture from 21
+  angles but emits nothing. Ten evidence streams exist under
+  `content/evidence/` and fifteen schemas under `schemas/evidence/`;
+  none is sovereignty. An operator can therefore observe that they are
+  EU-resident but cannot hand a reviewer a dated artifact saying so,
+  which is the difference between claiming the property and evidencing
+  it.
+- **Acceptance criteria:**
+  - `content/evidence/sovereignty/` ships with `README.md` and
+    `SCHEMA.md` in the same layout as the seven F-CP streams.
+  - `schemas/evidence/sovereignty.schema.json` validates a record
+    carrying the assessment window, one observation per
+    sovereignty-cluster indicator (`stable_id`, observed value, the
+    threshold band it fell in) and an attestation state drawn from
+    `schemas/attestation_state.json`.
+  - The four-state vocabulary is *reused* from
+    `schemas/attestation_state.json`, not redeclared — a test fails if
+    the stream introduces a parallel state set.
+  - A record omitting any sovereignty-cluster KPI fails validation, so
+    the stream cannot silently under-report the posture it attests to.
+  - All three compile targets emit a record that validates, and the
+    committed examples regenerate byte-identically.
+  - No numeric aggregate: the record carries per-indicator observations
+    and never a single sovereignty score. A ratio invites "N% sovereign",
+    which is not a defensible claim — the same reasoning that keeps a
+    percentage out of the SOC 2 readiness attestation.
+- **Sovereign-stack constraints:** No default sink and no network call —
+  the stream is composed from observations the operator supplies. The
+  emitted artifact carries no endpoint literal, so it cannot itself
+  become a non-EU reference that
+  `kri.hardcoded_non_eu_endpoint_reference_count@v1` would count.
+- **Depends on:** F-CP-01
+- **Source:** FOUNDATION (sovereignty); the sovereignty cluster under
+  `content/metrics/`; issue #890.
+
+### F-SV-05 — Declared sovereignty conformance profile
+
+- **Status:** Proposed
+- **Priority:** P1
+- **Rationale:** Twenty-one indicators each carry their own thresholds,
+  but nothing declares *which* of them, at which bands, constitute the
+  sovereign posture. Two deployments can both claim sovereignty on
+  entirely different evidence, and neither is wrong, because there is no
+  baseline to be wrong about.
+- **Acceptance criteria:**
+  - A profile artifact names the required indicator set and the band
+    each indicator must meet for the posture to hold.
+  - The profile is data, not code: a sovereignty-tagged metric added to
+    the catalogue surfaces as unclassified rather than being silently
+    excluded from the posture.
+  - A linter fails when a sovereignty-tagged metric is absent from the
+    profile, naming the metric and the file to edit — the same
+    force-a-classification shape as the playbook family map.
+  - An F-SV-04 evidence record can be evaluated against the profile
+    deterministically: same record plus same profile yields the same
+    verdict, with no clock read and no network access.
+  - The verdict is per-indicator with a pass/fail roll-up, never a score.
+  - Tightening a band in an operator's own profile is supported;
+    loosening one below the declared baseline requires an explicit
+    recorded override, so a relaxation is visible rather than inferred.
+- **Sovereign-stack constraints:** Portable content only — the profile
+  ships as an artifact the three targets read, not as runtime code.
+- **Depends on:** F-SV-04
+- **Source:** FOUNDATION (sovereignty); issue #890.
+
+### F-SV-06 — Generalise the coverage/exposure pairing invariant
+
+- **Status:** Proposed
+- **Priority:** P2
+- **Rationale:** `tools/lint_sovereignty_lm_endpoint_pairing.py` exists
+  because an LM-endpoint coverage KPI cannot distinguish an
+  operator-supplied or self-hosted endpoint from a confirmed non-EU one,
+  so it must ship with a paired UNKNOWN-exposure KRI to stay honest. That
+  reasoning is not specific to LM endpoints, but the lint is: the cluster
+  holds 15 KPIs against 6 KRIs, so most coverage indicators carry no
+  declared residual-risk counterpart at all.
+- **Acceptance criteria:**
+  - The pairing assertion applies to every sovereignty-cluster coverage
+    KPI, not only the `lm_endpoint_*` family.
+  - Each such KPI declares its counterpart **explicitly** rather than by
+    name convention, so the pairing survives a rename on either side.
+  - A coverage KPI with no declared counterpart fails the lint, with the
+    KPI's `stable_id` in the message.
+  - The existing LM-endpoint case is covered by the generalised rule and
+    the bespoke linter is retired, not left in place as a second source
+    of truth.
+  - The CI lane keeps its current job name so branch protection is
+    unaffected by the change.
+- **Sovereign-stack constraints:** —
+- **Depends on:** —
+- **Source:** FOUNDATION (sovereignty);
+  `tools/lint_sovereignty_lm_endpoint_pairing.py`; issue #890.
 
 ---
 
