@@ -1,0 +1,32 @@
+{
+  "stable_id": "telemetry.ocsf.cloud_resources_inventory_info@v1",
+  "content_version": "0.1.0",
+  "maturity": "experimental",
+  "title": "Cloud Resources Inventory Info event (cloud asset inventory telemetry for misconfiguration enrichment)",
+  "summary": "OCSF Cloud Resources Inventory Info events the cloud_misconfiguration playbook consumes at the enrich-resource-and-owner step: the inventory record for the misconfigured resource supplies its type, account and ownership metadata so the finding can be routed to the owning team rather than a shared queue. The class exists upstream from OCSF 1.4.0 (uid 5023); the overlay's original gap note deferred this binding until the catalogue baseline lifted to 1.4.0 — which every artifact under content/telemetry/ now pins. The playbook previously referenced it under the invented name `cloud_resource_inventory`; provenance for the rename is on issue #875.",
+  "ocsf": {
+    "version": "1.4.0",
+    "category_uid": 5,
+    "category_name": "Discovery",
+    "class_uid": 5023,
+    "class_name": "Cloud Resources Inventory Info"
+  },
+  "direction": "ingest",
+  "fields_used": [
+    "time",
+    "cloud.provider",
+    "cloud.account.uid",
+    "resources[].uid",
+    "resources[].type",
+    "resources[].owner"
+  ],
+  "playbook_refs": [
+    {
+      "playbook_id": "playbook.cloud_misconfiguration@v1"
+    }
+  ],
+  "maintainer": "telemetry-wg@secops-ng.org",
+  "sources": [
+    "OCSF v1.4.0 Discovery category — Cloud Resources Inventory Info class (uid 5023)"
+  ]
+}

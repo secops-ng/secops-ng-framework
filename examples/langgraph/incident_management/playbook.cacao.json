@@ -11,7 +11,7 @@
   ],
   "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
   "created": "2026-06-06T00:00:00Z",
-  "modified": "2026-06-06T00:00:00Z",
+  "modified": "2026-08-03T00:00:00Z",
   "labels": [
     "incident_management",
     "incident-timeline",
@@ -98,6 +98,46 @@
       "type": "string",
       "description": "Repository-relative path where the canonical timeline JSON artefact was persisted by the close-timeline action.",
       "external": false
+    },
+    "__intake_signals__": {
+      "type": "dictionary",
+      "description": "Signal bundle the significance classifier reads (impact, users affected, cross-border reach, service criticality). Operator- or runtime-supplied.",
+      "external": true
+    },
+    "__timeline_opened_at__": {
+      "type": "string",
+      "description": "ISO-8601 UTC instant the incident timeline opened. Anchors every Article 23 stage clock — the 24h, 72h and one-month windows are all measured from it.",
+      "external": true
+    },
+    "__notification_submitted_at__": {
+      "type": "string",
+      "description": "ISO-8601 UTC instant the 72-hour notification was submitted; compared against the stage window to produce the clock verdict.",
+      "external": true
+    },
+    "__timeline_closed_at__": {
+      "type": "string",
+      "description": "ISO-8601 UTC instant the incident timeline closed.",
+      "external": true
+    },
+    "__classification_verdict__": {
+      "type": "string",
+      "description": "Structured significance verdict from the classification table; carries the significant and cross-border determinations plus the rules that fired.",
+      "external": false
+    },
+    "__early_warning_destination__": {
+      "type": "string",
+      "description": "Resolved regulator destination for the 24-hour early warning. Fail-closed: the framework ships no default endpoint.",
+      "external": false
+    },
+    "__notification_stage_verdict__": {
+      "type": "string",
+      "description": "Stage-clock verdict for the 72-hour notification (within window, or by how much it overran).",
+      "external": false
+    },
+    "__final_report_destination__": {
+      "type": "string",
+      "description": "Resolved regulator destination for the one-month final report. Fail-closed.",
+      "external": false
     }
   },
   "workflow_start": "start--50000000-0000-4000-8000-000000000001",
@@ -151,7 +191,7 @@
           "kpi.timeline_completeness@v1"
         ],
         "core_body": {
-          "primitive": "incident_management.primitives.classification.classify_significance",
+          "primitive": "content.playbooks.incident_management.primitives.classification.classify_significance",
           "in": {
             "signals": "__intake_signals__"
           },
@@ -164,7 +204,8 @@
       "name": "significant?",
       "description": "Branch on __significant__. True paths into the regulator-timeline three-stage submission flow. False routes directly to the end step (the audit-only close-out for non-significant events is logged for the false-positive KPI by an out-of-scope downstream card).",
       "on_success": "action--50000000-0000-4000-8000-000000000005",
-      "on_failure": "end--50000000-0000-4000-8000-00000000000b"
+      "on_failure": "end--50000000-0000-4000-8000-00000000000b",
+      "condition": "__significant__"
     },
     "action--50000000-0000-4000-8000-000000000005": {
       "type": "action",
@@ -188,7 +229,15 @@
         ],
         "metric_refs": [
           "kpi.timeline_completeness@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.incident_management.primitives.timeline_binding.open_timeline",
+          "in": {
+            "incident_id": "__incident_id__",
+            "opened_at": "__timeline_opened_at__"
+          },
+          "out": "__timeline_handle__"
+        }
       }
     },
     "action--50000000-0000-4000-8000-000000000006": {
@@ -219,7 +268,7 @@
           "kri.regulator_notification_overrun@v1"
         ],
         "core_body": {
-          "primitive": "incident_management.primitives.regulator_submission.resolve_destination",
+          "primitive": "content.playbooks.incident_management.primitives.regulator_submission.resolve_destination",
           "in": {
             "destinations": "__notification_destinations__",
             "stage": "'early_warning'"
@@ -256,7 +305,7 @@
           "kri.regulator_notification_overrun@v1"
         ],
         "core_body": {
-          "primitive": "incident_management.primitives.stage_clock.verdict_for_submission",
+          "primitive": "content.playbooks.incident_management.primitives.stage_clock.verdict_for_submission",
           "in": {
             "stage": "'notification'",
             "opened_at": "__timeline_opened_at__",
@@ -271,7 +320,8 @@
       "name": "final-report material complete?",
       "description": "Branch on __final_report_ready__. True paths into the one-month final-report submission. False paths around it: the timeline is closed with a deferred-final-report marker so the timeline JSON is well-formed and consumable downstream; a late final-report submission is operator-driven re-entry and out of scope for this card.",
       "on_success": "action--50000000-0000-4000-8000-000000000009",
-      "on_failure": "action--50000000-0000-4000-8000-00000000000a"
+      "on_failure": "action--50000000-0000-4000-8000-00000000000a",
+      "condition": "__final_report_ready__"
     },
     "action--50000000-0000-4000-8000-000000000009": {
       "type": "action",
@@ -302,7 +352,7 @@
           "kri.regulator_notification_overrun@v1"
         ],
         "core_body": {
-          "primitive": "incident_management.primitives.regulator_submission.resolve_destination",
+          "primitive": "content.playbooks.incident_management.primitives.regulator_submission.resolve_destination",
           "in": {
             "destinations": "__notification_destinations__",
             "stage": "'final_report'"
@@ -332,7 +382,15 @@
         ],
         "metric_refs": [
           "kpi.timeline_completeness@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.incident_management.primitives.timeline_binding.close_timeline",
+          "in": {
+            "session": "__timeline_handle__",
+            "closed_at": "__timeline_closed_at__"
+          },
+          "out": "__timeline_artefact_path__"
+        }
       }
     },
     "end--50000000-0000-4000-8000-00000000000b": {
@@ -342,7 +400,7 @@
   },
   "x_secops_ng": {
     "stable_id": "playbook.incident_management@v1",
-    "content_version": "0.1.0",
+    "content_version": "0.2.0",
     "maturity": "experimental",
     "compile_targets": [
       "n8n",

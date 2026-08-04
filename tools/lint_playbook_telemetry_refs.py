@@ -15,23 +15,23 @@ is ``telemetry.ocsf.api_activity@v1``. The metrics guard caught this only when
 a contributor copied the bare spelling out of an overlay and into a metric,
 which is exactly how it was found.
 
-## Two severities
-
-**HARD** — fails the build. One defect, one correct answer:
+## Two finding codes, both HARD
 
 * ``bare_ocsf_ref`` — the ref omits the ``ocsf`` segment while the namespaced
   form has a committed artifact. Purely a spelling regression on the
   normalisation done in #873.
-
-**SOFT** — reported with a count, does not fail:
-
 * ``undefined_telemetry_class`` — the ref names a class with no artifact under
-  either spelling. Renaming cannot fix these: the catalogue does not ship the
-  class. Closing them means authoring the telemetry artifact or dropping the
-  claim, which is content work with a judgement in it.
+  either spelling. Every ref must resolve to a committed artifact under
+  ``content/telemetry/``; assert a new class by authoring its artifact in the
+  same change.
 
-Failing on the soft set would mean the guard is switched off until that
-content lands, and an always-red guard is one nobody reads.
+``undefined_telemetry_class`` started as a SOFT count with a pinned ceiling:
+36 refs named classes the catalogue did not ship, and failing on them would
+have meant a guard that was red until all that content landed. #875 closed
+all 36 — four artifacts authored against the verified OCSF 1.4.0 class list,
+the rest rebound to classes that exist — and promoted the code to HARD, as
+that issue's sequencing prescribed. The SOFT tuple is kept (empty) so the
+severity partition stays explicit.
 
 Usage:
 
@@ -42,7 +42,8 @@ Usage:
     python -m tools.lint_playbook_telemetry_refs --root /path
 
 Exit code is non-zero iff a HARD finding is emitted (or any, under
-``--strict``).
+``--strict``; vestigial now that every code is HARD, kept for interface
+stability).
 
 Pure stdlib + PyYAML. No network.
 """
@@ -57,8 +58,8 @@ from pathlib import Path
 
 import yaml
 
-HARD = ("bare_ocsf_ref",)
-SOFT = ("undefined_telemetry_class",)
+HARD = ("bare_ocsf_ref", "undefined_telemetry_class")
+SOFT = ()
 
 TELEMETRY_RE = re.compile(r"^telemetry\.(?P<rest>[a-z][a-z0-9_.]*)@v\d+(?:\.\d+){0,2}$")
 
@@ -113,9 +114,10 @@ def _classify(slug: str, where: str, ref: str, have: set[str]) -> Finding | None
         where,
         ref,
         "undefined_telemetry_class",
-        "SOFT",
+        "HARD",
         f"{ref} names a class with no artifact under content/telemetry/ in "
-        f"either spelling. Author the artifact or drop the claim.",
+        f"either spelling. Author the artifact (against the upstream OCSF "
+        f"class list) or drop the claim.",
     )
 
 
@@ -189,7 +191,10 @@ def main(argv: list[str] | None = None) -> int:
             f"{summary['hard']} hard, {summary['soft']} soft"
         )
         if not summary["hard"]:
-            print("HARD findings: none — every ref uses the namespaced OCSF spelling.")
+            print(
+                "HARD findings: none — every ref uses the namespaced OCSF "
+                "spelling and resolves to a committed artifact."
+            )
 
     return 1 if summary["hard"] + (summary["soft"] if args.strict else 0) else 0
 

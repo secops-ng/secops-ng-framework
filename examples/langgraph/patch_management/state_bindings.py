@@ -51,6 +51,66 @@ class PlaybookPatchManagementV1State(TypedDict, total=False):
     # playbook_variable: __evidence_id__
     # Identifier of the dated patch-application evidence record published to the operator's evidence store. Always populated, including on the short-circuit branch (unclassified update) and the canary-unhealthy branch.
     evidence_id: str
+    # playbook_variable: __workflow_id__
+    # Runtime-supplied: content-model slug of the workflow that ran.
+    workflow_id: str
+    # playbook_variable: __execution_id__
+    # Runtime-supplied: n8n execution id / Temporal run id / LangGraph thread id.
+    execution_id: str
+    # playbook_variable: __captured_at__
+    # Runtime-supplied: ISO-8601 UTC instant the evidence was captured.
+    captured_at: str
+    # playbook_variable: __regulation_refs__
+    # Operator-supplied: regulation anchors this execution attests against.
+    regulation_refs: str
+    # playbook_variable: __control_refs__
+    # Operator-supplied: control stable-ids attested by this execution.
+    control_refs: str
+    # playbook_variable: __source_url__
+    # Operator-supplied: provenance URL for this execution.
+    source_url: str
+    # playbook_variable: __advisory_kind__
+    # Kind of upstream advisory that surfaced the update (vendor bulletin, CVE feed, registry digest).
+    advisory_kind: str
+    # playbook_variable: __tracked_inventory__
+    # Deployed estate entries tracked for this update subject; detection compares the advisory against these.
+    tracked_inventory: dict[str, object]
+    # playbook_variable: __severity_band__
+    # Severity band asserted by the advisory. Feeds the criticality policy.
+    severity_band: str
+    # playbook_variable: __exploit_observed__
+    # True when exploitation of this update subject has been observed in the wild.
+    exploit_observed: bool
+    # playbook_variable: __is_feature_only__
+    # True when the update carries no security fix; routes to the feature-only criticality lane.
+    is_feature_only: bool
+    # playbook_variable: __ring_topology__
+    # Operator's deployment-ring topology. Staging selects the canary ring from this.
+    ring_topology: dict[str, object]
+    # playbook_variable: __broad_rings__
+    # Rings the fan-out targets once the canary is healthy.
+    broad_rings: dict[str, object]
+    # playbook_variable: __functional_probe__
+    # Canary functional probe outcome.
+    functional_probe: bool
+    # playbook_variable: __error_rate_within_threshold__
+    # True when the canary's error rate stayed inside the agreed threshold.
+    error_rate_within_threshold: bool
+    # playbook_variable: __latency_within_threshold__
+    # True when the canary's latency stayed inside the agreed threshold.
+    latency_within_threshold: bool
+    # playbook_variable: __rollback_ready__
+    # True when a verified rollback path exists for the staged ring.
+    rollback_ready: bool
+    # playbook_variable: __health_observations__
+    # Ordered canary health observations carried onto the evidence artifact.
+    health_observations: dict[str, object]
+    # playbook_variable: __detection_record__
+    # Detection verdict produced by the availability check.
+    detection_record: str
+    # playbook_variable: __canary_verdict__
+    # Structured canary validation verdict.
+    canary_verdict: str
     # bookkeeping
     # Per-step status map keyed by CACAO step_id. Conventional values: 'pending', 'running', 'ok', 'failed', 'awaiting-human'. The graph builder writes here; conditional-edge routers read it.
     step_status: dict[str, str]
@@ -75,9 +135,8 @@ async def detect_patch_availability(update_subject: str, update_reference: str) 
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--70000000-0000-4000-8000-000000000002', attributes={'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'detect patch availability', 'secops_ng.tool.name': 'detect_patch_availability', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--70000000-0000-4000-8000-000000000002'"
-        )
+        from content.playbooks.patch_management.primitives.detect import detect_patch_availability
+        __detection_record__ = detect_patch_availability(update_subject=__update_subject__, update_reference=__update_reference__, advisory_kind=__advisory_kind__, tracked_inventory=__tracked_inventory__)
 
 @tool
 async def classify_patch_criticality(update_subject: str, update_reference: str) -> str:
@@ -93,9 +152,8 @@ async def classify_patch_criticality(update_subject: str, update_reference: str)
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--70000000-0000-4000-8000-000000000003', attributes={'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify patch criticality', 'secops_ng.tool.name': 'classify_patch_criticality', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--70000000-0000-4000-8000-000000000003'"
-        )
+        from content.playbooks.patch_management.primitives.classify import classify_patch_criticality
+        __patch_criticality__ = classify_patch_criticality(update_subject=__update_subject__, severity_band=__severity_band__, exploit_observed=__exploit_observed__, is_feature_only=__is_feature_only__)
 
 @tool
 async def stage_rollout_to_canary_ring(update_subject: str, update_reference: str, patch_criticality: str) -> str:
@@ -111,9 +169,8 @@ async def stage_rollout_to_canary_ring(update_subject: str, update_reference: st
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--70000000-0000-4000-8000-000000000004', attributes={'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'stage rollout to canary ring', 'secops_ng.tool.name': 'stage_rollout_to_canary_ring', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--70000000-0000-4000-8000-000000000004'"
-        )
+        from content.playbooks.patch_management.primitives.stage import stage_rollout_to_canary_ring
+        __staged_ring_id__ = stage_rollout_to_canary_ring(update_subject=__update_subject__, update_reference=__update_reference__, patch_criticality=__patch_criticality__, ring_topology=__ring_topology__)
 
 @tool
 async def validate_canary(update_subject: str, staged_ring_id: str) -> bool:
@@ -129,9 +186,8 @@ async def validate_canary(update_subject: str, staged_ring_id: str) -> bool:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--70000000-0000-4000-8000-000000000005', attributes={'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'validate canary', 'secops_ng.tool.name': 'validate_canary', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--70000000-0000-4000-8000-000000000005'"
-        )
+        from content.playbooks.patch_management.primitives.validate import validate_canary
+        __canary_verdict__ = validate_canary(functional_probe=__functional_probe__, error_rate_within_threshold=__error_rate_within_threshold__, latency_within_threshold=__latency_within_threshold__, rollback_ready=__rollback_ready__)
 
 @tool
 async def fan_out_to_broad_rings(update_subject: str, update_reference: str, staged_ring_id: str, canary_healthy: bool) -> str:
@@ -147,9 +203,8 @@ async def fan_out_to_broad_rings(update_subject: str, update_reference: str, sta
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--70000000-0000-4000-8000-000000000006', attributes={'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'fan out to broad rings', 'secops_ng.tool.name': 'fan_out_to_broad_rings', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--70000000-0000-4000-8000-000000000006'"
-        )
+        from content.playbooks.patch_management.primitives.fanout import fan_out_to_broad_rings
+        __broad_rollout_id__ = fan_out_to_broad_rings(update_subject=__update_subject__, update_reference=__update_reference__, staged_ring_id=__staged_ring_id__, canary_healthy=__canary_healthy__, broad_rings=__broad_rings__)
 
 @tool
 async def evidence_capture(update_subject: str, update_reference: str, patch_criticality: str, staged_ring_id: str, canary_healthy: bool, broad_rollout_id: str) -> str:
@@ -165,9 +220,8 @@ async def evidence_capture(update_subject: str, update_reference: str, patch_cri
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--70000000-0000-4000-8000-000000000007', attributes={'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'evidence capture', 'secops_ng.tool.name': 'evidence_capture', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--70000000-0000-4000-8000-000000000007'"
-        )
+        from content.playbooks.patch_management.primitives.artifact import build_patch_application_evidence_artifact
+        __evidence_id__ = build_patch_application_evidence_artifact(workflow_id=__workflow_id__, execution_id=__execution_id__, regulation_refs=__regulation_refs__, control_refs=__control_refs__, update_subject=__update_subject__, update_reference=__update_reference__, patch_criticality=__patch_criticality__, staged_ring_id=__staged_ring_id__, canary_healthy=__canary_healthy__, broad_rollout_id=__broad_rollout_id__, health_observations=__health_observations__, captured_at=__captured_at__, source_url=__source_url__)
 
 @tool
 async def notify_maintenance_owner(evidence_id: str, update_subject: str, canary_healthy: bool) -> None:

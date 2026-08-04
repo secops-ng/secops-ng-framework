@@ -1,64 +1,7 @@
 {
   "_meta": {
-    "purpose": "F-WF-05 CORE-WIRE-TMPRL SKELETON-wave overlay. Per-step x_secops_ng.core_body bindings layered onto the canonical content/playbooks/incident_management/playbook.cacao.json to produce the Temporal mirror at examples/temporal/incident_management/playbook.cacao.json. The canonical CACAO source intentionally carries no core_body blocks yet; the Temporal SKELETON example mirror diverges to demonstrate the wire-in shape ahead of the sibling LangGraph CORE-WIRE card. When that lands and the canonical gets the core_body promoted upward, this overlay collapses to empty and the Temporal mirror returns to byte-parity with the canonical. Bindings are cell-for-cell identical to the n8n sibling overlay so the three compile targets stay in lock-step across the SKELETON wave.",
-    "binding_layout": [
-      "action--...0003 classify -> incident_management.primitives.classification.classify_significance (closed-alphabet classification table).",
-      "action--...0006 submit 24h early warning -> incident_management.primitives.regulator_submission.resolve_destination(stage='early_warning') (fail-closed destination resolver; framework ships no default endpoint).",
-      "action--...0007 submit 72h notification -> incident_management.primitives.stage_clock.verdict_for_submission(stage='notification', ...) (three-stage NIS2 Article 23 clock arithmetic).",
-      "action--...0009 submit 1-month final report -> incident_management.primitives.regulator_submission.resolve_destination(stage='final_report') (fail-closed destination resolver).",
-      "Asymmetry between the three submit steps (two bind the destination resolver, one binds the clock verdict) is a deliberate SKELETON demonstration: every primitive group named on the wave card (stage-clock, classification, regulator-submission) is exercised somewhere in the workflow, with the operator wiring the second primitive per step at the Temporal activity layer. Subsequent waves consolidate per-step bindings.",
-      "DSPy reach stays scoped to the free-text fields of the final report per content/playbooks/incident_management/primitives/signatures.py; regulated decisions (clock, classification, destination resolution) are deterministic code, not LM."
-    ],
-    "wave_seam_closure_condition": "Closed by the F-WF-05 CORE-WIRE-LG sibling card. When it lands, the canonical content/playbooks/incident_management/playbook.cacao.json gains the core_body blocks (a single source of truth for the three compile targets) and the n8n + Temporal overlay files are deleted in the same PR that lands the canonical promotion."
+    "purpose": "F-WF-05 wave seam CLOSED. The canonical content/playbooks/incident_management/playbook.cacao.json now carries the core_body bindings directly, as the single source of truth for all three compile targets, so this overlay is empty and the mirror is byte-identical to the canonical. Kept rather than deleted because apply_overlay.py's module docstring commits to the scripts remaining in place across the seam closure so the build path stays stable; the earlier _meta text said 'deleted', which contradicted that, and collapsing satisfies both.",
+    "closed_by": "Canonical promotion: the four bindings previously layered here (classification.classify_significance, regulator_submission.resolve_destination at the early-warning and final-report stages, stage_clock.verdict_for_submission) were promoted verbatim, and timeline_binding.open_timeline / close_timeline were bound alongside them."
   },
-  "workflow_overlays": {
-    "action--50000000-0000-4000-8000-000000000003": {
-      "x_secops_ng": {
-        "core_body": {
-          "primitive": "incident_management.primitives.classification.classify_significance",
-          "in": {
-            "signals": "__intake_signals__"
-          },
-          "out": "__classification_verdict__"
-        }
-      }
-    },
-    "action--50000000-0000-4000-8000-000000000006": {
-      "x_secops_ng": {
-        "core_body": {
-          "primitive": "incident_management.primitives.regulator_submission.resolve_destination",
-          "in": {
-            "destinations": "__notification_destinations__",
-            "stage": "'early_warning'"
-          },
-          "out": "__early_warning_destination__"
-        }
-      }
-    },
-    "action--50000000-0000-4000-8000-000000000007": {
-      "x_secops_ng": {
-        "core_body": {
-          "primitive": "incident_management.primitives.stage_clock.verdict_for_submission",
-          "in": {
-            "stage": "'notification'",
-            "opened_at": "__timeline_opened_at__",
-            "submitted_at": "__notification_submitted_at__"
-          },
-          "out": "__notification_stage_verdict__"
-        }
-      }
-    },
-    "action--50000000-0000-4000-8000-000000000009": {
-      "x_secops_ng": {
-        "core_body": {
-          "primitive": "incident_management.primitives.regulator_submission.resolve_destination",
-          "in": {
-            "destinations": "__notification_destinations__",
-            "stage": "'final_report'"
-          },
-          "out": "__final_report_destination__"
-        }
-      }
-    }
-  }
+  "workflow_overlays": {}
 }

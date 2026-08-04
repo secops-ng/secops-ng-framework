@@ -54,7 +54,7 @@ recurring-deviation risk indicator over a rolling window.
 | Control      | `control.iac_policy_guardrail.json`                       | `control.iac_policy_guardrail@v1`                  |
 | Control      | `control.cloud_identity_least_privilege.json`             | `control.cloud_identity_least_privilege@v1`        |
 | Telemetry    | `telemetry.json`                                          | `telemetry.ocsf.compliance_finding@v1`             |
-| Telemetry    | `telemetry.cloud_resource_inventory.json`                 | `telemetry.ocsf.cloud_resource_inventory@v1`       |
+| Telemetry    | `telemetry.cloud_resources_inventory_info.json`                 | `telemetry.ocsf.cloud_resources_inventory_info@v1`       |
 | Metric (KPI) | `metrics/kpi.mttd_cloud_misconfig.json`                   | `kpi.mttd_cloud_misconfig@v1`                      |
 | Metric (KPI) | `metrics/kpi.mttr_cloud_misconfig.json`                   | `kpi.mttr_cloud_misconfig@v1`                      |
 | Metric (KPI) | `metrics/kpi.cloud_posture_coverage.json`                 | `kpi.cloud_posture_coverage@v1`                    |
@@ -91,7 +91,7 @@ example layers controls, telemetry, and metrics around them.
         │                     │                      │
         ▼                     ▼                      ▼
   telemetry.ocsf.compliance_finding@v1
-  telemetry.ocsf.cloud_resource_inventory@v1
+  telemetry.ocsf.cloud_resources_inventory_info@v1
                               │
                               ▼
                 kpi.mttd_cloud_misconfig@v1
