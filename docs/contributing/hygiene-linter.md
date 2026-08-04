@@ -42,6 +42,25 @@ Exit codes:
 - `1` — at least one gating-severity finding.
 - `2` — CLI usage error.
 
+### What is never scanned
+
+Beyond anything you pass to `--exclude`, the walk always skips:
+
+- the usual build and environment directories — `.git/`, `.venv/`,
+  `venv/`, `node_modules/`, `__pycache__/`, `.mypy_cache/`,
+  `.ruff_cache/`, `dist/`, `build/`, `*.egg-info/`;
+- `tests/hygiene_linter/` — this linter's own test corpus. Those files
+  hold deliberate positives (fake AWS keys, a PEM header, sample
+  commercial phrasing) so the rules have something to fire on;
+- **any nested checkout** — a subdirectory carrying its own `.git`
+  marker, whether a clone, a submodule, or a git worktree, is pruned
+  along with its subtree. Without this, working in a worktree under the
+  repo reports every finding twice.
+
+A bare `python -m tools.hygiene_linter` at the repo root is expected to
+exit `0`. A test asserts it, so if it starts failing, treat it as a real
+finding to fix rather than scan scope to widen.
+
 The linter is pure-stdlib Python; no install step is required beyond
 the Python interpreter the framework already targets.
 
@@ -61,11 +80,12 @@ their own.
 
 ## CI integration
 
-The repo runs `python -m tools.hygiene_linter` on every PR and every
-push to `main` via `.github/workflows/hygiene-lint.yml`. The job
-excludes `tests/hygiene_linter/*` because those files contain
-intentional positive fixtures and literal test inputs for the rules
-under test.
+The repo runs `python -m tools.hygiene_linter . --format text` on every
+PR and every push to `main` via `.github/workflows/hygiene-lint.yml`.
+The job passes no `--exclude`: it is deliberately the same command you
+run locally, so a green CI cannot mean something different from a green
+laptop. `tests/hygiene_linter/` is skipped by the linter itself (see
+below), not by a workflow flag.
 
 ## Adding a new rule
 
