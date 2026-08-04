@@ -11,7 +11,7 @@
   ],
   "created_by": "identity--c0c0c0c0-c0c0-4c0c-8c0c-c0c0c0c0c0c0",
   "created": "2026-05-30T00:00:00Z",
-  "modified": "2026-05-30T00:00:00Z",
+  "modified": "2026-08-03T00:00:00Z",
   "valid_from": "2026-05-30T00:00:00Z",
   "labels": [
     "cra",
@@ -78,6 +78,61 @@
     "__severity_verdict__": {
       "type": "dictionary",
       "description": "Full severity verdict (SeverityVerdict) written by the severity policy: the severity plus the CVSS/EPSS factors and context flags that produced it. __severity__ carries the bare value for branch conditions; this carries the evidence.",
+      "external": false
+    },
+    "__awareness_at__": {
+      "type": "string",
+      "description": "ISO-8601 UTC instant the operator became aware. Anchors the Art. 14 24h and 72h clocks.",
+      "external": true
+    },
+    "__exploitation_evidence__": {
+      "type": "string",
+      "description": "Observed-exploitation evidence kind. Only observed exploitation engages Art. 14(1) — a high EPSS forecast does not.",
+      "external": true
+    },
+    "__remedy_available_at__": {
+      "type": "string",
+      "description": "ISO-8601 UTC instant a corrective or mitigating measure became available; anchors the 14-day final-report clock.",
+      "external": true
+    },
+    "__notification_destinations__": {
+      "type": "dictionary",
+      "description": "Stage -> CSIRT/ENISA recipient. Fail-closed: no default endpoint ships.",
+      "external": true
+    },
+    "__triaged_at__": {
+      "type": "string",
+      "description": "ISO-8601 UTC instant triage completed; anchors every remediation deadline.",
+      "external": true
+    },
+    "__cvd_sla_days__": {
+      "type": "integer",
+      "description": "Remediation window in days from the operator's documented CVD policy (CRA Annex I §2(5)).",
+      "external": true
+    },
+    "__risk_accepted_by__": {
+      "type": "string",
+      "description": "Named party accepting the residual risk on the None lane.",
+      "external": true
+    },
+    "__risk_review_after_days__": {
+      "type": "integer",
+      "description": "Days until a risk acceptance must be revisited. No default — an acceptance without expiry becomes permanent by accident.",
+      "external": true
+    },
+    "__cra_trigger_verdict__": {
+      "type": "dictionary",
+      "description": "CRA Art. 14 trigger verdict: whether reporting is owed and when each stage falls due.",
+      "external": false
+    },
+    "__notification_chain_plan__": {
+      "type": "dictionary",
+      "description": "Ordered Art. 14 submission plan with resolved destinations.",
+      "external": false
+    },
+    "__remediation_directive__": {
+      "type": "dictionary",
+      "description": "Remediation routing verdict from the lane that handled the case.",
       "external": false
     }
   },
@@ -168,7 +223,17 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.vulnerability_finding@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.vuln_intake.primitives.cra_trigger.assess_cra_reporting_trigger",
+          "in": {
+            "cve_id": "__cve_id__",
+            "awareness_at": "__awareness_at__",
+            "exploitation_evidence": "__exploitation_evidence__",
+            "remedy_available_at": "__remedy_available_at__"
+          },
+          "out": "__cra_trigger_verdict__"
+        }
       }
     },
     "if-condition--01a17a01-0000-4000-8000-000000000005": {
@@ -176,7 +241,8 @@
       "name": "actively exploited?",
       "description": "Branch the case on the CRA reporting trigger. on_success: __actively_exploited__ is true and the regulator-notification chain fires ahead of the severity-keyed response so the CRA Article 14 24h / 72h / 14d clocks start at the operator's awareness timestamp. on_failure: the disclosure stays an internal-only case and routes directly to the severity switch.",
       "on_success": "action--01a17a01-0000-4000-8000-000000000006",
-      "on_failure": "switch-condition--01a17a01-0000-4000-8000-000000000007"
+      "on_failure": "switch-condition--01a17a01-0000-4000-8000-000000000007",
+      "condition": "__actively_exploited__"
     },
     "action--01a17a01-0000-4000-8000-000000000006": {
       "type": "action",
@@ -201,7 +267,16 @@
           "kpi.cra_notification_72h_on_time@v1",
           "kpi.cra_final_report_on_time@v1",
           "kpi.cra_severe_incident_on_time@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.vuln_intake.primitives.cra_trigger.build_notification_chain",
+          "in": {
+            "cve_id": "__cve_id__",
+            "trigger": "__cra_trigger_verdict__",
+            "destinations": "__notification_destinations__"
+          },
+          "out": "__notification_chain_plan__"
+        }
       }
     },
     "switch-condition--01a17a01-0000-4000-8000-000000000007": {
@@ -210,19 +285,19 @@
       "description": "Route to the technical-response branch keyed on __severity__. Each branch is a single response-routing action that ships the security update on the operator's SLA for that band, emits an advisory where applicable, and closes the case. The accept-risk branch documents the disposition without paging or scheduling a release.",
       "switch": "__severity__",
       "cases": {
-        "critical": [
+        "Critical": [
           "action--01a17a01-0000-4000-8000-000000000008"
         ],
-        "high": [
+        "High": [
           "action--01a17a01-0000-4000-8000-000000000009"
         ],
-        "medium": [
+        "Medium": [
           "action--01a17a01-0000-4000-8000-00000000000a"
         ],
-        "low": [
+        "Low": [
           "action--01a17a01-0000-4000-8000-00000000000a"
         ],
-        "info": [
+        "None": [
           "action--01a17a01-0000-4000-8000-00000000000b"
         ]
       }
@@ -243,7 +318,17 @@
         "metric_refs": [
           "kpi.patch_disseminated_on_time@v1",
           "kpi.mttr_critical@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.vuln_intake.primitives.remediation.patch_and_advisory_critical",
+          "in": {
+            "severity": "__severity__",
+            "asset_criticality": "__asset_context__.asset_criticality",
+            "triaged_at": "__triaged_at__",
+            "sla_days": "__cvd_sla_days__"
+          },
+          "out": "__remediation_directive__"
+        }
       }
     },
     "action--01a17a01-0000-4000-8000-000000000009": {
@@ -261,7 +346,17 @@
         ],
         "metric_refs": [
           "kpi.patch_disseminated_on_time@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.vuln_intake.primitives.remediation.patch_and_advisory_high",
+          "in": {
+            "severity": "__severity__",
+            "asset_criticality": "__asset_context__.asset_criticality",
+            "triaged_at": "__triaged_at__",
+            "sla_days": "__cvd_sla_days__"
+          },
+          "out": "__remediation_directive__"
+        }
       }
     },
     "action--01a17a01-0000-4000-8000-00000000000a": {
@@ -278,7 +373,17 @@
         ],
         "metric_refs": [
           "kpi.patch_disseminated_on_time@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.vuln_intake.primitives.remediation.schedule_remediation",
+          "in": {
+            "severity": "__severity__",
+            "asset_criticality": "__asset_context__.asset_criticality",
+            "triaged_at": "__triaged_at__",
+            "sla_days": "__cvd_sla_days__"
+          },
+          "out": "__remediation_directive__"
+        }
       }
     },
     "action--01a17a01-0000-4000-8000-00000000000b": {
@@ -289,7 +394,18 @@
       "x_secops_ng": {
         "telemetry_refs": [
           "telemetry.ocsf.vulnerability_finding@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.vuln_intake.primitives.remediation.accept_risk",
+          "in": {
+            "severity": "__severity__",
+            "asset_criticality": "__asset_context__.asset_criticality",
+            "triaged_at": "__triaged_at__",
+            "accepted_by": "__risk_accepted_by__",
+            "review_after_days": "__risk_review_after_days__"
+          },
+          "out": "__remediation_directive__"
+        }
       }
     },
     "end--01a17a01-0000-4000-8000-00000000000c": {

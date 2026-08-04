@@ -28,6 +28,23 @@ shipping it.
 
 from __future__ import annotations
 
+from .cra_trigger import (
+    CRAStage,
+    CRATriggerVerdict,
+    ExploitationEvidence,
+    NotificationChainPlan,
+    assess_cra_reporting_trigger,
+    build_notification_chain,
+)
+from .remediation import (
+    AdvisoryPosture,
+    RemediationDirective,
+    RemediationLane,
+    accept_risk,
+    patch_and_advisory_critical,
+    patch_and_advisory_high,
+    schedule_remediation,
+)
 from .cvss import (
     CVSSParseError,
     CVSSScore,
@@ -55,23 +72,36 @@ from .severity import (
 from .signatures import signature_schema
 
 __all__ = [
+    "AdvisoryPosture",
     "AssetCriticality",
     "BusinessContext",
+    "CRAStage",
+    "CRATriggerVerdict",
     "CVSSParseError",
     "CVSSScore",
     "CVSSv31Vector",
     "DEFAULT_FRESHNESS_WINDOW",
     "EPSSScore",
+    "ExploitationEvidence",
+    "NotificationChainPlan",
+    "RemediationDirective",
+    "RemediationLane",
     "Severity",
     "SeverityVerdict",
     "StaleEPSSWarning",
+    "accept_risk",
+    "assess_cra_reporting_trigger",
     "base_score",
+    "build_notification_chain",
     "canonicalize_case_field",
     "canonicalize_epss",
     "case_idempotency_key",
     "compute_cvss",
     "parse_cvss_vector",
     "parse_epss",
+    "patch_and_advisory_critical",
+    "patch_and_advisory_high",
+    "schedule_remediation",
     "severity_policy",
     "severity_rating",
     "signature_schema",

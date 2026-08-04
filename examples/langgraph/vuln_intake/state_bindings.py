@@ -66,6 +66,39 @@ class PlaybookVulnIntakeV1State(TypedDict, total=False):
     # playbook_variable: __severity_verdict__
     # Full severity verdict (SeverityVerdict) written by the severity policy: the severity plus the CVSS/EPSS factors and context flags that produced it. __severity__ carries the bare value for branch conditions; this carries the evidence.
     severity_verdict: dict[str, object]
+    # playbook_variable: __awareness_at__
+    # ISO-8601 UTC instant the operator became aware. Anchors the Art. 14 24h and 72h clocks.
+    awareness_at: str
+    # playbook_variable: __exploitation_evidence__
+    # Observed-exploitation evidence kind. Only observed exploitation engages Art. 14(1) — a high EPSS forecast does not.
+    exploitation_evidence: str
+    # playbook_variable: __remedy_available_at__
+    # ISO-8601 UTC instant a corrective or mitigating measure became available; anchors the 14-day final-report clock.
+    remedy_available_at: str
+    # playbook_variable: __notification_destinations__
+    # Stage -> CSIRT/ENISA recipient. Fail-closed: no default endpoint ships.
+    notification_destinations: dict[str, object]
+    # playbook_variable: __triaged_at__
+    # ISO-8601 UTC instant triage completed; anchors every remediation deadline.
+    triaged_at: str
+    # playbook_variable: __cvd_sla_days__
+    # Remediation window in days from the operator's documented CVD policy (CRA Annex I §2(5)).
+    cvd_sla_days: int
+    # playbook_variable: __risk_accepted_by__
+    # Named party accepting the residual risk on the None lane.
+    risk_accepted_by: str
+    # playbook_variable: __risk_review_after_days__
+    # Days until a risk acceptance must be revisited. No default — an acceptance without expiry becomes permanent by accident.
+    risk_review_after_days: int
+    # playbook_variable: __cra_trigger_verdict__
+    # CRA Art. 14 trigger verdict: whether reporting is owed and when each stage falls due.
+    cra_trigger_verdict: dict[str, object]
+    # playbook_variable: __notification_chain_plan__
+    # Ordered Art. 14 submission plan with resolved destinations.
+    notification_chain_plan: dict[str, object]
+    # playbook_variable: __remediation_directive__
+    # Remediation routing verdict from the lane that handled the case.
+    remediation_directive: dict[str, object]
     # bookkeeping
     # Per-step status map keyed by CACAO step_id. Conventional values: 'pending', 'running', 'ok', 'failed', 'awaiting-human'. The graph builder writes here; conditional-edge routers read it.
     step_status: dict[str, str]
@@ -124,9 +157,8 @@ async def assess_cra_reporting_trigger(cve_id: str, cvss_vector: str, epss_score
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--01a17a01-0000-4000-8000-000000000004', attributes={'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000004', 'secops_ng.step.name': 'assess CRA reporting trigger', 'secops_ng.tool.name': 'assess_cra_reporting_trigger', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--01a17a01-0000-4000-8000-000000000004'"
-        )
+        from content.playbooks.vuln_intake.primitives.cra_trigger import assess_cra_reporting_trigger
+        __cra_trigger_verdict__ = assess_cra_reporting_trigger(cve_id=__cve_id__, awareness_at=__awareness_at__, exploitation_evidence=__exploitation_evidence__, remedy_available_at=__remedy_available_at__)
 
 @tool
 async def regulator_notification_chain_cra_art_14(actively_exploited: bool, cve_id: str, severity: str) -> None:
@@ -142,9 +174,8 @@ async def regulator_notification_chain_cra_art_14(actively_exploited: bool, cve_
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--01a17a01-0000-4000-8000-000000000006', attributes={'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000006', 'secops_ng.step.name': 'regulator-notification chain (CRA Art. 14)', 'secops_ng.tool.name': 'regulator_notification_chain_cra_art_14', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--01a17a01-0000-4000-8000-000000000006'"
-        )
+        from content.playbooks.vuln_intake.primitives.cra_trigger import build_notification_chain
+        __notification_chain_plan__ = build_notification_chain(cve_id=__cve_id__, trigger=__cra_trigger_verdict__, destinations=__notification_destinations__)
 
 @tool
 async def response_critical_patch_and_advisory() -> None:
@@ -160,9 +191,8 @@ async def response_critical_patch_and_advisory() -> None:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--01a17a01-0000-4000-8000-000000000008', attributes={'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000008', 'secops_ng.step.name': 'response: critical — patch and advisory', 'secops_ng.tool.name': 'response_critical_patch_and_advisory', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--01a17a01-0000-4000-8000-000000000008'"
-        )
+        from content.playbooks.vuln_intake.primitives.remediation import patch_and_advisory_critical
+        __remediation_directive__ = patch_and_advisory_critical(severity=__severity__, asset_criticality=__asset_context__.asset_criticality, triaged_at=__triaged_at__, sla_days=__cvd_sla_days__)
 
 @tool
 async def response_high_patch_and_advisory() -> None:
@@ -178,9 +208,8 @@ async def response_high_patch_and_advisory() -> None:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--01a17a01-0000-4000-8000-000000000009', attributes={'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000009', 'secops_ng.step.name': 'response: high — patch and advisory', 'secops_ng.tool.name': 'response_high_patch_and_advisory', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--01a17a01-0000-4000-8000-000000000009'"
-        )
+        from content.playbooks.vuln_intake.primitives.remediation import patch_and_advisory_high
+        __remediation_directive__ = patch_and_advisory_high(severity=__severity__, asset_criticality=__asset_context__.asset_criticality, triaged_at=__triaged_at__, sla_days=__cvd_sla_days__)
 
 @tool
 async def response_scheduled_remediation() -> None:
@@ -196,9 +225,8 @@ async def response_scheduled_remediation() -> None:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--01a17a01-0000-4000-8000-00000000000a', attributes={'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'response: scheduled remediation', 'secops_ng.tool.name': 'response_scheduled_remediation', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--01a17a01-0000-4000-8000-00000000000a'"
-        )
+        from content.playbooks.vuln_intake.primitives.remediation import schedule_remediation
+        __remediation_directive__ = schedule_remediation(severity=__severity__, asset_criticality=__asset_context__.asset_criticality, triaged_at=__triaged_at__, sla_days=__cvd_sla_days__)
 
 @tool
 async def response_accept_risk() -> None:
@@ -214,9 +242,8 @@ async def response_accept_risk() -> None:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--01a17a01-0000-4000-8000-00000000000b', attributes={'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-00000000000b', 'secops_ng.step.name': 'response: accept risk', 'secops_ng.tool.name': 'response_accept_risk', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--01a17a01-0000-4000-8000-00000000000b'"
-        )
+        from content.playbooks.vuln_intake.primitives.remediation import accept_risk
+        __remediation_directive__ = accept_risk(severity=__severity__, asset_criticality=__asset_context__.asset_criticality, triaged_at=__triaged_at__, accepted_by=__risk_accepted_by__, review_after_days=__risk_review_after_days__)
 
 async def llm_step(state: PlaybookVulnIntakeV1State) -> dict:
     """Agentic-extension hook.

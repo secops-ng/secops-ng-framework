@@ -78,9 +78,8 @@ async def assess_cra_reporting_trigger(cve_id: str, cvss_vector: str, epss_score
         AuditTrail.current().append(
             AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000004', 'secops_ng.step.name': 'assess CRA reporting trigger', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_cra_reporting_trigger'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--01a17a01-0000-4000-8000-000000000004'"
-        )
+        from content.playbooks.vuln_intake.primitives.cra_trigger import assess_cra_reporting_trigger
+        __cra_trigger_verdict__ = assess_cra_reporting_trigger(cve_id=__cve_id__, awareness_at=__awareness_at__, exploitation_evidence=__exploitation_evidence__, remedy_available_at=__remedy_available_at__)
 
 ASSESS_CRA_REPORTING_TRIGGER_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -102,9 +101,8 @@ async def regulator_notification_chain_cra_art_14(actively_exploited: bool, cve_
         AuditTrail.current().append(
             AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000006', 'secops_ng.step.name': 'regulator-notification chain (CRA Art. 14)', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'regulator_notification_chain_cra_art_14'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--01a17a01-0000-4000-8000-000000000006'"
-        )
+        from content.playbooks.vuln_intake.primitives.cra_trigger import build_notification_chain
+        __notification_chain_plan__ = build_notification_chain(cve_id=__cve_id__, trigger=__cra_trigger_verdict__, destinations=__notification_destinations__)
 
 REGULATOR_NOTIFICATION_CHAIN_CRA_ART_14_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -126,9 +124,8 @@ async def response_critical_patch_and_advisory() -> None:
         AuditTrail.current().append(
             AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-000000000008', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000008', 'secops_ng.step.name': 'response: critical — patch and advisory', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_critical_patch_and_advisory'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--01a17a01-0000-4000-8000-000000000008'"
-        )
+        from content.playbooks.vuln_intake.primitives.remediation import patch_and_advisory_critical
+        __remediation_directive__ = patch_and_advisory_critical(severity=__severity__, asset_criticality=__asset_context__.asset_criticality, triaged_at=__triaged_at__, sla_days=__cvd_sla_days__)
 
 RESPONSE_CRITICAL_PATCH_AND_ADVISORY_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -150,9 +147,8 @@ async def response_high_patch_and_advisory() -> None:
         AuditTrail.current().append(
             AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-000000000009', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000009', 'secops_ng.step.name': 'response: high — patch and advisory', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_high_patch_and_advisory'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--01a17a01-0000-4000-8000-000000000009'"
-        )
+        from content.playbooks.vuln_intake.primitives.remediation import patch_and_advisory_high
+        __remediation_directive__ = patch_and_advisory_high(severity=__severity__, asset_criticality=__asset_context__.asset_criticality, triaged_at=__triaged_at__, sla_days=__cvd_sla_days__)
 
 RESPONSE_HIGH_PATCH_AND_ADVISORY_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -174,9 +170,8 @@ async def response_scheduled_remediation() -> None:
         AuditTrail.current().append(
             AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-00000000000a', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'response: scheduled remediation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_scheduled_remediation'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--01a17a01-0000-4000-8000-00000000000a'"
-        )
+        from content.playbooks.vuln_intake.primitives.remediation import schedule_remediation
+        __remediation_directive__ = schedule_remediation(severity=__severity__, asset_criticality=__asset_context__.asset_criticality, triaged_at=__triaged_at__, sla_days=__cvd_sla_days__)
 
 RESPONSE_SCHEDULED_REMEDIATION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -198,9 +193,8 @@ async def response_accept_risk() -> None:
         AuditTrail.current().append(
             AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-00000000000b', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-00000000000b', 'secops_ng.step.name': 'response: accept risk', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_accept_risk'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--01a17a01-0000-4000-8000-00000000000b'"
-        )
+        from content.playbooks.vuln_intake.primitives.remediation import accept_risk
+        __remediation_directive__ = accept_risk(severity=__severity__, asset_criticality=__asset_context__.asset_criticality, triaged_at=__triaged_at__, accepted_by=__risk_accepted_by__, review_after_days=__risk_review_after_days__)
 
 RESPONSE_ACCEPT_RISK_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
