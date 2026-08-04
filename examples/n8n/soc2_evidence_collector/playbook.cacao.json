@@ -96,7 +96,7 @@
           "control.evidence_pipeline@v1"
         ],
         "metric_refs": [
-          "kpi.control_coverage@v1"
+          "kri.control_effectiveness@v1"
         ],
         "core_body": {
           "primitive": "content.playbooks.soc2_evidence_collector.primitives.criteria.collect_criteria_atoms",
@@ -131,7 +131,10 @@
             "evidence_refs": "__evidence_refs__"
           },
           "out": "__criteria_mapping__"
-        }
+        },
+        "metric_refs": [
+          "kpi.soc2_evidence_ref_resolution_rate@v1"
+        ]
       }
     },
     "action--b7c2e5a1-0000-4000-8000-000000000004": {
@@ -151,7 +154,7 @@
           "control.evidence_pipeline@v1"
         ],
         "metric_refs": [
-          "kpi.control_coverage@v1"
+          "kri.soc2_unsupported_criteria_count@v1"
         ],
         "core_body": {
           "primitive": "content.playbooks.soc2_evidence_collector.primitives.scoring.score_criterion_coverage",
@@ -182,7 +185,7 @@
           "control.evidence_pipeline@v1"
         ],
         "metric_refs": [
-          "kpi.control_coverage@v1"
+          "kri.soc2_unsupported_criteria_count@v1"
         ],
         "core_body": {
           "primitive": "content.playbooks.soc2_evidence_collector.primitives.attestation.build_readiness_attestation",
@@ -216,7 +219,7 @@
       "control.evidence_pipeline@v1"
     ],
     "metric_refs": [
-      "kpi.control_coverage@v1"
+      "kri.control_effectiveness@v1"
     ],
     "sources": [
       "OASIS CACAO v2.0 specification",
