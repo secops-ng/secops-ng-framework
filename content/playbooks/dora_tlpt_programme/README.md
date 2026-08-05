@@ -1,6 +1,6 @@
 # dora_tlpt_programme
 
-CACAO v2 SKELETON playbook operationalising the operator-side **DORA
+CACAO v2 playbook operationalising the operator-side **DORA
 Chapter IV digital operational resilience testing (DORT) programme** a
 financial entity discharges against its ICT risk-management framework
 — Article 24 (general requirements for the testing of digital
@@ -25,22 +25,31 @@ Action steps are scaffolded as CACAO v2 actions with `control_refs` /
 materialised as three worked examples under
 `examples/{n8n,temporal,langgraph}/dora_tlpt_programme/` with
 byte-parity goldens under
-`tests/examples/{n8n,temporal,langgraph}/dora_tlpt_programme/`. The
-per-step primitives (scope-catalogue composition, TLPT
-trigger-and-planning gate, competent-authority notification adapter,
-red-team scoping-submission adapter, findings-register schema,
-remediation-attestation emitter) remain adapter-bound placeholders
-that a sibling EXTEND card lands alongside the TIBER-EU red-team
-choreography, the threat-intelligence-source binding, and the
-purple-team lessons-learned loop into `detection_engineering`.
+`tests/examples/{n8n,temporal,langgraph}/dora_tlpt_programme/`. Four
+deterministic primitives under `primitives/` are bound to the four
+action steps: scope-catalogue composition, the TLPT
+trigger-and-planning gate, the red-team scoping submission, and the
+findings register with its remediation attestation.
+
+What remains adapter-bound is **dispatch**, not decision. The
+competent-authority notification channel, the scoping-submission
+channel and the evidence store are operator surfaces a sibling EXTEND
+card binds, alongside the TIBER-EU red-team choreography, the
+threat-intelligence-source binding, and the purple-team
+lessons-learned loop into `detection_engineering`. The primitives
+package and record; nothing here transmits.
 
 ## Trilogy
 
 - **SKELETON:** scaffold + mappings + compile-target declaration (PR #714).
-- **CORE:** three-target compiled examples + byte-parity goldens,
-  full mappings closure (D3-OAM D3FEND selection, NIS2 Art. 21(2)(f) +
-  GDPR Art. 32(1)(d) inbound edges, CRA + EU AI Act reviewed skips)
-  (PR #715).
+- **CORE (mappings / examples):** three-target compiled examples +
+  byte-parity goldens, full mappings closure (D3-OAM D3FEND selection,
+  NIS2 Art. 21(2)(f) + GDPR Art. 32(1)(d) inbound edges, CRA + EU AI Act
+  reviewed skips) (PR #715).
+- **CORE (primitive bindings):** the four deterministic bodies under
+  `primitives/`, bound via `x_secops_ng.core_body`. Landed after the
+  card above because the two axes ran separately — until then every
+  compile target emitted topology with unbound Set-node stubs.
 - **EXTEND (this card):** cookbook walkthrough at
   [`docs/cookbook/dora_tlpt_programme.md`](../../../docs/cookbook/dora_tlpt_programme.md).
   Adapter Protocols under `patterns.dora_tlpt_programme`, the
@@ -54,6 +63,10 @@ purple-team lessons-learned loop into `detection_engineering`.
   (`playbook.dora_tlpt_programme@v1`), authored as JSON per the
   finalisation-marker convention (`.cacao.json` or `.cacao.yaml` both
   counted as finalised).
+- `primitives/` — the four deterministic bodies the action steps bind to.
+  Pure, offline, replay-safe: no clock reads, no network, no LLM. Every
+  date and instant is supplied as an input, which is what lets the
+  byte-parity goldens exist.
 - `mappings.yaml` — outbound cross-references to the OSCAL controls,
   MITRE D3FEND techniques, OCSF event classes, and EU regulatory
   clauses this playbook operationalises. The CORE overlay pins the
