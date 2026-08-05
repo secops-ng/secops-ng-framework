@@ -1860,7 +1860,7 @@ one playbook's provenance.
 
 ### F-WF-EUAIACT-RISKMGMT — EU AI Act Art. 9 risk-management system
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P2
 - **Rationale:** The risk-management system Art. 9 requires providers of
   high-risk AI systems to establish, implement, document and maintain across
@@ -1873,7 +1873,7 @@ one playbook's provenance.
     cookbook walkthrough (shipped).
   - Deterministic primitives under
     `content/playbooks/eu_ai_act_risk_management/primitives/` bound to the 4
-    action steps, replay-safe and offline (CORE — **outstanding**).
+    action steps, replay-safe and offline.
   - The system is documented as a continuous lifecycle, not a one-off
     assessment, per Art. 9(2)'s iterative requirement.
   - Residual risk is recorded per identified risk rather than aggregated, so
@@ -1887,6 +1887,10 @@ one playbook's provenance.
 - **Shipped via:**
   - SKELETON — #682, #683, #684, #685
   - EXTEND — #687, #806, #807 (cookbook, mappings, metric pair)
+  - CORE — #903 (four Art. 9 primitives bound to the four action steps;
+    tier B -> A). Landed after EXTEND because the two axes ran separately:
+    the mappings / telemetry / metrics overlay reached EXTEND at content
+    version 0.3.0 while the steps still carried no `core_body`.
 
 ### F-WF-MFA-COMMS — MFA and secured-communications posture
 
