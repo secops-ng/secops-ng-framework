@@ -149,7 +149,7 @@ def _action_without_commands_steps() -> dict[str, dict]:
     A step carrying ``x_secops_ng.core_body`` compiles to a Code node calling
     its primitive, not to a Set node surfacing the CACAO contract as rows. The
     Set-node assertions therefore scope to steps *without* a binding;
-    ``test_bound_steps_emit_code_nodes_calling_their_primitive`` covers the
+    ``test_core_body_steps_emit_code_nodes`` covers the
     bound ones.
 
     All four action steps are bound as of the CORE stage, so this selector is
