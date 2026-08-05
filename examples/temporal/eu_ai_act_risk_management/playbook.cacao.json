@@ -3,7 +3,7 @@
   "spec_version": "2.0",
   "id": "playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8",
   "name": "EU AI Act Art.9 risk-management system",
-  "description": "CACAO v2 scaffold for the risk-management system Article 9 of the EU AI Act (Regulation (EU) 2024/1689) requires providers of high-risk AI systems to establish, implement, document and maintain. The playbook inventories a high-risk AI system against Annex III, iterates the Art. 9(2) identify / analyse / evaluate cycle, generates the technical documentation Art. 11 and Annex IV pin, and closes the loop with the post-market monitoring feedback Art. 9(2)(c) reads together with Art. 72. CORE tier: real OSCAL pins (RA-3, PM-9, PL-2), D3FEND anchor (D3-OAM on the risk-assessment step), and reference compile targets emitted under examples/{n8n,temporal,langgraph}/eu_ai_act_risk_management/. Portable content; runtime is the operator's choice \u2014 n8n, Temporal, or LangGraph.",
+  "description": "CACAO v2 scaffold for the risk-management system Article 9 of the EU AI Act (Regulation (EU) 2024/1689) requires providers of high-risk AI systems to establish, implement, document and maintain. The playbook inventories a high-risk AI system against Annex III, iterates the Art. 9(2) identify / analyse / evaluate cycle, generates the technical documentation Art. 11 and Annex IV pin, and closes the loop with the post-market monitoring feedback Art. 9(2)(c) reads together with Art. 72. CORE tier: real OSCAL pins (RA-3, PM-9, PL-2), D3FEND anchor (D3-OAM on the risk-assessment step), and reference compile targets emitted under examples/{n8n,temporal,langgraph}/eu_ai_act_risk_management/. Portable content; runtime is the operator's choice — n8n, Temporal, or LangGraph.",
   "playbook_types": [
     "notification",
     "investigation"
@@ -25,24 +25,84 @@
       "external": true
     },
     "__annex_iii_use_case__": {
-      "type": "string",
+      "type": "dictionary",
       "description": "Annex III high-risk use-case category the system falls under (e.g. biometric identification, critical infrastructure management, employment screening). SKELETON: string; CORE tightens to an enum against the Annex III eight-area catalogue.",
       "external": false
     },
     "__risk_register_id__": {
-      "type": "string",
+      "type": "dictionary",
       "description": "Identifier of the risk register emitted by the Art. 9(2)(a)-(b) identification / estimation step and consumed by the Art. 9(2)(d) risk-treatment step.",
       "external": false
     },
     "__technical_documentation_id__": {
-      "type": "string",
+      "type": "dictionary",
       "description": "Identifier of the technical documentation bundle assembled per Art. 11 read with Annex IV. Consumed by conformity assessment.",
       "external": false
     },
     "__post_market_signal__": {
-      "type": "string",
+      "type": "dictionary",
       "description": "Identifier of the post-market monitoring signal fed back into the iterative risk-management cycle under Art. 9(2)(c) read with Art. 72.",
       "external": false
+    },
+    "__classification_basis__": {
+      "type": "string",
+      "description": "Which Article 6 path applies: annex_i_product_safety (6(1)), annex_iii_standalone (6(2)) or annex_iii_derogated (6(3)). Asserted by the provider — never inferred from the intended purpose.",
+      "external": true
+    },
+    "__annex_iii_area__": {
+      "type": "string",
+      "description": "One of the eight Annex III areas, matching the eu_ai_act:annex-iii-N-<area> mapping ids. Required on both Annex III paths, forbidden on the Art. 6(1) product-safety path.",
+      "external": true
+    },
+    "__union_harmonisation_ref__": {
+      "type": "string",
+      "description": "Reference to the Annex I Union harmonisation legislation entry. Required on the Art. 6(1) path only.",
+      "external": true
+    },
+    "__derogation_ground__": {
+      "type": "string",
+      "description": "One of the four Art. 6(3) grounds. Required on the derogated path only.",
+      "external": true
+    },
+    "__derogation_assessment_ref__": {
+      "type": "string",
+      "description": "Reference to the Art. 6(4) documented assessment supporting an Art. 6(3) derogation. Required on the derogated path only — a derogation with no assessment behind it is not representable.",
+      "external": true
+    },
+    "__iteration_id__": {
+      "type": "string",
+      "description": "Identifier of this Art. 9(2) iteration. Art. 9(2) is a continuous iterative process, so every register is scoped to an iteration.",
+      "external": true
+    },
+    "__identified_risks__": {
+      "type": "dictionary",
+      "description": "Risk records for this iteration, each carrying risk_id, origin_paragraph (9(2)(a)/(b)/(c)), residual_score and measure_refs. References into the provider's risk documentation, never hazard prose.",
+      "external": true
+    },
+    "__acceptability_thresholds__": {
+      "type": "dictionary",
+      "description": "Annex III area to Art. 9(5) residual-risk acceptability threshold. The framework ships no default: acceptability is the operator's own policy.",
+      "external": true
+    },
+    "__annex_iv_sections__": {
+      "type": "dictionary",
+      "description": "Annex IV section key to a reference into the provider's documentation store. Annex IV(5) must reference this iteration's register.",
+      "external": true
+    },
+    "__technical_doc_committed_at__": {
+      "type": "string",
+      "description": "ISO-8601 date the Art. 11 / Annex IV bundle was last committed. Supplied rather than clock-read, which is what makes a run replayable.",
+      "external": true
+    },
+    "__instructions_committed_at__": {
+      "type": "string",
+      "description": "ISO-8601 date the Art. 13 instructions for use were last committed. Tracked separately because kri.transparency_doc_freshness_age@v1 takes the maximum of the two ages.",
+      "external": true
+    },
+    "__post_market_observation__": {
+      "type": "dictionary",
+      "description": "One Art. 72 observation: signal_id, signal_kind, observed_at, evidence_ref and optional affects_risk_ids.",
+      "external": true
     }
   },
   "workflow_start": "start--40000000-0000-4000-8000-000000000001",
@@ -58,7 +118,12 @@
       "description": "Inventory the AI system, resolve whether it is a high-risk AI system under Art. 6 read with Annex III (or against a Union harmonisation-legislation entry per Art. 6(1) and Annex I), and pin the Annex III use-case category the risk-management system will be operated against. SKELETON: stub action; CORE wires the Annex III inventory join, the provider / deployer role determination under Art. 3(3) and (4), and the Art. 6(3) derogation self-declaration.",
       "on_completion": "action--40000000-0000-4000-8000-000000000003",
       "in_args": [
-        "__ai_system_id__"
+        "__ai_system_id__",
+        "__annex_iii_area__",
+        "__classification_basis__",
+        "__derogation_assessment_ref__",
+        "__derogation_ground__",
+        "__union_harmonisation_ref__"
       ],
       "out_args": [
         "__annex_iii_use_case__"
@@ -68,7 +133,19 @@
           "control.risk_management_strategy@v1"
         ],
         "telemetry_refs": [],
-        "metric_refs": []
+        "metric_refs": [],
+        "core_body": {
+          "primitive": "content.playbooks.eu_ai_act_risk_management.primitives.classification.classify_high_risk_system",
+          "in": {
+            "ai_system_id": "__ai_system_id__",
+            "classification_basis": "__classification_basis__",
+            "annex_iii_area": "__annex_iii_area__",
+            "union_harmonisation_ref": "__union_harmonisation_ref__",
+            "derogation_ground": "__derogation_ground__",
+            "derogation_assessment_ref": "__derogation_assessment_ref__"
+          },
+          "out": "__annex_iii_use_case__"
+        }
       }
     },
     "action--40000000-0000-4000-8000-000000000003": {
@@ -77,7 +154,10 @@
       "description": "Iterate the Art. 9(2) risk-management cycle for the pinned use case: identification and analysis of known and reasonably foreseeable risks under Art. 9(2)(a); estimation and evaluation of risks that may emerge when the system is used in accordance with its intended purpose and under conditions of reasonably foreseeable misuse under Art. 9(2)(b); evaluation of other risks possibly arising, based on the analysis of data gathered from the post-market monitoring system, under Art. 9(2)(c); adoption of appropriate and targeted risk-management measures under Art. 9(2)(d), giving effect to the requirements of Chapter III Section 2. SKELETON: stub action; CORE wires the risk-analysis evidence artifact and the metric hooks measuring residual-risk acceptability under Art. 9(5).",
       "on_completion": "action--40000000-0000-4000-8000-000000000004",
       "in_args": [
-        "__annex_iii_use_case__"
+        "__acceptability_thresholds__",
+        "__annex_iii_use_case__",
+        "__identified_risks__",
+        "__iteration_id__"
       ],
       "out_args": [
         "__risk_register_id__"
@@ -92,7 +172,17 @@
         ],
         "metric_refs": [
           "kri.residual_risk_threshold_breach_count@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.eu_ai_act_risk_management.primitives.assessment.assess_art9_risks",
+          "in": {
+            "classification": "__annex_iii_use_case__",
+            "iteration_id": "__iteration_id__",
+            "identified_risks": "__identified_risks__",
+            "acceptability_thresholds": "__acceptability_thresholds__"
+          },
+          "out": "__risk_register_id__"
+        }
       }
     },
     "action--40000000-0000-4000-8000-000000000004": {
@@ -101,7 +191,10 @@
       "description": "Assemble the technical documentation the provider draws up before the high-risk AI system is placed on the market or put into service and keeps up to date under Art. 11 read with Annex IV: general description of the AI system, detailed description of its elements and of the process for its development, information about the monitoring, functioning and control of the AI system, description of the appropriateness of the performance metrics, detailed description of the risk-management system per Art. 9, and a list of the harmonised standards applied. SKELETON: stub action; CORE wires the Annex IV section-by-section bundle assembly and the conformity-assessment intake handoff under Art. 43.",
       "on_completion": "action--40000000-0000-4000-8000-000000000005",
       "in_args": [
-        "__risk_register_id__"
+        "__annex_iv_sections__",
+        "__instructions_committed_at__",
+        "__risk_register_id__",
+        "__technical_doc_committed_at__"
       ],
       "out_args": [
         "__technical_documentation_id__"
@@ -115,7 +208,17 @@
         ],
         "metric_refs": [
           "kri.transparency_doc_freshness_age@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.eu_ai_act_risk_management.primitives.documentation.assemble_technical_documentation",
+          "in": {
+            "risk_register": "__risk_register_id__",
+            "annex_iv_sections": "__annex_iv_sections__",
+            "technical_doc_committed_at": "__technical_doc_committed_at__",
+            "instructions_committed_at": "__instructions_committed_at__"
+          },
+          "out": "__technical_documentation_id__"
+        }
       }
     },
     "action--40000000-0000-4000-8000-000000000005": {
@@ -135,8 +238,20 @@
         ],
         "metric_refs": [
           "kri.residual_risk_threshold_breach_count@v1"
-        ]
-      }
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.eu_ai_act_risk_management.primitives.post_market.record_post_market_signal",
+          "in": {
+            "risk_register": "__risk_register_id__",
+            "observation": "__post_market_observation__"
+          },
+          "out": "__post_market_signal__"
+        }
+      },
+      "in_args": [
+        "__post_market_observation__",
+        "__risk_register_id__"
+      ]
     },
     "end--40000000-0000-4000-8000-000000000006": {
       "type": "end",
@@ -145,7 +260,7 @@
   },
   "x_secops_ng": {
     "stable_id": "playbook.eu_ai_act_risk_management@v1",
-    "content_version": "0.3.0",
+    "content_version": "0.4.0",
     "maturity": "experimental",
     "compile_targets": [
       "n8n",
@@ -166,16 +281,16 @@
       "kri.transparency_doc_freshness_age@v1"
     ],
     "sources": [
-      "OASIS CACAO v2.0 specification \u2014 workflow step types, variable conventions, x_ extension namespace",
-      "Regulation (EU) 2024/1689 \u2014 EU Artificial Intelligence Act, Article 6 \u2014 classification rules for high-risk AI systems",
-      "Regulation (EU) 2024/1689 \u2014 EU Artificial Intelligence Act, Article 9 \u2014 risk-management system for high-risk AI systems",
-      "Regulation (EU) 2024/1689 \u2014 EU Artificial Intelligence Act, Article 11 read with Annex IV \u2014 technical documentation",
-      "Regulation (EU) 2024/1689 \u2014 EU Artificial Intelligence Act, Article 13 \u2014 transparency and provision of information to deployers",
-      "Regulation (EU) 2024/1689 \u2014 EU Artificial Intelligence Act, Article 72 \u2014 post-market monitoring by providers",
-      "Regulation (EU) 2024/1689 \u2014 EU Artificial Intelligence Act, Annex III \u2014 high-risk AI systems referred to in Article 6(2)",
-      "NIST SP 800-53 Rev. 5 \u2014 RA-3 (Risk Assessment), PM-9 (Risk Management Strategy), PL-2 (System Security and Privacy Plans) control axes",
-      "MITRE D3FEND v1.0.0 \u2014 D3-OAM (Operational Activity Mapping) defensive technique",
-      "NIS2 Directive (EU) 2022/2555, Article 21(2)(a) \u2014 policies on risk analysis and information system security"
+      "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
+      "Regulation (EU) 2024/1689 — EU Artificial Intelligence Act, Article 6 — classification rules for high-risk AI systems",
+      "Regulation (EU) 2024/1689 — EU Artificial Intelligence Act, Article 9 — risk-management system for high-risk AI systems",
+      "Regulation (EU) 2024/1689 — EU Artificial Intelligence Act, Article 11 read with Annex IV — technical documentation",
+      "Regulation (EU) 2024/1689 — EU Artificial Intelligence Act, Article 13 — transparency and provision of information to deployers",
+      "Regulation (EU) 2024/1689 — EU Artificial Intelligence Act, Article 72 — post-market monitoring by providers",
+      "Regulation (EU) 2024/1689 — EU Artificial Intelligence Act, Annex III — high-risk AI systems referred to in Article 6(2)",
+      "NIST SP 800-53 Rev. 5 — RA-3 (Risk Assessment), PM-9 (Risk Management Strategy), PL-2 (System Security and Privacy Plans) control axes",
+      "MITRE D3FEND v1.0.0 — D3-OAM (Operational Activity Mapping) defensive technique",
+      "NIS2 Directive (EU) 2022/2555, Article 21(2)(a) — policies on risk analysis and information system security"
     ]
   }
 }

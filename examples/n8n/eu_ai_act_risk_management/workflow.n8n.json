@@ -21,27 +21,99 @@
             },
             {
               "name": "__annex_iii_use_case__",
-              "type": "string",
+              "type": "object",
               "value": "",
               "description": "Annex III high-risk use-case category the system falls under (e.g. biometric identification, critical infrastructure management, employment screening). SKELETON: string; CORE tightens to an enum against the Annex III eight-area catalogue."
             },
             {
               "name": "__risk_register_id__",
-              "type": "string",
+              "type": "object",
               "value": "",
               "description": "Identifier of the risk register emitted by the Art. 9(2)(a)-(b) identification / estimation step and consumed by the Art. 9(2)(d) risk-treatment step."
             },
             {
               "name": "__technical_documentation_id__",
-              "type": "string",
+              "type": "object",
               "value": "",
               "description": "Identifier of the technical documentation bundle assembled per Art. 11 read with Annex IV. Consumed by conformity assessment."
             },
             {
               "name": "__post_market_signal__",
-              "type": "string",
+              "type": "object",
               "value": "",
               "description": "Identifier of the post-market monitoring signal fed back into the iterative risk-management cycle under Art. 9(2)(c) read with Art. 72."
+            },
+            {
+              "name": "__classification_basis__",
+              "type": "string",
+              "value": "",
+              "description": "Which Article 6 path applies: annex_i_product_safety (6(1)), annex_iii_standalone (6(2)) or annex_iii_derogated (6(3)). Asserted by the provider \u2014 never inferred from the intended purpose."
+            },
+            {
+              "name": "__annex_iii_area__",
+              "type": "string",
+              "value": "",
+              "description": "One of the eight Annex III areas, matching the eu_ai_act:annex-iii-N-<area> mapping ids. Required on both Annex III paths, forbidden on the Art. 6(1) product-safety path."
+            },
+            {
+              "name": "__union_harmonisation_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Reference to the Annex I Union harmonisation legislation entry. Required on the Art. 6(1) path only."
+            },
+            {
+              "name": "__derogation_ground__",
+              "type": "string",
+              "value": "",
+              "description": "One of the four Art. 6(3) grounds. Required on the derogated path only."
+            },
+            {
+              "name": "__derogation_assessment_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Reference to the Art. 6(4) documented assessment supporting an Art. 6(3) derogation. Required on the derogated path only \u2014 a derogation with no assessment behind it is not representable."
+            },
+            {
+              "name": "__iteration_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of this Art. 9(2) iteration. Art. 9(2) is a continuous iterative process, so every register is scoped to an iteration."
+            },
+            {
+              "name": "__identified_risks__",
+              "type": "object",
+              "value": "",
+              "description": "Risk records for this iteration, each carrying risk_id, origin_paragraph (9(2)(a)/(b)/(c)), residual_score and measure_refs. References into the provider's risk documentation, never hazard prose."
+            },
+            {
+              "name": "__acceptability_thresholds__",
+              "type": "object",
+              "value": "",
+              "description": "Annex III area to Art. 9(5) residual-risk acceptability threshold. The framework ships no default: acceptability is the operator's own policy."
+            },
+            {
+              "name": "__annex_iv_sections__",
+              "type": "object",
+              "value": "",
+              "description": "Annex IV section key to a reference into the provider's documentation store. Annex IV(5) must reference this iteration's register."
+            },
+            {
+              "name": "__technical_doc_committed_at__",
+              "type": "string",
+              "value": "",
+              "description": "ISO-8601 date the Art. 11 / Annex IV bundle was last committed. Supplied rather than clock-read, which is what makes a run replayable."
+            },
+            {
+              "name": "__instructions_committed_at__",
+              "type": "string",
+              "value": "",
+              "description": "ISO-8601 date the Art. 13 instructions for use were last committed. Tracked separately because kri.transparency_doc_freshness_age@v1 takes the maximum of the two ages."
+            },
+            {
+              "name": "__post_market_observation__",
+              "type": "object",
+              "value": "",
+              "description": "One Art. 72 observation: signal_id, signal_kind, observed_at, evidence_ref and optional affects_risk_ids."
             }
           ]
         }
@@ -52,36 +124,15 @@
     {
       "id": "action--40000000-0000-4000-8000-000000000002",
       "name": "identify high-risk AI system",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         500,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.ai_system_id",
-              "name": "in.ai_system_id",
-              "value": "={{$workflow.variables.ai_system_id}}",
-              "type": "string"
-            },
-            {
-              "id": "out.annex_iii_use_case",
-              "name": "out.annex_iii_use_case",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.risk_management_strategy@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.eu_ai_act_risk_management.primitives.classification import classify_high_risk_system\n__annex_iii_use_case__ = classify_high_risk_system(ai_system_id=__ai_system_id__, classification_basis=__classification_basis__, annex_iii_area=__annex_iii_area__, union_harmonisation_ref=__union_harmonisation_ref__, derogation_ground=__derogation_ground__, derogation_assessment_ref=__derogation_assessment_ref__)"
       },
       "notes": "Inventory the AI system, resolve whether it is a high-risk AI system under Art. 6 read with Annex III (or against a Union harmonisation-legislation entry per Art. 6(1) and Annex I), and pin the Annex III use-case category the risk-management system will be operated against. SKELETON: stub action; CORE wires the Annex III inventory join, the provider / deployer role determination under Art. 3(3) and (4), and the Art. 6(3) derogation self-declaration.",
       "notesInFlow": true
@@ -89,48 +140,15 @@
     {
       "id": "action--40000000-0000-4000-8000-000000000003",
       "name": "assess risk under Art. 9(2)",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         760,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.annex_iii_use_case",
-              "name": "in.annex_iii_use_case",
-              "value": "={{$workflow.variables.annex_iii_use_case}}",
-              "type": "string"
-            },
-            {
-              "id": "out.risk_register_id",
-              "name": "out.risk_register_id",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.risk_assessment@v1, control.risk_management_strategy@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.compliance_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kri.residual_risk_threshold_breach_count@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.eu_ai_act_risk_management.primitives.assessment import assess_art9_risks\n__risk_register_id__ = assess_art9_risks(classification=__annex_iii_use_case__, iteration_id=__iteration_id__, identified_risks=__identified_risks__, acceptability_thresholds=__acceptability_thresholds__)"
       },
       "notes": "Iterate the Art. 9(2) risk-management cycle for the pinned use case: identification and analysis of known and reasonably foreseeable risks under Art. 9(2)(a); estimation and evaluation of risks that may emerge when the system is used in accordance with its intended purpose and under conditions of reasonably foreseeable misuse under Art. 9(2)(b); evaluation of other risks possibly arising, based on the analysis of data gathered from the post-market monitoring system, under Art. 9(2)(c); adoption of appropriate and targeted risk-management measures under Art. 9(2)(d), giving effect to the requirements of Chapter III Section 2. SKELETON: stub action; CORE wires the risk-analysis evidence artifact and the metric hooks measuring residual-risk acceptability under Art. 9(5).",
       "notesInFlow": true
@@ -138,48 +156,15 @@
     {
       "id": "action--40000000-0000-4000-8000-000000000004",
       "name": "assemble technical documentation",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1020,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.risk_register_id",
-              "name": "in.risk_register_id",
-              "value": "={{$workflow.variables.risk_register_id}}",
-              "type": "string"
-            },
-            {
-              "id": "out.technical_documentation_id",
-              "name": "out.technical_documentation_id",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.system_security_privacy_plan@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.compliance_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kri.transparency_doc_freshness_age@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.eu_ai_act_risk_management.primitives.documentation import assemble_technical_documentation\n__technical_documentation_id__ = assemble_technical_documentation(risk_register=__risk_register_id__, annex_iv_sections=__annex_iv_sections__, technical_doc_committed_at=__technical_doc_committed_at__, instructions_committed_at=__instructions_committed_at__)"
       },
       "notes": "Assemble the technical documentation the provider draws up before the high-risk AI system is placed on the market or put into service and keeps up to date under Art. 11 read with Annex IV: general description of the AI system, detailed description of its elements and of the process for its development, information about the monitoring, functioning and control of the AI system, description of the appropriateness of the performance metrics, detailed description of the risk-management system per Art. 9, and a list of the harmonised standards applied. SKELETON: stub action; CORE wires the Annex IV section-by-section bundle assembly and the conformity-assessment intake handoff under Art. 43.",
       "notesInFlow": true
@@ -187,42 +172,15 @@
     {
       "id": "action--40000000-0000-4000-8000-000000000005",
       "name": "monitor post-market signals",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1280,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "out.post_market_signal",
-              "name": "out.post_market_signal",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.risk_assessment@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.detection_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kri.residual_risk_threshold_breach_count@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.eu_ai_act_risk_management.primitives.post_market import record_post_market_signal\n__post_market_signal__ = record_post_market_signal(risk_register=__risk_register_id__, observation=__post_market_observation__)"
       },
       "notes": "Operate the post-market monitoring feedback loop the iterative Art. 9(2)(c) cycle depends on: the provider establishes and documents a post-market monitoring system under Art. 72, actively and systematically collects, documents and analyses relevant data on the performance of the high-risk AI system throughout its lifetime, and feeds the resulting signals back into the Art. 9 iteration so residual-risk acceptability under Art. 9(5) stays defended. SKELETON: stub action; CORE wires the Art. 72 post-market monitoring plan template and the loop-back edge into the Art. 9(2)(c) step of the next iteration.",
       "notesInFlow": true
@@ -314,15 +272,10 @@
   "meta": {
     "secops_ng": {
       "stable_id": "playbook.eu_ai_act_risk_management@v1",
-      "content_version": "0.3.0",
+      "content_version": "0.4.0",
       "maturity": "experimental",
       "source_playbook_id": "playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8"
     },
-    "secops_ng_notes": [
-      "step 'action--40000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'action--40000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'action--40000000-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'action--40000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
-    ]
+    "secops_ng_notes": []
   }
 }

@@ -1,6 +1,6 @@
 # eu_ai_act_risk_management
 
-CACAO v2 SKELETON playbook for the risk-management system
+CACAO v2 playbook for the risk-management system
 Article 9 of the EU AI Act (Regulation (EU) 2024/1689) requires
 providers of high-risk AI systems to establish, implement, document
 and maintain. The playbook inventories a high-risk AI system against
@@ -11,10 +11,22 @@ feedback Art. 9(2)(c) reads together with Art. 72.
 
 ## Status
 
-EXTEND (content version `0.3.0`). Ships the CACAO scaffold, the CORE
-outbound overlay (real OSCAL pins on RA-3 / PM-9 / PL-2, D3FEND
-`D3-OAM` on the risk-assessment step, three-target compile examples
-with byte-parity goldens), and the EXTEND wiring (OCSF Compliance
+Content version `0.4.0`. Two axes have run separately here, and the
+distinction is worth stating because the earlier revisions of this file
+read as more finished than the playbook was:
+
+* **Mappings / telemetry / metrics** reached EXTEND at `0.3.0` — the
+  outbound overlay, OCSF bindings and the two KRI entries below.
+* **Primitive bindings** reached CORE at `0.4.0`. Before that the four
+  action steps carried no `core_body`, so every compile target emitted
+  topology with unbound Set-node stubs. All four are now bound to
+  deterministic bodies under `primitives/`, and the catalogue reads the
+  playbook as tier A rather than tier B.
+
+Ships the CACAO scaffold, the CORE outbound overlay (real OSCAL pins on
+RA-3 / PM-9 / PL-2, D3FEND `D3-OAM` on the risk-assessment step,
+three-target compile examples with byte-parity goldens), the four bound
+primitives, and the EXTEND wiring (OCSF Compliance
 Finding + Detection Finding bindings on the assessment,
 documentation-assembly and post-market-monitoring steps; two KRI
 catalogue entries — `kri.residual_risk_threshold_breach_count@v1` and
@@ -42,12 +54,19 @@ human oversight (Art. 14), accuracy / robustness / cybersecurity
 
 - `playbook.cacao.json` — the CACAO v2 artifact
   (`playbook.eu_ai_act_risk_management@v1`).
-- `mappings.yaml` — SKELETON outbound overlay. Every field carries
-  either a real pin or a `todo: true` placeholder pointing to the
-  sibling G-02 card. Schema:
-  `../../../schemas/playbook-mappings.schema.json`.
+- `mappings.yaml` — outbound overlay. Every field carries either a real
+  pin or a `todo: true` placeholder pointing to the sibling G-02 card.
+  Schema: `../../../schemas/playbook-mappings.schema.json`.
+- `primitives/` — the four deterministic bodies the action steps bind to
+  via `x_secops_ng.core_body`. Pure, offline, replay-safe: no clock
+  reads, no network, no LLM. Every instant and date the lifecycle needs
+  is supplied as an input, which is what lets the byte-parity goldens
+  exist.
 
-## Workflow (SKELETON stubs)
+## Workflow
+
+All four action steps are bound to a primitive. What each step decides,
+beyond the article it discharges:
 
 1. **Identify high-risk AI system** — inventory the AI system,
    resolve whether it is a high-risk AI system under Art. 6 read
