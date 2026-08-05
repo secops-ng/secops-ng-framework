@@ -163,7 +163,7 @@ def _action_without_commands_steps() -> dict[str, dict]:
     }
 
 
-def _bound_steps() -> dict[str, dict]:
+def _core_body_steps() -> dict[str, dict]:
     raw = json.loads(SOURCE.read_text(encoding="utf-8"))
     return {
         step_id: step
@@ -235,15 +235,17 @@ def test_set_nodes_surface_x_secops_ng_refs() -> None:
             )
 
 
-def test_bound_steps_emit_code_nodes_calling_their_primitive() -> None:
-    """A `core_body` binding must reach the emitted workflow, not just the CACAO.
+def test_core_body_steps_emit_code_nodes() -> None:
+    """Steps with ``x_secops_ng.core_body`` compile to n8n Code nodes
+    rendering the primitive call (per CORE-MECH-EMIT-N8N).
 
-    This is the assertion the Set-node tests used to provide before the CORE
-    stage bound these steps: without it, dropping a binding from the canonical
-    playbook would leave every remaining test green, because a Set node is a
-    perfectly valid node.
+    Catches an **emitter regression**: a declared binding emitting a Set node,
+    or a Code node that imports the primitive but never calls it. It does not
+    catch deliberate de-binding — removing a ``core_body`` and regenerating
+    leaves this suite green, since the declaration is the input to the check.
+    See #906, which unified this assertion across every bound playbook.
     """
-    bound = _bound_steps()
+    bound = _core_body_steps()
     assert len(bound) == 4, f"expected four bound action steps, got {sorted(bound)}"
 
     nodes_by_id = _nodes_by_id()
