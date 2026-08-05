@@ -12,7 +12,7 @@ The shipped pairing this lint locks in (F-MET-DET earlier waves):
 * ``kri.same_target_replay_drift@v1``             (residual-risk KRI)
 
 This lint is the determinism-corner sibling of
-``tools/lint_sovereignty_lm_endpoint_pairing.py`` (F-MET-SOV CORE, PR
+``tools/lint_sovereignty_pairing.py`` (F-MET-SOV CORE, PR
 #543), which encoded the same residual-risk pairing invariant for the
 sovereignty corner of FOUNDATION. The sovereignty lane's semantics are
 intentionally NOT shared from this module — the sovereignty lint

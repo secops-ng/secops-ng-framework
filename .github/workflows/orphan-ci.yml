@@ -40,7 +40,7 @@ on:
       - "tools/lint_posture_ocsf_bindings.py"
       - "tools/lint_detection_ocsf_bindings.py"
       - "tools/lint_catalogue_ocsf_bindings.py"
-      - "tools/lint_sovereignty_lm_endpoint_pairing.py"
+      - "tools/lint_sovereignty_pairing.py"
       - "tools/lint_determinism_replay_pairing.py"
       - "tools/lint_post_incident_review_ocsf_bindings.py"
       - "tools/lint_regulatory_notification_ocsf_bindings.py"
@@ -116,7 +116,7 @@ on:
       - "tools/lint_posture_ocsf_bindings.py"
       - "tools/lint_detection_ocsf_bindings.py"
       - "tools/lint_catalogue_ocsf_bindings.py"
-      - "tools/lint_sovereignty_lm_endpoint_pairing.py"
+      - "tools/lint_sovereignty_pairing.py"
       - "tools/lint_determinism_replay_pairing.py"
       - "tools/lint_post_incident_review_ocsf_bindings.py"
       - "tools/lint_regulatory_notification_ocsf_bindings.py"
@@ -287,14 +287,19 @@ jobs:
 
   sovereignty-lm-endpoint-pairing:
     # G-04 catalogue-maturity sovereignty corner — asserts that every
-    # sovereignty-cluster LM-endpoint coverage KPI ships with a paired
-    # sovereignty-cluster UNKNOWN-exposure residual-risk KRI at the
-    # same version family. Closes the F-MET-SOV triplet (SKELETON
-    # #542) by making the residual-risk pairing a nightly invariant
-    # so the UNKNOWN-exposure signal cannot silently regress out of
-    # the catalogue. Rides the same nightly content-CI cadence as the
-    # OCSF cluster jobs; runs independently from the per-framework
-    # orphan matrix and the OCSF jobs.
+    # sovereignty-cluster *coverage* KPI declares a resolvable
+    # residual-risk KRI counterpart in `residual_risk_refs`, so the
+    # exposure reading cannot silently regress out of the catalogue.
+    # F-SV-06 stage 1 generalised this from the LM-endpoint family
+    # (originally F-MET-SOV SKELETON #542) to the whole cluster and
+    # moved the pairing from a naming convention to a declared field.
+    #
+    # The job key and `name:` are deliberately unchanged despite the
+    # widened scope: branch protection matches on the check name, and
+    # renaming it would silently drop the required check.
+    #
+    # Rides the same nightly content-CI cadence as the OCSF cluster
+    # jobs; runs independently from the per-framework orphan matrix.
     name: G-04 sovereignty LM-endpoint pairing assertion
     runs-on: ubuntu-latest
     steps:
@@ -311,9 +316,9 @@ jobs:
       - name: Install runtime deps (PyYAML)
         run: pip install --no-cache-dir pyyaml
 
-      - name: Run sovereignty LM-endpoint pairing assertion (text)
+      - name: Run sovereignty coverage/residual-risk pairing assertion (text)
         run: |
-          python -m tools.lint_sovereignty_lm_endpoint_pairing --format text
+          python -m tools.lint_sovereignty_pairing --format text
 
   determinism-replay-pairing:
     # G-04 catalogue-maturity determinism corner — asserts that every

@@ -2346,10 +2346,10 @@ shipping without their residual-risk counterpart.
 
 ### F-SV-06 — Generalise the coverage/exposure pairing invariant
 
-- **Status:** Proposed
+- **Status:** In Progress
 - **Priority:** P2
-- **Rationale:** `tools/lint_sovereignty_lm_endpoint_pairing.py` exists
-  because an LM-endpoint coverage KPI cannot distinguish an
+- **Rationale:** The sovereignty pairing lint exists because an
+  LM-endpoint coverage KPI cannot distinguish an
   operator-supplied or self-hosted endpoint from a confirmed non-EU one,
   so it must ship with a paired UNKNOWN-exposure KRI to stay honest. That
   reasoning is not specific to LM endpoints, but the lint is: the cluster
@@ -2370,7 +2370,7 @@ shipping without their residual-risk counterpart.
 - **Sovereign-stack constraints:** —
 - **Depends on:** —
 - **Source:** FOUNDATION (sovereignty);
-  `tools/lint_sovereignty_lm_endpoint_pairing.py`; issue #890.
+  `tools/lint_sovereignty_pairing.py`; issue #890.
 
 ---
 
