@@ -161,7 +161,7 @@ def _action_without_commands_steps() -> dict[str, dict]:
     }
 
 
-def _bound_steps() -> dict[str, dict]:
+def _core_body_steps() -> dict[str, dict]:
     raw = json.loads(SOURCE.read_text(encoding="utf-8"))
     return {
         step_id: step
@@ -242,7 +242,7 @@ def test_only_end_step_emits_noop() -> None:
         )
 
 
-def test_bound_steps_emit_code_nodes_calling_their_primitive() -> None:
+def test_core_body_steps_emit_code_nodes() -> None:
     """Each bound step lowers to a Pyodide node that calls its own primitive.
 
     The counterpart to the Set-node assertions above: after the CORE-WIRE,
@@ -250,7 +250,7 @@ def test_bound_steps_emit_code_nodes_calling_their_primitive() -> None:
     actually invoke the bound primitive rather than restate the contract.
     """
     nodes_by_id = _nodes_by_id()
-    bound = _bound_steps()
+    bound = _core_body_steps()
     assert bound, "expected patch_management to carry core_body bindings"
     for step_id, step in bound.items():
         node = nodes_by_id[step_id]
