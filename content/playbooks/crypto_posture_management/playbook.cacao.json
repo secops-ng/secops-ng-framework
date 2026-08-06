@@ -50,24 +50,79 @@
       "external": true
     },
     "__policy_inventory_id__": {
-      "type": "string",
+      "type": "dictionary",
       "description": "Identifier of the resolved cryptography-policy inventory snapshot: the operator's declared algorithm floor, key-size floor, rotation cadence, and TLS-version floor at the start of the posture window. Resolved against __crypto_scope__.",
       "external": false
     },
     "__cert_posture_id__": {
-      "type": "string",
+      "type": "dictionary",
       "description": "Identifier of the certificate-posture probe artifact: per-endpoint record of certificate validity, chain, expiry, negotiated TLS version, and cipher suite against the scope catalogue.",
       "external": false
     },
     "__rotation_status__": {
-      "type": "string",
+      "type": "dictionary",
       "description": "Identifier of the key-rotation status artifact: per-key record of last-rotation timestamp, declared cadence, and overdue-by counter against __policy_inventory_id__.",
       "external": false
     },
     "__attestation_id__": {
-      "type": "string",
+      "type": "dictionary",
       "description": "Identifier of the dated cryptography-posture attestation record published to the operator's evidence store. Carries the policy snapshot, the cert-posture probe, and the rotation-status artifact — the audit-evident discharge of NIS2 Art.21(2)(h).",
       "external": false
+    },
+    "__policy_clauses__": {
+      "type": "dictionary",
+      "description": "Clause records from the operator's documented cryptography policy: clause_ref, concern and threshold. No default baseline ships — a shipped cipher floor would become a de-facto standard.",
+      "external": true
+    },
+    "__scoped_assets__": {
+      "type": "dictionary",
+      "description": "Asset ids in scope for this posture window.",
+      "external": true
+    },
+    "__certificate_observations__": {
+      "type": "dictionary",
+      "description": "Observations the operator's own scanner produced: asset_id, certificate_ref, not_after and optional cipher_suite / protocol_version. References and parameters only, never certificate bodies.",
+      "external": true
+    },
+    "__accepted_cipher_suites__": {
+      "type": "dictionary",
+      "description": "Suites the operator's declared floor admits. Required when the policy governs cipher_suite_floor; the framework ships no suite ordering.",
+      "external": true
+    },
+    "__key_records__": {
+      "type": "dictionary",
+      "description": "Key rotation records: asset_id, key_ref and last_rotated_on where one exists. Key references only, never key material.",
+      "external": true
+    },
+    "__crypto_owner_role__": {
+      "type": "string",
+      "description": "Role accountable for the cryptography posture. A role, never a named individual.",
+      "external": true
+    },
+    "__notification_channel_ref__": {
+      "type": "string",
+      "description": "Reference to the operator's declared notification channel. Recorded; delivery is adapter-bound.",
+      "external": true
+    },
+    "__notification_plan__": {
+      "type": "dictionary",
+      "description": "The composed owner notification, marked dispatched: false. This step plans; it does not send.",
+      "external": true
+    },
+    "__workflow_id__": {
+      "type": "string",
+      "description": "Runtime workflow identifier, recorded in provenance.",
+      "external": true
+    },
+    "__execution_id__": {
+      "type": "string",
+      "description": "Runtime execution identifier, recorded in provenance.",
+      "external": true
+    },
+    "__captured_at__": {
+      "type": "string",
+      "description": "ISO-8601 UTC instant the attestation is dated at. Supplied rather than clock-read, which is what makes the run replayable.",
+      "external": true
     }
   },
   "workflow_start": "start--51000000-0000-4000-8000-000000000001",
@@ -83,8 +138,10 @@
       "description": "Resolve the operator's declared cryptography policy at the start of the posture window: algorithm floor (symmetric and asymmetric), minimum key sizes, declared key-rotation cadence per key class, TLS-version floor, and the set of in-scope endpoints / key-management surfaces / datasets-at-rest enumerated in __crypto_scope__. Reads the operator's governance source-of-truth (policy document or policy catalogue) and emits __policy_inventory_id__ — the snapshot the subsequent steps measure against. The playbook does NOT author the policy; if no policy is declared for __crypto_scope__, this step emits an inventory artifact with the gap explicitly flagged and the downstream steps still run so the attestation records the missing-policy condition.",
       "on_completion": "action--51000000-0000-4000-8000-000000000003",
       "in_args": [
+        "__crypto_scope__",
+        "__policy_clauses__",
         "__posture_window__",
-        "__crypto_scope__"
+        "__scoped_assets__"
       ],
       "out_args": [
         "__policy_inventory_id__"
@@ -95,7 +152,17 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.crypto_posture_management.primitives.policy.inventory_crypto_policy",
+          "in": {
+            "posture_window": "__posture_window__",
+            "crypto_scope": "__crypto_scope__",
+            "policy_clauses": "__policy_clauses__",
+            "scoped_assets": "__scoped_assets__"
+          },
+          "out": "__policy_inventory_id__"
+        }
       }
     },
     "action--51000000-0000-4000-8000-000000000003": {
@@ -104,6 +171,8 @@
       "description": "Probe the certificate posture of the TLS endpoints enumerated in __crypto_scope__ against the floors carried in __policy_inventory_id__: certificate validity and chain, days-to-expiry, negotiated TLS version, negotiated cipher suite, and presence of mandated extensions. Per-endpoint records are aggregated into __cert_posture_id__. The probe is read-only and side-effect-free against operator infrastructure; it does not attempt connection coercion or downgrade. Detection bindings for expired-cert / weak-cipher / floor-violation upstream rule ids are owned by the CORE-layer sibling card once stable ids are selected.",
       "on_completion": "action--51000000-0000-4000-8000-000000000004",
       "in_args": [
+        "__accepted_cipher_suites__",
+        "__certificate_observations__",
         "__crypto_scope__",
         "__policy_inventory_id__"
       ],
@@ -116,7 +185,17 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.crypto_posture_management.primitives.certificates.probe_cert_posture",
+          "in": {
+            "crypto_scope": "__crypto_scope__",
+            "policy_inventory": "__policy_inventory_id__",
+            "certificate_observations": "__certificate_observations__",
+            "accepted_cipher_suites": "__accepted_cipher_suites__"
+          },
+          "out": "__cert_posture_id__"
+        }
       }
     },
     "action--51000000-0000-4000-8000-000000000004": {
@@ -126,6 +205,7 @@
       "on_completion": "action--51000000-0000-4000-8000-000000000005",
       "in_args": [
         "__crypto_scope__",
+        "__key_records__",
         "__policy_inventory_id__"
       ],
       "out_args": [
@@ -137,7 +217,16 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.crypto_posture_management.primitives.rotation.check_key_rotation",
+          "in": {
+            "crypto_scope": "__crypto_scope__",
+            "policy_inventory": "__policy_inventory_id__",
+            "key_records": "__key_records__"
+          },
+          "out": "__rotation_status__"
+        }
       }
     },
     "action--51000000-0000-4000-8000-000000000005": {
@@ -146,10 +235,14 @@
       "description": "Compose and publish the dated cryptography-posture attestation to the operator's evidence store. The record carries the policy-inventory snapshot, the cert-posture probe artifact, the key-rotation status artifact, the posture window, and a top-level gap summary (missing-policy, expiring-certs, overdue-rotations counts). This is the audit-evident artifact that NIS2 Art.21(2)(h) reviewers read; missing or stale attestations are the failure mode the metrics surface. The attestation is always emitted, including the policy-gap branch (which records the missing-policy condition rather than skipping the attestation).",
       "on_completion": "action--51000000-0000-4000-8000-000000000006",
       "in_args": [
-        "__policy_inventory_id__",
+        "__captured_at__",
         "__cert_posture_id__",
+        "__crypto_owner_role__",
+        "__execution_id__",
+        "__policy_inventory_id__",
+        "__posture_window__",
         "__rotation_status__",
-        "__posture_window__"
+        "__workflow_id__"
       ],
       "out_args": [
         "__attestation_id__"
@@ -162,7 +255,21 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.crypto_posture_management.primitives.evidence.capture_crypto_evidence",
+          "in": {
+            "policy_inventory": "__policy_inventory_id__",
+            "cert_posture": "__cert_posture_id__",
+            "rotation_status": "__rotation_status__",
+            "posture_window": "__posture_window__",
+            "owner_role": "__crypto_owner_role__",
+            "workflow_id": "__workflow_id__",
+            "execution_id": "__execution_id__",
+            "captured_at": "__captured_at__"
+          },
+          "out": "__attestation_id__"
+        }
       }
     },
     "action--51000000-0000-4000-8000-000000000006": {
@@ -172,13 +279,28 @@
       "on_completion": "end--51000000-0000-4000-8000-000000000007",
       "in_args": [
         "__attestation_id__",
-        "__crypto_scope__"
+        "__crypto_owner_role__",
+        "__crypto_scope__",
+        "__notification_channel_ref__"
       ],
       "x_secops_ng": {
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
-        ]
-      }
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.crypto_posture_management.primitives.notify.plan_crypto_owner_notification",
+          "in": {
+            "attestation": "__attestation_id__",
+            "crypto_scope": "__crypto_scope__",
+            "owner_role": "__crypto_owner_role__",
+            "channel_ref": "__notification_channel_ref__"
+          },
+          "out": "__notification_plan__"
+        }
+      },
+      "out_args": [
+        "__notification_plan__"
+      ]
     },
     "end--51000000-0000-4000-8000-000000000007": {
       "type": "end",
@@ -187,7 +309,7 @@
   },
   "x_secops_ng": {
     "stable_id": "playbook.crypto_posture_management@v1",
-    "content_version": "0.1.0",
+    "content_version": "0.2.0",
     "maturity": "experimental",
     "compile_targets": [
       "n8n",

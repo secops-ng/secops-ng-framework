@@ -145,11 +145,31 @@ def test_worked_example_has_valid_n8n_shape() -> None:
 
 
 def _action_without_commands_steps() -> dict[str, dict]:
-    raw = json.loads(SOURCE.read_text(encoding="utf-8"))
+    """Unbound action steps — the ones the emitter uplifts to Set nodes.
+
+    A step carrying ``x_secops_ng.core_body`` compiles to a Code node calling
+    its primitive, so the Set-node assertions scope to steps without a
+    binding; ``test_core_body_steps_emit_code_nodes`` covers the bound ones.
+    All five action steps are bound as of the CORE stage, so this selector is
+    empty and those assertions hold vacuously — deliberate, not dead: a step
+    added later without a binding must still surface its contract.
+    """
+    raw = json.loads(MIRRORED_CACAO.read_text(encoding="utf-8"))
     return {
         step_id: step
         for step_id, step in raw["workflow"].items()
-        if step.get("type") == "action" and not step.get("commands")
+        if step.get("type") == "action"
+        and not step.get("commands")
+        and not (step.get("x_secops_ng") or {}).get("core_body")
+    }
+
+
+def _core_body_steps() -> dict[str, dict]:
+    raw = json.loads(MIRRORED_CACAO.read_text(encoding="utf-8"))
+    return {
+        step_id: step
+        for step_id, step in raw["workflow"].items()
+        if (step.get("x_secops_ng") or {}).get("core_body")
     }
 
 
@@ -209,6 +229,38 @@ def test_set_nodes_surface_x_secops_ng_refs() -> None:
                 f"step {step_id!r}: x_secops_ng.{key} dropped from Set node; "
                 f"present assignments: {sorted(names)}"
             )
+
+
+def test_core_body_steps_emit_code_nodes() -> None:
+    """Steps with ``x_secops_ng.core_body`` compile to n8n Code nodes
+    rendering the primitive call (per CORE-MECH-EMIT-N8N).
+
+    Catches an emitter regression: a declared binding emitting a Set node, or
+    a Code node that imports the primitive but never calls it. It does not
+    catch deliberate de-binding — removing a ``core_body`` and regenerating
+    leaves this suite green, since the declaration is the input to the check.
+    """
+    nodes_by_id = _nodes_by_id()
+    core_steps = _core_body_steps()
+    assert core_steps, "expected at least one CORE-bound step in crypto_posture_management"
+    for step_id, step in core_steps.items():
+        node = nodes_by_id[step_id]
+        assert node["type"] == "n8n-nodes-base.code", (
+            f"step {step_id!r} carries core_body and must emit a Code node, "
+            f"not {node['type']!r}"
+        )
+        body = node["parameters"].get("pythonCode", "")
+        primitive = step["x_secops_ng"]["core_body"]["primitive"]
+        module, _, callable_name = primitive.rpartition(".")
+        assert f"from {module} import {callable_name}" in body, (
+            f"step {step_id!r}: Code node missing primitive import "
+            f"`from {module} import {callable_name}`"
+        )
+        out_var = step["x_secops_ng"]["core_body"]["out"]
+        assert f"{out_var} = {callable_name}(" in body, (
+            f"step {step_id!r}: Code node missing primitive call binding "
+            f"`{out_var} = {callable_name}(...)`"
+        )
 
 
 def test_only_end_step_emits_noop() -> None:
