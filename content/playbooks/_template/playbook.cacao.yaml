@@ -46,9 +46,12 @@ created_by: identity--TODO_UUID
 # ISO-8601 timestamps. `created` is when the artifact was first
 # authored; `modified` is bumped on every content-affecting edit;
 # `valid_from` gates activation.
-created: TODO_ISO8601_UTC
-modified: TODO_ISO8601_UTC
-valid_from: TODO_ISO8601_UTC
+# Keep the quotes when you fill these in: unquoted ISO timestamps parse
+# as datetime objects and crash the YAML->JSON conversion in quickstart
+# step 3.
+created: "TODO_ISO8601_UTC"
+modified: "TODO_ISO8601_UTC"
+valid_from: "TODO_ISO8601_UTC"
 
 # Lowercase tag tokens. Include the regulatory anchor slug and any
 # tokens a searcher would use (e.g. "cra", "article-14", "cvd").
@@ -65,7 +68,7 @@ external_references:
     source: OASIS Open
   - name: TODO_REGULATORY_CITATION
     source: TODO_PUBLISHER
-    # url: https://TODO
+    # url: TODO_URL
 
 # SecOps-NG extension namespace. All fields nested here are required
 # unless noted otherwise.
