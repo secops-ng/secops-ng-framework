@@ -1,0 +1,84 @@
+stable_id: kri.unresolvable_regulatory_reference_count@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Catalogue entries asserting an EU-regulatory obligation with no resolvable reference — residual grounding exposure
+summary: >
+  Residual-risk indicator paired with
+  ``kpi.eu_regulatory_reference_coverage@v1``. Count of catalogue
+  entries under ``content/metrics/*.yaml`` that assert an EU-regulatory
+  obligation — a GDPR / NIS2 / DORA / CRA / ENISA anchor named in
+  ``external_refs`` — where the assertion does not resolve: the entry
+  carries neither an ``external_id`` pinning the instrument nor a
+  ``url`` a reviewer can follow to the authority. The paired KPI counts
+  an entry as anchored the moment any EU anchor is named; it cannot
+  distinguish a resolvable citation from a bare name-drop. This KRI
+  reads that unverifiable slice: an entry claiming regulatory grounding
+  that no one can check is not grounded, and it is worse than an entry
+  claiming nothing, because it reads as covered on the coverage chart.
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: "=="
+  rationale: >
+    The floor is zero: every regulatory assertion in the catalogue
+    either resolves to the instrument (EUR-Lex permalink or an
+    ``external_id`` naming the regulation and article) or it comes out.
+    Coverage may only rise by adding resolvable anchors, never by
+    unverifiable name-drops — the same claim-versus-evidence line the
+    sovereignty evidence stream draws.
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 0
+    severity: warn
+  - name: breach
+    comparator: ">="
+    value: 3
+    severity: high
+measurement:
+  source: composite
+  aggregation: count
+  formula: >
+    Over the catalogue entries under ``content/metrics/*.yaml`` on the
+    evaluation commit, for each ``external_refs`` entry whose ``source``
+    or ``name`` names an EU-regulatory authority (GDPR, NIS2, DORA, CRA,
+    ENISA), record one observation: 1 if the ref carries neither
+    ``external_id`` nor ``url`` (unresolvable), 0 otherwise. Aggregate
+    as count of entries carrying at least one unresolvable EU-regulatory
+    ref. Disjoint from the paired KPI's complement population: an entry
+    with no EU anchor at all is the KPI's uncovered slice, not this
+    KRI's — asserting nothing is honest, asserting the uncheckable is
+    the exposure.
+    Reference visualisation: see the committed rendering at
+    ``content/metrics/unresolvable_regulatory_reference_count.viz.md`` — that file is the contract for
+    the chart shape; the compile target renders the executable form at
+    evaluation time.
+  inputs:
+    - name: regulatory_assertion
+      description: >
+        One ``external_refs`` entry naming an EU-regulatory authority,
+        observed on a catalogue entry at the evaluation commit.
+    - name: resolvability
+      description: >
+        Whether the assertion carries an ``external_id`` or ``url`` a
+        reviewer can follow to the instrument. Only the
+        neither-present branch counts toward this KRI.
+  window:
+    duration: P1D
+    sliding: false
+external_refs:
+  - name: SecOps-NG FOUNDATION §3 — Sovereignty
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+  - name: SecOps-NG ROADMAP — F-SV-06 coverage/exposure pairing invariant
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/ROADMAP.md
+  - name: GDPR — cited-instrument resolvability context
+    source: EU
+    external_id: Regulation (EU) 2016/679
+    url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - sovereignty

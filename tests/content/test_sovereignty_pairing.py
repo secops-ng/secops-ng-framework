@@ -25,7 +25,6 @@ import pytest
 import yaml
 
 from tools.lint_sovereignty_pairing import (
-    MAX_SOFT_FINDINGS,
     is_coverage_kpi,
     main,
     partition,
@@ -66,13 +65,13 @@ def test_shipped_tree_has_no_hard_findings() -> None:
     assert hard == [], [f.as_text() for f in hard]
 
 
-def test_shipped_tree_soft_is_at_or_below_ceiling() -> None:
+def test_shipped_tree_has_no_soft_findings() -> None:
+    """F-SV-06 stage 2 promoted the last SOFT code; the partition is empty."""
     _, soft = partition(scan())
-    assert len(soft) <= MAX_SOFT_FINDINGS, (
-        f"undeclared coverage KPIs rose to {len(soft)} (ceiling "
-        f"{MAX_SOFT_FINDINGS}). The ceiling may only be lowered — declare a "
-        f"residual_risk_refs counterpart instead: "
-        f"{[f.kpi_stable_id for f in soft]}"
+    assert soft == [], (
+        "SOFT findings reappeared after the F-SV-06 stage-2 promotion — "
+        f"{[f.kpi_stable_id for f in soft]}. Every code is HARD now; a new "
+        "SOFT code is a decision that belongs in the module docstring."
     )
 
 
@@ -170,26 +169,15 @@ def test_lm_endpoint_without_declaration_is_hard_not_soft(tmp_path: Path) -> Non
     assert main(["--format", "json", "--metrics-dir", str(tmp_path)]) == 1
 
 
-# --- SOFT code and ceiling --------------------------------------------------
+# --- promoted code ----------------------------------------------------------
 
 
-def test_other_coverage_kpi_without_declaration_is_soft(tmp_path: Path) -> None:
+def test_coverage_kpi_without_declaration_is_hard(tmp_path: Path) -> None:
+    """Promoted by F-SV-06 stage 2: an undeclared coverage KPI gates alone."""
     _write(tmp_path, _metric(stable_id="kpi.cloud_posture_coverage@v1"))
     f = scan(tmp_path)
     assert [x.code for x in f] == ["coverage_kpi_without_residual_risk"]
-    assert f[0].severity == "SOFT"
-
-
-def test_soft_under_ceiling_exits_zero(tmp_path: Path) -> None:
-    _write(tmp_path, _metric(stable_id="kpi.a_coverage@v1"))
-    assert main(["--format", "text", "--metrics-dir", str(tmp_path)]) == 0
-
-
-def test_soft_over_ceiling_exits_nonzero(tmp_path: Path) -> None:
-    _write(tmp_path, *[
-        _metric(stable_id=f"kpi.s{i}_coverage@v1")
-        for i in range(MAX_SOFT_FINDINGS + 1)
-    ])
+    assert f[0].severity == "HARD"
     assert main(["--format", "text", "--metrics-dir", str(tmp_path)]) == 1
 
 
@@ -222,7 +210,6 @@ def test_cli_json_payload_shape(tmp_path: Path, capsys: pytest.CaptureFixture[st
     assert rc == 1
     assert doc["tool"] == "sovereignty-pairing"
     assert doc["hard"] == 1 and doc["soft"] == 0
-    assert doc["soft_ceiling"] == MAX_SOFT_FINDINGS
     assert doc["findings"][0]["code"] == "unresolved_residual_risk_ref"
 
 

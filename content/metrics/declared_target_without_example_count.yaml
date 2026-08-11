@@ -1,0 +1,82 @@
+stable_id: kri.declared_target_without_example_count@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Compile targets declared by a playbook but never exercised by a worked example — residual portability exposure
+summary: >
+  Residual-risk indicator paired with
+  ``kpi.reference_deployment_target_coverage@v1``. Count of
+  (workflow, target) pairs where the playbook's ``compile_targets``
+  declaration names one of the three reference targets but no compiled
+  example artifact exists under ``examples/<target>/<workflow>/`` on
+  the evaluation commit. The paired KPI reads ring completeness —
+  which workflows ship all three targets. It cannot read the inverse
+  claim: a declaration asserting portability that nothing has ever
+  exercised. A ``compile_targets`` entry with no example behind it is
+  an unverifiable portability claim shipped to operators as if
+  verified — the same declared-versus-demonstrated gap that put six
+  stale ``compile_targets`` declarations into the catalogue once
+  before. This KRI keeps that population explicitly at zero.
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: "=="
+  rationale: >
+    The floor is zero: a playbook declares exactly the targets its
+    worked examples exercise. Declaring more is a claim the repository
+    cannot back; declaring fewer under-sells the ring. The paired KPI
+    may only rise by authoring examples, never by declaration edits —
+    and this KRI is what makes a declaration-only edit visible.
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 0
+    severity: warn
+  - name: breach
+    comparator: ">="
+    value: 3
+    severity: high
+measurement:
+  source: composite
+  aggregation: count
+  formula: >
+    Over the reference workflows under ``content/playbooks/`` on the
+    evaluation commit, for each target named in the canonical source's
+    ``compile_targets`` declaration, record one observation: 1 if
+    ``examples/<target>/<workflow>/`` is absent or empty, 0 otherwise.
+    Aggregate as count of (workflow, target) pairs. The paired KPI's
+    per-workflow ring predicate and this KRI's per-pair claim predicate
+    read different failure modes: a workflow can hold a complete ring
+    (KPI numerator) while a fourth declared-but-unshipped target sits
+    in this count.
+    Reference visualisation: see the committed rendering at
+    ``content/metrics/declared_target_without_example_count.viz.md`` — that file is the contract for
+    the chart shape; the compile target renders the executable form at
+    evaluation time.
+  inputs:
+    - name: declared_target
+      description: >
+        One (workflow, target) pair from a canonical playbook's
+        ``compile_targets`` declaration on the evaluation commit.
+    - name: example_presence
+      description: >
+        Whether ``examples/<target>/<workflow>/`` carries a non-empty
+        compiled example artifact. Only the absent branch counts
+        toward this KRI.
+  window:
+    duration: P1D
+    sliding: false
+external_refs:
+  - name: SecOps-NG FOUNDATION §3 — Sovereignty
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+  - name: SecOps-NG ROADMAP — F-SV-06 coverage/exposure pairing invariant
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/ROADMAP.md
+  - name: SecOps-NG — compile-target parity goal (G-03) context
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/ROADMAP.md
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - sovereignty

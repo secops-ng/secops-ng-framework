@@ -280,12 +280,10 @@ survives a rename on either side. Each ref must resolve to a shipped metric,
 be a `kri`, share the KPI's version family, and carry `sovereignty` in its
 `foundation_property`. Those four are HARD and always gate.
 
-A coverage KPI that declares no counterpart at all is **SOFT**, ceilinged in
-the module at the current population and lowerable only — authoring the
-missing KRIs is F-SV-06 stage 2, and the code is promoted to HARD when the
-population reaches zero. The one exception is the `lm_endpoint_*_coverage`
-family, which is HARD: it shipped green under the narrower lint this
-replaced, and widening a rule must not relax the case it already covered.
+A coverage KPI that declares no counterpart at all is **HARD** — every
+sovereignty coverage KPI ships with its residual-risk counterpart
+(F-SV-06, both stages shipped), and `tools.lint_sovereignty_pairing`
+gates the pairing.
 
 Run it locally with:
 

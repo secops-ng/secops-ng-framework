@@ -2356,7 +2356,12 @@ shipping without their residual-risk counterpart.
 
 ### F-SV-06 — Generalise the coverage/exposure pairing invariant
 
-- **Status:** In Progress
+- **Status:** Shipped
+- **Shipped:** stage 1 (`residual_risk_refs` field, generalised
+  pairing lint, two existing pairings declared — #901); stage 2 (the
+  five missing residual-risk KRIs with committed reference
+  visualisations, `coverage_kpi_without_residual_risk` promoted to
+  HARD, ceiling deleted — the PR closing #902).
 - **Priority:** P2
 - **Rationale:** The sovereignty pairing lint exists because an
   LM-endpoint coverage KPI cannot distinguish an
