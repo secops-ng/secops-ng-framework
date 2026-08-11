@@ -52,7 +52,11 @@
     "compile_target": {
       "description": "Which of the three reference compile targets produced the running form of the workflow. Constrained to the three reference targets the project ships compilers for.",
       "type": "string",
-      "enum": ["n8n", "temporal", "langgraph"]
+      "enum": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ]
     },
     "regulation_refs": {
       "description": "Pins to the upstream regulatory mapping entries the attested posture bears on (typically GDPR Chapter V transfer atoms and NIS2 Art. 21(2)(d) supply-chain atoms — the sovereignty indicators' own external_refs are the authority). At least one entry: an artifact with no regulatory anchor is not evidence in the F-CP sense.",
@@ -79,7 +83,10 @@
       "description": "The window the observations cover. Observations sampled at different instants inside the window are legitimate; the window bounds are the honesty contract about how stale the oldest observation may be.",
       "type": "object",
       "additionalProperties": false,
-      "required": ["from", "to"],
+      "required": [
+        "from",
+        "to"
+      ],
       "properties": {
         "from": {
           "description": "ISO-8601 UTC start of the assessment window.",
@@ -113,35 +120,97 @@
         "kpi.sovereign_cloud_provider_diversity@v1",
         "kpi.sovereign_object_storage_binding_coverage@v1",
         "kpi.unmanaged_asset_cardinality@v1",
+        "kri.cloud_container_unclassifiable_scope_count@v1",
         "kri.cross_border_transfer_exposure_count@v1",
+        "kri.declared_target_without_example_count@v1",
         "kri.hardcoded_non_eu_endpoint_reference_count@v1",
+        "kri.lawful_basis_undocumented_surface_count@v1",
         "kri.lm_endpoint_unknown_residency_exposure@v1",
         "kri.non_eu_critical_dependency_count@v1",
         "kri.non_eu_lm_endpoint_escape_rate@v1",
-        "kri.non_eu_vendor_sdk_exposure@v1"
+        "kri.non_eu_vendor_sdk_exposure@v1",
+        "kri.object_storage_unknown_jurisdiction_exposure@v1",
+        "kri.unresolvable_regulatory_reference_count@v1"
       ],
       "properties": {
-        "kpi.ai_provider_neutral_binding_ratio@v1": { "$ref": "#/$defs/observation" },
-        "kpi.backup_integrity_pass_rate@v1": { "$ref": "#/$defs/observation" },
-        "kpi.cloud_posture_coverage@v1": { "$ref": "#/$defs/observation" },
-        "kpi.dependency_free_ratio@v1": { "$ref": "#/$defs/observation" },
-        "kpi.eu_data_residency_declaration_coverage@v1": { "$ref": "#/$defs/observation" },
-        "kpi.eu_regulatory_reference_coverage@v1": { "$ref": "#/$defs/observation" },
-        "kpi.forward_public_hygiene_high_severity_escape_rate@v1": { "$ref": "#/$defs/observation" },
-        "kpi.gdpr_lawful_basis_section_coverage@v1": { "$ref": "#/$defs/observation" },
-        "kpi.lm_endpoint_eu_residency_coverage@v1": { "$ref": "#/$defs/observation" },
-        "kpi.non_eu_saas_free_workflow_ratio@v1": { "$ref": "#/$defs/observation" },
-        "kpi.notification_sla_compliance@v1": { "$ref": "#/$defs/observation" },
-        "kpi.reference_deployment_target_coverage@v1": { "$ref": "#/$defs/observation" },
-        "kpi.sovereign_cloud_provider_diversity@v1": { "$ref": "#/$defs/observation" },
-        "kpi.sovereign_object_storage_binding_coverage@v1": { "$ref": "#/$defs/observation" },
-        "kpi.unmanaged_asset_cardinality@v1": { "$ref": "#/$defs/observation" },
-        "kri.cross_border_transfer_exposure_count@v1": { "$ref": "#/$defs/observation" },
-        "kri.hardcoded_non_eu_endpoint_reference_count@v1": { "$ref": "#/$defs/observation" },
-        "kri.lm_endpoint_unknown_residency_exposure@v1": { "$ref": "#/$defs/observation" },
-        "kri.non_eu_critical_dependency_count@v1": { "$ref": "#/$defs/observation" },
-        "kri.non_eu_lm_endpoint_escape_rate@v1": { "$ref": "#/$defs/observation" },
-        "kri.non_eu_vendor_sdk_exposure@v1": { "$ref": "#/$defs/observation" }
+        "kpi.ai_provider_neutral_binding_ratio@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kpi.backup_integrity_pass_rate@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kpi.cloud_posture_coverage@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kpi.dependency_free_ratio@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kpi.eu_data_residency_declaration_coverage@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kpi.eu_regulatory_reference_coverage@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kpi.forward_public_hygiene_high_severity_escape_rate@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kpi.gdpr_lawful_basis_section_coverage@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kpi.lm_endpoint_eu_residency_coverage@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kpi.non_eu_saas_free_workflow_ratio@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kpi.notification_sla_compliance@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kpi.reference_deployment_target_coverage@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kpi.sovereign_cloud_provider_diversity@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kpi.sovereign_object_storage_binding_coverage@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kpi.unmanaged_asset_cardinality@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kri.cloud_container_unclassifiable_scope_count@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kri.cross_border_transfer_exposure_count@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kri.declared_target_without_example_count@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kri.hardcoded_non_eu_endpoint_reference_count@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kri.lawful_basis_undocumented_surface_count@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kri.lm_endpoint_unknown_residency_exposure@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kri.non_eu_critical_dependency_count@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kri.non_eu_lm_endpoint_escape_rate@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kri.non_eu_vendor_sdk_exposure@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kri.object_storage_unknown_jurisdiction_exposure@v1": {
+          "$ref": "#/$defs/observation"
+        },
+        "kri.unresolvable_regulatory_reference_count@v1": {
+          "$ref": "#/$defs/observation"
+        }
       }
     },
     "attestation_state": {
@@ -157,7 +226,10 @@
       "description": "Where this artifact came from. Mirrors the provenance pattern used by content/controls/*.yaml so a reviewer can re-derive the chain back to source.",
       "type": "object",
       "additionalProperties": false,
-      "required": ["source_url", "captured_at"],
+      "required": [
+        "source_url",
+        "captured_at"
+      ],
       "properties": {
         "source_url": {
           "description": "URL of the workflow run (or workflow-content source) that produced this artifact. Compile targets may use their own run-id URLs; the URL itself is opaque to this schema.",
@@ -181,7 +253,11 @@
       "description": "One indicator observation: the value observed inside the assessment window and the threshold band it fell in, per the indicator's own catalogue thresholds. No aggregate is derived from these — the record carries the observations, the F-SV-05 profile carries the judgement.",
       "type": "object",
       "additionalProperties": false,
-      "required": ["observed_value", "threshold_band", "observed_at"],
+      "required": [
+        "observed_value",
+        "threshold_band",
+        "observed_at"
+      ],
       "properties": {
         "observed_value": {
           "description": "The indicator reading (ratio, rate, or cardinality — the indicator's catalogue entry declares the unit).",
@@ -190,7 +266,12 @@
         "threshold_band": {
           "description": "The band the observed value fell in against the indicator's own catalogue thresholds. `on_target` means no threshold fired.",
           "type": "string",
-          "enum": ["on_target", "warn", "high", "breach"]
+          "enum": [
+            "on_target",
+            "warn",
+            "high",
+            "breach"
+          ]
         },
         "observed_at": {
           "description": "ISO-8601 UTC instant this indicator was sampled. Must fall inside the artifact's assessment_window; the window, not this field, is the staleness contract.",

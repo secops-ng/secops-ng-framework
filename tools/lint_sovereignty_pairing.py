@@ -41,11 +41,12 @@ satisfied everywhere on the day it lands:
     rather than folded into the SOFT population below: it shipped green and
     must not regress just because the rule around it got wider.
 
-**SOFT** — ``coverage_kpi_without_residual_risk``, a sovereignty coverage KPI
-that declares no counterpart. Five of the seven are in this state today. The
-ceiling below may only ever be *lowered*: authoring the missing KRIs is
-F-SV-06's second stage, and when the population reaches zero this code is
-promoted to HARD and the ceiling deleted.
+  * ``coverage_kpi_without_residual_risk`` — a sovereignty coverage KPI that
+    declares no counterpart at all. This started SOFT under a ceiling of 5
+    while the missing KRIs did not exist; F-SV-06 stage 2 authored all five
+    and promoted the code, deleting the ceiling rather than leaving it at 0 —
+    a dead ceiling invites someone to raise it. Every sovereignty coverage
+    KPI now ships with its residual-risk counterpart or the gate is red.
 
 Output formats: ``text`` (default) and ``json``. Pure stdlib + PyYAML, no
 network.
@@ -79,17 +80,17 @@ LM_ENDPOINT_COVERAGE_RE = re.compile(
 
 VERSION_RE = re.compile(r"@v(?P<ver>\d+)$")
 
-# SOFT ceiling — may only be lowered. See the module docstring.
-MAX_SOFT_FINDINGS = 5
-
 HARD_CODES = frozenset({
     "unresolved_residual_risk_ref",
     "residual_risk_ref_not_kri",
     "residual_risk_ref_version_mismatch",
     "residual_risk_ref_property_gap",
     "lm_endpoint_pairing_regressed",
+    "coverage_kpi_without_residual_risk",
 })
-SOFT_CODES = frozenset({"coverage_kpi_without_residual_risk"})
+# Promoted empty by F-SV-06 stage 2; kept so the severity partition stays
+# explicit and a future SOFT code is a decision, not a drive-by.
+SOFT_CODES = frozenset()
 
 
 @dataclass(frozen=True)
@@ -245,16 +246,13 @@ def partition(findings: list[PairingFinding]) -> tuple[list[PairingFinding], lis
 
 def _emit_text(findings: list[PairingFinding]) -> None:
     hard, soft = partition(findings)
-    print(f"{CLI_NAME} — {len(hard)} HARD, {len(soft)} SOFT "
-          f"(ceiling {MAX_SOFT_FINDINGS})")
+    print(f"{CLI_NAME} — {len(hard)} HARD, {len(soft)} SOFT")
     for f in findings:
         print(f"  {f.as_text()}")
     if not findings:
         print("  OK — every sovereignty coverage KPI declares a resolvable "
               "residual-risk counterpart.")
-    elif not hard and len(soft) <= MAX_SOFT_FINDINGS:
-        print(f"  PASS — no HARD findings; {len(soft)} SOFT at or below the "
-              f"ceiling. Authoring the missing KRIs is F-SV-06 stage 2.")
+
 
 
 def _emit_json(findings: list[PairingFinding]) -> None:
@@ -263,7 +261,6 @@ def _emit_json(findings: list[PairingFinding]) -> None:
         "tool": CLI_NAME,
         "hard": len(hard),
         "soft": len(soft),
-        "soft_ceiling": MAX_SOFT_FINDINGS,
         "findings": [f.as_dict() for f in findings],
     }, indent=2))
 
@@ -282,15 +279,8 @@ def main(argv: list[str] | None = None) -> int:
     findings = scan(args.metrics_dir)
     (_emit_json if args.format == "json" else _emit_text)(findings)
 
-    hard, soft = partition(findings)
-    if hard:
-        return 1
-    if len(soft) > MAX_SOFT_FINDINGS:
-        print(f"{CLI_NAME}: SOFT findings rose to {len(soft)} (ceiling "
-              f"{MAX_SOFT_FINDINGS}). The ceiling may only be lowered — "
-              f"declare a counterpart rather than raising it.")
-        return 1
-    return 0
+    hard, _ = partition(findings)
+    return 1 if hard else 0
 
 
 if __name__ == "__main__":

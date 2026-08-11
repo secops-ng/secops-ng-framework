@@ -1,0 +1,90 @@
+stable_id: kri.object_storage_unknown_jurisdiction_exposure@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Object-storage bindings whose jurisdiction the residency guard cannot determine — residual sovereignty exposure
+summary: >
+  Residual-risk indicator paired with
+  ``kpi.sovereign_object_storage_binding_coverage@v1``. Count of
+  object-storage bindings declared in compiled example artifacts under
+  ``examples/<target>/<workflow>/`` whose jurisdiction the residency
+  evaluation cannot determine — an endpoint or provider shape that
+  resolves to neither the EU-resident / sovereign-provider set nor a
+  known non-EU provider. The paired KPI's 0-branch lumps
+  confirmed-non-EU and cannot-determine together as 'not sovereign',
+  so an operator reading an off-floor coverage ratio cannot tell
+  whether they are looking at an explicit non-EU dependency or an
+  operator-supplied / self-hosted store the evaluation has no signal
+  on. This KRI surfaces the cannot-determine sub-signal explicitly —
+  the same UNKNOWN-versus-NON_EU split the LM-endpoint pairing drew,
+  applied to the second most common sovereignty leak in reference
+  content.
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: "=="
+  rationale: >
+    The floor is zero: every object-storage binding the reference
+    content declares classifies under a known jurisdiction — EU-resident
+    (counts toward coverage) or non-EU (an explicit, documented
+    exception). A binding nobody can classify is residual risk: not
+    refused, but not evidence of the posture either. Coverage may only
+    rise by resolving an unknown into a known label, never by silent
+    re-classification — the pairing contract.
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 0
+    severity: warn
+  - name: breach
+    comparator: ">="
+    value: 3
+    severity: high
+measurement:
+  source: composite
+  aggregation: count
+  formula: >
+    For each object-storage binding extracted from a compiled example
+    artifact under ``examples/<target>/<workflow>/`` on the evaluation
+    commit — the same extraction surface the paired KPI reads for its
+    log, evidence and cache stores — record one observation: 1 if the
+    binding's jurisdiction cannot be determined (matches neither the
+    EU-resident / sovereign-provider set nor a known non-EU provider
+    shape), 0 otherwise (either known label). Aggregate as count across
+    observations; the three-target ring is the canonical surface and
+    per-target sub-counts are a drill-down dimension, not a separate
+    KRI.
+    Reference visualisation: see the committed rendering at
+    ``content/metrics/object_storage_unknown_jurisdiction_exposure.viz.md`` — that file is the contract for
+    the chart shape; the compile target renders the executable form at
+    evaluation time.
+  inputs:
+    - name: declared_storage_binding
+      description: >
+        One object-storage binding extracted from a compiled example
+        artifact — the log, evidence-bundle, or cache store the artifact
+        declares.
+    - name: jurisdiction_outcome
+      description: >
+        Jurisdiction classification of the binding. Only the
+        cannot-determine branch counts toward this KRI — EU-resident
+        bindings are the paired KPI's numerator, known non-EU ones its
+        recorded exceptions.
+  window:
+    duration: P1D
+    sliding: false
+external_refs:
+  - name: SecOps-NG FOUNDATION §3 — Sovereignty
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+  - name: SecOps-NG ROADMAP — F-SV-06 coverage/exposure pairing invariant
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/ROADMAP.md
+  - name: GDPR — Chapter V cross-border transfers of personal data
+    source: EU
+    external_id: Regulation (EU) 2016/679, Chapter V
+    url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - sovereignty

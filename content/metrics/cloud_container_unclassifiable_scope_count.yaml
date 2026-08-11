@@ -1,0 +1,85 @@
+stable_id: kri.cloud_container_unclassifiable_scope_count@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Cloud containers whose in-scope state the posture surface cannot classify — residual sovereignty exposure
+summary: >
+  Residual-risk indicator paired with ``kpi.cloud_posture_coverage@v1``.
+  Count of cloud-account containers (accounts, subscriptions, projects,
+  tenants) whose in-scope state is UNKNOWN to the operator's
+  record-keeping on the evaluation window — the population the coverage
+  KPI deliberately excludes from its denominator so record-keeping gaps
+  cannot silently improve the ratio. That exclusion is honest for the
+  coverage reading and is exactly why this counterpart exists: a
+  container nobody can classify as in-scope or out-of-scope is not
+  covered, not exempt, and not visible on the coverage chart. It is
+  where the exposure lives. This KRI counts that excluded population
+  explicitly, so the pairing reads: coverage over what the operator can
+  classify, exposure over what they cannot.
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: "=="
+  rationale: >
+    Every container the operator runs is classifiable in principle —
+    in scope for posture evaluation or recorded out of scope with a
+    reason. A container in neither state is a record-keeping gap the
+    coverage KPI is designed not to reward; the floor is zero and any
+    positive reading is an open residual-risk row. Coverage may only
+    rise by classifying a container, never by losing track of it.
+thresholds:
+  - name: warn
+    comparator: ">"
+    value: 0
+    severity: warn
+  - name: breach
+    comparator: ">="
+    value: 3
+    severity: high
+measurement:
+  source: composite
+  aggregation: count
+  formula: >
+    Over the same rolling window ``kpi.cloud_posture_coverage@v1``
+    evaluates, count the cloud-account containers whose in-scope state
+    is unknown — present in at least one inventory or billing surface
+    the operator reads, but absent from the posture surface's in-scope
+    and out-of-scope registers both. This is precisely the population
+    the paired KPI's formula excludes from its denominator; the two
+    indicators partition the container estate between them, and a
+    container may appear in exactly one. Aggregate as count — one
+    unclassifiable container is already a residual-risk row.
+    Reference visualisation: see the committed rendering at
+    ``content/metrics/cloud_container_unclassifiable_scope_count.viz.md`` — that file is the contract for
+    the chart shape; the compile target renders the executable form at
+    evaluation time.
+  inputs:
+    - name: observed_container
+      description: >
+        One cloud-account container observed in any inventory or
+        billing surface the operator reads (the union surface), keyed by
+        provider container id.
+    - name: scope_register_state
+      description: >
+        The container's presence in the posture surface's in-scope /
+        out-of-scope registers. Only the absent-from-both branch counts
+        toward this KRI — in-scope containers are the paired KPI's
+        denominator, out-of-scope ones its recorded exclusions.
+  window:
+    duration: P7D
+    sliding: true
+external_refs:
+  - name: SecOps-NG FOUNDATION §3 — Sovereignty
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/docs/FOUNDATION.md
+  - name: SecOps-NG ROADMAP — F-SV-06 coverage/exposure pairing invariant
+    source: SecOps-NG
+    url: https://github.com/secops-ng/secops-ng-framework/blob/main/ROADMAP.md
+  - name: NIS2 — Article 21(2)(d) supply chain security (cloud estate hygiene context)
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(d)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - sovereignty
