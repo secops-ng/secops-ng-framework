@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/evidence/sovereignty.schema.json",
+  "title": "SecOps-NG Sovereignty Posture Evidence Artifact",
+  "description": "Typed shape for one evidence artifact emitted by the sovereignty evidence stream (F-SV-04). One artifact attests the sovereign posture over a declared assessment window: one observation per sovereignty-cluster indicator from content/metrics/ (every indicator, mechanically — the observations object requires all of them, so a record cannot silently under-report the posture it attests to) plus an attestation state drawn from the shared four-state vocabulary in schemas/attestation_state.json. Deliberately carries NO numeric aggregate: a single sovereignty score invites the claim 'N% sovereign', which is not a defensible statement — the same reasoning that keeps a percentage out of the SOC 2 readiness attestation. The record is composed from observations the operator supplies; it names no sink and carries no endpoint literal, so the artifact cannot itself become a non-EU reference that kri.hardcoded_non_eu_endpoint_reference_count@v1 would count.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_id",
+    "stream",
+    "workflow_id",
+    "execution_id",
+    "compile_target",
+    "regulation_refs",
+    "control_refs",
+    "assessment_window",
+    "observations",
+    "attestation_state",
+    "captured_at",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Pinned schema version. Lets a consumer reject artifacts produced under an older schema once breaking changes ship.",
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "artifact_id": {
+      "description": "Stable per-artifact identifier. Convention: SHA-256 hex digest of `<workflow_id>|<execution_id>|<compile_target>` (UTF-8, no separators around the pipes). Deterministic on those three inputs so a replay of the same execution under the same compile target re-derives the same id.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "stream": {
+      "description": "Identifies which evidence stream produced the artifact. Constant on this schema.",
+      "type": "string",
+      "const": "sovereignty"
+    },
+    "workflow_id": {
+      "description": "Stable identifier of the workflow whose execution composed this artifact. Convention: lower-snake-case workflow stable-id from `content/playbooks/<workflow>/`.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*$",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "execution_id": {
+      "description": "Per-execution identifier issued by the compile target's workflow runtime (n8n execution id, Temporal workflow run id, LangGraph thread/checkpoint id).",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "compile_target": {
+      "description": "Which of the three reference compile targets produced the running form of the workflow. Constrained to the three reference targets the project ships compilers for.",
+      "type": "string",
+      "enum": ["n8n", "temporal", "langgraph"]
+    },
+    "regulation_refs": {
+      "description": "Pins to the upstream regulatory mapping entries the attested posture bears on (typically GDPR Chapter V transfer atoms and NIS2 Art. 21(2)(d) supply-chain atoms — the sovereignty indicators' own external_refs are the authority). At least one entry: an artifact with no regulatory anchor is not evidence in the F-CP sense.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(nis2|dora|cra|gdpr|iso27001|soc2|eu_ai_act):[a-z0-9][a-z0-9.-]*$",
+        "maxLength": 120
+      }
+    },
+    "control_refs": {
+      "description": "Control stable-ids the attested posture evidences. Same shape every other layer of the content model uses.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^control\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+      }
+    },
+    "assessment_window": {
+      "description": "The window the observations cover. Observations sampled at different instants inside the window are legitimate; the window bounds are the honesty contract about how stale the oldest observation may be.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to"],
+      "properties": {
+        "from": {
+          "description": "ISO-8601 UTC start of the assessment window.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "to": {
+          "description": "ISO-8601 UTC end of the assessment window.",
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "observations": {
+      "description": "One observation per sovereignty-cluster indicator, keyed by the indicator's stable_id. Every indicator carrying `foundation_property: sovereignty` under content/metrics/ is REQUIRED and no other key is accepted — completeness is schema-enforced so the record cannot silently under-report, and a new sovereignty-tagged indicator must be added here (test_sovereignty_evidence_schema.py fails naming the metric until it is). Deliberately an exhaustive enumeration rather than a pattern: the point is that this list and the catalogue can never drift apart silently.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kpi.ai_provider_neutral_binding_ratio@v1",
+        "kpi.backup_integrity_pass_rate@v1",
+        "kpi.cloud_posture_coverage@v1",
+        "kpi.dependency_free_ratio@v1",
+        "kpi.eu_data_residency_declaration_coverage@v1",
+        "kpi.eu_regulatory_reference_coverage@v1",
+        "kpi.forward_public_hygiene_high_severity_escape_rate@v1",
+        "kpi.gdpr_lawful_basis_section_coverage@v1",
+        "kpi.lm_endpoint_eu_residency_coverage@v1",
+        "kpi.non_eu_saas_free_workflow_ratio@v1",
+        "kpi.notification_sla_compliance@v1",
+        "kpi.reference_deployment_target_coverage@v1",
+        "kpi.sovereign_cloud_provider_diversity@v1",
+        "kpi.sovereign_object_storage_binding_coverage@v1",
+        "kpi.unmanaged_asset_cardinality@v1",
+        "kri.cross_border_transfer_exposure_count@v1",
+        "kri.hardcoded_non_eu_endpoint_reference_count@v1",
+        "kri.lm_endpoint_unknown_residency_exposure@v1",
+        "kri.non_eu_critical_dependency_count@v1",
+        "kri.non_eu_lm_endpoint_escape_rate@v1",
+        "kri.non_eu_vendor_sdk_exposure@v1"
+      ],
+      "properties": {
+        "kpi.ai_provider_neutral_binding_ratio@v1": { "$ref": "#/$defs/observation" },
+        "kpi.backup_integrity_pass_rate@v1": { "$ref": "#/$defs/observation" },
+        "kpi.cloud_posture_coverage@v1": { "$ref": "#/$defs/observation" },
+        "kpi.dependency_free_ratio@v1": { "$ref": "#/$defs/observation" },
+        "kpi.eu_data_residency_declaration_coverage@v1": { "$ref": "#/$defs/observation" },
+        "kpi.eu_regulatory_reference_coverage@v1": { "$ref": "#/$defs/observation" },
+        "kpi.forward_public_hygiene_high_severity_escape_rate@v1": { "$ref": "#/$defs/observation" },
+        "kpi.gdpr_lawful_basis_section_coverage@v1": { "$ref": "#/$defs/observation" },
+        "kpi.lm_endpoint_eu_residency_coverage@v1": { "$ref": "#/$defs/observation" },
+        "kpi.non_eu_saas_free_workflow_ratio@v1": { "$ref": "#/$defs/observation" },
+        "kpi.notification_sla_compliance@v1": { "$ref": "#/$defs/observation" },
+        "kpi.reference_deployment_target_coverage@v1": { "$ref": "#/$defs/observation" },
+        "kpi.sovereign_cloud_provider_diversity@v1": { "$ref": "#/$defs/observation" },
+        "kpi.sovereign_object_storage_binding_coverage@v1": { "$ref": "#/$defs/observation" },
+        "kpi.unmanaged_asset_cardinality@v1": { "$ref": "#/$defs/observation" },
+        "kri.cross_border_transfer_exposure_count@v1": { "$ref": "#/$defs/observation" },
+        "kri.hardcoded_non_eu_endpoint_reference_count@v1": { "$ref": "#/$defs/observation" },
+        "kri.lm_endpoint_unknown_residency_exposure@v1": { "$ref": "#/$defs/observation" },
+        "kri.non_eu_critical_dependency_count@v1": { "$ref": "#/$defs/observation" },
+        "kri.non_eu_lm_endpoint_escape_rate@v1": { "$ref": "#/$defs/observation" },
+        "kri.non_eu_vendor_sdk_exposure@v1": { "$ref": "#/$defs/observation" }
+      }
+    },
+    "attestation_state": {
+      "description": "State of this posture attestation, drawn from the shared four-state vocabulary (schemas/attestation_state.json) — reused by $ref, never redeclared. This is a categorical state about the attestation exercise (fresh and complete vs. gapped vs. overdue), NOT a sovereignty verdict and NOT a score; per-indicator evaluation against a declared baseline is the F-SV-05 conformance profile's job.",
+      "$ref": "https://secops-ng.org/schemas/attestation_state.json"
+    },
+    "captured_at": {
+      "description": "ISO-8601 UTC timestamp at which this artifact was composed. Not part of `artifact_id` — re-emissions inside the same execution stay byte-identical at the path level.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "provenance": {
+      "description": "Where this artifact came from. Mirrors the provenance pattern used by content/controls/*.yaml so a reviewer can re-derive the chain back to source.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_url", "captured_at"],
+      "properties": {
+        "source_url": {
+          "description": "URL of the workflow run (or workflow-content source) that produced this artifact. Compile targets may use their own run-id URLs; the URL itself is opaque to this schema.",
+          "type": "string",
+          "format": "uri"
+        },
+        "captured_at": {
+          "description": "ISO-8601 date or date-time matching the artifact-level captured_at.",
+          "type": "string"
+        },
+        "commit_sha": {
+          "description": "Optional commit SHA of the content snapshot the workflow walked.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,64}$"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "observation": {
+      "description": "One indicator observation: the value observed inside the assessment window and the threshold band it fell in, per the indicator's own catalogue thresholds. No aggregate is derived from these — the record carries the observations, the F-SV-05 profile carries the judgement.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["observed_value", "threshold_band", "observed_at"],
+      "properties": {
+        "observed_value": {
+          "description": "The indicator reading (ratio, rate, or cardinality — the indicator's catalogue entry declares the unit).",
+          "type": "number"
+        },
+        "threshold_band": {
+          "description": "The band the observed value fell in against the indicator's own catalogue thresholds. `on_target` means no threshold fired.",
+          "type": "string",
+          "enum": ["on_target", "warn", "high", "breach"]
+        },
+        "observed_at": {
+          "description": "ISO-8601 UTC instant this indicator was sampled. Must fall inside the artifact's assessment_window; the window, not this field, is the staleness contract.",
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}
