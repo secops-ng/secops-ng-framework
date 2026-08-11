@@ -242,7 +242,7 @@ def test_only_end_step_emits_noop() -> None:
         )
 
 
-def test_bound_steps_emit_code_nodes_calling_their_primitive() -> None:
+def test_core_body_steps_emit_code_nodes() -> None:
     """Each bound step lowers to a Pyodide node that calls its own primitive.
 
     The counterpart to the Set-node assertions above: after the CORE-WIRE,

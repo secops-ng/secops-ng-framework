@@ -141,11 +141,34 @@ def test_worked_example_has_valid_n8n_shape() -> None:
 
 
 def _action_without_commands_steps() -> dict[str, dict]:
+    """Unbound action steps — the ones the emitter uplifts to Set nodes.
+
+    A step carrying ``x_secops_ng.core_body`` compiles to a Code node that
+    calls its primitive, not to a Set node surfacing the CACAO contract as
+    rows. The Set-node assertions below therefore scope to steps *without* a
+    binding; ``test_bound_steps_emit_code_nodes`` covers the bound ones.
+
+    All four action steps are bound as of the CORE stage, so this selector is
+    currently empty and the Set-node tests hold vacuously. That is deliberate
+    rather than dead: the emitter contract for an unbound step is unchanged,
+    and a step added later without a binding must still surface it.
+    """
     raw = json.loads(SOURCE.read_text(encoding="utf-8"))
     return {
         step_id: step
         for step_id, step in raw["workflow"].items()
-        if step.get("type") == "action" and not step.get("commands")
+        if step.get("type") == "action"
+        and not step.get("commands")
+        and not (step.get("x_secops_ng") or {}).get("core_body")
+    }
+
+
+def _core_body_steps() -> dict[str, dict]:
+    raw = json.loads(SOURCE.read_text(encoding="utf-8"))
+    return {
+        step_id: step
+        for step_id, step in raw["workflow"].items()
+        if (step.get("x_secops_ng") or {}).get("core_body")
     }
 
 
@@ -210,6 +233,42 @@ def test_set_nodes_surface_x_secops_ng_refs() -> None:
                 f"step {step_id!r}: x_secops_ng.{key} dropped from Set node; "
                 f"present assignments: {sorted(names)}"
             )
+
+
+def test_core_body_steps_emit_code_nodes() -> None:
+    """Steps with ``x_secops_ng.core_body`` compile to n8n Code nodes
+    rendering the primitive call (per CORE-MECH-EMIT-N8N).
+
+    Catches an **emitter regression**: a declared binding emitting a Set node,
+    or a Code node that imports the primitive but never calls it. It does not
+    catch deliberate de-binding — removing a ``core_body`` and regenerating
+    leaves this suite green, since the declaration is the input to the check.
+    See #906, which unified this assertion across every bound playbook.
+    """
+    bound = _core_body_steps()
+    assert len(bound) == 4, f"expected four bound action steps, got {sorted(bound)}"
+
+    nodes_by_id = _nodes_by_id()
+    for step_id, step in bound.items():
+        node = nodes_by_id[step_id]
+        assert node["type"] == "n8n-nodes-base.code", (
+            f"step {step_id!r} carries a core_body binding and must emit a "
+            f"Code node calling its primitive, not {node['type']!r}"
+        )
+        # The primitives are Python, so the emitter uses the Code node's
+        # python language mode rather than the default jsCode field.
+        assert node["parameters"]["language"] == "python"
+        primitive = step["x_secops_ng"]["core_body"]["primitive"]
+        module, _, callable_name = primitive.rpartition(".")
+        source = node["parameters"]["pythonCode"]
+        assert f"from {module} import {callable_name}" in source, (
+            f"step {step_id!r}: emitted Code node does not import "
+            f"{callable_name!r} from {module!r}"
+        )
+        assert f"{callable_name}(" in source, (
+            f"step {step_id!r}: emitted Code node imports {callable_name!r} "
+            f"but never calls it"
+        )
 
 
 def test_only_end_step_emits_noop() -> None:
