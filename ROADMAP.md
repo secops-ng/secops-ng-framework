@@ -1069,7 +1069,7 @@ one playbook's provenance.
     `examples/{n8n,temporal,langgraph}/dora_tpr_management/`
     + byte-parity goldens across targets + inbound DORA anchor
     wiring).
-  - EXTEND — PR #<this> (practitioner cookbook walkthrough and
+  - EXTEND — PR #723 (practitioner cookbook walkthrough and
     ROADMAP `Shipped` flip).
 
 ---
@@ -1162,7 +1162,7 @@ one playbook's provenance.
   - CORE-B-EXAMPLES — #743 (three-target examples/goldens regenerated
     from the CORE-B-PRIM source + cookbook status flipped to CORE +
     GDPR data-flow ROPA entry lifted to CORE).
-  - EXTEND — PR #<this> (operator-facing cookbook walkthrough:
+  - EXTEND — PR #744 (operator-facing cookbook walkthrough:
     prerequisites, step-by-step, worked example, evidence-record
     shape, sovereign-stack note; ROADMAP `Shipped` flip).
 
@@ -1219,7 +1219,7 @@ one playbook's provenance.
     six primitives, three-target compile examples with
     byte-parity goldens, and the operator cookbook
     (`docs/cookbook/patch_management.md`).
-  - ROADMAP `Shipped` flip — PR #<this> (formal ROADMAP entry
+  - ROADMAP `Shipped` flip — PR #746 (formal ROADMAP entry
     for the already-landed trilogy; README Status flip to
     reflect actual delivery state).
 
@@ -1276,7 +1276,7 @@ one playbook's provenance.
     scaffold, three-target compile examples with byte-parity
     goldens, and the operator cookbook
     (`docs/cookbook/cyber_hygiene_training.md`).
-  - ROADMAP `Shipped` flip — PR #<this> (formal ROADMAP entry
+  - ROADMAP `Shipped` flip — PR #746 (formal ROADMAP entry
     for the already-landed trilogy; README Status flip to
     reflect actual delivery state).
 
@@ -1418,7 +1418,7 @@ one playbook's provenance.
     `tests/examples/{n8n,temporal,langgraph}/dora_major_incident_reporting/`
     guarding the per-milestone submission ring across all three
     targets on every PR).
-  - EXTEND — PR #<this>
+  - EXTEND — PR #771
     (`docs/cookbook/dora_major_incident_reporting.md` operator
     walkthrough covering the Art. 18 classification gate and the
     Art. 19 three-milestone reporting cycle with the three-target
@@ -1506,7 +1506,7 @@ one playbook's provenance.
     (`tests/examples/{n8n,temporal,langgraph}/network_security/test_golden.py`
     byte-parity goldens guarding the reconciliation ring across
     all three targets on every PR).
-  - EXTEND-COOKBOOK — PR #<this>
+  - EXTEND-COOKBOOK — PR #802
     (`docs/cookbook/network_security.md` operator walkthrough
     covering the five-step reconciliation cycle, the three-target
     hand-off, the OSCAL SC-7 / SC-3 anchors, the D3-NTA detect-step
@@ -2651,7 +2651,7 @@ component definition.
   - CORE — PR #718 (all 106 Subcategory-level entries nested under
     their parent Categories, each with `playbook_refs` or
     `gap_note`; schema extension and shape tests).
-  - EXTEND — PR #<this> (practitioner cookbook walkthrough and
+  - EXTEND — PR #719 (practitioner cookbook walkthrough and
     ROADMAP `Shipped` flip).
 
 ---
@@ -2708,7 +2708,7 @@ component definition.
     Processing Integrity, Privacy).
   - OSCAL 1.1.2 component definition + round-trip test.
   - D3FEND ↔ SOC 2 crosswalk.
-  - SKELETON — PR #<this> (practitioner cookbook walkthrough
+  - SKELETON — PR #720 (practitioner cookbook walkthrough
     and ROADMAP `Shipped` flip).
 
 ### F-MAP-EUAIACT-GPAI — EU AI Act Chapter V general-purpose AI model obligations
