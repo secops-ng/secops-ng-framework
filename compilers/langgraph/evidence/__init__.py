@@ -56,6 +56,10 @@ from compilers.langgraph.evidence.inventory_node import (
     emit_asset_inventory_delta_artifact_node,
 )
 
+from compilers.langgraph.evidence.sovereignty_node import (
+    emit_sovereignty_artifact_node,
+)
+
 __all__ = [
     "emit_risk_analysis_artifact_node",
     "emit_vulns_artifact_node",
@@ -72,4 +76,5 @@ __all__ = [
     "emit_contractual_obligations_artifact_node",
     "emit_interaction_evidence_artifact_node",
     "emit_asset_inventory_delta_artifact_node",
+    "emit_sovereignty_artifact_node",
 ]

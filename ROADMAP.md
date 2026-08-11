@@ -2281,7 +2281,13 @@ shipping without their residual-risk counterpart.
 
 ### F-SV-04 — Sovereignty posture evidence stream
 
-- **Status:** Proposed
+- **Status:** Shipped
+- **Shipped:** SKELETON (stream layout, artifact schema with the
+  21-indicator completeness contract and `$ref`'d attestation
+  vocabulary, twelve validation pins — #898); CORE (shared emitter +
+  n8n / Temporal / LangGraph adapters, byte-parity worked examples on
+  `infra_posture_management`, three-way emitter↔schema↔catalogue
+  lockstep pins — the PR closing #899).
 - **Priority:** P1
 - **Rationale:** The catalogue measures the sovereign posture from 21
   angles but emits nothing. Ten evidence streams exist under

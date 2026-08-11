@@ -57,11 +57,15 @@ endpoint literal, so it cannot itself become a non-EU reference that
 
 ## Status
 
-SKELETON (this card): stream layout, artifact schema, and the
-validation guards above. The reference emitters for the three compile
-targets (n8n, Temporal, LangGraph) and their byte-identical committed
-examples land in the sibling CORE card against this stable target —
-filed on this card's merge, per the house staging pattern.
+Shipped. SKELETON (#898): stream layout, artifact schema, and the
+validation guards above. CORE (#899): the shared emitter at
+[`compilers/_shared/evidence/sovereignty.py`](../../../compilers/_shared/evidence/sovereignty.py)
+— which enforces the all-indicators completeness contract and the
+window-containment rule *before* any file is written, so a gapped
+attestation is refused rather than fabricated — plus the three thin
+target adapters (n8n node, Temporal activity, LangGraph node) and
+byte-parity worked examples anchored on `infra_posture_management`
+under `examples/<target>/infra_posture_management/evidence/sovereignty/`.
 
 ## Consumers
 

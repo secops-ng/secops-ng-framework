@@ -49,6 +49,10 @@ from compilers.n8n.evidence.inventory_node import (
     emit_asset_inventory_delta_artifact_n8n,
 )
 
+from compilers.n8n.evidence.sovereignty_node import (
+    emit_sovereignty_artifact_n8n,
+)
+
 __all__ = [
     "emit_risk_analysis_artifact_n8n",
     "emit_vulns_artifact_n8n",
@@ -65,4 +69,5 @@ __all__ = [
     "emit_contractual_obligations_artifact_n8n",
     "emit_interaction_evidence_artifact_n8n",
     "emit_asset_inventory_delta_artifact_n8n",
+    "emit_sovereignty_artifact_n8n",
 ]
