@@ -53,6 +53,10 @@ from compilers.temporal.evidence.inventory_activity import (
     emit_asset_inventory_delta_artifact_activity,
 )
 
+from compilers.temporal.evidence.sovereignty_activity import (
+    emit_sovereignty_artifact_activity,
+)
+
 __all__ = [
     "emit_risk_analysis_artifact_activity",
     "emit_vulns_artifact_activity",
@@ -69,4 +73,5 @@ __all__ = [
     "emit_contractual_obligations_artifact_activity",
     "emit_interaction_evidence_artifact_activity",
     "emit_asset_inventory_delta_artifact_activity",
+    "emit_sovereignty_artifact_activity",
 ]

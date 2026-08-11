@@ -138,6 +138,15 @@ from compilers._shared.evidence.contractual_obligations import (
     render_contractual_obligations_artifact,
 )
 
+from compilers._shared.evidence.sovereignty import (
+    Observation,
+    SovereigntyContext,
+    REQUIRED_INDICATORS as SOVEREIGNTY_REQUIRED_INDICATORS,
+    derive_artifact_id as derive_sovereignty_artifact_id,
+    emit_sovereignty_artifact,
+    render_sovereignty_artifact,
+)
+
 __all__ = [
     "RiskAnalysisContext",
     "derive_artifact_id",
@@ -232,4 +241,10 @@ __all__ = [
     "derive_contractual_obligations_artifact_id",
     "emit_contractual_obligations_artifact",
     "render_contractual_obligations_artifact",
+    "Observation",
+    "SovereigntyContext",
+    "SOVEREIGNTY_REQUIRED_INDICATORS",
+    "derive_sovereignty_artifact_id",
+    "emit_sovereignty_artifact",
+    "render_sovereignty_artifact",
 ]
