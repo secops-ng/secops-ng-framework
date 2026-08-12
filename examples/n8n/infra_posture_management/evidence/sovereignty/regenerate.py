@@ -60,6 +60,11 @@ OBSERVATIONS = [
     ("kri.non_eu_critical_dependency_count@v1", 1.0, "high"),
     ("kri.non_eu_lm_endpoint_escape_rate@v1", 0.0, "on_target"),
     ("kri.non_eu_vendor_sdk_exposure@v1", 1.0, "warn"),
+    ("kri.cloud_container_unclassifiable_scope_count@v1", 1.0, "warn"),
+    ("kri.declared_target_without_example_count@v1", 0.0, "on_target"),
+    ("kri.lawful_basis_undocumented_surface_count@v1", 0.0, "on_target"),
+    ("kri.object_storage_unknown_jurisdiction_exposure@v1", 0.0, "on_target"),
+    ("kri.unresolvable_regulatory_reference_count@v1", 0.0, "on_target"),
 ]
 
 OBSERVED_AT = datetime(2026, 8, 1, 6, 0, tzinfo=timezone.utc)
