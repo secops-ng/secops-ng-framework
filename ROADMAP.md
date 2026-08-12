@@ -2944,7 +2944,14 @@ SecOps-NG visible without requiring the project to run telemetry.
 
 ### F-ADOPT-03 — Adoption-signal metric pair in the catalogue
 
-- **Status:** Proposed
+- **Status:** Shipped
+- **Shipped:** single card (#930, closing #929) —
+  kpi.attested_adoption_count@v1 (verified-evidence registry rows,
+  target from the F-ADOPT-01 outreach goal) paired via
+  residual_risk_refs with kri.adoption_evidence_rot_count@v1
+  (failing evidence links, consecutive-run aging as the canonical
+  drill-down), both registry-derived with committed reference
+  visualisations, no telemetry.
 - **Priority:** P2
 - **Goal:** G-07 (the Sunday scorecard currently has no needle for
   adoption — the registry exists but nothing reads it), G-04 (the
