@@ -1,0 +1,132 @@
+stable_id: profile.sovereignty_conformance@v1
+content_version: 0.1.0
+maturity: experimental
+title: Declared sovereignty conformance profile — shipped baseline
+summary: >-
+  The declaration of which sovereignty-cluster indicators, at which
+  threshold bands, constitute the sovereign posture (F-SV-05). Before
+  this profile, twenty-six indicators each carried their own thresholds
+  and two deployments could claim sovereignty on entirely different
+  evidence — neither wrongly, because there was no baseline to be wrong
+  about. This is the baseline. An F-SV-04 evidence record evaluates
+  against it deterministically (tools/evaluate_sovereignty_conformance);
+  the verdict is per-indicator with a pass/fail roll-up and never a
+  score. Band semantics: an indicator passes when its observed
+  threshold_band is at or better than max_band
+  (on_target < warn < high < breach). Hard floors sit at on_target where
+  a fired threshold is itself the posture leak (confirmed non-EU
+  references, unverifiable claims, undocumented processing surfaces);
+  warn is tolerated where the fired threshold names a small, visible
+  working set (UNKNOWN residency populations, operational lag) that the
+  paired residual-risk KRIs keep honest. Operators tighten bands freely
+  in a derived profile (baseline_ref); loosening below this baseline
+  requires a recorded override entry, so a relaxation is a visible
+  decision, never an inferred drift. Overrides are empty here by
+  definition — the baseline cannot relax itself.
+indicators:
+  kpi.ai_provider_neutral_binding_ratio@v1:
+    max_band: on_target
+    rationale: >-
+      Provider-neutral bindings are the no-lock-in half of the sovereignty posture.
+  kpi.backup_integrity_pass_rate@v1:
+    max_band: warn
+    rationale: >-
+      Backup integrity tolerates isolated failures inside a remediation cycle; persistent decay crosses the band.
+  kpi.cloud_posture_coverage@v1:
+    max_band: warn
+    rationale: >-
+      Posture-surface coverage has legitimate onboarding lag; a persistent shortfall surfaces via the paired KRI instead.
+  kpi.dependency_free_ratio@v1:
+    max_band: warn
+    rationale: >-
+      Dependency reduction is a trajectory indicator; the posture claim does not hinge on a single reading.
+  kpi.eu_data_residency_declaration_coverage@v1:
+    max_band: on_target
+    rationale: >-
+      The declaration floor: residency undeclared is residency unclaimed.
+  kpi.eu_regulatory_reference_coverage@v1:
+    max_band: warn
+    rationale: >-
+      Anchor coverage may lag fresh content briefly; the unresolvable-reference KRI carries the hard floor.
+  kpi.forward_public_hygiene_high_severity_escape_rate@v1:
+    max_band: warn
+    rationale: >-
+      Hygiene escapes are caught-and-fixed events; the rate matters over a window, not per event.
+  kpi.gdpr_lawful_basis_section_coverage@v1:
+    max_band: on_target
+    rationale: >-
+      Every documented surface passes the seven-section guard, or the lawful-basis posture is partial.
+  kpi.lm_endpoint_eu_residency_coverage@v1:
+    max_band: on_target
+    rationale: >-
+      FOUNDATION §3 claims EU residency for reference LM endpoints; a below-floor reading names the open UNKNOWNs to resolve, and the profile does not paper over them.
+  kpi.non_eu_saas_free_workflow_ratio@v1:
+    max_band: warn
+    rationale: >-
+      SaaS-free ratio moves with content mix; warn keeps regressions visible without freezing content work.
+  kpi.notification_sla_compliance@v1:
+    max_band: warn
+    rationale: >-
+      SLA compliance has operational variance; breach-band readings are the disqualifier, not a fired warn.
+  kpi.reference_deployment_target_coverage@v1:
+    max_band: on_target
+    rationale: >-
+      The three-target ring is the framework-agnosticism claim; a broken ring is a broken claim.
+  kpi.sovereign_cloud_provider_diversity@v1:
+    max_band: warn
+    rationale: >-
+      Provider diversity is a resilience preference; a temporary single-provider window is not a posture failure.
+  kpi.sovereign_object_storage_binding_coverage@v1:
+    max_band: on_target
+    rationale: >-
+      Object storage is the second most common residency leak; reference content declares residency explicitly or the posture inherits silence.
+  kpi.unmanaged_asset_cardinality@v1:
+    max_band: warn
+    rationale: >-
+      A small unmanaged tail under active inventory is lag; the band line keeps it from normalising.
+  kri.cloud_container_unclassifiable_scope_count@v1:
+    max_band: warn
+    rationale: >-
+      A container awaiting classification is a record-keeping gap being closed; tolerated small and visible.
+  kri.cross_border_transfer_exposure_count@v1:
+    max_band: on_target
+    rationale: >-
+      A confirmed cross-border transfer is a GDPR Chapter V event, not an unknown; the posture claim does not survive one.
+  kri.declared_target_without_example_count@v1:
+    max_band: on_target
+    rationale: >-
+      A portability claim nothing exercises is an unverifiable assertion shipped as verified; catalogue hygiene, zero floor.
+  kri.hardcoded_non_eu_endpoint_reference_count@v1:
+    max_band: on_target
+    rationale: >-
+      A confirmed non-EU endpoint literal in shipped content is the posture leak itself, not residual risk; zero is the only supportable reading.
+  kri.lawful_basis_undocumented_surface_count@v1:
+    max_band: on_target
+    rationale: >-
+      An undocumented processing surface is invisible to the coverage ratio; the posture holds only over a fully documented surface.
+  kri.lm_endpoint_unknown_residency_exposure@v1:
+    max_band: warn
+    rationale: >-
+      UNKNOWN endpoints are residual risk being resolved, visible on the paired KRI; tolerated at warn, never at high.
+  kri.non_eu_critical_dependency_count@v1:
+    max_band: warn
+    rationale: >-
+      Documented critical exceptions are FOUNDATION-admissible; more than a fired warn stops being an exception regime.
+  kri.non_eu_lm_endpoint_escape_rate@v1:
+    max_band: on_target
+    rationale: >-
+      An escape past the residency guard means the guard failed; tolerance here would hollow out F-SV-01.
+  kri.non_eu_vendor_sdk_exposure@v1:
+    max_band: warn
+    rationale: >-
+      Vendor-SDK exposure carries documented-exception semantics like critical dependencies.
+  kri.object_storage_unknown_jurisdiction_exposure@v1:
+    max_band: warn
+    rationale: >-
+      Unknown-jurisdiction bindings mirror the LM-endpoint case: a small visible working set, not a silent one.
+  kri.unresolvable_regulatory_reference_count@v1:
+    max_band: on_target
+    rationale: >-
+      An uncheckable regulatory assertion is worse than none; the claim-versus-evidence line the whole evidence layer draws.
+overrides: []
+maintainer: metrics-wg@secops-ng.org

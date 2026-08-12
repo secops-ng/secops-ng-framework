@@ -2326,7 +2326,15 @@ shipping without their residual-risk counterpart.
 
 ### F-SV-05 — Declared sovereignty conformance profile
 
-- **Status:** Proposed
+- **Status:** Shipped
+- **Shipped:** single card (the PR closing #914) — the 26-indicator
+  baseline at `content/profiles/sovereignty_conformance.yaml` with a
+  per-indicator band and rationale, its schema, the all-HARD
+  force-a-classification linter (`tools.lint_sovereignty_profile`),
+  and the deterministic pure evaluator
+  (`tools.evaluate_sovereignty_conformance` over
+  `compilers._shared.evidence.sovereignty_profile`) with the
+  tighten-freely / loosen-only-on-record override contract.
 - **Priority:** P1
 - **Rationale:** Twenty-one indicators each carry their own thresholds,
   but nothing declares *which* of them, at which bands, constitute the
