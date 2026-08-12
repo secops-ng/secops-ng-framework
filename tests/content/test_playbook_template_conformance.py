@@ -15,8 +15,8 @@ import json
 import shutil
 from pathlib import Path
 
+import pytest
 import yaml
-from jsonschema import Draft202012Validator
 
 from tools import lint_playbook_template as lint_mod
 
@@ -111,7 +111,14 @@ def test_mappings_stub_validates_once_renamed_and_filled() -> None:
     quickstart § 5 makes for it. The verbatim stub must NOT validate:
     the schema's lowercase pattern rejects TODO_SLUG by design, so the
     schema itself names the remaining fill-in.
+
+    jsonschema is imported lazily: the dedicated G-06 template lane
+    (playbook-template-lint.yml) deliberately installs PyYAML + pytest
+    only, matching the linter's stdlib+PyYAML contract — this schema
+    pin runs in the full suite, which carries jsonschema.
     """
+    jsonschema = pytest.importorskip("jsonschema")
+    Draft202012Validator = jsonschema.Draft202012Validator
     stub = (
         REPO_ROOT / "content" / "playbooks" / "_template"
         / "mappings.yaml.example"
