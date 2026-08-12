@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.org/schemas/sovereignty-profile.schema.json",
+  "title": "SecOps-NG Declared Sovereignty Conformance Profile",
+  "description": "Typed shape for a sovereignty conformance profile (F-SV-05): the declaration of WHICH sovereignty-cluster indicators, at WHICH threshold bands, constitute the sovereign posture. The profile is data the three compile targets read, never runtime code. Band semantics: an observation passes an indicator when its threshold_band is at or better than the profile's max_band (on_target < warn < high < breach). Tightening a band in an operator's own profile needs nothing; loosening one below the shipped baseline requires an explicit entry under `overrides`, so a relaxation is a recorded decision rather than an inferred drift. Completeness is guarded outside this schema: tools/lint_sovereignty_profile.py fails when any sovereignty-tagged catalogue metric is absent from `indicators` — the same force-a-classification shape as the playbook family map — because a pattern-keyed schema cannot know the catalogue.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "stable_id",
+    "content_version",
+    "maturity",
+    "title",
+    "summary",
+    "indicators",
+    "overrides",
+    "maintainer"
+  ],
+  "properties": {
+    "stable_id": {
+      "description": "Stable identifier of this profile. The shipped baseline is profile.sovereignty_conformance@v1; operator profiles use their own namespace.",
+      "type": "string",
+      "pattern": "^profile\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+    },
+    "content_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "maturity": {
+      "type": "string",
+      "enum": ["experimental", "stable", "deprecated"]
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "summary": { "type": "string", "minLength": 1 },
+    "baseline_ref": {
+      "description": "For operator profiles: the stable_id of the shipped baseline this profile derives from. Absent on the baseline itself. The evaluator uses it to decide which relaxations need an override entry.",
+      "type": "string",
+      "pattern": "^profile\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*@v[0-9]+(\\.[0-9]+){0,2}$"
+    },
+    "indicators": {
+      "description": "One entry per sovereignty-cluster indicator, keyed by the indicator's stable_id. The linter — not this schema — enforces that the key set equals the catalogue's sovereignty-tagged set in both directions.",
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "patternProperties": {
+        "^(kpi|kri)\\.[a-z][a-z0-9_]*@v[0-9]+(\\.[0-9]+){0,2}$": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["max_band", "rationale"],
+          "properties": {
+            "max_band": {
+              "description": "The worst threshold band at which this indicator still supports the posture claim. `on_target` means no fired threshold is tolerated.",
+              "type": "string",
+              "enum": ["on_target", "warn", "high", "breach"]
+            },
+            "rationale": {
+              "description": "Why this band, in one or two sentences. A profile without reasons is a scorecard; the reasons are what a reviewer audits.",
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "overrides": {
+      "description": "Recorded relaxations below the declared baseline. Empty on the shipped baseline by definition. Each entry names the indicator, both bands, who recorded it and when, and why — a relaxation is visible or it is invalid.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "indicator",
+          "baseline_band",
+          "declared_band",
+          "rationale",
+          "recorded_by",
+          "recorded_at"
+        ],
+        "properties": {
+          "indicator": {
+            "type": "string",
+            "pattern": "^(kpi|kri)\\.[a-z][a-z0-9_]*@v[0-9]+(\\.[0-9]+){0,2}$"
+          },
+          "baseline_band": {
+            "type": "string",
+            "enum": ["on_target", "warn", "high", "breach"]
+          },
+          "declared_band": {
+            "type": "string",
+            "enum": ["on_target", "warn", "high", "breach"]
+          },
+          "rationale": { "type": "string", "minLength": 1 },
+          "recorded_by": {
+            "description": "Role-shaped identity of the accepting party (public-bar discipline: role, not personal name).",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "recorded_at": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "maintainer": { "type": "string", "minLength": 1 }
+  }
+}

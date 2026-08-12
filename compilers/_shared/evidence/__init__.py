@@ -147,6 +147,14 @@ from compilers._shared.evidence.sovereignty import (
     render_sovereignty_artifact,
 )
 
+from compilers._shared.evidence.sovereignty_profile import (
+    BAND_ORDER,
+    ProfileError,
+    effective_bands,
+    evaluate_record,
+    validate_profile_against_baseline,
+)
+
 __all__ = [
     "RiskAnalysisContext",
     "derive_artifact_id",
@@ -247,4 +255,9 @@ __all__ = [
     "derive_sovereignty_artifact_id",
     "emit_sovereignty_artifact",
     "render_sovereignty_artifact",
+    "BAND_ORDER",
+    "ProfileError",
+    "effective_bands",
+    "evaluate_record",
+    "validate_profile_against_baseline",
 ]
