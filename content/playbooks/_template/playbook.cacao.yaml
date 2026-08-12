@@ -103,6 +103,29 @@ x_secops_ng:
   sources:
     - TODO_UPSTREAM_SPEC_OR_CLAUSE_URL
 
+# CACAO playbook variables. Declare EVERY workflow variable here — the
+# all-HARD core_body lint (tools.lint_core_body) rejects a step binding
+# that reads or writes an undeclared variable. House convention:
+# __lower_snake__ names. Mark `external: true` on values the runtime or
+# the operator supplies rather than an upstream step. Primitives that
+# compose evidence also declare the six runtime-context variables
+# (__workflow_id__, __execution_id__, __captured_at__, …) as ordinary
+# external variables — see playbook-authoring.md § 3.1; there is no
+# separate injection mechanism.
+playbook_variables:
+  __TODO_INPUT__:
+    type: string
+    description: >-
+      TODO. What this value is, where it comes from (trigger payload,
+      operator configuration, an operator-side upstream fetcher node),
+      and what format it has.
+    external: true
+  __TODO_OUTPUT__:
+    type: string
+    description: >-
+      TODO. The artifact or value the workflow produces. Downstream
+      steps and evidence emissions read it by this name.
+
 # CACAO entry point. This value must resolve to a start step in the
 # workflow map below.
 workflow_start: step--TODO_UUID_START
@@ -113,6 +136,19 @@ workflow_start: step--TODO_UUID_START
 # action steps, if-condition branches, while-condition loops, and
 # playbook-action calls into sibling playbooks. See
 # content/playbooks/cra_cvd/playbook.cacao.json for a worked example.
+#
+# The house action-step shape (playbook-authoring.md § 3):
+#   in_args   — playbook variables the step reads
+#   out_args  — playbook variables the step produces
+#   x_secops_ng.control_refs / .telemetry_refs / .metric_refs —
+#     per-step reference bundles, same stable-id shape as the
+#     playbook-level arrays above. telemetry_refs use the namespaced
+#     OCSF spelling: telemetry.ocsf.<class>@v<major>.
+#   x_secops_ng.core_body — optional deterministic primitive binding;
+#     see the commented block on the action step below.
+#
+# Do NOT use a CACAO `commands` array. No playbook in the catalogue
+# does, and the compilers do not read it.
 workflow:
 
   step--TODO_UUID_START:
@@ -126,13 +162,28 @@ workflow:
     name: TODO_ACTION_STEP_NAME
     description: >-
       TODO. Describe what this step does, its inputs, and its outputs.
-      Reference OSCAL controls or OCSF event classes it operationalises.
-    # `commands` names the primitives compilers will emit. Keep the
-    # step framework-agnostic — do not reference n8n / Temporal /
-    # LangGraph specifics here.
-    commands:
-      - type: manual
-        command: TODO_HUMAN_READABLE_PRIMITIVE
+      Reference the OSCAL controls or OCSF event classes it
+      operationalises. Keep the step framework-agnostic — do not
+      reference n8n / Temporal / LangGraph specifics here.
+    in_args:
+      - __TODO_INPUT__
+    out_args:
+      - __TODO_OUTPUT__
+    x_secops_ng:
+      control_refs: []
+      telemetry_refs: []
+      metric_refs: []
+      # Optional: bind the step to a deterministic primitive. Uncomment
+      # only when the primitive module exists under
+      # content/playbooks/<slug>/primitives/. The all-HARD core_body
+      # lint checks every binding: all three keys required, every `in`
+      # value and the `out` target declared in playbook_variables
+      # above. A SKELETON ships without this block; CORE adds it.
+      # core_body:
+      #   primitive: content.playbooks.<slug>.primitives.<module>.<function>
+      #   in:
+      #     argument_name: __TODO_INPUT__
+      #   out: __TODO_OUTPUT__
     on_completion: step--TODO_UUID_END
 
   step--TODO_UUID_END:

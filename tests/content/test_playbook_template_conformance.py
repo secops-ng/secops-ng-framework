@@ -11,9 +11,11 @@ placeholder detection fire when they should).
 """
 from __future__ import annotations
 
+import json
 import shutil
 from pathlib import Path
 
+import pytest
 import yaml
 
 from tools import lint_playbook_template as lint_mod
@@ -101,6 +103,67 @@ def test_strict_all_fires_on_template_copy(tmp_path: Path) -> None:
         "new_contribution",
         "NO_MAPPING_EDGE",
     ) in codes, f"expected no-mapping-edge finding, got: {codes}"
+
+
+def test_mappings_stub_validates_once_renamed_and_filled() -> None:
+    """The shipped mappings.yaml.example is one rename and one slug away
+    from passing the playbook-mappings schema — the exact promise
+    quickstart § 5 makes for it. The verbatim stub must NOT validate:
+    the schema's lowercase pattern rejects TODO_SLUG by design, so the
+    schema itself names the remaining fill-in.
+
+    jsonschema is imported lazily: the dedicated G-06 template lane
+    (playbook-template-lint.yml) deliberately installs PyYAML + pytest
+    only, matching the linter's stdlib+PyYAML contract — this schema
+    pin runs in the full suite, which carries jsonschema.
+    """
+    jsonschema = pytest.importorskip("jsonschema")
+    Draft202012Validator = jsonschema.Draft202012Validator
+    stub = (
+        REPO_ROOT / "content" / "playbooks" / "_template"
+        / "mappings.yaml.example"
+    )
+    text = stub.read_text(encoding="utf-8")
+    schema = json.loads(
+        (REPO_ROOT / "schemas" / "playbook-mappings.schema.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    validator = Draft202012Validator(schema)
+
+    verbatim_errors = list(validator.iter_errors(yaml.safe_load(text)))
+    assert verbatim_errors, (
+        "the verbatim TODO_SLUG stub should fail the schema's lowercase "
+        "pattern until the contributor fills the slug in"
+    )
+
+    filled = yaml.safe_load(text.replace("TODO_SLUG", "new_contribution"))
+    errors = sorted(validator.iter_errors(filled), key=str)
+    assert not errors, [e.message for e in errors]
+
+
+def test_renamed_stub_satisfies_mapping_edge(tmp_path: Path) -> None:
+    """Renaming mappings.yaml.example to mappings.yaml — the deliberate
+    act quickstart § 5 asks for — clears NO_MAPPING_EDGE while the
+    placeholder leak keeps the structural tier red until the TODOs are
+    filled. The two signals decouple exactly as designed.
+    """
+    root = tmp_path / "repo"
+    (root / "content" / "playbooks").mkdir(parents=True)
+    (root / "content" / "mappings").mkdir(parents=True)
+    src = REPO_ROOT / "content" / "playbooks" / "_template"
+    dst = root / "content" / "playbooks" / "new_contribution"
+    shutil.copytree(src, dst)
+    (dst / "mappings.yaml.example").rename(dst / "mappings.yaml")
+
+    report = lint_mod.lint(root, strict_all=True)
+    codes = {(f.slug, f.code) for f in report.findings}
+    assert ("new_contribution", "NO_MAPPING_EDGE") not in codes, (
+        f"renamed stub should satisfy the mapping edge, got: {codes}"
+    )
+    assert ("new_contribution", "TEMPLATE_PLACEHOLDER_LEAK") in codes, (
+        f"placeholder leak should keep firing until TODOs are filled: {codes}"
+    )
 
 
 def test_strict_missing_heading_flagged(tmp_path: Path) -> None:

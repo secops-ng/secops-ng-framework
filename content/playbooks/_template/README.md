@@ -14,9 +14,15 @@ For the exhaustive field reference, read
 ## Contents
 
 - `playbook.cacao.yaml` — CACAO v2 skeleton with inline comments on
-  every required field. YAML is used here only because it supports
-  comments; canonical playbooks ship JSON, so convert this file to
-  `playbook.cacao.json` before opening the PR (quickstart § 3).
+  every required field, action steps in the house shape (`in_args` /
+  `out_args` / per-step `x_secops_ng`, optional `core_body` binding).
+  YAML is used here only because it supports comments; canonical
+  playbooks ship JSON, so convert this file to `playbook.cacao.json`
+  before opening the PR (quickstart § 3).
+- `mappings.yaml.example` — schema-minimum outbound mapping overlay.
+  Rename to `mappings.yaml` in your copy and fill the seven keys; the
+  `.example` suffix keeps the structural-tier NO_MAPPING_EDGE signal
+  armed until you do (quickstart § 5).
 - `README.md` — this file. When you copy the template, replace it with
   a per-playbook README following the section headings below.
 - `examples/` — placeholder for sample input / output fixtures the

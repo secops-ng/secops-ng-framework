@@ -1,0 +1,35 @@
+# Outbound mapping overlay — schema-minimum skeleton.
+#
+# RENAME to `mappings.yaml` in your copy. The `.example` suffix keeps
+# this scaffold out of the schema walk and keeps the structural-tier
+# NO_MAPPING_EDGE signal armed until you rename it — the rename is the
+# deliberate act that says "this playbook's mapping edge exists".
+#
+# All seven keys are REQUIRED by schemas/playbook-mappings.schema.json
+# (additionalProperties: false — do not invent keys). Empty lists are
+# valid at SKELETON stage; fill them as the mapping work lands.
+#
+# The other catalogue gates every new playbook clears are listed in
+# docs/contributing/playbook-quickstart.md § 5, including the GDPR
+# data-flow doc every playbook carries — seed it from
+# content/mappings/gdpr/_data-flow-template.md.
+
+# Must match the playbook's x_secops_ng.stable_id exactly. Lowercase
+# only — the schema pattern rejects the TODO_SLUG placeholder, so the
+# schema itself reminds you to fill this in.
+playbook: playbook.TODO_SLUG@v1
+
+# OSCAL control stable-ids this playbook operationalises.
+oscal: []
+
+# D3FEND technique stable-ids.
+d3fend: []
+
+# OCSF event-class refs, namespaced spelling:
+# telemetry.ocsf.<class>@v<major>.
+ocsf: []
+
+# Per-framework clause anchors (nis2:art-21-2-e shapes).
+nis2: []
+dora: []
+cra: []
