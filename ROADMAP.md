@@ -2818,6 +2818,49 @@ component definition.
 - **Source:** EU AI Act (Regulation (EU) 2024/1689) Art. 12; Annex III
   point 1(a).
 
+### F-MAP-ORPHAN-PARITY — orphan-CI parity for the non-EU mapping axes
+
+- **Status:** Proposed
+- **Priority:** P2
+- **Goal:** G-02 (a mapping axis without the orphan device cannot
+  claim coverage — it can only claim files), G-08 (the device class
+  proved itself on 2026-08-12: the EU-axis grace window expired and
+  was caught only because a PR happened to run the suite that
+  afternoon; on the unguarded axes the same rot is permanent and
+  silent).
+- **Rationale:** The orphan-CI device (finalized playbook must carry
+  an inbound `playbook_refs:` citation or an audited
+  `_orphan_skip.yaml` entry, 7-day grace window, per-axis KRI) runs
+  on the five EU statutory axes only. `content/mappings/iso27001/`
+  (4 mapping YAML), `soc2/` (5), `nist_csf/` (1) and `d3fend/` (7)
+  have no manifest, no per-axis test, and no nightly lane — a
+  playbook finalized without inbound coverage there is never named
+  by anything. soc2 is the sharpest case: `soc2_evidence_collector`
+  closes its inbound graph on exactly this unguarded axis, so the
+  claim "closed on the home axis" that the EU manifests now cite is
+  itself unverified by CI.
+- **Acceptance criteria:**
+  - `_orphan_skip.yaml` manifests, per-axis pytest modules, and
+    nightly workflow rows for `iso27001`, `soc2` and `nist_csf`,
+    same shape as the EU five (`tools.lint_playbook_orphans`
+    parameterised, `kri_name_for(framework)` naming).
+  - The initial manifests land audited the same way as the SKELETON
+    batches: every currently-finalized playbook classified — real
+    citation or an audited skip with domain rationale — in the PR
+    that arms the assertion, so the device is born clean rather
+    than born with a ceiling.
+  - `d3fend` is assessed, not assumed: it is a technique crosswalk,
+    not an obligation axis, and may warrant a different device or a
+    documented exclusion. The decision and its rationale land in
+    `content/mappings/d3fend/README.md` either way.
+  - The per-axis KRIs join the catalogue with the same schema
+    compliance as the EU five.
+- **Sovereign-stack constraints:** None beyond the house rule — the
+  device is repo-local lint, no network, no telemetry.
+- **Depends on:** —
+- **Source:** 2026-08-12 repository review; the grace-window
+  incident fixed by the audited-skip batch (#917); goal G-02.
+
 ---
 
 ## Epic ADOPT — Operator adoption signal
@@ -2854,6 +2897,85 @@ SecOps-NG visible without requiring the project to run telemetry.
 - **Depends on:** —
 - **Source:** Contributor-experience gap surfaced by the FOUNDATION /
   ROADMAP review; goal G-07 (operator adoption signal, Q4 2026).
+
+### F-ADOPT-02 — Sovereignty conformance disclosure pack
+
+- **Status:** Proposed
+- **Priority:** P1
+- **Goal:** G-07 (the registry's `Evidence link` column currently
+  points at whatever the operator happens to have public; this gives
+  it a checkable artifact to point at), G-05 (the pack is the public
+  face of the Epic SV chain — measured, evidenced, judged — and the
+  first reason for an operator to run it end to end).
+- **Rationale:** Epic SV completed on 2026-08-12: an operator can
+  emit an F-SV-04 evidence record and evaluate it against the
+  declared baseline deterministically. What they cannot yet do is
+  *publish* the result safely. A disclosure pack is the redacted,
+  self-contained subset of the verdict an operator can link from
+  their `USED-BY.md` row — turning "we use it" into "we use it and
+  here is the posture we hold", with the honest-verdict discipline
+  intact (a pack that only renders passing rows is airbrushing).
+- **Acceptance criteria:**
+  - A documented pack format: profile stable id, evaluator verdict
+    (all indicators, all outcomes — including `fail` and
+    `unobserved`), the evidence-record digest rather than the raw
+    record, and generation provenance (tool version, profile
+    version). Never a score.
+  - A redaction contract stating what the pack MUST NOT carry:
+    endpoint literals, internal identifiers, raw observed values for
+    indicators the operator marks sensitive — mirroring the F-SV-04
+    constraint that the artifact cannot itself become a non-EU
+    reference.
+  - A deterministic renderer (`tools.render_disclosure_pack` or a
+    documented `evaluate_sovereignty_conformance --disclosure` mode):
+    same record + same profile → byte-identical pack.
+  - A committed worked example generated from the reference
+    `infra_posture_management` artifacts — carrying its true
+    failing rows, per the F-SV-05 test discipline.
+  - `USED-BY.md`'s heading note and
+    `docs/contributing/self-attesting-adoption.md` name the pack as
+    the preferred evidence-link target; the F-ADOPT-01 reachability
+    check needs no change (a pack URL is a URL).
+- **Sovereign-stack constraints:** Operator-published, pull-based —
+  no submission endpoint, no telemetry. The renderer is pure and
+  offline like the evaluator it wraps.
+- **Depends on:** F-SV-04, F-SV-05 (both Shipped).
+- **Source:** Epic SV completion review, 2026-08-12; goal G-07.
+
+### F-ADOPT-03 — Adoption-signal metric pair in the catalogue
+
+- **Status:** Proposed
+- **Priority:** P2
+- **Goal:** G-07 (the Sunday scorecard currently has no needle for
+  adoption — the registry exists but nothing reads it), G-04 (the
+  pair lands under the same schema, pairing and reference-viz
+  discipline as the rest of the catalogue).
+- **Rationale:** F-ADOPT-01 shipped the signal surface and F-ADOPT-02
+  makes it checkable, but neither makes it *measured*. The catalogue
+  is the house instrument for that, and the F-SV-06 rule applies
+  unchanged: a coverage KPI without its residual-risk counterpart
+  invites reading growth while rot accumulates silently.
+- **Acceptance criteria:**
+  - `kpi.attested_adoption_count@v1` — count of `USED-BY.md` rows
+    whose evidence link passed the latest scheduled reachability
+    check. Source of record is the registry file plus the check
+    output; no telemetry, no analytics.
+  - `kri.adoption_evidence_rot_count@v1` — rows whose evidence link
+    failed that check; declared as the KPI's `residual_risk_refs`
+    counterpart so the pairing lint holds.
+  - Both carry committed reference visualisations and pass the
+    catalogue schema, hygiene linter, and pairing lint with zero
+    findings.
+  - The Sunday scorecard reads the pair once they exist (scorecard
+    wiring is the agent's lane; the acceptance boundary here is
+    that the metrics exist and are correct).
+- **Sovereign-stack constraints:** Registry-derived only — the
+  project never collects operator data; the metrics read a file in
+  its own repository.
+- **Depends on:** F-ADOPT-01 (Shipped); pairs naturally with
+  F-ADOPT-02.
+- **Source:** 2026-08-12 repository review (G-07 milestone: one
+  closed item, zero open, no pipeline); goal G-07.
 
 ---
 
