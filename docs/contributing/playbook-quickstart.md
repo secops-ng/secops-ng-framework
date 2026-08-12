@@ -118,18 +118,12 @@ them up front saves four red runs:
 2. **Outbound mapping overlay** — ship a `mappings.yaml` next to your
    `playbook.cacao.json`. The inbound citation from step 4 is not
    enough on its own: the structural-tier check requires a mapping
-   edge on the playbook side too. The schema-minimum skeleton (all
-   seven keys are required, empty lists are valid at SKELETON stage):
-
-   ```yaml
-   playbook: playbook.<slug>@v1
-   oscal: []
-   d3fend: []
-   ocsf: []
-   nis2: []
-   dora: []
-   cra: []
-   ```
+   edge on the playbook side too. The template ships the
+   schema-minimum skeleton as `mappings.yaml.example` — **rename it
+   to `mappings.yaml`** in your copy and set the `playbook:` key to
+   your stable id (all seven keys are required, empty lists are valid
+   at SKELETON stage; the `.example` suffix keeps the
+   NO_MAPPING_EDGE signal armed until you rename).
 
    `playbook-authoring.md` § 4 covers filling the entries; any shipped
    playbook directory is a worked example.
