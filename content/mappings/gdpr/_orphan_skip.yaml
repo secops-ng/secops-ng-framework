@@ -123,3 +123,52 @@ skip:
       artifact and file separate evidentiary requirements. Skip
       entry stands.
 
+
+  - slug: ai_human_oversight
+    rationale: >-
+      Interim skip, same device as the SKELETON batch above: the
+      playbook finalized on 2026-08-02 and crossed the 7-day grace
+      window with no inbound GDPR citation.
+      `content/mappings/gdpr/data-flow-ai_human_oversight.md`
+      documents the data-flow surface for this snapshot. A real edge
+      is warranted rather than a durable exclusion:
+      `article-15-22-data-subject-rights.yaml` deliberately folds
+      Art. 22 into the Art. 21 objection entry because
+      `data_subject_rights` classifies and routes but does not itself
+      review the underlying automated decision — this playbook's
+      review surface is exactly the missing Art. 22(3)
+      human-intervention anchor. Issue #916 authors the standalone
+      `gdpr:art-22-automated-decisions` entry and removes this skip
+      in the same PR.
+
+  - slug: eu_ai_act_deployer_obligations
+    rationale: >-
+      Interim skip, same device as the SKELETON batch above: the
+      playbook finalized on 2026-08-02 and crossed the 7-day grace
+      window with no inbound GDPR citation.
+      `content/mappings/gdpr/data-flow-eu_ai_act_deployer_obligations.md`
+      documents the data-flow surface for this snapshot. A real edge
+      is warranted rather than a durable exclusion: AI Act Art. 26(9)
+      obliges deployers of high-risk AI systems to use the provider's
+      Art. 13 information to comply with their GDPR Art. 35 DPIA
+      duty, which makes the playbook's provider-documentation /
+      FRIA surface the fourth limb of the existing
+      `article-35-dpia.yaml` cluster. Issue #916 authors that edge
+      and removes this skip in the same PR.
+
+  - slug: soc2_evidence_collector
+    rationale: >-
+      SOC 2 Trust-Services-Criteria readiness roll-up. The playbook
+      walks TSC criterion atoms, resolves committed evidence-record
+      references, and emits a four-state readiness attestation — its
+      inputs and outputs are criterion identifiers, evidence-record
+      identifiers, and attestation states, none of which are personal
+      data, so there is no GDPR processing surface to anchor a
+      per-clause edge on. Its inbound graph is closed on its home
+      axis (`content/mappings/soc2/` cites
+      playbook.soc2_evidence_collector@v1). Mirrors the
+      `executive_metrics` and `dora_ict_risk_selfassess` precedents
+      above: attestation/roll-up playbooks anchor via their home
+      framework, not via a personal-data-processing edge.
+      `content/mappings/gdpr/data-flow-soc2_evidence_collector.md`
+      documents the non-surface for the audit trail.

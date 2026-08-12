@@ -138,3 +138,45 @@ skip:
       evidence attestation surface across financial-entity operators
       subject to both regimes). Mirrors the dora_ict_risk_selfassess
       NIS2-axis precedent.
+
+  - slug: ai_human_oversight
+    rationale: >-
+      EU AI Act Art. 14 human-oversight lifecycle — the operator-side
+      review of AI-system decisions (intervention, override,
+      oversight-measure effectiveness). Reviewing the quality and
+      human control of automated decisions is not a NIS2 Art. 21(2)
+      cybersecurity-risk-management measure, and NIS2 Art. 20 anchors
+      management-body oversight of *cybersecurity* risk on
+      `nis2_art20_governance`, a different oversight object. The
+      playbook's inbound graph is closed on its home axis at
+      `content/mappings/eu_ai_act/article-14-human-oversight.yaml`.
+      A sibling card revisits the cross-regime graph if ENISA or
+      national transposition guidance ties AI-decision oversight to
+      an Art. 21(2) measure.
+
+  - slug: eu_ai_act_deployer_obligations
+    rationale: >-
+      EU AI Act Art. 26 deployer-duty discharge (provider
+      documentation verification, oversight assignment, input-data
+      conformity, usage monitoring, incident escalation to the
+      provider/authority). This is AI-regulatory compliance
+      machinery, not a network-and-information-systems security
+      measure; the security of any underlying ICT estate is already
+      wired per-measure via the `article-21-2-*` entries on the
+      operational playbooks. Inbound graph closed at
+      `content/mappings/eu_ai_act/article-26-deployer-obligations.yaml`.
+      Mirrors the `dora_tpr_management` NIS2-axis precedent: a
+      distinct-regime lifecycle discipline with no same-shape NIS2
+      equivalent.
+
+  - slug: soc2_evidence_collector
+    rationale: >-
+      SOC 2 Trust-Services-Criteria readiness roll-up operating on
+      criterion atoms, evidence-record identifiers, and attestation
+      states. NIS2 evidence is wired per-measure on the operational
+      playbooks that produce it (`article-21-2-*`,
+      `article-20.yaml`); a US attestation-regime aggregator carries
+      no NIS2 obligation surface of its own. Inbound graph closed on
+      the home axis under `content/mappings/soc2/`. Mirrors the
+      `executive_metrics` precedent: roll-up playbooks anchor via
+      their home framework.
