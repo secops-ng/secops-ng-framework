@@ -1,0 +1,71 @@
+stable_id: kpi.attested_adoption_count@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Self-attested adoption rows with verifiable evidence
+summary: >
+  Count of rows in the USED-BY.md adoption registry whose Evidence
+  link passed the most recent completed scheduled reachability run.
+  The G-07 needle: the project collects no telemetry, so the registry
+  is the adoption signal, and a row only counts here while its
+  evidence can actually be opened by a reader without an account — an
+  attested claim, not an asserted one. Pairs with
+  kri.adoption_evidence_rot_count@v1: a registry that grows while its
+  evidence links rot is the false-comfort pattern the pairing
+  discipline exists to catch.
+unit: count
+direction: higher_is_better
+target:
+  value: 5
+  comparator: ">="
+  rationale: >
+    The F-ADOPT-01 CORE acceptance criterion targets at least five
+    publicly attestable references by Q4 2026. The target is the
+    community-outreach goal, not a floor the catalogue enforces — a
+    reading below it is a growth gap, not a defect.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 5
+    severity: warn
+  - name: breach
+    comparator: "<"
+    value: 1
+    severity: high
+measurement:
+  source: composite
+  aggregation: count
+  formula: >
+    Over the USED-BY.md registry table on the evaluation commit,
+    count the rows whose Evidence link URL received a passing verdict
+    (HTTP 2xx without a login-wall redirect) in the most recent
+    completed run of the scheduled reachability workflow
+    (.github/workflows/used-by-link-check.yml, daily). A row whose
+    link failed that run, or whose link the run has not yet covered,
+    does not count — evidence that cannot be opened is not evidence.
+    No telemetry and no analytics enter the measurement: both inputs
+    are files and CI artifacts of this repository. Reference
+    visualisation: a two-panel composition with the count headline
+    and a per-row drill-down; the committed reference rendering lives
+    at `content/metrics/attested_adoption_count.viz.md` — that file
+    is the contract for the chart shape; the compile target renders
+    the executable form at evaluation time.
+  inputs:
+    - name: registry_row
+      description: >
+        One row of the USED-BY.md registry table on the evaluation
+        commit (organisation, deployment type, playbooks in use,
+        since, evidence link).
+    - name: link_check_verdict
+      description: >
+        The scheduled reachability workflow's verdict for the row's
+        Evidence link URL in its most recent completed run. Only the
+        passing branch counts toward this KPI.
+  window:
+    duration: P1D
+    sliding: false
+maintainer: metrics-wg@secops-ng.org
+residual_risk_refs:
+  - kri.adoption_evidence_rot_count@v1
+foundation_property:
+  - auditability
