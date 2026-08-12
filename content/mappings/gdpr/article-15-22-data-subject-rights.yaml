@@ -43,14 +43,25 @@
 #     step assembles the Article 20(1) structured, commonly-used,
 #     machine-readable data package.
 #
-#   - gdpr:art-21-objection — right to object, folding the Article
-#     22 automated-decision-review concern axis. Anchored on
-#     data_subject_rights@v1 whose classify_request step tags an
-#     Article 22 concern on the case and routes it to the operator's
-#     human-in-the-loop review surface as part of the objection
-#     envelope. Article 22 is not authored as a standalone edge
-#     because the workflow does not itself review the underlying
-#     automated decision — it classifies and routes.
+#   - gdpr:art-21-objection — right to object, carrying the intake
+#     half of the Article 22 automated-decision-review concern axis.
+#     Anchored on data_subject_rights@v1 whose classify_request step
+#     tags an Article 22 concern on the case and routes it to the
+#     operator's human-in-the-loop review surface as part of the
+#     objection envelope. The review surface itself is the standalone
+#     gdpr:art-22-automated-decisions edge below.
+#
+#   - gdpr:art-22-automated-decisions — the right not to be subject
+#     to a decision based solely on automated processing, and the
+#     Article 22(3) safeguards (human intervention, the subject's
+#     point of view, contesting the decision). Anchored on
+#     ai_human_oversight@v1: its review_flagged_decisions and
+#     record_intervention steps ARE the human-intervention machinery
+#     the safeguard requires — a competent reviewer with authority
+#     to override, and a dated record of the intervention. This
+#     entry existed as a deliberate gap while data_subject_rights
+#     was the only candidate anchor (it classifies and routes but
+#     does not review); the oversight playbook closed it (#916).
 #
 # Out of scope of this file (deliberately):
 #
@@ -331,9 +342,60 @@ entries:
       legitimate-interest determination and the subject's onward
       remedies (Article 77 supervisory-authority complaint,
       Article 79 judicial remedy) are named on the response
-      envelope. The Article 22 automated-decision-review concern
-      axis is folded here rather than authored as a standalone
-      edge: the workflow does not review the underlying automated
-      decision, it classifies the concern at classify_request and
-      routes it to the operator's human-in-the-loop review
-      surface as part of the objection lane.
+      envelope. This entry carries the intake half of the Article
+      22 concern axis: the workflow does not review the underlying
+      automated decision, it classifies the concern at
+      classify_request and routes it to the operator's
+      human-in-the-loop review surface as part of the objection
+      lane. The review surface itself is the standalone
+      gdpr:art-22-automated-decisions edge below, anchored on
+      ai_human_oversight@v1.
+
+  - id: gdpr:art-22-automated-decisions
+    regulation:
+      name: GDPR
+      instrument: Regulation (EU) 2016/679
+      celex: 32016R0679
+      article: "22"
+      url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    obligation: >-
+      Do not subject the data subject to a decision based solely on
+      automated processing, including profiling, which produces
+      legal effects concerning them or similarly significantly
+      affects them, outside the Article 22(2) carve-outs
+      (contractual necessity, Union or Member State law, explicit
+      consent). Where a carve-out applies under Article 22(2)(a) or
+      (c), Article 22(3) requires suitable safeguards: at least the
+      right to obtain human intervention on the part of the
+      controller, to express the data subject's point of view, and
+      to contest the decision. Article 22(4) restricts such
+      decisions on Article 9(1) special categories to the Article
+      9(2)(a)/(g) grounds with suitable safeguards in place.
+    status: draft
+    control_refs:
+      - control.ict_risk_governance@v1
+      - control.training_attestation@v1
+    playbook_refs:
+      - playbook.ai_human_oversight@v1
+    evidence_stream_refs:
+      - incidents
+    notes: >-
+      ai_human_oversight@v1 is the review surface Article 22(3)
+      requires, and the reason this edge exists as more than a
+      fold-in: its review_flagged_decisions step places a flagged
+      automated decision before a briefed human reviewer with
+      authority to confirm or override it (the establish_oversight_
+      roster and brief_oversight_personnel steps are what make the
+      intervention "human" in the substantive sense the EDPB
+      guidelines on Article 22 require — a competent reviewer, not
+      a rubber stamp), record_intervention captures the dated
+      outcome including the subject's point of view where one was
+      routed in from the gdpr:art-21-objection intake lane, and
+      emit_oversight_evidence publishes the intervention record the
+      controller cites when the subject contests the decision. The
+      two entries compose: data_subject_rights classifies and
+      routes the concern; this playbook reviews and records. The
+      edge also closes the interim orphan-skip entry recorded for
+      ai_human_oversight on this axis (#916) — the skip is removed
+      in the same change that lands this entry, per the manifest
+      contract.
