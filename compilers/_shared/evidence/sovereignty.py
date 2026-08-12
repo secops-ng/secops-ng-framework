@@ -80,12 +80,17 @@ REQUIRED_INDICATORS = (
     "kpi.sovereign_cloud_provider_diversity@v1",
     "kpi.sovereign_object_storage_binding_coverage@v1",
     "kpi.unmanaged_asset_cardinality@v1",
+    "kri.cloud_container_unclassifiable_scope_count@v1",
     "kri.cross_border_transfer_exposure_count@v1",
+    "kri.declared_target_without_example_count@v1",
     "kri.hardcoded_non_eu_endpoint_reference_count@v1",
+    "kri.lawful_basis_undocumented_surface_count@v1",
     "kri.lm_endpoint_unknown_residency_exposure@v1",
     "kri.non_eu_critical_dependency_count@v1",
     "kri.non_eu_lm_endpoint_escape_rate@v1",
     "kri.non_eu_vendor_sdk_exposure@v1",
+    "kri.object_storage_unknown_jurisdiction_exposure@v1",
+    "kri.unresolvable_regulatory_reference_count@v1",
 )
 
 # Shared four-state vocabulary — schemas/attestation_state.json is the
