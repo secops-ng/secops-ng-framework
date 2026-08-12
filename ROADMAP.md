@@ -2287,7 +2287,7 @@ shipping without their residual-risk counterpart.
   vocabulary, twelve validation pins — #898); CORE (shared emitter +
   n8n / Temporal / LangGraph adapters, byte-parity worked examples on
   `infra_posture_management`, three-way emitter↔schema↔catalogue
-  lockstep pins — the PR closing #899).
+  lockstep pins — #909, closing #899).
 - **Priority:** P1
 - **Rationale:** The catalogue measures the sovereign posture from 21
   angles but emits nothing. Ten evidence streams exist under
@@ -2327,7 +2327,7 @@ shipping without their residual-risk counterpart.
 ### F-SV-05 — Declared sovereignty conformance profile
 
 - **Status:** Shipped
-- **Shipped:** single card (the PR closing #914) — the 26-indicator
+- **Shipped:** single card (#915, closing #914) — the 26-indicator
   baseline at `content/profiles/sovereignty_conformance.yaml` with a
   per-indicator band and rationale, its schema, the all-HARD
   force-a-classification linter (`tools.lint_sovereignty_profile`),
@@ -2369,7 +2369,7 @@ shipping without their residual-risk counterpart.
   pairing lint, two existing pairings declared — #901); stage 2 (the
   five missing residual-risk KRIs with committed reference
   visualisations, `coverage_kpi_without_residual_risk` promoted to
-  HARD, ceiling deleted — the PR closing #902).
+  HARD, ceiling deleted — #910, closing #902).
 - **Priority:** P2
 - **Rationale:** The sovereignty pairing lint exists because an
   LM-endpoint coverage KPI cannot distinguish an
