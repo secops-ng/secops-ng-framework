@@ -5,9 +5,10 @@ This is the fast lane; for the exhaustive rules read
 [`playbook-authoring.md`](playbook-authoring.md) and the top-level
 [`CONTRIBUTING.md`](../../CONTRIBUTING.md).
 
-The steps below assume you have a green checkout, a Python environment
-that can run the test suite, and a workflow you want to contribute as
-portable CACAO v2 content.
+The steps below assume you have a green checkout, an **activated**
+Python environment that can run the test suite (every command below
+says `python`, not `python3` — it resolves inside the venv), and a
+workflow you want to contribute as portable CACAO v2 content.
 
 ## 1. Pick a slug
 
@@ -70,9 +71,14 @@ can carry inline comments; convert once your fields are correct:
 ```bash
 python -c 'import sys, json, yaml; \
   json.dump(yaml.safe_load(open("content/playbooks/<slug>/playbook.cacao.yaml")), \
-            open("content/playbooks/<slug>/playbook.cacao.json","w"), indent=2)'
+            open("content/playbooks/<slug>/playbook.cacao.json","w"), indent=2, default=str)'
 rm content/playbooks/<slug>/playbook.cacao.yaml
 ```
+
+Keep the quotes around your `created` / `modified` / `valid_from`
+timestamps in the YAML (the template ships them quoted): unquoted ISO
+timestamps parse as datetime objects, and only the `default=str` above
+keeps the conversion from crashing on them.
 
 For the reasoning behind JSON-only see `playbook-authoring.md` § 2.
 
@@ -98,7 +104,49 @@ add the slug to the framework's `_orphan_skip.yaml` with a rationale
 and a target CORE card reference. Temporary only — a permanent skip is
 a design mistake.
 
-## 5. Run the linter and tests locally
+## 5. Clear the four catalogue gates
+
+Four generated or cross-referenced surfaces must know about every new
+playbook, and each has a CI guard whose failure names the fix. Doing
+them up front saves four red runs:
+
+1. **GDPR data-flow doc** — create
+   `content/mappings/gdpr/data-flow-<slug>.md` from
+   [`content/mappings/gdpr/_data-flow-template.md`](../../content/mappings/gdpr/_data-flow-template.md)
+   and fill the seven canonical sections. Every playbook carries one;
+   the F-GD-02 guard holds the tree otherwise.
+2. **Outbound mapping overlay** — ship a `mappings.yaml` next to your
+   `playbook.cacao.json`. The inbound citation from step 4 is not
+   enough on its own: the structural-tier check requires a mapping
+   edge on the playbook side too. The schema-minimum skeleton (all
+   seven keys are required, empty lists are valid at SKELETON stage):
+
+   ```yaml
+   playbook: playbook.<slug>@v1
+   oscal: []
+   d3fend: []
+   ocsf: []
+   nis2: []
+   dora: []
+   cra: []
+   ```
+
+   `playbook-authoring.md` § 4 covers filling the entries; any shipped
+   playbook directory is a worked example.
+3. **Family map** — add your slug to `FAMILIES` in
+   [`tools/render_playbook_table.py`](../../tools/render_playbook_table.py)
+   (regulation-prefixed slugs file themselves; everything else is a
+   one-line entry). Unfiled playbooks fail
+   `test_every_playbook_is_filed_into_a_family` by design — filing is
+   a decision, not a default.
+4. **Catalog table** — regenerate the committed table and commit the
+   result:
+
+```bash
+python -m tools.render_playbook_table
+```
+
+## 6. Run the linter and tests locally
 
 Two commands, in this order:
 
@@ -116,7 +164,7 @@ orphan-CI.
 If the linter fires on something you believe is legitimate, see
 [`hygiene-linter.md`](hygiene-linter.md) for the escalation path.
 
-## 6. Open the pull request
+## 7. Open the pull request
 
 Branch naming: `content/<framework>-<slug>` for regulatory-anchored
 playbooks, `content/playbook-<slug>` for cross-cutting workflows.
@@ -140,7 +188,7 @@ A maintainer will review against the voice guardrails in
 [`FOUNDATION.md`](../FOUNDATION.md). Expect questions about
 sovereignty-stack alignment for anything that touches the compilers.
 
-## 7. What lands after merge
+## 8. What lands after merge
 
 The playbook becomes part of the commons. If you declared
 `compile_targets`, the follow-on cookbook lands the compiled examples
