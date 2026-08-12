@@ -1,0 +1,176 @@
+# SOC 2 orphan-CI assertion skip manifest.
+#
+# Used by `tools.lint_playbook_orphans --framework soc2` (and the
+# nightly per-framework workflow) to allow a finalized playbook to
+# stay without an inbound `playbook_refs:` citation under
+# `content/mappings/soc2/` without tripping the assertion.
+#
+# Each entry is a deliberate, audited exclusion. The rationale is
+# committed history; the guard rejects any entry that lacks the two
+# required fields. Removing a slug from this list re-arms the
+# assertion against it immediately.
+#
+# F-MAP-ORPHAN-PARITY stage 1 state (armed 2026-08-12):
+#
+# This axis was the sharpest gap the parity card named: the EU-axis
+# manifests justify several of their own exclusions with "inbound
+# graph closed on the home axis under content/mappings/soc2/", and
+# until this manifest and its test landed, nothing verified that
+# claim — soc2_evidence_collector itself was an orphan here. Stage 1
+# classifies every finalized playbook: 26 already carried TSC
+# citations, soc2_evidence_collector gains its real CC4.1 citation
+# in the same change, and the 21 entries below split into two
+# batches. Durable exclusions are other-regime duty ledgers with no
+# TSC criterion surface of their own. Interim entries are playbooks
+# with genuine TSC surfaces whose criteria-level citations are owed
+# by issue #931 — as each real citation lands, the matching entry
+# below MUST be removed in the same PR so the assertion re-arms.
+
+skip:
+  # ── Durable exclusions: other-regime duty ledgers ────────────────
+  # The pattern mirrors the EU manifests' precedent in reverse: a
+  # regulation-specific lifecycle anchors on its home regime, and the
+  # TSC coverage of the underlying operational surface is carried by
+  # the operational playbooks the tsc-*.yaml files already cite. A
+  # SOC 2 report does not attest to EU-statutory duty discharge.
+
+  - slug: cra_cvd
+    rationale: >-
+      CRA Art. 14 coordinated-vulnerability-disclosure lifecycle. The
+      TSC surface for vulnerability handling is the operational
+      intake/management pair (interim entries below, CC7.1); the CRA
+      notification duty ledger itself has no SOC 2 criterion
+      counterpart. Home axis: content/mappings/cra/.
+
+  - slug: dora_major_incident_reporting
+    rationale: >-
+      DORA Art. 19 major-incident reporting clock. Incident-response
+      operations carry the CC7 surface via the operational playbooks;
+      the financial-regulator notification ledger has no TSC
+      counterpart. Home axis: content/mappings/dora/.
+
+  - slug: dora_tlpt_programme
+    rationale: >-
+      DORA Ch. IV threat-led penetration-testing programme
+      composition. Control-effectiveness evaluation under CC4.1 is
+      anchored on control_effectiveness_test / security_assessment
+      and the evaluation roll-ups; the TLPT regulatory programme
+      record has no TSC counterpart. Home axis:
+      content/mappings/dora/.
+
+  - slug: dora_tpr_management
+    rationale: >-
+      DORA Ch. V ICT third-party register and contract lifecycle.
+      The TSC vendor surface (CC9.2) anchors on the operational
+      vendor playbooks already cited; the register-of-information
+      duty is DORA-specific. Home axis: content/mappings/dora/.
+
+  - slug: eidas2_identity_verification
+    rationale: >-
+      eIDAS2 EUDI-wallet verification lifecycle — an EU
+      digital-identity regulatory onboarding flow. The TSC identity
+      surface (CC6) anchors on iam_auditor / mfa_secured_comms /
+      onboarding_offboarding_tracker, all already cited. Home axis
+      pending its own mapping tree; orphan-parity for it is tracked
+      with the playbook's own roadmap card.
+
+  - slug: eu_ai_act_risk_management
+    rationale: >-
+      EU AI Act Art. 9 risk-management cycle for high-risk AI
+      systems — an AI-regulatory duty ledger. No TSC criterion
+      attests AI-Act conformity. Home axis:
+      content/mappings/eu_ai_act/.
+
+  - slug: eu_ai_act_deployer_obligations
+    rationale: >-
+      EU AI Act Art. 26 deployer-duty discharge. Same reasoning as
+      eu_ai_act_risk_management: AI-regulatory compliance machinery
+      with no TSC counterpart. Home axis:
+      content/mappings/eu_ai_act/.
+
+  - slug: ai_human_oversight
+    rationale: >-
+      EU AI Act Art. 14 human-oversight lifecycle (and, since
+      2026-08-12, the GDPR Art. 22 review anchor). Oversight of AI
+      decision quality is not a TSC control component; the workforce
+      competence surface it touches is carried by
+      cyber_hygiene_training under CC1.4, already cited. Home axes:
+      content/mappings/eu_ai_act/, content/mappings/gdpr/.
+
+  - slug: nis2_art20_governance
+    rationale: >-
+      NIS2 Art. 20 management-body cybersecurity governance ledger.
+      The TSC governance surface (CC1) anchors on the policy and
+      training playbooks already cited; the NIS2 management-approval
+      duty is regime-specific. Home axis: content/mappings/nis2/.
+
+  # ── Interim entries: real TSC surfaces, citations owed by #931 ──
+  # Each of these playbooks has a genuine Trust Services Criteria
+  # surface; the criteria-level citation with house-quality notes is
+  # stage-2 work under issue #931. The interim device mirrors the
+  # gdpr manifest's SKELETON batch: the skip records the debt
+  # honestly so the axis can arm born-clean, and each entry leaves
+  # in the same PR that lands its real citation.
+
+  - slug: agentic_threat_response
+    rationale: >-
+      Interim (#931): autonomous-adversary response is CC7.3-7.5
+      incident-response surface; the criteria citation lands with
+      the stage-2 batch.
+
+  - slug: business_continuity
+    rationale: >-
+      Interim (#931): the A1 availability series is this playbook's
+      natural home; the tsc-availability.yaml citation lands with
+      the stage-2 batch.
+
+  - slug: cryptographic_controls
+    rationale: >-
+      Interim (#931): CC6.1/CC6.7 logical-access and
+      transmission-protection criteria; citation lands with the
+      stage-2 batch.
+
+  - slug: ddos_response
+    rationale: >-
+      Interim (#931): A1 availability plus CC7 incident response;
+      citation lands with the stage-2 batch.
+
+  - slug: identity_compromise
+    rationale: >-
+      Interim (#931): CC6 logical access and CC7 incident response;
+      citation lands with the stage-2 batch.
+
+  - slug: it_security_support_agent
+    rationale: >-
+      Interim (#931): CC6.2/CC6.3 credential-lifecycle support
+      surface; citation lands with the stage-2 batch.
+
+  - slug: network_security
+    rationale: >-
+      Interim (#931): CC6.6 network-boundary protection; citation
+      lands with the stage-2 batch.
+
+  - slug: phishing_triage
+    rationale: >-
+      Interim (#931): CC7.2 anomaly detection and triage; citation
+      lands with the stage-2 batch.
+
+  - slug: ransomware_containment
+    rationale: >-
+      Interim (#931): CC7.3-7.5 incident containment and recovery;
+      citation lands with the stage-2 batch.
+
+  - slug: security_awareness_training
+    rationale: >-
+      Interim (#931): CC1.4/CC2.2 workforce competence and internal
+      communication; citation lands with the stage-2 batch.
+
+  - slug: vuln_intake
+    rationale: >-
+      Interim (#931): CC7.1 vulnerability identification intake;
+      citation lands with the stage-2 batch.
+
+  - slug: vulnerability_management
+    rationale: >-
+      Interim (#931): CC7.1 vulnerability management lifecycle;
+      citation lands with the stage-2 batch.
