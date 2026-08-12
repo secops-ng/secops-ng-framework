@@ -186,6 +186,9 @@
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
         ],
+        "metric_refs": [
+          "kri.expiring_tls_certs@v1"
+        ],
         "core_body": {
           "primitive": "content.playbooks.crypto_posture_management.primitives.certificates.probe_cert_posture",
           "in": {
@@ -217,6 +220,9 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
+        ],
+        "metric_refs": [
+          "kri.overdue_key_rotations@v1"
         ],
         "core_body": {
           "primitive": "content.playbooks.crypto_posture_management.primitives.rotation.check_key_rotation",
@@ -324,7 +330,10 @@
     "telemetry_refs": [
       "telemetry.ocsf.api_activity@v1"
     ],
-    "metric_refs": [],
+    "metric_refs": [
+      "kri.expiring_tls_certs@v1",
+      "kri.overdue_key_rotations@v1"
+    ],
     "sources": [
       "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
       "NIS2 Directive (EU) 2022/2555, Article 21(2)(h) — policies and procedures regarding the use of cryptography and, where appropriate, encryption",

@@ -1,0 +1,87 @@
+stable_id: kri.expiring_tls_certs@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: TLS certificates in contradiction with the validity policy
+summary: >
+  Count of certificate findings emitted by the crypto-posture probe
+  step within the evaluation window — a certificate already expired,
+  or whose remaining validity contradicts the declared
+  maximum-validity / renewal-lead clause. Residual-risk indicator
+  against NIS2 Art. 21(2)(h): the posture playbook's certificate
+  probe is read-only, so every finding here is exposure the operator
+  still has to act on. Each finding carries the drift/gap distinction
+  from the probe primitive — a certificate contradicting a declared
+  clause is *drift* (fix the estate), the same certificate where the
+  policy declares no validity clause is a *gap* (write the clause) —
+  and the two are counted together because both leave the expiry
+  surface unguarded.
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: "=="
+  rationale: >
+    The probe names the clause each finding contradicts (or reports
+    the clause missing). A posture where certificates contradict the
+    declared policy — or where the policy is silent on validity — is
+    exposure regardless of how the operator chooses to close it.
+thresholds:
+  - name: warn
+    comparator: ">="
+    value: 1
+    severity: warn
+  - name: breach
+    comparator: ">="
+    value: 5
+    severity: high
+measurement:
+  source: workflow
+  aggregation: count
+  formula: >
+    For each certificate observation judged by the probe-cert-posture
+    step within the evaluation window, increment when the finding's
+    verdict is drift or gap on an expiry-related clause: the
+    observation's not_after has passed, or its remaining validity
+    contradicts the policy inventory's maximum-validity /
+    renewal-lead clause, or the clause the observation should be
+    judged against is absent from the declared policy. Distinct
+    certificate_refs are counted once per window. Findings carry the
+    certificate reference, the observed not_after and the clause_ref
+    (or its absence) — never certificate bodies or key material, per
+    the playbook's sovereign-stack constraint. Reference
+    visualisation: a two-panel composition with the count headline
+    and a per-certificate drill-down; the committed reference
+    rendering lives at `content/metrics/expiring_tls_certs.viz.md` —
+    that file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: cert_probe_step
+      description: >
+        Probe-cert-posture step completion recorded by the
+        crypto_posture_management playbook. Carried on the OCSF API
+        Activity event the step emits per judged certificate
+        observation, with the finding envelope (certificate_ref,
+        verdict, clause_ref, observed not_after) recorded against the
+        case. A drift or gap verdict on an expiry-related clause is
+        what increments the counter.
+      playbook_step: action--51000000-0000-4000-8000-000000000003
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+      field: time
+  window:
+    duration: P30D
+    sliding: true
+telemetry_refs:
+  - telemetry.ocsf.api_activity@v1
+playbook_refs:
+  - playbook_id: playbook.crypto_posture_management@v1
+    step_id: action--51000000-0000-4000-8000-000000000003
+external_refs:
+  - name: NIS2 — Article 21(2)(h) cryptography and encryption policies
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(h)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability
+  - determinism
