@@ -83,6 +83,13 @@ SUPPORTED_FRAMEWORKS: tuple[str, ...] = (
     "dora",
     "gdpr",
     "eu_ai_act",
+    # F-MAP-ORPHAN-PARITY stage 1: the first non-EU-statutory axis.
+    # soc2 was the sharpest gap — the EU manifests' own skip
+    # rationales cite "closed on the home axis under
+    # content/mappings/soc2/", a claim nothing verified until this
+    # axis was armed. iso27001 / nist_csf follow in later stages;
+    # d3fend gets a documented decision, not an assumption.
+    "soc2",
 )
 
 
