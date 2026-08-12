@@ -1,0 +1,95 @@
+stable_id: kpi.dora_resilience_test_coverage@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kpi
+title: Critical functions covered by in-cadence resilience testing
+summary: >
+  Share of the critical-or-important functions in the DORT scope
+  catalogue that carry composed testing evidence completed within the
+  DORA-required cadence for their class — annual testing of critical
+  ICT systems under Art. 24(6), the three-year threat-led penetration
+  testing cycle under Art. 26(1) where the TLPT trigger decision says
+  the entity is in scope. The programme composes evidence the
+  operator's testing lanes produce; it never executes a test, so this
+  KPI measures the composition surface — a function is covered when a
+  dated, referenced test record exists for it inside its cadence
+  window, and only then. Pairs with kri.tlpt_remediation_overdue@v1:
+  coverage rising while remediation debt ages is the exact
+  false-comfort pattern the pairing discipline exists to catch.
+unit: ratio
+direction: higher_is_better
+target:
+  value: 1.0
+  comparator: ">="
+  rationale: >
+    Art. 24(6) admits no untested critical system in steady state:
+    every critical-or-important function in the DORT scope catalogue
+    is either covered by in-cadence evidence or is a named gap the
+    programme record must carry. The out-of-scope case is explicit by
+    design — an entity out of TLPT scope produces a programme record
+    saying so, and its functions are measured against the Art. 24
+    cadence only.
+thresholds:
+  - name: warn
+    comparator: "<"
+    value: 1.0
+    severity: warn
+  - name: breach
+    comparator: "<"
+    value: 0.8
+    severity: high
+measurement:
+  source: workflow
+  aggregation: ratio
+  formula: >
+    Denominator: distinct critical-or-important functions in the
+    __dort_scope_catalogue__ emitted by the define-DORT-scope step
+    within the evaluation window. Numerator: those functions holding
+    at least one composed testing-evidence reference whose completion
+    date falls inside the cadence window the function's class
+    requires (Art. 24(6) annual; Art. 26(1) three-year TLPT where the
+    trigger decision marks the entity in scope). Evidence is counted
+    by reference — the record carries test-record identifiers, never
+    finding bodies, per the playbook's sovereign-stack constraint.
+    Reference visualisation: a two-panel composition with the ratio
+    headline and a per-function drill-down; the committed reference
+    rendering lives at
+    `content/metrics/dora_resilience_test_coverage.viz.md` — that
+    file is the contract for the chart shape; the compile target
+    renders the executable form against operator data.
+  inputs:
+    - name: dort_scope_step
+      description: >
+        Define-DORT-scope step completion recorded by the
+        dora_tlpt_programme playbook. Carried on the OCSF API
+        Activity event the step emits when the scope catalogue is
+        composed from the business-service, ICT-asset and third-party
+        provider registers; the catalogue's per-function rows (function
+        reference, criticality class, cadence class, testing-evidence
+        references) are what the ratio reads.
+      playbook_step: action--55000000-0000-4000-8000-000000000002
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+      field: time
+  window:
+    duration: P90D
+    sliding: true
+telemetry_refs:
+  - telemetry.ocsf.api_activity@v1
+playbook_refs:
+  - playbook_id: playbook.dora_tlpt_programme@v1
+    step_id: action--55000000-0000-4000-8000-000000000002
+external_refs:
+  - name: DORA — Article 24(6) testing of ICT tools and systems
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 24(6)
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: DORA — Article 26(1) advanced testing by means of TLPT
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 26(1)
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+maintainer: metrics-wg@secops-ng.org
+residual_risk_refs:
+  - kri.tlpt_remediation_overdue@v1
+foundation_property:
+  - auditability
+  - determinism

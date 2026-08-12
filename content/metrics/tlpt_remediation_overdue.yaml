@@ -1,0 +1,85 @@
+stable_id: kri.tlpt_remediation_overdue@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Resilience-testing findings past their remediation date
+summary: >
+  Count of findings in the composed TLPT/resilience-testing findings
+  register whose dated remediation attestation is absent past the
+  committed remediation date. Residual-risk counterpart to
+  kpi.dora_resilience_test_coverage@v1: a testing programme can show
+  rising coverage while the findings its tests produced age
+  unremediated — this KRI is the aging side of that pair, per the
+  coverage/exposure pairing discipline. The register carries finding
+  references and dates only; finding bodies stay in the operator's
+  own store, per the playbook's sovereign-stack constraint.
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: "=="
+  rationale: >
+    DORA Art. 26(8) requires remediation plans for TLPT findings and
+    Art. 24(5) requires procedures to address issues revealed by
+    testing. A finding past its committed remediation date without a
+    dated attestation is open, tracked exposure — the register knows
+    about it, which is precisely why it must not silently age there.
+thresholds:
+  - name: warn
+    comparator: ">="
+    value: 1
+    severity: warn
+  - name: breach
+    comparator: ">="
+    value: 5
+    severity: high
+measurement:
+  source: workflow
+  aggregation: count
+  formula: >
+    For each finding reference in the register composed by the
+    remediation-tracking step within the evaluation window, increment
+    when the finding's committed remediation date has passed as of
+    the window end and no dated remediation attestation is bound to
+    it. Distinct finding references are counted once per window.
+    Counted entries carry the finding reference, the committed date
+    and the attestation reference (or its absence) — never finding
+    bodies. Reference visualisation: a two-panel composition with the
+    count headline and a per-finding drill-down; the committed
+    reference rendering lives at
+    `content/metrics/tlpt_remediation_overdue.viz.md` — that file is
+    the contract for the chart shape; the compile target renders the
+    executable form against operator data.
+  inputs:
+    - name: remediation_tracking_step
+      description: >
+        Remediation-tracking step completion recorded by the
+        dora_tlpt_programme playbook. Carried on the OCSF API
+        Activity event the step emits when the findings register is
+        composed and the dated remediation attestation is emitted;
+        register rows past their committed date without an
+        attestation reference are what increment the counter.
+      playbook_step: action--55000000-0000-4000-8000-000000000005
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+      field: time
+  window:
+    duration: P90D
+    sliding: true
+telemetry_refs:
+  - telemetry.ocsf.api_activity@v1
+playbook_refs:
+  - playbook_id: playbook.dora_tlpt_programme@v1
+    step_id: action--55000000-0000-4000-8000-000000000005
+external_refs:
+  - name: DORA — Article 26(8) remediation of TLPT findings
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 26(8)
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+  - name: DORA — Article 24(5) addressing issues revealed by testing
+    source: EU
+    external_id: Regulation (EU) 2022/2554, Art. 24(5)
+    url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability
+  - determinism
