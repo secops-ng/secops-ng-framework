@@ -449,3 +449,42 @@ skip:
       an operator-side network-security anchor not already
       covered by the pins above.
 
+
+  - slug: ai_human_oversight
+    rationale: >-
+      EU AI Act Art. 14 human-oversight lifecycle. CRA Annex I
+      anchors essential cybersecurity requirements on the
+      manufacturer-side lifecycle of a product with digital elements
+      (secure-by-default posture, vulnerability handling, update
+      provision); reviewing and overriding the decisions an AI
+      system makes in operation is deployer-side usage governance
+      under the AI Act axis, not a PDE property or manufacturer
+      process. Inbound graph closed at
+      `content/mappings/eu_ai_act/article-14-human-oversight.yaml`.
+      Re-open the review if CRA secondary acts carve an AI-specific
+      operator-side oversight anchor.
+
+  - slug: eu_ai_act_deployer_obligations
+    rationale: >-
+      EU AI Act Art. 26 deployer-duty discharge. The playbook's
+      objects are provider documentation, oversight assignments,
+      input-data conformity checks, and usage monitoring for a
+      deployed AI system — the regulatory counterpart relationship
+      CRA models is manufacturer→product, and the AI Act models
+      provider→deployer; neither Annex I requirement class anchors
+      on the deployer's duty ledger. Inbound graph closed at
+      `content/mappings/eu_ai_act/article-26-deployer-obligations.yaml`.
+      Mirrors the reasoning of the framework-agnostic exclusions
+      above.
+
+  - slug: soc2_evidence_collector
+    rationale: >-
+      SOC 2 Trust-Services-Criteria readiness roll-up operating on
+      criterion atoms, evidence-record identifiers, and attestation
+      states. It neither produces nor verifies a CRA Annex I
+      product-security property; CRA conformity evidence is wired
+      per-requirement on the operational playbooks in the
+      `annex-i-*` entries. Inbound graph closed on the home axis
+      under `content/mappings/soc2/`. Mirrors the
+      `executive_metrics` precedent: roll-up playbooks anchor via
+      their home framework.

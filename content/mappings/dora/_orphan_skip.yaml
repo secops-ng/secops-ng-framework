@@ -186,3 +186,46 @@ skip:
       Delegated Regulation (EU) 2024/1774) coverage is extended
       to the agentic-tradecraft indicator class.
 
+
+  - slug: ai_human_oversight
+    rationale: >-
+      EU AI Act Art. 14 human-oversight lifecycle. DORA anchors on
+      the financial entity's ICT-risk surfaces — risk management
+      (Art. 5-16), incident handling (Art. 17-23), resilience
+      testing (Art. 24-27), third-party risk (Art. 28-30) — and the
+      oversight playbook governs the quality and human control of
+      AI-system decisions, which is an AI-regulatory object, not an
+      ICT-risk one. Where a financial entity's AI system sits on ICT
+      infrastructure, that estate's DORA surface is already wired
+      via the per-article entries on the operational playbooks.
+      Inbound graph closed at
+      `content/mappings/eu_ai_act/article-14-human-oversight.yaml`.
+      Mirrors the `dora_ict_risk_selfassess` cross-regime reasoning
+      in the NIS2 manifest: distinct-regime disciplines get distinct
+      anchors.
+
+  - slug: eu_ai_act_deployer_obligations
+    rationale: >-
+      EU AI Act Art. 26 deployer-duty discharge (provider
+      documentation, oversight assignment, input-data conformity,
+      usage monitoring, provider/authority escalation). The
+      third-party relationship DORA models is the Chapter V ICT
+      service-provider contract lifecycle carried by
+      `dora_tpr_management`; the AI Act provider→deployer duty
+      ledger is a different regime with different evidentiary
+      requirements, and conflating the two would double-count the
+      third-party surface. Inbound graph closed at
+      `content/mappings/eu_ai_act/article-26-deployer-obligations.yaml`.
+      A sibling card revisits this if ESAs guidance ties high-risk
+      AI deployment to a DORA Art. 28 register row class.
+
+  - slug: soc2_evidence_collector
+    rationale: >-
+      SOC 2 Trust-Services-Criteria readiness roll-up operating on
+      criterion atoms, evidence-record identifiers, and attestation
+      states. DORA evidence is wired per-article on the operational
+      playbooks that produce it; a US attestation-regime aggregator
+      carries no DORA obligation surface of its own. Inbound graph
+      closed on the home axis under `content/mappings/soc2/`.
+      Mirrors the `executive_metrics` precedent: roll-up playbooks
+      anchor via their home framework.
