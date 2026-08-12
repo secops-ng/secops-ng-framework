@@ -33,7 +33,13 @@ standard PR review that checks the entry follows the format below.
   A blog post, a conference talk recording, a public write-up, a
   GitHub repository, or a page on the organisation's own site all
   qualify. Private links (login-walled dashboards, internal wikis)
-  do not.
+  do not. The **preferred** target is a published sovereignty
+  conformance **disclosure pack** — the redacted, deterministic
+  verdict artifact described in
+  [`content/evidence/sovereignty/DISCLOSURE.md`](content/evidence/sovereignty/DISCLOSURE.md) —
+  because it is the one evidence form a reader can check against the
+  declared baseline rather than take on faith. Prose evidence remains
+  welcome.
 
 ## How to add your row
 

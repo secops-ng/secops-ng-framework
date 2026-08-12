@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secops-ng.eu/schemas/sovereignty-disclosure-pack.schema.json",
+  "title": "Sovereignty conformance disclosure pack",
+  "description": "The redacted, publishable subset of an F-SV-05 verdict an operator links from their USED-BY.md row (F-ADOPT-02). The schema is the redaction contract in machine-readable form: additionalProperties is false at every level, so a pack carrying raw observed values, observation payloads, or any field outside the allowlist does not validate. Per indicator the pack carries the outcome and the band pair — the posture, not the telemetry. No score of any kind.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "disclosure_pack",
+    "profile",
+    "record",
+    "record_sha256",
+    "assessment_window",
+    "indicators",
+    "pass",
+    "provenance"
+  ],
+  "properties": {
+    "disclosure_pack": {
+      "description": "Pack format discriminator and version.",
+      "const": "sovereignty-conformance-disclosure/v1"
+    },
+    "profile": {
+      "description": "Stable id of the profile the record was judged against.",
+      "type": "string",
+      "pattern": "^profile\\.[a-z][a-z0-9_]*@v[0-9]+(\\.[0-9]+){0,2}$"
+    },
+    "record": {
+      "description": "The evidence record's artifact_id (already digest-shaped; carries no endpoint or internal literal).",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "record_sha256": {
+      "description": "SHA-256 of the exact record bytes evaluated, so a reviewer holding the record can verify which snapshot the pack discloses.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "assessment_window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to"],
+      "properties": {
+        "from": {"type": "string", "format": "date-time"},
+        "to": {"type": "string", "format": "date-time"}
+      }
+    },
+    "indicators": {
+      "description": "Every indicator the verdict carries — including fail, unobserved and unprofiled outcomes. A pack that renders only its passing rows is not a disclosure.",
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "patternProperties": {
+        "^(kpi|kri)\\.[a-z][a-z0-9_]*@v[0-9]+(\\.[0-9]+){0,2}$": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["outcome"],
+          "properties": {
+            "outcome": {
+              "enum": ["pass", "fail", "unobserved", "unprofiled"]
+            },
+            "observed_band": {
+              "enum": ["on_target", "warn", "high", "breach"]
+            },
+            "required_band": {
+              "enum": ["on_target", "warn", "high", "breach"]
+            },
+            "via_override": {"const": true}
+          }
+        }
+      }
+    },
+    "pass": {
+      "description": "Boolean roll-up: true iff every indicator outcome is pass. Never a count, ratio or score.",
+      "type": "boolean"
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["renderer", "renderer_version", "evaluator"],
+      "properties": {
+        "renderer": {"const": "render-disclosure-pack"},
+        "renderer_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "evaluator": {
+          "const": "compilers._shared.evidence.sovereignty_profile"
+        }
+      }
+    }
+  }
+}
