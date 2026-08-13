@@ -2820,7 +2820,16 @@ component definition.
 
 ### F-MAP-ORPHAN-PARITY — orphan-CI parity for the non-EU mapping axes
 
-- **Status:** Proposed
+- **Status:** In Progress
+- **Shipped so far:** stage 1 (#932, advancing #931) — the soc2 axis
+  armed born-clean: SUPPORTED_FRAMEWORKS + nightly matrix leg +
+  per-axis test module; audited initial manifest (26 cited, 1 newly
+  cited, 9 durable exclusions, 12 interim entries owed by #931);
+  soc2_evidence_collector's missing home-axis citation authored
+  (CC4.1) and pinned by test, making the EU manifests' "closed on
+  the home axis" rationales CI-verified. Stages 2+ (soc2 CC
+  citations, iso27001/nist_csf, d3fend decision, per-axis
+  catalogue-KRI criterion review) tracked in #931.
 - **Priority:** P2
 - **Goal:** G-02 (a mapping axis without the orphan device cannot
   claim coverage — it can only claim files), G-08 (the device class

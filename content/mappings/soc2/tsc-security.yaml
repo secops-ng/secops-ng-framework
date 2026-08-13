@@ -344,12 +344,24 @@ entries:
       - control.security_assessment@v1
     playbook_refs:
       - playbook.executive_metrics@v1
+      - playbook.soc2_evidence_collector@v1
     notes: >-
       control_effectiveness_test carries the per-control
       ongoing-evaluation anchor; security_assessment carries the
       independent-separate-evaluation anchor;
       executive_metrics is the rollup surface that carries the
-      evaluation results to governance.
+      evaluation results to governance. soc2_evidence_collector is
+      the CC4.1 separate-evaluation surface for this framework
+      specifically: it walks the TSC criterion atoms, resolves the
+      committed evidence-record references behind each, and emits
+      the dated four-state readiness attestation — the ongoing
+      evaluation of whether the SOC 2 control components are
+      "present and functioning", produced as evidence rather than
+      asserted. Until 2026-08-12 this playbook carried no inbound
+      soc2 citation at all — the EU-axis orphan manifests justified
+      their exclusions by claiming its graph was closed on this
+      home axis, and nothing verified the claim; this entry makes
+      it true and the new soc2 orphan-CI lane keeps it true.
 
   - id: soc2:cc4-2-evaluation-and-communication-of-deficiencies
     regulation:
