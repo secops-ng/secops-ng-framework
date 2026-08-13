@@ -1641,7 +1641,7 @@ one playbook's provenance.
     cookbook walkthrough (shipped).
   - Deterministic primitives under
     `content/playbooks/backup_recovery/primitives/` bound to the 5 action
-    steps, replay-safe and offline (CORE — **outstanding**).
+    steps, replay-safe and offline (CORE — shipped).
   - The restore drill is non-destructive by construction — no step writes to
     a production target.
   - The five metric entries for this surface keep their reference
@@ -1655,6 +1655,9 @@ one playbook's provenance.
   issue #890.
 - **Shipped via:**
   - SKELETON — #478, #483
+  - CORE — #938 (five pure primitives with direct unit coverage, all 5
+    action steps bound, the `__integrity_ok__` predicate filled, three
+    worked examples refreshed onto the canonical core_body goldens).
 
 ### F-WF-BCM — Business-continuity event lifecycle
 

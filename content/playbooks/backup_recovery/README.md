@@ -9,12 +9,17 @@ against the operator's documented isolated drill target.
 
 ## Status
 
-SKELETON. The playbook artifact and the regulatory + control overlay
-land here; CORE-layer cards add the detection bindings (restore-target
-misconfiguration signals) and the per-target compiler emissions
-(n8n / Temporal / LangGraph goldens); an EXTEND card wires the
-attestation-cadence and integrity-failure metric emitters against
-the operator's evidence store.
+CORE. All five action steps carry `core_body` bindings onto the pure
+primitives under `primitives/` (drill-trigger resolution, integrity
+evaluation, restore-drill evaluation, attestation build, notification
+composition); the `__integrity_ok__` branch predicate is filled; the
+three worked examples and their byte-parity goldens ship refreshed
+against the bound playbook. Operator observations (backup inventory,
+integrity checks, drill results, owner channel binding) arrive as
+external playbook variables so the primitives stay replay-safe and
+offline. An EXTEND card owns the cookbook walkthrough and wires the
+attestation-cadence and integrity-failure metric emitters against the
+operator's evidence store.
 
 ## Contents
 
