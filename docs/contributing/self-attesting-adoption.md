@@ -39,6 +39,25 @@ signal is the same: an operator willing to say so in public.
      wikis do not — the registry only carries links a reader without
      an account can open.
 
+     The preferred target is a **sovereignty conformance disclosure
+     pack**: render it from your own evidence record with
+
+     ```bash
+     python -m tools.render_disclosure_pack your-record.json \
+         --baseline content/profiles/sovereignty_conformance.yaml \
+         --output disclosure-pack.json
+     ```
+
+     publish the JSON anywhere public, and link it. It is redacted by
+     construction (bands and outcomes only — never raw values,
+     endpoints, or internal identifiers; see
+     [`content/evidence/sovereignty/DISCLOSURE.md`](../../content/evidence/sovereignty/DISCLOSURE.md))
+     and it is the one evidence form a reader can check against the
+     declared baseline rather than take on faith. A pack whose
+     roll-up is `"pass": false` is still good evidence — the shipped
+     reference example fails its own baseline, and publishing the
+     failing rows is exactly the discipline the registry rewards.
+
 4. **Open a PR** against `main` of the upstream repository. Title it
    `docs(community): add <organisation> to USED-BY.md`. The PR body
    only needs the evidence link and a one-line description of what you

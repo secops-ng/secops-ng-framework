@@ -2920,7 +2920,14 @@ SecOps-NG visible without requiring the project to run telemetry.
 
 ### F-ADOPT-02 — Sovereignty conformance disclosure pack
 
-- **Status:** Proposed
+- **Status:** Shipped
+- **Shipped:** single card (#923, closing #922) — deterministic
+  renderer (`tools.render_disclosure_pack`, allowlist construction +
+  serialisation backstop + `--baseline` drift refusal), the pack
+  schema as machine-readable redaction contract, the DISCLOSURE.md
+  format and MUST-NOT documentation, the committed worked example
+  carrying the reference posture's true failing rows, and the
+  USED-BY.md / self-attestation-guide pointers, pinned by test.
 - **Priority:** P1
 - **Goal:** G-07 (the registry's `Evidence link` column currently
   points at whatever the operator happens to have public; this gives
