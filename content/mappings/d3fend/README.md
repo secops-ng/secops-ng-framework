@@ -107,10 +107,45 @@ satisfy?* This tree is that index. Compilers and reviewers consuming
 the content model can now answer "which D3FEND coverage does our DORA
 Art. 12 evidence rest on?" without re-parsing playbook JSON.
 
+## Orphan-CI: deliberately excluded
+
+The per-framework orphan-CI device (`tools.lint_playbook_orphans`,
+F-MAP-ORPHAN-PARITY) does **not** run on this tree, by decision
+rather than omission (#931, option A accepted 2026-08-13).
+
+The device asks "which finalized playbooks carry no inbound
+`playbook_refs:` citation under this axis?" — a question this
+directory cannot meaningfully answer. Its rows are (D3FEND
+technique, regulation clause, control) triples: playbooks connect
+to D3FEND **through controls** (`control_refs` →
+`content/controls/`, whose `defensive_techniques_d3fend` blocks
+source the technique anchors) and through their own outbound
+`d3fend:` overlay in `mappings.yaml` — never through inbound
+playbook citations. A playbook with no D3FEND technique is not
+unmapped debt: governance, reporting, and regulatory-ledger
+playbooks legitimately have none. Arming the device here would
+produce a manifest of several dozen identical "linkage flows
+through controls" exclusions — ceremony that dilutes the audited-
+exclusion device on the axes where it means something.
+
+The integrity guards that fit this tree's actual shape already
+exist and are the ones to extend if gaps surface:
+
+- `tests/content/test_d3fend_<regime>_crosswalk.py` (one module per
+  file here) asserts every `control_refs` entry resolves to a real
+  control and every `regulation_refs.entry_id` round-trips to a
+  real entry in the regime's mapping tree.
+- `tests/content/test_control_xref_lint.py` holds the control-side
+  `d3fend_refs` blocks this index is built from.
+
+If a via-controls coverage device ever proves necessary (playbook →
+control_refs → controls → techniques), it belongs to the
+dangling-reference guard scope (#841), not to orphan parity.
+
 ## Status
 
-SKELETON — 2–3 representative entries per regulation, no schema, no
-test coverage, no compiler hook. CORE adds schema validation under
-`schemas/` plus a test that every `entry_id` round-trips to a real
-crosswalk entry. EXTEND broadens coverage to every D3FEND technique
-referenced in the control catalogue.
+CORE — per-regime coverage as described in the file-layout section
+above, guarded by the six per-regime crosswalk test modules
+(control_refs and regulation_refs resolution, both directions).
+EXTEND broadens coverage to every D3FEND technique referenced in
+the control catalogue.

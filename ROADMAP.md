@@ -2861,9 +2861,20 @@ component definition.
   - `d3fend` is assessed, not assumed: it is a technique crosswalk,
     not an obligation axis, and may warrant a different device or a
     documented exclusion. The decision and its rationale land in
-    `content/mappings/d3fend/README.md` either way.
-  - The per-axis KRIs join the catalogue with the same schema
-    compliance as the EU five.
+    `content/mappings/d3fend/README.md` either way. (Decided —
+    #931 option A, 2026-08-13: documented exclusion; playbooks
+    connect through controls, and the six per-regime crosswalk
+    test modules already guard both resolution directions. A
+    via-controls coverage device, if ever warranted, belongs to
+    the dangling-refs guard scope (#841).)
+  - The per-axis KRI emission uses the shipped mechanism the EU
+    five use: `kri_name_for(framework)` dashboard labels via
+    `--format kri`, uploaded per matrix leg. (Amended per the
+    #931 memo — the criterion originally said "join the catalogue
+    with the same schema compliance as the EU five", written on
+    the wrong assumption that the EU five had catalogue entries;
+    catalogue-grade orphan metrics, if wanted, are their own
+    G-04 card.)
 - **Sovereign-stack constraints:** None beyond the house rule — the
   device is repo-local lint, no network, no telemetry.
 - **Depends on:** —
