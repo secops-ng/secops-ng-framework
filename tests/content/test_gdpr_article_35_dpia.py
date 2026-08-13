@@ -36,6 +36,10 @@ REQUIRED_ANCHORS: frozenset[str] = frozenset({
     "data_exfil",
     "identity_compromise",
     "ransomware_containment",
+    # The deployer-side Art. 26(9)/27(4) AI Act linkage (#916) — pinned
+    # so removing the edge re-orphans ai-lifecycle coverage loudly
+    # instead of via a 7-day grace window.
+    "eu_ai_act_deployer_obligations",
 })
 
 # ``playbook.<slug>@vN`` — matches the schema's playbook_ref shape.

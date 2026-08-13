@@ -181,6 +181,7 @@ entries:
       - playbook.ransomware_containment@v1
       - playbook.data_protection_impact_assessment@v1
       - playbook.eu_ai_act_risk_management@v1
+      - playbook.eu_ai_act_deployer_obligations@v1
     metric_refs:
       - kpi.notification_sla_compliance@v1
       - kri.regulator_notification_overrun@v1
@@ -243,7 +244,18 @@ entries:
       a high-risk processing profile Art. 35(1) requires a DPIA
       for; the eu_ai_act_risk_management playbook is the
       AI-system-specific execution surface Art. 35(1) reads against
-      on that path.
+      on that path. eu_ai_act_deployer_obligations is the sixth
+      anchor, the deployer-side counterpart: AI Act Art. 26(9)
+      obliges deployers of Annex III high-risk AI systems to use the
+      provider's Art. 13 information to comply with their GDPR
+      Art. 35 DPIA obligation, and Art. 27(4) lets the
+      fundamental-rights impact assessment complement an existing
+      DPIA. The playbook's confirm_intended_use step is where the
+      provider's Art. 13 information enters the deployer's record;
+      its assess_fundamental_rights_impact step is the FRIA surface
+      the Art. 27(4) complement reads against. This edge closes the
+      interim orphan-skip for the playbook on this axis (#916); the
+      skip is removed in the same change.
 
   - id: gdpr:art-35-3-a-dpia-systematic-evaluation
     regulation:
