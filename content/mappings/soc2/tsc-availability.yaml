@@ -55,6 +55,7 @@ entries:
       - control.cspm_baseline@v1
     playbook_refs:
       - playbook.infra_posture_management@v1
+      - playbook.ddos_response@v1
     notes: >-
       baseline_configuration and cspm_baseline carry the
       infrastructure-posture anchors that exercise capacity-relevant
@@ -65,6 +66,11 @@ entries:
       uptime targets) and environmental-threat modelling for the
       physical facility sit outside the SecOps-NG catalogue and
       remain operator-owned artifacts under this criterion.
+      ddos_response exercises the availability-attack lane of
+      the capacity commitment: detection and mitigation of
+      volumetric threats against the declared availability
+      targets.
+
 
   - id: soc2:a1-2-environmental-and-backup-infrastructure
     regulation:
@@ -112,6 +118,7 @@ entries:
     playbook_refs:
       - playbook.backup_recovery@v1
       - playbook.incident_management@v1
+      - playbook.business_continuity@v1
     notes: >-
       restore_drill carries the exercised-recovery anchor that
       directly discharges the plan-testing obligation;
@@ -121,3 +128,8 @@ entries:
       recovery-plan document itself (RTO/RPO targets, invocation
       criteria, roles matrix) is an operator-owned artifact and
       sits outside the SecOps-NG catalogue.
+      business_continuity exercises the continuity-event
+      lifecycle around the recovery plan — invocation,
+      coordination, stand-down — beside backup_recovery's
+      restore-drill anchor.
+

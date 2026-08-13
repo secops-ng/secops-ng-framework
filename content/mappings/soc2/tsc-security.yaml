@@ -123,11 +123,17 @@ entries:
     playbook_refs:
       - playbook.cyber_hygiene_training@v1
       - playbook.onboarding_offboarding_tracker@v1
+      - playbook.security_awareness_training@v1
     notes: >-
       training_attestation carries the workforce-competence anchor;
       jml_evidence carries the pre-hire verification slice. Formal
       performance evaluation is out of scope of the SecOps-NG
       catalogue and discharges against HR records.
+      security_awareness_training exercises the programme
+      lifecycle behind the training_attestation anchor —
+      curriculum design, delivery scheduling, completion
+      tracking, and per-audience effectiveness measurement.
+
 
   - id: soc2:cc1-5-accountability-for-internal-control
     regulation:
@@ -478,11 +484,16 @@ entries:
       - control.cloud_identity_least_privilege@v1
     playbook_refs:
       - playbook.iam_auditor@v1
+      - playbook.cryptographic_controls@v1
     notes: >-
       access_enforcement, least_privilege, and
       cloud_identity_least_privilege carry the logical-access-control
       anchors across on-prem and cloud; iam_auditor exercises the
       operational access-audit surface.
+      cryptographic_controls exercises the encryption-key
+      lifecycle slice of the logical-access surface — CC6.1's
+      protection-of-encryption-keys point of focus.
+
 
   - id: soc2:cc6-2-user-registration-and-authorization
     regulation:
@@ -503,12 +514,18 @@ entries:
       - control.account_management@v1
     playbook_refs:
       - playbook.onboarding_offboarding_tracker@v1
+      - playbook.it_security_support_agent@v1
     notes: >-
       jml_evidence carries the joiner-side pre-issuance
       authorisation anchor and the leaver-side removal anchor;
       account_management carries the credential-lifecycle anchor;
       onboarding_offboarding_tracker exercises the operational
       lifecycle flow.
+      it_security_support_agent exercises the operator-side
+      credential-support lane (resets, lockouts, access-request
+      intake) on the same registration and authorisation
+      surface.
+
 
   - id: soc2:cc6-3-authorization-modification-and-removal-of-access
     regulation:
@@ -607,12 +624,17 @@ entries:
       - control.access_enforcement@v1
     playbook_refs:
       - playbook.mfa_secured_comms@v1
+      - playbook.network_security@v1
     notes: >-
       mfa_state_probe carries the external-user authentication
       anchor; service_identification_authentication carries the
       external-process authentication anchor; access_enforcement
       carries the boundary-enforcement anchor. mfa_secured_comms
       exercises the operational secured-session surface.
+      network_security exercises the network-boundary lifecycle
+      — segmentation posture and boundary-rule review — behind
+      the boundary-enforcement anchor.
+
 
   - id: soc2:cc6-7-transmission-and-movement-of-information
     regulation:
@@ -689,6 +711,8 @@ entries:
     playbook_refs:
       - playbook.infra_posture_management@v1
       - playbook.cloud_misconfiguration@v1
+      - playbook.vuln_intake@v1
+      - playbook.vulnerability_management@v1
     notes: >-
       The configuration trio (configuration_settings,
       baseline_configuration, cspm_baseline) carries the
@@ -696,6 +720,11 @@ entries:
       the newly-disclosed-vulnerability response anchor;
       infra_posture_management and cloud_misconfiguration
       exercise the operational posture-drift surfaces.
+      vuln_intake and vulnerability_management exercise CC7.1's
+      newly-disclosed-vulnerability point of focus: disclosure
+      intake on one side, the scan-triage-remediate lifecycle on
+      the other.
+
 
   - id: soc2:cc7-2-monitoring-of-system-components
     regulation:
@@ -715,11 +744,16 @@ entries:
     playbook_refs:
       - playbook.detection_engineering@v1
       - playbook.alert_triage@v1
+      - playbook.phishing_triage@v1
     notes: >-
       detection_coverage_evidence carries the monitoring-coverage
       anchor; detection_engineering exercises the
       coverage-authoring lifecycle; alert_triage exercises the
       anomaly-analysis / event-classification surface.
+      phishing_triage exercises the user-reported-anomaly lane
+      of the monitoring surface — suspected-malicious mail
+      evaluated and classified against the same event taxonomy.
+
 
   - id: soc2:cc7-3-evaluation-of-security-events
     regulation:
@@ -739,11 +773,17 @@ entries:
     playbook_refs:
       - playbook.alert_triage@v1
       - playbook.incident_management@v1
+      - playbook.identity_compromise@v1
     notes: >-
       incident_timeline_signals carries the event-to-incident
       evaluation anchor; incident_handling_capability carries the
       response-capability anchor; alert_triage and
       incident_management exercise the operational surfaces.
+      identity_compromise exercises the deep-evaluation lane: a
+      suspected principal compromise assessed across session,
+      token, OAuth-grant and inbox-rule surfaces to determine
+      incident impact.
+
 
   - id: soc2:cc7-4-security-incident-response
     regulation:
@@ -765,6 +805,8 @@ entries:
     playbook_refs:
       - playbook.incident_management@v1
       - playbook.on_call_rotation@v1
+      - playbook.ransomware_containment@v1
+      - playbook.agentic_threat_response@v1
     notes: >-
       incident_handling_capability is the response-programme anchor;
       incident_timeline_signals carries the timeline-reconstruction
@@ -773,6 +815,11 @@ entries:
       out-of-band channel required when in-band comms are
       compromised; incident_management and on_call_rotation
       exercise the operational surfaces.
+      ransomware_containment and agentic_threat_response
+      exercise the containment-and-remediation lane — host
+      isolation, account revocation, and autonomous-adversary
+      response execution — under the same response programme.
+
 
   - id: soc2:cc7-5-recovery-from-incidents
     regulation:

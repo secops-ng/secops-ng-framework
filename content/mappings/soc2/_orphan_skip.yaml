@@ -17,14 +17,14 @@
 # graph closed on the home axis under content/mappings/soc2/", and
 # until this manifest and its test landed, nothing verified that
 # claim — soc2_evidence_collector itself was an orphan here. Stage 1
-# classifies every finalized playbook: 26 already carried TSC
-# citations, soc2_evidence_collector gains its real CC4.1 citation
-# in the same change, and the 21 entries below split into two
-# batches. Durable exclusions are other-regime duty ledgers with no
-# TSC criterion surface of their own. Interim entries are playbooks
-# with genuine TSC surfaces whose criteria-level citations are owed
-# by issue #931 — as each real citation lands, the matching entry
-# below MUST be removed in the same PR so the assertion re-arms.
+# classified every finalized playbook and armed the axis with 21
+# entries (9 durable, 12 interim). Stage 2 (#931 package 1) authored
+# the criteria-level citations for all twelve interim playbooks in
+# the tsc-*.yaml files and removed their entries here, per the
+# manifest contract. What remains below is the durable set only:
+# other-regime duty ledgers with no TSC criterion surface of their
+# own. Any new entry needs the same audited rationale, and an
+# interim entry needs the issue number that owes its citation.
 
 skip:
   # ── Durable exclusions: other-regime duty ledgers ────────────────
@@ -103,74 +103,3 @@ skip:
       The TSC governance surface (CC1) anchors on the policy and
       training playbooks already cited; the NIS2 management-approval
       duty is regime-specific. Home axis: content/mappings/nis2/.
-
-  # ── Interim entries: real TSC surfaces, citations owed by #931 ──
-  # Each of these playbooks has a genuine Trust Services Criteria
-  # surface; the criteria-level citation with house-quality notes is
-  # stage-2 work under issue #931. The interim device mirrors the
-  # gdpr manifest's SKELETON batch: the skip records the debt
-  # honestly so the axis can arm born-clean, and each entry leaves
-  # in the same PR that lands its real citation.
-
-  - slug: agentic_threat_response
-    rationale: >-
-      Interim (#931): autonomous-adversary response is CC7.3-7.5
-      incident-response surface; the criteria citation lands with
-      the stage-2 batch.
-
-  - slug: business_continuity
-    rationale: >-
-      Interim (#931): the A1 availability series is this playbook's
-      natural home; the tsc-availability.yaml citation lands with
-      the stage-2 batch.
-
-  - slug: cryptographic_controls
-    rationale: >-
-      Interim (#931): CC6.1/CC6.7 logical-access and
-      transmission-protection criteria; citation lands with the
-      stage-2 batch.
-
-  - slug: ddos_response
-    rationale: >-
-      Interim (#931): A1 availability plus CC7 incident response;
-      citation lands with the stage-2 batch.
-
-  - slug: identity_compromise
-    rationale: >-
-      Interim (#931): CC6 logical access and CC7 incident response;
-      citation lands with the stage-2 batch.
-
-  - slug: it_security_support_agent
-    rationale: >-
-      Interim (#931): CC6.2/CC6.3 credential-lifecycle support
-      surface; citation lands with the stage-2 batch.
-
-  - slug: network_security
-    rationale: >-
-      Interim (#931): CC6.6 network-boundary protection; citation
-      lands with the stage-2 batch.
-
-  - slug: phishing_triage
-    rationale: >-
-      Interim (#931): CC7.2 anomaly detection and triage; citation
-      lands with the stage-2 batch.
-
-  - slug: ransomware_containment
-    rationale: >-
-      Interim (#931): CC7.3-7.5 incident containment and recovery;
-      citation lands with the stage-2 batch.
-
-  - slug: security_awareness_training
-    rationale: >-
-      Interim (#931): CC1.4/CC2.2 workforce competence and internal
-      communication; citation lands with the stage-2 batch.
-
-  - slug: vuln_intake
-    rationale: >-
-      Interim (#931): CC7.1 vulnerability identification intake;
-      citation lands with the stage-2 batch.
-
-  - slug: vulnerability_management
-    rationale: >-
-      Interim (#931): CC7.1 vulnerability management lifecycle;
-      citation lands with the stage-2 batch.
