@@ -48,6 +48,45 @@ Each feature has the following fields:
 Forward-public hygiene applies to every entry: community language,
 no internal infrastructure detail, no contact names, no credentials.
 
+## Maturity ladder
+
+`playbook.schema.json` gives every playbook a `maturity` field
+(`draft | experimental | stable | deprecated`) and defers its meaning
+here. The ladder:
+
+| Tier | Meaning |
+|------|---------|
+| `draft` | Scaffold exists; content is not yet trustworthy. |
+| `experimental` | Complete enough to study and compile, not yet held to the stable bar. The default for new content. |
+| `stable` | Deployment-ready: every criterion below holds. Deployers can adopt it without reading the source first. |
+| `deprecated` | Kept for compatibility; do not adopt. Entry names its replacement. |
+
+**Graduation to `stable` requires all of the following, and every
+criterion is computed by `catalog.py` or enforced by CI — graduation is
+a checklist, not a judgement call:**
+
+1. Tier A in the catalogue: cookbook entry **and** deterministic
+   primitives **and** every action step carries a real `core_body`
+   binding (`real_bindings == action_steps`, zero placeholder bodies).
+2. Zero blank predicates and zero schema errors.
+3. Compiles to all three reference targets, with committed worked
+   examples and byte-parity goldens for each.
+4. Primitives have unit coverage; the playbook's scoped test suite and
+   the hygiene linter pass at `LOW`.
+5. `content_version` reaches `1.0.0` at graduation (semver: first
+   stable interface), and the three worked examples are regenerated in
+   the same change so their embedded metadata stays byte-true.
+
+Demotion (`stable → deprecated`, or back to `experimental` when a
+regression breaks a criterion) follows the same PR + Shipped-via
+bookkeeping as graduation.
+
+Enforcement status, stated honestly: the schema note that non-stable
+content is "not compiled by default in production targets" is a
+**deployer-side contract** — the reference compilers compile whatever
+they are pointed at and carry `maturity` through as metadata for the
+deployer's gate. Nothing in this repository silently skips content.
+
 ---
 
 ## Epic CR — Core Runtime
@@ -541,6 +580,9 @@ one playbook's provenance.
     `compilers/langgraph/evidence/` + worked example under
     `examples/langgraph/it_security_support_agent/` closing the
     three-target byte-parity ring).
+  - GRADUATE — #935 (first maturity graduation: `experimental` →
+    `stable`, `content_version` 1.0.0, per the Maturity ladder; all
+    three worked examples regenerated with the new metadata).
 
 ### F-WF-SCS — Supply-chain security
 
