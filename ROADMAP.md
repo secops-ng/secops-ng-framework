@@ -1688,7 +1688,7 @@ one playbook's provenance.
 
 ### F-WF-CRYPTO-POSTURE — Cryptography and encryption posture management
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P2
 - **Rationale:** NIS2 Art. 21(2)(h) names cryptography and, where
   appropriate, encryption. This is the posture-observation half: inventory
@@ -1701,11 +1701,12 @@ one playbook's provenance.
     cookbook walkthrough (shipped).
   - Deterministic primitives under
     `content/playbooks/crypto_posture_management/primitives/` bound to the 5
-    action steps, replay-safe and offline (CORE — **outstanding**).
+    action steps, replay-safe and offline (CORE — shipped, #907).
   - Probing is read-only: no step rotates a key, reissues a certificate or
-    changes a cipher suite.
+    changes a cipher suite (shipped, #907).
   - A probe finding names the declared policy clause it contradicts, so a
-    reviewer can tell a policy gap from a drift.
+    reviewer can tell a policy gap from a drift (shipped, #907 — and the
+    EXTEND metric pair preserves the distinction on the counted findings).
 - **Sovereign-stack constraints:** Certificate and key material never enters
   an emitted artifact — findings carry references and observed parameters
   only.
@@ -1714,6 +1715,10 @@ one playbook's provenance.
 - **Source:** FOUNDATION (auditability); NIS2 Art. 21(2)(h); issue #890.
 - **Shipped via:**
   - SKELETON — #479, #482
+  - CORE — #907 (five primitives, drift vs policy gap)
+  - EXTEND — #925, closing #924 (kri.expiring_tls_certs@v1 and
+    kri.overdue_key_rotations@v1 with committed reference
+    visualisations, metric_refs wired both ways)
 
 ### F-WF-CRYPTO-CONTROLS — Cryptographic-controls lifecycle
 

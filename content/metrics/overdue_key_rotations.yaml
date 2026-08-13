@@ -1,0 +1,83 @@
+stable_id: kri.overdue_key_rotations@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Keys past the declared rotation interval
+summary: >
+  Count of key findings emitted by the crypto-posture rotation check
+  within the evaluation window — a key whose last-rotation date sits
+  outside the policy inventory's rotation-interval clause, or a key
+  the declared policy carries no rotation clause for. Residual-risk
+  indicator against NIS2 Art. 21(2)(h): the check is read-only (no
+  step rotates a key), so every finding here is rotation debt the
+  operator still owns. Each finding carries the drift/gap distinction
+  from the rotation primitive — an overdue key against a declared
+  interval is *drift*, a key with no governing interval clause is a
+  *gap* — counted together because both leave key age ungoverned.
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: "=="
+  rationale: >
+    The rotation check judges every in-scope key against the clause
+    that governs it and names the clause on the finding. A key aging
+    past its declared interval — or aging with no declared interval
+    at all — is exposure regardless of which fix (rotate, or write
+    the clause) closes it.
+thresholds:
+  - name: warn
+    comparator: ">="
+    value: 1
+    severity: warn
+  - name: breach
+    comparator: ">="
+    value: 5
+    severity: high
+measurement:
+  source: workflow
+  aggregation: count
+  formula: >
+    For each in-scope key judged by the check-key-rotation step within
+    the evaluation window, increment when the finding's verdict is
+    drift (last-rotation date outside the policy inventory's
+    rotation-interval clause as of the window end) or gap (no
+    rotation-interval clause declared for the key's class). Distinct
+    key references are counted once per window. Findings carry the
+    key reference, the observed last-rotation date and the clause_ref
+    (or its absence) — never key material, per the playbook's
+    sovereign-stack constraint. Reference visualisation: a two-panel
+    composition with the count headline and a per-key drill-down; the
+    committed reference rendering lives at
+    `content/metrics/overdue_key_rotations.viz.md` — that file is the
+    contract for the chart shape; the compile target renders the
+    executable form against operator data.
+  inputs:
+    - name: rotation_check_step
+      description: >
+        Check-key-rotation step completion recorded by the
+        crypto_posture_management playbook. Carried on the OCSF API
+        Activity event the step emits per judged key, with the
+        finding envelope (key reference, verdict, clause_ref,
+        observed last-rotation date) recorded against the case. A
+        drift or gap verdict is what increments the counter.
+      playbook_step: action--51000000-0000-4000-8000-000000000004
+      telemetry_ref: telemetry.ocsf.api_activity@v1
+      field: time
+  window:
+    duration: P30D
+    sliding: true
+telemetry_refs:
+  - telemetry.ocsf.api_activity@v1
+playbook_refs:
+  - playbook_id: playbook.crypto_posture_management@v1
+    step_id: action--51000000-0000-4000-8000-000000000004
+external_refs:
+  - name: NIS2 — Article 21(2)(h) cryptography and encryption policies
+    source: EU
+    external_id: Directive (EU) 2022/2555, Art. 21(2)(h)
+    url: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability
+  - determinism
