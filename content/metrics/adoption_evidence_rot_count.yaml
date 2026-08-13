@@ -1,0 +1,67 @@
+stable_id: kri.adoption_evidence_rot_count@v1
+content_version: 0.1.0
+maturity: experimental
+kind: kri
+title: Adoption registry rows whose evidence link no longer opens
+summary: >
+  Count of rows in the USED-BY.md adoption registry whose Evidence
+  link failed the most recent completed scheduled reachability run —
+  a non-2xx response, a login-wall redirect, or a timeout. Residual-
+  risk counterpart to kpi.attested_adoption_count@v1: the registry
+  can keep its row count while the evidence behind the rows rots,
+  and a public registry pointing at dead links reads as neglect to
+  exactly the operators it exists to convince. A firing row is a
+  small, named fix — contact the attesting organisation or open the
+  one-line PR the USED-BY.md contract already provides for.
+unit: count
+direction: lower_is_better
+target:
+  value: 0
+  comparator: "=="
+  rationale: >
+    The registry's own contract admits only links a reader without an
+    account can open. A row that stops meeting that bar either gets a
+    working link or, failing contact, the row's removal — the
+    F-ADOPT-01 reachability check exists so neither happens silently.
+thresholds:
+  - name: warn
+    comparator: ">="
+    value: 1
+    severity: warn
+  - name: breach
+    comparator: ">="
+    value: 3
+    severity: high
+measurement:
+  source: composite
+  aggregation: count
+  formula: >
+    Over the USED-BY.md registry table on the evaluation commit,
+    count the rows whose Evidence link URL received a failing verdict
+    (non-2xx, login-wall redirect, or timeout) in the most recent
+    completed run of the scheduled reachability workflow
+    (.github/workflows/used-by-link-check.yml, daily). Distinct rows
+    are counted once per run. No telemetry and no analytics enter
+    the measurement: both inputs are files and CI artifacts of this
+    repository. Reference visualisation: a two-panel composition
+    with the count headline and a per-row drill-down; the committed
+    reference rendering lives at
+    `content/metrics/adoption_evidence_rot_count.viz.md` — that file
+    is the contract for the chart shape; the compile target renders
+    the executable form at evaluation time.
+  inputs:
+    - name: registry_row
+      description: >
+        One row of the USED-BY.md registry table on the evaluation
+        commit.
+    - name: link_check_verdict
+      description: >
+        The scheduled reachability workflow's verdict for the row's
+        Evidence link URL in its most recent completed run. Only the
+        failing branch counts toward this KRI.
+  window:
+    duration: P1D
+    sliding: false
+maintainer: metrics-wg@secops-ng.org
+foundation_property:
+  - auditability
