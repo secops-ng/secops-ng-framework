@@ -1809,7 +1809,7 @@ one playbook's provenance.
 
 ### F-WF-DORA-TLPT — DORA Chapter IV resilience-testing programme
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P2
 - **Rationale:** The digital operational resilience testing programme a
   financial entity operates against its ICT risk-management framework,
@@ -1821,11 +1821,13 @@ one playbook's provenance.
     cookbook walkthrough (shipped).
   - Deterministic primitives under
     `content/playbooks/dora_tlpt_programme/primitives/` bound to the 4
-    action steps, replay-safe and offline (CORE — **outstanding**).
+    action steps, replay-safe and offline (CORE — shipped, #904).
   - The programme composes existing testing evidence rather than executing
-    tests — the framework does not run penetration tests.
+    tests — the framework does not run penetration tests (shipped, #904).
   - Scope determination is explicit: an entity out of TLPT scope produces a
-    programme record saying so, rather than an empty one.
+    programme record saying so, rather than an empty one (shipped, #904 —
+    and the EXTEND coverage KPI measures out-of-scope entities against the
+    Art. 24 cadence only).
 - **Sovereign-stack constraints:** Test findings stay in the operator's own
   store; the emitted record carries references, never finding bodies.
 - **Depends on:** F-WF-DORA-SELFASSESS (the ICT risk-management framework
@@ -1833,6 +1835,11 @@ one playbook's provenance.
 - **Source:** FOUNDATION (auditability); DORA Arts. 24–27; issue #890.
 - **Shipped via:**
   - SKELETON — #714, #715, #716
+  - CORE — #904 (four DORA Ch. IV primitives, tier B → A)
+  - EXTEND — #927, closing #926
+    (kpi.dora_resilience_test_coverage@v1 paired with
+    kri.tlpt_remediation_overdue@v1, metric_refs wired both ways,
+    stale TODO(CORE) description lead-ins stripped)
 
 ### F-WF-EIDAS2-IDV — EU Digital Identity Wallet verification lifecycle
 
