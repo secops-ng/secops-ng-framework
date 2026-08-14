@@ -4,8 +4,8 @@ Mirrors the ransomware_containment / vuln_intake n8n example tests:
 parses the canonical CACAO playbook, emits the n8n workflow JSON, and
 pins the result byte-for-byte against the committed
 ``examples/n8n/backup_recovery/workflow.n8n.json``. Adds a node-id <->
-CACAO action-id parity check, a Set-node-uplift check, and a mirror
-check against the canonical CACAO source so the ``regenerate.sh``
+CACAO action-id parity check, a Set-node-uplift check for unbound
+steps, the canonical core_body Code-node assertion, and a mirror check against the canonical CACAO source so the ``regenerate.sh``
 contract (mirror + emit) cannot drift unnoticed.
 
 This worked example opens the n8n end of the cross-target parity lane
@@ -17,6 +17,7 @@ Regenerate via::
 
     ./examples/n8n/backup_recovery/regenerate.sh
 """
+
 from __future__ import annotations
 
 import json
@@ -52,18 +53,20 @@ def test_worked_example_matches_emitter_output() -> None:
     rendered = _serialise(emit(playbook))
     expected = WORKED_EXAMPLE.read_text(encoding="utf-8")
     assert rendered == expected, (
-        "examples/n8n/backup_recovery/workflow.n8n.json drifted from the "
-        "n8n emitter output. Regenerate via "
-        "`./examples/n8n/backup_recovery/regenerate.sh` and commit the "
-        "new bytes."
+        "examples/n8n/backup_recovery/workflow.n8n.json drifted "
+        "from the n8n emitter output. Regenerate via "
+        "`./examples/n8n/backup_recovery/regenerate.sh` and "
+        "commit the new bytes."
     )
 
 
 def test_mirrored_cacao_matches_canonical_source() -> None:
     assert MIRRORED_CACAO.read_bytes() == SOURCE.read_bytes(), (
-        "examples/n8n/backup_recovery/playbook.cacao.json drifted from "
-        "the canonical content/playbooks/backup_recovery/playbook.cacao.json. "
-        "Regenerate via `./examples/n8n/backup_recovery/regenerate.sh`."
+        "examples/n8n/backup_recovery/playbook.cacao.json drifted "
+        "from the canonical "
+        "content/playbooks/backup_recovery/playbook.cacao.json. "
+        "Regenerate via "
+        "`./examples/n8n/backup_recovery/regenerate.sh`."
     )
 
 
@@ -142,11 +145,31 @@ def test_worked_example_has_valid_n8n_shape() -> None:
 
 
 def _action_without_commands_steps() -> dict[str, dict]:
-    raw = json.loads(SOURCE.read_text(encoding="utf-8"))
+    """Unbound action steps — the ones the emitter uplifts to Set nodes.
+
+    A step carrying ``x_secops_ng.core_body`` compiles to a Code node calling
+    its primitive, so the Set-node assertions scope to steps without a
+    binding; ``test_core_body_steps_emit_code_nodes`` covers the bound ones.
+    All five action steps are bound as of the CORE stage, so this selector is
+    empty and those assertions hold vacuously — deliberate, not dead: a step
+    added later without a binding must still surface its contract.
+    """
+    raw = json.loads(MIRRORED_CACAO.read_text(encoding="utf-8"))
     return {
         step_id: step
         for step_id, step in raw["workflow"].items()
-        if step.get("type") == "action" and not step.get("commands")
+        if step.get("type") == "action"
+        and not step.get("commands")
+        and not (step.get("x_secops_ng") or {}).get("core_body")
+    }
+
+
+def _core_body_steps() -> dict[str, dict]:
+    raw = json.loads(MIRRORED_CACAO.read_text(encoding="utf-8"))
+    return {
+        step_id: step
+        for step_id, step in raw["workflow"].items()
+        if (step.get("x_secops_ng") or {}).get("core_body")
     }
 
 
@@ -206,6 +229,38 @@ def test_set_nodes_surface_x_secops_ng_refs() -> None:
                 f"step {step_id!r}: x_secops_ng.{key} dropped from Set node; "
                 f"present assignments: {sorted(names)}"
             )
+
+
+def test_core_body_steps_emit_code_nodes() -> None:
+    """Steps with ``x_secops_ng.core_body`` compile to n8n Code nodes
+    rendering the primitive call (per CORE-MECH-EMIT-N8N).
+
+    Catches an emitter regression: a declared binding emitting a Set node, or
+    a Code node that imports the primitive but never calls it. It does not
+    catch deliberate de-binding — removing a ``core_body`` and regenerating
+    leaves this suite green, since the declaration is the input to the check.
+    """
+    nodes_by_id = _nodes_by_id()
+    core_steps = _core_body_steps()
+    assert core_steps, "expected at least one CORE-bound step in backup_recovery"
+    for step_id, step in core_steps.items():
+        node = nodes_by_id[step_id]
+        assert node["type"] == "n8n-nodes-base.code", (
+            f"step {step_id!r} carries core_body and must emit a Code node, "
+            f"not {node['type']!r}"
+        )
+        body = node["parameters"].get("pythonCode", "")
+        primitive = step["x_secops_ng"]["core_body"]["primitive"]
+        module, _, callable_name = primitive.rpartition(".")
+        assert f"from {module} import {callable_name}" in body, (
+            f"step {step_id!r}: Code node missing primitive import "
+            f"`from {module} import {callable_name}`"
+        )
+        out_var = step["x_secops_ng"]["core_body"]["out"]
+        assert f"{out_var} = {callable_name}(" in body, (
+            f"step {step_id!r}: Code node missing primitive call binding "
+            f"`{out_var} = {callable_name}(...)`"
+        )
 
 
 def test_only_end_step_emits_noop() -> None:
