@@ -27,10 +27,10 @@ async def ingest_support_request(raw_support_request: str, support_request_ref: 
     """
     with _TRACER.start_as_current_span(
         name='activity.action--20122012-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--20122012-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest-support-request', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_support_request'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--20122012-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest-support-request', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_support_request'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--20122012-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--20122012-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest-support-request', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_support_request'})
+            AuditRecord(span_name='activity.action--20122012-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--20122012-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest-support-request', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_support_request'})
         )
         from content.playbooks.it_security_support_agent.primitives.ingest import ingest_support_request
         __support_request_record_ref__ = ingest_support_request(raw_request=__raw_support_request__, support_request_ref=__support_request_ref__)
@@ -50,10 +50,10 @@ async def classify_request(support_request_record_ref: str, classification_verdi
     """
     with _TRACER.start_as_current_span(
         name='activity.action--20122012-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--20122012-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify-request', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_request'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--20122012-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify-request', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_request'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--20122012-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--20122012-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify-request', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_request'})
+            AuditRecord(span_name='activity.action--20122012-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--20122012-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify-request', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_request'})
         )
         from content.playbooks.it_security_support_agent.primitives.classify import classify_request
         __classification_ref__ = classify_request(support_request_record=__support_request_record_ref__, classification_verdict=__classification_verdict_input__)
@@ -73,10 +73,10 @@ async def attempt_automated_resolution(support_request_record_ref: str, classifi
     """
     with _TRACER.start_as_current_span(
         name='activity.action--20122012-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--20122012-0000-4000-8000-000000000004', 'secops_ng.step.name': 'attempt-automated-resolution', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'attempt_automated_resolution'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--20122012-0000-4000-8000-000000000004', 'secops_ng.step.name': 'attempt-automated-resolution', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'attempt_automated_resolution'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--20122012-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--20122012-0000-4000-8000-000000000004', 'secops_ng.step.name': 'attempt-automated-resolution', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'attempt_automated_resolution'})
+            AuditRecord(span_name='activity.action--20122012-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--20122012-0000-4000-8000-000000000004', 'secops_ng.step.name': 'attempt-automated-resolution', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'attempt_automated_resolution'})
         )
         from content.playbooks.it_security_support_agent.primitives.resolution import attempt_automated_resolution
         __automated_resolution_ref__ = attempt_automated_resolution(support_request_record=__support_request_record_ref__, classification=__classification_ref__, observation=__automated_resolution_observation__)
@@ -96,10 +96,10 @@ async def escalate_with_human_handoff(classification_ref: str, automated_resolut
     """
     with _TRACER.start_as_current_span(
         name='activity.action--20122012-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--20122012-0000-4000-8000-000000000005', 'secops_ng.step.name': 'escalate-with-human-handoff', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'escalate_with_human_handoff'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--20122012-0000-4000-8000-000000000005', 'secops_ng.step.name': 'escalate-with-human-handoff', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'escalate_with_human_handoff'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--20122012-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--20122012-0000-4000-8000-000000000005', 'secops_ng.step.name': 'escalate-with-human-handoff', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'escalate_with_human_handoff'})
+            AuditRecord(span_name='activity.action--20122012-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--20122012-0000-4000-8000-000000000005', 'secops_ng.step.name': 'escalate-with-human-handoff', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'escalate_with_human_handoff'})
         )
         from content.playbooks.it_security_support_agent.primitives.handoff import escalate_with_human_handoff
         __human_handoff_ref__ = escalate_with_human_handoff(classification=__classification_ref__, automated_resolution=__automated_resolution_ref__, handoff_inputs=__handoff_inputs__)
@@ -119,10 +119,10 @@ async def emit_interaction_evidence(workflow_id: str, execution_id: str, regulat
     """
     with _TRACER.start_as_current_span(
         name='activity.action--20122012-0000-4000-8000-000000000006',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--20122012-0000-4000-8000-000000000006', 'secops_ng.step.name': 'emit-interaction-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_interaction_evidence'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--20122012-0000-4000-8000-000000000006', 'secops_ng.step.name': 'emit-interaction-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_interaction_evidence'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--20122012-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--20122012-0000-4000-8000-000000000006', 'secops_ng.step.name': 'emit-interaction-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_interaction_evidence'})
+            AuditRecord(span_name='activity.action--20122012-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--20122012-0000-4000-8000-000000000006', 'secops_ng.step.name': 'emit-interaction-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_interaction_evidence'})
         )
         from content.playbooks.it_security_support_agent.primitives.artifact import build_interaction_artifact
         __interaction_artifact_ref__ = build_interaction_artifact(workflow_id=__workflow_id__, execution_id=__execution_id__, regulation_refs=__regulation_refs__, control_refs=__control_refs__, support_request_record=__support_request_record_ref__, classification_verdict=__classification_ref__, automated_resolution=__automated_resolution_ref__, handoff_envelope=__human_handoff_ref__, captured_at=__captured_at__, source_url=__source_url__, owner_role=__owner_role__, owner_assigned_at=__owner_assigned_at__, cross_border=__cross_border__)
@@ -140,8 +140,8 @@ class PlaybookItSecuritySupportAgentV1Workflow:
 
     CACAO playbook id : playbook--20122012-0000-4000-8000-000000000001
     stable_id         : playbook.it_security_support_agent@v1
-    content_version   : 0.2.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--20122012-0000-4000-8000-000000000001
     activities        : ingest_support_request, classify_request, attempt_automated_resolution, escalate_with_human_handoff, emit_interaction_evidence
     """
@@ -150,10 +150,10 @@ class PlaybookItSecuritySupportAgentV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.it_security_support_agent@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.it_security_support_agent@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0'})
+                AuditRecord(span_name='workflow.playbook.it_security_support_agent@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20122012-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.it_security_support_agent@v1'"
