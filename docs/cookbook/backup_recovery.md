@@ -89,13 +89,19 @@ success-branch attestation, with the drill-result marker distinguishing
 "integrity check failed, drill not executed" from "drill executed,
 observed RTO / RPO recorded".
 
-> The playbook status is SKELETON on the workflow-local README: the
-> control and regulatory overlay is pinned in `mappings.yaml`, the
-> n8n reference emitter ships a committed `workflow.n8n.json` today,
-> and the Temporal / LangGraph siblings ship deterministic emitter
-> output with `NotImplementedError` activity / tool bodies pending
-> the per-target CORE cards. Cross-target byte-parity goldens land
-> under `tests/examples/backup_recovery/` in the same wave.
+> CORE landed for this playbook: all five action steps carry
+> `core_body` bindings to the pure primitives under
+> `content/playbooks/backup_recovery/primitives/` (drill-trigger
+> resolution, integrity evaluation, restore-drill evaluation,
+> attestation build, notification composition), the integrity
+> branch condition is wired (`__integrity_ok__`), and the three
+> worked examples compile from the bound playbook with committed
+> goldens. The primitives are reducers over operator-reported
+> facts — none probes a system, none reads a clock (the drill
+> window is the clock) — so replays are byte-stable by
+> construction. The EXTEND wave pinned the catalogue metrics
+> (drill-attestation freshness, integrity-failure rate and count)
+> at both the step and playbook level.
 
 ## 3. Lifecycle contract — the five states
 
@@ -308,16 +314,18 @@ metrics read.
 ### 5.1 n8n — operator-edited Set rows over the drill topology
 
 `examples/n8n/backup_recovery/workflow.n8n.json` carries the CACAO
-topology as eight n8n nodes (`manualTrigger`, five `set` nodes, one
+topology as eight n8n nodes (`manualTrigger`, five `code` nodes, one
 `if`, one `noOp`), with node ids preserving the CACAO step ids
-verbatim. The five action steps emit `n8n-nodes-base.set` nodes
-carrying the CACAO I/O contract as editable assignment rows plus the
-`x_secops_ng` reference bundles. The single `if-condition` node
-(`backup integrity ok?`) emits an `n8n-nodes-base.if` node with a
-placeholder condition the operator must wire to the upstream
-`out.integrity_ok` field. The lossy translation is recorded in
-`meta.secops_ng_notes` so the integrator sees exactly which seams
-need attention.
+verbatim. Since CORE, the five action steps emit
+`n8n-nodes-base.code` nodes in the canonical form: each node body
+invokes its bound primitive under
+`content.playbooks.backup_recovery.primitives.*` with the CACAO I/O
+contract mapped onto workflow variables, alongside the
+`x_secops_ng` reference bundles. The `backup integrity ok?` node
+emits an `n8n-nodes-base.if` whose condition is wired to the
+upstream `integrity_ok` output — no placeholder remains. Whatever
+translation seams persist are recorded in `meta.secops_ng_notes`
+so the integrator sees them explicitly.
 
 Operators bind the Set rows to their connectors:
 
@@ -351,18 +359,20 @@ inactive by default — review and bind the Set rows to your own
 connectors before activating. The emitted workflow is a *snapshot of
 intent*, not a runnable playbook.
 
-### 5.2 Temporal — `@activity.defn` bodies (SKELETON stub)
+### 5.2 Temporal — `@activity.defn` bodies (bound since CORE)
 
 `examples/temporal/backup_recovery/workflow.temporal.py` is a
 standard Temporal worker module: one `@workflow.defn` class and one
-`@activity.defn` function per CACAO action, with the five action
-activities documenting their operator-bound seam (trigger resolution,
-integrity verification, restore execution, attestation emission,
-continuity-owner notification). The committed stub raises
-`NotImplementedError` in the activity bodies pending the CORE-TEMPORAL
-sibling card that wires the deterministic activity implementations
-into the Temporal target; operators can drop the module next to their
-worker today to see the topology and the activity signatures.
+`@activity.defn` function per CACAO action. Since CORE the five
+action activities call their bound primitives under
+`content.playbooks.backup_recovery.primitives.*` — the deterministic
+policy runs inside the activity; what remains
+`NotImplementedError` is only the operator-integration seam the
+emitter cannot know (feeding the external observation dictionaries
+from your scheduler, backup store, and drill target into the
+activity inputs, and the workflow-level control-flow wiring the
+module header points at). Operators can drop the module next to
+their worker today and wire those seams.
 
 Temporal is the natural fit for the drill-window discipline: each
 per-drill execution becomes one workflow run; the drill window
@@ -372,7 +382,7 @@ integrity or drill activity get first-class Temporal semantics
 against the same Temporal event history re-derives the same
 attestation payload once the activity bodies are wired.
 
-### 5.3 LangGraph — `@tool` wrappers + agentic-extension hook (SKELETON stub)
+### 5.3 LangGraph — `@tool` wrappers + agentic-extension hook (bound since CORE)
 
 `examples/langgraph/backup_recovery/state_bindings.py` carries the
 `TypedDict` state and the `@tool`-decorated action wrappers.
@@ -380,11 +390,12 @@ attestation payload once the activity bodies are wired.
 conditional edge on the integrity outcome, linear edges through
 evidence capture and notify); `assemble.py` is the hand-written
 reference assembly that wires the GraphSpec + bindings into a
-`langgraph.graph.StateGraph`. The committed `state_bindings.py` is a
-generated stub: each tool's docstring names the operator-bound seam
-it discharges and the body raises `NotImplementedError` until the
-CORE-LANGGRAPH sibling card wires the deterministic tool
-implementations into the LangGraph target.
+`langgraph.graph.StateGraph`. Since CORE each bound tool body calls
+its primitive under
+`content.playbooks.backup_recovery.primitives.*`; the remaining
+`NotImplementedError` marks only the operator-integration seam
+(supplying the external observation dictionaries from your own
+estate into the graph state).
 
 LangGraph is the agentic target — an operator who wants to layer an
 LM-driven notification summariser on top of the `notify-continuity-owner`
