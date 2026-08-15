@@ -1,0 +1,183 @@
+# ISO 27001 orphan-CI assertion skip manifest.
+#
+# Used by `tools.lint_playbook_orphans --framework iso27001` (and the
+# nightly per-framework workflow) to allow a finalized playbook to
+# stay without an inbound `playbook_refs:` citation under
+# `content/mappings/iso27001/` without tripping the assertion.
+#
+# Each entry is a deliberate, audited exclusion. Removing a slug
+# re-arms the assertion against it immediately; an interim entry
+# names the issue that owes its citation and leaves in the same PR
+# that lands it.
+#
+# F-MAP-ORPHAN-PARITY package 2 state (armed 2026-08-15): 23
+# playbooks already carried Annex A citations; the 25 entries below
+# split into 14 durable exclusions (regulatory duty ledgers and
+# roll-ups whose operational surfaces the crosswalk already cites)
+# and 11 interim entries with genuine Annex A surfaces owed by #943.
+
+skip:
+  # ── Durable exclusions ───────────────────────────────────────────
+  # Regulation-specific duty ledgers anchor on their home regime;
+  # ISO/IEC 27001 Annex A has no control that attests EU-statutory
+  # duty discharge, and the underlying operational surfaces (incident
+  # handling, vulnerability management, continuity, training) are
+  # carried by the operational playbooks the Annex A entries already
+  # cite. Mirrors the soc2 manifest's precedent.
+
+  - slug: cra_cvd
+    rationale: >-
+      CRA Art. 14 coordinated-vulnerability-disclosure duty ledger.
+      The Annex A vulnerability surface (A.8.8) anchors on the
+      operational vulnerability lifecycle (interim entries below);
+      the CRA notification clock has no Annex A counterpart. Home
+      axis: content/mappings/cra/.
+
+  - slug: cra_srp_notify
+    rationale: >-
+      CRA single-reporting-platform notification composition — an
+      EU-statutory reporting duty with no Annex A control
+      counterpart. Incident handling itself is A.5.24-27 surface
+      carried by the operational playbooks. Home axis:
+      content/mappings/cra/.
+
+  - slug: dora_major_incident_reporting
+    rationale: >-
+      DORA Art. 19 financial-regulator reporting clock; no Annex A
+      counterpart. Home axis: content/mappings/dora/.
+
+  - slug: dora_tlpt_programme
+    rationale: >-
+      DORA Ch. IV TLPT programme composition. Annex A's testing
+      surface (A.5.35-36 review/compliance, A.8.29 security testing)
+      anchors on control-effectiveness playbooks already cited; the
+      TLPT regulatory record is DORA-specific. Home axis:
+      content/mappings/dora/.
+
+  - slug: dora_tpr_management
+    rationale: >-
+      DORA Ch. V ICT third-party register lifecycle. The Annex A
+      supplier surface (A.5.19-22) anchors on the operational vendor
+      playbooks already cited; the register-of-information duty is
+      DORA-specific. Home axis: content/mappings/dora/.
+
+  - slug: dora_ict_risk_selfassess
+    rationale: >-
+      DORA Chapter II whole-framework self-assessment roll-up
+      operating on section atoms and attestation identifiers. The
+      ISO management-clause counterpart (9.1 evaluation) is an
+      ISMS-clause obligation, not an Annex A control; the roll-up
+      anchors on its home regime. Home axis: content/mappings/dora/.
+
+  - slug: eidas2_identity_verification
+    rationale: >-
+      eIDAS2 EUDI-wallet verification lifecycle. The Annex A identity
+      surface (A.5.16-18) anchors on the operational identity
+      playbooks (interim entries below and already-cited ones); the
+      wallet-regulation onboarding flow is regime-specific.
+
+  - slug: eu_ai_act_risk_management
+    rationale: >-
+      EU AI Act Art. 9 risk-management cycle — AI-regulatory duty
+      ledger; no Annex A control attests AI-Act conformity. Home
+      axis: content/mappings/eu_ai_act/.
+
+  - slug: eu_ai_act_deployer_obligations
+    rationale: >-
+      EU AI Act Art. 26 deployer-duty discharge — same reasoning as
+      eu_ai_act_risk_management. Home axis:
+      content/mappings/eu_ai_act/.
+
+  - slug: ai_human_oversight
+    rationale: >-
+      EU AI Act Art. 14 human-oversight lifecycle and GDPR Art. 22
+      review anchor. AI-decision oversight is not an Annex A control
+      object; the competence surface it touches is A.6.3, carried by
+      the training playbooks. Home axes: content/mappings/eu_ai_act/,
+      content/mappings/gdpr/.
+
+  - slug: nis2_art20_governance
+    rationale: >-
+      NIS2 Art. 20 management-body governance ledger. The Annex A
+      governance surface (A.5.1-5.4) anchors on the policy and
+      review playbooks already cited; the NIS2 management-approval
+      duty is regime-specific. Home axis: content/mappings/nis2/.
+
+  - slug: nis2_self_assessment
+    rationale: >-
+      NIS2 measure self-assessment roll-up operating on section
+      atoms; same reasoning as dora_ict_risk_selfassess — the ISO
+      counterpart is an ISMS management clause, not an Annex A
+      control. Home axis: content/mappings/nis2/.
+
+  - slug: soc2_evidence_collector
+    rationale: >-
+      SOC 2 TSC readiness roll-up; anchors on its home axis
+      (content/mappings/soc2/, CC4.1 — CI-verified since #932).
+      Mirrors the executive_metrics roll-up precedent.
+
+  - slug: executive_metrics
+    rationale: >-
+      Reporting roll-up; surfaces via metric_refs indirection across
+      regimes rather than via playbook_refs — the audited convention
+      for reporting playbooks (see the gdpr manifest's founding
+      entry). No Annex A control anchors a board-reporting
+      aggregation as an operational object.
+
+  # ── Interim entries: real Annex A surfaces, citations owed by #943 ──
+
+  - slug: agentic_threat_response
+    rationale: >-
+      Interim (#943): A.5.24-A.5.26 incident management surface;
+      citation lands with the follow-up batch.
+
+  - slug: business_continuity
+    rationale: >-
+      Interim (#943): A.5.29/A.5.30 ICT continuity; citation lands
+      with the follow-up batch.
+
+  - slug: cryptographic_controls
+    rationale: >-
+      Interim (#943): A.8.24 use of cryptography; citation lands
+      with the follow-up batch.
+
+  - slug: ddos_response
+    rationale: >-
+      Interim (#943): A.5.24 incident handling plus A.8.6 capacity
+      management; citation lands with the follow-up batch.
+
+  - slug: identity_compromise
+    rationale: >-
+      Interim (#943): A.5.24-A.5.27 incident lifecycle plus A.8.16
+      monitoring; citation lands with the follow-up batch.
+
+  - slug: it_security_support_agent
+    rationale: >-
+      Interim (#943): A.5.16-A.5.18 identity and access lifecycle
+      support; citation lands with the follow-up batch.
+
+  - slug: network_security
+    rationale: >-
+      Interim (#943): A.8.20-A.8.22 network security controls;
+      citation lands with the follow-up batch.
+
+  - slug: phishing_triage
+    rationale: >-
+      Interim (#943): A.8.16 monitoring plus A.5.24 incident
+      intake; citation lands with the follow-up batch.
+
+  - slug: ransomware_containment
+    rationale: >-
+      Interim (#943): A.5.24-A.5.27 incident management and
+      recovery; citation lands with the follow-up batch.
+
+  - slug: security_awareness_training
+    rationale: >-
+      Interim (#943): A.6.3 information security awareness,
+      education and training; citation lands with the follow-up
+      batch.
+
+  - slug: vulnerability_management
+    rationale: >-
+      Interim (#943): A.8.8 management of technical
+      vulnerabilities; citation lands with the follow-up batch.
