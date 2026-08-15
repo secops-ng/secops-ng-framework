@@ -2877,16 +2877,19 @@ component definition.
 
 ### F-MAP-ORPHAN-PARITY — orphan-CI parity for the non-EU mapping axes
 
-- **Status:** In Progress
-- **Shipped so far:** stage 1 (#932, advancing #931) — the soc2 axis
-  armed born-clean: SUPPORTED_FRAMEWORKS + nightly matrix leg +
-  per-axis test module; audited initial manifest (26 cited, 1 newly
-  cited, 9 durable exclusions, 12 interim entries owed by #931);
+- **Status:** Shipped
+- **Shipped:** stage 1 (#932) — the soc2 axis armed born-clean, with
   soc2_evidence_collector's missing home-axis citation authored
   (CC4.1) and pinned by test, making the EU manifests' "closed on
-  the home axis" rationales CI-verified. Stages 2+ (soc2 CC
-  citations, iso27001/nist_csf, d3fend decision, per-axis
-  catalogue-KRI criterion review) tracked in #931.
+  the home axis" rationales CI-verified; stage 2 (#933) — the twelve
+  soc2 interim skips became real TSC citations; package 3 (#934) —
+  the d3fend exclusion documented per the accepted option-A memo,
+  card criteria amended; package 2 (#944, closing #931) — the
+  iso27001 and nist_csf axes armed born-clean (25 and 12 audited
+  entries), nightly matrix at eight legs, and the repo-wide
+  invariant holding: every finalized playbook on every axis is
+  either cited or an audited, named decision. Follow-up citations
+  for the fifteen interim entries tracked in #943.
 - **Priority:** P2
 - **Goal:** G-02 (a mapping axis without the orphan device cannot
   claim coverage — it can only claim files), G-08 (the device class
