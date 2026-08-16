@@ -27,10 +27,10 @@ async def inventory_crypto_policy(crypto_scope: str, policy_clauses: dict[str, o
     """
     with _TRACER.start_as_current_span(
         name='activity.action--51000000-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--51000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'inventory crypto policy', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'inventory_crypto_policy'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--51000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'inventory crypto policy', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'inventory_crypto_policy'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--51000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--51000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'inventory crypto policy', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'inventory_crypto_policy'})
+            AuditRecord(span_name='activity.action--51000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--51000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'inventory crypto policy', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'inventory_crypto_policy'})
         )
         from content.playbooks.crypto_posture_management.primitives.policy import inventory_crypto_policy
         __policy_inventory_id__ = inventory_crypto_policy(posture_window=__posture_window__, crypto_scope=__crypto_scope__, policy_clauses=__policy_clauses__, scoped_assets=__scoped_assets__)
@@ -50,10 +50,10 @@ async def probe_cert_posture(accepted_cipher_suites: dict[str, object], certific
     """
     with _TRACER.start_as_current_span(
         name='activity.action--51000000-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--51000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'probe cert posture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'probe_cert_posture'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--51000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'probe cert posture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'probe_cert_posture'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--51000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--51000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'probe cert posture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'probe_cert_posture'})
+            AuditRecord(span_name='activity.action--51000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--51000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'probe cert posture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'probe_cert_posture'})
         )
         from content.playbooks.crypto_posture_management.primitives.certificates import probe_cert_posture
         __cert_posture_id__ = probe_cert_posture(crypto_scope=__crypto_scope__, policy_inventory=__policy_inventory_id__, certificate_observations=__certificate_observations__, accepted_cipher_suites=__accepted_cipher_suites__)
@@ -73,10 +73,10 @@ async def check_key_rotation(crypto_scope: str, key_records: dict[str, object], 
     """
     with _TRACER.start_as_current_span(
         name='activity.action--51000000-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--51000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'check key rotation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'check_key_rotation'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--51000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'check key rotation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'check_key_rotation'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--51000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--51000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'check key rotation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'check_key_rotation'})
+            AuditRecord(span_name='activity.action--51000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--51000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'check key rotation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'check_key_rotation'})
         )
         from content.playbooks.crypto_posture_management.primitives.rotation import check_key_rotation
         __rotation_status__ = check_key_rotation(crypto_scope=__crypto_scope__, policy_inventory=__policy_inventory_id__, key_records=__key_records__)
@@ -96,10 +96,10 @@ async def evidence_capture(captured_at: str, cert_posture_id: dict[str, object],
     """
     with _TRACER.start_as_current_span(
         name='activity.action--51000000-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--51000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'evidence capture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evidence_capture'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--51000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'evidence capture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evidence_capture'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--51000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--51000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'evidence capture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evidence_capture'})
+            AuditRecord(span_name='activity.action--51000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--51000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'evidence capture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evidence_capture'})
         )
         from content.playbooks.crypto_posture_management.primitives.evidence import capture_crypto_evidence
         __attestation_id__ = capture_crypto_evidence(policy_inventory=__policy_inventory_id__, cert_posture=__cert_posture_id__, rotation_status=__rotation_status__, posture_window=__posture_window__, owner_role=__crypto_owner_role__, workflow_id=__workflow_id__, execution_id=__execution_id__, captured_at=__captured_at__)
@@ -119,10 +119,10 @@ async def notify_crypto_owner(attestation_id: dict[str, object], crypto_owner_ro
     """
     with _TRACER.start_as_current_span(
         name='activity.action--51000000-0000-4000-8000-000000000006',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--51000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'notify crypto owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_crypto_owner'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--51000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'notify crypto owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_crypto_owner'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--51000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--51000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'notify crypto owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_crypto_owner'})
+            AuditRecord(span_name='activity.action--51000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--51000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'notify crypto owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_crypto_owner'})
         )
         from content.playbooks.crypto_posture_management.primitives.notify import plan_crypto_owner_notification
         __notification_plan__ = plan_crypto_owner_notification(attestation=__attestation_id__, crypto_scope=__crypto_scope__, owner_role=__crypto_owner_role__, channel_ref=__notification_channel_ref__)
@@ -140,8 +140,8 @@ class PlaybookCryptoPostureManagementV1Workflow:
 
     CACAO playbook id : playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7
     stable_id         : playbook.crypto_posture_management@v1
-    content_version   : 0.2.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--51000000-0000-4000-8000-000000000001
     activities        : inventory_crypto_policy, probe_cert_posture, check_key_rotation, evidence_capture, notify_crypto_owner
     """
@@ -150,10 +150,10 @@ class PlaybookCryptoPostureManagementV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.crypto_posture_management@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '0.2.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.crypto_posture_management@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '0.2.0'})
+                AuditRecord(span_name='workflow.playbook.crypto_posture_management@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.crypto_posture_management@v1'"

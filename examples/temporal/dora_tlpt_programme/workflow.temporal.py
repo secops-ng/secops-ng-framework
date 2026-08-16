@@ -27,10 +27,10 @@ async def define_dort_scope(asset_register: dict[str, object], critical_function
     """
     with _TRACER.start_as_current_span(
         name='activity.action--55000000-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--55000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'define DORT scope', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'define_dort_scope'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--55000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'define DORT scope', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'define_dort_scope'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--55000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--55000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'define DORT scope', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'define_dort_scope'})
+            AuditRecord(span_name='activity.action--55000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--55000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'define DORT scope', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'define_dort_scope'})
         )
         from content.playbooks.dora_tlpt_programme.primitives.scope import define_dort_scope
         __dort_scope_catalogue__ = define_dort_scope(testing_window=__testing_window__, critical_functions=__critical_functions__, asset_register=__asset_register__, third_party_register=__third_party_register__)
@@ -50,10 +50,10 @@ async def tlpt_trigger_and_planning_gate(authority_notification_ref: str, declar
     """
     with _TRACER.start_as_current_span(
         name='activity.action--55000000-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--55000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'TLPT trigger and planning gate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'tlpt_trigger_and_planning_gate'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--55000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'TLPT trigger and planning gate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'tlpt_trigger_and_planning_gate'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--55000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--55000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'TLPT trigger and planning gate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'tlpt_trigger_and_planning_gate'})
+            AuditRecord(span_name='activity.action--55000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--55000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'TLPT trigger and planning gate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'tlpt_trigger_and_planning_gate'})
         )
         from content.playbooks.dora_tlpt_programme.primitives.trigger import evaluate_tlpt_trigger
         __tlpt_trigger_decision__ = evaluate_tlpt_trigger(dort_scope=__dort_scope_catalogue__, entity_significance_tier=__entity_significance_tier__, tlpt_identified=__tlpt_identified__, threat_intelligence_source=__threat_intelligence_source__, tester_posture=__tester_posture__, authority_notification_ref=__authority_notification_ref__, last_tlpt_completed_on=__last_tlpt_completed_on__, declared_cadence_months=__declared_cadence_months__)
@@ -73,10 +73,10 @@ async def red_team_scoping_approval(dort_scope_catalogue: dict[str, object], sco
     """
     with _TRACER.start_as_current_span(
         name='activity.action--55000000-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--55000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'red-team scoping approval', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'red_team_scoping_approval'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--55000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'red-team scoping approval', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'red_team_scoping_approval'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--55000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--55000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'red-team scoping approval', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'red_team_scoping_approval'})
+            AuditRecord(span_name='activity.action--55000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--55000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'red-team scoping approval', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'red_team_scoping_approval'})
         )
         from content.playbooks.dora_tlpt_programme.primitives.scoping import approve_red_team_scoping
         __red_team_scoping_id__ = approve_red_team_scoping(dort_scope=__dort_scope_catalogue__, tlpt_trigger=__tlpt_trigger_decision__, tester_ref=__tester_ref__, outcome=__scoping_outcome__, tester_certification_ref=__tester_certification_ref__, tester_independence_attestation_ref=__tester_independence_attestation_ref__, third_party_carve_outs=__third_party_carve_outs__)
@@ -96,10 +96,10 @@ async def remediation_tracking(captured_at: str, dort_scope_catalogue: dict[str,
     """
     with _TRACER.start_as_current_span(
         name='activity.action--55000000-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--55000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'remediation tracking', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'remediation_tracking'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--55000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'remediation tracking', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'remediation_tracking'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--55000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--55000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'remediation tracking', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'remediation_tracking'})
+            AuditRecord(span_name='activity.action--55000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--55000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'remediation tracking', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'remediation_tracking'})
         )
         from content.playbooks.dora_tlpt_programme.primitives.remediation import track_remediation
         __remediation_attestation_id__ = track_remediation(dort_scope=__dort_scope_catalogue__, red_team_scoping=__red_team_scoping_id__, findings=__engagement_findings__, severity_rubric=__severity_rubric__, workflow_id=__workflow_id__, execution_id=__execution_id__, captured_at=__captured_at__)
@@ -117,8 +117,8 @@ class PlaybookDoraTlptProgrammeV1Workflow:
 
     CACAO playbook id : playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f
     stable_id         : playbook.dora_tlpt_programme@v1
-    content_version   : 0.2.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--55000000-0000-4000-8000-000000000001
     activities        : define_dort_scope, tlpt_trigger_and_planning_gate, red_team_scoping_approval, remediation_tracking
     """
@@ -127,10 +127,10 @@ class PlaybookDoraTlptProgrammeV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.dora_tlpt_programme@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f', 'secops_ng.playbook.version': '0.2.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.dora_tlpt_programme@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f', 'secops_ng.playbook.version': '0.2.0'})
+                AuditRecord(span_name='workflow.playbook.dora_tlpt_programme@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--55d0e1f2-3a4b-4c5d-8e6f-1a2b3c4d5e6f', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.dora_tlpt_programme@v1'"
