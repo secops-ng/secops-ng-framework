@@ -31,14 +31,20 @@ cp .env.example .env  # local only; never commit this file
 Sanity-check that the toolchain works on your machine:
 
 ```bash
-pytest            # unit + smoke tests
-ruff check .      # lint
-ruff format .     # auto-format
-mypy src          # type-check
+python -m pytest                                   # full suite
+python -m tools.hygiene_linter --min-severity LOW  # public-bar linter
 ```
 
-CI runs the same set on every pull request. Green locally is the
-baseline; green in CI is the contract.
+Keep the virtualenv's `bin/` on your `PATH` when running the suite
+(activating it as above does this): the per-example `regenerate.sh`
+scripts invoke bare `python`, and without it a block of observability
+tests fails spuriously.
+
+For a docs- or content-only change, the hygiene linter plus the pytest
+modules scoped to the surface you touched is a reasonable local pass —
+CI runs the full suite and the guard workflows on every pull request
+either way. Green locally is the baseline; green in CI is the
+contract.
 
 ## 2. Read SOUL.md before you write anything public-facing
 
