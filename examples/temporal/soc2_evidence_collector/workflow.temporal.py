@@ -27,10 +27,10 @@ async def collect_criteria_atoms() -> str:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--b7c2e5a1-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--b7c2e5a1-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--b7c2e5a1-0000-4000-8000-000000000002', 'secops_ng.step.name': 'collect criteria atoms', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'collect_criteria_atoms'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--b7c2e5a1-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--b7c2e5a1-0000-4000-8000-000000000002', 'secops_ng.step.name': 'collect criteria atoms', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'collect_criteria_atoms'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--b7c2e5a1-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--b7c2e5a1-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--b7c2e5a1-0000-4000-8000-000000000002', 'secops_ng.step.name': 'collect criteria atoms', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'collect_criteria_atoms'})
+            AuditRecord(span_name='activity.action--b7c2e5a1-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--b7c2e5a1-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--b7c2e5a1-0000-4000-8000-000000000002', 'secops_ng.step.name': 'collect criteria atoms', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'collect_criteria_atoms'})
         )
         from content.playbooks.soc2_evidence_collector.primitives.criteria import collect_criteria_atoms
         __criteria_atoms__ = collect_criteria_atoms(crosswalk_entries=__crosswalk_entries__)
@@ -50,10 +50,10 @@ async def map_evidence_to_criteria(assessment_window: str, evidence_refs: dict[s
     """
     with _TRACER.start_as_current_span(
         name='activity.action--b7c2e5a1-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--b7c2e5a1-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--b7c2e5a1-0000-4000-8000-000000000003', 'secops_ng.step.name': 'map evidence to criteria', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'map_evidence_to_criteria'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--b7c2e5a1-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--b7c2e5a1-0000-4000-8000-000000000003', 'secops_ng.step.name': 'map evidence to criteria', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'map_evidence_to_criteria'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--b7c2e5a1-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--b7c2e5a1-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--b7c2e5a1-0000-4000-8000-000000000003', 'secops_ng.step.name': 'map evidence to criteria', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'map_evidence_to_criteria'})
+            AuditRecord(span_name='activity.action--b7c2e5a1-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--b7c2e5a1-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--b7c2e5a1-0000-4000-8000-000000000003', 'secops_ng.step.name': 'map evidence to criteria', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'map_evidence_to_criteria'})
         )
         from content.playbooks.soc2_evidence_collector.primitives.mapping import map_evidence_to_criteria
         __criteria_mapping__ = map_evidence_to_criteria(atoms=__criteria_atoms__, evidence_refs=__evidence_refs__)
@@ -73,10 +73,10 @@ async def score_per_criterion_coverage(criteria_atoms: str, criteria_mapping: st
     """
     with _TRACER.start_as_current_span(
         name='activity.action--b7c2e5a1-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--b7c2e5a1-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--b7c2e5a1-0000-4000-8000-000000000004', 'secops_ng.step.name': 'score per-criterion coverage', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'score_per_criterion_coverage'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--b7c2e5a1-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--b7c2e5a1-0000-4000-8000-000000000004', 'secops_ng.step.name': 'score per-criterion coverage', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'score_per_criterion_coverage'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--b7c2e5a1-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--b7c2e5a1-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--b7c2e5a1-0000-4000-8000-000000000004', 'secops_ng.step.name': 'score per-criterion coverage', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'score_per_criterion_coverage'})
+            AuditRecord(span_name='activity.action--b7c2e5a1-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--b7c2e5a1-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--b7c2e5a1-0000-4000-8000-000000000004', 'secops_ng.step.name': 'score per-criterion coverage', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'score_per_criterion_coverage'})
         )
         from content.playbooks.soc2_evidence_collector.primitives.scoring import score_criterion_coverage
         __coverage_scoring__ = score_criterion_coverage(atoms=__criteria_atoms__, mapping=__criteria_mapping__)
@@ -96,10 +96,10 @@ async def report_readiness_attestation(assessment_window: str, criteria_atoms: s
     """
     with _TRACER.start_as_current_span(
         name='activity.action--b7c2e5a1-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--b7c2e5a1-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--b7c2e5a1-0000-4000-8000-000000000005', 'secops_ng.step.name': 'report readiness attestation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'report_readiness_attestation'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--b7c2e5a1-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--b7c2e5a1-0000-4000-8000-000000000005', 'secops_ng.step.name': 'report readiness attestation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'report_readiness_attestation'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--b7c2e5a1-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--b7c2e5a1-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--b7c2e5a1-0000-4000-8000-000000000005', 'secops_ng.step.name': 'report readiness attestation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'report_readiness_attestation'})
+            AuditRecord(span_name='activity.action--b7c2e5a1-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--b7c2e5a1-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--b7c2e5a1-0000-4000-8000-000000000005', 'secops_ng.step.name': 'report readiness attestation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'report_readiness_attestation'})
         )
         from content.playbooks.soc2_evidence_collector.primitives.attestation import build_readiness_attestation
         __attestation_id__ = build_readiness_attestation(workflow_id=__workflow_id__, execution_id=__execution_id__, captured_at=__captured_at__, assessment_window=__assessment_window__, scoring=__coverage_scoring__, owner_role=__owner_role__)
@@ -117,8 +117,8 @@ class PlaybookSoc2EvidenceCollectorV1Workflow:
 
     CACAO playbook id : playbook--b7c2e5a1-0000-4000-8000-000000000000
     stable_id         : playbook.soc2_evidence_collector@v1
-    content_version   : 0.1.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--b7c2e5a1-0000-4000-8000-000000000001
     activities        : collect_criteria_atoms, map_evidence_to_criteria, score_per_criterion_coverage, report_readiness_attestation
     """
@@ -127,10 +127,10 @@ class PlaybookSoc2EvidenceCollectorV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.soc2_evidence_collector@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--b7c2e5a1-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.1.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--b7c2e5a1-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.soc2_evidence_collector@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--b7c2e5a1-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.1.0'})
+                AuditRecord(span_name='workflow.playbook.soc2_evidence_collector@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--b7c2e5a1-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.soc2_evidence_collector@v1'"
