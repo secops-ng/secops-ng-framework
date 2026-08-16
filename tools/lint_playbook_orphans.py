@@ -87,9 +87,15 @@ SUPPORTED_FRAMEWORKS: tuple[str, ...] = (
     # soc2 was the sharpest gap — the EU manifests' own skip
     # rationales cite "closed on the home axis under
     # content/mappings/soc2/", a claim nothing verified until this
-    # axis was armed. iso27001 / nist_csf follow in later stages;
-    # d3fend gets a documented decision, not an assumption.
+    # axis was armed.
     "soc2",
+    # Package 2 (closing the parity card): the remaining mapping
+    # axes. d3fend is deliberately absent — its rows are
+    # technique/clause/control triples with no inbound playbook
+    # citations by design; the documented exclusion lives in
+    # content/mappings/d3fend/README.md (#931 option A).
+    "iso27001",
+    "nist_csf",
 )
 
 
