@@ -27,10 +27,10 @@ async def ingest_sbom(sbom_bytes: str, sbom_format: str) -> str:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--01a17a07-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a07-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a07-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest-sbom', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_sbom'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a07-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a07-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest-sbom', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_sbom'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--01a17a07-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a07-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a07-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest-sbom', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_sbom'})
+            AuditRecord(span_name='activity.action--01a17a07-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a07-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a07-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest-sbom', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_sbom'})
         )
         from content.playbooks.codebase_vuln_management.primitives.sbom import pin_sbom_content_hash
         __sbom_content_hash__ = pin_sbom_content_hash(sbom_bytes=__sbom_bytes__, sbom_format=__sbom_format__)
@@ -50,10 +50,10 @@ async def review_deps(raw_findings: str, sbom_content_hash: str) -> str:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--01a17a07-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a07-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a07-0000-4000-8000-000000000003', 'secops_ng.step.name': 'review-deps', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'review_deps'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a07-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a07-0000-4000-8000-000000000003', 'secops_ng.step.name': 'review-deps', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'review_deps'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--01a17a07-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a07-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a07-0000-4000-8000-000000000003', 'secops_ng.step.name': 'review-deps', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'review_deps'})
+            AuditRecord(span_name='activity.action--01a17a07-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a07-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a07-0000-4000-8000-000000000003', 'secops_ng.step.name': 'review-deps', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'review_deps'})
         )
         from content.playbooks.codebase_vuln_management.primitives.sbom import normalise_findings
         __findings_ref__ = normalise_findings(raw_findings=__raw_findings__, sbom_content_hash=__sbom_content_hash__)
@@ -73,10 +73,10 @@ async def assess_disclosure(finding_severity: str, awareness_at: str, cvd_policy
     """
     with _TRACER.start_as_current_span(
         name='activity.action--01a17a07-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a07-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a07-0000-4000-8000-000000000004', 'secops_ng.step.name': 'assess-disclosure', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_disclosure'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a07-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a07-0000-4000-8000-000000000004', 'secops_ng.step.name': 'assess-disclosure', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_disclosure'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--01a17a07-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a07-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a07-0000-4000-8000-000000000004', 'secops_ng.step.name': 'assess-disclosure', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_disclosure'})
+            AuditRecord(span_name='activity.action--01a17a07-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a07-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a07-0000-4000-8000-000000000004', 'secops_ng.step.name': 'assess-disclosure', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_disclosure'})
         )
         from content.playbooks.codebase_vuln_management.primitives.disclosure_window import resolve_disclosure_window
         __disclosure_window__ = resolve_disclosure_window(severity=__finding_severity__, awareness_at=__awareness_at__, cvd_policy=__cvd_policy__)
@@ -96,10 +96,10 @@ async def track_timeline(finding: str, disclosure_window: str, captured_at: str,
     """
     with _TRACER.start_as_current_span(
         name='activity.action--01a17a07-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a07-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a07-0000-4000-8000-000000000005', 'secops_ng.step.name': 'track-timeline', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'track_timeline'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a07-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a07-0000-4000-8000-000000000005', 'secops_ng.step.name': 'track-timeline', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'track_timeline'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--01a17a07-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a07-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a07-0000-4000-8000-000000000005', 'secops_ng.step.name': 'track-timeline', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'track_timeline'})
+            AuditRecord(span_name='activity.action--01a17a07-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a07-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a07-0000-4000-8000-000000000005', 'secops_ng.step.name': 'track-timeline', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'track_timeline'})
         )
         from content.playbooks.codebase_vuln_management.primitives.timeline import build_disclosure_timeline_stub
         __disclosure_timeline_record__ = build_disclosure_timeline_stub(finding=__finding__, disclosure_window=__disclosure_window__, captured_at=__captured_at__, ref_viz=__ref_viz__, source_data=__source_data__)
@@ -117,8 +117,8 @@ class PlaybookCodebaseVulnManagementV1Workflow:
 
     CACAO playbook id : playbook--01a17a07-0000-4000-8000-000000000001
     stable_id         : playbook.codebase_vuln_management@v1
-    content_version   : 0.2.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--01a17a07-0000-4000-8000-000000000001
     activities        : ingest_sbom, review_deps, assess_disclosure, track_timeline
     """
@@ -127,10 +127,10 @@ class PlaybookCodebaseVulnManagementV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.codebase_vuln_management@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a07-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a07-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.codebase_vuln_management@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a07-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0'})
+                AuditRecord(span_name='workflow.playbook.codebase_vuln_management@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a07-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.codebase_vuln_management@v1'"
