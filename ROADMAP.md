@@ -1671,7 +1671,7 @@ one playbook's provenance.
 
 ### F-WF-BACKUP-RECOVERY — Backup integrity and restore-drill lifecycle
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P2
 - **Rationale:** NIS2 Art. 21(2)(c) requires backup management and disaster
   recovery; an untested backup is an assertion, so the workflow is built
@@ -1697,9 +1697,14 @@ one playbook's provenance.
   issue #890.
 - **Shipped via:**
   - SKELETON — #478, #483
-  - CORE — #938 (five pure primitives with direct unit coverage, all 5
-    action steps bound, the `__integrity_ok__` predicate filled, three
-    worked examples refreshed onto the canonical core_body goldens).
+  - CORE — #939, closing #938 (five pure primitives with direct unit
+    coverage, all 5 action steps bound, the `__integrity_ok__`
+    predicate filled, three worked examples refreshed onto the
+    canonical core_body goldens).
+  - EXTEND — #946, closing #940 (metric re-pins both directions onto
+    the existing freshness/integrity catalogue pair, drill-step
+    description unblocked, cookbook de-staled to the bound reality;
+    maturity graduation deferred to the #937 ladder wave).
 
 ### F-WF-BCM — Business-continuity event lifecycle
 
