@@ -424,6 +424,13 @@ one playbook's provenance.
   from EU-hosted package index; no hosted scanner SaaS dependency.
 - **Depends on:** F-WF-01
 - **Source:** NIS2 Art. 21(2)(e).
+- **Shipped via:**
+  - GRADUATE — #937 coverage lane (`experimental` → `stable`,
+    `content_version` 1.0.0, per the Maturity ladder. The audit found
+    the evidence-ring-era gap: goldens pinned emitter output while
+    nothing executed the primitives — the unit suite under
+    `tests/playbooks/codebase_vuln_management/` lands with the flip.
+    Earlier stages predate Shipped-via bookkeeping).
 
 ### F-WF-08 — IAM auditor
 
