@@ -27,8 +27,8 @@ dst.write_text(json.dumps(data, indent=2, sort_keys=True) + '\n', encoding='utf-
 "
 
 # Emit GraphSpec + generated state bindings from the JSON mirror.
-python -m compilers.langgraph.emit  "${MIRROR_JSON}" > "${HERE}/graph_spec.json"
-python -m compilers.langgraph.state "${MIRROR_JSON}" > "${HERE}/state_bindings.py"
+PYTHONPATH="${REPO_ROOT}" python -m compilers.langgraph.emit  "${MIRROR_JSON}" > "${HERE}/graph_spec.json"
+PYTHONPATH="${REPO_ROOT}" python -m compilers.langgraph.state "${MIRROR_JSON}" > "${HERE}/state_bindings.py"
 
 # Materialise the dependency-free audit-mirror sibling. See
 # docs/observability/audit-mirror.md for the co-location rationale.
