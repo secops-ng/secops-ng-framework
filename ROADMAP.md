@@ -2039,6 +2039,12 @@ one playbook's provenance.
 - **Shipped via:**
   - SKELETON + CORE — #884
   - EXTEND — #893 (cookbook + metric pair)
+  - GRADUATE — #937 golden lane (`experimental` → `stable`,
+    `content_version` 1.0.0, per the Maturity ladder. The audit found
+    the three-target examples committed but unpinned; the byte-parity
+    golden modules under `tests/examples/{n8n,temporal,langgraph}/`
+    land with the flip, closing the acceptance criterion that was
+    claimed but untested).
 
 ---
 
