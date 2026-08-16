@@ -27,10 +27,10 @@ async def schedule_management_review(governance_cycle: str, trigger: str) -> str
     """
     with _TRACER.start_as_current_span(
         name='activity.action--a2000000-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--a2000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'schedule_management_review', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'schedule_management_review'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a2000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'schedule_management_review', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'schedule_management_review'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--a2000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--a2000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'schedule_management_review', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'schedule_management_review'})
+            AuditRecord(span_name='activity.action--a2000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a2000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'schedule_management_review', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'schedule_management_review'})
         )
         from content.playbooks.nis2_art20_governance.primitives.cycle import resolve_governance_cycle
         __review_id__ = resolve_governance_cycle(governance_cycle=__governance_cycle__, trigger=__trigger__)
@@ -50,10 +50,10 @@ async def present_risk_posture(governance_cycle: str, review_id: str, posture_sn
     """
     with _TRACER.start_as_current_span(
         name='activity.action--a2000000-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--a2000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'present_risk_posture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'present_risk_posture'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a2000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'present_risk_posture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'present_risk_posture'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--a2000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--a2000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'present_risk_posture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'present_risk_posture'})
+            AuditRecord(span_name='activity.action--a2000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a2000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'present_risk_posture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'present_risk_posture'})
         )
         from content.playbooks.nis2_art20_governance.primitives.review import conduct_art20_review
         __posture_snapshot_id__ = conduct_art20_review(governance_cycle=__governance_cycle__, posture_snapshot_id=__posture_snapshot_id__, clauses=__clauses__, open_exceptions=__open_exceptions__, training_completion=__training_completion__)
@@ -73,10 +73,10 @@ async def approve_risk_measures(governance_cycle: str, review_id: str, posture_s
     """
     with _TRACER.start_as_current_span(
         name='activity.action--a2000000-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--a2000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'approve_risk_measures', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'approve_risk_measures'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a2000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'approve_risk_measures', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'approve_risk_measures'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--a2000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--a2000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'approve_risk_measures', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'approve_risk_measures'})
+            AuditRecord(span_name='activity.action--a2000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a2000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'approve_risk_measures', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'approve_risk_measures'})
         )
         from content.playbooks.nis2_art20_governance.primitives.approval import record_management_approval
         __approval_record_id__ = record_management_approval(governance_cycle=__governance_cycle__, review_id=__review_id__, posture_snapshot_id=__posture_snapshot_id__, outcome=__review_outcome__, measures=__measures__, signatories=__signatories__, approved_at_iso=__approved_at_iso__)
@@ -96,10 +96,10 @@ async def log_governance_evidence(governance_cycle: str, trigger: str, review_id
     """
     with _TRACER.start_as_current_span(
         name='activity.action--a2000000-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--a2000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'log_governance_evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'log_governance_evidence'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a2000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'log_governance_evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'log_governance_evidence'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--a2000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--a2000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'log_governance_evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'log_governance_evidence'})
+            AuditRecord(span_name='activity.action--a2000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a2000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'log_governance_evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'log_governance_evidence'})
         )
         from content.playbooks.nis2_art20_governance.primitives.evidence import emit_governance_evidence
         __evidence_id__ = emit_governance_evidence(governance_cycle=__governance_cycle__, trigger=__trigger__, review_id=__review_id__, posture_snapshot_id=__posture_snapshot_id__, approval_record_id=__approval_record_id__, outcome=__review_outcome__, captured_at=__captured_at__, workflow_id=__workflow_id__, execution_id=__execution_id__, compile_target=__compile_target__)
@@ -117,8 +117,8 @@ class PlaybookNis2Art20GovernanceV1Workflow:
 
     CACAO playbook id : playbook--a2000000-0000-4000-8000-000000000001
     stable_id         : playbook.nis2_art20_governance@v1
-    content_version   : 0.1.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--a2000000-0000-4000-8000-000000000001
     activities        : schedule_management_review, present_risk_posture, approve_risk_measures, log_governance_evidence
     """
@@ -127,10 +127,10 @@ class PlaybookNis2Art20GovernanceV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.nis2_art20_governance@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.nis2_art20_governance@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0'})
+                AuditRecord(span_name='workflow.playbook.nis2_art20_governance@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a2000000-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.nis2_art20_governance@v1'"

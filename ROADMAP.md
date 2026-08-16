@@ -1052,6 +1052,9 @@ one playbook's provenance.
   - EXTEND — practitioner cookbook walkthrough at
     `docs/cookbook/nis2_art20_governance.md` and cookbook index
     entry under `docs/cookbook/README.md`.
+  - GRADUATE — #937 batch B (`experimental` → `stable`,
+    `content_version` 1.0.0, per the Maturity ladder; all three
+    worked examples regenerated with the new metadata).
 
 ---
 
@@ -1764,6 +1767,9 @@ one playbook's provenance.
   - EXTEND — #925, closing #924 (kri.expiring_tls_certs@v1 and
     kri.overdue_key_rotations@v1 with committed reference
     visualisations, metric_refs wired both ways)
+  - GRADUATE — #937 batch B (`experimental` → `stable`,
+    `content_version` 1.0.0, per the Maturity ladder; all three
+    worked examples regenerated with the new metadata).
 
 ### F-WF-CRYPTO-CONTROLS — Cryptographic-controls lifecycle
 
@@ -1885,6 +1891,9 @@ one playbook's provenance.
     (kpi.dora_resilience_test_coverage@v1 paired with
     kri.tlpt_remediation_overdue@v1, metric_refs wired both ways,
     stale TODO(CORE) description lead-ins stripped)
+  - GRADUATE — #937 batch B (`experimental` → `stable`,
+    `content_version` 1.0.0, per the Maturity ladder; all three
+    worked examples regenerated with the new metadata).
 
 ### F-WF-EIDAS2-IDV — EU Digital Identity Wallet verification lifecycle
 
@@ -1948,6 +1957,9 @@ one playbook's provenance.
     tier B -> A). Landed after EXTEND because the two axes ran separately:
     the mappings / telemetry / metrics overlay reached EXTEND at content
     version 0.3.0 while the steps still carried no `core_body`.
+  - GRADUATE — #937 batch B (`experimental` → `stable`,
+    `content_version` 0.4.0 → 1.0.0, per the Maturity ladder; all
+    three worked examples regenerated with the new metadata).
 
 ### F-WF-MFA-COMMS — MFA and secured-communications posture
 

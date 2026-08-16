@@ -27,10 +27,10 @@ async def identify_high_risk_ai_system(ai_system_id: str, annex_iii_area: str, c
     """
     with _TRACER.start_as_current_span(
         name='activity.action--40000000-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.4.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'identify high-risk AI system', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'identify_high_risk_ai_system'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'identify high-risk AI system', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'identify_high_risk_ai_system'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--40000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.4.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'identify high-risk AI system', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'identify_high_risk_ai_system'})
+            AuditRecord(span_name='activity.action--40000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'identify high-risk AI system', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'identify_high_risk_ai_system'})
         )
         from content.playbooks.eu_ai_act_risk_management.primitives.classification import classify_high_risk_system
         __annex_iii_use_case__ = classify_high_risk_system(ai_system_id=__ai_system_id__, classification_basis=__classification_basis__, annex_iii_area=__annex_iii_area__, union_harmonisation_ref=__union_harmonisation_ref__, derogation_ground=__derogation_ground__, derogation_assessment_ref=__derogation_assessment_ref__)
@@ -50,10 +50,10 @@ async def assess_risk_under_art_9_2(acceptability_thresholds: dict[str, object],
     """
     with _TRACER.start_as_current_span(
         name='activity.action--40000000-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.4.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'assess risk under Art. 9(2)', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_risk_under_art_9_2'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'assess risk under Art. 9(2)', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_risk_under_art_9_2'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--40000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.4.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'assess risk under Art. 9(2)', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_risk_under_art_9_2'})
+            AuditRecord(span_name='activity.action--40000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'assess risk under Art. 9(2)', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_risk_under_art_9_2'})
         )
         from content.playbooks.eu_ai_act_risk_management.primitives.assessment import assess_art9_risks
         __risk_register_id__ = assess_art9_risks(classification=__annex_iii_use_case__, iteration_id=__iteration_id__, identified_risks=__identified_risks__, acceptability_thresholds=__acceptability_thresholds__)
@@ -73,10 +73,10 @@ async def assemble_technical_documentation(annex_iv_sections: dict[str, object],
     """
     with _TRACER.start_as_current_span(
         name='activity.action--40000000-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.4.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'assemble technical documentation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assemble_technical_documentation'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'assemble technical documentation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assemble_technical_documentation'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--40000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.4.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'assemble technical documentation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assemble_technical_documentation'})
+            AuditRecord(span_name='activity.action--40000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'assemble technical documentation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assemble_technical_documentation'})
         )
         from content.playbooks.eu_ai_act_risk_management.primitives.documentation import assemble_technical_documentation
         __technical_documentation_id__ = assemble_technical_documentation(risk_register=__risk_register_id__, annex_iv_sections=__annex_iv_sections__, technical_doc_committed_at=__technical_doc_committed_at__, instructions_committed_at=__instructions_committed_at__)
@@ -96,10 +96,10 @@ async def monitor_post_market_signals(post_market_observation: dict[str, object]
     """
     with _TRACER.start_as_current_span(
         name='activity.action--40000000-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.4.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'monitor post-market signals', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'monitor_post_market_signals'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'monitor post-market signals', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'monitor_post_market_signals'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--40000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.4.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'monitor post-market signals', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'monitor_post_market_signals'})
+            AuditRecord(span_name='activity.action--40000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'monitor post-market signals', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'monitor_post_market_signals'})
         )
         from content.playbooks.eu_ai_act_risk_management.primitives.post_market import record_post_market_signal
         __post_market_signal__ = record_post_market_signal(risk_register=__risk_register_id__, observation=__post_market_observation__)
@@ -117,8 +117,8 @@ class PlaybookEuAiActRiskManagementV1Workflow:
 
     CACAO playbook id : playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8
     stable_id         : playbook.eu_ai_act_risk_management@v1
-    content_version   : 0.4.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--40000000-0000-4000-8000-000000000001
     activities        : identify_high_risk_ai_system, assess_risk_under_art_9_2, assemble_technical_documentation, monitor_post_market_signals
     """
@@ -127,10 +127,10 @@ class PlaybookEuAiActRiskManagementV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.eu_ai_act_risk_management@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.4.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.eu_ai_act_risk_management@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.4.0'})
+                AuditRecord(span_name='workflow.playbook.eu_ai_act_risk_management@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.eu_ai_act_risk_management@v1'"
