@@ -27,10 +27,10 @@ async def assess_supplier_signal(signal_class: str, signal_verdict: str, signal_
     """
     with _TRACER.start_as_current_span(
         name='activity.action--5c5c5c5c-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--5c5c5c5c-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--5c5c5c5c-0000-4000-8000-000000000002', 'secops_ng.step.name': 'assess-supplier-signal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_supplier_signal'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--5c5c5c5c-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--5c5c5c5c-0000-4000-8000-000000000002', 'secops_ng.step.name': 'assess-supplier-signal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_supplier_signal'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--5c5c5c5c-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--5c5c5c5c-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--5c5c5c5c-0000-4000-8000-000000000002', 'secops_ng.step.name': 'assess-supplier-signal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_supplier_signal'})
+            AuditRecord(span_name='activity.action--5c5c5c5c-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--5c5c5c5c-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--5c5c5c5c-0000-4000-8000-000000000002', 'secops_ng.step.name': 'assess-supplier-signal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_supplier_signal'})
         )
         from content.playbooks.supply_chain_security.primitives.assess import assess_supplier_signal
         __assessment_ref__ = assess_supplier_signal(signal_class=__signal_class__, verdict=__signal_verdict__, affected_supplier_handle=__signal_supplier_handle__, received_at=__signal_received_at__, affected_component_set=__signal_component_set__, signal_id=__signal_id__, scoring_notes=__signal_scoring_notes__)
@@ -50,10 +50,10 @@ async def emit_supply_chain_evidence(workflow_id: str, execution_id: str, regula
     """
     with _TRACER.start_as_current_span(
         name='activity.action--5c5c5c5c-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--5c5c5c5c-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--5c5c5c5c-0000-4000-8000-000000000003', 'secops_ng.step.name': 'emit-supply-chain-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_supply_chain_evidence'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--5c5c5c5c-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--5c5c5c5c-0000-4000-8000-000000000003', 'secops_ng.step.name': 'emit-supply-chain-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_supply_chain_evidence'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--5c5c5c5c-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--5c5c5c5c-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--5c5c5c5c-0000-4000-8000-000000000003', 'secops_ng.step.name': 'emit-supply-chain-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_supply_chain_evidence'})
+            AuditRecord(span_name='activity.action--5c5c5c5c-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--5c5c5c5c-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--5c5c5c5c-0000-4000-8000-000000000003', 'secops_ng.step.name': 'emit-supply-chain-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_supply_chain_evidence'})
         )
         from content.playbooks.supply_chain_security.primitives.artifact import build_supply_chain_evidence_artifact
         __supply_chain_artifact_ref__ = build_supply_chain_evidence_artifact(workflow_id=__workflow_id__, execution_id=__execution_id__, regulation_refs=__regulation_refs__, control_refs=__control_refs__, assessment=__assessment_ref__, dependencies=__dependencies__, owner_role=__owner_role__, owner_assigned_at=__owner_assigned_at__, captured_at=__captured_at__, source_url=__source_url__, aggregates=__aggregates__)
@@ -71,8 +71,8 @@ class PlaybookSupplyChainSecurityV1Workflow:
 
     CACAO playbook id : playbook--5c5c5c5c-0000-4000-8000-000000000001
     stable_id         : playbook.supply_chain_security@v1
-    content_version   : 0.2.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--5c5c5c5c-0000-4000-8000-000000000001
     activities        : assess_supplier_signal, emit_supply_chain_evidence
     """
@@ -81,10 +81,10 @@ class PlaybookSupplyChainSecurityV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.supply_chain_security@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--5c5c5c5c-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--5c5c5c5c-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.supply_chain_security@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--5c5c5c5c-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0'})
+                AuditRecord(span_name='workflow.playbook.supply_chain_security@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--5c5c5c5c-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.supply_chain_security@v1'"
