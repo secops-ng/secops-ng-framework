@@ -27,10 +27,10 @@ async def ingest_typed_alert_payload(alert_id: str, alert_source_shape: str) -> 
     """
     with _TRACER.start_as_current_span(
         name='activity.action--a1e47431-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest typed alert payload', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_typed_alert_payload'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest typed alert payload', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_typed_alert_payload'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest typed alert payload', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_typed_alert_payload'})
+            AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest typed alert payload', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_typed_alert_payload'})
         )
         from content.playbooks.alert_triage.primitives.payloads import validate_alert_payload
         __alert_payload__ = validate_alert_payload(raw=__raw_payload__, source_shape=__alert_source_shape__)
@@ -50,10 +50,10 @@ async def enrich_with_telemetry_context() -> bool:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--a1e47431-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000003', 'secops_ng.step.name': 'enrich with telemetry context', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enrich_with_telemetry_context'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000003', 'secops_ng.step.name': 'enrich with telemetry context', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enrich_with_telemetry_context'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000003', 'secops_ng.step.name': 'enrich with telemetry context', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enrich_with_telemetry_context'})
+            AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000003', 'secops_ng.step.name': 'enrich with telemetry context', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enrich_with_telemetry_context'})
         )
         from content.playbooks.alert_triage.primitives.suppression import canonical_seen_key
         __seen_key__ = canonical_seen_key(asset_ref=__asset_ref__, classification=__classification__, detection_rule_id=__detection_rule_id__, subject_ref=__subject_ref__)
@@ -73,10 +73,10 @@ async def suppress_and_close() -> None:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--a1e47431-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000005', 'secops_ng.step.name': 'suppress and close', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'suppress_and_close'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000005', 'secops_ng.step.name': 'suppress and close', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'suppress_and_close'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000005', 'secops_ng.step.name': 'suppress and close', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'suppress_and_close'})
+            AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000005', 'secops_ng.step.name': 'suppress and close', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'suppress_and_close'})
         )
         from content.playbooks.alert_triage.primitives.suppression import canonical_seen_key
         __close_record_key__ = canonical_seen_key(asset_ref=__asset_ref__, classification=__classification__, detection_rule_id=__detection_rule_id__, subject_ref=__subject_ref__)
@@ -96,10 +96,10 @@ async def classify_and_prioritise_deterministic_policy() -> str:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--a1e47431-0000-4000-8000-000000000006',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000006', 'secops_ng.step.name': 'classify and prioritise (deterministic policy)', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_and_prioritise_deterministic_policy'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000006', 'secops_ng.step.name': 'classify and prioritise (deterministic policy)', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_and_prioritise_deterministic_policy'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000006', 'secops_ng.step.name': 'classify and prioritise (deterministic policy)', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_and_prioritise_deterministic_policy'})
+            AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000006', 'secops_ng.step.name': 'classify and prioritise (deterministic policy)', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_and_prioritise_deterministic_policy'})
         )
         from content.playbooks.alert_triage.primitives.prioritisation import prioritise
         __priority_verdict__ = prioritise(context=__asset_context__, correlates_open_case=__correlates_open_case__, detection_class=__detection_class__, detection_severity=__detection_severity__)
@@ -119,10 +119,10 @@ async def response_p1_severe_page_and_escalate() -> None:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--a1e47431-0000-4000-8000-000000000008',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000008', 'secops_ng.step.name': 'response: p1 severe — page and escalate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_p1_severe_page_and_escalate'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000008', 'secops_ng.step.name': 'response: p1 severe — page and escalate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_p1_severe_page_and_escalate'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-000000000008', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000008', 'secops_ng.step.name': 'response: p1 severe — page and escalate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_p1_severe_page_and_escalate'})
+            AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-000000000008', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000008', 'secops_ng.step.name': 'response: p1 severe — page and escalate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_p1_severe_page_and_escalate'})
         )
         from content.playbooks.alert_triage.primitives.response import escalation_route
         __escalation_directive__ = escalation_route(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)
@@ -142,10 +142,10 @@ async def response_p2_high_queue_for_primary_analyst() -> None:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--a1e47431-0000-4000-8000-000000000009',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000009', 'secops_ng.step.name': 'response: p2 high — queue for primary analyst', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_p2_high_queue_for_primary_analyst'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000009', 'secops_ng.step.name': 'response: p2 high — queue for primary analyst', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_p2_high_queue_for_primary_analyst'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-000000000009', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000009', 'secops_ng.step.name': 'response: p2 high — queue for primary analyst', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_p2_high_queue_for_primary_analyst'})
+            AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-000000000009', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-000000000009', 'secops_ng.step.name': 'response: p2 high — queue for primary analyst', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_p2_high_queue_for_primary_analyst'})
         )
         from content.playbooks.alert_triage.primitives.response import notify_on_call
         __notification_directive__ = notify_on_call(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)
@@ -165,10 +165,10 @@ async def response_p3_routine_queue_for_review() -> None:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--a1e47431-0000-4000-8000-00000000000a',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'response: p3 routine — queue for review', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_p3_routine_queue_for_review'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'response: p3 routine — queue for review', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_p3_routine_queue_for_review'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-00000000000a', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'response: p3 routine — queue for review', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_p3_routine_queue_for_review'})
+            AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-00000000000a', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'response: p3 routine — queue for review', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_p3_routine_queue_for_review'})
         )
         from content.playbooks.alert_triage.primitives.response import route_to_review_queue
         __review_queue_directive__ = route_to_review_queue(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)
@@ -188,10 +188,10 @@ async def response_p4_informational_log_and_close() -> None:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--a1e47431-0000-4000-8000-00000000000b',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-00000000000b', 'secops_ng.step.name': 'response: p4 informational — log and close', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_p4_informational_log_and_close'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-00000000000b', 'secops_ng.step.name': 'response: p4 informational — log and close', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_p4_informational_log_and_close'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-00000000000b', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-00000000000b', 'secops_ng.step.name': 'response: p4 informational — log and close', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_p4_informational_log_and_close'})
+            AuditRecord(span_name='activity.action--a1e47431-0000-4000-8000-00000000000b', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--a1e47431-0000-4000-8000-00000000000b', 'secops_ng.step.name': 'response: p4 informational — log and close', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_p4_informational_log_and_close'})
         )
         from content.playbooks.alert_triage.primitives.response import log_and_close
         __closure_record__ = log_and_close(asset_criticality=__asset_context__.asset_criticality, internet_exposed=__asset_context__.internet_exposed, priority=__priority__, regulated_data=__asset_context__.regulated_data)
@@ -209,8 +209,8 @@ class PlaybookAlertTriageV1Workflow:
 
     CACAO playbook id : playbook--a1e47431-0000-4000-8000-000000000000
     stable_id         : playbook.alert_triage@v1
-    content_version   : 0.2.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--a1e47431-0000-4000-8000-000000000001
     activities        : ingest_typed_alert_payload, enrich_with_telemetry_context, suppress_and_close, classify_and_prioritise_deterministic_policy, response_p1_severe_page_and_escalate, response_p2_high_queue_for_primary_analyst, response_p3_routine_queue_for_review, response_p4_informational_log_and_close
     """
@@ -219,10 +219,10 @@ class PlaybookAlertTriageV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.alert_triage@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.2.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.alert_triage@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '0.2.0'})
+                AuditRecord(span_name='workflow.playbook.alert_triage@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--a1e47431-0000-4000-8000-000000000000', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.alert_triage@v1'"

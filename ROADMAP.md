@@ -295,6 +295,11 @@ one playbook's provenance.
   Pydantic-typed supplier dependencies (F-CP-04).
 - **Depends on:** F-CR-01, F-CR-02, F-CR-03, F-CR-04
 - **Source:** NIS2 Art. 21(2)(e), Art. 21(2)(b).
+- **Shipped via:**
+  - GRADUATE — #937 batch A (`vuln_intake`: `experimental` → `stable`,
+    `content_version` 1.0.0, per the Maturity ladder; all three worked
+    examples regenerated with the new metadata. Earlier stages predate
+    Shipped-via bookkeeping).
 
 ### F-WF-02 — Posture audit
 
@@ -322,6 +327,11 @@ one playbook's provenance.
   GDPR data-flow `data-flow-alert_triage.md` (see `content/mappings/gdpr/`).
 - **Depends on:** F-WF-01
 - **Source:** NIS2 Art. 21(2)(b).
+- **Shipped via:**
+  - GRADUATE — #937 batch A (`alert_triage`: `experimental` → `stable`,
+    `content_version` 1.0.0, per the Maturity ladder; all three worked
+    examples regenerated with the new metadata. Earlier stages predate
+    Shipped-via bookkeeping).
 
 ### F-WF-04 — Detection engineering
 
@@ -648,6 +658,9 @@ one playbook's provenance.
   - CORE-FANOUT-LANGGRAPH — #422 (LangGraph node adapter + worked
     example under `examples/langgraph/supply_chain_security/`
     closing the three-target byte-parity ring).
+  - GRADUATE — #937 batch A (`experimental` → `stable`,
+    `content_version` 1.0.0, per the Maturity ladder; all three
+    worked examples regenerated with the new metadata).
 - EXTEND-mappings (OSCAL / D3FEND / OCSF outbound closure on the
   supply_chain_security overlay, NIS2 / DORA / CRA inbound already
   landed via #431 / #438 / #440) and EXTEND-metrics
@@ -696,6 +709,11 @@ one playbook's provenance.
   (product vulnerability handling and security-updates
   distribution) and DORA Art. 25 (ICT vulnerability management);
   the EXTEND card closes the CRA / DORA overlap graph.
+- **Shipped via:**
+  - GRADUATE — #937 batch A (`vulnerability_management`:
+    `experimental` → `stable`, `content_version` 1.0.0, per the
+    Maturity ladder; all three worked examples regenerated with the
+    new metadata. Earlier stages predate Shipped-via bookkeeping).
 
 ---
 

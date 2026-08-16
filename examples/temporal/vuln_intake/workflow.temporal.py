@@ -27,10 +27,10 @@ async def intake_disclosure(cve_id: str, report_source: str) -> None:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--01a17a01-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000002', 'secops_ng.step.name': 'intake disclosure', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'intake_disclosure'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000002', 'secops_ng.step.name': 'intake disclosure', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'intake_disclosure'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000002', 'secops_ng.step.name': 'intake disclosure', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'intake_disclosure'})
+            AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000002', 'secops_ng.step.name': 'intake disclosure', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'intake_disclosure'})
         )
         from content.playbooks.vuln_intake.primitives.dedup import canonicalize_case_field
         __cve_id_canonical__ = canonicalize_case_field(value=__cve_id__)
@@ -50,10 +50,10 @@ async def triage_and_asset_correlation() -> dict[str, object]:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--01a17a01-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000003', 'secops_ng.step.name': 'triage and asset correlation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'triage_and_asset_correlation'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000003', 'secops_ng.step.name': 'triage and asset correlation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'triage_and_asset_correlation'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000003', 'secops_ng.step.name': 'triage and asset correlation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'triage_and_asset_correlation'})
+            AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000003', 'secops_ng.step.name': 'triage and asset correlation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'triage_and_asset_correlation'})
         )
         from content.playbooks.vuln_intake.primitives.severity import severity_policy
         __severity_verdict__ = severity_policy(cvss=__cvss__, epss=__epss__, context=__asset_context__)
@@ -73,10 +73,10 @@ async def assess_cra_reporting_trigger(cve_id: str, cvss_vector: str, epss_score
     """
     with _TRACER.start_as_current_span(
         name='activity.action--01a17a01-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000004', 'secops_ng.step.name': 'assess CRA reporting trigger', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_cra_reporting_trigger'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000004', 'secops_ng.step.name': 'assess CRA reporting trigger', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_cra_reporting_trigger'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000004', 'secops_ng.step.name': 'assess CRA reporting trigger', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_cra_reporting_trigger'})
+            AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000004', 'secops_ng.step.name': 'assess CRA reporting trigger', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_cra_reporting_trigger'})
         )
         from content.playbooks.vuln_intake.primitives.cra_trigger import assess_cra_reporting_trigger
         __cra_trigger_verdict__ = assess_cra_reporting_trigger(cve_id=__cve_id__, awareness_at=__awareness_at__, exploitation_evidence=__exploitation_evidence__, remedy_available_at=__remedy_available_at__)
@@ -96,10 +96,10 @@ async def regulator_notification_chain_cra_art_14(actively_exploited: bool, cve_
     """
     with _TRACER.start_as_current_span(
         name='activity.action--01a17a01-0000-4000-8000-000000000006',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000006', 'secops_ng.step.name': 'regulator-notification chain (CRA Art. 14)', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'regulator_notification_chain_cra_art_14'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000006', 'secops_ng.step.name': 'regulator-notification chain (CRA Art. 14)', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'regulator_notification_chain_cra_art_14'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000006', 'secops_ng.step.name': 'regulator-notification chain (CRA Art. 14)', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'regulator_notification_chain_cra_art_14'})
+            AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000006', 'secops_ng.step.name': 'regulator-notification chain (CRA Art. 14)', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'regulator_notification_chain_cra_art_14'})
         )
         from content.playbooks.vuln_intake.primitives.cra_trigger import build_notification_chain
         __notification_chain_plan__ = build_notification_chain(cve_id=__cve_id__, trigger=__cra_trigger_verdict__, destinations=__notification_destinations__)
@@ -119,10 +119,10 @@ async def response_critical_patch_and_advisory() -> None:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--01a17a01-0000-4000-8000-000000000008',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000008', 'secops_ng.step.name': 'response: critical — patch and advisory', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_critical_patch_and_advisory'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000008', 'secops_ng.step.name': 'response: critical — patch and advisory', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_critical_patch_and_advisory'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-000000000008', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000008', 'secops_ng.step.name': 'response: critical — patch and advisory', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_critical_patch_and_advisory'})
+            AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-000000000008', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000008', 'secops_ng.step.name': 'response: critical — patch and advisory', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_critical_patch_and_advisory'})
         )
         from content.playbooks.vuln_intake.primitives.remediation import patch_and_advisory_critical
         __remediation_directive__ = patch_and_advisory_critical(severity=__severity__, asset_criticality=__asset_context__.asset_criticality, triaged_at=__triaged_at__, sla_days=__cvd_sla_days__)
@@ -142,10 +142,10 @@ async def response_high_patch_and_advisory() -> None:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--01a17a01-0000-4000-8000-000000000009',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000009', 'secops_ng.step.name': 'response: high — patch and advisory', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_high_patch_and_advisory'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000009', 'secops_ng.step.name': 'response: high — patch and advisory', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_high_patch_and_advisory'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-000000000009', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000009', 'secops_ng.step.name': 'response: high — patch and advisory', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_high_patch_and_advisory'})
+            AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-000000000009', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-000000000009', 'secops_ng.step.name': 'response: high — patch and advisory', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_high_patch_and_advisory'})
         )
         from content.playbooks.vuln_intake.primitives.remediation import patch_and_advisory_high
         __remediation_directive__ = patch_and_advisory_high(severity=__severity__, asset_criticality=__asset_context__.asset_criticality, triaged_at=__triaged_at__, sla_days=__cvd_sla_days__)
@@ -165,10 +165,10 @@ async def response_scheduled_remediation() -> None:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--01a17a01-0000-4000-8000-00000000000a',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'response: scheduled remediation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_scheduled_remediation'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'response: scheduled remediation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_scheduled_remediation'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-00000000000a', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'response: scheduled remediation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_scheduled_remediation'})
+            AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-00000000000a', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'response: scheduled remediation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_scheduled_remediation'})
         )
         from content.playbooks.vuln_intake.primitives.remediation import schedule_remediation
         __remediation_directive__ = schedule_remediation(severity=__severity__, asset_criticality=__asset_context__.asset_criticality, triaged_at=__triaged_at__, sla_days=__cvd_sla_days__)
@@ -188,10 +188,10 @@ async def response_accept_risk() -> None:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--01a17a01-0000-4000-8000-00000000000b',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-00000000000b', 'secops_ng.step.name': 'response: accept risk', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_accept_risk'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-00000000000b', 'secops_ng.step.name': 'response: accept risk', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_accept_risk'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-00000000000b', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-00000000000b', 'secops_ng.step.name': 'response: accept risk', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_accept_risk'})
+            AuditRecord(span_name='activity.action--01a17a01-0000-4000-8000-00000000000b', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--01a17a01-0000-4000-8000-00000000000b', 'secops_ng.step.name': 'response: accept risk', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_accept_risk'})
         )
         from content.playbooks.vuln_intake.primitives.remediation import accept_risk
         __remediation_directive__ = accept_risk(severity=__severity__, asset_criticality=__asset_context__.asset_criticality, triaged_at=__triaged_at__, accepted_by=__risk_accepted_by__, review_after_days=__risk_review_after_days__)
@@ -209,8 +209,8 @@ class PlaybookVulnIntakeV1Workflow:
 
     CACAO playbook id : playbook--01a17a01-0000-4000-8000-000000000001
     stable_id         : playbook.vuln_intake@v1
-    content_version   : 0.2.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--01a17a01-0000-4000-8000-000000000001
     activities        : intake_disclosure, triage_and_asset_correlation, assess_cra_reporting_trigger, regulator_notification_chain_cra_art_14, response_critical_patch_and_advisory, response_high_patch_and_advisory, response_scheduled_remediation, response_accept_risk
     """
@@ -219,10 +219,10 @@ class PlaybookVulnIntakeV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.vuln_intake@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.vuln_intake@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0'})
+                AuditRecord(span_name='workflow.playbook.vuln_intake@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--01a17a01-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.vuln_intake@v1'"
