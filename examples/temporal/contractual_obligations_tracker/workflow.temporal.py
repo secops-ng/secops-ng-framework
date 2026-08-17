@@ -27,10 +27,10 @@ async def ingest_contract(raw_contract: str, contract_ref: str) -> str:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--10101010-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--10101010-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--10101010-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest-contract', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_contract'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--10101010-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--10101010-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest-contract', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_contract'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--10101010-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--10101010-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--10101010-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest-contract', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_contract'})
+            AuditRecord(span_name='activity.action--10101010-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--10101010-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--10101010-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest-contract', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_contract'})
         )
         from content.playbooks.contractual_obligations_tracker.primitives.ingest import ingest_contract
         __contract_record_ref__ = ingest_contract(raw_contract=__raw_contract__, contract_ref=__contract_ref__)
@@ -50,10 +50,10 @@ async def extract_obligations(raw_obligations: str, contract_record_ref: str) ->
     """
     with _TRACER.start_as_current_span(
         name='activity.action--10101010-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--10101010-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--10101010-0000-4000-8000-000000000003', 'secops_ng.step.name': 'extract-obligations', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'extract_obligations'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--10101010-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--10101010-0000-4000-8000-000000000003', 'secops_ng.step.name': 'extract-obligations', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'extract_obligations'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--10101010-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--10101010-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--10101010-0000-4000-8000-000000000003', 'secops_ng.step.name': 'extract-obligations', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'extract_obligations'})
+            AuditRecord(span_name='activity.action--10101010-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--10101010-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--10101010-0000-4000-8000-000000000003', 'secops_ng.step.name': 'extract-obligations', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'extract_obligations'})
         )
         from content.playbooks.contractual_obligations_tracker.primitives.obligations import extract_obligations
         __obligation_set_ref__ = extract_obligations(raw_obligations=__raw_obligations__, contract=__contract_record_ref__)
@@ -73,10 +73,10 @@ async def schedule_review(obligation_set_ref: str, review_policy: str, captured_
     """
     with _TRACER.start_as_current_span(
         name='activity.action--10101010-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--10101010-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--10101010-0000-4000-8000-000000000004', 'secops_ng.step.name': 'schedule-review', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'schedule_review'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--10101010-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--10101010-0000-4000-8000-000000000004', 'secops_ng.step.name': 'schedule-review', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'schedule_review'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--10101010-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--10101010-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--10101010-0000-4000-8000-000000000004', 'secops_ng.step.name': 'schedule-review', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'schedule_review'})
+            AuditRecord(span_name='activity.action--10101010-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--10101010-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--10101010-0000-4000-8000-000000000004', 'secops_ng.step.name': 'schedule-review', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'schedule_review'})
         )
         from content.playbooks.contractual_obligations_tracker.primitives.schedule import schedule_reviews
         __review_schedule_ref__ = schedule_reviews(obligations=__obligation_set_ref__, review_policy=__review_policy__, captured_at=__captured_at__)
@@ -96,10 +96,10 @@ async def emit_obligation_evidence(workflow_id: str, execution_id: str, regulati
     """
     with _TRACER.start_as_current_span(
         name='activity.action--10101010-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--10101010-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--10101010-0000-4000-8000-000000000005', 'secops_ng.step.name': 'emit-obligation-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_obligation_evidence'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--10101010-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--10101010-0000-4000-8000-000000000005', 'secops_ng.step.name': 'emit-obligation-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_obligation_evidence'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--10101010-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--10101010-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--10101010-0000-4000-8000-000000000005', 'secops_ng.step.name': 'emit-obligation-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_obligation_evidence'})
+            AuditRecord(span_name='activity.action--10101010-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--10101010-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--10101010-0000-4000-8000-000000000005', 'secops_ng.step.name': 'emit-obligation-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_obligation_evidence'})
         )
         from content.playbooks.contractual_obligations_tracker.primitives.artifact import build_obligation_artifact
         __obligation_artifact_ref__ = build_obligation_artifact(workflow_id=__workflow_id__, execution_id=__execution_id__, regulation_refs=__regulation_refs__, control_refs=__control_refs__, contract=__contract_record_ref__, obligations=__obligation_set_ref__, review_schedule=__review_schedule_ref__, owner_role=__owner_role__, owner_assigned_at=__owner_assigned_at__, captured_at=__captured_at__, source_url=__source_url__)
@@ -117,8 +117,8 @@ class PlaybookContractualObligationsTrackerV1Workflow:
 
     CACAO playbook id : playbook--10101010-0000-4000-8000-000000000001
     stable_id         : playbook.contractual_obligations_tracker@v1
-    content_version   : 0.2.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--10101010-0000-4000-8000-000000000001
     activities        : ingest_contract, extract_obligations, schedule_review, emit_obligation_evidence
     """
@@ -127,10 +127,10 @@ class PlaybookContractualObligationsTrackerV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.contractual_obligations_tracker@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--10101010-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--10101010-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.contractual_obligations_tracker@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--10101010-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0'})
+                AuditRecord(span_name='workflow.playbook.contractual_obligations_tracker@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--10101010-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.contractual_obligations_tracker@v1'"
