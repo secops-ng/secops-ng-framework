@@ -527,12 +527,17 @@ entries:
       - playbook.threat_intel_ingest@v1
       - playbook.dora_ict_risk_selfassess@v1
       - playbook.codebase_vuln_management@v1
+      - playbook.vulnerability_management@v1
     notes: >-
       ID.RA is exercised by the composite threat-intel + vulnerability
       + risk-assessment surfaces. Threat identification lands in the
       threat-intel playbook, vulnerability identification in the
       codebase-vuln-management playbook and disclosure-intake control,
       and risk aggregation in the DORA ICT-risk self-assessment.
+      The playbook.vulnerability_management@v1 CACAO playbook adds the
+      operational vulnerability-lifecycle spine — identification
+      through remediation verification — beside the intake and
+      codebase-specific surfaces.
     subcategory_entries:
       - id: ID.RA-01
         outcome: >-
@@ -541,6 +546,7 @@ entries:
           - playbook.codebase_vuln_management@v1
           - playbook.vuln_intake@v1
           - playbook.infra_posture_management@v1
+          - playbook.vulnerability_management@v1
       - id: ID.RA-02
         outcome: >-
           Cyber threat intelligence is received from information sharing
@@ -680,12 +686,17 @@ entries:
       - playbook.iam_auditor@v1
       - playbook.onboarding_offboarding_tracker@v1
       - playbook.mfa_secured_comms@v1
+      - playbook.it_security_support_agent@v1
     notes: >-
       PR.AA is the largest single Category by control surface. The
       catalogue anchors carry the identity / authentication /
       authorisation slice end-to-end: joiner-mover-leaver evidence,
       MFA state, least-privilege review, privileged-access review,
       service-identity authentication, and the IAM audit playbook.
+      The playbook.it_security_support_agent@v1 CACAO playbook adds
+      the operator-facing identity-lifecycle support surface — access
+      requests, credential resets, entitlement queries — routed
+      through the same JML and review artifacts.
     subcategory_entries:
       - id: PR.AA-01
         outcome: >-
@@ -694,6 +705,7 @@ entries:
         playbook_refs:
           - playbook.iam_auditor@v1
           - playbook.onboarding_offboarding_tracker@v1
+          - playbook.it_security_support_agent@v1
       - id: PR.AA-02
         outcome: >-
           Identities are proofed and bound to credentials based on the context
@@ -746,11 +758,16 @@ entries:
     playbook_refs:
       - playbook.cyber_hygiene_training@v1
       - playbook.phishing_triage@v1
+      - playbook.security_awareness_training@v1
     notes: >-
       Training-content authoring itself is operator-owned. The
       catalogue anchors discharge the "training attendance is
       attested" and "phishing exposure is exercised in-practice"
       slices.
+      The playbook.security_awareness_training@v1 CACAO playbook adds
+      the awareness-campaign lifecycle slice — curriculum assignment,
+      completion attestation — beside the hygiene-exercise and
+      phishing-exposure discharges.
     subcategory_entries:
       - id: PR.AT-01
         outcome: >-
@@ -760,6 +777,7 @@ entries:
         playbook_refs:
           - playbook.cyber_hygiene_training@v1
           - playbook.phishing_triage@v1
+          - playbook.security_awareness_training@v1
       - id: PR.AT-02
         outcome: >-
           Individuals in specialized roles are provided with awareness and
@@ -913,12 +931,17 @@ entries:
       - playbook.backup_recovery@v1
       - playbook.cloud_misconfiguration@v1
       - playbook.ddos_response@v1
+      - playbook.network_security@v1
     notes: >-
       PR.IR is new in CSF 2.0 and consolidates resilience-of-
       infrastructure outcomes. Catalogue anchors exercise the
       cloud-posture baseline (segmentation and network-boundary
       controls), the backup + restore-drill surface (recovery
       capacity), and DDoS response.
+      The playbook.network_security@v1 CACAO playbook adds the
+      network-boundary and segmentation-verification discharge to the
+      resilience surface, beside the availability-attack response
+      playbook.ddos_response@v1 already cited.
     subcategory_entries:
       - id: PR.IR-01
         outcome: >-
@@ -927,6 +950,7 @@ entries:
         playbook_refs:
           - playbook.infra_posture_management@v1
           - playbook.cloud_misconfiguration@v1
+          - playbook.network_security@v1
       - id: PR.IR-02
         outcome: >-
           The organization's technology assets are protected from

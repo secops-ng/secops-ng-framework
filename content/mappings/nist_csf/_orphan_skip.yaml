@@ -10,10 +10,10 @@
 # names the issue that owes its citation and leaves in the same PR
 # that lands it.
 #
-# F-MAP-ORPHAN-PARITY package 2 state (armed 2026-08-15): 36
-# playbooks already carried CSF citations via the core-functions
-# crosswalk; the 12 entries below split into 8 durable exclusions
-# and 4 interim entries with genuine CSF 2.0 surfaces owed by #943.
+# F-MAP-ORPHAN-PARITY package 2 state (armed 2026-08-15 with 8
+# durable + 4 interim entries; the interim batch left with the #943
+# citation PR): the 8 entries below are all durable exclusions
+# against the core-functions crosswalk.
 
 skip:
   # ── Durable exclusions ───────────────────────────────────────────
@@ -76,25 +76,3 @@ skip:
       SOC 2 TSC readiness roll-up; anchors on its home axis
       (content/mappings/soc2/, CC4.1 — CI-verified since #932).
       Mirrors the roll-up precedent across manifests.
-
-  # ── Interim entries: real CSF 2.0 surfaces, citations owed by #943 ──
-
-  - slug: it_security_support_agent
-    rationale: >-
-      Interim (#943): PR.AA identity and access lifecycle support;
-      citation lands with the follow-up batch.
-
-  - slug: network_security
-    rationale: >-
-      Interim (#943): PR.IR infrastructure resilience and DE.CM
-      network monitoring; citation lands with the follow-up batch.
-
-  - slug: security_awareness_training
-    rationale: >-
-      Interim (#943): PR.AT awareness and training; citation lands
-      with the follow-up batch.
-
-  - slug: vulnerability_management
-    rationale: >-
-      Interim (#943): ID.RA vulnerability identification and PR.PS
-      platform security; citation lands with the follow-up batch.

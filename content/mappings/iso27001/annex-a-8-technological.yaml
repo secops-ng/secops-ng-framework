@@ -328,6 +328,8 @@ entries:
     # A.8.13 via control.backup_attestation@v1 /
     # control.restore_drill@v1 (landing as sibling entries on a
     # subsequent card).
+    playbook_refs:
+      - playbook.ddos_response@v1
     notes: >-
       A.8.6 is the capacity-management anchor within the Annex A.8
       theme — the standard treats resource saturation as an
@@ -346,6 +348,11 @@ entries:
       capacity-management under the JC RTS ICT risk-management
       framework; the regimes carry separate evidence requirements
       against the same underlying capacity artifact.
+      The playbook.ddos_response@v1 CACAO playbook exercises the
+      availability-attack slice of capacity management — detection of
+      capacity exhaustion under attack, mitigation activation, and
+      post-event capacity review — the slice the standard's guidance
+      singles out as denial-of-service resistance.
   - id: iso27001:a-8-7-protection-against-malware
     regulation:
       name: ISO/IEC 27001:2022
@@ -420,6 +427,7 @@ entries:
       - playbook.codebase_vuln_management@v1
       - playbook.infra_posture_management@v1
       - playbook.cloud_misconfiguration@v1
+      - playbook.vulnerability_management@v1
     notes: >-
       A.8.8 is the technical-vulnerability-management anchor for the
       Annex A.8 theme — the standard requires a documented programme
@@ -451,6 +459,10 @@ entries:
       elements. The regimes carry separate evidence requirements
       against the same underlying vulnerability-and-patch artifact
       set.
+      The playbook.vulnerability_management@v1 CACAO playbook is the
+      discovery-to-audit lifecycle spine — scan trigger, severity
+      triage, remediation decision, verification, audit evidence —
+      that the intake- and patch-specific playbooks in this list feed.
   - id: iso27001:a-8-9-configuration-management
     regulation:
       name: ISO/IEC 27001:2022
@@ -855,6 +867,7 @@ entries:
     playbook_refs:
       - playbook.detection_engineering@v1
       - playbook.alert_triage@v1
+      - playbook.phishing_triage@v1
     notes: >-
       A.8.16 is the monitoring-activities anchor for the Annex A.8
       theme — the standard requires that networks, systems, and
@@ -886,6 +899,10 @@ entries:
       on ICT assets; the regimes carry separate evidence
       requirements against the same underlying detection-and-
       monitoring artifact set.
+      The playbook.phishing_triage@v1 CACAO playbook is the user-
+      reported-phishing intake-and-triage discharge — the human-
+      reporting monitoring channel the control's guidance names beside
+      the automated detection surfaces already cited.
   - id: iso27001:a-8-17-clock-synchronisation
     regulation:
       name: ISO/IEC 27001:2022
@@ -1087,6 +1104,8 @@ entries:
     # changing the entry id. The network-services / third-party
     # side is anchored in the A.8.21 sibling entry, and the
     # network-segregation side in the A.8.22 sibling entry.
+    playbook_refs:
+      - playbook.network_security@v1
     notes: >-
       A.8.20 is the network-security anchor within the Annex A.8
       theme — the standard requires that networks and network
@@ -1113,6 +1132,10 @@ entries:
       network-side ICT protection; the regimes carry separate
       evidence requirements against the same underlying
       network-security artifact.
+      The playbook.network_security@v1 CACAO playbook is the
+      operational network-controls discharge — boundary-rule review,
+      segmentation verification, and network-service hardening checks
+      — against the networks-security obligation.
   - id: iso27001:a-8-21-security-of-network-services
     regulation:
       name: ISO/IEC 27001:2022
@@ -1323,6 +1346,7 @@ entries:
       - control.cert_posture_scan@v1
     playbook_refs:
       - playbook.crypto_posture_management@v1
+      - playbook.cryptographic_controls@v1
     notes: >-
       A.8.24 is the use-of-cryptography anchor for the Annex A.8
       theme — the standard requires that rules for the effective use
@@ -1362,6 +1386,10 @@ entries:
       cryptographic-posture lane on the product-facing side; the
       regimes carry separate evidence requirements against the same
       underlying cryptography-and-key-management artifact set.
+      The playbook.cryptographic_controls@v1 CACAO playbook is the
+      cryptographic-controls lifecycle discharge — algorithm and key
+      policy checks and rotation execution — beside the posture-drift
+      surface playbook.crypto_posture_management@v1 monitors.
   - id: iso27001:a-8-25-secure-development-life-cycle
     regulation:
       name: ISO/IEC 27001:2022
