@@ -1733,6 +1733,10 @@ one playbook's provenance.
     the existing freshness/integrity catalogue pair, drill-step
     description unblocked, cookbook de-staled to the bound reality;
     maturity graduation deferred to the #937 ladder wave).
+  - GRADUATE — #937 wave straggler (`experimental` → `stable`,
+    `content_version` 1.0.0, per the Maturity ladder; qualified as of
+    the CORE + EXTEND pair above, graduated once both had merged. All
+    three worked examples regenerated with the new metadata).
 
 ### F-WF-BCM — Business-continuity event lifecycle
 
