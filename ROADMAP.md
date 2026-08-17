@@ -586,6 +586,12 @@ one playbook's provenance.
   - EXTEND-metrics — #369 (joiner-to-provisioned-time and
     leaver-to-revoked-time KRI entries under `content/metrics/` with
     playbook pin).
+  - GRADUATE — #937 coverage lane (`experimental` → `stable`,
+    `content_version` 1.0.0, per the Maturity ladder. The audit found
+    the evidence-ring-era gap — goldens pinned emitter output while
+    nothing executed the primitives; the unit suite under
+    `tests/playbooks/onboarding_offboarding_tracker/` lands with the
+    flip, closing the audit's last coverage-lane item).
 
 ### F-WF-12 — IT and security support agent
 
