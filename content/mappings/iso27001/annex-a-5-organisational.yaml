@@ -687,6 +687,7 @@ entries:
     playbook_refs:
       - playbook.onboarding_offboarding_tracker@v1
       - playbook.iam_auditor@v1
+      - playbook.it_security_support_agent@v1
     notes: >-
       A.5.16 is the identity-management anchor within the Annex
       A.5 organisational-controls theme — the standard treats it as
@@ -713,6 +714,11 @@ entries:
       against their regime-specific scopes; the regimes carry
       separate evidence requirements against the same underlying
       JML and account-management artifacts.
+      The playbook.it_security_support_agent@v1 CACAO playbook is the
+      operator-facing identity-lifecycle support discharge — access
+      requests, credential resets, entitlement queries — that routes
+      day-to-day identity changes through the same JML and account-
+      management surfaces the audit playbooks above verify.
   - id: iso27001:a-5-17-authentication-information
     regulation:
       name: ISO/IEC 27001:2022
@@ -1174,6 +1180,9 @@ entries:
     playbook_refs:
       - playbook.incident_management@v1
       - playbook.on_call_rotation@v1
+      - playbook.agentic_threat_response@v1
+      - playbook.identity_compromise@v1
+      - playbook.ransomware_containment@v1
     notes: >-
       A.5.26 is the incident-response anchor within the Annex A.5
       organisational-controls theme — the standard treats it as the
@@ -1201,6 +1210,15 @@ entries:
       regime-specific scopes; the regimes carry separate evidence
       requirements against the same underlying case-record and
       response-plan artifacts.
+      Three incident-class-specific response playbooks discharge the
+      respond-per-documented-procedures obligation for their classes:
+      playbook.agentic_threat_response@v1 is the autonomous-response
+      engine that executes containment under the response plan's
+      authority gates, playbook.identity_compromise@v1 is the
+      credential-compromise response discharge (session revocation,
+      credential reset, access re-verification), and
+      playbook.ransomware_containment@v1 is the ransomware
+      containment-and-recovery discharge.
   - id: iso27001:a-5-27-learning-from-information-security-incidents
     regulation:
       name: ISO/IEC 27001:2022
@@ -1361,6 +1379,7 @@ entries:
       - control.restore_drill@v1
     playbook_refs:
       - playbook.backup_recovery@v1
+      - playbook.business_continuity@v1
     notes: >-
       A.5.30 is the ICT-readiness anchor within the Annex A.5
       organisational-controls theme — the standard treats it as the
@@ -1383,6 +1402,12 @@ entries:
       regime-specific scopes; the regimes carry separate evidence
       requirements against the same underlying restore-drill
       artifact.
+      The playbook.business_continuity@v1 CACAO playbook is the
+      continuity-event lifecycle discharge — activation, service-
+      degradation tracking, and recovery verification — that exercises
+      the ICT-readiness obligation end to end, complementing the
+      backup-and-restore-drill slice playbook.backup_recovery@v1
+      carries.
   - id: iso27001:a-5-31-legal-statutory-regulatory-and-contractual-requirements
     regulation:
       name: ISO/IEC 27001:2022
