@@ -472,6 +472,13 @@ one playbook's provenance.
 - **Sovereign-stack constraints:** —
 - **Depends on:** F-CP-07
 - **Source:** NIS2 Art. 21(2)(i).
+- **Shipped via:**
+  - GRADUATE — #937 coverage lane (`experimental` → `stable`,
+    `content_version` 1.0.0, per the Maturity ladder. The audit found
+    the evidence-ring-era gap — goldens pinned emitter output while
+    nothing executed the primitives; the unit suite under
+    `tests/playbooks/iam_auditor/` lands with the flip. Earlier
+    stages predate Shipped-via bookkeeping).
 
 ### F-WF-09 — Compliance evidence collection
 
