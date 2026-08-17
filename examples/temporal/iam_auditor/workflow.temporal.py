@@ -27,10 +27,10 @@ async def enumerate_identities(principal_type: str, principal_id: str, identity_
     """
     with _TRACER.start_as_current_span(
         name='activity.action--08aa0d10-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000002', 'secops_ng.step.name': 'enumerate-identities', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enumerate_identities'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000002', 'secops_ng.step.name': 'enumerate-identities', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enumerate_identities'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--08aa0d10-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000002', 'secops_ng.step.name': 'enumerate-identities', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enumerate_identities'})
+            AuditRecord(span_name='activity.action--08aa0d10-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000002', 'secops_ng.step.name': 'enumerate-identities', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enumerate_identities'})
         )
         from content.playbooks.iam_auditor.primitives.identity import resolve_caller_identity
         __caller_identity_ref__ = resolve_caller_identity(principal_type=__principal_type__, principal_id=__principal_id__, identity_provider=__identity_provider__)
@@ -50,10 +50,10 @@ async def enumerate_capabilities(capabilities_raw: str) -> str:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--08aa0d10-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000003', 'secops_ng.step.name': 'enumerate-capabilities', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enumerate_capabilities'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000003', 'secops_ng.step.name': 'enumerate-capabilities', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enumerate_capabilities'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--08aa0d10-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000003', 'secops_ng.step.name': 'enumerate-capabilities', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enumerate_capabilities'})
+            AuditRecord(span_name='activity.action--08aa0d10-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000003', 'secops_ng.step.name': 'enumerate-capabilities', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enumerate_capabilities'})
         )
         from content.playbooks.iam_auditor.primitives.capabilities import build_capability_list
         __capabilities_ref__ = build_capability_list(capabilities=__capabilities_raw__)
@@ -73,10 +73,10 @@ async def emit_access_evidence(workflow_id: str, execution_id: str, compile_targ
     """
     with _TRACER.start_as_current_span(
         name='activity.action--08aa0d10-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000004', 'secops_ng.step.name': 'emit-access-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_access_evidence'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000004', 'secops_ng.step.name': 'emit-access-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_access_evidence'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--08aa0d10-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000004', 'secops_ng.step.name': 'emit-access-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_access_evidence'})
+            AuditRecord(span_name='activity.action--08aa0d10-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--08aa0d10-0000-4000-8000-000000000004', 'secops_ng.step.name': 'emit-access-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_access_evidence'})
         )
         from content.playbooks.iam_auditor.primitives.artifact import build_access_artifact
         __access_artifact_ref__ = build_access_artifact(workflow_id=__workflow_id__, execution_id=__execution_id__, compile_target=__compile_target__, regulation_refs=__regulation_refs__, control_refs=__control_refs__, caller_identity=__caller_identity_ref__, capabilities=__capabilities_ref__, captured_at=__captured_at__, source_url=__source_url__)
@@ -94,8 +94,8 @@ class PlaybookIamAuditorV1Workflow:
 
     CACAO playbook id : playbook--08aa0d10-0000-4000-8000-000000000001
     stable_id         : playbook.iam_auditor@v1
-    content_version   : 0.2.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--08aa0d10-0000-4000-8000-000000000001
     activities        : enumerate_identities, enumerate_capabilities, emit_access_evidence
     """
@@ -104,10 +104,10 @@ class PlaybookIamAuditorV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.iam_auditor@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.iam_auditor@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0'})
+                AuditRecord(span_name='workflow.playbook.iam_auditor@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--08aa0d10-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.iam_auditor@v1'"
