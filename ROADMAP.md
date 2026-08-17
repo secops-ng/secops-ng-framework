@@ -409,6 +409,13 @@ one playbook's provenance.
   ships no default endpoint and bundles no vendor SDK.
 - **Depends on:** F-WF-02
 - **Source:** NIS2 Art. 21(2)(a).
+- **Shipped via:**
+  - GRADUATE — #937 coverage lane (`experimental` → `stable`,
+    `content_version` 1.0.0, per the Maturity ladder. The audit found
+    the evidence-ring-era gap — goldens pinned emitter output while
+    nothing executed the primitives; the unit suite under
+    `tests/playbooks/infra_posture_management/` lands with the flip.
+    Earlier stages predate Shipped-via bookkeeping).
 
 ### F-WF-07 — Codebase vulnerability management
 

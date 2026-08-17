@@ -27,10 +27,10 @@ async def collect_posture(raw_posture: str, scope_ref: str) -> str:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--06f06f06-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--06f06f06-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--06f06f06-0000-4000-8000-000000000002', 'secops_ng.step.name': 'collect-posture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'collect_posture'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--06f06f06-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--06f06f06-0000-4000-8000-000000000002', 'secops_ng.step.name': 'collect-posture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'collect_posture'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--06f06f06-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--06f06f06-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--06f06f06-0000-4000-8000-000000000002', 'secops_ng.step.name': 'collect-posture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'collect_posture'})
+            AuditRecord(span_name='activity.action--06f06f06-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--06f06f06-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--06f06f06-0000-4000-8000-000000000002', 'secops_ng.step.name': 'collect-posture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'collect_posture'})
         )
         from content.playbooks.infra_posture_management.primitives.collect import collect_posture_state
         __posture_state_ref__ = collect_posture_state(raw_posture=__raw_posture__, scope_ref=__scope_ref__)
@@ -50,10 +50,10 @@ async def evaluate_controls(posture_state_ref: str, posture_policy: str) -> str:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--06f06f06-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--06f06f06-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--06f06f06-0000-4000-8000-000000000003', 'secops_ng.step.name': 'evaluate-controls', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evaluate_controls'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--06f06f06-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--06f06f06-0000-4000-8000-000000000003', 'secops_ng.step.name': 'evaluate-controls', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evaluate_controls'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--06f06f06-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--06f06f06-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--06f06f06-0000-4000-8000-000000000003', 'secops_ng.step.name': 'evaluate-controls', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evaluate_controls'})
+            AuditRecord(span_name='activity.action--06f06f06-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--06f06f06-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--06f06f06-0000-4000-8000-000000000003', 'secops_ng.step.name': 'evaluate-controls', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evaluate_controls'})
         )
         from content.playbooks.infra_posture_management.primitives.controls import evaluate_controls
         __control_evaluation_ref__ = evaluate_controls(posture_state=__posture_state_ref__, posture_policy=__posture_policy__)
@@ -73,10 +73,10 @@ async def emit_posture_evidence(workflow_id: str, execution_id: str, compile_tar
     """
     with _TRACER.start_as_current_span(
         name='activity.action--06f06f06-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--06f06f06-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--06f06f06-0000-4000-8000-000000000004', 'secops_ng.step.name': 'emit-posture-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_posture_evidence'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--06f06f06-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--06f06f06-0000-4000-8000-000000000004', 'secops_ng.step.name': 'emit-posture-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_posture_evidence'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--06f06f06-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--06f06f06-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--06f06f06-0000-4000-8000-000000000004', 'secops_ng.step.name': 'emit-posture-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_posture_evidence'})
+            AuditRecord(span_name='activity.action--06f06f06-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--06f06f06-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--06f06f06-0000-4000-8000-000000000004', 'secops_ng.step.name': 'emit-posture-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_posture_evidence'})
         )
         from content.playbooks.infra_posture_management.primitives.artifact import build_posture_artifact
         __posture_artifact_ref__ = build_posture_artifact(workflow_id=__workflow_id__, execution_id=__execution_id__, compile_target=__compile_target__, regulation_refs=__regulation_refs__, control_refs=__control_refs__, policy_version=__policy_version__, posture_state=__posture_state_ref__, control_evaluation=__control_evaluation_ref__, evaluated_at=__evaluated_at__, captured_at=__captured_at__, source_url=__source_url__)
@@ -94,8 +94,8 @@ class PlaybookInfraPostureManagementV1Workflow:
 
     CACAO playbook id : playbook--06f06f06-0000-4000-8000-000000000001
     stable_id         : playbook.infra_posture_management@v1
-    content_version   : 0.2.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--06f06f06-0000-4000-8000-000000000001
     activities        : collect_posture, evaluate_controls, emit_posture_evidence
     """
@@ -104,10 +104,10 @@ class PlaybookInfraPostureManagementV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.infra_posture_management@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--06f06f06-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--06f06f06-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.infra_posture_management@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--06f06f06-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0'})
+                AuditRecord(span_name='workflow.playbook.infra_posture_management@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--06f06f06-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.infra_posture_management@v1'"
