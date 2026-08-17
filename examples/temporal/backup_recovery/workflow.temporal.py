@@ -27,10 +27,10 @@ async def detect_restore_drill_trigger(backup_inventory: dict[str, object], back
     """
     with _TRACER.start_as_current_span(
         name='activity.action--50000000-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'detect restore-drill trigger', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_restore_drill_trigger'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'detect restore-drill trigger', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_restore_drill_trigger'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'detect restore-drill trigger', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_restore_drill_trigger'})
+            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'detect restore-drill trigger', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_restore_drill_trigger'})
         )
         from content.playbooks.backup_recovery.primitives.detect import resolve_drill_trigger
         __candidate_backup_id__ = resolve_drill_trigger(drill_window=__drill_window__, backup_scope=__backup_scope__, backup_inventory=__backup_inventory__)
@@ -50,10 +50,10 @@ async def validate_backup_integrity(candidate_backup_id: str, integrity_observat
     """
     with _TRACER.start_as_current_span(
         name='activity.action--50000000-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'validate backup integrity', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'validate_backup_integrity'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'validate backup integrity', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'validate_backup_integrity'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'validate backup integrity', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'validate_backup_integrity'})
+            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'validate backup integrity', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'validate_backup_integrity'})
         )
         from content.playbooks.backup_recovery.primitives.integrity import evaluate_backup_integrity
         __integrity_ok__ = evaluate_backup_integrity(candidate_backup_id=__candidate_backup_id__, integrity_observation=__integrity_observation__)
@@ -73,10 +73,10 @@ async def execute_restore_drill(backup_scope: str, candidate_backup_id: str, dri
     """
     with _TRACER.start_as_current_span(
         name='activity.action--50000000-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'execute restore drill', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'execute_restore_drill'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'execute restore drill', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'execute_restore_drill'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'execute restore drill', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'execute_restore_drill'})
+            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'execute restore drill', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'execute_restore_drill'})
         )
         from content.playbooks.backup_recovery.primitives.drill import evaluate_restore_drill
         __drill_result__ = evaluate_restore_drill(candidate_backup_id=__candidate_backup_id__, backup_scope=__backup_scope__, drill_observation=__drill_observation__)
@@ -96,10 +96,10 @@ async def evidence_capture(backup_scope: str, candidate_backup_id: str, captured
     """
     with _TRACER.start_as_current_span(
         name='activity.action--50000000-0000-4000-8000-000000000006',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'evidence capture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evidence_capture'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'evidence capture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evidence_capture'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'evidence capture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evidence_capture'})
+            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'evidence capture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evidence_capture'})
         )
         from content.playbooks.backup_recovery.primitives.attestation import build_drill_attestation
         __attestation_id__ = build_drill_attestation(workflow_id=__workflow_id__, execution_id=__execution_id__, captured_at=__captured_at__, backup_scope=__backup_scope__, candidate_backup_id=__candidate_backup_id__, integrity_ok=__integrity_ok__, drill_result=__drill_result__, integrity_observation=__integrity_observation__)
@@ -119,10 +119,10 @@ async def notify_continuity_owner(attestation_id: dict[str, object], backup_scop
     """
     with _TRACER.start_as_current_span(
         name='activity.action--50000000-0000-4000-8000-000000000007',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'notify continuity owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_continuity_owner'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'notify continuity owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_continuity_owner'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000007', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'notify continuity owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_continuity_owner'})
+            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000007', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'notify continuity owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_continuity_owner'})
         )
         from content.playbooks.backup_recovery.primitives.notify import compose_continuity_notification
         __continuity_notification__ = compose_continuity_notification(attestation=__attestation_id__, backup_scope=__backup_scope__, owner_binding=__owner_binding__)
@@ -140,8 +140,8 @@ class PlaybookBackupRecoveryV1Workflow:
 
     CACAO playbook id : playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba
     stable_id         : playbook.backup_recovery@v1
-    content_version   : 0.2.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--50000000-0000-4000-8000-000000000001
     activities        : detect_restore_drill_trigger, validate_backup_integrity, execute_restore_drill, evidence_capture, notify_continuity_owner
     """
@@ -150,10 +150,10 @@ class PlaybookBackupRecoveryV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.backup_recovery@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '0.2.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.backup_recovery@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '0.2.0'})
+                AuditRecord(span_name='workflow.playbook.backup_recovery@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6ba', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.backup_recovery@v1'"
