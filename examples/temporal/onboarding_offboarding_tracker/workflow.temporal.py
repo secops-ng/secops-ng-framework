@@ -27,10 +27,10 @@ async def ingest_lifecycle_event(raw_event: str, lifecycle_event_ref: str) -> st
     """
     with _TRACER.start_as_current_span(
         name='activity.action--20212021-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--20212021-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest-lifecycle-event', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_lifecycle_event'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--20212021-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest-lifecycle-event', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_lifecycle_event'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--20212021-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--20212021-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest-lifecycle-event', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_lifecycle_event'})
+            AuditRecord(span_name='activity.action--20212021-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--20212021-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest-lifecycle-event', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_lifecycle_event'})
         )
         from content.playbooks.onboarding_offboarding_tracker.primitives.ingest import ingest_lifecycle_event
         __lifecycle_event_record_ref__ = ingest_lifecycle_event(raw_event=__raw_event__, lifecycle_event_ref=__lifecycle_event_ref__)
@@ -50,10 +50,10 @@ async def resolve_identity(lifecycle_event_record_ref: str) -> str:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--20212021-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--20212021-0000-4000-8000-000000000003', 'secops_ng.step.name': 'resolve-identity', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'resolve_identity'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--20212021-0000-4000-8000-000000000003', 'secops_ng.step.name': 'resolve-identity', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'resolve_identity'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--20212021-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--20212021-0000-4000-8000-000000000003', 'secops_ng.step.name': 'resolve-identity', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'resolve_identity'})
+            AuditRecord(span_name='activity.action--20212021-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--20212021-0000-4000-8000-000000000003', 'secops_ng.step.name': 'resolve-identity', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'resolve_identity'})
         )
         from content.playbooks.onboarding_offboarding_tracker.primitives.identity import resolve_identity
         __resolved_identity_ref__ = resolve_identity(lifecycle_event_record=__lifecycle_event_record_ref__)
@@ -73,10 +73,10 @@ async def apply_capability_delta(lifecycle_event_record_ref: str, resolved_ident
     """
     with _TRACER.start_as_current_span(
         name='activity.action--20212021-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--20212021-0000-4000-8000-000000000004', 'secops_ng.step.name': 'apply-capability-delta', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'apply_capability_delta'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--20212021-0000-4000-8000-000000000004', 'secops_ng.step.name': 'apply-capability-delta', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'apply_capability_delta'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--20212021-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--20212021-0000-4000-8000-000000000004', 'secops_ng.step.name': 'apply-capability-delta', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'apply_capability_delta'})
+            AuditRecord(span_name='activity.action--20212021-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--20212021-0000-4000-8000-000000000004', 'secops_ng.step.name': 'apply-capability-delta', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'apply_capability_delta'})
         )
         from content.playbooks.onboarding_offboarding_tracker.primitives.delta import apply_capability_delta
         __capability_delta_ref__ = apply_capability_delta(lifecycle_event_record=__lifecycle_event_record_ref__, resolved_identity=__resolved_identity_ref__)
@@ -96,10 +96,10 @@ async def confirm_grant_revoke(capability_delta_ref: str, observed_capabilities:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--20212021-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--20212021-0000-4000-8000-000000000005', 'secops_ng.step.name': 'confirm-grant-revoke', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'confirm_grant_revoke'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--20212021-0000-4000-8000-000000000005', 'secops_ng.step.name': 'confirm-grant-revoke', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'confirm_grant_revoke'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--20212021-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--20212021-0000-4000-8000-000000000005', 'secops_ng.step.name': 'confirm-grant-revoke', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'confirm_grant_revoke'})
+            AuditRecord(span_name='activity.action--20212021-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--20212021-0000-4000-8000-000000000005', 'secops_ng.step.name': 'confirm-grant-revoke', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'confirm_grant_revoke'})
         )
         from content.playbooks.onboarding_offboarding_tracker.primitives.confirmation import confirm_grant_revoke
         __confirmation_ref__ = confirm_grant_revoke(capability_delta=__capability_delta_ref__, observed_capabilities=__observed_capabilities__)
@@ -119,10 +119,10 @@ async def emit_access_evidence(workflow_id: str, execution_id: str, compile_targ
     """
     with _TRACER.start_as_current_span(
         name='activity.action--20212021-0000-4000-8000-000000000006',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--20212021-0000-4000-8000-000000000006', 'secops_ng.step.name': 'emit-access-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_access_evidence'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--20212021-0000-4000-8000-000000000006', 'secops_ng.step.name': 'emit-access-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_access_evidence'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--20212021-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--20212021-0000-4000-8000-000000000006', 'secops_ng.step.name': 'emit-access-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_access_evidence'})
+            AuditRecord(span_name='activity.action--20212021-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--20212021-0000-4000-8000-000000000006', 'secops_ng.step.name': 'emit-access-evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_access_evidence'})
         )
         from content.playbooks.onboarding_offboarding_tracker.primitives.artifact import build_access_artifact
         __access_artifact_ref__ = build_access_artifact(workflow_id=__workflow_id__, execution_id=__execution_id__, compile_target=__compile_target__, regulation_refs=__regulation_refs__, control_refs=__control_refs__, resolved_identity=__resolved_identity_ref__, confirmation=__confirmation_ref__, captured_at=__captured_at__, source_url=__source_url__, owner_role=__owner_role__, owner_assigned_at=__owner_assigned_at__)
@@ -140,8 +140,8 @@ class PlaybookOnboardingOffboardingTrackerV1Workflow:
 
     CACAO playbook id : playbook--20212021-0000-4000-8000-000000000001
     stable_id         : playbook.onboarding_offboarding_tracker@v1
-    content_version   : 0.2.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--20212021-0000-4000-8000-000000000001
     activities        : ingest_lifecycle_event, resolve_identity, apply_capability_delta, confirm_grant_revoke, emit_access_evidence
     """
@@ -150,10 +150,10 @@ class PlaybookOnboardingOffboardingTrackerV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.onboarding_offboarding_tracker@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.onboarding_offboarding_tracker@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0'})
+                AuditRecord(span_name='workflow.playbook.onboarding_offboarding_tracker@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--20212021-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.onboarding_offboarding_tracker@v1'"
