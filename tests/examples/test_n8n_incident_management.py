@@ -222,10 +222,13 @@ def test_worked_example_has_valid_n8n_shape() -> None:
 def _action_without_commands_steps() -> dict[str, dict]:
     """Action steps without ``commands`` AND without a CORE primitive binding.
 
-    Steps that carry ``x_secops_ng.core_body`` would compile to an n8n Code
-    node rendering the primitive call (CORE-MECH-EMIT-N8N) rather than the
-    Set-node uplift. SKELETON-stage incident_management ships with zero
-    CORE bodies, so this set is the full set of action steps.
+    Steps that carry ``x_secops_ng.core_body`` compile to an n8n Code
+    node rendering the primitive call (CORE-MECH-EMIT-N8N) rather than
+    the Set-node uplift. The #937 wire card bound the last unbound
+    action step (intake), so this set is now EMPTY — selecting on
+    command-less alone would assert the pre-binding shape. The Set-node
+    tests below quantify over the (empty) set; the code-node test pins
+    the bound reality.
     """
     raw = json.loads(MIRROR_JSON.read_text(encoding="utf-8"))
     return {
@@ -246,7 +249,6 @@ def test_action_without_commands_steps_emit_set_nodes() -> None:
     """No `noOp` placeholders left for steps that should carry intent."""
     nodes_by_id = _nodes_by_id()
     action_steps = _action_without_commands_steps()
-    assert action_steps, "expected SKELETON action steps in incident_management"
     for step_id in action_steps:
         node = nodes_by_id[step_id]
         assert node["type"] == "n8n-nodes-base.set", (
@@ -351,3 +353,39 @@ def test_workflow_shape_matches_gap_inventory() -> None:
     assert by_type.get("if-condition") == 2, by_type
     assert by_type.get("action") == 7, by_type
     assert len(workflow) == 11, len(workflow)
+
+
+# --------------------------------------------------------------------------- #
+# CORE semantic checks — code-node lowering for bound steps                    #
+# --------------------------------------------------------------------------- #
+
+
+def _core_body_steps() -> dict[str, dict]:
+    raw = json.loads(MIRROR_JSON.read_text(encoding="utf-8"))
+    return {
+        step_id: step
+        for step_id, step in raw["workflow"].items()
+        if (step.get("x_secops_ng") or {}).get("core_body")
+    }
+
+
+def test_core_body_steps_emit_code_nodes() -> None:
+    """Each bound step lowers to a Pyodide node that calls its own primitive.
+
+    All seven action steps are bound as of the #937 wire card (intake
+    was the last), so this set is the full action-step set.
+    """
+    nodes_by_id = _nodes_by_id()
+    bound = _core_body_steps()
+    assert len(bound) == 7, "expected all seven action steps bound"
+    for step_id, step in bound.items():
+        node = nodes_by_id[step_id]
+        assert node["type"] == "n8n-nodes-base.code", (
+            f"step {step_id!r} carries a core_body binding and must emit a "
+            f"Pyodide code node, not {node['type']!r}"
+        )
+        leaf = step["x_secops_ng"]["core_body"]["primitive"].rsplit(".", 1)[-1]
+        assert leaf in node["parameters"]["pythonCode"], (
+            f"step {step_id!r}: emitted code does not reference the bound "
+            f"primitive {leaf!r}"
+        )

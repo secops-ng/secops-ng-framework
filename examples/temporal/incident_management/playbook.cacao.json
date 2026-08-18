@@ -150,7 +150,7 @@
     "action--50000000-0000-4000-8000-000000000002": {
       "type": "action",
       "name": "intake significant-incident signal",
-      "description": "Receive the originating incident signal and hydrate it with the typed intake-event payload shape consumed by the F-PT-02 incident-timeline pattern. Produces __incident_id__. CORE body lands in CORE-PRIM (card 5); SKELETON stub raises NotImplementedError against the named contract.",
+      "description": "Receive the originating incident signal and hydrate it with the typed intake-event payload shape consumed by the F-PT-02 incident-timeline pattern. Produces __incident_id__ deterministically (UUIDv5 over the namespaced signal id, so the same signal replays to the same incident and intake dedup is a property of the derivation); bound to the intake primitive since the #937 wire card.",
       "on_completion": "action--50000000-0000-4000-8000-000000000003",
       "in_args": [
         "__signal_id__"
@@ -168,7 +168,14 @@
         ],
         "metric_refs": [
           "kpi.timeline_completeness@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.incident_management.primitives.intake.derive_incident_id",
+          "in": {
+            "signal_id": "__signal_id__"
+          },
+          "out": "__incident_id__"
+        }
       }
     },
     "action--50000000-0000-4000-8000-000000000003": {
@@ -400,8 +407,8 @@
   },
   "x_secops_ng": {
     "stable_id": "playbook.incident_management@v1",
-    "content_version": "0.2.0",
-    "maturity": "experimental",
+    "content_version": "1.0.0",
+    "maturity": "stable",
     "compile_targets": [
       "n8n",
       "temporal",

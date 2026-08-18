@@ -364,6 +364,14 @@ one playbook's provenance.
   operator-configured; the framework ships no default endpoint.
 - **Depends on:** F-CR-04, F-PT-02 (incident_timeline pattern)
 - **Source:** NIS2 Art. 23.
+- **Shipped via:**
+  - WIRE + GRADUATE — #937 wire lane (the last unbound action step,
+    intake, bound to `primitives.intake.derive_incident_id` — a
+    deterministic UUIDv5 over the namespaced signal id, so intake
+    dedup is a property of the derivation; then `experimental` →
+    `stable`, `content_version` 1.0.0, per the Maturity ladder, all
+    three worked examples regenerated. Earlier stages predate
+    Shipped-via bookkeeping).
 
 ### F-WF-06 — Infrastructure posture management
 
