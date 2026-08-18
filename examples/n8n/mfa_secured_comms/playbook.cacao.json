@@ -114,6 +114,12 @@
       "type": "string",
       "description": "Dated authentication and secured-communications posture-attestation record emitted by artifact.build_mfa_posture_attestation_artifact and published to the operator's evidence store. Carries the MFA-coverage snapshot, the continuous-authentication assessment, the OOB-channel verification, and the aggregate gap_summary \u2014 the audit-evident discharge of NIS2 Art.21(2)(j).",
       "external": false
+    },
+    "__owner_notification__": {
+      "type": "dictionary",
+      "description": "Closed owner-notification payload composed by notify.compose_owner_notification: role-shaped recipient, attestation_ref, auth_scope echo, and the SHA-256 notification_id the messaging surface uses as a delivery dedup key.",
+      "constant": false,
+      "external": false
     }
   },
   "workflow_start": "start--52000000-0000-4000-8000-000000000001",
@@ -266,7 +272,7 @@
     "action--52000000-0000-4000-8000-000000000006": {
       "type": "action",
       "name": "notify authentication owner",
-      "description": "Deliver the attestation reference to the authentication owner along the operator's pre-bound channel (ticketing system, chat thread, email). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an attestation written but never delivered to the owner is itself a posture gap. No core_body primitive is bound: notification is a delivery discipline owned by the compile target's messaging surface, not a deterministic primitive.",
+      "description": "Deliver the attestation reference to the authentication owner along the operator's pre-bound channel (ticketing system, chat thread, email). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an attestation written but never delivered to the owner is itself a posture gap. The deterministic half is bound since the #937 wire card: compose_owner_notification builds the closed payload (role-shaped recipient, attestation ref, idempotency key) the messaging surface delivers verbatim \u2014 delivery itself remains a discipline of the compile target's messaging surface, mirroring the incident_management destination-resolver split.",
       "on_completion": "end--52000000-0000-4000-8000-000000000007",
       "in_args": [
         "__attestation_id__",
@@ -275,8 +281,19 @@
       "x_secops_ng": {
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
-        ]
-      }
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.mfa_secured_comms.primitives.notify.compose_owner_notification",
+          "in": {
+            "attestation_id": "__attestation_id__",
+            "auth_scope": "__auth_scope__"
+          },
+          "out": "__owner_notification__"
+        }
+      },
+      "out_args": [
+        "__owner_notification__"
+      ]
     },
     "end--52000000-0000-4000-8000-000000000007": {
       "type": "end",
@@ -285,8 +302,8 @@
   },
   "x_secops_ng": {
     "stable_id": "playbook.mfa_secured_comms@v1",
-    "content_version": "0.2.0",
-    "maturity": "experimental",
+    "content_version": "1.0.0",
+    "maturity": "stable",
     "compile_targets": [
       "n8n",
       "temporal",
