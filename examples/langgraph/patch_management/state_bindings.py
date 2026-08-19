@@ -111,6 +111,9 @@ class PlaybookPatchManagementV1State(TypedDict, total=False):
     # playbook_variable: __canary_verdict__
     # Structured canary validation verdict.
     canary_verdict: str
+    # playbook_variable: __maintenance_notification__
+    # Closed maintenance-owner notification payload composed by notify.compose_maintenance_notification: role-shaped recipient, evidence_ref, urgency derived from __canary_healthy__ (with the documented escalation levers carried verbatim when unhealthy), and the SHA-256 notification_id the messaging surface uses as a delivery dedup key.
+    maintenance_notification: dict[str, object]
     # bookkeeping
     # Per-step status map keyed by CACAO step_id. Conventional values: 'pending', 'running', 'ok', 'failed', 'awaiting-human'. The graph builder writes here; conditional-edge routers read it.
     step_status: dict[str, str]
@@ -224,8 +227,8 @@ async def evidence_capture(update_subject: str, update_reference: str, patch_cri
         __evidence_id__ = build_patch_application_evidence_artifact(workflow_id=__workflow_id__, execution_id=__execution_id__, regulation_refs=__regulation_refs__, control_refs=__control_refs__, update_subject=__update_subject__, update_reference=__update_reference__, patch_criticality=__patch_criticality__, staged_ring_id=__staged_ring_id__, canary_healthy=__canary_healthy__, broad_rollout_id=__broad_rollout_id__, health_observations=__health_observations__, captured_at=__captured_at__, source_url=__source_url__)
 
 @tool
-async def notify_maintenance_owner(evidence_id: str, update_subject: str, canary_healthy: bool) -> None:
-    """Deliver the evidence reference to the maintenance owner along the operator's pre-bound channel (ticketing system, chat thread, change-management board). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an evidence record written but never delivered to the owner is itself a maintenance-discipline gap. Notification carries the canary health outcome so a false __canary_healthy__ pages with appropriate urgency for the next maintenance lever (rollback the canary, escalate the advisory, hold the broad rollout).
+async def notify_maintenance_owner(evidence_id: str, update_subject: str, canary_healthy: bool) -> dict[str, object]:
+    """Deliver the evidence reference to the maintenance owner along the operator's pre-bound channel (ticketing system, chat thread, change-management board). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an evidence record written but never delivered to the owner is itself a maintenance-discipline gap. The deterministic half is bound since the #937 wire card: compose_maintenance_notification builds the closed payload — role-shaped recipient, evidence ref, SHA-256 delivery dedup key, and urgency derived from __canary_healthy__ (a false outcome composes action_required and carries the documented next maintenance levers verbatim: rollback the canary, escalate the advisory, hold the broad rollout — the choice stays with the owner). Delivery itself remains a discipline of the compile target's messaging surface, mirroring the incident_management destination-resolver split.
 
     CACAO step_id : action--70000000-0000-4000-8000-000000000008
     CACAO type    : action
@@ -237,9 +240,8 @@ async def notify_maintenance_owner(evidence_id: str, update_subject: str, canary
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--70000000-0000-4000-8000-000000000008', attributes={'secops_ng.playbook.id': 'playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc', 'secops_ng.step.id': 'action--70000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'notify maintenance owner', 'secops_ng.tool.name': 'notify_maintenance_owner', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--70000000-0000-4000-8000-000000000008'"
-        )
+        from content.playbooks.patch_management.primitives.notify import compose_maintenance_notification
+        __maintenance_notification__ = compose_maintenance_notification(evidence_id=__evidence_id__, update_subject=__update_subject__, canary_healthy=__canary_healthy__)
 
 async def llm_step(state: PlaybookPatchManagementV1State) -> dict:
     """Agentic-extension hook.

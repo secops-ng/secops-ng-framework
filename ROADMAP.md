@@ -1319,6 +1319,15 @@ one playbook's provenance.
   - ROADMAP `Shipped` flip — PR #746 (formal ROADMAP entry
     for the already-landed trilogy; README Status flip to
     reflect actual delivery state).
+  - WIRE + GRADUATE — #937 wire lane (the notify step's deterministic
+    composition half bound to
+    `primitives.notify.compose_maintenance_notification` —
+    role-shaped recipient, evidence ref, SHA-256 delivery dedup key,
+    and urgency derived from the canary outcome with the documented
+    escalation levers carried verbatim when unhealthy; delivery
+    itself remains the compile target's messaging discipline. Then
+    `experimental` → `stable`, `content_version` 1.0.0, all three
+    worked examples regenerated).
 
 ---
 

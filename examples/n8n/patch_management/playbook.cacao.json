@@ -173,6 +173,12 @@
       "type": "string",
       "description": "Structured canary validation verdict.",
       "external": false
+    },
+    "__maintenance_notification__": {
+      "type": "dictionary",
+      "description": "Closed maintenance-owner notification payload composed by notify.compose_maintenance_notification: role-shaped recipient, evidence_ref, urgency derived from __canary_healthy__ (with the documented escalation levers carried verbatim when unhealthy), and the SHA-256 notification_id the messaging surface uses as a delivery dedup key.",
+      "constant": false,
+      "external": false
     }
   },
   "workflow_start": "start--70000000-0000-4000-8000-000000000001",
@@ -405,7 +411,7 @@
     "action--70000000-0000-4000-8000-000000000008": {
       "type": "action",
       "name": "notify maintenance owner",
-      "description": "Deliver the evidence reference to the maintenance owner along the operator's pre-bound channel (ticketing system, chat thread, change-management board). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an evidence record written but never delivered to the owner is itself a maintenance-discipline gap. Notification carries the canary health outcome so a false __canary_healthy__ pages with appropriate urgency for the next maintenance lever (rollback the canary, escalate the advisory, hold the broad rollout).",
+      "description": "Deliver the evidence reference to the maintenance owner along the operator's pre-bound channel (ticketing system, chat thread, change-management board). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an evidence record written but never delivered to the owner is itself a maintenance-discipline gap. The deterministic half is bound since the #937 wire card: compose_maintenance_notification builds the closed payload — role-shaped recipient, evidence ref, SHA-256 delivery dedup key, and urgency derived from __canary_healthy__ (a false outcome composes action_required and carries the documented next maintenance levers verbatim: rollback the canary, escalate the advisory, hold the broad rollout — the choice stays with the owner). Delivery itself remains a discipline of the compile target's messaging surface, mirroring the incident_management destination-resolver split.",
       "on_completion": "end--70000000-0000-4000-8000-000000000009",
       "in_args": [
         "__evidence_id__",
@@ -418,8 +424,20 @@
         ],
         "metric_refs": [
           "kri.control_effectiveness@v1"
-        ]
-      }
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.patch_management.primitives.notify.compose_maintenance_notification",
+          "in": {
+            "evidence_id": "__evidence_id__",
+            "update_subject": "__update_subject__",
+            "canary_healthy": "__canary_healthy__"
+          },
+          "out": "__maintenance_notification__"
+        }
+      },
+      "out_args": [
+        "__maintenance_notification__"
+      ]
     },
     "end--70000000-0000-4000-8000-000000000009": {
       "type": "end",
@@ -428,8 +446,8 @@
   },
   "x_secops_ng": {
     "stable_id": "playbook.patch_management@v1",
-    "content_version": "0.2.0",
-    "maturity": "experimental",
+    "content_version": "1.0.0",
+    "maturity": "stable",
     "compile_targets": [
       "n8n",
       "temporal",
