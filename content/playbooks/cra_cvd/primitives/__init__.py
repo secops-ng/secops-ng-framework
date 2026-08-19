@@ -36,6 +36,11 @@ and ``content/playbooks/supply_chain_security/primitives/__init__.py``.
 
 from __future__ import annotations
 
+from .coordination import (
+    ANONYMOUS_CREDIT_MARKER,
+    InvalidDisclosureAgreementError,
+    record_disclosure_coordination,
+)
 from .csirt import (
     InvalidCsirtNotificationError,
     notify_national_csirt,
@@ -44,16 +49,43 @@ from .disclosure import (
     InvalidAdvisoryArtifactError,
     build_advisory_artifact,
 )
+from .fix import (
+    InvalidFixCandidateError,
+    record_fix_candidate,
+)
+from .intake import (
+    InvalidCvdReportError,
+    open_cvd_case,
+)
 from .reporter import (
     InvalidAcknowledgementError,
     send_acknowledgement,
 )
+from .triage import (
+    InvalidTriageObservationsError,
+    triage_case,
+)
+from .validation import (
+    InvalidFixValidationError,
+    confirm_fix_validation,
+)
 
 __all__ = [
+    "ANONYMOUS_CREDIT_MARKER",
     "InvalidAcknowledgementError",
     "InvalidAdvisoryArtifactError",
     "InvalidCsirtNotificationError",
+    "InvalidCvdReportError",
+    "InvalidDisclosureAgreementError",
+    "InvalidFixCandidateError",
+    "InvalidFixValidationError",
+    "InvalidTriageObservationsError",
     "build_advisory_artifact",
+    "confirm_fix_validation",
     "notify_national_csirt",
+    "open_cvd_case",
+    "record_disclosure_coordination",
+    "record_fix_candidate",
     "send_acknowledgement",
+    "triage_case",
 ]
