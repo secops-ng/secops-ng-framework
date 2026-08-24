@@ -96,6 +96,36 @@ class PlaybookCraCvdV1State(TypedDict, total=False):
     # playbook_variable: __severity_label__
     # Severity rating label published on the advisory (critical / high / medium / low), consistent with __severity_score__.
     severity_label: str
+    # playbook_variable: __raw_report__
+    # Raw vulnerability report handed over by the operator's CVD intake surface adapter (RFC 9116 security.txt address, disclosure mailbox, bug-bounty portal webhook): reporter_contact, product, affected_versions, reproduction, optional proposed_embargo. Validated and shaped by intake.open_cvd_case.
+    raw_report: dict[str, object]
+    # playbook_variable: __intake_channel__
+    # Which CVD intake surface received the report: security_txt, disclosure_mailbox, or bug_bounty_portal. Part of the content-derived case identity.
+    intake_channel: str
+    # playbook_variable: __cvd_case__
+    # Closed case envelope composed by intake.open_cvd_case: case_id, intake_channel, reporter_contact, product, affected_versions, reproduction, proposed_embargo. The compile target's adapter extracts __case_id__ (and mirrors __reporter_contact__) from this envelope — the documented out_args extraction seam.
+    cvd_case: dict[str, object]
+    # playbook_variable: __triage_observations__
+    # Operator-recorded triage observations consumed by triage.triage_case: in_scope, reproduced, actively_exploited (real booleans), optional duplicate_of and compensating_control.
+    triage_observations: dict[str, object]
+    # playbook_variable: __triage_result__
+    # Verdict record composed by triage.triage_case: case_id, triage_verdict, actively_exploited, rationale. The compile target's adapter extracts __triage_verdict__ and __actively_exploited__ from this record — the documented out_args extraction seam.
+    triage_result: dict[str, object]
+    # playbook_variable: __fix_candidate__
+    # Operator-supplied fix-candidate record consumed by fix.record_fix_candidate: kind (patch_commit / build_id / release_attestation) and role-shaped ref into the operator's change-management surface.
+    fix_candidate: dict[str, object]
+    # playbook_variable: __validation_evidence__
+    # Operator-recorded validation outcomes consumed by validation.confirm_fix_validation: regression_suite_green, replay_reproduced (real booleans; replay_reproduced=true fails the gate), optional reporter_reverified.
+    validation_evidence: dict[str, object]
+    # playbook_variable: __fix_validation__
+    # Validation-gate record composed by validation.confirm_fix_validation: case_id, fix_ref, validated, failed_checks. Divergence is data: a failing gate is recorded here, not raised.
+    fix_validation: dict[str, object]
+    # playbook_variable: __disclosure_agreement__
+    # Operator-recorded outcome of the disclosure coordination consumed by coordination.record_disclosure_coordination: target_date, credit_consent (real boolean), and credit_display (required with consent, forbidden without).
+    disclosure_agreement: dict[str, object]
+    # playbook_variable: __coordination_record__
+    # Coordination record composed by coordination.record_disclosure_coordination: case_id, disclosure_target_date, reporter_credit_display. The compile target's adapter extracts __disclosure_target_date__ and __reporter_credit_display__ from this record — the documented out_args extraction seam (the CORE-DEFERRED single-ref collapse the step description anticipated).
+    coordination_record: dict[str, object]
     # bookkeeping
     # Per-step status map keyed by CACAO step_id. Conventional values: 'pending', 'running', 'ok', 'failed', 'awaiting-human'. The graph builder writes here; conditional-edge routers read it.
     step_status: dict[str, str]
@@ -108,7 +138,7 @@ class PlaybookCraCvdV1State(TypedDict, total=False):
 
 @tool
 async def intake() -> dict[str, object]:
-    """SKELETON — receive a vulnerability report through the operator's CVD intake surface (security.txt / disclosure address / bug-bounty portal). Assign __case_id__, capture reporter contact, product / component in scope, affected versions, reproduction steps, and any embargo terms the reporter has proposed. TODO (CORE): pin the intake surface adapter (RFC 9116 security.txt address resolution, PGP-encrypted mailbox handling) and the initial evidence-capture shape.
+    """Receive a vulnerability report through the operator's CVD intake surface (security.txt / disclosure address / bug-bounty portal) and open the case: intake.open_cvd_case validates the report envelope and derives __case_id__ deterministically from the intake channel and the canonicalised report content, so the same report re-received resolves to the same case (intake dedup by construction). Bound since the CORE-WIRE card; the binding assigns the full case envelope to __cvd_case__ and the compile target's adapter extracts the documented out_args (__case_id__; __reporter_contact__ mirrors the envelope field) — the same marshalling seam every bound playbook documents. Embargo terms the reporter proposed travel on the envelope.
 
     CACAO step_id : action--c7d51014-0000-4000-8000-000000000002
     CACAO type    : action
@@ -120,9 +150,8 @@ async def intake() -> dict[str, object]:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--c7d51014-0000-4000-8000-000000000002', attributes={'secops_ng.playbook.id': 'playbook--c7d51014-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--c7d51014-0000-4000-8000-000000000002', 'secops_ng.step.name': 'intake', 'secops_ng.tool.name': 'intake', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--c7d51014-0000-4000-8000-000000000002'"
-        )
+        from content.playbooks.cra_cvd.primitives.intake import open_cvd_case
+        __cvd_case__ = open_cvd_case(raw_report=__raw_report__, intake_channel=__intake_channel__)
 
 @tool
 async def ack_to_reporter(case_id: str, reporter_contact: str, captured_at: str, operator_display: str, cvd_policy_url: str, next_update_after: str, smtp_endpoint: str) -> str:
@@ -143,7 +172,7 @@ async def ack_to_reporter(case_id: str, reporter_contact: str, captured_at: str,
 
 @tool
 async def triage(case_id: str) -> dict[str, object]:
-    """SKELETON — reproduce, assess severity, determine scope of affected versions, and produce __triage_verdict__. When __actively_exploited__ is true (either at triage or when re-evaluated later), fork a sibling cra_srp_notify run with __clock_kind__ = actively_exploited_vulnerability keyed on __case_id__; the disclosure lifecycle here continues in parallel. When __triage_verdict__ is not valid_needs_fix, short-circuit to a reporter-facing rationale communication and end. TODO (CORE): severity-scoring input (CVSS 4.0 vector + operator adjustments), CPE / affected-version enumeration shape, actively-exploited signal source.
+    """Reproduce, assess severity, and scope the affected versions: triage.triage_case derives __triage_verdict__ and __actively_exploited__ deterministically from the operator's recorded observations under the pinned five-verdict precedence (out_of_scope > duplicate > not_reproducible > valid_no_action > valid_needs_fix). Bound since the CORE-WIRE card; the binding assigns the verdict record to __triage_result__ and the adapter extracts the documented out_args. When __actively_exploited__ is true (at triage or on later re-evaluation), fork a sibling cra_srp_notify run with __clock_kind__ = actively_exploited_vulnerability keyed on __case_id__; the disclosure lifecycle here continues in parallel. When __triage_verdict__ is not valid_needs_fix the case short-circuits to a reporter-facing rationale communication and ends.
 
     CACAO step_id : action--c7d51014-0000-4000-8000-000000000004
     CACAO type    : action
@@ -155,13 +184,12 @@ async def triage(case_id: str) -> dict[str, object]:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--c7d51014-0000-4000-8000-000000000004', attributes={'secops_ng.playbook.id': 'playbook--c7d51014-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--c7d51014-0000-4000-8000-000000000004', 'secops_ng.step.name': 'triage', 'secops_ng.tool.name': 'triage', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--c7d51014-0000-4000-8000-000000000004'"
-        )
+        from content.playbooks.cra_cvd.primitives.triage import triage_case
+        __triage_result__ = triage_case(case_id=__case_id__, observations=__triage_observations__)
 
 @tool
 async def develop_fix(case_id: str, triage_verdict: str) -> str:
-    """SKELETON — develop the corrective / mitigating measure for the confirmed vulnerability. Records __fix_ref__ on production of a candidate build or patch. TODO (CORE): fix-artifact provenance shape (SBOM update, signed release attestation) and interaction with the operator's change-management surface.
+    """Develop the corrective / mitigating measure for the confirmed vulnerability on the operator's change-management surface. Bound since the CORE-WIRE card: fix.record_fix_candidate validates the candidate's provenance (patch_commit / build_id / release_attestation) and composes the kind-prefixed __fix_ref__; recording a fix for a non-actionable verdict is refused at the boundary — only valid_needs_fix cases take this lane.
 
     CACAO step_id : action--c7d51014-0000-4000-8000-000000000005
     CACAO type    : action
@@ -173,13 +201,12 @@ async def develop_fix(case_id: str, triage_verdict: str) -> str:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--c7d51014-0000-4000-8000-000000000005', attributes={'secops_ng.playbook.id': 'playbook--c7d51014-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--c7d51014-0000-4000-8000-000000000005', 'secops_ng.step.name': 'develop_fix', 'secops_ng.tool.name': 'develop_fix', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--c7d51014-0000-4000-8000-000000000005'"
-        )
+        from content.playbooks.cra_cvd.primitives.fix import record_fix_candidate
+        __fix_ref__ = record_fix_candidate(case_id=__case_id__, triage_verdict=__triage_verdict__, fix_candidate=__fix_candidate__)
 
 @tool
-async def validate_fix(case_id: str, fix_ref: str) -> None:
-    """SKELETON — verify the candidate fix closes the reported condition without regressing adjacent behaviour. Confirms __fix_ref__ before disclosure coordination proceeds. TODO (CORE): validation-evidence shape (regression tests, red-team replay, reporter re-verification path).
+async def validate_fix(case_id: str, fix_ref: str) -> dict[str, object]:
+    """Verify the candidate fix closes the reported condition without regressing adjacent behaviour. Bound since the CORE-WIRE card: validation.confirm_fix_validation derives the gate record from the operator's recorded outcomes — regression suite green, the original reproduction no longer working (replay_reproduced=true FAILS the gate), and optional reporter re-verification (never silently failing: not-attempted is allowed, attempted-and-failed fails). Divergence is data: a failing gate lands on __fix_validation__ for the case file rather than raising.
 
     CACAO step_id : action--c7d51014-0000-4000-8000-000000000006
     CACAO type    : action
@@ -191,13 +218,12 @@ async def validate_fix(case_id: str, fix_ref: str) -> None:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--c7d51014-0000-4000-8000-000000000006', attributes={'secops_ng.playbook.id': 'playbook--c7d51014-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--c7d51014-0000-4000-8000-000000000006', 'secops_ng.step.name': 'validate_fix', 'secops_ng.tool.name': 'validate_fix', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--c7d51014-0000-4000-8000-000000000006'"
-        )
+        from content.playbooks.cra_cvd.primitives.validation import confirm_fix_validation
+        __fix_validation__ = confirm_fix_validation(case_id=__case_id__, fix_ref=__fix_ref__, validation_evidence=__validation_evidence__)
 
 @tool
 async def coordinate_disclosure(case_id: str, reporter_contact: str, fix_ref: str) -> dict[str, object]:
-    """# CORE-DEFERRED: out_args collapse to single __coordinate_disclosure_ref__ pending EXTEND scope. Agree the coordinated public-disclosure date with the reporter and, where applicable, the coordinating CSIRT. Records __disclosure_target_date__ and captures the reporter-credit consent decision into __reporter_credit_display__ (opt-in attribution string or the anonymous marker) so the publish_advisory step can render both the human-readable and CSAF 2.0 advisory templates without a second reporter round-trip. Coordinates with the sibling cra_srp_notify run when one is active so the public-advisory publication does not front-run a regulator submission the SRP notification chain has not yet completed. Left CACAO-only in the CORE-B-PRIM scope because binding a single core_body primitive here would collapse the two-variable out_args (__disclosure_target_date__, __reporter_credit_display__) into a single __coordinate_disclosure_ref__ ref, which changes the workflow variable contract; the primitive surface (content.playbooks.cra_cvd.primitives.csirt.notify_national_csirt) is landed for the EXTEND scope to wire once the contract collapse is scoped.
+    """Agree the coordinated public-disclosure date with the reporter and, where applicable, the coordinating CSIRT. Bound since the CORE-WIRE card, resolving the CORE-DEFERRED note: the binding assigns the coordination record to the single __coordination_record__ and the adapter extracts the documented out_args (__disclosure_target_date__, __reporter_credit_display__). coordination.record_disclosure_coordination captures the reporter-credit consent decision per ISO/IEC 29147 (consent taken after the reporter has seen the draft advisory): attribution follows consent both ways — a credit line without consent is refused rather than dropped, and the anonymous marker is the exact literal the advisory builder pins.
 
     CACAO step_id : action--c7d51014-0000-4000-8000-000000000007
     CACAO type    : action
@@ -209,9 +235,8 @@ async def coordinate_disclosure(case_id: str, reporter_contact: str, fix_ref: st
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--c7d51014-0000-4000-8000-000000000007', attributes={'secops_ng.playbook.id': 'playbook--c7d51014-0000-4000-8000-000000000001', 'secops_ng.step.id': 'action--c7d51014-0000-4000-8000-000000000007', 'secops_ng.step.name': 'coordinate_disclosure', 'secops_ng.tool.name': 'coordinate_disclosure', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--c7d51014-0000-4000-8000-000000000007'"
-        )
+        from content.playbooks.cra_cvd.primitives.coordination import record_disclosure_coordination
+        __coordination_record__ = record_disclosure_coordination(case_id=__case_id__, reporter_contact=__reporter_contact__, fix_ref=__fix_ref__, agreement=__disclosure_agreement__)
 
 @tool
 async def publish_advisory(case_id: str, fix_ref: str, disclosure_target_date: str, reporter_credit_display: str, advisory_id: str, advisory_title: str, advisory_summary: str, advisory_impact: str, affected_products: dict[str, object], severity_cvss_v4: str, severity_score: str, severity_label: str, operator_display: str, operator_namespace: str) -> str:

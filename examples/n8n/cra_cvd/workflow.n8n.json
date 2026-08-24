@@ -144,6 +144,66 @@
               "type": "string",
               "value": "",
               "description": "Severity rating label published on the advisory (critical / high / medium / low), consistent with __severity_score__."
+            },
+            {
+              "name": "__raw_report__",
+              "type": "object",
+              "value": "",
+              "description": "Raw vulnerability report handed over by the operator's CVD intake surface adapter (RFC 9116 security.txt address, disclosure mailbox, bug-bounty portal webhook): reporter_contact, product, affected_versions, reproduction, optional proposed_embargo. Validated and shaped by intake.open_cvd_case."
+            },
+            {
+              "name": "__intake_channel__",
+              "type": "string",
+              "value": "",
+              "description": "Which CVD intake surface received the report: security_txt, disclosure_mailbox, or bug_bounty_portal. Part of the content-derived case identity."
+            },
+            {
+              "name": "__cvd_case__",
+              "type": "object",
+              "value": "",
+              "description": "Closed case envelope composed by intake.open_cvd_case: case_id, intake_channel, reporter_contact, product, affected_versions, reproduction, proposed_embargo. The compile target's adapter extracts __case_id__ (and mirrors __reporter_contact__) from this envelope \u2014 the documented out_args extraction seam."
+            },
+            {
+              "name": "__triage_observations__",
+              "type": "object",
+              "value": "",
+              "description": "Operator-recorded triage observations consumed by triage.triage_case: in_scope, reproduced, actively_exploited (real booleans), optional duplicate_of and compensating_control."
+            },
+            {
+              "name": "__triage_result__",
+              "type": "object",
+              "value": "",
+              "description": "Verdict record composed by triage.triage_case: case_id, triage_verdict, actively_exploited, rationale. The compile target's adapter extracts __triage_verdict__ and __actively_exploited__ from this record \u2014 the documented out_args extraction seam."
+            },
+            {
+              "name": "__fix_candidate__",
+              "type": "object",
+              "value": "",
+              "description": "Operator-supplied fix-candidate record consumed by fix.record_fix_candidate: kind (patch_commit / build_id / release_attestation) and role-shaped ref into the operator's change-management surface."
+            },
+            {
+              "name": "__validation_evidence__",
+              "type": "object",
+              "value": "",
+              "description": "Operator-recorded validation outcomes consumed by validation.confirm_fix_validation: regression_suite_green, replay_reproduced (real booleans; replay_reproduced=true fails the gate), optional reporter_reverified."
+            },
+            {
+              "name": "__fix_validation__",
+              "type": "object",
+              "value": "",
+              "description": "Validation-gate record composed by validation.confirm_fix_validation: case_id, fix_ref, validated, failed_checks. Divergence is data: a failing gate is recorded here, not raised."
+            },
+            {
+              "name": "__disclosure_agreement__",
+              "type": "object",
+              "value": "",
+              "description": "Operator-recorded outcome of the disclosure coordination consumed by coordination.record_disclosure_coordination: target_date, credit_consent (real boolean), and credit_display (required with consent, forbidden without)."
+            },
+            {
+              "name": "__coordination_record__",
+              "type": "object",
+              "value": "",
+              "description": "Coordination record composed by coordination.record_disclosure_coordination: case_id, disclosure_target_date, reporter_credit_display. The compile target's adapter extracts __disclosure_target_date__ and __reporter_credit_display__ from this record \u2014 the documented out_args extraction seam (the CORE-DEFERRED single-ref collapse the step description anticipated)."
             }
           ]
         }
@@ -154,50 +214,17 @@
     {
       "id": "action--c7d51014-0000-4000-8000-000000000002",
       "name": "intake",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         500,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "out.case_id",
-              "name": "out.case_id",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "out.reporter_contact",
-              "name": "out.reporter_contact",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.vuln_disclosure_intake@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.vulnerability_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kri.cvd_intake_aging@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.cra_cvd.primitives.intake import open_cvd_case\n__cvd_case__ = open_cvd_case(raw_report=__raw_report__, intake_channel=__intake_channel__)"
       },
-      "notes": "SKELETON \u2014 receive a vulnerability report through the operator's CVD intake surface (security.txt / disclosure address / bug-bounty portal). Assign __case_id__, capture reporter contact, product / component in scope, affected versions, reproduction steps, and any embargo terms the reporter has proposed. TODO (CORE): pin the intake surface adapter (RFC 9116 security.txt address resolution, PGP-encrypted mailbox handling) and the initial evidence-capture shape.",
+      "notes": "Receive a vulnerability report through the operator's CVD intake surface (security.txt / disclosure address / bug-bounty portal) and open the case: intake.open_cvd_case validates the report envelope and derives __case_id__ deterministically from the intake channel and the canonicalised report content, so the same report re-received resolves to the same case (intake dedup by construction). Bound since the CORE-WIRE card; the binding assigns the full case envelope to __cvd_case__ and the compile target's adapter extracts the documented out_args (__case_id__; __reporter_contact__ mirrors the envelope field) \u2014 the same marshalling seam every bound playbook documents. Embargo terms the reporter proposed travel on the envelope.",
       "notesInFlow": true
     },
     {
@@ -219,227 +246,65 @@
     {
       "id": "action--c7d51014-0000-4000-8000-000000000004",
       "name": "triage",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1020,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.case_id",
-              "name": "in.case_id",
-              "value": "={{$workflow.variables.case_id}}",
-              "type": "string"
-            },
-            {
-              "id": "out.triage_verdict",
-              "name": "out.triage_verdict",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "out.actively_exploited",
-              "name": "out.actively_exploited",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.vuln_disclosure_intake@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.vulnerability_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.false_positive_rate@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.cra_cvd.primitives.triage import triage_case\n__triage_result__ = triage_case(case_id=__case_id__, observations=__triage_observations__)"
       },
-      "notes": "SKELETON \u2014 reproduce, assess severity, determine scope of affected versions, and produce __triage_verdict__. When __actively_exploited__ is true (either at triage or when re-evaluated later), fork a sibling cra_srp_notify run with __clock_kind__ = actively_exploited_vulnerability keyed on __case_id__; the disclosure lifecycle here continues in parallel. When __triage_verdict__ is not valid_needs_fix, short-circuit to a reporter-facing rationale communication and end. TODO (CORE): severity-scoring input (CVSS 4.0 vector + operator adjustments), CPE / affected-version enumeration shape, actively-exploited signal source.",
+      "notes": "Reproduce, assess severity, and scope the affected versions: triage.triage_case derives __triage_verdict__ and __actively_exploited__ deterministically from the operator's recorded observations under the pinned five-verdict precedence (out_of_scope > duplicate > not_reproducible > valid_no_action > valid_needs_fix). Bound since the CORE-WIRE card; the binding assigns the verdict record to __triage_result__ and the adapter extracts the documented out_args. When __actively_exploited__ is true (at triage or on later re-evaluation), fork a sibling cra_srp_notify run with __clock_kind__ = actively_exploited_vulnerability keyed on __case_id__; the disclosure lifecycle here continues in parallel. When __triage_verdict__ is not valid_needs_fix the case short-circuits to a reporter-facing rationale communication and ends.",
       "notesInFlow": true
     },
     {
       "id": "action--c7d51014-0000-4000-8000-000000000005",
       "name": "develop_fix",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1280,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.case_id",
-              "name": "in.case_id",
-              "value": "={{$workflow.variables.case_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.triage_verdict",
-              "name": "in.triage_verdict",
-              "value": "={{$workflow.variables.triage_verdict}}",
-              "type": "string"
-            },
-            {
-              "id": "out.fix_ref",
-              "name": "out.fix_ref",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.vuln_disclosure_intake@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.vulnerability_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kri.cvd_intake_aging@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.cra_cvd.primitives.fix import record_fix_candidate\n__fix_ref__ = record_fix_candidate(case_id=__case_id__, triage_verdict=__triage_verdict__, fix_candidate=__fix_candidate__)"
       },
-      "notes": "SKELETON \u2014 develop the corrective / mitigating measure for the confirmed vulnerability. Records __fix_ref__ on production of a candidate build or patch. TODO (CORE): fix-artifact provenance shape (SBOM update, signed release attestation) and interaction with the operator's change-management surface.",
+      "notes": "Develop the corrective / mitigating measure for the confirmed vulnerability on the operator's change-management surface. Bound since the CORE-WIRE card: fix.record_fix_candidate validates the candidate's provenance (patch_commit / build_id / release_attestation) and composes the kind-prefixed __fix_ref__; recording a fix for a non-actionable verdict is refused at the boundary \u2014 only valid_needs_fix cases take this lane.",
       "notesInFlow": true
     },
     {
       "id": "action--c7d51014-0000-4000-8000-000000000006",
       "name": "validate_fix",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1540,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.case_id",
-              "name": "in.case_id",
-              "value": "={{$workflow.variables.case_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.fix_ref",
-              "name": "in.fix_ref",
-              "value": "={{$workflow.variables.fix_ref}}",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.vuln_disclosure_intake@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.vulnerability_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.false_positive_rate@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.cra_cvd.primitives.validation import confirm_fix_validation\n__fix_validation__ = confirm_fix_validation(case_id=__case_id__, fix_ref=__fix_ref__, validation_evidence=__validation_evidence__)"
       },
-      "notes": "SKELETON \u2014 verify the candidate fix closes the reported condition without regressing adjacent behaviour. Confirms __fix_ref__ before disclosure coordination proceeds. TODO (CORE): validation-evidence shape (regression tests, red-team replay, reporter re-verification path).",
+      "notes": "Verify the candidate fix closes the reported condition without regressing adjacent behaviour. Bound since the CORE-WIRE card: validation.confirm_fix_validation derives the gate record from the operator's recorded outcomes \u2014 regression suite green, the original reproduction no longer working (replay_reproduced=true FAILS the gate), and optional reporter re-verification (never silently failing: not-attempted is allowed, attempted-and-failed fails). Divergence is data: a failing gate lands on __fix_validation__ for the case file rather than raising.",
       "notesInFlow": true
     },
     {
       "id": "action--c7d51014-0000-4000-8000-000000000007",
       "name": "coordinate_disclosure",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1800,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.case_id",
-              "name": "in.case_id",
-              "value": "={{$workflow.variables.case_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.reporter_contact",
-              "name": "in.reporter_contact",
-              "value": "={{$workflow.variables.reporter_contact}}",
-              "type": "string"
-            },
-            {
-              "id": "in.fix_ref",
-              "name": "in.fix_ref",
-              "value": "={{$workflow.variables.fix_ref}}",
-              "type": "string"
-            },
-            {
-              "id": "out.disclosure_target_date",
-              "name": "out.disclosure_target_date",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "out.reporter_credit_display",
-              "name": "out.reporter_credit_display",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.vuln_disclosure_intake@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.compliance_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kri.cvd_intake_aging@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.cra_cvd.primitives.coordination import record_disclosure_coordination\n__coordination_record__ = record_disclosure_coordination(case_id=__case_id__, reporter_contact=__reporter_contact__, fix_ref=__fix_ref__, agreement=__disclosure_agreement__)"
       },
-      "notes": "# CORE-DEFERRED: out_args collapse to single __coordinate_disclosure_ref__ pending EXTEND scope. Agree the coordinated public-disclosure date with the reporter and, where applicable, the coordinating CSIRT. Records __disclosure_target_date__ and captures the reporter-credit consent decision into __reporter_credit_display__ (opt-in attribution string or the anonymous marker) so the publish_advisory step can render both the human-readable and CSAF 2.0 advisory templates without a second reporter round-trip. Coordinates with the sibling cra_srp_notify run when one is active so the public-advisory publication does not front-run a regulator submission the SRP notification chain has not yet completed. Left CACAO-only in the CORE-B-PRIM scope because binding a single core_body primitive here would collapse the two-variable out_args (__disclosure_target_date__, __reporter_credit_display__) into a single __coordinate_disclosure_ref__ ref, which changes the workflow variable contract; the primitive surface (content.playbooks.cra_cvd.primitives.csirt.notify_national_csirt) is landed for the EXTEND scope to wire once the contract collapse is scoped.",
+      "notes": "Agree the coordinated public-disclosure date with the reporter and, where applicable, the coordinating CSIRT. Bound since the CORE-WIRE card, resolving the CORE-DEFERRED note: the binding assigns the coordination record to the single __coordination_record__ and the adapter extracts the documented out_args (__disclosure_target_date__, __reporter_credit_display__). coordination.record_disclosure_coordination captures the reporter-credit consent decision per ISO/IEC 29147 (consent taken after the reporter has seen the draft advisory): attribution follows consent both ways \u2014 a credit line without consent is refused rather than dropped, and the anonymous marker is the exact literal the advisory builder pins.",
       "notesInFlow": true
     },
     {
@@ -578,16 +443,10 @@
   "meta": {
     "secops_ng": {
       "stable_id": "playbook.cra_cvd@v1",
-      "content_version": "0.1.0",
-      "maturity": "experimental",
+      "content_version": "1.0.0",
+      "maturity": "stable",
       "source_playbook_id": "playbook--c7d51014-0000-4000-8000-000000000001"
     },
-    "secops_ng_notes": [
-      "step 'action--c7d51014-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'action--c7d51014-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'action--c7d51014-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'action--c7d51014-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'action--c7d51014-0000-4000-8000-000000000007': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
-    ]
+    "secops_ng_notes": []
   }
 }

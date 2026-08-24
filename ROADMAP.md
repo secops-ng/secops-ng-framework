@@ -1267,8 +1267,17 @@ one playbook's provenance.
     five-verdict triage precedence, kind-prefixed fix-candidate refs
     gated to actionable verdicts, the divergence-as-data validation
     gate, and consent-following disclosure coordination with the
-    pinned anonymous marker. Bindings land in the CORE-WIRE card;
-    maturity stays `experimental` until the ladder holds end to end).
+    pinned anonymous marker).
+  - CORE-WIRE + GRADUATE — closing #964 (all five bindings on the
+    canonical source with the multi-out steps collapsed to single
+    envelope variables per the CORE-DEFERRED note — the documented
+    out_args extract at the compile target's adapter seam; the five
+    SKELETON/TODO(CORE) step descriptions and the stale top-level
+    SKELETON-only sentence rewritten to record the wiring; mixed
+    escape state normalised to the house utf-8 form. Then
+    `experimental` → `stable`, `content_version` 1.0.0, all three
+    worked examples regenerated — 7/7 bound, the audit's final gap
+    closed).
 
 ---
 
