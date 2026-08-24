@@ -42,33 +42,32 @@ operator's data plane.
 
 ## 2. CACAO topology and primitives binding
 
-The playbook ships 11 steps: one `start`, seven `action`, one
-`if-condition`, one `switch-condition`, one `end`. The seven action
-steps each declare an `x_secops_ng.core_body` reference where a
-deterministic primitive exists today; the rest stay absent-body and
-raise `NotImplementedError` until the upstream primitive lands.
+The playbook ships 12 steps: one `start`, eight `action`, one
+`if-condition`, one `switch-condition`, one `end`. All eight action
+steps declare an `x_secops_ng.core_body` reference into the
+deterministic primitives package; the playbook is `stable` at
+`content_version` 1.0.0 under the Maturity ladder.
 
 | Step suffix       | Step                                          | `core_body` binding                                            | Status   |
 |-------------------|-----------------------------------------------|----------------------------------------------------------------|----------|
 | `…000002`         | intake disclosure                             | `primitives.dedup.canonicalize_case_field`                     | bound    |
 | `…000003`         | triage and asset correlation                  | `primitives.severity.severity_policy`                          | bound    |
-| `…000004`         | assess CRA reporting trigger                  | (no upstream primitive yet — KEV-feed lookup deferred)         | absent   |
+| `…000004`         | assess CRA reporting trigger                  | `primitives.cra_trigger.assess_cra_reporting_trigger`          | bound    |
 | `…000005`         | actively exploited? (if-condition)            | edge wiring only — no body                                     | n/a      |
-| `…000006`         | regulator-notification chain (CRA Art. 14)    | (no upstream primitive yet — submission chain deferred)        | absent   |
+| `…000006`         | regulator-notification chain (CRA Art. 14)    | `primitives.cra_trigger.build_notification_chain`              | bound    |
 | `…000007`         | route on severity (switch-condition)          | edge wiring only — no body                                     | n/a      |
-| `…000008` `…000009` `…00000a` `…00000b` | per-severity response branches | (no upstream primitive yet — patch + advisory chain deferred)  | absent   |
+| `…000008`         | response: critical — patch and advisory       | `primitives.remediation.patch_and_advisory_critical`           | bound    |
+| `…000009`         | response: high — patch and advisory           | `primitives.remediation.patch_and_advisory_high`               | bound    |
+| `…00000a`         | response: scheduled remediation               | `primitives.remediation.schedule_remediation`                  | bound    |
+| `…00000b`         | response: accept risk                         | `primitives.remediation.accept_risk`                           | bound    |
 
-The two bindings shipped today are the byte-identical anchor the
-cross-target replay property hangs off. The five absent-body steps
-all share the same shape — span + AuditTrail mirror prologue, then
-`raise NotImplementedError(...)` — so an integrator can identify the
-seam at a glance.
-
-> The five remaining bindings are tracked as follow-up cards on the
-> framework board (KEV-feed lookup, CRA Article 14 submission shape,
-> patch + advisory dissemination response). They land when their
-> upstream primitives do; the cookbook entry will be updated in the
-> same wave.
+The eight bindings are the byte-identical anchor the cross-target
+replay property hangs off. The remaining `NotImplementedError` in the
+emitted artifacts marks only operator-integration seams (KEV-feed
+adapter, submission endpoint, advisory channel — the connectors the
+operator wires), which is emitter-standard across every bound
+playbook: span + AuditTrail mirror prologue first, so the seam is
+identifiable at a glance.
 
 ## 3. Deterministic primitives — the contract
 
@@ -112,7 +111,8 @@ with node ids preserving the CACAO step ids verbatim. The two bound
 CORE steps emit `n8n-nodes-base.code` nodes whose `pythonCode` is the
 exact primitive call (e.g. `from vuln_intake.primitives.severity import
 severity_policy ; __severity_verdict__ = severity_policy(…)`); the
-five absent-body CORE steps emit `n8n-nodes-base.set` nodes carrying
+bound steps emit `n8n-nodes-base.code` nodes invoking their
+primitives, and no Set-node placeholders remain, carrying
 the CACAO I/O contract as editable assignment rows.
 
 Operators bind the Set rows to their connectors:
@@ -136,8 +136,8 @@ under *Per-action wiring notes — CORE bodies*.
 Temporal worker module: one `@workflow.defn` class and one
 `@activity.defn` function per CACAO action. The two bound activities
 import the primitive and produce the canonical case field / severity
-verdict; the five absent-body activities open the span, append the
-audit record, and then `raise NotImplementedError` so an integrator
+verdict; the only remaining `NotImplementedError` marks the
+operator-integration seams (connector wiring) so an integrator
 sees exactly which seam they still have to wire.
 
 Operators drop `workflow.temporal.py` next to their worker, register
@@ -160,8 +160,9 @@ the target-neutral topology (nodes, edges, conditional edges).
 into a `StateGraph`.
 
 The two bound tools import the primitive and update the typed state.
-The five absent-body tools raise `NotImplementedError` after opening
-their span and audit record. Operators wire the absent-body tools to
+All eight tools import their primitive and update the typed state;
+the operator-integration seams stay marked with `NotImplementedError`
+after their span and audit record. Operators wire those seams to
 their own runtime, or swap any node for an LLM-driven callable that
 fills the agentic hook.
 
@@ -176,7 +177,7 @@ EU-resident LM endpoint guard re-applies the check at process startup
 
 ## 5. Observability — OTel + AuditTrail in every target
 
-Every emitted action — bound or absent-body — opens an OpenTelemetry
+Every emitted action opens an OpenTelemetry
 span and appends an `AuditRecord` to a context-local `AuditTrail`
 *before* the primitive call or the `NotImplementedError`. The mirror
 runs unconditionally, ahead of any OTLP exporter, so the audit
@@ -243,10 +244,11 @@ diff to confirm the property held.
   the per-activity defaults, persistence backends, n8n hosting,
   LangGraph host process model — those are runtime concerns the
   operator applies in their own assembly.
-- **KEV / threat-intel feed integration.** Tracked as a separate
-  roadmap line item; the CRA reporting-trigger step (`…000004`)
-  carries an absent-body stub today and binds when the upstream
-  primitive lands.
+- **KEV / threat-intel feed integration.** The CRA reporting-trigger
+  step (`…000004`) is bound to
+  `primitives.cra_trigger.assess_cra_reporting_trigger`; the KEV-feed
+  *adapter* — where the exploited-in-the-wild signal comes from —
+  remains the operator's connector seam by design.
 - **Per-deployment YAML.** This playbook ships no separate
   operator-facing `config.yaml`; per-case inputs are the CACAO
   `playbook_variables` block bound at compile time via the standard
