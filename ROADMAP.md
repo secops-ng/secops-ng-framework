@@ -1270,6 +1270,13 @@ one playbook's provenance.
   - EXTEND — PR #744 (operator-facing cookbook walkthrough:
     prerequisites, step-by-step, worked example, evidence-record
     shape, sovereign-stack note; ROADMAP `Shipped` flip).
+  - CORE-PRIM — #937 staging (the five lifecycle primitives the audit
+    found unbound: content-derived case identity at intake, the
+    five-verdict triage precedence, kind-prefixed fix-candidate refs
+    gated to actionable verdicts, the divergence-as-data validation
+    gate, and consent-following disclosure coordination with the
+    pinned anonymous marker. Bindings land in the CORE-WIRE card;
+    maturity stays `experimental` until the ladder holds end to end).
 
 ---
 
