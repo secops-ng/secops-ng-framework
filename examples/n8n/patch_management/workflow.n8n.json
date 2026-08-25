@@ -174,6 +174,12 @@
               "type": "string",
               "value": "",
               "description": "Structured canary validation verdict."
+            },
+            {
+              "name": "__maintenance_notification__",
+              "type": "object",
+              "value": "",
+              "description": "Closed maintenance-owner notification payload composed by notify.compose_maintenance_notification: role-shaped recipient, evidence_ref, urgency derived from __canary_healthy__ (with the documented escalation levers carried verbatim when unhealthy), and the SHA-256 notification_id the messaging surface uses as a delivery dedup key."
             }
           ]
         }
@@ -280,50 +286,17 @@
     {
       "id": "action--70000000-0000-4000-8000-000000000008",
       "name": "notify maintenance owner",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         2060,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.evidence_id",
-              "name": "in.evidence_id",
-              "value": "={{$workflow.variables.evidence_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.update_subject",
-              "name": "in.update_subject",
-              "value": "={{$workflow.variables.update_subject}}",
-              "type": "string"
-            },
-            {
-              "id": "in.canary_healthy",
-              "name": "in.canary_healthy",
-              "value": "={{$workflow.variables.canary_healthy}}",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.api_activity@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kri.control_effectiveness@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.patch_management.primitives.notify import compose_maintenance_notification\n__maintenance_notification__ = compose_maintenance_notification(evidence_id=__evidence_id__, update_subject=__update_subject__, canary_healthy=__canary_healthy__)"
       },
-      "notes": "Deliver the evidence reference to the maintenance owner along the operator's pre-bound channel (ticketing system, chat thread, change-management board). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an evidence record written but never delivered to the owner is itself a maintenance-discipline gap. Notification carries the canary health outcome so a false __canary_healthy__ pages with appropriate urgency for the next maintenance lever (rollback the canary, escalate the advisory, hold the broad rollout).",
+      "notes": "Deliver the evidence reference to the maintenance owner along the operator's pre-bound channel (ticketing system, chat thread, change-management board). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an evidence record written but never delivered to the owner is itself a maintenance-discipline gap. The deterministic half is bound since the #937 wire card: compose_maintenance_notification builds the closed payload \u2014 role-shaped recipient, evidence ref, SHA-256 delivery dedup key, and urgency derived from __canary_healthy__ (a false outcome composes action_required and carries the documented next maintenance levers verbatim: rollback the canary, escalate the advisory, hold the broad rollout \u2014 the choice stays with the owner). Delivery itself remains a discipline of the compile target's messaging surface, mirroring the incident_management destination-resolver split.",
       "notesInFlow": true
     },
     {
@@ -447,12 +420,10 @@
   "meta": {
     "secops_ng": {
       "stable_id": "playbook.patch_management@v1",
-      "content_version": "0.2.0",
-      "maturity": "experimental",
+      "content_version": "1.0.0",
+      "maturity": "stable",
       "source_playbook_id": "playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc"
     },
-    "secops_ng_notes": [
-      "step 'action--70000000-0000-4000-8000-000000000008': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
-    ]
+    "secops_ng_notes": []
   }
 }
