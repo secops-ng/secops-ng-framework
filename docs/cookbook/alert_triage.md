@@ -54,8 +54,8 @@ tree is what the per-target compilers depend on today.
 The playbook ships 12 steps: one `start`, eight `action`, one
 `if-condition`, one `switch-condition`, one `end`. Seven of the eight
 action steps declare an `x_secops_ng.core_body` reference into the
-deterministic primitives package; one stays absent-body and raises
-`NotImplementedError` until the upstream primitive lands.
+deterministic primitives package — all eight are bound; the playbook
+is `stable` at `content_version` 1.0.0 under the Maturity ladder.
 
 | Step suffix       | Step                                                | `core_body` binding                                            | Status   |
 |-------------------|-----------------------------------------------------|----------------------------------------------------------------|----------|
@@ -68,20 +68,14 @@ deterministic primitives package; one stays absent-body and raises
 | `…000008`         | response: p1 severe — page and escalate             | `primitives.response.escalation_route`                         | bound    |
 | `…000009`         | response: p2 high — notify on-call                  | `primitives.response.notify_on_call`                           | bound    |
 | `…00000a`         | response: p3 routine — queue for review             | `primitives.response.route_to_review_queue`                    | bound    |
-| `…00000b`         | response: p4 informational — log and close          | (no upstream primitive yet — telemetry-coverage close deferred)| absent   |
+| `…00000b`         | response: p4 informational — log and close          | `primitives.response.log_and_close`                            | bound    |
 
-The seven bindings shipped today are the byte-identical anchor the
-cross-target replay property hangs off. The single absent-body step
-shares the same shape as the absent-body steps in the other worked
-examples — span + AuditTrail mirror prologue, then
-`raise NotImplementedError(...)` — so an integrator can identify the
-seam at a glance.
-
-> The remaining log-and-close binding is tracked as a follow-up card
-> on the framework board (telemetry-coverage accounting +
-> false-positive denominator wiring). It lands when the upstream
-> metric helper does; the cookbook entry will be updated in the same
-> wave.
+The eight bindings are the byte-identical anchor the cross-target
+replay property hangs off. The remaining `NotImplementedError` in the
+emitted artifacts marks only operator-integration seams (connector
+inputs the operator wires), which is emitter-standard across every
+bound playbook — span + AuditTrail mirror prologue first, so the seam
+is identifiable at a glance.
 
 ## 3. Deterministic primitives — the contract
 
@@ -154,11 +148,11 @@ topology as n8n nodes (`manualTrigger`, `set`, `if`, `switch`, `noOp`),
 with node ids preserving the CACAO step ids verbatim. The seven bound
 CORE steps emit `n8n-nodes-base.code` nodes whose `pythonCode` is the
 exact primitive call (e.g. `from alert_triage.primitives.prioritisation
-import prioritise ; __priority_verdict__ = prioritise(...)`); the
-absent-body p4 log-and-close step emits an `n8n-nodes-base.set` node
-carrying the CACAO I/O contract as editable assignment rows.
+import prioritise ; __priority_verdict__ = prioritise(...)`) — all
+eight action steps, the p4 log-and-close step included, lower to code
+nodes invoking their bound primitives.
 
-Operators bind the Set rows and Code-node inputs to their connectors:
+Operators bind the Code-node inputs to their connectors:
 
 - ingest → detection-pipeline push endpoint / shared alert store
 - enrich → telemetry-context enrichment store
@@ -176,12 +170,11 @@ under *Per-action wiring notes — CORE bodies*.
 
 `examples/temporal/alert_triage/workflow.temporal.py` is a standard
 Temporal worker module: one `@workflow.defn` class and one
-`@activity.defn` function per CACAO action. The seven bound activities
-import the primitive and produce the canonical payload / seen key /
-priority verdict / response directive; the single absent-body activity
-opens the span, appends the audit record, and then
-`raise NotImplementedError` so an integrator sees exactly which seam
-they still have to wire.
+`@activity.defn` function per CACAO action. All eight activities
+import their primitive and produce the canonical payload / seen key /
+priority verdict / response directive; the only remaining
+`NotImplementedError` marks the operator-integration seam (connector
+wiring) so an integrator sees exactly which seam is theirs.
 
 Operators drop `workflow.temporal.py` next to their worker, register
 the activities, and run the worker against their Temporal cluster.
@@ -202,11 +195,10 @@ the target-neutral topology (nodes, edges, conditional edges).
 `assemble.py` is the canonical reference assembly that wires the spec
 into a `StateGraph`.
 
-The seven bound tools import the primitive and update the typed state.
-The single absent-body tool raises `NotImplementedError` after opening
-its span and audit record. Operators wire the absent-body tool to
-their own runtime, or swap any node for an LLM-driven callable that
-fills the agentic hook.
+All eight tools import their primitive and update the typed state;
+the operator-integration seams stay marked with `NotImplementedError`
+for the operator to wire, or any node can be swapped for an
+LLM-driven callable that fills the agentic hook.
 
 The agentic-extension slot is provider-neutral by construction: the
 compiler never embeds an LLM SDK, so the operator wires the hook to
@@ -219,7 +211,7 @@ EU-resident LM endpoint guard re-applies the check at process startup
 
 ## 5. Observability — OTel + AuditTrail in every target
 
-Every emitted action — bound or absent-body — opens an OpenTelemetry
+Every emitted action opens an OpenTelemetry
 span and appends an `AuditRecord` to a context-local `AuditTrail`
 *before* the primitive call or the `NotImplementedError`. The mirror
 runs unconditionally, ahead of any OTLP exporter, so the audit
