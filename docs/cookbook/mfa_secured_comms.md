@@ -146,8 +146,10 @@ telemetry). One execution runs the five-step chain (probe → assess
 Per-window metric accounting into the mfa-coverage-gaps catalogue
 entry is unambiguous.
 
-> The playbook maturity is `experimental` on the workflow-local
-> content marker. The mappings overlay pins the control and
+> The playbook maturity is `stable` at `content_version` 1.0.0,
+> graduated under the Maturity ladder (all five action steps carry
+> deterministic primitive bindings, the notify step's composition
+> half included). The mappings overlay pins the control and
 > telemetry surface (OSCAL IA-2 / CP-8, D3FEND D3-AM on the probe
 > and assess halves, OCSF API Activity and Compliance Finding); the
 > n8n, Temporal, and LangGraph reference emitters ship deterministic

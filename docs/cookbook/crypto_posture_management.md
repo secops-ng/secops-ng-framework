@@ -122,8 +122,9 @@ window. Per-window metric accounting into the
 `kri.expiring_tls_certs@v1` and `kri.overdue_key_rotations@v1`
 catalogue entries is unambiguous.
 
-> The playbook maturity is `experimental` on the workflow-local
-> content marker. The mappings overlay pins the control and
+> The playbook maturity is `stable` at `content_version` 1.0.0,
+> graduated under the Maturity ladder (all five action steps carry
+> deterministic primitive bindings). The mappings overlay pins the control and
 > telemetry surface (OSCAL SC-13 / SC-8, D3FEND D3-CA on the probe
 > and rotation halves, OCSF API Activity and Compliance Finding);
 > the n8n, Temporal, and LangGraph reference emitters ship
