@@ -171,25 +171,56 @@ def classify(slug: str) -> str:
     return UNFILED
 
 
+def maturity(doc: dict) -> str:
+    """The playbook's Maturity-ladder tier, verbatim from the source.
+
+    ``stable`` is the ladder's deployment-ready designation (see
+    ROADMAP "Maturity ladder"); everything else is reported as the
+    author wrote it. A missing field is surfaced loudly rather than
+    defaulted — the schema requires it, so absence is a content bug
+    the table should not paper over.
+    """
+    value = (doc.get("x_secops_ng") or {}).get("maturity")
+    return value if isinstance(value, str) and value else "(unset!)"
+
+
 def render(sources: dict[str, Path]) -> str:
     grouped: dict[str, list[str]] = {f: [] for f in FAMILIES}
     grouped[UNFILED] = []
     for slug in sorted(sources):
         grouped[classify(slug)].append(slug)
 
+    docs = {slug: _load(src) for slug, src in sources.items()}
+    tally: dict[str, int] = {}
+    for doc in docs.values():
+        tier = maturity(doc)
+        tally[tier] = tally.get(tier, 0) + 1
+    # Ladder order first, anything unexpected after, alphabetically.
+    ladder = ("stable", "experimental", "draft", "deprecated")
+    tally_text = " / ".join(
+        f"{tally[t]} {t}" for t in
+        (*[t for t in ladder if t in tally],
+         *sorted(k for k in tally if k not in ladder))
+    )
+
     lines: list[str] = [BEGIN, ""]
     total = sum(len(v) for v in grouped.values())
-    lines.append(f"_{total} playbooks. Regenerate with "
+    lines.append(f"_{total} playbooks — {tally_text}. `stable` is the "
+                 f"Maturity ladder's deployment-ready bar (ROADMAP § Maturity "
+                 f"ladder). Regenerate with "
                  f"`python -m tools.render_playbook_table`; CI fails when this "
                  f"block is stale._")
     for family, slugs in grouped.items():
         if not slugs:
             continue
-        lines += ["", f"### {family}", "", "| Playbook | What it does |", "|---|---|"]
+        lines += ["", f"### {family}", "",
+                  "| Playbook | Maturity | What it does |", "|---|---|---|"]
         for slug in slugs:
             src = sources[slug]
             link = slug if src.parent != PLAYBOOK_DIR else "."
-            lines.append(f"| [`{slug}`]({link}/) | {short_description(_load(src))} |")
+            doc = docs[slug]
+            lines.append(f"| [`{slug}`]({link}/) | `{maturity(doc)}` "
+                         f"| {short_description(doc)} |")
     lines += ["", END]
     return "\n".join(lines)
 
