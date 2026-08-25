@@ -100,11 +100,12 @@ content/mappings/gdpr/data-flow-cra_cvd.md
 
 The CACAO source is canonical. The seven-step topology (one `start`,
 seven `action` steps, one `end`) is the deterministic policy the
-playbook *means*. Per-target worked examples under
-`examples/{n8n,temporal,langgraph}/cra_cvd/` land with the CORE card;
-the SKELETON deliberately defers the worked emitters so the CACAO
-source and the CORE-lands artifacts land together, ready to
-regenerate byte-for-byte.
+playbook *means* — all seven action steps carry deterministic
+primitive bindings on the canonical source, and the playbook is
+`stable` at `content_version` 1.0.0 under the Maturity ladder. The
+per-target worked examples under
+`examples/{n8n,temporal,langgraph}/cra_cvd/` are committed and pinned
+byte-for-byte by their goldens.
 
 ## 3. CACAO topology
 
@@ -372,15 +373,15 @@ codebase-side outbound-scan leg discharged by
 `codebase_vuln_management`; this playbook is the reporter-received
 leg.
 
-**MITRE D3FEND v1.0.0** — the outbound overlay carries a `D3-TODO`
-placeholder. D3FEND v1.0.0 frames its defensive techniques around
-runtime countermeasures against adversary behaviours; a CVD
-lifecycle is a coordination / remediation discipline rather than a
-runtime countermeasure and the closest fit is either a documentation
-/ advisory tag or a vulnerability-analysis tag. The CORE card either
-selects the closest-fitting technique or documents the deliberate
-absence the way the `cra_srp_notify` overlay documents its
-notify-owner gap.
+**MITRE D3FEND v1.0.0** — resolved: the overlay aligns with the
+audited `d3fend:cra:annex-i-2-cvd-policy` and
+`d3fend:cra:annex-i-2-vuln-handling` entries under
+`content/mappings/d3fend/cra.yaml`. D3FEND v1.0.0 frames its
+defensive techniques around runtime countermeasures against adversary
+behaviours; a CVD lifecycle is a coordination / remediation
+discipline, so the crosswalk anchors on the documented policy and
+vulnerability-handling entries rather than forcing a runtime-technique
+tag.
 
 **OCSF v1.3.0** — two class bindings.
 `Vulnerability Finding` (class_uid 2002, category Findings),
@@ -471,7 +472,7 @@ The three reference compilers ship byte-parity worked examples for
   `TypedDict` state plus `@tool`-decorated action wrappers; the
   target-neutral topology in `graph_spec.json` and the hand-written
   reference assembly in `assemble.py`. The agentic layer an
-  operator can add on top of the SKELETON (rendering the advisory
+  operator can add on top of the shipped assembly (rendering the advisory
   draft, summarising the case for reviewer sign-off) fills as a
   private extension; the framework-wide EU-resident LM endpoint
   guard re-applies at process startup
@@ -522,7 +523,7 @@ trail offline.
 ## 10. Metrics — the KPIs and KRIs
 
 The playbook feeds the metric surface via the two catalogue entries
-pinned on the SKELETON `x_secops_ng` bundles:
+pinned on the step-level `x_secops_ng` bundles:
 
 - **`kri.cvd_intake_aging@v1`** — per-case age computed against
   `__reporter_ack_ts__` and the case's current step, so the CVD
@@ -535,13 +536,14 @@ pinned on the SKELETON `x_secops_ng` bundles:
   window so the operator can dashboard the intake surface's
   signal-to-noise property.
 
-The CORE card lands a dedicated **acknowledgement-SLA KPI** for the
-CRA Article 14 §6 3-working-day window against `__reporter_ack_ts__`
-(minus the intake-received timestamp), plus a **coordinated-
-disclosure-on-time KPI** for `publish_advisory` completion against
-`__disclosure_target_date__`. Both live in the metrics catalogue
-and are dashboarded by the operator against their own metrics
-backend; the framework does not ship a hosted dashboard.
+A dedicated **acknowledgement-SLA KPI** exists in the catalogue as
+`kpi.cvd_ack_sla@v1` (audited from the CRA Article 14 mapping; its
+step-level `metric_refs` pin is EXTEND-metrics scope). A
+**coordinated-disclosure-on-time KPI** for `publish_advisory`
+completion against `__disclosure_target_date__` remains open on the
+same EXTEND-metrics card. Metrics are dashboarded by the operator
+against their own metrics backend; the framework does not ship a
+hosted dashboard.
 
 ## 11. Operator customisation points
 
@@ -551,26 +553,28 @@ it exercises are the operator's. The customisation seams:
 - **Intake surface.** The `intake` step reads from the operator's
   CVD intake surface — the RFC 9116 `security.txt` address, a
   PGP-encrypted mailbox, or a bug-bounty platform. The framework
-  binds no default. The CORE card lands the reference adapters
-  under `content/playbooks/cra_cvd/adapters/`.
+  binds no default; the intake surface adapter is the operator's
+  connector seam (the bound `intake.open_cvd_case` primitive
+  validates and shapes whatever the adapter hands over).
 - **Acknowledgement letter.** The `ack_to_reporter` step
   materialises a durable acknowledgement carrying `__case_id__` and
   the operator's CVD policy reference. Template selection and
-  PGP-signed delivery are operator-bound; a reference template
-  lands with CORE.
+  PGP-signed delivery are operator-bound seams; a reference
+  template remains a candidate future card.
 - **Advisory template.** The `publish_advisory` step emits a public
-  advisory. The CORE card lands a reference CSAF 2.0 emitter
-  alongside the human-readable template so the operator can pin
-  both surfaces from the same source.
+  advisory via the bound `disclosure.build_advisory_artifact`
+  primitive; a reference CSAF 2.0 emitter alongside the
+  human-readable template remains a candidate future card.
 - **CVE-request adapter.** Where a CVE identifier is required, the
-  CORE card lands the adapter against the operator's CNA (either
-  the operator's own CNA scope or a third-party CNA like the MITRE
-  root CNA).
+  CNA adapter (the operator's own CNA scope or a third-party CNA
+  like the MITRE root CNA) is the operator's connector seam.
 - **CSIRT-coordination adapter.** For cases that require
   coordinated disclosure with a national CSIRT (typically because
   the vulnerability crosses multiple downstream operators), the
-  CORE card lands the coordination adapter and the embargo-hold
-  state machine on `coordinate_disclosure`.
+  bound `coordination.record_disclosure_coordination` primitive
+  records the agreed date and credit consent; the CSIRT
+  communication channel and any embargo-hold state machine are the
+  operator's seams.
 - **Sibling regime handoffs.** When `__actively_exploited__` is
   true, the operator forks `cra_srp_notify` from the `triage` step.
   When the case is a severe incident, the operator's
