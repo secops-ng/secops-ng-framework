@@ -364,14 +364,6 @@ one playbook's provenance.
   operator-configured; the framework ships no default endpoint.
 - **Depends on:** F-CR-04, F-PT-02 (incident_timeline pattern)
 - **Source:** NIS2 Art. 23.
-- **Shipped via:**
-  - WIRE + GRADUATE — #937 wire lane (the last unbound action step,
-    intake, bound to `primitives.intake.derive_incident_id` — a
-    deterministic UUIDv5 over the namespaced signal id, so intake
-    dedup is a property of the derivation; then `experimental` →
-    `stable`, `content_version` 1.0.0, per the Maturity ladder, all
-    three worked examples regenerated. Earlier stages predate
-    Shipped-via bookkeeping).
 
 ### F-WF-06 — Infrastructure posture management
 
@@ -1275,8 +1267,17 @@ one playbook's provenance.
     five-verdict triage precedence, kind-prefixed fix-candidate refs
     gated to actionable verdicts, the divergence-as-data validation
     gate, and consent-following disclosure coordination with the
-    pinned anonymous marker. Bindings land in the CORE-WIRE card;
-    maturity stays `experimental` until the ladder holds end to end).
+    pinned anonymous marker).
+  - CORE-WIRE + GRADUATE — closing #964 (all five bindings on the
+    canonical source with the multi-out steps collapsed to single
+    envelope variables per the CORE-DEFERRED note — the documented
+    out_args extract at the compile target's adapter seam; the five
+    SKELETON/TODO(CORE) step descriptions and the stale top-level
+    SKELETON-only sentence rewritten to record the wiring; mixed
+    escape state normalised to the house utf-8 form. Then
+    `experimental` → `stable`, `content_version` 1.0.0, all three
+    worked examples regenerated — 7/7 bound, the audit's final gap
+    closed).
 
 ---
 
@@ -1334,15 +1335,6 @@ one playbook's provenance.
   - ROADMAP `Shipped` flip — PR #746 (formal ROADMAP entry
     for the already-landed trilogy; README Status flip to
     reflect actual delivery state).
-  - WIRE + GRADUATE — #937 wire lane (the notify step's deterministic
-    composition half bound to
-    `primitives.notify.compose_maintenance_notification` —
-    role-shaped recipient, evidence ref, SHA-256 delivery dedup key,
-    and urgency derived from the canary outcome with the documented
-    escalation levers carried verbatim when unhealthy; delivery
-    itself remains the compile target's messaging discipline. Then
-    `experimental` → `stable`, `content_version` 1.0.0, all three
-    worked examples regenerated).
 
 ---
 
@@ -2070,13 +2062,6 @@ one playbook's provenance.
   - SKELETON — #480, #484
   - CORE — #577
   - EXTEND — #604 (cookbook + metric)
-  - WIRE + GRADUATE — #937 wire lane (the notify step's deterministic
-    composition half bound to `primitives.notify.compose_owner_notification`
-    — role-shaped recipient, attestation ref, SHA-256 delivery dedup
-    key — with delivery itself remaining the compile target's
-    messaging discipline, per the incident_management
-    destination-resolver split; then `experimental` → `stable`,
-    `content_version` 1.0.0, all three worked examples regenerated).
 
 ### F-WF-SOC2-EVIDENCE — SOC 2 readiness evidence collection
 

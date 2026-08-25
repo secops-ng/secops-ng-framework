@@ -3,7 +3,7 @@
   "spec_version": "2.0",
   "id": "playbook--c7d51014-0000-4000-8000-000000000001",
   "name": "CRA Article 14 coordinated vulnerability disclosure (CVD)",
-  "description": "SKELETON \u2014 CACAO v2 scaffold for the operator-side coordinated vulnerability disclosure (CVD) lifecycle a manufacturer of a product with digital elements runs when a reporter (finder / security researcher / downstream operator) submits a vulnerability report against a shipped product. Distinct from playbook.cra_srp_notify@v1: the SRP notification chain covers the regulator-facing 24h / 72h / 14d-or-1-month timer cascade under CRA Article 14 \u00a71\u2013\u00a73; this playbook covers the triage-to-public-advisory lifecycle under CRA Article 14 \u00a71 (which requires an operator CVD policy) and \u00a76 (acknowledgement to the reporter within a policy-declared window, in practice 3 working days on the operator baseline). The two playbooks compose: an intake that trips the Art. 14(2) actively-exploited clock hands off to cra_srp_notify while continuing the disclosure lifecycle here. SKELETON only: submission bodies, advisory template, and reporter-communications channel are placeholders \u2014 a sibling CORE card lands the acknowledgement-letter and advisory templates, the D3FEND tag selection, and the OSCAL / OCSF binding closure. CACAO v2 + SecOps-NG content-model extensions.",
+  "description": "SKELETON — CACAO v2 scaffold for the operator-side coordinated vulnerability disclosure (CVD) lifecycle a manufacturer of a product with digital elements runs when a reporter (finder / security researcher / downstream operator) submits a vulnerability report against a shipped product. Distinct from playbook.cra_srp_notify@v1: the SRP notification chain covers the regulator-facing 24h / 72h / 14d-or-1-month timer cascade under CRA Article 14 §1–§3; this playbook covers the triage-to-public-advisory lifecycle under CRA Article 14 §1 (which requires an operator CVD policy) and §6 (acknowledgement to the reporter within a policy-declared window, in practice 3 working days on the operator baseline). The two playbooks compose: an intake that trips the Art. 14(2) actively-exploited clock hands off to cra_srp_notify while continuing the disclosure lifecycle here. CORE complete as of the CORE-PRIM + CORE-WIRE cards: all seven action steps carry deterministic primitive bindings; the reporter-communications delivery channel and the advisory publication surface remain compile-target adapter seams by design. CACAO v2 + SecOps-NG content-model extensions.",
   "playbook_types": [
     "investigation",
     "notification"
@@ -26,16 +26,16 @@
       "source": "OASIS Open"
     },
     {
-      "name": "Cyber Resilience Act (EU) 2024/2847, Article 14 \u2014 manufacturer reporting obligations and coordinated vulnerability disclosure policy",
+      "name": "Cyber Resilience Act (EU) 2024/2847, Article 14 — manufacturer reporting obligations and coordinated vulnerability disclosure policy",
       "source": "Official Journal of the European Union",
       "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj"
     },
     {
-      "name": "ISO/IEC 29147:2018 \u2014 Vulnerability disclosure",
+      "name": "ISO/IEC 29147:2018 — Vulnerability disclosure",
       "source": "ISO/IEC"
     },
     {
-      "name": "ISO/IEC 30111:2019 \u2014 Vulnerability handling processes",
+      "name": "ISO/IEC 30111:2019 — Vulnerability handling processes",
       "source": "ISO/IEC"
     }
   ],
@@ -47,12 +47,12 @@
     },
     "__reporter_contact__": {
       "type": "string",
-      "description": "Contact channel provided by the reporter at intake (email, PGP key id, security.txt reference). Empty on anonymous reports; the acknowledgement step SHOULD still write a durable receipt so the case has a citable timestamp for the CRA Article 14 \u00a76 acknowledgement window.",
+      "description": "Contact channel provided by the reporter at intake (email, PGP key id, security.txt reference). Empty on anonymous reports; the acknowledgement step SHOULD still write a durable receipt so the case has a citable timestamp for the CRA Article 14 §6 acknowledgement window.",
       "external": true
     },
     "__reporter_ack_ts__": {
       "type": "string",
-      "description": "ISO 8601 timestamp when the operator acknowledged receipt to the reporter. Anchors the CRA Article 14 \u00a76 acknowledgement window (3 working days on the operator baseline). Stamped by the ack_to_reporter step.",
+      "description": "ISO 8601 timestamp when the operator acknowledged receipt to the reporter. Anchors the CRA Article 14 §6 acknowledgement window (3 working days on the operator baseline). Stamped by the ack_to_reporter step.",
       "external": false
     },
     "__triage_verdict__": {
@@ -149,6 +149,66 @@
       "type": "string",
       "description": "Severity rating label published on the advisory (critical / high / medium / low), consistent with __severity_score__.",
       "external": true
+    },
+    "__raw_report__": {
+      "type": "dictionary",
+      "description": "Raw vulnerability report handed over by the operator's CVD intake surface adapter (RFC 9116 security.txt address, disclosure mailbox, bug-bounty portal webhook): reporter_contact, product, affected_versions, reproduction, optional proposed_embargo. Validated and shaped by intake.open_cvd_case.",
+      "constant": false,
+      "external": true
+    },
+    "__intake_channel__": {
+      "type": "string",
+      "description": "Which CVD intake surface received the report: security_txt, disclosure_mailbox, or bug_bounty_portal. Part of the content-derived case identity.",
+      "constant": false,
+      "external": true
+    },
+    "__cvd_case__": {
+      "type": "dictionary",
+      "description": "Closed case envelope composed by intake.open_cvd_case: case_id, intake_channel, reporter_contact, product, affected_versions, reproduction, proposed_embargo. The compile target's adapter extracts __case_id__ (and mirrors __reporter_contact__) from this envelope — the documented out_args extraction seam.",
+      "constant": false,
+      "external": false
+    },
+    "__triage_observations__": {
+      "type": "dictionary",
+      "description": "Operator-recorded triage observations consumed by triage.triage_case: in_scope, reproduced, actively_exploited (real booleans), optional duplicate_of and compensating_control.",
+      "constant": false,
+      "external": true
+    },
+    "__triage_result__": {
+      "type": "dictionary",
+      "description": "Verdict record composed by triage.triage_case: case_id, triage_verdict, actively_exploited, rationale. The compile target's adapter extracts __triage_verdict__ and __actively_exploited__ from this record — the documented out_args extraction seam.",
+      "constant": false,
+      "external": false
+    },
+    "__fix_candidate__": {
+      "type": "dictionary",
+      "description": "Operator-supplied fix-candidate record consumed by fix.record_fix_candidate: kind (patch_commit / build_id / release_attestation) and role-shaped ref into the operator's change-management surface.",
+      "constant": false,
+      "external": true
+    },
+    "__validation_evidence__": {
+      "type": "dictionary",
+      "description": "Operator-recorded validation outcomes consumed by validation.confirm_fix_validation: regression_suite_green, replay_reproduced (real booleans; replay_reproduced=true fails the gate), optional reporter_reverified.",
+      "constant": false,
+      "external": true
+    },
+    "__fix_validation__": {
+      "type": "dictionary",
+      "description": "Validation-gate record composed by validation.confirm_fix_validation: case_id, fix_ref, validated, failed_checks. Divergence is data: a failing gate is recorded here, not raised.",
+      "constant": false,
+      "external": false
+    },
+    "__disclosure_agreement__": {
+      "type": "dictionary",
+      "description": "Operator-recorded outcome of the disclosure coordination consumed by coordination.record_disclosure_coordination: target_date, credit_consent (real boolean), and credit_display (required with consent, forbidden without).",
+      "constant": false,
+      "external": true
+    },
+    "__coordination_record__": {
+      "type": "dictionary",
+      "description": "Coordination record composed by coordination.record_disclosure_coordination: case_id, disclosure_target_date, reporter_credit_display. The compile target's adapter extracts __disclosure_target_date__ and __reporter_credit_display__ from this record — the documented out_args extraction seam (the CORE-DEFERRED single-ref collapse the step description anticipated).",
+      "constant": false,
+      "external": false
     }
   },
   "workflow_start": "start--c7d51014-0000-4000-8000-000000000001",
@@ -161,9 +221,10 @@
     "action--c7d51014-0000-4000-8000-000000000002": {
       "type": "action",
       "name": "intake",
-      "description": "SKELETON \u2014 receive a vulnerability report through the operator's CVD intake surface (security.txt / disclosure address / bug-bounty portal). Assign __case_id__, capture reporter contact, product / component in scope, affected versions, reproduction steps, and any embargo terms the reporter has proposed. TODO (CORE): pin the intake surface adapter (RFC 9116 security.txt address resolution, PGP-encrypted mailbox handling) and the initial evidence-capture shape.",
+      "description": "Receive a vulnerability report through the operator's CVD intake surface (security.txt / disclosure address / bug-bounty portal) and open the case: intake.open_cvd_case validates the report envelope and derives __case_id__ deterministically from the intake channel and the canonicalised report content, so the same report re-received resolves to the same case (intake dedup by construction). Bound since the CORE-WIRE card; the binding assigns the full case envelope to __cvd_case__ and the compile target's adapter extracts the documented out_args (__case_id__; __reporter_contact__ mirrors the envelope field) — the same marshalling seam every bound playbook documents. Embargo terms the reporter proposed travel on the envelope.",
       "on_completion": "action--c7d51014-0000-4000-8000-000000000003",
       "out_args": [
+        "__cvd_case__",
         "__case_id__",
         "__reporter_contact__"
       ],
@@ -177,7 +238,15 @@
         ],
         "metric_refs": [
           "kri.cvd_intake_aging@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.cra_cvd.primitives.intake.open_cvd_case",
+          "in": {
+            "raw_report": "__raw_report__",
+            "intake_channel": "__intake_channel__"
+          },
+          "out": "__cvd_case__"
+        }
       }
     },
     "action--c7d51014-0000-4000-8000-000000000003": {
@@ -226,12 +295,13 @@
     "action--c7d51014-0000-4000-8000-000000000004": {
       "type": "action",
       "name": "triage",
-      "description": "SKELETON \u2014 reproduce, assess severity, determine scope of affected versions, and produce __triage_verdict__. When __actively_exploited__ is true (either at triage or when re-evaluated later), fork a sibling cra_srp_notify run with __clock_kind__ = actively_exploited_vulnerability keyed on __case_id__; the disclosure lifecycle here continues in parallel. When __triage_verdict__ is not valid_needs_fix, short-circuit to a reporter-facing rationale communication and end. TODO (CORE): severity-scoring input (CVSS 4.0 vector + operator adjustments), CPE / affected-version enumeration shape, actively-exploited signal source.",
+      "description": "Reproduce, assess severity, and scope the affected versions: triage.triage_case derives __triage_verdict__ and __actively_exploited__ deterministically from the operator's recorded observations under the pinned five-verdict precedence (out_of_scope > duplicate > not_reproducible > valid_no_action > valid_needs_fix). Bound since the CORE-WIRE card; the binding assigns the verdict record to __triage_result__ and the adapter extracts the documented out_args. When __actively_exploited__ is true (at triage or on later re-evaluation), fork a sibling cra_srp_notify run with __clock_kind__ = actively_exploited_vulnerability keyed on __case_id__; the disclosure lifecycle here continues in parallel. When __triage_verdict__ is not valid_needs_fix the case short-circuits to a reporter-facing rationale communication and ends.",
       "on_completion": "action--c7d51014-0000-4000-8000-000000000005",
       "in_args": [
         "__case_id__"
       ],
       "out_args": [
+        "__triage_result__",
         "__triage_verdict__",
         "__actively_exploited__"
       ],
@@ -245,13 +315,21 @@
         ],
         "metric_refs": [
           "kpi.false_positive_rate@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.cra_cvd.primitives.triage.triage_case",
+          "in": {
+            "case_id": "__case_id__",
+            "observations": "__triage_observations__"
+          },
+          "out": "__triage_result__"
+        }
       }
     },
     "action--c7d51014-0000-4000-8000-000000000005": {
       "type": "action",
       "name": "develop_fix",
-      "description": "SKELETON \u2014 develop the corrective / mitigating measure for the confirmed vulnerability. Records __fix_ref__ on production of a candidate build or patch. TODO (CORE): fix-artifact provenance shape (SBOM update, signed release attestation) and interaction with the operator's change-management surface.",
+      "description": "Develop the corrective / mitigating measure for the confirmed vulnerability on the operator's change-management surface. Bound since the CORE-WIRE card: fix.record_fix_candidate validates the candidate's provenance (patch_commit / build_id / release_attestation) and composes the kind-prefixed __fix_ref__; recording a fix for a non-actionable verdict is refused at the boundary — only valid_needs_fix cases take this lane.",
       "on_completion": "action--c7d51014-0000-4000-8000-000000000006",
       "in_args": [
         "__case_id__",
@@ -270,13 +348,22 @@
         ],
         "metric_refs": [
           "kri.cvd_intake_aging@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.cra_cvd.primitives.fix.record_fix_candidate",
+          "in": {
+            "case_id": "__case_id__",
+            "triage_verdict": "__triage_verdict__",
+            "fix_candidate": "__fix_candidate__"
+          },
+          "out": "__fix_ref__"
+        }
       }
     },
     "action--c7d51014-0000-4000-8000-000000000006": {
       "type": "action",
       "name": "validate_fix",
-      "description": "SKELETON \u2014 verify the candidate fix closes the reported condition without regressing adjacent behaviour. Confirms __fix_ref__ before disclosure coordination proceeds. TODO (CORE): validation-evidence shape (regression tests, red-team replay, reporter re-verification path).",
+      "description": "Verify the candidate fix closes the reported condition without regressing adjacent behaviour. Bound since the CORE-WIRE card: validation.confirm_fix_validation derives the gate record from the operator's recorded outcomes — regression suite green, the original reproduction no longer working (replay_reproduced=true FAILS the gate), and optional reporter re-verification (never silently failing: not-attempted is allowed, attempted-and-failed fails). Divergence is data: a failing gate lands on __fix_validation__ for the case file rather than raising.",
       "on_completion": "action--c7d51014-0000-4000-8000-000000000007",
       "in_args": [
         "__case_id__",
@@ -292,13 +379,25 @@
         ],
         "metric_refs": [
           "kpi.false_positive_rate@v1"
-        ]
-      }
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.cra_cvd.primitives.validation.confirm_fix_validation",
+          "in": {
+            "case_id": "__case_id__",
+            "fix_ref": "__fix_ref__",
+            "validation_evidence": "__validation_evidence__"
+          },
+          "out": "__fix_validation__"
+        }
+      },
+      "out_args": [
+        "__fix_validation__"
+      ]
     },
     "action--c7d51014-0000-4000-8000-000000000007": {
       "type": "action",
       "name": "coordinate_disclosure",
-      "description": "# CORE-DEFERRED: out_args collapse to single __coordinate_disclosure_ref__ pending EXTEND scope. Agree the coordinated public-disclosure date with the reporter and, where applicable, the coordinating CSIRT. Records __disclosure_target_date__ and captures the reporter-credit consent decision into __reporter_credit_display__ (opt-in attribution string or the anonymous marker) so the publish_advisory step can render both the human-readable and CSAF 2.0 advisory templates without a second reporter round-trip. Coordinates with the sibling cra_srp_notify run when one is active so the public-advisory publication does not front-run a regulator submission the SRP notification chain has not yet completed. Left CACAO-only in the CORE-B-PRIM scope because binding a single core_body primitive here would collapse the two-variable out_args (__disclosure_target_date__, __reporter_credit_display__) into a single __coordinate_disclosure_ref__ ref, which changes the workflow variable contract; the primitive surface (content.playbooks.cra_cvd.primitives.csirt.notify_national_csirt) is landed for the EXTEND scope to wire once the contract collapse is scoped.",
+      "description": "Agree the coordinated public-disclosure date with the reporter and, where applicable, the coordinating CSIRT. Bound since the CORE-WIRE card, resolving the CORE-DEFERRED note: the binding assigns the coordination record to the single __coordination_record__ and the adapter extracts the documented out_args (__disclosure_target_date__, __reporter_credit_display__). coordination.record_disclosure_coordination captures the reporter-credit consent decision per ISO/IEC 29147 (consent taken after the reporter has seen the draft advisory): attribution follows consent both ways — a credit line without consent is refused rather than dropped, and the anonymous marker is the exact literal the advisory builder pins.",
       "on_completion": "action--c7d51014-0000-4000-8000-000000000008",
       "in_args": [
         "__case_id__",
@@ -306,6 +405,7 @@
         "__fix_ref__"
       ],
       "out_args": [
+        "__coordination_record__",
         "__disclosure_target_date__",
         "__reporter_credit_display__"
       ],
@@ -319,7 +419,17 @@
         ],
         "metric_refs": [
           "kri.cvd_intake_aging@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.cra_cvd.primitives.coordination.record_disclosure_coordination",
+          "in": {
+            "case_id": "__case_id__",
+            "reporter_contact": "__reporter_contact__",
+            "fix_ref": "__fix_ref__",
+            "agreement": "__disclosure_agreement__"
+          },
+          "out": "__coordination_record__"
+        }
       }
     },
     "action--c7d51014-0000-4000-8000-000000000008": {
@@ -386,8 +496,8 @@
   },
   "x_secops_ng": {
     "stable_id": "playbook.cra_cvd@v1",
-    "content_version": "0.1.0",
-    "maturity": "experimental",
+    "content_version": "1.0.0",
+    "maturity": "stable",
     "compile_targets": [
       "n8n",
       "temporal",
@@ -405,11 +515,11 @@
       "kpi.false_positive_rate@v1"
     ],
     "sources": [
-      "OASIS CACAO v2.0 specification \u2014 workflow step types (start, action, end), variable conventions, x_ extension namespace",
-      "Cyber Resilience Act (EU) 2024/2847, Article 14 \u2014 manufacturer coordinated vulnerability disclosure policy (\u00a71) and acknowledgement to reporter (\u00a76)",
-      "ISO/IEC 29147:2018 \u2014 Vulnerability disclosure",
-      "ISO/IEC 30111:2019 \u2014 Vulnerability handling processes",
-      "OCSF v1.3.0 \u2014 Vulnerability Finding (class_uid 2002) and Compliance Finding (class_uid 2003) event classes emitted across the lifecycle"
+      "OASIS CACAO v2.0 specification — workflow step types (start, action, end), variable conventions, x_ extension namespace",
+      "Cyber Resilience Act (EU) 2024/2847, Article 14 — manufacturer coordinated vulnerability disclosure policy (§1) and acknowledgement to reporter (§6)",
+      "ISO/IEC 29147:2018 — Vulnerability disclosure",
+      "ISO/IEC 30111:2019 — Vulnerability handling processes",
+      "OCSF v1.3.0 — Vulnerability Finding (class_uid 2002) and Compliance Finding (class_uid 2003) event classes emitted across the lifecycle"
     ]
   }
 }
