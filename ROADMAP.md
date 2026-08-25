@@ -2054,6 +2054,13 @@ one playbook's provenance.
   - SKELETON — #480, #484
   - CORE — #577
   - EXTEND — #604 (cookbook + metric)
+  - WIRE + GRADUATE — #937 wire lane (the notify step's deterministic
+    composition half bound to `primitives.notify.compose_owner_notification`
+    — role-shaped recipient, attestation ref, SHA-256 delivery dedup
+    key — with delivery itself remaining the compile target's
+    messaging discipline, per the incident_management
+    destination-resolver split; then `experimental` → `stable`,
+    `content_version` 1.0.0, all three worked examples regenerated).
 
 ### F-WF-SOC2-EVIDENCE — SOC 2 readiness evidence collection
 

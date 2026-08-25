@@ -27,10 +27,10 @@ async def probe_mfa_coverage(auth_scope: str, posture_window: str, principals: s
     """
     with _TRACER.start_as_current_span(
         name='activity.action--52000000-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'probe mfa coverage', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'probe_mfa_coverage'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'probe mfa coverage', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'probe_mfa_coverage'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--52000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'probe mfa coverage', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'probe_mfa_coverage'})
+            AuditRecord(span_name='activity.action--52000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'probe mfa coverage', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'probe_mfa_coverage'})
         )
         from content.playbooks.mfa_secured_comms.primitives.probe import probe_mfa_coverage
         __mfa_coverage_id__ = probe_mfa_coverage(auth_scope=__auth_scope__, posture_window=__posture_window__, principals=__principals__)
@@ -50,10 +50,10 @@ async def assess_continuous_auth(auth_scope: str, sessions: str) -> str:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--52000000-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'assess continuous auth', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_continuous_auth'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'assess continuous auth', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_continuous_auth'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--52000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'assess continuous auth', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_continuous_auth'})
+            AuditRecord(span_name='activity.action--52000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'assess continuous auth', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_continuous_auth'})
         )
         from content.playbooks.mfa_secured_comms.primitives.assess import assess_continuous_auth
         __continuous_auth_id__ = assess_continuous_auth(auth_scope=__auth_scope__, sessions=__sessions__)
@@ -73,10 +73,10 @@ async def verify_oob_channels(auth_scope: str, posture_window: str, channels: st
     """
     with _TRACER.start_as_current_span(
         name='activity.action--52000000-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'verify oob channels', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'verify_oob_channels'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'verify oob channels', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'verify_oob_channels'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--52000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'verify oob channels', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'verify_oob_channels'})
+            AuditRecord(span_name='activity.action--52000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'verify oob channels', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'verify_oob_channels'})
         )
         from content.playbooks.mfa_secured_comms.primitives.verify import verify_oob_channel
         __oob_channel_status__ = verify_oob_channel(auth_scope=__auth_scope__, posture_window=__posture_window__, channels=__channels__)
@@ -96,10 +96,10 @@ async def evidence_capture(workflow_id: str, execution_id: str, regulation_refs:
     """
     with _TRACER.start_as_current_span(
         name='activity.action--52000000-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'evidence capture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evidence_capture'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'evidence capture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evidence_capture'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--52000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'evidence capture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evidence_capture'})
+            AuditRecord(span_name='activity.action--52000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'evidence capture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evidence_capture'})
         )
         from content.playbooks.mfa_secured_comms.primitives.artifact import build_mfa_posture_attestation_artifact
         __attestation_id__ = build_mfa_posture_attestation_artifact(workflow_id=__workflow_id__, execution_id=__execution_id__, regulation_refs=__regulation_refs__, control_refs=__control_refs__, auth_scope=__auth_scope__, posture_window=__posture_window__, mfa_coverage_snapshot=__mfa_coverage_id__, continuous_auth_assessment=__continuous_auth_id__, oob_channel_status=__oob_channel_status__, captured_at=__captured_at__, source_url=__source_url__)
@@ -112,21 +112,20 @@ EVIDENCE_CAPTURE_RETRY_POLICY = RetryPolicy(
 )
 
 @activity.defn
-async def notify_authentication_owner(attestation_id: str, auth_scope: str) -> None:
-    """Deliver the attestation reference to the authentication owner along the operator's pre-bound channel (ticketing system, chat thread, email). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an attestation written but never delivered to the owner is itself a posture gap. No core_body primitive is bound: notification is a delivery discipline owned by the compile target's messaging surface, not a deterministic primitive.
+async def notify_authentication_owner(attestation_id: str, auth_scope: str) -> dict[str, object]:
+    """Deliver the attestation reference to the authentication owner along the operator's pre-bound channel (ticketing system, chat thread, email). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an attestation written but never delivered to the owner is itself a posture gap. The deterministic half is bound since the #937 wire card: compose_owner_notification builds the closed payload (role-shaped recipient, attestation ref, idempotency key) the messaging surface delivers verbatim — delivery itself remains a discipline of the compile target's messaging surface, mirroring the incident_management destination-resolver split.
 
     CACAO step_id: action--52000000-0000-4000-8000-000000000006
     """
     with _TRACER.start_as_current_span(
         name='activity.action--52000000-0000-4000-8000-000000000006',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'notify authentication owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_authentication_owner'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'notify authentication owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_authentication_owner'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--52000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'notify authentication owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_authentication_owner'})
+            AuditRecord(span_name='activity.action--52000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'notify authentication owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_authentication_owner'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--52000000-0000-4000-8000-000000000006'"
-        )
+        from content.playbooks.mfa_secured_comms.primitives.notify import compose_owner_notification
+        __owner_notification__ = compose_owner_notification(attestation_id=__attestation_id__, auth_scope=__auth_scope__)
 
 NOTIFY_AUTHENTICATION_OWNER_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -141,8 +140,8 @@ class PlaybookMfaSecuredCommsV1Workflow:
 
     CACAO playbook id : playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8
     stable_id         : playbook.mfa_secured_comms@v1
-    content_version   : 0.2.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--52000000-0000-4000-8000-000000000001
     activities        : probe_mfa_coverage, assess_continuous_auth, verify_oob_channels, evidence_capture, notify_authentication_owner
     """
@@ -151,10 +150,10 @@ class PlaybookMfaSecuredCommsV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.mfa_secured_comms@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '0.2.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.mfa_secured_comms@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '0.2.0'})
+                AuditRecord(span_name='workflow.playbook.mfa_secured_comms@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.mfa_secured_comms@v1'"
