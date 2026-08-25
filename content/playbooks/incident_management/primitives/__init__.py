@@ -43,6 +43,10 @@ from .classification import (
     load_policy,
     policy_path,
 )
+from .intake import (
+    InvalidIncidentSignalError,
+    derive_incident_id,
+)
 from .regulator_submission import (
     EarlyWarningSubmission,
     FinalReportSubmission,
@@ -84,6 +88,7 @@ __all__ = [
     "EarlyWarningSubmission",
     "FinalReportSubmission",
     "IntakeSignals",
+    "InvalidIncidentSignalError",
     "MissingDestinationError",
     "NotificationSubmission",
     "PT02_BINDING_STATUS",
@@ -100,6 +105,7 @@ __all__ = [
     "TimelineSession",
     "classify_significance",
     "close_timeline",
+    "derive_incident_id",
     "due_at",
     "elapsed",
     "load_policy",
