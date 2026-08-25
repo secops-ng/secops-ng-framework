@@ -21,20 +21,19 @@ from ._audit_mirror import AuditRecord, AuditTrail
 
 @activity.defn
 async def intake_significant_incident_signal(signal_id: str) -> str:
-    """Receive the originating incident signal and hydrate it with the typed intake-event payload shape consumed by the F-PT-02 incident-timeline pattern. Produces __incident_id__. CORE body lands in CORE-PRIM (card 5); SKELETON stub raises NotImplementedError against the named contract.
+    """Receive the originating incident signal and hydrate it with the typed intake-event payload shape consumed by the F-PT-02 incident-timeline pattern. Produces __incident_id__ deterministically (UUIDv5 over the namespaced signal id, so the same signal replays to the same incident and intake dedup is a property of the derivation); bound to the intake primitive since the #937 wire card.
 
     CACAO step_id: action--50000000-0000-4000-8000-000000000002
     """
     with _TRACER.start_as_current_span(
         name='activity.action--50000000-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'intake significant-incident signal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'intake_significant_incident_signal'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'intake significant-incident signal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'intake_significant_incident_signal'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'intake significant-incident signal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'intake_significant_incident_signal'})
+            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'intake significant-incident signal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'intake_significant_incident_signal'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--50000000-0000-4000-8000-000000000002'"
-        )
+        from content.playbooks.incident_management.primitives.intake import derive_incident_id
+        __incident_id__ = derive_incident_id(signal_id=__signal_id__)
 
 INTAKE_SIGNIFICANT_INCIDENT_SIGNAL_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -51,10 +50,10 @@ async def classify_significance_and_cross_border_scope(incident_id: str) -> dict
     """
     with _TRACER.start_as_current_span(
         name='activity.action--50000000-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify significance and cross-border scope', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_significance_and_cross_border_scope'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify significance and cross-border scope', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_significance_and_cross_border_scope'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify significance and cross-border scope', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_significance_and_cross_border_scope'})
+            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify significance and cross-border scope', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_significance_and_cross_border_scope'})
         )
         from content.playbooks.incident_management.primitives.classification import classify_significance
         __classification_verdict__ = classify_significance(signals=__intake_signals__)
@@ -74,10 +73,10 @@ async def open_incident_timeline(incident_id: str, significant: bool, cross_bord
     """
     with _TRACER.start_as_current_span(
         name='activity.action--50000000-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'open incident timeline', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'open_incident_timeline'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'open incident timeline', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'open_incident_timeline'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'open incident timeline', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'open_incident_timeline'})
+            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'open incident timeline', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'open_incident_timeline'})
         )
         from content.playbooks.incident_management.primitives.timeline_binding import open_timeline
         __timeline_handle__ = open_timeline(incident_id=__incident_id__, opened_at=__timeline_opened_at__)
@@ -97,10 +96,10 @@ async def submit_24_hour_early_warning(incident_id: str, timeline_handle: str, s
     """
     with _TRACER.start_as_current_span(
         name='activity.action--50000000-0000-4000-8000-000000000006',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'submit 24-hour early warning', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'submit_24_hour_early_warning'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'submit 24-hour early warning', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'submit_24_hour_early_warning'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'submit 24-hour early warning', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'submit_24_hour_early_warning'})
+            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'submit 24-hour early warning', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'submit_24_hour_early_warning'})
         )
         from content.playbooks.incident_management.primitives.regulator_submission import resolve_destination
         __early_warning_destination__ = resolve_destination(destinations=__notification_destinations__, stage='early_warning')
@@ -120,10 +119,10 @@ async def submit_72_hour_notification(incident_id: str, timeline_handle: str, si
     """
     with _TRACER.start_as_current_span(
         name='activity.action--50000000-0000-4000-8000-000000000007',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'submit 72-hour notification', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'submit_72_hour_notification'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'submit 72-hour notification', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'submit_72_hour_notification'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000007', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'submit 72-hour notification', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'submit_72_hour_notification'})
+            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000007', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'submit 72-hour notification', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'submit_72_hour_notification'})
         )
         from content.playbooks.incident_management.primitives.stage_clock import verdict_for_submission
         __notification_stage_verdict__ = verdict_for_submission(stage='notification', opened_at=__timeline_opened_at__, submitted_at=__notification_submitted_at__)
@@ -143,10 +142,10 @@ async def submit_1_month_final_report(incident_id: str, timeline_handle: str, si
     """
     with _TRACER.start_as_current_span(
         name='activity.action--50000000-0000-4000-8000-000000000009',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000009', 'secops_ng.step.name': 'submit 1-month final report', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'submit_1_month_final_report'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000009', 'secops_ng.step.name': 'submit 1-month final report', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'submit_1_month_final_report'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000009', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000009', 'secops_ng.step.name': 'submit 1-month final report', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'submit_1_month_final_report'})
+            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-000000000009', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000009', 'secops_ng.step.name': 'submit 1-month final report', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'submit_1_month_final_report'})
         )
         from content.playbooks.incident_management.primitives.regulator_submission import resolve_destination
         __final_report_destination__ = resolve_destination(destinations=__notification_destinations__, stage='final_report')
@@ -166,10 +165,10 @@ async def close_incident_timeline(incident_id: str, timeline_handle: str) -> str
     """
     with _TRACER.start_as_current_span(
         name='activity.action--50000000-0000-4000-8000-00000000000a',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'close incident timeline', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'close_incident_timeline'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'close incident timeline', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'close_incident_timeline'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-00000000000a', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'close incident timeline', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'close_incident_timeline'})
+            AuditRecord(span_name='activity.action--50000000-0000-4000-8000-00000000000a', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'close incident timeline', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'close_incident_timeline'})
         )
         from content.playbooks.incident_management.primitives.timeline_binding import close_timeline
         __timeline_artefact_path__ = close_timeline(session=__timeline_handle__, closed_at=__timeline_closed_at__)
@@ -187,8 +186,8 @@ class PlaybookIncidentManagementV1Workflow:
 
     CACAO playbook id : playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0
     stable_id         : playbook.incident_management@v1
-    content_version   : 0.2.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--50000000-0000-4000-8000-000000000001
     activities        : intake_significant_incident_signal, classify_significance_and_cross_border_scope, open_incident_timeline, submit_24_hour_early_warning, submit_72_hour_notification, submit_1_month_final_report, close_incident_timeline
     """
@@ -197,10 +196,10 @@ class PlaybookIncidentManagementV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.incident_management@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '0.2.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.incident_management@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '0.2.0'})
+                AuditRecord(span_name='workflow.playbook.incident_management@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.incident_management@v1'"

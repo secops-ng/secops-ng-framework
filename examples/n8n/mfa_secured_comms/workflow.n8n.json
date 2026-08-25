@@ -102,6 +102,12 @@
               "type": "string",
               "value": "",
               "description": "Dated authentication and secured-communications posture-attestation record emitted by artifact.build_mfa_posture_attestation_artifact and published to the operator's evidence store. Carries the MFA-coverage snapshot, the continuous-authentication assessment, the OOB-channel verification, and the aggregate gap_summary \u2014 the audit-evident discharge of NIS2 Art.21(2)(j)."
+            },
+            {
+              "name": "__owner_notification__",
+              "type": "object",
+              "value": "",
+              "description": "Closed owner-notification payload composed by notify.compose_owner_notification: role-shaped recipient, attestation_ref, auth_scope echo, and the SHA-256 notification_id the messaging surface uses as a delivery dedup key."
             }
           ]
         }
@@ -176,38 +182,17 @@
     {
       "id": "action--52000000-0000-4000-8000-000000000006",
       "name": "notify authentication owner",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1540,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.attestation_id",
-              "name": "in.attestation_id",
-              "value": "={{$workflow.variables.attestation_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.auth_scope",
-              "name": "in.auth_scope",
-              "value": "={{$workflow.variables.auth_scope}}",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.api_activity@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.mfa_secured_comms.primitives.notify import compose_owner_notification\n__owner_notification__ = compose_owner_notification(attestation_id=__attestation_id__, auth_scope=__auth_scope__)"
       },
-      "notes": "Deliver the attestation reference to the authentication owner along the operator's pre-bound channel (ticketing system, chat thread, email). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an attestation written but never delivered to the owner is itself a posture gap. No core_body primitive is bound: notification is a delivery discipline owned by the compile target's messaging surface, not a deterministic primitive.",
+      "notes": "Deliver the attestation reference to the authentication owner along the operator's pre-bound channel (ticketing system, chat thread, email). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an attestation written but never delivered to the owner is itself a posture gap. The deterministic half is bound since the #937 wire card: compose_owner_notification builds the closed payload (role-shaped recipient, attestation ref, idempotency key) the messaging surface delivers verbatim \u2014 delivery itself remains a discipline of the compile target's messaging surface, mirroring the incident_management destination-resolver split.",
       "notesInFlow": true
     },
     {
@@ -310,12 +295,10 @@
   "meta": {
     "secops_ng": {
       "stable_id": "playbook.mfa_secured_comms@v1",
-      "content_version": "0.2.0",
-      "maturity": "experimental",
+      "content_version": "1.0.0",
+      "maturity": "stable",
       "source_playbook_id": "playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8"
     },
-    "secops_ng_notes": [
-      "step 'action--52000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
-    ]
+    "secops_ng_notes": []
   }
 }

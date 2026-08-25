@@ -56,6 +56,10 @@ from .assess import (
     InvalidContinuousAuthAssessmentError,
     assess_continuous_auth,
 )
+from .notify import (
+    InvalidOwnerNotificationError,
+    compose_owner_notification,
+)
 from .probe import (
     InvalidMfaCoverageProbeError,
     probe_mfa_coverage,
@@ -70,8 +74,10 @@ __all__ = [
     "InvalidMfaCoverageProbeError",
     "InvalidMfaPostureAttestationArtifactError",
     "InvalidOobChannelVerificationError",
+    "InvalidOwnerNotificationError",
     "assess_continuous_auth",
     "build_mfa_posture_attestation_artifact",
+    "compose_owner_notification",
     "derive_mfa_posture_attestation_artifact_id",
     "probe_mfa_coverage",
     "verify_oob_channel",

@@ -75,6 +75,9 @@ class PlaybookMfaSecuredCommsV1State(TypedDict, total=False):
     # playbook_variable: __attestation_id__
     # Dated authentication and secured-communications posture-attestation record emitted by artifact.build_mfa_posture_attestation_artifact and published to the operator's evidence store. Carries the MFA-coverage snapshot, the continuous-authentication assessment, the OOB-channel verification, and the aggregate gap_summary — the audit-evident discharge of NIS2 Art.21(2)(j).
     attestation_id: str
+    # playbook_variable: __owner_notification__
+    # Closed owner-notification payload composed by notify.compose_owner_notification: role-shaped recipient, attestation_ref, auth_scope echo, and the SHA-256 notification_id the messaging surface uses as a delivery dedup key.
+    owner_notification: dict[str, object]
     # bookkeeping
     # Per-step status map keyed by CACAO step_id. Conventional values: 'pending', 'running', 'ok', 'failed', 'awaiting-human'. The graph builder writes here; conditional-edge routers read it.
     step_status: dict[str, str]
@@ -154,8 +157,8 @@ async def evidence_capture(workflow_id: str, execution_id: str, regulation_refs:
         __attestation_id__ = build_mfa_posture_attestation_artifact(workflow_id=__workflow_id__, execution_id=__execution_id__, regulation_refs=__regulation_refs__, control_refs=__control_refs__, auth_scope=__auth_scope__, posture_window=__posture_window__, mfa_coverage_snapshot=__mfa_coverage_id__, continuous_auth_assessment=__continuous_auth_id__, oob_channel_status=__oob_channel_status__, captured_at=__captured_at__, source_url=__source_url__)
 
 @tool
-async def notify_authentication_owner(attestation_id: str, auth_scope: str) -> None:
-    """Deliver the attestation reference to the authentication owner along the operator's pre-bound channel (ticketing system, chat thread, email). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an attestation written but never delivered to the owner is itself a posture gap. No core_body primitive is bound: notification is a delivery discipline owned by the compile target's messaging surface, not a deterministic primitive.
+async def notify_authentication_owner(attestation_id: str, auth_scope: str) -> dict[str, object]:
+    """Deliver the attestation reference to the authentication owner along the operator's pre-bound channel (ticketing system, chat thread, email). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an attestation written but never delivered to the owner is itself a posture gap. The deterministic half is bound since the #937 wire card: compose_owner_notification builds the closed payload (role-shaped recipient, attestation ref, idempotency key) the messaging surface delivers verbatim — delivery itself remains a discipline of the compile target's messaging surface, mirroring the incident_management destination-resolver split.
 
     CACAO step_id : action--52000000-0000-4000-8000-000000000006
     CACAO type    : action
@@ -167,9 +170,8 @@ async def notify_authentication_owner(attestation_id: str, auth_scope: str) -> N
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--52000000-0000-4000-8000-000000000006', attributes={'secops_ng.playbook.id': 'playbook--7b2c3d4e-5f60-4a11-9c2d-e3f4a5b6c7d8', 'secops_ng.step.id': 'action--52000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'notify authentication owner', 'secops_ng.tool.name': 'notify_authentication_owner', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--52000000-0000-4000-8000-000000000006'"
-        )
+        from content.playbooks.mfa_secured_comms.primitives.notify import compose_owner_notification
+        __owner_notification__ = compose_owner_notification(attestation_id=__attestation_id__, auth_scope=__auth_scope__)
 
 async def llm_step(state: PlaybookMfaSecuredCommsV1State) -> dict:
     """Agentic-extension hook.

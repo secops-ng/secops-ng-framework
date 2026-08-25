@@ -69,6 +69,10 @@ from .fanout import (
     InvalidPatchFanOutError,
     fan_out_to_broad_rings,
 )
+from .notify import (
+    InvalidMaintenanceNotificationError,
+    compose_maintenance_notification,
+)
 from .stage import (
     InvalidPatchStagingError,
     stage_rollout_to_canary_ring,
@@ -80,6 +84,7 @@ from .validate import (
 
 __all__ = [
     "InvalidCanaryValidationError",
+    "InvalidMaintenanceNotificationError",
     "InvalidPatchApplicationArtifactError",
     "InvalidPatchCriticalityError",
     "InvalidPatchDetectionError",
@@ -87,6 +92,7 @@ __all__ = [
     "InvalidPatchStagingError",
     "build_patch_application_evidence_artifact",
     "classify_patch_criticality",
+    "compose_maintenance_notification",
     "derive_patch_application_artifact_id",
     "detect_patch_availability",
     "fan_out_to_broad_rings",

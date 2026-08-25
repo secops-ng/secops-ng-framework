@@ -99,7 +99,7 @@ class PlaybookIncidentManagementV1State(TypedDict, total=False):
 
 @tool
 async def intake_significant_incident_signal(signal_id: str) -> str:
-    """Receive the originating incident signal and hydrate it with the typed intake-event payload shape consumed by the F-PT-02 incident-timeline pattern. Produces __incident_id__. CORE body lands in CORE-PRIM (card 5); SKELETON stub raises NotImplementedError against the named contract.
+    """Receive the originating incident signal and hydrate it with the typed intake-event payload shape consumed by the F-PT-02 incident-timeline pattern. Produces __incident_id__ deterministically (UUIDv5 over the namespaced signal id, so the same signal replays to the same incident and intake dedup is a property of the derivation); bound to the intake primitive since the #937 wire card.
 
     CACAO step_id : action--50000000-0000-4000-8000-000000000002
     CACAO type    : action
@@ -111,9 +111,8 @@ async def intake_significant_incident_signal(signal_id: str) -> str:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--50000000-0000-4000-8000-000000000002', attributes={'secops_ng.playbook.id': 'playbook--50a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6c0', 'secops_ng.step.id': 'action--50000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'intake significant-incident signal', 'secops_ng.tool.name': 'intake_significant_incident_signal', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--50000000-0000-4000-8000-000000000002'"
-        )
+        from content.playbooks.incident_management.primitives.intake import derive_incident_id
+        __incident_id__ = derive_incident_id(signal_id=__signal_id__)
 
 @tool
 async def classify_significance_and_cross_border_scope(incident_id: str) -> dict[str, object]:
