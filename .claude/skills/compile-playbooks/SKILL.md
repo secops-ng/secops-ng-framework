@@ -7,8 +7,8 @@ description: Pick which playbooks to adopt and which compile target to use, then
 
 `docs/quickstart/README.md` already walks through installing, compiling and running
 one worked playbook end to end. **Send the operator there for the mechanics.** This
-skill covers the two things the quickstart deliberately does not: with 40 compilable
-playbooks, *which* to adopt, and which target to compile into.
+skill covers the two things the quickstart deliberately does not: with every
+finalized playbook compilable, *which* to adopt, and which target to compile into.
 
 Companion reference: `reference/target-tradeoffs.md` for the per-target matrix,
 `reference/handoff-honesty.md` for how to report remaining work.
@@ -40,26 +40,29 @@ reading by eye walks into:
   cannot compile is reported as such instead of being recommended.
 
 `predicted_n8n_todos` is the remaining-work figure: unbound actions plus
-control-flow steps (`if`/`switch`/`while`/`parallel`). Verified exact against **all
-40** committed n8n examples, so it needs no compile to compute.
+control-flow steps (`if`/`switch`/`while`/`parallel`). Verified exact against every
+committed n8n example when the column landed; it recomputes from source, so it
+needs no compile.
 
 ## Choosing a playbook
 
-Sort by the `todo` column — it is the only figure that predicts time-to-running.
+Rank by `maturity` first. `stable` is the Maturity ladder's deployment-ready
+designation (ROADMAP § Maturity ladder): every action step carries a real
+primitive binding, three-target worked examples are golden-pinned, and the
+primitives are unit-covered — graduation is a checklist `catalog.py` computes,
+not a judgement call. **The `stable` set is the honest "start here" set**, and
+it currently coincides exactly with `todo = 0`. Never quote a count from this
+file: the generated table at `content/playbooks/README.md` carries the current
+maturity tally and per-playbook tier, and CI fails when it is stale.
 
-- **8 playbooks are fully bound (`todo = 0`)**: `codebase_vuln_management`,
-  `contractual_obligations_tracker`, `iam_auditor`, `infra_posture_management`,
-  `it_security_support_agent`, `nis2_art20_governance`,
-  `onboarding_offboarding_tracker`, `supply_chain_security`. Every action step
-  carries a primitive binding. These are the honest "start here" set.
-- Mid-range (`todo` 1–5) needs a handful of step bodies written.
-- The scenario names an operator asks for first — `phishing_triage` (11),
-  `cloud_misconfiguration` (9), `ransomware_containment` (8) — carry the **most**
-  remaining work. Say so before they invest a sprint in one.
+Within the non-stable tail, sort by the `todo` column — the figure that predicts
+time-to-running. Two things to say out loud:
 
-Do **not** rank by `maturity`: nothing in the catalogue is `stable` (13 `draft` /
-27 `experimental`), so it has no discriminating power. Do not rank by step count
-either — it measures scope, not readiness.
+- The scenario names an operator often asks for first (`phishing_triage`,
+  `ransomware_containment`, `cloud_misconfiguration`) currently sit in the
+  unbound tail with the **most** remaining work — read their `todo` from the
+  script and say so before they invest a sprint in one.
+- Do not rank by step count — it measures scope, not readiness.
 
 **Cap the first pass at one playbook.** The failure this prevents is an operator
 compiling six, opening forty stub bodies, and concluding the framework is vapour.

@@ -89,9 +89,11 @@ not after.
 
 LangGraph earns its cost only when a model must **choose what happens next**. If
 the model is only writing text inside a step whose path is fixed, all three
-targets can do that, and the framework's own position (`examples/*/
-incident_management/core_body.overlay.json` `_meta`) is that model reach stays
-scoped to free-text fields while regulated decisions stay deterministic code.
+targets can do that, and the framework's own position (`docs/FOUNDATION.md` —
+LLM-facing steps go through versioned, diff-reviewable signatures) is that
+model reach stays scoped to free-text fields while regulated decisions stay
+deterministic code. (The overlay `_meta` that used to carry this position now
+records the wave-seam closure instead.)
 
 ## Offer the second compile
 
