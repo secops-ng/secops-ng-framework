@@ -1904,6 +1904,15 @@ one playbook's provenance.
 - **Source:** FOUNDATION (auditability); GDPR Arts. 12, 15–22; issue #890.
 - **Shipped via:**
   - SKELETON — #621
+  - CORE-PRIM — #979 (seven deterministic primitives — opaque-subject
+    intake with the supplied-instant Art. 12(3) anchor, closed-method
+    verification record storing no subject attributes, calendar-month
+    deadline arithmetic with the end-of-month clamp and the
+    justification-required extension shape, contractual per-type
+    owner routing, completeness-gated fulfilment pack with lawful
+    qualifications as data, remedy-carrying response composition,
+    signed-delta outcome record — each executed directly by unit
+    coverage; CORE-WIRE binds them and regenerates the examples)
 
 ### F-WF-DDOS — Availability-attack detection and response
 
