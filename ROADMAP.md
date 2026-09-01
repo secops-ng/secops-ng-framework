@@ -1739,6 +1739,13 @@ one playbook's provenance.
 - **Shipped via:**
   - SKELETON — #678, #679, #680, #681
   - EXTEND — #747 (cookbook + metric set)
+  - CORE-PRIM — #975 (five deterministic primitives — indicator
+    hydration with divergence-as-data cadence, ordered credential
+    cut-out ledger, policy-bounded segmentation rules,
+    incident-management escalation envelope with cross-playbook
+    dedup-by-derivation, four-kind evidence-bundle seal — each
+    executed directly by unit coverage; CORE-WIRE binds them and
+    regenerates the examples)
 
 ### F-WF-BACKUP-RECOVERY — Backup integrity and restore-drill lifecycle
 
