@@ -1876,6 +1876,15 @@ one playbook's provenance.
 - **Shipped via:**
   - SKELETON — #711, #712, #713
   - EXTEND — #726 (cookbook)
+  - CORE-PRIM — #983 (six deterministic primitives — gap-flagging
+    policy-inventory snapshot that never injects a default baseline,
+    material-refusing key-lifecycle records, trust-anchor and
+    expiry-buffer certificate verdicts, documented-violation-only
+    enforcement gate, cross-consistent lifecycle attestation,
+    flag-driven owner notification — every check on the
+    satisfied / violated / undocumented ladder with 'compliant'
+    reserved for documented-and-satisfied; CORE-WIRE binds them and
+    regenerates the examples)
 
 ### F-WF-DSR — GDPR Chapter III data-subject-rights lifecycle
 
