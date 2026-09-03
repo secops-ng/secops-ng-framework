@@ -2000,6 +2000,15 @@ one playbook's provenance.
   #890.
 - **Shipped via:**
   - SKELETON — #759, #761
+  - CORE-PRIM — #985 (five deterministic primitives — types-only
+    presentation request, no-partial-trust verification record that
+    actively refuses attribute payloads and retains outcome plus
+    provenance only, explicit-refusal assurance assessment with the
+    below-minimum drift case, OCSF 3001 evidence record on every
+    terminal path with the prescribed
+    principal|request|captured_at id derivation, reasoned
+    provisioning hand-off / no-op — each executed directly by unit
+    coverage; CORE-WIRE binds them and regenerates the examples)
 
 ### F-WF-EUAIACT-RISKMGMT — EU AI Act Art. 9 risk-management system
 
