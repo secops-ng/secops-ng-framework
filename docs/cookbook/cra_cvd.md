@@ -137,17 +137,16 @@ pointing at `control.vuln_disclosure_intake@v1`,
 `telemetry.ocsf.compliance_finding@v1`, and `kri.cvd_intake_aging@v1`
 / `kpi.false_positive_rate@v1`.
 
-> The playbook maturity is `experimental` on the workflow-local
-> content marker. At CORE, the seven-step topology and the
-> `__case_id__`-anchored variable contract are landed; the
-> `ack_to_reporter` and `publish_advisory` steps carry `core_body`
-> bindings against the two CORE primitives
-> (`primitives.reporter.send_acknowledgement`,
-> `primitives.disclosure.build_advisory_artifact`); the CSAF 2.0 and
-> Markdown advisory templates plus the acknowledgement-letter
-> template land under `content/playbooks/cra_cvd/templates/`. The
-> `coordinate_disclosure` binding, the CVE-request adapter, and the
-> national-CSIRT wire on `coordinate_disclosure` remain EXTEND-scope
+> The playbook maturity is `stable` at `content_version` 1.0.0,
+> graduated under the Maturity ladder: all seven action steps carry
+> `core_body` bindings on the canonical source (the CORE-PRIM +
+> CORE-WIRE pair landed the five lifecycle primitives — intake,
+> triage, fix recording, fix validation, disclosure coordination —
+> beside the original `send_acknowledgement` and
+> `build_advisory_artifact`); the CSAF 2.0 and Markdown advisory
+> templates plus the acknowledgement-letter template live under
+> `content/playbooks/cra_cvd/templates/`. The CVE-request adapter
+> and the national-CSIRT communication channel remain operator seams
 > (see § 17).
 
 ## 4. Playbook variables

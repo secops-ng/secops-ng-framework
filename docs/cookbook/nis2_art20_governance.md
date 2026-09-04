@@ -350,8 +350,9 @@ governance-cadence discharge.
   approved measure that is not resourced is not a discharged
   measure.
 
-The two OSCAL anchors ship as SKELETON placeholders on this
-playbook's `mappings.yaml`; the sibling
+The two OSCAL anchors on this playbook's `mappings.yaml` are
+resolved (neither is a placeholder any longer — the overlay's own
+comments record the resolution); the sibling
 [`content/controls/control.ict_risk_governance@v1.yaml`](../../content/controls/control.ict_risk_governance@v1.yaml)
 consolidates the PM-2 anchor for the wider governance surface.
 
@@ -491,8 +492,9 @@ To regenerate the compiled artifact from the repo root:
 The byte-parity golden test under
 [`tests/examples/temporal/nis2_art20_governance/test_golden.py`](../../tests/examples/temporal/nis2_art20_governance/test_golden.py)
 reruns the emitter and fails if the committed artifact drifts.
-Activity bodies remain `NotImplementedError` stubs by design in
-the shipped example; the operator supplies the bindings.
+Activity bodies invoke the four bound governance primitives; the
+remaining `NotImplementedError` marks only the operator-integration
+seams (evidence sink, approval channel) the operator wires.
 
 ### 8.3 LangGraph — nodes and state over the four-step lifecycle
 

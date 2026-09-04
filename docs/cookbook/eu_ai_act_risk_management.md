@@ -108,8 +108,9 @@ iterations is the operator-side signal that the Article 9(2)(d)
 targeted-measures set is not converging on the Article 9(5)
 acceptability line.
 
-> The playbook maturity is `experimental` on the workflow-local
-> content marker. The overlay pins the control, defensive-technique,
+> The playbook maturity is `stable` at `content_version` 1.0.0,
+> graduated under the Maturity ladder (all four action steps carry
+> deterministic primitive bindings from the CORE wiring). The overlay pins the control, defensive-technique,
 > telemetry, and metric surface; the three reference emitters ship
 > committed workflow artefacts today, with deterministic emitter
 > output and byte-parity goldens under
@@ -311,16 +312,17 @@ compiles the same four action steps into its native idiom.
   signal source respectively.
 - **Temporal** (`examples/temporal/eu_ai_act_risk_management/workflow.temporal.py`).
   The compiler emits a deterministic Python workflow whose activity
-  bodies raise `NotImplementedError` until the operator wires the
-  activity implementations against their own AI-system inventory
-  and evidence stores. Determinism guarantees at the workflow layer
-  survive the placeholder activity bodies.
+  bodies invoke the four bound Art. 9 primitives; the remaining
+  `NotImplementedError` marks only the operator-integration seams
+  (the AI-system inventory and evidence-store connectors the
+  operator wires).
 - **LangGraph** (`examples/langgraph/eu_ai_act_risk_management/`).
   The compiler emits a graph specification, a state binding module,
-  and an audit-mirror scaffold. Tool bodies raise
-  `NotImplementedError` until the operator wires them; the state
-  machine is exercisable end-to-end from the start node so the
-  graph shape can be inspected without operator bindings.
+  and an audit-mirror scaffold. Tool bodies invoke their bound
+  primitives, with the operator-integration seams marked
+  `NotImplementedError`; the state machine is exercisable
+  end-to-end from the start node so the graph shape can be
+  inspected before the operator wires their connectors.
 
 Each target directory ships a `regenerate.sh` that re-emits the
 worked-example artifact from the canonical CACAO source via the

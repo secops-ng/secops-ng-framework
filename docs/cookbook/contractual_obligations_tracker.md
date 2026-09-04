@@ -137,10 +137,11 @@ The four bindings exercised today:
     NFKC-normalised, sorted on `obligation_id`, exact-match duplicates
     collapse, and the cadence is validated against the ISO-8601
     duration grammar. The classifier is intentionally minimal at this
-    layer — it returns the SKELETON obligation-kind enum
-    (`audit_right` / `attestation_cadence` /
-    `breach_notification_cadence` / `sub_processor_disclosure` /
-    `security_control_commitment`); an EXTEND-schema sibling tightens
+    layer — it returns the closed obligation-kind enum
+    (`security_control_commitment` / `audit_right` /
+    `attestation_cadence` / `sub_processor_disclosure` /
+    `breach_notification_cadence` / `data_localisation` / `other`);
+    an EXTEND-schema sibling tightens
     the inner envelopes and lifts `schema_version` to 1.0.0.
 
 `schedule_reviews(obligations, review_policy, captured_at) -> Sequence[ReviewScheduleEntry]`

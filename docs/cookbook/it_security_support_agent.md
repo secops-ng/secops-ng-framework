@@ -72,7 +72,8 @@ would erase the decision from the trace.
 | `…00000006` | emit-interaction-evidence         | `compilers.<target>.evidence.emit_interaction_evidence_artifact_<target>` (adapter)  | bound  |
 
 The five action steps are all bound; there are no absent-body seams
-at the F-WF-05 SKELETON layer. The interaction-evidence emitter is
+— the playbook is `stable` at `content_version` 1.0.0, the F-WF-12
+ladder's first graduation. The interaction-evidence emitter is
 a per-target adapter (n8n Code node, Temporal activity, LangGraph
 node) that reuses the F-CP-02 incidents-schema
 (`schemas/evidence/incidents.schema.json`) — the same shape
@@ -270,8 +271,7 @@ The per-execution interaction-evidence artefact is emitted against
 the same directory `playbook.incident_management@v1` writes against.
 The schema's closed `classification` envelope (with the `significant`
 and `cross_border` flags) and the `lifecycle` envelope together
-carry the support-interaction shape without extension at the
-SKELETON layer:
+carry the support-interaction shape without schema extension:
 
 - **automated-resolution closure** — the record emits on the
   intake-only audit-close branch with `classification.significant=false`
