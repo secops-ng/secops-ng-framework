@@ -103,19 +103,18 @@ makes byte-parity meaningful at audit time.
 
 ## 4. Per-target hand-off
 
-### 4.1 n8n — operator-edited Set rows + optional Code-node binding
+### 4.1 n8n — code-node bindings, operator-wired connectors
 
 `examples/n8n/vuln_intake/workflow.n8n.json` carries the CACAO
-topology as n8n nodes (`manualTrigger`, `set`, `if`, `switch`, `noOp`),
-with node ids preserving the CACAO step ids verbatim. The two bound
-CORE steps emit `n8n-nodes-base.code` nodes whose `pythonCode` is the
-exact primitive call (e.g. `from vuln_intake.primitives.severity import
-severity_policy ; __severity_verdict__ = severity_policy(…)`); the
-bound steps emit `n8n-nodes-base.code` nodes invoking their
-primitives, and no Set-node placeholders remain, carrying
-the CACAO I/O contract as editable assignment rows.
+topology as n8n nodes (`manualTrigger`, `code`, `if`, `switch`,
+`noOp`), with node ids preserving the CACAO step ids verbatim. All
+eight bound action steps emit `n8n-nodes-base.code` nodes whose
+`pythonCode` is the exact primitive call (e.g.
+`from vuln_intake.primitives.severity import severity_policy ;
+__severity_verdict__ = severity_policy(…)`); no Set-node placeholders
+remain.
 
-Operators bind the Set rows to their connectors:
+Operators wire the code-node inputs to their connectors:
 
 - intake → CVD intake mailbox / advisory feed / CVE webhook
 - triage → SBOM + asset-inventory connector, CVSS / EPSS scoring
@@ -123,10 +122,10 @@ Operators bind the Set rows to their connectors:
   the CRA 24h / 72h / 14d clock from their incident_management system
 - response branches → ticketing system + advisory distribution channel
 
-The Code-node body for the two bound steps assumes `PYTHONPATH` on
-the n8n host resolves `vuln_intake.primitives`. Operators who run n8n
-in a Python-free container drop a single Python-runner Code node
-between the Set node and the next step; the wiring is documented in
+The Code-node bodies assume `PYTHONPATH` on the n8n host resolves
+`vuln_intake.primitives`. Operators who run n8n in a Python-free
+container drop a single Python-runner Code node ahead of the chain;
+the wiring is documented in
 [`examples/n8n/vuln_intake/README.md`](../../examples/n8n/vuln_intake/README.md)
 under *Per-action wiring notes — CORE bodies*.
 
@@ -134,11 +133,12 @@ under *Per-action wiring notes — CORE bodies*.
 
 `examples/temporal/vuln_intake/workflow.temporal.py` is a standard
 Temporal worker module: one `@workflow.defn` class and one
-`@activity.defn` function per CACAO action. The two bound activities
-import the primitive and produce the canonical case field / severity
-verdict; the only remaining `NotImplementedError` marks the
+`@activity.defn` function per CACAO action. All eight activities
+import their primitive and produce the canonical case field, severity
+verdict, trigger assessment, notification chain, and response
+directives; the only remaining `NotImplementedError` marks the
 operator-integration seams (connector wiring) so an integrator
-sees exactly which seam they still have to wire.
+sees exactly which seam is theirs.
 
 Operators drop `workflow.temporal.py` next to their worker, register
 the activities, and run the worker against their Temporal cluster.
@@ -159,7 +159,6 @@ the target-neutral topology (nodes, edges, conditional edges).
 `assemble.py` is the canonical reference assembly that wires the spec
 into a `StateGraph`.
 
-The two bound tools import the primitive and update the typed state.
 All eight tools import their primitive and update the typed state;
 the operator-integration seams stay marked with `NotImplementedError`
 after their span and audit record. Operators wire those seams to
