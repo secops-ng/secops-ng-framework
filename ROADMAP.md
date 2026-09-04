@@ -1941,6 +1941,14 @@ one playbook's provenance.
 - **Shipped via:**
   - SKELETON — #501, #505
   - EXTEND — #606 (cookbook)
+  - CORE-PRIM — #977 (six deterministic primitives — trigger
+    resolution with the full mitigation ladder required at detect
+    time, closed-taxonomy vector classification with pinned
+    precedence and time-box short-circuit, contractual
+    vector-to-discipline engagement selection, traffic-observed
+    restoration verdict, dated evidence record with branch markers,
+    outcome-driven owner notification — each executed directly by
+    unit coverage; CORE-WIRE binds them and regenerates the examples)
 
 ### F-WF-DORA-TLPT — DORA Chapter IV resilience-testing programme
 
