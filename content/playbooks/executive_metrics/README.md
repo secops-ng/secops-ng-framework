@@ -39,3 +39,13 @@ This directory ships the portable content only.
 - DORA Regulation (EU) 2022/2554, Article 6
 - ENISA — Good practices for incident reporting and metrics
 - OSCAL — CA-2 (Control Assessments) and PM-6 (Measures of Performance)
+
+## Binding status
+
+Deliberately unbound. The 5 action steps compile with operator-TODO
+bodies on all three targets and the playbook carries no `core_body`
+primitive bindings; `catalog.py` reports it that way and the playbook
+stays `experimental` under the Maturity ladder. This is a recorded
+decision (#921 — PARK bucket, Director 2026-09-04), not neglect:
+a reporting roll-up whose evidence value anchors through `metric_refs` into the KPI/KRI catalogue, not through execution — a deterministic body would add no evidence a reviewer does not already get from the catalogue entries it rolls up. Reopening the park is a roadmap decision, not a bug — the
+trigger would be that the roll-up ever needs a replayable computation of the board-attention flag.
