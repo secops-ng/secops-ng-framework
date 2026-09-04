@@ -9,9 +9,9 @@ where the integrator owns the seams.
 
 This worked example pins the n8n end of the cross-target parity ring
 for the `ddos_response` playbook (NIS2 Art.21(2)(b)). The Temporal
-sibling ships under `../../temporal/ddos_response/`; the LangGraph
-sibling lands in a separate card. Until all three are committed, this
-folder pins the n8n slice of the three-target contract.
+sibling ships under `../../temporal/ddos_response/` and the LangGraph
+sibling under `../../langgraph/ddos_response/`; all three are pinned
+by byte-parity goldens under `tests/examples/`.
 
 ## Files in this directory
 
@@ -40,11 +40,16 @@ the regeneration script.
    connectors before activating.
 
 The emitted workflow is a *snapshot of intent*, not a runnable
-playbook. The Set nodes carry the CACAO I/O contract as editable
-assignments; binding those rows to real connectors (availability-anomaly
-detector, attack-vector classifier, mitigation-engagement surface,
-service-restoration probe, dated-attestation evidence store, and the
-incident-management notification channel) is the operator's job.
+playbook. The six action steps are `n8n-nodes-base.code` nodes whose
+`pythonCode` is the exact primitive call from
+`content/playbooks/ddos_response/primitives/`; the bodies assume
+`PYTHONPATH` on the n8n host resolves that package. The external
+inputs (`__service_inventory__`, `__vector_signals__`,
+`__deadline_exceeded__`, `__validation_observations__`,
+`__owner_channel__`) and the adapter seams (monitoring ingress,
+mitigation-engagement surface, evidence store, notification channel)
+are the operator's to wire against their connectors — see the
+per-action notes below.
 
 ## How to regenerate
 
@@ -81,58 +86,50 @@ step:
    `__mitigation_action_id__`, `__service_restored__`,
    `__evidence_id__`) the operator's monitoring surface or
    operator-initiated trigger supplies.
-2. `detect availability anomaly` (`set`) — confirm the anomaly against
+2. `detect availability anomaly` (`code`) — confirm the anomaly against
    the documented availability objective for the protected service.
-3. `classify attack vector` (`set`) — categorise the anomaly as
+3. `classify attack vector` (`code`) — categorise the anomaly as
    volumetric, protocol, or application-layer (or empty when
    classification could not be completed within the documented
    mitigation-engagement deadline).
-4. `engage mitigation` (`set`) — exercise the operator's pre-bound
+4. `engage mitigation` (`code`) — exercise the operator's pre-bound
    response surface for the classified vector (upstream-scrubbing
    activation, rate-limit / WAF posture change, or failover to a
    documented standby).
-5. `validate service restoration` (`set`) — probe the protected service
+5. `validate service restoration` (`code`) — probe the protected service
    against its documented availability objective and set
    `__service_restored__`.
-6. `evidence capture` (`set`) — persist a dated attestation record
+6. `evidence capture` (`code`) — persist a dated attestation record
    covering the incident (vector, mitigation reference, restoration
    outcome).
-7. `notify incident-management owner` (`set`) — surface the
+7. `notify incident-management owner` (`code`) — surface the
    attestation to the incident-management owner via the operator's
    notification channel.
 8. `ddos_response_end` (`noOp`) — end sentinel.
 
-## CACAO contract surfaces on Set nodes
+## Per-action wiring notes — CORE bodies
 
-Every `action`-without-commands step in the CACAO source emits an n8n
-`set` node whose **assignments** carry the CACAO contract one row per
-field:
+Every action step declares an `x_secops_ng.core_body` binding into the
+deterministic primitives package, so the emitter renders each as a
+Code node; the cross-target semantic contract is the primitives
+package itself (Temporal binds via activity imports, LangGraph via
+tool imports — all three call the same Python functions).
 
-- `in.<name>` rows for each entry in the step's `in_args`.
-- `out.<name>` rows for each entry in the step's `out_args`.
-- `x_secops_ng.<key>` rows for each key under the step's
-  `x_secops_ng` block (`control_refs`, `telemetry_refs`, `metric_refs`).
-
-The values are left blank (or pre-seeded with the reference-id list,
-for `x_secops_ng` rows) so the integrator can wire them to expressions
-that pull from upstream nodes, n8n variables, or operator-bound
-connectors. Concretely on this playbook:
-
-| Set node | `in.` rows | `out.` rows | `x_secops_ng.` rows |
-|----------|------------|-------------|---------------------|
-| `detect availability anomaly` | `protected_service`, `anomaly_window` | — | `control_refs`, `telemetry_refs` |
-| `classify attack vector` | `protected_service`, `anomaly_window` | `attack_vector` | `control_refs`, `telemetry_refs` |
-| `engage mitigation` | `protected_service`, `attack_vector` | `mitigation_action_id` | `control_refs`, `telemetry_refs` |
-| `validate service restoration` | `protected_service`, `mitigation_action_id` | `service_restored` | `control_refs`, `telemetry_refs` |
-| `evidence capture` | `protected_service`, `attack_vector`, `mitigation_action_id`, `service_restored` | `evidence_id` | `control_refs`, `telemetry_refs` |
-| `notify incident-management owner` | `evidence_id`, `protected_service`, `service_restored` | — | `telemetry_refs` |
+| Step id (suffix) | CACAO step | Deterministic primitive | Operator wires |
+|---|---|---|---|
+| `…000002` | detect availability anomaly | `detect.resolve_availability_trigger(protected_service, anomaly_window, service_inventory)` → `__trigger_envelope__` | the monitoring ingress raising the anomaly; `__service_inventory__` with the availability objective and all three pre-bound mitigation surfaces |
+| `…000003` | classify attack vector | `classify.classify_attack_vector(signals=__vector_signals__, deadline_exceeded)` → `__classification__` | the packet-capture / flow-record reading that produces the three per-vector verdicts, and the deadline clock; the adapter extracts `__attack_vector__` (empty on the short-circuit) |
+| `…000004` | engage mitigation | `mitigation.select_mitigation_engagement(attack_vector=__classification__.attack_vector, …, mitigation_surfaces=__trigger_envelope__.mitigation_surfaces)` → `__engagement__` | the response surface that executes the order (scrubbing provider activation, rate-limit / WAF posture push, or failover exercise); the adapter extracts `__mitigation_action_id__` |
+| `…000005` | validate service restoration | `restoration.evaluate_service_restoration(availability_objective=__trigger_envelope__.availability_objective, observations=__validation_observations__)` → `__restoration_verdict__` | the observation surface supplying the validation-window samples; the adapter extracts `__service_restored__` |
+| `…000006` | evidence capture | `evidence.compose_incident_evidence_record(…, restoration=__restoration_verdict__)` → `__evidence_record__` | the evidence store that publishes the record; the adapter extracts `__evidence_id__` |
+| `…000007` | notify incident-management owner | `notify.compose_owner_notification(evidence_id=__evidence_record__.evidence_id, …, owner_channel=__owner_channel__)` → `__owner_notification__` | `__owner_channel__` and the messaging surface that delivers the page or the note |
 
 The playbook is a linear chain (no `if-condition` / `switch-condition`
-nodes); the short-circuit behaviour for an unclassified vector or an
-unrestored service is carried inside the CACAO step bodies via the
-operator-bound expressions on the Set rows, not as a topology branch.
-The lossy translation per step is recorded in `meta.secops_ng_notes` so
-the integrator sees exactly which seams need attention.
+nodes); the short-circuit behaviour for an unclassified vector (the
+engage primitive receives an empty vector and selects the
+most-restrictive pre-bound mitigation) and for an unrestored service
+(the evidence record carries the failure marker and the notification
+pages) lives inside the primitives, not as a topology branch.
 
 ## Mirroring policy
 
@@ -142,7 +139,8 @@ for every worked example in this directory:
 | CACAO step type    | n8n node type                        |
 |--------------------|--------------------------------------|
 | `start`            | `n8n-nodes-base.manualTrigger`       |
-| `action` (no commands) | `n8n-nodes-base.set` (CACAO I/O contract as assignments) |
+| `action` with `core_body` | `n8n-nodes-base.code` (the primitive call as `pythonCode`) |
+| `action` without `core_body` | `n8n-nodes-base.set` (CACAO I/O contract as assignments) — none remain on this playbook |
 | `if-condition`     | `n8n-nodes-base.if`                  |
 | `switch-condition` | `n8n-nodes-base.switch`              |
 | `end`              | `n8n-nodes-base.noOp`                |
@@ -154,10 +152,11 @@ becomes n8n `connections` edges.
 
 ## What this example deliberately doesn't do
 
-- It does not execute the workflow. The Set nodes carry the CACAO I/O
-  contract but the right-hand values are blank — the integrator wires
-  them to their own anomaly-detection, classifier, mitigation,
-  restoration-probe, evidence-store, and notification endpoints.
+- It does not execute the workflow. The Code nodes call the
+  deterministic primitives, but the external inputs and the adapter
+  seams — anomaly-detection ingress, classifier verdicts, the
+  mitigation surface, the restoration probe, the evidence store and
+  the notification channel — are the integrator's to wire.
 - It does not ship operator credentials, secrets, or environment-
   specific endpoints. Secrets stay with the operator.
 - It does not encode attack-vector classification rules, mitigation

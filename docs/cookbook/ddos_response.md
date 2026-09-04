@@ -139,7 +139,7 @@ availability incident. Per-incident metric accounting into the
 time-to-mitigation and availability-restoration catalogue entries is
 unambiguous.
 
-> The playbook maturity is `experimental` on the workflow-local
+> The playbook maturity is `stable` (`content_version` 1.0.0) on the workflow-local
 > content marker. The mappings overlay pins the control and
 > telemetry surface (OSCAL IR-4 / IR-5, D3FEND D3-NTA on the three
 > detect-side steps, OCSF Network Activity and API Activity); the
@@ -443,20 +443,22 @@ channel).
 
 ## 5. Per-target hand-off
 
-### 5.1 n8n — operator-edited Set rows over the availability-response topology
+### 5.1 n8n — code-node bindings over the availability-response topology
 
 `examples/n8n/ddos_response/workflow.n8n.json` carries the CACAO
-topology as eight n8n nodes (`manualTrigger`, six `set` nodes, one
+topology as eight n8n nodes (`manualTrigger`, six `code` nodes, one
 `noOp` terminal), with node ids preserving the CACAO step ids
-verbatim. The six action steps emit `n8n-nodes-base.set` nodes
-carrying the CACAO I/O contract as editable assignment rows plus the
-`x_secops_ng` reference bundles (control, telemetry). The linear
-sequencing carries via `on_completion` edges on the emitted
-`connections` block. The lossy translations are recorded in
-`meta.secops_ng_notes` so the integrator sees exactly which seams
-need attention.
+verbatim. All six action steps emit `n8n-nodes-base.code` nodes whose
+`pythonCode` is the exact primitive call (e.g.
+`from content.playbooks.ddos_response.primitives.mitigation import
+select_mitigation_engagement ; __engagement__ =
+select_mitigation_engagement(attack_vector=__classification__.attack_vector,
+…, mitigation_surfaces=__trigger_envelope__.mitigation_surfaces)`); no
+Set-node placeholders remain. The linear sequencing carries via
+`on_completion` edges on the emitted `connections` block.
 
-Operators bind the Set rows to their connectors:
+Operators wire the code-node inputs and the adapter seams to their
+connectors:
 
 - `detect availability anomaly` → the operator's synthetic-probe
   surface (Blackbox Exporter, an in-house synthetic prober, a
@@ -493,21 +495,29 @@ To regenerate the compiled workflow artifact from the repo root:
 To import into an n8n instance: open the workflows list, choose
 **Import from File**, and select
 `examples/n8n/ddos_response/workflow.n8n.json`. The workflow is
-inactive by default — review and bind the Set rows to your own
-connectors before activating. The emitted workflow is a *snapshot of
-intent*, not a runnable playbook.
+inactive by default — review and wire the external inputs
+(`__service_inventory__`, `__vector_signals__`, `__deadline_exceeded__`,
+`__validation_observations__`, `__owner_channel__`) and the adapter
+seams to your own connectors before activating. The Code-node bodies
+assume `PYTHONPATH` on the n8n host resolves
+`content.playbooks.ddos_response.primitives`; operators who run n8n in
+a Python-free container drop a single Python-runner Code node ahead of
+the chain. The emitted workflow is a *snapshot of intent*, not a
+runnable playbook.
 
-### 5.2 Temporal — `@activity.defn` bodies (SKELETON stub)
+### 5.2 Temporal — `@activity.defn` bodies calling the primitives
 
 `examples/temporal/ddos_response/workflow.temporal.py` is a standard
 Temporal worker module: one `@workflow.defn` class and one
-`@activity.defn` function per CACAO action, with the six action
-activities documenting their operator-bound seam (detect / classify /
-engage / validate / attest / notify). The committed stub raises
-`NotImplementedError` in the activity bodies pending the CORE-TEMPORAL
-sibling card that wires the deterministic activity implementations
-into the Temporal target; operators can drop the module next to their
-worker today to see the topology and the activity signatures.
+`@activity.defn` function per CACAO action. All six activities import
+their primitive and produce the trigger envelope, the classification,
+the engagement order, the restoration verdict, the evidence record and
+the owner notification; the only remaining `NotImplementedError`
+marks the operator-integration seams (monitoring ingress, response
+surface, evidence store, owner channel) after the span and audit
+record, so an integrator sees exactly which seam is theirs. Operators
+drop the module next to their worker, register the activities, and
+run the worker against their Temporal cluster.
 
 Temporal is a natural fit for the availability-response discipline:
 each availability incident becomes one workflow run; retries against
@@ -517,26 +527,26 @@ or the evidence store get first-class Temporal semantics (activity
 retry policy per seam); replay against the same Temporal event
 history re-derives the same detection observation, the same
 classification, the same engagement reference, and the same
-availability-incident evidence record once the activity bodies are
-wired. The engage-mitigation activity is the natural home for the
+availability-incident evidence record — the primitives are pure, so
+the replay property holds by construction. The engage-mitigation
+activity is the natural home for the
 per-vector branch selection (volumetric → scrubber; application-layer
 → rate-limit / WAF; protocol → failover) — the branch lives inside
 one activity against the operator's pre-bound surface rather than as
 a workflow-level fan-out.
 
-### 5.3 LangGraph — `@tool` wrappers + agentic-extension hook (SKELETON stub)
+### 5.3 LangGraph — `@tool` wrappers + agentic-extension hook
 
 `examples/langgraph/ddos_response/state_bindings.py` carries the
 `TypedDict` state and the `@tool`-decorated action wrappers.
 `graph_spec.json` carries the target-neutral topology (nodes and the
 linear on-completion edges from detect through notify to the terminal
 end); `assemble.py` is the hand-written reference assembly that wires
-the GraphSpec + bindings into a `langgraph.graph.StateGraph`. The
-committed `state_bindings.py` is a generated stub: each tool's
-docstring names the operator-bound seam it discharges and the body
-raises `NotImplementedError` until the CORE-LANGGRAPH sibling card
-wires the deterministic tool implementations into the LangGraph
-target.
+the GraphSpec + bindings into a `langgraph.graph.StateGraph`. All six
+tools import their primitive and update the typed state; each tool's
+docstring names the operator-bound seam it discharges, and the
+operator-integration seams stay marked with `NotImplementedError`
+after their span and audit record.
 
 LangGraph is the agentic target — an operator who wants to layer an
 LM-driven enrichment on top of the `notify incident-management owner`
@@ -556,9 +566,9 @@ All three reference targets are present in the tree today
 (`examples/n8n/ddos_response/`, `examples/temporal/ddos_response/`,
 `examples/langgraph/ddos_response/`). Each ships a committed emitter
 artifact (n8n workflow JSON, Temporal worker module, LangGraph
-GraphSpec + bindings) with the operator-bound activity / tool bodies
-raising `NotImplementedError` pending the per-target CORE cards.
-Cross-target byte-parity goldens land under
+GraphSpec + bindings), every action body bound to its primitive and
+the operator-integration seams marked with `NotImplementedError`.
+Cross-target byte-parity goldens ship under
 `tests/examples/{n8n,temporal,langgraph}/ddos_response/` — the same
 cross-target byte-parity property the framework relies on for the
 rest of the playbook set.
@@ -567,7 +577,7 @@ rest of the playbook set.
 
 Every emitted action opens an OpenTelemetry span and appends an
 `AuditRecord` to a context-local `AuditTrail` *before* the operator-
-bound seam call or the (pending) primitive body. The mirror runs
+bound seam call or the primitive body. The mirror runs
 unconditionally, ahead of any OTLP exporter, so the audit property
 holds even when the operator has not configured a collector —
 typical for disconnected, sovereign, or air-gapped deployments.
@@ -844,9 +854,9 @@ the framework guarantees.
 - [`examples/n8n/ddos_response/README.md`](../../examples/n8n/ddos_response/README.md)
   — n8n worked-example walkthrough and import instructions.
 - [`examples/temporal/ddos_response/README.md`](../../examples/temporal/ddos_response/README.md)
-  — Temporal worked-example stub.
+  — Temporal worked example.
 - [`examples/langgraph/ddos_response/README.md`](../../examples/langgraph/ddos_response/README.md)
-  — LangGraph worked-example stub.
+  — LangGraph worked example.
 - [`docs/cookbook/incident_management.md`](./incident_management.md)
   — sibling cookbook (lifecycle owner: DORA Art. 18/19 & NIS2
   Art. 23 notification chain).
