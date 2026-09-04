@@ -1817,6 +1817,16 @@ one playbook's provenance.
   issue #890.
 - **Shipped via:**
   - SKELETON — #707
+  - CORE-PRIM — #981 (seven step primitives plus the OCSF milestone
+    composers — supplied-instant Art. 23 declaration anchor, the
+    no-plan-on-file-is-reported-not-blocking activation discipline,
+    skip-as-data isolation scope, preference-order failover selection,
+    hand-verified 24h/72h/one-month cascade with the exclusive
+    no-notification determination, observed-not-asserted recovery
+    verdict with signed RTO/RPO deltas, lessons-mandatory PIR record,
+    and the API Activity / Incident Finding milestone records keyed to
+    the event id — each executed directly by unit coverage; CORE-WIRE
+    binds them and regenerates the examples)
 
 ### F-WF-CRYPTO-POSTURE — Cryptography and encryption posture management
 
