@@ -1713,7 +1713,7 @@ one playbook's provenance.
 
 ### F-WF-AGENTIC-RESPONSE — Fully-agentic adversary response
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P2
 - **Rationale:** Covers autonomous LLM-driven credential harvest, lateral
   movement and encryption chains — an attacker capability the rest of the
@@ -1725,7 +1725,7 @@ one playbook's provenance.
     cookbook walkthrough (shipped).
   - Deterministic primitives under
     `content/playbooks/agentic_threat_response/primitives/` bound to the 5
-    action steps, replay-safe and offline (CORE — **outstanding**).
+    action steps, replay-safe and offline (CORE — shipped).
   - Detection reads the agentic-activity signals the operator's telemetry
     already carries; the playbook mints no new sensor.
   - The five KPI/KRI entries already under `content/metrics/` for this
@@ -1746,6 +1746,19 @@ one playbook's provenance.
     dedup-by-derivation, four-kind evidence-bundle seal — each
     executed directly by unit coverage; CORE-WIRE binds them and
     regenerates the examples)
+  - CORE-WIRE + GRADUATE — #992 closing #976 (all five bindings on the
+    canonical source — each multi-field primitive output bound to a
+    single dictionary envelope with the documented out_args extracted
+    at the compile target's adapter seam, downstream steps reading the
+    envelopes through dotted accessors, the two list-valued external
+    inputs riding as JSON-native list variables; the five step
+    descriptions and the top-level scaffold sentence rewritten to
+    record the wiring; every core_body variable declared. Then
+    `experimental` → `stable`, `content_version` 1.0.0, all three
+    worked examples regenerated — 5/5 bound, n8n five Code nodes,
+    Temporal and LangGraph importing all five primitives with
+    `NotImplementedError` only at the operator seams; README, cookbook
+    and n8n example README de-staled in the same change).
 
 ### F-WF-BACKUP-RECOVERY — Backup integrity and restore-drill lifecycle
 
@@ -1942,7 +1955,7 @@ one playbook's provenance.
 
 ### F-WF-DDOS — Availability-attack detection and response
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P2
 - **Rationale:** The availability dimension of the incident-handling
   capability: confirm an availability anomaly is an attack rather than
@@ -1954,7 +1967,7 @@ one playbook's provenance.
     cookbook walkthrough (shipped).
   - Deterministic primitives under
     `content/playbooks/ddos_response/primitives/` bound to the 6 action
-    steps, replay-safe and offline (CORE — **outstanding**).
+    steps, replay-safe and offline (CORE — shipped).
   - Classification distinguishes volumetric from connection-rate and
     application-layer vectors, because the mitigation differs and an
     aggregate 'under attack' verdict is not actionable.
@@ -1977,6 +1990,19 @@ one playbook's provenance.
     restoration verdict, dated evidence record with branch markers,
     outcome-driven owner notification — each executed directly by
     unit coverage; CORE-WIRE binds them and regenerates the examples)
+  - CORE-WIRE + GRADUATE — #993 closing #978 (all six bindings on the
+    canonical source — each multi-field primitive output bound to a
+    single dictionary envelope with the documented out_args extracted
+    at the compile target's adapter seam; the classify short-circuit's
+    empty vector reaching the engage primitive and the false
+    restoration verdict flowing into the evidence record and the page
+    as first-class branches; the six SKELETON-era step descriptions
+    rewritten to record the wiring. Then `experimental` → `stable`,
+    `content_version` 1.0.0, all three worked examples regenerated —
+    6/6 bound, n8n six Code nodes, Temporal and LangGraph importing
+    all six primitives with `NotImplementedError` only at the
+    operator seams; README, cookbook and all three example READMEs
+    de-staled in the same change).
 
 ### F-WF-DORA-TLPT — DORA Chapter IV resilience-testing programme
 

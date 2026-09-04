@@ -325,6 +325,22 @@ def test_escalation_signal_feeds_incident_management_intake():
     assert first == second
 
 
+def test_escalation_accepts_segmentation_rule_records():
+    # The wire passes the segmentation envelope's `rules` list straight
+    # through; bare ids and rule records must produce the same envelope.
+    rules = derive_segmentation_rules([IDENTITY_EDGE, EDGE], POLICY)["rules"]
+    from_records = compose_escalation_envelope(
+        "ind:atr-2026-0142", PRINCIPAL, "atr-iso-" + "0" * 24, rules
+    )
+    from_ids = compose_escalation_envelope(
+        "ind:atr-2026-0142",
+        PRINCIPAL,
+        "atr-iso-" + "0" * 24,
+        [r["rule_id"] for r in rules],
+    )
+    assert canonical(from_records) == canonical(from_ids)
+
+
 def test_escalation_rejects_empty_rule_list():
     with pytest.raises(InvalidEscalationInputError, match="non-empty"):
         compose_escalation_envelope(

@@ -55,22 +55,77 @@
     },
     "__attack_vector__": {
       "type": "string",
-      "description": "Identifier of the classified attack vector for the anomaly: volumetric (e.g. UDP / ICMP / amplification flood), protocol (e.g. SYN flood, TCP state exhaustion), or application-layer (e.g. HTTP flood, slow-loris). Empty when classification could not be completed within the documented mitigation-engagement deadline; an empty value short-circuits into an evidence-capture failure record while still engaging the most-restrictive pre-bound mitigation.",
+      "description": "Identifier of the classified attack vector for the anomaly: volumetric (e.g. UDP / ICMP / amplification flood), protocol (e.g. SYN flood, TCP state exhaustion), or application-layer (e.g. HTTP flood, slow-loris). Empty when classification could not be completed within the documented mitigation-engagement deadline; an empty value short-circuits into an evidence-capture failure record while still engaging the most-restrictive pre-bound mitigation. Extracted at the compile target's adapter seam from __classification__.attack_vector.",
       "external": false
     },
     "__mitigation_action_id__": {
       "type": "string",
-      "description": "Identifier of the engaged mitigation action against the operator's pre-bound response surface (upstream-scrubbing provider activation reference, rate-limit / WAF posture-change ticket id, or failover-to-standby exercise reference). Always populated; the value names the discipline that was engaged even on the short-circuit branch.",
+      "description": "Identifier of the engaged mitigation action against the operator's pre-bound response surface (upstream-scrubbing provider activation reference, rate-limit / WAF posture-change ticket id, or failover-to-standby exercise reference). Always populated; the value names the discipline that was engaged even on the short-circuit branch. Extracted at the compile target's adapter seam from __engagement__.mitigation_action_id.",
       "external": false
     },
     "__service_restored__": {
       "type": "boolean",
-      "description": "Outcome of the validate-service-restoration step: true when the protected service is observed back inside the documented availability objective (latency, error rate, throughput) for the documented validation window; false when the service has not recovered and the incident remains active. A false value does not block the evidence-capture and notify branches; the record is published with the failure marker so the incident-management owner is paged with full context rather than discovering the gap later.",
+      "description": "Outcome of the validate-service-restoration step: true when the protected service is observed back inside the documented availability objective (latency, error rate, throughput) for the documented validation window; false when the service has not recovered and the incident remains active. A false value does not block the evidence-capture and notify branches; the record is published with the failure marker so the incident-management owner is paged with full context rather than discovering the gap later. Extracted at the compile target's adapter seam from __restoration_verdict__.service_restored.",
       "external": false
     },
     "__evidence_id__": {
       "type": "string",
-      "description": "Identifier of the dated availability-incident evidence record published to the operator's evidence store. Always populated, including on the short-circuit branch (unclassified vector) and the unrestored-service branch.",
+      "description": "Identifier of the dated availability-incident evidence record published to the operator's evidence store. Always populated, including on the short-circuit branch (unclassified vector) and the unrestored-service branch. Extracted at the compile target's adapter seam from __evidence_record__.evidence_id.",
+      "external": false
+    },
+    "__service_inventory__": {
+      "type": "dictionary",
+      "description": "The operator's documented service inventory handed over by the adapter: services — rows carrying service, availability_objective (latency_ms_p99, error_rate_max, throughput_min_rps) and mitigation_surfaces (upstream_scrubber, rate_limit_waf, standby_failover — all three required, so the full ladder is documented before an incident). Consumed by detect.resolve_availability_trigger.",
+      "external": true
+    },
+    "__trigger_envelope__": {
+      "type": "dictionary",
+      "description": "Trigger envelope composed by detect.resolve_availability_trigger: protected_service, anomaly_window (start, end), availability_objective, mitigation_surfaces. The engage binding reads .mitigation_surfaces and the validate binding reads .availability_objective.",
+      "external": false
+    },
+    "__vector_signals__": {
+      "type": "dictionary",
+      "description": "The monitoring adapter's per-vector verdicts for classify.classify_attack_vector: volumetric, protocol, application_layer — real booleans, all three keys required so an absent surface is an explicit false, never an omission. The packet-capture / flow-record reading that produced them is the adapter's.",
+      "external": true
+    },
+    "__deadline_exceeded__": {
+      "type": "boolean",
+      "description": "Whether the documented mitigation-engagement deadline expired before classification completed. The adapter enforces the clock; classify.classify_attack_vector decides what the flag means (a signal that arrived still classifies; no signal plus the flag records deadline_exceeded).",
+      "external": true
+    },
+    "__classification__": {
+      "type": "dictionary",
+      "description": "Classification envelope composed by classify.classify_attack_vector: attack_vector (empty on the short-circuit branch), classification_state (classified | deadline_exceeded | no_signal), signals. The adapter extracts __attack_vector__; the engage and evidence bindings read .attack_vector.",
+      "external": false
+    },
+    "__engagement__": {
+      "type": "dictionary",
+      "description": "Engagement order composed by mitigation.select_mitigation_engagement: mitigation_action_id (ddos-mit-<discipline>-…), discipline, surface_ref, short_circuit, engagement_order. Executed by the response-surface adapter; the adapter extracts __mitigation_action_id__ and the evidence binding reads .mitigation_action_id.",
+      "external": false
+    },
+    "__validation_observations__": {
+      "type": "string",
+      "description": "JSON-native list of the monitoring adapter's samples across the documented validation window for restoration.evaluate_service_restoration: at (Zulu instant), latency_ms_p99, error_rate, throughput_rps. Restoration is verified against these observations, never asserted on the mitigation having been applied.",
+      "external": true
+    },
+    "__restoration_verdict__": {
+      "type": "dictionary",
+      "description": "Restoration verdict composed by restoration.evaluate_service_restoration: service_restored, samples_evaluated, breaches (per-dimension records with observed value and bound). The adapter extracts __service_restored__; the evidence binding consumes the whole verdict and the notify binding reads .service_restored.",
+      "external": false
+    },
+    "__evidence_record__": {
+      "type": "dictionary",
+      "description": "Availability-incident evidence record composed by evidence.compose_incident_evidence_record: evidence_id (ddos-evd-…), record_date, protected_service, anomaly_window, attack_vector, mitigation_action_id, service_restored, markers, restoration. Published by the evidence-store adapter; the adapter extracts __evidence_id__ and the notify binding reads .evidence_id.",
+      "external": false
+    },
+    "__owner_channel__": {
+      "type": "string",
+      "description": "Role-shaped reference to the incident-management owner's pre-bound delivery channel (ticketing system, chat thread, page-out roster). Consumed by notify.compose_owner_notification; delivery along it is the messaging surface's.",
+      "external": true
+    },
+    "__owner_notification__": {
+      "type": "dictionary",
+      "description": "Owner notification composed by notify.compose_owner_notification: channel_ref, urgency (page | inform), evidence_id, service_restored, headline, body. Delivered by the messaging surface.",
       "external": false
     }
   },
@@ -84,11 +139,15 @@
     "action--60000000-0000-4000-8000-000000000002": {
       "type": "action",
       "name": "detect availability anomaly",
-      "description": "Resolve the trigger for this run: a synthetic-probe alert against __protected_service__ has tripped an availability threshold, edge / origin telemetry shows a sustained throughput / error-rate / latency deviation outside the documented availability objective, or an operator-initiated trigger landed. Reads __protected_service__ and __anomaly_window__ to confirm the anomaly is current and bounded; reads the operator's documented service-inventory row for the protected service to surface the pre-bound mitigation surface (upstream scrubber, rate-limit / WAF, standby failover) the downstream steps will engage against.",
+      "description": "Resolve the trigger for this run: detect.resolve_availability_trigger confirms __anomaly_window__ is a bounded ISO-8601 interval, resolves __protected_service__ to its row in the operator's documented __service_inventory__ (an undocumented service or a duplicated row fails loud), and surfaces the availability objective (latency, error rate, throughput) together with the full pre-bound mitigation ladder — upstream scrubber, rate-limit / WAF and standby failover are all required at detect time, so a missing surface is discovered before an incident rather than mid-engagement with the service down. The synthetic-probe alert, edge / origin telemetry deviation or operator-initiated trigger that raised the anomaly is the monitoring adapter's ingress. The binding assigns the trigger envelope to __trigger_envelope__; the engage and validate bindings read its mitigation_surfaces and availability_objective.",
       "on_completion": "action--60000000-0000-4000-8000-000000000003",
       "in_args": [
         "__protected_service__",
-        "__anomaly_window__"
+        "__anomaly_window__",
+        "__service_inventory__"
+      ],
+      "out_args": [
+        "__trigger_envelope__"
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -96,19 +155,29 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.network_activity@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.ddos_response.primitives.detect.resolve_availability_trigger",
+          "in": {
+            "protected_service": "__protected_service__",
+            "anomaly_window": "__anomaly_window__",
+            "service_inventory": "__service_inventory__"
+          },
+          "out": "__trigger_envelope__"
+        }
       }
     },
     "action--60000000-0000-4000-8000-000000000003": {
       "type": "action",
       "name": "classify attack vector",
-      "description": "Classify the attack vector for the anomaly against the operator's documented vector taxonomy: volumetric (UDP / ICMP / amplification flood), protocol (SYN flood, TCP state exhaustion), or application-layer (HTTP flood, slow-loris). Reads the same monitoring surfaces the detect step consulted plus any operator-bound packet-capture / flow-record source documented for __protected_service__. Sets __attack_vector__. The classification is best-effort and time-boxed; if classification cannot be completed within the documented mitigation-engagement deadline (so the operator is not held by a perfect-classification stall while the service stays down), this step leaves __attack_vector__ empty and the downstream engage-mitigation step engages the most-restrictive pre-bound mitigation rather than waiting.",
+      "description": "Classify the attack vector against the operator's documented taxonomy — volumetric (UDP / ICMP / amplification flood), protocol (SYN flood, TCP state exhaustion) or application-layer (HTTP flood, slow-loris): classify.classify_attack_vector consumes the monitoring adapter's per-vector verdicts in __vector_signals__ (real booleans, all three keys required) and the adapter-enforced __deadline_exceeded__ time-box flag. Multi-signal precedence is volumetric > protocol > application_layer (the pipe-filler first); an aggregate 'under attack' verdict is never produced. A signal that arrived is a completed classification even at the deadline; when no signal arrived the vector is empty and classification_state records deadline_exceeded or no_signal, so the engage step engages the most-restrictive pre-bound mitigation rather than holding the operator to a perfect-classification stall while the service stays down. The binding assigns the envelope to __classification__; the compile target's adapter extracts __attack_vector__ (empty on the short-circuit branch).",
       "on_completion": "action--60000000-0000-4000-8000-000000000004",
       "in_args": [
-        "__protected_service__",
-        "__anomaly_window__"
+        "__vector_signals__",
+        "__deadline_exceeded__"
       ],
       "out_args": [
+        "__classification__",
         "__attack_vector__"
       ],
       "x_secops_ng": {
@@ -117,19 +186,30 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.network_activity@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.ddos_response.primitives.classify.classify_attack_vector",
+          "in": {
+            "signals": "__vector_signals__",
+            "deadline_exceeded": "__deadline_exceeded__"
+          },
+          "out": "__classification__"
+        }
       }
     },
     "action--60000000-0000-4000-8000-000000000004": {
       "type": "action",
       "name": "engage mitigation",
-      "description": "Engage the appropriate mitigation discipline against the operator's pre-bound response surface for __protected_service__: activate the upstream-scrubbing provider (volumetric); push the documented rate-limit / WAF posture change against the operator's edge surface (application-layer); or initiate the documented failover to the standby (protocol exhaustion or when scrubbing / rate-limit cannot recover the service inside the validation window). Reads __attack_vector__ to select the mitigation discipline; when __attack_vector__ is empty the step engages the most-restrictive pre-bound mitigation (typically failover) rather than waiting for classification. Emits __mitigation_action_id__ — the durable identifier of the engagement against the response surface (provider activation reference, ticket id, or failover-exercise reference). Detection bindings for mitigation-surface misconfiguration (scrubber not actually engaged, rate-limit pushed to wrong zone, standby reachable but not healthy) are owned by CORE-layer cards once upstream rule ids are selected.",
+      "description": "Engage the mitigation discipline against the operator's pre-bound response surface: mitigation.select_mitigation_engagement maps the vector to the discipline — volumetric ⇒ upstream scrubbing, application-layer ⇒ rate-limit / WAF posture, protocol ⇒ failover to standby — reading the surfaces resolved at detect time from __trigger_envelope__.mitigation_surfaces; an empty vector (the classify short-circuit) engages the most-restrictive pre-bound mitigation, failover, with short_circuit recorded rather than waiting for classification. The composed engagement order carries a deterministic, discipline-naming action id (ddos-mit-<discipline>-… over service, window and surface) so the value names the discipline even on the short-circuit branch and a replayed engagement resolves to the same id. Activating the scrubbing provider, pushing the posture change or exercising the failover is the compile target's adapter — the framework ships the hand-off and no scrubbing-provider binding. The binding assigns the order to __engagement__; the adapter extracts __mitigation_action_id__.",
       "on_completion": "action--60000000-0000-4000-8000-000000000005",
       "in_args": [
+        "__classification__",
         "__protected_service__",
-        "__attack_vector__"
+        "__anomaly_window__",
+        "__trigger_envelope__"
       ],
       "out_args": [
+        "__engagement__",
         "__mitigation_action_id__"
       ],
       "x_secops_ng": {
@@ -138,19 +218,30 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.ddos_response.primitives.mitigation.select_mitigation_engagement",
+          "in": {
+            "attack_vector": "__classification__.attack_vector",
+            "protected_service": "__protected_service__",
+            "anomaly_window": "__anomaly_window__",
+            "mitigation_surfaces": "__trigger_envelope__.mitigation_surfaces"
+          },
+          "out": "__engagement__"
+        }
       }
     },
     "action--60000000-0000-4000-8000-000000000005": {
       "type": "action",
       "name": "validate service restoration",
-      "description": "Observe the protected service against its documented availability objective (latency, error rate, throughput) for the documented validation window after the mitigation engagement. Reads __protected_service__ and __mitigation_action_id__; sets __service_restored__. A false outcome does not block downstream steps — the evidence-capture record is published with the failure marker and the notify step pages the incident-management owner with the full context so the next mitigation lever (escalate scrubbing tier, expand rate-limit scope, manual failover) can be engaged. Time-to-mitigation and availability-restoration metric emitters that read this step are owned by a sibling EXTEND card; this step intentionally does not pin a step-level metric_ref until that catalogue entry lands.",
+      "description": "Verify restoration against observed traffic, never against the mitigation having been applied: restoration.evaluate_service_restoration takes the monitoring adapter's samples across the documented validation window in __validation_observations__ and judges each against the availability objective resolved at detect time (__trigger_envelope__.availability_objective) — latency, error rate and throughput, with boundary equality inside the objective. The verdict is true only when every sample sits inside the objective; a false verdict is data, not a failure — every breach is enumerated by dimension with observed value and bound, the evidence record publishes with the failure marker, and the notify step pages the owner for the next mitigation lever (escalate scrubbing tier, expand rate-limit scope, manual failover). Malformed samples fail loud. The binding assigns the verdict to __restoration_verdict__; the adapter extracts __service_restored__.",
       "on_completion": "action--60000000-0000-4000-8000-000000000006",
       "in_args": [
-        "__protected_service__",
-        "__mitigation_action_id__"
+        "__trigger_envelope__",
+        "__validation_observations__"
       ],
       "out_args": [
+        "__restoration_verdict__",
         "__service_restored__"
       ],
       "x_secops_ng": {
@@ -159,21 +250,31 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.network_activity@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.ddos_response.primitives.restoration.evaluate_service_restoration",
+          "in": {
+            "availability_objective": "__trigger_envelope__.availability_objective",
+            "observations": "__validation_observations__"
+          },
+          "out": "__restoration_verdict__"
+        }
       }
     },
     "action--60000000-0000-4000-8000-000000000006": {
       "type": "action",
       "name": "evidence capture",
-      "description": "Compose and publish the dated availability-incident evidence record to the operator's evidence store. The record carries the protected service id, the anomaly window, the classified attack vector (or the empty-classification marker on the short-circuit branch), the engaged mitigation action id, the restoration outcome (or the failure marker), and the observed availability-objective measurements across the validation window. This is the audit-evident artifact NIS2 Art. 21(2)(b) reviewers read against an availability/DoS incident; missing or stale evidence is the failure mode the incident-handling metrics surface.",
+      "description": "Compose the dated availability-incident evidence record the NIS2 Art. 21(2)(b) reviewer reads: evidence.compose_incident_evidence_record pins __protected_service__, __anomaly_window__, the classified vector (empty on the short-circuit branch, carrying the unclassified_vector marker), the engaged __engagement__.mitigation_action_id, the restoration verdict (service_not_restored marker on the unrestored branch) and the observed measurements — dated from the anomaly window's start instant, never from emitter run time, with a content-derived record identity so re-publication is idempotent. Missing or stale evidence is the failure mode the incident-handling metrics surface; publishing to the evidence store is the compile target's adapter. The binding assigns the record to __evidence_record__; the adapter extracts __evidence_id__.",
       "on_completion": "action--60000000-0000-4000-8000-000000000007",
       "in_args": [
         "__protected_service__",
-        "__attack_vector__",
-        "__mitigation_action_id__",
-        "__service_restored__"
+        "__anomaly_window__",
+        "__classification__",
+        "__engagement__",
+        "__restoration_verdict__"
       ],
       "out_args": [
+        "__evidence_record__",
         "__evidence_id__"
       ],
       "x_secops_ng": {
@@ -182,23 +283,48 @@
         ],
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.ddos_response.primitives.evidence.compose_incident_evidence_record",
+          "in": {
+            "protected_service": "__protected_service__",
+            "anomaly_window": "__anomaly_window__",
+            "attack_vector": "__classification__.attack_vector",
+            "mitigation_action_id": "__engagement__.mitigation_action_id",
+            "restoration": "__restoration_verdict__"
+          },
+          "out": "__evidence_record__"
+        }
       }
     },
     "action--60000000-0000-4000-8000-000000000007": {
       "type": "action",
       "name": "notify incident-management owner",
-      "description": "Deliver the evidence reference to the incident-management owner along the operator's pre-bound channel (ticketing system, chat thread, page-out roster). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an evidence record written but never delivered to the owner is itself an incident-handling gap. Notification carries the restoration outcome so a false __service_restored__ pages with appropriate urgency for the next mitigation lever.",
+      "description": "Compose the owner notification: notify.compose_owner_notification carries __evidence_record__.evidence_id and the restoration outcome to the incident-management owner's pre-bound __owner_channel__ (ticketing system, chat thread, page-out roster) — a false service_restored pages with the next-lever prompt, a true one informs; a coerced string flag is refused. Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an evidence record written but never delivered to the owner is itself an incident-handling gap. Delivery along the channel is the messaging surface's; the binding assigns the payload to __owner_notification__.",
       "on_completion": "end--60000000-0000-4000-8000-000000000008",
       "in_args": [
-        "__evidence_id__",
+        "__evidence_record__",
         "__protected_service__",
-        "__service_restored__"
+        "__restoration_verdict__",
+        "__owner_channel__"
+      ],
+      "out_args": [
+        "__owner_notification__"
       ],
       "x_secops_ng": {
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.ddos_response.primitives.notify.compose_owner_notification",
+          "in": {
+            "evidence_id": "__evidence_record__.evidence_id",
+            "protected_service": "__protected_service__",
+            "service_restored": "__restoration_verdict__.service_restored",
+            "owner_channel": "__owner_channel__"
+          },
+          "out": "__owner_notification__"
+        }
       }
     },
     "end--60000000-0000-4000-8000-000000000008": {
@@ -208,8 +334,8 @@
   },
   "x_secops_ng": {
     "stable_id": "playbook.ddos_response@v1",
-    "content_version": "0.1.0",
-    "maturity": "experimental",
+    "content_version": "1.0.0",
+    "maturity": "stable",
     "compile_targets": [
       "n8n",
       "temporal",

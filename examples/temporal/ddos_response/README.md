@@ -45,8 +45,11 @@ re-emits `workflow.temporal.py` via `tools.compile --target temporal`.
 
 ## Status
 
-SKELETON — the Temporal artifact ships byte-deterministic from the
-canonical CACAO source. Activity bodies remain `NotImplementedError`
-stubs by design; the per-target byte-parity goldens across n8n +
-Temporal + LangGraph land in the EXTEND-goldens sibling once the
-remaining two compile targets ship.
+Bound — the Temporal artifact ships byte-deterministic from the
+canonical CACAO source, and all six `@activity.defn` bodies import and
+call their deterministic primitive from
+`content/playbooks/ddos_response/primitives/`. `NotImplementedError`
+marks only the operator-integration seams (monitoring ingress,
+response surface, evidence store, owner channel). The per-target
+byte-parity goldens across n8n + Temporal + LangGraph live under
+`tests/examples/`.
