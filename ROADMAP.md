@@ -754,6 +754,10 @@ one playbook's provenance.
 ### F-WF-ASSET — Asset and configuration management
 
 - **Status:** Shipped
+- **Binding note:** Shipped pre-`core_body` — every action step
+  compiles with an operator-TODO body; primitive binding is tracked
+  by the F-WF-CORE-WAVE-1 card (#921, Director decision 2026-09-04),
+  not by a status flip.
 - **Priority:** P2
 - **Goal:** G-01 (content coverage — 25th canonical cookbook
   playbook, closing the top-5 NIS2 Art. 21 family bar); the
@@ -1341,6 +1345,10 @@ one playbook's provenance.
 ### F-WF-CYBERHYG — Security-awareness and cyber-hygiene training
 
 - **Status:** Shipped
+- **Binding note:** Shipped pre-`core_body`; deliberately left
+  unbound (PARK, #921 — the training pair is parked pending a merge
+  decision, Director 2026-09-04); the playbook README carries the
+  binding-status note.
 - **Priority:** P1
 - **Goal:** G-01 (content coverage — a portable operator-side
   proactive security-awareness and cyber-hygiene training
@@ -1398,6 +1406,10 @@ one playbook's provenance.
 ### F-WF-SECAWARENESS — Security-awareness training programme lifecycle
 
 - **Status:** Shipped
+- **Binding note:** Shipped pre-`core_body`; deliberately left
+  unbound (PARK, #921 — the training pair is parked pending a merge
+  decision, Director 2026-09-04); the playbook README carries the
+  binding-status note.
 - **Priority:** P1
 - **Goal:** G-01 (content coverage — a portable operator-side
   programme-lifecycle workflow for the structured security-
@@ -1631,6 +1643,10 @@ one playbook's provenance.
 ### F-WF-EUAIACT-DEPLOYER — EU AI Act Art. 26 deployer-obligation lifecycle with Art. 27 fundamental-rights impact assessment
 
 - **Status:** Shipped
+- **Binding note:** Shipped pre-`core_body` — every action step
+  compiles with an operator-TODO body; primitive binding is tracked
+  by the F-WF-CORE-WAVE-1 card (#921, Director decision 2026-09-04),
+  not by a status flip.
 - **Priority:** P1
 - **Goal:** G-01 (content coverage — the shipped EU AI Act surface is
   provider-side end to end; an operator running a third-party high-risk
@@ -1678,6 +1694,10 @@ one playbook's provenance.
 ### F-WF-AI-OVERSIGHT — EU AI Act Art. 14 human-oversight design and operation lifecycle
 
 - **Status:** Shipped
+- **Binding note:** Shipped pre-`core_body` — every action step
+  compiles with an operator-TODO body; primitive binding is tracked
+  by the F-WF-CORE-WAVE-1 card (#921, Director decision 2026-09-04),
+  not by a status flip.
 - **Priority:** P2
 - **Goal:** G-01 (content coverage — Art. 14 is a standing high-risk
   requirement with no playbook; the oversight measures it demands are
@@ -2153,6 +2173,96 @@ one playbook's provenance.
     claimed but untested).
 
 ---
+
+### F-WF-CORE-WAVE-1 — CORE-WIRE wave 1: bind the highest-payoff unbound playbooks
+
+- **Status:** Proposed
+- **Priority:** P2
+- **Goal:** G-01 (content coverage — `stable` under the Maturity ladder
+  is the catalogue's deployment-ready designation, and every playbook on
+  this card is one binding lane away from it), G-03 (compile-target
+  parity — bound steps emit executable bodies on all three targets
+  instead of operator TODOs).
+- **Rationale:** #921 classified the 22 finalized playbooks that carry
+  zero primitive bindings and were tracked by nothing — their features
+  shipped honestly against the pre-`core_body` definition of done, and
+  the definition then moved. Director decision 2026-09-04: **wire**,
+  buckets accepted as written. This card makes wave 1 sweep-visible;
+  F-WF-CORE-WAVE-2 carries the rest and records the parked five.
+- **Acceptance criteria:**
+  - Staged **one playbook per cycle**, in this order:
+    `asset_management` first (WIRE NOW — its primitives already ship on
+    disk, so this is a single CORE-WIRE cycle on the
+    incident_management / patch_management retro-wiring pattern), then
+    `phishing_triage`, `ransomware_containment`, `data_exfil`,
+    `identity_compromise`, `dora_major_incident_reporting`,
+    `eu_ai_act_deployer_obligations`, `ai_human_oversight` — each as
+    CORE-PRIM then CORE-WIRE (about two cycles apiece).
+  - Per playbook: deterministic primitives under
+    `content/playbooks/<slug>/primitives/`, each executed directly by
+    unit coverage; every action step bound through `core_body` on the
+    canonical source (#866 variable discipline); the three-target
+    examples regenerated in the same wire change; blank predicates
+    resolved where the memo counted them (`phishing_triage` 1,
+    `ransomware_containment` 2, `data_exfil` 2).
+  - The graduation checklist is **recomputed** per playbook with
+    `catalog.py`; maturity flips only when every criterion is green,
+    never asserted.
+  - `identity_compromise` — the catalogue's only `draft` — is **bound
+    and promoted** (the Director's "wire" applied to the memo's
+    bind-or-demote sub-decision); its README status paragraph is
+    rewritten to record the binding.
+  - Each landing is recorded under *Shipped via* below; the card flips
+    to Shipped when the eighth playbook graduates or is explicitly
+    re-parked with a recorded reason.
+- **Sovereign-stack constraints:** primitives stay pure, offline and
+  LLM-free; connectors, IdP/KMS/scrubbing surfaces and messaging stay
+  adapter-bound operator surfaces, as on every bound playbook.
+- **Depends on:** none — `asset_management` already has its primitives;
+  the other seven start from shipped SKELETON + goldens.
+- **Source:** #921 (memo 2026-08-12, refresh 2026-08-25); Director
+  decision 2026-09-04.
+- **Shipped via:**
+  - —
+
+### F-WF-CORE-WAVE-2 — CORE wave 2: bind the remaining worthy playbooks; record the parked five
+
+- **Status:** Proposed
+- **Priority:** P3
+- **Goal:** G-01 (content coverage — completes the deployability story
+  for the corpus: with wave 1 this card ends at every finalized
+  playbook either `stable` or a documented park), G-03.
+- **Rationale:** the second #921 bucket — worthy, not differentiating —
+  sequenced behind F-WF-CORE-WAVE-1 by priority so the sweep finishes
+  the high-payoff eight first. The PARK bucket is recorded here so the
+  five deliberately unbound playbooks stop counting as debt.
+- **Acceptance criteria:**
+  - Staged one playbook per cycle after wave 1 completes:
+    `cloud_misconfiguration` (2 blank predicates),
+    `data_protection_impact_assessment` (10 action steps — its CORE-PRIM
+    is split in two cycles before the wire), `threat_intel_ingest`,
+    `network_security`, `dora_tpr_management`,
+    `dora_ict_risk_selfassess`, `nis2_self_assessment`,
+    `cra_srp_notify`, and `detection_engineering` last — its
+    prerequisite is restoring three-target parity (it compiles to one
+    of three targets today) before any CORE work.
+  - The same per-playbook contract as wave 1: primitives executed by
+    unit coverage, `core_body` on the canonical source, examples
+    regenerated in the wire change, graduation recomputed with
+    `catalog.py`.
+  - **Parked, not owed** (Director 2026-09-04, training pair
+    park-both): `executive_metrics`, `post_incident_review`,
+    `on_call_rotation`, `cyber_hygiene_training`,
+    `security_awareness_training`. Each README carries a one-paragraph
+    binding-status note so the state reads as a decision; `catalog.py`
+    keeps reporting them unbound and they stay `experimental` honestly.
+    Reopening a park is a roadmap decision, not a bug.
+- **Sovereign-stack constraints:** as F-WF-CORE-WAVE-1.
+- **Depends on:** F-WF-CORE-WAVE-1 (sequencing only); `detection_engineering`
+  parity restoration (its own prerequisite cycle).
+- **Source:** #921; Director decision 2026-09-04.
+- **Shipped via:**
+  - PARK notes — (docs PR, filed alongside this card)
 
 ## Epic PT — Pattern Library
 
