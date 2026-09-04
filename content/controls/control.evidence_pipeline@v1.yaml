@@ -1,0 +1,51 @@
+# SecOps-NG control file — cross-reference layer.
+# Schema: content-model/control_xref.schema.json
+#
+# Owed since #884: the soc2_evidence_collector SKELETON referenced
+# this stable_id from its mappings overlay (twice, anchoring CA-7 and
+# CA-2) but the control file never landed. Authored with the #841
+# resolution guard so the reference resolves the way
+# content/controls/README.md promises, instead of exempting it.
+stable_id: control.evidence_pipeline@v1
+title: Evidence aggregation pipeline
+summary: >-
+  Operator maintains a dated, replayable pipeline that aggregates the
+  evidence records other workflows emit (access, posture, patch,
+  incident-timeline and sibling streams) into per-criterion coverage
+  reports for the compliance surfaces in scope, without collecting new
+  telemetry of its own — a criterion with no evidence reports as
+  uncovered rather than triggering a scan, and the aggregation output
+  carries no audit opinion.
+
+oscal_refs:
+  - catalog: "NIST 800-53 rev5"
+    control_id: "CA-7"
+    title: "Continuous Monitoring"
+  - catalog: "NIST 800-53 rev5"
+    control_id: "CA-2"
+    title: "Control Assessments"
+  - catalog: "ISO/IEC 27001:2022"
+    control_id: "A.5.36"
+    title: "Compliance with policies, rules and standards for information security"
+
+d3fend_refs:
+  - d3f_id: D3-OAM
+    technique_name: "Operational Activity Mapping"
+    url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+
+review_cadence: P1Y
+
+provenance:
+  source_url: https://d3fend.mitre.org/technique/d3f:OperationalActivityMapping/
+  captured_at: '2026-08-29'
+  notes: >-
+    The aggregation discipline maps the operator's evidence-emitting
+    activity onto the compliance criteria it discharges (D3FEND
+    Operational Activity Mapping), anchored to the NIST 800-53 CA-7
+    continuous-monitoring and CA-2 assessment controls the
+    soc2_evidence_collector overlay cites, with ISO/IEC 27001 A.5.36
+    as the compliance-verification counterpart. Authored to resolve
+    the reference the #884 SKELETON declared; the referencing
+    playbook's scope statement (aggregate, never scan; counts, never
+    percentages; no audit opinion) is restated in the summary so the
+    control cannot be read as broader than the playbook it anchors.
