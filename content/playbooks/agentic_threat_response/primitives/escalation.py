@@ -90,8 +90,11 @@ def compose_escalation_envelope(
         The credential-isolation plan id
         (:func:`..isolation.plan_credential_isolation`).
     segmentation_rule_ids
-        Non-empty list of applied segmentation rule ids
-        (:func:`..segmentation.derive_segmentation_rules`); any order,
+        Non-empty list of applied segmentation rules — either bare rule
+        ids or the rule records from
+        :func:`..segmentation.derive_segmentation_rules` (``rules``),
+        each carrying ``rule_id``; the wire passes the segmentation
+        envelope's ``rules`` list straight through. Any order,
         duplicates tolerated — the envelope form is canonical.
 
     Returns
@@ -120,7 +123,10 @@ def compose_escalation_envelope(
         )
     rule_ids = sorted(
         {
-            _canonical_pointer(r, f"segmentation_rule_ids[{i}]")
+            _canonical_pointer(
+                r.get("rule_id") if isinstance(r, dict) else r,
+                f"segmentation_rule_ids[{i}]",
+            )
             for i, r in enumerate(segmentation_rule_ids)
         }
     )

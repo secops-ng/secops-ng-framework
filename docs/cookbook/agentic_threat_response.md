@@ -171,14 +171,19 @@ directory carrying a mirror of the canonical `playbook.cacao.json`
 alongside the compiled artifact and a `regenerate.sh` that re-emits
 via the unified `tools.compile` CLI.
 
-### 4.1 n8n — importable workflow JSON
+### 4.1 n8n — code-node bindings, operator-wired connectors
 
 `examples/n8n/agentic_threat_response/workflow.n8n.json` carries the
-CACAO topology as n8n nodes (`manualTrigger`, `set`, `noOp`), with
-node ids preserving the CACAO step ids verbatim. The five action
-steps land as `n8n-nodes-base.set` nodes carrying the CACAO I/O
-contract as editable assignment rows an operator binds to their
-connectors:
+CACAO topology as n8n nodes (`manualTrigger`, `code`, `noOp`), with
+node ids preserving the CACAO step ids verbatim. All five action
+steps emit `n8n-nodes-base.code` nodes whose `pythonCode` is the
+exact primitive call (e.g.
+`from content.playbooks.agentic_threat_response.primitives.segmentation
+import derive_segmentation_rules ; __segmentation_rules__ =
+derive_segmentation_rules(lateral_path=__indicator_envelope__.edges,
+authorisation_policy=__authorisation_policy__)`); no Set-node
+placeholders remain. Operators wire the code-node inputs and the
+adapter seams to their connectors:
 
 - ingest → detection-layer feed (SIEM / detection-engineering
   output) carrying the OCSF Detection Finding class shape
@@ -191,24 +196,35 @@ connectors:
   case management system, or persistence backend under change
   control)
 
-Import the JSON directly into an n8n instance; the Set-row
-assignments are the seams the operator wires against their
-credentials in the n8n credentials store.
+Import the JSON directly into an n8n instance. The Code-node bodies
+assume `PYTHONPATH` on the n8n host resolves
+`content.playbooks.agentic_threat_response.primitives`; operators who
+run n8n in a Python-free container drop a single Python-runner Code
+node ahead of the chain. The four external inputs
+(`__raw_indicator__`, `__containment_window__`,
+`__authorisation_policy__`, `__evidence_artifacts__`) are the seams
+the operator binds against their connectors in the n8n credentials
+store.
 
 ### 4.2 Temporal — deterministic workflow module
 
 `examples/temporal/agentic_threat_response/workflow.temporal.py` is a
 standard Temporal worker module: one `@workflow.defn` class and one
-`@activity.defn` function per CACAO action. Activity bodies raise
-`NotImplementedError` after opening the span and appending an
-`AuditRecord` on the context-local `AuditTrail`, so an integrator
-sees exactly which seam they still have to wire against their IdP,
-segmentation control plane, and evidence store.
+`@activity.defn` function per CACAO action. All five activities
+import their primitive and produce the hydrated indicator envelope,
+the isolation plan, the segmentation rule set, the escalation
+envelope and the evidence manifest; the only remaining
+`NotImplementedError` marks the operator-integration seams (IdP
+execution, segmentation control plane, incident-management dispatch,
+evidence store) after the span and the `AuditRecord` on the
+context-local `AuditTrail`, so an integrator sees exactly which seam
+is theirs.
 
 Operators drop `workflow.temporal.py` next to their worker, register
 the activities, and run the worker against their Temporal cluster.
-Determinism guarantees at the workflow layer survive the placeholder
-activity bodies.
+Determinism at the workflow layer is carried by the primitives
+themselves: the same envelope in yields the same ledger, rules,
+signal id and bundle id out.
 
 ### 4.3 LangGraph — graph spec + state bindings + agentic hook
 
@@ -216,8 +232,10 @@ activity bodies.
 carries the `TypedDict` state and the `@tool`-decorated action
 wrappers; `graph_spec.json` carries the target-neutral topology
 (nodes, edges); `assemble.py` is the canonical reference assembly
-that wires the spec into a `StateGraph`. Tool bodies raise
-`NotImplementedError` until the operator wires them.
+that wires the spec into a `StateGraph`. All five tools import their
+primitive and update the typed state; the operator-integration seams
+stay marked with `NotImplementedError` after their span and audit
+record.
 
 The LangGraph target is a natural fit for this playbook: the ingest
 step's behaviour-analysis surface is a candidate for an LLM-driven
@@ -249,8 +267,11 @@ sovereign-security property a regulator can diff against: the same
 indicator, fed through all three targets, produces byte-identical
 credential-isolation account-change events, byte-identical
 containment-action ledger entries, and byte-identical evidence-bundle
-receipts once each target's activity / tool bodies are wired against
-the same operator seams.
+receipts. The five primitives are the shared contract all three
+targets call, so the composed artifacts are byte-identical today
+(pinned by the replay tests under
+`tests/playbooks/agentic_threat_response/`); the delivered ones follow
+once the operator seams are wired against the same surfaces.
 
 ## 6. Observability — OCSF telemetry and KPI hooks
 
