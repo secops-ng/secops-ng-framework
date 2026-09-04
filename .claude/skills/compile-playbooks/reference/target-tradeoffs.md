@@ -25,11 +25,12 @@ replayable), **LangGraph** (graph-shaped, agentic).
 ## Evidence for each claim
 
 **Control flow.** `examples/n8n/vuln_intake/workflow.n8n.json` node types:
-`{manualTrigger: 1, code: 2, set: 6, if: 1, switch: 1, noOp: 1}` — the branch
-steps survive as real nodes. `examples/langgraph/vuln_intake/graph_spec.json`
+`{manualTrigger: 1, code: 8, if: 1, switch: 1, noOp: 1}` — the branch
+steps survive as real nodes (and with the playbook fully bound, no `set`
+placeholders remain). `examples/langgraph/vuln_intake/graph_spec.json`
 carries `nodes: 10, edges: 8, conditional_edges: 2`. By contrast
-`examples/temporal/vuln_intake/workflow.temporal.py` contains **8
-`NotImplementedError`**, one of which is the workflow lowering itself:
+`examples/temporal/vuln_intake/workflow.temporal.py` still contains the
+workflow-lowering raise itself:
 
 ```
 raise NotImplementedError(
@@ -38,12 +39,12 @@ raise NotImplementedError(
 ```
 
 `compilers/temporal/README.md` states control-flow lowering is "intentionally
-deferred". **Note the doc conflict:** `docs/cookbook/vuln_intake.md` §4.2
-describes the Temporal output as a worker module you "register the activities and
-run" — that overstates it. Trust the artifact.
+deferred", and the cookbooks name it as the deliberate compiler gap — the
+activities are real (each invokes its bound primitive); the *orchestration*
+between them is the part you write. Trust the artifact when any doc drifts.
 
-**Bound vs unbound.** `vuln_intake` has 2 real `core_body` bindings and its n8n
-emit has exactly 2 `code` nodes; `data_exfil` has 0 bindings and 0 `code` nodes
+**Bound vs unbound.** `vuln_intake` has 8 real `core_body` bindings and its n8n
+emit has exactly 8 `code` nodes; `data_exfil` has 0 bindings and 0 `code` nodes
 (`{manualTrigger: 1, set: 5, if: 2, noOp: 1}`). The mapping is one-to-one.
 
 **Hand-written assembly.** `examples/langgraph/vuln_intake/assemble.py` is **184
@@ -52,7 +53,7 @@ it. `docs/compilers/langgraph.md` is explicit: the compiler emits "a *scaffold*,
 not a runnable graph" and "does not assemble the `StateGraph`". That file is the
 honest measure of what LangGraph adoption costs.
 
-**The Temporal import gap.** All 12 emitted Temporal modules do
+**The Temporal import gap.** Every emitted Temporal module does
 `from ._audit_mirror import AuditRecord, AuditTrail`, but no
 `examples/temporal/*/` directory contains `_audit_mirror.py` or `__init__.py`,
 and their `regenerate.sh` never calls `audit_mirror_cli`. So the committed
@@ -68,11 +69,14 @@ not the bare `__var__` names the emitter writes. So on n8n, **more bindings mean
 more rewriting**, not less — either flatten to a `set` node plus an external
 call, or run the primitive outside n8n behind HTTP.
 
-**Bound bodies are intent, not working code.** A bound step's body references
-playbook variables that are frequently absent from `playbook_variables`, so it
-raises `NameError` before it does anything. Treat a binding as *a precise
-statement of the intended call*, which is genuinely useful, and not as a step
-that runs. This is why binding coverage is a poor readiness ranking.
+**Bound bodies are precise intent; the runtime marshals the inputs.** Every
+`core_body` variable is declared in `playbook_variables` (the #866 discipline
+closed the old undeclared-variable gap), but the emitted call still resolves
+its inputs through the compile target's marshalling layer — a bound body runs
+once the operator wires the declared external inputs, not before. Treat a
+binding as *a precise statement of the intended call*. Readiness ranking now
+belongs to the Maturity ladder, which requires bindings **plus** golden-pinned
+examples and unit-covered primitives — see SKILL.md § Choosing a playbook.
 
 ## Choosing when nothing is decisive
 
@@ -89,9 +93,11 @@ not after.
 
 LangGraph earns its cost only when a model must **choose what happens next**. If
 the model is only writing text inside a step whose path is fixed, all three
-targets can do that, and the framework's own position (`examples/*/
-incident_management/core_body.overlay.json` `_meta`) is that model reach stays
-scoped to free-text fields while regulated decisions stay deterministic code.
+targets can do that, and the framework's own position (`docs/FOUNDATION.md` —
+LLM-facing steps go through versioned, diff-reviewable signatures) is that
+model reach stays scoped to free-text fields while regulated decisions stay
+deterministic code. (The overlay `_meta` that used to carry this position now
+records the wave-seam closure instead.)
 
 ## Offer the second compile
 
