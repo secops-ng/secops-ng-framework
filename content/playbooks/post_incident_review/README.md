@@ -62,3 +62,13 @@ mapping packs under `../../mappings/`.
   Authentication event classes
 - SigmaHQ — upstream anti-forensics / audit-tampering rule IDs
   referenced inline
+
+## Binding status
+
+Deliberately unbound. The 3 action steps compile with operator-TODO
+bodies on all three targets and the playbook carries no `core_body`
+primitive bindings; `catalog.py` reports it that way and the playbook
+stays `experimental` under the Maturity ladder. This is a recorded
+decision (#921 — PARK bucket, Director 2026-09-04), not neglect:
+three steps of human facilitation — timeline collation, a blameless review, corrective-action tracking — where a deterministic primitive would be ceremony around a conversation. Reopening the park is a roadmap decision, not a bug — the
+trigger would be that corrective-action tracking is ever wired into an audited evidence store.
