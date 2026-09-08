@@ -392,7 +392,7 @@ def test_response_refusal_always_carries_both_remedies():
 
 
 def test_response_refusal_and_fulfilment_are_exclusive():
-    with pytest.raises(InvalidResponseCompositionError, match="both"):
+    with pytest.raises(InvalidResponseCompositionError, match="exactly one"):
         compose_controller_response(
             "dsr-" + "0" * 24, "access", "c", DEADLINE,
             "2026-09-01T08:00:00Z",
@@ -418,6 +418,32 @@ def test_response_reasonless_refusal_is_not_representable():
             "dsr-" + "0" * 24, "access", "c", DEADLINE,
             "2026-09-01T08:00:00Z",
             refusal={"ground": "did_not_feel_like_it", "reasons": "r"},
+        )
+
+
+def test_response_additional_information_request_is_the_unverified_disposition():
+    # Art. 12(6): identity not verified → ask for what is needed. No
+    # pack, no refusal, no remedies — and never two dispositions.
+    envelope = compose_controller_response(
+        "dsr-" + "0" * 24, "access", "c", DEADLINE, "2026-09-01T08:00:00Z",
+        additional_information_request={
+            "reasons": "the contact channel does not match a record we hold; "
+            "please confirm through the in-app portal"
+        },
+    )
+    assert envelope["disposition"] == "additional_information_request"
+    assert envelope["additional_information_request"]["article"] == "GDPR Art. 12(6)"
+    assert envelope["fulfilment_pack_ref"] is None and envelope["refusal"] is None
+    with pytest.raises(InvalidResponseCompositionError, match="exactly one"):
+        compose_controller_response(
+            "dsr-" + "0" * 24, "access", "c", DEADLINE, "2026-09-01T08:00:00Z",
+            fulfilment_pack_ref=PACK,
+            additional_information_request={"reasons": "r"},
+        )
+    with pytest.raises(InvalidResponseCompositionError):
+        compose_controller_response(
+            "dsr-" + "0" * 24, "access", "c", DEADLINE, "2026-09-01T08:00:00Z",
+            additional_information_request={"reasons": "  "},
         )
 
 

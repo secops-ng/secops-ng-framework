@@ -57,3 +57,23 @@ across the three targets by
 Operators binding the intake nodes MUST stamp
 `__request_received_ts__` at ingress and MUST NOT let downstream
 nodes reach for `$now` / `Date.now()` when computing the deadline.
+
+## Per-action wiring notes — CORE bodies
+
+Every action step declares an `x_secops_ng.core_body` binding into the
+deterministic primitives package, so the emitter renders each as a Code
+node; the verification gate is an If node on `__identity_verified__`.
+The cross-target semantic contract is the primitives package itself
+(Temporal binds via activity imports, LangGraph via tool imports — all
+three call the same Python functions).
+
+| Step id (suffix) | CACAO step | Deterministic primitive | Operator wires |
+|---|---|---|---|
+| `…000002` | receive_request | `intake.open_dsr_case(raw_request, intake_channel)` → `__dsr_case__` | the intake surface supplying `__raw_request__` + `__intake_channel__`; the adapter extracts `__case_id__`, `__request_received_ts__` |
+| `…000003` | verify_identity | `verification.record_identity_verification(case_id, verification_method, identity_verified=__verification_result__, evidence_ref)` → `__verification_record__` | the sovereign IdP / out-of-band surface supplying the verdict, method and evidence pointer; the adapter extracts `__identity_verified__` |
+| `…000004` | classify_request | `classification.classify_request(request_type=__classified_request_type__, request_received_ts, extension=__extension_decision__)` → `__classification__` | the classifier surface and the controller's extension decision; the adapter extracts `__request_type__`, `__response_deadline__` |
+| `…000009` | identity verified? | — (If node on `__identity_verified__`) | nothing — true → routing, false → the Art. 12(6) response |
+| `…000005` | route_to_data_owners | `routing.resolve_data_owner_manifest(case_id, request_type, owner_rows)` → `__owner_manifest__` | the data-inventory join supplying `__owner_rows__`; the adapter extracts `__data_owner_manifest__` |
+| `…000006` | compile_fulfilment_evidence | `fulfilment.compile_fulfilment_pack(manifest=__owner_manifest__, owner_returns)` → `__fulfilment_pack__` | the owner transport returning `__owner_returns__`; the adapter extracts `__fulfilment_pack_ref__` |
+| `…000007` | send_controller_response | `response.compose_controller_response(…, dispatch_ts, fulfilment_pack_ref, refusal=__refusal_decision__, extension, additional_information_request=__identity_followup__)` → `__controller_response__` | secure delivery supplying `__dispatch_ts__` and exactly one disposition input per branch |
+| `…000008` | record_outcome | `outcome.record_case_outcome(case_id, outcome_code=__outcome_decision__, response_dispatch_ts=__controller_response__.dispatch_ts, response_deadline, fulfilment_pack_ref)` → `__outcome_record__` | the evidence store persisting the record and the handler's `__outcome_decision__`; the adapter extracts `__outcome_code__` |

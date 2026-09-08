@@ -16,9 +16,11 @@ Design constraints
   reasons AND both onward remedies (Article 77 supervisory-authority
   complaint, Article 79 judicial remedy) — the shape makes a
   remedy-free refusal unrepresentable.
-* **Refusal and fulfilment are exclusive.** A refused response carries
-  no fulfilment pack; a non-refused response requires one. Both at
-  once — or neither — is a composition error.
+* **Exactly one disposition.** A response fulfils (carrying the pack),
+  refuses (carrying reasons and remedies), or — on the unverified
+  branch — requests additional information under Article 12(6) to
+  confirm the requester's identity. Two at once, or none, is a
+  composition error; the empty response is not representable.
 * **Late is data, not permission.** ``responded_on_time`` is computed
   and recorded — a late response must still go out (better late for
   the subject), but the lateness is never silently absorbed; the
@@ -95,6 +97,7 @@ def compose_controller_response(
     fulfilment_pack_ref: str | None = None,
     refusal: dict | None = None,
     extension: dict | None = None,
+    additional_information_request: dict | None = None,
 ) -> dict:
     """Compose the controller's response envelope for one DSR case.
 
@@ -123,6 +126,11 @@ def compose_controller_response(
         ``None``, or the classification step's recorded extension
         (``further_months``, ``justification``): the response then
         carries the Article 12(3) extension notice with its reasons.
+    additional_information_request
+        ``None``, or the Article 12(6) request the controller sends
+        when identity could not be verified: an object with non-empty
+        ``reasons`` naming what the requester must supply. Exclusive
+        with the pack and the refusal.
 
     Returns
     -------
@@ -132,10 +140,13 @@ def compose_controller_response(
             "case_id": "...",
             "request_type": "...",
             "subject_contact": "...",
-            "disposition": "fulfilment" | "refusal",
+            "disposition": "fulfilment" | "refusal"
+                           | "additional_information_request",
             "fulfilment_pack_ref": "..." | None,
             "refusal": None | {"ground": "...", "reasons": "...",
                                "remedies": [...]},
+            "additional_information_request": None | {"article": "GDPR Art. 12(6)",
+                                                      "reasons": "..."},
             "extension_notice": None | {"further_months": <int>,
                                         "justification": "..."},
             "response_deadline": "...",
@@ -149,20 +160,41 @@ def compose_controller_response(
     deadline = _canonical_instant(response_deadline, "response_deadline")
     dispatched = _canonical_instant(dispatch_ts, "dispatch_ts")
 
-    if refusal is not None and fulfilment_pack_ref is not None:
+    dispositions = [
+        d for d in (fulfilment_pack_ref, refusal, additional_information_request)
+        if d is not None
+    ]
+    if len(dispositions) > 1:
         raise InvalidResponseCompositionError(
-            "a response cannot both refuse and carry a fulfilment pack"
+            "a response carries exactly one disposition — a fulfilment "
+            "pack, a refusal, or an Article 12(6) additional-information "
+            "request — never two"
         )
-    if refusal is None and fulfilment_pack_ref is None:
+    if not dispositions:
         raise InvalidResponseCompositionError(
-            "a response must either fulfil (fulfilment_pack_ref) or "
-            "refuse (refusal with reasons); an empty response is not "
-            "representable"
+            "a response must fulfil (fulfilment_pack_ref), refuse (refusal "
+            "with reasons) or request additional information "
+            "(additional_information_request with reasons); an empty "
+            "response is not representable"
         )
 
     refusal_record = None
     pack_ref = None
-    if refusal is not None:
+    followup_record = None
+    if additional_information_request is not None:
+        if not isinstance(additional_information_request, dict):
+            raise InvalidResponseCompositionError(
+                "additional_information_request must be an object, got "
+                f"{type(additional_information_request).__name__}"
+            )
+        followup_record = {
+            "article": "GDPR Art. 12(6)",
+            "reasons": _canonical_text(
+                additional_information_request.get("reasons"),
+                "additional_information_request.reasons",
+            ),
+        }
+    elif refusal is not None:
         if not isinstance(refusal, dict):
             raise InvalidResponseCompositionError(
                 f"refusal must be an object, got {type(refusal).__name__}"
@@ -206,9 +238,16 @@ def compose_controller_response(
         "case_id": case,
         "request_type": rtype,
         "subject_contact": contact,
-        "disposition": "refusal" if refusal_record else "fulfilment",
+        "disposition": (
+            "refusal"
+            if refusal_record
+            else "additional_information_request"
+            if followup_record
+            else "fulfilment"
+        ),
         "fulfilment_pack_ref": pack_ref,
         "refusal": refusal_record,
+        "additional_information_request": followup_record,
         "extension_notice": extension_notice,
         "response_deadline": deadline,
         "dispatch_ts": dispatched,
