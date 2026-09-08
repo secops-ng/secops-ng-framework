@@ -127,3 +127,49 @@ def test_worked_example_has_valid_n8n_shape() -> None:
             )
     meta = workflow.get("meta") or {}
     assert "secops_ng" in meta, "meta.secops_ng missing — content metadata dropped"
+
+
+# --------------------------------------------------------------------------- #
+# CORE bodies — Code nodes (per CORE-MECH-EMIT-N8N)
+# --------------------------------------------------------------------------- #
+
+_BCM_ROOT = Path(__file__).resolve().parents[4]
+_BCM_CANON = _BCM_ROOT / "content" / "playbooks" / "business_continuity" / "playbook.cacao.yaml"
+_BCM_WORKED = _BCM_ROOT / "examples" / "n8n" / "business_continuity" / "workflow.n8n.json"
+
+
+def _bcm_core_body_steps() -> dict[str, dict]:
+    import yaml
+
+    workflow = yaml.safe_load(_BCM_CANON.read_text(encoding="utf-8"))["workflow"]
+    return {
+        step_id: step
+        for step_id, step in workflow.items()
+        if step.get("type") == "action"
+        and (step.get("x_secops_ng") or {}).get("core_body")
+    }
+
+
+def test_core_body_steps_emit_code_nodes() -> None:
+    """Steps with ``x_secops_ng.core_body`` compile to n8n Code nodes
+    rendering the primitive call — the emitter-regression guard the
+    vuln_intake exemplar carries, applied to this YAML-sourced playbook.
+    Every action step on business_continuity is bound since CORE-WIRE, so
+    an empty selection here is itself a regression.
+    """
+    workflow = json.loads(_BCM_WORKED.read_text(encoding="utf-8"))
+    nodes_by_id = {node["id"]: node for node in workflow["nodes"]}
+    core_steps = _bcm_core_body_steps()
+    assert len(core_steps) == 7, "expected all seven action steps to carry core_body"
+    for step_id, step in core_steps.items():
+        node = nodes_by_id[step_id]
+        assert node["type"] == "n8n-nodes-base.code", (
+            f"step {step_id!r} carries core_body and must emit a Code node, "
+            f"not {node['type']!r}"
+        )
+        body = node["parameters"].get("pythonCode", "")
+        primitive = step["x_secops_ng"]["core_body"]["primitive"]
+        module, _, callable_name = primitive.rpartition(".")
+        assert f"from {module} import {callable_name}" in body
+        out_var = step["x_secops_ng"]["core_body"]["out"]
+        assert f"{out_var} = {callable_name}(" in body

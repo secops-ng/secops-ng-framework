@@ -54,11 +54,16 @@ parity with sibling targets), and the regeneration command.
    activating.
 
 The emitted workflow is a *snapshot of intent*, not a runnable
-playbook. Set-node assignments carry the CACAO I/O contract as
-editable rows; binding them to real connectors (BCM-plan store,
-isolation surface, failover surface, competent-authority notification
-transport, health-signal probe, evidence store) is the operator's
-job.
+playbook. The seven action steps are `n8n-nodes-base.code` nodes whose
+`pythonCode` is the exact primitive call from
+`content/playbooks/business_continuity/primitives/`; the bodies assume
+`PYTHONPATH` on the n8n host resolves that package. The external
+inputs (`__raw_trigger__`, `__plan_register__`, `__significance_policy__`,
+the Art. 23 branch inputs, `__recovery_observations__`, the PIR
+content) and the adapter seams (event-declaration surface, BCM-plan
+store, isolation surface, failover surface, competent-authority
+transport, health-signal probe, evidence store) are the operator's to
+wire against their connectors.
 
 ## How to regenerate
 

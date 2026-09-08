@@ -26,9 +26,13 @@ Art. 21(2)(c)).
 
 The canonical input is the CACAO v2 playbook at
 `../../../content/playbooks/business_continuity/playbook.cacao.yaml`.
-The emitted `workflow.temporal.py` is a workflow stub: one
+The emitted `workflow.temporal.py` is a workflow module: one
 `@workflow.defn` class whose method calls one `@activity.defn`
-coroutine per CACAO action step. Activity function names mirror CACAO
+coroutine per CACAO action step; each activity imports and calls its
+deterministic primitive from
+`content/playbooks/business_continuity/primitives/`, with
+`NotImplementedError` marking only the operator-integration seams.
+Activity function names mirror CACAO
 step ids so the two artifacts cross-reference by id alone; each
 activity docstring records the originating `step_id` for auditability.
 
@@ -61,5 +65,5 @@ the same pipeline and fails if the committed artifact drifts.
 Temporal is open source (MIT) and runs on infrastructure the operator
 controls (Nebul, OVHcloud, Scaleway, Hetzner, self-hosted). The
 Temporal Cloud SaaS is one deployment choice, not a vendor lock-in —
-the workflow stub emitted here is a `temporalio.workflow.defn` that
+the workflow module emitted here is a `temporalio.workflow.defn` that
 runs against any Temporal server the operator brings.
