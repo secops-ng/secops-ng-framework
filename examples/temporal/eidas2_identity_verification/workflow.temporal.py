@@ -20,21 +20,20 @@ _TRACER = trace.get_tracer(__name__)
 from ._audit_mirror import AuditRecord, AuditTrail
 
 @activity.defn
-async def request_eudiw_presentation(principal_id: str, auth_scope: str) -> str:
-    """SKELETON — issue an EUDIW presentation request to the principal identified by __principal_id__ for the PID credential set required by __auth_scope__, per eIDAS 2.0 Art. 5c (presentation of electronic attestations of attributes and person identification data from the European Digital Identity Wallet). Records __presentation_request_id__ for correlation with the wallet-side response. Read-only against the wallet surface — no attribute is asserted or written back. TODO (CORE): presentation-request adapter binding (OpenID4VP relying-party surface the operator already runs), transaction-timeout policy, response-envelope shape.
+async def request_eudiw_presentation(principal_id: str, auth_scope: str, required_credentials: str, requested_at: str) -> dict[str, object]:
+    """Issue an EUDIW presentation request to the principal identified by __principal_id__ for the PID credential set __auth_scope__ requires, per eIDAS 2.0 Art. 5c (presentation of electronic attestations of attributes and person identification data from the European Digital Identity Wallet): presentation.compose_presentation_request canonicalises the principal, the scope and the requested credential types, and derives __presentation_request_id__ from that set plus the supplied request instant so the transaction correlates deterministically with the wallet-side response. The request names credential *types* only — it carries no attribute values, asserts nothing and writes nothing back, and an entry naming an attribute container fails loud. Read-only against the wallet surface. Bound since the CORE-WIRE card: the binding assigns the request envelope to __presentation_request__ and the compile target's adapter extracts __presentation_request_id__; the OpenID4VP relying-party surface the operator already runs, and its transaction-timeout policy, are the adapter's.
 
     CACAO step_id: action--e1d5a520-0000-4000-8000-000000000002
     """
     with _TRACER.start_as_current_span(
         name='activity.action--e1d5a520-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e1d5a520-0000-4000-8000-000000000002', 'secops_ng.step.name': 'request_eudiw_presentation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'request_eudiw_presentation'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e1d5a520-0000-4000-8000-000000000002', 'secops_ng.step.name': 'request_eudiw_presentation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'request_eudiw_presentation'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--e1d5a520-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e1d5a520-0000-4000-8000-000000000002', 'secops_ng.step.name': 'request_eudiw_presentation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'request_eudiw_presentation'})
+            AuditRecord(span_name='activity.action--e1d5a520-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e1d5a520-0000-4000-8000-000000000002', 'secops_ng.step.name': 'request_eudiw_presentation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'request_eudiw_presentation'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--e1d5a520-0000-4000-8000-000000000002'"
-        )
+        from content.playbooks.eidas2_identity_verification.primitives.presentation import compose_presentation_request
+        __presentation_request__ = compose_presentation_request(principal_id=__principal_id__, auth_scope=__auth_scope__, required_credentials=__required_credentials__, requested_at=__requested_at__)
 
 REQUEST_EUDIW_PRESENTATION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -44,21 +43,20 @@ REQUEST_EUDIW_PRESENTATION_RETRY_POLICY = RetryPolicy(
 )
 
 @activity.defn
-async def verify_pid_credential(principal_id: str, presentation_request_id: str) -> dict[str, object]:
-    """SKELETON — cryptographically verify the PID (person identification data) credential returned by the wallet against the operator's declared EU trust-anchor registry: resolve the issuer to a Member-State Trusted List entry (or its LOTL aggregator, per Commission Implementing Decision (EU) 2015/1505 as maintained under eIDAS 2.0), verify the credential signature chain, confirm holder-binding to the presenting device (cnf claim for SD-JWT VC, device binding for mDoc per ARF v2), and resolve the credential's revocation / suspension status against the declared status-list surface. Records __pid_credential_id__ and __verification_verdict__. A false verdict does not short-circuit — the workflow proceeds to emit_identity_audit_evidence with the failure marker so the attestation stream carries the negative evidence. Read-only against the trust-anchor registry. TODO (CORE): trust-anchor probe binding, signature verification adapter, status-list freshness policy.
+async def verify_pid_credential(principal_id: str, presentation_request_id: str, verification_report: dict[str, object]) -> dict[str, object]:
+    """Record the outcome of cryptographically verifying the PID (person identification data) credential the wallet returned: verification.record_pid_verification consumes the verification adapter's typed report for __presentation_request_id__ — issuer resolution against the operator's declared EU trust-anchor registry (a Member-State Trusted List entry or its LOTL aggregator, per Commission Implementing Decision (EU) 2015/1505 as maintained under eIDAS 2.0), signature-chain validity, holder binding to the presenting device (cnf claim for SD-JWT VC, device binding for mDoc per ARF v2), and revocation status against the declared status-list surface — and derives one verdict from them. There is no partial-trust state: every check must hold and the status must be active, with suspended and unknown failing closed and each failed check enumerated. The record retains the outcome and its provenance only; a report carrying attested attributes fails loud rather than being dropped, because a dropped attribute has already crossed the boundary Regulation (EU) 2024/1183 forbids. __pid_credential_id__ stays empty until verification passes, and a false verdict does not short-circuit — the workflow proceeds to the audit-evidence step with the failure marker so the attestation stream carries the negative evidence. The probe, the signature verification and the status-list freshness policy are the adapter's. The binding assigns the record to __verification_record__; the adapter extracts __pid_credential_id__ and __verification_verdict__.
 
     CACAO step_id: action--e1d5a520-0000-4000-8000-000000000003
     """
     with _TRACER.start_as_current_span(
         name='activity.action--e1d5a520-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e1d5a520-0000-4000-8000-000000000003', 'secops_ng.step.name': 'verify_pid_credential', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'verify_pid_credential'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e1d5a520-0000-4000-8000-000000000003', 'secops_ng.step.name': 'verify_pid_credential', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'verify_pid_credential'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--e1d5a520-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e1d5a520-0000-4000-8000-000000000003', 'secops_ng.step.name': 'verify_pid_credential', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'verify_pid_credential'})
+            AuditRecord(span_name='activity.action--e1d5a520-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e1d5a520-0000-4000-8000-000000000003', 'secops_ng.step.name': 'verify_pid_credential', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'verify_pid_credential'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--e1d5a520-0000-4000-8000-000000000003'"
-        )
+        from content.playbooks.eidas2_identity_verification.primitives.verification import record_pid_verification
+        __verification_record__ = record_pid_verification(presentation_request_id=__presentation_request_id__, verification_report=__verification_report__)
 
 VERIFY_PID_CREDENTIAL_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -68,21 +66,20 @@ VERIFY_PID_CREDENTIAL_RETRY_POLICY = RetryPolicy(
 )
 
 @activity.defn
-async def assess_assurance_level(auth_scope: str, pid_credential_id: str, verification_verdict: bool) -> dict[str, object]:
-    """SKELETON — read the Level of Assurance attribute (high, substantial, low) carried on the verified PID credential and map it to the operator-side access tier for __auth_scope__ per the documented assurance-to-tier table. Records __loa_verdict__ and __access_tier__. On the verification-failure branch (__verification_verdict__ = false) this step short-circuits: __loa_verdict__ is recorded as returned but __access_tier__ stays empty so downstream provisioning is not triggered. TODO (CORE): LoA-to-tier mapping-table binding per __auth_scope__, drift-detection rule when the returned LoA is below the tier's declared minimum.
+async def assess_assurance_level(auth_scope: str, pid_credential_id: str, verification_verdict: bool, returned_loa: str, assurance_tier_table: dict[str, object]) -> dict[str, object]:
+    """Map the Level of Assurance the verified PID credential carries (__returned_loa__ — high, substantial or low on the closed eIDAS 2.0 ladder) to the operator-side access tier for __auth_scope__, per the documented __assurance_tier_table__: assurance.assess_assurance_level yields one of three explicit outcomes and never a partial-trust state. tier_assigned carries the documented tier. refused_verification_failed is the short-circuit the verification branch produces: the returned LoA is recorded as returned but the tier stays empty, so downstream provisioning is never triggered for an unverified principal. refused_below_minimum is the drift case made explicit — a returned LoA below the scope's declared minimum refuses rather than quietly downgrading the principal onto a lower tier. A scope missing from the table, or a table row missing the returned LoA's tier, fails loud: a tier the operator never documented cannot be invented. The binding assigns the assessment to __assurance_assessment__; the adapter extracts __loa_verdict__ and __access_tier__ (empty on both refusals).
 
     CACAO step_id: action--e1d5a520-0000-4000-8000-000000000004
     """
     with _TRACER.start_as_current_span(
         name='activity.action--e1d5a520-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e1d5a520-0000-4000-8000-000000000004', 'secops_ng.step.name': 'assess_assurance_level', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_assurance_level'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e1d5a520-0000-4000-8000-000000000004', 'secops_ng.step.name': 'assess_assurance_level', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_assurance_level'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--e1d5a520-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e1d5a520-0000-4000-8000-000000000004', 'secops_ng.step.name': 'assess_assurance_level', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_assurance_level'})
+            AuditRecord(span_name='activity.action--e1d5a520-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e1d5a520-0000-4000-8000-000000000004', 'secops_ng.step.name': 'assess_assurance_level', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_assurance_level'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--e1d5a520-0000-4000-8000-000000000004'"
-        )
+        from content.playbooks.eidas2_identity_verification.primitives.assurance import assess_assurance_level
+        __assurance_assessment__ = assess_assurance_level(loa_verdict=__returned_loa__, auth_scope=__auth_scope__, assurance_tier_table=__assurance_tier_table__, verification_verdict=__verification_verdict__)
 
 ASSESS_ASSURANCE_LEVEL_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -92,21 +89,20 @@ ASSESS_ASSURANCE_LEVEL_RETRY_POLICY = RetryPolicy(
 )
 
 @activity.defn
-async def emit_identity_audit_evidence(principal_id: str, auth_scope: str, presentation_request_id: str, pid_credential_id: str, loa_verdict: str, access_tier: str, verification_verdict: bool, captured_at: str) -> str:
-    """SKELETON — publish the dated identity-verification audit-evidence artifact to the operator's evidence store as an OCSF Account Change (class_uid 3001) record. Record pins __principal_id__, __auth_scope__, __presentation_request_id__, __pid_credential_id__, __loa_verdict__, __access_tier__, __verification_verdict__, and __captured_at__ so the NIS2 Art.21(2)(i) auditable-lifecycle obligation is discharged on every terminal path (including the verification-failed branch, which is recorded with the failure marker rather than dropped). Records __evidence_id__. TODO (CORE): evidence-record schema pin against the existing schemas/evidence/access.schema.json envelope, evidence-sink adapter binding, deterministic evidence_id derivation from SHA-256(principal_id | presentation_request_id | captured_at).
+async def emit_identity_audit_evidence(principal_id: str, auth_scope: str, presentation_request_id: str, pid_credential_id: str, loa_verdict: str, access_tier: str, verification_verdict: bool, captured_at: str) -> dict[str, object]:
+    """Compose the dated identity-verification audit-evidence artifact as an OCSF Account Change record (class_uid 3001, matching content/telemetry/telemetry.ocsf.account_change@v1): evidence.compose_identity_evidence_record pins __principal_id__, __auth_scope__, __presentation_request_id__, __pid_credential_id__, __loa_verdict__, __access_tier__, __verification_verdict__ and __captured_at__, so the NIS2 Art. 21(2)(i) auditable-lifecycle obligation is discharged on every terminal path — the verification-failed branch is recorded with the verification_failed marker and a Failure status rather than dropped, and a verdict of false carrying a credential id or a tier fails loud as mislabelled evidence. The record id follows the derivation this step has always prescribed, verbatim: SHA-256 over principal_id | presentation_request_id | captured_at, so the three reference compilers re-derive byte-identical ids from the runtime-supplied __captured_at__. The F-CP-07 access-evidence envelope (schemas/evidence/access.schema.json) carries runtime-only fields — execution_id, compile_target — so wrapping this record into that envelope, and persisting it, is the evidence-sink adapter's at the compile-target seam; the primitive composes the OCSF record the envelope carries. The binding assigns the record to __identity_evidence_record__; the adapter extracts __evidence_id__.
 
     CACAO step_id: action--e1d5a520-0000-4000-8000-000000000005
     """
     with _TRACER.start_as_current_span(
         name='activity.action--e1d5a520-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e1d5a520-0000-4000-8000-000000000005', 'secops_ng.step.name': 'emit_identity_audit_evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_identity_audit_evidence'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e1d5a520-0000-4000-8000-000000000005', 'secops_ng.step.name': 'emit_identity_audit_evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_identity_audit_evidence'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--e1d5a520-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e1d5a520-0000-4000-8000-000000000005', 'secops_ng.step.name': 'emit_identity_audit_evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_identity_audit_evidence'})
+            AuditRecord(span_name='activity.action--e1d5a520-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e1d5a520-0000-4000-8000-000000000005', 'secops_ng.step.name': 'emit_identity_audit_evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_identity_audit_evidence'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--e1d5a520-0000-4000-8000-000000000005'"
-        )
+        from content.playbooks.eidas2_identity_verification.primitives.evidence import compose_identity_evidence_record
+        __identity_evidence_record__ = compose_identity_evidence_record(principal_id=__principal_id__, auth_scope=__auth_scope__, presentation_request_id=__presentation_request_id__, pid_credential_id=__pid_credential_id__, loa_verdict=__loa_verdict__, access_tier=__access_tier__, verification_verdict=__verification_verdict__, captured_at=__captured_at__)
 
 EMIT_IDENTITY_AUDIT_EVIDENCE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -116,21 +112,20 @@ EMIT_IDENTITY_AUDIT_EVIDENCE_RETRY_POLICY = RetryPolicy(
 )
 
 @activity.defn
-async def trigger_access_provisioning(principal_id: str, auth_scope: str, access_tier: str, verification_verdict: bool, evidence_id: str) -> None:
-    """SKELETON — hand the verified identity off to the downstream access-provisioning workflow (playbook.onboarding_offboarding_tracker@v1) so the joiner-side capability delta is applied against __auth_scope__ at __access_tier__. On the verification-failure branch this step short-circuits into the end node without triggering provisioning; the emitted __evidence_id__ still carries the negative record so the audit trail is complete. TODO (CORE): hand-off adapter binding into the onboarding_offboarding_tracker spine, correlation-key carry so the joiner-record joins on __principal_id__.
+async def trigger_access_provisioning(principal_id: str, auth_scope: str, access_tier: str, verification_verdict: bool, evidence_id: str) -> dict[str, object]:
+    """Hand the verified identity off to the downstream access-provisioning workflow (playbook.onboarding_offboarding_tracker@v1) so the joiner-side capability delta is applied against __auth_scope__ at __access_tier__: provisioning.compose_provisioning_handoff composes the envelope correlated on __principal_id__, so the joiner record joins on the same lifecycle key the evidence record pinned. Both refusal branches are reasoned no-ops rather than silent ones — a false verification verdict, or an empty access tier from the below-minimum assurance refusal, yields provisioning_triggered false with the reason named, and each still references the emitted __evidence_id__ so the negative trail is joinable. A false verdict arriving with a non-empty tier is mislabelled state from the wire and fails loud, protecting the provisioning spine from tiering an unverified principal. Dispatching the envelope into the tracker spine is the compile target's adapter. The binding assigns the record to __provisioning_handoff__.
 
     CACAO step_id: action--e1d5a520-0000-4000-8000-000000000006
     """
     with _TRACER.start_as_current_span(
         name='activity.action--e1d5a520-0000-4000-8000-000000000006',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e1d5a520-0000-4000-8000-000000000006', 'secops_ng.step.name': 'trigger_access_provisioning', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'trigger_access_provisioning'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e1d5a520-0000-4000-8000-000000000006', 'secops_ng.step.name': 'trigger_access_provisioning', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'trigger_access_provisioning'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--e1d5a520-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e1d5a520-0000-4000-8000-000000000006', 'secops_ng.step.name': 'trigger_access_provisioning', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'trigger_access_provisioning'})
+            AuditRecord(span_name='activity.action--e1d5a520-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e1d5a520-0000-4000-8000-000000000006', 'secops_ng.step.name': 'trigger_access_provisioning', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'trigger_access_provisioning'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--e1d5a520-0000-4000-8000-000000000006'"
-        )
+        from content.playbooks.eidas2_identity_verification.primitives.provisioning import compose_provisioning_handoff
+        __provisioning_handoff__ = compose_provisioning_handoff(principal_id=__principal_id__, auth_scope=__auth_scope__, access_tier=__access_tier__, verification_verdict=__verification_verdict__, evidence_id=__evidence_id__)
 
 TRIGGER_ACCESS_PROVISIONING_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -145,8 +140,8 @@ class PlaybookEidas2IdentityVerificationV1Workflow:
 
     CACAO playbook id : playbook--e1d5a520-0000-4000-8000-000000000001
     stable_id         : playbook.eidas2_identity_verification@v1
-    content_version   : 0.1.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--e1d5a520-0000-4000-8000-000000000001
     activities        : request_eudiw_presentation, verify_pid_credential, assess_assurance_level, emit_identity_audit_evidence, trigger_access_provisioning
     """
@@ -155,10 +150,10 @@ class PlaybookEidas2IdentityVerificationV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.eidas2_identity_verification@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.eidas2_identity_verification@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0'})
+                AuditRecord(span_name='workflow.playbook.eidas2_identity_verification@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e1d5a520-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.eidas2_identity_verification@v1'"

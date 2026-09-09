@@ -8,13 +8,23 @@ lifecycle (request-EUDIW-presentation → verify-PID-credential →
 assess-assurance-level → emit-identity-audit-evidence →
 trigger-access-provisioning).
 
-Binding the placeholder Set-node steps to real connectors — the
-OpenID4VP presentation-request adapter, the trust-anchor-registry
-probe against the Member-State Trusted List / LOTL aggregator, the
-LoA-to-access-tier mapping table, the OCSF Account Change evidence
-sink, and the downstream `onboarding_offboarding_tracker` hand-off —
-is the operator's job. The framework ships no default endpoint and
-no non-EU trust-anchor SDK.
+All five action steps emit `n8n-nodes-base.code` nodes whose
+`pythonCode` is the exact primitive call from
+`content/playbooks/eidas2_identity_verification/primitives/`, so the
+deterministic half — the presentation request, the verification
+verdict, the assurance assessment, the evidence record and the
+hand-off envelope — is computed in the workflow itself. The bodies
+assume `PYTHONPATH` on the n8n host resolves that package; operators
+who run n8n in a Python-free container drop a single Python-runner
+Code node ahead of the chain.
+
+Wiring the surrounding connectors is the operator's job: the
+OpenID4VP presentation-request transport, the trust-anchor-registry
+probe against the Member-State Trusted List / LOTL aggregator (whose
+typed report the verification primitive consumes), the documented
+LoA-to-access-tier table, the OCSF Account Change evidence sink, and
+the downstream `onboarding_offboarding_tracker` hand-off. The
+framework ships no default endpoint and no non-EU trust-anchor SDK.
 
 ## Source
 

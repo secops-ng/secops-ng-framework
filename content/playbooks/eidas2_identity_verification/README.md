@@ -1,6 +1,6 @@
 # eidas2_identity_verification
 
-CACAO v2 SKELETON playbook for the eIDAS 2.0 European Digital Identity
+CACAO v2 playbook for the eIDAS 2.0 European Digital Identity
 Wallet (EUDIW) identity-verification lifecycle a regulated operator
 runs when onboarding a new EUDIW-enabled principal to a protected
 access surface: request an EUDIW presentation → cryptographically
@@ -16,14 +16,36 @@ management and DORA Art. 5 digital-identity governance.
 
 ## Status
 
-SKELETON. The playbook artifact and the outbound overlay
+Stable — `content_version` 1.0.0 under the Maturity ladder. All five
+action steps carry `x_secops_ng.core_body` bindings into the
+deterministic primitives under `primitives/`
+(`presentation.compose_presentation_request`,
+`verification.record_pid_verification`,
+`assurance.assess_assurance_level`,
+`evidence.compose_identity_evidence_record`,
+`provisioning.compose_provisioning_handoff`), each executed directly
+by the unit suite under
+`tests/playbooks/eidas2_identity_verification/`. The outbound overlay
 (OSCAL AC-2 + IA-8, D3FEND D3-OAM, OCSF Account Change 3001, NIS2
-Art. 21(2)(i), DORA Art. 5) land here. CORE-layer cards add the
-per-target compiler emissions (n8n / Temporal / LangGraph goldens)
-and the primitive bodies (presentation-request adapter, trust-anchor
-probe, LoA-to-tier mapping); an EXTEND card wires the OCSF Compliance
-Finding (2003) emission for the verification-failure branch and the
-LoA-tier-drift KRI.
+Art. 21(2)(i), DORA Art. 5) and the three worked examples under
+`examples/{n8n,temporal,langgraph}/eidas2_identity_verification/` ship
+alongside, regenerated from the bound source: n8n emits five Code
+nodes, and the Temporal activities and LangGraph tools import their
+primitives, with `NotImplementedError` marking only the
+operator-integration seams (the OpenID4VP verifier transport, the
+trust-anchor probe and status-list read, the evidence sink, the
+provisioning dispatch).
+
+Two sovereignty properties are enforced rather than described: the
+verification record retains the outcome and its provenance and
+**actively refuses** a report carrying attested attributes, and there
+is no partial-trust state — every check must hold and the revocation
+status must be active, with suspended and unknown failing closed.
+
+Still owed, and recorded as such: the OCSF Compliance Finding (2003)
+emission for the verification-failure branch and the LoA-tier-drift
+KRI remain a metrics-layer card; the steps carry no `metric_refs`
+until it lands.
 
 ## Regulatory anchors
 
@@ -56,12 +78,24 @@ Temporal, LangGraph on Nebul / OVHcloud / Scaleway / Hetzner).
   (`playbook.eidas2_identity_verification@v1`).
 - `mappings.yaml` — outbound overlay (OSCAL controls, D3FEND
   technique, OCSF telemetry class, NIS2 + DORA cross-references).
+- `primitives/` — the five deterministic primitives the action steps
+  bind: pure, offline, LLM-free. The presentation request names
+  credential types only; the verification record keeps outcome plus
+  provenance and no attested attribute; the assurance assessment
+  refuses below-minimum rather than downgrading; the evidence record
+  is emitted on every terminal path with the prescribed id
+  derivation; the provisioning hand-off is a reasoned no-op on both
+  refusal branches.
+- `cookbook.md` — the practitioner walkthrough (mirrored at
+  [`docs/cookbook/eidas2_identity_verification.md`](../../../docs/cookbook/eidas2_identity_verification.md)).
 
 ## Compile targets
 
-`compile_targets` declares `["n8n", "temporal", "langgraph"]`.
-Emitted artifacts and golden tests are owned by CORE-layer sibling
-cards; this directory ships the portable content only.
+`compile_targets` declares `["n8n", "temporal", "langgraph"]`. The
+emitted artifacts live under
+`examples/{n8n,temporal,langgraph}/eidas2_identity_verification/`
+with byte-parity goldens under `tests/examples/`, regenerated from
+the bound canonical source via each directory's `regenerate.sh`.
 
 ## Companion pattern
 
