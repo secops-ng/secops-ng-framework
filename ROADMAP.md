@@ -1895,7 +1895,7 @@ one playbook's provenance.
 
 ### F-WF-CRYPTO-CONTROLS — Cryptographic-controls lifecycle
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P2
 - **Rationale:** The controls half of the Art. 21(2)(h) surface: the
   operator-side lifecycle run against a documented cryptography policy,
@@ -1907,7 +1907,7 @@ one playbook's provenance.
     cookbook walkthrough (shipped).
   - Deterministic primitives under
     `content/playbooks/cryptographic_controls/primitives/` bound to the 6
-    action steps, replay-safe and offline (CORE — **outstanding**).
+    action steps, replay-safe and offline (CORE — shipped).
   - The policy is input, not content: the playbook scores against the
     operator's documented policy and ships no default cipher baseline.
   - A control with no documented policy clause behind it is reported as
@@ -1930,6 +1930,23 @@ one playbook's provenance.
     satisfied / violated / undocumented ladder with 'compliant'
     reserved for documented-and-satisfied; CORE-WIRE binds them and
     regenerates the examples)
+  - CORE-WIRE + GRADUATE — #997 closing #984 (all six bindings on the
+    canonical source — each multi-field primitive output bound to a
+    single dictionary envelope with the documented out_args extracted
+    at the compile target's adapter seam; one `switch-condition` on
+    `__lifecycle_event__` added after policy resolution, routing the
+    three key events, the three certificate events and the
+    enforcement gate to the branch whose primitive accepts them and
+    converging on the attestation — the branch selection the step
+    text had deferred to a sibling card, landed here because the
+    bound primitives fail loud on a mismatched event and make the
+    linear scaffold unexecutable; descriptions and the event variable
+    rewritten to record it, and the cookbook's `__attestation_id__`
+    corrected to the real `__lifecycle_attestation_id__`. Then
+    `experimental` → `stable`, `content_version` 1.0.0, all three
+    worked examples regenerated — 6/6 bound, n8n six Code nodes plus
+    the Switch, Temporal and LangGraph importing all six primitives
+    with `NotImplementedError` only at the operator seams).
 
 ### F-WF-DSR — GDPR Chapter III data-subject-rights lifecycle
 
