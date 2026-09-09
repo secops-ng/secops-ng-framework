@@ -68,19 +68,21 @@ workflow layer. Six GraphSpec action nodes, one per CACAO action step:
 6. `notify crypto owner` — surface the attestation to the cryptography
    owner via the operator's notification channel.
 
-Because the playbook is linear, the emitted GraphSpec has no
-`conditional_edges`; every edge is an unconditional `on_completion`
-hand-off. The conditional-edge router pattern documented in
-`assemble.py` is still imported and exercised for parity with the
-other LangGraph worked examples — it is a no-op for this playbook but
-makes the assembly file copy-paste-ready for playbooks that do branch.
+The playbook branches once: a `switch-condition` on
+`__lifecycle_event__` routes the run into the key-lifecycle,
+certificate-lifecycle or enforcement-gate branch, and all three
+converge on the attestation step. The conditional-edge router pattern
+documented in `assemble.py` is what carries that routing; every other
+edge is an unconditional `on_completion` hand-off.
 
 ## What this example deliberately doesn't do
 
-- It does not execute the graph. The `@tool` bodies raise
-  `NotImplementedError`; integrators wire them to their own runtime
-  (KMS backend, CA backend, storage-encryption backend, TLS-endpoint
-  backend, evidence store, notification channel).
+- It does not execute the graph. The `@tool` bodies call the
+  deterministic primitives; the operator-integration seams raise
+  `NotImplementedError` until integrators wire them to their own
+  runtime (policy store, KMS backend, CA backend, storage-encryption
+  backend, TLS-endpoint backend, evidence store, notification
+  channel).
 - It does not ship operator credentials, endpoints, or environment.
   Secrets stay with the operator.
 - It does not pick an LLM provider for the agentic-extension hook.
