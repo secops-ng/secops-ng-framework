@@ -2090,7 +2090,7 @@ one playbook's provenance.
 
 ### F-WF-EIDAS2-IDV — EU Digital Identity Wallet verification lifecycle
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P2
 - **Rationale:** The operator-side lifecycle for onboarding an EUDIW-enabled
   principal: consume a wallet attestation, verify it, and bind the verified
@@ -2103,7 +2103,7 @@ one playbook's provenance.
     cookbook walkthrough (shipped).
   - Deterministic primitives under
     `content/playbooks/eidas2_identity_verification/primitives/` bound to
-    the 5 action steps, replay-safe and offline (CORE — **outstanding**).
+    the 5 action steps, replay-safe and offline (CORE — shipped).
   - Verification consumes the attestation and retains the outcome plus its
     provenance — not the attested attributes themselves.
   - A failed or expired attestation produces an explicit refusal outcome;
@@ -2125,6 +2125,23 @@ one playbook's provenance.
     principal|request|captured_at id derivation, reasoned
     provisioning hand-off / no-op — each executed directly by unit
     coverage; CORE-WIRE binds them and regenerates the examples)
+  - CORE-WIRE + GRADUATE — #998 closing #986 (all five bindings on the
+    canonical source — each multi-field primitive output bound to a
+    single dictionary envelope with the documented out_args extracted
+    at the compile target's adapter seam, the returned LoA entering as
+    an external input so the primitive decides the tier; the
+    prescribed evidence-id seed fed the runtime-supplied captured_at
+    unchanged and pinned by test; no gating on the verification
+    verdict, so the assurance short-circuit and the provisioning
+    no-ops keep the audit trail complete on every terminal path; the
+    F-CP-07 envelope wrap recorded as the evidence-sink adapter's
+    seam. Then `experimental` → `stable`, `content_version` 1.0.0,
+    all three worked examples regenerated — 5/5 bound, n8n five Code
+    nodes, Temporal and LangGraph importing all five primitives with
+    `NotImplementedError` only at the operator seams; both cookbook
+    copies, the README, the three example READMEs and the mappings
+    header de-staled, including per-step compile-target claims
+    describing nodes the emitter never produced).
 
 ### F-WF-EUAIACT-RISKMGMT — EU AI Act Art. 9 risk-management system
 
