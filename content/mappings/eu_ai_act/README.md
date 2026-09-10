@@ -46,6 +46,14 @@ Art. 13 transparency, and Art. 72 post-market-monitoring surfaces the
 - `article-11-technical-documentation.yaml` — Art. 11 + Annex IV
   technical documentation obligations (bundle authoring and
   maintenance).
+- `article-12-record-keeping.yaml` — Art. 12(1)-(3) record-keeping and
+  automatic logging: the lifetime event-recording capability, the
+  traceability-appropriate-to-purpose standard that feeds Art. 72 and
+  Art. 26(5), and the Art. 12(3)(a)-(d) minimum log content for
+  Annex III(1)(a) remote-biometric systems. Binds the shipped
+  `incidents` and `access` evidence streams as the carriers; the
+  deployer-side retention half is `article-26-deployer-obligations.yaml`
+  (Art. 26(6)).
 - `article-13-transparency.yaml` — Art. 13 transparency obligations
   (instructions for use, information duties toward deployers).
 - `article-72-post-market-monitoring.yaml` — Art. 72 post-market

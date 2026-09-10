@@ -304,8 +304,11 @@ and never ships:
   are specific to Annex III(1)(a) deployments.
 - **Art. 25(1) provider flip** — see § 1.
 - **Art. 12** — the record-keeping and automatic-logging content the
-  Art. 26(6) retention duty presupposes. Tracked as a separate mapping
-  card; on its merge the retention step gains the anchor.
+  Art. 26(6) retention duty presupposes. Now mapped at
+  [`content/mappings/eu_ai_act/article-12-record-keeping.yaml`](../../content/mappings/eu_ai_act/article-12-record-keeping.yaml):
+  Art. 12 binds the *provider* to produce the logs, Art. 26(6) binds
+  the *deployer* to keep them, and the two entries cross-reference
+  each other. This cookbook still covers only the deployer half.
 
 ## 11. References
 
