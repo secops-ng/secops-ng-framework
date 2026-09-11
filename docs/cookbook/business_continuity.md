@@ -104,14 +104,17 @@ the significance branch inside `notify-competent-authority` never
 creates a parallel evidence lane — one event, one PIR, one
 notification decision recorded.
 
-> The playbook status is SKELETON on the workflow-local README (this
-> EXTEND card lands with the cookbook walkthrough). All three
+> The playbook maturity is `stable` (`content_version` 1.0.0) on the
+> workflow-local content marker: all seven action steps are bound to
+> deterministic primitives under `primitives/`, and the three
 > reference emitters ship committed artifacts under
-> `examples/{n8n,temporal,langgraph}/business_continuity/` with
-> deterministic stubs for the operator-bound seams; a sibling CORE
-> revisit lands the full adapter bindings (BCM-plan store,
-> significance-threshold evaluator, per-Member-State competent-
-> authority delivery surface, Art. 23 envelope templates).
+> `examples/{n8n,temporal,langgraph}/business_continuity/`
+> regenerated from the bound source. The BCM-plan store, the
+> significance-threshold policy, the isolation and failover
+> surfaces, the per-Member-State competent-authority delivery
+> surface and the evidence store are the adapter-bound seams the
+> operator wires; the significance evaluation and the Art. 23
+> record composition are bound, deterministic, and replayable.
 
 ## 3. Lifecycle contract — the seven states
 
@@ -161,7 +164,7 @@ opaque operator-assigned identifiers.
     for the event class — a pure availability outage with no
     compromise indicator, for example. Anchored on OSCAL CP-2 as the
     plan-directed containment leg; deliberately not pinned to a
-    D3FEND isolation technique at SKELETON — the containment surface
+    D3FEND isolation technique — the containment surface
     the plan directs into is operator-defined and the sibling
     `ransomware_containment` overlay already pins the compromise-
     indicator isolation lane.
@@ -325,7 +328,7 @@ documents each omission.
 **MITRE D3FEND v1.0.0** — `D3-SRA` (System Recovery Analysis) at
 `restore-and-verify`. The declaration, activation, isolation,
 failover, notify, and PIR steps are deliberately not pinned to a
-D3FEND technique at SKELETON tier because D3FEND v1.0.0 frames its
+D3FEND technique because D3FEND v1.0.0 frames its
 defensive techniques around runtime countermeasures against adversary
 behaviours; coordination-surface reads, plan-activation flows,
 notification cascades, and PIR emission are anchored on the OSCAL
@@ -334,12 +337,13 @@ document each deliberate absence, mirroring the `backup_recovery`,
 `crypto_posture_management`, `infra_posture_management`,
 `iam_auditor`, and `on_call_rotation` precedents.
 
-**OCSF v1.3.0** — two event classes across the seven action steps.
-`HTTP Activity` (class_uid 4004, category 4 Network Activity),
-direction `emits`, at `detect-and-declare-bcm-event`,
+**OCSF** — two event classes across the seven action steps.
+`API Activity` (class_uid 6003, category 6 Application Activity, OCSF
+v1.4.0), direction `emits`, at `detect-and-declare-bcm-event`,
 `activate-bcm-plan`, `isolate-affected-systems`, `switch-to-backup`,
-and `restore-and-verify`: one availability-activity record per
-milestone keyed to `__event_id__` so the operator's availability-
+and `restore-and-verify`: one milestone record per step keyed to
+`__event_id__` (composed by
+`primitives.milestones.compose_milestone_record`) so the operator's availability-
 management surface and the observed RTO / RPO delta against the
 documented objectives can be computed and audited from the emitted
 telemetry alone. `Incident Finding` (class_uid 2005, category 2
@@ -347,55 +351,72 @@ Findings), direction `emits`, at `notify-competent-authority` and
 `post-incident-review`: one incident-finding record per notification
 and per PIR milestone keyed to `__event_id__`, with the
 on-time-vs-deadline delta feeding the operator's Art. 23 timeliness
-posture. The class_uid 4004 binding is intentional at SKELETON tier
-— HTTP Activity is the OCSF v1.3.0 network-activity class the
-reference wiring emits; a sibling CORE card revisits the class
-selection if a more specific availability class lands in a future
-OCSF release.
+posture. The operational milestones bind OCSF API Activity
+(class_uid 6003) — the house binding for workflow-emitted
+milestones, corrected from an invented availability class by #877;
+`primitives.milestones.compose_milestone_record` composes those
+records and `compose_incident_finding_record` the two Incident
+Finding records, each keyed to `__event_id__`, at the telemetry seam.
 
 ## 5. Per-target hand-off
 
-### 5.1 n8n — operator-edited Set rows over the lifecycle topology
+### 5.1 n8n — Code nodes over the lifecycle topology
 
 `examples/n8n/business_continuity/workflow.n8n.json` carries the
-CACAO topology as nine n8n nodes (one `manualTrigger`, seven `set`
+CACAO topology as nine n8n nodes (one `manualTrigger`, seven `code`
 nodes, one `noOp`), with node ids preserving the CACAO step ids
-verbatim. The seven action steps emit `n8n-nodes-base.set` nodes
-carrying the CACAO I/O contract as editable assignment rows plus the
-`x_secops_ng` reference bundles. The Art. 23 significance branch lives
-inside the `notify-competent-authority` Set row rather than a
-`n8n-nodes-base.if` node — the row's assignments carry both the
-significance-true dispatch fields and the significance-false
-no-notification determination fields so the operator wires whichever
-branch their significance-threshold policy exercises against the
-`__significant_incident__` field. The lossy translation is recorded
-in `meta.secops_ng_notes` so the integrator sees exactly which seams
-need attention.
+verbatim. All seven action steps emit `n8n-nodes-base.code` nodes
+whose `pythonCode` is the exact primitive call (e.g.
+`from content.playbooks.business_continuity.primitives.activation
+import activate_bcm_plan ; __activation__ =
+activate_bcm_plan(event=__bcm_event__, plan_register=__plan_register__,
+significance_policy=__significance_policy__)`); no Set-node
+placeholders remain. The Art. 23 significance branch lives inside the
+`notify-competent-authority` primitive rather than a
+`n8n-nodes-base.if` node: `compose_authority_notification` composes
+either the notification (phase + assessment required) or the
+locally-logged no-notification determination (rationale required) and
+refuses the other branch's inputs, so the operator supplies whichever
+branch their significance-threshold policy exercises.
 
-Operators bind the Set rows to their connectors:
+Operators wire the external inputs and the adapter seams to their
+connectors:
 
 - `detect and declare bcm event` → the operator's event-declaration
   surface (webhook or upstream orchestrator escalation from the
-  incident-management or ransomware-containment lane); the Set row
-  records `__event_id__` and `__event_declared_ts__`.
-- `activate bcm plan` → the operator's BCM-plan store (documented
-  plan artifact + significance-threshold policy); the Set row records
-  `__bcm_plan_ref__` and `__significant_incident__`.
+  incident-management or ransomware-containment lane) supplying
+  `__raw_trigger__`; the adapter extracts `__event_id__` and
+  `__event_declared_ts__` from `__bcm_event__`.
+- `activate bcm plan` → the operator's BCM-plan store supplying
+  `__plan_register__` and the entity's `__significance_policy__`; the
+  adapter extracts `__bcm_plan_ref__` and `__significant_incident__`.
 - `isolate affected systems` → the operator's isolation surface
   (network-segmentation controller, IAM revocation surface, upstream
-  dependency circuit-breaker); the Set row records
-  `__isolation_scope__`.
+  dependency circuit-breaker) executing the resolved scope; the adapter
+  extracts `__isolation_scope__` (empty when skipped as data).
 - `switch to backup` → the operator's failover surface (backup site
-  routing, data-replica promotion, standby-capacity activation); the
-  Set row records `__failover_target__`.
+  routing, data-replica promotion, standby-capacity activation)
+  executing the cutover order; the adapter extracts
+  `__failover_target__` (null when not engaged).
 - `notify competent authority` → the operator's competent-authority
   delivery transport (per-Member-State portal, S/MIME email,
-  sector-specific API); the Set row records `__notification_ref__`.
+  sector-specific API) supplying `__notification_phase__` +
+  `__notification_assessment__`, or `__no_notification_rationale__`;
+  the adapter extracts `__notification_ref__`.
 - `restore and verify` → the operator's health-signal probe and
-  cutback discipline; the Set row records `__recovery_result__`.
-- `post incident review` → the operator's evidence store (retention
-  discipline documented in the operator's governance surface); the
-  Set row records `__pir_ref__`.
+  cutback discipline supplying `__recovery_observations__`; the
+  adapter extracts `__recovery_result__`.
+- `post incident review` → the operator's evidence store persisting
+  `__pir_record__`, with the review content supplied as
+  `__pir_lessons__`, `__pir_corrective_actions__`,
+  `__pir_plan_revisions__` and the assembled `__pir_linked_refs__`;
+  the adapter extracts `__pir_ref__`.
+
+The Code-node bodies assume `PYTHONPATH` on the n8n host resolves
+`content.playbooks.business_continuity.primitives`; operators who run
+n8n in a Python-free container drop a single Python-runner Code node
+ahead of the chain. The per-milestone OCSF records are composed at
+the telemetry seam by `primitives.milestones`.
 
 To regenerate the compiled workflow artifact from the repo root:
 
@@ -406,23 +427,25 @@ To regenerate the compiled workflow artifact from the repo root:
 To import into an n8n instance: open the workflows list, choose
 **Import from File**, and select
 `examples/n8n/business_continuity/workflow.n8n.json`. The workflow is
-inactive by default — review and bind the Set rows to your own
-connectors before activating. The emitted workflow is a *snapshot of
-intent*, not a runnable playbook.
+inactive by default — review and wire the external inputs and the
+adapter seams to your own connectors before activating. The emitted
+workflow is a *snapshot of intent*, not a runnable playbook.
 
-### 5.2 Temporal — `@activity.defn` bodies (SKELETON stub)
+### 5.2 Temporal — `@activity.defn` bodies calling the primitives
 
 `examples/temporal/business_continuity/workflow.temporal.py` is a
 standard Temporal worker module: one `@workflow.defn` class and one
-`@activity.defn` function per CACAO action, with the seven action
-activities documenting their operator-bound seam (event ingestion,
-plan retrieval, isolation execution, failover execution, notification
-dispatch, recovery verification, PIR persistence). The committed stub
-raises `NotImplementedError` in the activity bodies pending the
-CORE-TEMPORAL sibling card that wires the deterministic activity
-implementations into the Temporal target; operators can drop the
-module next to their worker today to see the topology and the activity
-signatures.
+`@activity.defn` function per CACAO action. All seven activities
+import their primitive and produce the event envelope, the activation,
+the isolation scope, the failover order, the Art. 23 record, the
+recovery record and the PIR record; the only remaining
+`NotImplementedError` marks the operator-integration seams (event
+ingestion, plan retrieval, isolation and failover execution,
+notification dispatch, health-signal observation, PIR persistence)
+after the span and audit record, so an integrator sees exactly which
+seam is theirs. Operators drop the module next to their worker,
+register the activities, and run the worker against their Temporal
+cluster.
 
 Temporal is the natural fit for the plan-lifecycle discipline: each
 declared event becomes one workflow run; the Art. 23 24h / 72h /
@@ -430,13 +453,14 @@ one-month cascade becomes three Temporal timers on the same workflow;
 retries against transient failures on the failover activity or the
 notification transport get first-class Temporal semantics (activity
 retry policy against the operator-bound surface); replay against the
-same Temporal event history re-derives the same PIR payload once the
-activity bodies are wired. The workflow code the compiler emits stays
+same Temporal event history re-derives the same PIR payload — the
+primitives are pure, so the property holds by construction. The
+workflow code the compiler emits stays
 pure — every non-deterministic boundary lives on the activity side of
 the `@activity.defn` line, so replay determinism survives the
 operator's own activity implementations.
 
-### 5.3 LangGraph — `@tool` wrappers + agentic-extension hook (SKELETON stub)
+### 5.3 LangGraph — `@tool` wrappers + agentic-extension hook
 
 `examples/langgraph/business_continuity/state_bindings.py` carries the
 `TypedDict` state and the `@tool`-decorated action wrappers.
@@ -445,11 +469,11 @@ edges through the seven action states, and the internal
 significance-branch inside `notify-competent-authority` recorded as a
 state field rather than a conditional edge); `assemble.py` is the
 hand-written reference assembly that wires the GraphSpec + bindings
-into a `langgraph.graph.StateGraph`. The committed `state_bindings.py`
-is a generated stub: each tool's docstring names the operator-bound
-seam it discharges and the body raises `NotImplementedError` until
-the CORE-LANGGRAPH sibling card wires the deterministic tool
-implementations into the LangGraph target.
+into a `langgraph.graph.StateGraph`. All seven tools import their
+primitive and update the typed state; each tool's docstring names the
+operator-bound seam it discharges, and the operator-integration seams
+stay marked with `NotImplementedError` after their span and audit
+record.
 
 LangGraph is the agentic target — an operator who wants to layer an
 LM-driven summariser on top of the Art. 23 preliminary-assessment
@@ -466,10 +490,10 @@ The compiler never embeds an LLM SDK.
 All three reference targets are present in the tree today
 (`examples/n8n/business_continuity/`,
 `examples/temporal/business_continuity/`,
-`examples/langgraph/business_continuity/`). The n8n target ships a
-committed workflow artifact; the Temporal and LangGraph targets ship
-deterministic emitter output with `NotImplementedError` activity /
-tool bodies pending the per-target CORE cards. The per-target
+`examples/langgraph/business_continuity/`). Each ships a committed
+emitter artifact with every action body bound to its primitive and
+the operator-integration seams marked with `NotImplementedError`.
+The per-target
 byte-parity goldens under `tests/examples/{n8n,temporal,langgraph}/business_continuity/`
 pin each per-target artifact against a fresh emitter run from the
 canonical CACAO source — the cross-target byte-parity property the
@@ -479,7 +503,7 @@ framework relies on.
 
 Every emitted action opens an OpenTelemetry span and appends an
 `AuditRecord` to a context-local `AuditTrail` *before* the operator-
-bound seam call or the (pending) primitive body. The mirror runs
+bound seam call or the primitive body. The mirror runs
 unconditionally, ahead of any OTLP exporter, so the audit property
 holds even when the operator has not configured a collector —
 typical for disconnected, sovereign, or air-gapped deployments.
@@ -621,9 +645,10 @@ declaration to PIR.
   framework does not prescribe it.
 - **Per-Member-State competent-authority delivery adapters.** The
   Art. 23 envelope shape and the 24h / 72h / one-month cascade timing
-  ship at SKELETON; per-Member-State delivery adapters (per-authority
-  portal, S/MIME email, sector-specific API) land on a sibling EXTEND
-  card once the per-authority delivery surfaces stabilise.
+  are composed by the bound notification primitive; per-Member-State
+  delivery adapters (per-authority portal, S/MIME email,
+  sector-specific API) are the operator's transport and stay outside
+  the framework.
 - **Cutback-misconfiguration detection.** Detection bindings for
   cutback misconfiguration (partial cutback, health-signal
   false-positive on the restored primary) are owned by a sibling
@@ -658,9 +683,9 @@ declaration to PIR.
 - [`examples/n8n/business_continuity/README.md`](../../examples/n8n/business_continuity/README.md)
   — n8n worked-example walkthrough and import instructions.
 - [`examples/temporal/business_continuity/README.md`](../../examples/temporal/business_continuity/README.md)
-  — Temporal worked-example stub.
+  — Temporal worked example.
 - [`examples/langgraph/business_continuity/README.md`](../../examples/langgraph/business_continuity/README.md)
-  — LangGraph worked-example stub.
+  — LangGraph worked example.
 - [`docs/observability/audit-mirror.md`](../observability/audit-mirror.md)
   — `AuditTrail` / `AuditRecord` envelope and offline replay shape.
 - [`docs/sovereignty/eu-resident-lm-guard.md`](../sovereignty/eu-resident-lm-guard.md)

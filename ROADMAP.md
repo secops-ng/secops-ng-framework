@@ -1803,7 +1803,7 @@ one playbook's provenance.
 
 ### F-WF-BCM — Business-continuity event lifecycle
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P2
 - **Rationale:** The operator-side continuity lifecycle a NIS2 essential or
   important entity runs on a major outage, ransomware containment or
@@ -1815,7 +1815,7 @@ one playbook's provenance.
     cookbook walkthrough (shipped).
   - Deterministic primitives under
     `content/playbooks/business_continuity/primitives/` bound to the 7
-    action steps, replay-safe and offline (CORE — **outstanding**).
+    action steps, replay-safe and offline (CORE — shipped).
   - Each lifecycle milestone emits an `api_activity` record keyed to the
     event id — the house binding for workflow-emitted milestones, corrected
     from an invented availability class by #877.
@@ -1840,6 +1840,21 @@ one playbook's provenance.
     and the API Activity / Incident Finding milestone records keyed to
     the event id — each executed directly by unit coverage; CORE-WIRE
     binds them and regenerates the examples)
+  - CORE-WIRE + GRADUATE — #995 closing #982 (all seven bindings on the
+    canonical YAML source — each multi-field primitive output bound to
+    a single dictionary envelope with the documented out_args
+    extracted at the compile target's adapter seam; the milestone
+    composers kept as the telemetry-seam contract the mappings'
+    `direction: emits` notes declare; the no-plan branch untouched,
+    its skip / non-engagement / two-disposition semantics living in
+    the primitive outputs; the seven SKELETON/TODO(CORE) descriptions
+    rewritten to record the wiring and the stale 4004 class reference
+    corrected to API Activity 6003. Then `experimental` → `stable`,
+    `content_version` 1.0.0, all three worked examples regenerated —
+    7/7 bound, n8n seven Code nodes, Temporal and LangGraph importing
+    all seven primitives with `NotImplementedError` only at the
+    operator seams; README, cookbook and example READMEs de-staled in
+    the same change).
 
 ### F-WF-CRYPTO-POSTURE — Cryptography and encryption posture management
 

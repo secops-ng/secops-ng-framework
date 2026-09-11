@@ -31,10 +31,13 @@ The canonical input is the CACAO v2 playbook at
 `../../../content/playbooks/business_continuity/playbook.cacao.yaml`.
 The emitter splits into two artifacts: a declarative `GraphSpec` JSON
 (nodes, edges, conditional-edge routers) and a generated Python module
-carrying the state schema and per-step tool stubs. `assemble.py` wires
-the two into a `langgraph.graph.StateGraph`; integrators copy this
-file into their runtime and replace each `NotImplementedError` stub in
-`state_bindings.py` with their own tool implementations.
+carrying the state schema and per-step tools, each calling its
+deterministic primitive from
+`content/playbooks/business_continuity/primitives/`. `assemble.py`
+wires the two into a `langgraph.graph.StateGraph`; integrators copy
+this file into their runtime and wire the `NotImplementedError`
+operator-integration seams in `state_bindings.py` to their own
+surfaces.
 
 ## How to regenerate
 

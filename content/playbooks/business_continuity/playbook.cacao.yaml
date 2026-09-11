@@ -3,35 +3,33 @@ spec_version: "2.0"
 id: playbook--b17c0072-0000-4000-8000-000000000001
 name: Business Continuity — NIS2 Art.21(2)(c)
 description: >-
-  SKELETON — CACAO v2 scaffold for the operator-side business
-  continuity lifecycle a NIS2 essential or important entity runs
-  when a business-continuity event (major outage, ransomware
-  containment escalation, dependency failure, or facility loss)
-  is declared against an in-scope service. Covers the three
-  discipline surfaces NIS2 Art. 21(2)(c) names — backup
-  management, disaster recovery, and crisis management — as a
-  single continuity envelope. The lifecycle chains seven steps:
-  detect-and-declare-bcm-event → activate-bcm-plan (retrieve and
-  activate the documented BCM plan artifact) →
-  isolate-affected-systems (contain the failure surface where
-  applicable) → switch-to-backup (failover to the documented
-  backup site, data replica, or standby capacity) →
-  notify-competent-authority (NIS2 Art. 23 significant-incident
-  reporting path where the event crosses the significant-
-  incident threshold) → restore-and-verify (return the primary
-  service to a known-good state and validate) →
-  post-incident-review (lessons-learned record for the
-  operator's Art. 5(2)-equivalent accountability posture and any
-  regulator query). This SKELETON scaffolds the plan-lifecycle
-  side of the continuity surface; the periodic non-destructive
-  restore-drill discipline that continuously exercises the
-  backup-and-recovery apparatus lives on the sibling
-  backup_recovery playbook (both pin nis2:art-21-2-c and
-  co-anchor the clause, plan-lifecycle vs exercise-lifecycle).
-  A sibling CORE card lands the full workflow logic (adapter
-  bindings for the BCM-plan store, isolation surface, failover
-  surface, and NCA notification path); a sibling EXTEND card
-  lands the cookbook walkthrough and advanced features.
+  CACAO v2 playbook for the operator-side business continuity
+  lifecycle a NIS2 essential or important entity runs when a business-
+  continuity event (major outage, ransomware containment escalation,
+  dependency failure, or facility loss) is declared against an in-
+  scope service. Covers the three discipline surfaces NIS2 Art.
+  21(2)(c) names — backup management, disaster recovery, and crisis
+  management — as a single continuity envelope. The lifecycle chains
+  seven bound action steps: detect-and-declare-bcm-event → activate-
+  bcm-plan → isolate-affected-systems → switch-to-backup → notify-
+  competent-authority (the NIS2 Art. 23 path where the event crosses
+  the significant-incident threshold; a locally-logged no-notification
+  determination otherwise) → restore-and-verify → post-incident-
+  review. Every action step binds a deterministic primitive under
+  primitives/ (bound since the CORE-WIRE card; stable at
+  content_version 1.0.0): the declaration anchors the Art. 23 clock on
+  the supplied instant, a continuity event with no plan on file is
+  reported as such rather than blocking (skips and non-engagement are
+  data), recovery is verified against observed RTO / RPO rather than
+  asserted, and each lifecycle milestone's OCSF record (API Activity
+  6003; Incident Finding 2005 at notification and review) is composed
+  by the milestone composers at the telemetry seam, keyed to the event
+  id. The plan register, the isolation and failover surfaces, the
+  competent-authority delivery path and the evidence store are
+  adapter-bound operator surfaces. The periodic non-destructive
+  restore-drill discipline lives on the sibling backup_recovery
+  playbook (both pin nis2:art-21-2-c — plan-lifecycle vs exercise-
+  lifecycle). CACAO v2 + SecOps-NG content-model extensions.
 playbook_types:
   - notification
   - investigation
@@ -66,81 +64,249 @@ playbook_variables:
   __event_id__:
     type: string
     description: >-
-      Business-continuity event identifier assigned at
-      declaration. Correlation key across activate, isolate,
-      switch-to-backup, notify, restore-and-verify, and
-      post-incident-review so a reviewer can join the full
-      continuity lifecycle into a single reportable-event
-      ledger keyed to the operator's accountability surface.
+      Business-continuity event identifier assigned at declaration.
+      Correlation key across activate, isolate, switch-to-backup,
+      notify, restore-and-verify, and post-incident-review so a
+      reviewer can join the full continuity lifecycle into a single
+      reportable-event ledger keyed to the operator's accountability
+      surface. Extracted at the compile target's adapter seam from
+      __bcm_event__.event_id.
     external: false
   __event_declared_ts__:
     type: string
     description: >-
-      ISO 8601 timestamp of the business-continuity event
-      declaration. Anchors the NIS2 Art. 23 24h early-warning
-      / 72h incident-notification / 1-month final-report clock
-      when the significant-incident threshold is crossed.
+      ISO 8601 timestamp of the business-continuity event declaration.
+      Anchors the NIS2 Art. 23 24h early-warning / 72h incident-
+      notification / 1-month final-report clock when the significant-
+      incident threshold is crossed. Supplied on the raw trigger by
+      the declaring surface and extracted at the adapter seam from
+      __bcm_event__.event_declared_ts.
     external: false
   __bcm_plan_ref__:
     type: string
     description: >-
-      Reference to the activated BCM plan artifact resolved
-      from the operator's BCM-plan store. Enumerates the
-      documented isolation targets, failover targets, and
-      recovery objectives (RTO / RPO) the workflow reads at
-      switch-to-backup and restore-and-verify.
+      Reference to the activated BCM plan artifact resolved from the
+      operator's BCM-plan store. Enumerates the documented isolation
+      targets, failover targets, and recovery objectives (RTO / RPO)
+      the workflow reads at switch-to-backup and restore-and-verify.
+      Extracted at the adapter seam from __activation__.plan_ref; null
+      when no plan is on file (reported, not blocking).
     external: false
   __isolation_scope__:
     type: string
     description: >-
-      Reference to the isolation scope resolved by
-      isolate-affected-systems against __bcm_plan_ref__ (the
-      affected primary systems, network segments, or upstream
-      dependencies contained to prevent cascade). Empty when
-      the event does not require isolation.
+      Reference to the isolation scope resolved by isolate-affected-
+      systems against __bcm_plan_ref__ (the affected primary systems,
+      network segments, or upstream dependencies contained to prevent
+      cascade). Empty when the event does not require isolation.
+      Extracted at the adapter seam from
+      __isolation_result__.scope_id; empty when the plan documents no
+      isolation step (skipped as data).
     external: false
   __failover_target__:
     type: string
     description: >-
-      Reference to the failover target resolved by
-      switch-to-backup against __bcm_plan_ref__ (the documented
-      backup site, data replica, or standby capacity the
-      service is switched to). Feeds restore-and-verify for the
-      cutback validation.
+      Reference to the failover target resolved by switch-to-backup
+      against __bcm_plan_ref__ (the documented backup site, data
+      replica, or standby capacity the service is switched to). Feeds
+      restore-and-verify for the cutback validation. Extracted at the
+      adapter seam from __failover_order__.failover_target; null when
+      failover is not engaged (the order carries not_engaged_reason).
     external: false
   __significant_incident__:
     type: boolean
     description: >-
-      Whether the event crosses the NIS2 Art. 23 significant-
-      incident threshold. When true, notify-competent-authority
-      dispatches the Art. 23 24h early warning; when false, the
-      notify step short-circuits to a locally-logged
-      no-notification record. Set at activate-bcm-plan against
-      the operator's declared significance-threshold policy.
+      Whether the event crosses the NIS2 Art. 23 significant- incident
+      threshold. When true, notify-competent-authority dispatches the
+      Art. 23 24h early warning; when false, the notify step short-
+      circuits to a locally-logged no-notification record. Set at
+      activate-bcm-plan against the operator's declared significance-
+      threshold policy. Extracted at the adapter seam from
+      __activation__.significant_incident.
     external: false
   __notification_ref__:
     type: string
     description: >-
-      Reference to the NIS2 Art. 23 notification artifact emitted
-      by notify-competent-authority when the event crosses the
-      significant-incident threshold. Empty otherwise.
+      Reference to the NIS2 Art. 23 notification artifact emitted by
+      notify-competent-authority when the event crosses the
+      significant-incident threshold. Empty otherwise. Extracted at
+      the adapter seam from __authority_record__.notification_ref;
+      empty on the no-notification-determination branch.
     external: false
   __recovery_result__:
     type: string
     description: >-
-      Reference to the recovery-and-verification result produced
-      by restore-and-verify — the observed RTO / RPO against
-      the documented objectives, the primary-service health
-      signal, and the cutback outcome. Feeds
-      post-incident-review.
+      Reference to the recovery-and-verification result produced by
+      restore-and-verify — the observed RTO / RPO against the
+      documented objectives, the primary-service health signal, and
+      the cutback outcome. Feeds post-incident-review. Extracted at
+      the adapter seam from __recovery_record__.recovery_ref.
     external: false
   __pir_ref__:
     type: string
     description: >-
-      Reference to the post-incident-review record persisted at
-      post-incident-review. The audit-evident record of lessons
-      learned, corrective actions, and BCM-plan revisions the
-      operator's accountability posture reads.
+      Reference to the post-incident-review record persisted at post-
+      incident-review. The audit-evident record of lessons learned,
+      corrective actions, and BCM-plan revisions the operator's
+      accountability posture reads. Extracted at the adapter seam from
+      __pir_record__.pir_ref.
+    external: false
+  __raw_trigger__:
+    type: dictionary
+    description: >-
+      Trigger record handed over by the declaring surface for
+      declaration.declare_bcm_event: trigger_class
+      (major_outage_escalation | ransomware_containment_escalation |
+      upstream_dependency_failure | facility_loss_declaration),
+      affected_service (role-shaped), source_ref (the escalating
+      lane's record), declared_ts (Zulu instant — the Art. 23 anchor).
+    external: true
+  __bcm_event__:
+    type: dictionary
+    description: >-
+      Event envelope composed by declaration.declare_bcm_event:
+      event_id (bcm-..., content-derived), trigger_class,
+      affected_service, source_ref, event_declared_ts. The adapter
+      extracts __event_id__ and __event_declared_ts__; the activation
+      binding consumes the whole envelope.
+    external: false
+  __plan_register__:
+    type: dictionary
+    description: >-
+      The operator's BCM-plan register handed over by the plan-store
+      adapter: plans — rows with service, plan_ref, isolation_targets,
+      failover_targets (either list may be empty) and rto_seconds /
+      rpo_seconds. The list may be empty: an operator with no plans on
+      file still declares events. Consumed by
+      activation.activate_bcm_plan.
+    external: true
+  __significance_policy__:
+    type: dictionary
+    description: >-
+      The entity's declared NIS2 Art. 23 significance-threshold
+      policy: significant_trigger_classes — the trigger classes that
+      cross the threshold (possibly empty). Entity- and sector-
+      specific; the framework does not prescribe it. Consumed by
+      activation.activate_bcm_plan.
+    external: true
+  __activation__:
+    type: dictionary
+    description: >-
+      Activation envelope composed by activation.activate_bcm_plan:
+      event_id, plan_on_file, plan_ref, isolation_targets,
+      failover_targets, recovery_objectives (null without a plan),
+      significant_incident. The adapter extracts __bcm_plan_ref__ and
+      __significant_incident__; the isolate, switch, restore and
+      review bindings read it.
+    external: false
+  __isolation_result__:
+    type: dictionary
+    description: >-
+      Isolation scope composed by isolation.resolve_isolation_scope:
+      event_id, scope_id (bcm-iso-... or empty), skipped, targets.
+      Executed by the isolation adapter; the adapter extracts
+      __isolation_scope__.
+    external: false
+  __failover_order__:
+    type: dictionary
+    description: >-
+      Failover order composed by failover.select_failover_target:
+      event_id, failover_engaged, failover_ref, failover_target,
+      not_engaged_reason, cutover_order. Executed by the failover
+      adapter; the adapter extracts __failover_target__.
+    external: false
+  __notification_phase__:
+    type: string
+    description: >-
+      Which Art. 23 phase the record is composed for when the event is
+      significant: early_warning (24h), incident_notification (72h) or
+      final_report (one calendar month). Null when the event is not
+      significant — the primitive refuses a phase on the determination
+      branch. Consumed by notification.compose_authority_notification.
+    external: true
+  __notification_assessment__:
+    type: dictionary
+    description: >-
+      The controller's assessment carried on a significant-incident
+      notification: preliminary_assessment and impact_scope (non-empty
+      text, carried opaquely) and cross_border_effect (real boolean).
+      Null when the event is not significant. Consumed by
+      notification.compose_authority_notification.
+    external: true
+  __no_notification_rationale__:
+    type: string
+    description: >-
+      The non-empty rationale for the locally-logged no-notification
+      determination when the event does not cross the significance
+      threshold; null when it does. Retained for accountability.
+      Consumed by notification.compose_authority_notification.
+    external: true
+  __authority_record__:
+    type: dictionary
+    description: >-
+      The Art. 23 record composed by
+      notification.compose_authority_notification — one of two
+      exclusive shapes: disposition notification (notification_ref,
+      phase, phase_deadline, assessment fields) or disposition
+      no_notification_determination (determination_ref, rationale).
+      Delivered by the competent-authority adapter; the adapter
+      extracts __notification_ref__.
+    external: false
+  __recovery_observations__:
+    type: dictionary
+    description: >-
+      The adapter's observations across the recovery for
+      recovery.evaluate_recovery: cutback_completed and
+      primary_health_ok (real booleans), observed_rto_seconds and
+      observed_rpo_seconds (non-negative integers). Recovery is
+      verified against these observations, never asserted.
+    external: true
+  __recovery_record__:
+    type: dictionary
+    description: >-
+      Recovery record composed by recovery.evaluate_recovery:
+      recovery_ref, event_id, objectives_documented, rto and rpo
+      (observed, documented, signed delta, met), cutback_completed,
+      primary_health_ok, recovered. The adapter extracts
+      __recovery_result__.
+    external: false
+  __pir_lessons__:
+    type: string
+    description: >-
+      JSON-native list of the non-empty lessons-learned texts for
+      review.compose_pir_record; at least one is mandatory.
+    external: true
+  __pir_corrective_actions__:
+    type: string
+    description: >-
+      JSON-native list of corrective-action records for
+      review.compose_pir_record, each with action (non-empty text) and
+      owner_ref (role-shaped); may be empty.
+    external: true
+  __pir_plan_revisions__:
+    type: string
+    description: >-
+      JSON-native list of the BCM-plan revision texts the event
+      surfaced, for review.compose_pir_record; may be empty.
+    external: true
+  __pir_linked_refs__:
+    type: dictionary
+    description: >-
+      Role-shaped references the adapter assembles onto the review
+      record, keyed by name: the notification or determination ref
+      from __authority_record__, recovery_ref from
+      __recovery_record__, failover_ref from __failover_order__.
+      Empty-string values are dropped so the no-notification branch
+      joins cleanly. Consumed by review.compose_pir_record.
+    external: true
+  __pir_record__:
+    type: dictionary
+    description: >-
+      Post-incident-review record composed by
+      review.compose_pir_record: pir_ref (bcm-pir-...), event_id,
+      markers (ran_without_plan when applicable), lessons_learned,
+      corrective_actions, plan_revisions, linked_refs. Persisted by
+      the evidence-store adapter; the adapter extracts __pir_ref__.
     external: false
 workflow_start: start--b17c0072-0000-4000-8000-000000000001
 workflow:
@@ -152,17 +318,31 @@ workflow:
     type: action
     name: detect_and_declare_bcm_event
     description: >-
-      SKELETON — receive a business-continuity trigger on the
-      operator's declared event-declaration surface (major
-      outage escalation from the incident-management lane,
-      ransomware containment escalation from the containment
-      lane, upstream-dependency failure signal, or facility-
-      loss declaration). Assign __event_id__ and stamp
-      __event_declared_ts__ against the NIS2 Art. 23 clock.
-      TODO (CORE): pin the trigger-surface adapter shape and
-      the initial evidence-capture record.
+      Receive a business-continuity trigger on the operator's declared
+      event-declaration surface — a major-outage escalation from the
+      incident-management lane, a ransomware-containment escalation
+      from the containment lane, an upstream-dependency failure
+      signal, or a facility-loss declaration:
+      declaration.declare_bcm_event validates the adapter's
+      __raw_trigger__ against the closed trigger-class vocabulary,
+      canonicalises the affected service and the escalating lane's
+      source reference as role-shaped pointers, anchors the NIS2 Art.
+      23 clock on the supplied declared_ts (a Zulu instant the
+      declaring surface stamped — never a clock read inside the
+      primitive) and derives __event_id__ from the trigger content so
+      the same escalation re-received resolves to the same event.
+      Bound since the CORE-WIRE card: the binding assigns the event
+      envelope to __bcm_event__ and the compile target's adapter
+      extracts __event_id__ and __event_declared_ts__ — the
+      marshalling seam every bound playbook documents. The step's API
+      Activity milestone record is composed at the telemetry seam by
+      primitives.milestones.compose_milestone_record, keyed to the
+      event id.
     on_completion: action--b17c0072-0000-4000-8000-000000000003
+    in_args:
+      - __raw_trigger__
     out_args:
+      - __bcm_event__
       - __event_id__
       - __event_declared_ts__
     agent_target: bcm_coordinator
@@ -171,23 +351,42 @@ workflow:
         - control.contingency_plan@v1
       telemetry_refs:
         - telemetry.ocsf.api_activity@v1
+      core_body:
+        primitive: content.playbooks.business_continuity.primitives.declaration.declare_bcm_event
+        in:
+          raw_trigger: __raw_trigger__
+        out: __bcm_event__
   action--b17c0072-0000-4000-8000-000000000003:
     type: action
     name: activate_bcm_plan
     description: >-
-      SKELETON — retrieve the documented BCM plan artifact for
-      the affected service from the operator's BCM-plan store
-      and activate it. Reads the documented isolation targets,
-      failover targets, and recovery objectives (RTO / RPO)
-      into workflow state. Evaluates the event against the
-      operator's declared significance-threshold policy and
-      sets __significant_incident__ accordingly. TODO (CORE):
-      pin the BCM-plan store adapter, the plan-artifact schema,
-      and the significance-threshold evaluator.
+      Activate the documented BCM plan for the affected service, or
+      record its absence: activation.activate_bcm_plan resolves the
+      service against the operator's __plan_register__ (a duplicated
+      row fails loud; an empty register is legitimate — an operator
+      with no plans on file still declares events), reads the
+      documented isolation targets, failover targets and recovery
+      objectives (RTO / RPO) into the activation envelope, and
+      evaluates the event's trigger class against the declared
+      __significance_policy__ to set __significant_incident__. A
+      continuity event with no plan on file is reported as such
+      (plan_on_file false, plan_ref null) rather than blocking — the
+      downstream isolate, switch and restore bindings read that state
+      and record skips and non-engagement as data. The plan register
+      and the significance policy are operator-owned adapter surfaces.
+      The binding assigns the envelope to __activation__; the adapter
+      extracts __bcm_plan_ref__ and __significant_incident__. The
+      step's API Activity milestone record is composed at the
+      telemetry seam by
+      primitives.milestones.compose_milestone_record, keyed to the
+      event id.
     on_completion: action--b17c0072-0000-4000-8000-000000000004
     in_args:
-      - __event_id__
+      - __bcm_event__
+      - __plan_register__
+      - __significance_policy__
     out_args:
+      - __activation__
       - __bcm_plan_ref__
       - __significant_incident__
     agent_target: bcm_coordinator
@@ -196,26 +395,38 @@ workflow:
         - control.contingency_plan@v1
       telemetry_refs:
         - telemetry.ocsf.api_activity@v1
+      core_body:
+        primitive: content.playbooks.business_continuity.primitives.activation.activate_bcm_plan
+        in:
+          event: __bcm_event__
+          plan_register: __plan_register__
+          significance_policy: __significance_policy__
+        out: __activation__
   action--b17c0072-0000-4000-8000-000000000004:
     type: action
     name: isolate_affected_systems
     description: >-
-      SKELETON — where the event and the activated plan call
-      for it, contain the failure surface by isolating the
-      affected primary systems, network segments, or upstream
-      dependencies against the operator's isolation surface
-      per __bcm_plan_ref__. Records __isolation_scope__ for the
-      downstream recovery-and-verification cutback discipline.
-      Skipped (empty __isolation_scope__) where the plan
-      documents no isolation step for the event class (e.g. a
-      pure availability outage with no compromise indicator).
-      TODO (CORE): pin the isolation-surface adapter and the
-      isolation-scope schema.
+      Resolve the isolation scope where the activated plan documents
+      one: isolation.resolve_isolation_scope reads the activation
+      envelope's isolation targets and emits the content-derived scope
+      over them; where the plan documents no isolation step for the
+      event class (a pure availability outage with no compromise
+      indicator, for example) — or no plan is on file — the scope is
+      skipped as data (skipped true, empty scope id), which is the
+      empty __isolation_scope__ contract, never a failure. Executing
+      the containment against the operator's isolation surface
+      (network-segmentation controller, IAM revocation surface,
+      upstream-dependency circuit-breaker) is the compile target's
+      adapter. The binding assigns the result to __isolation_result__;
+      the adapter extracts __isolation_scope__. The step's API
+      Activity milestone record is composed at the telemetry seam by
+      primitives.milestones.compose_milestone_record, keyed to the
+      event id.
     on_completion: action--b17c0072-0000-4000-8000-000000000005
     in_args:
-      - __event_id__
-      - __bcm_plan_ref__
+      - __activation__
     out_args:
+      - __isolation_result__
       - __isolation_scope__
     agent_target: bcm_coordinator
     x_secops_ng:
@@ -223,28 +434,39 @@ workflow:
         - control.contingency_plan@v1
       telemetry_refs:
         - telemetry.ocsf.api_activity@v1
+      core_body:
+        primitive: content.playbooks.business_continuity.primitives.isolation.resolve_isolation_scope
+        in:
+          activation: __activation__
+        out: __isolation_result__
   action--b17c0072-0000-4000-8000-000000000005:
     type: action
     name: switch_to_backup
     description: >-
-      SKELETON — failover the affected service to the
-      documented backup site, data replica, or standby capacity
-      per __bcm_plan_ref__. The failover is the disaster-
-      recovery leg of the Art. 21(2)(c) triplet (backup +
-      disaster recovery + crisis management); backup integrity
-      the failover reads is exercised on the sibling
+      Select the failover engagement for the disaster-recovery leg of
+      the Art. 21(2)(c) triplet: failover.select_failover_target reads
+      the activation envelope and selects the first documented
+      failover target in the plan's preference order, composing the
+      cutover order the failover surface executes; with no plan on
+      file or no documented target the order records failover_engaged
+      false with the not_engaged_reason (no_plan_on_file /
+      no_documented_target) as data rather than blocking. Backup
+      integrity the failover relies on is exercised on the sibling
       backup_recovery playbook's periodic restore-drill lane.
-      Records __failover_target__ for the downstream
-      restore-and-verify cutback discipline. TODO (CORE): pin
-      the failover-surface adapter, the recovery-objective
-      evaluator (observed vs documented RTO / RPO), and the
-      cutover-evidence record.
+      Executing the cutover (backup-site routing, data-replica
+      promotion, standby-capacity activation) is the compile target's
+      adapter. The binding assigns the order to __failover_order__;
+      the adapter extracts __failover_target__ (null when not
+      engaged). The step's API Activity milestone record is composed
+      at the telemetry seam by
+      primitives.milestones.compose_milestone_record, keyed to the
+      event id.
     on_completion: action--b17c0072-0000-4000-8000-000000000006
     in_args:
-      - __event_id__
-      - __bcm_plan_ref__
+      - __activation__
       - __isolation_scope__
     out_args:
+      - __failover_order__
       - __failover_target__
     agent_target: bcm_coordinator
     x_secops_ng:
@@ -252,33 +474,47 @@ workflow:
         - control.system_recovery_reconstitution@v1
       telemetry_refs:
         - telemetry.ocsf.api_activity@v1
+      core_body:
+        primitive: content.playbooks.business_continuity.primitives.failover.select_failover_target
+        in:
+          activation: __activation__
+        out: __failover_order__
   action--b17c0072-0000-4000-8000-000000000006:
     type: action
     name: notify_competent_authority
     description: >-
-      SKELETON — where __significant_incident__ is true,
-      dispatch the NIS2 Art. 23 significant-incident notification
-      to the operator's competent authority (national
-      cybersecurity authority per the entity's establishment
-      Member State) on the Art. 23 timeline: 24h early warning,
-      72h incident notification, one-month final report. The
-      envelope carries __event_id__, __event_declared_ts__, the
-      preliminary assessment, the impact scope, and the cross-
-      border-effect indicator. Where __significant_incident__ is
-      false, the step records a locally-logged
-      no-notification determination (retained for accountability)
-      and short-circuits to restore-and-verify. Records
-      __notification_ref__ for the post-incident-review record.
-      TODO (CORE): pin the competent-authority adapter (per-Member-
-      State delivery surface), the Art. 23 envelope templates
-      (early-warning, incident-notification, final-report), and
-      the significance-determination evidence discipline.
+      Compose the NIS2 Art. 23 record for the event:
+      notification.compose_authority_notification takes
+      __significant_incident__ and, when true, the
+      __notification_phase__ (early_warning — 24h;
+      incident_notification — 72h; final_report — one calendar month,
+      end-of-month clamped) and the __notification_assessment__
+      (preliminary assessment, impact scope, cross-border-effect
+      indicator) and composes the notification envelope with its phase
+      deadline derived from __event_declared_ts__; when false, it
+      composes the locally-logged no-notification determination from
+      the required __no_notification_rationale__ (retained for
+      accountability) — the two dispositions are exclusive and the
+      primitive refuses the inputs of the other branch. Delivering the
+      envelope to the competent authority (national cybersecurity
+      authority per the entity's establishment Member State — portal,
+      S/MIME, sector-specific API) is the compile target's adapter.
+      The binding assigns the record to __authority_record__; the
+      adapter extracts __notification_ref__ (empty on the
+      determination branch). The step's Incident Finding milestone
+      record is composed at the telemetry seam by
+      primitives.milestones.compose_incident_finding_record, keyed to
+      the event id.
     on_completion: action--b17c0072-0000-4000-8000-000000000007
     in_args:
       - __event_id__
       - __event_declared_ts__
       - __significant_incident__
+      - __notification_phase__
+      - __notification_assessment__
+      - __no_notification_rationale__
     out_args:
+      - __authority_record__
       - __notification_ref__
     agent_target: bcm_coordinator
     x_secops_ng:
@@ -286,26 +522,42 @@ workflow:
         - control.incident_timeline_signals@v1
       telemetry_refs:
         - telemetry.ocsf.incident_finding@v1
+      core_body:
+        primitive: content.playbooks.business_continuity.primitives.notification.compose_authority_notification
+        in:
+          event_id: __event_id__
+          event_declared_ts: __event_declared_ts__
+          significant_incident: __significant_incident__
+          phase: __notification_phase__
+          assessment: __notification_assessment__
+          no_notification_rationale: __no_notification_rationale__
+        out: __authority_record__
   action--b17c0072-0000-4000-8000-000000000007:
     type: action
     name: restore_and_verify
     description: >-
-      SKELETON — return the primary service to a known-good
-      state per __bcm_plan_ref__ (cutback from
-      __failover_target__ where applicable, dependency
-      revalidation, and health-signal check against the
-      documented recovery objectives). Records __recovery_result__
-      with the observed RTO / RPO delta against the documented
-      objectives and the primary-service health signal. TODO
-      (CORE): pin the health-signal adapter, the cutback
-      procedure, and the recovery-attestation evidence
-      discipline.
+      Verify the recovery against the documented objectives, never
+      assert it: recovery.evaluate_recovery reads the activation
+      envelope's recovery objectives (null when no plan is on file —
+      objectives_documented false and the RTO / RPO verdicts recorded
+      as undetermined rather than met) and the adapter's
+      __recovery_observations__ (cutback completed, primary health
+      signal, observed RTO and RPO seconds) and records the signed
+      observed-versus-documented deltas and the recovered verdict.
+      Cutback from __failover_target__, dependency revalidation and
+      the health-signal probe are the compile target's adapter. The
+      binding assigns the record to __recovery_record__; the adapter
+      extracts __recovery_result__. The step's API Activity milestone
+      record is composed at the telemetry seam by
+      primitives.milestones.compose_milestone_record, keyed to the
+      event id.
     on_completion: action--b17c0072-0000-4000-8000-000000000008
     in_args:
-      - __event_id__
-      - __bcm_plan_ref__
+      - __activation__
       - __failover_target__
+      - __recovery_observations__
     out_args:
+      - __recovery_record__
       - __recovery_result__
     agent_target: bcm_coordinator
     x_secops_ng:
@@ -313,26 +565,45 @@ workflow:
         - control.system_recovery_reconstitution@v1
       telemetry_refs:
         - telemetry.ocsf.api_activity@v1
+      core_body:
+        primitive: content.playbooks.business_continuity.primitives.recovery.evaluate_recovery
+        in:
+          activation: __activation__
+          observed: __recovery_observations__
+        out: __recovery_record__
   action--b17c0072-0000-4000-8000-000000000008:
     type: action
     name: post_incident_review
     description: >-
-      SKELETON — persist the post-incident-review record for
-      the event: lessons learned, corrective actions, and any
-      BCM-plan revisions surfaced by the event. Records
-      __pir_ref__ on the operator's evidence store keyed to
-      __event_id__. Feeds the operator's accountability posture
-      and any downstream regulator query (Art. 23 final-report
-      supplement, Art. 32 supervisory-authority information
-      request). TODO (CORE): pin the PIR record schema, the
-      evidence-store retention discipline, and the BCM-plan
-      revision handoff.
+      Compose the post-incident-review record:
+      review.compose_pir_record takes the lessons learned
+      (__pir_lessons__ — mandatory; a review without a lesson is not a
+      review), the corrective actions with their owners
+      (__pir_corrective_actions__), any BCM-plan revisions the event
+      surfaced (__pir_plan_revisions__) and the linked references the
+      adapter assembles from the notification or determination,
+      recovery and failover envelopes (__pir_linked_refs__ — empty
+      values dropped, so the no-notification branch joins cleanly),
+      stamps ran_without_plan when the activation found no plan on
+      file, and derives the content-keyed __pir_ref__. Persistence on
+      the operator's evidence store and the retention discipline are
+      the adapter's; the record feeds the accountability posture and
+      any downstream regulator query (Art. 23 final-report supplement,
+      Art. 32 supervisory-authority information request). The binding
+      assigns the record to __pir_record__; the adapter extracts
+      __pir_ref__. The step's Incident Finding milestone record
+      (close) is composed at the telemetry seam by
+      primitives.milestones.compose_incident_finding_record.
     on_completion: end--b17c0072-0000-4000-8000-00000000000a
     in_args:
       - __event_id__
-      - __recovery_result__
-      - __notification_ref__
+      - __activation__
+      - __pir_lessons__
+      - __pir_corrective_actions__
+      - __pir_plan_revisions__
+      - __pir_linked_refs__
     out_args:
+      - __pir_record__
       - __pir_ref__
     agent_target: bcm_coordinator
     x_secops_ng:
@@ -340,13 +611,23 @@ workflow:
         - control.contingency_plan@v1
       telemetry_refs:
         - telemetry.ocsf.incident_finding@v1
+      core_body:
+        primitive: content.playbooks.business_continuity.primitives.review.compose_pir_record
+        in:
+          event_id: __event_id__
+          plan_on_file: __activation__.plan_on_file
+          lessons_learned: __pir_lessons__
+          corrective_actions: __pir_corrective_actions__
+          plan_revisions: __pir_plan_revisions__
+          linked_refs: __pir_linked_refs__
+        out: __pir_record__
   end--b17c0072-0000-4000-8000-00000000000a:
     type: end
     name: bcm_end
 x_secops_ng:
   stable_id: playbook.business_continuity@v1
-  content_version: 0.1.0
-  maturity: experimental
+  content_version: 1.0.0
+  maturity: stable
   compile_targets:
     - n8n
     - temporal
@@ -369,6 +650,7 @@ x_secops_ng:
       continuity, backup management, disaster recovery, crisis
       management; Article 23 significant-incident reporting
     - >-
-      OCSF v1.3.0 — Availability Activity (class_uid 4004) and
-      Incident Finding (class_uid 2005) event classes emitted at
-      lifecycle milestones
+      OCSF v1.4.0 — API Activity (class_uid 6003) and Incident
+      Finding (class_uid 2005) event classes emitted at lifecycle
+      milestones (the house binding for workflow-emitted milestones,
+      corrected from an invented availability class by #877)
