@@ -1918,7 +1918,7 @@ one playbook's provenance.
 
 ### F-WF-DSR — GDPR Chapter III data-subject-rights lifecycle
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P2
 - **Rationale:** The controller-side intake and fulfilment lifecycle for a
   data subject exercising a Chapter III right. The one-month Art. 12(3)
@@ -1930,7 +1930,7 @@ one playbook's provenance.
     cookbook walkthrough (shipped).
   - Deterministic primitives under
     `content/playbooks/data_subject_rights/primitives/` bound to the 7
-    action steps, replay-safe and offline (CORE — **outstanding**).
+    action steps, replay-safe and offline (CORE — shipped).
   - The Art. 12(3) one-month response clock is anchored on a supplied
     awareness instant, never on a clock read inside a primitive, so a run is
     replayable and the deadline is auditable.
@@ -1952,6 +1952,21 @@ one playbook's provenance.
     qualifications as data, remedy-carrying response composition,
     signed-delta outcome record — each executed directly by unit
     coverage; CORE-WIRE binds them and regenerates the examples)
+  - CORE-WIRE + GRADUATE — #994 closing #980 (all seven bindings on the
+    canonical YAML source — each multi-field primitive output bound to
+    a single dictionary envelope with the documented out_args
+    extracted at the compile target's adapter seam; one if-condition
+    on `__identity_verified__` added after classification so the
+    Article 12(6) short-circuit the descriptions always promised is
+    real topology, with the response primitive gaining the
+    additional-information disposition it needs; the seven
+    SKELETON/TODO(CORE) descriptions and the top-level SKELETON
+    sentence rewritten to record the wiring. Then `experimental` →
+    `stable`, `content_version` 1.0.0, all three worked examples
+    regenerated — 7/7 bound, n8n seven Code nodes plus the If node,
+    Temporal and LangGraph importing all seven primitives with
+    `NotImplementedError` only at the operator seams; README,
+    cookbook and example READMEs de-staled in the same change).
 
 ### F-WF-DDOS — Availability-attack detection and response
 

@@ -1,5 +1,14 @@
 {
-  "conditional_edges": [],
+  "conditional_edges": [
+    {
+      "branches": {
+        "failure": "action--d5b17a15-0000-4000-8000-000000000007",
+        "success": "action--d5b17a15-0000-4000-8000-000000000005"
+      },
+      "default": null,
+      "src": "if-condition--d5b17a15-0000-4000-8000-000000000009"
+    }
+  ],
   "edges": [
     {
       "cacao_edge": "on_completion",
@@ -13,7 +22,7 @@
     },
     {
       "cacao_edge": "on_completion",
-      "dst": "action--d5b17a15-0000-4000-8000-000000000005",
+      "dst": "if-condition--d5b17a15-0000-4000-8000-000000000009",
       "src": "action--d5b17a15-0000-4000-8000-000000000004"
     },
     {
@@ -89,6 +98,13 @@
       "label": "record_outcome",
       "name": "action--d5b17a15-0000-4000-8000-000000000008",
       "step_id": "action--d5b17a15-0000-4000-8000-000000000008"
+    },
+    {
+      "cacao_type": "if-condition",
+      "kind": "condition",
+      "label": "identity verified?",
+      "name": "if-condition--d5b17a15-0000-4000-8000-000000000009",
+      "step_id": "if-condition--d5b17a15-0000-4000-8000-000000000009"
     }
   ],
   "playbook_id": "playbook--d5b17a15-0000-4000-8000-000000000001",

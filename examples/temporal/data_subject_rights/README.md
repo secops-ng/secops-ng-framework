@@ -3,11 +3,12 @@
 Worked example: the `data_subject_rights` CACAO v2 playbook
 (GDPR Art. 15–22) compiled by the Temporal reference compiler.
 Operators who already run Temporal can import `workflow.temporal.py`
-into their worker module to see the topology the emitter produces;
-binding the activity bodies to real connectors (subject-facing intake
-surface, sovereign IdP verification, data-owner routing catalogue,
-fulfilment-pack assembler, subject-facing response envelope, and the
-evidence-store outcome writer) is the operator's job.
+into their worker module to see the topology the emitter produces.
+The seven activity bodies call the deterministic primitives under
+`content/playbooks/data_subject_rights/primitives/`; wiring the
+operator seams (subject-facing intake surface, sovereign IdP
+verification, data-inventory join, owner transport, subject-facing
+delivery, and the evidence-store writer) is the operator's job.
 
 This worked example pins the Temporal leg (target 2 of 3) of the
 cross-target parity lane for the `data_subject_rights` playbook. The

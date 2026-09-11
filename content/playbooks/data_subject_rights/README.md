@@ -1,6 +1,6 @@
 # data_subject_rights
 
-CACAO v2 SKELETON playbook operationalising the operator-side
+CACAO v2 playbook operationalising the operator-side
 **data subject rights (DSR) intake and fulfilment lifecycle** a
 controller runs when a data subject exercises one of the GDPR
 Chapter III rights against personal data the controller holds.
@@ -25,13 +25,27 @@ and `data_exfil` playbooks): this lifecycle is subject-initiated
 against already-collected data; the breach-notification lifecycle
 is controller-initiated on a personal-data-breach event.
 
-Status: **SKELETON**. Action steps are scaffolded as CACAO v2
-sources with `control_refs` / `telemetry_refs` stubs; the sovereign
-IdP-bound subject-verification adapter, the per-data-store owner-
-routing catalogue, and the outbound response templates (portability
-data-package format, erasure-attestation letter, subject-facing
-access-copy assembly) are placeholders that a sibling CORE card
-lands.
+Status: **stable** — `content_version` 1.0.0 under the Maturity
+ladder. All seven action steps carry `x_secops_ng.core_body`
+bindings into the deterministic primitives under `primitives/`
+(`intake.open_dsr_case`, `verification.record_identity_verification`,
+`classification.classify_request`, `routing.resolve_data_owner_manifest`,
+`fulfilment.compile_fulfilment_pack`,
+`response.compose_controller_response`, `outcome.record_case_outcome`),
+each executed directly by the unit suite under
+`tests/playbooks/data_subject_rights/`. One `if-condition` on
+`__identity_verified__` after classification makes the Article 12(6)
+short-circuit real topology: an unverified requester never reaches
+data-owner routing; the case goes straight to the additional-
+information response and closes as `unverified_subject`. The three
+worked examples under `examples/{n8n,temporal,langgraph}/data_subject_rights/`
+are regenerated from the bound source (n8n: seven Code nodes and one
+If node; Temporal activities and LangGraph tools import their
+primitives, with `NotImplementedError` marking only the operator-
+integration seams). The sovereign IdP verification surface, the
+data-inventory join, owner transport, secure delivery and the
+evidence store remain adapter-bound operator surfaces — the framework
+ships the deterministic contract, not a connector.
 
 ## Contents
 
@@ -41,17 +55,26 @@ lands.
   both counted as finalised).
 - `mappings.yaml` — outbound cross-references to the OSCAL controls,
   MITRE D3FEND techniques, OCSF event classes, and EU regulatory
-  clauses this playbook operationalises. The SKELETON overlay pins
-  the GDPR Articles 15-22 clause anchors, the OSCAL AC-2(11) and
-  AU-9 anchors called out in the task brief, and the D3FEND D3-IAA
-  Identity Access Assurance anchor on the `verify_identity` step.
+  clauses this playbook operationalises. The overlay pins the GDPR
+  Articles 15-22 clause anchors, the OSCAL AC-2(11) and AU-9
+  anchors, and the D3FEND D3-IAA Identity Access Assurance anchor
+  on the `verify_identity` step.
+- `primitives/` — the seven deterministic primitives the action
+  steps bind: pure, offline, LLM-free. The Article 12(3) clock is
+  anchored on the supplied receipt instant (never a clock read),
+  deadlines use calendar-month arithmetic with the end-of-month
+  clamp, an extension is representable only with its justification,
+  a refusal always carries the Article 77 / 79 remedies, and the
+  verification record stores no subject-supplied attribute.
 
 ## Compile targets
 
-`compile_targets` declares `["n8n", "temporal", "langgraph"]`.
-Emitted artifacts under `examples/{n8n,temporal,langgraph}/data_subject_rights/`
-land in a follow-on CORE / EXTEND card once the verification,
-routing, and response-template adapters are populated.
+`compile_targets` declares `["n8n", "temporal", "langgraph"]`. The
+emitted artifacts live under
+`examples/{n8n,temporal,langgraph}/data_subject_rights/` with
+byte-parity goldens under `tests/examples/`, regenerated from the
+bound canonical YAML via each directory's `regenerate.sh` (which
+mirrors the YAML into a byte-deterministic JSON form first).
 
 ## Step outline
 
@@ -65,19 +88,25 @@ routing, and response-template adapters are populated.
 3. **classify_request** — resolves `__request_type__` (access /
    rectification / erasure / restriction / portability / objection
    / Article 22 concern). Computes `__response_deadline__` as
-   `__request_received_ts__` + 1 month per Article 12(3); records
-   the two-month extension where invoked.
-4. **route_to_data_owners** — resolves the per-owner manifest
+   `__request_received_ts__` + 1 calendar month per Article 12(3),
+   end-of-month clamped; records the justified extension where
+   invoked. Runs before the gate so both branches carry a deadline.
+4. **identity verified?** — the `if-condition` on
+   `__identity_verified__`: true continues to routing; false
+   short-circuits to `send_controller_response` for the Article
+   12(6) additional-information request.
+5. **route_to_data_owners** — resolves the per-owner manifest
    against the controller's declared data-inventory surface.
-5. **compile_fulfilment_evidence** — assembles the per-request
+6. **compile_fulfilment_evidence** — assembles the per-request
    fulfilment pack (subject-copy assembly, applied-correction
    attestation, deletion attestation, restriction-marker set,
    structured data package, cessation record, or overriding-
    legitimate-interest determination).
-6. **send_controller_response** — emits the response envelope on
+7. **send_controller_response** — composes the response envelope on
    or before `__response_deadline__` under the Article 12
-   modalities.
-7. **record_outcome** — closes the case with `__outcome_code__`
+   modalities: fulfilment pack, refusal with remedies, or the
+   Article 12(6) additional-information request — exactly one.
+8. **record_outcome** — closes the case with `__outcome_code__`
    for the operator's Article 5(2) accountability posture.
 
 ## Regulatory anchors
@@ -99,13 +128,14 @@ Inbound mappings live at
 
 ## Operator integration notes
 
-The SKELETON declares the following adapter-bound surfaces the
-operator wires; the CORE card lands the reference bindings:
+The playbook declares the following adapter-bound surfaces the
+operator wires; the deterministic halves are bound under
+`primitives/`, and the wired variables name each seam:
 
 - **DSR intake surface** — the privacy-policy contact channel,
   the subject-facing in-app portal, and the paper-channel intake
-  the controller's DSR policy admits. `receive_request` pins the
-  adapter shape at CORE.
+  the controller's DSR policy admits. `receive_request` consumes it
+  as `__raw_request__` + `__intake_channel__`.
 - **Sovereign IdP integration point** — the operator's declared
   subject-verification surface for account-holders. On the
   SecOps-NG substrate the default binding is an EU-resident IdP
