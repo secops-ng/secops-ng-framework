@@ -1,6 +1,6 @@
 # ddos_response
 
-CACAO v2 SKELETON playbook for the incident-handling capability on the
+CACAO v2 playbook for the incident-handling capability on the
 availability/denial-of-service attack dimension: detect availability
 anomaly → classify attack vector → engage mitigation (upstream
 scrubbing / rate-limit / failover) → validate service restoration →
@@ -10,18 +10,33 @@ surface; it does not author the operator's anti-DDoS architecture.
 
 ## Status
 
-SKELETON. The playbook artifact and the NIS2 Art. 21(2)(b)
-incident-handling overlay land here; CORE-layer cards add the
-detection bindings (mitigation-surface misconfiguration signals)
-together with their D3FEND pins, and the per-target compiler
-emissions (n8n / Temporal / LangGraph goldens); an EXTEND card wires
-the time-to-mitigation and availability-restoration metric emitters
-against the operator's evidence store. DORA Art. 11 and CRA Annex I
-§1(h) availability-response inbound entries are deliberately deferred
-to separate inbound-closure cards (see the gap notes in
-`mappings.yaml` and the audited skip entries under
-`content/mappings/dora/_orphan_skip.yaml` and
-`content/mappings/cra/_orphan_skip.yaml`).
+Stable — `content_version` 1.0.0 under the Maturity ladder. All six
+action steps carry `x_secops_ng.core_body` bindings into the
+deterministic primitives under `primitives/`
+(`detect.resolve_availability_trigger`,
+`classify.classify_attack_vector`,
+`mitigation.select_mitigation_engagement`,
+`restoration.evaluate_service_restoration`,
+`evidence.compose_incident_evidence_record`,
+`notify.compose_owner_notification`), each executed directly by the
+unit suite under `tests/playbooks/ddos_response/`. The three worked
+examples under `examples/{n8n,temporal,langgraph}/ddos_response/` are
+regenerated from the bound source: n8n emits six Code nodes, and the
+Temporal activities and LangGraph tools import their primitives, with
+`NotImplementedError` marking only the operator-integration seams
+(monitoring ingress, the response surface, the evidence store, the
+owner channel). The NIS2 Art. 21(2)(b) outbound overlay and the DORA
+Art. 11 inbound anchor
+(`content/mappings/dora/article-11-availability-response.yaml`) cite
+the playbook; the CRA Annex I §1(h) inbound entry remains an audited
+skip under `content/mappings/cra/_orphan_skip.yaml`. Still open, and
+recorded as such: the detection bindings for mitigation-surface
+misconfiguration (scrubber not engaged, rate-limit pushed to the wrong
+zone, unhealthy standby) wait on upstream rule ids from the operator's
+posture-management layer, and the time-to-mitigation /
+availability-restoration metric emitters remain a separate
+metrics-layer card — the steps carry no `metric_refs` until that
+catalogue entry lands.
 
 ## Contents
 
@@ -29,9 +44,16 @@ to separate inbound-closure cards (see the gap notes in
   (`playbook.ddos_response@v1`).
 - `mappings.yaml` — outbound overlay (OSCAL controls, OCSF telemetry,
   NIS2 Art. 21(2)(b)).
+- `primitives/` — the six deterministic primitives the action steps
+  bind: pure, offline, LLM-free. Mitigation is an adapter-bound
+  operator surface — the framework ships the hand-off and no
+  scrubbing-provider binding; restoration is verified against
+  observed traffic, never asserted on the mitigation having been
+  applied.
 
 ## Compile targets
 
-`compile_targets` declares `["n8n", "temporal", "langgraph"]`. Emitted
-artifacts and golden tests are owned by CORE-layer sibling cards; this
-directory ships the portable content only.
+`compile_targets` declares `["n8n", "temporal", "langgraph"]`. The
+emitted artifacts live under `examples/{n8n,temporal,langgraph}/ddos_response/`
+with byte-parity goldens under `tests/examples/`, regenerated from
+the bound canonical source via each directory's `regenerate.sh`.

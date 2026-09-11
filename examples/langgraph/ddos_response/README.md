@@ -45,7 +45,7 @@ The same canonical playbook ships under the other two reference compile
 targets so an integrator can compare lowerings side by side:
 
 - [`examples/n8n/ddos_response/`](../../n8n/ddos_response/) — n8n no-code workflow.
-- [`examples/temporal/ddos_response/`](../../temporal/ddos_response/) — Temporal durable workflow stub.
+- [`examples/temporal/ddos_response/`](../../temporal/ddos_response/) — Temporal durable workflow.
 
 ## Topology
 
@@ -79,9 +79,10 @@ makes the assembly file copy-paste-ready for playbooks that do branch.
 
 ## What this example deliberately doesn't do
 
-- It does not execute the graph. The `@tool` bodies raise
-  `NotImplementedError`; integrators wire them to their own runtime
-  (availability-anomaly detector, attack-vector classifier,
+- It does not execute the graph. The `@tool` bodies call the
+  deterministic primitives; the operator-integration seams raise
+  `NotImplementedError` until integrators wire them to their own
+  runtime (availability-anomaly ingress, classifier verdicts,
   mitigation-engagement surface, service-restoration probe, evidence
   store, notification channel).
 - It does not ship operator credentials, endpoints, or environment.

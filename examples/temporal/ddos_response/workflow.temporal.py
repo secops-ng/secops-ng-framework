@@ -20,21 +20,20 @@ _TRACER = trace.get_tracer(__name__)
 from ._audit_mirror import AuditRecord, AuditTrail
 
 @activity.defn
-async def detect_availability_anomaly(protected_service: str, anomaly_window: str) -> None:
-    """Resolve the trigger for this run: a synthetic-probe alert against __protected_service__ has tripped an availability threshold, edge / origin telemetry shows a sustained throughput / error-rate / latency deviation outside the documented availability objective, or an operator-initiated trigger landed. Reads __protected_service__ and __anomaly_window__ to confirm the anomaly is current and bounded; reads the operator's documented service-inventory row for the protected service to surface the pre-bound mitigation surface (upstream scrubber, rate-limit / WAF, standby failover) the downstream steps will engage against.
+async def detect_availability_anomaly(protected_service: str, anomaly_window: str, service_inventory: dict[str, object]) -> dict[str, object]:
+    """Resolve the trigger for this run: detect.resolve_availability_trigger confirms __anomaly_window__ is a bounded ISO-8601 interval, resolves __protected_service__ to its row in the operator's documented __service_inventory__ (an undocumented service or a duplicated row fails loud), and surfaces the availability objective (latency, error rate, throughput) together with the full pre-bound mitigation ladder — upstream scrubber, rate-limit / WAF and standby failover are all required at detect time, so a missing surface is discovered before an incident rather than mid-engagement with the service down. The synthetic-probe alert, edge / origin telemetry deviation or operator-initiated trigger that raised the anomaly is the monitoring adapter's ingress. The binding assigns the trigger envelope to __trigger_envelope__; the engage and validate bindings read its mitigation_surfaces and availability_objective.
 
     CACAO step_id: action--60000000-0000-4000-8000-000000000002
     """
     with _TRACER.start_as_current_span(
         name='activity.action--60000000-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'detect availability anomaly', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_availability_anomaly'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'detect availability anomaly', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_availability_anomaly'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--60000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'detect availability anomaly', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_availability_anomaly'})
+            AuditRecord(span_name='activity.action--60000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'detect availability anomaly', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_availability_anomaly'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--60000000-0000-4000-8000-000000000002'"
-        )
+        from content.playbooks.ddos_response.primitives.detect import resolve_availability_trigger
+        __trigger_envelope__ = resolve_availability_trigger(protected_service=__protected_service__, anomaly_window=__anomaly_window__, service_inventory=__service_inventory__)
 
 DETECT_AVAILABILITY_ANOMALY_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -44,21 +43,20 @@ DETECT_AVAILABILITY_ANOMALY_RETRY_POLICY = RetryPolicy(
 )
 
 @activity.defn
-async def classify_attack_vector(protected_service: str, anomaly_window: str) -> str:
-    """Classify the attack vector for the anomaly against the operator's documented vector taxonomy: volumetric (UDP / ICMP / amplification flood), protocol (SYN flood, TCP state exhaustion), or application-layer (HTTP flood, slow-loris). Reads the same monitoring surfaces the detect step consulted plus any operator-bound packet-capture / flow-record source documented for __protected_service__. Sets __attack_vector__. The classification is best-effort and time-boxed; if classification cannot be completed within the documented mitigation-engagement deadline (so the operator is not held by a perfect-classification stall while the service stays down), this step leaves __attack_vector__ empty and the downstream engage-mitigation step engages the most-restrictive pre-bound mitigation rather than waiting.
+async def classify_attack_vector(vector_signals: dict[str, object], deadline_exceeded: bool) -> dict[str, object]:
+    """Classify the attack vector against the operator's documented taxonomy — volumetric (UDP / ICMP / amplification flood), protocol (SYN flood, TCP state exhaustion) or application-layer (HTTP flood, slow-loris): classify.classify_attack_vector consumes the monitoring adapter's per-vector verdicts in __vector_signals__ (real booleans, all three keys required) and the adapter-enforced __deadline_exceeded__ time-box flag. Multi-signal precedence is volumetric > protocol > application_layer (the pipe-filler first); an aggregate 'under attack' verdict is never produced. A signal that arrived is a completed classification even at the deadline; when no signal arrived the vector is empty and classification_state records deadline_exceeded or no_signal, so the engage step engages the most-restrictive pre-bound mitigation rather than holding the operator to a perfect-classification stall while the service stays down. The binding assigns the envelope to __classification__; the compile target's adapter extracts __attack_vector__ (empty on the short-circuit branch).
 
     CACAO step_id: action--60000000-0000-4000-8000-000000000003
     """
     with _TRACER.start_as_current_span(
         name='activity.action--60000000-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify attack vector', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_attack_vector'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify attack vector', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_attack_vector'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--60000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify attack vector', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_attack_vector'})
+            AuditRecord(span_name='activity.action--60000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify attack vector', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_attack_vector'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--60000000-0000-4000-8000-000000000003'"
-        )
+        from content.playbooks.ddos_response.primitives.classify import classify_attack_vector
+        __classification__ = classify_attack_vector(signals=__vector_signals__, deadline_exceeded=__deadline_exceeded__)
 
 CLASSIFY_ATTACK_VECTOR_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -68,21 +66,20 @@ CLASSIFY_ATTACK_VECTOR_RETRY_POLICY = RetryPolicy(
 )
 
 @activity.defn
-async def engage_mitigation(protected_service: str, attack_vector: str) -> str:
-    """Engage the appropriate mitigation discipline against the operator's pre-bound response surface for __protected_service__: activate the upstream-scrubbing provider (volumetric); push the documented rate-limit / WAF posture change against the operator's edge surface (application-layer); or initiate the documented failover to the standby (protocol exhaustion or when scrubbing / rate-limit cannot recover the service inside the validation window). Reads __attack_vector__ to select the mitigation discipline; when __attack_vector__ is empty the step engages the most-restrictive pre-bound mitigation (typically failover) rather than waiting for classification. Emits __mitigation_action_id__ — the durable identifier of the engagement against the response surface (provider activation reference, ticket id, or failover-exercise reference). Detection bindings for mitigation-surface misconfiguration (scrubber not actually engaged, rate-limit pushed to wrong zone, standby reachable but not healthy) are owned by CORE-layer cards once upstream rule ids are selected.
+async def engage_mitigation(classification: dict[str, object], protected_service: str, anomaly_window: str, trigger_envelope: dict[str, object]) -> dict[str, object]:
+    """Engage the mitigation discipline against the operator's pre-bound response surface: mitigation.select_mitigation_engagement maps the vector to the discipline — volumetric ⇒ upstream scrubbing, application-layer ⇒ rate-limit / WAF posture, protocol ⇒ failover to standby — reading the surfaces resolved at detect time from __trigger_envelope__.mitigation_surfaces; an empty vector (the classify short-circuit) engages the most-restrictive pre-bound mitigation, failover, with short_circuit recorded rather than waiting for classification. The composed engagement order carries a deterministic, discipline-naming action id (ddos-mit-<discipline>-… over service, window and surface) so the value names the discipline even on the short-circuit branch and a replayed engagement resolves to the same id. Activating the scrubbing provider, pushing the posture change or exercising the failover is the compile target's adapter — the framework ships the hand-off and no scrubbing-provider binding. The binding assigns the order to __engagement__; the adapter extracts __mitigation_action_id__.
 
     CACAO step_id: action--60000000-0000-4000-8000-000000000004
     """
     with _TRACER.start_as_current_span(
         name='activity.action--60000000-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'engage mitigation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'engage_mitigation'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'engage mitigation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'engage_mitigation'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--60000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'engage mitigation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'engage_mitigation'})
+            AuditRecord(span_name='activity.action--60000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'engage mitigation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'engage_mitigation'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--60000000-0000-4000-8000-000000000004'"
-        )
+        from content.playbooks.ddos_response.primitives.mitigation import select_mitigation_engagement
+        __engagement__ = select_mitigation_engagement(attack_vector=__classification__.attack_vector, protected_service=__protected_service__, anomaly_window=__anomaly_window__, mitigation_surfaces=__trigger_envelope__.mitigation_surfaces)
 
 ENGAGE_MITIGATION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -92,21 +89,20 @@ ENGAGE_MITIGATION_RETRY_POLICY = RetryPolicy(
 )
 
 @activity.defn
-async def validate_service_restoration(protected_service: str, mitigation_action_id: str) -> bool:
-    """Observe the protected service against its documented availability objective (latency, error rate, throughput) for the documented validation window after the mitigation engagement. Reads __protected_service__ and __mitigation_action_id__; sets __service_restored__. A false outcome does not block downstream steps — the evidence-capture record is published with the failure marker and the notify step pages the incident-management owner with the full context so the next mitigation lever (escalate scrubbing tier, expand rate-limit scope, manual failover) can be engaged. Time-to-mitigation and availability-restoration metric emitters that read this step are owned by a sibling EXTEND card; this step intentionally does not pin a step-level metric_ref until that catalogue entry lands.
+async def validate_service_restoration(trigger_envelope: dict[str, object], validation_observations: str) -> dict[str, object]:
+    """Verify restoration against observed traffic, never against the mitigation having been applied: restoration.evaluate_service_restoration takes the monitoring adapter's samples across the documented validation window in __validation_observations__ and judges each against the availability objective resolved at detect time (__trigger_envelope__.availability_objective) — latency, error rate and throughput, with boundary equality inside the objective. The verdict is true only when every sample sits inside the objective; a false verdict is data, not a failure — every breach is enumerated by dimension with observed value and bound, the evidence record publishes with the failure marker, and the notify step pages the owner for the next mitigation lever (escalate scrubbing tier, expand rate-limit scope, manual failover). Malformed samples fail loud. The binding assigns the verdict to __restoration_verdict__; the adapter extracts __service_restored__.
 
     CACAO step_id: action--60000000-0000-4000-8000-000000000005
     """
     with _TRACER.start_as_current_span(
         name='activity.action--60000000-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'validate service restoration', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'validate_service_restoration'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'validate service restoration', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'validate_service_restoration'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--60000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'validate service restoration', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'validate_service_restoration'})
+            AuditRecord(span_name='activity.action--60000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'validate service restoration', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'validate_service_restoration'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--60000000-0000-4000-8000-000000000005'"
-        )
+        from content.playbooks.ddos_response.primitives.restoration import evaluate_service_restoration
+        __restoration_verdict__ = evaluate_service_restoration(availability_objective=__trigger_envelope__.availability_objective, observations=__validation_observations__)
 
 VALIDATE_SERVICE_RESTORATION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -116,21 +112,20 @@ VALIDATE_SERVICE_RESTORATION_RETRY_POLICY = RetryPolicy(
 )
 
 @activity.defn
-async def evidence_capture(protected_service: str, attack_vector: str, mitigation_action_id: str, service_restored: bool) -> str:
-    """Compose and publish the dated availability-incident evidence record to the operator's evidence store. The record carries the protected service id, the anomaly window, the classified attack vector (or the empty-classification marker on the short-circuit branch), the engaged mitigation action id, the restoration outcome (or the failure marker), and the observed availability-objective measurements across the validation window. This is the audit-evident artifact NIS2 Art. 21(2)(b) reviewers read against an availability/DoS incident; missing or stale evidence is the failure mode the incident-handling metrics surface.
+async def evidence_capture(protected_service: str, anomaly_window: str, classification: dict[str, object], engagement: dict[str, object], restoration_verdict: dict[str, object]) -> dict[str, object]:
+    """Compose the dated availability-incident evidence record the NIS2 Art. 21(2)(b) reviewer reads: evidence.compose_incident_evidence_record pins __protected_service__, __anomaly_window__, the classified vector (empty on the short-circuit branch, carrying the unclassified_vector marker), the engaged __engagement__.mitigation_action_id, the restoration verdict (service_not_restored marker on the unrestored branch) and the observed measurements — dated from the anomaly window's start instant, never from emitter run time, with a content-derived record identity so re-publication is idempotent. Missing or stale evidence is the failure mode the incident-handling metrics surface; publishing to the evidence store is the compile target's adapter. The binding assigns the record to __evidence_record__; the adapter extracts __evidence_id__.
 
     CACAO step_id: action--60000000-0000-4000-8000-000000000006
     """
     with _TRACER.start_as_current_span(
         name='activity.action--60000000-0000-4000-8000-000000000006',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'evidence capture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evidence_capture'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'evidence capture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evidence_capture'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--60000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'evidence capture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evidence_capture'})
+            AuditRecord(span_name='activity.action--60000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'evidence capture', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evidence_capture'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--60000000-0000-4000-8000-000000000006'"
-        )
+        from content.playbooks.ddos_response.primitives.evidence import compose_incident_evidence_record
+        __evidence_record__ = compose_incident_evidence_record(protected_service=__protected_service__, anomaly_window=__anomaly_window__, attack_vector=__classification__.attack_vector, mitigation_action_id=__engagement__.mitigation_action_id, restoration=__restoration_verdict__)
 
 EVIDENCE_CAPTURE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -140,21 +135,20 @@ EVIDENCE_CAPTURE_RETRY_POLICY = RetryPolicy(
 )
 
 @activity.defn
-async def notify_incident_management_owner(evidence_id: str, protected_service: str, service_restored: bool) -> None:
-    """Deliver the evidence reference to the incident-management owner along the operator's pre-bound channel (ticketing system, chat thread, page-out roster). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an evidence record written but never delivered to the owner is itself an incident-handling gap. Notification carries the restoration outcome so a false __service_restored__ pages with appropriate urgency for the next mitigation lever.
+async def notify_incident_management_owner(evidence_record: dict[str, object], protected_service: str, restoration_verdict: dict[str, object], owner_channel: str) -> dict[str, object]:
+    """Compose the owner notification: notify.compose_owner_notification carries __evidence_record__.evidence_id and the restoration outcome to the incident-management owner's pre-bound __owner_channel__ (ticketing system, chat thread, page-out roster) — a false service_restored pages with the next-lever prompt, a true one informs; a coerced string flag is refused. Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an evidence record written but never delivered to the owner is itself an incident-handling gap. Delivery along the channel is the messaging surface's; the binding assigns the payload to __owner_notification__.
 
     CACAO step_id: action--60000000-0000-4000-8000-000000000007
     """
     with _TRACER.start_as_current_span(
         name='activity.action--60000000-0000-4000-8000-000000000007',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'notify incident-management owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_incident_management_owner'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'notify incident-management owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_incident_management_owner'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--60000000-0000-4000-8000-000000000007', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'notify incident-management owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_incident_management_owner'})
+            AuditRecord(span_name='activity.action--60000000-0000-4000-8000-000000000007', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--60000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'notify incident-management owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_incident_management_owner'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--60000000-0000-4000-8000-000000000007'"
-        )
+        from content.playbooks.ddos_response.primitives.notify import compose_owner_notification
+        __owner_notification__ = compose_owner_notification(evidence_id=__evidence_record__.evidence_id, protected_service=__protected_service__, service_restored=__restoration_verdict__.service_restored, owner_channel=__owner_channel__)
 
 NOTIFY_INCIDENT_MANAGEMENT_OWNER_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
@@ -169,8 +163,8 @@ class PlaybookDdosResponseV1Workflow:
 
     CACAO playbook id : playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb
     stable_id         : playbook.ddos_response@v1
-    content_version   : 0.1.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--60000000-0000-4000-8000-000000000001
     activities        : detect_availability_anomaly, classify_attack_vector, engage_mitigation, validate_service_restoration, evidence_capture, notify_incident_management_owner
     """
@@ -179,10 +173,10 @@ class PlaybookDdosResponseV1Workflow:
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.ddos_response@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '0.1.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.ddos_response@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '0.1.0'})
+                AuditRecord(span_name='workflow.playbook.ddos_response@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--60a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6bb', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.ddos_response@v1'"
