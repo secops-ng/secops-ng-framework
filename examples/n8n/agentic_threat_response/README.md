@@ -39,10 +39,15 @@ inspection, and the regeneration script.
    review and bind it to your own connectors before activating.
 
 The emitted workflow is a *snapshot of intent*, not a runnable
-playbook. The Set nodes carry the CACAO I/O contract (`in_args` /
-`out_args`) plus the `x_secops_ng` reference bundles (control,
-detection, telemetry, metric) as editable assignments; binding those
-rows to real connectors is the operator's job.
+playbook. The five action steps are `n8n-nodes-base.code` nodes whose
+`pythonCode` is the exact primitive call from
+`content/playbooks/agentic_threat_response/primitives/`; the bodies
+assume `PYTHONPATH` on the n8n host resolves that package. The
+external inputs (`__raw_indicator__`, `__containment_window__`,
+`__authorisation_policy__`, `__evidence_artifacts__`) and the adapter
+seams (IdP execution, segmentation control plane, incident-management
+dispatch, evidence store) are the operator's to wire against their
+connectors — see the per-action notes below.
 
 ## Regeneration
 
@@ -76,3 +81,19 @@ process: hosting it on EU sovereign infrastructure (Nebul, OVHcloud,
 Scaleway, Hetzner) is a deployment choice, not a vendor decision. The
 operator runs n8n on infrastructure they control — we ship the
 structure, they own the data plane.
+
+## Per-action wiring notes — CORE bodies
+
+Every action step declares an `x_secops_ng.core_body` binding into the
+deterministic primitives package, so the emitter renders each as a Code
+node; the cross-target semantic contract is the primitives package
+itself (Temporal binds via activity imports, LangGraph via tool
+imports — all three call the same Python functions).
+
+| Step id (suffix) | CACAO step | Deterministic primitive | Operator wires |
+|---|---|---|---|
+| `…000002` | ingest agentic-threat indicator | `intake.hydrate_indicator(raw_indicator=__raw_indicator__)` → `__indicator_envelope__` | the detection-layer feed supplying `__raw_indicator__`; the adapter extracts `__affected_principal__` and mirrors `edges` into `__lateral_path__` |
+| `…000003` | isolate affected credential set | `isolation.plan_credential_isolation(affected_principal, containment_window)` → `__isolation_plan__` | `__containment_window__` from the containment policy; the IdP endpoint that executes the ledger and the channel that delivers the IAM-auditor alert |
+| `…000004` | contain lateral-movement path | `segmentation.derive_segmentation_rules(lateral_path=__indicator_envelope__.edges, authorisation_policy)` → `__segmentation_rules__` | `__authorisation_policy__` (the signed-off scope set); the segmentation control plane that applies the `deny_pivot` rules |
+| `…000005` | escalate to incident-management | `escalation.compose_escalation_envelope(indicator_id, affected_principal, isolation_plan_id=__isolation_plan__.plan_id, segmentation_rule_ids=__segmentation_rules__.rules)` → `__escalation_envelope__` | the intake seam on the deployed `incident_management` workflow that receives the envelope |
+| `…000006` | preserve evidence for notification chain | `evidence.seal_evidence_bundle(signal_id=__escalation_envelope__.signal_id, artifacts=__evidence_artifacts__)` → `__evidence_bundle_manifest__` | the evidence store supplying the four artifact refs + digests in `__evidence_artifacts__` and persisting the sealed bundle; the adapter extracts `__evidence_bundle__` |

@@ -141,17 +141,34 @@ def test_worked_example_has_valid_n8n_shape() -> None:
 
 
 def _action_without_commands_steps() -> dict[str, dict]:
+    """Action steps without ``commands`` AND without a CORE primitive binding.
+
+    Steps that carry ``x_secops_ng.core_body`` would compile to an n8n Code
+    node rendering the primitive call (CORE-MECH-EMIT-N8N) rather than the
+    Set-node uplift, so they are excluded from the Set-node contract checks.
+    """
     raw = json.loads(SOURCE.read_text(encoding="utf-8"))
     return {
         step_id: step
         for step_id, step in raw["workflow"].items()
-        if step.get("type") == "action" and not step.get("commands")
+        if step.get("type") == "action"
+        and not step.get("commands")
+        and not (step.get("x_secops_ng") or {}).get("core_body")
     }
 
 
 def _nodes_by_id() -> dict[str, dict]:
     workflow = json.loads(WORKED_EXAMPLE.read_text(encoding="utf-8"))
     return {node["id"]: node for node in workflow["nodes"]}
+
+
+def _core_body_steps() -> dict[str, dict]:
+    raw = json.loads(SOURCE.read_text(encoding="utf-8"))
+    return {
+        step_id: step
+        for step_id, step in raw["workflow"].items()
+        if (step.get("x_secops_ng") or {}).get("core_body")
+    }
 
 
 def test_action_without_commands_steps_emit_set_nodes() -> None:
@@ -200,9 +217,6 @@ def test_set_nodes_surface_x_secops_ng_refs() -> None:
         assignments = node["parameters"]["assignments"]["assignments"]
         names = {row["name"] for row in assignments}
         for key, value in x.items():
-            # Empty ref categories are dropped by the n8n emitter — mirror
-            # that contract so the test only asserts on refs that are
-            # actually surfaced as Set rows.
             if not value:
                 continue
             expected = f"x_secops_ng.{key}"
@@ -210,6 +224,50 @@ def test_set_nodes_surface_x_secops_ng_refs() -> None:
                 f"step {step_id!r}: x_secops_ng.{key} dropped from Set node; "
                 f"present assignments: {sorted(names)}"
             )
+
+
+def test_core_body_steps_emit_code_nodes() -> None:
+    """Steps with ``x_secops_ng.core_body`` compile to n8n Code nodes
+    rendering the primitive call (per CORE-MECH-EMIT-N8N).
+
+    Added by #905. This suite already scoped the Set-node assertions to
+    *unbound* steps, which left its bound steps with nothing asserting the
+    emitter had honoured them at all.
+
+    What this catches is an **emitter regression**: the n8n emitter stopping
+    honouring ``core_body``, or honouring it wrongly — emitting a Set node, a
+    Code node that imports the primitive but never calls it, or one whose call
+    does not bind the declared ``out`` variable. Byte-parity alone does not
+    catch that, because a careless regenerate bakes the regression into the
+    committed golden and the two then agree.
+
+    What it does **not** catch is deliberate de-binding: removing a
+    ``core_body`` and regenerating leaves this whole suite green, since the
+    declaration is the input to the check. That is a reviewable diff rather
+    than a silent regression — the removal shows up in both the CACAO and the
+    emitted workflow — so it is left to review rather than guarded here.
+    """
+    nodes_by_id = _nodes_by_id()
+    core_steps = _core_body_steps()
+    assert core_steps, "expected at least one CORE-bound step in agentic_threat_response"
+    for step_id, step in core_steps.items():
+        node = nodes_by_id[step_id]
+        assert node["type"] == "n8n-nodes-base.code", (
+            f"step {step_id!r} carries core_body and must emit a Code node, "
+            f"not {node['type']!r}"
+        )
+        body = node["parameters"].get("pythonCode", "")
+        primitive = step["x_secops_ng"]["core_body"]["primitive"]
+        module, _, callable_name = primitive.rpartition(".")
+        assert f"from {module} import {callable_name}" in body, (
+            f"step {step_id!r}: Code node missing primitive import "
+            f"`from {module} import {callable_name}`"
+        )
+        out_var = step["x_secops_ng"]["core_body"]["out"]
+        assert f"{out_var} = {callable_name}(" in body, (
+            f"step {step_id!r}: Code node missing primitive call binding "
+            f"`{out_var} = {callable_name}(...)`"
+        )
 
 
 def test_only_end_step_emits_noop() -> None:

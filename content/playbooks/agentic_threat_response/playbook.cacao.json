@@ -3,7 +3,7 @@
   "spec_version": "2.0",
   "id": "playbook--30a1b2c3-d4e5-4f60-8a1b-c2d3e4f5a6b8",
   "name": "Agentic-threat detection and response",
-  "description": "CACAO v2 scaffold for detecting and initially responding to fully-agentic adversary activity (autonomous LLM-driven credential harvest, lateral movement, and encryption chains observed at machine-speed decision cadence). The playbook ingests an agentic-threat indicator, isolates the affected credential set, contains the lateral-movement path, hands off the case envelope to the incident-management engine for the regulator-notification chain, and preserves evidence for the NIS2 Article 23 notification obligation. Portable content; runtime is the operator's choice \u2014 n8n, Temporal, or LangGraph.",
+  "description": "CACAO v2 playbook for detecting and initially responding to fully-agentic adversary activity (autonomous LLM-driven credential harvest, lateral movement, and encryption chains observed at machine-speed decision cadence). The playbook ingests an agentic-threat indicator, isolates the affected credential set, contains the lateral-movement path, hands off the case envelope to the incident-management engine for the regulator-notification chain, and preserves evidence for the NIS2 Article 23 notification obligation. Portable content; runtime is the operator's choice \u2014 n8n, Temporal, or LangGraph.",
   "playbook_types": [
     "detection",
     "investigation",
@@ -27,17 +27,62 @@
     },
     "__affected_principal__": {
       "type": "string",
-      "description": "Identity or service-account principal implicated by the indicator; drives the credential-isolation step.",
+      "description": "Identity or service-account principal implicated by the indicator; drives the credential-isolation step. Extracted at the compile target's adapter seam from __indicator_envelope__.affected_principal.",
       "external": false
     },
     "__lateral_path__": {
       "type": "string",
-      "description": "Resolved lateral-movement path (source-to-destination network / identity edges) the containment step must interrupt.",
+      "description": "JSON-native list of the implicated edge records (source, destination, edge_kind of network | identity, scope) mirrored at the compile target's adapter seam from __indicator_envelope__.edges. The containment binding consumes the envelope field directly; the mirror exists so an operator reading the path as a workflow variable sees the same records the rules were derived from.",
       "external": false
     },
     "__evidence_bundle__": {
       "type": "string",
-      "description": "Identifier of the preserved evidence bundle handed to the NIS2 Article 23 notification chain (LLM API call logs, credential-enumeration timeline, lateral-movement graph).",
+      "description": "Identifier of the preserved evidence bundle handed to the NIS2 Article 23 notification chain (LLM API call logs, credential-enumeration timeline, lateral-movement graph). Extracted at the compile target's adapter seam from __evidence_bundle_manifest__.bundle_id.",
+      "external": false
+    },
+    "__raw_indicator__": {
+      "type": "dictionary",
+      "description": "Detection-layer indicator record handed over by the telemetry adapter: indicator_id, indicator_class (llm_api_call_volume | credential_enumeration_burst | lateral_movement_window), affected_principal, source_context, destination_context, self_correction_seconds, and edges (source, destination, edge_kind of network | identity, scope). Consumed by intake.hydrate_indicator; the classifier that produced it is an adapter-bound operator surface.",
+      "external": true
+    },
+    "__indicator_envelope__": {
+      "type": "dictionary",
+      "description": "Hydrated indicator envelope composed by intake.hydrate_indicator: indicator_id, indicator_class, affected_principal, source_context, destination_context, self_correction_seconds, cadence_within_authored_window, edges. The compile target's adapter extracts __affected_principal__ and mirrors edges into __lateral_path__; the containment binding reads .edges directly.",
+      "external": false
+    },
+    "__containment_window__": {
+      "type": "string",
+      "description": "ISO-8601 duration the isolated principal stays disabled (e.g. PT4H), supplied by the operator's containment policy. Consumed by isolation.plan_credential_isolation and carried on the disable_principal ledger entry.",
+      "external": true
+    },
+    "__isolation_plan__": {
+      "type": "dictionary",
+      "description": "Credential-isolation plan composed by isolation.plan_credential_isolation: plan_id (content-derived, atr-iso-...), affected_principal, containment_window, the ordered ledger (revoke_live_sessions, revoke_refresh_tokens, revoke_access_tokens, disable_principal) and the composed iam_audit_alert. Executed by the IdP adapter and delivered by the messaging surface; the escalate binding reads .plan_id.",
+      "external": false
+    },
+    "__authorisation_policy__": {
+      "type": "dictionary",
+      "description": "Operator-supplied containment authorisation bound: authorised_scopes, the role-shaped scope identifiers the operator has signed off for segmentation action. Consumed by segmentation.derive_segmentation_rules; an implicated edge outside the set fails loud rather than being contained silently.",
+      "external": true
+    },
+    "__segmentation_rules__": {
+      "type": "dictionary",
+      "description": "Segmentation plan composed by segmentation.derive_segmentation_rules: rules, one deny_pivot record per implicated edge triple (rule_id atr-seg-..., source, destination, edge_kind, scope), in first-observation order. Applied by the segmentation adapter; the escalate binding reads .rules.",
+      "external": false
+    },
+    "__escalation_envelope__": {
+      "type": "dictionary",
+      "description": "Incident-management intake envelope composed by escalation.compose_escalation_envelope: signal_id (atr-..., derived from the indicator and shaped for the incident_management intake grammar), upstream_playbook, downstream_playbook, indicator_id, affected_principal, containment (isolation_plan_id, segmentation_rule_ids). Dispatched by the adapter; the preserve binding reads .signal_id.",
+      "external": false
+    },
+    "__evidence_artifacts__": {
+      "type": "string",
+      "description": "JSON-native list of the four artifact records the evidence-store adapter supplies to evidence.seal_evidence_bundle: kind (llm_api_call_logs | credential_enumeration_timeline | lateral_movement_graph | containment_action_ledger), ref (role-shaped evidence-store pointer), sha256 (64-hex digest of the stored artifact, computed by the adapter - the primitive never reads the artifacts). All four kinds required.",
+      "external": true
+    },
+    "__evidence_bundle_manifest__": {
+      "type": "dictionary",
+      "description": "Sealed evidence manifest composed by evidence.seal_evidence_bundle: bundle_id (content-derived, atr-evb-...), signal_id, artifacts sorted by kind. The compile target's adapter extracts __evidence_bundle__ (the bundle id) and persists the bundle.",
       "external": false
     }
   },
@@ -51,12 +96,14 @@
     "action--30000000-0000-4000-8000-000000000002": {
       "type": "action",
       "name": "ingest agentic-threat indicator",
-      "description": "Receive the agentic-threat indicator from the detection layer and hydrate it with originating principal, source / destination context, and the observed self-correction cadence. The indicator classes this step is authored against are: anomalous LLM API call volume from a workload principal, rapid credential-enumeration bursts inside a sub-minute window, and lateral movement across identity / network edges within a short self-correction window observed in fully-agentic operations.",
+      "description": "Receive the agentic-threat indicator from the detection layer and hydrate it into the response envelope: intake.hydrate_indicator validates the indicator against the three authored classes (anomalous LLM API call volume from a workload principal, rapid credential-enumeration bursts inside a sub-minute window, lateral movement across identity / network edges within a short self-correction window), canonicalises the originating principal and the source / destination context, records the observed self-correction cadence as data (an out-of-window cadence sets cadence_within_authored_window false rather than rejecting the indicator - the detection layer's classification is not second-guessed here), and requires at least one implicated edge for every class because the workflow is linear and containment always runs. Bound since the CORE-WIRE card: the binding assigns the full envelope to __indicator_envelope__ and the compile target's adapter extracts the documented out_args (__affected_principal__; __lateral_path__ mirrors the envelope's edges list) - the same marshalling seam every bound playbook documents. The agentic-activity classifier itself is an adapter-bound operator surface; the framework ships the contract, not a model.",
       "on_completion": "action--30000000-0000-4000-8000-000000000003",
       "in_args": [
-        "__indicator_id__"
+        "__indicator_id__",
+        "__raw_indicator__"
       ],
       "out_args": [
+        "__indicator_envelope__",
         "__affected_principal__",
         "__lateral_path__"
       ],
@@ -75,16 +122,27 @@
           "kpi.agentic_threat_detection_rate@v1",
           "kri.agentic_model_decision_latency_seconds@v1",
           "kri.agentic_false_positive_rate@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.agentic_threat_response.primitives.intake.hydrate_indicator",
+          "in": {
+            "raw_indicator": "__raw_indicator__"
+          },
+          "out": "__indicator_envelope__"
+        }
       }
     },
     "action--30000000-0000-4000-8000-000000000003": {
       "type": "action",
       "name": "isolate affected credential set",
-      "description": "Revoke live sessions, refresh and access tokens for __affected_principal__ at the IdP, disable the principal for the containment window, and dispatch an alert to the IAM auditor lane so the credential-scope audit and forced-rotation follow-on run in parallel. This step is the credential-side cut-out on the agentic operator; the deeper IdP-side audit lives on playbook.identity_compromise@v1.",
+      "description": "Plan the credential cut-out for __affected_principal__: isolation.plan_credential_isolation derives the ordered ledger the IdP adapter executes - revoke live sessions, then refresh tokens, then access tokens, then disable the principal for __containment_window__ - with a content-derived plan id so a replayed isolation resolves to the same ledger (idempotent containment), and composes the IAM-auditor alert so the credential-scope audit and forced-rotation follow-on run in parallel. Composition / delivery split: executing the revocations and delivering the alert are the compile target's IdP and messaging adapter surfaces; the deeper IdP-side audit lives on playbook.identity_compromise@v1. The binding assigns the plan to __isolation_plan__.",
       "on_completion": "action--30000000-0000-4000-8000-000000000004",
       "in_args": [
-        "__affected_principal__"
+        "__affected_principal__",
+        "__containment_window__"
+      ],
+      "out_args": [
+        "__isolation_plan__"
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -95,16 +153,28 @@
         ],
         "metric_refs": [
           "kpi.mttc_agentic_threat@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.agentic_threat_response.primitives.isolation.plan_credential_isolation",
+          "in": {
+            "affected_principal": "__affected_principal__",
+            "containment_window": "__containment_window__"
+          },
+          "out": "__isolation_plan__"
+        }
       }
     },
     "action--30000000-0000-4000-8000-000000000004": {
       "type": "action",
       "name": "contain lateral-movement path",
-      "description": "Apply a network micro-segmentation call along the resolved __lateral_path__ so the agentic operator cannot pivot off the implicated edge to continue the encryption / staging chain during the containment window. Bounded by the operator-supplied authorisation policy.",
+      "description": "Derive the micro-segmentation rules along the resolved lateral-movement path: segmentation.derive_segmentation_rules reads the implicated edges from __indicator_envelope__.edges and emits one deterministic deny_pivot rule per edge triple, hard-bounded by the operator-supplied __authorisation_policy__ - an edge whose scope the policy does not authorise fails loud rather than widening containment beyond the signed-off bound; duplicate observations of an edge collapse to one rule, while the same edge under two different scopes is refused as ambiguous authorisation. Applying the rules on the segmentation surface (firewall, service mesh, identity-aware proxy) so the agentic operator cannot pivot off the implicated edge during the containment window is the compile target's adapter. The binding assigns the rule set to __segmentation_rules__.",
       "on_completion": "action--30000000-0000-4000-8000-000000000005",
       "in_args": [
-        "__lateral_path__"
+        "__indicator_envelope__",
+        "__authorisation_policy__"
+      ],
+      "out_args": [
+        "__segmentation_rules__"
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -112,28 +182,60 @@
           "control.boundary_protection@v1"
         ],
         "telemetry_refs": [],
-        "metric_refs": []
+        "metric_refs": [],
+        "core_body": {
+          "primitive": "content.playbooks.agentic_threat_response.primitives.segmentation.derive_segmentation_rules",
+          "in": {
+            "lateral_path": "__indicator_envelope__.edges",
+            "authorisation_policy": "__authorisation_policy__"
+          },
+          "out": "__segmentation_rules__"
+        }
       }
     },
     "action--30000000-0000-4000-8000-000000000005": {
       "type": "action",
       "name": "escalate to incident-management",
-      "description": "Hand off the case envelope to playbook.incident_management@v1 as the upstream-playbook intake so the regulator-submission timeline (NIS2 Article 23 early-warning and 72-hour notification) is dispatched by the incident-management engine. Cross-playbook reference; this playbook does not itself render the regulator notification.",
+      "description": "Compose the case envelope handed to playbook.incident_management@v1 as the upstream-playbook intake: escalation.compose_escalation_envelope derives the signal id deterministically from __indicator_id__ - shaped to pass the incident-management intake grammar, so the same indicator replayed resolves to the same incident and cross-playbook dedup composes out of two derivations with no shared runtime state - and carries the containment ledger (__isolation_plan__.plan_id and the rule ids read from __segmentation_rules__.rules, deduplicated and sorted for an order-insensitive canonical form). This playbook does not itself render the regulator notification: the NIS2 Article 23 early-warning and 72-hour timelines are dispatched by the incident-management engine. The workflow escalates before it seals evidence, so the envelope carries no bundle id - the bundle joins by signal id. Dispatching the envelope is the compile target's concern; the binding assigns it to __escalation_envelope__.",
       "on_completion": "action--30000000-0000-4000-8000-000000000006",
+      "in_args": [
+        "__indicator_id__",
+        "__affected_principal__",
+        "__isolation_plan__",
+        "__segmentation_rules__"
+      ],
+      "out_args": [
+        "__escalation_envelope__"
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.incident_reporting@v1"
         ],
         "telemetry_refs": [],
-        "metric_refs": []
+        "metric_refs": [],
+        "core_body": {
+          "primitive": "content.playbooks.agentic_threat_response.primitives.escalation.compose_escalation_envelope",
+          "in": {
+            "indicator_id": "__indicator_id__",
+            "affected_principal": "__affected_principal__",
+            "isolation_plan_id": "__isolation_plan__.plan_id",
+            "segmentation_rule_ids": "__segmentation_rules__.rules"
+          },
+          "out": "__escalation_envelope__"
+        }
       }
     },
     "action--30000000-0000-4000-8000-000000000006": {
       "type": "action",
       "name": "preserve evidence for notification chain",
-      "description": "Persist an evidence bundle for the NIS2 Article 23 notification chain: LLM API call logs, credential-enumeration timeline, lateral-movement graph, and the containment-action ledger. The bundle identifier is emitted as __evidence_bundle__ and consumed by the downstream incident-management engine.",
+      "description": "Seal the evidence bundle for the NIS2 Article 23 notification chain: evidence.seal_evidence_bundle takes the four artifact records the evidence-store adapter supplies in __evidence_artifacts__ (LLM API call logs, credential-enumeration timeline, lateral-movement graph, containment-action ledger - each an opaque store reference plus the operator-computed SHA-256; all four kinds required and no other kind accepted), collapses identical re-presentations, fails loud on a conflicting digest or reference, and derives a content-keyed bundle id joined to the case by __escalation_envelope__.signal_id. The binding assigns the manifest to __evidence_bundle_manifest__ and the compile target's adapter extracts __evidence_bundle__ (the bundle id) for the downstream incident-management engine; persisting the bundle to the evidence store is the adapter's.",
       "on_completion": "end--30000000-0000-4000-8000-000000000007",
+      "in_args": [
+        "__escalation_envelope__",
+        "__evidence_artifacts__"
+      ],
       "out_args": [
+        "__evidence_bundle_manifest__",
         "__evidence_bundle__"
       ],
       "x_secops_ng": {
@@ -141,7 +243,15 @@
           "control.audit_review_analysis_reporting@v1"
         ],
         "telemetry_refs": [],
-        "metric_refs": []
+        "metric_refs": [],
+        "core_body": {
+          "primitive": "content.playbooks.agentic_threat_response.primitives.evidence.seal_evidence_bundle",
+          "in": {
+            "signal_id": "__escalation_envelope__.signal_id",
+            "artifacts": "__evidence_artifacts__"
+          },
+          "out": "__evidence_bundle_manifest__"
+        }
       }
     },
     "end--30000000-0000-4000-8000-000000000007": {
@@ -151,8 +261,8 @@
   },
   "x_secops_ng": {
     "stable_id": "playbook.agentic_threat_response@v1",
-    "content_version": "0.3.0",
-    "maturity": "experimental",
+    "content_version": "1.0.0",
+    "maturity": "stable",
     "compile_targets": [
       "n8n",
       "temporal",
