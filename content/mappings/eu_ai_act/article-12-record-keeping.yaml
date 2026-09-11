@@ -1,0 +1,184 @@
+# EU AI Act — Article 12 record-keeping and automatic logging.
+#
+# Art. 12 legislates the property the framework's evidence-stream model
+# already produces: a high-risk AI system must technically allow the
+# automatic recording of events over its lifetime, at a level of
+# traceability appropriate to the intended purpose. This crosswalk
+# binds the article to the shipped `incidents` and `access` streams as
+# the carriers rather than proposing a new stream, and pins the OCSF
+# class the log records resolve against
+# (`telemetry.ocsf.api_activity@v1` — the class the
+# `kpi.audit_log_completeness_ratio@v1` catalogue entry already reads).
+#
+# Scope. Art. 12 binds the *provider* of a high-risk AI system: the
+# obligation is that the system be designed and developed with the
+# logging capability. The framework ships no AI system, so what these
+# entries anchor is the operator-side surface that consumes and retains
+# those logs — the record contract, the audit-evident stream carrying
+# it, and the completeness and tamper-evidence measurements over it.
+# The log store itself is operator-owned and never shipped here.
+#
+# Cross-reference. Art. 26(6) obliges the deployer to retain the logs
+# this article obliges the provider to produce; the two entries
+# reference each other. Art. 12(2) names Art. 72 post-market
+# monitoring and Art. 26(5) monitoring-of-operation as the two
+# downstream consumers of the recorded events, and both have shipped
+# entries on this axis.
+regime: eu_ai_act
+entries:
+  - id: eu_ai_act:art-12-1-automatic-event-logging
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "12"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      High-risk AI systems shall technically allow for the automatic
+      recording of events (logs) over the lifetime of the system.
+    status: live
+    control_refs:
+      - control.evidence_pipeline@v1
+    playbook_refs:
+      - playbook.eu_ai_act_risk_management@v1
+    metric_refs:
+      - kpi.audit_log_completeness_ratio@v1
+      - kpi.audit_log_tamper_evidence_coverage@v1
+    telemetry_refs:
+      - telemetry.ocsf.api_activity@v1
+    evidence_stream_refs:
+      - incidents
+      - access
+    notes: >-
+      The logging capability is a design obligation on the provider's
+      system; the framework ships no AI system and therefore does not
+      discharge it. What the catalogue does carry is the operator-side
+      half the obligation presupposes: the evidence-pipeline control
+      aggregates the records the workflow layer emits, and the two
+      audit-log metrics measure whether that recording is in fact
+      complete (`audit_log_completeness_ratio`, the ratio of step
+      transitions that emit a durable record) and tamper-evident
+      (`audit_log_tamper_evidence_coverage`). Anchored on the
+      assemble-technical-documentation step of the
+      eu_ai_act_risk_management playbook, because Annex IV point 2(f)
+      requires the logging capability to be described in the technical
+      documentation the step assembles. Retention of the produced logs
+      is the deployer's obligation under Art. 26(6) — see
+      `eu_ai_act:art-26-6-log-retention`.
+
+  - id: eu_ai_act:art-12-2-traceability-appropriate-to-purpose
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "12"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      The logging capabilities shall enable the recording of events
+      relevant for identifying situations that may result in the system
+      presenting a risk within the meaning of Article 79(1) or in a
+      substantial modification, for facilitating post-market monitoring
+      under Article 72, and for monitoring the operation of high-risk
+      systems as referred to in Article 26(5).
+    status: live
+    control_refs:
+      - control.incident_timeline_signals@v1
+    playbook_refs:
+      - playbook.eu_ai_act_risk_management@v1
+      - playbook.eu_ai_act_deployer_obligations@v1
+    metric_refs:
+      - kpi.audit_log_completeness_ratio@v1
+    telemetry_refs:
+      - telemetry.ocsf.api_activity@v1
+      - telemetry.ocsf.detection_finding@v1
+    evidence_stream_refs:
+      - incidents
+    notes: >-
+      This is the paragraph that makes Art. 12 an operational
+      obligation rather than a storage one: the recorded events must be
+      the ones that let a reviewer identify a risk situation or a
+      substantial modification. It names its own two downstream
+      consumers, and both are shipped entries on this axis — Art. 72
+      post-market monitoring on the provider side
+      (`eu_ai_act:art-72-post-market-monitoring`, the
+      monitor-post-market-signals step) and Art. 26(5)
+      monitoring-of-operation on the deployer side
+      (`eu_ai_act:art-26-5-monitoring-and-suspension`, the
+      monitor_operation step). The Detection Finding class is the
+      machine-readable form a risk-relevant event takes once the
+      operator's detection surface classifies it; the API Activity
+      class carries the lifecycle records themselves. "Appropriate to
+      the intended purpose" is a proportionality standard the operator
+      sets against their own system — the framework declares the
+      record contract, never a retention period or an event volume.
+
+  - id: eu_ai_act:art-12-3-annex-iii-1a-minimum-log-content
+    regulation:
+      name: EU AI Act
+      instrument: Regulation (EU) 2024/1689
+      celex: 32024R1689
+      article: "12"
+      url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    obligation: >-
+      For high-risk AI systems referred to in point 1(a) of Annex III
+      (remote biometric identification), the logging shall provide at a
+      minimum the period of each use, the reference database against
+      which input data has been checked, the input data for which the
+      search led to a match, and the identification of the natural
+      persons involved in the verification of the results under
+      Article 14(5).
+    status: live
+    playbook_refs:
+      - playbook.ai_human_oversight@v1
+    telemetry_refs:
+      - telemetry.ocsf.api_activity@v1
+    evidence_stream_refs:
+      - access
+    subcategory_entries:
+      - id: 12(3)(a)
+        outcome: >-
+          The period of each use is recorded — the start date and time
+          and the end date and time of every use of the system.
+        gap_note: >-
+          Produced by the biometric system's own logging capability.
+          The framework ships no remote biometric identification
+          system and no matcher, so no catalogue artifact emits this
+          record; the operator's system does, and the access stream
+          carries it once retained.
+      - id: 12(3)(b)
+        outcome: >-
+          The reference database against which the system checked the
+          input data is recorded.
+        gap_note: >-
+          Same surface as 12(3)(a): the reference-database identifier
+          is known only to the matching system. Recorded by the
+          operator's system, not by any catalogue artifact.
+      - id: 12(3)(c)
+        outcome: >-
+          The input data for which the search led to a match is
+          recorded.
+        gap_note: >-
+          Same surface as 12(3)(a). Note that this record is personal
+          data — often biometric data under GDPR Art. 9 — so the
+          retention period Art. 26(6) sets interacts with the GDPR
+          storage-limitation principle; the framework declares the
+          record contract and takes no position on the operator's
+          lawful basis.
+      - id: 12(3)(d)
+        outcome: >-
+          The natural persons involved in verifying the results, as
+          required by Article 14(5), are identified in the log.
+        playbook_refs:
+          - playbook.ai_human_oversight@v1
+    notes: >-
+      The only sub-atom with a catalogue anchor is (d): Art. 14(5)
+      requires that no action be taken on a remote-biometric
+      identification unless verified and confirmed by at least two
+      natural persons, and the ai_human_oversight playbook exercises
+      that verification on the access stream — the same anchor
+      `eu_ai_act:art-14-5-biometric-two-person-verification` carries.
+      Sub-atoms (a) to (c) are recorded by the operator's biometric
+      system itself; they are named here with gap notes rather than
+      left implicit, so a reviewer reading this axis sees the boundary
+      between what the catalogue discharges and what the deployed
+      system must produce. Retention of all four is Art. 26(6).

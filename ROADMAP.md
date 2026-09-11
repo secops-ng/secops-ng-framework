@@ -3083,7 +3083,7 @@ component definition.
 
 ### F-MAP-EUAIACT-LOGGING — EU AI Act Art. 12 record-keeping and automatic logging
 
-- **Status:** Proposed
+- **Status:** Shipped
 - **Priority:** P2
 - **Goal:** G-02 (regulatory-graph closure — Art. 12 is unmapped and is
   the obligation the Art. 26(6) deployer log-retention atom depends
@@ -3111,6 +3111,21 @@ component definition.
   stream, Shipped).
 - **Source:** EU AI Act (Regulation (EU) 2024/1689) Art. 12; Annex III
   point 1(a).
+- **Shipped:** #999 closing #836 —
+  `content/mappings/eu_ai_act/article-12-record-keeping.yaml` with three
+  `live` atoms: the lifetime event-recording capability (anchored on
+  assemble-technical-documentation, per Annex IV point 2(f)), the
+  traceability-appropriate-to-purpose standard naming its own two
+  shipped downstream consumers (Art. 72 provider-side, Art. 26(5)
+  deployer-side), and the Annex III(1)(a) minimum log content broken
+  into subcategory entries (a)-(d) — only (d) carrying a catalogue
+  anchor (ai_human_oversight, Art. 14(5)), (a)-(c) carrying gap notes
+  because the operator's own biometric matcher produces them. Binds the
+  shipped `incidents` and `access` streams rather than proposing a new
+  one, and pins `telemetry.ocsf.api_activity@v1` — the class the
+  shipped `kpi.audit_log_completeness_ratio@v1` entry already reads —
+  so the mapping agrees with the metric that measures it. The Art.
+  26(6) cross-reference is closed both ways, as the criterion required.
 
 ### F-MAP-ORPHAN-PARITY — orphan-CI parity for the non-EU mapping axes
 
