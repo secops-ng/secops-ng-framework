@@ -55,57 +55,54 @@ examples each carry a mirror copy at
 ## 2. CACAO topology and primitives binding
 
 The playbook ships 11 steps: one `start`, seven `action`, two
-`if-condition`, one `end`. Of the seven action steps, four declare an
+`if-condition`, one `end`. All seven action steps declare an
 `x_secops_ng.core_body` reference into the deterministic primitives
-package via the per-target overlay (see § 2.1); three stay absent-body
-across the SKELETON wave and raise `NotImplementedError` from inside
-the span + audit-mirror prologue until the upstream primitive lands.
+package **on the canonical source** (the overlay era is closed — see
+§ 2.1); the playbook is `stable` at `content_version` 1.0.0 under the
+Maturity ladder.
 
-| Step suffix | Step                                            | `core_body` binding (per-target overlay)                                       | Status   |
+| Step suffix | Step                                            | `core_body` binding (canonical source)                                         | Status   |
 |-------------|-------------------------------------------------|--------------------------------------------------------------------------------|----------|
-| `…000002`   | intake significant-incident signal              | (no upstream primitive yet — upstream-workflow handoff envelope deferred)      | absent   |
+| `…000002`   | intake significant-incident signal              | `primitives.intake.derive_incident_id`                                         | bound    |
 | `…000003`   | classify significance and cross-border scope    | `primitives.classification.classify_significance`                              | bound    |
 | `…000004`   | significant? (if-condition)                     | edge wiring only — no body                                                     | n/a      |
-| `…000005`   | open incident timeline                          | (no upstream primitive yet — F-PT-02 binding adapter present; open-call seam)  | absent   |
+| `…000005`   | open incident timeline                          | `primitives.timeline_binding.open_timeline`                                    | bound    |
 | `…000006`   | submit 24-hour early warning                    | `primitives.regulator_submission.resolve_destination(stage='early_warning')`   | bound    |
 | `…000007`   | submit 72-hour notification                     | `primitives.stage_clock.verdict_for_submission(stage='notification', ...)`     | bound    |
 | `…000008`   | final-report material complete? (if-condition)  | edge wiring only — no body                                                     | n/a      |
 | `…000009`   | submit 1-month final report                     | `primitives.regulator_submission.resolve_destination(stage='final_report')`    | bound    |
-| `…00000a`   | close incident timeline                         | (no upstream primitive yet — close-call seam against F-PT-02 adapter)          | absent   |
+| `…00000a`   | close incident timeline                         | `primitives.timeline_binding.close_timeline`                                   | bound    |
 
-The four bindings shipped today are the byte-identical anchor the
-cross-target replay property hangs off. The three absent-body steps
-all share the same shape — span + `AuditTrail` mirror prologue, then
-`raise NotImplementedError(...)` — so an integrator can identify each
-seam at a glance.
+The seven bindings are the byte-identical anchor the cross-target
+replay property hangs off. The remaining `NotImplementedError` in the
+emitted artifacts marks only operator-integration seams (submission
+endpoints, notification channels — the connectors the operator
+wires), which is emitter-standard across every bound playbook: span +
+`AuditTrail` mirror prologue first, so the seam is identifiable at a
+glance.
 
-### 2.1 The CORE-PRIM contract and the per-target overlay
+### 2.1 Single source of truth — the overlay era, closed
 
-The canonical `playbook.cacao.json` deliberately ships **without**
-`x_secops_ng.core_body` blocks on the action steps in this SKELETON
-wave. The per-step bindings instead live in
-`examples/{n8n,temporal,langgraph}/incident_management/core_body.overlay.json`
-and are layered onto each target's CACAO mirror at regeneration time.
-The three overlays are **cell-for-cell identical** — same step ids,
-same primitive references, same input / output names — so the three
-compile targets stay in lock-step across the SKELETON wave.
+During the SKELETON wave the per-step bindings lived in a per-target
+`core_body.overlay.json` layered onto each mirror at regeneration
+time, with the canonical source deliberately binding-free. That seam
+is **closed**: the `core_body` blocks were promoted onto the canonical
+`playbook.cacao.json` as the single source of truth, the overlay
+collapsed to empty, and the divergence guard was replaced — at its own
+instruction — by a seam-closure test
+(`tests/examples/test_n8n_incident_management.py::test_wave_seam_is_closed_and_mirror_is_byte_identical`)
+that pins the overlay empty and the mirror byte-identical to the
+canonical. A contributor re-introducing per-target divergence trips
+that test instead of silently forking the source of truth.
 
-The overlay collapses to empty and the per-target divergence closes
-when a subsequent card promotes the `core_body` blocks upward into the
-canonical source as the single source of truth. The per-example
-divergence guard tests
-(`tests/examples/incident_management/test_temporal_workflow.py`,
-`tests/examples/incident_management/test_langgraph_graph.py`, and the
-n8n sibling) pin the asymmetry until that promotion lands.
-
-Asymmetry between the three regulator-submission steps (two bind the
-fail-closed destination resolver, one binds the stage-clock verdict)
-is a deliberate SKELETON demonstration: every primitive group named on
-the wave card (stage-clock, classification, regulator-submission) is
-exercised somewhere in the workflow, with the operator wiring the
-second primitive per step (the clock check on the bound-destination
-steps and the destination resolution on the bound-clock step) at the
-target's body layer. Subsequent waves consolidate per-step bindings.
+One deliberate asymmetry persists in the shipped bindings: of the
+three regulator-submission steps, two bind the fail-closed destination
+resolver and one binds the stage-clock verdict — every primitive group
+(stage-clock, classification, regulator-submission, timeline binding,
+intake derivation) is exercised somewhere in the workflow, and the
+operator wires the complementary primitive per step (the clock check
+on the bound-destination steps, the destination resolution on the
+bound-clock step) at the target's body layer.
 
 ## 3. Deterministic primitives — the contract
 
@@ -180,18 +177,17 @@ called through three different idioms.
 
 ## 4. Per-target hand-off
 
-### 4.1 n8n — operator-edited Set rows + Code-node bindings
+### 4.1 n8n — code-node bindings, operator-wired connectors
 
 `examples/n8n/incident_management/workflow.n8n.json` carries the CACAO
-topology as n8n nodes (`manualTrigger`, `set`, `if`, `noOp`), with
-node ids preserving the CACAO step ids verbatim. The four bound CORE
-steps emit `n8n-nodes-base.code` nodes whose `pythonCode` is the exact
-primitive call (e.g.
+topology as n8n nodes (`manualTrigger`, `code`, `if`, `noOp`), with
+node ids preserving the CACAO step ids verbatim. All seven bound
+action steps emit `n8n-nodes-base.code` nodes whose `pythonCode` is
+the exact primitive call (e.g.
 `from incident_management.primitives.classification import classify_significance ; __classification_verdict__ = classify_significance(__intake_signals__)`);
-the three absent-body steps emit an `n8n-nodes-base.set` node carrying
-the CACAO I/O contract as editable assignment rows.
+no Set-node placeholders remain.
 
-Operators bind the Set rows and Code-node inputs to their connectors:
+Operators wire the Code-node inputs to their connectors:
 
 - intake → upstream-workflow handoff envelope (alert_triage close-out,
   ransomware_containment close-out, or operator-raised ticket)
@@ -201,11 +197,10 @@ Operators bind the Set rows and Code-node inputs to their connectors:
   regulator endpoint per stage, resolved out of
   `__notification_destinations__`
 
-The Code-node body for the four bound steps assumes `PYTHONPATH` on
-the n8n host resolves `incident_management.primitives`. Operators who
-run n8n in a Python-free container drop a single Python-runner Code
-node between the Set node and the next step; the wiring is documented
-in
+The Code-node bodies assume `PYTHONPATH` on the n8n host resolves
+`incident_management.primitives`. Operators who run n8n in a
+Python-free container drop a single Python-runner Code node ahead of
+the chain; the wiring is documented in
 [`examples/n8n/incident_management/README.md`](../../examples/n8n/incident_management/README.md)
 under *Per-action wiring notes — CORE bodies*.
 
@@ -213,12 +208,13 @@ under *Per-action wiring notes — CORE bodies*.
 
 `examples/temporal/incident_management/workflow.temporal.py` is a
 standard Temporal worker module: one `@workflow.defn` class and one
-`@activity.defn` function per CACAO action. The four bound activities
-import the primitive and produce the canonical classification verdict /
-destination handle / stage verdict; the three absent-body activities
-open the span, append the audit record, and then
-`raise NotImplementedError` so an integrator sees exactly which seam
-they still have to wire.
+`@activity.defn` function per CACAO action. All seven activities
+import their primitive and produce the canonical incident id /
+classification verdict / timeline handle / destination handle / stage
+verdict; the only remaining `NotImplementedError` marks the
+operator-integration seams (submission endpoints, the timeline
+persistence backend) so an integrator sees exactly which seam is
+theirs.
 
 Operators drop `workflow.temporal.py` next to their worker, register
 the activities, and run the worker against their Temporal cluster.
@@ -239,9 +235,9 @@ the target-neutral topology (nodes, edges, conditional edges).
 `assemble.py` is the canonical reference assembly that wires the spec
 into a `StateGraph`.
 
-The four bound tools import the primitive and update the typed state.
-The three absent-body tools raise `NotImplementedError` after opening
-their span and audit record. Operators wire the absent-body tools to
+All seven tools import their primitive and update the typed state;
+the operator-integration seams stay marked with `NotImplementedError`
+after their span and audit record. Operators wire those seams to
 their own runtime, or swap any node for an LLM-driven callable that
 fills the agentic hook (the natural seam is the free-text fields on
 the final-report submission, where `primitives.signatures` provides
@@ -258,7 +254,7 @@ endpoint guard re-applies the check at process startup
 
 ## 5. Observability — OTel + AuditTrail in every target
 
-Every emitted action — bound or absent-body — opens an OpenTelemetry
+Every emitted action opens an OpenTelemetry
 span and appends an `AuditRecord` to a context-local `AuditTrail`
 *before* the primitive call or the `NotImplementedError`. The mirror
 runs unconditionally, ahead of any OTLP exporter, so the audit

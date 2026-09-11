@@ -224,9 +224,8 @@ The six bindings exercised today:
     separators around the pipes). `compile_target` is intentionally
     **not** part of the id — the three reference compilers (n8n,
     Temporal, LangGraph) re-derive byte-identical bytes from the same
-    primitive output, and the cross-target byte-parity contract the
-    F-WF-PATCH CORE-FANOUT siblings assert against holds across
-    targets. The skip-marker invariant (`broad_rollout_id` empty iff
+    primitive output, and the cross-target byte-parity goldens
+    assert that contract holds across targets. The skip-marker invariant (`broad_rollout_id` empty iff
     `broad_rollout_skip_reason == "canary_unhealthy"`) and the
     `canary_healthy ↔ gate-combination` invariant are re-validated at
     the primitive boundary so an inconsistent record fails loud at
@@ -255,30 +254,31 @@ consumers join on `(workflow_id, execution_id)` and dedupe on
 
 ## 4. Per-target hand-off
 
-The deterministic primitives package shipped under CORE-PRIM; the per-
-target evidence-emitter wiring (artifact-path, content-addressed
-filename, atomic write) is owned by the F-WF-PATCH CORE-FANOUT sibling
-cards and lands with that work. Until the CORE-FANOUT siblings ship,
-the three worked-example artifacts under
+The deterministic primitives package shipped under CORE-PRIM, and
+every action step is bound on the canonical source — all seven,
+including the notify step's composition half
+(`primitives.notify.compose_maintenance_notification`, wired under the
+maturity-wave WIRE card); the playbook is `stable` at
+`content_version` 1.0.0. The three worked-example artifacts under
 `examples/{n8n,temporal,langgraph}/patch_management/` carry the CACAO
-topology with the primitive call documented per action and the bodies
-left as integrator seams (`NotImplementedError` stubs on the Temporal
-and LangGraph stubs, editable Set rows on the n8n side). Each
+topology with each body invoking its bound primitive (n8n emits code
+nodes — no Set-node placeholders remain); the remaining
+`NotImplementedError` marks only operator-integration seams
+(scanner/ring adapters, the evidence sink, the messaging surface). Each
 worked example also ships a `regenerate.sh` that mirrors the canonical
 CACAO source into the example folder and re-emits the per-target
 artifact via `tools.compile`; running it from the repo root yields
-byte-identical output, which is the property the per-target byte-
-parity goldens assert against once the CORE-FANOUT siblings land.
+byte-identical output, which is the property the per-target
+byte-parity goldens assert.
 
-### 4.1 n8n — operator-edited Set rows + Code-node bindings
+### 4.1 n8n — code-node bindings, operator-wired connectors
 
 `examples/n8n/patch_management/workflow.n8n.json` carries the CACAO
-topology as n8n nodes (`manualTrigger`, `set`, `noOp`), with node ids
-preserving the CACAO step ids verbatim. The seven action steps emit
-`n8n-nodes-base.set` nodes carrying the CACAO I/O contract as
-editable assignment rows — the n8n target ships as a **snapshot of
-intent**, and the operator binds the Set rows to their own connectors
-in their n8n instance:
+topology as n8n nodes (`manualTrigger`, `code`, `noOp`), with node ids
+preserving the CACAO step ids verbatim. All seven action steps emit
+`n8n-nodes-base.code` nodes invoking their bound primitives — the n8n
+target ships as a **snapshot of intent**, and the operator wires each
+node's inputs to their own connectors in their n8n instance:
 
 - `detect-patch-availability` → advisory-intake surface (vendor feed,
   distribution channel, upstream release notification; HTTP / queue
@@ -299,20 +299,22 @@ in their n8n instance:
   `content.playbooks.patch_management.primitives.fanout.fan_out_to_broad_rings`,
   followed by the operator's distribution-channel push call against
   the remaining rings on a green canary.
-- `evidence-capture` → `executeCommand` node calling the per-target
-  patch-evidence adapter once it ships with CORE-FANOUT (the adapter
-  routes the typed payload through the workflow-local primitive at
-  `content.playbooks.patch_management.primitives.artifact` and writes
-  the artifact bytes atomically via `os.replace` through a sibling
-  `.tmp`).
-- `notify-maintenance-owner` → operator's maintenance-owner
-  notification channel (ticketing webhook, chat thread, change-
-  management board connector).
+- `evidence-capture` → Code node invoking
+  `content.playbooks.patch_management.primitives.artifact.build_patch_application_evidence_artifact`;
+  the durable write (artifact path, content-addressed filename,
+  atomic `os.replace` through a sibling `.tmp`) is the operator's
+  evidence-sink seam.
+- `notify-maintenance-owner` → Code node invoking
+  `content.playbooks.patch_management.primitives.notify.compose_maintenance_notification`
+  (role-shaped recipient, urgency from the canary outcome, SHA-256
+  delivery dedup key); the delivery itself goes to the operator's
+  maintenance-owner channel (ticketing webhook, chat thread,
+  change-management board connector).
 
-The Code-node body for the bound steps assumes `PYTHONPATH` on the
-n8n host resolves `content.playbooks.patch_management.primitives`;
-operators who run n8n in a Python-free container drop a Python-runner
-Code node ahead of the Set node. n8n is the **no-code** target; the
+The Code-node bodies assume `PYTHONPATH` on the n8n host resolves
+`content.playbooks.patch_management.primitives`; operators who run
+n8n in a Python-free container drop a Python-runner Code node ahead
+of the chain. n8n is the **no-code** target; the
 per-update trigger is the operator's webhook / advisory-intake feed
 adapter at the front of the imported workflow. The compiled artefact
 is a snapshot of intent — the operator wires the trigger, the
@@ -326,14 +328,13 @@ channel in their own n8n instance.
 `examples/temporal/patch_management/workflow.temporal.py` is a
 standard Temporal worker module: one `@workflow.defn` class and one
 `@activity.defn` function per CACAO action. Each activity docstring
-names the primitive (or operator-bound seam) the activity discharges;
-the bodies of the committed stub raise `NotImplementedError` pending
-the worker-translator slice, so the operator wires the activity
-implementations in their own assembly. The six core-bound activities
-(`detect-patch-availability`, `classify-patch-criticality`,
-`stage-rollout-to-canary-ring`, `validate-canary`,
-`fan-out-to-broad-rings`, `evidence-capture`) document the primitive
-call against the deterministic body under
+names the primitive the activity discharges; each body imports and
+invokes it, with the remaining `NotImplementedError` marking only the
+operator-integration seams the operator wires in their own assembly.
+The seven bound activities (`detect-patch-availability`,
+`classify-patch-criticality`, `stage-rollout-to-canary-ring`,
+`validate-canary`, `fan-out-to-broad-rings`, `evidence-capture`,
+`notify-maintenance-owner`) invoke the deterministic bodies under
 `content.playbooks.patch_management.primitives.{detect,classify,stage,validate,fanout,artifact}`;
 the notify activity documents the operator-bound seam (no default
 endpoint).
@@ -355,15 +356,15 @@ back against.
 `graph_spec.json` carries the target-neutral topology (nodes, edges);
 `assemble.py` is the hand-written reference assembly that wires the
 GraphSpec + bindings into a `langgraph.graph.StateGraph`. The
-committed `state_bindings.py` is a generated stub: each tool's
-docstring names the primitive (or operator-bound seam) it discharges
-and the body raises `NotImplementedError` until a human integrator
-wires it to the operator's runtime — the six core-bound tools
+committed `state_bindings.py` is generated: each tool's docstring
+names the primitive it discharges and the body invokes it, with the
+operator-integration seams marked `NotImplementedError` for the
+integrator to wire — the seven bound tools
 (`detect-patch-availability`, `classify-patch-criticality`,
 `stage-rollout-to-canary-ring`, `validate-canary`,
-`fan-out-to-broad-rings`, `evidence-capture`) document the primitive
-call against
-`content.playbooks.patch_management.primitives.{detect,classify,stage,validate,fanout,artifact}`,
+`fan-out-to-broad-rings`, `evidence-capture`,
+`notify-maintenance-owner`) invoke
+`content.playbooks.patch_management.primitives.{detect,classify,stage,validate,fanout,artifact,notify}`,
 and the notify tool documents the operator-bound seam.
 
 LangGraph is the agentic target — the natural seam an operator extends
@@ -393,10 +394,10 @@ compiler module, refresh the committed artifacts from the repo root:
 Each script mirrors the canonical CACAO source into the example folder
 and re-emits the per-target artifact via `tools.compile --target
 {n8n,temporal,langgraph}`. The drift tests under
-`tests/examples/patch_management/` (landing with the CORE-FANOUT
-siblings) fail the suite if the committed artifacts diverge from a
-fresh regeneration, so the worked examples stay honest as the
-compilers evolve.
+`tests/examples/{n8n,temporal,langgraph}/patch_management/test_golden.py`
+fail the suite if the committed artifacts diverge from a fresh
+regeneration, so the worked examples stay honest as the compilers
+evolve.
 
 ## 5. Observability — OTel + AuditTrail in every target
 
@@ -491,10 +492,9 @@ update_reference, canary_ring, cadence)` tuple, and the
 `(update_subject, update_reference, staged_ring_id, sorted
 broad_rings)` tuple on a healthy canary.
 
-**Per-target byte-stable goldens, cross-target byte-parity** — once
-the F-WF-PATCH CORE-FANOUT siblings ship the per-target byte-parity
-goldens at `tests/examples/patch_management/test_{n8n,temporal,langgraph}_workflow_golden.py`
-and the per-target patch-application evidence goldens, each test will
+**Per-target byte-stable goldens, cross-target byte-parity** — the
+per-target byte-parity goldens at
+`tests/examples/{n8n,temporal,langgraph}/patch_management/test_golden.py`
 pin (a) the per-target workflow artefact (`workflow.n8n.json` /
 `workflow.temporal.py` / `graph_spec.json` + `state_bindings.py`),
 (b) the per-target patch-application evidence record, and (c) the
