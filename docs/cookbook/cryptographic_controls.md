@@ -100,44 +100,51 @@ plane.
 
 ## 2. CACAO topology and lifecycle binding
 
-The playbook ships eight steps: one `start`, six `action`, one
-`end`. The chain is linear on the workflow edges; the branch
-selection on the key-lifecycle and certificate-lifecycle steps
-(generate / rotate / revoke; issue / renew / revoke) and the
-permit / deny outcome on the enforcement-gate step live *inside*
-each action's body rather than on a CACAO `if-condition` node, so
-the workflow topology stays a single audit lane regardless of
-branch outcome.
+The playbook ships nine steps: one `start`, six `action`, one
+`switch-condition`, one `end`. Policy resolution runs first, then
+the switch routes the run on `__lifecycle_event__` to the branch the
+event names — the three key events to key-lifecycle, the three
+certificate events to certificate-lifecycle, `enforcement-gate` to
+the enforcement gate — and all three branches converge on
+record-lifecycle-evidence, so the workflow stays a single audit lane
+with exactly one attestation per run. Within a branch, the
+sub-selection (generate / rotate / revoke; issue / renew / revoke)
+and the admit / deny outcome on the gate live inside the bound
+primitive rather than on further CACAO nodes.
 
 | Step suffix | Step                          | Discipline                                                                                                                                                                                                                                                        | Status         |
 |-------------|-------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|
 | `…000001`   | start (`cryptographic_controls_start`) | edge wiring only — no body                                                                                                                                                                                                                              | n/a            |
-| `…000002`   | resolve policy inventory      | resolve the operator's declared cryptography policy for the trigger scope: algorithm floor, key-size floor, per-key-class rotation cadence, TLS-version floor, declared CA / trust anchors, expiry buffer (`__policy_inventory_id__`)                             | operator-bound |
-| `…000003`   | key lifecycle                 | dispatch the generate / rotate / revoke branch against the operator's KMS backend for the target key material (`__key_lifecycle_record__`)                                                                                                                        | operator-bound |
-| `…000004`   | enforce encryption            | per-workload measurement of the at-rest and in-transit conditions against the declared floors (permit / deny outcome carried on `__enforcement_decision__`); the actual admission or blocking is operator-owned on the provisioning control plane                 | operator-bound |
-| `…000005`   | certificate lifecycle         | dispatch the issue / renew / revoke branch against the operator's CA backend for the target certificate material (`__cert_lifecycle_record__`)                                                                                                                    | operator-bound |
-| `…000006`   | record lifecycle evidence     | compose and publish the dated cryptographic-controls lifecycle attestation to the operator's evidence store: policy snapshot, key-lifecycle record, enforcement-gate outcome, certificate-lifecycle record (`__attestation_id__`)                                 | operator-bound |
-| `…000007`   | notify crypto owner           | deliver the attestation reference to the cryptography owner along the operator's pre-bound channel; write-side lifecycle dispatch — the notification carries the lifecycle record, not a remediation demand                                                       | operator-bound |
+| `…000002`   | resolve policy inventory      | resolve the operator's declared cryptography policy for the trigger scope: algorithm allow-lists, key-size floors, per-key-class rotation cadence, TLS-version floor, declared CA / trust anchors, expiry buffer — gaps flagged, never filled (`__policy_inventory_id__`) | bound — `policy.resolve_policy_inventory` |
+| `…000009`   | route on lifecycle event      | `switch-condition` on `__lifecycle_event__`: the three key events → key lifecycle; the three certificate events → certificate lifecycle; `enforcement-gate` → enforce encryption                                                                                  | switch         |
+| `…000003`   | key lifecycle                 | judge the executed generate / rotate / revoke action's metadata against the policy snapshot; key material is refused at the boundary (`__key_lifecycle_record__`)                                                                                                 | bound — `keys.record_key_lifecycle` |
+| `…000004`   | enforce encryption            | per-workload measurement of the at-rest and in-transit conditions against the declared floors; denies only on a documented violation, admits-but-enumerates on gaps (`__enforcement_decision__`); the actual admission or blocking is operator-owned on the provisioning control plane | bound — `enforcement.decide_enforcement_gate` |
+| `…000005`   | certificate lifecycle         | judge the executed issue / renew / revoke action against the trust anchors and the expiry buffer (`__cert_lifecycle_record__`)                                                                                                                                    | bound — `certificates.record_certificate_lifecycle` |
+| `…000006`   | record lifecycle evidence     | compose and publish the dated lifecycle attestation: policy snapshot plus exactly the branch's evidence record, with the breach and policy-gap flags computed once (`__lifecycle_attestation_id__`)                                                               | bound — `attestation.compose_lifecycle_attestation` |
+| `…000007`   | notify crypto owner           | compose the owner notification, urgency graded from the attestation's flags; write-side lifecycle dispatch — the notification carries the lifecycle record, not a remediation demand                                                                              | bound — `notify.compose_owner_notification` |
 | `…000008`   | end (`cryptographic_controls_end`) | edge wiring only — no body                                                                                                                                                                                                                                 | n/a            |
 
 All six action steps carry the CACAO I/O contract (`in_args` /
-`out_args`) plus `x_secops_ng` reference bundles (control,
-telemetry). One per-trigger execution emits exactly one lifecycle
-attestation; the per-branch outcomes on the key-lifecycle,
-enforcement-gate, and certificate-lifecycle steps never create a
-parallel evidence lane — one trigger, one attestation, one record
-per lifecycle branch decided.
+`out_args`), the `x_secops_ng` reference bundles (control,
+telemetry), and a `core_body` binding into the deterministic
+primitives under `primitives/`. One per-trigger execution emits
+exactly one lifecycle attestation; exactly one branch runs, so the
+run never creates a parallel evidence lane — one trigger, one
+branch, one attestation.
 
-> The playbook maturity is CORE on the workflow-local README (this
-> EXTEND card lands with the cookbook walkthrough). All three
-> reference emitters ship committed artifacts under
-> `examples/{n8n,temporal,langgraph}/cryptographic_controls/` with
-> deterministic stubs for the operator-bound seams; a sibling
-> EXTEND card lands the adapter Protocols under
-> `patterns.cryptographic_controls` (KMS backend, CA backend,
-> storage-encryption backend, TLS-endpoint backend) and the
-> advanced features (HSM-backed key ceremonies, post-quantum
-> rollover choreography, per-Member-State CA-trust posture).
+> The playbook maturity is `stable` (`content_version` 1.0.0) on the
+> workflow-local content marker: every action step is bound, the
+> lifecycle switch is real topology, and the three reference emitters
+> ship committed artifacts under
+> `examples/{n8n,temporal,langgraph}/cryptographic_controls/`
+> regenerated from the bound source. The KMS backend, CA backend,
+> storage-encryption and TLS-endpoint surfaces, the evidence store
+> and the owner channel are the adapter-bound seams the operator
+> wires; the policy evaluation, the gate decision and the attestation
+> composition are bound, deterministic and replayable. Advanced
+> features — HSM-backed key ceremonies, post-quantum rollover
+> choreography, per-Member-State CA-trust posture — remain
+> operator-side (see § 10).
 
 ## 3. Lifecycle contract — the six action states
 
@@ -156,7 +163,7 @@ processes personal data, GDPR Art. 32(1)(a) attaches as a parallel
 obligation surface on the encryption limb (see § 4). The framework
 treats `__policy_inventory_id__`, `__key_lifecycle_record__`,
 `__enforcement_decision__`, `__cert_lifecycle_record__`, and
-`__attestation_id__` as opaque operator-assigned identifiers.
+`__lifecycle_attestation_id__` as opaque operator-assigned identifiers.
 
 **resolve policy inventory** (`…000002`)
 :   Read step. Resolves the operator's declared cryptography policy
@@ -267,7 +274,7 @@ treats `__policy_inventory_id__`, `__key_lifecycle_record__`,
     cryptographic-controls lifecycle attestation to the operator's
     evidence store, carrying the policy snapshot, the key-lifecycle
     record, the enforcement-gate decision, and the
-    certificate-lifecycle record. Records `__attestation_id__` on
+    certificate-lifecycle record. Records `__lifecycle_attestation_id__` on
     the operator's evidence store keyed to `__crypto_scope__` and
     `__policy_inventory_id__`. The attestation is always emitted,
     including the policy-gap branch (missing-policy condition
@@ -478,63 +485,71 @@ enforcement-gate deny branch) once the adapter surfaces are pinned.
 
 ## 5. Per-target hand-off
 
-### 5.1 n8n — operator-edited Set rows over the lifecycle topology
+### 5.1 n8n — Code nodes and the lifecycle Switch
 
 `examples/n8n/cryptographic_controls/workflow.n8n.json` carries the
-CACAO topology as eight n8n nodes (one `manualTrigger`, six `set`
-nodes, one `noOp`), with node ids preserving the CACAO step ids
-verbatim. The six action steps emit `n8n-nodes-base.set` nodes
-carrying the CACAO I/O contract as editable assignment rows plus the
-`x_secops_ng` reference bundles. The per-branch selection on the
-key-lifecycle, enforcement-gate, and certificate-lifecycle steps
-lives inside each Set row's assignments rather than fanning out as
-downstream `n8n-nodes-base.if` nodes — the row carries every
-branch's `out_args` shape so the operator wires whichever branch
-the trigger scope names against `__key_lifecycle_record__`,
-`__enforcement_decision__`, and `__cert_lifecycle_record__`. The
-lossy translation is recorded in `meta.secops_ng_notes` so the
-integrator sees exactly which seams need attention.
+CACAO topology as nine n8n nodes (one `manualTrigger`, six `code`
+nodes, one `switch`, one `noOp`), with node ids preserving the CACAO
+step ids verbatim. All six action steps emit `n8n-nodes-base.code`
+nodes whose `pythonCode` is the exact primitive call (e.g.
+`from content.playbooks.cryptographic_controls.primitives.keys import
+record_key_lifecycle ; __key_lifecycle_result__ =
+record_key_lifecycle(lifecycle_event=__lifecycle_event__,
+key_record=__key_record__, policy_inventory=__policy_inventory__)`);
+no Set-node placeholders remain. The lifecycle switch emits an
+`n8n-nodes-base.switch` with one routed output per event value, so
+the branch the trigger names is chosen by the workflow rather than by
+the operator wiring rows.
 
-Operators bind the Set rows to their connectors — worked against
-the scheduled per-key-class rotation scenario carried through this
-walkthrough:
+Operators wire the external inputs and the adapter seams to their
+connectors — worked against the scheduled per-key-class rotation
+scenario carried through this walkthrough:
 
 - `resolve policy inventory` → the operator's governance policy
   store (a policy-as-code repository, a GRC platform, a
-  cryptography-policy document store); the Set row records
-  `__policy_inventory_id__` — the snapshot the subsequent steps
-  measure against, including the per-key-class rotation cadence
-  the key-lifecycle step reads.
+  cryptography-policy document store) supplying `__declared_policy__`;
+  the adapter extracts `__policy_inventory_id__` — the snapshot the
+  branch measures against, including the per-key-class rotation
+  cadence the key-lifecycle step reads.
+- `route on lifecycle event` → no wiring: the Switch node evaluates
+  `__lifecycle_event__` and routes the run.
 - `key lifecycle` → the operator's KMS backend (an HSM control
-  plane, a cloud KMS, an internal key-management system); for the
-  scheduled-rotation trigger, the Set row records
-  `__key_lifecycle_record__` with the `rotate` branch, the target
-  key class, the new key material handle, and the previous-key
-  backreference. The compromise-trigger scenario diverges here:
-  the Set row records the `revoke` branch instead; the new-
-  workload trigger records the `generate` branch.
+  plane, a cloud KMS, an internal key-management system) executing
+  the action and supplying its metadata as `__key_record__`; for the
+  scheduled-rotation trigger that carries the target key class, the
+  new key handle and the previous-key backreference. The
+  compromise-trigger scenario routes the same branch with the
+  `key-revoke` event; the new-workload trigger with `key-generate`.
+  The adapter extracts `__key_lifecycle_record__`.
 - `enforce encryption` → the operator's storage-encryption backend
   (per-workload at-rest condition) and TLS-endpoint backend
-  (per-workload in-transit condition); the Set row records
-  `__enforcement_decision__` — a permit outcome when both
-  conditions meet the declared floor, a deny outcome with the
-  per-condition rationale otherwise. The operator's provisioning
-  control plane consumes the decision and enforces admission /
-  blocking downstream.
+  (per-workload in-transit condition) supplying
+  `__at_rest_condition__` and `__in_transit_condition__` for
+  `__workload_ref__`; the primitive returns an admit outcome when
+  every documented condition is satisfied, a deny with the
+  per-condition rationale on a documented violation. The operator's
+  provisioning control plane consumes the decision and enforces
+  admission / blocking downstream.
 - `certificate lifecycle` → the operator's CA backend (an internal
-  CA, an ACME endpoint, a managed PKI); the Set row records
-  `__cert_lifecycle_record__` with the branch (`issue` for new
-  subjects, `renew` for expiry-buffer-crossing certificates,
-  `revoke` for compromise or scope exit) and the certificate
-  material reference.
+  CA, an ACME endpoint, a managed PKI) executing the action and
+  supplying `__certificate_record__`; the event value selects
+  `cert-issue` for new subjects, `cert-renew` for
+  expiry-buffer-crossing certificates, `cert-revoke` for compromise
+  or scope exit. The adapter extracts `__cert_lifecycle_record__`.
 - `record lifecycle evidence` → the operator's evidence store
-  (object store, GRC platform, evidence lake); the Set row records
-  `__attestation_id__` carrying the policy snapshot, the
-  key-lifecycle record, the enforcement-gate outcome, and the
-  certificate-lifecycle record.
+  (object store, GRC platform, evidence lake) publishing
+  `__lifecycle_attestation__`, which carries the policy snapshot and
+  exactly the branch's evidence record; the adapter extracts
+  `__lifecycle_attestation_id__`.
 - `notify crypto owner` → the operator's cryptography-owner
   channel (ticketing queue, chat channel, email alias,
-  policy-owner mailbox).
+  policy-owner mailbox) as `__owner_channel__`, delivering the
+  composed payload.
+
+The Code-node bodies assume `PYTHONPATH` on the n8n host resolves
+`content.playbooks.cryptographic_controls.primitives`; operators who
+run n8n in a Python-free container drop a single Python-runner Code
+node ahead of the chain.
 
 To regenerate the compiled workflow artifact from the repo root:
 
@@ -545,20 +560,23 @@ To regenerate the compiled workflow artifact from the repo root:
 To import into an n8n instance: open the workflows list, choose
 **Import from File**, and select
 `examples/n8n/cryptographic_controls/workflow.n8n.json`. The
-workflow is inactive by default — review and bind the Set rows to
-your own connectors before activating. The emitted workflow is a
-*snapshot of intent*, not a runnable playbook.
+workflow is inactive by default — review and wire the external inputs
+and the adapter seams to your own connectors before activating. The
+emitted workflow is a *snapshot of intent*, not a runnable playbook.
 
 ### 5.2 Temporal — `@activity.defn` bodies
 
 `examples/temporal/cryptographic_controls/workflow.temporal.py` is
 a standard Temporal worker module: one `@workflow.defn` class and
 one `@activity.defn` function per CACAO action, with the six
-action activities documenting their operator-bound seam (policy
-inventory, KMS dispatch, at-rest / in-transit gate measurement, CA
-dispatch, evidence-store write, notification dispatch). Each
-activity documents the canonicalisation and validation contract;
-the operator wires the surrounding data-plane call inside the
+action activities importing their primitive and producing the policy
+snapshot, the key-lifecycle record, the gate decision, the
+certificate-lifecycle record, the attestation and the owner
+notification. The only remaining `NotImplementedError` marks the
+operator-integration seams (policy store, KMS dispatch, at-rest /
+in-transit measurement, CA dispatch, evidence-store write,
+notification dispatch), so an integrator sees exactly which seam is
+theirs; the operator wires the surrounding data-plane call inside the
 activity body.
 
 Temporal is the natural fit for the write-side lifecycle
@@ -572,8 +590,8 @@ backend, or the evidence store get first-class Temporal semantics
 (activity retry policy per seam); replay against the same Temporal
 event history re-derives the same policy snapshot, the same
 key-lifecycle record, the same enforcement-gate decision, the same
-certificate-lifecycle record, and the same lifecycle attestation
-once the activity bodies are wired against deterministic seams.
+certificate-lifecycle record, and the same lifecycle attestation —
+the primitives are pure, so the property holds by construction.
 The compromise-trigger scenario is a separate schedule (or an
 event-signal into a long-running parent workflow); the workflow
 code the compiler emits stays pure — every non-deterministic
@@ -586,11 +604,10 @@ implementations.
 `examples/langgraph/cryptographic_controls/state_bindings.py`
 carries the `TypedDict` state and the `@tool`-decorated action
 wrappers. `graph_spec.json` carries the target-neutral topology
-(nodes and the linear on-completion edges from resolve-policy-
-inventory through notify-crypto-owner to the terminal end, with
-the internal per-branch selection on the key-lifecycle,
-enforcement-gate, and certificate-lifecycle steps recorded as
-state fields rather than conditional edges); `assemble.py` is the
+(the on-completion edges from resolve-policy-inventory through the
+lifecycle switch into the three convergent branches and on to the
+terminal end, with the sub-selection inside each branch's primitive
+rather than as further edges); `assemble.py` is the
 hand-written reference assembly that wires the GraphSpec +
 bindings into a `langgraph.graph.StateGraph`. `_audit_mirror.py`
 is the dependency-free audit-mirror sibling (see
@@ -613,9 +630,9 @@ All three reference targets are present in the tree today
 `examples/temporal/cryptographic_controls/`,
 `examples/langgraph/cryptographic_controls/`). Each ships a
 committed emitter artifact (n8n workflow JSON, Temporal worker
-module, LangGraph GraphSpec + bindings) with the action bodies
-documenting the operator-bound seam and the CACAO I/O contract.
-The per-target byte-parity goldens under
+module, LangGraph GraphSpec + bindings) with every action body bound
+to its primitive and the operator-integration seams marked with
+`NotImplementedError`. The per-target byte-parity goldens under
 `tests/examples/{n8n,temporal,langgraph}/cryptographic_controls/`
 pin each per-target artifact against a fresh emitter run from the
 canonical CACAO source — the cross-target byte-parity property the
@@ -745,7 +762,7 @@ lifecycle records once each target's activity / tool bodies are
 wired against the same operator seams and the same OSCAL / OCSF /
 D3FEND reference bundles. The `(__policy_inventory_id__,
 __key_lifecycle_record__, __enforcement_decision__,
-__cert_lifecycle_record__, __attestation_id__)` tuple is the
+__cert_lifecycle_record__, __lifecycle_attestation_id__)` tuple is the
 string a regulator can diff to confirm the property holds across
 targets, and the `__policy_inventory_id__` correlation key is the
 join column that threads through every audit record from policy
@@ -818,11 +835,11 @@ property the framework guarantees.
   bounded by the ENISA algorithm-and-key-parameters guidance and
   by the JC RTS on ICT risk management framework Art. 6
   discipline.
-- **Adapter Protocols under `patterns.cryptographic_controls`.**
-  KMS backend, CA backend, storage-encryption backend, and
-  TLS-endpoint backend adapter Protocols land on a sibling EXTEND
-  card. The CORE tier ships deterministic emitter output with
-  documented seams; the adapter binding lands next.
+- **The operator's backend adapters.** KMS backend, CA backend,
+  storage-encryption backend and TLS-endpoint backend are the
+  operator's data plane: the playbook composes and judges the
+  records those surfaces produce, and the compile target wires the
+  calls. The framework ships no client for any of them.
 - **HSM-backed key ceremonies.** The scheduled per-key-class
   rotation scenario carried through this walkthrough is the most
   common Art. 21(2)(h) discharge; HSM-backed key ceremonies (with

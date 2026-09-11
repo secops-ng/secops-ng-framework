@@ -1,7 +1,9 @@
 # cryptographic_controls — NIS2 Art. 21(2)(h) lifecycle
 
-EXTEND tier of the F-WF-CRYPTOMGMT trilogy (cookbook walkthrough shipped
-at [`docs/cookbook/cryptographic_controls.md`](../../../docs/cookbook/cryptographic_controls.md)).
+Write-side lifecycle playbook of the F-WF-CRYPTOMGMT trilogy —
+`stable` under the Maturity ladder (`content_version` 1.0.0), with the
+cookbook walkthrough at
+[`docs/cookbook/cryptographic_controls.md`](../../../docs/cookbook/cryptographic_controls.md).
 This playbook is the
 operator-side lifecycle materialisation of the NIS2 Art. 21(2)(h)
 cryptography-and-encryption obligation: resolve the declared
@@ -24,13 +26,23 @@ declared scope.
 
 ## Files
 
-- `playbook.cacao.json` — CACAO v2 workflow scaffold (six action
-  steps: resolve-policy-inventory → key-lifecycle → enforce-encryption
-  → certificate-lifecycle → record-lifecycle-evidence →
-  notify-crypto-owner). SKELETON: adapter bindings under
-  `patterns.cryptographic_controls` (KMS backend, CA backend,
-  storage-encryption backend, TLS-endpoint backend) are TODO markers
-  a sibling CORE card lands.
+- `playbook.cacao.json` — the CACAO v2 workflow: resolve-policy-inventory
+  → a `switch-condition` on `__lifecycle_event__` → the branch the event
+  names (key-lifecycle for the three key events, certificate-lifecycle
+  for the three certificate events, enforce-encryption for
+  `enforcement-gate`) → record-lifecycle-evidence → notify-crypto-owner.
+  Every action step binds a deterministic primitive under `primitives/`
+  through `x_secops_ng.core_body`.
+- `primitives/` — the six deterministic primitives: pure, offline,
+  LLM-free. The policy is input, not content (no default cipher
+  baseline is ever injected — a shipped baseline would become a
+  de-facto standard the framework has no authority to set); every
+  policy check lands on the satisfied / violated / undocumented ladder
+  with `compliant` reserved for documented-and-satisfied; key material
+  is actively refused at the boundary; the enforcement gate denies only
+  on a documented violation. The KMS backend, CA backend,
+  storage-encryption and TLS-endpoint surfaces, the evidence store and
+  the owner channel stay adapter-bound operator surfaces.
 - `mappings.yaml` — outbound view of the content model: OSCAL
   (SC-12 key management, SC-13 cryptographic protection, SC-17
   PKI certificates, SC-28 protection of information at rest, SC-8
@@ -49,20 +61,26 @@ declared scope.
 Byte-parity compiled examples ship under
 `examples/{n8n,temporal,langgraph}/cryptographic_controls/` with
 drift guards under
-`tests/examples/{n8n,temporal,langgraph}/cryptographic_controls/`.
+`tests/examples/{n8n,temporal,langgraph}/cryptographic_controls/`,
+regenerated from the bound source: n8n emits six Code nodes and one
+Switch node; the Temporal activities and LangGraph tools import their
+primitives, with `NotImplementedError` marking only the
+operator-integration seams.
 
 ## Trilogy
 
 - **SKELETON:** scaffold + mappings + compile-target declaration.
-- **CORE:** three-target compiled examples + byte-parity
-  goldens, full mappings closure (D3-SKT / D3-CM D3FEND selection,
-  GDPR Art. 32(1)(a) inbound edge, NIS2 + DORA inbound edges).
-- **EXTEND (this card):** cookbook walkthrough at
+- **CORE:** three-target compiled examples + byte-parity goldens and
+  the mappings closure (D3-SKT / D3-CM D3FEND selection, GDPR
+  Art. 32(1)(a) inbound edge, NIS2 + DORA inbound edges); then the six
+  deterministic primitives (CORE-PRIM) bound to the action steps with
+  the lifecycle switch and the playbook graduated to `stable`
+  (CORE-WIRE).
+- **EXTEND:** the cookbook walkthrough at
   [`docs/cookbook/cryptographic_controls.md`](../../../docs/cookbook/cryptographic_controls.md).
-  Adapter Protocols under `patterns.cryptographic_controls` and
-  advanced features (HSM-backed key ceremonies, post-quantum
-  rollover choreography, per-Member-State CA-trust posture) land
-  on a sibling EXTEND card.
+  Advanced features — HSM-backed key ceremonies, post-quantum rollover
+  choreography, per-Member-State CA-trust posture — remain
+  operator-side and are recorded as not covered in the cookbook.
 
 ## Prerequisites
 

@@ -37,17 +37,21 @@ the regeneration script.
 1. In your own n8n instance, open the workflows list and choose
    **Import from File**.
 2. Select `workflow.n8n.json` from this directory.
-3. n8n loads eight nodes wired into the topology described below. The
+3. n8n loads nine nodes wired into the topology described below. The
    workflow is **inactive** by default — review and bind it to your own
    connectors before activating.
 
 The emitted workflow is a *snapshot of intent*, not a runnable
-playbook. The Set nodes carry the CACAO I/O contract as editable
-assignments; binding those rows to real connectors (crypto-policy
-inventory, KMS backend for the key-lifecycle branch, storage-encryption
-and TLS-endpoint backends for the enforcement gate, CA backend for the
-certificate-lifecycle branch, dated-attestation evidence store, and
-the cryptography-owner notification channel) is the operator's job.
+playbook. The six action steps are `n8n-nodes-base.code` nodes whose
+`pythonCode` is the exact primitive call from
+`content/playbooks/cryptographic_controls/primitives/`; the bodies
+assume `PYTHONPATH` on the n8n host resolves that package, and the
+Switch node routes the run on `__lifecycle_event__`. The external
+inputs (`__declared_policy__`, `__key_record__`,
+`__certificate_record__`, the enforcement observations, `__event_ts__`,
+`__owner_channel__`) and the adapter seams (crypto-policy inventory,
+KMS backend, storage-encryption and TLS-endpoint backends, CA backend,
+evidence store, owner channel) are the operator's to wire.
 
 ## How to regenerate
 
@@ -75,52 +79,59 @@ evolves.
 
 ## Topology
 
-The cryptographic_controls playbook is a linear resolve-policy /
-key-lifecycle / enforce-encryption / certificate-lifecycle /
-record-evidence / notify chain. Eight n8n nodes, one per CACAO step:
+The cryptographic_controls playbook resolves the policy, routes on
+`__lifecycle_event__` to one of three lifecycle branches
+(key-lifecycle, enforce-encryption, certificate-lifecycle), and
+converges on the record-evidence / notify chain. Nine n8n nodes, one
+per CACAO step (the lifecycle switch included):
 
 1. `cryptographic_controls_start` (`manualTrigger`) — entry point.
-   Carries the workflow-scope variables (`__lifecycle_event__`,
-   `__crypto_scope__`) the operator's KMS/CA control plane, scheduler,
-   or operator-initiated trigger supplies.
-2. `resolve policy inventory` (`set`) — resolve the operator's declared
+   Carries the workflow-scope variables the operator's KMS/CA control
+   plane, scheduler, or operator-initiated trigger supplies —
+   `__lifecycle_event__` and `__crypto_scope__` among them.
+2. `resolve policy inventory` (`code`) — resolve the operator's declared
    cryptography policy at the start of the lifecycle event; emits
    `__policy_inventory_id__`.
-3. `key lifecycle` (`set`) — discharge the generate / rotate / revoke
-   branch of the key-lifecycle discipline against the operator's KMS
-   backend; emits `__key_lifecycle_record__`.
-4. `enforce encryption` (`set`) — evaluate the at-rest and in-transit
+3. `route on lifecycle event` (`switch`) — route the run on
+   `__lifecycle_event__`: the three key events to step 4, the three
+   certificate events to step 6, `enforcement-gate` to step 5.
+4. `key lifecycle` (`code`) — judge the executed generate / rotate /
+   revoke action against the policy snapshot; emits
+   `__key_lifecycle_record__`.
+5. `enforce encryption` (`code`) — evaluate the at-rest and in-transit
    enforcement gate on the target workload; emits
    `__enforcement_decision__`.
-5. `certificate lifecycle` (`set`) — discharge the issue / renew /
-   revoke branch of the certificate-lifecycle discipline against the
-   operator's CA backend; emits `__cert_lifecycle_record__`.
-6. `record lifecycle evidence` (`set`) — persist the dated lifecycle-
-   attestation record; emits `__lifecycle_attestation_id__`.
-7. `notify crypto owner` (`set`) — surface the attestation to the
+6. `certificate lifecycle` (`code`) — judge the executed issue / renew /
+   revoke action against the trust anchors and the expiry buffer; emits
+   `__cert_lifecycle_record__`.
+7. `record lifecycle evidence` (`code`) — persist the dated lifecycle-
+   attestation record; emits `__lifecycle_attestation_id__`. All three
+   branches converge here.
+8. `notify crypto owner` (`code`) — surface the attestation to the
    cryptography owner via the operator's notification channel.
-8. `cryptographic_controls_end` (`noOp`) — end sentinel.
+9. `cryptographic_controls_end` (`noOp`) — end sentinel.
 
-## CACAO contract surfaces on Set nodes
+## Per-action wiring notes — CORE bodies
 
-Every `action`-without-commands step in the CACAO source emits an n8n
-`set` node whose **assignments** carry the CACAO contract one row per
-field:
+Every action step declares an `x_secops_ng.core_body` binding into the
+deterministic primitives package, so the emitter renders each as a Code
+node; the cross-target semantic contract is the primitives package
+itself (Temporal binds via activity imports, LangGraph via tool
+imports — all three call the same Python functions).
 
-- `in.<name>` rows for each entry in the step's `in_args`.
-- `out.<name>` rows for each entry in the step's `out_args`.
-- `x_secops_ng.<key>` rows for each key under the step's
-  `x_secops_ng` block (`control_refs`, `telemetry_refs`).
-
-The values are left blank (or pre-seeded with the reference-id list,
-for `x_secops_ng` rows) so the integrator can wire them to expressions
-that pull from upstream nodes, n8n variables, or operator-bound
-connectors.
+| Step id (suffix) | CACAO step | Deterministic primitive | Operator wires |
+|---|---|---|---|
+| `…000002` | resolve policy inventory | `policy.resolve_policy_inventory(crypto_scope, declared_policy)` → `__policy_inventory__` | the policy store supplying `__declared_policy__` (or null); the adapter extracts `__policy_inventory_id__` |
+| `…000009` | route on lifecycle event | — (Switch node on `__lifecycle_event__`) | nothing — the workflow routes the run |
+| `…000003` | key lifecycle | `keys.record_key_lifecycle(lifecycle_event, key_record, policy_inventory)` → `__key_lifecycle_result__` | the KMS backend executing the action and supplying `__key_record__` (metadata only — material is refused) |
+| `…000004` | enforce encryption | `enforcement.decide_enforcement_gate(workload_ref, observed_at, at_rest, in_transit, policy_inventory)` → `__enforcement_result__` | the storage-encryption and TLS-endpoint surfaces supplying the observed conditions; the provisioning control plane consuming the decision |
+| `…000005` | certificate lifecycle | `certificates.record_certificate_lifecycle(lifecycle_event, certificate_record, policy_inventory)` → `__cert_lifecycle_result__` | the CA backend executing the action and supplying `__certificate_record__` |
+| `…000006` | record lifecycle evidence | `attestation.compose_lifecycle_attestation(lifecycle_event, event_ts, policy_inventory, …)` → `__lifecycle_attestation__` | the evidence store publishing the attestation; the adapter extracts `__lifecycle_attestation_id__` |
+| `…000007` | notify crypto owner | `notify.compose_owner_notification(…, has_breach=__lifecycle_attestation__.has_breach, has_policy_gap=…, owner_channel)` → `__owner_notification__` | `__owner_channel__` and the messaging surface that delivers it |
 
 The lossy translations the emitter notes (workflow-scope variables
-flattened onto the trigger, CACAO contract rows surfaced as blank Set
-assignments) are recorded in `meta.secops_ng_notes` so the integrator
-sees exactly which seams need attention.
+flattened onto the trigger) are recorded in `meta.secops_ng_notes` so
+the integrator sees exactly which seams need attention.
 
 ## Mirroring policy
 
@@ -130,7 +141,8 @@ for every worked example in this directory:
 | CACAO step type    | n8n node type                        |
 |--------------------|--------------------------------------|
 | `start`            | `n8n-nodes-base.manualTrigger`       |
-| `action` (no commands) | `n8n-nodes-base.set` (CACAO I/O contract as assignments) |
+| `action` with `core_body` | `n8n-nodes-base.code` (the primitive call as `pythonCode`) |
+| `action` without `core_body` | `n8n-nodes-base.set` (CACAO I/O contract as assignments) — none remain on this playbook |
 | `if-condition`     | `n8n-nodes-base.if`                  |
 | `switch-condition` | `n8n-nodes-base.switch`              |
 | `end`              | `n8n-nodes-base.noOp`                |
@@ -138,16 +150,17 @@ for every worked example in this directory:
 Node ids preserve the CACAO step id verbatim so the two artifacts can
 be cross-referenced by id alone. Node labels mirror the CACAO step
 `name`. Sequencing (`on_completion` / `on_success` / `on_failure`)
-becomes n8n `connections` edges. This playbook is linear: every step
-hands off via `on_completion`, so all node-to-node edges land on the
-default n8n `main` output.
+becomes n8n `connections` edges. This playbook branches once: the
+`switch-condition` fans out to the three lifecycle branches on the
+Switch node's per-case outputs, and every other step hands off via
+`on_completion` on the default `main` output.
 
 ## What this example deliberately doesn't do
 
-- It does not execute the workflow. The Set nodes carry the CACAO I/O
-  contract but the right-hand values are blank — the integrator wires
-  them to their own KMS, CA, storage-encryption, TLS-endpoint,
-  evidence-store, and notification connectors.
+- It does not execute the workflow. The Code nodes call the
+  deterministic primitives, but the external inputs and the adapter
+  seams — KMS, CA, storage-encryption, TLS-endpoint, evidence store
+  and notification channel — are the integrator's to wire.
 - It does not ship operator credentials, secrets, or environment-
   specific endpoints. Secrets stay with the operator.
 - It does not encode the algorithm floor, key-size floor, TLS-version
@@ -158,13 +171,14 @@ default n8n `main` output.
 
 ## Status
 
-CORE — the n8n artifact ships byte-deterministic from the canonical
+Bound — the n8n artifact ships byte-deterministic from the canonical
 CACAO source and is pinned by the byte-parity drift guard under
-`tests/examples/n8n/cryptographic_controls/`. Adapter Protocols under
-`patterns.cryptographic_controls` (KMS backend, CA backend, storage-
-encryption backend, TLS-endpoint backend) and the enforcement-gate
-policy evaluator are a follow-on; the cookbook walkthrough for
-operators lands in the sibling EXTEND card.
+`tests/examples/n8n/cryptographic_controls/`. All six action steps are
+Code nodes calling their deterministic primitive, and the
+enforcement-gate policy evaluator is one of them; the KMS, CA,
+storage-encryption, TLS-endpoint, evidence-store and notification
+surfaces are the operator's data plane. The operator walkthrough is
+[`docs/cookbook/cryptographic_controls.md`](../../../docs/cookbook/cryptographic_controls.md).
 
 ## Sovereignty note
 

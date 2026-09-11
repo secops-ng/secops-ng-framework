@@ -48,10 +48,12 @@ re-emits `workflow.temporal.py` via `tools.compile --target temporal`.
 
 ## Status
 
-CORE — the Temporal artifact ships byte-deterministic from the
+Bound — the Temporal artifact ships byte-deterministic from the
 canonical CACAO source and is pinned by the byte-parity drift guard
-under `tests/examples/temporal/cryptographic_controls/`. Activity
-bodies remain `NotImplementedError` stubs by design; adapter Protocols
-under `patterns.cryptographic_controls` (KMS backend, CA backend,
-storage-encryption backend, TLS-endpoint backend) and the enforcement-
-gate policy evaluator are a follow-on.
+under `tests/examples/temporal/cryptographic_controls/`. All six
+`@activity.defn` bodies import and call their deterministic primitive
+from `content/playbooks/cryptographic_controls/primitives/`, the
+enforcement-gate policy evaluator among them; `NotImplementedError`
+marks only the operator-integration seams (policy store, KMS backend,
+storage-encryption and TLS-endpoint surfaces, CA backend, evidence
+store, owner channel).

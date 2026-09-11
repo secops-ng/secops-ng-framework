@@ -1,19 +1,33 @@
 {
-  "conditional_edges": [],
+  "conditional_edges": [
+    {
+      "branches": {
+        "cert-issue": "action--52000000-0000-4000-8000-000000000005",
+        "cert-renew": "action--52000000-0000-4000-8000-000000000005",
+        "cert-revoke": "action--52000000-0000-4000-8000-000000000005",
+        "enforcement-gate": "action--52000000-0000-4000-8000-000000000004",
+        "key-generate": "action--52000000-0000-4000-8000-000000000003",
+        "key-revoke": "action--52000000-0000-4000-8000-000000000003",
+        "key-rotate": "action--52000000-0000-4000-8000-000000000003"
+      },
+      "default": null,
+      "src": "switch-condition--52000000-0000-4000-8000-000000000009"
+    }
+  ],
   "edges": [
     {
       "cacao_edge": "on_completion",
-      "dst": "action--52000000-0000-4000-8000-000000000003",
+      "dst": "switch-condition--52000000-0000-4000-8000-000000000009",
       "src": "action--52000000-0000-4000-8000-000000000002"
     },
     {
       "cacao_edge": "on_completion",
-      "dst": "action--52000000-0000-4000-8000-000000000004",
+      "dst": "action--52000000-0000-4000-8000-000000000006",
       "src": "action--52000000-0000-4000-8000-000000000003"
     },
     {
       "cacao_edge": "on_completion",
-      "dst": "action--52000000-0000-4000-8000-000000000005",
+      "dst": "action--52000000-0000-4000-8000-000000000006",
       "src": "action--52000000-0000-4000-8000-000000000004"
     },
     {
@@ -42,6 +56,13 @@
       "label": "resolve policy inventory",
       "name": "action--52000000-0000-4000-8000-000000000002",
       "step_id": "action--52000000-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "switch-condition",
+      "kind": "condition",
+      "label": "route on lifecycle event",
+      "name": "switch-condition--52000000-0000-4000-8000-000000000009",
+      "step_id": "switch-condition--52000000-0000-4000-8000-000000000009"
     },
     {
       "cacao_type": "action",
