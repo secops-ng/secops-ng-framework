@@ -156,6 +156,12 @@ def test_set_nodes_surface_non_empty_x_secops_ng_refs() -> None:
     CACAO step surfaces as a Set-node assignment on the emitted n8n node. Empty
     ref categories are dropped by the emitter (compilers/n8n/emit.py) and are
     not asserted here.
+
+    Since CORE-WIRE every action step carries a ``core_body`` and therefore
+    emits a Code node, so the loop below skips every step and this test is
+    vacuous today. It is kept because it costs nothing and would bite again
+    if a step were ever de-bound; the binding itself is asserted by
+    ``test_core_body_steps_emit_code_nodes``.
     """
     nodes_by_id = _nodes_by_id()
     for step_id, step in _action_without_commands_steps().items():
@@ -179,3 +185,68 @@ def test_set_nodes_surface_non_empty_x_secops_ng_refs() -> None:
                 f"step {step_id!r}: x_secops_ng.{key} dropped from Set node; "
                 f"present assignments: {sorted(names)}"
             )
+
+
+def _core_body_steps() -> dict[str, dict]:
+    raw = json.loads(SOURCE.read_text(encoding="utf-8"))
+    return {
+        step_id: step
+        for step_id, step in raw["workflow"].items()
+        if step.get("type") == "action"
+        and (step.get("x_secops_ng") or {}).get("core_body")
+    }
+
+
+def test_core_body_steps_emit_code_nodes() -> None:
+    """Steps with ``x_secops_ng.core_body`` compile to n8n Code nodes
+    rendering the primitive call (per CORE-MECH-EMIT-N8N).
+
+    The emitter-regression guard the vuln_intake exemplar carries: it catches
+    the n8n emitter dropping ``core_body``, or honouring it wrongly — a Set
+    node, a Code node that imports the primitive but never calls it, or one
+    whose call does not bind the declared ``out`` variable. Byte-parity alone
+    misses that, because a careless regenerate bakes the regression into the
+    committed golden and the two then agree. Every action step on this
+    playbook is bound since CORE-WIRE, so an empty selection is itself a
+    regression.
+    """
+    nodes_by_id = _nodes_by_id()
+    core_steps = _core_body_steps()
+    assert len(core_steps) == 5, "expected all five action steps to carry core_body"
+    for step_id, step in core_steps.items():
+        node = nodes_by_id[step_id]
+        assert node["type"] == "n8n-nodes-base.code", (
+            f"step {step_id!r} carries core_body and must emit a Code node, "
+            f"not {node['type']!r}"
+        )
+        body = node["parameters"].get("pythonCode", "")
+        primitive = step["x_secops_ng"]["core_body"]["primitive"]
+        module, _, callable_name = primitive.rpartition(".")
+        assert f"from {module} import {callable_name}" in body, (
+            f"step {step_id!r}: Code node missing primitive import"
+        )
+        out_var = step["x_secops_ng"]["core_body"]["out"]
+        assert f"{out_var} = {callable_name}(" in body, (
+            f"step {step_id!r}: Code node missing call binding {out_var!r}"
+        )
+
+
+def test_evidence_step_feeds_the_prescribed_derivation_inputs() -> None:
+    """The evidence id's seed is contract, not convention.
+
+    ``compose_identity_evidence_record`` derives the id as SHA-256 over
+    ``principal_id | presentation_request_id | captured_at``; the wire must
+    pass the runtime-supplied ``__captured_at__`` through unchanged so the
+    three reference compilers re-derive byte-identical ids. This pins the
+    three seed inputs onto the binding.
+    """
+    raw = json.loads(SOURCE.read_text(encoding="utf-8"))
+    step = next(
+        s for s in raw["workflow"].values()
+        if s.get("name") == "emit_identity_audit_evidence"
+    )
+    bound = step["x_secops_ng"]["core_body"]["in"]
+    assert bound["principal_id"] == "__principal_id__"
+    assert bound["presentation_request_id"] == "__presentation_request_id__"
+    assert bound["captured_at"] == "__captured_at__"
+    assert raw["playbook_variables"]["__captured_at__"]["external"] is True

@@ -7,11 +7,18 @@ emitter walks the CACAO topology and produces two artifacts:
 - `graph_spec.json` — target-neutral immutable description of the
   graph nodes, edges, entry pointer, and finish pointer.
 - `state_bindings.py` — generated `TypedDict` state schema and
-  `@tool`-decorated stubs for the five CACAO action steps.
+  `@tool`-decorated nodes for the five CACAO action steps, each
+  calling its deterministic primitive from
+  `content/playbooks/eidas2_identity_verification/primitives/`.
 
-Wiring the graph into a live LangGraph runtime, binding the tool
-stubs to real primitives, and adding a conditional edge on the
-`__verification_verdict__` branch is the operator's job. The
+Wiring the graph into a live LangGraph runtime and connecting the
+operator-integration seams — the OpenID4VP verifier transport, the
+trust-anchor probe, the evidence sink and the provisioning dispatch,
+each marked with `NotImplementedError` — is the operator's job. The
+workflow needs no conditional edge on `__verification_verdict__`:
+the assurance and provisioning primitives carry the failure branch
+as explicit outcomes (an empty tier, a reasoned no-op), so the
+evidence record is emitted on every terminal path. The
 `_audit_mirror.py` sibling is the co-located dependency-free
 audit-record helper — see `docs/observability/audit-mirror.md` for
 the co-location rationale.
@@ -31,7 +38,7 @@ OSCAL / D3FEND / OCSF bindings live in the sibling `mappings.yaml`.
 |------------------------|----------------------------|-----------------------|
 | `playbook.cacao.json`  | (input mirror)             | CACAO v2 JSON         |
 | `graph_spec.json`      | `compilers.langgraph.emit` | LangGraph GraphSpec   |
-| `state_bindings.py`    | `compilers.langgraph.state`| Generated Python stub |
+| `state_bindings.py`    | `compilers.langgraph.state`| Generated Python module |
 | `_audit_mirror.py`     | `compilers._shared`        | Audit-record helper   |
 | `regenerate.sh`        | (tooling)                  | bash script           |
 
@@ -51,7 +58,7 @@ audit-mirror sibling via `compilers._shared.audit_mirror_cli`.
 ## Sovereign-stack default
 
 LangGraph is a Python library that runs in the operator's own
-runtime; no hosted-SaaS default is assumed. The tool stubs are
+runtime; no hosted-SaaS default is assumed. The tool seams are
 expected to bind against the operator's own OpenID4VP verifier and
 the EU trust-anchor registry. No non-EU trust anchor, no Microsoft /
 Google EUDIW proxy, and no third-party LLM provider is assumed at

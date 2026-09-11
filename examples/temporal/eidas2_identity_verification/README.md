@@ -6,14 +6,15 @@ v2 playbook compiled by the Temporal reference compiler. The emitted
 and one `@activity.defn` per CACAO action step, with the CACAO
 control flow projected onto deterministic Temporal awaitables.
 
-The activity bodies raise `NotImplementedError` at the SKELETON
-layer: request-EUDIW-presentation, verify-PID-credential,
-assess-assurance-level, emit-identity-audit-evidence, and
-trigger-access-provisioning are each stubbed at the primitive
-boundary. Sibling CORE-FANOUT cards land the primitive bindings
-(OpenID4VP relying-party surface, trust-anchor-registry probe,
-LoA-to-access-tier mapping, OCSF Account Change evidence emission,
-onboarding hand-off).
+All five activities — request-EUDIW-presentation,
+verify-PID-credential, assess-assurance-level,
+emit-identity-audit-evidence and trigger-access-provisioning —
+import and call their deterministic primitive from
+`content/playbooks/eidas2_identity_verification/primitives/`.
+`NotImplementedError` marks only the operator-integration seams: the
+OpenID4VP relying-party transport, the trust-anchor-registry probe
+and status-list read that produce the verification report, the
+evidence sink, and the onboarding hand-off dispatch.
 
 ## Source
 
@@ -32,7 +33,7 @@ inspection, and the regeneration script.
 | Path                    | Source compiler       | Format            |
 |-------------------------|-----------------------|-------------------|
 | `playbook.cacao.json`   | (input mirror)        | CACAO v2 JSON     |
-| `workflow.temporal.py`  | `compilers.temporal`  | Python stub       |
+| `workflow.temporal.py`  | `compilers.temporal`  | Python module     |
 | `regenerate.sh`         | (tooling)             | bash script       |
 
 ## How to regenerate
@@ -53,4 +54,4 @@ hosted Temporal SaaS default is assumed. The activity bodies are
 expected to bind against the operator's own OpenID4VP verifier and
 EU trust-anchor registry — no non-EU trust anchor is modelled and
 no Microsoft / Google EUDIW proxy surface is assumed anywhere in
-the stub.
+the emitted module.

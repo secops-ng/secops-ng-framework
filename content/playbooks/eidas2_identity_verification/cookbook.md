@@ -75,7 +75,8 @@ that in their own data-flow entry.
 ```
 content/playbooks/eidas2_identity_verification/
 ├── README.md                    # workflow-local module tree and status
-├── playbook.cacao.json          # canonical CACAO v2 source
+├── playbook.cacao.json          # canonical CACAO v2 source, every action step bound
+├── primitives/                  # the five deterministic primitives the steps bind
 ├── mappings.yaml                # outbound overlay (OSCAL, D3FEND, OCSF, NIS2, DORA)
 └── cookbook.md                  # this file
 
@@ -95,7 +96,7 @@ examples/langgraph/eidas2_identity_verification/
 ├── README.md
 ├── playbook.cacao.json          # byte-identical mirror
 ├── graph_spec.json              # target-neutral node + edge description
-├── state_bindings.py            # TypedDict state schema + @tool stubs
+├── state_bindings.py            # TypedDict state schema + @tool nodes calling the primitives
 ├── _audit_mirror.py             # per-step audit-mirror shim
 └── regenerate.sh
 ```
@@ -110,8 +111,16 @@ compiled artifact and the goldens re-lock.
 
 The workflow ships seven steps: one `start`, five `action`, one
 `end`. Deterministic transitions — each state has exactly one
-`on_completion` successor. One onboarding event emits exactly one
-identity-verification evidence record.
+`on_completion` successor, including on the verification-failure
+branch, which is why the audit trail is complete on every terminal
+path. One onboarding event emits exactly one identity-verification
+evidence record.
+
+Every action step binds a deterministic primitive from
+`primitives/` through `x_secops_ng.core_body`, so each
+compile-target view below has the same two halves: the emitter
+renders the primitive call, and the operator wires the named
+adapter around it.
 
 ### Step 1 — `request_eudiw_presentation`
 
@@ -123,20 +132,20 @@ of attributes).
 
 **Compile-target view.**
 
-- *n8n* — the step maps to an HTTP Request node emitting the
-  OpenID4VP presentation request against the verifier endpoint the
-  practitioner has bound to `presentation_endpoint`. Import
+- *n8n* — a Code node calling
+  `presentation.compose_presentation_request`, which composes the
+  request envelope and derives the correlation id. Import
   `examples/n8n/eidas2_identity_verification/workflow.n8n.json` into
-  a running n8n and wire the credentials the node references.
-- *Temporal* — the step compiles to
-  `activity.request_eudiw_presentation` in
-  `examples/temporal/eidas2_identity_verification/workflow.temporal.py`.
-  The activity raises `NotImplementedError` at the SKELETON layer;
-  the practitioner supplies the verifier-adapter body when wiring
-  their own verifier deployment.
-- *LangGraph* — the step is a `@tool`-decorated node in
-  `state_bindings.py` with the same NotImplementedError contract;
-  the graph spec in `graph_spec.json` records the immutable topology.
+  a running n8n and wire the OpenID4VP relying-party surface that
+  actually issues the request to the wallet.
+- *Temporal* — `activity.request_eudiw_presentation` in
+  `examples/temporal/eidas2_identity_verification/workflow.temporal.py`
+  imports and calls the same primitive; `NotImplementedError` marks
+  only the verifier-transport seam the practitioner supplies when
+  wiring their own verifier deployment.
+- *LangGraph* — a `@tool`-decorated node in `state_bindings.py`
+  calling the same primitive, with the same seam; the graph spec in
+  `graph_spec.json` records the topology.
 
 **Regulatory anchor.** eIDAS 2.0 Art. 5c (wallet presentation).
 
@@ -153,16 +162,20 @@ registry.
 
 **Compile-target view.**
 
-- *n8n* — HTTP Request node against the operator's declared trust-
-  anchor probe, followed by a Code node that runs the holder-binding
-  and status-list checks against the returned credential envelope.
-- *Temporal* — `activity.verify_pid_credential`. The activity is the
-  natural home for the trust-anchor cache (with a documented TTL)
-  so repeat verifications against the same issuer inside a
-  restart-window do not re-hit the trust-list endpoint.
-- *LangGraph* — `@tool` node; the state schema carries the returned
-  credential envelope on the input edge and the verification verdict
-  on the output edge.
+- *n8n* — a Code node calling
+  `verification.record_pid_verification`, which turns the adapter's
+  typed report into the one verdict and its provenance. The
+  trust-anchor probe, the signature verification and the status-list
+  read that produce that report are the operator's HTTP surface,
+  wired ahead of the node.
+- *Temporal* — `activity.verify_pid_credential` calls the same
+  primitive. The activity is the natural home for the trust-anchor
+  cache (with a documented TTL) so repeat verifications against the
+  same issuer inside a restart-window do not re-hit the trust-list
+  endpoint.
+- *LangGraph* — `@tool` node calling the same primitive; the state
+  schema carries the adapter's report on the input edge and the
+  verification record on the output edge.
 
 **Regulatory anchor.** eIDAS 2.0 Art. 5c and the Member-State
 Trusted List surface maintained under Commission Implementing
@@ -180,11 +193,19 @@ scope is a terminal negative verdict at this step.
 
 **Compile-target view.**
 
-- *n8n* — a Switch node against the `loa_verdict` field routing
-  onto the accept / reject branches.
-- *Temporal* — `activity.assess_assurance_level` returning the
-  mapped access tier or a documented `LoARejection` signal.
-- *LangGraph* — `@tool` node returning the mapped tier on the state
+All three targets call `assurance.assess_assurance_level`, which
+returns one of three explicit outcomes rather than branching the
+topology: `tier_assigned`, `refused_verification_failed` (the
+short-circuit on a failed verification — the returned LoA is
+recorded, the tier stays empty) or `refused_below_minimum` (a
+returned LoA below the scope's declared minimum refuses rather than
+quietly downgrading the principal).
+
+- *n8n* — a Code node calling the primitive; the operator supplies
+  the documented assurance-to-tier table.
+- *Temporal* — `activity.assess_assurance_level` calling the same
+  primitive and returning the assessment envelope.
+- *LangGraph* — `@tool` node returning the assessment on the state
   edge.
 
 **Regulatory anchor.** eIDAS 2.0 Art. 8 (assurance levels) as read
@@ -203,15 +224,23 @@ and `__captured_at__` so the NIS2 Art. 21(2)(i) auditable-lifecycle
 obligation is discharged on every terminal path (including the
 verification-failed branch).
 
-**Compile-target view.** All three targets project the record into
-the same shape; the difference is only in how the emitter is
-invoked.
+**Compile-target view.** All three targets call
+`evidence.compose_identity_evidence_record`, so the record is
+byte-identical across targets: the id is derived as SHA-256 over
+`principal_id | presentation_request_id | captured_at`, and
+`__captured_at__` is runtime-supplied and passed through unchanged.
+The F-CP-07 access-evidence envelope
+(`schemas/evidence/access.schema.json`) carries runtime-only fields
+(`execution_id`, `compile_target`), so wrapping the record into that
+envelope and persisting it is the evidence-sink adapter's job at each
+target's seam — the primitive composes the OCSF record the envelope
+carries.
 
-- *n8n* — HTTP Request node against the operator's evidence sink,
-  carrying the JSON body below.
-- *Temporal* — `activity.emit_identity_audit_evidence` invoking the
-  shared emitter under `compilers/_shared/evidence/`.
-- *LangGraph* — `@tool` node calling the same shared emitter.
+- *n8n* — a Code node calling the primitive; the operator wires the
+  HTTP request to their evidence sink, carrying the JSON body below.
+- *Temporal* — `activity.emit_identity_audit_evidence` calling the
+  same primitive, then the operator's sink.
+- *LangGraph* — `@tool` node, same primitive, same sink seam.
 
 **Regulatory anchor.** OCSF Account Change (`class_uid 3001`)
 telemetry class carries the record; the audit-evident obligation is
@@ -228,8 +257,16 @@ downstream workflow can trace back to the verification transaction.
 
 **Compile-target view.**
 
-- *n8n* — Execute Workflow node invoking the onboarding tracker's
-  compiled n8n workflow.
+All three targets call
+`provisioning.compose_provisioning_handoff`, which composes the
+envelope correlated on `__principal_id__` — or, on a failed
+verification or an assurance refusal, a reasoned no-op that still
+references the emitted `evidence_id`, so the negative trail is
+joinable and no capability delta is ever applied for a refused
+principal. Dispatching the composed envelope is the target's:
+
+- *n8n* — an Execute Workflow node invoking the onboarding tracker's
+  compiled n8n workflow with the envelope.
 - *Temporal* — a child-workflow invocation of
   `OnboardingOffboardingTracker` via
   `workflow.start_child_workflow`.
@@ -329,11 +366,16 @@ every PR.
 - Temporal: [`examples/temporal/eidas2_identity_verification/README.md`](../../../examples/temporal/eidas2_identity_verification/README.md)
 - LangGraph: [`examples/langgraph/eidas2_identity_verification/README.md`](../../../examples/langgraph/eidas2_identity_verification/README.md)
 
-The compiled artifacts are the starting point, not the finished
-workflow: the primitive bodies (verifier adapter, trust-anchor
-probe, LoA-to-tier mapping) are the practitioner's own to wire
-against their identity plane. The framework holds the shape; the
-practitioner holds the data plane.
+The compiled artifacts carry the deterministic half in full: every
+action step calls its primitive, so the presentation request, the
+verification verdict, the assurance assessment, the evidence record
+and the hand-off envelope are computed identically on all three
+targets. What remains the practitioner's is the data plane around
+them — the OpenID4VP verifier transport, the trust-anchor probe and
+status-list read that produce the verification report, the
+documented assurance-to-tier table, and the evidence sink. The
+framework holds the shape and the decisions; the practitioner holds
+the connections.
 
 ## 7. Companion pattern
 
