@@ -75,3 +75,13 @@ EXTEND sibling cards.
 - **G-02** — regulatory-graph closure: NIS2 Art. 21(2)(g) primary
   anchor with sibling references to GDPR Art. 32(1)(b) staff-training
   organisational-measures obligation and ISO/IEC 27001 Annex A.6.3.
+
+## Binding status
+
+Deliberately unbound. The 6 action steps compile with operator-TODO
+bodies on all three targets and the playbook carries no `core_body`
+primitive bindings; `catalog.py` reports it that way and the playbook
+stays `experimental` under the Maturity ladder. This is a recorded
+decision (#921 — PARK bucket, Director 2026-09-04), not neglect:
+the training lifecycle is LMS-owned in practice, and F-WF-SECAWARENESS shipped its real value — the control definitions and the programme-governance metrics — already; parked together with its `cyber_hygiene_training` companion pending a merge decision (park-both). Reopening the park is a roadmap decision, not a bug — the
+trigger would be that the merge decision is taken, after which the surviving playbook is bound once.

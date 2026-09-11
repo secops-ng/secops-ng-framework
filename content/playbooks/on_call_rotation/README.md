@@ -57,3 +57,13 @@ starts at the responder's first acknowledgement.
 - MITRE D3FEND — Account Monitoring (D3-AM)
 - SigmaHQ — upstream off-hours-authentication and privileged-account-
   modification rule references (named, not vendored)
+
+## Binding status
+
+Deliberately unbound. The 4 action steps compile with operator-TODO
+bodies on all three targets and the playbook carries no `core_body`
+primitive bindings; `catalog.py` reports it that way and the playbook
+stays `experimental` under the Maturity ladder. This is a recorded
+decision (#921 — PARK bucket, Director 2026-09-04), not neglect:
+scheduling and people-operations; the value is the CACAO shape of the escalation chain and the handoff brief, not machine execution — and since the notify-lane composition/delivery split, "cannot bind" is not the reason, "no evidence value" is. Reopening the park is a roadmap decision, not a bug — the
+trigger would be that the handoff brief becomes an audited artifact in its own right.

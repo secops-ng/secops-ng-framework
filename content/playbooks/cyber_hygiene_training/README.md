@@ -47,3 +47,13 @@ evidence store remain a separate metrics-layer card.
 Reference emissions and byte-parity goldens ship under
 `examples/{n8n,temporal,langgraph}/cyber_hygiene_training/` and
 `tests/examples/{n8n,temporal,langgraph}/cyber_hygiene_training/`.
+
+## Binding status
+
+Deliberately unbound. The 6 action steps compile with operator-TODO
+bodies on all three targets and the playbook carries no `core_body`
+primitive bindings; `catalog.py` reports it that way and the playbook
+stays `experimental` under the Maturity ladder. This is a recorded
+decision (#921 — PARK bucket, Director 2026-09-04), not neglect:
+it overlaps `security_awareness_training` almost entirely, and binding either playbook twice would entrench the duplication — the pair is parked together pending a merge decision (park-both). Reopening the park is a roadmap decision, not a bug — the
+trigger would be that the merge decision is taken, after which the surviving playbook is bound once.
