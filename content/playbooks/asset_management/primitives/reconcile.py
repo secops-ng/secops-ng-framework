@@ -44,6 +44,7 @@ import unicodedata
 
 __all__ = [
     "InvalidInventorySnapshotError",
+    "derive_source_set_id",
     "reconcile_inventory_snapshot",
 ]
 
@@ -89,6 +90,29 @@ def _validate_asset_id(value: object, where: str) -> str:
             f"{where} {text!r} does not match the opaque asset-id pattern"
         )
     return text
+
+
+def derive_source_set_id(source_pairs: list) -> str:
+    """Derive the durable id naming a consulted inventory source set.
+
+    The id keys on the sorted ``(source_id, source_kind)`` pair list, so
+    it names the *surface* consulted independently of what those sources
+    observed: the same source set across two windows yields the same id
+    even when the asset observations differ.
+
+    Shared rather than duplicated. The ingest step names the source set
+    it consulted and the reconciliation step returns the same id on its
+    envelope; deriving that digest in two places is exactly the kind of
+    thing that drifts apart silently, so both call this one function and
+    a test pins the two outputs equal.
+    """
+    sorted_pairs = sorted(
+        (str(a), str(b)) for a, b in (tuple(p) for p in source_pairs)
+    )
+    payload = json.dumps(
+        [list(p) for p in sorted_pairs], ensure_ascii=False, separators=(",", ":")
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
 
 
 def _validate_baseline_hash(value: object, where: str) -> str | None:
@@ -222,11 +246,9 @@ def reconcile_inventory_snapshot(
             asset_obs.setdefault(aid, {})[sid] = bh
 
     # source_set_id keys on the sorted (source_id, source_kind) pair list.
-    sorted_pairs = sorted(canonical_sources)
-    source_set_payload = json.dumps(
-        sorted_pairs, ensure_ascii=False, separators=(",", ":")
-    ).encode("utf-8")
-    source_set_id = hashlib.sha256(source_set_payload).hexdigest()
+    # Derived by the shared helper so the ingest step and this step can
+    # never disagree about what names a source set.
+    source_set_id = derive_source_set_id(canonical_sources)
 
     # Compose the per-asset record list under precedence ordering.
     assets: list[dict] = []

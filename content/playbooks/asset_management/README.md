@@ -1,6 +1,6 @@
 # asset_management
 
-CACAO v2 SKELETON playbook for the asset and configuration management
+CACAO v2 playbook for the asset and configuration management
 capability against the operator's own deployed estate: ingest the
 documented inventory-source set on a scheduled cadence → reconcile
 into the operator-authoritative snapshot → compute the per-asset
@@ -13,14 +13,22 @@ inventory-source architecture.
 
 ## Status
 
-SKELETON. The playbook artifact and the NIS2 Art. 21(2)(i)
-asset-management overlay land here; CORE-layer cards add the
-deterministic primitives (ingest-source reconciliation, snapshot-id
-derivation, delta normalisation, taxonomy classification, evidence
-emission) together with their D3FEND pins, and the per-target
-compiler emissions (n8n / Temporal / LangGraph goldens); EXTEND
-cards wire the asset-inventory-drift and unmanaged-asset-cardinality
-metric emitters against the operator's evidence store. DORA Art. 8
+Experimental, CORE-PRIM complete. All six action steps now have a
+deterministic primitive behind them under `primitives/` — source-set
+resolution, snapshot reconciliation, delta computation, taxonomy
+classification, evidence composition and owner notification — each
+executed directly by unit coverage. The three worked examples under
+`examples/{n8n,temporal,langgraph}/asset_management/` and the
+cookbook at `docs/cookbook/asset_management.md` ship alongside.
+
+**Owed: the wire.** The CACAO steps do not yet carry
+`x_secops_ng.core_body` bindings, so `catalog.py` reports 0 of 6
+bound and the playbook stays `experimental`: the primitives exist but
+the compile targets still emit operator-TODO bodies rather than
+calling them. Binding the six steps, regenerating the examples and
+recomputing the Maturity ladder is the CORE-WIRE card. EXTEND cards
+wire the asset-inventory-drift and unmanaged-asset-cardinality metric
+emitters against the operator's evidence store. DORA Art. 8
 (identification function — asset / configuration register) and CRA
 Annex I §1(c) / §1(e) inbound entries are deliberately deferred to
 separate inbound-closure cards (see the gap notes in `mappings.yaml`
@@ -36,9 +44,24 @@ ddos_response.
   (`playbook.asset_management@v1`).
 - `mappings.yaml` — outbound overlay (OSCAL controls, OCSF telemetry,
   NIS2 Art. 21(2)(i)).
+- `primitives/` — the six deterministic primitives the action steps
+  bind at CORE-WIRE: pure, offline, LLM-free. Reconciliation is
+  read-only against the source set — the playbook surfaces inventory
+  drift and never writes back into the operator's CMDB or IaC
+  declarations; correcting drift is the operator's downstream lever.
+  Two derivations are shared rather than duplicated: the source-set
+  id is computed once in `reconcile` and reused by `ingest`, and the
+  `unmanaged-discovered` cardinality the notification pages on is
+  counted from the same classification list the evidence record
+  counts, with both equalities pinned by test.
+- `docs/cookbook/asset_management.md` — the practitioner walkthrough.
 
 ## Compile targets
 
-`compile_targets` declares `["n8n", "temporal", "langgraph"]`. Emitted
-artifacts and golden tests are owned by CORE-layer sibling cards; this
-directory ships the portable content only.
+`compile_targets` declares `["n8n", "temporal", "langgraph"]`. The
+emitted artifacts ship under
+`examples/{n8n,temporal,langgraph}/asset_management/` with byte-parity
+goldens under `tests/examples/`. They are regenerated from the
+canonical source, which is not yet bound — so the emitted bodies are
+still operator-TODO placeholders rather than primitive calls. The
+CORE-WIRE card changes that and regenerates them in the same change.

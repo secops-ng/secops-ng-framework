@@ -2281,9 +2281,13 @@ one playbook's provenance.
   F-WF-CORE-WAVE-2 carries the rest and records the parked five.
 - **Acceptance criteria:**
   - Staged **one playbook per cycle**, in this order:
-    `asset_management` first (WIRE NOW — its primitives already ship on
-    disk, so this is a single CORE-WIRE cycle on the
-    incident_management / patch_management retro-wiring pattern), then
+    `asset_management` first — filed as WIRE NOW on the premise that
+    its primitives already shipped, which the CORE-PRIM cycle below
+    found to be only half true: three of its six steps had primitives
+    (reconcile, classify, artifact, from #516) and three still carried
+    `TODO (CORE)` markers, so it needed a CORE-PRIM before the wire
+    rather than a single retro-wiring cycle. Both stages are now
+    staged explicitly: CORE-PRIM shipped, CORE-WIRE owed. Then
     `phishing_triage`, `ransomware_containment`, `data_exfil`,
     `identity_compromise`, `dora_major_incident_reporting`,
     `eu_ai_act_deployer_obligations`, `ai_human_oversight` — each as

@@ -6,6 +6,17 @@ replay-friendly helpers that the per-target CORE action bodies
 its own module so the per-target compilers depend only on what they
 need:
 
+* :mod:`.ingest` \u2014 :func:`resolve_inventory_source_set`
+  (ingest-inventory-sources). Validates and canonicalises the
+  per-source snapshots the ingest adapters pulled, and names the
+  consulted source set. The pull itself is the compile target's
+  adapter concern; what is deterministic is the grammar those pulls
+  must satisfy and the identity of the surface consulted. Imports
+  the source-envelope validators and the ``source_set_id``
+  derivation from :mod:`.reconcile` rather than restating them, so
+  the two steps cannot disagree about what a valid source is or
+  what names a source set.
+
 * :mod:`.reconcile` \u2014 :func:`reconcile_inventory_snapshot`
   (reconcile-authoritative-inventory). Merges per-source asset
   observations under the operator's documented source-precedence
@@ -13,6 +24,18 @@ need:
   ``source_set_id`` / canonical asset record list. Pure, replay-
   friendly; same inputs (under any input ordering) yield byte-
   identical output.
+
+* :mod:`.delta` \u2014 :func:`compute_inventory_delta`
+  (compute-delta-against-previous). Diffs the reconciled snapshot
+  against the previous documented one, emitting the per-delta
+  records ``schemas/evidence/inventory.schema.json#/$defs/delta_record``
+  defines and :func:`classify_inventory_delta` consumes. Unchanged
+  assets yield no record and a no-change window yields ``[]``
+  explicitly. ``baseline_diverged`` is claimed only when a baseline
+  was observed on both sides and differs \u2014 a baseline that
+  starts or stops being observed is an observation-coverage change,
+  not drift, and the closed change-kind enumeration has no member
+  for it.
 
 * :mod:`.classify` \u2014 :func:`classify_inventory_delta`
   (classify-delta). Resolves each per-asset delta against the closed
@@ -31,6 +54,14 @@ need:
   schema contract \u2014 ``compile_target`` is intentionally NOT part of
   the id so the three reference compilers re-derive byte-identical
   bytes (CORE-FANOUT byte-parity contract).
+
+* :mod:`.notify` \u2014 :func:`compose_owner_notification`
+  (notify-inventory-owner). Composes the owner payload and grades
+  the urgency from the classification: paging above the operator's
+  documented ``unmanaged-discovered`` tolerance, and always on the
+  ``[\"unclassified\"]`` short-circuit, where nothing is known
+  about the bucket. Composition only \u2014 delivery is the
+  messaging surface's.
 
 Style: every primitive is pure, network-free, LLM-free, deterministic.
 Inputs are JSON-native (strings, ints, lists, dicts); outputs are
@@ -51,17 +82,37 @@ from .classify import (
     InvalidInventoryDeltaClassificationError,
     classify_inventory_delta,
 )
+from .delta import (
+    InvalidInventoryDeltaError,
+    compute_inventory_delta,
+)
+from .ingest import (
+    InvalidInventorySourceSetError,
+    resolve_inventory_source_set,
+)
+from .notify import (
+    InvalidInventoryNotificationError,
+    compose_owner_notification,
+)
 from .reconcile import (
     InvalidInventorySnapshotError,
+    derive_source_set_id,
     reconcile_inventory_snapshot,
 )
 
 __all__ = [
     "InvalidAssetInventoryDeltaArtifactError",
     "InvalidInventoryDeltaClassificationError",
+    "InvalidInventoryDeltaError",
+    "InvalidInventoryNotificationError",
     "InvalidInventorySnapshotError",
+    "InvalidInventorySourceSetError",
     "build_asset_inventory_delta_evidence_artifact",
     "classify_inventory_delta",
+    "compose_owner_notification",
+    "compute_inventory_delta",
     "derive_asset_inventory_delta_artifact_id",
+    "derive_source_set_id",
     "reconcile_inventory_snapshot",
+    "resolve_inventory_source_set",
 ]
