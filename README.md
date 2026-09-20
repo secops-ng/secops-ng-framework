@@ -167,8 +167,11 @@ cp .env.example .env  # then edit
 pytest
 ```
 
-See `docs/quickstart/` once the launch compilers land for the
-end-to-end walkthrough ("clone, pick orchestrator, ship in days").
+The end-to-end walkthrough — clone, pick an orchestrator, compile the
+reference playbook, see the first operator-actionable output — is in
+[`docs/quickstart/README.md`](docs/quickstart/README.md). Questions that
+are not bugs go to
+[GitHub Discussions](https://github.com/secops-ng/secops-ng-framework/discussions).
 
 ## Contributing & governance
 
