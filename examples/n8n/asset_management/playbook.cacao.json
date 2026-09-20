@@ -3,14 +3,14 @@
   "spec_version": "2.0",
   "id": "playbook--80a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6dd",
   "name": "Asset and configuration inventory delta capture",
-  "description": "Operationalise the asset and configuration management capability against the operator's own deployed estate: ingest the documented asset-inventory sources (CMDB, declarative infrastructure-as-code records, cloud-provider asset APIs, endpoint-management agents) on a scheduled cadence, reconcile them into the operator-authoritative snapshot for the current window, compute the per-asset delta against the previous documented snapshot, classify each delta against the operator's documented delta taxonomy (new-managed, unmanaged-discovered, decommissioned, baseline-drift), capture the dated asset-inventory-delta evidence record, and notify the inventory owner so unmanaged or undocumented assets surface as exceptions rather than as quiet drift. The playbook does not author the operator's inventory-source architecture itself; it operationalises a documented reconciliation posture against pre-bound sources. SKELETON only — control bindings (control.asset_inventory_delta@v1) are pinned and the workflow topology + IDs are fixed, but per-step deterministic primitives (source reconciliation, delta classification, evidence emission), detection bindings, golden tests, and per-target compiler emissions are owned by CORE / EXTEND siblings. CACAO v2 + SecOps-NG content-model extensions.",
+  "description": "Operationalise the asset and configuration management capability against the operator's own deployed estate: ingest the documented asset-inventory sources (CMDB, declarative infrastructure-as-code records, cloud-provider asset APIs, endpoint-management agents) on a scheduled cadence, reconcile them into the operator-authoritative snapshot for the current window, compute the per-asset delta against the previous documented snapshot, classify each delta against the operator's documented delta taxonomy (new-managed, unmanaged-discovered, decommissioned, baseline-drift), capture the dated asset-inventory-delta evidence record, and notify the inventory owner so unmanaged or undocumented assets surface as exceptions rather than as quiet drift. The playbook does not author the operator's inventory-source architecture itself; it operationalises a documented reconciliation posture against pre-bound sources. All six action steps bind deterministic primitives under primitives/, each executed directly by unit coverage, and the three reference compilers emit those calls. Detection bindings for ingest-side and reconciliation-side failures remain owned by later cards once upstream rule ids are selected. CACAO v2 + SecOps-NG content-model extensions.",
   "playbook_types": [
     "investigation",
     "notification"
   ],
   "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
   "created": "2026-06-27T00:00:00Z",
-  "modified": "2026-06-27T00:00:00Z",
+  "modified": "2026-09-20T00:00:00Z",
   "labels": [
     "asset-management",
     "configuration-management",
@@ -44,29 +44,134 @@
       "description": "Identifier of the reconciliation window this run discharges (scheduled-cadence reference, on-demand reconciliation reference, or operator-initiated trigger). Names which inventory cohort the run reconciled against rather than the run's wall-clock time; the wall-clock instant lives on the evidence record itself.",
       "external": true
     },
+    "__raw_inventory_sources__": {
+      "type": "string",
+      "description": "Per-source inventory snapshots the ingest adapters pulled for this window, one envelope per consulted source (source id, source kind, and the observed asset records). The pull itself is the compile target's adapter concern; the ingest primitive validates the grammar these envelopes must satisfy and names the consulted surface. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__source_precedence__": {
+      "type": "string",
+      "description": "The operator's documented source-precedence ordering, as source ids most-authoritative first. Decides which source wins when two sources agree on an asset's identity and disagree on its declared baseline or lifecycle state. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__previous_snapshot_assets__": {
+      "type": "string",
+      "description": "The canonical asset record list of the previous documented snapshot for the same source set, read from the operator's evidence store. The delta step diffs the current reconciled snapshot against it. An empty list is the first-window case and is a legitimate input, not an error. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__ownership_declarations__": {
+      "type": "string",
+      "description": "Asset ids the operator has a documented owner or declaration for. Discriminates new-managed from unmanaged-discovered on the appeared axis. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__decommissioning_records__": {
+      "type": "string",
+      "description": "Asset ids that carry a recorded decommissioning entry. Discriminates decommissioned from unmanaged-discovered on the disappeared axis. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__reconciliation_deadline_missed__": {
+      "type": "string",
+      "description": "Real boolean. True when the documented reconciliation deadline elapsed before classification could complete, so the operator is not held by a perfect-classification stall while the window slips. The classify primitive reads it as a real boolean and rejects strings: the string 'false' is truthy in most target runtimes and would silently invert the short-circuit.",
+      "external": true
+    },
+    "__unmanaged_threshold__": {
+      "type": "string",
+      "description": "The operator's documented tolerance for unmanaged-discovered assets in a single window, as an integer. The notification pages when the counted cardinality exceeds it.",
+      "external": true
+    },
+    "__owner_channel__": {
+      "type": "string",
+      "description": "Pre-bound delivery channel reference for the inventory owner (ticket queue, chat thread, asset-management board). The notify primitive composes against it; delivery is the messaging surface's concern.",
+      "external": true
+    },
+    "__workflow_id__": {
+      "type": "string",
+      "description": "Stable workflow identifier recorded on the evidence artifact and folded into the deterministic artifact id.",
+      "external": true
+    },
+    "__execution_id__": {
+      "type": "string",
+      "description": "Per-run execution identifier recorded on the evidence artifact and folded into the deterministic artifact id. Distinguishes two runs of the same workflow.",
+      "external": true
+    },
+    "__regulation_refs__": {
+      "type": "string",
+      "description": "Regulation references recorded on the evidence artifact. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__control_refs__": {
+      "type": "string",
+      "description": "Control references recorded on the evidence artifact. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__captured_at__": {
+      "type": "string",
+      "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) at which the evidence record was captured. Folded into the deterministic artifact id, so the three reference compilers must be handed the same instant to re-derive byte-identical bytes.",
+      "external": true
+    },
+    "__source_url__": {
+      "type": "string",
+      "description": "Provenance URL recorded on the evidence artifact, naming where the reconciled observation came from.",
+      "external": true
+    },
     "__inventory_source_set__": {
       "type": "string",
-      "description": "Identifier of the documented inventory-source set the ingest step consulted (CMDB reference, IaC declaration set, cloud-provider asset-API binding, endpoint-management agent fleet). Populated by the ingest step; carried forward so the evidence record names which sources contributed to the reconciled snapshot.",
+      "description": "Envelope the ingest step emits: the resolved inventory-source set for this window, carrying the derived source_set_id, the normalised and sorted per-source snapshots, and the normalised precedence ordering. Carried forward so the evidence record names which sources contributed to the reconciled snapshot.",
+      "external": false
+    },
+    "__source_set_id__": {
+      "type": "string",
+      "description": "Digest naming the consulted inventory-source set. Extracted at the compile target's adapter seam from __inventory_source_set__.source_set_id. The reconcile primitive re-derives the same digest from the same sources through the shared derive_source_set_id helper, and a test pins the two equal.",
+      "external": false
+    },
+    "__resolved_inventory_sources__": {
+      "type": "string",
+      "description": "The normalised, sorted per-source snapshots the ingest step validated. Extracted at the compile target's adapter seam from __inventory_source_set__.sources. Reconciliation reads these rather than the raw pull, so a source that fails the ingest grammar cannot reach the snapshot. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": false
+    },
+    "__resolved_source_precedence__": {
+      "type": "string",
+      "description": "The normalised precedence ordering the ingest step validated. Extracted at the compile target's adapter seam from __inventory_source_set__.precedence. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": false
+    },
+    "__inventory_snapshot__": {
+      "type": "string",
+      "description": "Envelope the reconcile step emits: the operator-authoritative snapshot for this window, carrying the derived snapshot_id, the re-derived source_set_id, and the canonical merged asset record list.",
       "external": false
     },
     "__snapshot_id__": {
       "type": "string",
-      "description": "Identifier of the reconciled operator-authoritative snapshot the reconcile step composed for this window. Always populated; the value names the snapshot the delta computation reads against. CORE primitives define the deterministic snapshot-id derivation (sorted, normalised asset-set hash) so re-emissions are byte-identical.",
+      "description": "Digest naming the reconciled operator-authoritative snapshot for this window. Extracted at the compile target's adapter seam from __inventory_snapshot__.snapshot_id. Keyed on the canonical, source-precedence-ordered, normalised asset record list, so re-emissions inside the same window are byte-identical.",
       "external": false
     },
-    "__delta_set_id__": {
+    "__snapshot_assets__": {
       "type": "string",
-      "description": "Identifier of the per-delta set the compute-delta step emits against the previous documented snapshot. Each delta carries an asset identifier, an observed-source attribution, a previous-state marker, and a current-state marker. The set may be empty (no delta against the previous snapshot) — the empty case is still emitted explicitly so the audit-evident chain is closed.",
+      "description": "The canonical merged asset record list of the reconciled snapshot. Extracted at the compile target's adapter seam from __inventory_snapshot__.assets. The delta step diffs it against __previous_snapshot_assets__. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": false
+    },
+    "__delta_set__": {
+      "type": "string",
+      "description": "The per-delta records the compute-delta step emits against the previous documented snapshot, shaped against schemas/evidence/inventory.schema.json#/$defs/delta_record: each carries an asset id, a change kind, a source attribution, and the previous / current state markers. Unchanged assets yield no record and a no-change window yields an explicit empty list, so the audit-evident chain is closed either way. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
       "external": false
     },
     "__delta_classification__": {
       "type": "string",
-      "description": "Identifier of the classified delta set against the operator's documented delta taxonomy: new-managed (asset appeared and is covered by a documented owner), unmanaged-discovered (asset appeared without a documented owner — the exception bucket NIS2 Art. 21(2)(i) reviewers consume), decommissioned (asset disappeared per a documented decommissioning record), baseline-drift (asset present but observed configuration diverges from the documented baseline). Empty when classification could not be completed within the documented reconciliation deadline; an empty value short-circuits into an evidence-capture failure record while still treating the delta set as unmanaged-discovered for notification urgency.",
+      "description": "One taxonomy entry per delta, in the order of __delta_set__, drawn from the closed enumeration: new-managed (asset appeared and a documented owner covers it), unmanaged-discovered (asset appeared without one — the exception bucket NIS2 Art. 21(2)(i) reviewers consume), decommissioned (asset disappeared per a documented decommissioning record), baseline-drift (asset present but the observed configuration diverges from the documented baseline). On the deadline short-circuit the value is the single sentinel ['unclassified'], which the evidence record carries verbatim and the notification always pages on. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": false
+    },
+    "__evidence_artifact__": {
+      "type": "string",
+      "description": "Envelope the capture-evidence step emits: the JSON-native asset-inventory-delta evidence record shaped against schemas/evidence/inventory.schema.json (stream: inventory).",
       "external": false
     },
     "__evidence_id__": {
       "type": "string",
-      "description": "Identifier of the dated asset-inventory-delta evidence record published to the operator's evidence store. Always populated, including on the empty-delta-set branch and on the unclassified-delta short-circuit branch.",
+      "description": "Identifier of the dated asset-inventory-delta evidence record. Extracted at the compile target's adapter seam from __evidence_artifact__.artifact_id, derived as SHA-256(workflow_id|execution_id|captured_at). Always populated, including on the empty-delta-set branch and on the unclassified short-circuit.",
+      "external": false
+    },
+    "__owner_notification__": {
+      "type": "string",
+      "description": "Envelope the notify step emits: the composed owner payload with its graded urgency, the counted unmanaged-discovered cardinality and the per-taxonomy breakdown. Composition only — delivery is the messaging surface's concern.",
       "external": false
     }
   },
@@ -80,13 +185,18 @@
     "action--80000000-0000-4000-8000-000000000002": {
       "type": "action",
       "name": "ingest inventory sources",
-      "description": "TODO (CORE): per-source ingest primitive. The action body reads the documented inventory-source set for the current reconciliation window (CMDB reference, IaC declaration set, cloud-provider asset-API binding, endpoint-management agent fleet) and pulls each source's snapshot of declared and observed assets into the playbook's working set. Sets __inventory_source_set__ to the durable identifier of the source set the run consulted. SKELETON pins the topology + ID + control / telemetry refs; the deterministic per-source pull, normalisation, and source-attribution carry are owned by CORE-PRIM. Detection bindings for ingest-side failures (source endpoint unreachable, stale declaration set, partial pull) are owned by CORE-FANOUT cards once upstream rule ids are selected.",
+      "description": "Source-set resolution step. Binds against the deterministic primitive at content.playbooks.asset_management.primitives.ingest.resolve_inventory_source_set: validates and canonicalises the per-source snapshots the ingest adapters pulled for this window, sorts them, and names the consulted surface with a SHA-256 source-set digest. The pull itself is the compile target's adapter concern — what is deterministic here is the grammar those pulls must satisfy and the identity of the surface consulted. The digest is computed by the shared derive_source_set_id helper that the reconcile primitive also calls, so the two steps cannot drift apart about what names a source set. Sets __inventory_source_set__; the digest, the normalised sources and the normalised precedence are extracted from it downstream.",
       "on_completion": "action--80000000-0000-4000-8000-000000000003",
       "in_args": [
-        "__snapshot_window__"
+        "__snapshot_window__",
+        "__raw_inventory_sources__",
+        "__source_precedence__"
       ],
       "out_args": [
-        "__inventory_source_set__"
+        "__inventory_source_set__",
+        "__source_set_id__",
+        "__resolved_inventory_sources__",
+        "__resolved_source_precedence__"
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -97,20 +207,31 @@
         ],
         "metric_refs": [
           "kri.control_effectiveness@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.asset_management.primitives.ingest.resolve_inventory_source_set",
+          "in": {
+            "raw_sources": "__raw_inventory_sources__",
+            "precedence": "__source_precedence__"
+          },
+          "out": "__inventory_source_set__"
+        }
       }
     },
     "action--80000000-0000-4000-8000-000000000003": {
       "type": "action",
       "name": "reconcile authoritative inventory",
-      "description": "Authoritative-snapshot reconciliation step. Binds against the deterministic primitive at content.playbooks.asset_management.primitives.reconcile.reconcile_inventory_snapshot: composes the operator-authoritative snapshot for the current reconciliation window from the ingested source set by merging per-source asset observations under the operator's documented source-precedence ordering (e.g. IaC declaration wins over discovered observation when both agree on identity but disagree on declared baseline; cloud-provider asset API wins on lifecycle state). The primitive emits a SHA-256 snapshot id keyed on the canonical, source-precedence-ordered, normalised asset record list so re-emissions inside the same window are byte-identical. Sets __snapshot_id__ to that digest. The reconciliation step is read-only against the source set — it does not write back into the operator's CMDB or IaC declarations; correcting drift is the operator's downstream lever, the playbook only surfaces the observation.",
+      "description": "Authoritative-snapshot reconciliation step. Binds against the deterministic primitive at content.playbooks.asset_management.primitives.reconcile.reconcile_inventory_snapshot: composes the operator-authoritative snapshot for the current reconciliation window from the ingested source set by merging per-source asset observations under the operator's documented source-precedence ordering (e.g. IaC declaration wins over discovered observation when both agree on identity but disagree on declared baseline; cloud-provider asset API wins on lifecycle state). The primitive emits a SHA-256 snapshot id keyed on the canonical, source-precedence-ordered, normalised asset record list so re-emissions inside the same window are byte-identical. Sets __inventory_snapshot__; the digest and the canonical asset record list are extracted from it downstream. The reconciliation step is read-only against the source set — it does not write back into the operator's CMDB or IaC declarations; correcting drift is the operator's downstream lever, the playbook only surfaces the observation.",
       "on_completion": "action--80000000-0000-4000-8000-000000000004",
       "in_args": [
         "__snapshot_window__",
-        "__inventory_source_set__"
+        "__resolved_inventory_sources__",
+        "__resolved_source_precedence__"
       ],
       "out_args": [
-        "__snapshot_id__"
+        "__inventory_snapshot__",
+        "__snapshot_id__",
+        "__snapshot_assets__"
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -121,20 +242,29 @@
         ],
         "metric_refs": [
           "kri.control_effectiveness@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.asset_management.primitives.reconcile.reconcile_inventory_snapshot",
+          "in": {
+            "sources": "__resolved_inventory_sources__",
+            "precedence": "__resolved_source_precedence__"
+          },
+          "out": "__inventory_snapshot__"
+        }
       }
     },
     "action--80000000-0000-4000-8000-000000000004": {
       "type": "action",
       "name": "compute delta against previous snapshot",
-      "description": "TODO (CORE): per-asset delta-computation primitive. The action body diffs the reconciled snapshot (__snapshot_id__) against the previous documented snapshot for the same source set, emitting the per-delta set: each delta carries an asset identifier, a source-attribution marker for the side that observed the asset, a previous-state marker (absent / present-with-baseline-X / decommissioned), and a current-state marker (absent / present-with-baseline-Y / observed-without-owner). Empty deltas are emitted explicitly so the audit-evident chain is closed even on a no-change reconciliation. Sets __delta_set_id__. SKELETON pins the topology + ID; the deterministic delta normalisation and source-attribution carry are owned by CORE-PRIM.",
+      "description": "Per-asset delta-computation step. Binds against the deterministic primitive at content.playbooks.asset_management.primitives.delta.compute_inventory_delta: diffs the reconciled snapshot's canonical asset record list against the previous documented snapshot for the same source set, emitting one record per change — appeared, disappeared, or baseline_diverged — each carrying the asset id, the observing source's attribution, and the previous / current state markers. Unchanged assets yield no record, and a no-change window yields an explicit empty list so the audit-evident chain is closed either way. baseline_diverged is claimed only when a baseline was observed on both sides and differs: a baseline that starts or stops being observed is a change in observation coverage, not drift, and the closed change-kind enumeration has no member for it. Sets __delta_set__.",
       "on_completion": "action--80000000-0000-4000-8000-000000000005",
       "in_args": [
         "__snapshot_window__",
-        "__snapshot_id__"
+        "__snapshot_assets__",
+        "__previous_snapshot_assets__"
       ],
       "out_args": [
-        "__delta_set_id__"
+        "__delta_set__"
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -146,17 +276,28 @@
         "metric_refs": [
           "kri.control_effectiveness@v1",
           "kri.asset_inventory_drift@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.asset_management.primitives.delta.compute_inventory_delta",
+          "in": {
+            "current_assets": "__snapshot_assets__",
+            "previous_assets": "__previous_snapshot_assets__"
+          },
+          "out": "__delta_set__"
+        }
       }
     },
     "action--80000000-0000-4000-8000-000000000005": {
       "type": "action",
       "name": "classify delta",
-      "description": "Per-delta classification step. Binds against the deterministic primitive at content.playbooks.asset_management.primitives.classify.classify_inventory_delta: classifies each delta in __delta_set_id__ against the operator's documented delta taxonomy: new-managed (asset appeared and a documented owner / declaration covers it), unmanaged-discovered (asset appeared without a documented owner — the exception bucket NIS2 Art. 21(2)(i) reviewers consume), decommissioned (asset disappeared per a documented decommissioning record), baseline-drift (asset present but the observed configuration diverges from the documented baseline). Per-delta internal consistency (change-kind vs state transition) is enforced at the primitive boundary so an inconsistent delta fails loud here rather than at the evidence-emit boundary downstream. Sets __delta_classification__. The classification is best-effort and time-boxed; if classification cannot be completed within the documented reconciliation deadline (so the operator is not held by a perfect-classification stall while the window slips), the primitive is invoked with deadline_missed=true and emits the single sentinel ['unclassified']; the downstream evidence-capture step records that marker while still treating the delta set as unmanaged-discovered for notification urgency.",
+      "description": "Per-delta classification step. Binds against the deterministic primitive at content.playbooks.asset_management.primitives.classify.classify_inventory_delta: classifies each delta in __delta_set__ against the operator's documented delta taxonomy: new-managed (asset appeared and a documented owner / declaration covers it), unmanaged-discovered (asset appeared without a documented owner — the exception bucket NIS2 Art. 21(2)(i) reviewers consume), decommissioned (asset disappeared per a documented decommissioning record), baseline-drift (asset present but the observed configuration diverges from the documented baseline). Per-delta internal consistency (change-kind vs state transition) is enforced at the primitive boundary so an inconsistent delta fails loud here rather than at the evidence-emit boundary downstream. Sets __delta_classification__. The classification is best-effort and time-boxed; if classification cannot be completed within the documented reconciliation deadline (so the operator is not held by a perfect-classification stall while the window slips), the primitive is invoked with deadline_missed bound to __reconciliation_deadline_missed__ and emits the single sentinel ['unclassified']; the downstream evidence-capture step records that marker while still treating the delta set as unmanaged-discovered for notification urgency.",
       "on_completion": "action--80000000-0000-4000-8000-000000000006",
       "in_args": [
         "__snapshot_id__",
-        "__delta_set_id__"
+        "__delta_set__",
+        "__ownership_declarations__",
+        "__decommissioning_records__",
+        "__reconciliation_deadline_missed__"
       ],
       "out_args": [
         "__delta_classification__"
@@ -171,7 +312,17 @@
         "metric_refs": [
           "kri.control_effectiveness@v1",
           "kpi.unmanaged_asset_cardinality@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.asset_management.primitives.classify.classify_inventory_delta",
+          "in": {
+            "delta_set": "__delta_set__",
+            "ownership_declarations": "__ownership_declarations__",
+            "decommissioning_records": "__decommissioning_records__",
+            "deadline_missed": "__reconciliation_deadline_missed__"
+          },
+          "out": "__delta_classification__"
+        }
       }
     },
     "action--80000000-0000-4000-8000-000000000006": {
@@ -182,10 +333,18 @@
       "in_args": [
         "__snapshot_window__",
         "__snapshot_id__",
-        "__delta_set_id__",
-        "__delta_classification__"
+        "__source_set_id__",
+        "__delta_set__",
+        "__delta_classification__",
+        "__workflow_id__",
+        "__execution_id__",
+        "__regulation_refs__",
+        "__control_refs__",
+        "__captured_at__",
+        "__source_url__"
       ],
       "out_args": [
+        "__evidence_artifact__",
         "__evidence_id__"
       ],
       "x_secops_ng": {
@@ -199,17 +358,37 @@
           "kri.control_effectiveness@v1",
           "kri.asset_inventory_drift@v1",
           "kpi.unmanaged_asset_cardinality@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.asset_management.primitives.artifact.build_asset_inventory_delta_evidence_artifact",
+          "in": {
+            "workflow_id": "__workflow_id__",
+            "execution_id": "__execution_id__",
+            "regulation_refs": "__regulation_refs__",
+            "control_refs": "__control_refs__",
+            "snapshot_window": "__snapshot_window__",
+            "snapshot_id": "__snapshot_id__",
+            "source_set_id": "__source_set_id__",
+            "delta_set": "__delta_set__",
+            "delta_classification": "__delta_classification__",
+            "captured_at": "__captured_at__",
+            "source_url": "__source_url__"
+          },
+          "out": "__evidence_artifact__"
+        }
       }
     },
     "action--80000000-0000-4000-8000-000000000007": {
       "type": "action",
       "name": "notify inventory owner",
-      "description": "TODO (CORE): owner-notification primitive. The action body delivers the evidence reference to the inventory owner along the operator's pre-bound channel (ticketing system, chat thread, asset-management board). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an evidence record written but never delivered to the owner is itself an asset-management-discipline gap. The notification carries the classified delta breakdown so an unmanaged-discovered cardinality above the operator's documented threshold pages with appropriate urgency for the next asset-management lever (decommission, claim ownership, attach to a documented baseline). SKELETON pins the topology + ID; the deterministic delivery shape is owned by CORE-PRIM.",
+      "description": "Owner-notification step. Binds against the deterministic primitive at content.playbooks.asset_management.primitives.notify.compose_owner_notification: composes the owner payload and grades its urgency from the classification, paging when the counted unmanaged-discovered cardinality exceeds the operator's documented tolerance and always on the ['unclassified'] short-circuit, where nothing is known about the bucket. The primitive counts that cardinality from the same classification list the evidence record counts, and a test pins the two counts equal rather than passing the number across the seam. Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently: an evidence record written but never delivered to the owner is itself an asset-management-discipline gap. Composition only — delivery along the pre-bound channel is the messaging surface's concern. Sets __owner_notification__.",
       "on_completion": "end--80000000-0000-4000-8000-000000000008",
       "in_args": [
         "__evidence_id__",
-        "__delta_classification__"
+        "__snapshot_window__",
+        "__delta_classification__",
+        "__unmanaged_threshold__",
+        "__owner_channel__"
       ],
       "x_secops_ng": {
         "telemetry_refs": [
@@ -218,8 +397,22 @@
         "metric_refs": [
           "kri.control_effectiveness@v1",
           "kpi.unmanaged_asset_cardinality@v1"
-        ]
-      }
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.asset_management.primitives.notify.compose_owner_notification",
+          "in": {
+            "evidence_id": "__evidence_id__",
+            "snapshot_window": "__snapshot_window__",
+            "delta_classification": "__delta_classification__",
+            "unmanaged_threshold": "__unmanaged_threshold__",
+            "owner_channel": "__owner_channel__"
+          },
+          "out": "__owner_notification__"
+        }
+      },
+      "out_args": [
+        "__owner_notification__"
+      ]
     },
     "end--80000000-0000-4000-8000-000000000008": {
       "type": "end",
@@ -228,8 +421,8 @@
   },
   "x_secops_ng": {
     "stable_id": "playbook.asset_management@v1",
-    "content_version": "0.1.0",
-    "maturity": "experimental",
+    "content_version": "1.0.0",
+    "maturity": "stable",
     "compile_targets": [
       "n8n",
       "temporal",

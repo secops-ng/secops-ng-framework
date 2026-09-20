@@ -13,22 +13,43 @@ inventory-source architecture.
 
 ## Status
 
-Experimental, CORE-PRIM complete. All six action steps now have a
-deterministic primitive behind them under `primitives/` — source-set
-resolution, snapshot reconciliation, delta computation, taxonomy
-classification, evidence composition and owner notification — each
-executed directly by unit coverage. The three worked examples under
-`examples/{n8n,temporal,langgraph}/asset_management/` and the
-cookbook at `docs/cookbook/asset_management.md` ship alongside.
+Stable, `content_version` 1.0.0. All six action steps bind a
+deterministic primitive under `primitives/` through
+`x_secops_ng.core_body` — source-set resolution, snapshot
+reconciliation, delta computation, taxonomy classification, evidence
+composition and owner notification — each executed directly by unit
+coverage, and the three reference targets emit those calls rather than
+operator-TODO bodies. The graduation checklist recomputes green:
+tier A, 6 of 6 real bindings, zero placeholder bodies, zero blank
+predicates, zero schema errors, three-target goldens, examples
+regenerated in the same change.
 
-**Owed: the wire.** The CACAO steps do not yet carry
-`x_secops_ng.core_body` bindings, so `catalog.py` reports 0 of 6
-bound and the playbook stays `experimental`: the primitives exist but
-the compile targets still emit operator-TODO bodies rather than
-calling them. Binding the six steps, regenerating the examples and
-recomputing the Maturity ladder is the CORE-WIRE card. EXTEND cards
-wire the asset-inventory-drift and unmanaged-asset-cardinality metric
-emitters against the operator's evidence store. DORA Art. 8
+What the wire does **not** claim: the compile targets emit primitive
+calls, not a deployment. The per-source pull, the evidence-store write,
+and the delivery of the owner notification are all adapter surfaces the
+operator binds. The reconciliation stays read-only against the source
+set — the playbook surfaces inventory drift and never writes back into
+the operator's CMDB or IaC declarations; correcting drift is the
+operator's downstream lever.
+
+Two naming points were settled at the wire rather than carried
+forward. `__delta_set_id__` was renamed `__delta_set__`: the primitive
+emits the delta records themselves, and naming a record list an "id"
+would have promised a digest no primitive computes. `__delta_classification__`
+keeps its name but its description now records that it carries one
+taxonomy entry per delta, not an identifier.
+
+The deadline short-circuit stays inside the classify primitive rather
+than becoming a CACAO branch. `__reconciliation_deadline_missed__` is
+bound as a real boolean input and the primitive returns the single
+sentinel `['unclassified']`; routing around the step instead would mean
+the sentinel is never produced, and deciding the same thing in two
+places is how the two decisions drift apart.
+
+Still owed: EXTEND cards wire the asset-inventory-drift and
+unmanaged-asset-cardinality metric emitters against the operator's
+evidence store, and detection bindings for ingest-side and
+reconciliation-side failures wait on upstream rule ids. DORA Art. 8
 (identification function — asset / configuration register) and CRA
 Annex I §1(c) / §1(e) inbound entries are deliberately deferred to
 separate inbound-closure cards (see the gap notes in `mappings.yaml`
@@ -61,7 +82,9 @@ ddos_response.
 `compile_targets` declares `["n8n", "temporal", "langgraph"]`. The
 emitted artifacts ship under
 `examples/{n8n,temporal,langgraph}/asset_management/` with byte-parity
-goldens under `tests/examples/`. They are regenerated from the
-canonical source, which is not yet bound — so the emitted bodies are
-still operator-TODO placeholders rather than primitive calls. The
-CORE-WIRE card changes that and regenerates them in the same change.
+goldens under `tests/examples/`. All three are regenerated from the
+canonical source and emit the bound primitive calls: n8n as Code nodes
+carrying the import and the call, Temporal as activity bodies,
+LangGraph as state-bound node functions. The evidence `artifact_id`
+does not key on `compile_target`, so the three re-derive byte-identical
+records — asserted across targets rather than assumed.

@@ -754,10 +754,12 @@ one playbook's provenance.
 ### F-WF-ASSET — Asset and configuration management
 
 - **Status:** Shipped
-- **Binding note:** Shipped pre-`core_body` — every action step
-  compiles with an operator-TODO body; primitive binding is tracked
-  by the F-WF-CORE-WAVE-1 card (#921, Director decision 2026-09-04),
-  not by a status flip.
+- **Binding note:** bound. All six action steps carry `core_body`
+  and the three reference targets emit the primitive calls; the
+  graduation checklist recomputes green (tier A, 6/6 real bindings,
+  0 predicted n8n TODOs, 0 schema errors) and the playbook is
+  `stable` at `content_version` 1.0.0. The wire landed under the
+  F-WF-CORE-WAVE-1 card (#921, Director decision 2026-09-04).
 - **Priority:** P2
 - **Goal:** G-01 (content coverage — 25th canonical cookbook
   playbook, closing the top-5 NIS2 Art. 21 family bar); the
@@ -2286,8 +2288,8 @@ one playbook's provenance.
     found to be only half true: three of its six steps had primitives
     (reconcile, classify, artifact, from #516) and three still carried
     `TODO (CORE)` markers, so it needed a CORE-PRIM before the wire
-    rather than a single retro-wiring cycle. Both stages are now
-    staged explicitly: CORE-PRIM shipped, CORE-WIRE owed. Then
+    rather than a single retro-wiring cycle. Both stages have now
+    shipped and the playbook graduated. Then
     `phishing_triage`, `ransomware_containment`, `data_exfil`,
     `identity_compromise`, `dora_major_incident_reporting`,
     `eu_ai_act_deployer_obligations`, `ai_human_oversight` — each as
@@ -2317,7 +2319,17 @@ one playbook's provenance.
 - **Source:** #921 (memo 2026-08-12, refresh 2026-08-25); Director
   decision 2026-09-04.
 - **Shipped via:**
-  - —
+  - CORE-PRIM — #1000 (`asset_management`: the three steps that still
+    carried `TODO (CORE)` markers — ingest, delta, notify — gained
+    deterministic primitives, and the source-set-id derivation was
+    promoted to a shared helper so ingest and reconcile cannot drift
+    apart about what names a source set).
+  - CORE-WIRE + GRADUATE — #1001 (`asset_management`: all six action
+    steps bound through `core_body` with every bound variable declared
+    per #866; `__delta_set_id__` renamed to `__delta_set__` because the
+    primitive emits delta records, not an id; the three targets
+    regenerated and byte-parity re-asserted; `experimental` → `stable`,
+    `content_version` 1.0.0 on a recomputed checklist).
 
 ### F-WF-CORE-WAVE-2 — CORE wave 2: bind the remaining worthy playbooks; record the parked five
 
