@@ -56,7 +56,7 @@ def test_parse_file_round_trip(tmp_path: Path, fixture_data: dict) -> None:
 
 def test_playbook_root_fields(playbook: Playbook) -> None:
     assert playbook.type == "playbook"
-    assert playbook.spec_version == "2.0"
+    assert playbook.spec_version == "cacao-2.0"
     assert playbook.name.startswith("Vulnerability intake")
     assert playbook.playbook_types == ("investigation", "remediation")
     assert playbook.labels == ("vulnerability-management", "intake")

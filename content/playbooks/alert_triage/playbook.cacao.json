@@ -1,6 +1,6 @@
 {
   "type": "playbook",
-  "spec_version": "2.0",
+  "spec_version": "cacao-2.0",
   "id": "playbook--a1e47431-0000-4000-8000-000000000000",
   "name": "Alert triage",
   "description": "SOC alert_triage source playbook. Ingests typed alert payloads from at least two source shapes (push from detection pipeline, pull from a shared alert store), enriches with telemetry context, suppresses already-seen or known-benign hits inside a configurable window, applies a deterministic prioritisation policy (free-text fields may be routed through a DSPy module, the priority decision itself stays in code), and routes the case onto a response branch keyed on the disposition. Every action step carries a deterministic core_body binding into content/playbooks/alert_triage/primitives/; the workflow graph, join keys, and metric/control references are the contract this source artifact commits to.",

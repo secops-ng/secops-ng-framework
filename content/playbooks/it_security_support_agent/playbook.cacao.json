@@ -1,6 +1,6 @@
 {
   "type": "playbook",
-  "spec_version": "2.0",
+  "spec_version": "cacao-2.0",
   "id": "playbook--20122012-0000-4000-8000-000000000001",
   "name": "IT and security support agent",
   "description": "Ticket-shaped interaction workflow that ingests one operator-supplied support request, classifies it (informational / actionable / incident-shaped), attempts an automated resolution against the declared self-service surface, escalates to a human responder when automated resolution does not close the request, and emits one interaction-evidence artifact pinning the request, the classification, the automated-resolution outcome, and the human-handoff envelope when one fires. The human-handoff step is a first-class, explicit step — a support interaction MUST end with either an automated-resolution closure or a confirmed handoff to a human responder; the workflow does not silently auto-close. CORE: the five action bodies bind to deterministic primitives in content.playbooks.it_security_support_agent.primitives; CORE-FANOUT-N8N pins the n8n adapter binding and the operator-facing example — TMP and LG follow in sibling cards. Anchors against the F-CP-02 incidents evidence stream so support→incident handoffs feed the same NIS2 Article 21(2)(b) incident-handling capability the F-WF-05 incident_management workflow discharges.",

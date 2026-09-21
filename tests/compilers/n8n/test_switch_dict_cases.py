@@ -22,7 +22,7 @@ _SWITCH_ID = "switch-condition--00000000-0000-4000-8000-000000000002"
 
 _PLAYBOOK: dict[str, Any] = {
     "type": "playbook",
-    "spec_version": "2.0",
+    "spec_version": "cacao-2.0",
     "id": "playbook--00000000-0000-4000-8000-000000000000",
     "name": "switch fixture",
     "created_by": "identity--00000000-0000-4000-8000-00000000000f",

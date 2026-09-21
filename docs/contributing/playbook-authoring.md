@@ -67,7 +67,7 @@ object. The following fields are required and are checked by
 | Field | Notes |
 |---|---|
 | `type` | Always `"playbook"`. |
-| `spec_version` | `"2.0"`. |
+| `spec_version` | `"cacao-2.0"`, the literal the official CACAO 2.0 schema enumerates. |
 | `id` | `playbook--<uuid>`. Generate once; never change. |
 | `name` | Human-readable title. Sentence case, no marketing verbs. |
 | `description` | 1–4 paragraphs. Names the regulatory anchor and the workflow's inputs / outputs. `SKELETON` playbooks say so in the first sentence. |

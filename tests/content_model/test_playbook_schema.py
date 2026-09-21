@@ -38,7 +38,7 @@ def validator(schema: dict) -> Draft202012Validator:
 # ---------------------------------------------------------------------------
 MIN_PLAYBOOK: dict = {
     "type": "playbook",
-    "spec_version": "2.0",
+    "spec_version": "cacao-2.0",
     "id": "playbook--11111111-1111-4111-8111-111111111111",
     "name": "Vulnerability intake (smoke)",
     "description": "Minimal playbook used by the content-model smoke tests.",

@@ -1,6 +1,6 @@
 {
   "type": "playbook",
-  "spec_version": "2.0",
+  "spec_version": "cacao-2.0",
   "id": "playbook--80a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6dd",
   "name": "Asset and configuration inventory delta capture",
   "description": "Operationalise the asset and configuration management capability against the operator's own deployed estate: ingest the documented asset-inventory sources (CMDB, declarative infrastructure-as-code records, cloud-provider asset APIs, endpoint-management agents) on a scheduled cadence, reconcile them into the operator-authoritative snapshot for the current window, compute the per-asset delta against the previous documented snapshot, classify each delta against the operator's documented delta taxonomy (new-managed, unmanaged-discovered, decommissioned, baseline-drift), capture the dated asset-inventory-delta evidence record, and notify the inventory owner so unmanaged or undocumented assets surface as exceptions rather than as quiet drift. The playbook does not author the operator's inventory-source architecture itself; it operationalises a documented reconciliation posture against pre-bound sources. All six action steps bind deterministic primitives under primitives/, each executed directly by unit coverage, and the three reference compilers emit those calls. Detection bindings for ingest-side and reconciliation-side failures remain owned by later cards once upstream rule ids are selected. CACAO v2 + SecOps-NG content-model extensions.",
