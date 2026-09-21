@@ -8,3 +8,6 @@ JSON Schema for every portable artifact shape:
 - `control.schema.json`    OSCAL component / D3FEND mapping shape
 
 Validated by `tools/validate/`.
+
+`vendor/cacao-2.0/` holds the official OASIS CACAO 2.0 JSON schemas,
+unmodified, for the conformance ratchet (`tools/cacao_conformance.py`).

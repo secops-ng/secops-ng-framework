@@ -20,6 +20,10 @@ Honoured exclusions (regardless of ``--exclude``):
         hold deliberate positives for the rules under test
     any nested checkout — a subdirectory carrying its own ``.git`` marker
         (a clone, a submodule, or a git worktree) is pruned with its subtree
+    schemas/vendor/ — vendored third-party specification files (for example
+        the OASIS CACAO JSON schemas). Voice rules (``commercial.*``) are not
+        applied to text we did not write and may not edit; credential rules
+        always are, so a secret cannot hide under a vendor path.
 
 The last two exist because a scan that reports its own fixtures, or a
 worktree's copy of them, buries the real signal: before this, a bare run
@@ -66,6 +70,14 @@ _DEFAULT_EXCLUDES = {
 # or every ``hygiene_linter`` directory would be far too broad).
 _DEFAULT_EXCLUDE_PATHS = frozenset({
     ("tests", "hygiene_linter"),
+})
+
+# Directory paths whose files carry third-party text verbatim (vendored
+# specifications). Voice rules do not apply to words we did not choose and
+# must not edit; credential rules still do. Matched as consecutive path
+# segments anywhere under the scan root.
+_VOICE_EXEMPT_PATHS = frozenset({
+    ("schemas", "vendor"),
 })
 
 _SKIP_SUFFIXES = {
@@ -163,7 +175,20 @@ def _scan_file(path: Path, display: str) -> list[Finding]:
     # design conventions require scanners to stay pure functions of
     # (path, lines), and a rule that had to know about pragmas would not be.
     # HIGH findings survive this regardless of any pragma — see pragma.py.
-    return pragma.apply(out, lines)
+    out = pragma.apply(out, lines)
+    if _is_voice_exempt(path):
+        out = [f for f in out if not f.rule.startswith("commercial.")]
+    return out
+
+
+def _is_voice_exempt(path: Path) -> bool:
+    """True when ``path`` sits under a vendored third-party directory."""
+    parts = path.parts
+    return any(
+        parts[i : i + len(marker)] == marker
+        for marker in _VOICE_EXEMPT_PATHS
+        for i in range(len(parts) - len(marker) + 1)
+    )
 
 
 def _filter_severity(

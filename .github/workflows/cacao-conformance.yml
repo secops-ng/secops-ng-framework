@@ -1,0 +1,62 @@
+name: cacao-conformance
+
+# Official-schema conformance ratchet for the canonical playbooks.
+#
+# Every document under content/playbooks/ is validated against the OASIS
+# CACAO 2.0 JSON schemas vendored under schemas/vendor/cacao-2.0/. The
+# committed baseline (tests/content/cacao_conformance_baseline.json) records
+# the error count per document; this lane fails when any count changes, so a
+# pull request cannot add non-conformance silently and a pull request that
+# fixes some has to record the new floor in the same change.
+#
+# Runs on every PR touching playbooks, the vendored schemas, the tool, or the
+# baseline, and on push to main.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "content/playbooks/**"
+      - "schemas/vendor/cacao-2.0/**"
+      - "tools/cacao_conformance.py"
+      - "tests/content/test_cacao_official_schema.py"
+      - "tests/content/cacao_conformance_baseline.json"
+      - ".github/workflows/cacao-conformance.yml"
+  push:
+    branches: [main]
+    paths:
+      - "content/playbooks/**"
+      - "schemas/vendor/cacao-2.0/**"
+      - "tools/cacao_conformance.py"
+      - "tests/content/test_cacao_official_schema.py"
+      - "tests/content/cacao_conformance_baseline.json"
+      - ".github/workflows/cacao-conformance.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  official-schema-ratchet:
+    name: CACAO 2.0 official-schema ratchet
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps (PyYAML, jsonschema, pytest)
+        run: pip install --no-cache-dir pyyaml "jsonschema>=4.21" pytest
+
+      - name: Ratchet — pytest
+        run: |
+          python -m pytest tests/content/test_cacao_official_schema.py -q
+
+      - name: Full report for review readability
+        if: always()
+        run: |
+          python -m tools.cacao_conformance --baseline tests/content/cacao_conformance_baseline.json --show 3
