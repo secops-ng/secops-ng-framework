@@ -383,6 +383,26 @@ def test_file_pragma_is_still_rule_specific(tmp_path: Path) -> None:
     assert [f["rule"] for f in _findings(tmp_path)] == ["commercial.b2b_language"]
 
 
+def test_vendored_specification_text_is_exempt_from_voice_rules_only(tmp_path: Path) -> None:
+    """``schemas/vendor/`` holds third-party text verbatim: voice rules skip it,
+    credential rules do not."""
+    vendor = tmp_path / "schemas" / "vendor" / "spec"
+    vendor.mkdir(parents=True)
+    (vendor / "vocab.json").write_text('["consulting", "AKIAIOSFODNN7EXAMPLE"]\n')
+    (tmp_path / "ours.json").write_text('["consulting"]\n')
+
+    findings = _findings(tmp_path)
+    # Filter on file names: pytest's tmp_path carries the test's own name,
+    # which contains the word "vendor".
+    vendored = [f for f in findings if f["path"].endswith("vocab.json")]
+    ours = [f for f in findings if f["path"].endswith("ours.json")]
+
+    assert vendored, "credential rules must still fire under a vendor path"
+    assert all(f["rule"].startswith("credentials.") for f in vendored)
+    assert not any(f["rule"].startswith("commercial.") for f in vendored)
+    assert any(f["rule"] == "commercial.consulting_language" for f in ours)
+
+
 def test_repo_root_scan_is_clean_at_lowest_severity() -> None:
     """Stronger than the gate check: zero findings at --min-severity LOW.
 
