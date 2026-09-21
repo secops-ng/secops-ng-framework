@@ -196,7 +196,7 @@ _S_END = "end--33333333-3333-4333-8333-333333333333"
 def _typed_var_playbook() -> dict:
     return {
         "type": "playbook",
-        "spec_version": "2.0",
+        "spec_version": "cacao-2.0",
         "id": "playbook--cccccccc-cccc-4ccc-8ccc-cccccccccccc",
         "name": "Typed variable demo",
         "playbook_types": ["investigation"],
@@ -280,7 +280,7 @@ def test_no_playbook_variables_still_emits_bookkeeping() -> None:
 def _no_action_playbook() -> dict:
     return {
         "type": "playbook",
-        "spec_version": "2.0",
+        "spec_version": "cacao-2.0",
         "id": "playbook--eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
         "name": "Action-free playbook",
         "playbook_types": ["investigation"],

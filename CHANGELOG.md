@@ -6,6 +6,23 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- **`spec_version` is now `"cacao-2.0"`** on every canonical playbook, the
+  `_template`, the content-model examples and the worked-example mirrors.
+  The official OASIS CACAO 2.0 JSON schema enumerates that literal; the
+  previous `"2.0"` failed it on all 49 documents. `content-model/playbook.schema.json`
+  now requires the `cacao-2.` prefix. Consumers that compared the field to
+  `"2.0"` must update; the compilers carry the value through unchanged.
+
+### Added
+
+- **Official-schema conformance ratchet.** `tools/cacao_conformance.py`
+  validates every playbook against the vendored OASIS CACAO 2.0 schemas
+  (`schemas/vendor/cacao-2.0/`); `tests/content/cacao_conformance_baseline.json`
+  records the error count per document and CI fails when any count changes.
+  See `docs/concepts/cacao-conformance.md`.
+
 ## [0.1.0] — 2026-07-24
 
 First tagged release. Everything below has been on `main` and covered by

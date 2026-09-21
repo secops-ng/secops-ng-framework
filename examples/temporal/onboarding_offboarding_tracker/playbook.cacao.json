@@ -1,6 +1,6 @@
 {
   "type": "playbook",
-  "spec_version": "2.0",
+  "spec_version": "cacao-2.0",
   "id": "playbook--20212021-0000-4000-8000-000000000001",
   "name": "On-boarding / off-boarding tracker",
   "description": "Identity-lifecycle grant/revoke-confirmation workflow under NIS2 Article 21(2)(i) — human-resources security, access-control policies, and asset management. On each execution, ingest one operator-supplied lifecycle event (joiner, mover, or leaver) for a role-shaped runtime principal (service-account, workflow-runtime principal, or automation role), resolve that principal against the operator's identity source, apply the declared capability delta (grant on join, adjust on move, revoke on leave), confirm the grant/revoke landed at the principal's downstream capability surface, and emit one access-evidence artifact pinning the resulting caller-identity and closed capability list. CORE: the five action bodies bind to deterministic primitives in content.playbooks.onboarding_offboarding_tracker.primitives; CORE-FANOUT-N8N pins the n8n adapter and the byte-parity golden — TMP and LG follow in sibling cards. Opens the NIS2 Article 21(2)(i) joiner-mover-leaver workflow surface alongside the F-WF-08 IAM auditor (per-execution capability-inventory producer) — both anchor onto the same F-CP-07 access evidence stream.",

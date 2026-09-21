@@ -1,6 +1,6 @@
 {
   "type": "playbook",
-  "spec_version": "2.0",
+  "spec_version": "cacao-2.0",
   "id": "playbook--8c3d4e5f-6071-4a22-9d3e-f405b6c7d8e9",
   "name": "Cyber-hygiene and security-training posture",
   "description": "Operate the basic cyber-hygiene and staff cybersecurity-training posture surface required by NIS2 Art.21(2)(g): inventory the in-scope training roster against the declared training scope, schedule the per-cycle awareness and role-based training assignments, run the cycle's phishing-simulation exercise, track completion of mandatory training and report-rate on the simulation, capture a dated training-attestation artifact, and notify the training owner of any gaps. The playbook is the operationalisation of declared training and hygiene policy; it does not author the policy itself. SKELETON only \u2014 control bindings (control.training_attestation@v1, control.phishing_simulation@v1) are pinned but detection bindings (missed-training, simulation-click upstream rule ids), golden tests, and per-target compiler emissions are owned by CORE / EXTEND siblings. The metric_refs pin the catalogue entries kpi.training_completion_rate@v1 and kpi.phishing_sim_click_rate@v1 that already ship under content/mappings/nis2/article-21-2-g.yaml; the CORE/EXTEND siblings add the per-cohort training-overdue KPI and re-pin step-level refs against it. CACAO v2 + SecOps-NG content-model extensions.",

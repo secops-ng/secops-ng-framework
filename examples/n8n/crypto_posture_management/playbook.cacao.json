@@ -1,6 +1,6 @@
 {
   "type": "playbook",
-  "spec_version": "2.0",
+  "spec_version": "cacao-2.0",
   "id": "playbook--6a1b2c3d-4e5f-4a00-9b1c-d2e3f4a5b6c7",
   "name": "Cryptography and encryption posture management",
   "description": "Operate the cryptography & encryption posture surface required by NIS2 Art.21(2)(h): inventory the operator's declared cryptography policy and the assets in its scope, probe the certificate posture of declared TLS endpoints, check key-rotation cadence against the documented rotation schedule, capture a dated posture-attestation artifact, and notify the cryptography owner. The playbook is the operationalisation of a documented cryptography policy; it does not author the policy itself. SKELETON only — control bindings (control.crypto_policy_inventory@v1, control.cert_posture_scan@v1, control.key_rotation_evidence@v1) are pinned but detection bindings (expired-cert, weak-cipher, missed-rotation upstream rule ids), golden tests, and per-target compiler emissions are owned by CORE / EXTEND siblings. The metric_refs pin the catalogue entries kri.expiring_tls_certs@v1 and kri.overdue_key_rotations@v1 that already ship under content/mappings/nis2/article-21-2-h.yaml; the CORE/EXTEND siblings add cipher-suite-floor and rotation-cadence KPI catalogue entries and re-pin step-level refs against them. CACAO v2 + SecOps-NG content-model extensions.",

@@ -1,6 +1,6 @@
 {
   "type": "playbook",
-  "spec_version": "2.0",
+  "spec_version": "cacao-2.0",
   "id": "playbook--10101010-0000-4000-8000-000000000001",
   "name": "Contractual obligations tracker",
   "description": "Supplier-contract obligation tracking workflow under NIS2 Article 21(2)(d) supply-chain security. On each execution, ingest a supplier contract reference, extract the per-clause obligations the operator has accepted from that contract, schedule the next review date for each obligation against the operator's review-cadence policy, and emit one obligation-evidence artifact pinning the contract id, the extracted obligation set, the per-obligation review-state, and the provenance envelope. CORE: the four action bodies bind to deterministic primitives in content.playbooks.contractual_obligations_tracker.primitives; CORE-FANOUT-N8N pins the n8n adapter and the byte-parity golden — TMP and LG follow in sibling cards. Opens the NIS2 Article 21(2)(d) supply-chain control family at the workflow layer (per-entity supplier-contract obligation surface).",

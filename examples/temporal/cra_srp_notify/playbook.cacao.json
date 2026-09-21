@@ -1,6 +1,6 @@
 {
   "type": "playbook",
-  "spec_version": "2.0",
+  "spec_version": "cacao-2.0",
   "id": "playbook--5a509a09-0000-4000-8000-000000000001",
   "name": "CRA Article 14 SRP notification",
   "description": "SKELETON \u2014 durable-state scaffold for the CRA Article 14 notification workflow that will address the Single Reporting Platform (SRP) once its schema is published. Expresses the 24h / 72h / 14d-or-30d timer cascade as first-class CACAO steps so any of the three reference compile targets (n8n, Temporal, LangGraph) can carry the clocks as durable state. Fired by a sibling incident-handling or vulnerability-intake playbook when the operator's incident-classification step trips the CRA Article 14(2) actively-exploited-vulnerability clock or the Article 14(3) severe-incident clock; this playbook is the shared regulator-notification chain those upstream playbooks hand off to. SKELETON only: submission bodies are placeholder \u2014 the SRP intake schema is not yet published (Commission page notes a pre-go-live testing period ahead of 11 September 2026); a sibling CORE card populates the CACAO parallel + delay step bodies against the operator's SRP intake surface once that surface is publicly documented. CACAO v2 + SecOps-NG content-model extensions.",

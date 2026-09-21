@@ -1,6 +1,6 @@
 {
   "type": "playbook",
-  "spec_version": "2.0",
+  "spec_version": "cacao-2.0",
   "id": "playbook--06f06f06-0000-4000-8000-000000000001",
   "name": "Infrastructure posture management",
   "description": "Continuous infrastructure-posture-management workflow. On each scheduled re-execution, collect the current posture state of the in-scope infrastructure (cloud accounts, identity boundaries, network baseline), evaluate each declared control against that state, then emit one posture-evidence artifact shaped against schemas/evidence/posture.schema.json so a regulator-facing reviewer can re-derive what the posture was at evaluation time. CORE: the three action bodies bind to deterministic primitives in content.playbooks.infra_posture_management.primitives; the per-target byte-parity goldens land alongside the worked examples. Continuous variant of the F-WF-02 posture-audit workflow under NIS2 Article 21(2)(a).",

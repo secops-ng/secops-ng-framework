@@ -65,7 +65,7 @@ def _synthetic_playbook() -> dict:
     """Minimal playbook with one action step — enough to exercise the wiring."""
     return {
         "type": "playbook",
-        "spec_version": "2.0",
+        "spec_version": "cacao-2.0",
         "id": _PB_ID,
         "name": "audit-mirror emitter test",
         "playbook_types": ["investigation"],

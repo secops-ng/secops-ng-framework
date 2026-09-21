@@ -1,6 +1,6 @@
 {
   "type": "playbook",
-  "spec_version": "2.0",
+  "spec_version": "cacao-2.0",
   "id": "playbook--5c5c5c5c-0000-4000-8000-000000000001",
   "name": "Supply-chain security",
   "description": "Supply-chain-security playbook (NIS2 Directive (EU) 2022/2555, Article 21(2)(d)). Detects and responds to supply-chain compromises that reach the operator through a direct supplier, service provider, or upstream software component. Two canonical action steps: assess-supplier-signal canonicalises the operator-supplied raw signal (signal-source ingestion, SBOM correlation result, supplier-attestation lookup result, scoring verdict) into the closed assessment block (verdict in {no_impact, watch, confirmed_compromise}, affected_supplier_handle, affected_component_set, received_at); emit-supply-chain-evidence wires through the F-CP-03 shared emitter at compilers/_shared/evidence/supply_chain.py to render a JSON-native supply-chain-evidence record shaped against schemas/evidence/supply-chain.schema.json, joining the assessed-supplier handle against the declared dependency surface so the artifact actually documents the implicated supplier. CORE-PRIM: the two action bodies bind to deterministic primitives in content.playbooks.supply_chain_security.primitives; per-target compile-target fan-out (n8n / Temporal / LangGraph) and the per-target byte-parity goldens land in the CORE-FANOUT sibling, and OSCAL / D3FEND / OCSF / NIS2 / DORA / CRA inbound + outbound mappings closure plus metric_refs land in the EXTEND sibling.",

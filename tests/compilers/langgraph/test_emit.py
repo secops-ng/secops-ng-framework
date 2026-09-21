@@ -154,7 +154,7 @@ def test_to_dict_is_json_serialisable(spec: GraphSpec) -> None:
 def _switch_playbook() -> dict:
     return {
         "type": "playbook",
-        "spec_version": "2.0",
+        "spec_version": "cacao-2.0",
         "id": "playbook--cccccccc-cccc-4ccc-8ccc-cccccccccccc",
         "name": "Minimal switch playbook",
         "playbook_types": ["investigation"],

@@ -1,6 +1,6 @@
 {
   "type": "playbook",
-  "spec_version": "2.0",
+  "spec_version": "cacao-2.0",
   "id": "playbook--70a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6cc",
   "name": "Coordinated patch / update rollout",
   "description": "Operationalise the patch / update maintenance capability against the operator's own deployed estate: detect that a security update is available against a tracked package / image / firmware line, classify the update against the operator's documented patch-criticality taxonomy (security-critical, security-routine, feature-only), stage the rollout against the operator's documented deployment-ring topology (test → canary → broad), validate the canary ring against the documented health gates (functional probes, error-rate / latency deviation, rollback readiness), fan out to the remaining rings on a green canary, capture the dated patch-application evidence record, and notify the maintenance owner. The playbook does not author the operator's patch-distribution architecture itself; it operationalises the documented rollout posture against an already-provisioned update channel and ring topology. SKELETON only — control bindings (control.patch_evidence@v1) are pinned but detection bindings, golden tests, and per-target compiler emissions are owned by CORE / EXTEND siblings. The CORE / EXTEND siblings add the canary-health / rollback-readiness detection bindings and the time-to-patch / patch-coverage metric emitters. CACAO v2 + SecOps-NG content-model extensions.",
