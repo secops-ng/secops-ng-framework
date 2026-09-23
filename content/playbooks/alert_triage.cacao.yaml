@@ -279,15 +279,15 @@ workflow:
     name: "already-seen or known-benign?"
     description: >-
       Suppression branch on the boolean __benign_or_seen__ set by the
-      enrichment step. on_success (true): matches a known-benign rule
+      enrichment step. on_true: matches a known-benign rule
       or an already-seen case fingerprint inside the window; suppress
-      and close. on_failure (false): proceed to prioritisation. The
+      and close. on_false: proceed to prioritisation. The
       condition is a bare boolean variable reference on purpose — the
       n8n emitter compiles it to a working IF node comparator, and the
       LangGraph consumer routes on the same state key at runtime.
     condition: "__benign_or_seen__"
-    on_success: "action--a1e47431-0000-4000-8000-000000000005"
-    on_failure: "action--a1e47431-0000-4000-8000-000000000006"
+    on_true: "action--a1e47431-0000-4000-8000-000000000005"
+    on_false: "action--a1e47431-0000-4000-8000-000000000006"
 
   "action--a1e47431-0000-4000-8000-000000000005":
     type: action

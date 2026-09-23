@@ -45,7 +45,7 @@ TRIAGE_SIGNAL_RETRY_POLICY = RetryPolicy(
 
 @activity.defn
 async def scope_assessment(signal_id: str) -> dict[str, object]:
-    """Determine the volume and classification of data observed leaving the boundary, the count of distinct data subjects affected, and whether actual exfiltration occurred or was prevented by an in-line control. Produces __data_classification__, __affected_subjects_count__, and __exfil_confirmed__.
+    """Determine the volume and classification of data observed leaving the boundary, the count of distinct data subjects affected, and whether actual exfiltration occurred or was prevented by an in-line control. Produces __data_classification__, __affected_subjects_count__, __exfil_confirmed__, and __regulator_required__ — whether the classification and the subject count together cross the operator's regulator-notification threshold, which the notification branch reads after containment.
 
     CACAO step_id: action--20000000-0000-4000-8000-000000000003
     """

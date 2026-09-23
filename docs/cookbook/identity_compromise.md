@@ -119,9 +119,9 @@ data plane.
 The playbook ships nine steps: one `start`, five `action`, one
 `if-condition`, and two `end` (the terminal end and a distinct
 false-positive end so the false-verdict branch is audit-evident).
-The `if-condition` fires on `__compromise_confirmed__`; `on_success`
+The `if-condition` fires on `__compromise_confirmed__`; `on_true`
 routes into `reset MFA factors` and then linearly through the four
-containment-and-audit steps; `on_failure` short-circuits to the
+containment-and-audit steps; `on_false` short-circuits to the
 false-positive end. Downstream regulator / customer notification is
 not on this playbook — the significance-threshold gate and the per-
 stage submissions run on `playbook.incident_management@v1` from the
@@ -192,9 +192,9 @@ surface.
     hydration. Feeds `kpi.mttd_identity_compromise@v1`.
 
 **compromise confirmed?** (`…000003`, `if-condition`)
-:   Deterministic branch on `__compromise_confirmed__`. `on_success`
+:   Deterministic branch on `__compromise_confirmed__`. `on_true`
     (confirmed) routes into `reset MFA factors` and then linearly
-    through the four containment-and-audit steps; `on_failure`
+    through the four containment-and-audit steps; `on_false`
     (false positive) short-circuits to the false-positive end. The
     false-positive branch is a distinct terminal end so the close-
     out is audit-evident on the CACAO trail. Anchored on OSCAL IR-4
@@ -423,9 +423,10 @@ step ids verbatim. The five action steps emit `n8n-nodes-base.set`
 nodes carrying the CACAO I/O contract as editable assignment rows
 plus the `x_secops_ng` reference bundles (detection, control,
 telemetry, metric). The `if-condition` node (`compromise confirmed?`)
-emits an `n8n-nodes-base.if` with a placeholder condition the
-operator wires to the upstream `out.compromise_confirmed` field. The
-lossy translations are recorded in `meta.secops_ng_notes` so the
+emits an `n8n-nodes-base.if` whose condition reads
+`__compromise_confirmed__`, the variable the triage step sets
+(surfaced on its Set node as `out.compromise_confirmed`). The
+remaining lossy translations — one per unbound action — are recorded in `meta.secops_ng_notes` so the
 integrator sees exactly which seams need attention.
 
 Operators bind the Set rows to their connectors:

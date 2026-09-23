@@ -113,12 +113,12 @@ The playbook ships ten steps: one `start`, six `action`, two
 `if-condition`, and two `end` (the terminal end and a distinct
 false-positive end so the false-verdict branch is audit-evident).
 The first `if-condition` fires on `__ransomware_confirmed__`;
-`on_success` routes into the EDR-available gate; `on_failure`
+`on_true` routes into the EDR-available gate; `on_false`
 short-circuits to the terminal end (no false-positive marker is
 carried today — the false close-out is logged for the false-positive
 KPI by an out-of-scope card on the operator's ticketing surface).
-The second `if-condition` fires on `__edr_available__`; `on_success`
-routes into the EDR isolate action; `on_failure` routes into the
+The second `if-condition` fires on `__edr_available__`; `on_true`
+routes into the EDR isolate action; `on_false` routes into the
 network-ACL deny fallback. Both isolation branches converge on the
 identity-revocation step and then linearly through backup
 verification into the comms-plan step. Downstream regulator /
@@ -196,14 +196,14 @@ surface.
     Feeds `kpi.mttd_ransomware@v1`.
 
 **ransomware confirmed?** (`…000003`, `if-condition`)
-:   Deterministic branch on `__ransomware_confirmed__`. `on_success`
-    (confirmed) routes into the EDR-available gate; `on_failure`
+:   Deterministic branch on `__ransomware_confirmed__`. `on_true`
+    (confirmed) routes into the EDR-available gate; `on_false`
     (false positive) routes to the terminal end. Anchored on OSCAL
     IR-4 (Incident Handling).
 
 **EDR available?** (`…000004`, `if-condition`)
-:   Deterministic branch on `__edr_available__`. `on_success` (EDR
-    reachable) routes to the EDR isolate action; `on_failure` (EDR
+:   Deterministic branch on `__edr_available__`. `on_true` (EDR
+    reachable) routes to the EDR isolate action; `on_false` (EDR
     unreachable or absent) routes to the network-ACL deny fallback.
     Both branches converge on identity revocation. Anchored on
     OSCAL IR-4 (Incident Handling).
@@ -455,9 +455,11 @@ step ids verbatim. The six action steps emit `n8n-nodes-base.set`
 nodes carrying the CACAO I/O contract as editable assignment rows
 plus the `x_secops_ng` reference bundles (detection, control,
 telemetry, metric). The two `if-condition` nodes emit
-`n8n-nodes-base.if` with placeholder conditions the operator wires
-to `out.ransomware_confirmed` and `out.edr_available` on the
-upstream Set rows. The lossy translations are recorded in
+`n8n-nodes-base.if` with working conditions on
+`__ransomware_confirmed__` and `__edr_available__`, both set by the
+triage step (surfaced as `out.ransomware_confirmed` and
+`out.edr_available` on its Set row). The remaining lossy
+translations — one per unbound action — are recorded in
 `meta.secops_ng_notes` so the integrator sees exactly which seams
 need attention.
 

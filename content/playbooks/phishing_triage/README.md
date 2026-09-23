@@ -72,10 +72,10 @@ of `phishing`, `credential_harvest`, `malware_attached`,
    (1001) records per indicator. Correlates against the upstream Sigma
    email-related rules pinned in `mappings.yaml`.
 4. **if-condition — known-benign sender or already seen?**
-   - `on_success` → **suppress and close.** Link onto the existing
+   - `on_true` → **suppress and close.** Link onto the existing
      case or known-benign sender record, close without paging,
      account against `kri.phishing_suppression_rate@v1`.
-   - `on_failure` → **classify intent.**
+   - `on_false` → **classify intent.**
 5. **switch-condition — route on intent.** Five branches, one per
    `__intent__` value, each a single response-routing action handing
    off to the downstream playbook or owner team. Bodies of those

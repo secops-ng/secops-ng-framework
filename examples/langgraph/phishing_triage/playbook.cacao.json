@@ -96,9 +96,10 @@
     "if-condition--c0a17a01-0000-4000-8000-000000000004": {
       "type": "if-condition",
       "name": "known-benign sender or already seen?",
-      "description": "Suppression branch. on_success: the message matches a known-benign sender or an already-seen case fingerprint within the configured suppression window, and we suppress-and-close. on_failure: we proceed to intent classification.",
-      "on_success": "action--c0a17a01-0000-4000-8000-000000000005",
-      "on_failure": "action--c0a17a01-0000-4000-8000-000000000006"
+      "description": "Suppression branch on the boolean __benign_or_seen__ set by the enrichment step. on_true: the message matches a known-benign sender or an already-seen case fingerprint within the configured suppression window, and we suppress-and-close. on_false: we proceed to intent classification.",
+      "condition": "__benign_or_seen__",
+      "on_true": "action--c0a17a01-0000-4000-8000-000000000005",
+      "on_false": "action--c0a17a01-0000-4000-8000-000000000006"
     },
     "action--c0a17a01-0000-4000-8000-000000000005": {
       "type": "action",

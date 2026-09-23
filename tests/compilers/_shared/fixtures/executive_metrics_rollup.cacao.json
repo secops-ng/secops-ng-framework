@@ -118,8 +118,8 @@
       "type": "if-condition",
       "name": "any breach band hit?",
       "description": "Branch on whether any metric evaluation matched its `breach` threshold band. `on_success` (true): emit the summary AND raise a board-attention flag the downstream pipeline surfaces in the cover page. `on_failure` (false): emit the summary without the attention flag. Both branches converge on the same emit step so the rollup is single-output.",
-      "on_success": "action--e0000000-0000-4000-8000-000000000006",
-      "on_failure": "action--e0000000-0000-4000-8000-000000000007"
+      "on_true": "action--e0000000-0000-4000-8000-000000000006",
+      "on_false": "action--e0000000-0000-4000-8000-000000000007"
     },
     "action--e0000000-0000-4000-8000-000000000006": {
       "type": "action",

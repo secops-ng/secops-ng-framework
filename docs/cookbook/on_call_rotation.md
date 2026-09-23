@@ -374,9 +374,10 @@ topology as seven n8n nodes (`manualTrigger`, four `set` nodes, one
 verbatim. The four action steps emit `n8n-nodes-base.set` nodes
 carrying the CACAO I/O contract as editable assignment rows plus the
 `x_secops_ng` reference bundles. The single `if-condition` node
-(`shift handoff window?`) emits an `n8n-nodes-base.if` node with a
-placeholder condition the operator must wire to the upstream
-`out.handoff_window` field. The lossy translation is recorded in
+(`shift handoff window?`) emits an `n8n-nodes-base.if` node whose
+condition reads `__handoff_window__`, set by the escalation-binding
+step (surfaced as `out.handoff_window`). The remaining lossy
+translations — one per unbound action — are recorded in
 `meta.secops_ng_notes` so the integrator sees exactly which seams
 need attention.
 

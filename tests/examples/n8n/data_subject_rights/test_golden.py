@@ -177,16 +177,19 @@ def test_core_body_steps_emit_code_nodes() -> None:
 
 def test_verification_gate_emits_if_node_with_predicate() -> None:
     """The Article 12(6) short-circuit is real topology: one if-condition on
-    ``__identity_verified__`` routing to route_to_data_owners on success and
-    to send_controller_response on failure, emitted as an n8n If node — and
-    never a blank predicate (a Maturity-ladder criterion)."""
+    ``__identity_verified__`` routing to route_to_data_owners when it holds and
+    to send_controller_response when it does not, emitted as an n8n If node —
+    and never a blank predicate (a Maturity-ladder criterion). The branches use
+    the CACAO 2.0 names ``on_true`` / ``on_false``; the legacy
+    ``on_success`` / ``on_failure`` spelling must not reappear here."""
     steps = _canonical_steps()
     gates = {sid: s for sid, s in steps.items() if s.get("type") == "if-condition"}
     assert len(gates) == 1
     (gate_id, gate), = gates.items()
     assert gate["condition"] == "__identity_verified__"
-    assert steps[gate["on_success"]]["name"] == "route_to_data_owners"
-    assert steps[gate["on_failure"]]["name"] == "send_controller_response"
+    assert "on_success" not in gate and "on_failure" not in gate
+    assert steps[gate["on_true"]]["name"] == "route_to_data_owners"
+    assert steps[gate["on_false"]]["name"] == "send_controller_response"
     workflow = json.loads(WORKED_EXAMPLE.read_text(encoding="utf-8"))
     node = {n["id"]: n for n in workflow["nodes"]}[gate_id]
     assert node["type"] == "n8n-nodes-base.if"

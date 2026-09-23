@@ -142,15 +142,17 @@
       "type": "if-condition",
       "name": "ransomware confirmed?",
       "description": "Branch on __ransomware_confirmed__. True paths into containment; false closes the incident out with no further action (the close-out itself is logged for the false-positive KPI by an out-of-scope card).",
-      "on_success": "if-condition--30000000-0000-4000-8000-000000000004",
-      "on_failure": "end--30000000-0000-4000-8000-00000000000a"
+      "condition": "__ransomware_confirmed__",
+      "on_true": "if-condition--30000000-0000-4000-8000-000000000004",
+      "on_false": "end--30000000-0000-4000-8000-00000000000a"
     },
     "if-condition--30000000-0000-4000-8000-000000000004": {
       "type": "if-condition",
       "name": "EDR available?",
       "description": "Branch on __edr_available__. True uses the EDR isolate action; false falls back to a network ACL deny at the operator's egress chokepoint. Both branches converge on identity revocation.",
-      "on_success": "action--30000000-0000-4000-8000-000000000005",
-      "on_failure": "action--30000000-0000-4000-8000-000000000006"
+      "condition": "__edr_available__",
+      "on_true": "action--30000000-0000-4000-8000-000000000005",
+      "on_false": "action--30000000-0000-4000-8000-000000000006"
     },
     "action--30000000-0000-4000-8000-000000000005": {
       "type": "action",

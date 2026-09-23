@@ -154,7 +154,7 @@
           "conditions": [
             {
               "id": "secops_ng_condition",
-              "leftValue": "",
+              "leftValue": "{{$workflow.variables.benign_or_seen}}",
               "rightValue": "true",
               "operator": {
                 "type": "string",
@@ -166,7 +166,7 @@
         },
         "options": {}
       },
-      "notes": "Suppression branch. on_success: the message matches a known-benign sender or an already-seen case fingerprint within the configured suppression window, and we suppress-and-close. on_failure: we proceed to intent classification.",
+      "notes": "Suppression branch on the boolean __benign_or_seen__ set by the enrichment step. on_true: the message matches a known-benign sender or an already-seen case fingerprint within the configured suppression window, and we suppress-and-close. on_false: we proceed to intent classification.",
       "notesInFlow": true
     },
     {
@@ -744,7 +744,6 @@
     "secops_ng_notes": [
       "step 'action--c0a17a01-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--c0a17a01-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'if-condition--c0a17a01-0000-4000-8000-000000000004' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
       "step 'action--c0a17a01-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--c0a17a01-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--c0a17a01-0000-4000-8000-000000000008': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",

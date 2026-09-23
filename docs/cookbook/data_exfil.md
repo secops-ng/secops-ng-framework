@@ -115,12 +115,12 @@ customer-notification gateway — is the operator's data plane.
 
 The playbook ships nine steps: one `start`, five `action`, two
 `if-condition`, and one `end`. The first `if-condition` fires on
-`__exfil_confirmed__`; `on_success` (confirmed exfiltration) routes
-into `containment`, `on_failure` (in-line prevention or false
+`__exfil_confirmed__`; `on_true` (confirmed exfiltration) routes
+into `containment`, `on_false` (in-line prevention or false
 positive) short-circuits to `end`. The second `if-condition` fires
-on `__regulator_required__`; `on_success` (threshold crossed) routes
+on `__regulator_required__`; `on_true` (threshold crossed) routes
 into `notify regulator` then falls through to `notify customer`;
-`on_failure` routes directly to `notify customer`. Both branches
+`on_false` routes directly to `notify customer`. Both branches
 converge on the notify-customer step so the affected-subjects
 notification path is reached whenever exfiltration is confirmed —
 the regulator submission is the *conditional* leg, not the
@@ -210,8 +210,8 @@ outside the operator's own identity surface.
     assessment step to bound observed egress volume.
 
 **exfil confirmed?** (`…000004`, `if-condition`)
-:   Deterministic branch on `__exfil_confirmed__`. `on_success`
-    (confirmed) routes into `containment`; `on_failure` (false
+:   Deterministic branch on `__exfil_confirmed__`. `on_true`
+    (confirmed) routes into `containment`; `on_false` (false
     positive or in-line-prevented egress) short-circuits to `end`.
     The close-out on the false branch is logged for the false-
     positive KPI by an out-of-scope card and no containment or
@@ -243,9 +243,9 @@ outside the operator's own identity surface.
 :   Deterministic branch on `__regulator_required__`, evaluated
     against `__affected_subjects_count__` and
     `__data_classification__` per the operator's regulator-routing
-    policy. `on_success` (threshold crossed) routes into `notify
+    policy. `on_true` (threshold crossed) routes into `notify
     regulator` and then falls through to `notify customer`;
-    `on_failure` routes directly to `notify customer`. The
+    `on_false` routes directly to `notify customer`. The
     threshold policy itself is operator-owned — the framework binds
     the gate and the routing surface, not the numeric cut-off. The
     routing key is the joint NIS2 Art. 23 / DORA Art. 19 / GDPR
@@ -453,9 +453,11 @@ ids verbatim. The five action steps emit `n8n-nodes-base.set` nodes
 carrying the CACAO I/O contract as editable assignment rows plus
 the `x_secops_ng` reference bundles (detection, control, telemetry,
 metric). The two `if-condition` nodes emit `n8n-nodes-base.if` with
-placeholder conditions the operator wires to the upstream
-`out.exfil_confirmed` and `out.regulator_required` fields.
-Lossy translations are recorded in `meta.secops_ng_notes` so the
+working conditions on `__exfil_confirmed__` and
+`__regulator_required__`, both set by the scope-assessment step
+(surfaced on its Set node as `out.exfil_confirmed` and
+`out.regulator_required`). The remaining lossy translations — one per
+unbound action — are recorded in `meta.secops_ng_notes` so the
 integrator sees exactly which seams need attention.
 
 Operators bind the Set rows to their connectors:
