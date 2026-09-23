@@ -184,6 +184,12 @@
       "external": true
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--55000000-0000-4000-8000-000000000001",
   "workflow": {
     "start--55000000-0000-4000-8000-000000000001": {
@@ -204,6 +210,13 @@
       ],
       "out_args": [
         "__dort_scope_catalogue__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.dora_tlpt_programme.primitives.scope.define_dort_scope"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -246,6 +259,13 @@
       "out_args": [
         "__tlpt_trigger_decision__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.dora_tlpt_programme.primitives.trigger.evaluate_tlpt_trigger"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.security_assessment@v1"
@@ -287,6 +307,13 @@
       "out_args": [
         "__red_team_scoping_id__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.dora_tlpt_programme.primitives.scoping.approve_red_team_scoping"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.security_assessment@v1"
@@ -326,6 +353,13 @@
       ],
       "out_args": [
         "__remediation_attestation_id__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.dora_tlpt_programme.primitives.remediation.track_remediation"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [

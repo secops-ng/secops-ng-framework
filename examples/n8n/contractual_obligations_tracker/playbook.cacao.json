@@ -100,6 +100,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--10101010-0000-4000-8000-000000000001",
   "workflow": {
     "start--10101010-0000-4000-8000-000000000001": {
@@ -118,6 +124,13 @@
       ],
       "out_args": [
         "__contract_record_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.contractual_obligations_tracker.primitives.ingest.ingest_contract"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -148,6 +161,13 @@
       "out_args": [
         "__obligation_set_ref__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.contractual_obligations_tracker.primitives.obligations.extract_obligations"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.supplier_inventory@v1",
@@ -175,6 +195,13 @@
       ],
       "out_args": [
         "__review_schedule_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.contractual_obligations_tracker.primitives.schedule.schedule_reviews"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -211,6 +238,13 @@
       ],
       "out_args": [
         "__obligation_artifact_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.contractual_obligations_tracker.primitives.artifact.build_obligation_artifact"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [

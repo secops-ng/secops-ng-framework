@@ -143,8 +143,9 @@ severity scorer in the (forthcoming) primitives module:
   "type": "action",
   "name": "Triage and correlate",
   "description": "Score severity (CVSS+EPSS), correlate to asset, dedup.",
+  "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
   "commands": [
-    { "type": "manual", "command": "see x_secops_ng.core_body" }
+    { "type": "secops-ng-primitive", "command": "vuln_intake.primitives.score_and_dedup" }
   ],
   "on_completion": "if-condition--0000-0000-0000-0000-000000000005",
   "x_secops_ng": {
@@ -165,6 +166,11 @@ severity scorer in the (forthcoming) primitives module:
   }
 }
 ```
+
+The command mirrors `core_body.primitive` so CACAO tooling can see what
+the step runs; the emitters compile `core_body` and never read it. A
+`manual` command would be wrong here: the Temporal emitter treats
+`manual` as a human-in-the-loop step.
 
 Per-target sketch of what each emitter generates from that body
 (illustrative; exact wrapping helper names are owned by the per-target

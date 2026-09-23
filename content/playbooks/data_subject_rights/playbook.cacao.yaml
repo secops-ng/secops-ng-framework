@@ -345,6 +345,10 @@ playbook_variables:
       fulfilment_pack_ref. Persisted by the evidence-store adapter;
       the adapter extracts __outcome_code__.
     external: false
+agent_definitions:
+  group--9479ad47-df96-5a3c-831a-f668158e5b9e:
+    type: group
+    name: Security operations team
 workflow_start: start--d5b17a15-0000-4000-8000-000000000001
 workflow:
   start--d5b17a15-0000-4000-8000-000000000001:
@@ -383,6 +387,10 @@ workflow:
       - __request_received_ts__
       - __subject_contact__
     agent_target: dsr_intake
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
+    commands:
+      - type: secops-ng-primitive
+        command: content.playbooks.data_subject_rights.primitives.intake.open_dsr_case
     x_secops_ng:
       control_refs:
         - control.account_management@v1
@@ -425,6 +433,10 @@ workflow:
       - __verification_record__
       - __identity_verified__
     agent_target: dsr_intake
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
+    commands:
+      - type: secops-ng-primitive
+        command: content.playbooks.data_subject_rights.primitives.verification.record_identity_verification
     x_secops_ng:
       control_refs:
         - control.access_enforcement@v1
@@ -473,6 +485,10 @@ workflow:
       - __request_type__
       - __response_deadline__
     agent_target: dsr_intake
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
+    commands:
+      - type: secops-ng-primitive
+        command: content.playbooks.data_subject_rights.primitives.classification.classify_request
     x_secops_ng:
       control_refs:
         - control.account_management@v1
@@ -531,6 +547,10 @@ workflow:
       - __owner_manifest__
       - __data_owner_manifest__
     agent_target: dsr_intake
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
+    commands:
+      - type: secops-ng-primitive
+        command: content.playbooks.data_subject_rights.primitives.routing.resolve_data_owner_manifest
     x_secops_ng:
       control_refs:
         - control.account_management@v1
@@ -572,6 +592,10 @@ workflow:
       - __fulfilment_pack__
       - __fulfilment_pack_ref__
     agent_target: dsr_intake
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
+    commands:
+      - type: secops-ng-primitive
+        command: content.playbooks.data_subject_rights.primitives.fulfilment.compile_fulfilment_pack
     x_secops_ng:
       control_refs:
         - control.incident_timeline_signals@v1
@@ -618,6 +642,10 @@ workflow:
     out_args:
       - __controller_response__
     agent_target: dsr_intake
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
+    commands:
+      - type: secops-ng-primitive
+        command: content.playbooks.data_subject_rights.primitives.response.compose_controller_response
     x_secops_ng:
       control_refs:
         - control.incident_timeline_signals@v1
@@ -667,6 +695,10 @@ workflow:
       - __outcome_record__
       - __outcome_code__
     agent_target: dsr_intake
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
+    commands:
+      - type: secops-ng-primitive
+        command: content.playbooks.data_subject_rights.primitives.outcome.record_case_outcome
     x_secops_ng:
       control_refs:
         - control.incident_timeline_signals@v1

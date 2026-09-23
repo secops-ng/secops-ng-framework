@@ -190,6 +190,10 @@ playbook_variables:
       duration records the maximum interval between reviews
       absent such a change.
     external: false
+agent_definitions:
+  group--9479ad47-df96-5a3c-831a-f668158e5b9e:
+    type: group
+    name: Security operations team
 workflow_start: start--d91a35c0-0000-4000-8000-000000000001
 workflow:
   start--d91a35c0-0000-4000-8000-000000000001:
@@ -228,6 +232,7 @@ workflow:
       - __dpia_required__
       - __screening_result_ref__
     agent_target: dpia_assessor
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
     x_secops_ng:
       control_refs:
         - control.risk_management_policy@v1
@@ -255,6 +260,7 @@ workflow:
       - __dpia_case_id__
       - __processing_ref__
     agent_target: dpia_assessor
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
     x_secops_ng:
       control_refs:
         - control.risk_management_policy@v1
@@ -284,6 +290,7 @@ workflow:
     out_args:
       - __processing_description_ref__
     agent_target: dpia_assessor
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
     x_secops_ng:
       control_refs:
         - control.risk_management_policy@v1
@@ -309,6 +316,7 @@ workflow:
       - __dpia_case_id__
       - __processing_description_ref__
     agent_target: dpia_assessor
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
     x_secops_ng:
       control_refs:
         - control.risk_management_policy@v1
@@ -338,6 +346,7 @@ workflow:
     out_args:
       - __risk_assessment_ref__
     agent_target: dpia_assessor
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
     x_secops_ng:
       control_refs:
         - control.risk_management_policy@v1
@@ -367,6 +376,7 @@ workflow:
     out_args:
       - __mitigations_ref__
     agent_target: dpia_assessor
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
     x_secops_ng:
       control_refs:
         - control.risk_management_policy@v1
@@ -398,6 +408,7 @@ workflow:
     out_args:
       - __dpo_consultation_ref__
     agent_target: dpia_assessor
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
     x_secops_ng:
       control_refs:
         - control.risk_management_policy@v1
@@ -430,6 +441,7 @@ workflow:
     out_args:
       - __article_36_pre_consultation_flag__
     agent_target: dpia_assessor
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
     x_secops_ng:
       control_refs:
         - control.risk_management_policy@v1
@@ -464,6 +476,7 @@ workflow:
     out_args:
       - __dpia_document_ref__
     agent_target: dpia_assessor
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
     x_secops_ng:
       control_refs:
         - control.risk_management_policy@v1
@@ -492,6 +505,7 @@ workflow:
     out_args:
       - __review_cadence__
     agent_target: dpia_assessor
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
     x_secops_ng:
       control_refs:
         - control.risk_management_policy@v1

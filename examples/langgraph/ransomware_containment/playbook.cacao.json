@@ -101,6 +101,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--30000000-0000-4000-8000-000000000001",
   "workflow": {
     "start--30000000-0000-4000-8000-000000000001": {
@@ -122,6 +128,7 @@
         "__ransomware_confirmed__",
         "__edr_available__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "detection_refs": [
           "detection.sigma.shadow_copies_deletion@v1",
@@ -160,6 +167,7 @@
       "in_args": [
         "__affected_host__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "detection_refs": [
           "detection.sigma.shadow_copies_deletion@v1",
@@ -184,6 +192,7 @@
       "in_args": [
         "__affected_host__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "control_refs": [
           "control.network_egress_filtering@v1",
@@ -205,6 +214,7 @@
       "in_args": [
         "__affected_identity__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "detection_refs": [
           "detection.sigma.overpass_the_hash@v1"
@@ -230,6 +240,7 @@
         "__latest_known_good_snapshot__",
         "__snapshot_integrity_ok__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "detection_refs": [
           "detection.sigma.wbadmin_backup_deletion@v1",
@@ -257,6 +268,7 @@
         "__latest_known_good_snapshot__",
         "__snapshot_integrity_ok__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "control_refs": [
           "control.incident_notification@v1"

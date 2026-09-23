@@ -136,6 +136,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--01a17a01-0000-4000-8000-000000000001",
   "workflow": {
     "start--01a17a01-0000-4000-8000-000000000001": {
@@ -151,6 +157,13 @@
       "in_args": [
         "__cve_id__",
         "__report_source__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.vuln_intake.primitives.dedup.canonicalize_case_field"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -182,6 +195,13 @@
         "__cvss_vector__",
         "__epss_score__",
         "__asset_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.vuln_intake.primitives.severity.severity_policy"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -216,6 +236,13 @@
       ],
       "out_args": [
         "__actively_exploited__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.vuln_intake.primitives.cra_trigger.assess_cra_reporting_trigger"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -253,6 +280,13 @@
         "__actively_exploited__",
         "__cve_id__",
         "__severity__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.vuln_intake.primitives.cra_trigger.build_notification_chain"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -307,6 +341,13 @@
       "name": "response: critical — patch and advisory",
       "description": "Critical-severity response: page the response team, ship the security update across affected releases for the duration of the support period free of charge per CRA Annex I §2(7), and emit a public advisory to users. Records the dissemination event against the patch-dissemination KPI and the critical-MTTR clock.",
       "on_completion": "end--01a17a01-0000-4000-8000-00000000000c",
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.vuln_intake.primitives.remediation.patch_and_advisory_critical"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.patch_evidence@v1",
@@ -336,6 +377,13 @@
       "name": "response: high — patch and advisory",
       "description": "High-severity response: ship the security update on the operator's high-severity SLA and emit an advisory through the same dissemination channel as the critical branch. Same dissemination KPI; the response latency is measured against the patch-dissemination clock rather than the critical-band MTTR.",
       "on_completion": "end--01a17a01-0000-4000-8000-00000000000c",
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.vuln_intake.primitives.remediation.patch_and_advisory_high"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.patch_evidence@v1",
@@ -364,6 +412,13 @@
       "name": "response: scheduled remediation",
       "description": "Medium / low-severity response: schedule the security update on the operator's standard release cadence and roll the advisory into the next scheduled release note. The CRA Annex I §2(7) obligation to disseminate updates without undue delay is met by the operator's documented release SLA; the patch-dissemination clock measures whether that SLA is held.",
       "on_completion": "end--01a17a01-0000-4000-8000-00000000000c",
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.vuln_intake.primitives.remediation.schedule_remediation"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.patch_evidence@v1"
@@ -391,6 +446,13 @@
       "name": "response: accept risk",
       "description": "Informational-severity response: record the disclosure on the case ledger with a documented accept-risk decision and close without paging or scheduling a release. The case still emits an OCSF Vulnerability Finding so the intake-aging KRI sees a closed disposition rather than an open backlog item.",
       "on_completion": "end--01a17a01-0000-4000-8000-00000000000c",
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.vuln_intake.primitives.remediation.accept_risk"
+        }
+      ],
       "x_secops_ng": {
         "telemetry_refs": [
           "telemetry.ocsf.vulnerability_finding@v1"

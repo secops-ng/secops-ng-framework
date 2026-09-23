@@ -46,6 +46,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--20000000-0000-4000-8000-000000000001",
   "workflow": {
     "start--20000000-0000-4000-8000-000000000001": {
@@ -61,6 +67,7 @@
       "in_args": [
         "__signal_id__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "detection_refs": [
           "detection.sigma.dlp_egress_alert@v1",
@@ -87,6 +94,7 @@
         "__affected_subjects_count__",
         "__exfil_confirmed__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "control_refs": [
           "control.data_classification_baseline@v1"
@@ -115,6 +123,7 @@
         "__data_classification__",
         "__affected_subjects_count__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "control_refs": [
           "control.network_egress_filtering@v1",
@@ -144,6 +153,7 @@
         "__data_classification__",
         "__affected_subjects_count__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "control_refs": [
           "control.dlp_enforcement@v1"
@@ -166,6 +176,7 @@
         "__data_classification__",
         "__affected_subjects_count__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "telemetry_refs": [
           "telemetry.ocsf.incident_finding@v1"

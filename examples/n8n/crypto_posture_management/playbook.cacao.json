@@ -125,6 +125,12 @@
       "external": true
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--51000000-0000-4000-8000-000000000001",
   "workflow": {
     "start--51000000-0000-4000-8000-000000000001": {
@@ -145,6 +151,13 @@
       ],
       "out_args": [
         "__policy_inventory_id__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.crypto_posture_management.primitives.policy.inventory_crypto_policy"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -178,6 +191,13 @@
       ],
       "out_args": [
         "__cert_posture_id__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.crypto_posture_management.primitives.certificates.probe_cert_posture"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -213,6 +233,13 @@
       ],
       "out_args": [
         "__rotation_status__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.crypto_posture_management.primitives.rotation.check_key_rotation"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -253,6 +280,13 @@
       "out_args": [
         "__attestation_id__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.crypto_posture_management.primitives.evidence.capture_crypto_evidence"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.crypto_policy_inventory@v1",
@@ -288,6 +322,13 @@
         "__crypto_owner_role__",
         "__crypto_scope__",
         "__notification_channel_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.crypto_posture_management.primitives.notify.plan_crypto_owner_notification"
+        }
       ],
       "x_secops_ng": {
         "telemetry_refs": [

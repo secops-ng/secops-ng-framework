@@ -67,6 +67,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--5a509a09-0000-4000-8000-000000000001",
   "workflow": {
     "start--5a509a09-0000-4000-8000-000000000001": {
@@ -88,6 +94,7 @@
         "__srp_early_warning_id__"
       ],
       "agent_target": "SRP_intake",
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "control_refs": [
           "control.incident_timeline_signals@v1",
@@ -118,7 +125,8 @@
       "on_completion": "action--5a509a09-0000-4000-8000-000000000005",
       "in_args": [
         "__awareness_ts__"
-      ]
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e"
     },
     "action--5a509a09-0000-4000-8000-000000000005": {
       "type": "action",
@@ -134,6 +142,7 @@
         "__srp_full_notification_id__"
       ],
       "agent_target": "SRP_intake",
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "control_refs": [
           "control.incident_timeline_signals@v1",
@@ -155,7 +164,8 @@
       "in_args": [
         "__clock_kind__",
         "__awareness_ts__"
-      ]
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e"
     },
     "action--5a509a09-0000-4000-8000-000000000007": {
       "type": "action",
@@ -171,6 +181,7 @@
         "__srp_final_report_id__"
       ],
       "agent_target": "SRP_intake",
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "control_refs": [
           "control.incident_timeline_signals@v1",

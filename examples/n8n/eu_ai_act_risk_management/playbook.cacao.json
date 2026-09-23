@@ -105,6 +105,12 @@
       "external": true
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--40000000-0000-4000-8000-000000000001",
   "workflow": {
     "start--40000000-0000-4000-8000-000000000001": {
@@ -127,6 +133,13 @@
       ],
       "out_args": [
         "__annex_iii_use_case__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.eu_ai_act_risk_management.primitives.classification.classify_high_risk_system"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -161,6 +174,13 @@
       ],
       "out_args": [
         "__risk_register_id__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.eu_ai_act_risk_management.primitives.assessment.assess_art9_risks"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -199,6 +219,13 @@
       "out_args": [
         "__technical_documentation_id__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.eu_ai_act_risk_management.primitives.documentation.assemble_technical_documentation"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.system_security_privacy_plan@v1"
@@ -228,6 +255,13 @@
       "on_completion": "end--40000000-0000-4000-8000-000000000006",
       "out_args": [
         "__post_market_signal__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.eu_ai_act_risk_management.primitives.post_market.record_post_market_signal"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [

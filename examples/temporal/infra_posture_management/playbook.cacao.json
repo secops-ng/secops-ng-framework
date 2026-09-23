@@ -95,6 +95,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--06f06f06-0000-4000-8000-000000000001",
   "workflow": {
     "start--06f06f06-0000-4000-8000-000000000001": {
@@ -113,6 +119,13 @@
       ],
       "out_args": [
         "__posture_state_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.infra_posture_management.primitives.collect.collect_posture_state"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -147,6 +160,13 @@
       ],
       "out_args": [
         "__control_evaluation_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.infra_posture_management.primitives.controls.evaluate_controls"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -190,6 +210,13 @@
       ],
       "out_args": [
         "__posture_artifact_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.infra_posture_management.primitives.artifact.build_posture_artifact"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [

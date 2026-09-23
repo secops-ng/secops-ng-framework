@@ -173,6 +173,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--30000000-0000-4000-8000-000000000001",
   "workflow": {
     "start--30000000-0000-4000-8000-000000000001": {
@@ -188,6 +194,7 @@
       "in_args": [
         "__finding_id__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "detection_refs": [
           "detection.sigma.cspm_finding_critical@v1",
@@ -218,6 +225,7 @@
         "__owner_id__",
         "__severity__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "control_refs": [
           "control.cspm_baseline@v1",
@@ -244,6 +252,7 @@
       "name": "suppress and close",
       "description": "Link the finding to its existing exception or known-deviation record, close the case without paging, and account the suppression against the recurring-misconfiguration KRI so a chronically suppressed posture rule surfaces in the metrics layer.",
       "on_completion": "end--30000000-0000-4000-8000-00000000000a",
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "metric_refs": [
           "kri.recurring_cloud_misconfig@v1"
@@ -264,6 +273,7 @@
         "__resource_id__",
         "__severity__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "telemetry_refs": [
           "telemetry.ocsf.compliance_finding@v1"
@@ -286,6 +296,7 @@
         "__resource_id__",
         "__owner_id__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "control_refs": [
           "control.cspm_baseline@v1",
@@ -310,6 +321,7 @@
       "out_args": [
         "__remediation_verified__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "detection_refs": [
           "detection.sigma.cspm_finding_critical@v1"
@@ -344,6 +356,7 @@
         "__resource_id__",
         "__severity__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "telemetry_refs": [
           "telemetry.ocsf.compliance_finding@v1"

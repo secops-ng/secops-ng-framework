@@ -86,6 +86,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--30000000-0000-4000-8000-000000000001",
   "workflow": {
     "start--30000000-0000-4000-8000-000000000001": {
@@ -106,6 +112,13 @@
         "__indicator_envelope__",
         "__affected_principal__",
         "__lateral_path__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.agentic_threat_response.primitives.intake.hydrate_indicator"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -144,6 +157,13 @@
       "out_args": [
         "__isolation_plan__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.agentic_threat_response.primitives.isolation.plan_credential_isolation"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.account_management_disable_accounts@v1"
@@ -176,6 +196,13 @@
       "out_args": [
         "__segmentation_rules__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.agentic_threat_response.primitives.segmentation.derive_segmentation_rules"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.information_flow_enforcement@v1",
@@ -207,6 +234,13 @@
       "out_args": [
         "__escalation_envelope__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.agentic_threat_response.primitives.escalation.compose_escalation_envelope"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.incident_reporting@v1"
@@ -237,6 +271,13 @@
       "out_args": [
         "__evidence_bundle_manifest__",
         "__evidence_bundle__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.agentic_threat_response.primitives.evidence.seal_evidence_bundle"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [

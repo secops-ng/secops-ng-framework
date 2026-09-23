@@ -100,10 +100,33 @@ carry the I/O contract the compilers turn into source:
 | `x_secops_ng.control_refs` / `.telemetry_refs` / `.metric_refs` | Per-step reference bundles, same shape as the playbook-level ones. |
 | `x_secops_ng.core_body` | Optional. The deterministic primitive the step compiles to — see §&nbsp;3.1. |
 
-**Do not use a CACAO `commands` array.** No playbook in the catalogue
-does, and the compilers do not read it. Earlier revisions of this
-document recommended it; that guidance was wrong and the last two
-playbooks using it were converted in #854 and #863.
+**Agents and commands.** The official CACAO 2.0 schema requires every
+action step to name an `agent` and to carry at least one command. Every
+playbook declares one agent in `agent_definitions` — the group
+*Security operations team*, under the fixed id
+`group--9479ad47-df96-5a3c-831a-f668158e5b9e` — and every action step
+names it in `agent`. A bound step (one with `core_body`) also carries
+exactly one command:
+
+```json
+"commands": [
+  { "type": "secops-ng-primitive", "command": "<the core_body primitive's dotted path>" }
+]
+```
+
+`secops-ng-primitive` is a value in CACAO's open command-type vocabulary;
+none of the listed types describes a call into a Python primitive.
+`tests/content/test_cacao_agents_and_commands.py` pins the command equal to
+`core_body.primitive`. The compilers still compile `core_body` and never
+read the command — it exists so that CACAO tooling can see what the step
+runs.
+
+**Do not express a step's work as other command types** (`http-api`,
+`bash`, …) for the compilers to execute. Earlier revisions of this
+document recommended that; it was wrong, because the compilers compile
+`core_body`, and the last two playbooks doing it were converted in #854
+and #863. Unbound steps carry no command for now, so they still fail the
+official schema on `commands`; their representation lands separately.
 
 `content/playbooks/cra_cvd/playbook.cacao.json` is a full worked
 example.

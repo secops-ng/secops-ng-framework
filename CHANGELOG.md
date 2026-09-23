@@ -14,6 +14,15 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
   previous `"2.0"` failed it on all 49 documents. `content-model/playbook.schema.json`
   now requires the `cacao-2.` prefix. Consumers that compared the field to
   `"2.0"` must update; the compilers carry the value through unchanged.
+- **Every action step names an agent; bound steps carry a command.** Each
+  canonical playbook, and the `_template`, declares one `agent_definitions`
+  entry — the group "Security operations team", under the fixed id
+  `group--9479ad47-df96-5a3c-831a-f668158e5b9e` — and all 261 action steps
+  reference it. The 149 bound steps also carry one command of the
+  open-vocabulary type `secops-ng-primitive` whose `command` is the
+  `core_body` primitive's dotted path, pinned equal by test. The compilers
+  still compile `core_body`, so every compiled artifact is byte-identical;
+  only the CACAO mirrors change. The 112 unbound steps carry no command yet.
 
 ### Added
 

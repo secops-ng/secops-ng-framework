@@ -89,6 +89,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--71000000-0000-4000-8000-000000000001",
   "workflow": {
     "start--71000000-0000-4000-8000-000000000001": {
@@ -108,6 +114,7 @@
       "out_args": [
         "__classification_decision_id__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "control_refs": [
           "control.dora_major_classifier@v1"
@@ -126,6 +133,7 @@
       "out_args": [
         "__initial_notification_id__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "control_refs": [
           "control.dora_submission_templates@v1",
@@ -145,6 +153,7 @@
       "out_args": [
         "__intermediate_report_id__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "control_refs": [
           "control.dora_submission_templates@v1",
@@ -164,6 +173,7 @@
       "out_args": [
         "__final_report_id__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "control_refs": [
           "control.dora_submission_templates@v1",
@@ -186,6 +196,7 @@
       "out_args": [
         "__cycle_archive_id__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "control_refs": [
           "control.incident_timeline_signals@v1"

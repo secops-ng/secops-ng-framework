@@ -110,6 +110,10 @@ playbook_variables:
       configured metric sink.
     external: false
 
+agent_definitions:
+  "group--9479ad47-df96-5a3c-831a-f668158e5b9e":
+    type: group
+    name: Security operations team
 workflow_start: "start--f0e4f404-0000-4000-8000-000000000001"
 
 workflow:
@@ -133,6 +137,7 @@ workflow:
       - __rule_version__
       - __proposal_rationale__
     on_completion: "action--f0e4f404-0000-4000-8000-000000000003"
+    agent: "group--9479ad47-df96-5a3c-831a-f668158e5b9e"
     x_secops_ng:
       control_refs:
         - "control.control_effectiveness_test@v1"
@@ -152,6 +157,7 @@ workflow:
     out_args:
       - __review_verdict__
     on_completion: "action--f0e4f404-0000-4000-8000-000000000004"
+    agent: "group--9479ad47-df96-5a3c-831a-f668158e5b9e"
     x_secops_ng:
       control_refs:
         - "control.control_effectiveness_test@v1"
@@ -172,6 +178,7 @@ workflow:
     out_args:
       - __ship_status__
     on_completion: "action--f0e4f404-0000-4000-8000-000000000005"
+    agent: "group--9479ad47-df96-5a3c-831a-f668158e5b9e"
     x_secops_ng:
       control_refs:
         - "control.control_effectiveness_test@v1"
@@ -197,6 +204,7 @@ workflow:
     out_args:
       - __effectiveness_snapshot_id__
     on_completion: "end--f0e4f404-0000-4000-8000-000000000006"
+    agent: "group--9479ad47-df96-5a3c-831a-f668158e5b9e"
     x_secops_ng:
       control_refs:
         - "control.control_effectiveness_test@v1"

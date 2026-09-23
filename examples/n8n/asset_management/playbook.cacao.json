@@ -175,6 +175,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--80000000-0000-4000-8000-000000000001",
   "workflow": {
     "start--80000000-0000-4000-8000-000000000001": {
@@ -197,6 +203,13 @@
         "__source_set_id__",
         "__resolved_inventory_sources__",
         "__resolved_source_precedence__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.asset_management.primitives.ingest.resolve_inventory_source_set"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -233,6 +246,13 @@
         "__snapshot_id__",
         "__snapshot_assets__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.asset_management.primitives.reconcile.reconcile_inventory_snapshot"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.asset_inventory_delta@v1"
@@ -265,6 +285,13 @@
       ],
       "out_args": [
         "__delta_set__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.asset_management.primitives.delta.compute_inventory_delta"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -301,6 +328,13 @@
       ],
       "out_args": [
         "__delta_classification__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.asset_management.primitives.classify.classify_inventory_delta"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -347,6 +381,13 @@
         "__evidence_artifact__",
         "__evidence_id__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.asset_management.primitives.artifact.build_asset_inventory_delta_evidence_artifact"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.asset_inventory_delta@v1"
@@ -389,6 +430,13 @@
         "__delta_classification__",
         "__unmanaged_threshold__",
         "__owner_channel__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.asset_management.primitives.notify.compose_owner_notification"
+        }
       ],
       "x_secops_ng": {
         "telemetry_refs": [

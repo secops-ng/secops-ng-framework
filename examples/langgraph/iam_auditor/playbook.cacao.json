@@ -90,6 +90,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--08aa0d10-0000-4000-8000-000000000001",
   "workflow": {
     "start--08aa0d10-0000-4000-8000-000000000001": {
@@ -109,6 +115,13 @@
       ],
       "out_args": [
         "__caller_identity_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.iam_auditor.primitives.identity.resolve_caller_identity"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -140,6 +153,13 @@
       ],
       "out_args": [
         "__capabilities_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.iam_auditor.primitives.capabilities.build_capability_list"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -178,6 +198,13 @@
       ],
       "out_args": [
         "__access_artifact_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.iam_auditor.primitives.artifact.build_access_artifact"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [

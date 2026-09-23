@@ -181,6 +181,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--70000000-0000-4000-8000-000000000001",
   "workflow": {
     "start--70000000-0000-4000-8000-000000000001": {
@@ -196,6 +202,13 @@
       "in_args": [
         "__update_subject__",
         "__update_reference__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.patch_management.primitives.detect.detect_patch_availability"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -230,6 +243,13 @@
       ],
       "out_args": [
         "__patch_criticality__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.patch_management.primitives.classify.classify_patch_criticality"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -266,6 +286,13 @@
       "out_args": [
         "__staged_ring_id__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.patch_management.primitives.stage.stage_rollout_to_canary_ring"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.patch_evidence@v1"
@@ -300,6 +327,13 @@
       ],
       "out_args": [
         "__canary_healthy__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.patch_management.primitives.validate.validate_canary"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -336,6 +370,13 @@
       ],
       "out_args": [
         "__broad_rollout_id__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.patch_management.primitives.fanout.fan_out_to_broad_rings"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -377,6 +418,13 @@
       "out_args": [
         "__evidence_id__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.patch_management.primitives.artifact.build_patch_application_evidence_artifact"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.patch_evidence@v1"
@@ -417,6 +465,13 @@
         "__evidence_id__",
         "__update_subject__",
         "__canary_healthy__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.patch_management.primitives.notify.compose_maintenance_notification"
+        }
       ],
       "x_secops_ng": {
         "telemetry_refs": [
