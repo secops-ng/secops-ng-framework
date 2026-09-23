@@ -100,6 +100,17 @@ carry the I/O contract the compilers turn into source:
 | `x_secops_ng.control_refs` / `.telemetry_refs` / `.metric_refs` | Per-step reference bundles, same shape as the playbook-level ones. |
 | `x_secops_ng.core_body` | Optional. The deterministic primitive the step compiles to — see §&nbsp;3.1. |
 
+Conditional steps carry the routing fields the standard defines:
+
+| Field | Notes |
+|---|---|
+| `switch` (switch-condition) | The playbook variable whose value selects the case. |
+| `cases` (switch-condition) | Case value → **one** step identifier, the CACAO 2.0 shape. Earlier revisions wrote a one-element list; the compilers accept that form for one more release and then reject it. |
+
+Playbook variables always carry their `value` as a string (or `null`); the
+variable's `type` tells each compiler how to read it, and the n8n emitter
+turns integer and float strings back into numbers for its typed slots.
+
 **Do not use a CACAO `commands` array.** No playbook in the catalogue
 does, and the compilers do not read it. Earlier revisions of this
 document recommended it; that guidance was wrong and the last two

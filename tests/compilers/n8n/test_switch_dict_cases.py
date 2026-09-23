@@ -1,6 +1,7 @@
 """The n8n emitter must lower CACAO v2 dict-shaped switch cases.
 
-CACAO's ``cases`` property is a mapping of case value → list of step ids.
+CACAO's ``cases`` property is a mapping of case value → one step identifier;
+the pre-standard list form is still accepted for one release.
 The emitter historically accepted only a legacy list-of-``{when, label}``
 shape, so every spec-shaped switch emitted a Switch node with an empty rule
 set, **no outgoing connections at all**, and a "no cases parsed" note — the
@@ -50,8 +51,8 @@ _PLAYBOOK: dict[str, Any] = {
             "name": "route on priority",
             "switch": "__priority__",
             "cases": {
-                "p1_severe": ["action--00000000-0000-4000-8000-000000000003"],
-                "p2_high": ["action--00000000-0000-4000-8000-000000000004"],
+                "p1_severe": "action--00000000-0000-4000-8000-000000000003",
+                "p2_high": "action--00000000-0000-4000-8000-000000000004",
             },
         },
         "action--00000000-0000-4000-8000-000000000003": {
@@ -157,3 +158,15 @@ def test_legacy_list_shape_still_accepted() -> None:
     rules = _switch_node(wf)["parameters"]["rules"]["values"]
     assert [r["outputKey"] for r in rules] == ["legacy"]
     assert not any("no cases parsed" in n for n in wf["meta"]["secops_ng_notes"])
+
+
+def test_list_form_and_identifier_form_emit_identical_rules() -> None:
+    """The tolerated pre-standard list form must compile exactly like the spec form."""
+    spec_form = emit(parse(copy.deepcopy(_PLAYBOOK)))
+    pb = copy.deepcopy(_PLAYBOOK)
+    pb["workflow"][_SWITCH_ID]["cases"] = {
+        value: [target] for value, target in pb["workflow"][_SWITCH_ID]["cases"].items()
+    }
+    list_form = emit(parse(pb))
+    assert list_form["nodes"] == spec_form["nodes"]
+    assert list_form["connections"] == spec_form["connections"]
