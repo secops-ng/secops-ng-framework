@@ -363,15 +363,19 @@ def _condition_edge(step: WorkflowStep, end_ids: set[str]) -> ConditionalEdge:
         return GraphSpec.END if target in end_ids else target
 
     if step.type is StepType.SWITCH_CONDITION:
-        # CACAO v2 expresses switch arms as a ``cases`` map (label -> [step_ids]).
-        # That field is unknown to the AST and lands on ``step.extra``. Older
-        # authoring tools may instead pre-flatten arms onto ``next_steps``;
-        # we honour both, with case-label keys taking precedence.
+        # CACAO v2 expresses switch arms as a ``cases`` map of case value ->
+        # one step identifier (spec 4.10). The field is unknown to the AST and
+        # lands on ``step.extra``. The pre-standard list form (case value ->
+        # [step_ids]) is accepted for one more release; its first entry is the
+        # branch head. Older authoring tools may instead pre-flatten arms onto
+        # ``next_steps``; we honour all three, case-label keys taking precedence.
         raw_cases = step.extra.get("cases")
         if isinstance(raw_cases, Mapping):
-            for label, targets in raw_cases.items():
-                if isinstance(targets, (list, tuple)) and targets:
-                    branches[str(label)] = _resolve(str(targets[0]))
+            for label, target in raw_cases.items():
+                if isinstance(target, str) and target:
+                    branches[str(label)] = _resolve(target)
+                elif isinstance(target, (list, tuple)) and target:
+                    branches[str(label)] = _resolve(str(target[0]))
         for idx, ref in enumerate(step.next_steps):
             branches.setdefault(f"case_{idx}", _resolve(ref))
     else:

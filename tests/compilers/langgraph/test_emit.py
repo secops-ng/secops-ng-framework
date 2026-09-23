@@ -227,3 +227,27 @@ def test_start_pointing_at_end_collapses_entry() -> None:
     assert s.nodes == ()
     assert s.edges == ()
     assert s.conditional_edges == ()
+
+
+def _switch_playbook_with_cases(cases: dict) -> dict:
+    pb = _switch_playbook()
+    step = pb["workflow"][_S_SW]
+    step.pop("next_steps", None)
+    step["switch"] = "__sector__"
+    step["cases"] = cases
+    return pb
+
+
+def test_switch_cases_identifier_form_routes_each_case() -> None:
+    """CACAO 2.0: each ``cases`` value is one step identifier."""
+    s = emit(parse(_switch_playbook_with_cases({"finance": _S_A1, "health": _S_A2})))
+    edge = next(c for c in s.conditional_edges if c.src == _S_SW)
+    assert edge.branches == {"finance": _S_A1, "health": _S_A2}
+    assert edge.default == _S_DEF
+
+
+def test_switch_cases_list_form_still_accepted_this_release() -> None:
+    """The pre-standard list form compiles to the same edge as the spec form."""
+    spec_form = emit(parse(_switch_playbook_with_cases({"finance": _S_A1, "health": _S_A2})))
+    list_form = emit(parse(_switch_playbook_with_cases({"finance": [_S_A1], "health": [_S_A2]})))
+    assert list_form.conditional_edges == spec_form.conditional_edges

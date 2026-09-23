@@ -140,21 +140,11 @@
       "description": "Route to the response branch keyed on the classifier output. Each branch is a single response-routing action that hands off to the appropriate downstream playbook or owner team; the bodies of those downstream playbooks are out of scope here.",
       "switch": "__intent__",
       "cases": {
-        "phishing": [
-          "action--c0a17a01-0000-4000-8000-000000000008"
-        ],
-        "credential_harvest": [
-          "action--c0a17a01-0000-4000-8000-000000000009"
-        ],
-        "malware_attached": [
-          "action--c0a17a01-0000-4000-8000-00000000000a"
-        ],
-        "business_email_compromise": [
-          "action--c0a17a01-0000-4000-8000-00000000000b"
-        ],
-        "unknown": [
-          "action--c0a17a01-0000-4000-8000-00000000000c"
-        ]
+        "phishing": "action--c0a17a01-0000-4000-8000-000000000008",
+        "credential_harvest": "action--c0a17a01-0000-4000-8000-000000000009",
+        "malware_attached": "action--c0a17a01-0000-4000-8000-00000000000a",
+        "business_email_compromise": "action--c0a17a01-0000-4000-8000-00000000000b",
+        "unknown": "action--c0a17a01-0000-4000-8000-00000000000c"
       }
     },
     "action--c0a17a01-0000-4000-8000-000000000008": {

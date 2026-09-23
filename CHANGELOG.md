@@ -8,6 +8,17 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Switch cases are single step identifiers.** The four playbooks with a
+  `switch-condition` step (`alert_triage`, `cryptographic_controls`,
+  `phishing_triage`, `vuln_intake`) now write `cases` as case value → one
+  step identifier, the shape CACAO 2.0 defines. The n8n and LangGraph
+  emitters accept the previous one-element-list form for one more release
+  and compile both identically; the list form is rejected after that.
+- **Variable values are strings.** `threat_intel_ingest`'s confidence
+  threshold is `"70"` rather than `70`; `content-model/playbook.schema.json`
+  now requires `value` to be a string or `null`, as CACAO does. The n8n
+  emitter coerces integer and float strings back into numbers for its typed
+  trigger slots, so compiled output is unchanged.
 - **`spec_version` is now `"cacao-2.0"`** on every canonical playbook, the
   `_template`, the content-model examples and the worked-example mirrors.
   The official OASIS CACAO 2.0 JSON schema enumerates that literal; the

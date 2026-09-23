@@ -320,7 +320,7 @@ def test_lifecycle_switch_routes_every_event_class() -> None:
         "switch cases must cover the closed lifecycle-event vocabulary exactly"
     )
     for event, step_name in expected.items():
-        assert switch["cases"][event] == [by_name[step_name]], (
+        assert switch["cases"][event] == by_name[step_name], (
             f"lifecycle event {event!r} must route to {step_name!r}"
         )
 
