@@ -2319,17 +2319,24 @@ one playbook's provenance.
 - **Source:** #921 (memo 2026-08-12, refresh 2026-08-25); Director
   decision 2026-09-04.
 - **Shipped via:**
-  - CORE-PRIM — #1000 (`asset_management`: the three steps that still
+  - CORE-PRIM — authored as #1000, landed in #1003 (the stacked
+    branch carried both stages, and its squash-merge brought this one
+    in; #1000 was then closed as already landed) (`asset_management`: the three steps that still
     carried `TODO (CORE)` markers — ingest, delta, notify — gained
     deterministic primitives, and the source-set-id derivation was
     promoted to a shared helper so ingest and reconcile cannot drift
     apart about what names a source set).
-  - CORE-WIRE + GRADUATE — #1001 (`asset_management`: all six action
+  - CORE-WIRE + GRADUATE — #1003, closing #1001 (`asset_management`: all six action
     steps bound through `core_body` with every bound variable declared
     per #866; `__delta_set_id__` renamed to `__delta_set__` because the
     primitive emits delta records, not an id; the three targets
     regenerated and byte-parity re-asserted; `experimental` → `stable`,
     `content_version` 1.0.0 on a recomputed checklist).
+  - CORE-PRIM — #1017 (`phishing_triage`: primitives for all nine action
+    steps, from none; the suppression gate's two lanes are asymmetric —
+    an already-seen case always collapses, a known-benign sender needs
+    DMARC `pass` and no flagged indicator — and every doubtful
+    classification routes to manual review).
 
 ### F-WF-CORE-WAVE-2 — CORE wave 2: bind the remaining worthy playbooks; record the parked five
 
