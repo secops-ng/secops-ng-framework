@@ -141,6 +141,12 @@
               "type": "string"
             },
             {
+              "id": "out.known_false_positive",
+              "name": "out.known_false_positive",
+              "value": "",
+              "type": "string"
+            },
+            {
               "id": "x_secops_ng.control_refs",
               "name": "x_secops_ng.control_refs",
               "value": "control.cspm_baseline@v1, control.cloud_identity_least_privilege@v1, control.asset_inventory_delta@v1",
@@ -162,7 +168,7 @@
         },
         "options": {}
       },
-      "notes": "Resolve the affected resource against the cloud inventory and ownership graph: tenant, project / account, region, resource type, tags, accountable owner, classification. Produces __resource_id__, __owner_id__, and __severity__ (severity is resolved here rather than ingested raw because the operator's classification can lift or lower the upstream CSPM severity).",
+      "notes": "Resolve the affected resource against the cloud inventory and ownership graph: tenant, project / account, region, resource type, tags, accountable owner, classification. Produces __resource_id__, __owner_id__, and __severity__ (severity is resolved here rather than ingested raw because the operator's classification can lift or lower the upstream CSPM severity). Also sets __known_false_positive__: true when the finding matches a documented exception or a known-benign baseline-deviation record within the suppression window, which the suppression branch reads.",
       "notesInFlow": true
     },
     {
@@ -184,7 +190,7 @@
           "conditions": [
             {
               "id": "secops_ng_condition",
-              "leftValue": "",
+              "leftValue": "{{$workflow.variables.known_false_positive}}",
               "rightValue": "true",
               "operator": {
                 "type": "string",
@@ -196,7 +202,7 @@
         },
         "options": {}
       },
-      "notes": "Suppression branch. on_success: the finding matches a documented exception (compensating-control attestation, time-boxed exception record) or an already-seen baseline-deviation fingerprint within the suppression window; suppress-and-close. on_failure: continue into owner notification.",
+      "notes": "Suppression branch on the boolean __known_false_positive__ set by the enrichment step. on_true: the finding matches a documented exception (compensating-control attestation, time-boxed exception record) or an already-seen baseline-deviation fingerprint within the suppression window; suppress-and-close. on_false: continue into owner notification.",
       "notesInFlow": true
     },
     {
@@ -408,7 +414,7 @@
           "conditions": [
             {
               "id": "secops_ng_condition",
-              "leftValue": "",
+              "leftValue": "{{$workflow.variables.remediation_verified}}",
               "rightValue": "true",
               "operator": {
                 "type": "string",
@@ -420,7 +426,7 @@
         },
         "options": {}
       },
-      "notes": "Branch on __remediation_verified__. on_success: re-scan confirms the rule no longer fires; close the case. on_failure: remediation did not stick \u2014 escalate so the recurring-misconfiguration KRI captures the residual exposure rather than closing on an unverified attempt.",
+      "notes": "Branch on __remediation_verified__. on_true: re-scan confirms the rule no longer fires; close the case. on_false: remediation did not stick \u2014 escalate so the recurring-misconfiguration KRI captures the residual exposure rather than closing on an unverified attempt.",
       "notesInFlow": true
     },
     {
@@ -642,12 +648,10 @@
     "secops_ng_notes": [
       "step 'action--30000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--30000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'if-condition--30000000-0000-4000-8000-000000000004' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
       "step 'action--30000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--30000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--30000000-0000-4000-8000-000000000007': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--30000000-0000-4000-8000-000000000008': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'if-condition--30000000-0000-4000-8000-000000000009' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
       "step 'action--30000000-0000-4000-8000-00000000000b': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
     ]
   }

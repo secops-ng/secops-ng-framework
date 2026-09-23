@@ -103,8 +103,8 @@ operator's data plane.
 The playbook ships eleven steps: one `start`, seven `action`, one
 `if-condition`, one `switch-condition`, and one `end`. The
 `if-condition` fires on the suppression predicate
-(`__benign_or_seen__`); `on_success` (already-seen or known-benign)
-routes into `suppress and close`, `on_failure` routes into `classify
+(`__benign_or_seen__`); `on_true` (already-seen or known-benign)
+routes into `suppress and close`, `on_false` routes into `classify
 intent`. The `switch-condition` fires on `__intent__` and routes into
 exactly one of the five response actions.
 
@@ -192,10 +192,10 @@ identity surface.
     `kpi.mttd_phishing@v1`.
 
 **known-benign sender or already seen?** (`…000004`, `if-condition`)
-:   Deterministic branch on `__benign_or_seen__`. `on_success`
+:   Deterministic branch on `__benign_or_seen__`. `on_true`
     (already-seen fingerprint or known-benign sender within the
     configured suppression window) routes into `suppress and close`;
-    `on_failure` routes into `classify intent`. Anchored on OSCAL
+    `on_false` routes into `classify intent`. Anchored on OSCAL
     IR-4(4) (Incident Handling | Information Correlation) — the
     recurring-incident correlator semantics applied at the report
     grain: an already-seen case fingerprint or known-benign sender is
@@ -407,8 +407,8 @@ CACAO step ids verbatim. The seven action steps emit
 `n8n-nodes-base.set` nodes carrying the CACAO I/O contract as
 editable assignment rows plus the `x_secops_ng` reference bundles.
 The `if-condition` node (`known-benign sender or already seen?`) emits
-an `n8n-nodes-base.if` with a placeholder condition the operator
-wires to the upstream `out.benign_or_seen` field; the
+an `n8n-nodes-base.if` whose condition reads `__benign_or_seen__`,
+set by the enrichment step (surfaced as `out.benign_or_seen`); the
 `switch-condition` node (`route on intent`) emits an
 `n8n-nodes-base.switch` with five case rows keyed on `__intent__`.
 The lossy translations are recorded in `meta.secops_ng_notes` so the

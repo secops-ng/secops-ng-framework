@@ -116,9 +116,10 @@ connectors. Concretely on this playbook:
 | `comms plan` | `affected_host`, `affected_identity`, `latest_known_good_snapshot`, `snapshot_integrity_ok` | — | `control_refs`, `telemetry_refs`, `metric_refs` |
 
 The two `if-condition` nodes (`ransomware confirmed?`,
-`EDR available?`) emit an n8n `if` node with a placeholder condition
-the operator must wire to the upstream `out.*` field. The lossy
-translation is recorded in `meta.secops_ng_notes` so the integrator
+`EDR available?`) emit n8n `if` nodes whose conditions read
+`__ransomware_confirmed__` and `__edr_available__`, the variables the
+triage step sets. The remaining lossy translations — one per unbound
+action — are recorded in `meta.secops_ng_notes` so the integrator
 sees exactly which seams need attention.
 
 ## Mirroring policy

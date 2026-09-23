@@ -129,7 +129,7 @@
           "conditions": [
             {
               "id": "secops_ng_condition",
-              "leftValue": "",
+              "leftValue": "{{$workflow.variables.compromise_confirmed}}",
               "rightValue": "true",
               "operator": {
                 "type": "string",
@@ -141,8 +141,8 @@
         },
         "options": {}
       },
-      "notes": "",
-      "notesInFlow": false
+      "notes": "Branch on __compromise_confirmed__, set by the triage step. on_true: the compromise is confirmed and the playbook resets the principal's MFA factors. on_false: the signal closes as a false positive.",
+      "notesInFlow": true
     },
     {
       "id": "action--30000000-0000-4000-8000-000000000004",
@@ -463,7 +463,6 @@
     },
     "secops_ng_notes": [
       "step 'action--30000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'if-condition--30000000-0000-4000-8000-000000000003' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
       "step 'action--30000000-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--30000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--30000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",

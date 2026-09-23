@@ -25,6 +25,24 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
   previous `"2.0"` failed it on all 49 documents. `content-model/playbook.schema.json`
   now requires the `cacao-2.` prefix. Consumers that compared the field to
   `"2.0"` must update; the compilers carry the value through unchanged.
+- **If-condition branches are `on_true` / `on_false`.** The 18 if-condition
+  steps across 14 canonical playbook documents named their branches
+  `on_success` / `on_failure`, which CACAO 2.0 defines on every step as the
+  step's own execution outcome; the official schema requires `on_true`. The
+  parser accepts both spellings on conditional steps for one more release,
+  maps them onto the same AST fields, and rejects a step carrying both — so
+  every emitter's output is unchanged. Compiled artifacts for the stable
+  playbooks are byte-identical apart from the CACAO mirrors and the note
+  text on two n8n IF nodes whose descriptions named the old keys.
+- **Every if-condition has a `condition`.** Eleven steps, all in experimental
+  or draft playbooks, had none. Eight already had a declared boolean
+  variable set by an earlier step and now reference it. Two had a declared
+  variable that no step set — the enrich step in `cloud_misconfiguration`
+  now sets `__known_false_positive__`, and `data_exfil`'s scope assessment
+  now sets `__regulator_required__`. One had no variable: `executive_metrics`'s
+  evaluation step now sets a new `__breach_band_hit__`. The n8n emitter's "no machine-readable
+  expression" placeholder no longer fires anywhere in the catalogue, and
+  those eleven steps leave the Maturity ladder's blank-predicate count.
 
 ### Added
 

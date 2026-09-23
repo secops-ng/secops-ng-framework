@@ -106,6 +106,16 @@ Conditional steps carry the routing fields the standard defines:
 |---|---|
 | `switch` (switch-condition) | The playbook variable whose value selects the case. |
 | `cases` (switch-condition) | Case value → **one** step identifier, the CACAO 2.0 shape. Earlier revisions wrote a one-element list; the compilers accept that form for one more release and then reject it. |
+| `condition` (if-condition) | **Required.** The name of a declared `boolean` playbook variable, e.g. `"__benign_or_seen__"`. An earlier step must set it — list it in that step's `out_args` and say so in its `description`. The n8n emitter compiles it to a working IF comparator; a step without one compiles to a placeholder the operator has to fill. |
+| `on_true` (if-condition) | **Required.** The step taken when the condition holds. |
+| `on_false` (if-condition) | The step taken when it does not. |
+
+Do not write the branches as `on_success` / `on_failure`. CACAO defines
+those on every step as the step's *own* execution outcome, not as a
+branch, so the official schema rejects an if-condition that uses them in
+place of `on_true`. The parser still accepts the old spelling on
+conditional steps for one release and compiles it identically, and
+rejects a step that carries both.
 
 Playbook variables always carry their `value` as a string (or `null`); the
 variable's `type` tells each compiler how to read it, and the n8n emitter

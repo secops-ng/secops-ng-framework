@@ -133,6 +133,10 @@ class WorkflowStep:
     name: str
     description: str | None = None
     on_completion: str | None = None
+    # On if-condition / while-condition steps these carry the CACAO 2.0
+    # ``on_true`` / ``on_false`` branches (the parser also accepts the legacy
+    # ``on_success`` / ``on_failure`` spelling there, for one release). On every
+    # other step they are CACAO's own success / failure transitions.
     on_success: str | None = None
     on_failure: str | None = None
     next_steps: tuple[str, ...] = ()

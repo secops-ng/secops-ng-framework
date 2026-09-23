@@ -23,7 +23,7 @@ parallel                   n8n-nodes-base.merge          (fan-out by
                               connecting all outgoing edges; merge node
                               fans-in downstream)
 if-condition               n8n-nodes-base.if             (true branch =
-                              on_success, false branch = on_failure)
+                              on_true, false branch = on_false)
 while-condition            n8n-nodes-base.if + back-edge (lossy)
 switch-condition           n8n-nodes-base.switch         (mode=rules)
 

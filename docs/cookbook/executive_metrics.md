@@ -177,9 +177,9 @@ new personal-data surface of its own.
     `kri.control_effectiveness@v1`.
 
 **any breach band hit?** (`…000005`, if-condition)
-:   Deterministic in-band branch. `on_success` (true — at least one
+:   Deterministic in-band branch. `on_true` (true — at least one
     evaluation matched its `breach` band) routes to the raise-board-
-    attention-flag step; `on_failure` (false) skips the annotation
+    attention-flag step; `on_false` (false) skips the annotation
     and goes straight to emit. Both branches converge on the emit
     step so the rollup is single-output regardless of branch. No
     body, no external surface, no side effect.
@@ -373,8 +373,8 @@ action bodies, an `if` node for the breach-band branch, and one
 verbatim. The five action steps emit `n8n-nodes-base.set` nodes
 carrying the CACAO I/O contract as editable assignment rows plus the
 `x_secops_ng` reference bundles (control, metric). The linear
-sequencing plus the single branch carry via `on_completion` /
-`on_success` / `on_failure` edges on the emitted `connections` block.
+sequencing plus the single branch carry via `on_completion` edges and
+the if-condition's `on_true` / `on_false` on the emitted `connections` block.
 The lossy translations are recorded in `meta.secops_ng_notes` so the
 integrator sees exactly which seams need attention.
 

@@ -210,8 +210,8 @@
       "type": "if-condition",
       "name": "significant?",
       "description": "Branch on __significant__. True paths into the regulator-timeline three-stage submission flow. False routes directly to the end step (the audit-only close-out for non-significant events is logged for the false-positive KPI by an out-of-scope downstream card).",
-      "on_success": "action--50000000-0000-4000-8000-000000000005",
-      "on_failure": "end--50000000-0000-4000-8000-00000000000b",
+      "on_true": "action--50000000-0000-4000-8000-000000000005",
+      "on_false": "end--50000000-0000-4000-8000-00000000000b",
       "condition": "__significant__"
     },
     "action--50000000-0000-4000-8000-000000000005": {
@@ -326,8 +326,8 @@
       "type": "if-condition",
       "name": "final-report material complete?",
       "description": "Branch on __final_report_ready__. True paths into the one-month final-report submission. False paths around it: the timeline is closed with a deferred-final-report marker so the timeline JSON is well-formed and consumable downstream; a late final-report submission is operator-driven re-entry and out of scope for this card.",
-      "on_success": "action--50000000-0000-4000-8000-000000000009",
-      "on_failure": "action--50000000-0000-4000-8000-00000000000a",
+      "on_true": "action--50000000-0000-4000-8000-000000000009",
+      "on_false": "action--50000000-0000-4000-8000-00000000000a",
       "condition": "__final_report_ready__"
     },
     "action--50000000-0000-4000-8000-000000000009": {

@@ -32,6 +32,12 @@
               "description": "Serialised list of per-metric evaluations produced by the evaluation step. Each entry carries the metric stable_id, the observed value, the matched threshold band, and the lower-layer artifacts (control, telemetry, playbook step) the metric is bound to."
             },
             {
+              "name": "__breach_band_hit__",
+              "type": "boolean",
+              "value": "",
+              "description": "True when at least one metric evaluation over the rollup window matched its `breach` threshold band. Set by the evaluation step; the board-attention branch reads it."
+            },
+            {
               "name": "__control_effectiveness_score__",
               "type": "string",
               "value": "",
@@ -123,6 +129,12 @@
               "type": "string"
             },
             {
+              "id": "out.breach_band_hit",
+              "name": "out.breach_band_hit",
+              "value": "",
+              "type": "string"
+            },
+            {
               "id": "x_secops_ng.control_refs",
               "name": "x_secops_ng.control_refs",
               "value": "control.control_effectiveness_test@v1",
@@ -138,7 +150,7 @@
         },
         "options": {}
       },
-      "notes": "For each catalog entry, compute the value defined by the metric's `measurement.formula` over `__rollup_window__` against the operator's telemetry / workflow / control attestation source. Each evaluation carries the matched threshold band (target / warn / breach) and references the lower-layer artifacts (playbook step, detection, control, telemetry) the metric is bound to via its `inputs[]`. Emits `__metric_evaluations__`.",
+      "notes": "For each catalog entry, compute the value defined by the metric's `measurement.formula` over `__rollup_window__` against the operator's telemetry / workflow / control attestation source. Each evaluation carries the matched threshold band (target / warn / breach) and references the lower-layer artifacts (playbook step, detection, control, telemetry) the metric is bound to via its `inputs[]`. Emits `__metric_evaluations__`, and sets `__breach_band_hit__` to true when any evaluation matched its `breach` band \u2014 the flag the board-attention branch reads.",
       "notesInFlow": true
     },
     {
@@ -203,7 +215,7 @@
           "conditions": [
             {
               "id": "secops_ng_condition",
-              "leftValue": "",
+              "leftValue": "{{$workflow.variables.breach_band_hit}}",
               "rightValue": "true",
               "operator": {
                 "type": "string",
@@ -215,7 +227,7 @@
         },
         "options": {}
       },
-      "notes": "Branch on whether any metric evaluation matched its `breach` threshold band. `on_success` (true): annotate the in-flight summary with a board-attention flag before emit. `on_failure` (false): emit the summary without the attention flag. Both branches converge on the same emit step so the rollup is single-output.",
+      "notes": "Branch on `__breach_band_hit__`, set by the evaluation step when any metric evaluation matched its `breach` threshold band. `on_true`: annotate the in-flight summary with a board-attention flag before emit. `on_false`: emit the summary without the attention flag. Both branches converge on the same emit step so the rollup is single-output.",
       "notesInFlow": true
     },
     {
@@ -435,7 +447,6 @@
       "step 'action--e0000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--e0000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--e0000000-0000-4000-8000-000000000004': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'if-condition--e0000000-0000-4000-8000-000000000005' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
       "step 'action--e0000000-0000-4000-8000-000000000006': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--e0000000-0000-4000-8000-000000000007': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
     ]

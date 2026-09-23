@@ -105,8 +105,8 @@ data plane.
 
 The playbook ships seven steps: one `start`, five `action`, one
 `if-condition`, and one `end`. The single `if-condition` fires on the
-confidence-threshold verdict; `on_success` (high confidence) routes
-into the blocklist-propagation action; `on_failure` (below threshold)
+confidence-threshold verdict; `on_true` (high confidence) routes
+into the blocklist-propagation action; `on_false` (below threshold)
 short-circuits past the propagation step and both branches converge on
 the detection-rule activation step so the low-confidence indicator
 still arms a Sigma rule for future correlation without being pushed to
@@ -192,9 +192,9 @@ outside the operator's own SIEM surface.
     Detection Finding it emits downstream on match.
 
 **above confidence threshold?** (`…000004`, `if-condition`)
-:   Deterministic branch on the confidence-score verdict. `on_success`
+:   Deterministic branch on the confidence-score verdict. `on_true`
     (above operator-scoped threshold) routes into the
-    blocklist-propagation action. `on_failure` (below threshold)
+    blocklist-propagation action. `on_false` (below threshold)
     routes past propagation directly to the detection-rule activation
     step — a low-confidence indicator does not push to enforcement
     but still arms a matching Sigma rule for future correlation.
@@ -367,9 +367,9 @@ step ids verbatim. The five action steps emit `n8n-nodes-base.set`
 nodes carrying the CACAO I/O contract as editable assignment rows
 plus the `x_secops_ng` reference bundles (control, detection,
 telemetry, metric). The `if-condition` node emits `n8n-nodes-base.if`
-with a placeholder condition the operator wires to
-`out.confidence_score` on the upstream Set row for the normalise
-step. The lossy translations are recorded in `meta.secops_ng_notes`
+whose condition reads `__high_confidence__`, set by the normalise step
+(surfaced as `out.high_confidence` on its Set row). The remaining
+lossy translations — one per unbound action — are recorded in `meta.secops_ng_notes`
 so the integrator sees exactly which seams need attention.
 
 Operators bind the Set rows to their connectors:

@@ -190,8 +190,8 @@
       "name": "backup integrity ok?",
       "description": "Branch on __integrity_ok__. True branches into the non-destructive restore-drill execution; false routes straight to evidence capture (failure attestation) and notify, recording the gap without executing the restore against potentially-corrupt data.",
       "condition": "__integrity_ok__",
-      "on_success": "action--50000000-0000-4000-8000-000000000005",
-      "on_failure": "action--50000000-0000-4000-8000-000000000006"
+      "on_true": "action--50000000-0000-4000-8000-000000000005",
+      "on_false": "action--50000000-0000-4000-8000-000000000006"
     },
     "action--50000000-0000-4000-8000-000000000005": {
       "type": "action",

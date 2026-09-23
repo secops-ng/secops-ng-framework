@@ -70,7 +70,7 @@ and maps each step type to an n8n node:
 | `action` (bash / sh / shell) | `n8n-nodes-base.executeCommand`    | `command` interpolated for `__var__` tokens. |
 | `action` (other / none)   | `n8n-nodes-base.noOp`                 | Placeholder; lossy note recorded. |
 | `playbook-action`         | `n8n-nodes-base.executeWorkflow`      | Sub-playbook target is operator-managed. |
-| `if-condition`            | `n8n-nodes-base.if`                   | `on_success` = true branch, `on_failure` = false branch. |
+| `if-condition`            | `n8n-nodes-base.if`                   | `on_true` = true branch, `on_false` = false branch (legacy `on_success` / `on_failure` accepted for one release). |
 | `while-condition`         | `n8n-nodes-base.if` + back-edge       | Lossy: n8n has no native while loop. |
 | `switch-condition`        | `n8n-nodes-base.switch`               | Cases sourced from `extra.cases` (best-effort). |
 | `parallel`                | `n8n-nodes-base.merge`                | n8n parallelism is implicit (multi-edge fan-out); merge node handles fan-in. |

@@ -146,8 +146,10 @@
     "if-condition--30000000-0000-4000-8000-000000000003": {
       "type": "if-condition",
       "name": "compromise confirmed?",
-      "on_success": "action--30000000-0000-4000-8000-000000000004",
-      "on_failure": "end--30000000-0000-4000-8000-000000000009"
+      "description": "Branch on __compromise_confirmed__, set by the triage step. on_true: the compromise is confirmed and the playbook resets the principal's MFA factors. on_false: the signal closes as a false positive.",
+      "condition": "__compromise_confirmed__",
+      "on_true": "action--30000000-0000-4000-8000-000000000004",
+      "on_false": "end--30000000-0000-4000-8000-000000000009"
     },
     "action--30000000-0000-4000-8000-000000000004": {
       "type": "action",

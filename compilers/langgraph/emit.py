@@ -28,7 +28,8 @@ Design notes
 * CACAO ``end`` steps are collapsed onto the special ``END`` sentinel.
   This means a CACAO transition that points at an end step shows up in
   the spec as an edge whose ``dst`` is ``GraphSpec.END``.
-* Conditional steps with ``on_success`` / ``on_failure`` map to a
+* Conditional steps with ``on_true`` / ``on_false`` (parsed onto the AST's
+  ``on_success`` / ``on_failure`` fields) map to a
   two-branch ``ConditionalEdge`` (keys ``"success"`` / ``"failure"``).
   ``switch-condition`` steps that route via ``next_steps`` are recorded
   by step ID; the consumer-side routing function inspects state at
@@ -378,7 +379,8 @@ def _condition_edge(step: WorkflowStep, end_ids: set[str]) -> ConditionalEdge:
         for idx, ref in enumerate(step.next_steps):
             branches.setdefault(f"case_{idx}", _resolve(ref))
     else:
-        # if-condition and while-condition both use on_success / on_failure.
+        # if-condition and while-condition: the parser lands on_true / on_false
+        # (or the legacy on_success / on_failure) on these two AST fields.
         if step.on_success is not None:
             branches["success"] = _resolve(step.on_success)
         if step.on_failure is not None:
