@@ -2332,6 +2332,11 @@ one playbook's provenance.
     primitive emits delta records, not an id; the three targets
     regenerated and byte-parity re-asserted; `experimental` → `stable`,
     `content_version` 1.0.0 on a recomputed checklist).
+  - CORE-PRIM — #1017 (`phishing_triage`: primitives for all nine action
+    steps, from none; the suppression gate's two lanes are asymmetric —
+    an already-seen case always collapses, a known-benign sender needs
+    DMARC `pass` and no flagged indicator — and every doubtful
+    classification routes to manual review).
 
 ### F-WF-CORE-WAVE-2 — CORE wave 2: bind the remaining worthy playbooks; record the parked five
 
