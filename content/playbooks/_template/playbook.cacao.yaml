@@ -127,6 +127,15 @@ playbook_variables:
       TODO. The artifact or value the workflow produces. Downstream
       steps and evidence emissions read it by this name.
 
+# The agent that performs the action steps (CACAO 2.0 § 7). The
+# official schema requires every action step to name one. Every
+# playbook in the catalogue declares this same group agent under this
+# same id — keep both as they are.
+agent_definitions:
+  group--9479ad47-df96-5a3c-831a-f668158e5b9e:
+    type: group
+    name: Security operations team
+
 # CACAO entry point. This value must resolve to a start step in the
 # workflow map below.
 workflow_start: step--TODO_UUID_START
@@ -147,9 +156,12 @@ workflow_start: step--TODO_UUID_START
 #     OCSF spelling: telemetry.ocsf.<class>@v<major>.
 #   x_secops_ng.core_body — optional deterministic primitive binding;
 #     see the commented block on the action step below.
-#
-# Do NOT use a CACAO `commands` array. No playbook in the catalogue
-# does, and the compilers do not read it.
+#   agent — always the group agent declared in agent_definitions.
+#   commands — only on a bound step: exactly one command of type
+#     `secops-ng-primitive` whose `command` is the core_body primitive's
+#     dotted path (a test pins the two equal). The compilers compile
+#     core_body, not the command; the command is what lets CACAO
+#     tooling see what the step runs. Unbound steps carry no command.
 workflow:
 
   step--TODO_UUID_START:
@@ -170,6 +182,11 @@ workflow:
       - __TODO_INPUT__
     out_args:
       - __TODO_OUTPUT__
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
+    # Add together with the core_body binding below, never on its own:
+    # commands:
+    #   - type: secops-ng-primitive
+    #     command: content.playbooks.<slug>.primitives.<module>.<function>
     x_secops_ng:
       control_refs: []
       telemetry_refs: []

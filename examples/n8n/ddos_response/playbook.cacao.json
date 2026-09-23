@@ -129,6 +129,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--60000000-0000-4000-8000-000000000001",
   "workflow": {
     "start--60000000-0000-4000-8000-000000000001": {
@@ -148,6 +154,13 @@
       ],
       "out_args": [
         "__trigger_envelope__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.ddos_response.primitives.detect.resolve_availability_trigger"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -179,6 +192,13 @@
       "out_args": [
         "__classification__",
         "__attack_vector__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.ddos_response.primitives.classify.classify_attack_vector"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -212,6 +232,13 @@
         "__engagement__",
         "__mitigation_action_id__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.ddos_response.primitives.mitigation.select_mitigation_engagement"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.incident_handling_capability@v1"
@@ -243,6 +270,13 @@
       "out_args": [
         "__restoration_verdict__",
         "__service_restored__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.ddos_response.primitives.restoration.evaluate_service_restoration"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -277,6 +311,13 @@
         "__evidence_record__",
         "__evidence_id__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.ddos_response.primitives.evidence.compose_incident_evidence_record"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.incident_handling_capability@v1"
@@ -310,6 +351,13 @@
       ],
       "out_args": [
         "__owner_notification__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.ddos_response.primitives.notify.compose_owner_notification"
+        }
       ],
       "x_secops_ng": {
         "telemetry_refs": [

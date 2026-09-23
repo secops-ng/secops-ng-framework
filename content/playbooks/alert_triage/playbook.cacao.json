@@ -124,6 +124,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--a1e47431-0000-4000-8000-000000000001",
   "workflow": {
     "start--a1e47431-0000-4000-8000-000000000001": {
@@ -139,6 +145,13 @@
       "in_args": [
         "__alert_id__",
         "__alert_source_shape__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.alert_triage.primitives.payloads.validate_alert_payload"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -164,6 +177,13 @@
       "on_completion": "if-condition--a1e47431-0000-4000-8000-000000000004",
       "out_args": [
         "__benign_or_seen__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.alert_triage.primitives.suppression.canonical_seen_key"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -202,6 +222,13 @@
       "name": "suppress and close",
       "description": "Link this alert onto the existing case (or onto the benign-rule record), close it without paging, and account the suppression against the false-positive-rate KPI and (when the suppression covers a re-fire of a previously closed case) the recurring-incident correlator.",
       "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.alert_triage.primitives.suppression.canonical_seen_key"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.incident_handling_capability@v1",
@@ -229,6 +256,13 @@
       "on_completion": "switch-condition--a1e47431-0000-4000-8000-000000000007",
       "out_args": [
         "__priority__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.alert_triage.primitives.prioritisation.prioritise"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -266,6 +300,13 @@
       "name": "response: p1 severe — page and escalate",
       "description": "Page the on-call responder, open the incident case, stamp the timeline-start signal, and hand off to the incident management playbook. Records against the MTTR-critical clock and the regulator-notification-overrun KRI window.",
       "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.alert_triage.primitives.response.escalation_route"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.incident_handling_capability@v1",
@@ -293,6 +334,13 @@
       "name": "response: p2 high — queue for primary analyst",
       "description": "Queue the case to the primary analyst queue with the enriched evidence packet, no page. Records against the MTTR clock and the handoff-brief delivery SLA.",
       "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.alert_triage.primitives.response.notify_on_call"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.incident_handling_capability@v1"
@@ -318,6 +366,13 @@
       "name": "response: p3 routine — queue for review",
       "description": "Append to the review queue for batched analyst attention; no SLA clock beyond the routine review-completion SLA.",
       "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.alert_triage.primitives.response.route_to_review_queue"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.incident_handling_capability@v1"
@@ -342,6 +397,13 @@
       "name": "response: p4 informational — log and close",
       "description": "Record the alert for telemetry-coverage accounting and close without further action. Feeds the false-positive-rate denominator and the detection-coverage view. A crown-jewel asset or regulated data upgrades the close to keep a retention pointer for the recurring-incident correlator — still no page and no queue entry.",
       "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.alert_triage.primitives.response.log_and_close"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.incident_handling_capability@v1",

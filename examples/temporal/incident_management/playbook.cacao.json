@@ -140,6 +140,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--50000000-0000-4000-8000-000000000001",
   "workflow": {
     "start--50000000-0000-4000-8000-000000000001": {
@@ -157,6 +163,13 @@
       ],
       "out_args": [
         "__incident_id__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.incident_management.primitives.intake.derive_incident_id"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -189,6 +202,13 @@
       "out_args": [
         "__significant__",
         "__cross_border__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.incident_management.primitives.classification.classify_significance"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -227,6 +247,13 @@
       "out_args": [
         "__timeline_handle__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.incident_management.primitives.timeline_binding.open_timeline"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.incident_timeline_signals@v1"
@@ -261,6 +288,13 @@
       ],
       "out_args": [
         "__early_warning_event_id__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.incident_management.primitives.regulator_submission.resolve_destination"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -298,6 +332,13 @@
       ],
       "out_args": [
         "__notification_event_id__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.incident_management.primitives.stage_clock.verdict_for_submission"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -345,6 +386,13 @@
       "out_args": [
         "__final_report_event_id__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.incident_management.primitives.regulator_submission.resolve_destination"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.incident_notification@v1",
@@ -379,6 +427,13 @@
       ],
       "out_args": [
         "__timeline_artefact_path__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.incident_management.primitives.timeline_binding.close_timeline"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [

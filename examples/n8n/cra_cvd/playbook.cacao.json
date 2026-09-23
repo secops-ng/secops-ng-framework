@@ -211,6 +211,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--c7d51014-0000-4000-8000-000000000001",
   "workflow": {
     "start--c7d51014-0000-4000-8000-000000000001": {
@@ -229,6 +235,13 @@
         "__reporter_contact__"
       ],
       "agent_target": "cvd_intake",
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.cra_cvd.primitives.intake.open_cvd_case"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.vuln_disclosure_intake@v1"
@@ -267,6 +280,13 @@
         "__reporter_ack_ts__"
       ],
       "agent_target": "cvd_intake",
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.cra_cvd.primitives.reporter.send_acknowledgement"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.vuln_disclosure_intake@v1"
@@ -306,6 +326,13 @@
         "__actively_exploited__"
       ],
       "agent_target": "vuln_triage",
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.cra_cvd.primitives.triage.triage_case"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.vuln_disclosure_intake@v1"
@@ -339,6 +366,13 @@
         "__fix_ref__"
       ],
       "agent_target": "engineering",
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.cra_cvd.primitives.fix.record_fix_candidate"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.vuln_disclosure_intake@v1"
@@ -370,6 +404,13 @@
         "__fix_ref__"
       ],
       "agent_target": "engineering",
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.cra_cvd.primitives.validation.confirm_fix_validation"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.vuln_disclosure_intake@v1"
@@ -410,6 +451,13 @@
         "__reporter_credit_display__"
       ],
       "agent_target": "cvd_intake",
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.cra_cvd.primitives.coordination.record_disclosure_coordination"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.vuln_disclosure_intake@v1"
@@ -457,6 +505,13 @@
         "__advisory_id__"
       ],
       "agent_target": "cvd_intake",
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.cra_cvd.primitives.disclosure.build_advisory_artifact"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.vuln_disclosure_intake@v1"

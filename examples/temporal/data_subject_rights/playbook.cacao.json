@@ -1,4 +1,10 @@
 {
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "name": "Security operations team",
+      "type": "group"
+    }
+  },
   "created": "2026-07-03T00:00:00Z",
   "created_by": "identity--5a509a09-5a50-45a5-85a5-095a509a509a",
   "description": "CACAO v2 playbook for the operator-side data subject rights (DSR) intake and fulfilment lifecycle a controller runs when a data subject exercises one of the GDPR Chapter III rights against personal data the controller holds. Covers Article 15 (access), Article 16 (rectification), Article 17 (erasure), Article 18 (restriction), Article 20 (portability) and Article 21 (objection); Article 22 (automated individual decision-making) is an in-scope classifier axis routed to the controller's human-in-the-loop review surface, not a parallel workflow. The lifecycle chains seven bound action steps around one verification gate: receive_request \u2192 verify_identity \u2192 classify_request \u2192 [identity verified?] \u2192 route_to_data_owners \u2192 compile_fulfilment_evidence \u2192 send_controller_response \u2192 record_outcome, with the unverified branch short-circuiting from the gate to the Article 12(6) additional-information response and an unverified_subject outcome. Every action step binds a deterministic primitive under primitives/ (bound since the CORE-WIRE card; stable at content_version 1.0.0); the intake surface, the verification surface, the data-inventory join, owner transport, secure delivery and the evidence store are adapter-bound operator surfaces the operator wires. The Article 12(3) one-month clock is anchored on the supplied receipt instant and an extension is representable only with its justification. CACAO v2 + SecOps-NG content-model extensions.",
@@ -194,7 +200,14 @@
   "valid_from": "2026-07-03T00:00:00Z",
   "workflow": {
     "action--d5b17a15-0000-4000-8000-000000000002": {
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "agent_target": "dsr_intake",
+      "commands": [
+        {
+          "command": "content.playbooks.data_subject_rights.primitives.intake.open_dsr_case",
+          "type": "secops-ng-primitive"
+        }
+      ],
       "description": "Receive a data subject rights request through the controller's DSR intake surface \u2014 privacy-policy address, subject-facing in- app portal, or paper channel accepted per the controller's DSR policy: intake.open_dsr_case validates the adapter's raw request against the closed intake-channel enum, canonicalises the subject contact and the stated request as opaque personal data (never inspected beyond NFKC), anchors the Article 12(3) clock on the supplied __request_received_ts__ (a Zulu instant the intake surface stamped \u2014 never a clock read inside the primitive), notes any Article 22 concern raised on the request body as a real boolean, and derives __case_id__ from the request content so the same request re-received resolves to the same case. Bound since the CORE-WIRE card: the binding assigns the case envelope to __dsr_case__ and the compile target's adapter extracts the documented out_args (__case_id__, __request_received_ts__; __subject_contact__ mirrors the envelope field) \u2014 the marshalling seam every bound playbook documents.",
       "in_args": [
         "__raw_request__",
@@ -227,7 +240,14 @@
       }
     },
     "action--d5b17a15-0000-4000-8000-000000000003": {
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "agent_target": "dsr_intake",
+      "commands": [
+        {
+          "command": "content.playbooks.data_subject_rights.primitives.verification.record_identity_verification",
+          "type": "secops-ng-primitive"
+        }
+      ],
       "description": "Verify the requesting party is the data subject the request concerns on the controller's declared subject-verification surface: verification.record_identity_verification records the surface's verdict under the closed method vocabulary \u2014 the sovereign IdP SSO assertion where the subject holds an authenticated account, otherwise the out-of-band paths (recognised identity document check, subject-supplied shared secret, call-back to a channel of record) \u2014 together with the role-shaped evidence pointer. The record stores no subject- supplied attribute (sovereign-stack constraint: identity is resolved against the controller's own records at runtime; what the subject supplied stays on the verification surface). A false verdict is data: the gate after classification routes the case into the Article 12(6) additional-information response rather than fulfilling against an unverified subject. The binding assigns the record to __verification_record__; the adapter extracts __identity_verified__.",
       "in_args": [
         "__case_id__",
@@ -263,7 +283,14 @@
       }
     },
     "action--d5b17a15-0000-4000-8000-000000000004": {
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "agent_target": "dsr_intake",
+      "commands": [
+        {
+          "command": "content.playbooks.data_subject_rights.primitives.classification.classify_request",
+          "type": "secops-ng-primitive"
+        }
+      ],
       "description": "Resolve the request onto the closed Chapter III taxonomy and compute the Article 12(3) response deadline: classification.classify_request pins the article for the classified type \u2014 access (Article 15), rectification (Article 16), erasure (Article 17), restriction (Article 18), portability (Article 20), objection (Article 21), automated-decision-review (Article 22 concern, which sets the human-review handoff flag; this lifecycle never reviews the underlying automated decision) \u2014 and derives __response_deadline__ as __request_received_ts__ plus one calendar month, end-of-month clamped, plus the further months of a recorded Article 12(3) extension; an extension is representable only with its justification and one or two further months. Classification runs before the verification gate because the clock runs from receipt regardless of the verdict, so both branches carry a deadline. Resolving the subject's free text plus operator hints to the type is the adapter's (__classified_request_type__); the binding assigns the envelope to __classification__ and the adapter extracts __request_type__ and __response_deadline__.",
       "in_args": [
         "__case_id__",
@@ -298,7 +325,14 @@
       }
     },
     "action--d5b17a15-0000-4000-8000-000000000005": {
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "agent_target": "dsr_intake",
+      "commands": [
+        {
+          "command": "content.playbooks.data_subject_rights.primitives.routing.resolve_data_owner_manifest",
+          "type": "secops-ng-primitive"
+        }
+      ],
       "description": "Resolve the per-request owner manifest: routing.resolve_data_owner_manifest takes the owner rows the adapter resolved against the controller's declared data- inventory surface (which stores hold personal data on the subject is a runtime join against the controller's own records) and emits one acknowledgement envelope per (owner, store) with the request-type-appropriate evidence ask \u2014 access: assembled subject copy; rectification: applied correction; erasure: deletion or Article 17(3) retention-exemption record; restriction: applied restriction marker; portability: structured data package; objection: cessation or overriding-legitimate- interest note; automated-decision-review: the human-review referral record \u2014 with deterministic acknowledgement ids; duplicate rows collapse and an empty owner set fails loud. Owner-envelope transport and the owner-side response-timeout policy are the adapter's. The binding assigns the manifest to __owner_manifest__; the adapter extracts __data_owner_manifest__ (the manifest id).",
       "in_args": [
         "__case_id__",
@@ -331,7 +365,14 @@
       }
     },
     "action--d5b17a15-0000-4000-8000-000000000006": {
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "agent_target": "dsr_intake",
+      "commands": [
+        {
+          "command": "content.playbooks.data_subject_rights.primitives.fulfilment.compile_fulfilment_pack",
+          "type": "secops-ng-primitive"
+        }
+      ],
       "description": "Assemble the fulfilment pack from the owner acknowledgements returned against the manifest: fulfilment.compile_fulfilment_pack closes the pack only when every expected owner has returned (a missing return fails loud \u2014 an incomplete pack that looks complete is exactly the Article 5(2) accountability gap), refuses returns the manifest never routed and duplicate returns for one acknowledgement, and carries lawful qualifications \u2014 an Article 17(3) retention exemption on an erasure, an overriding-legitimate-interest determination on an objection \u2014 as data on the pack. The per- request-type pack shapes (subject-copy assembly with the Article 15(1) meta-information, applied-correction attestation, deletion attestation, restriction markers, the Article 20(1) machine- readable package, cessation record) are the evidence the owners return by reference. The binding assigns the pack to __fulfilment_pack__; the adapter extracts the content-derived __fulfilment_pack_ref__.",
       "in_args": [
         "__owner_manifest__",
@@ -362,7 +403,14 @@
       }
     },
     "action--d5b17a15-0000-4000-8000-000000000007": {
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "agent_target": "dsr_intake",
+      "commands": [
+        {
+          "command": "content.playbooks.data_subject_rights.primitives.response.compose_controller_response",
+          "type": "secops-ng-primitive"
+        }
+      ],
       "description": "Compose the controller's response to the data subject on or before __response_deadline__ under the Article 12 modalities (concise, transparent, intelligible, easily accessible, clear and plain language): response.compose_controller_response carries exactly one disposition \u2014 the fulfilment pack (__fulfilment_pack_ref__), a refusal under Article 12(5) or a Chapter III sub-exemption (__refusal_decision__, always carrying the reasons and the subject's onward remedies under Article 77 and Article 79 \u2014 a remedy-free refusal is not representable), or the Article 12(6) additional-information request on the unverified branch (__identity_followup__) \u2014 plus the extension notice with its reasons where the controller invoked Article 12(3). Lateness is computed from the adapter-stamped __dispatch_ts__ against the deadline and recorded, never absorbed: a late response still goes out. Secure delivery on the subject-facing channel is the compile target's adapter; the binding assigns the envelope to __controller_response__.",
       "in_args": [
         "__case_id__",
@@ -406,7 +454,14 @@
       }
     },
     "action--d5b17a15-0000-4000-8000-000000000008": {
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "agent_target": "dsr_intake",
+      "commands": [
+        {
+          "command": "content.playbooks.data_subject_rights.primitives.outcome.record_case_outcome",
+          "type": "secops-ng-primitive"
+        }
+      ],
       "description": "Record the terminal outcome on the controller's evidence store keyed to __case_id__: outcome.record_case_outcome takes the handler's terminal code from the closed vocabulary (__outcome_decision__ \u2014 fulfilled, partially_fulfilled, refused_manifestly_unfounded, refused_excessive, refused_exemption_applies, extended_two_months, unverified_subject) and closes the correlation record with the response dispatch instant, the signed on-time-vs-deadline delta in seconds \u2014 derived from the same comparison the response step used, so the two surfaces cannot disagree \u2014 and the pack reference where one exists. Feeds the operator's Article 5(2) accountability posture and any downstream regulator query (Article 58(1)(a) information order); persistence and the retention window are the evidence-store adapter's. The binding assigns the record to __outcome_record__; the adapter extracts __outcome_code__.",
       "in_args": [
         "__case_id__",

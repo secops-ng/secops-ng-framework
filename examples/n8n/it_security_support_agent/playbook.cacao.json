@@ -120,6 +120,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--20122012-0000-4000-8000-000000000001",
   "workflow": {
     "start--20122012-0000-4000-8000-000000000001": {
@@ -138,6 +144,13 @@
       ],
       "out_args": [
         "__support_request_record_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.it_security_support_agent.primitives.ingest.ingest_support_request"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -167,6 +180,13 @@
       ],
       "out_args": [
         "__classification_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.it_security_support_agent.primitives.classify.classify_request"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -198,6 +218,13 @@
       "out_args": [
         "__automated_resolution_ref__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.it_security_support_agent.primitives.resolution.attempt_automated_resolution"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.incident_handling_capability@v1"
@@ -228,6 +255,13 @@
       ],
       "out_args": [
         "__human_handoff_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.it_security_support_agent.primitives.handoff.escalate_with_human_handoff"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -269,6 +303,13 @@
       ],
       "out_args": [
         "__interaction_artifact_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.it_security_support_agent.primitives.artifact.build_interaction_artifact"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [

@@ -114,6 +114,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--5c5c5c5c-0000-4000-8000-000000000001",
   "workflow": {
     "start--5c5c5c5c-0000-4000-8000-000000000001": {
@@ -137,6 +143,13 @@
       ],
       "out_args": [
         "__assessment_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.supply_chain_security.primitives.assess.assess_supplier_signal"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -177,6 +190,13 @@
       ],
       "out_args": [
         "__supply_chain_artifact_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.supply_chain_security.primitives.artifact.build_supply_chain_evidence_artifact"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [

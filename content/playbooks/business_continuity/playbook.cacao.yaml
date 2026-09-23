@@ -308,6 +308,10 @@ playbook_variables:
       corrective_actions, plan_revisions, linked_refs. Persisted by
       the evidence-store adapter; the adapter extracts __pir_ref__.
     external: false
+agent_definitions:
+  group--9479ad47-df96-5a3c-831a-f668158e5b9e:
+    type: group
+    name: Security operations team
 workflow_start: start--b17c0072-0000-4000-8000-000000000001
 workflow:
   start--b17c0072-0000-4000-8000-000000000001:
@@ -346,6 +350,10 @@ workflow:
       - __event_id__
       - __event_declared_ts__
     agent_target: bcm_coordinator
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
+    commands:
+      - type: secops-ng-primitive
+        command: content.playbooks.business_continuity.primitives.declaration.declare_bcm_event
     x_secops_ng:
       control_refs:
         - control.contingency_plan@v1
@@ -390,6 +398,10 @@ workflow:
       - __bcm_plan_ref__
       - __significant_incident__
     agent_target: bcm_coordinator
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
+    commands:
+      - type: secops-ng-primitive
+        command: content.playbooks.business_continuity.primitives.activation.activate_bcm_plan
     x_secops_ng:
       control_refs:
         - control.contingency_plan@v1
@@ -429,6 +441,10 @@ workflow:
       - __isolation_result__
       - __isolation_scope__
     agent_target: bcm_coordinator
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
+    commands:
+      - type: secops-ng-primitive
+        command: content.playbooks.business_continuity.primitives.isolation.resolve_isolation_scope
     x_secops_ng:
       control_refs:
         - control.contingency_plan@v1
@@ -469,6 +485,10 @@ workflow:
       - __failover_order__
       - __failover_target__
     agent_target: bcm_coordinator
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
+    commands:
+      - type: secops-ng-primitive
+        command: content.playbooks.business_continuity.primitives.failover.select_failover_target
     x_secops_ng:
       control_refs:
         - control.system_recovery_reconstitution@v1
@@ -517,6 +537,10 @@ workflow:
       - __authority_record__
       - __notification_ref__
     agent_target: bcm_coordinator
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
+    commands:
+      - type: secops-ng-primitive
+        command: content.playbooks.business_continuity.primitives.notification.compose_authority_notification
     x_secops_ng:
       control_refs:
         - control.incident_timeline_signals@v1
@@ -560,6 +584,10 @@ workflow:
       - __recovery_record__
       - __recovery_result__
     agent_target: bcm_coordinator
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
+    commands:
+      - type: secops-ng-primitive
+        command: content.playbooks.business_continuity.primitives.recovery.evaluate_recovery
     x_secops_ng:
       control_refs:
         - control.system_recovery_reconstitution@v1
@@ -606,6 +634,10 @@ workflow:
       - __pir_record__
       - __pir_ref__
     agent_target: bcm_coordinator
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
+    commands:
+      - type: secops-ng-primitive
+        command: content.playbooks.business_continuity.primitives.review.compose_pir_record
     x_secops_ng:
       control_refs:
         - control.contingency_plan@v1

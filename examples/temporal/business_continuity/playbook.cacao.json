@@ -1,4 +1,10 @@
 {
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "name": "Security operations team",
+      "type": "group"
+    }
+  },
   "created": "2026-07-07T00:00:00Z",
   "created_by": "identity--5a509a09-5a50-45a5-85a5-095a509a509a",
   "description": "CACAO v2 playbook for the operator-side business continuity lifecycle a NIS2 essential or important entity runs when a business- continuity event (major outage, ransomware containment escalation, dependency failure, or facility loss) is declared against an in- scope service. Covers the three discipline surfaces NIS2 Art. 21(2)(c) names \u2014 backup management, disaster recovery, and crisis management \u2014 as a single continuity envelope. The lifecycle chains seven bound action steps: detect-and-declare-bcm-event \u2192 activate- bcm-plan \u2192 isolate-affected-systems \u2192 switch-to-backup \u2192 notify- competent-authority (the NIS2 Art. 23 path where the event crosses the significant-incident threshold; a locally-logged no-notification determination otherwise) \u2192 restore-and-verify \u2192 post-incident- review. Every action step binds a deterministic primitive under primitives/ (bound since the CORE-WIRE card; stable at content_version 1.0.0): the declaration anchors the Art. 23 clock on the supplied instant, a continuity event with no plan on file is reported as such rather than blocking (skips and non-engagement are data), recovery is verified against observed RTO / RPO rather than asserted, and each lifecycle milestone's OCSF record (API Activity 6003; Incident Finding 2005 at notification and review) is composed by the milestone composers at the telemetry seam, keyed to the event id. The plan register, the isolation and failover surfaces, the competent-authority delivery path and the evidence store are adapter-bound operator surfaces. The periodic non-destructive restore-drill discipline lives on the sibling backup_recovery playbook (both pin nis2:art-21-2-c \u2014 plan-lifecycle vs exercise- lifecycle). CACAO v2 + SecOps-NG content-model extensions.",
@@ -176,7 +182,14 @@
   "valid_from": "2026-07-07T00:00:00Z",
   "workflow": {
     "action--b17c0072-0000-4000-8000-000000000002": {
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "agent_target": "bcm_coordinator",
+      "commands": [
+        {
+          "command": "content.playbooks.business_continuity.primitives.declaration.declare_bcm_event",
+          "type": "secops-ng-primitive"
+        }
+      ],
       "description": "Receive a business-continuity trigger on the operator's declared event-declaration surface \u2014 a major-outage escalation from the incident-management lane, a ransomware-containment escalation from the containment lane, an upstream-dependency failure signal, or a facility-loss declaration: declaration.declare_bcm_event validates the adapter's __raw_trigger__ against the closed trigger-class vocabulary, canonicalises the affected service and the escalating lane's source reference as role-shaped pointers, anchors the NIS2 Art. 23 clock on the supplied declared_ts (a Zulu instant the declaring surface stamped \u2014 never a clock read inside the primitive) and derives __event_id__ from the trigger content so the same escalation re-received resolves to the same event. Bound since the CORE-WIRE card: the binding assigns the event envelope to __bcm_event__ and the compile target's adapter extracts __event_id__ and __event_declared_ts__ \u2014 the marshalling seam every bound playbook documents. The step's API Activity milestone record is composed at the telemetry seam by primitives.milestones.compose_milestone_record, keyed to the event id.",
       "in_args": [
         "__raw_trigger__"
@@ -206,7 +219,14 @@
       }
     },
     "action--b17c0072-0000-4000-8000-000000000003": {
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "agent_target": "bcm_coordinator",
+      "commands": [
+        {
+          "command": "content.playbooks.business_continuity.primitives.activation.activate_bcm_plan",
+          "type": "secops-ng-primitive"
+        }
+      ],
       "description": "Activate the documented BCM plan for the affected service, or record its absence: activation.activate_bcm_plan resolves the service against the operator's __plan_register__ (a duplicated row fails loud; an empty register is legitimate \u2014 an operator with no plans on file still declares events), reads the documented isolation targets, failover targets and recovery objectives (RTO / RPO) into the activation envelope, and evaluates the event's trigger class against the declared __significance_policy__ to set __significant_incident__. A continuity event with no plan on file is reported as such (plan_on_file false, plan_ref null) rather than blocking \u2014 the downstream isolate, switch and restore bindings read that state and record skips and non-engagement as data. The plan register and the significance policy are operator-owned adapter surfaces. The binding assigns the envelope to __activation__; the adapter extracts __bcm_plan_ref__ and __significant_incident__. The step's API Activity milestone record is composed at the telemetry seam by primitives.milestones.compose_milestone_record, keyed to the event id.",
       "in_args": [
         "__bcm_event__",
@@ -240,7 +260,14 @@
       }
     },
     "action--b17c0072-0000-4000-8000-000000000004": {
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "agent_target": "bcm_coordinator",
+      "commands": [
+        {
+          "command": "content.playbooks.business_continuity.primitives.isolation.resolve_isolation_scope",
+          "type": "secops-ng-primitive"
+        }
+      ],
       "description": "Resolve the isolation scope where the activated plan documents one: isolation.resolve_isolation_scope reads the activation envelope's isolation targets and emits the content-derived scope over them; where the plan documents no isolation step for the event class (a pure availability outage with no compromise indicator, for example) \u2014 or no plan is on file \u2014 the scope is skipped as data (skipped true, empty scope id), which is the empty __isolation_scope__ contract, never a failure. Executing the containment against the operator's isolation surface (network-segmentation controller, IAM revocation surface, upstream-dependency circuit-breaker) is the compile target's adapter. The binding assigns the result to __isolation_result__; the adapter extracts __isolation_scope__. The step's API Activity milestone record is composed at the telemetry seam by primitives.milestones.compose_milestone_record, keyed to the event id.",
       "in_args": [
         "__activation__"
@@ -269,7 +296,14 @@
       }
     },
     "action--b17c0072-0000-4000-8000-000000000005": {
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "agent_target": "bcm_coordinator",
+      "commands": [
+        {
+          "command": "content.playbooks.business_continuity.primitives.failover.select_failover_target",
+          "type": "secops-ng-primitive"
+        }
+      ],
       "description": "Select the failover engagement for the disaster-recovery leg of the Art. 21(2)(c) triplet: failover.select_failover_target reads the activation envelope and selects the first documented failover target in the plan's preference order, composing the cutover order the failover surface executes; with no plan on file or no documented target the order records failover_engaged false with the not_engaged_reason (no_plan_on_file / no_documented_target) as data rather than blocking. Backup integrity the failover relies on is exercised on the sibling backup_recovery playbook's periodic restore-drill lane. Executing the cutover (backup-site routing, data-replica promotion, standby-capacity activation) is the compile target's adapter. The binding assigns the order to __failover_order__; the adapter extracts __failover_target__ (null when not engaged). The step's API Activity milestone record is composed at the telemetry seam by primitives.milestones.compose_milestone_record, keyed to the event id.",
       "in_args": [
         "__activation__",
@@ -299,7 +333,14 @@
       }
     },
     "action--b17c0072-0000-4000-8000-000000000006": {
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "agent_target": "bcm_coordinator",
+      "commands": [
+        {
+          "command": "content.playbooks.business_continuity.primitives.notification.compose_authority_notification",
+          "type": "secops-ng-primitive"
+        }
+      ],
       "description": "Compose the NIS2 Art. 23 record for the event: notification.compose_authority_notification takes __significant_incident__ and, when true, the __notification_phase__ (early_warning \u2014 24h; incident_notification \u2014 72h; final_report \u2014 one calendar month, end-of-month clamped) and the __notification_assessment__ (preliminary assessment, impact scope, cross-border-effect indicator) and composes the notification envelope with its phase deadline derived from __event_declared_ts__; when false, it composes the locally-logged no-notification determination from the required __no_notification_rationale__ (retained for accountability) \u2014 the two dispositions are exclusive and the primitive refuses the inputs of the other branch. Delivering the envelope to the competent authority (national cybersecurity authority per the entity's establishment Member State \u2014 portal, S/MIME, sector-specific API) is the compile target's adapter. The binding assigns the record to __authority_record__; the adapter extracts __notification_ref__ (empty on the determination branch). The step's Incident Finding milestone record is composed at the telemetry seam by primitives.milestones.compose_incident_finding_record, keyed to the event id.",
       "in_args": [
         "__event_id__",
@@ -338,7 +379,14 @@
       }
     },
     "action--b17c0072-0000-4000-8000-000000000007": {
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "agent_target": "bcm_coordinator",
+      "commands": [
+        {
+          "command": "content.playbooks.business_continuity.primitives.recovery.evaluate_recovery",
+          "type": "secops-ng-primitive"
+        }
+      ],
       "description": "Verify the recovery against the documented objectives, never assert it: recovery.evaluate_recovery reads the activation envelope's recovery objectives (null when no plan is on file \u2014 objectives_documented false and the RTO / RPO verdicts recorded as undetermined rather than met) and the adapter's __recovery_observations__ (cutback completed, primary health signal, observed RTO and RPO seconds) and records the signed observed-versus-documented deltas and the recovered verdict. Cutback from __failover_target__, dependency revalidation and the health-signal probe are the compile target's adapter. The binding assigns the record to __recovery_record__; the adapter extracts __recovery_result__. The step's API Activity milestone record is composed at the telemetry seam by primitives.milestones.compose_milestone_record, keyed to the event id.",
       "in_args": [
         "__activation__",
@@ -370,7 +418,14 @@
       }
     },
     "action--b17c0072-0000-4000-8000-000000000008": {
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "agent_target": "bcm_coordinator",
+      "commands": [
+        {
+          "command": "content.playbooks.business_continuity.primitives.review.compose_pir_record",
+          "type": "secops-ng-primitive"
+        }
+      ],
       "description": "Compose the post-incident-review record: review.compose_pir_record takes the lessons learned (__pir_lessons__ \u2014 mandatory; a review without a lesson is not a review), the corrective actions with their owners (__pir_corrective_actions__), any BCM-plan revisions the event surfaced (__pir_plan_revisions__) and the linked references the adapter assembles from the notification or determination, recovery and failover envelopes (__pir_linked_refs__ \u2014 empty values dropped, so the no-notification branch joins cleanly), stamps ran_without_plan when the activation found no plan on file, and derives the content-keyed __pir_ref__. Persistence on the operator's evidence store and the retention discipline are the adapter's; the record feeds the accountability posture and any downstream regulator query (Art. 23 final-report supplement, Art. 32 supervisory-authority information request). The binding assigns the record to __pir_record__; the adapter extracts __pir_ref__. The step's Incident Finding milestone record (close) is composed at the telemetry seam by primitives.milestones.compose_incident_finding_record.",
       "in_args": [
         "__event_id__",

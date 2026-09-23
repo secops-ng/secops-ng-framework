@@ -105,6 +105,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--20212021-0000-4000-8000-000000000001",
   "workflow": {
     "start--20212021-0000-4000-8000-000000000001": {
@@ -123,6 +129,13 @@
       ],
       "out_args": [
         "__lifecycle_event_record_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.onboarding_offboarding_tracker.primitives.ingest.ingest_lifecycle_event"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -152,6 +165,13 @@
       "out_args": [
         "__resolved_identity_ref__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.onboarding_offboarding_tracker.primitives.identity.resolve_identity"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.jml_evidence@v1",
@@ -180,6 +200,13 @@
       ],
       "out_args": [
         "__capability_delta_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.onboarding_offboarding_tracker.primitives.delta.apply_capability_delta"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -211,6 +238,13 @@
       ],
       "out_args": [
         "__confirmation_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.onboarding_offboarding_tracker.primitives.confirmation.confirm_grant_revoke"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -255,6 +289,13 @@
       ],
       "out_args": [
         "__access_artifact_ref__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.onboarding_offboarding_tracker.primitives.artifact.build_access_artifact"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [

@@ -94,6 +94,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--40000000-0000-4000-8000-000000000001",
   "workflow": {
     "start--40000000-0000-4000-8000-000000000001": {
@@ -113,6 +119,7 @@
         "__timeline_artifact__",
         "__evidence_gaps_present__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "detection_refs": [
           "detection.sigma.eventlog_cleared@v1",
@@ -147,6 +154,7 @@
       "out_args": [
         "__review_artifact__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "control_refs": [
           "control.blameless_review@v1"
@@ -171,6 +179,7 @@
       "out_args": [
         "__corrective_action_register__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
         "control_refs": [
           "control.corrective_action_register@v1"

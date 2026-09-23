@@ -132,6 +132,10 @@ playbook_variables:
       policy snapshot, the violation set, and the remediation
       action for the reconciliation window.
     external: false
+agent_definitions:
+  group--9479ad47-df96-5a3c-831a-f668158e5b9e:
+    type: group
+    name: Security operations team
 workflow_start: start--7e750001-0000-4000-8000-000000000001
 workflow:
   start--7e750001-0000-4000-8000-000000000001:
@@ -169,6 +173,7 @@ workflow:
     out_args:
       - __segment_inventory_id__
     agent_target: netsec_posture_worker
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
     x_secops_ng:
       control_refs:
         - control.network_boundary_protection@v1
@@ -201,6 +206,7 @@ workflow:
     out_args:
       - __policy_snapshot_id__
     agent_target: netsec_posture_worker
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
     x_secops_ng:
       control_refs:
         - control.network_boundary_protection@v1
@@ -245,6 +251,7 @@ workflow:
     out_args:
       - __violation_set_id__
     agent_target: netsec_posture_worker
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
     x_secops_ng:
       control_refs:
         - control.network_boundary_protection@v1
@@ -286,6 +293,7 @@ workflow:
     out_args:
       - __remediation_action_id__
     agent_target: netsec_posture_worker
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
     x_secops_ng:
       control_refs:
         - control.network_boundary_protection@v1
@@ -326,6 +334,7 @@ workflow:
     out_args:
       - __posture_evidence_id__
     agent_target: netsec_posture_worker
+    agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
     x_secops_ng:
       control_refs:
         - control.network_boundary_protection@v1

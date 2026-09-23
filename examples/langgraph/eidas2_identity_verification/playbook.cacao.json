@@ -150,6 +150,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--e1d5a520-0000-4000-8000-000000000001",
   "workflow": {
     "start--e1d5a520-0000-4000-8000-000000000001": {
@@ -171,6 +177,13 @@
       "out_args": [
         "__presentation_request__",
         "__presentation_request_id__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.eidas2_identity_verification.primitives.presentation.compose_presentation_request"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -206,6 +219,13 @@
         "__pid_credential_id__",
         "__verification_verdict__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.eidas2_identity_verification.primitives.verification.record_pid_verification"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.jml_evidence@v1"
@@ -239,6 +259,13 @@
         "__assurance_assessment__",
         "__loa_verdict__",
         "__access_tier__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.eidas2_identity_verification.primitives.assurance.assess_assurance_level"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -278,6 +305,13 @@
         "__identity_evidence_record__",
         "__evidence_id__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.eidas2_identity_verification.primitives.evidence.compose_identity_evidence_record"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.jml_evidence@v1"
@@ -315,6 +349,13 @@
       ],
       "out_args": [
         "__provisioning_handoff__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.eidas2_identity_verification.primitives.provisioning.compose_provisioning_handoff"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [

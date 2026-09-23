@@ -136,6 +136,12 @@
       "external": true
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--a2000000-0000-4000-8000-000000000001",
   "workflow": {
     "start--a2000000-0000-4000-8000-000000000001": {
@@ -154,6 +160,13 @@
       ],
       "out_args": [
         "__review_id__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.nis2_art20_governance.primitives.cycle.resolve_governance_cycle"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -187,6 +200,13 @@
       ],
       "out_args": [
         "__posture_snapshot_id__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.nis2_art20_governance.primitives.review.conduct_art20_review"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -224,6 +244,13 @@
       ],
       "out_args": [
         "__approval_record_id__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.nis2_art20_governance.primitives.approval.record_management_approval"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -267,6 +294,13 @@
       ],
       "out_args": [
         "__evidence_id__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.nis2_art20_governance.primitives.evidence.emit_governance_evidence"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [

@@ -122,6 +122,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--52000000-0000-4000-8000-000000000001",
   "workflow": {
     "start--52000000-0000-4000-8000-000000000001": {
@@ -141,6 +147,13 @@
       ],
       "out_args": [
         "__mfa_coverage_id__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.mfa_secured_comms.primitives.probe.probe_mfa_coverage"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -172,6 +185,13 @@
       "out_args": [
         "__continuous_auth_id__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.mfa_secured_comms.primitives.assess.assess_continuous_auth"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.mfa_state_probe@v1"
@@ -201,6 +221,13 @@
       ],
       "out_args": [
         "__oob_channel_status__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.mfa_secured_comms.primitives.verify.verify_oob_channel"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -241,6 +268,13 @@
       "out_args": [
         "__attestation_id__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.mfa_secured_comms.primitives.artifact.build_mfa_posture_attestation_artifact"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.mfa_state_probe@v1",
@@ -277,6 +311,13 @@
       "in_args": [
         "__attestation_id__",
         "__auth_scope__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.mfa_secured_comms.primitives.notify.compose_owner_notification"
+        }
       ],
       "x_secops_ng": {
         "telemetry_refs": [

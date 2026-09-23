@@ -76,6 +76,12 @@
       "external": true
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--b7c2e5a1-0000-4000-8000-000000000001",
   "workflow": {
     "start--b7c2e5a1-0000-4000-8000-000000000001": {
@@ -90,6 +96,13 @@
       "on_completion": "action--b7c2e5a1-0000-4000-8000-000000000003",
       "out_args": [
         "__criteria_atoms__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.soc2_evidence_collector.primitives.criteria.collect_criteria_atoms"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -120,6 +133,13 @@
       "out_args": [
         "__criteria_mapping__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.soc2_evidence_collector.primitives.mapping.map_evidence_to_criteria"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.evidence_pipeline@v1"
@@ -148,6 +168,13 @@
       ],
       "out_args": [
         "__coverage_scoring__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.soc2_evidence_collector.primitives.scoring.score_criterion_coverage"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -179,6 +206,13 @@
       ],
       "out_args": [
         "__attestation_id__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.soc2_evidence_collector.primitives.attestation.build_readiness_attestation"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [

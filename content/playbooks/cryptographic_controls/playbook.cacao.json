@@ -160,6 +160,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--52000000-0000-4000-8000-000000000001",
   "workflow": {
     "start--52000000-0000-4000-8000-000000000001": {
@@ -180,6 +186,13 @@
       "out_args": [
         "__policy_inventory__",
         "__policy_inventory_id__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.cryptographic_controls.primitives.policy.resolve_policy_inventory"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -227,6 +240,13 @@
         "__key_lifecycle_result__",
         "__key_lifecycle_record__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.cryptographic_controls.primitives.keys.record_key_lifecycle"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.key_lifecycle_management@v1"
@@ -262,6 +282,13 @@
         "__enforcement_result__",
         "__enforcement_decision__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.cryptographic_controls.primitives.enforcement.decide_enforcement_gate"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.encryption_enforcement_gate@v1"
@@ -295,6 +322,13 @@
       "out_args": [
         "__cert_lifecycle_result__",
         "__cert_lifecycle_record__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.cryptographic_controls.primitives.certificates.record_certificate_lifecycle"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -330,6 +364,13 @@
       "out_args": [
         "__lifecycle_attestation__",
         "__lifecycle_attestation_id__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.cryptographic_controls.primitives.attestation.compose_lifecycle_attestation"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -369,6 +410,13 @@
       ],
       "out_args": [
         "__owner_notification__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.cryptographic_controls.primitives.notify.compose_owner_notification"
+        }
       ],
       "x_secops_ng": {
         "telemetry_refs": [

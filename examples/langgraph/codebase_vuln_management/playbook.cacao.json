@@ -101,6 +101,12 @@
       "external": false
     }
   },
+  "agent_definitions": {
+    "group--9479ad47-df96-5a3c-831a-f668158e5b9e": {
+      "type": "group",
+      "name": "Security operations team"
+    }
+  },
   "workflow_start": "start--01a17a07-0000-4000-8000-000000000001",
   "workflow": {
     "start--01a17a07-0000-4000-8000-000000000001": {
@@ -119,6 +125,13 @@
       ],
       "out_args": [
         "__sbom_content_hash__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.codebase_vuln_management.primitives.sbom.pin_sbom_content_hash"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -149,6 +162,13 @@
       "out_args": [
         "__findings_ref__"
       ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.codebase_vuln_management.primitives.sbom.normalise_findings"
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.sbom_capture@v1"
@@ -178,6 +198,13 @@
       ],
       "out_args": [
         "__disclosure_window__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.codebase_vuln_management.primitives.disclosure_window.resolve_disclosure_window"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
@@ -214,6 +241,13 @@
       ],
       "out_args": [
         "__disclosure_timeline_record__"
+      ],
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.codebase_vuln_management.primitives.timeline.build_disclosure_timeline_stub"
+        }
       ],
       "x_secops_ng": {
         "control_refs": [
