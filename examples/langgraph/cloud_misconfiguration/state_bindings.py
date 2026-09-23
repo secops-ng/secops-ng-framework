@@ -78,7 +78,7 @@ async def ingest_finding(finding_id: str) -> None:
 
 @tool
 async def enrich_resource_and_owner(finding_id: str) -> dict[str, object]:
-    """Resolve the affected resource against the cloud inventory and ownership graph: tenant, project / account, region, resource type, tags, accountable owner, classification. Produces __resource_id__, __owner_id__, and __severity__ (severity is resolved here rather than ingested raw because the operator's classification can lift or lower the upstream CSPM severity).
+    """Resolve the affected resource against the cloud inventory and ownership graph: tenant, project / account, region, resource type, tags, accountable owner, classification. Produces __resource_id__, __owner_id__, and __severity__ (severity is resolved here rather than ingested raw because the operator's classification can lift or lower the upstream CSPM severity). Also sets __known_false_positive__: true when the finding matches a documented exception or a known-benign baseline-deviation record within the suppression window, which the suppression branch reads.
 
     CACAO step_id : action--30000000-0000-4000-8000-000000000003
     CACAO type    : action

@@ -196,7 +196,7 @@
           ]
         },
         "description": { "type": "string" },
-        "value":       {},
+        "value":       { "type": ["string", "null"] },
         "constant":    { "type": "boolean" },
         "external":    { "type": "boolean" }
       },
@@ -218,6 +218,9 @@
         "on_completion":{ "type": "string", "pattern": "^[a-zA-Z0-9_.-]+--[0-9a-f-]{36}$" },
         "on_success":  { "type": "string", "pattern": "^[a-zA-Z0-9_.-]+--[0-9a-f-]{36}$" },
         "on_failure":  { "type": "string", "pattern": "^[a-zA-Z0-9_.-]+--[0-9a-f-]{36}$" },
+        "on_true":     { "type": "string", "pattern": "^[a-zA-Z0-9_.-]+--[0-9a-f-]{36}$", "description": "if-condition / while-condition: step taken when condition holds (CACAO 2.0 4.8, 4.9). on_success is accepted in its place for one release." },
+        "on_false":    { "type": "string", "pattern": "^[a-zA-Z0-9_.-]+--[0-9a-f-]{36}$", "description": "if-condition / while-condition: step taken when condition does not hold. on_failure is accepted in its place for one release." },
+        "condition":   { "type": "string", "minLength": 1, "description": "if-condition / while-condition: the boolean expression the branch evaluates. In this corpus, the name of a declared boolean playbook variable set by an earlier step." },
         "next_steps":  {
           "type": "array",
           "items": { "type": "string", "pattern": "^[a-zA-Z0-9_.-]+--[0-9a-f-]{36}$" }

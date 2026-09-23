@@ -161,8 +161,8 @@
       "type": "if-condition",
       "name": "known false positive?",
       "description": "Suppression branch. on_success: the finding matches a documented exception (compensating-control attestation, time-boxed exception record) or an already-seen baseline-deviation fingerprint within the suppression window; suppress-and-close. on_failure: continue into owner notification.",
-      "on_success": "action--30000000-0000-4000-8000-000000000005",
-      "on_failure": "action--30000000-0000-4000-8000-000000000006"
+      "on_true": "action--30000000-0000-4000-8000-000000000005",
+      "on_false": "action--30000000-0000-4000-8000-000000000006"
     },
     "action--30000000-0000-4000-8000-000000000005": {
       "type": "action",
@@ -243,8 +243,8 @@
       "type": "if-condition",
       "name": "remediation verified?",
       "description": "Branch on __remediation_verified__. on_success: re-scan confirms the rule no longer fires; close the case. on_failure: remediation did not stick — escalate so the recurring-misconfiguration KRI captures the residual exposure rather than closing on an unverified attempt.",
-      "on_success": "end--30000000-0000-4000-8000-00000000000a",
-      "on_failure": "action--30000000-0000-4000-8000-00000000000b"
+      "on_true": "end--30000000-0000-4000-8000-00000000000a",
+      "on_false": "action--30000000-0000-4000-8000-00000000000b"
     },
     "action--30000000-0000-4000-8000-00000000000b": {
       "type": "action",

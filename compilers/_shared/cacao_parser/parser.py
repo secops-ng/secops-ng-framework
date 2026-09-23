@@ -73,6 +73,8 @@ _STEP_KNOWN_FIELDS: frozenset[str] = frozenset(
         "on_completion",
         "on_success",
         "on_failure",
+        "on_true",
+        "on_false",
         "next_steps",
         "commands",
         "agent",
@@ -247,6 +249,48 @@ def _build_playbook(data: Mapping[str, Any]) -> Playbook:
     )
 
 
+# CACAO 2.0 (4.8, 4.9) names a conditional step's branches ``on_true`` /
+# ``on_false``. Earlier SecOps-NG content wrote them as ``on_success`` /
+# ``on_failure``, which CACAO defines on every step as the step's own execution
+# outcome, not as a branch. Both spellings are accepted on conditional steps for
+# one release and land on the same AST fields, so emitters are unaffected; the
+# legacy spelling is dropped after that.
+_CONDITIONAL_STEP_TYPES: frozenset[StepType] = frozenset(
+    {StepType.IF_CONDITION, StepType.WHILE_CONDITION}
+)
+
+
+def _branch_targets(
+    step_id: str, step_type: StepType, raw: Mapping[str, Any]
+) -> tuple[str | None, str | None]:
+    """Resolve a step's success/failure (or true/false) targets.
+
+    Returns the values for the AST's ``on_success`` / ``on_failure`` fields.
+    A conditional step may use either spelling but not both for the same
+    branch: in CACAO the two mean different things, so a document carrying
+    both is ambiguous rather than redundant. ``on_true`` / ``on_false`` on a
+    non-conditional step is rejected for the same reason.
+    """
+    if step_type not in _CONDITIONAL_STEP_TYPES:
+        for key in ("on_true", "on_false"):
+            if key in raw:
+                raise CacaoSemanticError(
+                    f"Step {step_id!r}: {key} is only defined for if-condition "
+                    f"and while-condition steps, not {step_type.value!r}"
+                )
+        return raw.get("on_success"), raw.get("on_failure")
+
+    resolved: list[str | None] = []
+    for new, legacy in (("on_true", "on_success"), ("on_false", "on_failure")):
+        if new in raw and legacy in raw:
+            raise CacaoSemanticError(
+                f"Step {step_id!r}: both {new} and {legacy} are set; a "
+                f"conditional step names each branch once (use {new})"
+            )
+        resolved.append(raw[new] if new in raw else raw.get(legacy))
+    return resolved[0], resolved[1]
+
+
 def _build_step(step_id: str, raw: Mapping[str, Any]) -> WorkflowStep:
     raw_type = raw["type"]
     try:
@@ -257,6 +301,7 @@ def _build_step(step_id: str, raw: Mapping[str, Any]) -> WorkflowStep:
         ) from exc
 
     extras = {k: v for k, v in raw.items() if k not in _STEP_KNOWN_FIELDS}
+    on_success, on_failure = _branch_targets(step_id, step_type, raw)
 
     return WorkflowStep(
         step_id=step_id,
@@ -264,8 +309,8 @@ def _build_step(step_id: str, raw: Mapping[str, Any]) -> WorkflowStep:
         name=raw["name"],
         description=raw.get("description"),
         on_completion=raw.get("on_completion"),
-        on_success=raw.get("on_success"),
-        on_failure=raw.get("on_failure"),
+        on_success=on_success,
+        on_failure=on_failure,
         next_steps=tuple(raw.get("next_steps", ())),
         commands=tuple(MappingProxyType(dict(c)) for c in raw.get("commands", ())),
         agent=raw.get("agent"),
@@ -376,10 +421,11 @@ def _check_workflow_invariants(
 
     # Every transition target must exist.
     for step_id, step in steps.items():
+        conditional = step.type in _CONDITIONAL_STEP_TYPES
         for kind, target in (
             ("on_completion", step.on_completion),
-            ("on_success", step.on_success),
-            ("on_failure", step.on_failure),
+            ("on_true" if conditional else "on_success", step.on_success),
+            ("on_false" if conditional else "on_failure", step.on_failure),
         ):
             if target is not None and target not in steps:
                 raise CacaoSemanticError(

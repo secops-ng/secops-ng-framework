@@ -39,6 +39,9 @@ class PlaybookExecutiveMetricsV1State(TypedDict, total=False):
     # playbook_variable: __metric_evaluations__
     # Serialised list of per-metric evaluations produced by the evaluation step. Each entry carries the metric stable_id, the observed value, the matched threshold band, and the lower-layer artifacts (control, telemetry, playbook step) the metric is bound to.
     metric_evaluations: str
+    # playbook_variable: __breach_band_hit__
+    # True when at least one metric evaluation over the rollup window matched its `breach` threshold band. Set by the evaluation step; the board-attention branch reads it.
+    breach_band_hit: bool
     # playbook_variable: __control_effectiveness_score__
     # Composite control-effectiveness score for the window, derived from the KPI/KRI evaluations grouped by control_ref. Bounded `0.0..1.0`. The scoring policy itself is operator-supplied; the playbook only pins the inputs and the output contract.
     control_effectiveness_score: str
@@ -74,8 +77,8 @@ async def resolve_kpi_kri_catalog(rollup_window: str, catalog_ref: str) -> None:
         )
 
 @tool
-async def evaluate_metrics_over_window(rollup_window: str, catalog_ref: str) -> str:
-    """For each catalog entry, compute the value defined by the metric's `measurement.formula` over `__rollup_window__` against the operator's telemetry / workflow / control attestation source. Each evaluation carries the matched threshold band (target / warn / breach) and references the lower-layer artifacts (playbook step, detection, control, telemetry) the metric is bound to via its `inputs[]`. Emits `__metric_evaluations__`.
+async def evaluate_metrics_over_window(rollup_window: str, catalog_ref: str) -> dict[str, object]:
+    """For each catalog entry, compute the value defined by the metric's `measurement.formula` over `__rollup_window__` against the operator's telemetry / workflow / control attestation source. Each evaluation carries the matched threshold band (target / warn / breach) and references the lower-layer artifacts (playbook step, detection, control, telemetry) the metric is bound to via its `inputs[]`. Emits `__metric_evaluations__`, and sets `__breach_band_hit__` to true when any evaluation matched its `breach` band — the flag the board-attention branch reads.
 
     CACAO step_id : action--e0000000-0000-4000-8000-000000000003
     CACAO type    : action

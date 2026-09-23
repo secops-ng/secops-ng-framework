@@ -84,7 +84,7 @@
     "action--20000000-0000-4000-8000-000000000003": {
       "type": "action",
       "name": "scope assessment",
-      "description": "Determine the volume and classification of data observed leaving the boundary, the count of distinct data subjects affected, and whether actual exfiltration occurred or was prevented by an in-line control. Produces __data_classification__, __affected_subjects_count__, and __exfil_confirmed__.",
+      "description": "Determine the volume and classification of data observed leaving the boundary, the count of distinct data subjects affected, and whether actual exfiltration occurred or was prevented by an in-line control. Produces __data_classification__, __affected_subjects_count__, __exfil_confirmed__, and __regulator_required__ \u2014 whether the classification and the subject count together cross the operator's regulator-notification threshold, which the notification branch reads after containment.",
       "on_completion": "if-condition--20000000-0000-4000-8000-000000000004",
       "in_args": [
         "__signal_id__"
@@ -92,7 +92,8 @@
       "out_args": [
         "__data_classification__",
         "__affected_subjects_count__",
-        "__exfil_confirmed__"
+        "__exfil_confirmed__",
+        "__regulator_required__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
@@ -111,8 +112,9 @@
       "type": "if-condition",
       "name": "exfil confirmed?",
       "description": "Branch on __exfil_confirmed__. True paths into containment; false closes the incident out with no regulator-facing action (the close-out itself is logged for the false-positive KPI by an out-of-scope card).",
-      "on_success": "action--20000000-0000-4000-8000-000000000005",
-      "on_failure": "end--20000000-0000-4000-8000-000000000009"
+      "condition": "__exfil_confirmed__",
+      "on_true": "action--20000000-0000-4000-8000-000000000005",
+      "on_false": "end--20000000-0000-4000-8000-000000000009"
     },
     "action--20000000-0000-4000-8000-000000000005": {
       "type": "action",
@@ -140,9 +142,10 @@
     "if-condition--20000000-0000-4000-8000-000000000006": {
       "type": "if-condition",
       "name": "regulator notification threshold met?",
-      "description": "Evaluate __regulator_required__ against the affected-subjects count and data classification per the operator's regulator-routing policy (NIS2 Art. 23, DORA Art. 19, GDPR Art. 33). True branches into regulator notification; in either branch the data-subject notification path is reached.",
-      "on_success": "action--20000000-0000-4000-8000-000000000007",
-      "on_failure": "action--20000000-0000-4000-8000-000000000008"
+      "description": "Branch on __regulator_required__, set by the scope-assessment step from the affected-subjects count and data classification per the operator's regulator-routing policy (NIS2 Art. 23, DORA Art. 19, GDPR Art. 33). True branches into regulator notification; in either branch the data-subject notification path is reached.",
+      "condition": "__regulator_required__",
+      "on_true": "action--20000000-0000-4000-8000-000000000007",
+      "on_false": "action--20000000-0000-4000-8000-000000000008"
     },
     "action--20000000-0000-4000-8000-000000000007": {
       "type": "action",

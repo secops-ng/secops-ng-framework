@@ -23,7 +23,7 @@ parallel                   n8n-nodes-base.merge          (fan-out by
                               connecting all outgoing edges; merge node
                               fans-in downstream)
 if-condition               n8n-nodes-base.if             (true branch =
-                              on_success, false branch = on_failure)
+                              on_true, false branch = on_false)
 while-condition            n8n-nodes-base.if + back-edge (lossy)
 switch-condition           n8n-nodes-base.switch         (mode=rules)
 
@@ -598,12 +598,16 @@ class _WorkflowBuilder:
     ) -> list[tuple[str, tuple[str, ...]]]:
         """CACAO v2 switch cases as ordered ``(case value, target ids)`` pairs.
 
-        The spec shape is a mapping of case value → list of step ids:
+        The spec shape is a mapping of case value → one step identifier
+        (CACAO 2.0, 4.10):
 
             switch: "__priority__"
             cases:
-              p1_severe: ["action--...8"]
-              p2_high:   ["action--...9"]
+              p1_severe: "action--...8"
+              p2_high:   "action--...9"
+
+        The pre-standard list form (case value → [step ids]) is accepted for
+        one more release and normalised to the same pairs.
 
         Order is the author's document order (dict insertion), and it is
         load-bearing: rule *i* in the emitted Switch node routes to output
@@ -794,7 +798,7 @@ class _WorkflowBuilder:
                 {
                     "name": name,
                     "type": _n8n_type_for(var.type_),
-                    "value": var.value if var.value is not None else "",
+                    "value": _typed_variable_value(var.type_, var.value),
                     "description": var.description or "",
                 }
             )
@@ -820,6 +824,31 @@ class _WorkflowBuilder:
 # --------------------------------------------------------------------------- #
 # helpers                                                                     #
 # --------------------------------------------------------------------------- #
+
+
+def _typed_variable_value(cacao_type: str, value: Any) -> Any:
+    """Coerce a CACAO variable ``value`` into the slot type n8n expects.
+
+    CACAO carries every ``value`` as a string and ``type`` says how to read
+    it; n8n's initial-assignment slots are typed. Integer, long and float
+    strings become numbers so a ``"70"`` in the playbook lands as ``70`` in
+    the trigger. Anything that does not parse, and every other type, passes
+    through unchanged; ``None`` becomes the empty string n8n expects.
+    """
+    if value is None:
+        return ""
+    if not isinstance(value, str):
+        return value
+    t = cacao_type.lower()
+    text = value.strip()
+    try:
+        if t in {"integer", "long"}:
+            return int(text)
+        if t in {"float", "double", "number"}:
+            return float(text)
+    except ValueError:
+        return value
+    return value
 
 
 def _n8n_type_for(cacao_type: str) -> str:

@@ -505,8 +505,8 @@
       "condition": "__identity_verified__",
       "description": "Gate on the verification verdict. True routes into data-owner routing and fulfilment. False short-circuits to send_controller_response, where the adapter supplies the Article 12(6) additional-information request and the case closes as unverified_subject \u2014 data owners are never asked to assemble a subject's data for an unverified requester. The gate sits after classification so the Article 12(3) deadline is on record for both branches.",
       "name": "identity verified?",
-      "on_failure": "action--d5b17a15-0000-4000-8000-000000000007",
-      "on_success": "action--d5b17a15-0000-4000-8000-000000000005",
+      "on_false": "action--d5b17a15-0000-4000-8000-000000000007",
+      "on_true": "action--d5b17a15-0000-4000-8000-000000000005",
       "type": "if-condition"
     },
     "start--d5b17a15-0000-4000-8000-000000000001": {

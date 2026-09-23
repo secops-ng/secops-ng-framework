@@ -15,13 +15,13 @@ Maturity: `experimental`
 |-----------------------|----------------------------------------------------------------------|
 | `playbook.cacao.json` | CACAO v2 + `x_secops_ng` artifact (canonical source of truth)        |
 | `README.md`           | This file                                                            |
-| `mappings.yaml`       | (tracked on EXTEND card) Sigma rule references, OSCAL/D3FEND control and OCSF telemetry pointers, KPI/KRI hooks, NIS2/DORA cross-references |
-| `fixtures/`           | (reserved) sample inputs for compiler tests                          |
+| `mappings.yaml`       | Sigma rule references, OSCAL/D3FEND control and OCSF telemetry pointers, KPI/KRI hooks, NIS2/DORA cross-references |
+| `primitives/`         | Deterministic primitives for the nine action steps (CORE-PRIM) — not yet bound; see Status |
 
-Worked examples produced by the three reference compilers land under
-`../../../examples/phishing_triage/` (tracked on the CORE sub-card).
-The KPI/KRI JSON bodies referenced below land alongside the mapping
-pack on the EXTEND sub-card.
+Worked examples produced by the three reference compilers ship under
+`examples/{n8n,temporal,langgraph}/phishing_triage/`, with byte-parity
+goldens under `tests/examples/`; the practitioner walkthrough is
+`docs/cookbook/phishing_triage.md`.
 
 ## Scenario
 
@@ -72,10 +72,10 @@ of `phishing`, `credential_harvest`, `malware_attached`,
    (1001) records per indicator. Correlates against the upstream Sigma
    email-related rules pinned in `mappings.yaml`.
 4. **if-condition — known-benign sender or already seen?**
-   - `on_success` → **suppress and close.** Link onto the existing
+   - `on_true` → **suppress and close.** Link onto the existing
      case or known-benign sender record, close without paging,
      account against `kri.phishing_suppression_rate@v1`.
-   - `on_failure` → **classify intent.**
+   - `on_false` → **classify intent.**
 5. **switch-condition — route on intent.** Five branches, one per
    `__intent__` value, each a single response-routing action handing
    off to the downstream playbook or owner team. Bodies of those
@@ -120,13 +120,49 @@ The playbook is intentionally agnostic to:
   response branch.
 
 These bind at compile time per target — see
-`examples/phishing_triage/<target>/` for the emitted skeletons each
-reference compiler produces (CORE sub-card).
+`examples/<target>/phishing_triage/` for what each reference compiler
+emits today.
 
 ## Status
 
-`maturity: experimental`. Schema-valid against
-`content-model/playbook.schema.json`. Worked examples and the
-metric/mapping bodies follow on the CORE and EXTEND sub-cards
-respectively. Sigma rule references point upstream — no detection
-logic is authored here.
+`maturity: experimental`, CORE-PRIM complete. Each of the nine action
+steps has a deterministic primitive under `primitives/`, executed
+directly by `tests/playbooks/phishing_triage/test_primitives.py`:
+
+| Step | Primitive |
+|---|---|
+| ingest report | `intake.validate_reported_message` |
+| enrich headers, URLs, attachments | `enrichment.assess_reported_message` |
+| suppress and close | `suppression.compose_suppression_record` |
+| classify intent | `classification.resolve_intent` |
+| the five response branches | `response.phishing_response`, `credential_harvest_response`, `malware_attachment_response`, `bec_response`, `manual_review_route` |
+
+Decisions the primitives fix, because the suppression gate closes
+reports without paging anyone:
+
+- **Two suppression lanes, deliberately asymmetric.** A report whose
+  case fingerprint matches a case seen inside the window always links
+  onto it — duplicate reports of an open phish must not page again. A
+  known-benign sender is suppressed only with DMARC `pass` *and* no
+  malicious or suspicious indicator: failing DMARC is what spoofing
+  looks like, and a benign sender carrying a bad link is what a
+  compromised partner account looks like. A refused benign claim is
+  recorded with its reason.
+- **Doubt routes to a human.** An abstaining classifier, a confidence
+  below the operator's threshold, and a label outside the closed
+  enumeration all resolve to `unknown`, the manual-review branch.
+- **A sanctioned simulation is not contained.** Reported through the
+  credential-harvest branch with its campaign reference, it records the
+  clicks for `kpi.phishing_sim_click_rate@v1` and takes no quarantine,
+  block or reset action.
+- **Every branch re-checks its intent**, and the suppression step
+  re-checks that the gate cleared the report, so a mis-wired switch
+  fails loud instead of acting on the wrong message.
+
+**Owed: the wire.** The CACAO steps do not yet carry
+`x_secops_ng.core_body`, so `catalog.py` reports 0 of 9 bound and the
+compiled examples still emit operator-placeholder bodies. Binding the
+nine steps, declaring the envelope variables they need, regenerating
+the examples and recomputing the Maturity ladder is the CORE-WIRE card.
+Sigma rule references point upstream — no detection logic is authored
+here.

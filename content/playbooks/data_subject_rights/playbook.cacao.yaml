@@ -514,8 +514,8 @@ workflow:
       classification so the Article 12(3) deadline is on record for
       both branches.
     condition: __identity_verified__
-    on_success: action--d5b17a15-0000-4000-8000-000000000005
-    on_failure: action--d5b17a15-0000-4000-8000-000000000007
+    on_true: action--d5b17a15-0000-4000-8000-000000000005
+    on_false: action--d5b17a15-0000-4000-8000-000000000007
   action--d5b17a15-0000-4000-8000-000000000005:
     type: action
     name: route_to_data_owners

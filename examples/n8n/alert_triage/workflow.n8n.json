@@ -173,7 +173,7 @@
         },
         "options": {}
       },
-      "notes": "Suppression branch on the boolean __benign_or_seen__ set by the enrichment step. on_success (true): matches a known-benign rule or an already-seen case fingerprint inside the window; suppress and close. on_failure (false): proceed to prioritisation. The condition is a bare boolean variable reference on purpose \u2014 the n8n emitter compiles it to a working IF node comparator, and the LangGraph consumer routes on the same state key at runtime.",
+      "notes": "Suppression branch on the boolean __benign_or_seen__ set by the enrichment step. on_true: matches a known-benign rule or an already-seen case fingerprint inside the window; suppress and close. on_false: proceed to prioritisation. The condition is a bare boolean variable reference on purpose \u2014 the n8n emitter compiles it to a working IF node comparator, and the LangGraph consumer routes on the same state key at runtime.",
       "notesInFlow": true
     },
     {

@@ -129,6 +129,12 @@
               "type": "string"
             },
             {
+              "id": "out.regulator_required",
+              "name": "out.regulator_required",
+              "value": "",
+              "type": "string"
+            },
+            {
               "id": "x_secops_ng.control_refs",
               "name": "x_secops_ng.control_refs",
               "value": "control.data_classification_baseline@v1",
@@ -150,7 +156,7 @@
         },
         "options": {}
       },
-      "notes": "Determine the volume and classification of data observed leaving the boundary, the count of distinct data subjects affected, and whether actual exfiltration occurred or was prevented by an in-line control. Produces __data_classification__, __affected_subjects_count__, and __exfil_confirmed__.",
+      "notes": "Determine the volume and classification of data observed leaving the boundary, the count of distinct data subjects affected, and whether actual exfiltration occurred or was prevented by an in-line control. Produces __data_classification__, __affected_subjects_count__, __exfil_confirmed__, and __regulator_required__ \u2014 whether the classification and the subject count together cross the operator's regulator-notification threshold, which the notification branch reads after containment.",
       "notesInFlow": true
     },
     {
@@ -172,7 +178,7 @@
           "conditions": [
             {
               "id": "secops_ng_condition",
-              "leftValue": "",
+              "leftValue": "{{$workflow.variables.exfil_confirmed}}",
               "rightValue": "true",
               "operator": {
                 "type": "string",
@@ -255,7 +261,7 @@
           "conditions": [
             {
               "id": "secops_ng_condition",
-              "leftValue": "",
+              "leftValue": "{{$workflow.variables.regulator_required}}",
               "rightValue": "true",
               "operator": {
                 "type": "string",
@@ -267,7 +273,7 @@
         },
         "options": {}
       },
-      "notes": "Evaluate __regulator_required__ against the affected-subjects count and data classification per the operator's regulator-routing policy (NIS2 Art. 23, DORA Art. 19, GDPR Art. 33). True branches into regulator notification; in either branch the data-subject notification path is reached.",
+      "notes": "Branch on __regulator_required__, set by the scope-assessment step from the affected-subjects count and data classification per the operator's regulator-routing policy (NIS2 Art. 23, DORA Art. 19, GDPR Art. 33). True branches into regulator notification; in either branch the data-subject notification path is reached.",
       "notesInFlow": true
     },
     {
@@ -503,9 +509,7 @@
     "secops_ng_notes": [
       "step 'action--20000000-0000-4000-8000-000000000002': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--20000000-0000-4000-8000-000000000003': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'if-condition--20000000-0000-4000-8000-000000000004' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
       "step 'action--20000000-0000-4000-8000-000000000005': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
-      "step 'if-condition--20000000-0000-4000-8000-000000000006' (if-condition): no machine-readable expression in CACAO source \u2014 emitted IF node with placeholder; operator must fill the condition in n8n.",
       "step 'action--20000000-0000-4000-8000-000000000007': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n.",
       "step 'action--20000000-0000-4000-8000-000000000008': action with no commands \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator fills the values in n8n."
     ]

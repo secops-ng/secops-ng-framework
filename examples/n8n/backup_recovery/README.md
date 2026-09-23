@@ -123,10 +123,9 @@ connectors. Concretely on this playbook:
 | `notify continuity owner` | `attestation_id`, `backup_scope` | — | `telemetry_refs` |
 
 The single `if-condition` node (`backup integrity ok?`) emits an n8n
-`if` node with a placeholder condition the operator must wire to the
-upstream `out.integrity_ok` field. The lossy translation is recorded
-in `meta.secops_ng_notes` so the integrator sees exactly which seams
-need attention.
+`if` node whose condition reads `__integrity_ok__`, the variable the
+`validate backup integrity` step sets. Every step is bound, so the
+workflow carries no `meta.secops_ng_notes` entries.
 
 ## Mirroring policy
 

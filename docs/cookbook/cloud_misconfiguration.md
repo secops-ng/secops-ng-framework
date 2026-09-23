@@ -119,11 +119,11 @@ The playbook ships eleven steps: one `start`, six `action`, two
 `if-condition`, and one terminal `end` reached from three inbound
 edges (suppression-close, verified-fix, and escalate-then-close). The
 first `if-condition` (`known false positive?`) fires on
-`__is_known_false_positive__`; `on_success` routes into the
-suppression close, `on_failure` routes into the linear remediation
+`__known_false_positive__`; `on_true` routes into the
+suppression close, `on_false` routes into the linear remediation
 chain. The second `if-condition` (`remediation verified?`) fires on
-`__remediation_verified__`; `on_success` routes directly to the end,
-`on_failure` routes into the escalation step which then terminates on
+`__remediation_verified__`; `on_true` routes directly to the end,
+`on_false` routes into the escalation step which then terminates on
 the same end so the case is closed under both branches with an
 audit-evident trail.
 
@@ -132,7 +132,7 @@ audit-evident trail.
 | `…000000001`   | cloud-misconfig-start         | edge wiring only — no body                                                                                                                                                                                                                        | n/a            |
 | `…000000002`   | ingest finding                | receive the Compliance Finding from the operator's CSPM / posture-management layer (rule fingerprint, affected resource, evaluated baseline, first-observed timestamp) and normalise it into the case shape the rest of the workflow reads       | operator-bound |
 | `…000000003`   | enrich resource and owner     | resolve tenant, account, region, resource type, tags, and accountable owner against the operator's cloud-inventory and ownership graph; annotate the case with the routing context the notification and escalation steps read against            | operator-bound |
-| `…000000004`   | known false positive?         | `if-condition` — branches on `__is_known_false_positive__` (true → suppress and close; false → notify owner)                                                                                                                                       | n/a            |
+| `…000000004`   | known false positive?         | `if-condition` — branches on `__known_false_positive__` (true → suppress and close; false → notify owner)                                                                                                                                       | n/a            |
 | `…000000005`   | suppress and close            | record the suppression against the operator's exception ledger (rule fingerprint, resource id, exception owner, expiry) and close the case without a remediation attempt so an already-triaged benign deviation stops re-paging owners           | operator-bound |
 | `…000000006`   | notify owner                  | hand off along the operator's pre-bound channel per `__severity__` (ticketing / chat / paging) carrying the finding, the affected resource, the violated baseline, and a pointer to the guided-remediation runbook the next step references     | operator-bound |
 | `…000000007`   | guided remediation            | apply the remediation bound to the violated baseline rule via an attested change — an IaC pull request against the operator's declarative-infrastructure repository or a runbook execution the operator's platform automates                    | operator-bound |
@@ -213,7 +213,7 @@ covers that processing per AGENTS.md §3.
     default ownership pool.
 
 **known false positive?** (`…000000004`, `if-condition`)
-:   Deterministic branch on `__is_known_false_positive__`. The gate
+:   Deterministic branch on `__known_false_positive__`. The gate
     reads the operator's suppression / exception ledger for a
     live-and-in-scope exception matching the finding's rule
     fingerprint against the affected resource; a match short-circuits
@@ -280,8 +280,8 @@ covers that processing per AGENTS.md §3.
     `kpi.mttr_cloud_misconfig@v1` on the verified branch.
 
 **remediation verified?** (`…000000009`, `if-condition`)
-:   Deterministic branch on `__remediation_verified__`. `on_success`
-    (verified) routes directly to the terminal end; `on_failure`
+:   Deterministic branch on `__remediation_verified__`. `on_true`
+    (verified) routes directly to the terminal end; `on_false`
     (still deviant) routes into escalation. Anchored on OSCAL IR-4
     (Incident Handling) for the case-closure leg.
 
@@ -473,10 +473,12 @@ ids verbatim. The six action steps emit `n8n-nodes-base.set` nodes
 carrying the CACAO I/O contract as editable assignment rows plus the
 `x_secops_ng` reference bundles (detection, control, telemetry,
 metric). The two `if-condition` nodes (`known false positive?`,
-`remediation verified?`) emit `n8n-nodes-base.if` nodes with
-placeholder conditions the operator wires to the upstream
-`out.is_known_false_positive` and `out.remediation_verified` fields.
-The lossy translations are recorded in `meta.secops_ng_notes` so the
+`remediation verified?`) emit `n8n-nodes-base.if` nodes whose
+conditions read `__known_false_positive__` (set by the enrich step,
+surfaced on its Set node as `out.known_false_positive`) and
+`__remediation_verified__` (set by the re-scan step,
+`out.remediation_verified`). The remaining lossy translations — one
+per unbound action — are recorded in `meta.secops_ng_notes` so the
 integrator sees exactly which seams need attention.
 
 Operators bind the Set rows to their connectors:
@@ -543,7 +545,7 @@ so the worker module is a self-contained drop-in.
 `examples/langgraph/cloud_misconfiguration/state_bindings.py` carries
 the `TypedDict` state and the six `@tool`-decorated action wrappers.
 `graph_spec.json` carries the target-neutral topology (nodes,
-conditional edges on `__is_known_false_positive__` and
+conditional edges on `__known_false_positive__` and
 `__remediation_verified__`, linear edges through the remediation
 chain to the terminal end, and the direct edge from the suppression
 branch to the same end); `assemble.py` is the hand-written
@@ -729,7 +731,7 @@ finding, fed through n8n / Temporal / LangGraph, produces byte-
 identical suppression / notification / remediation / re-scan records
 when each target's activity or tool bodies are wired against the same
 operator seams and the same OSCAL / OCSF / D3FEND reference bundles.
-The `(finding_id, resource_id, is_known_false_positive,
+The `(finding_id, resource_id, known_false_positive,
 suppression_stamped_at, notification_stamped_at,
 remediation_applied_at, remediation_verified, rescan_verdict)` key is
 the string a regulator can diff to confirm the property holds across

@@ -215,7 +215,7 @@
     "action--30000000-0000-4000-8000-000000000003": {
       "type": "action",
       "name": "enrich resource and owner",
-      "description": "Resolve the affected resource against the cloud inventory and ownership graph: tenant, project / account, region, resource type, tags, accountable owner, classification. Produces __resource_id__, __owner_id__, and __severity__ (severity is resolved here rather than ingested raw because the operator's classification can lift or lower the upstream CSPM severity).",
+      "description": "Resolve the affected resource against the cloud inventory and ownership graph: tenant, project / account, region, resource type, tags, accountable owner, classification. Produces __resource_id__, __owner_id__, and __severity__ (severity is resolved here rather than ingested raw because the operator's classification can lift or lower the upstream CSPM severity). Also sets __known_false_positive__: true when the finding matches a documented exception or a known-benign baseline-deviation record within the suppression window, which the suppression branch reads.",
       "on_completion": "if-condition--30000000-0000-4000-8000-000000000004",
       "in_args": [
         "__finding_id__"
@@ -223,7 +223,8 @@
       "out_args": [
         "__resource_id__",
         "__owner_id__",
-        "__severity__"
+        "__severity__",
+        "__known_false_positive__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "x_secops_ng": {
@@ -243,9 +244,10 @@
     "if-condition--30000000-0000-4000-8000-000000000004": {
       "type": "if-condition",
       "name": "known false positive?",
-      "description": "Suppression branch. on_success: the finding matches a documented exception (compensating-control attestation, time-boxed exception record) or an already-seen baseline-deviation fingerprint within the suppression window; suppress-and-close. on_failure: continue into owner notification.",
-      "on_success": "action--30000000-0000-4000-8000-000000000005",
-      "on_failure": "action--30000000-0000-4000-8000-000000000006"
+      "description": "Suppression branch on the boolean __known_false_positive__ set by the enrichment step. on_true: the finding matches a documented exception (compensating-control attestation, time-boxed exception record) or an already-seen baseline-deviation fingerprint within the suppression window; suppress-and-close. on_false: continue into owner notification.",
+      "condition": "__known_false_positive__",
+      "on_true": "action--30000000-0000-4000-8000-000000000005",
+      "on_false": "action--30000000-0000-4000-8000-000000000006"
     },
     "action--30000000-0000-4000-8000-000000000005": {
       "type": "action",
@@ -342,9 +344,10 @@
     "if-condition--30000000-0000-4000-8000-000000000009": {
       "type": "if-condition",
       "name": "remediation verified?",
-      "description": "Branch on __remediation_verified__. on_success: re-scan confirms the rule no longer fires; close the case. on_failure: remediation did not stick — escalate so the recurring-misconfiguration KRI captures the residual exposure rather than closing on an unverified attempt.",
-      "on_success": "end--30000000-0000-4000-8000-00000000000a",
-      "on_failure": "action--30000000-0000-4000-8000-00000000000b"
+      "description": "Branch on __remediation_verified__. on_true: re-scan confirms the rule no longer fires; close the case. on_false: remediation did not stick — escalate so the recurring-misconfiguration KRI captures the residual exposure rather than closing on an unverified attempt.",
+      "condition": "__remediation_verified__",
+      "on_true": "end--30000000-0000-4000-8000-00000000000a",
+      "on_false": "action--30000000-0000-4000-8000-00000000000b"
     },
     "action--30000000-0000-4000-8000-00000000000b": {
       "type": "action",

@@ -405,10 +405,10 @@
     },
     "if-condition--a1e47431-0000-4000-8000-000000000004": {
       "condition": "__benign_or_seen__",
-      "description": "Suppression branch on the boolean __benign_or_seen__ set by the enrichment step. on_success (true): matches a known-benign rule or an already-seen case fingerprint inside the window; suppress and close. on_failure (false): proceed to prioritisation. The condition is a bare boolean variable reference on purpose \u2014 the n8n emitter compiles it to a working IF node comparator, and the LangGraph consumer routes on the same state key at runtime.",
+      "description": "Suppression branch on the boolean __benign_or_seen__ set by the enrichment step. on_true: matches a known-benign rule or an already-seen case fingerprint inside the window; suppress and close. on_false: proceed to prioritisation. The condition is a bare boolean variable reference on purpose \u2014 the n8n emitter compiles it to a working IF node comparator, and the LangGraph consumer routes on the same state key at runtime.",
       "name": "already-seen or known-benign?",
-      "on_failure": "action--a1e47431-0000-4000-8000-000000000006",
-      "on_success": "action--a1e47431-0000-4000-8000-000000000005",
+      "on_false": "action--a1e47431-0000-4000-8000-000000000006",
+      "on_true": "action--a1e47431-0000-4000-8000-000000000005",
       "type": "if-condition"
     },
     "start--a1e47431-0000-4000-8000-000000000001": {
@@ -418,18 +418,10 @@
     },
     "switch-condition--a1e47431-0000-4000-8000-000000000007": {
       "cases": {
-        "p1_severe": [
-          "action--a1e47431-0000-4000-8000-000000000008"
-        ],
-        "p2_high": [
-          "action--a1e47431-0000-4000-8000-000000000009"
-        ],
-        "p3_routine": [
-          "action--a1e47431-0000-4000-8000-00000000000a"
-        ],
-        "p4_informational": [
-          "action--a1e47431-0000-4000-8000-00000000000b"
-        ]
+        "p1_severe": "action--a1e47431-0000-4000-8000-000000000008",
+        "p2_high": "action--a1e47431-0000-4000-8000-000000000009",
+        "p3_routine": "action--a1e47431-0000-4000-8000-00000000000a",
+        "p4_informational": "action--a1e47431-0000-4000-8000-00000000000b"
       },
       "description": "Route to the response branch keyed on the deterministic priority. Each branch is a single response-routing action that hands off to the appropriate downstream playbook or owner queue. Bodies of downstream playbooks are out of scope here.",
       "name": "route on priority",

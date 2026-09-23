@@ -28,7 +28,8 @@ Design notes
 * CACAO ``end`` steps are collapsed onto the special ``END`` sentinel.
   This means a CACAO transition that points at an end step shows up in
   the spec as an edge whose ``dst`` is ``GraphSpec.END``.
-* Conditional steps with ``on_success`` / ``on_failure`` map to a
+* Conditional steps with ``on_true`` / ``on_false`` (parsed onto the AST's
+  ``on_success`` / ``on_failure`` fields) map to a
   two-branch ``ConditionalEdge`` (keys ``"success"`` / ``"failure"``).
   ``switch-condition`` steps that route via ``next_steps`` are recorded
   by step ID; the consumer-side routing function inspects state at
@@ -362,19 +363,24 @@ def _condition_edge(step: WorkflowStep, end_ids: set[str]) -> ConditionalEdge:
         return GraphSpec.END if target in end_ids else target
 
     if step.type is StepType.SWITCH_CONDITION:
-        # CACAO v2 expresses switch arms as a ``cases`` map (label -> [step_ids]).
-        # That field is unknown to the AST and lands on ``step.extra``. Older
-        # authoring tools may instead pre-flatten arms onto ``next_steps``;
-        # we honour both, with case-label keys taking precedence.
+        # CACAO v2 expresses switch arms as a ``cases`` map of case value ->
+        # one step identifier (spec 4.10). The field is unknown to the AST and
+        # lands on ``step.extra``. The pre-standard list form (case value ->
+        # [step_ids]) is accepted for one more release; its first entry is the
+        # branch head. Older authoring tools may instead pre-flatten arms onto
+        # ``next_steps``; we honour all three, case-label keys taking precedence.
         raw_cases = step.extra.get("cases")
         if isinstance(raw_cases, Mapping):
-            for label, targets in raw_cases.items():
-                if isinstance(targets, (list, tuple)) and targets:
-                    branches[str(label)] = _resolve(str(targets[0]))
+            for label, target in raw_cases.items():
+                if isinstance(target, str) and target:
+                    branches[str(label)] = _resolve(target)
+                elif isinstance(target, (list, tuple)) and target:
+                    branches[str(label)] = _resolve(str(target[0]))
         for idx, ref in enumerate(step.next_steps):
             branches.setdefault(f"case_{idx}", _resolve(ref))
     else:
-        # if-condition and while-condition both use on_success / on_failure.
+        # if-condition and while-condition: the parser lands on_true / on_false
+        # (or the legacy on_success / on_failure) on these two AST fields.
         if step.on_success is not None:
             branches["success"] = _resolve(step.on_success)
         if step.on_failure is not None:

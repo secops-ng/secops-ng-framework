@@ -266,9 +266,9 @@
     "if-condition--01a17a01-0000-4000-8000-000000000005": {
       "type": "if-condition",
       "name": "actively exploited?",
-      "description": "Branch the case on the CRA reporting trigger. on_success: __actively_exploited__ is true and the regulator-notification chain fires ahead of the severity-keyed response so the CRA Article 14 24h / 72h / 14d clocks start at the operator's awareness timestamp. on_failure: the disclosure stays an internal-only case and routes directly to the severity switch.",
-      "on_success": "action--01a17a01-0000-4000-8000-000000000006",
-      "on_failure": "switch-condition--01a17a01-0000-4000-8000-000000000007",
+      "description": "Branch the case on the CRA reporting trigger. on_true: __actively_exploited__ is true and the regulator-notification chain fires ahead of the severity-keyed response so the CRA Article 14 24h / 72h / 14d clocks start at the operator's awareness timestamp. on_false: the disclosure stays an internal-only case and routes directly to the severity switch.",
+      "on_true": "action--01a17a01-0000-4000-8000-000000000006",
+      "on_false": "switch-condition--01a17a01-0000-4000-8000-000000000007",
       "condition": "__actively_exploited__"
     },
     "action--01a17a01-0000-4000-8000-000000000006": {
@@ -319,21 +319,11 @@
       "description": "Route to the technical-response branch keyed on __severity__. Each branch is a single response-routing action that ships the security update on the operator's SLA for that band, emits an advisory where applicable, and closes the case. The accept-risk branch documents the disposition without paging or scheduling a release.",
       "switch": "__severity__",
       "cases": {
-        "Critical": [
-          "action--01a17a01-0000-4000-8000-000000000008"
-        ],
-        "High": [
-          "action--01a17a01-0000-4000-8000-000000000009"
-        ],
-        "Medium": [
-          "action--01a17a01-0000-4000-8000-00000000000a"
-        ],
-        "Low": [
-          "action--01a17a01-0000-4000-8000-00000000000a"
-        ],
-        "None": [
-          "action--01a17a01-0000-4000-8000-00000000000b"
-        ]
+        "Critical": "action--01a17a01-0000-4000-8000-000000000008",
+        "High": "action--01a17a01-0000-4000-8000-000000000009",
+        "Medium": "action--01a17a01-0000-4000-8000-00000000000a",
+        "Low": "action--01a17a01-0000-4000-8000-00000000000a",
+        "None": "action--01a17a01-0000-4000-8000-00000000000b"
       }
     },
     "action--01a17a01-0000-4000-8000-000000000008": {

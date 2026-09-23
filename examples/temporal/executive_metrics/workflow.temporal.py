@@ -44,8 +44,8 @@ RESOLVE_KPI_KRI_CATALOG_RETRY_POLICY = RetryPolicy(
 )
 
 @activity.defn
-async def evaluate_metrics_over_window(rollup_window: str, catalog_ref: str) -> str:
-    """For each catalog entry, compute the value defined by the metric's `measurement.formula` over `__rollup_window__` against the operator's telemetry / workflow / control attestation source. Each evaluation carries the matched threshold band (target / warn / breach) and references the lower-layer artifacts (playbook step, detection, control, telemetry) the metric is bound to via its `inputs[]`. Emits `__metric_evaluations__`.
+async def evaluate_metrics_over_window(rollup_window: str, catalog_ref: str) -> dict[str, object]:
+    """For each catalog entry, compute the value defined by the metric's `measurement.formula` over `__rollup_window__` against the operator's telemetry / workflow / control attestation source. Each evaluation carries the matched threshold band (target / warn / breach) and references the lower-layer artifacts (playbook step, detection, control, telemetry) the metric is bound to via its `inputs[]`. Emits `__metric_evaluations__`, and sets `__breach_band_hit__` to true when any evaluation matched its `breach` band — the flag the board-attention branch reads.
 
     CACAO step_id: action--e0000000-0000-4000-8000-000000000003
     """

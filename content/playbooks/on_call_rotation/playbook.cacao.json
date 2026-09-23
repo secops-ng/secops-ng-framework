@@ -152,8 +152,9 @@
       "type": "if-condition",
       "name": "shift handoff window?",
       "description": "Branch on __handoff_window__. True branches into handoff-brief generation and notification of the incoming responder; false closes the run with the escalation chain bound but no handoff side effects (steady-state mid-shift execution).",
-      "on_success": "action--30000000-0000-4000-8000-000000000005",
-      "on_failure": "end--30000000-0000-4000-8000-000000000007"
+      "condition": "__handoff_window__",
+      "on_true": "action--30000000-0000-4000-8000-000000000005",
+      "on_false": "end--30000000-0000-4000-8000-000000000007"
     },
     "action--30000000-0000-4000-8000-000000000005": {
       "type": "action",
