@@ -143,6 +143,12 @@
         "__oversight_roster_id__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "resolve who holds human oversight of __deployment_id__ for __oversight_cycle__ and with what authority, and record the roster. Art. 26(2) makes the assignment; this step makes it operational for the window: which named persons or roles are on watch, what each is empowered to do, and who is reachable when an intervention is needed. The authority limb matters more than it looks — Art. 14(4)(d) and (e) require the overseer to be able to decide not to use the system, disregard or override its output, and interrupt operation, and a roster entry naming someone without that delegated power produces an overseer who cannot lawfully oversee. Read-only against the operator's governance and rota surfaces; this step records the resolved watch, it does not author the operator's delegation model."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.ict_risk_governance@v1"
@@ -166,6 +172,12 @@
         "__briefing_record_id__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "brief the rostered overseers against the provider's Art. 13 instructions for use and record the briefing, discharging the competence limbs of Art. 14(4). Three capabilities are evidenced here: that the overseer understands the system's relevant capacities and limitations and can monitor operation well enough to detect anomalies, dysfunctions and unexpected performance (14(4)(a)); that they remain aware of the tendency to automatically rely or over-rely on the system's output, which the Regulation names explicitly as automation bias and which is a briefing subject rather than a personal failing (14(4)(b)); and that they can correctly interpret the output, which depends on the interpretation aids the provider supplied (14(4)(c)). The briefing is per-system, not generic security-awareness training: an overseer briefed on a different deployment has not been briefed on this one."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.training_attestation@v1"
@@ -192,6 +204,12 @@
         "__biometric_two_person_verification__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "run the standing review pass over the outputs and decisions flagged for oversight in __oversight_cycle__, and record the disposition of each. This is the routine body of the loop: most cycles produce reviews and no interventions, and the dated record of a review that found nothing is as much evidence of oversight as an intervention is. Carries the Art. 14(5) conditional branch: where the deployment is an Annex III point 1(a) remote biometric identification system, no action or decision may be taken on the basis of an identification unless that identification has been separately verified and confirmed by at least two natural persons who each carry the necessary competence, training and authority. The branch records both verifiers separately — one person confirming twice does not satisfy it. Where the operator relies on the narrow law-enforcement, migration, border-control or asylum exemption, the step records the Union or national legal basis relied on, not merely that the exemption was taken."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.ict_risk_governance@v1"
@@ -219,6 +237,12 @@
         "__intervention_type__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "where the review produced an exercise of Art. 14(4)(d) or (e), record the intervention against __deployment_id__. Four distinct exercises fall here and the record names which occurred, because they carry different weight on later review: a decision not to use the system in the particular situation; a decision to disregard its output; an override or reversal of that output; and an interruption of operation through a stop button or similar procedure. The record captures who intervened, on what basis, and what the system had produced — the last of these matters because an intervention is also a signal about the system, and it is the raw material the Art. 26(5) monitoring duty and the provider's Art. 72 post-market loop consume. A cycle with no intervention closes this step with a dated nil record rather than skipping it."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.ict_risk_governance@v1"
@@ -249,6 +273,12 @@
         "__oversight_evidence_id__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "compose the dated cycle-evidence artifact joining the roster, the briefings, the review dispositions and any interventions for __deployment_id__ over __oversight_cycle__, and write it to the operator's evidence store. This is what an auditor or market-surveillance authority reads to establish that oversight was not merely assigned but exercised — the distinction Art. 14 turns on, since a named overseer who never reviewed anything satisfies Art. 26(2) on paper and Art. 14 not at all. The evidence store is an operator-owned adapter-bound surface; the playbook declares the record shape and ships no store."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.ict_risk_governance@v1"

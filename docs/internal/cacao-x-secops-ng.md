@@ -206,3 +206,24 @@ the deterministic *work* inside this step.
   CORE wave decomposition.
 - `content-model/playbook.schema.json#/$defs/core_body` — the schema
   $def this document describes.
+
+## 5. Unbound steps
+
+A step without a `core_body` binding is work an operator performs. It still
+has to carry an `agent` and a command for the document to be a valid CACAO
+playbook, so it carries the standard's own type for human work, with the
+step text as the instruction:
+
+```jsonc
+"agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+"commands": [
+  { "type": "manual", "command": "<the step's description, verbatim>" }
+]
+```
+
+`tests/content/test_cacao_agents_and_commands.py` pins the command text to
+the description. The n8n emitter renders such a step as its I/O-contract
+Set node; the Temporal emitter treats it as human-in-the-loop and emits the
+signal and query scaffold; the LangGraph emitter reads neither field. When
+a primitive is bound later, the `manual` command is replaced by the
+`secops-ng-primitive` one in the same change.

@@ -25,6 +25,9 @@ async def establish_oversight_roster(deployment_id: str, oversight_cycle: str) -
 
     CACAO step_id: action--e14a5100-0000-4000-8000-000000000002
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e14a5100-0000-4000-8000-000000000002',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000002', 'secops_ng.step.name': 'establish_oversight_roster', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'establish_oversight_roster'},
@@ -38,9 +41,9 @@ async def establish_oversight_roster(deployment_id: str, oversight_cycle: str) -
 
 ESTABLISH_OVERSIGHT_ROSTER_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -49,6 +52,9 @@ async def brief_oversight_personnel(deployment_id: str, oversight_roster_id: str
 
     CACAO step_id: action--e14a5100-0000-4000-8000-000000000003
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e14a5100-0000-4000-8000-000000000003',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000003', 'secops_ng.step.name': 'brief_oversight_personnel', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'brief_oversight_personnel'},
@@ -62,9 +68,9 @@ async def brief_oversight_personnel(deployment_id: str, oversight_roster_id: str
 
 BRIEF_OVERSIGHT_PERSONNEL_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -73,6 +79,9 @@ async def review_flagged_decisions(deployment_id: str, oversight_cycle: str, ove
 
     CACAO step_id: action--e14a5100-0000-4000-8000-000000000004
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e14a5100-0000-4000-8000-000000000004',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000004', 'secops_ng.step.name': 'review_flagged_decisions', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'review_flagged_decisions'},
@@ -86,9 +95,9 @@ async def review_flagged_decisions(deployment_id: str, oversight_cycle: str, ove
 
 REVIEW_FLAGGED_DECISIONS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -97,6 +106,9 @@ async def record_intervention(deployment_id: str, review_disposition_id: str) ->
 
     CACAO step_id: action--e14a5100-0000-4000-8000-000000000005
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e14a5100-0000-4000-8000-000000000005',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000005', 'secops_ng.step.name': 'record_intervention', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'record_intervention'},
@@ -110,9 +122,9 @@ async def record_intervention(deployment_id: str, review_disposition_id: str) ->
 
 RECORD_INTERVENTION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -121,6 +133,9 @@ async def emit_oversight_evidence(deployment_id: str, oversight_cycle: str, over
 
     CACAO step_id: action--e14a5100-0000-4000-8000-000000000006
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e14a5100-0000-4000-8000-000000000006',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000006', 'secops_ng.step.name': 'emit_oversight_evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_oversight_evidence'},
@@ -134,9 +149,9 @@ async def emit_oversight_evidence(deployment_id: str, oversight_cycle: str, over
 
 EMIT_OVERSIGHT_EVIDENCE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @workflow.defn
@@ -150,6 +165,101 @@ class PlaybookAiHumanOversightV1Workflow:
     workflow_start    : start--e14a5100-0000-4000-8000-000000000001
     activities        : establish_oversight_roster, brief_oversight_personnel, review_flagged_decisions, record_intervention, emit_oversight_evidence
     """
+
+    # Human-in-the-loop scaffold for CACAO step action--e14a5100-0000-4000-8000-000000000002.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_establish_oversight_roster_decision is not None` before continuing.
+    _establish_oversight_roster_decision: bool | None = None
+    _establish_oversight_roster_reason: str | None = None
+
+    @workflow.signal
+    def establish_oversight_roster_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._establish_oversight_roster_decision = decision
+        self._establish_oversight_roster_reason = reason
+
+    @workflow.query
+    def establish_oversight_roster_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._establish_oversight_roster_decision is None:
+            return "pending"
+        return "approved" if self._establish_oversight_roster_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--e14a5100-0000-4000-8000-000000000003.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_brief_oversight_personnel_decision is not None` before continuing.
+    _brief_oversight_personnel_decision: bool | None = None
+    _brief_oversight_personnel_reason: str | None = None
+
+    @workflow.signal
+    def brief_oversight_personnel_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._brief_oversight_personnel_decision = decision
+        self._brief_oversight_personnel_reason = reason
+
+    @workflow.query
+    def brief_oversight_personnel_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._brief_oversight_personnel_decision is None:
+            return "pending"
+        return "approved" if self._brief_oversight_personnel_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--e14a5100-0000-4000-8000-000000000004.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_review_flagged_decisions_decision is not None` before continuing.
+    _review_flagged_decisions_decision: bool | None = None
+    _review_flagged_decisions_reason: str | None = None
+
+    @workflow.signal
+    def review_flagged_decisions_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._review_flagged_decisions_decision = decision
+        self._review_flagged_decisions_reason = reason
+
+    @workflow.query
+    def review_flagged_decisions_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._review_flagged_decisions_decision is None:
+            return "pending"
+        return "approved" if self._review_flagged_decisions_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--e14a5100-0000-4000-8000-000000000005.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_record_intervention_decision is not None` before continuing.
+    _record_intervention_decision: bool | None = None
+    _record_intervention_reason: str | None = None
+
+    @workflow.signal
+    def record_intervention_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._record_intervention_decision = decision
+        self._record_intervention_reason = reason
+
+    @workflow.query
+    def record_intervention_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._record_intervention_decision is None:
+            return "pending"
+        return "approved" if self._record_intervention_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--e14a5100-0000-4000-8000-000000000006.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_emit_oversight_evidence_decision is not None` before continuing.
+    _emit_oversight_evidence_decision: bool | None = None
+    _emit_oversight_evidence_reason: str | None = None
+
+    @workflow.signal
+    def emit_oversight_evidence_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._emit_oversight_evidence_decision = decision
+        self._emit_oversight_evidence_reason = reason
+
+    @workflow.query
+    def emit_oversight_evidence_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._emit_oversight_evidence_decision is None:
+            return "pending"
+        return "approved" if self._emit_oversight_evidence_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:

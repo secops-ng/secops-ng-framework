@@ -25,6 +25,9 @@ async def ingest_finding(finding_id: str) -> None:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000002
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000002',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest finding', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_finding'},
@@ -38,9 +41,9 @@ async def ingest_finding(finding_id: str) -> None:
 
 INGEST_FINDING_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -49,6 +52,9 @@ async def enrich_resource_and_owner(finding_id: str) -> dict[str, object]:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000003
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000003',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'enrich resource and owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enrich_resource_and_owner'},
@@ -62,9 +68,9 @@ async def enrich_resource_and_owner(finding_id: str) -> dict[str, object]:
 
 ENRICH_RESOURCE_AND_OWNER_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -73,6 +79,9 @@ async def suppress_and_close() -> None:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000005
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000005',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'suppress and close', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'suppress_and_close'},
@@ -86,9 +95,9 @@ async def suppress_and_close() -> None:
 
 SUPPRESS_AND_CLOSE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -97,6 +106,9 @@ async def notify_owner(owner_id: str, resource_id: str, severity: str) -> None:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000006
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000006',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'notify owner', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_owner'},
@@ -110,9 +122,9 @@ async def notify_owner(owner_id: str, resource_id: str, severity: str) -> None:
 
 NOTIFY_OWNER_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -121,6 +133,9 @@ async def guided_remediation(resource_id: str, owner_id: str) -> None:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000007
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000007',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'guided remediation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'guided_remediation'},
@@ -134,9 +149,9 @@ async def guided_remediation(resource_id: str, owner_id: str) -> None:
 
 GUIDED_REMEDIATION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -145,6 +160,9 @@ async def re_scan(resource_id: str, finding_id: str) -> bool:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000008
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000008',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 're-scan', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 're_scan'},
@@ -158,9 +176,9 @@ async def re_scan(resource_id: str, finding_id: str) -> bool:
 
 RE_SCAN_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -169,6 +187,9 @@ async def escalate(finding_id: str, resource_id: str, severity: str) -> None:
 
     CACAO step_id: action--30000000-0000-4000-8000-00000000000b
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-00000000000b',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-00000000000b', 'secops_ng.step.name': 'escalate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'escalate'},
@@ -182,9 +203,9 @@ async def escalate(finding_id: str, resource_id: str, severity: str) -> None:
 
 ESCALATE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @workflow.defn
@@ -198,6 +219,139 @@ class PlaybookCloudMisconfigurationV1Workflow:
     workflow_start    : start--30000000-0000-4000-8000-000000000001
     activities        : ingest_finding, enrich_resource_and_owner, suppress_and_close, notify_owner, guided_remediation, re_scan, escalate
     """
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000002.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_ingest_finding_decision is not None` before continuing.
+    _ingest_finding_decision: bool | None = None
+    _ingest_finding_reason: str | None = None
+
+    @workflow.signal
+    def ingest_finding_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._ingest_finding_decision = decision
+        self._ingest_finding_reason = reason
+
+    @workflow.query
+    def ingest_finding_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._ingest_finding_decision is None:
+            return "pending"
+        return "approved" if self._ingest_finding_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000003.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_enrich_resource_and_owner_decision is not None` before continuing.
+    _enrich_resource_and_owner_decision: bool | None = None
+    _enrich_resource_and_owner_reason: str | None = None
+
+    @workflow.signal
+    def enrich_resource_and_owner_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._enrich_resource_and_owner_decision = decision
+        self._enrich_resource_and_owner_reason = reason
+
+    @workflow.query
+    def enrich_resource_and_owner_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._enrich_resource_and_owner_decision is None:
+            return "pending"
+        return "approved" if self._enrich_resource_and_owner_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000005.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_suppress_and_close_decision is not None` before continuing.
+    _suppress_and_close_decision: bool | None = None
+    _suppress_and_close_reason: str | None = None
+
+    @workflow.signal
+    def suppress_and_close_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._suppress_and_close_decision = decision
+        self._suppress_and_close_reason = reason
+
+    @workflow.query
+    def suppress_and_close_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._suppress_and_close_decision is None:
+            return "pending"
+        return "approved" if self._suppress_and_close_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000006.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_notify_owner_decision is not None` before continuing.
+    _notify_owner_decision: bool | None = None
+    _notify_owner_reason: str | None = None
+
+    @workflow.signal
+    def notify_owner_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._notify_owner_decision = decision
+        self._notify_owner_reason = reason
+
+    @workflow.query
+    def notify_owner_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._notify_owner_decision is None:
+            return "pending"
+        return "approved" if self._notify_owner_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000007.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_guided_remediation_decision is not None` before continuing.
+    _guided_remediation_decision: bool | None = None
+    _guided_remediation_reason: str | None = None
+
+    @workflow.signal
+    def guided_remediation_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._guided_remediation_decision = decision
+        self._guided_remediation_reason = reason
+
+    @workflow.query
+    def guided_remediation_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._guided_remediation_decision is None:
+            return "pending"
+        return "approved" if self._guided_remediation_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000008.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_re_scan_decision is not None` before continuing.
+    _re_scan_decision: bool | None = None
+    _re_scan_reason: str | None = None
+
+    @workflow.signal
+    def re_scan_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._re_scan_decision = decision
+        self._re_scan_reason = reason
+
+    @workflow.query
+    def re_scan_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._re_scan_decision is None:
+            return "pending"
+        return "approved" if self._re_scan_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-00000000000b.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_escalate_decision is not None` before continuing.
+    _escalate_decision: bool | None = None
+    _escalate_reason: str | None = None
+
+    @workflow.signal
+    def escalate_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._escalate_decision = decision
+        self._escalate_reason = reason
+
+    @workflow.query
+    def escalate_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._escalate_decision is None:
+            return "pending"
+        return "approved" if self._escalate_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:

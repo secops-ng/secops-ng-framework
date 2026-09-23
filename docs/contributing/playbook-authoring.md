@@ -126,8 +126,8 @@ action step to name an `agent` and to carry at least one command. Every
 playbook declares one agent in `agent_definitions` — the group
 *Security operations team*, under the fixed id
 `group--9479ad47-df96-5a3c-831a-f668158e5b9e` — and every action step
-names it in `agent`. A bound step (one with `core_body`) also carries
-exactly one command:
+names it in `agent`. Every action step also carries exactly one command,
+and its type says who does the work:
 
 ```json
 "commands": [
@@ -135,19 +135,33 @@ exactly one command:
 ]
 ```
 
+for a **bound** step (one with `core_body`), and
+
+```json
+"commands": [
+  { "type": "manual", "command": "<the step's description, verbatim>" }
+]
+```
+
+for an **unbound** step, where an operator performs the work.
 `secops-ng-primitive` is a value in CACAO's open command-type vocabulary;
-none of the listed types describes a call into a Python primitive.
-`tests/content/test_cacao_agents_and_commands.py` pins the command equal to
-`core_body.primitive`. The compilers still compile `core_body` and never
-read the command — it exists so that CACAO tooling can see what the step
-runs.
+none of the listed types describes a call into a Python primitive. `manual`
+is the standard's own type for a step a human performs.
+`tests/content/test_cacao_agents_and_commands.py` pins the bound command
+equal to `core_body.primitive` and the manual command equal to the step's
+`description`, so neither copy can drift.
+
+The compilers compile `core_body` and never read the primitive command. A
+`manual` command does shape output: the n8n emitter renders the step's I/O
+contract as an editable Set node, and the Temporal emitter wraps the step
+in its human-in-the-loop signal and query scaffold, so the workflow waits
+for an operator to release it.
 
 **Do not express a step's work as other command types** (`http-api`,
 `bash`, …) for the compilers to execute. Earlier revisions of this
 document recommended that; it was wrong, because the compilers compile
 `core_body`, and the last two playbooks doing it were converted in #854
-and #863. Unbound steps carry no command for now, so they still fail the
-official schema on `commands`; their representation lands separately.
+and #863.
 
 `content/playbooks/cra_cvd/playbook.cacao.json` is a full worked
 example.

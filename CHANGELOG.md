@@ -8,6 +8,16 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Every canonical playbook now passes the official OASIS CACAO 2.0
+  schema.** The 112 unbound action steps (all in experimental or draft
+  playbooks) carry one `manual` command whose text is the step's
+  description, completing the agents-and-commands representation. The
+  conformance baseline is all zeros and the test suite states the floor as
+  zero. Compiled output for stable playbooks is unchanged; for experimental
+  and draft playbooks the n8n workflows keep their contract nodes with an
+  updated note, and the Temporal modules gain the human-in-the-loop
+  signal and query scaffolds the emitter has always produced for `manual`
+  commands.
 - **Switch cases are single step identifiers.** The four playbooks with a
   `switch-condition` step (`alert_triage`, `cryptographic_controls`,
   `phishing_triage`, `vuln_intake`) now write `cases` as case value → one

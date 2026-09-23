@@ -98,6 +98,12 @@
         "__catalog_ref__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Load the operator's pinned KPI/KRI catalog version from `__catalog_ref__`. Each entry MUST validate against `content-model/metrics.schema.json` before it enters the rollup; entries that fail validation are recorded for the corrective-action register and excluded from the score so a malformed entry cannot inflate or deflate effectiveness."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.control_effectiveness_test@v1"
@@ -121,6 +127,12 @@
         "__breach_band_hit__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "For each catalog entry, compute the value defined by the metric's `measurement.formula` over `__rollup_window__` against the operator's telemetry / workflow / control attestation source. Each evaluation carries the matched threshold band (target / warn / breach) and references the lower-layer artifacts (playbook step, detection, control, telemetry) the metric is bound to via its `inputs[]`. Emits `__metric_evaluations__`, and sets `__breach_band_hit__` to true when any evaluation matched its `breach` band — the flag the board-attention branch reads."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.control_effectiveness_test@v1"
@@ -143,6 +155,12 @@
         "__control_effectiveness_score__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Group the evaluations by `control_refs[]` and compute a composite control-effectiveness score per control, then aggregate to a programme-level score in `0.0..1.0`. The scoring policy (per-control weighting, KRI penalty function, missing-evidence treatment) is operator-supplied. The playbook only pins the input contract and the output shape so the score is reproducible from the same evaluations."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.control_effectiveness_test@v1",
@@ -171,6 +189,12 @@
         "__metric_evaluations__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Annotate the in-flight summary with a board-attention flag so the downstream pack pipeline surfaces the breach band on the cover page. Pure annotation step — no notification is sent here; the board pack pipeline owns the distribution channel and cadence."
+        }
+      ],
       "x_secops_ng": {
         "metric_refs": [
           "kri.corrective_action_overdue@v1"
@@ -191,6 +215,12 @@
         "__board_summary_id__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Render the structured board-ready summary artifact and hand it off to the operator's board pack pipeline. The artifact carries: window, per-metric evaluations with threshold bands, per-control effectiveness scores, programme-level score, and (if set) the board-attention flag. Output is content-only — distribution, signing, and archival are out of scope of the playbook."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.control_effectiveness_test@v1"

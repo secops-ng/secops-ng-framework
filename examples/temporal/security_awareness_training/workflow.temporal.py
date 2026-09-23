@@ -25,6 +25,9 @@ async def schedule_assessment(training_window: str, training_scope: str) -> str:
 
     CACAO step_id: action--54000000-0000-4000-8000-000000000002
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--54000000-0000-4000-8000-000000000002',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--9e4d5f60-7182-4b33-ae4f-05c6d7e8f901', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--54000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'schedule assessment', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'schedule_assessment'},
@@ -38,9 +41,9 @@ async def schedule_assessment(training_window: str, training_scope: str) -> str:
 
 SCHEDULE_ASSESSMENT_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -49,6 +52,9 @@ async def design_content(assessment_id: str, training_scope: str) -> str:
 
     CACAO step_id: action--54000000-0000-4000-8000-000000000003
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--54000000-0000-4000-8000-000000000003',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--9e4d5f60-7182-4b33-ae4f-05c6d7e8f901', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--54000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'design content', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'design_content'},
@@ -62,9 +68,9 @@ async def design_content(assessment_id: str, training_scope: str) -> str:
 
 DESIGN_CONTENT_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -73,6 +79,9 @@ async def deliver_training(curriculum_id: str, training_scope: str) -> str:
 
     CACAO step_id: action--54000000-0000-4000-8000-000000000004
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--54000000-0000-4000-8000-000000000004',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--9e4d5f60-7182-4b33-ae4f-05c6d7e8f901', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--54000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'deliver training', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'deliver_training'},
@@ -86,9 +95,9 @@ async def deliver_training(curriculum_id: str, training_scope: str) -> str:
 
 DELIVER_TRAINING_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -97,6 +106,9 @@ async def record_completion(delivery_id: str, training_window: str) -> str:
 
     CACAO step_id: action--54000000-0000-4000-8000-000000000005
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--54000000-0000-4000-8000-000000000005',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--9e4d5f60-7182-4b33-ae4f-05c6d7e8f901', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--54000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'record completion', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'record_completion'},
@@ -110,9 +122,9 @@ async def record_completion(delivery_id: str, training_window: str) -> str:
 
 RECORD_COMPLETION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -121,6 +133,9 @@ async def report_gaps(completion_id: str, assessment_id: str) -> str:
 
     CACAO step_id: action--54000000-0000-4000-8000-000000000006
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--54000000-0000-4000-8000-000000000006',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--9e4d5f60-7182-4b33-ae4f-05c6d7e8f901', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--54000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'report gaps', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'report_gaps'},
@@ -134,9 +149,9 @@ async def report_gaps(completion_id: str, assessment_id: str) -> str:
 
 REPORT_GAPS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -145,6 +160,9 @@ async def review_cycle(assessment_id: str, curriculum_id: str, delivery_id: str,
 
     CACAO step_id: action--54000000-0000-4000-8000-000000000007
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--54000000-0000-4000-8000-000000000007',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--9e4d5f60-7182-4b33-ae4f-05c6d7e8f901', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--54000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'review cycle', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'review_cycle'},
@@ -158,9 +176,9 @@ async def review_cycle(assessment_id: str, curriculum_id: str, delivery_id: str,
 
 REVIEW_CYCLE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @workflow.defn
@@ -174,6 +192,120 @@ class PlaybookSecurityAwarenessTrainingV1Workflow:
     workflow_start    : start--54000000-0000-4000-8000-000000000001
     activities        : schedule_assessment, design_content, deliver_training, record_completion, report_gaps, review_cycle
     """
+
+    # Human-in-the-loop scaffold for CACAO step action--54000000-0000-4000-8000-000000000002.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_schedule_assessment_decision is not None` before continuing.
+    _schedule_assessment_decision: bool | None = None
+    _schedule_assessment_reason: str | None = None
+
+    @workflow.signal
+    def schedule_assessment_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._schedule_assessment_decision = decision
+        self._schedule_assessment_reason = reason
+
+    @workflow.query
+    def schedule_assessment_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._schedule_assessment_decision is None:
+            return "pending"
+        return "approved" if self._schedule_assessment_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--54000000-0000-4000-8000-000000000003.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_design_content_decision is not None` before continuing.
+    _design_content_decision: bool | None = None
+    _design_content_reason: str | None = None
+
+    @workflow.signal
+    def design_content_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._design_content_decision = decision
+        self._design_content_reason = reason
+
+    @workflow.query
+    def design_content_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._design_content_decision is None:
+            return "pending"
+        return "approved" if self._design_content_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--54000000-0000-4000-8000-000000000004.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_deliver_training_decision is not None` before continuing.
+    _deliver_training_decision: bool | None = None
+    _deliver_training_reason: str | None = None
+
+    @workflow.signal
+    def deliver_training_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._deliver_training_decision = decision
+        self._deliver_training_reason = reason
+
+    @workflow.query
+    def deliver_training_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._deliver_training_decision is None:
+            return "pending"
+        return "approved" if self._deliver_training_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--54000000-0000-4000-8000-000000000005.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_record_completion_decision is not None` before continuing.
+    _record_completion_decision: bool | None = None
+    _record_completion_reason: str | None = None
+
+    @workflow.signal
+    def record_completion_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._record_completion_decision = decision
+        self._record_completion_reason = reason
+
+    @workflow.query
+    def record_completion_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._record_completion_decision is None:
+            return "pending"
+        return "approved" if self._record_completion_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--54000000-0000-4000-8000-000000000006.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_report_gaps_decision is not None` before continuing.
+    _report_gaps_decision: bool | None = None
+    _report_gaps_reason: str | None = None
+
+    @workflow.signal
+    def report_gaps_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._report_gaps_decision = decision
+        self._report_gaps_reason = reason
+
+    @workflow.query
+    def report_gaps_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._report_gaps_decision is None:
+            return "pending"
+        return "approved" if self._report_gaps_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--54000000-0000-4000-8000-000000000007.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_review_cycle_decision is not None` before continuing.
+    _review_cycle_decision: bool | None = None
+    _review_cycle_reason: str | None = None
+
+    @workflow.signal
+    def review_cycle_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._review_cycle_decision = decision
+        self._review_cycle_reason = reason
+
+    @workflow.query
+    def review_cycle_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._review_cycle_decision is None:
+            return "pending"
+        return "approved" if self._review_cycle_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:

@@ -47,7 +47,7 @@ from __future__ import annotations
 
 import json
 import re
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -397,7 +397,7 @@ class _WorkflowBuilder:
         if core_body is not None:
             return _CODE, _TV_CODE, _core_body_code_parameters(core_body)
 
-        if not step.commands:
+        if not step.commands or _manual_only(step.commands):
             return self._map_action_without_commands(step)
 
         if len(step.commands) > 1:
@@ -425,13 +425,15 @@ class _WorkflowBuilder:
     def _map_action_without_commands(
         self, step: WorkflowStep
     ) -> tuple[str, int | float, dict[str, Any]]:
-        """Render an action step that carries no CACAO commands.
+        """Render an action step an operator performs.
 
-        CACAO action steps without ``commands`` typically encode work that
-        an operator wires manually — but the playbook author may still
-        have declared the I/O contract via ``in_args`` / ``out_args`` and
-        annotated the step with ``x_secops_ng`` references (detection,
-        control, telemetry, metric refs).
+        Two shapes land here: an action whose only commands are CACAO
+        ``manual`` commands (the catalogue's representation of an unbound
+        step), and an action with no ``commands`` at all (test fixtures and
+        pre-standard documents). Either way the work is the operator's, but
+        the author will have declared the I/O contract via ``in_args`` /
+        ``out_args`` and annotated the step with ``x_secops_ng`` references
+        (detection, control, telemetry, metric refs).
 
         When at least one of those signals is present we emit an
         ``n8n-nodes-base.set`` node whose ``assignments`` expose every
@@ -440,18 +442,20 @@ class _WorkflowBuilder:
         contract. Steps with no signals at all degrade to ``noOp`` so
         behaviour for truly empty actions is preserved.
         """
+        kind = "manual action" if step.commands else "action with no commands"
         assignments = self._build_set_assignments(step)
         if not assignments:
             self._notes.append(
-                f"step {step.step_id!r}: action with no commands — emitted "
+                f"step {step.step_id!r}: {kind} — emitted "
                 "as no-op placeholder. Operator must wire the work in n8n."
             )
             return _NOOP, _TV_NOOP, {}
 
         self._notes.append(
-            f"step {step.step_id!r}: action with no commands — emitted "
+            f"step {step.step_id!r}: {kind} — emitted "
             "Set node carrying the CACAO I/O contract (in_args / out_args / "
-            "x_secops_ng refs). Operator fills the values in n8n."
+            "x_secops_ng refs). Operator performs the step and fills the "
+            "values in n8n."
         )
         return _SET, _TV_SET, {
             "assignments": {"assignments": assignments},
@@ -824,6 +828,18 @@ class _WorkflowBuilder:
 # --------------------------------------------------------------------------- #
 # helpers                                                                     #
 # --------------------------------------------------------------------------- #
+
+
+def _manual_only(commands: Sequence[Mapping[str, Any]]) -> bool:
+    """True when every command on the step is a CACAO ``manual`` command.
+
+    That is how the catalogue represents an unbound action step: the work is
+    the operator's, so the emitter renders the step's I/O contract rather
+    than a no-op, exactly as it does for a step with no commands at all.
+    """
+    return bool(commands) and all(
+        isinstance(c, Mapping) and str(c.get("type", "")).lower() == "manual" for c in commands
+    )
 
 
 def _typed_variable_value(cacao_type: str, value: Any) -> Any:

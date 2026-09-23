@@ -142,7 +142,7 @@ def test_set_nodes_surface_non_empty_x_secops_ng_refs() -> None:
     nodes_by_id = {node["id"]: node for node in workflow["nodes"]}
 
     for step_id, step in steps.items():
-        if step.get("type") != "action" or step.get("commands"):
+        if step.get("type") != "action" or any(c.get("type") != "manual" for c in step.get("commands") or ()):
             continue
         x = step.get("x_secops_ng") or {}
         if not x:

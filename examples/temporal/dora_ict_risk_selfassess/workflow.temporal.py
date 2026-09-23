@@ -25,6 +25,9 @@ async def collect_section_evidence(assessment_window: str) -> dict[str, object]:
 
     CACAO step_id: action--92000000-0000-4000-8000-000000000002
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--92000000-0000-4000-8000-000000000002',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--92a2b3c4-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--92000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'collect section evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'collect_section_evidence'},
@@ -38,9 +41,9 @@ async def collect_section_evidence(assessment_window: str) -> dict[str, object]:
 
 COLLECT_SECTION_EVIDENCE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -49,6 +52,9 @@ async def map_evidence_to_sections(assessment_window: str, section_atoms: str, e
 
     CACAO step_id: action--92000000-0000-4000-8000-000000000003
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--92000000-0000-4000-8000-000000000003',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--92a2b3c4-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--92000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'map evidence to sections', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'map_evidence_to_sections'},
@@ -62,9 +68,9 @@ async def map_evidence_to_sections(assessment_window: str, section_atoms: str, e
 
 MAP_EVIDENCE_TO_SECTIONS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -73,6 +79,9 @@ async def score_per_section_coverage(section_atoms: str, section_mapping: str) -
 
     CACAO step_id: action--92000000-0000-4000-8000-000000000004
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--92000000-0000-4000-8000-000000000004',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--92a2b3c4-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--92000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'score per-section coverage', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'score_per_section_coverage'},
@@ -86,9 +95,9 @@ async def score_per_section_coverage(section_atoms: str, section_mapping: str) -
 
 SCORE_PER_SECTION_COVERAGE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -97,6 +106,9 @@ async def report_attestation(assessment_window: str, section_atoms: str, section
 
     CACAO step_id: action--92000000-0000-4000-8000-000000000005
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--92000000-0000-4000-8000-000000000005',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--92a2b3c4-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--92000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'report attestation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'report_attestation'},
@@ -110,9 +122,9 @@ async def report_attestation(assessment_window: str, section_atoms: str, section
 
 REPORT_ATTESTATION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @workflow.defn
@@ -126,6 +138,82 @@ class PlaybookDoraIctRiskSelfassessV1Workflow:
     workflow_start    : start--92000000-0000-4000-8000-000000000001
     activities        : collect_section_evidence, map_evidence_to_sections, score_per_section_coverage, report_attestation
     """
+
+    # Human-in-the-loop scaffold for CACAO step action--92000000-0000-4000-8000-000000000002.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_collect_section_evidence_decision is not None` before continuing.
+    _collect_section_evidence_decision: bool | None = None
+    _collect_section_evidence_reason: str | None = None
+
+    @workflow.signal
+    def collect_section_evidence_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._collect_section_evidence_decision = decision
+        self._collect_section_evidence_reason = reason
+
+    @workflow.query
+    def collect_section_evidence_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._collect_section_evidence_decision is None:
+            return "pending"
+        return "approved" if self._collect_section_evidence_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--92000000-0000-4000-8000-000000000003.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_map_evidence_to_sections_decision is not None` before continuing.
+    _map_evidence_to_sections_decision: bool | None = None
+    _map_evidence_to_sections_reason: str | None = None
+
+    @workflow.signal
+    def map_evidence_to_sections_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._map_evidence_to_sections_decision = decision
+        self._map_evidence_to_sections_reason = reason
+
+    @workflow.query
+    def map_evidence_to_sections_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._map_evidence_to_sections_decision is None:
+            return "pending"
+        return "approved" if self._map_evidence_to_sections_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--92000000-0000-4000-8000-000000000004.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_score_per_section_coverage_decision is not None` before continuing.
+    _score_per_section_coverage_decision: bool | None = None
+    _score_per_section_coverage_reason: str | None = None
+
+    @workflow.signal
+    def score_per_section_coverage_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._score_per_section_coverage_decision = decision
+        self._score_per_section_coverage_reason = reason
+
+    @workflow.query
+    def score_per_section_coverage_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._score_per_section_coverage_decision is None:
+            return "pending"
+        return "approved" if self._score_per_section_coverage_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--92000000-0000-4000-8000-000000000005.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_report_attestation_decision is not None` before continuing.
+    _report_attestation_decision: bool | None = None
+    _report_attestation_reason: str | None = None
+
+    @workflow.signal
+    def report_attestation_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._report_attestation_decision = decision
+        self._report_attestation_reason = reason
+
+    @workflow.query
+    def report_attestation_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._report_attestation_decision is None:
+            return "pending"
+        return "approved" if self._report_attestation_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:

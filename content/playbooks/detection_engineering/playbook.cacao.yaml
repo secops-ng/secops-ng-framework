@@ -138,6 +138,9 @@ workflow:
       - __proposal_rationale__
     on_completion: "action--f0e4f404-0000-4000-8000-000000000003"
     agent: "group--9479ad47-df96-5a3c-831a-f668158e5b9e"
+    commands:
+      - type: manual
+        command: "Intake the candidate rule version, its rationale, and the ATT&CK / detection-class bindings the proposer asserts. Operator wires the proposal-envelope handler in n8n; the CACAO I/O contract carries the inputs and the variable the next step reads."
     x_secops_ng:
       control_refs:
         - "control.control_effectiveness_test@v1"
@@ -158,6 +161,9 @@ workflow:
       - __review_verdict__
     on_completion: "action--f0e4f404-0000-4000-8000-000000000004"
     agent: "group--9479ad47-df96-5a3c-831a-f668158e5b9e"
+    commands:
+      - type: manual
+        command: "Peer-review the candidate rule against the operator's review checklist. Produces ``__review_verdict__``. Transitions are unconditional in this artifact; the follow-up sibling inserts a switch-condition keyed on the verdict with three branches (approved -> ship, changes_requested -> propose, rejected -> end)."
     x_secops_ng:
       control_refs:
         - "control.control_effectiveness_test@v1"
@@ -179,6 +185,9 @@ workflow:
       - __ship_status__
     on_completion: "action--f0e4f404-0000-4000-8000-000000000005"
     agent: "group--9479ad47-df96-5a3c-831a-f668158e5b9e"
+    commands:
+      - type: manual
+        command: "Promote the approved rule version to production status in the operator's detection store. Operator-side destination is resolved at the compile target's config layer (sovereign-stack constraint — the framework ships no default detection store). Sets ``__ship_status__``."
     x_secops_ng:
       control_refs:
         - "control.control_effectiveness_test@v1"
@@ -205,6 +214,9 @@ workflow:
       - __effectiveness_snapshot_id__
     on_completion: "end--f0e4f404-0000-4000-8000-000000000006"
     agent: "group--9479ad47-df96-5a3c-831a-f668158e5b9e"
+    commands:
+      - type: manual
+        command: "Emit a per-rule-version effectiveness-metric snapshot shaped per ``schemas/evidence/rule-effectiveness-snapshot.schema.json``. The snapshot pins the indicator value to the exact (``__rule_id__``, ``__rule_version__``) the lifecycle is operating on and carries pointers to the OCSF source-data shape and the reference visualisation hint the F-CP-06 effectiveness stream consumes. Metric storage is operator-configured; the n8n adapter at ``compilers/n8n/evidence/rule_effectiveness_node.py`` writes the snapshot to a directory the operator's chosen sink ingests from."
     x_secops_ng:
       control_refs:
         - "control.control_effectiveness_test@v1"

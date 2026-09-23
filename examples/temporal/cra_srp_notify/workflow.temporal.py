@@ -25,6 +25,9 @@ async def early_warning(case_id: str, clock_kind: str, awareness_ts: str) -> str
 
     CACAO step_id: action--5a509a09-0000-4000-8000-000000000002
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--5a509a09-0000-4000-8000-000000000002',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--5a509a09-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--5a509a09-0000-4000-8000-000000000002', 'secops_ng.step.name': 'early_warning', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'early_warning'},
@@ -38,9 +41,9 @@ async def early_warning(case_id: str, clock_kind: str, awareness_ts: str) -> str
 
 EARLY_WARNING_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -49,6 +52,9 @@ async def wait_until_72h_deadline(awareness_ts: str) -> None:
 
     CACAO step_id: action--5a509a09-0000-4000-8000-000000000004
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--5a509a09-0000-4000-8000-000000000004',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--5a509a09-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--5a509a09-0000-4000-8000-000000000004', 'secops_ng.step.name': 'wait until 72h deadline', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'wait_until_72h_deadline'},
@@ -62,9 +68,9 @@ async def wait_until_72h_deadline(awareness_ts: str) -> None:
 
 WAIT_UNTIL_72H_DEADLINE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -73,6 +79,9 @@ async def full_notification(case_id: str, clock_kind: str, awareness_ts: str) ->
 
     CACAO step_id: action--5a509a09-0000-4000-8000-000000000005
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--5a509a09-0000-4000-8000-000000000005',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--5a509a09-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--5a509a09-0000-4000-8000-000000000005', 'secops_ng.step.name': 'full_notification', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'full_notification'},
@@ -86,9 +95,9 @@ async def full_notification(case_id: str, clock_kind: str, awareness_ts: str) ->
 
 FULL_NOTIFICATION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -97,6 +106,9 @@ async def wait_until_final_report_deadline(clock_kind: str, awareness_ts: str) -
 
     CACAO step_id: action--5a509a09-0000-4000-8000-000000000006
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--5a509a09-0000-4000-8000-000000000006',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--5a509a09-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--5a509a09-0000-4000-8000-000000000006', 'secops_ng.step.name': 'wait until final-report deadline', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'wait_until_final_report_deadline'},
@@ -110,9 +122,9 @@ async def wait_until_final_report_deadline(clock_kind: str, awareness_ts: str) -
 
 WAIT_UNTIL_FINAL_REPORT_DEADLINE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -121,6 +133,9 @@ async def final_report(case_id: str, clock_kind: str, awareness_ts: str) -> str:
 
     CACAO step_id: action--5a509a09-0000-4000-8000-000000000007
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--5a509a09-0000-4000-8000-000000000007',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--5a509a09-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--5a509a09-0000-4000-8000-000000000007', 'secops_ng.step.name': 'final_report', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'final_report'},
@@ -134,9 +149,9 @@ async def final_report(case_id: str, clock_kind: str, awareness_ts: str) -> str:
 
 FINAL_REPORT_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @workflow.defn
@@ -150,6 +165,101 @@ class PlaybookCraSrpNotifyV1Workflow:
     workflow_start    : start--5a509a09-0000-4000-8000-000000000001
     activities        : early_warning, wait_until_72h_deadline, full_notification, wait_until_final_report_deadline, final_report
     """
+
+    # Human-in-the-loop scaffold for CACAO step action--5a509a09-0000-4000-8000-000000000002.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_early_warning_decision is not None` before continuing.
+    _early_warning_decision: bool | None = None
+    _early_warning_reason: str | None = None
+
+    @workflow.signal
+    def early_warning_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._early_warning_decision = decision
+        self._early_warning_reason = reason
+
+    @workflow.query
+    def early_warning_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._early_warning_decision is None:
+            return "pending"
+        return "approved" if self._early_warning_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--5a509a09-0000-4000-8000-000000000004.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_wait_until_72h_deadline_decision is not None` before continuing.
+    _wait_until_72h_deadline_decision: bool | None = None
+    _wait_until_72h_deadline_reason: str | None = None
+
+    @workflow.signal
+    def wait_until_72h_deadline_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._wait_until_72h_deadline_decision = decision
+        self._wait_until_72h_deadline_reason = reason
+
+    @workflow.query
+    def wait_until_72h_deadline_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._wait_until_72h_deadline_decision is None:
+            return "pending"
+        return "approved" if self._wait_until_72h_deadline_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--5a509a09-0000-4000-8000-000000000005.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_full_notification_decision is not None` before continuing.
+    _full_notification_decision: bool | None = None
+    _full_notification_reason: str | None = None
+
+    @workflow.signal
+    def full_notification_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._full_notification_decision = decision
+        self._full_notification_reason = reason
+
+    @workflow.query
+    def full_notification_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._full_notification_decision is None:
+            return "pending"
+        return "approved" if self._full_notification_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--5a509a09-0000-4000-8000-000000000006.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_wait_until_final_report_deadline_decision is not None` before continuing.
+    _wait_until_final_report_deadline_decision: bool | None = None
+    _wait_until_final_report_deadline_reason: str | None = None
+
+    @workflow.signal
+    def wait_until_final_report_deadline_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._wait_until_final_report_deadline_decision = decision
+        self._wait_until_final_report_deadline_reason = reason
+
+    @workflow.query
+    def wait_until_final_report_deadline_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._wait_until_final_report_deadline_decision is None:
+            return "pending"
+        return "approved" if self._wait_until_final_report_deadline_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--5a509a09-0000-4000-8000-000000000007.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_final_report_decision is not None` before continuing.
+    _final_report_decision: bool | None = None
+    _final_report_reason: str | None = None
+
+    @workflow.signal
+    def final_report_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._final_report_decision = decision
+        self._final_report_reason = reason
+
+    @workflow.query
+    def final_report_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._final_report_decision is None:
+            return "pending"
+        return "approved" if self._final_report_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:

@@ -101,6 +101,12 @@
         "__roster_id__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Resolve the in-scope training roster from the operator's HR / identity source against __training_scope__: which staff cohorts are subject to mandatory awareness training, which staff hold roles that require role-based training, and which cohorts are enrolled in the phishing-simulation programme. Emits __roster_id__ as a per-staff record of (staff id, cohort, mandatory tracks assigned, role-based tracks assigned, joiner/leaver state). The inventory is read-only against the HR and identity surfaces; it does not modify roster assignments. Staff with no declared training requirement in the operator's policy are reported as policy gaps rather than completion gaps; the distinction is preserved so the attestation surfaces the policy-side and operations-side gaps separately."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.training_attestation@v1"
@@ -123,6 +129,12 @@
         "__cycle_id__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Schedule the per-cycle awareness and role-based training assignments for the roster emitted by inventory-training-roster against the declared training tracks and cadence. Emits __cycle_id__ as a per-cohort record of (cohort id, training track id, assigned at, due at, channel). The scheduling step writes assignment intents to the operator's learning-management surface; it does NOT push training content directly to staff. Tracks with no declared cadence in the operator's policy are reported as policy gaps rather than scheduling failures."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.training_attestation@v1"
@@ -145,6 +157,12 @@
         "__simulation_id__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Dispatch the cycle's phishing-simulation exercise to the cohorts enrolled in the simulation programme using a documented simulation template. Emits __simulation_id__ as a per-recipient record of (recipient id, template id, delivered at, clicked, reported, time-to-report). The simulation is a clearly-labelled exercise governed by the operator's awareness programme; it does NOT trigger downstream incident response, does NOT inject content into production mailflow controls, and does NOT exfiltrate credentials. Cohorts with no declared simulation cadence are reported as policy gaps rather than simulation failures."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.phishing_simulation@v1"
@@ -167,6 +185,12 @@
         "__completion_id__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Read completion state for the cycle's training assignments from the operator's learning-management surface and aggregate the phishing-simulation results from __simulation_id__. Emits __completion_id__ as a per-staff record of (staff id, track id, completion state, completed at, overdue-by-days) and per-cohort aggregate of completion-rate, click-rate, and report-rate against the declared targets. The tracking step is read-only against the LMS; it does NOT mark training as complete on the operator's behalf. Tracks past their due date are reported as overdue-completion gaps with the overdue-by-days delta preserved so the attestation surfaces the magnitude of the gap rather than a boolean."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.training_attestation@v1",
@@ -196,6 +220,12 @@
         "__attestation_id__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Compose and publish the dated cyber-hygiene and security-training posture attestation to the operator's evidence store. The record carries the training-roster snapshot, the cycle assignments, the simulation results, the completion tracking, the training window, and a top-level gap summary (missed-mandatory-training, overdue-role-based-training, simulation-click counts). This is the audit-evident artifact NIS2 Art.21(2)(g) reviewers read; missing or stale attestations are the failure mode the metrics surface. The attestation is always emitted, including the policy-gap branch (which records missing-policy conditions rather than skipping the attestation)."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.training_attestation@v1",
@@ -216,6 +246,12 @@
         "__training_scope__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Deliver the attestation reference and the gap summary to the training owner along the operator's pre-bound channel (ticketing system, chat thread, email). Tracked as a distinct step so the evidence-capture artifact and the human-acknowledgement record can be audited independently; an attestation written but never delivered to the owner is itself a posture gap."
+        }
+      ],
       "x_secops_ng": {
         "telemetry_refs": [
           "telemetry.ocsf.api_activity@v1"

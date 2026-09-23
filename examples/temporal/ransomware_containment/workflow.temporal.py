@@ -25,6 +25,9 @@ async def triage_signal(signal_id: str) -> dict[str, object]:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000002
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000002',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'triage signal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'triage_signal'},
@@ -38,9 +41,9 @@ async def triage_signal(signal_id: str) -> dict[str, object]:
 
 TRIAGE_SIGNAL_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -49,6 +52,9 @@ async def endpoint_isolation_edr_isolate(affected_host: str) -> None:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000005
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000005',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'endpoint isolation — EDR isolate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'endpoint_isolation_edr_isolate'},
@@ -62,9 +68,9 @@ async def endpoint_isolation_edr_isolate(affected_host: str) -> None:
 
 ENDPOINT_ISOLATION_EDR_ISOLATE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -73,6 +79,9 @@ async def endpoint_isolation_network_acl_deny_fallback(affected_host: str) -> No
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000006
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000006',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'endpoint isolation — network ACL deny (fallback)', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'endpoint_isolation_network_acl_deny_fallback'},
@@ -86,9 +95,9 @@ async def endpoint_isolation_network_acl_deny_fallback(affected_host: str) -> No
 
 ENDPOINT_ISOLATION_NETWORK_ACL_DENY_FALLBACK_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -97,6 +106,9 @@ async def identity_revocation(affected_identity: str) -> None:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000007
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000007',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'identity revocation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'identity_revocation'},
@@ -110,9 +122,9 @@ async def identity_revocation(affected_identity: str) -> None:
 
 IDENTITY_REVOCATION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -121,6 +133,9 @@ async def backup_verification() -> dict[str, object]:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000008
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000008',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'backup verification', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'backup_verification'},
@@ -134,9 +149,9 @@ async def backup_verification() -> dict[str, object]:
 
 BACKUP_VERIFICATION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -145,6 +160,9 @@ async def comms_plan(affected_host: str, affected_identity: str, latest_known_go
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000009
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000009',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000009', 'secops_ng.step.name': 'comms plan', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'comms_plan'},
@@ -158,9 +176,9 @@ async def comms_plan(affected_host: str, affected_identity: str, latest_known_go
 
 COMMS_PLAN_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @workflow.defn
@@ -174,6 +192,120 @@ class PlaybookRansomwareContainmentV1Workflow:
     workflow_start    : start--30000000-0000-4000-8000-000000000001
     activities        : triage_signal, endpoint_isolation_edr_isolate, endpoint_isolation_network_acl_deny_fallback, identity_revocation, backup_verification, comms_plan
     """
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000002.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_triage_signal_decision is not None` before continuing.
+    _triage_signal_decision: bool | None = None
+    _triage_signal_reason: str | None = None
+
+    @workflow.signal
+    def triage_signal_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._triage_signal_decision = decision
+        self._triage_signal_reason = reason
+
+    @workflow.query
+    def triage_signal_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._triage_signal_decision is None:
+            return "pending"
+        return "approved" if self._triage_signal_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000005.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_endpoint_isolation_edr_isolate_decision is not None` before continuing.
+    _endpoint_isolation_edr_isolate_decision: bool | None = None
+    _endpoint_isolation_edr_isolate_reason: str | None = None
+
+    @workflow.signal
+    def endpoint_isolation_edr_isolate_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._endpoint_isolation_edr_isolate_decision = decision
+        self._endpoint_isolation_edr_isolate_reason = reason
+
+    @workflow.query
+    def endpoint_isolation_edr_isolate_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._endpoint_isolation_edr_isolate_decision is None:
+            return "pending"
+        return "approved" if self._endpoint_isolation_edr_isolate_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000006.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_endpoint_isolation_network_acl_deny_fallback_decision is not None` before continuing.
+    _endpoint_isolation_network_acl_deny_fallback_decision: bool | None = None
+    _endpoint_isolation_network_acl_deny_fallback_reason: str | None = None
+
+    @workflow.signal
+    def endpoint_isolation_network_acl_deny_fallback_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._endpoint_isolation_network_acl_deny_fallback_decision = decision
+        self._endpoint_isolation_network_acl_deny_fallback_reason = reason
+
+    @workflow.query
+    def endpoint_isolation_network_acl_deny_fallback_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._endpoint_isolation_network_acl_deny_fallback_decision is None:
+            return "pending"
+        return "approved" if self._endpoint_isolation_network_acl_deny_fallback_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000007.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_identity_revocation_decision is not None` before continuing.
+    _identity_revocation_decision: bool | None = None
+    _identity_revocation_reason: str | None = None
+
+    @workflow.signal
+    def identity_revocation_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._identity_revocation_decision = decision
+        self._identity_revocation_reason = reason
+
+    @workflow.query
+    def identity_revocation_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._identity_revocation_decision is None:
+            return "pending"
+        return "approved" if self._identity_revocation_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000008.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_backup_verification_decision is not None` before continuing.
+    _backup_verification_decision: bool | None = None
+    _backup_verification_reason: str | None = None
+
+    @workflow.signal
+    def backup_verification_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._backup_verification_decision = decision
+        self._backup_verification_reason = reason
+
+    @workflow.query
+    def backup_verification_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._backup_verification_decision is None:
+            return "pending"
+        return "approved" if self._backup_verification_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000009.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_comms_plan_decision is not None` before continuing.
+    _comms_plan_decision: bool | None = None
+    _comms_plan_reason: str | None = None
+
+    @workflow.signal
+    def comms_plan_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._comms_plan_decision = decision
+        self._comms_plan_reason = reason
+
+    @workflow.query
+    def comms_plan_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._comms_plan_decision is None:
+            return "pending"
+        return "approved" if self._comms_plan_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:

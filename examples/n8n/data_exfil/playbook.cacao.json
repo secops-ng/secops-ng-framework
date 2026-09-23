@@ -68,6 +68,12 @@
         "__signal_id__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Receive the DLP / egress signal, hydrate it with originating user / asset / destination context, and decide whether the signal warrants scope assessment or is a known benign egress pattern."
+        }
+      ],
       "x_secops_ng": {
         "detection_refs": [
           "detection.sigma.dlp_egress_alert@v1",
@@ -96,6 +102,12 @@
         "__regulator_required__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Determine the volume and classification of data observed leaving the boundary, the count of distinct data subjects affected, and whether actual exfiltration occurred or was prevented by an in-line control. Produces __data_classification__, __affected_subjects_count__, __exfil_confirmed__, and __regulator_required__ — whether the classification and the subject count together cross the operator's regulator-notification threshold, which the notification branch reads after containment."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.data_classification_baseline@v1"
@@ -126,6 +138,12 @@
         "__affected_subjects_count__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Apply containment proportionate to data classification and scope: revoke session tokens, isolate the originating identity / host, force a credential rotation, and tighten the egress policy on the destination(s) named in the signal. Bounded by the operator-supplied authorisation policy."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.network_egress_filtering@v1",
@@ -157,6 +175,12 @@
         "__affected_subjects_count__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Compose and send the regulator notification along the operator's pre-bound channel (national CSIRT for NIS2, competent authority for DORA, supervisory authority for GDPR). The notification payload is a structured incident finding sourced from the scope-assessment outputs."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.dlp_enforcement@v1"
@@ -180,6 +204,12 @@
         "__affected_subjects_count__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Notify affected data subjects via the operator's pre-bound channel. Tracked separately from regulator notification so the notification timelines can be reported independently."
+        }
+      ],
       "x_secops_ng": {
         "telemetry_refs": [
           "telemetry.ocsf.incident_finding@v1"

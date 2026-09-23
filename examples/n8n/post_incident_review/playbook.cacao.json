@@ -120,6 +120,12 @@
         "__evidence_gaps_present__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Collate a chronological timeline of the incident from the artifacts the responders left behind: ticket comments, chat transcripts, EDR / SIEM exports, network captures, and operator-supplied evidence packages. The step must flag gaps in the evidence record where anti-forensics signals (cleared eventlogs, disabled audit policy, timestomped files) are present — these are recorded in __evidence_gaps_present__ rather than silently smoothed over, so the review template can address decisions made under partial evidence. Produces __timeline_artifact__ and __evidence_gaps_present__."
+        }
+      ],
       "x_secops_ng": {
         "detection_refs": [
           "detection.sigma.eventlog_cleared@v1",
@@ -155,6 +161,12 @@
         "__review_artifact__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Walk the operator's blameless review template against the collated timeline. The template separates contributing factors (process, tooling, staffing, training, environment) from individual error, and explicitly captures decisions that were reasonable given the evidence available at the time. If __evidence_gaps_present__ is true the template's evidence-gaps section is mandatory rather than optional. Produces __review_artifact__."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.blameless_review@v1"
@@ -180,6 +192,12 @@
         "__corrective_action_register__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Extract corrective actions from the review artifact and register each one with owner, due-date, and verification clause. Registration is the deliverable here — execution and verification of each action are out of scope for this playbook (they live on the operator's existing change / ticketing system). Produces __corrective_action_register__."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.corrective_action_register@v1"

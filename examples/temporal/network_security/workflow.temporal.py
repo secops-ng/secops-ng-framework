@@ -25,6 +25,9 @@ async def inventory_network_segments(reconciliation_window: str) -> str:
 
     CACAO step_id: action--7e750001-0000-4000-8000-000000000002
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--7e750001-0000-4000-8000-000000000002',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000002', 'secops_ng.step.name': 'inventory_network_segments', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'inventory_network_segments'},
@@ -38,9 +41,9 @@ async def inventory_network_segments(reconciliation_window: str) -> str:
 
 INVENTORY_NETWORK_SEGMENTS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -49,6 +52,9 @@ async def evaluate_segmentation_policy(reconciliation_window: str, segment_inven
 
     CACAO step_id: action--7e750001-0000-4000-8000-000000000003
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--7e750001-0000-4000-8000-000000000003',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000003', 'secops_ng.step.name': 'evaluate_segmentation_policy', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evaluate_segmentation_policy'},
@@ -62,9 +68,9 @@ async def evaluate_segmentation_policy(reconciliation_window: str, segment_inven
 
 EVALUATE_SEGMENTATION_POLICY_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -73,6 +79,9 @@ async def detect_policy_violations(segment_inventory_id: str, policy_snapshot_id
 
     CACAO step_id: action--7e750001-0000-4000-8000-000000000004
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--7e750001-0000-4000-8000-000000000004',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000004', 'secops_ng.step.name': 'detect_policy_violations', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_policy_violations'},
@@ -86,9 +95,9 @@ async def detect_policy_violations(segment_inventory_id: str, policy_snapshot_id
 
 DETECT_POLICY_VIOLATIONS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -97,6 +106,9 @@ async def enforce_remediation(violation_set_id: str) -> str:
 
     CACAO step_id: action--7e750001-0000-4000-8000-000000000005
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--7e750001-0000-4000-8000-000000000005',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000005', 'secops_ng.step.name': 'enforce_remediation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enforce_remediation'},
@@ -110,9 +122,9 @@ async def enforce_remediation(violation_set_id: str) -> str:
 
 ENFORCE_REMEDIATION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -121,6 +133,9 @@ async def generate_posture_evidence_artifact(reconciliation_window: str, segment
 
     CACAO step_id: action--7e750001-0000-4000-8000-000000000006
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--7e750001-0000-4000-8000-000000000006',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000006', 'secops_ng.step.name': 'generate_posture_evidence_artifact', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'generate_posture_evidence_artifact'},
@@ -134,9 +149,9 @@ async def generate_posture_evidence_artifact(reconciliation_window: str, segment
 
 GENERATE_POSTURE_EVIDENCE_ARTIFACT_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @workflow.defn
@@ -150,6 +165,101 @@ class PlaybookNetworkSecurityV1Workflow:
     workflow_start    : start--7e750001-0000-4000-8000-000000000001
     activities        : inventory_network_segments, evaluate_segmentation_policy, detect_policy_violations, enforce_remediation, generate_posture_evidence_artifact
     """
+
+    # Human-in-the-loop scaffold for CACAO step action--7e750001-0000-4000-8000-000000000002.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_inventory_network_segments_decision is not None` before continuing.
+    _inventory_network_segments_decision: bool | None = None
+    _inventory_network_segments_reason: str | None = None
+
+    @workflow.signal
+    def inventory_network_segments_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._inventory_network_segments_decision = decision
+        self._inventory_network_segments_reason = reason
+
+    @workflow.query
+    def inventory_network_segments_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._inventory_network_segments_decision is None:
+            return "pending"
+        return "approved" if self._inventory_network_segments_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--7e750001-0000-4000-8000-000000000003.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_evaluate_segmentation_policy_decision is not None` before continuing.
+    _evaluate_segmentation_policy_decision: bool | None = None
+    _evaluate_segmentation_policy_reason: str | None = None
+
+    @workflow.signal
+    def evaluate_segmentation_policy_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._evaluate_segmentation_policy_decision = decision
+        self._evaluate_segmentation_policy_reason = reason
+
+    @workflow.query
+    def evaluate_segmentation_policy_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._evaluate_segmentation_policy_decision is None:
+            return "pending"
+        return "approved" if self._evaluate_segmentation_policy_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--7e750001-0000-4000-8000-000000000004.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_detect_policy_violations_decision is not None` before continuing.
+    _detect_policy_violations_decision: bool | None = None
+    _detect_policy_violations_reason: str | None = None
+
+    @workflow.signal
+    def detect_policy_violations_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._detect_policy_violations_decision = decision
+        self._detect_policy_violations_reason = reason
+
+    @workflow.query
+    def detect_policy_violations_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._detect_policy_violations_decision is None:
+            return "pending"
+        return "approved" if self._detect_policy_violations_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--7e750001-0000-4000-8000-000000000005.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_enforce_remediation_decision is not None` before continuing.
+    _enforce_remediation_decision: bool | None = None
+    _enforce_remediation_reason: str | None = None
+
+    @workflow.signal
+    def enforce_remediation_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._enforce_remediation_decision = decision
+        self._enforce_remediation_reason = reason
+
+    @workflow.query
+    def enforce_remediation_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._enforce_remediation_decision is None:
+            return "pending"
+        return "approved" if self._enforce_remediation_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--7e750001-0000-4000-8000-000000000006.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_generate_posture_evidence_artifact_decision is not None` before continuing.
+    _generate_posture_evidence_artifact_decision: bool | None = None
+    _generate_posture_evidence_artifact_reason: str | None = None
+
+    @workflow.signal
+    def generate_posture_evidence_artifact_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._generate_posture_evidence_artifact_decision = decision
+        self._generate_posture_evidence_artifact_reason = reason
+
+    @workflow.query
+    def generate_posture_evidence_artifact_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._generate_posture_evidence_artifact_decision is None:
+            return "pending"
+        return "approved" if self._generate_posture_evidence_artifact_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:
