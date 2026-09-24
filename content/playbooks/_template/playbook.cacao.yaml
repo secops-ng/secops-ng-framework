@@ -157,11 +157,13 @@ workflow_start: step--TODO_UUID_START
 #   x_secops_ng.core_body — optional deterministic primitive binding;
 #     see the commented block on the action step below.
 #   agent — always the group agent declared in agent_definitions.
-#   commands — only on a bound step: exactly one command of type
-#     `secops-ng-primitive` whose `command` is the core_body primitive's
-#     dotted path (a test pins the two equal). The compilers compile
-#     core_body, not the command; the command is what lets CACAO
-#     tooling see what the step runs. Unbound steps carry no command.
+#   commands — exactly one command on every action step. On a bound
+#     step it is of type `secops-ng-primitive` and its `command` is the
+#     core_body primitive's dotted path; on an unbound step it is of type
+#     `manual` and its `command` is the step's description, verbatim.
+#     Tests pin both equal. The compilers compile core_body, not the
+#     primitive command; a `manual` command makes n8n render the I/O
+#     contract and Temporal wait for an operator.
 workflow:
 
   step--TODO_UUID_START:
@@ -183,7 +185,17 @@ workflow:
     out_args:
       - __TODO_OUTPUT__
     agent: group--9479ad47-df96-5a3c-831a-f668158e5b9e
-    # Add together with the core_body binding below, never on its own:
+    # Unbound step: the operator performs it. The command text is the
+    # description above, verbatim (a test pins them equal).
+    commands:
+      - type: manual
+        command: >-
+          TODO. Describe what this step does, its inputs, and its outputs.
+          Reference the OSCAL controls or OCSF event classes it
+          operationalises. Keep the step framework-agnostic — do not
+          reference n8n / Temporal / LangGraph specifics here.
+    # Bound step: replace the manual command with the primitive, together
+    # with the core_body binding below, never on its own:
     # commands:
     #   - type: secops-ng-primitive
     #     command: content.playbooks.<slug>.primitives.<module>.<function>

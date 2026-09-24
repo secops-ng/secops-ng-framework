@@ -25,6 +25,9 @@ async def resolve_kpi_kri_catalog(rollup_window: str, catalog_ref: str) -> None:
 
     CACAO step_id: action--e0000000-0000-4000-8000-000000000002
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e0000000-0000-4000-8000-000000000002',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'resolve KPI/KRI catalog', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'resolve_kpi_kri_catalog'},
@@ -38,9 +41,9 @@ async def resolve_kpi_kri_catalog(rollup_window: str, catalog_ref: str) -> None:
 
 RESOLVE_KPI_KRI_CATALOG_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -49,6 +52,9 @@ async def evaluate_metrics_over_window(rollup_window: str, catalog_ref: str) -> 
 
     CACAO step_id: action--e0000000-0000-4000-8000-000000000003
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e0000000-0000-4000-8000-000000000003',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'evaluate metrics over window', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evaluate_metrics_over_window'},
@@ -62,9 +68,9 @@ async def evaluate_metrics_over_window(rollup_window: str, catalog_ref: str) -> 
 
 EVALUATE_METRICS_OVER_WINDOW_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -73,6 +79,9 @@ async def score_control_effectiveness(metric_evaluations: str) -> str:
 
     CACAO step_id: action--e0000000-0000-4000-8000-000000000004
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e0000000-0000-4000-8000-000000000004',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'score control effectiveness', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'score_control_effectiveness'},
@@ -86,9 +95,9 @@ async def score_control_effectiveness(metric_evaluations: str) -> str:
 
 SCORE_CONTROL_EFFECTIVENESS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -97,6 +106,9 @@ async def raise_board_attention_flag(control_effectiveness_score: str, metric_ev
 
     CACAO step_id: action--e0000000-0000-4000-8000-000000000006
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e0000000-0000-4000-8000-000000000006',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'raise board-attention flag', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'raise_board_attention_flag'},
@@ -110,9 +122,9 @@ async def raise_board_attention_flag(control_effectiveness_score: str, metric_ev
 
 RAISE_BOARD_ATTENTION_FLAG_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -121,6 +133,9 @@ async def emit_board_summary(rollup_window: str, metric_evaluations: str, contro
 
     CACAO step_id: action--e0000000-0000-4000-8000-000000000007
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e0000000-0000-4000-8000-000000000007',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e0a05ec0-0000-4f00-8a1b-d3e4f5a6b7c8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e0000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'emit board summary', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_board_summary'},
@@ -134,9 +149,9 @@ async def emit_board_summary(rollup_window: str, metric_evaluations: str, contro
 
 EMIT_BOARD_SUMMARY_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @workflow.defn
@@ -150,6 +165,101 @@ class PlaybookExecutiveMetricsV1Workflow:
     workflow_start    : start--e0000000-0000-4000-8000-000000000001
     activities        : resolve_kpi_kri_catalog, evaluate_metrics_over_window, score_control_effectiveness, raise_board_attention_flag, emit_board_summary
     """
+
+    # Human-in-the-loop scaffold for CACAO step action--e0000000-0000-4000-8000-000000000002.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_resolve_kpi_kri_catalog_decision is not None` before continuing.
+    _resolve_kpi_kri_catalog_decision: bool | None = None
+    _resolve_kpi_kri_catalog_reason: str | None = None
+
+    @workflow.signal
+    def resolve_kpi_kri_catalog_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._resolve_kpi_kri_catalog_decision = decision
+        self._resolve_kpi_kri_catalog_reason = reason
+
+    @workflow.query
+    def resolve_kpi_kri_catalog_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._resolve_kpi_kri_catalog_decision is None:
+            return "pending"
+        return "approved" if self._resolve_kpi_kri_catalog_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--e0000000-0000-4000-8000-000000000003.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_evaluate_metrics_over_window_decision is not None` before continuing.
+    _evaluate_metrics_over_window_decision: bool | None = None
+    _evaluate_metrics_over_window_reason: str | None = None
+
+    @workflow.signal
+    def evaluate_metrics_over_window_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._evaluate_metrics_over_window_decision = decision
+        self._evaluate_metrics_over_window_reason = reason
+
+    @workflow.query
+    def evaluate_metrics_over_window_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._evaluate_metrics_over_window_decision is None:
+            return "pending"
+        return "approved" if self._evaluate_metrics_over_window_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--e0000000-0000-4000-8000-000000000004.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_score_control_effectiveness_decision is not None` before continuing.
+    _score_control_effectiveness_decision: bool | None = None
+    _score_control_effectiveness_reason: str | None = None
+
+    @workflow.signal
+    def score_control_effectiveness_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._score_control_effectiveness_decision = decision
+        self._score_control_effectiveness_reason = reason
+
+    @workflow.query
+    def score_control_effectiveness_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._score_control_effectiveness_decision is None:
+            return "pending"
+        return "approved" if self._score_control_effectiveness_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--e0000000-0000-4000-8000-000000000006.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_raise_board_attention_flag_decision is not None` before continuing.
+    _raise_board_attention_flag_decision: bool | None = None
+    _raise_board_attention_flag_reason: str | None = None
+
+    @workflow.signal
+    def raise_board_attention_flag_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._raise_board_attention_flag_decision = decision
+        self._raise_board_attention_flag_reason = reason
+
+    @workflow.query
+    def raise_board_attention_flag_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._raise_board_attention_flag_decision is None:
+            return "pending"
+        return "approved" if self._raise_board_attention_flag_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--e0000000-0000-4000-8000-000000000007.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_emit_board_summary_decision is not None` before continuing.
+    _emit_board_summary_decision: bool | None = None
+    _emit_board_summary_reason: str | None = None
+
+    @workflow.signal
+    def emit_board_summary_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._emit_board_summary_decision = decision
+        self._emit_board_summary_reason = reason
+
+    @workflow.query
+    def emit_board_summary_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._emit_board_summary_decision is None:
+            return "pending"
+        return "approved" if self._emit_board_summary_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:

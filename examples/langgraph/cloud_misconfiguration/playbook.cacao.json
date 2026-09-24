@@ -195,6 +195,12 @@
         "__finding_id__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Fetch the CSPM / posture finding from the operator's posture-management platform: rule fingerprint, affected resource, evaluated baseline, first-observed timestamp. Source is identified by __finding_id__ and may originate from continuous CSPM scans or from an IaC policy guardrail emitting the same OCSF shape at deploy time."
+        }
+      ],
       "x_secops_ng": {
         "detection_refs": [
           "detection.sigma.cspm_finding_critical@v1",
@@ -227,6 +233,12 @@
         "__known_false_positive__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Resolve the affected resource against the cloud inventory and ownership graph: tenant, project / account, region, resource type, tags, accountable owner, classification. Produces __resource_id__, __owner_id__, and __severity__ (severity is resolved here rather than ingested raw because the operator's classification can lift or lower the upstream CSPM severity). Also sets __known_false_positive__: true when the finding matches a documented exception or a known-benign baseline-deviation record within the suppression window, which the suppression branch reads."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.cspm_baseline@v1",
@@ -255,6 +267,12 @@
       "description": "Link the finding to its existing exception or known-deviation record, close the case without paging, and account the suppression against the recurring-misconfiguration KRI so a chronically suppressed posture rule surfaces in the metrics layer.",
       "on_completion": "end--30000000-0000-4000-8000-00000000000a",
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Link the finding to its existing exception or known-deviation record, close the case without paging, and account the suppression against the recurring-misconfiguration KRI so a chronically suppressed posture rule surfaces in the metrics layer."
+        }
+      ],
       "x_secops_ng": {
         "metric_refs": [
           "kri.recurring_cloud_misconfig@v1"
@@ -276,6 +294,12 @@
         "__severity__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Notify the resource owner along the operator's pre-bound channel (ticketing / chat / paging, per __severity__). The notification carries the finding, the affected resource, the violated baseline, and a link to the guided-remediation runbook the next step references."
+        }
+      ],
       "x_secops_ng": {
         "telemetry_refs": [
           "telemetry.ocsf.compliance_finding@v1"
@@ -299,6 +323,12 @@
         "__owner_id__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Apply the remediation bound to the violated baseline rule, with change-management attestation: either an operator-approved auto-remediation hand-off (IaC pull request, runbook execution) or an owner-driven manual change captured against the change record. The action body is operator-bound; only the contract (a remediation attempt is recorded against the finding) is fixed by this playbook."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.cspm_baseline@v1",
@@ -324,6 +354,12 @@
         "__remediation_verified__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Trigger a targeted re-scan against the same baseline rule and resource. Emits __remediation_verified__ based on whether the rule still fires. The re-scan is a deterministic verification step, not a fresh posture sweep."
+        }
+      ],
       "x_secops_ng": {
         "detection_refs": [
           "detection.sigma.cspm_finding_critical@v1"
@@ -360,6 +396,12 @@
         "__severity__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Escalate to the security-engineering on-call along the operator's pre-bound paging channel. The escalation payload carries the finding, the attempted remediation, and the failing re-scan evidence. Tracked against the recurring-misconfiguration KRI so chronic unremediated posture exceptions surface in the metrics layer."
+        }
+      ],
       "x_secops_ng": {
         "telemetry_refs": [
           "telemetry.ocsf.compliance_finding@v1"

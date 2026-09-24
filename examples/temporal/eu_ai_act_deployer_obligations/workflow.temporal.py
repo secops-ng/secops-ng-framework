@@ -25,6 +25,9 @@ async def confirm_intended_use(deployment_id: str, system_reference: str) -> str
 
     CACAO step_id: action--e26d1a00-0000-4000-8000-000000000002
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e26d1a00-0000-4000-8000-000000000002',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000002', 'secops_ng.step.name': 'confirm_intended_use', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'confirm_intended_use'},
@@ -38,9 +41,9 @@ async def confirm_intended_use(deployment_id: str, system_reference: str) -> str
 
 CONFIRM_INTENDED_USE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -49,6 +52,9 @@ async def assign_human_oversight(deployment_id: str, intended_use_determination_
 
     CACAO step_id: action--e26d1a00-0000-4000-8000-000000000003
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e26d1a00-0000-4000-8000-000000000003',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000003', 'secops_ng.step.name': 'assign_human_oversight', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assign_human_oversight'},
@@ -62,9 +68,9 @@ async def assign_human_oversight(deployment_id: str, intended_use_determination_
 
 ASSIGN_HUMAN_OVERSIGHT_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -73,6 +79,9 @@ async def monitor_operation(deployment_id: str, system_reference: str, oversight
 
     CACAO step_id: action--e26d1a00-0000-4000-8000-000000000004
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e26d1a00-0000-4000-8000-000000000004',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000004', 'secops_ng.step.name': 'monitor_operation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'monitor_operation'},
@@ -86,9 +95,9 @@ async def monitor_operation(deployment_id: str, system_reference: str, oversight
 
 MONITOR_OPERATION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -97,6 +106,9 @@ async def assess_fundamental_rights_impact(deployment_id: str, intended_use_dete
 
     CACAO step_id: action--e26d1a00-0000-4000-8000-000000000005
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e26d1a00-0000-4000-8000-000000000005',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000005', 'secops_ng.step.name': 'assess_fundamental_rights_impact', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_fundamental_rights_impact'},
@@ -110,9 +122,9 @@ async def assess_fundamental_rights_impact(deployment_id: str, intended_use_dete
 
 ASSESS_FUNDAMENTAL_RIGHTS_IMPACT_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -121,6 +133,9 @@ async def retain_logs_and_evidence(deployment_id: str, oversight_assignment_id: 
 
     CACAO step_id: action--e26d1a00-0000-4000-8000-000000000006
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e26d1a00-0000-4000-8000-000000000006',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000006', 'secops_ng.step.name': 'retain_logs_and_evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'retain_logs_and_evidence'},
@@ -134,9 +149,9 @@ async def retain_logs_and_evidence(deployment_id: str, oversight_assignment_id: 
 
 RETAIN_LOGS_AND_EVIDENCE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @workflow.defn
@@ -150,6 +165,101 @@ class PlaybookEuAiActDeployerObligationsV1Workflow:
     workflow_start    : start--e26d1a00-0000-4000-8000-000000000001
     activities        : confirm_intended_use, assign_human_oversight, monitor_operation, assess_fundamental_rights_impact, retain_logs_and_evidence
     """
+
+    # Human-in-the-loop scaffold for CACAO step action--e26d1a00-0000-4000-8000-000000000002.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_confirm_intended_use_decision is not None` before continuing.
+    _confirm_intended_use_decision: bool | None = None
+    _confirm_intended_use_reason: str | None = None
+
+    @workflow.signal
+    def confirm_intended_use_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._confirm_intended_use_decision = decision
+        self._confirm_intended_use_reason = reason
+
+    @workflow.query
+    def confirm_intended_use_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._confirm_intended_use_decision is None:
+            return "pending"
+        return "approved" if self._confirm_intended_use_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--e26d1a00-0000-4000-8000-000000000003.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_assign_human_oversight_decision is not None` before continuing.
+    _assign_human_oversight_decision: bool | None = None
+    _assign_human_oversight_reason: str | None = None
+
+    @workflow.signal
+    def assign_human_oversight_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._assign_human_oversight_decision = decision
+        self._assign_human_oversight_reason = reason
+
+    @workflow.query
+    def assign_human_oversight_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._assign_human_oversight_decision is None:
+            return "pending"
+        return "approved" if self._assign_human_oversight_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--e26d1a00-0000-4000-8000-000000000004.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_monitor_operation_decision is not None` before continuing.
+    _monitor_operation_decision: bool | None = None
+    _monitor_operation_reason: str | None = None
+
+    @workflow.signal
+    def monitor_operation_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._monitor_operation_decision = decision
+        self._monitor_operation_reason = reason
+
+    @workflow.query
+    def monitor_operation_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._monitor_operation_decision is None:
+            return "pending"
+        return "approved" if self._monitor_operation_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--e26d1a00-0000-4000-8000-000000000005.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_assess_fundamental_rights_impact_decision is not None` before continuing.
+    _assess_fundamental_rights_impact_decision: bool | None = None
+    _assess_fundamental_rights_impact_reason: str | None = None
+
+    @workflow.signal
+    def assess_fundamental_rights_impact_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._assess_fundamental_rights_impact_decision = decision
+        self._assess_fundamental_rights_impact_reason = reason
+
+    @workflow.query
+    def assess_fundamental_rights_impact_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._assess_fundamental_rights_impact_decision is None:
+            return "pending"
+        return "approved" if self._assess_fundamental_rights_impact_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--e26d1a00-0000-4000-8000-000000000006.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_retain_logs_and_evidence_decision is not None` before continuing.
+    _retain_logs_and_evidence_decision: bool | None = None
+    _retain_logs_and_evidence_reason: str | None = None
+
+    @workflow.signal
+    def retain_logs_and_evidence_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._retain_logs_and_evidence_decision = decision
+        self._retain_logs_and_evidence_reason = reason
+
+    @workflow.query
+    def retain_logs_and_evidence_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._retain_logs_and_evidence_decision is None:
+            return "pending"
+        return "approved" if self._retain_logs_and_evidence_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:

@@ -25,6 +25,9 @@ async def propose_rule_version(rule_id: str, rule_version: str, proposal_rationa
 
     CACAO step_id: action--f0e4f404-0000-4000-8000-000000000002
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--f0e4f404-0000-4000-8000-000000000002',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--f0e4f404-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--f0e4f404-0000-4000-8000-000000000002', 'secops_ng.step.name': 'propose-rule-version', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'propose_rule_version'},
@@ -38,9 +41,9 @@ async def propose_rule_version(rule_id: str, rule_version: str, proposal_rationa
 
 PROPOSE_RULE_VERSION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -49,6 +52,9 @@ async def review_rule_version(rule_id: str, rule_version: str) -> str:
 
     CACAO step_id: action--f0e4f404-0000-4000-8000-000000000003
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--f0e4f404-0000-4000-8000-000000000003',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--f0e4f404-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--f0e4f404-0000-4000-8000-000000000003', 'secops_ng.step.name': 'review-rule-version', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'review_rule_version'},
@@ -62,9 +68,9 @@ async def review_rule_version(rule_id: str, rule_version: str) -> str:
 
 REVIEW_RULE_VERSION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -73,6 +79,9 @@ async def ship_rule_version(rule_id: str, rule_version: str, review_verdict: str
 
     CACAO step_id: action--f0e4f404-0000-4000-8000-000000000004
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--f0e4f404-0000-4000-8000-000000000004',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--f0e4f404-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--f0e4f404-0000-4000-8000-000000000004', 'secops_ng.step.name': 'ship-rule-version', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ship_rule_version'},
@@ -86,9 +95,9 @@ async def ship_rule_version(rule_id: str, rule_version: str, review_verdict: str
 
 SHIP_RULE_VERSION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -97,6 +106,9 @@ async def measure_rule_version(rule_id: str, rule_version: str, ship_status: str
 
     CACAO step_id: action--f0e4f404-0000-4000-8000-000000000005
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--f0e4f404-0000-4000-8000-000000000005',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--f0e4f404-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--f0e4f404-0000-4000-8000-000000000005', 'secops_ng.step.name': 'measure-rule-version', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'measure_rule_version'},
@@ -110,9 +122,9 @@ async def measure_rule_version(rule_id: str, rule_version: str, ship_status: str
 
 MEASURE_RULE_VERSION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @workflow.defn
@@ -126,6 +138,82 @@ class PlaybookDetectionEngineeringV1Workflow:
     workflow_start    : start--f0e4f404-0000-4000-8000-000000000001
     activities        : propose_rule_version, review_rule_version, ship_rule_version, measure_rule_version
     """
+
+    # Human-in-the-loop scaffold for CACAO step action--f0e4f404-0000-4000-8000-000000000002.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_propose_rule_version_decision is not None` before continuing.
+    _propose_rule_version_decision: bool | None = None
+    _propose_rule_version_reason: str | None = None
+
+    @workflow.signal
+    def propose_rule_version_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._propose_rule_version_decision = decision
+        self._propose_rule_version_reason = reason
+
+    @workflow.query
+    def propose_rule_version_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._propose_rule_version_decision is None:
+            return "pending"
+        return "approved" if self._propose_rule_version_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--f0e4f404-0000-4000-8000-000000000003.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_review_rule_version_decision is not None` before continuing.
+    _review_rule_version_decision: bool | None = None
+    _review_rule_version_reason: str | None = None
+
+    @workflow.signal
+    def review_rule_version_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._review_rule_version_decision = decision
+        self._review_rule_version_reason = reason
+
+    @workflow.query
+    def review_rule_version_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._review_rule_version_decision is None:
+            return "pending"
+        return "approved" if self._review_rule_version_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--f0e4f404-0000-4000-8000-000000000004.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_ship_rule_version_decision is not None` before continuing.
+    _ship_rule_version_decision: bool | None = None
+    _ship_rule_version_reason: str | None = None
+
+    @workflow.signal
+    def ship_rule_version_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._ship_rule_version_decision = decision
+        self._ship_rule_version_reason = reason
+
+    @workflow.query
+    def ship_rule_version_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._ship_rule_version_decision is None:
+            return "pending"
+        return "approved" if self._ship_rule_version_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--f0e4f404-0000-4000-8000-000000000005.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_measure_rule_version_decision is not None` before continuing.
+    _measure_rule_version_decision: bool | None = None
+    _measure_rule_version_reason: str | None = None
+
+    @workflow.signal
+    def measure_rule_version_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._measure_rule_version_decision = decision
+        self._measure_rule_version_reason = reason
+
+    @workflow.query
+    def measure_rule_version_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._measure_rule_version_decision is None:
+            return "pending"
+        return "approved" if self._measure_rule_version_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:

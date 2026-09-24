@@ -129,6 +129,12 @@
         "__edr_available__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Receive the originating detection signal and hydrate it with host, identity, and process context. Decide whether the signal is a confirmed ransomware event or a benign / out-of-scope alert. Produces __affected_host__, __affected_identity__, and __ransomware_confirmed__."
+        }
+      ],
       "x_secops_ng": {
         "detection_refs": [
           "detection.sigma.shadow_copies_deletion@v1",
@@ -170,6 +176,12 @@
         "__affected_host__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Issue the EDR-vendor isolate action against __affected_host__ via the operator's pre-bound EDR agent. Bounded by the operator-supplied authorisation policy. Primary path."
+        }
+      ],
       "x_secops_ng": {
         "detection_refs": [
           "detection.sigma.shadow_copies_deletion@v1",
@@ -195,6 +207,12 @@
         "__affected_host__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "EDR fallback: deny all ingress/egress for __affected_host__ at the operator's network chokepoint (firewall rule, switchport disable, or SDN policy). Used when the EDR agent is unreachable or absent."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.network_egress_filtering@v1",
@@ -217,6 +235,12 @@
         "__affected_identity__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Disable the implicated user account, revoke active sessions, and invalidate refresh/access tokens at the operator's IdP. Includes Kerberos TGT invalidation where supported. Targets __affected_identity__."
+        }
+      ],
       "x_secops_ng": {
         "detection_refs": [
           "detection.sigma.overpass_the_hash@v1"
@@ -243,6 +267,12 @@
         "__snapshot_integrity_ok__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Locate the most recent known-good backup snapshot that pre-dates the event window and verify its integrity hash against the backup-catalogue record. Produces __latest_known_good_snapshot__ and __snapshot_integrity_ok__. Does NOT restore — restore is a separate, out-of-scope recovery playbook."
+        }
+      ],
       "x_secops_ng": {
         "detection_refs": [
           "detection.sigma.wbadmin_backup_deletion@v1",
@@ -271,6 +301,12 @@
         "__snapshot_integrity_ok__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Notify the IR lead and comms officer along the operator's pre-bound channels, and draft the regulator early-warning pre-notification per NIS2 Article 23 within the 24-hour clock from initial detection. The drafted notification is staged for human sign-off, not auto-sent. Because this step is the handoff point that closes the incident timeline and trips the statutory reporting clocks, it stamps the timeline-completeness KPI alongside the notification-SLA KPI and the regulator-notification-overrun KRI."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.incident_notification@v1"

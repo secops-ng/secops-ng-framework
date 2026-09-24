@@ -19,7 +19,9 @@ many errors the official schema set reports. CI fails when any count changes:
 - **fewer errors** is progress, recorded by re-writing the baseline in the same
   pull request (`--write-baseline`), so the floor only moves down.
 
-A new playbook is expected to arrive with zero errors. The
+Every canonical document passes today, so the baseline is all zeros and
+`test_every_canonical_playbook_conforms` states the floor directly: a new or
+edited playbook has to arrive with zero errors. The
 [`_template`](../../content/playbooks/_template/) scaffold is excluded from the
 walk; it has its own conformance lane.
 

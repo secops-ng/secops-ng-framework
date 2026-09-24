@@ -1,4 +1,4 @@
-"""Agents and commands on action steps (#1010 item 5, part 1).
+"""Agents and commands on action steps (#1010 item 5).
 
 The official OASIS CACAO 2.0 schema requires every action step to carry an
 ``agent`` (a reference into the playbook's ``agent_definitions``) and a
@@ -11,7 +11,10 @@ catalogue uses for the first of those, and for the commands of bound steps:
 * every bound step (one with ``x_secops_ng.core_body``) carries exactly one
   command, of the open-vocabulary type ``secops-ng-primitive``, whose
   ``command`` is the core_body primitive's dotted path;
-* no unbound step claims a ``secops-ng-primitive`` command.
+* every unbound step carries exactly one command, of type ``manual``, whose
+  ``command`` is the step's own ``description`` — the operator instruction;
+* no unbound step claims a ``secops-ng-primitive`` command, and every action
+  step carries exactly one command.
 
 The command duplicates the primitive path on purpose — it is what CACAO
 tooling reads — and the compilers keep compiling ``core_body``. The equality
@@ -93,3 +96,24 @@ def test_bound_steps_carry_exactly_their_primitive_as_a_command(path: Path) -> N
         elif commands and any(c.get("type") == PRIMITIVE_COMMAND for c in commands):
             problems.append(f"{sid}: unbound step claims a {PRIMITIVE_COMMAND} command")
     assert not problems, "\n".join(problems)
+
+
+MANUAL_COMMAND = "manual"
+
+
+@pytest.mark.parametrize("path", DOCUMENTS, ids=IDS)
+def test_unbound_steps_carry_exactly_one_manual_command_with_the_step_text(path: Path) -> None:
+    problems = []
+    for sid, step in _actions(_load(path)).items():
+        if _core_body(step):
+            continue
+        expected = [{"type": MANUAL_COMMAND, "command": step.get("description")}]
+        if step.get("commands") != expected:
+            problems.append(f"{sid}: commands {step.get('commands')!r} != manual command carrying the step description")
+    assert not problems, "\n".join(problems)
+
+
+@pytest.mark.parametrize("path", DOCUMENTS, ids=IDS)
+def test_every_action_step_carries_exactly_one_command(path: Path) -> None:
+    off = {sid: len(s.get("commands") or []) for sid, s in _actions(_load(path)).items() if len(s.get("commands") or []) != 1}
+    assert not off, f"action steps without exactly one command: {off}"

@@ -104,6 +104,12 @@
         "__evidence_set_id__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "TODO (CORE): per-section evidence-collection primitive. The action body reads the operator's evidence store for the current self-assessment window and pulls every evidence record whose producing playbook is one of the playbooks the five DORA Chapter II ICT risk management section atoms currently anchor against (see content/playbooks/dora_ict_risk_selfassess/mappings.yaml). Sets __section_atoms__ to the fixed five-atom set dora:art-6-framework, dora:art-7-systems-protocols-tools, dora:art-8-identification, dora:art-10-detection, dora:art-11-response-recovery and __evidence_set_id__ to the durable identifier of the per-section evidence set for the window. Read-only against the evidence store: the collection step does not write back into the source records, it composes a per-window view keyed on the five section atoms. SKELETON pins the topology + ID + regulatory anchor refs; the deterministic per-source pull, normalisation, and section-attribution carry are owned by CORE-PRIM. Detection bindings for collection-side failures (evidence-store endpoint unreachable, partial pull inside the window, missing producing-playbook attribution on a record) are owned by CORE-FANOUT cards once upstream rule ids are selected."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.security_assessment@v1",
@@ -131,6 +137,12 @@
         "__section_mapping__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "TODO (CORE): per-record evidence-to-section mapping primitive. The action body binds each evidence record in __evidence_set_id__ to (i) the Chapter II ICT risk management section atom it discharges (one of dora:art-6-framework, dora:art-7-systems-protocols-tools, dora:art-8-identification, dora:art-10-detection, dora:art-11-response-recovery), (ii) the playbook slug that produced it, and (iii) the SecOps-NG content-model overlay refs (control_refs, telemetry_refs, metric_refs) that carry across from the producing playbook, using the outbound overlay declared at content/playbooks/<slug>/mappings.yaml as the join key. Sets __section_mapping__. The mapping is best-effort; evidence records that do not bind to a documented section atom are recorded as unbound and flagged on the report rather than dropped so the audit trail carries the gap explicitly. Empty per-section sub-sets are emitted explicitly (a section with no evidence in the window is still enumerated) so the downstream scoring records absent-uncovered rather than silently dropping the section. SKELETON pins the topology + ID + control / telemetry refs; the deterministic mapping-and-normalisation is owned by CORE-PRIM."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.security_assessment@v1"
@@ -156,6 +168,12 @@
         "__section_scoring__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "TODO (CORE): per-section coverage-scoring primitive. The action body scores each of the five Chapter II ICT risk management section atoms in __section_mapping__ against the operator's documented coverage rubric: present-and-current (at least one evidence record in the window whose captured_at is inside the operator's declared freshness threshold for the section), present-but-stale (evidence records exist but the freshest is past the declared freshness threshold), absent-with-declared-exception (no evidence records in the window but the operator maintains a documented, dated exception under the Art. 6 ICT risk-management framework naming the compensating measure), or absent-uncovered (no evidence records in the window and no declared exception — the gap the self-assessment surfaces). Per-section internal consistency is enforced at the primitive boundary so an inconsistent scoring (e.g. present-and-current with an empty evidence sub-set) fails loud here rather than at the report boundary downstream. The scoring is best-effort and time-boxed; if scoring cannot be completed within the documented self-assessment deadline (so the operator is not held by a perfect-scoring stall while the Art. 6(5) annual-review window slips), the primitive is invoked with deadline_missed=true and emits the sentinel per-section bucket ['unscored']; the downstream report step records that marker while still treating the per-section bucket as absent-uncovered for the whole-Chapter roll-up. Sets __section_scoring__. SKELETON pins the topology + ID + control / telemetry / metric refs; the deterministic scoring-rubric binding is owned by CORE-PRIM."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.security_assessment@v1",
@@ -184,6 +202,12 @@
         "__attestation_id__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "TODO (CORE): dated attestation-emission primitive. The action body composes the JSON-native DORA Chapter II ICT risk management self-assessment attestation record shaped against a schemas/evidence/dora-ict-risk-selfassess.schema.json (stream: attestation) landing in the sibling CORE card, and pins the artifact_id as SHA-256(workflow_id|execution_id|captured_at). compile_target is intentionally NOT part of the id so the three reference compilers re-derive byte-identical bytes from the same primitive output (the byte-parity contract the F-WF-DORA-SELFASSESS CORE-FANOUT siblings assert against). The record carries the assessment window, the five section atoms with their per-section scoring buckets, the unbound-evidence flag (if any), the whole-Chapter roll-up verdict (all-present-and-current / mixed-with-declared-exceptions / partial-coverage-with-gaps / uncovered), and the dated attestation timestamp. This is the audit-evident artifact DORA supervisory-authority reviewers read against the Chapter II ICT risk management surface; missing or stale attestation is the failure mode the operator-side Art. 6(5) annual-review cadence surfaces. The primitive only produces the JSON-native record; the durable emitter wiring (artifact-path, content-addressed filename, atomic write, notification of the operator's accountability owner) is owned by the per-target compilers and lands with the CORE-FANOUT sibling cards. Sets __attestation_id__."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.security_assessment@v1",

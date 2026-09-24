@@ -25,6 +25,9 @@ async def load_rotation_roster(shift_window: str) -> dict[str, object]:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000002
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000002',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'load rotation roster', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'load_rotation_roster'},
@@ -38,9 +41,9 @@ async def load_rotation_roster(shift_window: str) -> dict[str, object]:
 
 LOAD_ROTATION_ROSTER_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -49,6 +52,9 @@ async def bind_escalation_tiers(current_on_call: str) -> dict[str, object]:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000003
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000003',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'bind escalation tiers', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'bind_escalation_tiers'},
@@ -62,9 +68,9 @@ async def bind_escalation_tiers(current_on_call: str) -> dict[str, object]:
 
 BIND_ESCALATION_TIERS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -73,6 +79,9 @@ async def generate_handoff_brief(current_on_call: str, next_on_call: str) -> str
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000005
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000005',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'generate handoff brief', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'generate_handoff_brief'},
@@ -86,9 +95,9 @@ async def generate_handoff_brief(current_on_call: str, next_on_call: str) -> str
 
 GENERATE_HANDOFF_BRIEF_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -97,6 +106,9 @@ async def notify_incoming_on_call(next_on_call: str, brief_id: str) -> None:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000006
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000006',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'notify incoming on-call', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_incoming_on_call'},
@@ -110,9 +122,9 @@ async def notify_incoming_on_call(next_on_call: str, brief_id: str) -> None:
 
 NOTIFY_INCOMING_ON_CALL_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @workflow.defn
@@ -126,6 +138,82 @@ class PlaybookOnCallRotationV1Workflow:
     workflow_start    : start--30000000-0000-4000-8000-000000000001
     activities        : load_rotation_roster, bind_escalation_tiers, generate_handoff_brief, notify_incoming_on_call
     """
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000002.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_load_rotation_roster_decision is not None` before continuing.
+    _load_rotation_roster_decision: bool | None = None
+    _load_rotation_roster_reason: str | None = None
+
+    @workflow.signal
+    def load_rotation_roster_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._load_rotation_roster_decision = decision
+        self._load_rotation_roster_reason = reason
+
+    @workflow.query
+    def load_rotation_roster_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._load_rotation_roster_decision is None:
+            return "pending"
+        return "approved" if self._load_rotation_roster_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000003.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_bind_escalation_tiers_decision is not None` before continuing.
+    _bind_escalation_tiers_decision: bool | None = None
+    _bind_escalation_tiers_reason: str | None = None
+
+    @workflow.signal
+    def bind_escalation_tiers_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._bind_escalation_tiers_decision = decision
+        self._bind_escalation_tiers_reason = reason
+
+    @workflow.query
+    def bind_escalation_tiers_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._bind_escalation_tiers_decision is None:
+            return "pending"
+        return "approved" if self._bind_escalation_tiers_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000005.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_generate_handoff_brief_decision is not None` before continuing.
+    _generate_handoff_brief_decision: bool | None = None
+    _generate_handoff_brief_reason: str | None = None
+
+    @workflow.signal
+    def generate_handoff_brief_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._generate_handoff_brief_decision = decision
+        self._generate_handoff_brief_reason = reason
+
+    @workflow.query
+    def generate_handoff_brief_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._generate_handoff_brief_decision is None:
+            return "pending"
+        return "approved" if self._generate_handoff_brief_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000006.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_notify_incoming_on_call_decision is not None` before continuing.
+    _notify_incoming_on_call_decision: bool | None = None
+    _notify_incoming_on_call_reason: str | None = None
+
+    @workflow.signal
+    def notify_incoming_on_call_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._notify_incoming_on_call_decision = decision
+        self._notify_incoming_on_call_reason = reason
+
+    @workflow.query
+    def notify_incoming_on_call_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._notify_incoming_on_call_decision is None:
+            return "pending"
+        return "approved" if self._notify_incoming_on_call_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:

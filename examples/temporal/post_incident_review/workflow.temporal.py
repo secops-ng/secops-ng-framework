@@ -25,6 +25,9 @@ async def timeline_collation(incident_id: str) -> dict[str, object]:
 
     CACAO step_id: action--40000000-0000-4000-8000-000000000002
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--40000000-0000-4000-8000-000000000002',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'timeline collation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'timeline_collation'},
@@ -38,9 +41,9 @@ async def timeline_collation(incident_id: str) -> dict[str, object]:
 
 TIMELINE_COLLATION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -49,6 +52,9 @@ async def blameless_review_template(incident_id: str, timeline_artifact: str, ev
 
     CACAO step_id: action--40000000-0000-4000-8000-000000000003
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--40000000-0000-4000-8000-000000000003',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'blameless review template', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'blameless_review_template'},
@@ -62,9 +68,9 @@ async def blameless_review_template(incident_id: str, timeline_artifact: str, ev
 
 BLAMELESS_REVIEW_TEMPLATE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -73,6 +79,9 @@ async def corrective_action_tracking(incident_id: str, review_artifact: str) -> 
 
     CACAO step_id: action--40000000-0000-4000-8000-000000000004
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--40000000-0000-4000-8000-000000000004',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--40a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b9', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--40000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'corrective-action tracking', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'corrective_action_tracking'},
@@ -86,9 +95,9 @@ async def corrective_action_tracking(incident_id: str, review_artifact: str) -> 
 
 CORRECTIVE_ACTION_TRACKING_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @workflow.defn
@@ -102,6 +111,63 @@ class PlaybookPostIncidentReviewV1Workflow:
     workflow_start    : start--40000000-0000-4000-8000-000000000001
     activities        : timeline_collation, blameless_review_template, corrective_action_tracking
     """
+
+    # Human-in-the-loop scaffold for CACAO step action--40000000-0000-4000-8000-000000000002.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_timeline_collation_decision is not None` before continuing.
+    _timeline_collation_decision: bool | None = None
+    _timeline_collation_reason: str | None = None
+
+    @workflow.signal
+    def timeline_collation_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._timeline_collation_decision = decision
+        self._timeline_collation_reason = reason
+
+    @workflow.query
+    def timeline_collation_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._timeline_collation_decision is None:
+            return "pending"
+        return "approved" if self._timeline_collation_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--40000000-0000-4000-8000-000000000003.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_blameless_review_template_decision is not None` before continuing.
+    _blameless_review_template_decision: bool | None = None
+    _blameless_review_template_reason: str | None = None
+
+    @workflow.signal
+    def blameless_review_template_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._blameless_review_template_decision = decision
+        self._blameless_review_template_reason = reason
+
+    @workflow.query
+    def blameless_review_template_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._blameless_review_template_decision is None:
+            return "pending"
+        return "approved" if self._blameless_review_template_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--40000000-0000-4000-8000-000000000004.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_corrective_action_tracking_decision is not None` before continuing.
+    _corrective_action_tracking_decision: bool | None = None
+    _corrective_action_tracking_reason: str | None = None
+
+    @workflow.signal
+    def corrective_action_tracking_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._corrective_action_tracking_decision = decision
+        self._corrective_action_tracking_reason = reason
+
+    @workflow.query
+    def corrective_action_tracking_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._corrective_action_tracking_decision is None:
+            return "pending"
+        return "approved" if self._corrective_action_tracking_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:

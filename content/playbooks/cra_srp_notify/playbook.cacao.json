@@ -95,6 +95,12 @@
       ],
       "agent_target": "SRP_intake",
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "SKELETON — CRA Article 14 24-hour early warning. Compose the early-warning submission body (product / manufacturer / vulnerability or incident metadata) against the SRP intake shape and dispatch it to the manufacturer's main-establishment CSIRT via the SRP, with simultaneous availability to ENISA per Article 14. Records __srp_early_warning_id__ on confirmed receipt. TODO (CORE): SRP intake schema is not yet public (Commission page notes a pre-go-live testing period ahead of 11 September 2026); the submission body shape is a placeholder here and a sibling CORE card lands the schema-conformant payload builder once the SRP schema is published. The 24h clock anchor is __awareness_ts__ + 24 hours."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.incident_timeline_signals@v1",
@@ -126,7 +132,13 @@
       "in_args": [
         "__awareness_ts__"
       ],
-      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e"
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "SKELETON — durable delay to the CRA Article 14 72-hour deadline. Sleeps until __awareness_ts__ + 72 hours as durable state so the wait survives worker restart on each compile target. TODO (CORE): CACAO v2 does not ship a first-class 'delay' step type; the reference emitters (Temporal timer, n8n Wait node, LangGraph interrupt-then-resume-at-timestamp) each carry the wait in their idiomatic way. The compile-target parity test (roadmap goal G-03) verifies the 72h boundary survives restart without drift on all three targets."
+        }
+      ]
     },
     "action--5a509a09-0000-4000-8000-000000000005": {
       "type": "action",
@@ -143,6 +155,12 @@
       ],
       "agent_target": "SRP_intake",
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "SKELETON — CRA Article 14 72-hour full notification. Compose and dispatch the full notification body (product / manufacturer / vulnerability or incident metadata plus corrective / mitigating measures the manufacturer has taken or recommended) to the SRP, with simultaneous availability to ENISA per Article 14. Records __srp_full_notification_id__ on confirmed receipt. TODO (CORE): SRP intake schema is not yet public; the submission body shape is a placeholder pending the CORE card."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.incident_timeline_signals@v1",
@@ -165,7 +183,13 @@
         "__clock_kind__",
         "__awareness_ts__"
       ],
-      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e"
+      "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "SKELETON — durable delay to the CRA Article 14 final-report deadline. For __clock_kind__ = actively_exploited_vulnerability (Art. 14(2)) the wait resolves at __awareness_ts__ + 14 days after a corrective or mitigating measure becomes available; for __clock_kind__ = severe_incident (Art. 14(3)) the wait resolves at __awareness_ts__ + 1 month. Modelled as durable state so the wait survives worker restart on each compile target. TODO (CORE): the 'after a corrective measure becomes available' anchor is an event, not a fixed offset from awareness — the CORE card wires the corrective-measure-available signal from the upstream vulnerability-intake or incident-handling playbook so this delay can start its 14-day clock at the right instant; a placeholder anchor is used in the SKELETON."
+        }
+      ]
     },
     "action--5a509a09-0000-4000-8000-000000000007": {
       "type": "action",
@@ -182,6 +206,12 @@
       ],
       "agent_target": "SRP_intake",
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "SKELETON — CRA Article 14 final report. Compose and dispatch the final report (description of the vulnerability, severity and impact, information on actors that have exploited or could exploit the vulnerability, and details of the corrective measures for Art. 14(2); analogous shape for Art. 14(3) severe incidents at the 1-month deadline) to the SRP with simultaneous availability to ENISA. Records __srp_final_report_id__ on confirmed receipt. TODO (CORE): SRP intake schema is not yet public; the submission body shape is a placeholder pending the CORE card."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.incident_timeline_signals@v1",

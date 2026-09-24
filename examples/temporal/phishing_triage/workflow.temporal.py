@@ -25,6 +25,9 @@ async def ingest_report(email_id: str, report_source: str) -> None:
 
     CACAO step_id: action--c0a17a01-0000-4000-8000-000000000002
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--c0a17a01-0000-4000-8000-000000000002',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e51c1a6-7e51-4ab1-9ed0-aabbccddeeff', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--c0a17a01-0000-4000-8000-000000000002', 'secops_ng.step.name': 'ingest report', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'ingest_report'},
@@ -38,9 +41,9 @@ async def ingest_report(email_id: str, report_source: str) -> None:
 
 INGEST_REPORT_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -49,6 +52,9 @@ async def enrich_headers_urls_attachments() -> bool:
 
     CACAO step_id: action--c0a17a01-0000-4000-8000-000000000003
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--c0a17a01-0000-4000-8000-000000000003',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e51c1a6-7e51-4ab1-9ed0-aabbccddeeff', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--c0a17a01-0000-4000-8000-000000000003', 'secops_ng.step.name': 'enrich headers, URLs, attachments', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enrich_headers_urls_attachments'},
@@ -62,9 +68,9 @@ async def enrich_headers_urls_attachments() -> bool:
 
 ENRICH_HEADERS_URLS_ATTACHMENTS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -73,6 +79,9 @@ async def suppress_and_close() -> None:
 
     CACAO step_id: action--c0a17a01-0000-4000-8000-000000000005
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--c0a17a01-0000-4000-8000-000000000005',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e51c1a6-7e51-4ab1-9ed0-aabbccddeeff', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--c0a17a01-0000-4000-8000-000000000005', 'secops_ng.step.name': 'suppress and close', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'suppress_and_close'},
@@ -86,9 +95,9 @@ async def suppress_and_close() -> None:
 
 SUPPRESS_AND_CLOSE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -97,6 +106,9 @@ async def classify_intent() -> str:
 
     CACAO step_id: action--c0a17a01-0000-4000-8000-000000000006
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--c0a17a01-0000-4000-8000-000000000006',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e51c1a6-7e51-4ab1-9ed0-aabbccddeeff', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--c0a17a01-0000-4000-8000-000000000006', 'secops_ng.step.name': 'classify intent', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_intent'},
@@ -110,9 +122,9 @@ async def classify_intent() -> str:
 
 CLASSIFY_INTENT_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -121,6 +133,9 @@ async def response_phishing() -> None:
 
     CACAO step_id: action--c0a17a01-0000-4000-8000-000000000008
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--c0a17a01-0000-4000-8000-000000000008',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e51c1a6-7e51-4ab1-9ed0-aabbccddeeff', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--c0a17a01-0000-4000-8000-000000000008', 'secops_ng.step.name': 'response: phishing', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_phishing'},
@@ -134,9 +149,9 @@ async def response_phishing() -> None:
 
 RESPONSE_PHISHING_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -145,6 +160,9 @@ async def response_credential_harvest() -> None:
 
     CACAO step_id: action--c0a17a01-0000-4000-8000-000000000009
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--c0a17a01-0000-4000-8000-000000000009',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e51c1a6-7e51-4ab1-9ed0-aabbccddeeff', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--c0a17a01-0000-4000-8000-000000000009', 'secops_ng.step.name': 'response: credential harvest', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_credential_harvest'},
@@ -158,9 +176,9 @@ async def response_credential_harvest() -> None:
 
 RESPONSE_CREDENTIAL_HARVEST_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -169,6 +187,9 @@ async def response_malware_attached() -> None:
 
     CACAO step_id: action--c0a17a01-0000-4000-8000-00000000000a
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--c0a17a01-0000-4000-8000-00000000000a',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e51c1a6-7e51-4ab1-9ed0-aabbccddeeff', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--c0a17a01-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'response: malware attached', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_malware_attached'},
@@ -182,9 +203,9 @@ async def response_malware_attached() -> None:
 
 RESPONSE_MALWARE_ATTACHED_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -193,6 +214,9 @@ async def response_business_email_compromise() -> None:
 
     CACAO step_id: action--c0a17a01-0000-4000-8000-00000000000b
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--c0a17a01-0000-4000-8000-00000000000b',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e51c1a6-7e51-4ab1-9ed0-aabbccddeeff', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--c0a17a01-0000-4000-8000-00000000000b', 'secops_ng.step.name': 'response: business email compromise', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_business_email_compromise'},
@@ -206,9 +230,9 @@ async def response_business_email_compromise() -> None:
 
 RESPONSE_BUSINESS_EMAIL_COMPROMISE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -217,6 +241,9 @@ async def response_manual_review() -> None:
 
     CACAO step_id: action--c0a17a01-0000-4000-8000-00000000000c
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--c0a17a01-0000-4000-8000-00000000000c',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e51c1a6-7e51-4ab1-9ed0-aabbccddeeff', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--c0a17a01-0000-4000-8000-00000000000c', 'secops_ng.step.name': 'response: manual review', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'response_manual_review'},
@@ -230,9 +257,9 @@ async def response_manual_review() -> None:
 
 RESPONSE_MANUAL_REVIEW_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @workflow.defn
@@ -246,6 +273,177 @@ class PlaybookPhishingTriageV1Workflow:
     workflow_start    : start--c0a17a01-0000-4000-8000-000000000001
     activities        : ingest_report, enrich_headers_urls_attachments, suppress_and_close, classify_intent, response_phishing, response_credential_harvest, response_malware_attached, response_business_email_compromise, response_manual_review
     """
+
+    # Human-in-the-loop scaffold for CACAO step action--c0a17a01-0000-4000-8000-000000000002.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_ingest_report_decision is not None` before continuing.
+    _ingest_report_decision: bool | None = None
+    _ingest_report_reason: str | None = None
+
+    @workflow.signal
+    def ingest_report_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._ingest_report_decision = decision
+        self._ingest_report_reason = reason
+
+    @workflow.query
+    def ingest_report_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._ingest_report_decision is None:
+            return "pending"
+        return "approved" if self._ingest_report_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--c0a17a01-0000-4000-8000-000000000003.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_enrich_headers_urls_attachments_decision is not None` before continuing.
+    _enrich_headers_urls_attachments_decision: bool | None = None
+    _enrich_headers_urls_attachments_reason: str | None = None
+
+    @workflow.signal
+    def enrich_headers_urls_attachments_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._enrich_headers_urls_attachments_decision = decision
+        self._enrich_headers_urls_attachments_reason = reason
+
+    @workflow.query
+    def enrich_headers_urls_attachments_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._enrich_headers_urls_attachments_decision is None:
+            return "pending"
+        return "approved" if self._enrich_headers_urls_attachments_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--c0a17a01-0000-4000-8000-000000000005.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_suppress_and_close_decision is not None` before continuing.
+    _suppress_and_close_decision: bool | None = None
+    _suppress_and_close_reason: str | None = None
+
+    @workflow.signal
+    def suppress_and_close_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._suppress_and_close_decision = decision
+        self._suppress_and_close_reason = reason
+
+    @workflow.query
+    def suppress_and_close_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._suppress_and_close_decision is None:
+            return "pending"
+        return "approved" if self._suppress_and_close_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--c0a17a01-0000-4000-8000-000000000006.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_classify_intent_decision is not None` before continuing.
+    _classify_intent_decision: bool | None = None
+    _classify_intent_reason: str | None = None
+
+    @workflow.signal
+    def classify_intent_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._classify_intent_decision = decision
+        self._classify_intent_reason = reason
+
+    @workflow.query
+    def classify_intent_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._classify_intent_decision is None:
+            return "pending"
+        return "approved" if self._classify_intent_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--c0a17a01-0000-4000-8000-000000000008.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_response_phishing_decision is not None` before continuing.
+    _response_phishing_decision: bool | None = None
+    _response_phishing_reason: str | None = None
+
+    @workflow.signal
+    def response_phishing_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._response_phishing_decision = decision
+        self._response_phishing_reason = reason
+
+    @workflow.query
+    def response_phishing_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._response_phishing_decision is None:
+            return "pending"
+        return "approved" if self._response_phishing_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--c0a17a01-0000-4000-8000-000000000009.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_response_credential_harvest_decision is not None` before continuing.
+    _response_credential_harvest_decision: bool | None = None
+    _response_credential_harvest_reason: str | None = None
+
+    @workflow.signal
+    def response_credential_harvest_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._response_credential_harvest_decision = decision
+        self._response_credential_harvest_reason = reason
+
+    @workflow.query
+    def response_credential_harvest_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._response_credential_harvest_decision is None:
+            return "pending"
+        return "approved" if self._response_credential_harvest_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--c0a17a01-0000-4000-8000-00000000000a.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_response_malware_attached_decision is not None` before continuing.
+    _response_malware_attached_decision: bool | None = None
+    _response_malware_attached_reason: str | None = None
+
+    @workflow.signal
+    def response_malware_attached_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._response_malware_attached_decision = decision
+        self._response_malware_attached_reason = reason
+
+    @workflow.query
+    def response_malware_attached_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._response_malware_attached_decision is None:
+            return "pending"
+        return "approved" if self._response_malware_attached_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--c0a17a01-0000-4000-8000-00000000000b.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_response_business_email_compromise_decision is not None` before continuing.
+    _response_business_email_compromise_decision: bool | None = None
+    _response_business_email_compromise_reason: str | None = None
+
+    @workflow.signal
+    def response_business_email_compromise_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._response_business_email_compromise_decision = decision
+        self._response_business_email_compromise_reason = reason
+
+    @workflow.query
+    def response_business_email_compromise_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._response_business_email_compromise_decision is None:
+            return "pending"
+        return "approved" if self._response_business_email_compromise_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--c0a17a01-0000-4000-8000-00000000000c.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_response_manual_review_decision is not None` before continuing.
+    _response_manual_review_decision: bool | None = None
+    _response_manual_review_reason: str | None = None
+
+    @workflow.signal
+    def response_manual_review_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._response_manual_review_decision = decision
+        self._response_manual_review_reason = reason
+
+    @workflow.query
+    def response_manual_review_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._response_manual_review_decision is None:
+            return "pending"
+        return "approved" if self._response_manual_review_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:

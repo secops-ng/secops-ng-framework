@@ -66,3 +66,14 @@ def test_baseline_never_records_a_regression_against_itself() -> None:
     assert baseline["dialect"] == "declared"
     assert baseline["documents"], "baseline lists no documents"
     assert all(isinstance(n, int) and n >= 0 for n in baseline["documents"].values())
+
+
+def test_every_canonical_playbook_conforms(report: cacao_conformance.Report) -> None:
+    """The floor is zero: every canonical document passes the official schema.
+
+    The baseline test above still guards the per-document counts; this one
+    states the intent plainly so a baseline re-written upward is caught even
+    if the counts were made to agree.
+    """
+    failing = {d.path: d.errors for d in report.documents if d.errors}
+    assert not failing, f"documents failing the official CACAO 2.0 schema: {failing}"

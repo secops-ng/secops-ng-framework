@@ -70,6 +70,12 @@
         "__feed_id__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Poll the configured TAXII collection or STIX 2.1 endpoint and capture the raw bundle. The endpoint is operator-supplied; the content model does not embed feed URLs."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.threat_intel.feed_ingest@v1"
@@ -90,6 +96,12 @@
         "__high_confidence__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Map STIX 2.1 SDOs (Indicator, Malware, Threat-Actor) into the playbook's canonical normalised-indicator record. The released OCSF v1.3.0 catalogue does not contain a dedicated threat-intel ingest event class, so no OCSF class is asserted here on the consumed side (see mappings.yaml — ocsf section). Persist normalised records keyed by indicator value; deduplicate against records seen within the last 24 hours."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.threat_intel.normalisation@v1"
@@ -114,6 +126,12 @@
         "__indicator_count__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Push high-confidence indicators (IPs, domains, file hashes) to the operator's enforcement plane: perimeter firewall, DNS sinkhole, EDR allow/deny list. Records the propagation event so MTTR-to-block can be measured."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.blocklist.propagation@v1"
@@ -132,6 +150,12 @@
       "description": "Activate or refresh the corresponding upstream Sigma rule(s) in the operator's SIEM so subsequent telemetry matching the indicator generates an alert. Sigma rule IDs are pinned to upstream SigmaHQ — the framework does not re-author rule bodies (see README for the upstream rule ID list).",
       "on_completion": "end--10000000-0000-4000-8000-000000000007",
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
+      "commands": [
+        {
+          "type": "manual",
+          "command": "Activate or refresh the corresponding upstream Sigma rule(s) in the operator's SIEM so subsequent telemetry matching the indicator generates an alert. Sigma rule IDs are pinned to upstream SigmaHQ — the framework does not re-author rule bodies (see README for the upstream rule ID list)."
+        }
+      ],
       "x_secops_ng": {
         "control_refs": [
           "control.detection.sigma_deployment@v1"

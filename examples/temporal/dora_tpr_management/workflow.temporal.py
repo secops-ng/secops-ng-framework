@@ -25,6 +25,9 @@ async def onboarding_risk_assessment(provider_handle: str, function_supported: s
 
     CACAO step_id: action--d07a7970-0000-4000-8000-000000000002
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d07a7970-0000-4000-8000-000000000002',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d07a7970-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d07a7970-0000-4000-8000-000000000002', 'secops_ng.step.name': 'onboarding risk assessment', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'onboarding_risk_assessment'},
@@ -38,9 +41,9 @@ async def onboarding_risk_assessment(provider_handle: str, function_supported: s
 
 ONBOARDING_RISK_ASSESSMENT_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -49,6 +52,9 @@ async def contractual_provisions_check(provider_handle: str, contract_ref: str) 
 
     CACAO step_id: action--d07a7970-0000-4000-8000-000000000003
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d07a7970-0000-4000-8000-000000000003',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d07a7970-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d07a7970-0000-4000-8000-000000000003', 'secops_ng.step.name': 'contractual provisions check', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'contractual_provisions_check'},
@@ -62,9 +68,9 @@ async def contractual_provisions_check(provider_handle: str, contract_ref: str) 
 
 CONTRACTUAL_PROVISIONS_CHECK_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -73,6 +79,9 @@ async def register_entry(provider_handle: str, function_supported: str, critical
 
     CACAO step_id: action--d07a7970-0000-4000-8000-000000000004
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d07a7970-0000-4000-8000-000000000004',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d07a7970-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d07a7970-0000-4000-8000-000000000004', 'secops_ng.step.name': 'register entry', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'register_entry'},
@@ -86,9 +95,9 @@ async def register_entry(provider_handle: str, function_supported: str, critical
 
 REGISTER_ENTRY_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -97,6 +106,9 @@ async def periodic_review(provider_handle: str, register_row_id: str, review_win
 
     CACAO step_id: action--d07a7970-0000-4000-8000-000000000005
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d07a7970-0000-4000-8000-000000000005',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d07a7970-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d07a7970-0000-4000-8000-000000000005', 'secops_ng.step.name': 'periodic review', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'periodic_review'},
@@ -110,9 +122,9 @@ async def periodic_review(provider_handle: str, register_row_id: str, review_win
 
 PERIODIC_REVIEW_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -121,6 +133,9 @@ async def exit_assessment(provider_handle: str, register_row_id: str, risk_asses
 
     CACAO step_id: action--d07a7970-0000-4000-8000-000000000006
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d07a7970-0000-4000-8000-000000000006',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d07a7970-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d07a7970-0000-4000-8000-000000000006', 'secops_ng.step.name': 'exit assessment', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'exit_assessment'},
@@ -134,9 +149,9 @@ async def exit_assessment(provider_handle: str, register_row_id: str, risk_asses
 
 EXIT_ASSESSMENT_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @workflow.defn
@@ -150,6 +165,101 @@ class PlaybookDoraTprManagementV1Workflow:
     workflow_start    : start--d07a7970-0000-4000-8000-000000000001
     activities        : onboarding_risk_assessment, contractual_provisions_check, register_entry, periodic_review, exit_assessment
     """
+
+    # Human-in-the-loop scaffold for CACAO step action--d07a7970-0000-4000-8000-000000000002.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_onboarding_risk_assessment_decision is not None` before continuing.
+    _onboarding_risk_assessment_decision: bool | None = None
+    _onboarding_risk_assessment_reason: str | None = None
+
+    @workflow.signal
+    def onboarding_risk_assessment_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._onboarding_risk_assessment_decision = decision
+        self._onboarding_risk_assessment_reason = reason
+
+    @workflow.query
+    def onboarding_risk_assessment_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._onboarding_risk_assessment_decision is None:
+            return "pending"
+        return "approved" if self._onboarding_risk_assessment_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--d07a7970-0000-4000-8000-000000000003.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_contractual_provisions_check_decision is not None` before continuing.
+    _contractual_provisions_check_decision: bool | None = None
+    _contractual_provisions_check_reason: str | None = None
+
+    @workflow.signal
+    def contractual_provisions_check_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._contractual_provisions_check_decision = decision
+        self._contractual_provisions_check_reason = reason
+
+    @workflow.query
+    def contractual_provisions_check_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._contractual_provisions_check_decision is None:
+            return "pending"
+        return "approved" if self._contractual_provisions_check_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--d07a7970-0000-4000-8000-000000000004.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_register_entry_decision is not None` before continuing.
+    _register_entry_decision: bool | None = None
+    _register_entry_reason: str | None = None
+
+    @workflow.signal
+    def register_entry_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._register_entry_decision = decision
+        self._register_entry_reason = reason
+
+    @workflow.query
+    def register_entry_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._register_entry_decision is None:
+            return "pending"
+        return "approved" if self._register_entry_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--d07a7970-0000-4000-8000-000000000005.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_periodic_review_decision is not None` before continuing.
+    _periodic_review_decision: bool | None = None
+    _periodic_review_reason: str | None = None
+
+    @workflow.signal
+    def periodic_review_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._periodic_review_decision = decision
+        self._periodic_review_reason = reason
+
+    @workflow.query
+    def periodic_review_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._periodic_review_decision is None:
+            return "pending"
+        return "approved" if self._periodic_review_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--d07a7970-0000-4000-8000-000000000006.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_exit_assessment_decision is not None` before continuing.
+    _exit_assessment_decision: bool | None = None
+    _exit_assessment_reason: str | None = None
+
+    @workflow.signal
+    def exit_assessment_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._exit_assessment_decision = decision
+        self._exit_assessment_reason = reason
+
+    @workflow.query
+    def exit_assessment_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._exit_assessment_decision is None:
+            return "pending"
+        return "approved" if self._exit_assessment_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:

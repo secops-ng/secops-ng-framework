@@ -25,6 +25,9 @@ async def triage_identity_signal(signal_id: str, principal_id: str) -> bool:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000002
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000002',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'triage identity signal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'triage_identity_signal'},
@@ -38,9 +41,9 @@ async def triage_identity_signal(signal_id: str, principal_id: str) -> bool:
 
 TRIAGE_IDENTITY_SIGNAL_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -49,6 +52,9 @@ async def reset_mfa_factors(principal_id: str) -> None:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000004
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000004',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'reset MFA factors', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'reset_mfa_factors'},
@@ -62,9 +68,9 @@ async def reset_mfa_factors(principal_id: str) -> None:
 
 RESET_MFA_FACTORS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -73,6 +79,9 @@ async def revoke_active_sessions(principal_id: str) -> int:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000005
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000005',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'revoke active sessions', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'revoke_active_sessions'},
@@ -86,9 +95,9 @@ async def revoke_active_sessions(principal_id: str) -> int:
 
 REVOKE_ACTIVE_SESSIONS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -97,6 +106,9 @@ async def lateral_movement_hunt(principal_id: str) -> int:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000006
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000006',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'lateral-movement hunt', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'lateral_movement_hunt'},
@@ -110,9 +122,9 @@ async def lateral_movement_hunt(principal_id: str) -> int:
 
 LATERAL_MOVEMENT_HUNT_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -121,6 +133,9 @@ async def iam_audit_and_persistence_removal(principal_id: str) -> None:
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000007
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000007',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a701', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'IAM audit and persistence removal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'iam_audit_and_persistence_removal'},
@@ -134,9 +149,9 @@ async def iam_audit_and_persistence_removal(principal_id: str) -> None:
 
 IAM_AUDIT_AND_PERSISTENCE_REMOVAL_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @workflow.defn
@@ -150,6 +165,101 @@ class PlaybookIdentityCompromiseV1Workflow:
     workflow_start    : start--30000000-0000-4000-8000-000000000001
     activities        : triage_identity_signal, reset_mfa_factors, revoke_active_sessions, lateral_movement_hunt, iam_audit_and_persistence_removal
     """
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000002.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_triage_identity_signal_decision is not None` before continuing.
+    _triage_identity_signal_decision: bool | None = None
+    _triage_identity_signal_reason: str | None = None
+
+    @workflow.signal
+    def triage_identity_signal_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._triage_identity_signal_decision = decision
+        self._triage_identity_signal_reason = reason
+
+    @workflow.query
+    def triage_identity_signal_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._triage_identity_signal_decision is None:
+            return "pending"
+        return "approved" if self._triage_identity_signal_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000004.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_reset_mfa_factors_decision is not None` before continuing.
+    _reset_mfa_factors_decision: bool | None = None
+    _reset_mfa_factors_reason: str | None = None
+
+    @workflow.signal
+    def reset_mfa_factors_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._reset_mfa_factors_decision = decision
+        self._reset_mfa_factors_reason = reason
+
+    @workflow.query
+    def reset_mfa_factors_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._reset_mfa_factors_decision is None:
+            return "pending"
+        return "approved" if self._reset_mfa_factors_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000005.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_revoke_active_sessions_decision is not None` before continuing.
+    _revoke_active_sessions_decision: bool | None = None
+    _revoke_active_sessions_reason: str | None = None
+
+    @workflow.signal
+    def revoke_active_sessions_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._revoke_active_sessions_decision = decision
+        self._revoke_active_sessions_reason = reason
+
+    @workflow.query
+    def revoke_active_sessions_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._revoke_active_sessions_decision is None:
+            return "pending"
+        return "approved" if self._revoke_active_sessions_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000006.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_lateral_movement_hunt_decision is not None` before continuing.
+    _lateral_movement_hunt_decision: bool | None = None
+    _lateral_movement_hunt_reason: str | None = None
+
+    @workflow.signal
+    def lateral_movement_hunt_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._lateral_movement_hunt_decision = decision
+        self._lateral_movement_hunt_reason = reason
+
+    @workflow.query
+    def lateral_movement_hunt_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._lateral_movement_hunt_decision is None:
+            return "pending"
+        return "approved" if self._lateral_movement_hunt_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000007.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_iam_audit_and_persistence_removal_decision is not None` before continuing.
+    _iam_audit_and_persistence_removal_decision: bool | None = None
+    _iam_audit_and_persistence_removal_reason: str | None = None
+
+    @workflow.signal
+    def iam_audit_and_persistence_removal_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._iam_audit_and_persistence_removal_decision = decision
+        self._iam_audit_and_persistence_removal_reason = reason
+
+    @workflow.query
+    def iam_audit_and_persistence_removal_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._iam_audit_and_persistence_removal_decision is None:
+            return "pending"
+        return "approved" if self._iam_audit_and_persistence_removal_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:

@@ -25,6 +25,9 @@ async def screen_dpia_triggers(processing_ref: str) -> dict[str, object]:
 
     CACAO step_id: action--d91a35c0-0000-4000-8000-000000000002
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d91a35c0-0000-4000-8000-000000000002',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000002', 'secops_ng.step.name': 'screen_dpia_triggers', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'screen_dpia_triggers'},
@@ -38,9 +41,9 @@ async def screen_dpia_triggers(processing_ref: str) -> dict[str, object]:
 
 SCREEN_DPIA_TRIGGERS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -49,6 +52,9 @@ async def classify_processing_type(dpia_case_id: str, processing_ref: str) -> No
 
     CACAO step_id: action--d91a35c0-0000-4000-8000-000000000003
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d91a35c0-0000-4000-8000-000000000003',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify_processing_type', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_processing_type'},
@@ -62,9 +68,9 @@ async def classify_processing_type(dpia_case_id: str, processing_ref: str) -> No
 
 CLASSIFY_PROCESSING_TYPE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -73,6 +79,9 @@ async def gather_processing_description(dpia_case_id: str, processing_ref: str) 
 
     CACAO step_id: action--d91a35c0-0000-4000-8000-000000000004
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d91a35c0-0000-4000-8000-000000000004',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000004', 'secops_ng.step.name': 'gather_processing_description', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'gather_processing_description'},
@@ -86,9 +95,9 @@ async def gather_processing_description(dpia_case_id: str, processing_ref: str) 
 
 GATHER_PROCESSING_DESCRIPTION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -97,6 +106,9 @@ async def assess_necessity_and_proportionality(dpia_case_id: str, processing_des
 
     CACAO step_id: action--d91a35c0-0000-4000-8000-000000000005
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d91a35c0-0000-4000-8000-000000000005',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000005', 'secops_ng.step.name': 'assess_necessity_and_proportionality', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_necessity_and_proportionality'},
@@ -110,9 +122,9 @@ async def assess_necessity_and_proportionality(dpia_case_id: str, processing_des
 
 ASSESS_NECESSITY_AND_PROPORTIONALITY_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -121,6 +133,9 @@ async def identify_and_assess_risks(dpia_case_id: str, processing_description_re
 
     CACAO step_id: action--d91a35c0-0000-4000-8000-000000000006
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d91a35c0-0000-4000-8000-000000000006',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000006', 'secops_ng.step.name': 'identify_and_assess_risks', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'identify_and_assess_risks'},
@@ -134,9 +149,9 @@ async def identify_and_assess_risks(dpia_case_id: str, processing_description_re
 
 IDENTIFY_AND_ASSESS_RISKS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -145,6 +160,9 @@ async def identify_and_document_mitigations(dpia_case_id: str, risk_assessment_r
 
     CACAO step_id: action--d91a35c0-0000-4000-8000-000000000007
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d91a35c0-0000-4000-8000-000000000007',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000007', 'secops_ng.step.name': 'identify_and_document_mitigations', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'identify_and_document_mitigations'},
@@ -158,9 +176,9 @@ async def identify_and_document_mitigations(dpia_case_id: str, risk_assessment_r
 
 IDENTIFY_AND_DOCUMENT_MITIGATIONS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -169,6 +187,9 @@ async def dpo_consultation(dpia_case_id: str, processing_description_ref: str, r
 
     CACAO step_id: action--d91a35c0-0000-4000-8000-000000000008
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d91a35c0-0000-4000-8000-000000000008',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000008', 'secops_ng.step.name': 'dpo_consultation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'dpo_consultation'},
@@ -182,9 +203,9 @@ async def dpo_consultation(dpia_case_id: str, processing_description_ref: str, r
 
 DPO_CONSULTATION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -193,6 +214,9 @@ async def determine_article_36_gate(dpia_case_id: str, risk_assessment_ref: str,
 
     CACAO step_id: action--d91a35c0-0000-4000-8000-000000000009
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d91a35c0-0000-4000-8000-000000000009',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000009', 'secops_ng.step.name': 'determine_article_36_gate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'determine_article_36_gate'},
@@ -206,9 +230,9 @@ async def determine_article_36_gate(dpia_case_id: str, risk_assessment_ref: str,
 
 DETERMINE_ARTICLE_36_GATE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -217,6 +241,9 @@ async def produce_dpia_document(dpia_case_id: str, processing_description_ref: s
 
     CACAO step_id: action--d91a35c0-0000-4000-8000-00000000000a
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d91a35c0-0000-4000-8000-00000000000a',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'produce_dpia_document', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'produce_dpia_document'},
@@ -230,9 +257,9 @@ async def produce_dpia_document(dpia_case_id: str, processing_description_ref: s
 
 PRODUCE_DPIA_DOCUMENT_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -241,6 +268,9 @@ async def schedule_review_cadence(dpia_case_id: str, dpia_document_ref: str) -> 
 
     CACAO step_id: action--d91a35c0-0000-4000-8000-00000000000b
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d91a35c0-0000-4000-8000-00000000000b',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-00000000000b', 'secops_ng.step.name': 'schedule_review_cadence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'schedule_review_cadence'},
@@ -254,9 +284,9 @@ async def schedule_review_cadence(dpia_case_id: str, dpia_document_ref: str) -> 
 
 SCHEDULE_REVIEW_CADENCE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @workflow.defn
@@ -270,6 +300,196 @@ class PlaybookDataProtectionImpactAssessmentV1Workflow:
     workflow_start    : start--d91a35c0-0000-4000-8000-000000000001
     activities        : screen_dpia_triggers, classify_processing_type, gather_processing_description, assess_necessity_and_proportionality, identify_and_assess_risks, identify_and_document_mitigations, dpo_consultation, determine_article_36_gate, produce_dpia_document, schedule_review_cadence
     """
+
+    # Human-in-the-loop scaffold for CACAO step action--d91a35c0-0000-4000-8000-000000000002.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_screen_dpia_triggers_decision is not None` before continuing.
+    _screen_dpia_triggers_decision: bool | None = None
+    _screen_dpia_triggers_reason: str | None = None
+
+    @workflow.signal
+    def screen_dpia_triggers_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._screen_dpia_triggers_decision = decision
+        self._screen_dpia_triggers_reason = reason
+
+    @workflow.query
+    def screen_dpia_triggers_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._screen_dpia_triggers_decision is None:
+            return "pending"
+        return "approved" if self._screen_dpia_triggers_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--d91a35c0-0000-4000-8000-000000000003.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_classify_processing_type_decision is not None` before continuing.
+    _classify_processing_type_decision: bool | None = None
+    _classify_processing_type_reason: str | None = None
+
+    @workflow.signal
+    def classify_processing_type_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._classify_processing_type_decision = decision
+        self._classify_processing_type_reason = reason
+
+    @workflow.query
+    def classify_processing_type_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._classify_processing_type_decision is None:
+            return "pending"
+        return "approved" if self._classify_processing_type_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--d91a35c0-0000-4000-8000-000000000004.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_gather_processing_description_decision is not None` before continuing.
+    _gather_processing_description_decision: bool | None = None
+    _gather_processing_description_reason: str | None = None
+
+    @workflow.signal
+    def gather_processing_description_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._gather_processing_description_decision = decision
+        self._gather_processing_description_reason = reason
+
+    @workflow.query
+    def gather_processing_description_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._gather_processing_description_decision is None:
+            return "pending"
+        return "approved" if self._gather_processing_description_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--d91a35c0-0000-4000-8000-000000000005.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_assess_necessity_and_proportionality_decision is not None` before continuing.
+    _assess_necessity_and_proportionality_decision: bool | None = None
+    _assess_necessity_and_proportionality_reason: str | None = None
+
+    @workflow.signal
+    def assess_necessity_and_proportionality_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._assess_necessity_and_proportionality_decision = decision
+        self._assess_necessity_and_proportionality_reason = reason
+
+    @workflow.query
+    def assess_necessity_and_proportionality_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._assess_necessity_and_proportionality_decision is None:
+            return "pending"
+        return "approved" if self._assess_necessity_and_proportionality_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--d91a35c0-0000-4000-8000-000000000006.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_identify_and_assess_risks_decision is not None` before continuing.
+    _identify_and_assess_risks_decision: bool | None = None
+    _identify_and_assess_risks_reason: str | None = None
+
+    @workflow.signal
+    def identify_and_assess_risks_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._identify_and_assess_risks_decision = decision
+        self._identify_and_assess_risks_reason = reason
+
+    @workflow.query
+    def identify_and_assess_risks_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._identify_and_assess_risks_decision is None:
+            return "pending"
+        return "approved" if self._identify_and_assess_risks_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--d91a35c0-0000-4000-8000-000000000007.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_identify_and_document_mitigations_decision is not None` before continuing.
+    _identify_and_document_mitigations_decision: bool | None = None
+    _identify_and_document_mitigations_reason: str | None = None
+
+    @workflow.signal
+    def identify_and_document_mitigations_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._identify_and_document_mitigations_decision = decision
+        self._identify_and_document_mitigations_reason = reason
+
+    @workflow.query
+    def identify_and_document_mitigations_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._identify_and_document_mitigations_decision is None:
+            return "pending"
+        return "approved" if self._identify_and_document_mitigations_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--d91a35c0-0000-4000-8000-000000000008.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_dpo_consultation_decision is not None` before continuing.
+    _dpo_consultation_decision: bool | None = None
+    _dpo_consultation_reason: str | None = None
+
+    @workflow.signal
+    def dpo_consultation_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._dpo_consultation_decision = decision
+        self._dpo_consultation_reason = reason
+
+    @workflow.query
+    def dpo_consultation_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._dpo_consultation_decision is None:
+            return "pending"
+        return "approved" if self._dpo_consultation_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--d91a35c0-0000-4000-8000-000000000009.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_determine_article_36_gate_decision is not None` before continuing.
+    _determine_article_36_gate_decision: bool | None = None
+    _determine_article_36_gate_reason: str | None = None
+
+    @workflow.signal
+    def determine_article_36_gate_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._determine_article_36_gate_decision = decision
+        self._determine_article_36_gate_reason = reason
+
+    @workflow.query
+    def determine_article_36_gate_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._determine_article_36_gate_decision is None:
+            return "pending"
+        return "approved" if self._determine_article_36_gate_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--d91a35c0-0000-4000-8000-00000000000a.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_produce_dpia_document_decision is not None` before continuing.
+    _produce_dpia_document_decision: bool | None = None
+    _produce_dpia_document_reason: str | None = None
+
+    @workflow.signal
+    def produce_dpia_document_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._produce_dpia_document_decision = decision
+        self._produce_dpia_document_reason = reason
+
+    @workflow.query
+    def produce_dpia_document_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._produce_dpia_document_decision is None:
+            return "pending"
+        return "approved" if self._produce_dpia_document_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--d91a35c0-0000-4000-8000-00000000000b.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_schedule_review_cadence_decision is not None` before continuing.
+    _schedule_review_cadence_decision: bool | None = None
+    _schedule_review_cadence_reason: str | None = None
+
+    @workflow.signal
+    def schedule_review_cadence_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._schedule_review_cadence_decision = decision
+        self._schedule_review_cadence_reason = reason
+
+    @workflow.query
+    def schedule_review_cadence_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._schedule_review_cadence_decision is None:
+            return "pending"
+        return "approved" if self._schedule_review_cadence_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:

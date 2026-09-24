@@ -25,6 +25,9 @@ async def pull_upstream_feed(feed_url: str, feed_id: str) -> None:
 
     CACAO step_id: action--10000000-0000-4000-8000-000000000002
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--10000000-0000-4000-8000-000000000002',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7c1e2b3a-4d5f-4a8b-9c0d-1e2f3a4b5c6d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--10000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'pull upstream feed', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'pull_upstream_feed'},
@@ -38,9 +41,9 @@ async def pull_upstream_feed(feed_url: str, feed_id: str) -> None:
 
 PULL_UPSTREAM_FEED_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -49,6 +52,9 @@ async def normalise_stix_to_ocsf() -> dict[str, object]:
 
     CACAO step_id: action--10000000-0000-4000-8000-000000000003
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--10000000-0000-4000-8000-000000000003',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7c1e2b3a-4d5f-4a8b-9c0d-1e2f3a4b5c6d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--10000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'normalise STIX to OCSF', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'normalise_stix_to_ocsf'},
@@ -62,9 +68,9 @@ async def normalise_stix_to_ocsf() -> dict[str, object]:
 
 NORMALISE_STIX_TO_OCSF_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -73,6 +79,9 @@ async def propagate_to_blocklist(indicator_count: int) -> None:
 
     CACAO step_id: action--10000000-0000-4000-8000-000000000005
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--10000000-0000-4000-8000-000000000005',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7c1e2b3a-4d5f-4a8b-9c0d-1e2f3a4b5c6d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--10000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'propagate to blocklist', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'propagate_to_blocklist'},
@@ -86,9 +95,9 @@ async def propagate_to_blocklist(indicator_count: int) -> None:
 
 PROPAGATE_TO_BLOCKLIST_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @activity.defn
@@ -97,6 +106,9 @@ async def activate_detection_rule() -> None:
 
     CACAO step_id: action--10000000-0000-4000-8000-000000000006
     """
+    # CACAO `manual` command — this activity is the side-effect half of
+    # a human-in-the-loop step. The workflow class above carries the
+    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--10000000-0000-4000-8000-000000000006',
         attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7c1e2b3a-4d5f-4a8b-9c0d-1e2f3a4b5c6d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--10000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'activate detection rule', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'activate_detection_rule'},
@@ -110,9 +122,9 @@ async def activate_detection_rule() -> None:
 
 ACTIVATE_DETECTION_RULE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=60),
-    backoff_coefficient=2.0,
-    maximum_attempts=3,
+    maximum_interval=timedelta(seconds=1),
+    backoff_coefficient=1.0,
+    maximum_attempts=1,
 )
 
 @workflow.defn
@@ -126,6 +138,82 @@ class PlaybookThreatIntelIngestV1Workflow:
     workflow_start    : start--10000000-0000-4000-8000-000000000001
     activities        : pull_upstream_feed, normalise_stix_to_ocsf, propagate_to_blocklist, activate_detection_rule
     """
+
+    # Human-in-the-loop scaffold for CACAO step action--10000000-0000-4000-8000-000000000002.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_pull_upstream_feed_decision is not None` before continuing.
+    _pull_upstream_feed_decision: bool | None = None
+    _pull_upstream_feed_reason: str | None = None
+
+    @workflow.signal
+    def pull_upstream_feed_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._pull_upstream_feed_decision = decision
+        self._pull_upstream_feed_reason = reason
+
+    @workflow.query
+    def pull_upstream_feed_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._pull_upstream_feed_decision is None:
+            return "pending"
+        return "approved" if self._pull_upstream_feed_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--10000000-0000-4000-8000-000000000003.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_normalise_stix_to_ocsf_decision is not None` before continuing.
+    _normalise_stix_to_ocsf_decision: bool | None = None
+    _normalise_stix_to_ocsf_reason: str | None = None
+
+    @workflow.signal
+    def normalise_stix_to_ocsf_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._normalise_stix_to_ocsf_decision = decision
+        self._normalise_stix_to_ocsf_reason = reason
+
+    @workflow.query
+    def normalise_stix_to_ocsf_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._normalise_stix_to_ocsf_decision is None:
+            return "pending"
+        return "approved" if self._normalise_stix_to_ocsf_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--10000000-0000-4000-8000-000000000005.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_propagate_to_blocklist_decision is not None` before continuing.
+    _propagate_to_blocklist_decision: bool | None = None
+    _propagate_to_blocklist_reason: str | None = None
+
+    @workflow.signal
+    def propagate_to_blocklist_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._propagate_to_blocklist_decision = decision
+        self._propagate_to_blocklist_reason = reason
+
+    @workflow.query
+    def propagate_to_blocklist_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._propagate_to_blocklist_decision is None:
+            return "pending"
+        return "approved" if self._propagate_to_blocklist_decision else "denied"
+
+    # Human-in-the-loop scaffold for CACAO step action--10000000-0000-4000-8000-000000000006.
+    # State + signal + query — the integrator wires `run()` to
+    # await `_activate_detection_rule_decision is not None` before continuing.
+    _activate_detection_rule_decision: bool | None = None
+    _activate_detection_rule_reason: str | None = None
+
+    @workflow.signal
+    def activate_detection_rule_approve(self, decision: bool, reason: str | None = None) -> None:
+        """Signal handler — operator releases the workflow with decision/reason."""
+        self._activate_detection_rule_decision = decision
+        self._activate_detection_rule_reason = reason
+
+    @workflow.query
+    def activate_detection_rule_status(self) -> str:
+        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
+        if self._activate_detection_rule_decision is None:
+            return "pending"
+        return "approved" if self._activate_detection_rule_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:
