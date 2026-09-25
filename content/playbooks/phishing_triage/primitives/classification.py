@@ -17,6 +17,14 @@ analyst rather than to an automated response:
 
 Malformed *types* still fail loud: a confidence that is a boolean, NaN or
 outside [0, 1] is a broken adapter, not a doubtful message.
+
+The threshold is an integer percentage, not a fraction. CACAO playbook
+variables have no float type, so a fractional threshold could only travel
+as a string, and this primitive rejects strings; ``threat_intel_ingest``
+carries its confidence threshold the same way. The comparison is
+``confidence >= percent / 100``: IEEE division is correctly rounded, so
+``29 / 100`` is exactly the double a classifier's ``0.29`` parses to and
+the boundary holds, where ``confidence * 100 >= percent`` would drop it.
 """
 
 from __future__ import annotations
@@ -39,35 +47,35 @@ class InvalidIntentResolutionError(ValueError):
     """The classifier output or the threshold is malformed."""
 
 
-def _unit_interval(value: object, field: str, *, allow_zero: bool) -> float:
+def _unit_interval(value: object, field: str) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise InvalidIntentResolutionError(
             f"{field} must be a number, got {type(value).__name__}"
         )
     number = float(value)
-    low_ok = number >= 0.0 if allow_zero else number > 0.0
-    if math.isnan(number) or not low_ok or number > 1.0:
-        bound = "[0, 1]" if allow_zero else "(0, 1]"
-        raise InvalidIntentResolutionError(f"{field} must be in {bound}, got {value!r}")
+    if math.isnan(number) or not 0.0 <= number <= 1.0:
+        raise InvalidIntentResolutionError(f"{field} must be in [0, 1], got {value!r}")
     return number
 
 
-def resolve_intent(classifier_output: dict, confidence_threshold: float) -> dict:
+def resolve_intent(classifier_output: dict, confidence_threshold_percent: int) -> dict:
     """Resolve the classifier's output to one routable intent.
 
     Parameters
     ----------
     classifier_output
         Exactly ``label`` (string) and ``confidence`` (number in [0, 1]).
-    confidence_threshold
-        The operator's floor for acting on a label automatically, in (0, 1].
+    confidence_threshold_percent
+        The operator's floor for acting on a label automatically, as an
+        integer percentage from 1 to 100.
 
     Returns
     -------
     ``intent`` (always one of :data:`INTENTS`), the canonical
-    ``classifier_label`` as received, ``confidence``, ``threshold``, and a
-    ``reason``: ``accepted``, ``classifier_abstained``,
-    ``below_confidence_threshold`` or ``label_outside_enumeration``.
+    ``classifier_label`` as received, ``confidence``,
+    ``threshold_percent``, and a ``reason``: ``accepted``,
+    ``classifier_abstained``, ``below_confidence_threshold`` or
+    ``label_outside_enumeration``.
     """
     if not isinstance(classifier_output, dict) or set(classifier_output) != {"label", "confidence"}:
         raise InvalidIntentResolutionError(
@@ -79,14 +87,18 @@ def resolve_intent(classifier_output: dict, confidence_threshold: float) -> dict
             f"label must be a string, got {type(raw_label).__name__}"
         )
     label = unicodedata.normalize("NFKC", raw_label).strip().lower()
-    confidence = _unit_interval(classifier_output["confidence"], "confidence", allow_zero=True)
-    threshold = _unit_interval(confidence_threshold, "confidence_threshold", allow_zero=False)
+    confidence = _unit_interval(classifier_output["confidence"], "confidence")
+    percent = confidence_threshold_percent
+    if isinstance(percent, bool) or not isinstance(percent, int) or not 1 <= percent <= 100:
+        raise InvalidIntentResolutionError(
+            f"confidence_threshold_percent must be an integer from 1 to 100, got {percent!r}"
+        )
 
     if label not in INTENTS:
         intent, reason = "unknown", "label_outside_enumeration"
     elif label == "unknown":
         intent, reason = "unknown", "classifier_abstained"
-    elif confidence < threshold:
+    elif confidence < percent / 100:
         intent, reason = "unknown", "below_confidence_threshold"
     else:
         intent, reason = label, "accepted"
@@ -94,6 +106,6 @@ def resolve_intent(classifier_output: dict, confidence_threshold: float) -> dict
         "intent": intent,
         "classifier_label": label,
         "confidence": confidence,
-        "threshold": threshold,
+        "threshold_percent": percent,
         "reason": reason,
     }

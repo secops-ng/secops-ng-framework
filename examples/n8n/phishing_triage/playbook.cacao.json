@@ -11,7 +11,7 @@
   ],
   "created_by": "identity--c0c0c0c0-c0c0-4c0c-8c0c-c0c0c0c0c0c0",
   "created": "2026-05-29T00:00:00Z",
-  "modified": "2026-05-30T00:00:00Z",
+  "modified": "2026-09-25T00:00:00Z",
   "labels": [
     "phishing",
     "email-security",
@@ -29,14 +29,139 @@
       "description": "Where the report originated. One of: user_report, mailbox_sweep.",
       "external": true
     },
+    "__raw_message__": {
+      "type": "dictionary",
+      "description": "The reported-message envelope the email-security adapter fetched for __email_id__: message_id, sender, recipients, subject and received_at, plus optional urls and attachments (filename, sha256, size_bytes). The fetch is the adapter's concern; the ingest primitive validates the grammar and rejects unknown keys, so a misspelled attachments key cannot read as no attachments.",
+      "external": true
+    },
+    "__authentication_results__": {
+      "type": "dictionary",
+      "description": "SPF, DKIM and DMARC results the adapter evaluated for the message: exactly spf, dkim and dmarc, each one of pass, fail, softfail, neutral, none, temperror, permerror. A known-benign sender is only suppressed on DMARC pass.",
+      "external": true
+    },
+    "__url_verdicts__": {
+      "type": "dictionary",
+      "description": "URL-reputation verdict per URL the message carries: malicious, suspicious, clean or unknown. A URL with no verdict is recorded as unknown; a verdict for a URL the message does not carry fails loud.",
+      "external": true
+    },
+    "__attachment_verdicts__": {
+      "type": "dictionary",
+      "description": "Static-analysis verdict per attachment SHA-256, in the same vocabulary as __url_verdicts__.",
+      "external": true
+    },
+    "__known_benign_senders__": {
+      "type": "string",
+      "description": "The operator's known-benign sender entries: full addresses, or bare domains matching every address at them. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__seen_cases__": {
+      "type": "string",
+      "description": "Cases the suppression cache returned for this report, each with fingerprint, case_ref and seen_at. Only a case seen within the window before __assessed_at__ collapses the report. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__assessed_at__": {
+      "type": "string",
+      "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the assessment is evaluated at; the suppression window is measured back from it.",
+      "external": true
+    },
+    "__suppression_window_hours__": {
+      "type": "integer",
+      "description": "The operator's suppression window, in hours, as a positive integer.",
+      "external": true
+    },
+    "__closed_at__": {
+      "type": "string",
+      "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) of the suppression closure.",
+      "external": true
+    },
+    "__classifier_output__": {
+      "type": "dictionary",
+      "description": "The operator-bound intent classifier's output: exactly label and confidence, a number from 0 to 1. The classifier is the operator's; this playbook fixes only its output contract.",
+      "external": true
+    },
+    "__confidence_threshold_percent__": {
+      "type": "integer",
+      "description": "The operator's floor for acting on a classified intent automatically, as an integer percentage from 1 to 100. An integer rather than a fraction because CACAO variables have no float type; below it the report routes to manual review.",
+      "external": true
+    },
+    "__click_events__": {
+      "type": "string",
+      "description": "URL-activity records correlated to this message, each with identity, url and clicked_at. A click on a URL the message does not carry fails loud. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__simulation_campaign_ref__": {
+      "type": "string",
+      "description": "The campaign reference when the reported message is the operator's own sanctioned phishing simulation; unset or empty for a real report. A simulation records its clicks for the click-rate KPI and is not contained.",
+      "external": true
+    },
+    "__file_open_events__": {
+      "type": "string",
+      "description": "File-activity records for recipients who opened an attachment, each with identity, host_ref, sha256 and opened_at. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__pending_payment_refs__": {
+      "type": "string",
+      "description": "References of the pending payment instructions the finance adapter tied to the message. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__review_queue_ref__": {
+      "type": "string",
+      "description": "Reference of the analyst queue unknown-intent reports are routed to.",
+      "external": true
+    },
+    "__reported_message__": {
+      "type": "dictionary",
+      "description": "Envelope the ingest step emits: the canonical reported message, with sender_domain split out and report_source attached.",
+      "external": false
+    },
+    "__message_assessment__": {
+      "type": "dictionary",
+      "description": "Envelope the enrich step emits: the case fingerprint, the authentication results, the verdict-joined URLs and attachments, the flagged indicators, benign_or_seen, and the suppression lane taken or refused.",
+      "external": false
+    },
     "__benign_or_seen__": {
       "type": "boolean",
-      "description": "Set by the suppression check: true when the message matches a known-benign sender or an already-seen case fingerprint within the suppression window.",
+      "description": "True when the report collapses onto a case seen within the suppression window, or comes from a known-benign sender with DMARC pass and no flagged indicator. Extracted at the compile target's adapter seam from __message_assessment__.benign_or_seen. A real boolean: the gate compares it to true, and the string 'false' is truthy in most runtimes.",
+      "external": false
+    },
+    "__suppression_record__": {
+      "type": "dictionary",
+      "description": "Envelope the suppress step emits: the closure record, linked to the open case or to the known-benign sender entry, with pages false and no notifications.",
+      "external": false
+    },
+    "__intent_resolution__": {
+      "type": "dictionary",
+      "description": "Envelope the classify step emits: the resolved intent, the classifier's canonical label and confidence, the threshold applied, and the reason for the resolution.",
       "external": false
     },
     "__intent__": {
       "type": "string",
-      "description": "Classified intent of the message. One of: phishing, credential_harvest, malware_attached, business_email_compromise, unknown.",
+      "description": "Classified intent of the message: phishing, credential_harvest, malware_attached, business_email_compromise or unknown. Extracted at the compile target's adapter seam from __intent_resolution__.intent; every doubtful classification resolves to unknown, the manual-review branch.",
+      "external": false
+    },
+    "__phishing_directive__": {
+      "type": "dictionary",
+      "description": "Envelope the phishing response step emits: the ordered actions for the gateway, identity platform, finance or analyst queue to carry out, the teams to notify and the metrics stamped. Composition only; execution is the adapters'.",
+      "external": false
+    },
+    "__credential_harvest_directive__": {
+      "type": "dictionary",
+      "description": "Envelope the credential-harvest response step emits: the ordered actions for the gateway, identity platform, finance or analyst queue to carry out, the teams to notify and the metrics stamped. Composition only; execution is the adapters'.",
+      "external": false
+    },
+    "__malware_directive__": {
+      "type": "dictionary",
+      "description": "Envelope the malware-attachment response step emits: the ordered actions for the gateway, identity platform, finance or analyst queue to carry out, the teams to notify and the metrics stamped. Composition only; execution is the adapters'.",
+      "external": false
+    },
+    "__bec_directive__": {
+      "type": "dictionary",
+      "description": "Envelope the business-email-compromise response step emits: the ordered actions for the gateway, identity platform, finance or analyst queue to carry out, the teams to notify and the metrics stamped. Composition only; execution is the adapters'.",
+      "external": false
+    },
+    "__manual_review_directive__": {
+      "type": "dictionary",
+      "description": "Envelope the manual-review response step emits: the ordered actions for the gateway, identity platform, finance or analyst queue to carry out, the teams to notify and the metrics stamped. Composition only; execution is the adapters'.",
       "external": false
     }
   },
@@ -56,17 +181,21 @@
     "action--c0a17a01-0000-4000-8000-000000000002": {
       "type": "action",
       "name": "ingest report",
-      "description": "Fetch the reported email envelope, headers, body, and attachment metadata from the email-security platform. Accepts both user-reported messages and mailbox-sweep hits; the source is carried in __report_source__ for downstream accounting against the simulation click-rate and suppression-rate metrics.",
+      "description": "Reported-message intake. Binds against the deterministic primitive at content.playbooks.phishing_triage.primitives.intake.validate_reported_message: validates and canonicalises the envelope the email-security adapter fetched for __email_id__, accepting user reports and mailbox sweeps, and rejects unknown envelope keys so a misspelled field cannot silently drop evidence. Addresses keep their local part and lowercase their domain; URLs must be http(s) with a host, lose their fragment and keep path and query byte-for-byte; recipients, URLs and attachments are de-duplicated and sorted. The source is carried in __report_source__ for accounting against the simulation click-rate and suppression-rate metrics. Sets __reported_message__.",
       "on_completion": "action--c0a17a01-0000-4000-8000-000000000003",
       "in_args": [
         "__email_id__",
+        "__raw_message__",
         "__report_source__"
+      ],
+      "out_args": [
+        "__reported_message__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "commands": [
         {
-          "type": "manual",
-          "command": "Fetch the reported email envelope, headers, body, and attachment metadata from the email-security platform. Accepts both user-reported messages and mailbox-sweep hits; the source is carried in __report_source__ for downstream accounting against the simulation click-rate and suppression-rate metrics."
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.phishing_triage.primitives.intake.validate_reported_message"
         }
       ],
       "x_secops_ng": {
@@ -76,22 +205,41 @@
         "control_refs": [
           "control.training_attestation@v1",
           "control.phishing_simulation@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.phishing_triage.primitives.intake.validate_reported_message",
+          "in": {
+            "raw_message": "__raw_message__",
+            "report_source": "__report_source__"
+          },
+          "out": "__reported_message__"
+        }
       }
     },
     "action--c0a17a01-0000-4000-8000-000000000003": {
       "type": "action",
       "name": "enrich headers, URLs, attachments",
-      "description": "Run sender-domain authentication (SPF / DKIM / DMARC), URL reputation against the operator's allow/deny posture, and attachment static analysis. Emits OCSF Email Activity, URL Activity, and File Activity records per indicator; correlates against the Sigma email-related rule references pinned in mappings.yaml.",
+      "description": "Enrichment verdict join and suppression decision. Binds against the deterministic primitive at content.playbooks.phishing_triage.primitives.enrichment.assess_reported_message: joins the SPF / DKIM / DMARC results and the per-URL and per-attachment verdicts the adapters produced onto the envelope, derives the case fingerprint (full sender, normalised subject, URL set, attachment digests), and decides the suppression gate through two deliberately asymmetric lanes. A report whose fingerprint matches a case seen within the window always links onto it, whatever the verdicts say, so duplicate reports of an open phish do not page again. A known-benign sender is suppressed only with DMARC pass and no malicious or suspicious indicator: failing DMARC is what spoofing looks like, and a benign sender carrying a bad link is what a compromised partner looks like. A refused claim is recorded with its reason. Emits OCSF Email Activity, URL Activity and File Activity records per indicator and correlates against the Sigma email-related rule references pinned in mappings.yaml. Sets __message_assessment__; __benign_or_seen__ is extracted from it.",
       "on_completion": "if-condition--c0a17a01-0000-4000-8000-000000000004",
+      "in_args": [
+        "__reported_message__",
+        "__authentication_results__",
+        "__url_verdicts__",
+        "__attachment_verdicts__",
+        "__known_benign_senders__",
+        "__seen_cases__",
+        "__assessed_at__",
+        "__suppression_window_hours__"
+      ],
       "out_args": [
+        "__message_assessment__",
         "__benign_or_seen__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "commands": [
         {
-          "type": "manual",
-          "command": "Run sender-domain authentication (SPF / DKIM / DMARC), URL reputation against the operator's allow/deny posture, and attachment static analysis. Emits OCSF Email Activity, URL Activity, and File Activity records per indicator; correlates against the Sigma email-related rule references pinned in mappings.yaml."
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.phishing_triage.primitives.enrichment.assess_reported_message"
         }
       ],
       "x_secops_ng": {
@@ -110,7 +258,21 @@
         ],
         "metric_refs": [
           "kpi.mttd_phishing@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.phishing_triage.primitives.enrichment.assess_reported_message",
+          "in": {
+            "message": "__reported_message__",
+            "authentication": "__authentication_results__",
+            "url_verdicts": "__url_verdicts__",
+            "attachment_verdicts": "__attachment_verdicts__",
+            "known_benign_senders": "__known_benign_senders__",
+            "seen_cases": "__seen_cases__",
+            "as_of": "__assessed_at__",
+            "suppression_window_hours": "__suppression_window_hours__"
+          },
+          "out": "__message_assessment__"
+        }
       }
     },
     "if-condition--c0a17a01-0000-4000-8000-000000000004": {
@@ -124,13 +286,20 @@
     "action--c0a17a01-0000-4000-8000-000000000005": {
       "type": "action",
       "name": "suppress and close",
-      "description": "Link this report onto the existing case (or onto the known-benign sender record), close it without paging, and account the suppression against the suppression-rate KRI. Reporter receives the acknowledgement they already opted into; no further notifications fan out.",
+      "description": "Suppression closure. Binds against the deterministic primitive at content.playbooks.phishing_triage.primitives.suppression.compose_suppression_record: links the report onto the existing case or onto the known-benign sender entry, closes it without paging, and accounts the suppression against the suppression-rate KRI. The reporter receives only the acknowledgement they already opted into; no further notifications fan out. The primitive re-checks that the gate cleared the report rather than trusting the topology, so a mis-wired branch cannot close a live phish. Sets __suppression_record__.",
       "on_completion": "end--c0a17a01-0000-4000-8000-00000000000d",
+      "in_args": [
+        "__message_assessment__",
+        "__closed_at__"
+      ],
+      "out_args": [
+        "__suppression_record__"
+      ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "commands": [
         {
-          "type": "manual",
-          "command": "Link this report onto the existing case (or onto the known-benign sender record), close it without paging, and account the suppression against the suppression-rate KRI. Reporter receives the acknowledgement they already opted into; no further notifications fan out."
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.phishing_triage.primitives.suppression.compose_suppression_record"
         }
       ],
       "x_secops_ng": {
@@ -139,22 +308,35 @@
         ],
         "control_refs": [
           "control.incident_handling_capability@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.phishing_triage.primitives.suppression.compose_suppression_record",
+          "in": {
+            "assessment": "__message_assessment__",
+            "closed_at": "__closed_at__"
+          },
+          "out": "__suppression_record__"
+        }
       }
     },
     "action--c0a17a01-0000-4000-8000-000000000006": {
       "type": "action",
       "name": "classify intent",
-      "description": "Apply the operator's intent classifier (rule-based heuristics, ML model, or analyst review per maturity) to the enriched evidence. Emits one of: phishing, credential_harvest, malware_attached, business_email_compromise, unknown. The classifier itself is operator-bound; only the output contract is fixed by this playbook.",
+      "description": "Intent resolution. Binds against the deterministic primitive at content.playbooks.phishing_triage.primitives.classification.resolve_intent: enforces the output contract of the operator's intent classifier (rule-based heuristics, ML model, or analyst review per maturity), which stays operator-bound. The result is one of phishing, credential_harvest, malware_attached, business_email_compromise or unknown. An abstaining classifier, a confidence below __confidence_threshold_percent__ and a label outside the enumeration all resolve to unknown and so route to a human; malformed types fail loud. Sets __intent_resolution__; __intent__ is extracted from it.",
       "on_completion": "switch-condition--c0a17a01-0000-4000-8000-000000000007",
+      "in_args": [
+        "__classifier_output__",
+        "__confidence_threshold_percent__"
+      ],
       "out_args": [
+        "__intent_resolution__",
         "__intent__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "commands": [
         {
-          "type": "manual",
-          "command": "Apply the operator's intent classifier (rule-based heuristics, ML model, or analyst review per maturity) to the enriched evidence. Emits one of: phishing, credential_harvest, malware_attached, business_email_compromise, unknown. The classifier itself is operator-bound; only the output contract is fixed by this playbook."
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.phishing_triage.primitives.classification.resolve_intent"
         }
       ],
       "x_secops_ng": {
@@ -165,7 +347,15 @@
         ],
         "control_refs": [
           "control.incident_handling_capability@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.phishing_triage.primitives.classification.resolve_intent",
+          "in": {
+            "classifier_output": "__classifier_output__",
+            "confidence_threshold_percent": "__confidence_threshold_percent__"
+          },
+          "out": "__intent_resolution__"
+        }
       }
     },
     "switch-condition--c0a17a01-0000-4000-8000-000000000007": {
@@ -184,13 +374,20 @@
     "action--c0a17a01-0000-4000-8000-000000000008": {
       "type": "action",
       "name": "response: phishing",
-      "description": "Generic phishing response: quarantine / purge the message across mailboxes that received it, block sender + URL hashes at the email-security gateway, and notify the responsible response team. Records the response action against the phishing MTTR clock.",
+      "description": "Generic phishing response. Binds against the deterministic primitive at content.playbooks.phishing_triage.primitives.response.phishing_response: quarantines the message across the mailboxes that received it, blocks the sender, blocks only the URLs verdicted malicious or suspicious (lures routinely link to the impersonated brand's real site), and notifies the response team. Records the response against the phishing MTTR clock. Sets __phishing_directive__.",
       "on_completion": "end--c0a17a01-0000-4000-8000-00000000000d",
+      "in_args": [
+        "__message_assessment__",
+        "__intent_resolution__"
+      ],
+      "out_args": [
+        "__phishing_directive__"
+      ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "commands": [
         {
-          "type": "manual",
-          "command": "Generic phishing response: quarantine / purge the message across mailboxes that received it, block sender + URL hashes at the email-security gateway, and notify the responsible response team. Records the response action against the phishing MTTR clock."
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.phishing_triage.primitives.response.phishing_response"
         }
       ],
       "x_secops_ng": {
@@ -200,19 +397,36 @@
         ],
         "metric_refs": [
           "kpi.mttr_phishing_triage@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.phishing_triage.primitives.response.phishing_response",
+          "in": {
+            "assessment": "__message_assessment__",
+            "intent_resolution": "__intent_resolution__"
+          },
+          "out": "__phishing_directive__"
+        }
       }
     },
     "action--c0a17a01-0000-4000-8000-000000000009": {
       "type": "action",
       "name": "response: credential harvest",
-      "description": "Credential-harvest response: quarantine, block landing-page URLs, identify clickers from URL Activity telemetry and force credential reset / step-up on those identities, notify identity team. Feeds the simulation click-rate KPI when the source is a sanctioned phishing simulation.",
+      "description": "Credential-harvest response. Binds against the deterministic primitive at content.playbooks.phishing_triage.primitives.response.credential_harvest_response: quarantines the message, blocks every URL not verdicted clean (harvest pages are usually too new to have a reputation), identifies the clickers from the URL-activity events correlated to this message and forces a credential reset on each, and notifies the identity team. When __simulation_campaign_ref__ names the operator's own sanctioned simulation, it records the clicks for the click-rate KPI and takes no containment action. Sets __credential_harvest_directive__.",
       "on_completion": "end--c0a17a01-0000-4000-8000-00000000000d",
+      "in_args": [
+        "__message_assessment__",
+        "__intent_resolution__",
+        "__click_events__",
+        "__simulation_campaign_ref__"
+      ],
+      "out_args": [
+        "__credential_harvest_directive__"
+      ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "commands": [
         {
-          "type": "manual",
-          "command": "Credential-harvest response: quarantine, block landing-page URLs, identify clickers from URL Activity telemetry and force credential reset / step-up on those identities, notify identity team. Feeds the simulation click-rate KPI when the source is a sanctioned phishing simulation."
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.phishing_triage.primitives.response.credential_harvest_response"
         }
       ],
       "x_secops_ng": {
@@ -226,19 +440,37 @@
         "metric_refs": [
           "kpi.mttr_phishing_triage@v1",
           "kpi.phishing_sim_click_rate@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.phishing_triage.primitives.response.credential_harvest_response",
+          "in": {
+            "assessment": "__message_assessment__",
+            "intent_resolution": "__intent_resolution__",
+            "click_events": "__click_events__",
+            "simulation_campaign_ref": "__simulation_campaign_ref__"
+          },
+          "out": "__credential_harvest_directive__"
+        }
       }
     },
     "action--c0a17a01-0000-4000-8000-00000000000a": {
       "type": "action",
       "name": "response: malware attached",
-      "description": "Malware-attachment response: quarantine, block attachment SHA-256 at the gateway, hand the host-side investigation off to the endpoint owner playbook for any recipient who opened the file (correlated via OCSF File Activity).",
+      "description": "Malware-attachment response. Binds against the deterministic primitive at content.playbooks.phishing_triage.primitives.response.malware_attachment_response: quarantines the message, blocks every attachment SHA-256 not verdicted clean at the gateway, and hands each host where a recipient opened an attachment to the endpoint owner, correlated via OCSF File Activity. A message with no attachment fails loud rather than yielding an empty directive. Sets __malware_directive__.",
       "on_completion": "end--c0a17a01-0000-4000-8000-00000000000d",
+      "in_args": [
+        "__message_assessment__",
+        "__intent_resolution__",
+        "__file_open_events__"
+      ],
+      "out_args": [
+        "__malware_directive__"
+      ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "commands": [
         {
-          "type": "manual",
-          "command": "Malware-attachment response: quarantine, block attachment SHA-256 at the gateway, hand the host-side investigation off to the endpoint owner playbook for any recipient who opened the file (correlated via OCSF File Activity)."
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.phishing_triage.primitives.response.malware_attachment_response"
         }
       ],
       "x_secops_ng": {
@@ -251,19 +483,36 @@
         ],
         "metric_refs": [
           "kpi.mttr_phishing_triage@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.phishing_triage.primitives.response.malware_attachment_response",
+          "in": {
+            "assessment": "__message_assessment__",
+            "intent_resolution": "__intent_resolution__",
+            "file_open_events": "__file_open_events__"
+          },
+          "out": "__malware_directive__"
+        }
       }
     },
     "action--c0a17a01-0000-4000-8000-00000000000b": {
       "type": "action",
       "name": "response: business email compromise",
-      "description": "BEC response: escalate to the fraud / finance liaison, freeze any pending payment instruction tied to the message, and open an identity_compromise sub-investigation for the impersonated or compromised sender account. Distinguished from generic phishing because the response chain leaves email-security and enters finance and identity; a BEC case routinely trips the NIS2 / DORA reporting clocks, so the response stamps the regulator-notification-overrun KRI and the timeline-completeness KPI alongside the phishing MTTR clock.",
+      "description": "Business email compromise response. Binds against the deterministic primitive at content.playbooks.phishing_triage.primitives.response.bec_response: escalates to the fraud / finance liaison, freezes the pending payment instructions tied to the message, and opens an identity_compromise sub-investigation for the sender, recording whether it looks compromised (DMARC passed) or impersonated (it failed). Distinguished from generic phishing because the response chain leaves email security and enters finance and identity. A BEC case routinely trips the NIS2 / DORA reporting clocks, so the directive stamps the regulator-notification-overrun KRI and the timeline-completeness KPI alongside the phishing MTTR clock; whether a report is owed is the incident-management playbook's decision. Sets __bec_directive__.",
       "on_completion": "end--c0a17a01-0000-4000-8000-00000000000d",
+      "in_args": [
+        "__message_assessment__",
+        "__intent_resolution__",
+        "__pending_payment_refs__"
+      ],
+      "out_args": [
+        "__bec_directive__"
+      ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "commands": [
         {
-          "type": "manual",
-          "command": "BEC response: escalate to the fraud / finance liaison, freeze any pending payment instruction tied to the message, and open an identity_compromise sub-investigation for the impersonated or compromised sender account. Distinguished from generic phishing because the response chain leaves email-security and enters finance and identity; a BEC case routinely trips the NIS2 / DORA reporting clocks, so the response stamps the regulator-notification-overrun KRI and the timeline-completeness KPI alongside the phishing MTTR clock."
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.phishing_triage.primitives.response.bec_response"
         }
       ],
       "x_secops_ng": {
@@ -276,19 +525,36 @@
           "control.incident_handling_capability@v1",
           "control.incident_timeline_signals@v1",
           "control.recurring_incident_correlator@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.phishing_triage.primitives.response.bec_response",
+          "in": {
+            "assessment": "__message_assessment__",
+            "intent_resolution": "__intent_resolution__",
+            "pending_payment_refs": "__pending_payment_refs__"
+          },
+          "out": "__bec_directive__"
+        }
       }
     },
     "action--c0a17a01-0000-4000-8000-00000000000c": {
       "type": "action",
       "name": "response: manual review",
-      "description": "Unknown-intent branch: route to a human analyst queue with the enriched evidence packet. Manual outcome is fed back as labelled data for the classifier and recorded for telemetry-coverage accounting.",
+      "description": "Unknown-intent route. Binds against the deterministic primitive at content.playbooks.phishing_triage.primitives.response.manual_review_route: routes the enriched evidence packet to the analyst queue, with the classifier's label, confidence and the reason it resolved to unknown so the analyst sees why the report is theirs. The outcome is requested back as labelled data for the classifier. Sets __manual_review_directive__.",
       "on_completion": "end--c0a17a01-0000-4000-8000-00000000000d",
+      "in_args": [
+        "__message_assessment__",
+        "__intent_resolution__",
+        "__review_queue_ref__"
+      ],
+      "out_args": [
+        "__manual_review_directive__"
+      ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "commands": [
         {
-          "type": "manual",
-          "command": "Unknown-intent branch: route to a human analyst queue with the enriched evidence packet. Manual outcome is fed back as labelled data for the classifier and recorded for telemetry-coverage accounting."
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.phishing_triage.primitives.response.manual_review_route"
         }
       ],
       "x_secops_ng": {
@@ -297,7 +563,16 @@
         ],
         "control_refs": [
           "control.incident_handling_capability@v1"
-        ]
+        ],
+        "core_body": {
+          "primitive": "content.playbooks.phishing_triage.primitives.response.manual_review_route",
+          "in": {
+            "assessment": "__message_assessment__",
+            "intent_resolution": "__intent_resolution__",
+            "queue_ref": "__review_queue_ref__"
+          },
+          "out": "__manual_review_directive__"
+        }
       }
     },
     "end--c0a17a01-0000-4000-8000-00000000000d": {
@@ -307,8 +582,8 @@
   },
   "x_secops_ng": {
     "stable_id": "playbook.phishing_triage@v1",
-    "content_version": "0.2.0",
-    "maturity": "experimental",
+    "content_version": "1.0.0",
+    "maturity": "stable",
     "compile_targets": [
       "n8n",
       "temporal",
