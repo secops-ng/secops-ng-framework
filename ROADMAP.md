@@ -2337,6 +2337,14 @@ one playbook's provenance.
     an already-seen case always collapses, a known-benign sender needs
     DMARC `pass` and no flagged indicator — and every doubtful
     classification routes to manual review).
+  - CORE-WIRE + GRADUATE — #1020, closing #1018 (`phishing_triage`: all
+    nine action steps bound through `core_body`, each carrying its
+    `secops-ng-primitive` command in place of the manual one; the
+    confidence threshold became an integer percentage because CACAO
+    variables have no float type, and an empty simulation reference now
+    means a real report because the n8n trigger supplies `""` for unset
+    variables; three targets regenerated; `experimental` → `stable`,
+    `content_version` 1.0.0 on a recomputed checklist).
 
 ### F-WF-CORE-WAVE-2 — CORE wave 2: bind the remaining worthy playbooks; record the parked five
 
