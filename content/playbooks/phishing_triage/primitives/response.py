@@ -152,6 +152,9 @@ def credential_harvest_response(
     With ``simulation_campaign_ref`` set, the message is the operator's own
     sanctioned simulation: the directive records the clickers against the
     campaign for the click-rate KPI and takes no containment action.
+    ``None`` and the empty string both mean *not a simulation* — the n8n
+    trigger surfaces an unset playbook variable as ``""``, so treating it
+    as a malformed reference would fail every real report there.
     """
     a = _assessment(assessment)
     _branch(intent_resolution, "credential_harvest")
@@ -170,7 +173,7 @@ def credential_harvest_response(
         clickers.add(_pointer(event["identity"], f"click_events[{i}].identity"))
     identities = sorted(clickers)
 
-    if simulation_campaign_ref is not None:
+    if simulation_campaign_ref is not None and simulation_campaign_ref != "":
         campaign = _pointer(simulation_campaign_ref, "simulation_campaign_ref")
         actions = [{"action": "record_simulation_clicks", "campaign_ref": campaign,
                     "identities": identities}]
@@ -266,7 +269,8 @@ def manual_review_route(assessment: dict, intent_resolution: dict, queue_ref: st
     resolution = _branch(intent_resolution, "unknown")
     evidence = {k: a[k] for k in ("fingerprint", "authentication", "urls", "attachments",
                                   "flagged_indicators")}
-    classifier = {k: resolution.get(k) for k in ("classifier_label", "confidence", "threshold", "reason")}
+    classifier = {k: resolution.get(k)
+                  for k in ("classifier_label", "confidence", "threshold_percent", "reason")}
     actions = [{"action": "route_to_analyst_queue", "queue_ref": _pointer(queue_ref, "queue_ref"),
                 "evidence": evidence, "classifier": classifier}]
     return _directive(a, "unknown", actions, [], [], label_feedback_requested=True)

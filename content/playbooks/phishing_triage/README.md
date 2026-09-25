@@ -7,7 +7,7 @@ and route to a response branch keyed on intent.
 
 Stable ID: `playbook.phishing_triage@v1`
 Compile targets: `n8n`, `temporal`, `langgraph`
-Maturity: `experimental`
+Maturity: `stable`
 
 ## Files
 
@@ -16,7 +16,7 @@ Maturity: `experimental`
 | `playbook.cacao.json` | CACAO v2 + `x_secops_ng` artifact (canonical source of truth)        |
 | `README.md`           | This file                                                            |
 | `mappings.yaml`       | Sigma rule references, OSCAL/D3FEND control and OCSF telemetry pointers, KPI/KRI hooks, NIS2/DORA cross-references |
-| `primitives/`         | Deterministic primitives for the nine action steps (CORE-PRIM) — not yet bound; see Status |
+| `primitives/`         | Deterministic primitives the nine action steps bind through `x_secops_ng.core_body`; see Status |
 
 Worked examples produced by the three reference compilers ship under
 `examples/{n8n,temporal,langgraph}/phishing_triage/`, with byte-parity
@@ -125,9 +125,13 @@ emits today.
 
 ## Status
 
-`maturity: experimental`, CORE-PRIM complete. Each of the nine action
-steps has a deterministic primitive under `primitives/`, executed
-directly by `tests/playbooks/phishing_triage/test_primitives.py`:
+`maturity: stable`, `content_version` 1.0.0. All nine action steps bind
+a deterministic primitive under `primitives/` through
+`x_secops_ng.core_body`, each executed directly by
+`tests/playbooks/phishing_triage/test_primitives.py`, and the three
+reference targets emit those calls. The graduation checklist recomputes
+green: tier A, 9 of 9 real bindings, zero placeholder bodies, zero blank
+predicates, zero schema errors, three-target goldens.
 
 | Step | Primitive |
 |---|---|
@@ -159,10 +163,17 @@ reports without paging anyone:
   re-checks that the gate cleared the report, so a mis-wired switch
   fails loud instead of acting on the wrong message.
 
-**Owed: the wire.** The CACAO steps do not yet carry
-`x_secops_ng.core_body`, so `catalog.py` reports 0 of 9 bound and the
-compiled examples still emit operator-placeholder bodies. Binding the
-nine steps, declaring the envelope variables they need, regenerating
-the examples and recomputing the Maturity ladder is the CORE-WIRE card.
-Sigma rule references point upstream — no detection logic is authored
-here.
+Two contract choices were settled at the wire. The classifier
+confidence threshold is an integer percentage
+(`__confidence_threshold_percent__`), because CACAO variables have no
+float type and the primitive rejects a string. An unset
+`__simulation_campaign_ref__` means *not a simulation* whether it
+arrives as `null` or as the empty string the n8n trigger supplies.
+
+What stable does **not** claim: the compile targets emit the primitive
+calls, not a deployment. Fetching the message, the authentication and
+reputation lookups, the suppression cache, the classifier and every
+response gateway remain adapter surfaces the operator binds, and the
+Temporal target still leaves the workflow's control flow to the
+integrator, as it does for every playbook. Sigma rule references point
+upstream — no detection logic is authored here.

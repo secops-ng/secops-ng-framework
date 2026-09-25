@@ -64,7 +64,7 @@ def assess(message=None, *, auth=AUTH_PASS, urls=None, atts=None, benign=(), see
 
 
 def intent(label: str) -> dict:
-    return resolve_intent({"label": label, "confidence": 0.99}, 0.8)
+    return resolve_intent({"label": label, "confidence": 0.99}, 80)
 
 
 # --------------------------------------------------------------------------- intake
@@ -233,22 +233,25 @@ def test_suppression_refuses_unless_the_gate_cleared_the_report(gate) -> None:
     ({"label": "unknown", "confidence": 1.0}, "unknown", "classifier_abstained"),
 ])
 def test_intent_resolution(output: dict, expected_intent: str, reason: str) -> None:
-    result = resolve_intent(output, 0.8)
+    result = resolve_intent(output, 80)
     assert (result["intent"], result["reason"]) == (expected_intent, reason)
 
 
 def test_an_out_of_enumeration_label_is_kept_for_diagnosis() -> None:
-    assert resolve_intent({"label": "SPAM", "confidence": 1.0}, 0.5)["classifier_label"] == "spam"
+    assert resolve_intent({"label": "SPAM", "confidence": 1.0}, 50)["classifier_label"] == "spam"
 
 
 @pytest.mark.parametrize(("output", "threshold"), [
-    ({"label": "phishing", "confidence": True}, 0.8),
-    ({"label": "phishing", "confidence": float("nan")}, 0.8),
-    ({"label": "phishing", "confidence": 1.5}, 0.8),
+    ({"label": "phishing", "confidence": True}, 80),
+    ({"label": "phishing", "confidence": float("nan")}, 80),
+    ({"label": "phishing", "confidence": 1.5}, 80),
     ({"label": "phishing", "confidence": 0.9}, 0),
+    ({"label": "phishing", "confidence": 0.9}, 101),
     ({"label": "phishing", "confidence": 0.9}, True),
-    ({"label": "phishing", "confidence": 0.9, "extra": 1}, 0.8),
-    ({"label": 7, "confidence": 0.9}, 0.8),
+    ({"label": "phishing", "confidence": 0.9}, 0.8),
+    ({"label": "phishing", "confidence": 0.9}, "80"),
+    ({"label": "phishing", "confidence": 0.9, "extra": 1}, 80),
+    ({"label": 7, "confidence": 0.9}, 80),
 ])
 def test_malformed_classifier_output_fails_loud(output: dict, threshold) -> None:
     with pytest.raises(InvalidIntentResolutionError):
@@ -298,6 +301,21 @@ def test_credential_harvest_blocks_unverdicted_pages_and_resets_clickers() -> No
                                       "clicked_at": "2026-09-23T08:10:00Z"}])
 
 
+def test_an_empty_campaign_ref_is_not_a_simulation() -> None:
+    """n8n surfaces an unset playbook variable as the empty string."""
+    clicks = [{"identity": "bob@corp.example", "url": LURE, "clicked_at": "2026-09-23T08:10:00Z"}]
+    d = credential_harvest_response(assess(), intent("credential_harvest"), clicks,
+                                    simulation_campaign_ref="")
+    assert d["simulation"] is False
+    assert any(x["action"] == "force_credential_reset" for x in d["actions"])
+
+
+def test_the_threshold_boundary_holds_for_decimal_confidences() -> None:
+    """0.29 * 100 is 28.999999999999996; comparing against 29 / 100 is exact."""
+    at_boundary = resolve_intent({"label": "phishing", "confidence": 0.29}, 29)
+    assert (at_boundary["intent"], at_boundary["reason"]) == ("phishing", "accepted")
+
+
 def test_a_sanctioned_simulation_records_clicks_and_contains_nothing() -> None:
     clicks = [{"identity": "bob@corp.example", "url": LURE, "clicked_at": "2026-09-23T08:10:00Z"}]
     d = credential_harvest_response(assess(), intent("credential_harvest"), clicks,
@@ -338,7 +356,7 @@ def test_bec_distinguishes_compromise_from_impersonation() -> None:
 
 
 def test_manual_review_tells_the_analyst_why_it_is_theirs() -> None:
-    resolution = resolve_intent({"label": "spam", "confidence": 1.0}, 0.8)
+    resolution = resolve_intent({"label": "spam", "confidence": 1.0}, 80)
     d = manual_review_route(assess(), resolution, "queue:soc-l2")
     step = d["actions"][0]
     assert step["queue_ref"] == "queue:soc-l2"
@@ -366,7 +384,7 @@ def _all_outputs() -> list[dict]:
         credential_harvest_response(a, intent("credential_harvest"), click, "sim:q3"),
         malware_attachment_response(a, intent("malware_attached"), []),
         bec_response(a, intent("business_email_compromise"), []),
-        manual_review_route(a, resolve_intent({"label": "unknown", "confidence": 1}, 0.5), "queue:x"),
+        manual_review_route(a, resolve_intent({"label": "unknown", "confidence": 1}, 50), "queue:x"),
     ]
 
 
@@ -388,7 +406,7 @@ def test_end_to_end_a_report_flows_from_intake_to_a_directive() -> None:
     a = assess_reported_message(env, AUTH_FAIL, {LURE: "malicious"}, {SHA_A: "malicious"},
                                 ["pay-portal.example"], [], "2026-09-23T09:00:00Z", 24)
     assert a["benign_or_seen"] is False                    # spoofed benign sender refused
-    resolution = resolve_intent({"label": "malware_attached", "confidence": 0.95}, 0.8)
+    resolution = resolve_intent({"label": "malware_attached", "confidence": 0.95}, 80)
     d = malware_attachment_response(a, resolution, [])
     assert d["message_id"] == env["message_id"] and d["fingerprint"] == case_fingerprint(env)
     assert [x["sha256"] for x in d["actions"] if x["action"] == "block_attachment"] == [SHA_A, SHA_B]

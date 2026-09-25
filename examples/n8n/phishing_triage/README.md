@@ -3,7 +3,8 @@
 Worked example: the `playbook.phishing_triage@v1` CACAO v2 playbook
 compiled by the n8n reference compiler. Operators can import
 `workflow.n8n.json` directly into an n8n instance to see the topology
-the emitter produces; binding the placeholder Set-node steps to real
+the emitter produces. Every action step is a Code node calling its
+deterministic primitive; binding the inputs those calls read to real
 connectors (user-reported / mailbox-sweep ingestion, email security
 gateway / URL sandbox / attachment sandbox enrichment, suppression
 cache, intent classifier, response-branch ticketing / containment
@@ -39,10 +40,8 @@ inspection, and the regeneration script.
    review and bind it to your own connectors before activating.
 
 The emitted workflow is a *snapshot of intent*, not a runnable
-playbook. The Set nodes carry the CACAO I/O contract (`in_args` /
-`out_args`) plus the `x_secops_ng` reference bundles (control,
-detection, telemetry, metric) as editable assignments; binding those
-rows to real connectors is the operator's job.
+playbook. The Code nodes call the bound primitives; binding the
+adapter inputs they read to real connectors is the operator's job.
 
 ## Regeneration
 
@@ -74,7 +73,8 @@ The mapping from CACAO to n8n is the same one the compiler implements:
 | CACAO step type    | n8n node type                                       |
 |--------------------|-----------------------------------------------------|
 | `start`            | `n8n-nodes-base.manualTrigger`                      |
-| `action` (no cmds) | `n8n-nodes-base.set` (carries CACAO I/O + refs)     |
+| `action` (bound)   | `n8n-nodes-base.code` (imports and calls `core_body`) |
+| `action` (unbound) | `n8n-nodes-base.set` (carries CACAO I/O + refs)     |
 | `if-condition`     | `n8n-nodes-base.if`                                 |
 | `switch-condition` | `n8n-nodes-base.switch`                             |
 | `end`              | `n8n-nodes-base.noOp`                               |
@@ -89,9 +89,9 @@ switch `cases`) becomes n8n `connections` edges.
 The n8n reference compiler translates **structure** and the
 **CACAO I/O contract**, not **business logic**. The emitted workflow
 carries the topology of the playbook (steps, transitions, conditional
-routing), the per-step `in_args` / `out_args` and the `x_secops_ng`
-reference bundles as Set rows, plus the lossy-translation notes
-recorded under `meta.secops_ng_notes`. It does not carry:
+routing) and one primitive call per action step. With every step
+bound, `meta.secops_ng_notes` records no lossy translations. It does
+not carry:
 
 - Operator-bound bindings (user-reported / mailbox-sweep email source,
   email security gateway, URL sandbox, attachment sandbox, suppression

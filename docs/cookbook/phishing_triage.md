@@ -132,12 +132,11 @@ never more than one response branch — so the per-case accounting into
 the phishing MTTR / MTTD / suppression-rate / simulation-click-rate /
 regulator-overrun catalogue entries is unambiguous.
 
-> The playbook maturity is `experimental` on the workflow-local
-> content marker. The overlay pins the control, detection, telemetry,
-> and metric surface; the n8n reference emitter ships a committed
-> `workflow.n8n.json` today, and the Temporal / LangGraph siblings
-> ship deterministic emitter output with `NotImplementedError`
-> activity / tool bodies pending the per-target CORE cards.
+> The playbook maturity is `stable` (`content_version` 1.0.0). Every
+> action step binds a deterministic primitive under
+> `content/playbooks/phishing_triage/primitives/`, and all three
+> reference emitters compile those bindings into primitive calls. The
+> lookups and gateways around them stay operator-bound.
 > Cross-target byte-parity goldens live under
 > `tests/examples/phishing_triage/`.
 
@@ -398,23 +397,25 @@ OCSF-typed.
 
 ## 5. Per-target hand-off
 
-### 5.1 n8n — operator-edited Set rows over the triage topology
+### 5.1 n8n — primitive calls over the triage topology
 
 `examples/n8n/phishing_triage/workflow.n8n.json` carries the CACAO
-topology as eleven n8n nodes (`manualTrigger`, seven `set` nodes,
+topology as thirteen n8n nodes (`manualTrigger`, nine `code` nodes,
 one `if`, one `switch`, one `noOp`), with node ids preserving the
-CACAO step ids verbatim. The seven action steps emit
-`n8n-nodes-base.set` nodes carrying the CACAO I/O contract as
-editable assignment rows plus the `x_secops_ng` reference bundles.
+CACAO step ids verbatim. Each of the nine action steps emits an
+`n8n-nodes-base.code` node that imports its primitive and binds the
+step's output envelope to the call — `validate_reported_message`,
+`assess_reported_message`, `compose_suppression_record`,
+`resolve_intent`, and the five response directives.
 The `if-condition` node (`known-benign sender or already seen?`) emits
 an `n8n-nodes-base.if` whose condition reads `__benign_or_seen__`,
 set by the enrichment step (surfaced as `out.benign_or_seen`); the
 `switch-condition` node (`route on intent`) emits an
 `n8n-nodes-base.switch` with five case rows keyed on `__intent__`.
-The lossy translations are recorded in `meta.secops_ng_notes` so the
-integrator sees exactly which seams need attention.
+With every step bound and both conditions machine-readable, the
+workflow records no lossy translations in `meta.secops_ng_notes`.
 
-Operators bind the Set rows to their connectors:
+Operators bind the adapters that feed each primitive's inputs:
 
 - `ingest report` → the operator's email-security platform's
   message-fetch API against `__email_id__` and `__report_source__`.
@@ -440,22 +441,20 @@ To regenerate the compiled workflow artifact from the repo root:
 To import into an n8n instance: open the workflows list, choose
 **Import from File**, and select
 `examples/n8n/phishing_triage/workflow.n8n.json`. The workflow is
-inactive by default — review and bind the Set rows to your own
+inactive by default — review and bind the adapter inputs to your own
 connectors before activating. The emitted workflow is a *snapshot of
 intent*, not a runnable playbook.
 
-### 5.2 Temporal — `@activity.defn` bodies (SKELETON stub)
+### 5.2 Temporal — `@activity.defn` bodies calling the primitives
 
 `examples/temporal/phishing_triage/workflow.temporal.py` is a
 standard Temporal worker module: one `@workflow.defn` class and one
-`@activity.defn` function per CACAO action, with the seven action
-activities documenting their operator-bound seam (email fetch,
-enrichment, suppression write, classifier call, and each of the five
-response branches). The committed stub raises `NotImplementedError`
-in the activity bodies pending the CORE-TEMPORAL sibling card that
-wires the deterministic activity implementations into the Temporal
-target; operators can drop the module next to their worker today to
-see the topology and the activity signatures.
+`@activity.defn` function per CACAO action. Each of the nine activity
+bodies imports and calls its bound primitive. The workflow's `run`
+method still raises `NotImplementedError`: the Temporal emitter does
+not lower CACAO control flow into workflow code for any playbook, so
+sequencing the activities through the suppression gate and the intent
+switch is the integrator's.
 
 Temporal is a natural fit for the triage discipline: each case
 becomes one workflow run; the suppression branch and the intent
@@ -464,10 +463,10 @@ activities; retries against transient failures on the email-security
 platform, the reputation source, or a response gateway get first-
 class Temporal semantics (activity retry policy per seam); replay
 against the same Temporal event history re-derives the same
-suppression accounting and the same per-branch response record once
-the activity bodies are wired.
+suppression accounting and the same per-branch response record,
+because every activity body is a pure primitive call.
 
-### 5.3 LangGraph — `@tool` wrappers + agentic-extension hook (SKELETON stub)
+### 5.3 LangGraph — `@tool` wrappers calling the primitives + agentic-extension hook
 
 `examples/langgraph/phishing_triage/state_bindings.py` carries the
 `TypedDict` state and the `@tool`-decorated action wrappers.
@@ -475,11 +474,10 @@ the activity bodies are wired.
 conditional edge on `__benign_or_seen__`, switch edge on `__intent__`,
 linear edges through each response branch to `end`); `assemble.py` is
 the hand-written reference assembly that wires the GraphSpec +
-bindings into a `langgraph.graph.StateGraph`. The committed
-`state_bindings.py` is a generated stub: each tool's docstring names
-the operator-bound seam it discharges and the body raises
-`NotImplementedError` until the CORE-LANGGRAPH sibling card wires the
-deterministic tool implementations into the LangGraph target.
+bindings into a `langgraph.graph.StateGraph`. Each generated tool
+body imports and calls its bound primitive; the only body that still
+raises `NotImplementedError` is the agentic-extension hook, which is a
+placeholder by design.
 
 LangGraph is the agentic target — an operator who wants to layer an
 LM-driven intent classifier on top of the `classify intent` state
@@ -497,9 +495,8 @@ All three reference targets are present in the tree today
 (`examples/n8n/phishing_triage/`,
 `examples/temporal/phishing_triage/`,
 `examples/langgraph/phishing_triage/`). The n8n target ships a
-committed workflow artifact; the Temporal and LangGraph targets ship
-deterministic emitter output with `NotImplementedError` activity /
-tool bodies pending the per-target CORE cards. Cross-target byte-
+committed workflow artifact, and all three compile the same nine
+primitive bindings. Cross-target byte-
 parity goldens land under `tests/examples/phishing_triage/` — the
 cross-target byte-parity property the framework relies on.
 
