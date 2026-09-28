@@ -2345,6 +2345,12 @@ one playbook's provenance.
     means a real report because the n8n trigger supplies `""` for unset
     variables; three targets regenerated; `experimental` → `stable`,
     `content_version` 1.0.0 on a recomputed checklist).
+  - CORE-PRIM — #1021 (`ransomware_containment`: primitives for all six
+    action steps, from none; confirmation follows an explicit rule that
+    also confirms at the pre-encryption recovery-inhibition stage, a
+    protected host or principal always waits for approval, and known-good
+    backup means the newest snapshot before the compromise window whose
+    digest verifies).
 
 ### F-WF-CORE-WAVE-2 — CORE wave 2: bind the remaining worthy playbooks; record the parked five
 
