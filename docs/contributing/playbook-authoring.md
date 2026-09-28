@@ -163,6 +163,17 @@ document recommended that; it was wrong, because the compilers compile
 `core_body`, and the last two playbooks doing it were converted in #854
 and #863.
 
+**Open playbooks in CACAO Roaster to view them, not to edit them.**
+Every canonical playbook validates against the official OASIS CACAO 2.0
+schemas under the dialect they declare (`python -m tools.cacao_conformance`).
+CACAO Roaster rebuilds a playbook through its own model, which keeps only
+standard CACAO fields and CACAO extensions. It displays our playbooks,
+but it discards `x_secops_ng` on import, so a playbook saved from Roaster
+comes back without its stable id, maturity, reference bundles and
+`core_body` bindings. Do not commit a playbook saved from Roaster. Moving
+`x_secops_ng` into CACAO extensions, which Roaster keeps, is tracked in
+#1027.
+
 `content/playbooks/cra_cvd/playbook.cacao.json` is a full worked
 example.
 
