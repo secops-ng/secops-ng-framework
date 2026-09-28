@@ -2351,6 +2351,17 @@ one playbook's provenance.
     protected host or principal always waits for approval, and known-good
     backup means the newest snapshot before the compromise window whose
     digest verifies).
+  - CORE-PRIM — #1023 (`data_exfil`: primitives for all five action
+    steps, from none; content that could not be inspected routes as the
+    worst case, one regulator notice per applicable regime runs on its
+    own clock from awareness, and the data-subject determination always
+    carries its basis).
+  - CORE-PRIM — #1025 (`identity_compromise`, the catalogue's only
+    draft: primitives for all five action steps, from none; benign
+    patterns clear impossible travel and nothing else, a privileged
+    principal is contained on one uncleared detection, and persistence
+    created inside the compromise window without a change record is
+    removed).
 
 ### F-WF-CORE-WAVE-2 — CORE wave 2: bind the remaining worthy playbooks; record the parked five
 
