@@ -27,6 +27,12 @@ Public API:
 
 from __future__ import annotations
 
+from .extensions import (
+    SECOPS_NG_EXTENSION_ID,
+    ExtensionPlacementError,
+    migrate_to_extensions,
+    secops_extension,
+)
 from .ast import (
     CoreBody,
     Playbook,
@@ -44,12 +50,16 @@ __all__ = [
     "CacaoSchemaError",
     "CacaoSemanticError",
     "CoreBody",
+    "ExtensionPlacementError",
     "Playbook",
+    "SECOPS_NG_EXTENSION_ID",
     "SecOpsExtensions",
     "StepSecOpsExtensions",
     "StepType",
     "Variable",
     "WorkflowStep",
+    "migrate_to_extensions",
     "parse",
     "parse_file",
+    "secops_extension",
 ]

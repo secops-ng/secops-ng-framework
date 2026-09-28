@@ -41,6 +41,7 @@ from .ast import (
     freeze_mapping,
 )
 from .errors import CacaoSchemaError, CacaoSemanticError
+from .extensions import SECOPS_NG_EXTENSION_ID, ExtensionPlacementError, secops_extension
 
 # --------------------------------------------------------------------------- #
 # Schema loading                                                              #
@@ -205,7 +206,7 @@ def _build_playbook(data: Mapping[str, Any]) -> Playbook:
         steps=steps,
     )
 
-    sec = _build_secops_ext(data["x_secops_ng"])
+    sec = _build_secops_ext(_root_extension(data))
     playbook_vars = _build_variables(data.get("playbook_variables", {}))
 
     return Playbook(
@@ -291,6 +292,34 @@ def _branch_targets(
     return resolved[0], resolved[1]
 
 
+def _root_extension(data: Mapping[str, Any]) -> Mapping[str, Any]:
+    """The playbook's SecOps-NG payload, from either placement (#1027).
+
+    The extension slots require the extension to be declared: a payload
+    keyed by an id that ``extension_definitions`` does not define is a
+    reference to nothing, whatever it contains.
+    """
+    try:
+        payload = secops_extension(data, "playbook")
+    except ExtensionPlacementError as exc:
+        raise CacaoSemanticError(str(exc)) from exc
+    if payload is None:
+        raise CacaoSemanticError(
+            f"Playbook carries no SecOps-NG data: expected x_secops_ng or "
+            f"playbook_extensions[{SECOPS_NG_EXTENSION_ID!r}]"
+        )
+    uses_slot = SECOPS_NG_EXTENSION_ID in (data.get("playbook_extensions") or {}) or any(
+        SECOPS_NG_EXTENSION_ID in (step.get("step_extensions") or {})
+        for step in data["workflow"].values()
+    )
+    if uses_slot and SECOPS_NG_EXTENSION_ID not in (data.get("extension_definitions") or {}):
+        raise CacaoSemanticError(
+            f"SecOps-NG data is keyed by {SECOPS_NG_EXTENSION_ID!r}, but extension_definitions "
+            "does not declare it"
+        )
+    return payload
+
+
 def _build_step(step_id: str, raw: Mapping[str, Any]) -> WorkflowStep:
     raw_type = raw["type"]
     try:
@@ -301,6 +330,18 @@ def _build_step(step_id: str, raw: Mapping[str, Any]) -> WorkflowStep:
         ) from exc
 
     extras = {k: v for k, v in raw.items() if k not in _STEP_KNOWN_FIELDS}
+    # The SecOps-NG payload is modelled on x_secops_ng below; keep other
+    # tools' step extensions in ``extra`` so an emitter can opt in to them.
+    if isinstance(extras.get("step_extensions"), Mapping):
+        others = {k: v for k, v in extras["step_extensions"].items() if k != SECOPS_NG_EXTENSION_ID}
+        if others:
+            extras["step_extensions"] = others
+        else:
+            del extras["step_extensions"]
+    try:
+        step_ext = secops_extension(raw, f"Step {step_id!r}")
+    except ExtensionPlacementError as exc:
+        raise CacaoSemanticError(str(exc)) from exc
     on_success, on_failure = _branch_targets(step_id, step_type, raw)
 
     return WorkflowStep(
@@ -318,7 +359,7 @@ def _build_step(step_id: str, raw: Mapping[str, Any]) -> WorkflowStep:
         in_args=tuple(raw.get("in_args", ())),
         out_args=tuple(raw.get("out_args", ())),
         step_variables=MappingProxyType(_build_variables(raw.get("step_variables", {}))),
-        x_secops_ng=_build_step_ext(raw.get("x_secops_ng")),
+        x_secops_ng=_build_step_ext(step_ext),
         extra=MappingProxyType(extras),
     )
 

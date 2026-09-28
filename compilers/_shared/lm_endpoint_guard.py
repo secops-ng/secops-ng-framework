@@ -66,6 +66,8 @@ from dataclasses import dataclass
 from typing import Any
 from urllib.parse import urlparse
 
+from .cacao_parser.extensions import secops_extension
+
 __all__ = [
     "ACK_ENV_VAR",
     "EU_ALLOWLIST_SUFFIXES",
@@ -281,7 +283,7 @@ def extract_lm_endpoints(playbook: Mapping[str, Any]) -> list[LMEndpoint]:
             step = workflow[step_id]
             if not isinstance(step, Mapping):
                 continue
-            xs = step.get("x_secops_ng") or {}
+            xs = secops_extension(step, f"step {step_id!r}") or {}
             if not isinstance(xs, Mapping):
                 continue
             lm = xs.get("lm") or {}

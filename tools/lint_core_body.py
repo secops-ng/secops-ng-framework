@@ -67,6 +67,7 @@ import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+
 import yaml
 
 HARD = (
@@ -212,6 +213,9 @@ def _ensure_importable(root: Path) -> None:
 
 def check(root: Path) -> tuple[list[Finding], dict]:
     _ensure_importable(root)
+    # Imported here, not at module top: only now is ``root`` importable, and
+    # the linter must work however it is started (see _ensure_importable).
+    from compilers._shared.cacao_parser.extensions import secops_extension
     findings: list[Finding] = []
     bindings = 0
     slugs = sorted(
@@ -228,7 +232,7 @@ def check(root: Path) -> tuple[list[Finding], dict]:
         for step in (playbook.get("workflow") or {}).values():
             if not isinstance(step, dict):
                 continue
-            core_body = (step.get("x_secops_ng") or {}).get("core_body")
+            core_body = (secops_extension(step) or {}).get("core_body")
             if not isinstance(core_body, dict) or not core_body.get("primitive"):
                 continue
             bindings += 1
