@@ -59,4 +59,4 @@ jobs:
       - name: Full report for review readability
         if: always()
         run: |
-          python -m tools.cacao_conformance --baseline tests/content/cacao_conformance_baseline.json --show 3
+          python -m tools.cacao_conformance --dialect 2020-12 --baseline tests/content/cacao_conformance_baseline.json --show 3

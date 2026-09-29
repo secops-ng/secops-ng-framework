@@ -74,17 +74,19 @@
           "command": "Receive the DLP / egress signal, hydrate it with originating user / asset / destination context, and decide whether the signal warrants scope assessment or is a known benign egress pattern."
         }
       ],
-      "x_secops_ng": {
-        "detection_refs": [
-          "detection.sigma.dlp_egress_alert@v1",
-          "detection.sigma.data_staging_archive_created@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.data_security_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.mttd_exfil@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "detection_refs": [
+            "detection.sigma.dlp_egress_alert@v1",
+            "detection.sigma.data_staging_archive_created@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.data_security_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.mttd_exfil@v1"
+          ]
+        }
       }
     },
     "action--20000000-0000-4000-8000-000000000003": {
@@ -108,16 +110,18 @@
           "command": "Determine the volume and classification of data observed leaving the boundary, the count of distinct data subjects affected, and whether actual exfiltration occurred or was prevented by an in-line control. Produces __data_classification__, __affected_subjects_count__, __exfil_confirmed__, and __regulator_required__ — whether the classification and the subject count together cross the operator's regulator-notification threshold, which the notification branch reads after containment."
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.data_classification_baseline@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.data_security_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.mttd_exfil@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.data_classification_baseline@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.data_security_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.mttd_exfil@v1"
+          ]
+        }
       }
     },
     "if-condition--20000000-0000-4000-8000-000000000004": {
@@ -144,17 +148,19 @@
           "command": "Apply containment proportionate to data classification and scope: revoke session tokens, isolate the originating identity / host, force a credential rotation, and tighten the egress policy on the destination(s) named in the signal. Bounded by the operator-supplied authorisation policy."
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.network_egress_filtering@v1",
-          "control.dlp_enforcement@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.data_security_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.mttr_containment@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.network_egress_filtering@v1",
+            "control.dlp_enforcement@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.data_security_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.mttr_containment@v1"
+          ]
+        }
       }
     },
     "if-condition--20000000-0000-4000-8000-000000000006": {
@@ -181,17 +187,19 @@
           "command": "Compose and send the regulator notification along the operator's pre-bound channel (national CSIRT for NIS2, competent authority for DORA, supervisory authority for GDPR). The notification payload is a structured incident finding sourced from the scope-assessment outputs."
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.dlp_enforcement@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.incident_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.notification_sla_compliance@v1",
-          "kri.regulator_notification_overrun@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.dlp_enforcement@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.incident_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.notification_sla_compliance@v1",
+            "kri.regulator_notification_overrun@v1"
+          ]
+        }
       }
     },
     "action--20000000-0000-4000-8000-000000000008": {
@@ -210,13 +218,15 @@
           "command": "Notify affected data subjects via the operator's pre-bound channel. Tracked separately from regulator notification so the notification timelines can be reported independently."
         }
       ],
-      "x_secops_ng": {
-        "telemetry_refs": [
-          "telemetry.ocsf.incident_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.notification_sla_compliance@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "telemetry_refs": [
+            "telemetry.ocsf.incident_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.notification_sla_compliance@v1"
+          ]
+        }
       }
     },
     "end--20000000-0000-4000-8000-000000000009": {
@@ -224,41 +234,53 @@
       "name": "exfil-end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.data_exfil@v1",
-    "content_version": "0.1.0",
-    "maturity": "experimental",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "detection_refs": [
-      "detection.sigma.dlp_egress_alert@v1",
-      "detection.sigma.data_staging_archive_created@v1"
-    ],
-    "control_refs": [
-      "control.data_classification_baseline@v1",
-      "control.network_egress_filtering@v1",
-      "control.dlp_enforcement@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.data_security_finding@v1",
-      "telemetry.ocsf.incident_finding@v1"
-    ],
-    "metric_refs": [
-      "kpi.mttd_exfil@v1",
-      "kpi.mttr_containment@v1",
-      "kpi.notification_sla_compliance@v1",
-      "kri.regulator_notification_overrun@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification \u2014 workflow step types, variable conventions, x_ extension namespace",
-      "ENISA \u2014 Threat Landscape and Good Practices for Incident Notification",
-      "NIS2 Directive (EU) 2022/2555, Article 23 \u2014 incident reporting obligations",
-      "DORA Regulation (EU) 2022/2554, Article 19 \u2014 reporting of major ICT-related incidents",
-      "OCSF \u2014 DLP Activity (4006) and Security Finding (2001) event classes",
-      "SigmaHQ \u2014 DLP-egress and data-staging detection classes (upstream rule IDs referenced in detection.json)"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.data_exfil@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "detection_refs": [
+        "detection.sigma.dlp_egress_alert@v1",
+        "detection.sigma.data_staging_archive_created@v1"
+      ],
+      "control_refs": [
+        "control.data_classification_baseline@v1",
+        "control.network_egress_filtering@v1",
+        "control.dlp_enforcement@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.data_security_finding@v1",
+        "telemetry.ocsf.incident_finding@v1"
+      ],
+      "metric_refs": [
+        "kpi.mttd_exfil@v1",
+        "kpi.mttr_containment@v1",
+        "kpi.notification_sla_compliance@v1",
+        "kri.regulator_notification_overrun@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification \u2014 workflow step types, variable conventions, x_ extension namespace",
+        "ENISA \u2014 Threat Landscape and Good Practices for Incident Notification",
+        "NIS2 Directive (EU) 2022/2555, Article 23 \u2014 incident reporting obligations",
+        "DORA Regulation (EU) 2022/2554, Article 19 \u2014 reporting of major ICT-related incidents",
+        "OCSF \u2014 DLP Activity (4006) and Security Finding (2001) event classes",
+        "SigmaHQ \u2014 DLP-egress and data-staging detection classes (upstream rule IDs referenced in detection.json)"
+      ]
+    }
   }
 }

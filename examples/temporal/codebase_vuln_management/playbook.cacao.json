@@ -133,20 +133,22 @@
           "command": "content.playbooks.codebase_vuln_management.primitives.sbom.pin_sbom_content_hash"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.sbom_capture@v1"
-        ],
-        "metric_refs": [
-          "kri.releases_without_sbom@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.codebase_vuln_management.primitives.sbom.pin_sbom_content_hash",
-          "in": {
-            "sbom_bytes": "__sbom_bytes__",
-            "sbom_format": "__sbom_format__"
-          },
-          "out": "__sbom_content_hash__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.sbom_capture@v1"
+          ],
+          "metric_refs": [
+            "kri.releases_without_sbom@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.codebase_vuln_management.primitives.sbom.pin_sbom_content_hash",
+            "in": {
+              "sbom_bytes": "__sbom_bytes__",
+              "sbom_format": "__sbom_format__"
+            },
+            "out": "__sbom_content_hash__"
+          }
         }
       }
     },
@@ -169,20 +171,22 @@
           "command": "content.playbooks.codebase_vuln_management.primitives.sbom.normalise_findings"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.sbom_capture@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.vulnerability_finding@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.codebase_vuln_management.primitives.sbom.normalise_findings",
-          "in": {
-            "raw_findings": "__raw_findings__",
-            "sbom_content_hash": "__sbom_content_hash__"
-          },
-          "out": "__findings_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.sbom_capture@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.vulnerability_finding@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.codebase_vuln_management.primitives.sbom.normalise_findings",
+            "in": {
+              "raw_findings": "__raw_findings__",
+              "sbom_content_hash": "__sbom_content_hash__"
+            },
+            "out": "__findings_ref__"
+          }
         }
       }
     },
@@ -206,24 +210,26 @@
           "command": "content.playbooks.codebase_vuln_management.primitives.disclosure_window.resolve_disclosure_window"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.vuln_disclosure_intake@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.vulnerability_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.vuln_disclosure_sla@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.codebase_vuln_management.primitives.disclosure_window.resolve_disclosure_window",
-          "in": {
-            "severity": "__finding_severity__",
-            "awareness_at": "__awareness_at__",
-            "cvd_policy": "__cvd_policy__"
-          },
-          "out": "__disclosure_window__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.vuln_disclosure_intake@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.vulnerability_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.vuln_disclosure_sla@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.codebase_vuln_management.primitives.disclosure_window.resolve_disclosure_window",
+            "in": {
+              "severity": "__finding_severity__",
+              "awareness_at": "__awareness_at__",
+              "cvd_policy": "__cvd_policy__"
+            },
+            "out": "__disclosure_window__"
+          }
         }
       }
     },
@@ -249,27 +255,29 @@
           "command": "content.playbooks.codebase_vuln_management.primitives.timeline.build_disclosure_timeline_stub"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.vuln_disclosure_intake@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.vulnerability_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.vuln_disclosure_sla@v1",
-          "kri.cvd_intake_aging@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.codebase_vuln_management.primitives.timeline.build_disclosure_timeline_stub",
-          "in": {
-            "finding": "__finding__",
-            "disclosure_window": "__disclosure_window__",
-            "captured_at": "__captured_at__",
-            "ref_viz": "__ref_viz__",
-            "source_data": "__source_data__"
-          },
-          "out": "__disclosure_timeline_record__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.vuln_disclosure_intake@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.vulnerability_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.vuln_disclosure_sla@v1",
+            "kri.cvd_intake_aging@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.codebase_vuln_management.primitives.timeline.build_disclosure_timeline_stub",
+            "in": {
+              "finding": "__finding__",
+              "disclosure_window": "__disclosure_window__",
+              "captured_at": "__captured_at__",
+              "ref_viz": "__ref_viz__",
+              "source_data": "__source_data__"
+            },
+            "out": "__disclosure_timeline_record__"
+          }
         }
       }
     },
@@ -278,31 +286,43 @@
       "name": "codebase_vuln_management_end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.codebase_vuln_management@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "control_refs": [
-      "control.sbom_capture@v1",
-      "control.vuln_disclosure_intake@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.vulnerability_finding@v1"
-    ],
-    "metric_refs": [
-      "kpi.vuln_disclosure_sla@v1",
-      "kri.cvd_intake_aging@v1",
-      "kri.releases_without_sbom@v1"
-    ],
-    "sources": [
-      "nis2:art-21-2-e-codebase",
-      "cra:annex-i-2-codebase-vuln-mgmt",
-      "evidence-stream:vulns"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.codebase_vuln_management@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "control_refs": [
+        "control.sbom_capture@v1",
+        "control.vuln_disclosure_intake@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.vulnerability_finding@v1"
+      ],
+      "metric_refs": [
+        "kpi.vuln_disclosure_sla@v1",
+        "kri.cvd_intake_aging@v1",
+        "kri.releases_without_sbom@v1"
+      ],
+      "sources": [
+        "nis2:art-21-2-e-codebase",
+        "cra:annex-i-2-codebase-vuln-mgmt",
+        "evidence-stream:vulns"
+      ]
+    }
   }
 }

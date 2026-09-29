@@ -25,6 +25,7 @@ import re
 from pathlib import Path
 
 from compilers.temporal.emit import emit_file
+from compilers._shared.cacao_parser import secops_extension
 
 REPO = Path(__file__).resolve().parents[3]
 EXAMPLE = REPO / "examples" / "temporal" / "supply_chain_security"
@@ -87,7 +88,7 @@ def test_canonical_declares_temporal_compile_target() -> None:
     pins the Temporal binding owned by this card.
     """
     playbook = json.loads(SOURCE.read_text(encoding="utf-8"))
-    targets = playbook["x_secops_ng"]["compile_targets"]
+    targets = secops_extension(playbook)["compile_targets"]
     assert "temporal" in targets, (
         "compile_targets on the canonical supply_chain_security "
         "playbook must include 'temporal' once the CORE-FANOUT-TMP "

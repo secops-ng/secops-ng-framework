@@ -23,6 +23,7 @@ from pathlib import Path
 
 from compilers._shared.cacao_parser import parse_file
 from compilers.n8n.emit import emit
+from compilers._shared.cacao_parser import secops_extension
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 SOURCE = REPO_ROOT / "content" / "playbooks" / "patch_management" / "playbook.cacao.json"
@@ -157,7 +158,7 @@ def _action_without_commands_steps() -> dict[str, dict]:
         for step_id, step in raw["workflow"].items()
         if step.get("type") == "action"
         and all(c.get("type") == "manual" for c in step.get("commands") or ())
-        and not (step.get("x_secops_ng") or {}).get("core_body")
+        and not (secops_extension(step) or {}).get("core_body")
     }
 
 
@@ -166,7 +167,7 @@ def _core_body_steps() -> dict[str, dict]:
     return {
         step_id: step
         for step_id, step in raw["workflow"].items()
-        if (step.get("x_secops_ng") or {}).get("core_body")
+        if (secops_extension(step) or {}).get("core_body")
     }
 
 
@@ -214,7 +215,7 @@ def test_set_nodes_surface_x_secops_ng_refs() -> None:
     """Every `x_secops_ng.<key>` bundle on the CACAO step appears as a Set row."""
     nodes_by_id = _nodes_by_id()
     for step_id, step in _action_without_commands_steps().items():
-        x = step.get("x_secops_ng") or {}
+        x = secops_extension(step) or {}
         if not x:
             continue
         node = nodes_by_id[step_id]
@@ -258,7 +259,7 @@ def test_core_body_steps_emit_code_nodes() -> None:
             f"step {step_id!r} carries a core_body binding and must emit a "
             f"Pyodide code node, not {node['type']!r}"
         )
-        primitive = step["x_secops_ng"]["core_body"]["primitive"]
+        primitive = secops_extension(step)["core_body"]["primitive"]
         code = node["parameters"]["pythonCode"]
         leaf = primitive.rsplit(".", 1)[-1]
         assert leaf in code, (

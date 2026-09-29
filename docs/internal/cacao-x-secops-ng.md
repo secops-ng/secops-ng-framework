@@ -21,8 +21,16 @@ CACAO does not give a step is a portable, machine-checkable description
 of the deterministic *work* the step performs.
 
 `x_secops_ng.core_body` fills that gap without modifying the CACAO
-shape. It is an optional block under any step's `x_secops_ng` extension
-that declares the single primitive call the step compiles down to:
+shape. It is an optional block in a step's SecOps-NG payload that
+declares the single primitive call the step compiles down to.
+
+Where the payload sits: CACAO 2.0 carries tool data in extensions, so a
+step's SecOps-NG payload lives in its `step_extensions`, under the
+SecOps-NG extension id `extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a` that the playbook
+declares in `extension_definitions` (#1027). This note keeps calling the
+payload `x_secops_ng` — the name the parser's model and the emitters use,
+and the key it sat under before #1027 — so `<step>.x_secops_ng.core_body`
+reads as "the `core_body` field of the step's SecOps-NG payload":
 
 ```
 <step>.x_secops_ng.core_body = {
@@ -148,20 +156,22 @@ severity scorer in the (forthcoming) primitives module:
     { "type": "secops-ng-primitive", "command": "vuln_intake.primitives.score_and_dedup" }
   ],
   "on_completion": "if-condition--0000-0000-0000-0000-000000000005",
-  "x_secops_ng": {
-    "detection_refs": ["detection.cve_under_active_exploitation@v1"],
-    "control_refs":   ["control.vuln_disclosure_intake@v1"],
-    "telemetry_refs": ["telemetry.cve_advisory@v1"],
-    "metric_refs":    ["kri.vuln_intake_dedup_rate@v1"],
-    "core_body": {
-      "primitive": "vuln_intake.primitives.score_and_dedup",
-      "in": {
-        "advisory":     "__report__",
-        "asset_index":  "__asset_index__",
-        "cvss":         "__cvss_vector__",
-        "epss":         "__epss_score__"
-      },
-      "out": "__triage_result__"
+  "step_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "detection_refs": ["detection.cve_under_active_exploitation@v1"],
+      "control_refs":   ["control.vuln_disclosure_intake@v1"],
+      "telemetry_refs": ["telemetry.cve_advisory@v1"],
+      "metric_refs":    ["kri.vuln_intake_dedup_rate@v1"],
+      "core_body": {
+        "primitive": "vuln_intake.primitives.score_and_dedup",
+        "in": {
+          "advisory":     "__report__",
+          "asset_index":  "__asset_index__",
+          "cvss":         "__cvss_vector__",
+          "epss":         "__epss_score__"
+        },
+        "out": "__triage_result__"
+      }
     }
   }
 }

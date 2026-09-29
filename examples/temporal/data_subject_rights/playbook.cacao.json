@@ -8,6 +8,16 @@
   "created": "2026-07-03T00:00:00Z",
   "created_by": "identity--5a509a09-5a50-45a5-85a5-095a509a509a",
   "description": "CACAO v2 playbook for the operator-side data subject rights (DSR) intake and fulfilment lifecycle a controller runs when a data subject exercises one of the GDPR Chapter III rights against personal data the controller holds. Covers Article 15 (access), Article 16 (rectification), Article 17 (erasure), Article 18 (restriction), Article 20 (portability) and Article 21 (objection); Article 22 (automated individual decision-making) is an in-scope classifier axis routed to the controller's human-in-the-loop review surface, not a parallel workflow. The lifecycle chains seven bound action steps around one verification gate: receive_request \u2192 verify_identity \u2192 classify_request \u2192 [identity verified?] \u2192 route_to_data_owners \u2192 compile_fulfilment_evidence \u2192 send_controller_response \u2192 record_outcome, with the unverified branch short-circuiting from the gate to the Article 12(6) additional-information response and an unverified_subject outcome. Every action step binds a deterministic primitive under primitives/ (bound since the CORE-WIRE card; stable at content_version 1.0.0); the intake surface, the verification surface, the data-inventory join, owner transport, secure delivery and the evidence store are adapter-bound operator surfaces the operator wires. The Article 12(3) one-month clock is anchored on the supplied receipt instant and an extension is representable only with its justification. CACAO v2 + SecOps-NG content-model extensions.",
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "name": "SecOps-NG content model",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "type": "extension-definition",
+      "version": "1.0.0"
+    }
+  },
   "external_references": [
     {
       "description": "Workflow step types (start, action, end), variable conventions, x_ extension namespace.",
@@ -44,6 +54,34 @@
   ],
   "modified": "2026-07-03T00:00:00Z",
   "name": "GDPR Article 15-22 data subject rights (DSR) intake and fulfilment",
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "content_version": "1.0.0",
+      "control_refs": [
+        "control.access_enforcement@v1",
+        "control.account_management@v1",
+        "control.service_identification_authentication@v1",
+        "control.incident_timeline_signals@v1"
+      ],
+      "maturity": "stable",
+      "metric_refs": [],
+      "sources": [
+        "OASIS CACAO v2.0 specification \u2014 workflow step types (start, action, end), variable conventions, x_ extension namespace",
+        "General Data Protection Regulation (EU) 2016/679 \u2014 Chapter III, Articles 15-22 (rights of the data subject) and Article 12 (modalities, response window, refusal grounds)",
+        "EDPB Guidelines 01/2022 on data subject rights \u2014 right of access",
+        "OCSF v1.3.0 \u2014 Compliance Finding (class_uid 2003) event class emitted per lifecycle milestone for the operator's Article 5(2) accountability posture"
+      ],
+      "stable_id": "playbook.data_subject_rights@v1",
+      "telemetry_refs": [
+        "telemetry.ocsf.compliance_finding@v1"
+      ]
+    }
+  },
   "playbook_types": [
     "notification",
     "investigation"
@@ -221,23 +259,25 @@
         "__request_received_ts__",
         "__subject_contact__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.account_management@v1"
-        ],
-        "core_body": {
-          "in": {
-            "intake_channel": "__intake_channel__",
-            "raw_request": "__raw_request__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.account_management@v1"
+          ],
+          "core_body": {
+            "in": {
+              "intake_channel": "__intake_channel__",
+              "raw_request": "__raw_request__"
+            },
+            "out": "__dsr_case__",
+            "primitive": "content.playbooks.data_subject_rights.primitives.intake.open_dsr_case"
           },
-          "out": "__dsr_case__",
-          "primitive": "content.playbooks.data_subject_rights.primitives.intake.open_dsr_case"
-        },
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ]
-      }
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--d5b17a15-0000-4000-8000-000000000003": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -261,26 +301,28 @@
         "__verification_record__",
         "__identity_verified__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.access_enforcement@v1",
-          "control.service_identification_authentication@v1"
-        ],
-        "core_body": {
-          "in": {
-            "case_id": "__case_id__",
-            "evidence_ref": "__verification_evidence_ref__",
-            "identity_verified": "__verification_result__",
-            "verification_method": "__verification_method__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.access_enforcement@v1",
+            "control.service_identification_authentication@v1"
+          ],
+          "core_body": {
+            "in": {
+              "case_id": "__case_id__",
+              "evidence_ref": "__verification_evidence_ref__",
+              "identity_verified": "__verification_result__",
+              "verification_method": "__verification_method__"
+            },
+            "out": "__verification_record__",
+            "primitive": "content.playbooks.data_subject_rights.primitives.verification.record_identity_verification"
           },
-          "out": "__verification_record__",
-          "primitive": "content.playbooks.data_subject_rights.primitives.verification.record_identity_verification"
-        },
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ]
-      }
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--d5b17a15-0000-4000-8000-000000000004": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -305,24 +347,26 @@
         "__request_type__",
         "__response_deadline__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.account_management@v1"
-        ],
-        "core_body": {
-          "in": {
-            "extension": "__extension_decision__",
-            "request_received_ts": "__request_received_ts__",
-            "request_type": "__classified_request_type__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.account_management@v1"
+          ],
+          "core_body": {
+            "in": {
+              "extension": "__extension_decision__",
+              "request_received_ts": "__request_received_ts__",
+              "request_type": "__classified_request_type__"
+            },
+            "out": "__classification__",
+            "primitive": "content.playbooks.data_subject_rights.primitives.classification.classify_request"
           },
-          "out": "__classification__",
-          "primitive": "content.playbooks.data_subject_rights.primitives.classification.classify_request"
-        },
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ]
-      }
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--d5b17a15-0000-4000-8000-000000000005": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -345,24 +389,26 @@
         "__owner_manifest__",
         "__data_owner_manifest__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.account_management@v1"
-        ],
-        "core_body": {
-          "in": {
-            "case_id": "__case_id__",
-            "owner_rows": "__owner_rows__",
-            "request_type": "__request_type__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.account_management@v1"
+          ],
+          "core_body": {
+            "in": {
+              "case_id": "__case_id__",
+              "owner_rows": "__owner_rows__",
+              "request_type": "__request_type__"
+            },
+            "out": "__owner_manifest__",
+            "primitive": "content.playbooks.data_subject_rights.primitives.routing.resolve_data_owner_manifest"
           },
-          "out": "__owner_manifest__",
-          "primitive": "content.playbooks.data_subject_rights.primitives.routing.resolve_data_owner_manifest"
-        },
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ]
-      }
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--d5b17a15-0000-4000-8000-000000000006": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -384,23 +430,25 @@
         "__fulfilment_pack__",
         "__fulfilment_pack_ref__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_timeline_signals@v1"
-        ],
-        "core_body": {
-          "in": {
-            "manifest": "__owner_manifest__",
-            "owner_returns": "__owner_returns__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_timeline_signals@v1"
+          ],
+          "core_body": {
+            "in": {
+              "manifest": "__owner_manifest__",
+              "owner_returns": "__owner_returns__"
+            },
+            "out": "__fulfilment_pack__",
+            "primitive": "content.playbooks.data_subject_rights.primitives.fulfilment.compile_fulfilment_pack"
           },
-          "out": "__fulfilment_pack__",
-          "primitive": "content.playbooks.data_subject_rights.primitives.fulfilment.compile_fulfilment_pack"
-        },
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ]
-      }
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--d5b17a15-0000-4000-8000-000000000007": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -428,30 +476,32 @@
       "out_args": [
         "__controller_response__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_timeline_signals@v1"
-        ],
-        "core_body": {
-          "in": {
-            "additional_information_request": "__identity_followup__",
-            "case_id": "__case_id__",
-            "dispatch_ts": "__dispatch_ts__",
-            "extension": "__extension_decision__",
-            "fulfilment_pack_ref": "__fulfilment_pack_ref__",
-            "refusal": "__refusal_decision__",
-            "request_type": "__request_type__",
-            "response_deadline": "__response_deadline__",
-            "subject_contact": "__subject_contact__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_timeline_signals@v1"
+          ],
+          "core_body": {
+            "in": {
+              "additional_information_request": "__identity_followup__",
+              "case_id": "__case_id__",
+              "dispatch_ts": "__dispatch_ts__",
+              "extension": "__extension_decision__",
+              "fulfilment_pack_ref": "__fulfilment_pack_ref__",
+              "refusal": "__refusal_decision__",
+              "request_type": "__request_type__",
+              "response_deadline": "__response_deadline__",
+              "subject_contact": "__subject_contact__"
+            },
+            "out": "__controller_response__",
+            "primitive": "content.playbooks.data_subject_rights.primitives.response.compose_controller_response"
           },
-          "out": "__controller_response__",
-          "primitive": "content.playbooks.data_subject_rights.primitives.response.compose_controller_response"
-        },
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ]
-      }
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--d5b17a15-0000-4000-8000-000000000008": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -476,26 +526,28 @@
         "__outcome_record__",
         "__outcome_code__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_timeline_signals@v1"
-        ],
-        "core_body": {
-          "in": {
-            "case_id": "__case_id__",
-            "fulfilment_pack_ref": "__fulfilment_pack_ref__",
-            "outcome_code": "__outcome_decision__",
-            "response_deadline": "__response_deadline__",
-            "response_dispatch_ts": "__controller_response__.dispatch_ts"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_timeline_signals@v1"
+          ],
+          "core_body": {
+            "in": {
+              "case_id": "__case_id__",
+              "fulfilment_pack_ref": "__fulfilment_pack_ref__",
+              "outcome_code": "__outcome_decision__",
+              "response_deadline": "__response_deadline__",
+              "response_dispatch_ts": "__controller_response__.dispatch_ts"
+            },
+            "out": "__outcome_record__",
+            "primitive": "content.playbooks.data_subject_rights.primitives.outcome.record_case_outcome"
           },
-          "out": "__outcome_record__",
-          "primitive": "content.playbooks.data_subject_rights.primitives.outcome.record_case_outcome"
-        },
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ]
-      }
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "end--d5b17a15-0000-4000-8000-00000000000a": {
       "name": "dsr_end",
@@ -515,31 +567,5 @@
       "type": "start"
     }
   },
-  "workflow_start": "start--d5b17a15-0000-4000-8000-000000000001",
-  "x_secops_ng": {
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "content_version": "1.0.0",
-    "control_refs": [
-      "control.access_enforcement@v1",
-      "control.account_management@v1",
-      "control.service_identification_authentication@v1",
-      "control.incident_timeline_signals@v1"
-    ],
-    "maturity": "stable",
-    "metric_refs": [],
-    "sources": [
-      "OASIS CACAO v2.0 specification \u2014 workflow step types (start, action, end), variable conventions, x_ extension namespace",
-      "General Data Protection Regulation (EU) 2016/679 \u2014 Chapter III, Articles 15-22 (rights of the data subject) and Article 12 (modalities, response window, refusal grounds)",
-      "EDPB Guidelines 01/2022 on data subject rights \u2014 right of access",
-      "OCSF v1.3.0 \u2014 Compliance Finding (class_uid 2003) event class emitted per lifecycle milestone for the operator's Article 5(2) accountability posture"
-    ],
-    "stable_id": "playbook.data_subject_rights@v1",
-    "telemetry_refs": [
-      "telemetry.ocsf.compliance_finding@v1"
-    ]
-  }
+  "workflow_start": "start--d5b17a15-0000-4000-8000-000000000001"
 }

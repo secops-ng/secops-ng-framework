@@ -354,16 +354,17 @@ workflow:
     commands:
       - type: secops-ng-primitive
         command: content.playbooks.business_continuity.primitives.declaration.declare_bcm_event
-    x_secops_ng:
-      control_refs:
-        - control.contingency_plan@v1
-      telemetry_refs:
-        - telemetry.ocsf.api_activity@v1
-      core_body:
-        primitive: content.playbooks.business_continuity.primitives.declaration.declare_bcm_event
-        in:
-          raw_trigger: __raw_trigger__
-        out: __bcm_event__
+    step_extensions:
+      extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+        control_refs:
+          - control.contingency_plan@v1
+        telemetry_refs:
+          - telemetry.ocsf.api_activity@v1
+        core_body:
+          primitive: content.playbooks.business_continuity.primitives.declaration.declare_bcm_event
+          in:
+            raw_trigger: __raw_trigger__
+          out: __bcm_event__
   action--b17c0072-0000-4000-8000-000000000003:
     type: action
     name: activate_bcm_plan
@@ -402,18 +403,19 @@ workflow:
     commands:
       - type: secops-ng-primitive
         command: content.playbooks.business_continuity.primitives.activation.activate_bcm_plan
-    x_secops_ng:
-      control_refs:
-        - control.contingency_plan@v1
-      telemetry_refs:
-        - telemetry.ocsf.api_activity@v1
-      core_body:
-        primitive: content.playbooks.business_continuity.primitives.activation.activate_bcm_plan
-        in:
-          event: __bcm_event__
-          plan_register: __plan_register__
-          significance_policy: __significance_policy__
-        out: __activation__
+    step_extensions:
+      extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+        control_refs:
+          - control.contingency_plan@v1
+        telemetry_refs:
+          - telemetry.ocsf.api_activity@v1
+        core_body:
+          primitive: content.playbooks.business_continuity.primitives.activation.activate_bcm_plan
+          in:
+            event: __bcm_event__
+            plan_register: __plan_register__
+            significance_policy: __significance_policy__
+          out: __activation__
   action--b17c0072-0000-4000-8000-000000000004:
     type: action
     name: isolate_affected_systems
@@ -445,16 +447,17 @@ workflow:
     commands:
       - type: secops-ng-primitive
         command: content.playbooks.business_continuity.primitives.isolation.resolve_isolation_scope
-    x_secops_ng:
-      control_refs:
-        - control.contingency_plan@v1
-      telemetry_refs:
-        - telemetry.ocsf.api_activity@v1
-      core_body:
-        primitive: content.playbooks.business_continuity.primitives.isolation.resolve_isolation_scope
-        in:
-          activation: __activation__
-        out: __isolation_result__
+    step_extensions:
+      extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+        control_refs:
+          - control.contingency_plan@v1
+        telemetry_refs:
+          - telemetry.ocsf.api_activity@v1
+        core_body:
+          primitive: content.playbooks.business_continuity.primitives.isolation.resolve_isolation_scope
+          in:
+            activation: __activation__
+          out: __isolation_result__
   action--b17c0072-0000-4000-8000-000000000005:
     type: action
     name: switch_to_backup
@@ -489,16 +492,17 @@ workflow:
     commands:
       - type: secops-ng-primitive
         command: content.playbooks.business_continuity.primitives.failover.select_failover_target
-    x_secops_ng:
-      control_refs:
-        - control.system_recovery_reconstitution@v1
-      telemetry_refs:
-        - telemetry.ocsf.api_activity@v1
-      core_body:
-        primitive: content.playbooks.business_continuity.primitives.failover.select_failover_target
-        in:
-          activation: __activation__
-        out: __failover_order__
+    step_extensions:
+      extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+        control_refs:
+          - control.system_recovery_reconstitution@v1
+        telemetry_refs:
+          - telemetry.ocsf.api_activity@v1
+        core_body:
+          primitive: content.playbooks.business_continuity.primitives.failover.select_failover_target
+          in:
+            activation: __activation__
+          out: __failover_order__
   action--b17c0072-0000-4000-8000-000000000006:
     type: action
     name: notify_competent_authority
@@ -541,21 +545,22 @@ workflow:
     commands:
       - type: secops-ng-primitive
         command: content.playbooks.business_continuity.primitives.notification.compose_authority_notification
-    x_secops_ng:
-      control_refs:
-        - control.incident_timeline_signals@v1
-      telemetry_refs:
-        - telemetry.ocsf.incident_finding@v1
-      core_body:
-        primitive: content.playbooks.business_continuity.primitives.notification.compose_authority_notification
-        in:
-          event_id: __event_id__
-          event_declared_ts: __event_declared_ts__
-          significant_incident: __significant_incident__
-          phase: __notification_phase__
-          assessment: __notification_assessment__
-          no_notification_rationale: __no_notification_rationale__
-        out: __authority_record__
+    step_extensions:
+      extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+        control_refs:
+          - control.incident_timeline_signals@v1
+        telemetry_refs:
+          - telemetry.ocsf.incident_finding@v1
+        core_body:
+          primitive: content.playbooks.business_continuity.primitives.notification.compose_authority_notification
+          in:
+            event_id: __event_id__
+            event_declared_ts: __event_declared_ts__
+            significant_incident: __significant_incident__
+            phase: __notification_phase__
+            assessment: __notification_assessment__
+            no_notification_rationale: __no_notification_rationale__
+          out: __authority_record__
   action--b17c0072-0000-4000-8000-000000000007:
     type: action
     name: restore_and_verify
@@ -588,17 +593,18 @@ workflow:
     commands:
       - type: secops-ng-primitive
         command: content.playbooks.business_continuity.primitives.recovery.evaluate_recovery
-    x_secops_ng:
-      control_refs:
-        - control.system_recovery_reconstitution@v1
-      telemetry_refs:
-        - telemetry.ocsf.api_activity@v1
-      core_body:
-        primitive: content.playbooks.business_continuity.primitives.recovery.evaluate_recovery
-        in:
-          activation: __activation__
-          observed: __recovery_observations__
-        out: __recovery_record__
+    step_extensions:
+      extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+        control_refs:
+          - control.system_recovery_reconstitution@v1
+        telemetry_refs:
+          - telemetry.ocsf.api_activity@v1
+        core_body:
+          primitive: content.playbooks.business_continuity.primitives.recovery.evaluate_recovery
+          in:
+            activation: __activation__
+            observed: __recovery_observations__
+          out: __recovery_record__
   action--b17c0072-0000-4000-8000-000000000008:
     type: action
     name: post_incident_review
@@ -638,51 +644,61 @@ workflow:
     commands:
       - type: secops-ng-primitive
         command: content.playbooks.business_continuity.primitives.review.compose_pir_record
-    x_secops_ng:
-      control_refs:
-        - control.contingency_plan@v1
-      telemetry_refs:
-        - telemetry.ocsf.incident_finding@v1
-      core_body:
-        primitive: content.playbooks.business_continuity.primitives.review.compose_pir_record
-        in:
-          event_id: __event_id__
-          plan_on_file: __activation__.plan_on_file
-          lessons_learned: __pir_lessons__
-          corrective_actions: __pir_corrective_actions__
-          plan_revisions: __pir_plan_revisions__
-          linked_refs: __pir_linked_refs__
-        out: __pir_record__
+    step_extensions:
+      extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+        control_refs:
+          - control.contingency_plan@v1
+        telemetry_refs:
+          - telemetry.ocsf.incident_finding@v1
+        core_body:
+          primitive: content.playbooks.business_continuity.primitives.review.compose_pir_record
+          in:
+            event_id: __event_id__
+            plan_on_file: __activation__.plan_on_file
+            lessons_learned: __pir_lessons__
+            corrective_actions: __pir_corrective_actions__
+            plan_revisions: __pir_plan_revisions__
+            linked_refs: __pir_linked_refs__
+          out: __pir_record__
   end--b17c0072-0000-4000-8000-00000000000a:
     type: end
     name: bcm_end
-x_secops_ng:
-  stable_id: playbook.business_continuity@v1
-  content_version: 1.0.0
-  maturity: stable
-  compile_targets:
-    - n8n
-    - temporal
-    - langgraph
-  control_refs:
-    - control.contingency_plan@v1
-    - control.system_recovery_reconstitution@v1
-    - control.incident_timeline_signals@v1
-  telemetry_refs:
-    - telemetry.ocsf.api_activity@v1
-    - telemetry.ocsf.incident_finding@v1
-  metric_refs: []
-  sources:
-    - >-
-      OASIS CACAO v2.0 specification — workflow step types
-      (start, action, end), variable conventions, x_ extension
-      namespace
-    - >-
-      NIS2 Directive (EU) 2022/2555 — Article 21(2)(c) business
-      continuity, backup management, disaster recovery, crisis
-      management; Article 23 significant-incident reporting
-    - >-
-      OCSF v1.4.0 — API Activity (class_uid 6003) and Incident
-      Finding (class_uid 2005) event classes emitted at lifecycle
-      milestones (the house binding for workflow-emitted milestones,
-      corrected from an invented availability class by #877)
+extension_definitions:
+  extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+    type: "extension-definition"
+    name: "SecOps-NG content model"
+    description: "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level."
+    created_by: "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c"
+    schema: "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json"
+    version: "1.0.0"
+playbook_extensions:
+  extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+    stable_id: playbook.business_continuity@v1
+    content_version: 1.0.0
+    maturity: stable
+    compile_targets:
+      - n8n
+      - temporal
+      - langgraph
+    control_refs:
+      - control.contingency_plan@v1
+      - control.system_recovery_reconstitution@v1
+      - control.incident_timeline_signals@v1
+    telemetry_refs:
+      - telemetry.ocsf.api_activity@v1
+      - telemetry.ocsf.incident_finding@v1
+    metric_refs: []
+    sources:
+      - >-
+        OASIS CACAO v2.0 specification — workflow step types
+        (start, action, end), variable conventions, x_ extension
+        namespace
+      - >-
+        NIS2 Directive (EU) 2022/2555 — Article 21(2)(c) business
+        continuity, backup management, disaster recovery, crisis
+        management; Article 23 significant-incident reporting
+      - >-
+        OCSF v1.4.0 — API Activity (class_uid 6003) and Incident
+        Finding (class_uid 2005) event classes emitted at lifecycle
+        milestones (the house binding for workflow-emitted milestones,
+        corrected from an invented availability class by #877)

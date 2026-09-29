@@ -151,22 +151,24 @@
           "command": "content.playbooks.supply_chain_security.primitives.assess.assess_supplier_signal"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.supplier_inventory@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.supply_chain_security.primitives.assess.assess_supplier_signal",
-          "in": {
-            "signal_class": "__signal_class__",
-            "verdict": "__signal_verdict__",
-            "affected_supplier_handle": "__signal_supplier_handle__",
-            "received_at": "__signal_received_at__",
-            "affected_component_set": "__signal_component_set__",
-            "signal_id": "__signal_id__",
-            "scoring_notes": "__signal_scoring_notes__"
-          },
-          "out": "__assessment_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.supplier_inventory@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.supply_chain_security.primitives.assess.assess_supplier_signal",
+            "in": {
+              "signal_class": "__signal_class__",
+              "verdict": "__signal_verdict__",
+              "affected_supplier_handle": "__signal_supplier_handle__",
+              "received_at": "__signal_received_at__",
+              "affected_component_set": "__signal_component_set__",
+              "signal_id": "__signal_id__",
+              "scoring_notes": "__signal_scoring_notes__"
+            },
+            "out": "__assessment_ref__"
+          }
         }
       }
     },
@@ -198,26 +200,28 @@
           "command": "content.playbooks.supply_chain_security.primitives.artifact.build_supply_chain_evidence_artifact"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.supplier_inventory@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.supply_chain_security.primitives.artifact.build_supply_chain_evidence_artifact",
-          "in": {
-            "workflow_id": "__workflow_id__",
-            "execution_id": "__execution_id__",
-            "regulation_refs": "__regulation_refs__",
-            "control_refs": "__control_refs__",
-            "assessment": "__assessment_ref__",
-            "dependencies": "__dependencies__",
-            "owner_role": "__owner_role__",
-            "owner_assigned_at": "__owner_assigned_at__",
-            "captured_at": "__captured_at__",
-            "source_url": "__source_url__",
-            "aggregates": "__aggregates__"
-          },
-          "out": "__supply_chain_artifact_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.supplier_inventory@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.supply_chain_security.primitives.artifact.build_supply_chain_evidence_artifact",
+            "in": {
+              "workflow_id": "__workflow_id__",
+              "execution_id": "__execution_id__",
+              "regulation_refs": "__regulation_refs__",
+              "control_refs": "__control_refs__",
+              "assessment": "__assessment_ref__",
+              "dependencies": "__dependencies__",
+              "owner_role": "__owner_role__",
+              "owner_assigned_at": "__owner_assigned_at__",
+              "captured_at": "__captured_at__",
+              "source_url": "__source_url__",
+              "aggregates": "__aggregates__"
+            },
+            "out": "__supply_chain_artifact_ref__"
+          }
         }
       }
     },
@@ -226,18 +230,30 @@
       "name": "supply-chain-security-end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.supply_chain_security@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": ["n8n", "temporal", "langgraph"],
-    "control_refs": [
-      "control.supplier_inventory@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification",
-      "NIS2 Directive (EU) 2022/2555 — Article 21(2)(d)",
-      "Community input — supply-chain security workflow"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.supply_chain_security@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": ["n8n", "temporal", "langgraph"],
+      "control_refs": [
+        "control.supplier_inventory@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification",
+        "NIS2 Directive (EU) 2022/2555 — Article 21(2)(d)",
+        "Community input — supply-chain security workflow"
+      ]
+    }
   }
 }

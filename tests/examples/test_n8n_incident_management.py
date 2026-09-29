@@ -53,6 +53,7 @@ OVERLAY_JSON = EXAMPLE_DIR / "core_body.overlay.json"
 # Make ``apply_overlay`` importable for the divergence-guard test below.
 sys.path.insert(0, str(EXAMPLE_DIR))
 from apply_overlay import apply_overlay as _apply_overlay  # noqa: E402
+from compilers._shared.cacao_parser import secops_extension
 
 
 def _serialise_workflow(payload: dict) -> str:
@@ -236,7 +237,7 @@ def _action_without_commands_steps() -> dict[str, dict]:
         for step_id, step in raw["workflow"].items()
         if step.get("type") == "action"
         and all(c.get("type") == "manual" for c in step.get("commands") or ())
-        and not (step.get("x_secops_ng") or {}).get("core_body")
+        and not (secops_extension(step) or {}).get("core_body")
     }
 
 
@@ -285,7 +286,7 @@ def test_set_nodes_surface_x_secops_ng_refs() -> None:
     """Every `x_secops_ng.<key>` bundle on the CACAO step appears as a Set row."""
     nodes_by_id = _nodes_by_id()
     for step_id, step in _action_without_commands_steps().items():
-        x = step.get("x_secops_ng") or {}
+        x = secops_extension(step) or {}
         if not x:
             continue
         node = nodes_by_id[step_id]
@@ -365,7 +366,7 @@ def _core_body_steps() -> dict[str, dict]:
     return {
         step_id: step
         for step_id, step in raw["workflow"].items()
-        if (step.get("x_secops_ng") or {}).get("core_body")
+        if (secops_extension(step) or {}).get("core_body")
     }
 
 
@@ -384,7 +385,7 @@ def test_core_body_steps_emit_code_nodes() -> None:
             f"step {step_id!r} carries a core_body binding and must emit a "
             f"Pyodide code node, not {node['type']!r}"
         )
-        leaf = step["x_secops_ng"]["core_body"]["primitive"].rsplit(".", 1)[-1]
+        leaf = secops_extension(step)["core_body"]["primitive"].rsplit(".", 1)[-1]
         assert leaf in node["parameters"]["pythonCode"], (
             f"step {step_id!r}: emitted code does not reference the bound "
             f"primitive {leaf!r}"

@@ -25,6 +25,7 @@ import yaml
 
 from compilers._shared.cacao_parser import parse_file
 from compilers.n8n.emit import emit
+from compilers._shared.cacao_parser import secops_extension
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 CANON_YAML = (
@@ -146,7 +147,7 @@ def _bcm_core_body_steps() -> dict[str, dict]:
         step_id: step
         for step_id, step in workflow.items()
         if step.get("type") == "action"
-        and (step.get("x_secops_ng") or {}).get("core_body")
+        and (secops_extension(step) or {}).get("core_body")
     }
 
 
@@ -168,8 +169,8 @@ def test_core_body_steps_emit_code_nodes() -> None:
             f"not {node['type']!r}"
         )
         body = node["parameters"].get("pythonCode", "")
-        primitive = step["x_secops_ng"]["core_body"]["primitive"]
+        primitive = secops_extension(step)["core_body"]["primitive"]
         module, _, callable_name = primitive.rpartition(".")
         assert f"from {module} import {callable_name}" in body
-        out_var = step["x_secops_ng"]["core_body"]["out"]
+        out_var = secops_extension(step)["core_body"]["out"]
         assert f"{out_var} = {callable_name}(" in body

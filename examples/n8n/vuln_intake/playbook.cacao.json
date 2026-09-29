@@ -165,23 +165,25 @@
           "command": "content.playbooks.vuln_intake.primitives.dedup.canonicalize_case_field"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.vuln_disclosure_intake@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.vulnerability_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.vuln_disclosure_sla@v1",
-          "kri.cvd_intake_aging@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.vuln_intake.primitives.dedup.canonicalize_case_field",
-          "in": {
-            "value": "__cve_id__"
-          },
-          "out": "__cve_id_canonical__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.vuln_disclosure_intake@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.vulnerability_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.vuln_disclosure_sla@v1",
+            "kri.cvd_intake_aging@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.vuln_intake.primitives.dedup.canonicalize_case_field",
+            "in": {
+              "value": "__cve_id__"
+            },
+            "out": "__cve_id_canonical__"
+          }
         }
       }
     },
@@ -203,24 +205,26 @@
           "command": "content.playbooks.vuln_intake.primitives.severity.severity_policy"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.sbom_capture@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.vulnerability_finding@v1"
-        ],
-        "metric_refs": [
-          "kri.releases_without_sbom@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.vuln_intake.primitives.severity.severity_policy",
-          "in": {
-            "cvss": "__cvss__",
-            "epss": "__epss__",
-            "context": "__asset_context__"
-          },
-          "out": "__severity_verdict__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.sbom_capture@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.vulnerability_finding@v1"
+          ],
+          "metric_refs": [
+            "kri.releases_without_sbom@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.vuln_intake.primitives.severity.severity_policy",
+            "in": {
+              "cvss": "__cvss__",
+              "epss": "__epss__",
+              "context": "__asset_context__"
+            },
+            "out": "__severity_verdict__"
+          }
         }
       }
     },
@@ -244,22 +248,24 @@
           "command": "content.playbooks.vuln_intake.primitives.cra_trigger.assess_cra_reporting_trigger"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_timeline_signals@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.vulnerability_finding@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.vuln_intake.primitives.cra_trigger.assess_cra_reporting_trigger",
-          "in": {
-            "cve_id": "__cve_id__",
-            "awareness_at": "__awareness_at__",
-            "exploitation_evidence": "__exploitation_evidence__",
-            "remedy_available_at": "__remedy_available_at__"
-          },
-          "out": "__cra_trigger_verdict__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_timeline_signals@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.vulnerability_finding@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.vuln_intake.primitives.cra_trigger.assess_cra_reporting_trigger",
+            "in": {
+              "cve_id": "__cve_id__",
+              "awareness_at": "__awareness_at__",
+              "exploitation_evidence": "__exploitation_evidence__",
+              "remedy_available_at": "__remedy_available_at__"
+            },
+            "out": "__cra_trigger_verdict__"
+          }
         }
       }
     },
@@ -288,28 +294,30 @@
           "command": "content.playbooks.vuln_intake.primitives.cra_trigger.build_notification_chain"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.cra_submission_templates@v1",
-          "control.incident_timeline_signals@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.vulnerability_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.cra_early_warning_on_time@v1",
-          "kpi.cra_notification_72h_on_time@v1",
-          "kpi.cra_final_report_on_time@v1",
-          "kpi.cra_severe_incident_on_time@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.vuln_intake.primitives.cra_trigger.build_notification_chain",
-          "in": {
-            "cve_id": "__cve_id__",
-            "trigger": "__cra_trigger_verdict__",
-            "destinations": "__notification_destinations__"
-          },
-          "out": "__notification_chain_plan__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.cra_submission_templates@v1",
+            "control.incident_timeline_signals@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.vulnerability_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.cra_early_warning_on_time@v1",
+            "kpi.cra_notification_72h_on_time@v1",
+            "kpi.cra_final_report_on_time@v1",
+            "kpi.cra_severe_incident_on_time@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.vuln_intake.primitives.cra_trigger.build_notification_chain",
+            "in": {
+              "cve_id": "__cve_id__",
+              "trigger": "__cra_trigger_verdict__",
+              "destinations": "__notification_destinations__"
+            },
+            "out": "__notification_chain_plan__"
+          }
         }
       }
     },
@@ -338,27 +346,29 @@
           "command": "content.playbooks.vuln_intake.primitives.remediation.patch_and_advisory_critical"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.patch_evidence@v1",
-          "control.vuln_disclosure_intake@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.vulnerability_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.patch_disseminated_on_time@v1",
-          "kpi.mttr_critical@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.vuln_intake.primitives.remediation.patch_and_advisory_critical",
-          "in": {
-            "severity": "__severity__",
-            "asset_criticality": "__asset_context__.asset_criticality",
-            "triaged_at": "__triaged_at__",
-            "sla_days": "__cvd_sla_days__"
-          },
-          "out": "__remediation_directive__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.patch_evidence@v1",
+            "control.vuln_disclosure_intake@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.vulnerability_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.patch_disseminated_on_time@v1",
+            "kpi.mttr_critical@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.vuln_intake.primitives.remediation.patch_and_advisory_critical",
+            "in": {
+              "severity": "__severity__",
+              "asset_criticality": "__asset_context__.asset_criticality",
+              "triaged_at": "__triaged_at__",
+              "sla_days": "__cvd_sla_days__"
+            },
+            "out": "__remediation_directive__"
+          }
         }
       }
     },
@@ -374,26 +384,28 @@
           "command": "content.playbooks.vuln_intake.primitives.remediation.patch_and_advisory_high"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.patch_evidence@v1",
-          "control.vuln_disclosure_intake@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.vulnerability_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.patch_disseminated_on_time@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.vuln_intake.primitives.remediation.patch_and_advisory_high",
-          "in": {
-            "severity": "__severity__",
-            "asset_criticality": "__asset_context__.asset_criticality",
-            "triaged_at": "__triaged_at__",
-            "sla_days": "__cvd_sla_days__"
-          },
-          "out": "__remediation_directive__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.patch_evidence@v1",
+            "control.vuln_disclosure_intake@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.vulnerability_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.patch_disseminated_on_time@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.vuln_intake.primitives.remediation.patch_and_advisory_high",
+            "in": {
+              "severity": "__severity__",
+              "asset_criticality": "__asset_context__.asset_criticality",
+              "triaged_at": "__triaged_at__",
+              "sla_days": "__cvd_sla_days__"
+            },
+            "out": "__remediation_directive__"
+          }
         }
       }
     },
@@ -409,25 +421,27 @@
           "command": "content.playbooks.vuln_intake.primitives.remediation.schedule_remediation"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.patch_evidence@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.vulnerability_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.patch_disseminated_on_time@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.vuln_intake.primitives.remediation.schedule_remediation",
-          "in": {
-            "severity": "__severity__",
-            "asset_criticality": "__asset_context__.asset_criticality",
-            "triaged_at": "__triaged_at__",
-            "sla_days": "__cvd_sla_days__"
-          },
-          "out": "__remediation_directive__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.patch_evidence@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.vulnerability_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.patch_disseminated_on_time@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.vuln_intake.primitives.remediation.schedule_remediation",
+            "in": {
+              "severity": "__severity__",
+              "asset_criticality": "__asset_context__.asset_criticality",
+              "triaged_at": "__triaged_at__",
+              "sla_days": "__cvd_sla_days__"
+            },
+            "out": "__remediation_directive__"
+          }
         }
       }
     },
@@ -443,20 +457,22 @@
           "command": "content.playbooks.vuln_intake.primitives.remediation.accept_risk"
         }
       ],
-      "x_secops_ng": {
-        "telemetry_refs": [
-          "telemetry.ocsf.vulnerability_finding@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.vuln_intake.primitives.remediation.accept_risk",
-          "in": {
-            "severity": "__severity__",
-            "asset_criticality": "__asset_context__.asset_criticality",
-            "triaged_at": "__triaged_at__",
-            "accepted_by": "__risk_accepted_by__",
-            "review_after_days": "__risk_review_after_days__"
-          },
-          "out": "__remediation_directive__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "telemetry_refs": [
+            "telemetry.ocsf.vulnerability_finding@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.vuln_intake.primitives.remediation.accept_risk",
+            "in": {
+              "severity": "__severity__",
+              "asset_criticality": "__asset_context__.asset_criticality",
+              "triaged_at": "__triaged_at__",
+              "accepted_by": "__risk_accepted_by__",
+              "review_after_days": "__risk_review_after_days__"
+            },
+            "out": "__remediation_directive__"
+          }
         }
       }
     },
@@ -465,48 +481,60 @@
       "name": "vuln_intake_end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.vuln_intake@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "control_refs": [
-      "control.vuln_disclosure_intake@v1",
-      "control.sbom_capture@v1",
-      "control.incident_timeline_signals@v1",
-      "control.cra_submission_templates@v1",
-      "control.patch_evidence@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.vulnerability_finding@v1"
-    ],
-    "metric_refs": [
-      "kpi.vuln_disclosure_sla@v1",
-      "kri.cvd_intake_aging@v1",
-      "kri.releases_without_sbom@v1",
-      "kpi.cra_early_warning_on_time@v1",
-      "kpi.cra_notification_72h_on_time@v1",
-      "kpi.cra_final_report_on_time@v1",
-      "kpi.cra_severe_incident_on_time@v1",
-      "kpi.patch_disseminated_on_time@v1",
-      "kpi.mttr_critical@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification — workflow step types (start, action, if-condition, switch-condition, end), variable conventions, x_ extension namespace",
-      "Cyber Resilience Act (EU) 2024/2847, Annex I §2 — coordinated vulnerability disclosure policy, SBOM, and security-update obligations",
-      "Cyber Resilience Act (EU) 2024/2847, Article 14 — early-warning (24h), notification (72h), final report (14d), severe-incident reporting",
-      "NIS2 Directive (EU) 2022/2555, Article 21(2)(e) — vulnerability handling and disclosure",
-      "DORA Regulation (EU) 2022/2554, Article 9 — ICT risk management framework (vulnerability management)",
-      "Commission Delegated Regulation (EU) 2024/1774, Article 10 — JC RTS on ICT risk management (vulnerability management technical standard)",
-      "FIRST.org — CVSS v3.1 / v4.0 specification",
-      "FIRST.org — EPSS Exploit Prediction Scoring System",
-      "ISO/IEC 29147:2018 — Vulnerability disclosure",
-      "ISO/IEC 30111:2019 — Vulnerability handling processes",
-      "OCSF v1.3.0 — Vulnerability Finding (class_uid 2002) event class emitted at intake, triage, and on response disposition"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.vuln_intake@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "control_refs": [
+        "control.vuln_disclosure_intake@v1",
+        "control.sbom_capture@v1",
+        "control.incident_timeline_signals@v1",
+        "control.cra_submission_templates@v1",
+        "control.patch_evidence@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.vulnerability_finding@v1"
+      ],
+      "metric_refs": [
+        "kpi.vuln_disclosure_sla@v1",
+        "kri.cvd_intake_aging@v1",
+        "kri.releases_without_sbom@v1",
+        "kpi.cra_early_warning_on_time@v1",
+        "kpi.cra_notification_72h_on_time@v1",
+        "kpi.cra_final_report_on_time@v1",
+        "kpi.cra_severe_incident_on_time@v1",
+        "kpi.patch_disseminated_on_time@v1",
+        "kpi.mttr_critical@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification — workflow step types (start, action, if-condition, switch-condition, end), variable conventions, x_ extension namespace",
+        "Cyber Resilience Act (EU) 2024/2847, Annex I §2 — coordinated vulnerability disclosure policy, SBOM, and security-update obligations",
+        "Cyber Resilience Act (EU) 2024/2847, Article 14 — early-warning (24h), notification (72h), final report (14d), severe-incident reporting",
+        "NIS2 Directive (EU) 2022/2555, Article 21(2)(e) — vulnerability handling and disclosure",
+        "DORA Regulation (EU) 2022/2554, Article 9 — ICT risk management framework (vulnerability management)",
+        "Commission Delegated Regulation (EU) 2024/1774, Article 10 — JC RTS on ICT risk management (vulnerability management technical standard)",
+        "FIRST.org — CVSS v3.1 / v4.0 specification",
+        "FIRST.org — EPSS Exploit Prediction Scoring System",
+        "ISO/IEC 29147:2018 — Vulnerability disclosure",
+        "ISO/IEC 30111:2019 — Vulnerability handling processes",
+        "OCSF v1.3.0 — Vulnerability Finding (class_uid 2002) event class emitted at intake, triage, and on response disposition"
+      ]
+    }
   }
 }

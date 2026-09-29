@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://secops-ng.org/schemas/content-model/playbook.schema.json",
   "title": "SecOps-NG Playbook (CACAO v2 superset)",
-  "description": "JSON Schema for response playbooks expressed as OASIS CACAO v2 documents, extended with SecOps-NG stable identifiers that join the playbook to the detection, control, telemetry, and metrics layers of the content model. This schema is a superset: every required CACAO v2 field is required here, and SecOps-NG extensions live under the reserved `x_secops_ng` namespace so a SecOps-NG playbook remains a valid CACAO v2 playbook for any compliant consumer.",
+  "description": "JSON Schema for response playbooks expressed as OASIS CACAO v2 documents, extended with SecOps-NG stable identifiers that join the playbook to the detection, control, telemetry, and metrics layers of the content model. This schema is a superset: every required CACAO v2 field is required here, and the SecOps-NG data lives in the CACAO 2.0 extension slots (playbook_extensions and step_extensions, keyed by the SecOps-NG extension definition) so a SecOps-NG playbook remains a valid CACAO v2 playbook for any compliant consumer. The legacy placement under a root and per-step x_secops_ng object is still accepted for one release (#1027).",
   "type": "object",
   "additionalProperties": true,
   "required": [

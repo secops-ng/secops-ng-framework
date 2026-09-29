@@ -15,6 +15,7 @@ from pathlib import Path
 
 import pytest
 from jsonschema import Draft202012Validator
+from compilers._shared.cacao_parser import secops_extension
 
 ROOT = Path(__file__).resolve().parents[2]
 CONTENT_MODEL = ROOT / "content-model"
@@ -103,7 +104,7 @@ def test_each_metric_validates(metrics: list[dict], validators: dict[str, Draft2
 # ---------------------------------------------------------------------------
 
 def _x(playbook: dict) -> dict:
-    return playbook["x_secops_ng"]
+    return secops_extension(playbook)
 
 
 def test_playbook_refs_are_mirrored_in_mid_layers(

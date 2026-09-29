@@ -211,23 +211,25 @@
           "command": "content.playbooks.asset_management.primitives.ingest.resolve_inventory_source_set"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.asset_inventory_delta@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kri.control_effectiveness@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.asset_management.primitives.ingest.resolve_inventory_source_set",
-          "in": {
-            "raw_sources": "__raw_inventory_sources__",
-            "precedence": "__source_precedence__"
-          },
-          "out": "__inventory_source_set__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.asset_inventory_delta@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kri.control_effectiveness@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.asset_management.primitives.ingest.resolve_inventory_source_set",
+            "in": {
+              "raw_sources": "__raw_inventory_sources__",
+              "precedence": "__source_precedence__"
+            },
+            "out": "__inventory_source_set__"
+          }
         }
       }
     },
@@ -253,23 +255,25 @@
           "command": "content.playbooks.asset_management.primitives.reconcile.reconcile_inventory_snapshot"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.asset_inventory_delta@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kri.control_effectiveness@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.asset_management.primitives.reconcile.reconcile_inventory_snapshot",
-          "in": {
-            "sources": "__resolved_inventory_sources__",
-            "precedence": "__resolved_source_precedence__"
-          },
-          "out": "__inventory_snapshot__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.asset_inventory_delta@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kri.control_effectiveness@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.asset_management.primitives.reconcile.reconcile_inventory_snapshot",
+            "in": {
+              "sources": "__resolved_inventory_sources__",
+              "precedence": "__resolved_source_precedence__"
+            },
+            "out": "__inventory_snapshot__"
+          }
         }
       }
     },
@@ -293,24 +297,26 @@
           "command": "content.playbooks.asset_management.primitives.delta.compute_inventory_delta"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.asset_inventory_delta@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kri.control_effectiveness@v1",
-          "kri.asset_inventory_drift@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.asset_management.primitives.delta.compute_inventory_delta",
-          "in": {
-            "current_assets": "__snapshot_assets__",
-            "previous_assets": "__previous_snapshot_assets__"
-          },
-          "out": "__delta_set__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.asset_inventory_delta@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kri.control_effectiveness@v1",
+            "kri.asset_inventory_drift@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.asset_management.primitives.delta.compute_inventory_delta",
+            "in": {
+              "current_assets": "__snapshot_assets__",
+              "previous_assets": "__previous_snapshot_assets__"
+            },
+            "out": "__delta_set__"
+          }
         }
       }
     },
@@ -336,26 +342,28 @@
           "command": "content.playbooks.asset_management.primitives.classify.classify_inventory_delta"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.asset_inventory_delta@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kri.control_effectiveness@v1",
-          "kpi.unmanaged_asset_cardinality@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.asset_management.primitives.classify.classify_inventory_delta",
-          "in": {
-            "delta_set": "__delta_set__",
-            "ownership_declarations": "__ownership_declarations__",
-            "decommissioning_records": "__decommissioning_records__",
-            "deadline_missed": "__reconciliation_deadline_missed__"
-          },
-          "out": "__delta_classification__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.asset_inventory_delta@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kri.control_effectiveness@v1",
+            "kpi.unmanaged_asset_cardinality@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.asset_management.primitives.classify.classify_inventory_delta",
+            "in": {
+              "delta_set": "__delta_set__",
+              "ownership_declarations": "__ownership_declarations__",
+              "decommissioning_records": "__decommissioning_records__",
+              "deadline_missed": "__reconciliation_deadline_missed__"
+            },
+            "out": "__delta_classification__"
+          }
         }
       }
     },
@@ -388,34 +396,36 @@
           "command": "content.playbooks.asset_management.primitives.artifact.build_asset_inventory_delta_evidence_artifact"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.asset_inventory_delta@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kri.control_effectiveness@v1",
-          "kri.asset_inventory_drift@v1",
-          "kpi.unmanaged_asset_cardinality@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.asset_management.primitives.artifact.build_asset_inventory_delta_evidence_artifact",
-          "in": {
-            "workflow_id": "__workflow_id__",
-            "execution_id": "__execution_id__",
-            "regulation_refs": "__regulation_refs__",
-            "control_refs": "__control_refs__",
-            "snapshot_window": "__snapshot_window__",
-            "snapshot_id": "__snapshot_id__",
-            "source_set_id": "__source_set_id__",
-            "delta_set": "__delta_set__",
-            "delta_classification": "__delta_classification__",
-            "captured_at": "__captured_at__",
-            "source_url": "__source_url__"
-          },
-          "out": "__evidence_artifact__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.asset_inventory_delta@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kri.control_effectiveness@v1",
+            "kri.asset_inventory_drift@v1",
+            "kpi.unmanaged_asset_cardinality@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.asset_management.primitives.artifact.build_asset_inventory_delta_evidence_artifact",
+            "in": {
+              "workflow_id": "__workflow_id__",
+              "execution_id": "__execution_id__",
+              "regulation_refs": "__regulation_refs__",
+              "control_refs": "__control_refs__",
+              "snapshot_window": "__snapshot_window__",
+              "snapshot_id": "__snapshot_id__",
+              "source_set_id": "__source_set_id__",
+              "delta_set": "__delta_set__",
+              "delta_classification": "__delta_classification__",
+              "captured_at": "__captured_at__",
+              "source_url": "__source_url__"
+            },
+            "out": "__evidence_artifact__"
+          }
         }
       }
     },
@@ -438,24 +448,26 @@
           "command": "content.playbooks.asset_management.primitives.notify.compose_owner_notification"
         }
       ],
-      "x_secops_ng": {
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kri.control_effectiveness@v1",
-          "kpi.unmanaged_asset_cardinality@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.asset_management.primitives.notify.compose_owner_notification",
-          "in": {
-            "evidence_id": "__evidence_id__",
-            "snapshot_window": "__snapshot_window__",
-            "delta_classification": "__delta_classification__",
-            "unmanaged_threshold": "__unmanaged_threshold__",
-            "owner_channel": "__owner_channel__"
-          },
-          "out": "__owner_notification__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kri.control_effectiveness@v1",
+            "kpi.unmanaged_asset_cardinality@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.asset_management.primitives.notify.compose_owner_notification",
+            "in": {
+              "evidence_id": "__evidence_id__",
+              "snapshot_window": "__snapshot_window__",
+              "delta_classification": "__delta_classification__",
+              "unmanaged_threshold": "__unmanaged_threshold__",
+              "owner_channel": "__owner_channel__"
+            },
+            "out": "__owner_notification__"
+          }
         }
       },
       "out_args": [
@@ -467,31 +479,43 @@
       "name": "asset_management_end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.asset_management@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "control_refs": [
-      "control.asset_inventory_delta@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.api_activity@v1"
-    ],
-    "metric_refs": [
-      "kri.control_effectiveness@v1",
-      "kri.asset_inventory_drift@v1",
-      "kpi.unmanaged_asset_cardinality@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
-      "NIS2 Directive (EU) 2022/2555, Article 21(2)(i) — human resources security, access-control policies, and asset management",
-      "ENISA — Good practices on asset management for essential and important entities",
-      "OCSF — API Activity (6003) event class"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.asset_management@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "control_refs": [
+        "control.asset_inventory_delta@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.api_activity@v1"
+      ],
+      "metric_refs": [
+        "kri.control_effectiveness@v1",
+        "kri.asset_inventory_drift@v1",
+        "kpi.unmanaged_asset_cardinality@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
+        "NIS2 Directive (EU) 2022/2555, Article 21(2)(i) — human resources security, access-control policies, and asset management",
+        "ENISA — Good practices on asset management for essential and important entities",
+        "OCSF — API Activity (6003) event class"
+      ]
+    }
   }
 }

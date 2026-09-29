@@ -23,6 +23,7 @@ from pathlib import Path
 
 from compilers._shared.cacao_parser import parse_file
 from compilers.n8n.emit import emit as emit_n8n
+from compilers._shared.cacao_parser import secops_extension
 
 REPO = Path(__file__).resolve().parents[3]
 EXAMPLE = REPO / "examples" / "n8n" / "supply_chain_security"
@@ -86,7 +87,7 @@ def test_canonical_declares_n8n_compile_target() -> None:
     this card.
     """
     playbook = json.loads(SOURCE.read_text(encoding="utf-8"))
-    targets = playbook["x_secops_ng"]["compile_targets"]
+    targets = secops_extension(playbook)["compile_targets"]
     assert "n8n" in targets, (
         "compile_targets on the canonical supply_chain_security "
         "playbook must include 'n8n' once the CORE-FANOUT-N8N card "

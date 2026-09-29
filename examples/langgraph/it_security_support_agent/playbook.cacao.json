@@ -152,20 +152,22 @@
           "command": "content.playbooks.it_security_support_agent.primitives.ingest.ingest_support_request"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.it_security_support_agent.primitives.ingest.ingest_support_request",
-          "in": {
-            "raw_request": "__raw_support_request__",
-            "support_request_ref": "__support_request_ref__"
-          },
-          "out": "__support_request_record_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.it_security_support_agent.primitives.ingest.ingest_support_request",
+            "in": {
+              "raw_request": "__raw_support_request__",
+              "support_request_ref": "__support_request_ref__"
+            },
+            "out": "__support_request_record_ref__"
+          }
         }
       }
     },
@@ -188,20 +190,22 @@
           "command": "content.playbooks.it_security_support_agent.primitives.classify.classify_request"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.it_security_support_agent.primitives.classify.classify_request",
-          "in": {
-            "support_request_record": "__support_request_record_ref__",
-            "classification_verdict": "__classification_verdict_input__"
-          },
-          "out": "__classification_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.it_security_support_agent.primitives.classify.classify_request",
+            "in": {
+              "support_request_record": "__support_request_record_ref__",
+              "classification_verdict": "__classification_verdict_input__"
+            },
+            "out": "__classification_ref__"
+          }
         }
       }
     },
@@ -225,21 +229,23 @@
           "command": "content.playbooks.it_security_support_agent.primitives.resolution.attempt_automated_resolution"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.it_security_support_agent.primitives.resolution.attempt_automated_resolution",
-          "in": {
-            "support_request_record": "__support_request_record_ref__",
-            "classification": "__classification_ref__",
-            "observation": "__automated_resolution_observation__"
-          },
-          "out": "__automated_resolution_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.it_security_support_agent.primitives.resolution.attempt_automated_resolution",
+            "in": {
+              "support_request_record": "__support_request_record_ref__",
+              "classification": "__classification_ref__",
+              "observation": "__automated_resolution_observation__"
+            },
+            "out": "__automated_resolution_ref__"
+          }
         }
       }
     },
@@ -263,21 +269,23 @@
           "command": "content.playbooks.it_security_support_agent.primitives.handoff.escalate_with_human_handoff"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.it_security_support_agent.primitives.handoff.escalate_with_human_handoff",
-          "in": {
-            "classification": "__classification_ref__",
-            "automated_resolution": "__automated_resolution_ref__",
-            "handoff_inputs": "__handoff_inputs__"
-          },
-          "out": "__human_handoff_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.it_security_support_agent.primitives.handoff.escalate_with_human_handoff",
+            "in": {
+              "classification": "__classification_ref__",
+              "automated_resolution": "__automated_resolution_ref__",
+              "handoff_inputs": "__handoff_inputs__"
+            },
+            "out": "__human_handoff_ref__"
+          }
         }
       }
     },
@@ -311,31 +319,33 @@
           "command": "content.playbooks.it_security_support_agent.primitives.artifact.build_interaction_artifact"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.it_security_support_agent.primitives.artifact.build_interaction_artifact",
-          "in": {
-            "workflow_id": "__workflow_id__",
-            "execution_id": "__execution_id__",
-            "regulation_refs": "__regulation_refs__",
-            "control_refs": "__control_refs__",
-            "support_request_record": "__support_request_record_ref__",
-            "classification_verdict": "__classification_ref__",
-            "automated_resolution": "__automated_resolution_ref__",
-            "handoff_envelope": "__human_handoff_ref__",
-            "captured_at": "__captured_at__",
-            "source_url": "__source_url__",
-            "owner_role": "__owner_role__",
-            "owner_assigned_at": "__owner_assigned_at__",
-            "cross_border": "__cross_border__"
-          },
-          "out": "__interaction_artifact_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.it_security_support_agent.primitives.artifact.build_interaction_artifact",
+            "in": {
+              "workflow_id": "__workflow_id__",
+              "execution_id": "__execution_id__",
+              "regulation_refs": "__regulation_refs__",
+              "control_refs": "__control_refs__",
+              "support_request_record": "__support_request_record_ref__",
+              "classification_verdict": "__classification_ref__",
+              "automated_resolution": "__automated_resolution_ref__",
+              "handoff_envelope": "__human_handoff_ref__",
+              "captured_at": "__captured_at__",
+              "source_url": "__source_url__",
+              "owner_role": "__owner_role__",
+              "owner_assigned_at": "__owner_assigned_at__",
+              "cross_border": "__cross_border__"
+            },
+            "out": "__interaction_artifact_ref__"
+          }
         }
       }
     },
@@ -344,26 +354,38 @@
       "name": "it-security-support-agent-end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.it_security_support_agent@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "control_refs": [
-      "control.incident_handling_capability@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.api_activity@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification",
-      "NIS2 Directive (EU) 2022/2555 — Article 21(2)(b)",
-      "SecOps-NG incidents evidence stream — schemas/evidence/incidents.schema.json",
-      "Community input — support-agent intake/triage/handoff workflow"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.it_security_support_agent@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "control_refs": [
+        "control.incident_handling_capability@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.api_activity@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification",
+        "NIS2 Directive (EU) 2022/2555 — Article 21(2)(b)",
+        "SecOps-NG incidents evidence stream — schemas/evidence/incidents.schema.json",
+        "Community input — support-agent intake/triage/handoff workflow"
+      ]
+    }
   }
 }

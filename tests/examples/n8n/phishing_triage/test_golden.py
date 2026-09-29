@@ -23,6 +23,7 @@ from pathlib import Path
 
 from compilers._shared.cacao_parser import parse_file
 from compilers.n8n.emit import emit
+from compilers._shared.cacao_parser import secops_extension
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 SOURCE = REPO_ROOT / "content" / "playbooks" / "phishing_triage" / "playbook.cacao.json"
@@ -176,15 +177,15 @@ def test_core_body_steps_emit_code_nodes() -> None:
     raw = json.loads(SOURCE.read_text(encoding="utf-8"))
     nodes_by_id = _nodes_by_id()
     bound = {sid: s for sid, s in raw["workflow"].items()
-             if (s.get("x_secops_ng") or {}).get("core_body")}
+             if (secops_extension(s) or {}).get("core_body")}
     assert len(bound) == 9, f"expected all nine action steps bound, found {len(bound)}"
     for step_id, step in bound.items():
         node = nodes_by_id[step_id]
         assert node["type"] == "n8n-nodes-base.code", f"{step_id}: {node['type']}"
         body = node["parameters"].get("pythonCode", "")
-        module, _, fn = step["x_secops_ng"]["core_body"]["primitive"].rpartition(".")
+        module, _, fn = secops_extension(step)["core_body"]["primitive"].rpartition(".")
         assert f"from {module} import {fn}" in body, f"{step_id}: primitive not imported"
-        assert f"{step['x_secops_ng']['core_body']['out']} = {fn}(" in body, f"{step_id}: call not bound"
+        assert f"{secops_extension(step)['core_body']['out']} = {fn}(" in body, f"{step_id}: call not bound"
 
 
 def test_action_without_commands_steps_emit_set_nodes() -> None:
@@ -226,7 +227,7 @@ def test_set_nodes_surface_x_secops_ng_refs() -> None:
     """Every `x_secops_ng.<key>` bundle on the CACAO step appears as a Set row."""
     nodes_by_id = _nodes_by_id()
     for step_id, step in _action_without_commands_steps().items():
-        x = step.get("x_secops_ng") or {}
+        x = secops_extension(step) or {}
         if not x:
             continue
         node = nodes_by_id[step_id]

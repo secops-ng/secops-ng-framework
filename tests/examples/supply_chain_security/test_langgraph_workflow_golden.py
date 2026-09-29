@@ -28,6 +28,7 @@ from pathlib import Path
 from compilers._shared.cacao_parser import parse_file
 from compilers.langgraph.emit import emit
 from compilers.langgraph.state import render_module
+from compilers._shared.cacao_parser import secops_extension
 
 REPO = Path(__file__).resolve().parents[3]
 EXAMPLE = REPO / "examples" / "langgraph" / "supply_chain_security"
@@ -186,7 +187,7 @@ def test_canonical_declares_langgraph_compile_target() -> None:
     ``langgraph`` one and closes G-03 three-target parity.
     """
     playbook = json.loads(SOURCE.read_text(encoding="utf-8"))
-    targets = playbook["x_secops_ng"]["compile_targets"]
+    targets = secops_extension(playbook)["compile_targets"]
     assert "langgraph" in targets, (
         "compile_targets on the canonical supply_chain_security "
         "playbook must include 'langgraph' once the CORE-FANOUT-"

@@ -136,24 +136,26 @@
           "command": "Hydrate the originating identity-protection signal with principal context (role, group memberships, recent sign-ins, conditional-access posture). Decide whether the signal warrants containment or is a known benign pattern (planned travel, sanctioned automation)."
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1",
-          "control.incident_timeline_signals@v1",
-          "control.mfa_state_probe@v1"
-        ],
-        "detection_refs": [
-          "detection.sigma.azure_identity_protection_impossible_travel@v1",
-          "detection.sigma.azure_identity_protection_password_spray@v1",
-          "detection.sigma.azure_ad_suspicious_signin_bypassing_mfa@v1",
-          "detection.sigma.microsoft365_impossible_travel_activity@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.authentication@v1"
-        ],
-        "metric_refs": [
-          "kpi.mttd_identity_compromise@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1",
+            "control.incident_timeline_signals@v1",
+            "control.mfa_state_probe@v1"
+          ],
+          "detection_refs": [
+            "detection.sigma.azure_identity_protection_impossible_travel@v1",
+            "detection.sigma.azure_identity_protection_password_spray@v1",
+            "detection.sigma.azure_ad_suspicious_signin_bypassing_mfa@v1",
+            "detection.sigma.microsoft365_impossible_travel_activity@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.authentication@v1"
+          ],
+          "metric_refs": [
+            "kpi.mttd_identity_compromise@v1"
+          ]
+        }
       }
     },
     "if-condition--30000000-0000-4000-8000-000000000003": {
@@ -179,14 +181,16 @@
           "command": "Force re-enrollment of MFA factors for the principal: revoke existing TOTP / WebAuthn registrations, invalidate app passwords, and require step-up at next sign-in. Document factor list pre / post reset."
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1",
-          "control.mfa_state_probe@v1"
-        ],
-        "metric_refs": [
-          "kpi.mttc_identity_compromise@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1",
+            "control.mfa_state_probe@v1"
+          ],
+          "metric_refs": [
+            "kpi.mttc_identity_compromise@v1"
+          ]
+        }
       }
     },
     "action--30000000-0000-4000-8000-000000000005": {
@@ -207,17 +211,19 @@
           "command": "Revoke all live sessions, refresh tokens, and persistent device grants for the principal across the IdP and downstream SaaS tenants. Produces __sessions_revoked_count__ for the containment KPI."
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1",
-          "control.incident_timeline_signals@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.authentication@v1"
-        ],
-        "metric_refs": [
-          "kpi.mttc_identity_compromise@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1",
+            "control.incident_timeline_signals@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.authentication@v1"
+          ],
+          "metric_refs": [
+            "kpi.mttc_identity_compromise@v1"
+          ]
+        }
       }
     },
     "action--30000000-0000-4000-8000-000000000006": {
@@ -238,21 +244,23 @@
           "command": "Hunt for downstream activity attributable to the compromised principal within the configured lookback window: STS / AssumeRole chains, cross-tenant access, API-token reuse, OAuth-grant escalation, host logons. Produces __lateral_findings_count__."
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1",
-          "control.incident_timeline_signals@v1"
-        ],
-        "detection_refs": [
-          "detection.sigma.aws_sts_assumerole_misuse@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.authentication@v1",
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kpi.lateral_hunt_coverage@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1",
+            "control.incident_timeline_signals@v1"
+          ],
+          "detection_refs": [
+            "detection.sigma.aws_sts_assumerole_misuse@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.authentication@v1",
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kpi.lateral_hunt_coverage@v1"
+          ]
+        }
       }
     },
     "action--30000000-0000-4000-8000-000000000007": {
@@ -270,18 +278,20 @@
           "command": "Audit the principal's IAM surface for residual persistence: rogue OAuth consents, third-party app grants, conditional-access exceptions, inbox rules, new device registrations, and standing-privilege role assignments. Remove anything the principal could not authorise legitimately during the compromise window."
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.privileged_access_review@v1",
-          "control.jml_evidence@v1",
-          "control.cloud_identity_least_privilege@v1"
-        ],
-        "detection_refs": [
-          "detection.sigma.azure_mfa_disabled@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.account_change@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.privileged_access_review@v1",
+            "control.jml_evidence@v1",
+            "control.cloud_identity_least_privilege@v1"
+          ],
+          "detection_refs": [
+            "detection.sigma.azure_mfa_disabled@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.account_change@v1"
+          ]
+        }
       }
     },
     "end--30000000-0000-4000-8000-000000000008": {
@@ -293,42 +303,54 @@
       "name": "identity_compromise_false_positive_end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.identity_compromise@v1",
-    "content_version": "0.1.0",
-    "maturity": "draft",
-    "compile_targets": ["n8n", "temporal", "langgraph"],
-    "detection_refs": [
-      "detection.sigma.azure_identity_protection_impossible_travel@v1",
-      "detection.sigma.azure_identity_protection_password_spray@v1",
-      "detection.sigma.azure_ad_suspicious_signin_bypassing_mfa@v1",
-      "detection.sigma.microsoft365_impossible_travel_activity@v1",
-      "detection.sigma.aws_sts_assumerole_misuse@v1",
-      "detection.sigma.azure_mfa_disabled@v1"
-    ],
-    "control_refs": [
-      "control.incident_handling_capability@v1",
-      "control.incident_timeline_signals@v1",
-      "control.mfa_state_probe@v1",
-      "control.privileged_access_review@v1",
-      "control.jml_evidence@v1",
-      "control.cloud_identity_least_privilege@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.account_change@v1",
-      "telemetry.ocsf.api_activity@v1",
-      "telemetry.ocsf.authentication@v1"
-    ],
-    "metric_refs": [
-      "kpi.mttd_identity_compromise@v1",
-      "kpi.mttc_identity_compromise@v1",
-      "kpi.lateral_hunt_coverage@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification",
-      "SigmaHQ — upstream identity-protection rules (referenced, not re-authored)",
-      "MITRE ATT&CK — Credential Access (TA0006), Lateral Movement (TA0008)",
-      "ENISA threat landscape — identity and access management"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.identity_compromise@v1",
+      "content_version": "0.1.0",
+      "maturity": "draft",
+      "compile_targets": ["n8n", "temporal", "langgraph"],
+      "detection_refs": [
+        "detection.sigma.azure_identity_protection_impossible_travel@v1",
+        "detection.sigma.azure_identity_protection_password_spray@v1",
+        "detection.sigma.azure_ad_suspicious_signin_bypassing_mfa@v1",
+        "detection.sigma.microsoft365_impossible_travel_activity@v1",
+        "detection.sigma.aws_sts_assumerole_misuse@v1",
+        "detection.sigma.azure_mfa_disabled@v1"
+      ],
+      "control_refs": [
+        "control.incident_handling_capability@v1",
+        "control.incident_timeline_signals@v1",
+        "control.mfa_state_probe@v1",
+        "control.privileged_access_review@v1",
+        "control.jml_evidence@v1",
+        "control.cloud_identity_least_privilege@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.account_change@v1",
+        "telemetry.ocsf.api_activity@v1",
+        "telemetry.ocsf.authentication@v1"
+      ],
+      "metric_refs": [
+        "kpi.mttd_identity_compromise@v1",
+        "kpi.mttc_identity_compromise@v1",
+        "kpi.lateral_hunt_coverage@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification",
+        "SigmaHQ — upstream identity-protection rules (referenced, not re-authored)",
+        "MITRE ATT&CK — Credential Access (TA0006), Lateral Movement (TA0008)",
+        "ENISA threat landscape — identity and access management"
+      ]
+    }
   }
 }

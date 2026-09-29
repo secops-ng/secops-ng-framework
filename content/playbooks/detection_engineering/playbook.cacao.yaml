@@ -141,9 +141,10 @@ workflow:
     commands:
       - type: manual
         command: "Intake the candidate rule version, its rationale, and the ATT&CK / detection-class bindings the proposer asserts. Operator wires the proposal-envelope handler in n8n; the CACAO I/O contract carries the inputs and the variable the next step reads."
-    x_secops_ng:
-      control_refs:
-        - "control.control_effectiveness_test@v1"
+    step_extensions:
+      extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+        control_refs:
+          - "control.control_effectiveness_test@v1"
 
   "action--f0e4f404-0000-4000-8000-000000000003":
     type: action
@@ -164,9 +165,10 @@ workflow:
     commands:
       - type: manual
         command: "Peer-review the candidate rule against the operator's review checklist. Produces ``__review_verdict__``. Transitions are unconditional in this artifact; the follow-up sibling inserts a switch-condition keyed on the verdict with three branches (approved -> ship, changes_requested -> propose, rejected -> end)."
-    x_secops_ng:
-      control_refs:
-        - "control.control_effectiveness_test@v1"
+    step_extensions:
+      extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+        control_refs:
+          - "control.control_effectiveness_test@v1"
 
   "action--f0e4f404-0000-4000-8000-000000000004":
     type: action
@@ -188,9 +190,10 @@ workflow:
     commands:
       - type: manual
         command: "Promote the approved rule version to production status in the operator's detection store. Operator-side destination is resolved at the compile target's config layer (sovereign-stack constraint — the framework ships no default detection store). Sets ``__ship_status__``."
-    x_secops_ng:
-      control_refs:
-        - "control.control_effectiveness_test@v1"
+    step_extensions:
+      extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+        control_refs:
+          - "control.control_effectiveness_test@v1"
 
   "action--f0e4f404-0000-4000-8000-000000000005":
     type: action
@@ -217,15 +220,16 @@ workflow:
     commands:
       - type: manual
         command: "Emit a per-rule-version effectiveness-metric snapshot shaped per ``schemas/evidence/rule-effectiveness-snapshot.schema.json``. The snapshot pins the indicator value to the exact (``__rule_id__``, ``__rule_version__``) the lifecycle is operating on and carries pointers to the OCSF source-data shape and the reference visualisation hint the F-CP-06 effectiveness stream consumes. Metric storage is operator-configured; the n8n adapter at ``compilers/n8n/evidence/rule_effectiveness_node.py`` writes the snapshot to a directory the operator's chosen sink ingests from."
-    x_secops_ng:
-      control_refs:
-        - "control.control_effectiveness_test@v1"
-      telemetry_refs:
-        - "telemetry.ocsf.detection_finding@v1"
-      metric_refs:
-        - "kpi.detection_coverage@v1"
-        - "kpi.false_positive_rate@v1"
-        - "kri.control_effectiveness@v1"
+    step_extensions:
+      extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+        control_refs:
+          - "control.control_effectiveness_test@v1"
+        telemetry_refs:
+          - "telemetry.ocsf.detection_finding@v1"
+        metric_refs:
+          - "kpi.detection_coverage@v1"
+          - "kpi.false_positive_rate@v1"
+          - "kri.control_effectiveness@v1"
 
   "end--f0e4f404-0000-4000-8000-000000000006":
     type: end
@@ -234,21 +238,30 @@ workflow:
 # Playbook-level SecOps-NG content-model extensions. The pending
 # sibling cards covering gating predicates, byte-parity goldens, and
 # the cookbook walkthrough are tracked in ROADMAP.md § F-WF-04.
-x_secops_ng:
-  stable_id: "playbook.detection_engineering@v1"
-  content_version: "0.1.0"
-  maturity: experimental
-  compile_targets:
-    - n8n
-  control_refs:
-    - "control.control_effectiveness_test@v1"
-  telemetry_refs:
-    - "telemetry.ocsf.detection_finding@v1"
-  metric_refs:
-    - "kpi.detection_coverage@v1"
-    - "kpi.false_positive_rate@v1"
-    - "kri.control_effectiveness@v1"
-  sources:
-    - "NIS2 Directive (EU) 2022/2555, Article 21(2)(f) — effectiveness assessment of cybersecurity risk-management measures."
-    - "OASIS CACAO v2.0 — workflow step types, variable conventions, x_ extension namespace."
-    - "OCSF v1.3.0 Detection Finding (class_uid 2004) — the canonical OCSF event class the rule lifecycle's measure state binds against."
+extension_definitions:
+  extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+    type: "extension-definition"
+    name: "SecOps-NG content model"
+    description: "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level."
+    created_by: "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c"
+    schema: "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json"
+    version: "1.0.0"
+playbook_extensions:
+  extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+    stable_id: "playbook.detection_engineering@v1"
+    content_version: "0.1.0"
+    maturity: experimental
+    compile_targets:
+      - n8n
+    control_refs:
+      - "control.control_effectiveness_test@v1"
+    telemetry_refs:
+      - "telemetry.ocsf.detection_finding@v1"
+    metric_refs:
+      - "kpi.detection_coverage@v1"
+      - "kpi.false_positive_rate@v1"
+      - "kri.control_effectiveness@v1"
+    sources:
+      - "NIS2 Directive (EU) 2022/2555, Article 21(2)(f) — effectiveness assessment of cybersecurity risk-management measures."
+      - "OASIS CACAO v2.0 — workflow step types, variable conventions, x_ extension namespace."
+      - "OCSF v1.3.0 Detection Finding (class_uid 2004) — the canonical OCSF event class the rule lifecycle's measure state binds against."

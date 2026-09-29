@@ -141,23 +141,25 @@
           "command": "content.playbooks.eu_ai_act_risk_management.primitives.classification.classify_high_risk_system"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.risk_management_strategy@v1"
-        ],
-        "telemetry_refs": [],
-        "metric_refs": [],
-        "core_body": {
-          "primitive": "content.playbooks.eu_ai_act_risk_management.primitives.classification.classify_high_risk_system",
-          "in": {
-            "ai_system_id": "__ai_system_id__",
-            "classification_basis": "__classification_basis__",
-            "annex_iii_area": "__annex_iii_area__",
-            "union_harmonisation_ref": "__union_harmonisation_ref__",
-            "derogation_ground": "__derogation_ground__",
-            "derogation_assessment_ref": "__derogation_assessment_ref__"
-          },
-          "out": "__annex_iii_use_case__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.risk_management_strategy@v1"
+          ],
+          "telemetry_refs": [],
+          "metric_refs": [],
+          "core_body": {
+            "primitive": "content.playbooks.eu_ai_act_risk_management.primitives.classification.classify_high_risk_system",
+            "in": {
+              "ai_system_id": "__ai_system_id__",
+              "classification_basis": "__classification_basis__",
+              "annex_iii_area": "__annex_iii_area__",
+              "union_harmonisation_ref": "__union_harmonisation_ref__",
+              "derogation_ground": "__derogation_ground__",
+              "derogation_assessment_ref": "__derogation_assessment_ref__"
+            },
+            "out": "__annex_iii_use_case__"
+          }
         }
       }
     },
@@ -182,26 +184,28 @@
           "command": "content.playbooks.eu_ai_act_risk_management.primitives.assessment.assess_art9_risks"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.risk_assessment@v1",
-          "control.risk_management_strategy@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ],
-        "metric_refs": [
-          "kri.residual_risk_threshold_breach_count@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.eu_ai_act_risk_management.primitives.assessment.assess_art9_risks",
-          "in": {
-            "classification": "__annex_iii_use_case__",
-            "iteration_id": "__iteration_id__",
-            "identified_risks": "__identified_risks__",
-            "acceptability_thresholds": "__acceptability_thresholds__"
-          },
-          "out": "__risk_register_id__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.risk_assessment@v1",
+            "control.risk_management_strategy@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ],
+          "metric_refs": [
+            "kri.residual_risk_threshold_breach_count@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.eu_ai_act_risk_management.primitives.assessment.assess_art9_risks",
+            "in": {
+              "classification": "__annex_iii_use_case__",
+              "iteration_id": "__iteration_id__",
+              "identified_risks": "__identified_risks__",
+              "acceptability_thresholds": "__acceptability_thresholds__"
+            },
+            "out": "__risk_register_id__"
+          }
         }
       }
     },
@@ -226,25 +230,27 @@
           "command": "content.playbooks.eu_ai_act_risk_management.primitives.documentation.assemble_technical_documentation"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.system_security_privacy_plan@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ],
-        "metric_refs": [
-          "kri.transparency_doc_freshness_age@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.eu_ai_act_risk_management.primitives.documentation.assemble_technical_documentation",
-          "in": {
-            "risk_register": "__risk_register_id__",
-            "annex_iv_sections": "__annex_iv_sections__",
-            "technical_doc_committed_at": "__technical_doc_committed_at__",
-            "instructions_committed_at": "__instructions_committed_at__"
-          },
-          "out": "__technical_documentation_id__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.system_security_privacy_plan@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ],
+          "metric_refs": [
+            "kri.transparency_doc_freshness_age@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.eu_ai_act_risk_management.primitives.documentation.assemble_technical_documentation",
+            "in": {
+              "risk_register": "__risk_register_id__",
+              "annex_iv_sections": "__annex_iv_sections__",
+              "technical_doc_committed_at": "__technical_doc_committed_at__",
+              "instructions_committed_at": "__instructions_committed_at__"
+            },
+            "out": "__technical_documentation_id__"
+          }
         }
       }
     },
@@ -263,23 +269,25 @@
           "command": "content.playbooks.eu_ai_act_risk_management.primitives.post_market.record_post_market_signal"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.risk_assessment@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.detection_finding@v1"
-        ],
-        "metric_refs": [
-          "kri.residual_risk_threshold_breach_count@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.eu_ai_act_risk_management.primitives.post_market.record_post_market_signal",
-          "in": {
-            "risk_register": "__risk_register_id__",
-            "observation": "__post_market_observation__"
-          },
-          "out": "__post_market_signal__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.risk_assessment@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.detection_finding@v1"
+          ],
+          "metric_refs": [
+            "kri.residual_risk_threshold_breach_count@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.eu_ai_act_risk_management.primitives.post_market.record_post_market_signal",
+            "in": {
+              "risk_register": "__risk_register_id__",
+              "observation": "__post_market_observation__"
+            },
+            "out": "__post_market_signal__"
+          }
         }
       },
       "in_args": [
@@ -292,39 +300,51 @@
       "name": "eu-ai-act-rm-end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.eu_ai_act_risk_management@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "control_refs": [
-      "control.risk_management_strategy@v1",
-      "control.risk_assessment@v1",
-      "control.system_security_privacy_plan@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.compliance_finding@v1",
-      "telemetry.ocsf.detection_finding@v1"
-    ],
-    "metric_refs": [
-      "kri.residual_risk_threshold_breach_count@v1",
-      "kri.transparency_doc_freshness_age@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
-      "Regulation (EU) 2024/1689 — EU Artificial Intelligence Act, Article 6 — classification rules for high-risk AI systems",
-      "Regulation (EU) 2024/1689 — EU Artificial Intelligence Act, Article 9 — risk-management system for high-risk AI systems",
-      "Regulation (EU) 2024/1689 — EU Artificial Intelligence Act, Article 11 read with Annex IV — technical documentation",
-      "Regulation (EU) 2024/1689 — EU Artificial Intelligence Act, Article 13 — transparency and provision of information to deployers",
-      "Regulation (EU) 2024/1689 — EU Artificial Intelligence Act, Article 72 — post-market monitoring by providers",
-      "Regulation (EU) 2024/1689 — EU Artificial Intelligence Act, Annex III — high-risk AI systems referred to in Article 6(2)",
-      "NIST SP 800-53 Rev. 5 — RA-3 (Risk Assessment), PM-9 (Risk Management Strategy), PL-2 (System Security and Privacy Plans) control axes",
-      "MITRE D3FEND v1.0.0 — D3-OAM (Operational Activity Mapping) defensive technique",
-      "NIS2 Directive (EU) 2022/2555, Article 21(2)(a) — policies on risk analysis and information system security"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.eu_ai_act_risk_management@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "control_refs": [
+        "control.risk_management_strategy@v1",
+        "control.risk_assessment@v1",
+        "control.system_security_privacy_plan@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.compliance_finding@v1",
+        "telemetry.ocsf.detection_finding@v1"
+      ],
+      "metric_refs": [
+        "kri.residual_risk_threshold_breach_count@v1",
+        "kri.transparency_doc_freshness_age@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
+        "Regulation (EU) 2024/1689 — EU Artificial Intelligence Act, Article 6 — classification rules for high-risk AI systems",
+        "Regulation (EU) 2024/1689 — EU Artificial Intelligence Act, Article 9 — risk-management system for high-risk AI systems",
+        "Regulation (EU) 2024/1689 — EU Artificial Intelligence Act, Article 11 read with Annex IV — technical documentation",
+        "Regulation (EU) 2024/1689 — EU Artificial Intelligence Act, Article 13 — transparency and provision of information to deployers",
+        "Regulation (EU) 2024/1689 — EU Artificial Intelligence Act, Article 72 — post-market monitoring by providers",
+        "Regulation (EU) 2024/1689 — EU Artificial Intelligence Act, Annex III — high-risk AI systems referred to in Article 6(2)",
+        "NIST SP 800-53 Rev. 5 — RA-3 (Risk Assessment), PM-9 (Risk Management Strategy), PL-2 (System Security and Privacy Plans) control axes",
+        "MITRE D3FEND v1.0.0 — D3-OAM (Operational Activity Mapping) defensive technique",
+        "NIS2 Directive (EU) 2022/2555, Article 21(2)(a) — policies on risk analysis and information system security"
+      ]
+    }
   }
 }

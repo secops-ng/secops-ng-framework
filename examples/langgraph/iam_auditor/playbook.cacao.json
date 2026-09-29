@@ -123,23 +123,25 @@
           "command": "content.playbooks.iam_auditor.primitives.identity.resolve_caller_identity"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.jml_evidence@v1",
-          "control.privileged_access_review@v1",
-          "control.cloud_identity_least_privilege@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.authentication@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.iam_auditor.primitives.identity.resolve_caller_identity",
-          "in": {
-            "principal_type": "__principal_type__",
-            "principal_id": "__principal_id__",
-            "identity_provider": "__identity_provider__"
-          },
-          "out": "__caller_identity_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.jml_evidence@v1",
+            "control.privileged_access_review@v1",
+            "control.cloud_identity_least_privilege@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.authentication@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.iam_auditor.primitives.identity.resolve_caller_identity",
+            "in": {
+              "principal_type": "__principal_type__",
+              "principal_id": "__principal_id__",
+              "identity_provider": "__identity_provider__"
+            },
+            "out": "__caller_identity_ref__"
+          }
         }
       }
     },
@@ -161,22 +163,24 @@
           "command": "content.playbooks.iam_auditor.primitives.capabilities.build_capability_list"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.privileged_access_review@v1",
-          "control.cloud_identity_least_privilege@v1",
-          "control.asset_inventory_delta@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.account_change@v1",
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.iam_auditor.primitives.capabilities.build_capability_list",
-          "in": {
-            "capabilities": "__capabilities_raw__"
-          },
-          "out": "__capabilities_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.privileged_access_review@v1",
+            "control.cloud_identity_least_privilege@v1",
+            "control.asset_inventory_delta@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.account_change@v1",
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.iam_auditor.primitives.capabilities.build_capability_list",
+            "in": {
+              "capabilities": "__capabilities_raw__"
+            },
+            "out": "__capabilities_ref__"
+          }
         }
       }
     },
@@ -206,33 +210,35 @@
           "command": "content.playbooks.iam_auditor.primitives.artifact.build_access_artifact"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.jml_evidence@v1",
-          "control.privileged_access_review@v1",
-          "control.asset_inventory_delta@v1",
-          "control.cloud_identity_least_privilege@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.account_change@v1"
-        ],
-        "metric_refs": [
-          "kpi.cloud_posture_coverage@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.iam_auditor.primitives.artifact.build_access_artifact",
-          "in": {
-            "workflow_id": "__workflow_id__",
-            "execution_id": "__execution_id__",
-            "compile_target": "__compile_target__",
-            "regulation_refs": "__regulation_refs__",
-            "control_refs": "__control_refs__",
-            "caller_identity": "__caller_identity_ref__",
-            "capabilities": "__capabilities_ref__",
-            "captured_at": "__captured_at__",
-            "source_url": "__source_url__"
-          },
-          "out": "__access_artifact_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.jml_evidence@v1",
+            "control.privileged_access_review@v1",
+            "control.asset_inventory_delta@v1",
+            "control.cloud_identity_least_privilege@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.account_change@v1"
+          ],
+          "metric_refs": [
+            "kpi.cloud_posture_coverage@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.iam_auditor.primitives.artifact.build_access_artifact",
+            "in": {
+              "workflow_id": "__workflow_id__",
+              "execution_id": "__execution_id__",
+              "compile_target": "__compile_target__",
+              "regulation_refs": "__regulation_refs__",
+              "control_refs": "__control_refs__",
+              "caller_identity": "__caller_identity_ref__",
+              "capabilities": "__capabilities_ref__",
+              "captured_at": "__captured_at__",
+              "source_url": "__source_url__"
+            },
+            "out": "__access_artifact_ref__"
+          }
         }
       }
     },
@@ -241,33 +247,45 @@
       "name": "iam_auditor_end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.iam_auditor@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "control_refs": [
-      "control.jml_evidence@v1",
-      "control.privileged_access_review@v1",
-      "control.asset_inventory_delta@v1",
-      "control.cloud_identity_least_privilege@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.account_change@v1",
-      "telemetry.ocsf.api_activity@v1",
-      "telemetry.ocsf.authentication@v1"
-    ],
-    "metric_refs": [
-      "kpi.cloud_posture_coverage@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification",
-      "NIS2 Directive (EU) 2022/2555 — Article 21(2)(i)",
-      "SecOps-NG access evidence stream — schemas/evidence/access.schema.json"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.iam_auditor@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "control_refs": [
+        "control.jml_evidence@v1",
+        "control.privileged_access_review@v1",
+        "control.asset_inventory_delta@v1",
+        "control.cloud_identity_least_privilege@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.account_change@v1",
+        "telemetry.ocsf.api_activity@v1",
+        "telemetry.ocsf.authentication@v1"
+      ],
+      "metric_refs": [
+        "kpi.cloud_posture_coverage@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification",
+        "NIS2 Directive (EU) 2022/2555 — Article 21(2)(i)",
+        "SecOps-NG access evidence stream — schemas/evidence/access.schema.json"
+      ]
+    }
   }
 }

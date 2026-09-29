@@ -8,6 +8,16 @@
   "created": "2026-07-10T00:00:00Z",
   "created_by": "identity--5a509a09-5a50-45a5-85a5-095a509a509a",
   "description": "CACAO v2 playbook operationalising the per-window reconciliation of a declared segmentation policy against the observed network-boundary state on the operator's own deployed estate. Anchored to NIS2 Article 21(2)(e) (security in network and information systems) and to DORA Article 9 read against the JC RTS on ICT risk management framework (Commission Delegated Regulation (EU) 2024/1774) network- security articles. The lifecycle enumerates documented network segments from the operator's declarative network-inventory sources, evaluates the segmentation-policy allowances against the observed per-segment reachability posture, detects policy violations (undocumented cross-segment reachability, unauthorised egress paths, boundary-control drift against the declared zone-transit matrix), engages the operator's pre-bound remediation surface against each violation, and generates a dated network-security- posture evidence artifact for the reconciliation window. The playbook does not author the operator's segmentation policy or the segmentation architecture itself; it operationalises a documented reconciliation posture against pre-bound segmentation sources and pre-bound remediation surfaces. Distinct from playbook.infra_posture_management@v1 which is the broader infrastructure-posture (host, workload, IAM) reconciliation engine; this playbook is the network-boundary limb only.",
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "name": "SecOps-NG content model",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "type": "extension-definition",
+      "version": "1.0.0"
+    }
+  },
   "external_references": [
     {
       "description": "Workflow step types (start, action, end), variable conventions, x_ extension namespace.",
@@ -48,6 +58,32 @@
   ],
   "modified": "2026-07-10T00:00:00Z",
   "name": "Network security and segmentation posture",
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "content_version": "0.2.0",
+      "control_refs": [
+        "control.network_boundary_protection@v1"
+      ],
+      "maturity": "experimental",
+      "sources": [
+        "OASIS CACAO v2.0 specification \u2014 workflow step types (start, action, end), variable conventions, x_ extension namespace",
+        "NIS2 Directive (EU) 2022/2555 \u2014 Article 21(2)(e) security in network and information systems",
+        "DORA Regulation (EU) 2022/2554 \u2014 Article 9 protection and prevention, ICT network controls",
+        "Commission Delegated Regulation (EU) 2024/1774 \u2014 JC RTS on ICT risk management framework, network-security articles",
+        "OCSF v1.3.0 \u2014 Network Activity (class_uid 4001) event class emitted at reconciliation-window closure",
+        "D3FEND \u2014 D3-NTA (network traffic analysis) technique binding on the violation-detection step"
+      ],
+      "stable_id": "playbook.network_security@v1",
+      "telemetry_refs": [
+        "telemetry.ocsf.network_activity@v1"
+      ]
+    }
+  },
   "playbook_types": [
     "investigation",
     "remediation"
@@ -106,15 +142,17 @@
       "out_args": [
         "__segment_inventory_id__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.network_boundary_protection@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.network_activity@v1"
-        ]
-      }
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.network_boundary_protection@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.network_activity@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--7e750001-0000-4000-8000-000000000003": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -135,15 +173,17 @@
       "out_args": [
         "__policy_snapshot_id__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.network_boundary_protection@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.network_activity@v1"
-        ]
-      }
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.network_boundary_protection@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.network_activity@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--7e750001-0000-4000-8000-000000000004": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -164,15 +204,17 @@
       "out_args": [
         "__violation_set_id__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.network_boundary_protection@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.network_activity@v1"
-        ]
-      }
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.network_boundary_protection@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.network_activity@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--7e750001-0000-4000-8000-000000000005": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -192,15 +234,17 @@
       "out_args": [
         "__remediation_action_id__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.network_boundary_protection@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.network_activity@v1"
-        ]
-      }
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.network_boundary_protection@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.network_activity@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--7e750001-0000-4000-8000-000000000006": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -224,15 +268,17 @@
       "out_args": [
         "__posture_evidence_id__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.network_boundary_protection@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.network_activity@v1"
-        ]
-      }
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.network_boundary_protection@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.network_activity@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "end--7e750001-0000-4000-8000-000000000007": {
       "name": "netsec_posture_end",
@@ -244,29 +290,5 @@
       "type": "start"
     }
   },
-  "workflow_start": "start--7e750001-0000-4000-8000-000000000001",
-  "x_secops_ng": {
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "content_version": "0.2.0",
-    "control_refs": [
-      "control.network_boundary_protection@v1"
-    ],
-    "maturity": "experimental",
-    "sources": [
-      "OASIS CACAO v2.0 specification \u2014 workflow step types (start, action, end), variable conventions, x_ extension namespace",
-      "NIS2 Directive (EU) 2022/2555 \u2014 Article 21(2)(e) security in network and information systems",
-      "DORA Regulation (EU) 2022/2554 \u2014 Article 9 protection and prevention, ICT network controls",
-      "Commission Delegated Regulation (EU) 2024/1774 \u2014 JC RTS on ICT risk management framework, network-security articles",
-      "OCSF v1.3.0 \u2014 Network Activity (class_uid 4001) event class emitted at reconciliation-window closure",
-      "D3FEND \u2014 D3-NTA (network traffic analysis) technique binding on the violation-detection step"
-    ],
-    "stable_id": "playbook.network_security@v1",
-    "telemetry_refs": [
-      "telemetry.ocsf.network_activity@v1"
-    ]
-  }
+  "workflow_start": "start--7e750001-0000-4000-8000-000000000001"
 }

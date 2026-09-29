@@ -194,20 +194,22 @@
           "command": "content.playbooks.cryptographic_controls.primitives.policy.resolve_policy_inventory"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.crypto_policy_inventory@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.cryptographic_controls.primitives.policy.resolve_policy_inventory",
-          "in": {
-            "crypto_scope": "__crypto_scope__",
-            "declared_policy": "__declared_policy__"
-          },
-          "out": "__policy_inventory__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.crypto_policy_inventory@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.cryptographic_controls.primitives.policy.resolve_policy_inventory",
+            "in": {
+              "crypto_scope": "__crypto_scope__",
+              "declared_policy": "__declared_policy__"
+            },
+            "out": "__policy_inventory__"
+          }
         }
       }
     },
@@ -247,21 +249,23 @@
           "command": "content.playbooks.cryptographic_controls.primitives.keys.record_key_lifecycle"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.key_lifecycle_management@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.cryptographic_controls.primitives.keys.record_key_lifecycle",
-          "in": {
-            "lifecycle_event": "__lifecycle_event__",
-            "key_record": "__key_record__",
-            "policy_inventory": "__policy_inventory__"
-          },
-          "out": "__key_lifecycle_result__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.key_lifecycle_management@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.cryptographic_controls.primitives.keys.record_key_lifecycle",
+            "in": {
+              "lifecycle_event": "__lifecycle_event__",
+              "key_record": "__key_record__",
+              "policy_inventory": "__policy_inventory__"
+            },
+            "out": "__key_lifecycle_result__"
+          }
         }
       }
     },
@@ -289,23 +293,25 @@
           "command": "content.playbooks.cryptographic_controls.primitives.enforcement.decide_enforcement_gate"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.encryption_enforcement_gate@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.cryptographic_controls.primitives.enforcement.decide_enforcement_gate",
-          "in": {
-            "workload_ref": "__workload_ref__",
-            "observed_at": "__observed_at__",
-            "at_rest": "__at_rest_condition__",
-            "in_transit": "__in_transit_condition__",
-            "policy_inventory": "__policy_inventory__"
-          },
-          "out": "__enforcement_result__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.encryption_enforcement_gate@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.cryptographic_controls.primitives.enforcement.decide_enforcement_gate",
+            "in": {
+              "workload_ref": "__workload_ref__",
+              "observed_at": "__observed_at__",
+              "at_rest": "__at_rest_condition__",
+              "in_transit": "__in_transit_condition__",
+              "policy_inventory": "__policy_inventory__"
+            },
+            "out": "__enforcement_result__"
+          }
         }
       }
     },
@@ -330,21 +336,23 @@
           "command": "content.playbooks.cryptographic_controls.primitives.certificates.record_certificate_lifecycle"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.certificate_lifecycle_management@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.cryptographic_controls.primitives.certificates.record_certificate_lifecycle",
-          "in": {
-            "lifecycle_event": "__lifecycle_event__",
-            "certificate_record": "__certificate_record__",
-            "policy_inventory": "__policy_inventory__"
-          },
-          "out": "__cert_lifecycle_result__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.certificate_lifecycle_management@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.cryptographic_controls.primitives.certificates.record_certificate_lifecycle",
+            "in": {
+              "lifecycle_event": "__lifecycle_event__",
+              "certificate_record": "__certificate_record__",
+              "policy_inventory": "__policy_inventory__"
+            },
+            "out": "__cert_lifecycle_result__"
+          }
         }
       }
     },
@@ -372,27 +380,29 @@
           "command": "content.playbooks.cryptographic_controls.primitives.attestation.compose_lifecycle_attestation"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.crypto_policy_inventory@v1",
-          "control.key_lifecycle_management@v1",
-          "control.certificate_lifecycle_management@v1",
-          "control.encryption_enforcement_gate@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.cryptographic_controls.primitives.attestation.compose_lifecycle_attestation",
-          "in": {
-            "lifecycle_event": "__lifecycle_event__",
-            "event_ts": "__event_ts__",
-            "policy_inventory": "__policy_inventory__",
-            "key_lifecycle_record": "__key_lifecycle_result__",
-            "cert_lifecycle_record": "__cert_lifecycle_result__",
-            "enforcement_decision": "__enforcement_result__"
-          },
-          "out": "__lifecycle_attestation__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.crypto_policy_inventory@v1",
+            "control.key_lifecycle_management@v1",
+            "control.certificate_lifecycle_management@v1",
+            "control.encryption_enforcement_gate@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.cryptographic_controls.primitives.attestation.compose_lifecycle_attestation",
+            "in": {
+              "lifecycle_event": "__lifecycle_event__",
+              "event_ts": "__event_ts__",
+              "policy_inventory": "__policy_inventory__",
+              "key_lifecycle_record": "__key_lifecycle_result__",
+              "cert_lifecycle_record": "__cert_lifecycle_result__",
+              "enforcement_decision": "__enforcement_result__"
+            },
+            "out": "__lifecycle_attestation__"
+          }
         }
       }
     },
@@ -418,21 +428,23 @@
           "command": "content.playbooks.cryptographic_controls.primitives.notify.compose_owner_notification"
         }
       ],
-      "x_secops_ng": {
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.cryptographic_controls.primitives.notify.compose_owner_notification",
-          "in": {
-            "lifecycle_attestation_id": "__lifecycle_attestation_id__",
-            "crypto_scope": "__crypto_scope__",
-            "lifecycle_event": "__lifecycle_event__",
-            "has_breach": "__lifecycle_attestation__.has_breach",
-            "has_policy_gap": "__lifecycle_attestation__.has_policy_gap",
-            "owner_channel": "__owner_channel__"
-          },
-          "out": "__owner_notification__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.cryptographic_controls.primitives.notify.compose_owner_notification",
+            "in": {
+              "lifecycle_attestation_id": "__lifecycle_attestation_id__",
+              "crypto_scope": "__crypto_scope__",
+              "lifecycle_event": "__lifecycle_event__",
+              "has_breach": "__lifecycle_attestation__.has_breach",
+              "has_policy_gap": "__lifecycle_attestation__.has_policy_gap",
+              "owner_channel": "__owner_channel__"
+            },
+            "out": "__owner_notification__"
+          }
         }
       }
     },
@@ -441,31 +453,43 @@
       "name": "cryptographic_controls_end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.cryptographic_controls@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "control_refs": [
-      "control.crypto_policy_inventory@v1",
-      "control.key_lifecycle_management@v1",
-      "control.certificate_lifecycle_management@v1",
-      "control.encryption_enforcement_gate@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.api_activity@v1"
-    ],
-    "metric_refs": [],
-    "sources": [
-      "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
-      "NIS2 Directive (EU) 2022/2555, Article 21(2)(h) — policies and procedures regarding the use of cryptography and, where appropriate, encryption",
-      "DORA — Regulation (EU) 2022/2554, Article 9 — protection and prevention (cryptography and encryption slice)",
-      "CRA — Regulation (EU) 2024/2847, Annex I §1 — essential cybersecurity requirements (confidentiality / encryption / access-control lanes)",
-      "ENISA — Algorithms, key size and parameters report; post-quantum cryptography readiness"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.cryptographic_controls@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "control_refs": [
+        "control.crypto_policy_inventory@v1",
+        "control.key_lifecycle_management@v1",
+        "control.certificate_lifecycle_management@v1",
+        "control.encryption_enforcement_gate@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.api_activity@v1"
+      ],
+      "metric_refs": [],
+      "sources": [
+        "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
+        "NIS2 Directive (EU) 2022/2555, Article 21(2)(h) — policies and procedures regarding the use of cryptography and, where appropriate, encryption",
+        "DORA — Regulation (EU) 2022/2554, Article 9 — protection and prevention (cryptography and encryption slice)",
+        "CRA — Regulation (EU) 2024/2847, Annex I §1 — essential cybersecurity requirements (confidentiality / encryption / access-control lanes)",
+        "ENISA — Algorithms, key size and parameters report; post-quantum cryptography readiness"
+      ]
+    }
   }
 }

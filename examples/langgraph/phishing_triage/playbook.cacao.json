@@ -198,21 +198,23 @@
           "command": "content.playbooks.phishing_triage.primitives.intake.validate_reported_message"
         }
       ],
-      "x_secops_ng": {
-        "telemetry_refs": [
-          "telemetry.ocsf.email_activity@v1"
-        ],
-        "control_refs": [
-          "control.training_attestation@v1",
-          "control.phishing_simulation@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.phishing_triage.primitives.intake.validate_reported_message",
-          "in": {
-            "raw_message": "__raw_message__",
-            "report_source": "__report_source__"
-          },
-          "out": "__reported_message__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "telemetry_refs": [
+            "telemetry.ocsf.email_activity@v1"
+          ],
+          "control_refs": [
+            "control.training_attestation@v1",
+            "control.phishing_simulation@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.phishing_triage.primitives.intake.validate_reported_message",
+            "in": {
+              "raw_message": "__raw_message__",
+              "report_source": "__report_source__"
+            },
+            "out": "__reported_message__"
+          }
         }
       }
     },
@@ -242,36 +244,38 @@
           "command": "content.playbooks.phishing_triage.primitives.enrichment.assess_reported_message"
         }
       ],
-      "x_secops_ng": {
-        "detection_refs": [
-          "detection.sigma.email.suspicious_sender_domain@v1",
-          "detection.sigma.email.url_shortener_in_body@v1",
-          "detection.sigma.email.attachment_double_extension@v1"
-        ],
-        "control_refs": [
-          "control.incident_handling_capability@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.email_activity@v1",
-          "telemetry.ocsf.email_url_activity@v1",
-          "telemetry.ocsf.file_activity@v1"
-        ],
-        "metric_refs": [
-          "kpi.mttd_phishing@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.phishing_triage.primitives.enrichment.assess_reported_message",
-          "in": {
-            "message": "__reported_message__",
-            "authentication": "__authentication_results__",
-            "url_verdicts": "__url_verdicts__",
-            "attachment_verdicts": "__attachment_verdicts__",
-            "known_benign_senders": "__known_benign_senders__",
-            "seen_cases": "__seen_cases__",
-            "as_of": "__assessed_at__",
-            "suppression_window_hours": "__suppression_window_hours__"
-          },
-          "out": "__message_assessment__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "detection_refs": [
+            "detection.sigma.email.suspicious_sender_domain@v1",
+            "detection.sigma.email.url_shortener_in_body@v1",
+            "detection.sigma.email.attachment_double_extension@v1"
+          ],
+          "control_refs": [
+            "control.incident_handling_capability@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.email_activity@v1",
+            "telemetry.ocsf.email_url_activity@v1",
+            "telemetry.ocsf.file_activity@v1"
+          ],
+          "metric_refs": [
+            "kpi.mttd_phishing@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.phishing_triage.primitives.enrichment.assess_reported_message",
+            "in": {
+              "message": "__reported_message__",
+              "authentication": "__authentication_results__",
+              "url_verdicts": "__url_verdicts__",
+              "attachment_verdicts": "__attachment_verdicts__",
+              "known_benign_senders": "__known_benign_senders__",
+              "seen_cases": "__seen_cases__",
+              "as_of": "__assessed_at__",
+              "suppression_window_hours": "__suppression_window_hours__"
+            },
+            "out": "__message_assessment__"
+          }
         }
       }
     },
@@ -302,20 +306,22 @@
           "command": "content.playbooks.phishing_triage.primitives.suppression.compose_suppression_record"
         }
       ],
-      "x_secops_ng": {
-        "metric_refs": [
-          "kri.phishing_suppression_rate@v1"
-        ],
-        "control_refs": [
-          "control.incident_handling_capability@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.phishing_triage.primitives.suppression.compose_suppression_record",
-          "in": {
-            "assessment": "__message_assessment__",
-            "closed_at": "__closed_at__"
-          },
-          "out": "__suppression_record__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "metric_refs": [
+            "kri.phishing_suppression_rate@v1"
+          ],
+          "control_refs": [
+            "control.incident_handling_capability@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.phishing_triage.primitives.suppression.compose_suppression_record",
+            "in": {
+              "assessment": "__message_assessment__",
+              "closed_at": "__closed_at__"
+            },
+            "out": "__suppression_record__"
+          }
         }
       }
     },
@@ -339,22 +345,24 @@
           "command": "content.playbooks.phishing_triage.primitives.classification.resolve_intent"
         }
       ],
-      "x_secops_ng": {
-        "telemetry_refs": [
-          "telemetry.ocsf.email_activity@v1",
-          "telemetry.ocsf.email_url_activity@v1",
-          "telemetry.ocsf.file_activity@v1"
-        ],
-        "control_refs": [
-          "control.incident_handling_capability@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.phishing_triage.primitives.classification.resolve_intent",
-          "in": {
-            "classifier_output": "__classifier_output__",
-            "confidence_threshold_percent": "__confidence_threshold_percent__"
-          },
-          "out": "__intent_resolution__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "telemetry_refs": [
+            "telemetry.ocsf.email_activity@v1",
+            "telemetry.ocsf.email_url_activity@v1",
+            "telemetry.ocsf.file_activity@v1"
+          ],
+          "control_refs": [
+            "control.incident_handling_capability@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.phishing_triage.primitives.classification.resolve_intent",
+            "in": {
+              "classifier_output": "__classifier_output__",
+              "confidence_threshold_percent": "__confidence_threshold_percent__"
+            },
+            "out": "__intent_resolution__"
+          }
         }
       }
     },
@@ -390,21 +398,23 @@
           "command": "content.playbooks.phishing_triage.primitives.response.phishing_response"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1",
-          "control.incident_timeline_signals@v1"
-        ],
-        "metric_refs": [
-          "kpi.mttr_phishing_triage@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.phishing_triage.primitives.response.phishing_response",
-          "in": {
-            "assessment": "__message_assessment__",
-            "intent_resolution": "__intent_resolution__"
-          },
-          "out": "__phishing_directive__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1",
+            "control.incident_timeline_signals@v1"
+          ],
+          "metric_refs": [
+            "kpi.mttr_phishing_triage@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.phishing_triage.primitives.response.phishing_response",
+            "in": {
+              "assessment": "__message_assessment__",
+              "intent_resolution": "__intent_resolution__"
+            },
+            "out": "__phishing_directive__"
+          }
         }
       }
     },
@@ -429,27 +439,29 @@
           "command": "content.playbooks.phishing_triage.primitives.response.credential_harvest_response"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1",
-          "control.incident_timeline_signals@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.email_url_activity@v1"
-        ],
-        "metric_refs": [
-          "kpi.mttr_phishing_triage@v1",
-          "kpi.phishing_sim_click_rate@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.phishing_triage.primitives.response.credential_harvest_response",
-          "in": {
-            "assessment": "__message_assessment__",
-            "intent_resolution": "__intent_resolution__",
-            "click_events": "__click_events__",
-            "simulation_campaign_ref": "__simulation_campaign_ref__"
-          },
-          "out": "__credential_harvest_directive__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1",
+            "control.incident_timeline_signals@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.email_url_activity@v1"
+          ],
+          "metric_refs": [
+            "kpi.mttr_phishing_triage@v1",
+            "kpi.phishing_sim_click_rate@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.phishing_triage.primitives.response.credential_harvest_response",
+            "in": {
+              "assessment": "__message_assessment__",
+              "intent_resolution": "__intent_resolution__",
+              "click_events": "__click_events__",
+              "simulation_campaign_ref": "__simulation_campaign_ref__"
+            },
+            "out": "__credential_harvest_directive__"
+          }
         }
       }
     },
@@ -473,25 +485,27 @@
           "command": "content.playbooks.phishing_triage.primitives.response.malware_attachment_response"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1",
-          "control.incident_timeline_signals@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.file_activity@v1"
-        ],
-        "metric_refs": [
-          "kpi.mttr_phishing_triage@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.phishing_triage.primitives.response.malware_attachment_response",
-          "in": {
-            "assessment": "__message_assessment__",
-            "intent_resolution": "__intent_resolution__",
-            "file_open_events": "__file_open_events__"
-          },
-          "out": "__malware_directive__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1",
+            "control.incident_timeline_signals@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.file_activity@v1"
+          ],
+          "metric_refs": [
+            "kpi.mttr_phishing_triage@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.phishing_triage.primitives.response.malware_attachment_response",
+            "in": {
+              "assessment": "__message_assessment__",
+              "intent_resolution": "__intent_resolution__",
+              "file_open_events": "__file_open_events__"
+            },
+            "out": "__malware_directive__"
+          }
         }
       }
     },
@@ -515,25 +529,27 @@
           "command": "content.playbooks.phishing_triage.primitives.response.bec_response"
         }
       ],
-      "x_secops_ng": {
-        "metric_refs": [
-          "kpi.mttr_phishing_triage@v1",
-          "kpi.timeline_completeness@v1",
-          "kri.regulator_notification_overrun@v1"
-        ],
-        "control_refs": [
-          "control.incident_handling_capability@v1",
-          "control.incident_timeline_signals@v1",
-          "control.recurring_incident_correlator@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.phishing_triage.primitives.response.bec_response",
-          "in": {
-            "assessment": "__message_assessment__",
-            "intent_resolution": "__intent_resolution__",
-            "pending_payment_refs": "__pending_payment_refs__"
-          },
-          "out": "__bec_directive__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "metric_refs": [
+            "kpi.mttr_phishing_triage@v1",
+            "kpi.timeline_completeness@v1",
+            "kri.regulator_notification_overrun@v1"
+          ],
+          "control_refs": [
+            "control.incident_handling_capability@v1",
+            "control.incident_timeline_signals@v1",
+            "control.recurring_incident_correlator@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.phishing_triage.primitives.response.bec_response",
+            "in": {
+              "assessment": "__message_assessment__",
+              "intent_resolution": "__intent_resolution__",
+              "pending_payment_refs": "__pending_payment_refs__"
+            },
+            "out": "__bec_directive__"
+          }
         }
       }
     },
@@ -557,21 +573,23 @@
           "command": "content.playbooks.phishing_triage.primitives.response.manual_review_route"
         }
       ],
-      "x_secops_ng": {
-        "metric_refs": [
-          "kpi.mttr_phishing_triage@v1"
-        ],
-        "control_refs": [
-          "control.incident_handling_capability@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.phishing_triage.primitives.response.manual_review_route",
-          "in": {
-            "assessment": "__message_assessment__",
-            "intent_resolution": "__intent_resolution__",
-            "queue_ref": "__review_queue_ref__"
-          },
-          "out": "__manual_review_directive__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "metric_refs": [
+            "kpi.mttr_phishing_triage@v1"
+          ],
+          "control_refs": [
+            "control.incident_handling_capability@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.phishing_triage.primitives.response.manual_review_route",
+            "in": {
+              "assessment": "__message_assessment__",
+              "intent_resolution": "__intent_resolution__",
+              "queue_ref": "__review_queue_ref__"
+            },
+            "out": "__manual_review_directive__"
+          }
         }
       }
     },
@@ -580,52 +598,64 @@
       "name": "triage-end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.phishing_triage@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "detection_refs": [
-      "detection.sigma.email.suspicious_sender_domain@v1",
-      "detection.sigma.email.url_shortener_in_body@v1",
-      "detection.sigma.email.attachment_double_extension@v1"
-    ],
-    "control_refs": [
-      "control.incident_handling_capability@v1",
-      "control.incident_timeline_signals@v1",
-      "control.training_attestation@v1",
-      "control.phishing_simulation@v1",
-      "control.recurring_incident_correlator@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.email_activity@v1",
-      "telemetry.ocsf.email_url_activity@v1",
-      "telemetry.ocsf.file_activity@v1"
-    ],
-    "metric_refs": [
-      "kpi.mttd_phishing@v1",
-      "kpi.mttr_phishing_triage@v1",
-      "kpi.phishing_sim_click_rate@v1",
-      "kpi.timeline_completeness@v1",
-      "kri.phishing_suppression_rate@v1",
-      "kri.regulator_notification_overrun@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification \u2014 workflow step types (start, action, if-condition, switch-condition, end), variable conventions, x_ extension namespace",
-      "ENISA \u2014 Threat Landscape, phishing and social engineering",
-      "NIS2 Directive (EU) 2022/2555, Article 21(2)(b) \u2014 incident handling capability",
-      "NIS2 Directive (EU) 2022/2555, Article 21(2)(g) \u2014 basic cyber-hygiene practices and training",
-      "DORA Regulation (EU) 2022/2554, Article 18 \u2014 classification of ICT-related incidents",
-      "DORA Regulation (EU) 2022/2554, Article 19 \u2014 reporting of major ICT-related incidents",
-      "MITRE D3FEND \u2014 Message Authentication (d3f:MessageAuthentication), Sender Reputation Analysis (d3f:SenderReputationAnalysis)",
-      "OSCAL anchors: NIST 800-53 IR-4 / IR-6 / IR-8 (incident handling, reporting, plan) and AT-2 / AT-3 / AT-4 (awareness, role-based training, training records) \u2014 wired through content/controls/ entries control.incident_handling_capability@v1, control.incident_timeline_signals@v1, control.training_attestation@v1, control.phishing_simulation@v1, control.recurring_incident_correlator@v1",
-      "OCSF v1.4.0 \u2014 Email Activity (class 4009), Email URL Activity (class 4012), File Activity (class 1001)",
-      "SigmaHQ \u2014 upstream rule provenance for the detection.sigma.email.* references pinned in mappings.yaml (no Sigma rules authored here)",
-      "DORA Regulation (EU) 2022/2554, Article 17 \u2014 ICT-related incident management process (detect, manage, notify); clock signals captured via control.incident_timeline_signals@v1"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.phishing_triage@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "detection_refs": [
+        "detection.sigma.email.suspicious_sender_domain@v1",
+        "detection.sigma.email.url_shortener_in_body@v1",
+        "detection.sigma.email.attachment_double_extension@v1"
+      ],
+      "control_refs": [
+        "control.incident_handling_capability@v1",
+        "control.incident_timeline_signals@v1",
+        "control.training_attestation@v1",
+        "control.phishing_simulation@v1",
+        "control.recurring_incident_correlator@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.email_activity@v1",
+        "telemetry.ocsf.email_url_activity@v1",
+        "telemetry.ocsf.file_activity@v1"
+      ],
+      "metric_refs": [
+        "kpi.mttd_phishing@v1",
+        "kpi.mttr_phishing_triage@v1",
+        "kpi.phishing_sim_click_rate@v1",
+        "kpi.timeline_completeness@v1",
+        "kri.phishing_suppression_rate@v1",
+        "kri.regulator_notification_overrun@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification \u2014 workflow step types (start, action, if-condition, switch-condition, end), variable conventions, x_ extension namespace",
+        "ENISA \u2014 Threat Landscape, phishing and social engineering",
+        "NIS2 Directive (EU) 2022/2555, Article 21(2)(b) \u2014 incident handling capability",
+        "NIS2 Directive (EU) 2022/2555, Article 21(2)(g) \u2014 basic cyber-hygiene practices and training",
+        "DORA Regulation (EU) 2022/2554, Article 18 \u2014 classification of ICT-related incidents",
+        "DORA Regulation (EU) 2022/2554, Article 19 \u2014 reporting of major ICT-related incidents",
+        "MITRE D3FEND \u2014 Message Authentication (d3f:MessageAuthentication), Sender Reputation Analysis (d3f:SenderReputationAnalysis)",
+        "OSCAL anchors: NIST 800-53 IR-4 / IR-6 / IR-8 (incident handling, reporting, plan) and AT-2 / AT-3 / AT-4 (awareness, role-based training, training records) \u2014 wired through content/controls/ entries control.incident_handling_capability@v1, control.incident_timeline_signals@v1, control.training_attestation@v1, control.phishing_simulation@v1, control.recurring_incident_correlator@v1",
+        "OCSF v1.4.0 \u2014 Email Activity (class 4009), Email URL Activity (class 4012), File Activity (class 1001)",
+        "SigmaHQ \u2014 upstream rule provenance for the detection.sigma.email.* references pinned in mappings.yaml (no Sigma rules authored here)",
+        "DORA Regulation (EU) 2022/2554, Article 17 \u2014 ICT-related incident management process (detect, manage, notify); clock signals captured via control.incident_timeline_signals@v1"
+      ]
+    }
   }
 }

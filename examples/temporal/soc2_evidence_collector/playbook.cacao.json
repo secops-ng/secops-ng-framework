@@ -104,19 +104,21 @@
           "command": "content.playbooks.soc2_evidence_collector.primitives.criteria.collect_criteria_atoms"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.evidence_pipeline@v1"
-        ],
-        "metric_refs": [
-          "kri.control_effectiveness@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.soc2_evidence_collector.primitives.criteria.collect_criteria_atoms",
-          "in": {
-            "crosswalk_entries": "__crosswalk_entries__"
-          },
-          "out": "__criteria_atoms__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.evidence_pipeline@v1"
+          ],
+          "metric_refs": [
+            "kri.control_effectiveness@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.soc2_evidence_collector.primitives.criteria.collect_criteria_atoms",
+            "in": {
+              "crosswalk_entries": "__crosswalk_entries__"
+            },
+            "out": "__criteria_atoms__"
+          }
         }
       }
     },
@@ -140,21 +142,23 @@
           "command": "content.playbooks.soc2_evidence_collector.primitives.mapping.map_evidence_to_criteria"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.evidence_pipeline@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.soc2_evidence_collector.primitives.mapping.map_evidence_to_criteria",
-          "in": {
-            "atoms": "__criteria_atoms__",
-            "evidence_refs": "__evidence_refs__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.evidence_pipeline@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.soc2_evidence_collector.primitives.mapping.map_evidence_to_criteria",
+            "in": {
+              "atoms": "__criteria_atoms__",
+              "evidence_refs": "__evidence_refs__"
+            },
+            "out": "__criteria_mapping__"
           },
-          "out": "__criteria_mapping__"
-        },
-        "metric_refs": [
-          "kpi.soc2_evidence_ref_resolution_rate@v1"
-        ]
+          "metric_refs": [
+            "kpi.soc2_evidence_ref_resolution_rate@v1"
+          ]
+        }
       }
     },
     "action--b7c2e5a1-0000-4000-8000-000000000004": {
@@ -176,20 +180,22 @@
           "command": "content.playbooks.soc2_evidence_collector.primitives.scoring.score_criterion_coverage"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.evidence_pipeline@v1"
-        ],
-        "metric_refs": [
-          "kri.soc2_unsupported_criteria_count@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.soc2_evidence_collector.primitives.scoring.score_criterion_coverage",
-          "in": {
-            "atoms": "__criteria_atoms__",
-            "mapping": "__criteria_mapping__"
-          },
-          "out": "__coverage_scoring__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.evidence_pipeline@v1"
+          ],
+          "metric_refs": [
+            "kri.soc2_unsupported_criteria_count@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.soc2_evidence_collector.primitives.scoring.score_criterion_coverage",
+            "in": {
+              "atoms": "__criteria_atoms__",
+              "mapping": "__criteria_mapping__"
+            },
+            "out": "__coverage_scoring__"
+          }
         }
       }
     },
@@ -214,24 +220,26 @@
           "command": "content.playbooks.soc2_evidence_collector.primitives.attestation.build_readiness_attestation"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.evidence_pipeline@v1"
-        ],
-        "metric_refs": [
-          "kri.soc2_unsupported_criteria_count@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.soc2_evidence_collector.primitives.attestation.build_readiness_attestation",
-          "in": {
-            "workflow_id": "__workflow_id__",
-            "execution_id": "__execution_id__",
-            "captured_at": "__captured_at__",
-            "assessment_window": "__assessment_window__",
-            "scoring": "__coverage_scoring__",
-            "owner_role": "__owner_role__"
-          },
-          "out": "__attestation_id__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.evidence_pipeline@v1"
+          ],
+          "metric_refs": [
+            "kri.soc2_unsupported_criteria_count@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.soc2_evidence_collector.primitives.attestation.build_readiness_attestation",
+            "in": {
+              "workflow_id": "__workflow_id__",
+              "execution_id": "__execution_id__",
+              "captured_at": "__captured_at__",
+              "assessment_window": "__assessment_window__",
+              "scoring": "__coverage_scoring__",
+              "owner_role": "__owner_role__"
+            },
+            "out": "__attestation_id__"
+          }
         }
       }
     },
@@ -240,26 +248,38 @@
       "name": "soc2_evidence_collector_end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.soc2_evidence_collector@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "control_refs": [
-      "control.evidence_pipeline@v1"
-    ],
-    "metric_refs": [
-      "kri.control_effectiveness@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification",
-      "AICPA Trust Services Criteria (2017, as revised) — the criteria set this playbook scores coverage against, via content/mappings/soc2/",
-      "content/mappings/soc2/README.md — every crosswalk entry is status: draft, which the scoring step surfaces rather than smoothing over",
-      "docs/cookbook/soc2_crosswalk.md — SOC 2 is not an EU statutory instrument; the EU mappings remain the authoritative statutory pointer"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.soc2_evidence_collector@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "control_refs": [
+        "control.evidence_pipeline@v1"
+      ],
+      "metric_refs": [
+        "kri.control_effectiveness@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification",
+        "AICPA Trust Services Criteria (2017, as revised) — the criteria set this playbook scores coverage against, via content/mappings/soc2/",
+        "content/mappings/soc2/README.md — every crosswalk entry is status: draft, which the scoring step surfaces rather than smoothing over",
+        "docs/cookbook/soc2_crosswalk.md — SOC 2 is not an EU statutory instrument; the EU mappings remain the authoritative statutory pointer"
+      ]
+    }
   }
 }
