@@ -15,8 +15,20 @@
     "modified",
     "playbook_types",
     "workflow_start",
-    "workflow",
-    "x_secops_ng"
+    "workflow"
+  ],
+  "oneOf": [
+    {
+      "description": "Legacy placement, read for one release: SecOps-NG data under the root x_secops_ng object (#1027).",
+      "required": ["x_secops_ng"],
+      "not": { "required": ["playbook_extensions"], "properties": { "playbook_extensions": { "required": ["extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a"] } } }
+    },
+    {
+      "description": "CACAO 2.0 extension placement: SecOps-NG data under playbook_extensions, keyed by the SecOps-NG extension definition.",
+      "required": ["playbook_extensions"],
+      "properties": { "playbook_extensions": { "required": ["extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a"] } },
+      "not": { "required": ["x_secops_ng"] }
+    }
   ],
   "properties": {
     "type": {
@@ -157,7 +169,13 @@
       "items": { "type": "object" }
     },
 
-    "x_secops_ng": { "$ref": "#/$defs/x_secops_ng" }
+    "x_secops_ng": { "$ref": "#/$defs/x_secops_ng" },
+    "playbook_extensions": {
+      "description": "CACAO 2.0 playbook-level extension payloads keyed by extension-definition id. The SecOps-NG payload has the same shape as the legacy root x_secops_ng object; other tools' extensions are allowed alongside it.",
+      "type": "object",
+      "properties": { "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": { "$ref": "#/$defs/x_secops_ng" } },
+      "additionalProperties": true
+    }
   },
 
   "$defs": {
@@ -265,7 +283,18 @@
             },
             "core_body": { "$ref": "#/$defs/core_body" }
           }
+        },
+        "step_extensions": {
+          "description": "CACAO 2.0 step-level extension payloads keyed by extension-definition id. The SecOps-NG payload has the same shape as the legacy per-step x_secops_ng object; other tools' extensions (CACAO Roaster's diagram coordinates, say) are allowed alongside it.",
+          "type": "object",
+          "properties": { "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": { "$ref": "#/$defs/workflow_step/properties/x_secops_ng" } },
+          "additionalProperties": true
         }
+      },
+      "not": {
+        "description": "A step carries its SecOps-NG data in one placement only.",
+        "required": ["x_secops_ng", "step_extensions"],
+        "properties": { "step_extensions": { "required": ["extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a"] } }
       },
       "additionalProperties": true
     },

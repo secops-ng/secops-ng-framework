@@ -24,6 +24,10 @@ import sys
 from pathlib import Path
 from typing import Any
 
+# The accessor lives in the framework; the script runs from its own directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
+from compilers._shared.cacao_parser.extensions import secops_extension  # noqa: E402
+
 # Step types that branch. The n8n emitter records a TODO for each one whose
 # CACAO source carries no machine-readable expression — which is currently all
 # of them, in every playbook.
@@ -64,7 +68,7 @@ def _is_binding(core_body: Any) -> bool:
 
 
 def _core_body(step: dict[str, Any]) -> Any:
-    return (step.get("x_secops_ng") or {}).get("core_body")
+    return (secops_extension(step) or {}).get("core_body")
 
 
 def _validate(playbook: dict[str, Any], schema_path: Path) -> tuple[bool, int, str]:
@@ -118,7 +122,7 @@ def _overlay_bindings(root: Path, slug: str) -> dict[str, Any]:
 
 def _entry(root: Path, source: Path, slug: str, schema_path: Path) -> dict[str, Any]:
     playbook = _load(source)
-    x = playbook.get("x_secops_ng") or {}
+    x = secops_extension(playbook) or {}
     workflow = playbook.get("workflow") or {}
 
     step_types: dict[str, int] = {}

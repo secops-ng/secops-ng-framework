@@ -9,6 +9,22 @@ raw JSON.
 
 This module is **parse + validate only**. It emits nothing.
 
+## Where the SecOps-NG data lives
+
+A playbook carries its SecOps-NG data either under the legacy
+`x_secops_ng` object or in the CACAO 2.0 extension slots —
+`playbook_extensions` and each step's `step_extensions`, keyed by
+`SECOPS_NG_EXTENSION_ID` and declared in `extension_definitions` (#1027).
+The parser reads both for one release and rejects an object that carries
+both. Either way the AST exposes the payload as `x_secops_ng`, so emitters
+are unaffected.
+
+Code that reads a raw playbook dict instead of the AST — a lint tool, a
+test — must not index `x_secops_ng` directly. Use
+`secops_extension(obj)`, which works on a playbook or a step and returns
+the payload from whichever placement it uses. `migrate_to_extensions(doc)`
+rewrites a legacy document into the extension placement.
+
 ## Usage
 
 ```python

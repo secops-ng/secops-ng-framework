@@ -65,6 +65,20 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **SecOps-NG data can live in CACAO 2.0 extension slots.** Besides the
+  legacy `x_secops_ng` object, the parser now reads the payload from
+  `playbook_extensions` and `step_extensions`, keyed by the SecOps-NG
+  extension definition (`extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a`),
+  whose normative schema is `content-model/x-secops-ng.extension.schema.json`.
+  Both placements are accepted for one release; an object carrying both
+  is rejected, and a payload keyed by an undeclared extension is rejected.
+  `content-model/playbook.schema.json` accepts either placement. The lint
+  tools and `catalog.py` read through the new `secops_extension()`
+  accessor. No playbook moves yet: for every canonical playbook the
+  migrated form compiles byte-identically in all three emitters and passes
+  the official schema with zero errors under both dialects, including the
+  strict one that rejects the legacy root object. This is part 1 of #1027;
+  the content move follows.
 - **Official-schema conformance ratchet.** `tools/cacao_conformance.py`
   validates every playbook against the vendored OASIS CACAO 2.0 schemas
   (`schemas/vendor/cacao-2.0/`); `tests/content/cacao_conformance_baseline.json`

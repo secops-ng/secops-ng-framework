@@ -24,6 +24,10 @@ import json
 import sys
 from pathlib import Path
 
+# Runnable by path from anywhere, as before: put this repository on sys.path.
+sys.path.insert(0, str(__import__('pathlib').Path(__file__).resolve().parents[1]))
+from compilers._shared.cacao_parser.extensions import secops_extension  # noqa: E402
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PLAYBOOK_DIR = REPO_ROOT / "content" / "playbooks"
 README = PLAYBOOK_DIR / "README.md"
@@ -180,7 +184,7 @@ def maturity(doc: dict) -> str:
     defaulted — the schema requires it, so absence is a content bug
     the table should not paper over.
     """
-    value = (doc.get("x_secops_ng") or {}).get("maturity")
+    value = (secops_extension(doc) or {}).get("maturity")
     return value if isinstance(value, str) and value else "(unset!)"
 
 

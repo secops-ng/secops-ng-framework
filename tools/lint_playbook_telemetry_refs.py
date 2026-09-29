@@ -53,6 +53,10 @@ import argparse
 import json
 import re
 import sys
+
+# Runnable by path from anywhere, as before: put this repository on sys.path.
+sys.path.insert(0, str(__import__('pathlib').Path(__file__).resolve().parents[1]))
+from compilers._shared.cacao_parser.extensions import secops_extension  # noqa: E402
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -133,7 +137,7 @@ def check(root: Path) -> tuple[list[Finding], dict]:
         source = _canonical_playbook(root, slug)
         if source is not None:
             doc = _load(source)
-            for ref in (doc.get("x_secops_ng") or {}).get("telemetry_refs") or []:
+            for ref in (secops_extension(doc) or {}).get("telemetry_refs") or []:
                 refs += 1
                 if f := _classify(slug, "playbook.telemetry_refs", ref, have):
                     findings.append(f)
@@ -141,7 +145,7 @@ def check(root: Path) -> tuple[list[Finding], dict]:
                 if not isinstance(step, dict):
                     continue
                 name = step.get("name") or "?"
-                for ref in (step.get("x_secops_ng") or {}).get("telemetry_refs") or []:
+                for ref in (secops_extension(step) or {}).get("telemetry_refs") or []:
                     refs += 1
                     if f := _classify(slug, f"step:{name}", ref, have):
                         findings.append(f)

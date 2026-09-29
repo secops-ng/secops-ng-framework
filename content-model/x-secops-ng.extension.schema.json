@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+  "title": "SecOps-NG CACAO extension",
+  "description": "Normative schema for the SecOps-NG CACAO 2.0 extension (extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a). A payload under playbook_extensions matches the playbook shape; a payload under a step's step_extensions matches the step shape. Both shapes are defined once, in playbook.schema.json, and referenced here rather than copied, so the extension cannot drift from the content model.",
+  "oneOf": [
+    { "$ref": "#/$defs/playbook" },
+    { "$ref": "#/$defs/step" }
+  ],
+  "$defs": {
+    "playbook": { "$ref": "playbook.schema.json#/$defs/x_secops_ng" },
+    "step": { "$ref": "playbook.schema.json#/$defs/workflow_step/properties/x_secops_ng" }
+  }
+}
