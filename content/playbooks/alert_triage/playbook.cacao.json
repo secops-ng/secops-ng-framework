@@ -153,20 +153,22 @@
           "command": "content.playbooks.alert_triage.primitives.payloads.validate_alert_payload"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.alert_triage.primitives.payloads.validate_alert_payload",
-          "in": {
-            "raw": "__raw_payload__",
-            "source_shape": "__alert_source_shape__"
-          },
-          "out": "__alert_payload__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.alert_triage.primitives.payloads.validate_alert_payload",
+            "in": {
+              "raw": "__raw_payload__",
+              "source_shape": "__alert_source_shape__"
+            },
+            "out": "__alert_payload__"
+          }
         }
       }
     },
@@ -185,27 +187,29 @@
           "command": "content.playbooks.alert_triage.primitives.suppression.canonical_seen_key"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.authentication@v1",
-          "telemetry.ocsf.account_change@v1",
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kpi.mttd@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.alert_triage.primitives.suppression.canonical_seen_key",
-          "in": {
-            "detection_rule_id": "__detection_rule_id__",
-            "subject_ref": "__subject_ref__",
-            "asset_ref": "__asset_ref__",
-            "classification": "__classification__"
-          },
-          "out": "__seen_key__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.authentication@v1",
+            "telemetry.ocsf.account_change@v1",
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kpi.mttd@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.alert_triage.primitives.suppression.canonical_seen_key",
+            "in": {
+              "detection_rule_id": "__detection_rule_id__",
+              "subject_ref": "__subject_ref__",
+              "asset_ref": "__asset_ref__",
+              "classification": "__classification__"
+            },
+            "out": "__seen_key__"
+          }
         }
       }
     },
@@ -229,23 +233,25 @@
           "command": "content.playbooks.alert_triage.primitives.suppression.canonical_seen_key"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1",
-          "control.recurring_incident_correlator@v1"
-        ],
-        "metric_refs": [
-          "kpi.false_positive_rate@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.alert_triage.primitives.suppression.canonical_seen_key",
-          "in": {
-            "detection_rule_id": "__detection_rule_id__",
-            "subject_ref": "__subject_ref__",
-            "asset_ref": "__asset_ref__",
-            "classification": "__classification__"
-          },
-          "out": "__close_record_key__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1",
+            "control.recurring_incident_correlator@v1"
+          ],
+          "metric_refs": [
+            "kpi.false_positive_rate@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.alert_triage.primitives.suppression.canonical_seen_key",
+            "in": {
+              "detection_rule_id": "__detection_rule_id__",
+              "subject_ref": "__subject_ref__",
+              "asset_ref": "__asset_ref__",
+              "classification": "__classification__"
+            },
+            "out": "__close_record_key__"
+          }
         }
       }
     },
@@ -264,22 +270,24 @@
           "command": "content.playbooks.alert_triage.primitives.prioritisation.prioritise"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1"
-        ],
-        "metric_refs": [
-          "kpi.detection_coverage@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.alert_triage.primitives.prioritisation.prioritise",
-          "in": {
-            "detection_class": "__detection_class__",
-            "detection_severity": "__detection_severity__",
-            "context": "__asset_context__",
-            "correlates_open_case": "__correlates_open_case__"
-          },
-          "out": "__priority_verdict__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1"
+          ],
+          "metric_refs": [
+            "kpi.detection_coverage@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.alert_triage.primitives.prioritisation.prioritise",
+            "in": {
+              "detection_class": "__detection_class__",
+              "detection_severity": "__detection_severity__",
+              "context": "__asset_context__",
+              "correlates_open_case": "__correlates_open_case__"
+            },
+            "out": "__priority_verdict__"
+          }
         }
       }
     },
@@ -307,25 +315,27 @@
           "command": "content.playbooks.alert_triage.primitives.response.escalation_route"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1",
-          "control.incident_timeline_signals@v1"
-        ],
-        "metric_refs": [
-          "kpi.mttr_critical@v1",
-          "kri.escalation_tier_breach@v1",
-          "kpi.notification_sla_compliance@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.alert_triage.primitives.response.escalation_route",
-          "in": {
-            "priority": "__priority__",
-            "asset_criticality": "__asset_context__.asset_criticality",
-            "regulated_data": "__asset_context__.regulated_data",
-            "internet_exposed": "__asset_context__.internet_exposed"
-          },
-          "out": "__escalation_directive__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1",
+            "control.incident_timeline_signals@v1"
+          ],
+          "metric_refs": [
+            "kpi.mttr_critical@v1",
+            "kri.escalation_tier_breach@v1",
+            "kpi.notification_sla_compliance@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.alert_triage.primitives.response.escalation_route",
+            "in": {
+              "priority": "__priority__",
+              "asset_criticality": "__asset_context__.asset_criticality",
+              "regulated_data": "__asset_context__.regulated_data",
+              "internet_exposed": "__asset_context__.internet_exposed"
+            },
+            "out": "__escalation_directive__"
+          }
         }
       }
     },
@@ -341,23 +351,25 @@
           "command": "content.playbooks.alert_triage.primitives.response.notify_on_call"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1"
-        ],
-        "metric_refs": [
-          "kpi.mttr_critical@v1",
-          "kpi.handoff_brief_delivery_sla@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.alert_triage.primitives.response.notify_on_call",
-          "in": {
-            "priority": "__priority__",
-            "asset_criticality": "__asset_context__.asset_criticality",
-            "regulated_data": "__asset_context__.regulated_data",
-            "internet_exposed": "__asset_context__.internet_exposed"
-          },
-          "out": "__notification_directive__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1"
+          ],
+          "metric_refs": [
+            "kpi.mttr_critical@v1",
+            "kpi.handoff_brief_delivery_sla@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.alert_triage.primitives.response.notify_on_call",
+            "in": {
+              "priority": "__priority__",
+              "asset_criticality": "__asset_context__.asset_criticality",
+              "regulated_data": "__asset_context__.regulated_data",
+              "internet_exposed": "__asset_context__.internet_exposed"
+            },
+            "out": "__notification_directive__"
+          }
         }
       }
     },
@@ -373,22 +385,24 @@
           "command": "content.playbooks.alert_triage.primitives.response.route_to_review_queue"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1"
-        ],
-        "metric_refs": [
-          "kpi.review_completion_sla@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.alert_triage.primitives.response.route_to_review_queue",
-          "in": {
-            "priority": "__priority__",
-            "asset_criticality": "__asset_context__.asset_criticality",
-            "regulated_data": "__asset_context__.regulated_data",
-            "internet_exposed": "__asset_context__.internet_exposed"
-          },
-          "out": "__review_queue_directive__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1"
+          ],
+          "metric_refs": [
+            "kpi.review_completion_sla@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.alert_triage.primitives.response.route_to_review_queue",
+            "in": {
+              "priority": "__priority__",
+              "asset_criticality": "__asset_context__.asset_criticality",
+              "regulated_data": "__asset_context__.regulated_data",
+              "internet_exposed": "__asset_context__.internet_exposed"
+            },
+            "out": "__review_queue_directive__"
+          }
         }
       }
     },
@@ -404,24 +418,26 @@
           "command": "content.playbooks.alert_triage.primitives.response.log_and_close"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1",
-          "control.recurring_incident_correlator@v1"
-        ],
-        "metric_refs": [
-          "kpi.false_positive_rate@v1",
-          "kpi.detection_coverage@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.alert_triage.primitives.response.log_and_close",
-          "in": {
-            "priority": "__priority__",
-            "asset_criticality": "__asset_context__.asset_criticality",
-            "regulated_data": "__asset_context__.regulated_data",
-            "internet_exposed": "__asset_context__.internet_exposed"
-          },
-          "out": "__closure_record__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1",
+            "control.recurring_incident_correlator@v1"
+          ],
+          "metric_refs": [
+            "kpi.false_positive_rate@v1",
+            "kpi.detection_coverage@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.alert_triage.primitives.response.log_and_close",
+            "in": {
+              "priority": "__priority__",
+              "asset_criticality": "__asset_context__.asset_criticality",
+              "regulated_data": "__asset_context__.regulated_data",
+              "internet_exposed": "__asset_context__.internet_exposed"
+            },
+            "out": "__closure_record__"
+          }
         }
       }
     },
@@ -430,42 +446,54 @@
       "name": "triage-end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.alert_triage@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "control_refs": [
-      "control.incident_handling_capability@v1",
-      "control.incident_timeline_signals@v1",
-      "control.recurring_incident_correlator@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.api_activity@v1",
-      "telemetry.ocsf.authentication@v1",
-      "telemetry.ocsf.account_change@v1"
-    ],
-    "metric_refs": [
-      "kpi.mttd@v1",
-      "kpi.mttr_critical@v1",
-      "kpi.false_positive_rate@v1",
-      "kpi.detection_coverage@v1",
-      "kpi.review_completion_sla@v1",
-      "kpi.handoff_brief_delivery_sla@v1",
-      "kpi.notification_sla_compliance@v1",
-      "kri.escalation_tier_breach@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 — workflow step types (start, action, if-condition, switch-condition, end), variable conventions, x_ extension namespace",
-      "NIS2 Directive (EU) 2022/2555, Article 21(2)(b) — incident handling capability",
-      "DORA Regulation (EU) 2022/2554, Article 17 — ICT-related incident management process",
-      "MITRE D3FEND — Alert Analysis, Operational Reporting",
-      "OSCAL anchors: NIST 800-53 IR-4 / IR-5 / IR-6 (incident handling, monitoring, reporting) wired through content/controls/ entries control.incident_handling_capability@v1, control.incident_timeline_signals@v1, control.recurring_incident_correlator@v1",
-      "OCSF v1.4.0 — Authentication (class 3002), Account Change (class 3001), API Activity (class 6003); Security Finding (class 2001) pending a content/telemetry/ entry"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.alert_triage@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "control_refs": [
+        "control.incident_handling_capability@v1",
+        "control.incident_timeline_signals@v1",
+        "control.recurring_incident_correlator@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.api_activity@v1",
+        "telemetry.ocsf.authentication@v1",
+        "telemetry.ocsf.account_change@v1"
+      ],
+      "metric_refs": [
+        "kpi.mttd@v1",
+        "kpi.mttr_critical@v1",
+        "kpi.false_positive_rate@v1",
+        "kpi.detection_coverage@v1",
+        "kpi.review_completion_sla@v1",
+        "kpi.handoff_brief_delivery_sla@v1",
+        "kpi.notification_sla_compliance@v1",
+        "kri.escalation_tier_breach@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 — workflow step types (start, action, if-condition, switch-condition, end), variable conventions, x_ extension namespace",
+        "NIS2 Directive (EU) 2022/2555, Article 21(2)(b) — incident handling capability",
+        "DORA Regulation (EU) 2022/2554, Article 17 — ICT-related incident management process",
+        "MITRE D3FEND — Alert Analysis, Operational Reporting",
+        "OSCAL anchors: NIST 800-53 IR-4 / IR-5 / IR-6 (incident handling, monitoring, reporting) wired through content/controls/ entries control.incident_handling_capability@v1, control.incident_timeline_signals@v1, control.recurring_incident_correlator@v1",
+        "OCSF v1.4.0 — Authentication (class 3002), Account Change (class 3001), API Activity (class 6003); Security Finding (class 2001) pending a content/telemetry/ entry"
+      ]
+    }
   }
 }

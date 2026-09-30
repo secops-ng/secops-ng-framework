@@ -8,6 +8,21 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **SecOps-NG data moves into CACAO 2.0 extension slots.** Every
+  canonical playbook, and the `_template`, now declares the SecOps-NG
+  extension in `extension_definitions` and carries its SecOps-NG payload
+  under that id in `playbook_extensions` and each step's `step_extensions`,
+  instead of under a private `x_secops_ng` key. CACAO tooling keeps
+  extension data and discards unknown keys — CACAO Roaster drops
+  `x_secops_ng` on import — so this is what lets the bindings survive a
+  round trip through standard CACAO tools. The payload is unchanged; only
+  its location moved, and every compiled artifact is byte-identical (only
+  the CACAO mirrors change). All 49 documents now pass the official schema
+  with zero errors under the strict 2020-12 reading too, and the
+  conformance ratchet gates on that reading; the Draft-07 reading must stay
+  at zero as well. The parser still reads the legacy `x_secops_ng`
+  placement for one more release. Code and tests that read a raw playbook
+  must use `secops_extension()` rather than indexing `x_secops_ng`.
 - **Every canonical playbook now passes the official OASIS CACAO 2.0
   schema.** The 112 unbound action steps (all in experimental or draft
   playbooks) carry one `manual` command whose text is the step's

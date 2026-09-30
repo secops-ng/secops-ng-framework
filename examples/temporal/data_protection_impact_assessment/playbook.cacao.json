@@ -8,6 +8,16 @@
   "created": "2026-07-04T00:00:00Z",
   "created_by": "identity--5a509a09-5a50-45a5-85a5-095a509a509a",
   "description": "SKELETON \u2014 CACAO v2 scaffold for the operator-side data protection impact assessment (DPIA) lifecycle a controller runs before deploying processing that is likely to result in a high risk to the rights and freedoms of natural persons under GDPR Article 35. Distinct from the after-the-fact breach-notification lane (Articles 33-34) and from the subject-initiated rights lifecycle (Articles 15-22): this is the proactive ex-ante assessment lane that runs before the processing is bound to production. The lifecycle chains ten steps: screen_dpia_triggers against the Article 35(3) mandatory-DPIA triggers (novel technology, large-scale processing, systematic-monitoring) and the operator's supervisory-authority Article 35(4) blacklist \u2192 classify_processing_type against the processing-inventory surface \u2192 gather_processing_description (Article 35(7)(a): purposes, categories of data and subjects, recipients, retention) \u2192 assess_necessity_and_proportionality (Article 35(7)(b)) \u2192 identify_and_assess_risks to rights and freedoms (Article 35(7)(c)) \u2192 identify_and_document_mitigations (Article 35(7)(d): safeguards, security measures, mechanisms) \u2192 dpo_consultation to obtain the Data Protection Officer's advice under Article 35(2) \u2192 determine_article_36_gate on the residual-risk threshold that triggers prior consultation with the supervisory authority under Article 36(1) \u2192 produce_dpia_document as the durable artifact recording the assessment for the operator's Article 5(2) accountability posture \u2192 schedule_review_cadence with a re-assessment hook at each material processing change under Article 35(11). Evidence outputs: dpia-screening-result, dpia-document, dpo-consultation- record, article-36-pre-consultation-flag (boolean). SKELETON only: the processing-inventory adapter, the risk-taxonomy binding, and the DPIA-document template are declared as adapter-bound surfaces the operator wires; a sibling CORE card lands the templates, the OSCAL binding closure, and the supervisory-authority pre-consultation submission chain. CACAO v2 + SecOps-NG content-model extensions.",
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "name": "SecOps-NG content model",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "type": "extension-definition",
+      "version": "1.0.0"
+    }
+  },
   "external_references": [
     {
       "description": "Workflow step types (start, action, end), variable conventions, x_ extension namespace.",
@@ -40,6 +50,32 @@
   ],
   "modified": "2026-07-04T00:00:00Z",
   "name": "GDPR Article 35 data protection impact assessment (DPIA) lifecycle",
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "content_version": "0.1.0",
+      "control_refs": [
+        "control.risk_management_policy@v1",
+        "control.incident_timeline_signals@v1"
+      ],
+      "maturity": "experimental",
+      "metric_refs": [],
+      "sources": [
+        "OASIS CACAO v2.0 specification \u2014 workflow step types (start, action, end), variable conventions, x_ extension namespace",
+        "General Data Protection Regulation (EU) 2016/679 \u2014 Article 35 (data protection impact assessment) and Article 36 (prior consultation)",
+        "Article 29 Working Party WP248 rev.01 \u2014 Guidelines on Data Protection Impact Assessment (DPIA), endorsed by the European Data Protection Board",
+        "OCSF v1.3.0 \u2014 Compliance Finding (class_uid 2003) event class emitted per lifecycle milestone for the operator's Article 5(2) accountability posture"
+      ],
+      "stable_id": "playbook.data_protection_impact_assessment@v1",
+      "telemetry_refs": [
+        "telemetry.ocsf.compliance_finding@v1"
+      ]
+    }
+  },
   "playbook_types": [
     "notification",
     "investigation"
@@ -125,15 +161,17 @@
         "__dpia_required__",
         "__screening_result_ref__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.risk_management_policy@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ]
-      }
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.risk_management_policy@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--d91a35c0-0000-4000-8000-000000000003": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -151,15 +189,17 @@
       ],
       "name": "classify_processing_type",
       "on_completion": "action--d91a35c0-0000-4000-8000-000000000004",
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.risk_management_policy@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ]
-      }
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.risk_management_policy@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--d91a35c0-0000-4000-8000-000000000004": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -180,15 +220,17 @@
       "out_args": [
         "__processing_description_ref__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.risk_management_policy@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ]
-      }
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.risk_management_policy@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--d91a35c0-0000-4000-8000-000000000005": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -206,15 +248,17 @@
       ],
       "name": "assess_necessity_and_proportionality",
       "on_completion": "action--d91a35c0-0000-4000-8000-000000000006",
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.risk_management_policy@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ]
-      }
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.risk_management_policy@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--d91a35c0-0000-4000-8000-000000000006": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -235,16 +279,18 @@
       "out_args": [
         "__risk_assessment_ref__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.risk_management_policy@v1",
-          "control.incident_timeline_signals@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ]
-      }
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.risk_management_policy@v1",
+            "control.incident_timeline_signals@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--d91a35c0-0000-4000-8000-000000000007": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -265,15 +311,17 @@
       "out_args": [
         "__mitigations_ref__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.risk_management_policy@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ]
-      }
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.risk_management_policy@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--d91a35c0-0000-4000-8000-000000000008": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -296,15 +344,17 @@
       "out_args": [
         "__dpo_consultation_ref__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.risk_management_policy@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ]
-      }
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.risk_management_policy@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--d91a35c0-0000-4000-8000-000000000009": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -326,15 +376,17 @@
       "out_args": [
         "__article_36_pre_consultation_flag__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.risk_management_policy@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ]
-      }
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.risk_management_policy@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--d91a35c0-0000-4000-8000-00000000000a": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -359,16 +411,18 @@
       "out_args": [
         "__dpia_document_ref__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.risk_management_policy@v1",
-          "control.incident_timeline_signals@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ]
-      }
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.risk_management_policy@v1",
+            "control.incident_timeline_signals@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--d91a35c0-0000-4000-8000-00000000000b": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -389,15 +443,17 @@
       "out_args": [
         "__review_cadence__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.risk_management_policy@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ]
-      }
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.risk_management_policy@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "end--d91a35c0-0000-4000-8000-00000000000f": {
       "name": "dpia_end",
@@ -409,29 +465,5 @@
       "type": "start"
     }
   },
-  "workflow_start": "start--d91a35c0-0000-4000-8000-000000000001",
-  "x_secops_ng": {
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "content_version": "0.1.0",
-    "control_refs": [
-      "control.risk_management_policy@v1",
-      "control.incident_timeline_signals@v1"
-    ],
-    "maturity": "experimental",
-    "metric_refs": [],
-    "sources": [
-      "OASIS CACAO v2.0 specification \u2014 workflow step types (start, action, end), variable conventions, x_ extension namespace",
-      "General Data Protection Regulation (EU) 2016/679 \u2014 Article 35 (data protection impact assessment) and Article 36 (prior consultation)",
-      "Article 29 Working Party WP248 rev.01 \u2014 Guidelines on Data Protection Impact Assessment (DPIA), endorsed by the European Data Protection Board",
-      "OCSF v1.3.0 \u2014 Compliance Finding (class_uid 2003) event class emitted per lifecycle milestone for the operator's Article 5(2) accountability posture"
-    ],
-    "stable_id": "playbook.data_protection_impact_assessment@v1",
-    "telemetry_refs": [
-      "telemetry.ocsf.compliance_finding@v1"
-    ]
-  }
+  "workflow_start": "start--d91a35c0-0000-4000-8000-000000000001"
 }

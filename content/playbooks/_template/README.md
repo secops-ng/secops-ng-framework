@@ -15,7 +15,8 @@ For the exhaustive field reference, read
 
 - `playbook.cacao.yaml` — CACAO v2 skeleton with inline comments on
   every required field, action steps in the house shape (`in_args` /
-  `out_args` / per-step `x_secops_ng`, optional `core_body` binding).
+  `out_args` / per-step SecOps-NG payload in `step_extensions`, optional
+  `core_body` binding).
   YAML is used here only because it supports comments; canonical
   playbooks ship JSON, so convert this file to `playbook.cacao.json`
   before opening the PR (quickstart § 3).

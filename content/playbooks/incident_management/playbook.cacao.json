@@ -171,23 +171,25 @@
           "command": "content.playbooks.incident_management.primitives.intake.derive_incident_id"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1",
-          "control.incident_timeline_signals@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.incident_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.timeline_completeness@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.incident_management.primitives.intake.derive_incident_id",
-          "in": {
-            "signal_id": "__signal_id__"
-          },
-          "out": "__incident_id__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1",
+            "control.incident_timeline_signals@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.incident_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.timeline_completeness@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.incident_management.primitives.intake.derive_incident_id",
+            "in": {
+              "signal_id": "__signal_id__"
+            },
+            "out": "__incident_id__"
+          }
         }
       }
     },
@@ -210,19 +212,21 @@
           "command": "content.playbooks.incident_management.primitives.classification.classify_significance"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1"
-        ],
-        "metric_refs": [
-          "kpi.timeline_completeness@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.incident_management.primitives.classification.classify_significance",
-          "in": {
-            "signals": "__intake_signals__"
-          },
-          "out": "__classification_verdict__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1"
+          ],
+          "metric_refs": [
+            "kpi.timeline_completeness@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.incident_management.primitives.classification.classify_significance",
+            "in": {
+              "signals": "__intake_signals__"
+            },
+            "out": "__classification_verdict__"
+          }
         }
       }
     },
@@ -254,23 +258,25 @@
           "command": "content.playbooks.incident_management.primitives.timeline_binding.open_timeline"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_timeline_signals@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.incident_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.timeline_completeness@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.incident_management.primitives.timeline_binding.open_timeline",
-          "in": {
-            "incident_id": "__incident_id__",
-            "opened_at": "__timeline_opened_at__"
-          },
-          "out": "__timeline_handle__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_timeline_signals@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.incident_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.timeline_completeness@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.incident_management.primitives.timeline_binding.open_timeline",
+            "in": {
+              "incident_id": "__incident_id__",
+              "opened_at": "__timeline_opened_at__"
+            },
+            "out": "__timeline_handle__"
+          }
         }
       }
     },
@@ -296,25 +302,27 @@
           "command": "content.playbooks.incident_management.primitives.regulator_submission.resolve_destination"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_notification@v1",
-          "control.incident_timeline_signals@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.incident_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.notification_sla_compliance@v1",
-          "kri.regulator_notification_overrun@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.incident_management.primitives.regulator_submission.resolve_destination",
-          "in": {
-            "destinations": "__notification_destinations__",
-            "stage": "'early_warning'"
-          },
-          "out": "__early_warning_destination__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_notification@v1",
+            "control.incident_timeline_signals@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.incident_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.notification_sla_compliance@v1",
+            "kri.regulator_notification_overrun@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.incident_management.primitives.regulator_submission.resolve_destination",
+            "in": {
+              "destinations": "__notification_destinations__",
+              "stage": "'early_warning'"
+            },
+            "out": "__early_warning_destination__"
+          }
         }
       }
     },
@@ -340,26 +348,28 @@
           "command": "content.playbooks.incident_management.primitives.stage_clock.verdict_for_submission"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_notification@v1",
-          "control.incident_timeline_signals@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.incident_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.notification_sla_compliance@v1",
-          "kri.regulator_notification_overrun@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.incident_management.primitives.stage_clock.verdict_for_submission",
-          "in": {
-            "stage": "'notification'",
-            "opened_at": "__timeline_opened_at__",
-            "submitted_at": "__notification_submitted_at__"
-          },
-          "out": "__notification_stage_verdict__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_notification@v1",
+            "control.incident_timeline_signals@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.incident_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.notification_sla_compliance@v1",
+            "kri.regulator_notification_overrun@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.incident_management.primitives.stage_clock.verdict_for_submission",
+            "in": {
+              "stage": "'notification'",
+              "opened_at": "__timeline_opened_at__",
+              "submitted_at": "__notification_submitted_at__"
+            },
+            "out": "__notification_stage_verdict__"
+          }
         }
       }
     },
@@ -393,26 +403,28 @@
           "command": "content.playbooks.incident_management.primitives.regulator_submission.resolve_destination"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_notification@v1",
-          "control.incident_timeline_signals@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.incident_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.notification_sla_compliance@v1",
-          "kpi.timeline_completeness@v1",
-          "kri.regulator_notification_overrun@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.incident_management.primitives.regulator_submission.resolve_destination",
-          "in": {
-            "destinations": "__notification_destinations__",
-            "stage": "'final_report'"
-          },
-          "out": "__final_report_destination__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_notification@v1",
+            "control.incident_timeline_signals@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.incident_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.notification_sla_compliance@v1",
+            "kpi.timeline_completeness@v1",
+            "kri.regulator_notification_overrun@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.incident_management.primitives.regulator_submission.resolve_destination",
+            "in": {
+              "destinations": "__notification_destinations__",
+              "stage": "'final_report'"
+            },
+            "out": "__final_report_destination__"
+          }
         }
       }
     },
@@ -435,23 +447,25 @@
           "command": "content.playbooks.incident_management.primitives.timeline_binding.close_timeline"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_timeline_signals@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.incident_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.timeline_completeness@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.incident_management.primitives.timeline_binding.close_timeline",
-          "in": {
-            "session": "__timeline_handle__",
-            "closed_at": "__timeline_closed_at__"
-          },
-          "out": "__timeline_artefact_path__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_timeline_signals@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.incident_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.timeline_completeness@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.incident_management.primitives.timeline_binding.close_timeline",
+            "in": {
+              "session": "__timeline_handle__",
+              "closed_at": "__timeline_closed_at__"
+            },
+            "out": "__timeline_artefact_path__"
+          }
         }
       }
     },
@@ -460,34 +474,46 @@
       "name": "incident-mgmt-end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.incident_management@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "control_refs": [
-      "control.incident_handling_capability@v1",
-      "control.incident_timeline_signals@v1",
-      "control.incident_notification@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.incident_finding@v1"
-    ],
-    "metric_refs": [
-      "kpi.notification_sla_compliance@v1",
-      "kpi.timeline_completeness@v1",
-      "kri.regulator_notification_overrun@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
-      "NIS2 Directive (EU) 2022/2555, Article 23 — three-stage incident reporting obligations (24h early warning, 72h notification, 1 month final report) and cross-border scope",
-      "DORA Regulation (EU) 2022/2554, Article 19 — reporting of major ICT-related incidents",
-      "ENISA — Technical Guideline on Incident Reporting under the NIS Directive",
-      "OCSF — Security Finding (2001) event class for the incident-finding telemetry shape"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.incident_management@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "control_refs": [
+        "control.incident_handling_capability@v1",
+        "control.incident_timeline_signals@v1",
+        "control.incident_notification@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.incident_finding@v1"
+      ],
+      "metric_refs": [
+        "kpi.notification_sla_compliance@v1",
+        "kpi.timeline_completeness@v1",
+        "kri.regulator_notification_overrun@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
+        "NIS2 Directive (EU) 2022/2555, Article 23 — three-stage incident reporting obligations (24h early warning, 72h notification, 1 month final report) and cross-border scope",
+        "DORA Regulation (EU) 2022/2554, Article 19 — reporting of major ICT-related incidents",
+        "ENISA — Technical Guideline on Incident Reporting under the NIS Directive",
+        "OCSF — Security Finding (2001) event class for the incident-finding telemetry shape"
+      ]
+    }
   }
 }

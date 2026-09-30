@@ -8,6 +8,16 @@
   "created": "2026-06-18T00:00:00Z",
   "created_by": "identity--c0c0c0c0-c0c0-4c0c-8c0c-c0c0c0c0c0c0",
   "description": "Source playbook for the detection_engineering rule lifecycle. Moves a rule version deterministically through four states: propose (intake the candidate rule and its rationale), review (peer review against the operator's review checklist), ship (promote to production status in the operator's detection store), and measure (emit a per-rule-version effectiveness-metric snapshot the operator's chosen metric sink consumes). Action bodies are operator-wired placeholders carrying the CACAO I/O contract; the workflow graph, step ids, and schema references are the contract this artifact commits to. CACAO v2 + SecOps-NG content-model extensions.",
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "name": "SecOps-NG content model",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "type": "extension-definition",
+      "version": "1.0.0"
+    }
+  },
   "external_references": [
     {
       "name": "NIS2 Directive (EU) 2022/2555, Article 21(2)(f) \u2014 effectiveness assessment of risk-management measures",
@@ -28,6 +38,32 @@
   ],
   "modified": "2026-06-18T00:00:00Z",
   "name": "Detection engineering \u2014 rule lifecycle",
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "compile_targets": [
+        "n8n"
+      ],
+      "content_version": "0.1.0",
+      "control_refs": [
+        "control.control_effectiveness_test@v1"
+      ],
+      "maturity": "experimental",
+      "metric_refs": [
+        "kpi.detection_coverage@v1",
+        "kpi.false_positive_rate@v1",
+        "kri.control_effectiveness@v1"
+      ],
+      "sources": [
+        "NIS2 Directive (EU) 2022/2555, Article 21(2)(f) \u2014 effectiveness assessment of cybersecurity risk-management measures.",
+        "OASIS CACAO v2.0 \u2014 workflow step types, variable conventions, x_ extension namespace.",
+        "OCSF v1.3.0 Detection Finding (class_uid 2004) \u2014 the canonical OCSF event class the rule lifecycle's measure state binds against."
+      ],
+      "stable_id": "playbook.detection_engineering@v1",
+      "telemetry_refs": [
+        "telemetry.ocsf.detection_finding@v1"
+      ]
+    }
+  },
   "playbook_types": [
     "investigation",
     "notification"
@@ -83,12 +119,14 @@
       ],
       "name": "propose-rule-version",
       "on_completion": "action--f0e4f404-0000-4000-8000-000000000003",
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.control_effectiveness_test@v1"
-        ]
-      }
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.control_effectiveness_test@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--f0e4f404-0000-4000-8000-000000000003": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -108,12 +146,14 @@
       "out_args": [
         "__review_verdict__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.control_effectiveness_test@v1"
-        ]
-      }
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.control_effectiveness_test@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--f0e4f404-0000-4000-8000-000000000004": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -134,12 +174,14 @@
       "out_args": [
         "__ship_status__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.control_effectiveness_test@v1"
-        ]
-      }
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.control_effectiveness_test@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--f0e4f404-0000-4000-8000-000000000005": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -160,20 +202,22 @@
       "out_args": [
         "__effectiveness_snapshot_id__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.control_effectiveness_test@v1"
-        ],
-        "metric_refs": [
-          "kpi.detection_coverage@v1",
-          "kpi.false_positive_rate@v1",
-          "kri.control_effectiveness@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.detection_finding@v1"
-        ]
-      }
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.control_effectiveness_test@v1"
+          ],
+          "metric_refs": [
+            "kpi.detection_coverage@v1",
+            "kpi.false_positive_rate@v1",
+            "kri.control_effectiveness@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.detection_finding@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "end--f0e4f404-0000-4000-8000-000000000006": {
       "name": "rule-lifecycle-end",
@@ -185,29 +229,5 @@
       "type": "start"
     }
   },
-  "workflow_start": "start--f0e4f404-0000-4000-8000-000000000001",
-  "x_secops_ng": {
-    "compile_targets": [
-      "n8n"
-    ],
-    "content_version": "0.1.0",
-    "control_refs": [
-      "control.control_effectiveness_test@v1"
-    ],
-    "maturity": "experimental",
-    "metric_refs": [
-      "kpi.detection_coverage@v1",
-      "kpi.false_positive_rate@v1",
-      "kri.control_effectiveness@v1"
-    ],
-    "sources": [
-      "NIS2 Directive (EU) 2022/2555, Article 21(2)(f) \u2014 effectiveness assessment of cybersecurity risk-management measures.",
-      "OASIS CACAO v2.0 \u2014 workflow step types, variable conventions, x_ extension namespace.",
-      "OCSF v1.3.0 Detection Finding (class_uid 2004) \u2014 the canonical OCSF event class the rule lifecycle's measure state binds against."
-    ],
-    "stable_id": "playbook.detection_engineering@v1",
-    "telemetry_refs": [
-      "telemetry.ocsf.detection_finding@v1"
-    ]
-  }
+  "workflow_start": "start--f0e4f404-0000-4000-8000-000000000001"
 }

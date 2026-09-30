@@ -126,25 +126,27 @@
           "command": "Collate a chronological timeline of the incident from the artifacts the responders left behind: ticket comments, chat transcripts, EDR / SIEM exports, network captures, and operator-supplied evidence packages. The step must flag gaps in the evidence record where anti-forensics signals (cleared eventlogs, disabled audit policy, timestomped files) are present — these are recorded in __evidence_gaps_present__ rather than silently smoothed over, so the review template can address decisions made under partial evidence. Produces __timeline_artifact__ and __evidence_gaps_present__."
         }
       ],
-      "x_secops_ng": {
-        "detection_refs": [
-          "detection.sigma.eventlog_cleared@v1",
-          "detection.sigma.security_eventlog_cleared@v1",
-          "detection.sigma.important_eventlog_cleared@v1",
-          "detection.sigma.eventlog_clear_configuration_change@v1",
-          "detection.sigma.event_auditing_disabled@v1",
-          "detection.sigma.auditpol_tampering@v1",
-          "detection.sigma.timestomp_powershell@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.incident_finding@v1",
-          "telemetry.ocsf.process_activity@v1",
-          "telemetry.ocsf.file_activity@v1",
-          "telemetry.ocsf.authentication@v1"
-        ],
-        "metric_refs": [
-          "kpi.timeline_completeness@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "detection_refs": [
+            "detection.sigma.eventlog_cleared@v1",
+            "detection.sigma.security_eventlog_cleared@v1",
+            "detection.sigma.important_eventlog_cleared@v1",
+            "detection.sigma.eventlog_clear_configuration_change@v1",
+            "detection.sigma.event_auditing_disabled@v1",
+            "detection.sigma.auditpol_tampering@v1",
+            "detection.sigma.timestomp_powershell@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.incident_finding@v1",
+            "telemetry.ocsf.process_activity@v1",
+            "telemetry.ocsf.file_activity@v1",
+            "telemetry.ocsf.authentication@v1"
+          ],
+          "metric_refs": [
+            "kpi.timeline_completeness@v1"
+          ]
+        }
       }
     },
     "action--40000000-0000-4000-8000-000000000003": {
@@ -167,16 +169,18 @@
           "command": "Walk the operator's blameless review template against the collated timeline. The template separates contributing factors (process, tooling, staffing, training, environment) from individual error, and explicitly captures decisions that were reasonable given the evidence available at the time. If __evidence_gaps_present__ is true the template's evidence-gaps section is mandatory rather than optional. Produces __review_artifact__."
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.blameless_review@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.incident_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.review_completion_sla@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.blameless_review@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.incident_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.review_completion_sla@v1"
+          ]
+        }
       }
     },
     "action--40000000-0000-4000-8000-000000000004": {
@@ -198,17 +202,19 @@
           "command": "Extract corrective actions from the review artifact and register each one with owner, due-date, and verification clause. Registration is the deliverable here — execution and verification of each action are out of scope for this playbook (they live on the operator's existing change / ticketing system). Produces __corrective_action_register__."
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.corrective_action_register@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.incident_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.corrective_action_close_rate@v1",
-          "kri.corrective_action_overdue@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.corrective_action_register@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.incident_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.corrective_action_close_rate@v1",
+            "kri.corrective_action_overdue@v1"
+          ]
+        }
       }
     },
     "end--40000000-0000-4000-8000-000000000005": {
@@ -216,45 +222,57 @@
       "name": "post_incident_review_end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.post_incident_review@v1",
-    "content_version": "0.1.0",
-    "maturity": "experimental",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "detection_refs": [
-      "detection.sigma.eventlog_cleared@v1",
-      "detection.sigma.security_eventlog_cleared@v1",
-      "detection.sigma.important_eventlog_cleared@v1",
-      "detection.sigma.eventlog_clear_configuration_change@v1",
-      "detection.sigma.event_auditing_disabled@v1",
-      "detection.sigma.auditpol_tampering@v1",
-      "detection.sigma.timestomp_powershell@v1"
-    ],
-    "control_refs": [
-      "control.blameless_review@v1",
-      "control.corrective_action_register@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.incident_finding@v1",
-      "telemetry.ocsf.process_activity@v1",
-      "telemetry.ocsf.file_activity@v1",
-      "telemetry.ocsf.authentication@v1"
-    ],
-    "metric_refs": [
-      "kpi.timeline_completeness@v1",
-      "kpi.review_completion_sla@v1",
-      "kpi.corrective_action_close_rate@v1",
-      "kri.corrective_action_overdue@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
-      "ENISA — Good Practices for Supply Chain Cybersecurity (post-incident learning patterns)",
-      "OCSF — Security Finding (2001), Process Activity (1007), File Activity (1001), Authentication (3002) event classes",
-      "SigmaHQ — anti-forensics / audit-tampering rule IDs referenced via external_references (gap-detection signals only; SecOps-NG does not re-author Sigma rules)"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.post_incident_review@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "detection_refs": [
+        "detection.sigma.eventlog_cleared@v1",
+        "detection.sigma.security_eventlog_cleared@v1",
+        "detection.sigma.important_eventlog_cleared@v1",
+        "detection.sigma.eventlog_clear_configuration_change@v1",
+        "detection.sigma.event_auditing_disabled@v1",
+        "detection.sigma.auditpol_tampering@v1",
+        "detection.sigma.timestomp_powershell@v1"
+      ],
+      "control_refs": [
+        "control.blameless_review@v1",
+        "control.corrective_action_register@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.incident_finding@v1",
+        "telemetry.ocsf.process_activity@v1",
+        "telemetry.ocsf.file_activity@v1",
+        "telemetry.ocsf.authentication@v1"
+      ],
+      "metric_refs": [
+        "kpi.timeline_completeness@v1",
+        "kpi.review_completion_sla@v1",
+        "kpi.corrective_action_close_rate@v1",
+        "kri.corrective_action_overdue@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
+        "ENISA — Good Practices for Supply Chain Cybersecurity (post-incident learning patterns)",
+        "OCSF — Security Finding (2001), Process Activity (1007), File Activity (1001), Authentication (3002) event classes",
+        "SigmaHQ — anti-forensics / audit-tampering rule IDs referenced via external_references (gap-detection signals only; SecOps-NG does not re-author Sigma rules)"
+      ]
+    }
   }
 }

@@ -59,9 +59,27 @@ canonical rule; do not add new ones.
 
 ## 3. Required CACAO fields
 
-The canonical artifact is `playbook.cacao.json`. It is CACAO v2 plus a
-small SecOps-NG extension namespace under the reserved `x_secops_ng`
-object. The following fields are required and are checked by
+The canonical artifact is `playbook.cacao.json`. It is CACAO v2 plus the
+SecOps-NG extension. CACAO 2.0 carries tool-specific data in extensions
+(§ 10.10), so a playbook declares the SecOps-NG extension once, in
+`extension_definitions`, under the fixed id
+`extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a`, and puts its SecOps-NG payload under that id in
+`playbook_extensions` (playbook level) and in each step's
+`step_extensions` (step level). Copy the `extension_definitions` entry
+and both slots from `_template` as they are; the extension's normative
+schema is `content-model/x-secops-ng.extension.schema.json`.
+
+This guide calls that payload **`x_secops_ng`**: it is the name the
+parser's model, the lint tools and the compiled n8n rows use, and the key
+the payload sat under before #1027. So `x_secops_ng.stable_id` below means
+the `stable_id` field of the playbook-level payload, and
+`x_secops_ng.core_body` the `core_body` of a step's. The parser still
+reads a payload written under a literal `x_secops_ng` key, for one more
+release; new playbooks use the extension slots, and
+`tests/compilers/_shared/test_secops_extension_placement.py` requires
+every canonical playbook to.
+
+The following fields are required and are checked by
 `tests/content_model/test_playbook_schema.py`:
 
 | Field | Notes |
@@ -163,16 +181,17 @@ document recommended that; it was wrong, because the compilers compile
 `core_body`, and the last two playbooks doing it were converted in #854
 and #863.
 
-**Open playbooks in CACAO Roaster to view them, not to edit them.**
-Every canonical playbook validates against the official OASIS CACAO 2.0
-schemas under the dialect they declare (`python -m tools.cacao_conformance`).
-CACAO Roaster rebuilds a playbook through its own model, which keeps only
-standard CACAO fields and CACAO extensions. It displays our playbooks,
-but it discards `x_secops_ng` on import, so a playbook saved from Roaster
-comes back without its stable id, maturity, reference bundles and
-`core_body` bindings. Do not commit a playbook saved from Roaster. Moving
-`x_secops_ng` into CACAO extensions, which Roaster keeps, is tracked in
-#1027.
+**Official schema and CACAO Roaster.** Every canonical playbook passes
+the official OASIS CACAO 2.0 schemas with zero errors under both the
+Draft-07 reading the schemas declare and the strict 2020-12 reading,
+which enforces their `unevaluatedProperties`; the ratchet
+(`python -m tools.cacao_conformance --dialect 2020-12`) gates on the strict
+one. CACAO Roaster rebuilds a playbook through a model that keeps standard
+CACAO fields and CACAO extensions and nothing else. The SecOps-NG data
+now sits in extension slots, so by Roaster's source it survives import
+and export; a live load-save-reload check is still owed (#1027). Until it
+has run, review the diff of any playbook saved from Roaster before
+committing it.
 
 `content/playbooks/cra_cvd/playbook.cacao.json` is a full worked
 example.

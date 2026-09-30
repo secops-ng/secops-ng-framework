@@ -210,25 +210,27 @@
           "command": "content.playbooks.patch_management.primitives.detect.detect_patch_availability"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.patch_evidence@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kri.cvd_intake_aging@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.patch_management.primitives.detect.detect_patch_availability",
-          "in": {
-            "update_subject": "__update_subject__",
-            "update_reference": "__update_reference__",
-            "advisory_kind": "__advisory_kind__",
-            "tracked_inventory": "__tracked_inventory__"
-          },
-          "out": "__detection_record__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.patch_evidence@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kri.cvd_intake_aging@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.patch_management.primitives.detect.detect_patch_availability",
+            "in": {
+              "update_subject": "__update_subject__",
+              "update_reference": "__update_reference__",
+              "advisory_kind": "__advisory_kind__",
+              "tracked_inventory": "__tracked_inventory__"
+            },
+            "out": "__detection_record__"
+          }
         }
       }
     },
@@ -251,25 +253,27 @@
           "command": "content.playbooks.patch_management.primitives.classify.classify_patch_criticality"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.patch_evidence@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kri.cvd_intake_aging@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.patch_management.primitives.classify.classify_patch_criticality",
-          "in": {
-            "update_subject": "__update_subject__",
-            "severity_band": "__severity_band__",
-            "exploit_observed": "__exploit_observed__",
-            "is_feature_only": "__is_feature_only__"
-          },
-          "out": "__patch_criticality__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.patch_evidence@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kri.cvd_intake_aging@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.patch_management.primitives.classify.classify_patch_criticality",
+            "in": {
+              "update_subject": "__update_subject__",
+              "severity_band": "__severity_band__",
+              "exploit_observed": "__exploit_observed__",
+              "is_feature_only": "__is_feature_only__"
+            },
+            "out": "__patch_criticality__"
+          }
         }
       }
     },
@@ -293,26 +297,28 @@
           "command": "content.playbooks.patch_management.primitives.stage.stage_rollout_to_canary_ring"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.patch_evidence@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kpi.patch_disseminated_on_time@v1",
-          "kpi.nis2_patch_cadence_compliance_rate@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.patch_management.primitives.stage.stage_rollout_to_canary_ring",
-          "in": {
-            "update_subject": "__update_subject__",
-            "update_reference": "__update_reference__",
-            "patch_criticality": "__patch_criticality__",
-            "ring_topology": "__ring_topology__"
-          },
-          "out": "__staged_ring_id__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.patch_evidence@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kpi.patch_disseminated_on_time@v1",
+            "kpi.nis2_patch_cadence_compliance_rate@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.patch_management.primitives.stage.stage_rollout_to_canary_ring",
+            "in": {
+              "update_subject": "__update_subject__",
+              "update_reference": "__update_reference__",
+              "patch_criticality": "__patch_criticality__",
+              "ring_topology": "__ring_topology__"
+            },
+            "out": "__staged_ring_id__"
+          }
         }
       }
     },
@@ -335,25 +341,27 @@
           "command": "content.playbooks.patch_management.primitives.validate.validate_canary"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.patch_evidence@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kpi.mttr_containment@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.patch_management.primitives.validate.validate_canary",
-          "in": {
-            "functional_probe": "__functional_probe__",
-            "error_rate_within_threshold": "__error_rate_within_threshold__",
-            "latency_within_threshold": "__latency_within_threshold__",
-            "rollback_ready": "__rollback_ready__"
-          },
-          "out": "__canary_verdict__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.patch_evidence@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kpi.mttr_containment@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.patch_management.primitives.validate.validate_canary",
+            "in": {
+              "functional_probe": "__functional_probe__",
+              "error_rate_within_threshold": "__error_rate_within_threshold__",
+              "latency_within_threshold": "__latency_within_threshold__",
+              "rollback_ready": "__rollback_ready__"
+            },
+            "out": "__canary_verdict__"
+          }
         }
       }
     },
@@ -378,27 +386,29 @@
           "command": "content.playbooks.patch_management.primitives.fanout.fan_out_to_broad_rings"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.patch_evidence@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kpi.patch_disseminated_on_time@v1",
-          "kpi.nis2_patch_cadence_compliance_rate@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.patch_management.primitives.fanout.fan_out_to_broad_rings",
-          "in": {
-            "update_subject": "__update_subject__",
-            "update_reference": "__update_reference__",
-            "staged_ring_id": "__staged_ring_id__",
-            "canary_healthy": "__canary_healthy__",
-            "broad_rings": "__broad_rings__"
-          },
-          "out": "__broad_rollout_id__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.patch_evidence@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kpi.patch_disseminated_on_time@v1",
+            "kpi.nis2_patch_cadence_compliance_rate@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.patch_management.primitives.fanout.fan_out_to_broad_rings",
+            "in": {
+              "update_subject": "__update_subject__",
+              "update_reference": "__update_reference__",
+              "staged_ring_id": "__staged_ring_id__",
+              "canary_healthy": "__canary_healthy__",
+              "broad_rings": "__broad_rings__"
+            },
+            "out": "__broad_rollout_id__"
+          }
         }
       }
     },
@@ -425,34 +435,36 @@
           "command": "content.playbooks.patch_management.primitives.artifact.build_patch_application_evidence_artifact"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.patch_evidence@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kri.control_effectiveness@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.patch_management.primitives.artifact.build_patch_application_evidence_artifact",
-          "in": {
-            "workflow_id": "__workflow_id__",
-            "execution_id": "__execution_id__",
-            "regulation_refs": "__regulation_refs__",
-            "control_refs": "__control_refs__",
-            "update_subject": "__update_subject__",
-            "update_reference": "__update_reference__",
-            "patch_criticality": "__patch_criticality__",
-            "staged_ring_id": "__staged_ring_id__",
-            "canary_healthy": "__canary_healthy__",
-            "broad_rollout_id": "__broad_rollout_id__",
-            "health_observations": "__health_observations__",
-            "captured_at": "__captured_at__",
-            "source_url": "__source_url__"
-          },
-          "out": "__evidence_id__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.patch_evidence@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kri.control_effectiveness@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.patch_management.primitives.artifact.build_patch_application_evidence_artifact",
+            "in": {
+              "workflow_id": "__workflow_id__",
+              "execution_id": "__execution_id__",
+              "regulation_refs": "__regulation_refs__",
+              "control_refs": "__control_refs__",
+              "update_subject": "__update_subject__",
+              "update_reference": "__update_reference__",
+              "patch_criticality": "__patch_criticality__",
+              "staged_ring_id": "__staged_ring_id__",
+              "canary_healthy": "__canary_healthy__",
+              "broad_rollout_id": "__broad_rollout_id__",
+              "health_observations": "__health_observations__",
+              "captured_at": "__captured_at__",
+              "source_url": "__source_url__"
+            },
+            "out": "__evidence_id__"
+          }
         }
       }
     },
@@ -473,21 +485,23 @@
           "command": "content.playbooks.patch_management.primitives.notify.compose_maintenance_notification"
         }
       ],
-      "x_secops_ng": {
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kri.control_effectiveness@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.patch_management.primitives.notify.compose_maintenance_notification",
-          "in": {
-            "evidence_id": "__evidence_id__",
-            "update_subject": "__update_subject__",
-            "canary_healthy": "__canary_healthy__"
-          },
-          "out": "__maintenance_notification__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kri.control_effectiveness@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.patch_management.primitives.notify.compose_maintenance_notification",
+            "in": {
+              "evidence_id": "__evidence_id__",
+              "update_subject": "__update_subject__",
+              "canary_healthy": "__canary_healthy__"
+            },
+            "out": "__maintenance_notification__"
+          }
         }
       },
       "out_args": [
@@ -499,33 +513,45 @@
       "name": "patch_management_end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.patch_management@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "control_refs": [
-      "control.patch_evidence@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.api_activity@v1"
-    ],
-    "metric_refs": [
-      "kri.cvd_intake_aging@v1",
-      "kpi.patch_disseminated_on_time@v1",
-      "kpi.mttr_containment@v1",
-      "kri.control_effectiveness@v1",
-      "kpi.nis2_patch_cadence_compliance_rate@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
-      "NIS2 Directive (EU) 2022/2555, Article 21(2)(e) — security in acquisition, development and maintenance",
-      "ENISA — Good practices on the patch-management lifecycle",
-      "OCSF — API Activity (6003) event class"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.patch_management@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "control_refs": [
+        "control.patch_evidence@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.api_activity@v1"
+      ],
+      "metric_refs": [
+        "kri.cvd_intake_aging@v1",
+        "kpi.patch_disseminated_on_time@v1",
+        "kpi.mttr_containment@v1",
+        "kri.control_effectiveness@v1",
+        "kpi.nis2_patch_cadence_compliance_rate@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
+        "NIS2 Directive (EU) 2022/2555, Article 21(2)(e) — security in acquisition, development and maintenance",
+        "ENISA — Good practices on the patch-management lifecycle",
+        "OCSF — API Activity (6003) event class"
+      ]
+    }
   }
 }

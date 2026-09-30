@@ -28,6 +28,7 @@ from pathlib import Path
 from compilers._shared.cacao_parser import parse_file
 from compilers.n8n.emit import emit as emit_n8n
 from compilers.n8n.evidence import emit_access_artifact_n8n
+from compilers._shared.cacao_parser import secops_extension
 
 REPO = Path(__file__).resolve().parents[4]
 EXAMPLE = REPO / "examples" / "n8n" / "iam_auditor"
@@ -135,7 +136,7 @@ def _core_body_steps() -> dict[str, dict]:
     return {
         step_id: step
         for step_id, step in raw["workflow"].items()
-        if (step.get("x_secops_ng") or {}).get("core_body")
+        if (secops_extension(step) or {}).get("core_body")
     }
 
 
@@ -165,13 +166,13 @@ def test_core_body_steps_emit_code_nodes() -> None:
             f"not {node['type']!r}"
         )
         body = node["parameters"].get("pythonCode", "")
-        primitive = step["x_secops_ng"]["core_body"]["primitive"]
+        primitive = secops_extension(step)["core_body"]["primitive"]
         module, _, callable_name = primitive.rpartition(".")
         assert f"from {module} import {callable_name}" in body, (
             f"step {step_id!r}: Code node missing primitive import "
             f"`from {module} import {callable_name}`"
         )
-        out_var = step["x_secops_ng"]["core_body"]["out"]
+        out_var = secops_extension(step)["core_body"]["out"]
         assert f"{out_var} = {callable_name}(" in body, (
             f"step {step_id!r}: Code node missing primitive call binding "
             f"`{out_var} = {callable_name}(...)`"

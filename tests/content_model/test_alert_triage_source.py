@@ -22,6 +22,7 @@ from pathlib import Path
 import pytest
 import yaml
 from jsonschema import Draft202012Validator
+from compilers._shared.cacao_parser import secops_extension
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_PATH = REPO_ROOT / "content-model" / "playbook.schema.json"
@@ -59,13 +60,13 @@ def test_source_validates_against_playbook_schema(
 
 
 def test_source_stable_id_is_alert_triage(playbook: dict) -> None:
-    assert playbook["x_secops_ng"]["stable_id"] == "playbook.alert_triage@v1"
+    assert secops_extension(playbook)["stable_id"] == "playbook.alert_triage@v1"
 
 
 def test_source_declares_three_compile_targets(playbook: dict) -> None:
     """The wave (a)→(d) spawns one SKELETON card per compile target;
     the source must commit to all three."""
-    assert set(playbook["x_secops_ng"]["compile_targets"]) == {
+    assert set(secops_extension(playbook)["compile_targets"]) == {
         "n8n",
         "temporal",
         "langgraph",

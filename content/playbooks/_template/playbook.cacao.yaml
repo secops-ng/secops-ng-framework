@@ -71,38 +71,51 @@ external_references:
     source: TODO_PUBLISHER
     # url: TODO_URL
 
-# SecOps-NG extension namespace. All fields nested here are required
-# unless noted otherwise.
-x_secops_ng:
-  # Human-curated join key: playbook.<slug>@v<major>. This is what
-  # mappings and cross-references pin — it stays stable across
-  # regenerations of the CACAO `id` above.
-  stable_id: playbook.TODO_SLUG@v1
+# The SecOps-NG extension (CACAO 2.0 § 10.10). Declare it once, exactly as
+# below — same id, same fields — and put the SecOps-NG payload under that id
+# in playbook_extensions (here) and in each step's step_extensions. The
+# guide calls this payload `x_secops_ng` (playbook-authoring.md § 3).
+extension_definitions:
+  extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+    type: "extension-definition"
+    name: "SecOps-NG content model"
+    description: "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level."
+    created_by: "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c"
+    schema: "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json"
+    version: "1.0.0"
+playbook_extensions:
+  # The playbook-level SecOps-NG payload. All fields are required unless
+  # noted otherwise.
+  extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+    # Human-curated join key: playbook.<slug>@v<major>. This is what
+    # mappings and cross-references pin — it stays stable across
+    # regenerations of the CACAO `id` above.
+    stable_id: playbook.TODO_SLUG@v1
 
-  # Semantic version of the playbook BODY (not the CACAO spec_version).
-  # Bump on every content-affecting edit.
-  content_version: 0.1.0
+    # Semantic version of the playbook BODY (not the CACAO spec_version).
+    # Bump on every content-affecting edit.
+    content_version: 0.1.0
 
-  # Maturity gate. `draft` and `experimental` are not compiled by
-  # default in production targets.
-  maturity: draft   # draft | experimental | stable | deprecated
+    # Maturity gate. `draft` and `experimental` are not compiled by
+    # default in production targets.
+    maturity: draft   # draft | experimental | stable | deprecated
 
-  # Optional: which reference targets this playbook compiles into.
-  # Any subset of ["n8n", "temporal", "langgraph"]. Omit or leave
-  # empty if the playbook is portable content only for now.
-  compile_targets: []
+    # Optional: which reference targets this playbook compiles into.
+    # Any subset of ["n8n", "temporal", "langgraph"]. Omit or leave
+    # empty if the playbook is portable content only for now.
+    compile_targets: []
 
-  # Optional: outbound content-model references. Each entry is a
-  # stable-id string that resolves against the corresponding layer.
-  # Full outbound view (with OSCAL / D3FEND / OCSF details) lives in
-  # mappings.yaml — these arrays are the shortlist a compiler reads.
-  control_refs: []
-  telemetry_refs: []
-  metric_refs: []
+    # Optional: outbound content-model references. Each entry is a
+    # stable-id string that resolves against the corresponding layer.
+    # Full outbound view (with OSCAL / D3FEND / OCSF details) lives in
+    # mappings.yaml — these arrays are the shortlist a compiler reads.
+    control_refs: []
+    telemetry_refs: []
+    metric_refs: []
 
-  # Optional: free-form provenance pointers. One line per source.
-  sources:
-    - TODO_UPSTREAM_SPEC_OR_CLAUSE_URL
+    # Optional: free-form provenance pointers. One line per source.
+    sources:
+      - TODO_UPSTREAM_SPEC_OR_CLAUSE_URL
 
 # CACAO playbook variables. Declare EVERY workflow variable here — the
 # all-HARD core_body lint (tools.lint_core_body) rejects a step binding
@@ -150,12 +163,14 @@ workflow_start: step--TODO_UUID_START
 # The house action-step shape (playbook-authoring.md § 3):
 #   in_args   — playbook variables the step reads
 #   out_args  — playbook variables the step produces
-#   x_secops_ng.control_refs / .telemetry_refs / .metric_refs —
-#     per-step reference bundles, same stable-id shape as the
-#     playbook-level arrays above. telemetry_refs use the namespaced
-#     OCSF spelling: telemetry.ocsf.<class>@v<major>.
-#   x_secops_ng.core_body — optional deterministic primitive binding;
-#     see the commented block on the action step below.
+#   step_extensions[<the SecOps-NG extension id>] — the step's SecOps-NG
+#     payload (the guide's `x_secops_ng`), holding:
+#     control_refs / telemetry_refs / metric_refs — per-step reference
+#       bundles, same stable-id shape as the playbook-level arrays above.
+#       telemetry_refs use the namespaced OCSF spelling:
+#       telemetry.ocsf.<class>@v<major>.
+#     core_body — optional deterministic primitive binding; see the
+#       commented block on the action step below.
 #   agent — always the group agent declared in agent_definitions.
 #   commands — exactly one command on every action step. On a bound
 #     step it is of type `secops-ng-primitive` and its `command` is the
@@ -199,21 +214,22 @@ workflow:
     # commands:
     #   - type: secops-ng-primitive
     #     command: content.playbooks.<slug>.primitives.<module>.<function>
-    x_secops_ng:
-      control_refs: []
-      telemetry_refs: []
-      metric_refs: []
-      # Optional: bind the step to a deterministic primitive. Uncomment
-      # only when the primitive module exists under
-      # content/playbooks/<slug>/primitives/. The all-HARD core_body
-      # lint checks every binding: all three keys required, every `in`
-      # value and the `out` target declared in playbook_variables
-      # above. A SKELETON ships without this block; CORE adds it.
-      # core_body:
-      #   primitive: content.playbooks.<slug>.primitives.<module>.<function>
-      #   in:
-      #     argument_name: __TODO_INPUT__
-      #   out: __TODO_OUTPUT__
+    step_extensions:
+      extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+        control_refs: []
+        telemetry_refs: []
+        metric_refs: []
+        # Optional: bind the step to a deterministic primitive. Uncomment
+        # only when the primitive module exists under
+        # content/playbooks/<slug>/primitives/. The all-HARD core_body
+        # lint checks every binding: all three keys required, every `in`
+        # value and the `out` target declared in playbook_variables
+        # above. A SKELETON ships without this block; CORE adds it.
+        # core_body:
+        #   primitive: content.playbooks.<slug>.primitives.<module>.<function>
+        #   in:
+        #     argument_name: __TODO_INPUT__
+        #   out: __TODO_OUTPUT__
     on_completion: step--TODO_UUID_END
 
   step--TODO_UUID_END:

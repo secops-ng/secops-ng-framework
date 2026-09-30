@@ -185,22 +185,24 @@
           "command": "content.playbooks.eidas2_identity_verification.primitives.presentation.compose_presentation_request"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.jml_evidence@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.account_change@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.eidas2_identity_verification.primitives.presentation.compose_presentation_request",
-          "in": {
-            "principal_id": "__principal_id__",
-            "auth_scope": "__auth_scope__",
-            "required_credentials": "__required_credentials__",
-            "requested_at": "__requested_at__"
-          },
-          "out": "__presentation_request__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.jml_evidence@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.account_change@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.eidas2_identity_verification.primitives.presentation.compose_presentation_request",
+            "in": {
+              "principal_id": "__principal_id__",
+              "auth_scope": "__auth_scope__",
+              "required_credentials": "__required_credentials__",
+              "requested_at": "__requested_at__"
+            },
+            "out": "__presentation_request__"
+          }
         }
       }
     },
@@ -226,20 +228,22 @@
           "command": "content.playbooks.eidas2_identity_verification.primitives.verification.record_pid_verification"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.jml_evidence@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.account_change@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.eidas2_identity_verification.primitives.verification.record_pid_verification",
-          "in": {
-            "presentation_request_id": "__presentation_request_id__",
-            "verification_report": "__verification_report__"
-          },
-          "out": "__verification_record__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.jml_evidence@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.account_change@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.eidas2_identity_verification.primitives.verification.record_pid_verification",
+            "in": {
+              "presentation_request_id": "__presentation_request_id__",
+              "verification_report": "__verification_report__"
+            },
+            "out": "__verification_record__"
+          }
         }
       }
     },
@@ -267,22 +271,24 @@
           "command": "content.playbooks.eidas2_identity_verification.primitives.assurance.assess_assurance_level"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.jml_evidence@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.account_change@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.eidas2_identity_verification.primitives.assurance.assess_assurance_level",
-          "in": {
-            "loa_verdict": "__returned_loa__",
-            "auth_scope": "__auth_scope__",
-            "assurance_tier_table": "__assurance_tier_table__",
-            "verification_verdict": "__verification_verdict__"
-          },
-          "out": "__assurance_assessment__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.jml_evidence@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.account_change@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.eidas2_identity_verification.primitives.assurance.assess_assurance_level",
+            "in": {
+              "loa_verdict": "__returned_loa__",
+              "auth_scope": "__auth_scope__",
+              "assurance_tier_table": "__assurance_tier_table__",
+              "verification_verdict": "__verification_verdict__"
+            },
+            "out": "__assurance_assessment__"
+          }
         }
       }
     },
@@ -312,26 +318,28 @@
           "command": "content.playbooks.eidas2_identity_verification.primitives.evidence.compose_identity_evidence_record"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.jml_evidence@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.account_change@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.eidas2_identity_verification.primitives.evidence.compose_identity_evidence_record",
-          "in": {
-            "principal_id": "__principal_id__",
-            "auth_scope": "__auth_scope__",
-            "presentation_request_id": "__presentation_request_id__",
-            "pid_credential_id": "__pid_credential_id__",
-            "loa_verdict": "__loa_verdict__",
-            "access_tier": "__access_tier__",
-            "verification_verdict": "__verification_verdict__",
-            "captured_at": "__captured_at__"
-          },
-          "out": "__identity_evidence_record__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.jml_evidence@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.account_change@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.eidas2_identity_verification.primitives.evidence.compose_identity_evidence_record",
+            "in": {
+              "principal_id": "__principal_id__",
+              "auth_scope": "__auth_scope__",
+              "presentation_request_id": "__presentation_request_id__",
+              "pid_credential_id": "__pid_credential_id__",
+              "loa_verdict": "__loa_verdict__",
+              "access_tier": "__access_tier__",
+              "verification_verdict": "__verification_verdict__",
+              "captured_at": "__captured_at__"
+            },
+            "out": "__identity_evidence_record__"
+          }
         }
       }
     },
@@ -357,23 +365,25 @@
           "command": "content.playbooks.eidas2_identity_verification.primitives.provisioning.compose_provisioning_handoff"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.jml_evidence@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.account_change@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.eidas2_identity_verification.primitives.provisioning.compose_provisioning_handoff",
-          "in": {
-            "principal_id": "__principal_id__",
-            "auth_scope": "__auth_scope__",
-            "access_tier": "__access_tier__",
-            "verification_verdict": "__verification_verdict__",
-            "evidence_id": "__evidence_id__"
-          },
-          "out": "__provisioning_handoff__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.jml_evidence@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.account_change@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.eidas2_identity_verification.primitives.provisioning.compose_provisioning_handoff",
+            "in": {
+              "principal_id": "__principal_id__",
+              "auth_scope": "__auth_scope__",
+              "access_tier": "__access_tier__",
+              "verification_verdict": "__verification_verdict__",
+              "evidence_id": "__evidence_id__"
+            },
+            "out": "__provisioning_handoff__"
+          }
         }
       }
     },
@@ -382,29 +392,41 @@
       "name": "eidas2_identity_verification_end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.eidas2_identity_verification@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "control_refs": [
-      "control.jml_evidence@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.account_change@v1"
-    ],
-    "metric_refs": [],
-    "sources": [
-      "OASIS CACAO v2.0 specification \u2014 workflow step types (start, action, end), variable conventions, x_ extension namespace",
-      "eIDAS 2.0 \u2014 Regulation (EU) 2024/1183 amending Regulation (EU) No 910/2014 (European Digital Identity Framework)",
-      "NIS2 Directive (EU) 2022/2555, Article 21(2)(i) \u2014 human resources security, access-control policies, and asset management",
-      "DORA Regulation (EU) 2022/2554, Article 5 \u2014 governance and organisation, digital-identity governance surface",
-      "ARF v2 \u2014 European Digital Identity Wallet Architecture and Reference Framework",
-      "OCSF v1.3.0 \u2014 Account Change (class_uid 3001) event class"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.eidas2_identity_verification@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "control_refs": [
+        "control.jml_evidence@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.account_change@v1"
+      ],
+      "metric_refs": [],
+      "sources": [
+        "OASIS CACAO v2.0 specification \u2014 workflow step types (start, action, end), variable conventions, x_ extension namespace",
+        "eIDAS 2.0 \u2014 Regulation (EU) 2024/1183 amending Regulation (EU) No 910/2014 (European Digital Identity Framework)",
+        "NIS2 Directive (EU) 2022/2555, Article 21(2)(i) \u2014 human resources security, access-control policies, and asset management",
+        "DORA Regulation (EU) 2022/2554, Article 5 \u2014 governance and organisation, digital-identity governance surface",
+        "ARF v2 \u2014 European Digital Identity Wallet Architecture and Reference Framework",
+        "OCSF v1.3.0 \u2014 Account Change (class_uid 3001) event class"
+      ]
+    }
   }
 }

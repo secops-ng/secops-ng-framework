@@ -29,6 +29,7 @@ import pytest
 import yaml
 
 from tools.cacao_conformance import discover_playbooks
+from compilers._shared.cacao_parser import secops_extension
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE = REPO_ROOT / "content" / "playbooks" / "_template" / "playbook.cacao.yaml"
@@ -52,7 +53,7 @@ def _actions(data: dict) -> dict[str, dict]:
 
 
 def _core_body(step: dict) -> dict | None:
-    return (step.get("x_secops_ng") or {}).get("core_body")
+    return (secops_extension(step) or {}).get("core_body")
 
 
 def test_the_agent_id_is_a_valid_cacao_identifier() -> None:

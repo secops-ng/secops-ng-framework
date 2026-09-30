@@ -15,7 +15,8 @@ A playbook carries its SecOps-NG data either under the legacy
 `x_secops_ng` object or in the CACAO 2.0 extension slots —
 `playbook_extensions` and each step's `step_extensions`, keyed by
 `SECOPS_NG_EXTENSION_ID` and declared in `extension_definitions` (#1027).
-The parser reads both for one release and rejects an object that carries
+Every canonical playbook uses the extension slots; the parser still reads
+the legacy placement for one release and rejects an object that carries
 both. Either way the AST exposes the payload as `x_secops_ng`, so emitters
 are unaffected.
 

@@ -137,20 +137,22 @@
           "command": "content.playbooks.onboarding_offboarding_tracker.primitives.ingest.ingest_lifecycle_event"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.jml_evidence@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.account_change@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.onboarding_offboarding_tracker.primitives.ingest.ingest_lifecycle_event",
-          "in": {
-            "raw_event": "__raw_event__",
-            "lifecycle_event_ref": "__lifecycle_event_ref__"
-          },
-          "out": "__lifecycle_event_record_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.jml_evidence@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.account_change@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.onboarding_offboarding_tracker.primitives.ingest.ingest_lifecycle_event",
+            "in": {
+              "raw_event": "__raw_event__",
+              "lifecycle_event_ref": "__lifecycle_event_ref__"
+            },
+            "out": "__lifecycle_event_record_ref__"
+          }
         }
       }
     },
@@ -172,20 +174,22 @@
           "command": "content.playbooks.onboarding_offboarding_tracker.primitives.identity.resolve_identity"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.jml_evidence@v1",
-          "control.cloud_identity_least_privilege@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.authentication@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.onboarding_offboarding_tracker.primitives.identity.resolve_identity",
-          "in": {
-            "lifecycle_event_record": "__lifecycle_event_record_ref__"
-          },
-          "out": "__resolved_identity_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.jml_evidence@v1",
+            "control.cloud_identity_least_privilege@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.authentication@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.onboarding_offboarding_tracker.primitives.identity.resolve_identity",
+            "in": {
+              "lifecycle_event_record": "__lifecycle_event_record_ref__"
+            },
+            "out": "__resolved_identity_ref__"
+          }
         }
       }
     },
@@ -208,22 +212,24 @@
           "command": "content.playbooks.onboarding_offboarding_tracker.primitives.delta.apply_capability_delta"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.jml_evidence@v1",
-          "control.privileged_access_review@v1",
-          "control.cloud_identity_least_privilege@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.account_change@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.onboarding_offboarding_tracker.primitives.delta.apply_capability_delta",
-          "in": {
-            "lifecycle_event_record": "__lifecycle_event_record_ref__",
-            "resolved_identity": "__resolved_identity_ref__"
-          },
-          "out": "__capability_delta_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.jml_evidence@v1",
+            "control.privileged_access_review@v1",
+            "control.cloud_identity_least_privilege@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.account_change@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.onboarding_offboarding_tracker.primitives.delta.apply_capability_delta",
+            "in": {
+              "lifecycle_event_record": "__lifecycle_event_record_ref__",
+              "resolved_identity": "__resolved_identity_ref__"
+            },
+            "out": "__capability_delta_ref__"
+          }
         }
       }
     },
@@ -246,26 +252,28 @@
           "command": "content.playbooks.onboarding_offboarding_tracker.primitives.confirmation.confirm_grant_revoke"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.jml_evidence@v1",
-          "control.privileged_access_review@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.account_change@v1",
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kri.joiner_to_provisioned_time@v1",
-          "kri.leaver_to_revoked_time@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.onboarding_offboarding_tracker.primitives.confirmation.confirm_grant_revoke",
-          "in": {
-            "capability_delta": "__capability_delta_ref__",
-            "observed_capabilities": "__observed_capabilities__"
-          },
-          "out": "__confirmation_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.jml_evidence@v1",
+            "control.privileged_access_review@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.account_change@v1",
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kri.joiner_to_provisioned_time@v1",
+            "kri.leaver_to_revoked_time@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.onboarding_offboarding_tracker.primitives.confirmation.confirm_grant_revoke",
+            "in": {
+              "capability_delta": "__capability_delta_ref__",
+              "observed_capabilities": "__observed_capabilities__"
+            },
+            "out": "__confirmation_ref__"
+          }
         }
       }
     },
@@ -297,35 +305,37 @@
           "command": "content.playbooks.onboarding_offboarding_tracker.primitives.artifact.build_access_artifact"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.jml_evidence@v1",
-          "control.privileged_access_review@v1",
-          "control.cloud_identity_least_privilege@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.account_change@v1"
-        ],
-        "metric_refs": [
-          "kri.joiner_to_provisioned_time@v1",
-          "kri.leaver_to_revoked_time@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.onboarding_offboarding_tracker.primitives.artifact.build_access_artifact",
-          "in": {
-            "workflow_id": "__workflow_id__",
-            "execution_id": "__execution_id__",
-            "compile_target": "__compile_target__",
-            "regulation_refs": "__regulation_refs__",
-            "control_refs": "__control_refs__",
-            "resolved_identity": "__resolved_identity_ref__",
-            "confirmation": "__confirmation_ref__",
-            "captured_at": "__captured_at__",
-            "source_url": "__source_url__",
-            "owner_role": "__owner_role__",
-            "owner_assigned_at": "__owner_assigned_at__"
-          },
-          "out": "__access_artifact_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.jml_evidence@v1",
+            "control.privileged_access_review@v1",
+            "control.cloud_identity_least_privilege@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.account_change@v1"
+          ],
+          "metric_refs": [
+            "kri.joiner_to_provisioned_time@v1",
+            "kri.leaver_to_revoked_time@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.onboarding_offboarding_tracker.primitives.artifact.build_access_artifact",
+            "in": {
+              "workflow_id": "__workflow_id__",
+              "execution_id": "__execution_id__",
+              "compile_target": "__compile_target__",
+              "regulation_refs": "__regulation_refs__",
+              "control_refs": "__control_refs__",
+              "resolved_identity": "__resolved_identity_ref__",
+              "confirmation": "__confirmation_ref__",
+              "captured_at": "__captured_at__",
+              "source_url": "__source_url__",
+              "owner_role": "__owner_role__",
+              "owner_assigned_at": "__owner_assigned_at__"
+            },
+            "out": "__access_artifact_ref__"
+          }
         }
       }
     },
@@ -334,33 +344,45 @@
       "name": "onboarding-offboarding-tracker-end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.onboarding_offboarding_tracker@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "control_refs": [
-      "control.jml_evidence@v1",
-      "control.privileged_access_review@v1",
-      "control.cloud_identity_least_privilege@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.account_change@v1",
-      "telemetry.ocsf.api_activity@v1",
-      "telemetry.ocsf.authentication@v1"
-    ],
-    "metric_refs": [
-      "kri.joiner_to_provisioned_time@v1",
-      "kri.leaver_to_revoked_time@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification",
-      "NIS2 Directive (EU) 2022/2555 — Article 21(2)(i)",
-      "SecOps-NG access evidence stream — schemas/evidence/access.schema.json"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.onboarding_offboarding_tracker@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "control_refs": [
+        "control.jml_evidence@v1",
+        "control.privileged_access_review@v1",
+        "control.cloud_identity_least_privilege@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.account_change@v1",
+        "telemetry.ocsf.api_activity@v1",
+        "telemetry.ocsf.authentication@v1"
+      ],
+      "metric_refs": [
+        "kri.joiner_to_provisioned_time@v1",
+        "kri.leaver_to_revoked_time@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification",
+        "NIS2 Directive (EU) 2022/2555 — Article 21(2)(i)",
+        "SecOps-NG access evidence stream — schemas/evidence/access.schema.json"
+      ]
+    }
   }
 }

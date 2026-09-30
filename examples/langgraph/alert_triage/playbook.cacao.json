@@ -8,6 +8,16 @@
   "created": "2026-06-03T00:00:00Z",
   "created_by": "identity--c0c0c0c0-c0c0-4c0c-8c0c-c0c0c0c0c0c0",
   "description": "SOC alert_triage source playbook. Ingests typed alert payloads from at least two source shapes (push from detection pipeline, pull from a shared alert store), enriches with telemetry context, suppresses already-seen or known-benign hits inside a configurable window, applies a deterministic prioritisation policy (free-text fields may be routed through a DSPy module, the priority decision itself stays in code), and routes the case onto a response branch keyed on the disposition. Every action step carries a deterministic core_body binding into content/playbooks/alert_triage/primitives/; the workflow graph, join keys, and metric/control references are the contract this source artifact commits to.",
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "name": "SecOps-NG content model",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "type": "extension-definition",
+      "version": "1.0.0"
+    }
+  },
   "id": "playbook--a1e47431-0000-4000-8000-000000000000",
   "labels": [
     "alert_triage",
@@ -15,6 +25,46 @@
   ],
   "modified": "2026-07-27T00:00:00Z",
   "name": "Alert triage",
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "content_version": "1.0.0",
+      "control_refs": [
+        "control.incident_handling_capability@v1",
+        "control.incident_timeline_signals@v1",
+        "control.recurring_incident_correlator@v1"
+      ],
+      "maturity": "stable",
+      "metric_refs": [
+        "kpi.mttd@v1",
+        "kpi.mttr_critical@v1",
+        "kpi.false_positive_rate@v1",
+        "kpi.detection_coverage@v1",
+        "kpi.review_completion_sla@v1",
+        "kpi.handoff_brief_delivery_sla@v1",
+        "kpi.notification_sla_compliance@v1",
+        "kri.escalation_tier_breach@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 \u2014 workflow step types (start, action, if-condition, switch-condition, end), variable conventions, x_ extension namespace",
+        "NIS2 Directive (EU) 2022/2555, Article 21(2)(b) \u2014 incident handling capability",
+        "DORA Regulation (EU) 2022/2554, Article 17 \u2014 ICT-related incident management process",
+        "MITRE D3FEND \u2014 Alert Analysis, Operational Reporting",
+        "OSCAL anchors: NIST 800-53 IR-4 / IR-5 / IR-6 (incident handling, monitoring, reporting) wired through content/controls/ entries control.incident_handling_capability@v1, control.incident_timeline_signals@v1, control.recurring_incident_correlator@v1",
+        "OCSF v1.4.0 \u2014 Authentication (class 3002), Account Change (class 3001), API Activity (class 6003); Security Finding (class 2001) pending a content/telemetry/ entry"
+      ],
+      "stable_id": "playbook.alert_triage@v1",
+      "telemetry_refs": [
+        "telemetry.ocsf.api_activity@v1",
+        "telemetry.ocsf.authentication@v1",
+        "telemetry.ocsf.account_change@v1"
+      ]
+    }
+  },
   "playbook_types": [
     "notification",
     "detection",
@@ -146,23 +196,25 @@
       ],
       "name": "ingest typed alert payload",
       "on_completion": "action--a1e47431-0000-4000-8000-000000000003",
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1"
-        ],
-        "core_body": {
-          "in": {
-            "raw": "__raw_payload__",
-            "source_shape": "__alert_source_shape__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1"
+          ],
+          "core_body": {
+            "in": {
+              "raw": "__raw_payload__",
+              "source_shape": "__alert_source_shape__"
+            },
+            "out": "__alert_payload__",
+            "primitive": "content.playbooks.alert_triage.primitives.payloads.validate_alert_payload"
           },
-          "out": "__alert_payload__",
-          "primitive": "content.playbooks.alert_triage.primitives.payloads.validate_alert_payload"
-        },
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ]
-      }
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--a1e47431-0000-4000-8000-000000000003": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -178,30 +230,32 @@
       "out_args": [
         "__benign_or_seen__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1"
-        ],
-        "core_body": {
-          "in": {
-            "asset_ref": "__asset_ref__",
-            "classification": "__classification__",
-            "detection_rule_id": "__detection_rule_id__",
-            "subject_ref": "__subject_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1"
+          ],
+          "core_body": {
+            "in": {
+              "asset_ref": "__asset_ref__",
+              "classification": "__classification__",
+              "detection_rule_id": "__detection_rule_id__",
+              "subject_ref": "__subject_ref__"
+            },
+            "out": "__seen_key__",
+            "primitive": "content.playbooks.alert_triage.primitives.suppression.canonical_seen_key"
           },
-          "out": "__seen_key__",
-          "primitive": "content.playbooks.alert_triage.primitives.suppression.canonical_seen_key"
-        },
-        "metric_refs": [
-          "kpi.mttd@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.authentication@v1",
-          "telemetry.ocsf.account_change@v1",
-          "telemetry.ocsf.api_activity@v1"
-        ]
-      }
+          "metric_refs": [
+            "kpi.mttd@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.authentication@v1",
+            "telemetry.ocsf.account_change@v1",
+            "telemetry.ocsf.api_activity@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--a1e47431-0000-4000-8000-000000000005": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -214,26 +268,28 @@
       "description": "Link this alert onto the existing case (or onto the benign-rule record), close it without paging, and account the suppression against the false-positive-rate KPI and (when the suppression covers a re-fire of a previously closed case) the recurring-incident correlator.",
       "name": "suppress and close",
       "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1",
-          "control.recurring_incident_correlator@v1"
-        ],
-        "core_body": {
-          "in": {
-            "asset_ref": "__asset_ref__",
-            "classification": "__classification__",
-            "detection_rule_id": "__detection_rule_id__",
-            "subject_ref": "__subject_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1",
+            "control.recurring_incident_correlator@v1"
+          ],
+          "core_body": {
+            "in": {
+              "asset_ref": "__asset_ref__",
+              "classification": "__classification__",
+              "detection_rule_id": "__detection_rule_id__",
+              "subject_ref": "__subject_ref__"
+            },
+            "out": "__close_record_key__",
+            "primitive": "content.playbooks.alert_triage.primitives.suppression.canonical_seen_key"
           },
-          "out": "__close_record_key__",
-          "primitive": "content.playbooks.alert_triage.primitives.suppression.canonical_seen_key"
-        },
-        "metric_refs": [
-          "kpi.false_positive_rate@v1"
-        ]
-      }
+          "metric_refs": [
+            "kpi.false_positive_rate@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--a1e47431-0000-4000-8000-000000000006": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -249,25 +305,27 @@
       "out_args": [
         "__priority__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1"
-        ],
-        "core_body": {
-          "in": {
-            "context": "__asset_context__",
-            "correlates_open_case": "__correlates_open_case__",
-            "detection_class": "__detection_class__",
-            "detection_severity": "__detection_severity__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1"
+          ],
+          "core_body": {
+            "in": {
+              "context": "__asset_context__",
+              "correlates_open_case": "__correlates_open_case__",
+              "detection_class": "__detection_class__",
+              "detection_severity": "__detection_severity__"
+            },
+            "out": "__priority_verdict__",
+            "primitive": "content.playbooks.alert_triage.primitives.prioritisation.prioritise"
           },
-          "out": "__priority_verdict__",
-          "primitive": "content.playbooks.alert_triage.primitives.prioritisation.prioritise"
-        },
-        "metric_refs": [
-          "kpi.detection_coverage@v1"
-        ]
-      }
+          "metric_refs": [
+            "kpi.detection_coverage@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--a1e47431-0000-4000-8000-000000000008": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -280,28 +338,30 @@
       "description": "Page the on-call responder, open the incident case, stamp the timeline-start signal, and hand off to the incident management playbook. Records against the MTTR-critical clock and the regulator-notification-overrun KRI window.",
       "name": "response: p1 severe \u2014 page and escalate",
       "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1",
-          "control.incident_timeline_signals@v1"
-        ],
-        "core_body": {
-          "in": {
-            "asset_criticality": "__asset_context__.asset_criticality",
-            "internet_exposed": "__asset_context__.internet_exposed",
-            "priority": "__priority__",
-            "regulated_data": "__asset_context__.regulated_data"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1",
+            "control.incident_timeline_signals@v1"
+          ],
+          "core_body": {
+            "in": {
+              "asset_criticality": "__asset_context__.asset_criticality",
+              "internet_exposed": "__asset_context__.internet_exposed",
+              "priority": "__priority__",
+              "regulated_data": "__asset_context__.regulated_data"
+            },
+            "out": "__escalation_directive__",
+            "primitive": "content.playbooks.alert_triage.primitives.response.escalation_route"
           },
-          "out": "__escalation_directive__",
-          "primitive": "content.playbooks.alert_triage.primitives.response.escalation_route"
-        },
-        "metric_refs": [
-          "kpi.mttr_critical@v1",
-          "kri.escalation_tier_breach@v1",
-          "kpi.notification_sla_compliance@v1"
-        ]
-      }
+          "metric_refs": [
+            "kpi.mttr_critical@v1",
+            "kri.escalation_tier_breach@v1",
+            "kpi.notification_sla_compliance@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--a1e47431-0000-4000-8000-000000000009": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -314,26 +374,28 @@
       "description": "Queue the case to the primary analyst queue with the enriched evidence packet, no page. Records against the MTTR clock and the handoff-brief delivery SLA.",
       "name": "response: p2 high \u2014 queue for primary analyst",
       "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1"
-        ],
-        "core_body": {
-          "in": {
-            "asset_criticality": "__asset_context__.asset_criticality",
-            "internet_exposed": "__asset_context__.internet_exposed",
-            "priority": "__priority__",
-            "regulated_data": "__asset_context__.regulated_data"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1"
+          ],
+          "core_body": {
+            "in": {
+              "asset_criticality": "__asset_context__.asset_criticality",
+              "internet_exposed": "__asset_context__.internet_exposed",
+              "priority": "__priority__",
+              "regulated_data": "__asset_context__.regulated_data"
+            },
+            "out": "__notification_directive__",
+            "primitive": "content.playbooks.alert_triage.primitives.response.notify_on_call"
           },
-          "out": "__notification_directive__",
-          "primitive": "content.playbooks.alert_triage.primitives.response.notify_on_call"
-        },
-        "metric_refs": [
-          "kpi.mttr_critical@v1",
-          "kpi.handoff_brief_delivery_sla@v1"
-        ]
-      }
+          "metric_refs": [
+            "kpi.mttr_critical@v1",
+            "kpi.handoff_brief_delivery_sla@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--a1e47431-0000-4000-8000-00000000000a": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -346,25 +408,27 @@
       "description": "Append to the review queue for batched analyst attention; no SLA clock beyond the routine review-completion SLA.",
       "name": "response: p3 routine \u2014 queue for review",
       "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1"
-        ],
-        "core_body": {
-          "in": {
-            "asset_criticality": "__asset_context__.asset_criticality",
-            "internet_exposed": "__asset_context__.internet_exposed",
-            "priority": "__priority__",
-            "regulated_data": "__asset_context__.regulated_data"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1"
+          ],
+          "core_body": {
+            "in": {
+              "asset_criticality": "__asset_context__.asset_criticality",
+              "internet_exposed": "__asset_context__.internet_exposed",
+              "priority": "__priority__",
+              "regulated_data": "__asset_context__.regulated_data"
+            },
+            "out": "__review_queue_directive__",
+            "primitive": "content.playbooks.alert_triage.primitives.response.route_to_review_queue"
           },
-          "out": "__review_queue_directive__",
-          "primitive": "content.playbooks.alert_triage.primitives.response.route_to_review_queue"
-        },
-        "metric_refs": [
-          "kpi.review_completion_sla@v1"
-        ]
-      }
+          "metric_refs": [
+            "kpi.review_completion_sla@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--a1e47431-0000-4000-8000-00000000000b": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -377,27 +441,29 @@
       "description": "Record the alert for telemetry-coverage accounting and close without further action. Feeds the false-positive-rate denominator and the detection-coverage view. A crown-jewel asset or regulated data upgrades the close to keep a retention pointer for the recurring-incident correlator \u2014 still no page and no queue entry.",
       "name": "response: p4 informational \u2014 log and close",
       "on_completion": "end--a1e47431-0000-4000-8000-00000000000c",
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_handling_capability@v1",
-          "control.recurring_incident_correlator@v1"
-        ],
-        "core_body": {
-          "in": {
-            "asset_criticality": "__asset_context__.asset_criticality",
-            "internet_exposed": "__asset_context__.internet_exposed",
-            "priority": "__priority__",
-            "regulated_data": "__asset_context__.regulated_data"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_handling_capability@v1",
+            "control.recurring_incident_correlator@v1"
+          ],
+          "core_body": {
+            "in": {
+              "asset_criticality": "__asset_context__.asset_criticality",
+              "internet_exposed": "__asset_context__.internet_exposed",
+              "priority": "__priority__",
+              "regulated_data": "__asset_context__.regulated_data"
+            },
+            "out": "__closure_record__",
+            "primitive": "content.playbooks.alert_triage.primitives.response.log_and_close"
           },
-          "out": "__closure_record__",
-          "primitive": "content.playbooks.alert_triage.primitives.response.log_and_close"
-        },
-        "metric_refs": [
-          "kpi.false_positive_rate@v1",
-          "kpi.detection_coverage@v1"
-        ]
-      }
+          "metric_refs": [
+            "kpi.false_positive_rate@v1",
+            "kpi.detection_coverage@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "end--a1e47431-0000-4000-8000-00000000000c": {
       "name": "triage-end",
@@ -429,43 +495,5 @@
       "type": "switch-condition"
     }
   },
-  "workflow_start": "start--a1e47431-0000-4000-8000-000000000001",
-  "x_secops_ng": {
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "content_version": "1.0.0",
-    "control_refs": [
-      "control.incident_handling_capability@v1",
-      "control.incident_timeline_signals@v1",
-      "control.recurring_incident_correlator@v1"
-    ],
-    "maturity": "stable",
-    "metric_refs": [
-      "kpi.mttd@v1",
-      "kpi.mttr_critical@v1",
-      "kpi.false_positive_rate@v1",
-      "kpi.detection_coverage@v1",
-      "kpi.review_completion_sla@v1",
-      "kpi.handoff_brief_delivery_sla@v1",
-      "kpi.notification_sla_compliance@v1",
-      "kri.escalation_tier_breach@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 \u2014 workflow step types (start, action, if-condition, switch-condition, end), variable conventions, x_ extension namespace",
-      "NIS2 Directive (EU) 2022/2555, Article 21(2)(b) \u2014 incident handling capability",
-      "DORA Regulation (EU) 2022/2554, Article 17 \u2014 ICT-related incident management process",
-      "MITRE D3FEND \u2014 Alert Analysis, Operational Reporting",
-      "OSCAL anchors: NIST 800-53 IR-4 / IR-5 / IR-6 (incident handling, monitoring, reporting) wired through content/controls/ entries control.incident_handling_capability@v1, control.incident_timeline_signals@v1, control.recurring_incident_correlator@v1",
-      "OCSF v1.4.0 \u2014 Authentication (class 3002), Account Change (class 3001), API Activity (class 6003); Security Finding (class 2001) pending a content/telemetry/ entry"
-    ],
-    "stable_id": "playbook.alert_triage@v1",
-    "telemetry_refs": [
-      "telemetry.ocsf.api_activity@v1",
-      "telemetry.ocsf.authentication@v1",
-      "telemetry.ocsf.account_change@v1"
-    ]
-  }
+  "workflow_start": "start--a1e47431-0000-4000-8000-000000000001"
 }

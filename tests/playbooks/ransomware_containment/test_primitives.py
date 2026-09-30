@@ -19,6 +19,7 @@ from content.playbooks.ransomware_containment.primitives import (
     select_known_good_snapshot,
     triage_ransomware_signal,
 )
+from compilers._shared.cacao_parser import secops_extension
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 EDR_UP = {"agent_reachable": True, "isolate_capable": True}
@@ -276,7 +277,7 @@ def _outputs() -> list[dict]:
 def test_every_stamped_metric_is_declared_by_the_playbook() -> None:
     playbook = json.loads((REPO_ROOT / "content/playbooks/ransomware_containment/playbook.cacao.json")
                           .read_text(encoding="utf-8"))
-    declared = set(playbook["x_secops_ng"]["metric_refs"])
+    declared = set(secops_extension(playbook)["metric_refs"])
     stamped = {m for out in _outputs() for m in out["metric_stamps"]}
     assert stamped <= declared, f"undeclared: {sorted(stamped - declared)}"
 

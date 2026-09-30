@@ -155,21 +155,23 @@
           "command": "content.playbooks.mfa_secured_comms.primitives.probe.probe_mfa_coverage"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.mfa_state_probe@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.mfa_secured_comms.primitives.probe.probe_mfa_coverage",
-          "in": {
-            "auth_scope": "__auth_scope__",
-            "posture_window": "__posture_window__",
-            "principals": "__principals__"
-          },
-          "out": "__mfa_coverage_id__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.mfa_state_probe@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.mfa_secured_comms.primitives.probe.probe_mfa_coverage",
+            "in": {
+              "auth_scope": "__auth_scope__",
+              "posture_window": "__posture_window__",
+              "principals": "__principals__"
+            },
+            "out": "__mfa_coverage_id__"
+          }
         }
       }
     },
@@ -192,20 +194,22 @@
           "command": "content.playbooks.mfa_secured_comms.primitives.assess.assess_continuous_auth"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.mfa_state_probe@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.mfa_secured_comms.primitives.assess.assess_continuous_auth",
-          "in": {
-            "auth_scope": "__auth_scope__",
-            "sessions": "__sessions__"
-          },
-          "out": "__continuous_auth_id__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.mfa_state_probe@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.mfa_secured_comms.primitives.assess.assess_continuous_auth",
+            "in": {
+              "auth_scope": "__auth_scope__",
+              "sessions": "__sessions__"
+            },
+            "out": "__continuous_auth_id__"
+          }
         }
       }
     },
@@ -229,21 +233,23 @@
           "command": "content.playbooks.mfa_secured_comms.primitives.verify.verify_oob_channel"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.oob_channel_probe@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.mfa_secured_comms.primitives.verify.verify_oob_channel",
-          "in": {
-            "auth_scope": "__auth_scope__",
-            "posture_window": "__posture_window__",
-            "channels": "__channels__"
-          },
-          "out": "__oob_channel_status__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.oob_channel_probe@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.mfa_secured_comms.primitives.verify.verify_oob_channel",
+            "in": {
+              "auth_scope": "__auth_scope__",
+              "posture_window": "__posture_window__",
+              "channels": "__channels__"
+            },
+            "out": "__oob_channel_status__"
+          }
         }
       }
     },
@@ -275,31 +281,33 @@
           "command": "content.playbooks.mfa_secured_comms.primitives.artifact.build_mfa_posture_attestation_artifact"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.mfa_state_probe@v1",
-          "control.oob_channel_probe@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1",
-          "telemetry.ocsf.compliance_finding@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.mfa_secured_comms.primitives.artifact.build_mfa_posture_attestation_artifact",
-          "in": {
-            "workflow_id": "__workflow_id__",
-            "execution_id": "__execution_id__",
-            "regulation_refs": "__regulation_refs__",
-            "control_refs": "__control_refs__",
-            "auth_scope": "__auth_scope__",
-            "posture_window": "__posture_window__",
-            "mfa_coverage_snapshot": "__mfa_coverage_id__",
-            "continuous_auth_assessment": "__continuous_auth_id__",
-            "oob_channel_status": "__oob_channel_status__",
-            "captured_at": "__captured_at__",
-            "source_url": "__source_url__"
-          },
-          "out": "__attestation_id__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.mfa_state_probe@v1",
+            "control.oob_channel_probe@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1",
+            "telemetry.ocsf.compliance_finding@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.mfa_secured_comms.primitives.artifact.build_mfa_posture_attestation_artifact",
+            "in": {
+              "workflow_id": "__workflow_id__",
+              "execution_id": "__execution_id__",
+              "regulation_refs": "__regulation_refs__",
+              "control_refs": "__control_refs__",
+              "auth_scope": "__auth_scope__",
+              "posture_window": "__posture_window__",
+              "mfa_coverage_snapshot": "__mfa_coverage_id__",
+              "continuous_auth_assessment": "__continuous_auth_id__",
+              "oob_channel_status": "__oob_channel_status__",
+              "captured_at": "__captured_at__",
+              "source_url": "__source_url__"
+            },
+            "out": "__attestation_id__"
+          }
         }
       }
     },
@@ -319,17 +327,19 @@
           "command": "content.playbooks.mfa_secured_comms.primitives.notify.compose_owner_notification"
         }
       ],
-      "x_secops_ng": {
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.mfa_secured_comms.primitives.notify.compose_owner_notification",
-          "in": {
-            "attestation_id": "__attestation_id__",
-            "auth_scope": "__auth_scope__"
-          },
-          "out": "__owner_notification__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.mfa_secured_comms.primitives.notify.compose_owner_notification",
+            "in": {
+              "attestation_id": "__attestation_id__",
+              "auth_scope": "__auth_scope__"
+            },
+            "out": "__owner_notification__"
+          }
         }
       },
       "out_args": [
@@ -341,29 +351,41 @@
       "name": "mfa_secured_comms_end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.mfa_secured_comms@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "control_refs": [
-      "control.mfa_state_probe@v1",
-      "control.oob_channel_probe@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.api_activity@v1",
-      "telemetry.ocsf.compliance_finding@v1"
-    ],
-    "metric_refs": [],
-    "sources": [
-      "OASIS CACAO v2.0 specification \u2014 workflow step types, variable conventions, x_ extension namespace",
-      "NIS2 Directive (EU) 2022/2555, Article 21(2)(j) \u2014 use of multi-factor or continuous authentication, secured voice/video/text communications, and secured emergency communications systems",
-      "ENISA \u2014 Guidelines on authentication and secured-communications baseline for essential and important entities",
-      "OCSF \u2014 API Activity (6003) event class"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.mfa_secured_comms@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "control_refs": [
+        "control.mfa_state_probe@v1",
+        "control.oob_channel_probe@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.api_activity@v1",
+        "telemetry.ocsf.compliance_finding@v1"
+      ],
+      "metric_refs": [],
+      "sources": [
+        "OASIS CACAO v2.0 specification \u2014 workflow step types, variable conventions, x_ extension namespace",
+        "NIS2 Directive (EU) 2022/2555, Article 21(2)(j) \u2014 use of multi-factor or continuous authentication, secured voice/video/text communications, and secured emergency communications systems",
+        "ENISA \u2014 Guidelines on authentication and secured-communications baseline for essential and important entities",
+        "OCSF \u2014 API Activity (6003) event class"
+      ]
+    }
   }
 }

@@ -26,6 +26,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+from compilers._shared.cacao_parser import secops_extension
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 METRICS_DIR = REPO_ROOT / "content" / "metrics"
@@ -69,7 +70,7 @@ def playbooks() -> dict[str, dict]:
     out: dict[str, dict] = {}
     for pf in _playbook_files():
         pb = _load_playbook(pf)
-        sid = pb.get("x_secops_ng", {}).get("stable_id")
+        sid = (secops_extension(pb) or {}).get("stable_id")
         assert sid, f"{pf} is missing x_secops_ng.stable_id"
         assert sid not in out, f"duplicate playbook stable_id {sid}"
         out[sid] = pb
@@ -87,12 +88,12 @@ def _collect_playbook_metric_refs(pb: dict) -> list[tuple[str, str]]:
     Origin is ``"<playbook>:<step_id>"`` for workflow-step refs and
     ``"<playbook>:#top"`` for top-level x_secops_ng.metric_refs.
     """
-    sid = pb["x_secops_ng"]["stable_id"]
+    sid = secops_extension(pb)["stable_id"]
     out: list[tuple[str, str]] = []
-    for mref in pb.get("x_secops_ng", {}).get("metric_refs", []) or []:
+    for mref in (secops_extension(pb) or {}).get("metric_refs", []) or []:
         out.append((f"{sid}:#top", mref))
     for step_id, step in (pb.get("workflow") or {}).items():
-        x = step.get("x_secops_ng") or {}
+        x = secops_extension(step) or {}
         for mref in x.get("metric_refs", []) or []:
             out.append((f"{sid}:{step_id}", mref))
         # Single-valued metric_ref variant (defensive: schema allows

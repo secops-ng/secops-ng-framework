@@ -22,6 +22,7 @@ from pathlib import Path
 
 import pytest
 from jsonschema import Draft202012Validator
+from compilers._shared.cacao_parser import secops_extension
 
 ROOT = Path(__file__).resolve().parents[2]
 CONTENT_MODEL = ROOT / "content-model"
@@ -133,7 +134,7 @@ def test_metric_step_refs_resolve_to_workflow_steps(
 def test_playbook_metric_refs_match_metrics_dir(
     metrics: list[dict], playbook: dict
 ) -> None:
-    declared = set(playbook["x_secops_ng"]["metric_refs"])
+    declared = set(secops_extension(playbook)["metric_refs"])
     present = {m["stable_id"] for m in metrics}
     assert declared == present, (
         f"playbook.x_secops_ng.metric_refs and metrics/ disagree: "

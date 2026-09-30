@@ -146,22 +146,24 @@
           "command": "content.playbooks.backup_recovery.primitives.detect.resolve_drill_trigger"
         }
       ],
-      "x_secops_ng": {
-        "core_body": {
-          "primitive": "content.playbooks.backup_recovery.primitives.detect.resolve_drill_trigger",
-          "in": {
-            "drill_window": "__drill_window__",
-            "backup_scope": "__backup_scope__",
-            "backup_inventory": "__backup_inventory__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "core_body": {
+            "primitive": "content.playbooks.backup_recovery.primitives.detect.resolve_drill_trigger",
+            "in": {
+              "drill_window": "__drill_window__",
+              "backup_scope": "__backup_scope__",
+              "backup_inventory": "__backup_inventory__"
+            },
+            "out": "__candidate_backup_id__"
           },
-          "out": "__candidate_backup_id__"
-        },
-        "control_refs": [
-          "control.backup_attestation@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ]
+          "control_refs": [
+            "control.backup_attestation@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ]
+        }
       }
     },
     "action--50000000-0000-4000-8000-000000000003": {
@@ -183,26 +185,28 @@
           "command": "content.playbooks.backup_recovery.primitives.integrity.evaluate_backup_integrity"
         }
       ],
-      "x_secops_ng": {
-        "core_body": {
-          "primitive": "content.playbooks.backup_recovery.primitives.integrity.evaluate_backup_integrity",
-          "in": {
-            "candidate_backup_id": "__candidate_backup_id__",
-            "integrity_observation": "__integrity_observation__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "core_body": {
+            "primitive": "content.playbooks.backup_recovery.primitives.integrity.evaluate_backup_integrity",
+            "in": {
+              "candidate_backup_id": "__candidate_backup_id__",
+              "integrity_observation": "__integrity_observation__"
+            },
+            "out": "__integrity_ok__"
           },
-          "out": "__integrity_ok__"
-        },
-        "control_refs": [
-          "control.backup_attestation@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kpi.backup_integrity_pass_rate@v1",
-          "kri.backup_integrity_failure_rate@v1",
-          "kri.backup_integrity_failures@v1"
-        ]
+          "control_refs": [
+            "control.backup_attestation@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kpi.backup_integrity_pass_rate@v1",
+            "kri.backup_integrity_failure_rate@v1",
+            "kri.backup_integrity_failures@v1"
+          ]
+        }
       }
     },
     "if-condition--50000000-0000-4000-8000-000000000004": {
@@ -233,25 +237,27 @@
           "command": "content.playbooks.backup_recovery.primitives.drill.evaluate_restore_drill"
         }
       ],
-      "x_secops_ng": {
-        "core_body": {
-          "primitive": "content.playbooks.backup_recovery.primitives.drill.evaluate_restore_drill",
-          "in": {
-            "candidate_backup_id": "__candidate_backup_id__",
-            "backup_scope": "__backup_scope__",
-            "drill_observation": "__drill_observation__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "core_body": {
+            "primitive": "content.playbooks.backup_recovery.primitives.drill.evaluate_restore_drill",
+            "in": {
+              "candidate_backup_id": "__candidate_backup_id__",
+              "backup_scope": "__backup_scope__",
+              "drill_observation": "__drill_observation__"
+            },
+            "out": "__drill_result__"
           },
-          "out": "__drill_result__"
-        },
-        "control_refs": [
-          "control.restore_drill@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kpi.restore_drill_attestation_freshness@v1"
-        ]
+          "control_refs": [
+            "control.restore_drill@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kpi.restore_drill_attestation_freshness@v1"
+          ]
+        }
       }
     },
     "action--50000000-0000-4000-8000-000000000006": {
@@ -279,32 +285,34 @@
           "command": "content.playbooks.backup_recovery.primitives.attestation.build_drill_attestation"
         }
       ],
-      "x_secops_ng": {
-        "core_body": {
-          "primitive": "content.playbooks.backup_recovery.primitives.attestation.build_drill_attestation",
-          "in": {
-            "workflow_id": "__workflow_id__",
-            "execution_id": "__execution_id__",
-            "captured_at": "__captured_at__",
-            "backup_scope": "__backup_scope__",
-            "candidate_backup_id": "__candidate_backup_id__",
-            "integrity_ok": "__integrity_ok__",
-            "drill_result": "__drill_result__",
-            "integrity_observation": "__integrity_observation__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "core_body": {
+            "primitive": "content.playbooks.backup_recovery.primitives.attestation.build_drill_attestation",
+            "in": {
+              "workflow_id": "__workflow_id__",
+              "execution_id": "__execution_id__",
+              "captured_at": "__captured_at__",
+              "backup_scope": "__backup_scope__",
+              "candidate_backup_id": "__candidate_backup_id__",
+              "integrity_ok": "__integrity_ok__",
+              "drill_result": "__drill_result__",
+              "integrity_observation": "__integrity_observation__"
+            },
+            "out": "__attestation_id__"
           },
-          "out": "__attestation_id__"
-        },
-        "control_refs": [
-          "control.backup_attestation@v1",
-          "control.restore_drill@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kpi.backup_integrity_pass_rate@v1",
-          "kpi.restore_drill_attestation_freshness@v1"
-        ]
+          "control_refs": [
+            "control.backup_attestation@v1",
+            "control.restore_drill@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kpi.backup_integrity_pass_rate@v1",
+            "kpi.restore_drill_attestation_freshness@v1"
+          ]
+        }
       }
     },
     "action--50000000-0000-4000-8000-000000000007": {
@@ -327,19 +335,21 @@
           "command": "content.playbooks.backup_recovery.primitives.notify.compose_continuity_notification"
         }
       ],
-      "x_secops_ng": {
-        "core_body": {
-          "primitive": "content.playbooks.backup_recovery.primitives.notify.compose_continuity_notification",
-          "in": {
-            "attestation": "__attestation_id__",
-            "backup_scope": "__backup_scope__",
-            "owner_binding": "__owner_binding__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "core_body": {
+            "primitive": "content.playbooks.backup_recovery.primitives.notify.compose_continuity_notification",
+            "in": {
+              "attestation": "__attestation_id__",
+              "backup_scope": "__backup_scope__",
+              "owner_binding": "__owner_binding__"
+            },
+            "out": "__continuity_notification__"
           },
-          "out": "__continuity_notification__"
-        },
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ]
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ]
+        }
       }
     },
     "end--50000000-0000-4000-8000-000000000008": {
@@ -347,34 +357,46 @@
       "name": "backup_recovery_end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.backup_recovery@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "control_refs": [
-      "control.backup_attestation@v1",
-      "control.restore_drill@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.api_activity@v1"
-    ],
-    "metric_refs": [
-      "kpi.backup_integrity_pass_rate@v1",
-      "kpi.restore_drill_attestation_freshness@v1",
-      "kri.backup_integrity_failure_rate@v1",
-      "kri.backup_integrity_failures@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
-      "NIS2 Directive (EU) 2022/2555, Article 21(2)(c) — business continuity, backup management, disaster recovery, crisis management",
-      "DORA Regulation (EU) 2022/2554, Article 12 — backup policies and procedures, restoration and recovery procedures and methods",
-      "ENISA — Good practices for business continuity and disaster recovery",
-      "OCSF — API Activity (6003) event class"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.backup_recovery@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "control_refs": [
+        "control.backup_attestation@v1",
+        "control.restore_drill@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.api_activity@v1"
+      ],
+      "metric_refs": [
+        "kpi.backup_integrity_pass_rate@v1",
+        "kpi.restore_drill_attestation_freshness@v1",
+        "kri.backup_integrity_failure_rate@v1",
+        "kri.backup_integrity_failures@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
+        "NIS2 Directive (EU) 2022/2555, Article 21(2)(c) — business continuity, backup management, disaster recovery, crisis management",
+        "DORA Regulation (EU) 2022/2554, Article 12 — backup policies and procedures, restoration and recovery procedures and methods",
+        "ENISA — Good practices for business continuity and disaster recovery",
+        "OCSF — API Activity (6003) event class"
+      ]
+    }
   }
 }

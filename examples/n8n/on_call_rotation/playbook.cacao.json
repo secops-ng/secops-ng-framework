@@ -119,16 +119,18 @@
           "command": "Read the rotation roster from the operator's source of truth (paging system schedule, calendar feed, or roster file) and resolve who holds the primary slot and who receives the next shift for the evaluated window. The roster source itself is operator-bound; this step normalises its output into __current_on_call__ and __next_on_call__."
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.on_call_roster_governance@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.account_change@v1"
-        ],
-        "metric_refs": [
-          "kpi.coverage_on_call_schedule@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.on_call_roster_governance@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.account_change@v1"
+          ],
+          "metric_refs": [
+            "kpi.coverage_on_call_schedule@v1"
+          ]
+        }
       }
     },
     "action--30000000-0000-4000-8000-000000000003": {
@@ -150,14 +152,16 @@
           "command": "Resolve the escalation chain the paging system will fan through when an alert is not acknowledged: primary (current_on_call), secondary (back-up slot from the roster), then manager. The bound chain is published to the paging system's runtime configuration so the next page uses it. Detection coverage for unusual-hours authentication anomalies during off-hours rotation handoff and for suspicious privileged-account modification during rotation gaps is wired by the CORE-layer mapping; upstream SigmaHQ rule ids are referenced from the playbook-level external_references (TODO entries until pinned)."
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.on_call_roster_governance@v1"
-        ],
-        "metric_refs": [
-          "kpi.mttr_on_call_ack@v1",
-          "kri.escalation_tier_breach@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.on_call_roster_governance@v1"
+          ],
+          "metric_refs": [
+            "kpi.mttr_on_call_ack@v1",
+            "kri.escalation_tier_breach@v1"
+          ]
+        }
       }
     },
     "if-condition--30000000-0000-4000-8000-000000000004": {
@@ -187,13 +191,15 @@
           "command": "Compose a structured handoff brief covering open incidents, recent alerts within the configured lookback, outstanding escalations, and ack-latency snapshot for the prior shift. The brief is delivered as a structured artifact (markdown + a JSON payload), not free-form prose, so the next on-call ingests it deterministically."
         }
       ],
-      "x_secops_ng": {
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kpi.handoff_brief_delivery_sla@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kpi.handoff_brief_delivery_sla@v1"
+          ]
+        }
       }
     },
     "action--30000000-0000-4000-8000-000000000006": {
@@ -212,13 +218,15 @@
           "command": "Deliver the handoff brief to the incoming on-call along the operator's pre-bound channel (paging system DM, chat thread, email). Tracked separately from brief generation so the delivery-SLA KPI can report compose-time and deliver-time independently."
         }
       ],
-      "x_secops_ng": {
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kpi.handoff_brief_delivery_sla@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kpi.handoff_brief_delivery_sla@v1"
+          ]
+        }
       }
     },
     "end--30000000-0000-4000-8000-000000000007": {
@@ -226,39 +234,51 @@
       "name": "rotation-end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.on_call_rotation@v1",
-    "content_version": "0.1.0",
-    "maturity": "experimental",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "detection_refs": [
-      "detection.sigma.privileged_account_modification@v1"
-    ],
-    "control_refs": [
-      "control.on_call_roster_governance@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.account_change@v1",
-      "telemetry.ocsf.api_activity@v1"
-    ],
-    "metric_refs": [
-      "kpi.coverage_on_call_schedule@v1",
-      "kpi.mttr_on_call_ack@v1",
-      "kpi.handoff_brief_delivery_sla@v1",
-      "kri.escalation_tier_breach@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification \u2014 workflow step types, variable conventions, x_ extension namespace",
-      "ENISA \u2014 Good practices for incident response and on-call readiness",
-      "NIS2 Directive (EU) 2022/2555, Article 21(2)(b) \u2014 incident-handling capability (responder readiness)",
-      "DORA Regulation (EU) 2022/2554, Article 6 \u2014 ICT risk management framework (governance roles, on-call responsibility)",
-      "OCSF \u2014 Account Change (3001) and API Activity (6003) event classes",
-      "MITRE D3FEND \u2014 D3-AM (Account Monitoring)",
-      "SigmaHQ \u2014 upstream rule references for off-hours authentication anomaly and privileged-account modification (ids pending; recorded as TODO entries in external_references until pinned in the CORE-layer detection mapping)"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.on_call_rotation@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "detection_refs": [
+        "detection.sigma.privileged_account_modification@v1"
+      ],
+      "control_refs": [
+        "control.on_call_roster_governance@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.account_change@v1",
+        "telemetry.ocsf.api_activity@v1"
+      ],
+      "metric_refs": [
+        "kpi.coverage_on_call_schedule@v1",
+        "kpi.mttr_on_call_ack@v1",
+        "kpi.handoff_brief_delivery_sla@v1",
+        "kri.escalation_tier_breach@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification \u2014 workflow step types, variable conventions, x_ extension namespace",
+        "ENISA \u2014 Good practices for incident response and on-call readiness",
+        "NIS2 Directive (EU) 2022/2555, Article 21(2)(b) \u2014 incident-handling capability (responder readiness)",
+        "DORA Regulation (EU) 2022/2554, Article 6 \u2014 ICT risk management framework (governance roles, on-call responsibility)",
+        "OCSF \u2014 Account Change (3001) and API Activity (6003) event classes",
+        "MITRE D3FEND \u2014 D3-AM (Account Monitoring)",
+        "SigmaHQ \u2014 upstream rule references for off-hours authentication anomaly and privileged-account modification (ids pending; recorded as TODO entries in external_references until pinned in the CORE-layer detection mapping)"
+      ]
+    }
   }
 }

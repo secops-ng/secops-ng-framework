@@ -242,23 +242,25 @@
           "command": "content.playbooks.cra_cvd.primitives.intake.open_cvd_case"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.vuln_disclosure_intake@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.vulnerability_finding@v1"
-        ],
-        "metric_refs": [
-          "kri.cvd_intake_aging@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.cra_cvd.primitives.intake.open_cvd_case",
-          "in": {
-            "raw_report": "__raw_report__",
-            "intake_channel": "__intake_channel__"
-          },
-          "out": "__cvd_case__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.vuln_disclosure_intake@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.vulnerability_finding@v1"
+          ],
+          "metric_refs": [
+            "kri.cvd_intake_aging@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.cra_cvd.primitives.intake.open_cvd_case",
+            "in": {
+              "raw_report": "__raw_report__",
+              "intake_channel": "__intake_channel__"
+            },
+            "out": "__cvd_case__"
+          }
         }
       }
     },
@@ -287,28 +289,30 @@
           "command": "content.playbooks.cra_cvd.primitives.reporter.send_acknowledgement"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.vuln_disclosure_intake@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ],
-        "metric_refs": [
-          "kri.cvd_intake_aging@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.cra_cvd.primitives.reporter.send_acknowledgement",
-          "in": {
-            "case_id": "__case_id__",
-            "reporter_contact": "__reporter_contact__",
-            "ack_timestamp_iso": "__captured_at__",
-            "operator_display": "__operator_display__",
-            "cvd_policy_url": "__cvd_policy_url__",
-            "next_update_after": "__next_update_after__",
-            "smtp_endpoint": "__smtp_endpoint__"
-          },
-          "out": "__reporter_ack_ts__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.vuln_disclosure_intake@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ],
+          "metric_refs": [
+            "kri.cvd_intake_aging@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.cra_cvd.primitives.reporter.send_acknowledgement",
+            "in": {
+              "case_id": "__case_id__",
+              "reporter_contact": "__reporter_contact__",
+              "ack_timestamp_iso": "__captured_at__",
+              "operator_display": "__operator_display__",
+              "cvd_policy_url": "__cvd_policy_url__",
+              "next_update_after": "__next_update_after__",
+              "smtp_endpoint": "__smtp_endpoint__"
+            },
+            "out": "__reporter_ack_ts__"
+          }
         }
       }
     },
@@ -333,23 +337,25 @@
           "command": "content.playbooks.cra_cvd.primitives.triage.triage_case"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.vuln_disclosure_intake@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.vulnerability_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.false_positive_rate@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.cra_cvd.primitives.triage.triage_case",
-          "in": {
-            "case_id": "__case_id__",
-            "observations": "__triage_observations__"
-          },
-          "out": "__triage_result__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.vuln_disclosure_intake@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.vulnerability_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.false_positive_rate@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.cra_cvd.primitives.triage.triage_case",
+            "in": {
+              "case_id": "__case_id__",
+              "observations": "__triage_observations__"
+            },
+            "out": "__triage_result__"
+          }
         }
       }
     },
@@ -373,24 +379,26 @@
           "command": "content.playbooks.cra_cvd.primitives.fix.record_fix_candidate"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.vuln_disclosure_intake@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.vulnerability_finding@v1"
-        ],
-        "metric_refs": [
-          "kri.cvd_intake_aging@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.cra_cvd.primitives.fix.record_fix_candidate",
-          "in": {
-            "case_id": "__case_id__",
-            "triage_verdict": "__triage_verdict__",
-            "fix_candidate": "__fix_candidate__"
-          },
-          "out": "__fix_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.vuln_disclosure_intake@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.vulnerability_finding@v1"
+          ],
+          "metric_refs": [
+            "kri.cvd_intake_aging@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.cra_cvd.primitives.fix.record_fix_candidate",
+            "in": {
+              "case_id": "__case_id__",
+              "triage_verdict": "__triage_verdict__",
+              "fix_candidate": "__fix_candidate__"
+            },
+            "out": "__fix_ref__"
+          }
         }
       }
     },
@@ -411,24 +419,26 @@
           "command": "content.playbooks.cra_cvd.primitives.validation.confirm_fix_validation"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.vuln_disclosure_intake@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.vulnerability_finding@v1"
-        ],
-        "metric_refs": [
-          "kpi.false_positive_rate@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.cra_cvd.primitives.validation.confirm_fix_validation",
-          "in": {
-            "case_id": "__case_id__",
-            "fix_ref": "__fix_ref__",
-            "validation_evidence": "__validation_evidence__"
-          },
-          "out": "__fix_validation__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.vuln_disclosure_intake@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.vulnerability_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.false_positive_rate@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.cra_cvd.primitives.validation.confirm_fix_validation",
+            "in": {
+              "case_id": "__case_id__",
+              "fix_ref": "__fix_ref__",
+              "validation_evidence": "__validation_evidence__"
+            },
+            "out": "__fix_validation__"
+          }
         }
       },
       "out_args": [
@@ -458,25 +468,27 @@
           "command": "content.playbooks.cra_cvd.primitives.coordination.record_disclosure_coordination"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.vuln_disclosure_intake@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ],
-        "metric_refs": [
-          "kri.cvd_intake_aging@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.cra_cvd.primitives.coordination.record_disclosure_coordination",
-          "in": {
-            "case_id": "__case_id__",
-            "reporter_contact": "__reporter_contact__",
-            "fix_ref": "__fix_ref__",
-            "agreement": "__disclosure_agreement__"
-          },
-          "out": "__coordination_record__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.vuln_disclosure_intake@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ],
+          "metric_refs": [
+            "kri.cvd_intake_aging@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.cra_cvd.primitives.coordination.record_disclosure_coordination",
+            "in": {
+              "case_id": "__case_id__",
+              "reporter_contact": "__reporter_contact__",
+              "fix_ref": "__fix_ref__",
+              "agreement": "__disclosure_agreement__"
+            },
+            "out": "__coordination_record__"
+          }
         }
       }
     },
@@ -512,35 +524,37 @@
           "command": "content.playbooks.cra_cvd.primitives.disclosure.build_advisory_artifact"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.vuln_disclosure_intake@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.compliance_finding@v1"
-        ],
-        "metric_refs": [
-          "kri.cvd_intake_aging@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.cra_cvd.primitives.disclosure.build_advisory_artifact",
-          "in": {
-            "case_id": "__case_id__",
-            "fix_reference": "__fix_ref__",
-            "disclosure_date_iso": "__disclosure_target_date__",
-            "credit_display": "__reporter_credit_display__",
-            "advisory_id": "__advisory_id__",
-            "title": "__advisory_title__",
-            "summary": "__advisory_summary__",
-            "impact": "__advisory_impact__",
-            "affected_products": "__affected_products__",
-            "severity_cvss_v4": "__severity_cvss_v4__",
-            "severity_score": "__severity_score__",
-            "severity_label": "__severity_label__",
-            "operator_display": "__operator_display__",
-            "operator_namespace": "__operator_namespace__"
-          },
-          "out": "__advisory_id__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.vuln_disclosure_intake@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.compliance_finding@v1"
+          ],
+          "metric_refs": [
+            "kri.cvd_intake_aging@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.cra_cvd.primitives.disclosure.build_advisory_artifact",
+            "in": {
+              "case_id": "__case_id__",
+              "fix_reference": "__fix_ref__",
+              "disclosure_date_iso": "__disclosure_target_date__",
+              "credit_display": "__reporter_credit_display__",
+              "advisory_id": "__advisory_id__",
+              "title": "__advisory_title__",
+              "summary": "__advisory_summary__",
+              "impact": "__advisory_impact__",
+              "affected_products": "__affected_products__",
+              "severity_cvss_v4": "__severity_cvss_v4__",
+              "severity_score": "__severity_score__",
+              "severity_label": "__severity_label__",
+              "operator_display": "__operator_display__",
+              "operator_namespace": "__operator_namespace__"
+            },
+            "out": "__advisory_id__"
+          }
         }
       }
     },
@@ -549,32 +563,44 @@
       "name": "cra_cvd_end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.cra_cvd@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "control_refs": [
-      "control.vuln_disclosure_intake@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.vulnerability_finding@v1",
-      "telemetry.ocsf.compliance_finding@v1"
-    ],
-    "metric_refs": [
-      "kri.cvd_intake_aging@v1",
-      "kpi.false_positive_rate@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification — workflow step types (start, action, end), variable conventions, x_ extension namespace",
-      "Cyber Resilience Act (EU) 2024/2847, Article 14 — manufacturer coordinated vulnerability disclosure policy (§1) and acknowledgement to reporter (§6)",
-      "ISO/IEC 29147:2018 — Vulnerability disclosure",
-      "ISO/IEC 30111:2019 — Vulnerability handling processes",
-      "OCSF v1.3.0 — Vulnerability Finding (class_uid 2002) and Compliance Finding (class_uid 2003) event classes emitted across the lifecycle"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.cra_cvd@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "control_refs": [
+        "control.vuln_disclosure_intake@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.vulnerability_finding@v1",
+        "telemetry.ocsf.compliance_finding@v1"
+      ],
+      "metric_refs": [
+        "kri.cvd_intake_aging@v1",
+        "kpi.false_positive_rate@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification — workflow step types (start, action, end), variable conventions, x_ extension namespace",
+        "Cyber Resilience Act (EU) 2024/2847, Article 14 — manufacturer coordinated vulnerability disclosure policy (§1) and acknowledgement to reporter (§6)",
+        "ISO/IEC 29147:2018 — Vulnerability disclosure",
+        "ISO/IEC 30111:2019 — Vulnerability handling processes",
+        "OCSF v1.3.0 — Vulnerability Finding (class_uid 2002) and Compliance Finding (class_uid 2003) event classes emitted across the lifecycle"
+      ]
+    }
   }
 }

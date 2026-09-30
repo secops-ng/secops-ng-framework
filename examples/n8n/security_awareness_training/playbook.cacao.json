@@ -110,13 +110,15 @@
           "command": "Schedule the training-needs assessment against the in-scope programme surface: resolve the required awareness and role-based training tracks per cohort, identify residual gaps against the operator's declared training policy, and pin the per-cohort priority for this cycle. Emits __assessment_id__ as a per-cohort record. Read-only against the operator's HR / identity / policy surfaces; does not mutate roster or policy state."
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.training_needs_assessment@v1"
-        ],
-        "metric_refs": [
-          "kpi.security_awareness_programme_coverage@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.training_needs_assessment@v1"
+          ],
+          "metric_refs": [
+            "kpi.security_awareness_programme_coverage@v1"
+          ]
+        }
       }
     },
     "action--54000000-0000-4000-8000-000000000003": {
@@ -138,13 +140,15 @@
           "command": "Author or update the per-track training curriculum against the assessment artifact: learning objectives, module content references, source citations, and next review dates. Emits __curriculum_id__ as a per-track record. The curriculum is the programme-level content-authoring surface; individual per-cycle delivery lives downstream on this playbook and on the operational cyber_hygiene_training playbook."
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.training_curriculum@v1"
-        ],
-        "metric_refs": [
-          "kri.security_awareness_curriculum_staleness_days@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.training_curriculum@v1"
+          ],
+          "metric_refs": [
+            "kri.security_awareness_curriculum_staleness_days@v1"
+          ]
+        }
       }
     },
     "action--54000000-0000-4000-8000-000000000004": {
@@ -166,10 +170,12 @@
           "command": "Deliver the cycle's curriculum to the in-scope cohorts along the operator's declared training channel(s) (learning-management surface, live session, self-paced module). Emits __delivery_id__ as a per-cohort delivery record. The delivery step writes delivery-intent records to the training surface; the operator's LMS owns final scheduling and per-staff dispatch."
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.training_delivery@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.training_delivery@v1"
+          ]
+        }
       }
     },
     "action--54000000-0000-4000-8000-000000000005": {
@@ -191,10 +197,12 @@
           "command": "Read per-staff completion state from the operator's learning-management surface against the delivery artifact and roll up to per-cohort aggregate. Emits __completion_id__ as per-staff (staff id, track id, completion state, completed at, overdue-by-days) with per-cohort completion-rate. Read-only against the LMS; does not mark completion on the operator's behalf."
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.training_records@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.training_records@v1"
+          ]
+        }
       }
     },
     "action--54000000-0000-4000-8000-000000000006": {
@@ -216,13 +224,15 @@
           "command": "Compose the residual-gap report for the cycle: missed-mandatory tracks, overdue role-based tracks, cohorts below the declared completion-rate target, and any uncovered regulatory training requirement the assessment surfaced but the curriculum did not close. Emits __gap_report_id__. The report is the programme-owner-facing summary of what did NOT close this cycle."
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.training_records@v1"
-        ],
-        "metric_refs": [
-          "kpi.security_awareness_programme_coverage@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.training_records@v1"
+          ],
+          "metric_refs": [
+            "kpi.security_awareness_programme_coverage@v1"
+          ]
+        }
       }
     },
     "action--54000000-0000-4000-8000-000000000007": {
@@ -248,13 +258,15 @@
           "command": "Close the cycle with a dated cycle-review record referencing the assessment, curriculum, delivery, completion, and gap-report artifacts, plus programme-level recommendations feeding the next cycle's assessment (curriculum updates, cohort-scope changes, regulatory drivers). The cycle-review record is the audit-evident programme-governance artifact NIS2 Art. 21(2)(g) reviewers read against the operator's declared training policy."
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.training_records@v1"
-        ],
-        "metric_refs": [
-          "kri.security_awareness_curriculum_staleness_days@v1"
-        ]
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.training_records@v1"
+          ],
+          "metric_refs": [
+            "kri.security_awareness_curriculum_staleness_days@v1"
+          ]
+        }
       }
     },
     "end--54000000-0000-4000-8000-000000000008": {
@@ -262,30 +274,42 @@
       "name": "security_awareness_training_end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.security_awareness_training@v1",
-    "content_version": "0.1.0",
-    "maturity": "experimental",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "control_refs": [
-      "control.training_needs_assessment@v1",
-      "control.training_curriculum@v1",
-      "control.training_delivery@v1",
-      "control.training_records@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
-      "NIS2 Directive (EU) 2022/2555, Article 21(2)(g) — basic cyber-hygiene practices and cybersecurity training",
-      "GDPR Regulation (EU) 2016/679, Article 32(1)(b) — security of processing (staff-training obligation)",
-      "ISO/IEC 27001:2022, Annex A.6.3 — information security awareness, education and training"
-    ],
-    "metric_refs": [
-      "kpi.security_awareness_programme_coverage@v1",
-      "kri.security_awareness_curriculum_staleness_days@v1"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.security_awareness_training@v1",
+      "content_version": "0.1.0",
+      "maturity": "experimental",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "control_refs": [
+        "control.training_needs_assessment@v1",
+        "control.training_curriculum@v1",
+        "control.training_delivery@v1",
+        "control.training_records@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
+        "NIS2 Directive (EU) 2022/2555, Article 21(2)(g) — basic cyber-hygiene practices and cybersecurity training",
+        "GDPR Regulation (EU) 2016/679, Article 32(1)(b) — security of processing (staff-training obligation)",
+        "ISO/IEC 27001:2022, Annex A.6.3 — information security awareness, education and training"
+      ],
+      "metric_refs": [
+        "kpi.security_awareness_programme_coverage@v1",
+        "kri.security_awareness_curriculum_staleness_days@v1"
+      ]
+    }
   }
 }

@@ -168,20 +168,22 @@
           "command": "content.playbooks.nis2_art20_governance.primitives.cycle.resolve_governance_cycle"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.information_security_program_plan@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.nis2_art20_governance.primitives.cycle.resolve_governance_cycle",
-          "in": {
-            "governance_cycle": "__governance_cycle__",
-            "trigger": "__trigger__"
-          },
-          "out": "__review_id__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.information_security_program_plan@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.nis2_art20_governance.primitives.cycle.resolve_governance_cycle",
+            "in": {
+              "governance_cycle": "__governance_cycle__",
+              "trigger": "__trigger__"
+            },
+            "out": "__review_id__"
+          }
         }
       }
     },
@@ -208,23 +210,25 @@
           "command": "content.playbooks.nis2_art20_governance.primitives.review.conduct_art20_review"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.information_security_program_plan@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.nis2_art20_governance.primitives.review.conduct_art20_review",
-          "in": {
-            "governance_cycle": "__governance_cycle__",
-            "posture_snapshot_id": "__posture_snapshot_id__",
-            "clauses": "__clauses__",
-            "open_exceptions": "__open_exceptions__",
-            "training_completion": "__training_completion__"
-          },
-          "out": "__posture_snapshot_id__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.information_security_program_plan@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.nis2_art20_governance.primitives.review.conduct_art20_review",
+            "in": {
+              "governance_cycle": "__governance_cycle__",
+              "posture_snapshot_id": "__posture_snapshot_id__",
+              "clauses": "__clauses__",
+              "open_exceptions": "__open_exceptions__",
+              "training_completion": "__training_completion__"
+            },
+            "out": "__posture_snapshot_id__"
+          }
         }
       }
     },
@@ -252,26 +256,28 @@
           "command": "content.playbooks.nis2_art20_governance.primitives.approval.record_management_approval"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.information_security_program_plan@v1",
-          "control.resource_allocation@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.nis2_art20_governance.primitives.approval.record_management_approval",
-          "in": {
-            "governance_cycle": "__governance_cycle__",
-            "review_id": "__review_id__",
-            "posture_snapshot_id": "__posture_snapshot_id__",
-            "outcome": "__review_outcome__",
-            "measures": "__measures__",
-            "signatories": "__signatories__",
-            "approved_at_iso": "__approved_at_iso__"
-          },
-          "out": "__approval_record_id__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.information_security_program_plan@v1",
+            "control.resource_allocation@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.nis2_art20_governance.primitives.approval.record_management_approval",
+            "in": {
+              "governance_cycle": "__governance_cycle__",
+              "review_id": "__review_id__",
+              "posture_snapshot_id": "__posture_snapshot_id__",
+              "outcome": "__review_outcome__",
+              "measures": "__measures__",
+              "signatories": "__signatories__",
+              "approved_at_iso": "__approved_at_iso__"
+            },
+            "out": "__approval_record_id__"
+          }
         }
       }
     },
@@ -302,28 +308,30 @@
           "command": "content.playbooks.nis2_art20_governance.primitives.evidence.emit_governance_evidence"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.information_security_program_plan@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.nis2_art20_governance.primitives.evidence.emit_governance_evidence",
-          "in": {
-            "governance_cycle": "__governance_cycle__",
-            "trigger": "__trigger__",
-            "review_id": "__review_id__",
-            "posture_snapshot_id": "__posture_snapshot_id__",
-            "approval_record_id": "__approval_record_id__",
-            "outcome": "__review_outcome__",
-            "captured_at": "__captured_at__",
-            "workflow_id": "__workflow_id__",
-            "execution_id": "__execution_id__",
-            "compile_target": "__compile_target__"
-          },
-          "out": "__evidence_id__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.information_security_program_plan@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.nis2_art20_governance.primitives.evidence.emit_governance_evidence",
+            "in": {
+              "governance_cycle": "__governance_cycle__",
+              "trigger": "__trigger__",
+              "review_id": "__review_id__",
+              "posture_snapshot_id": "__posture_snapshot_id__",
+              "approval_record_id": "__approval_record_id__",
+              "outcome": "__review_outcome__",
+              "captured_at": "__captured_at__",
+              "workflow_id": "__workflow_id__",
+              "execution_id": "__execution_id__",
+              "compile_target": "__compile_target__"
+            },
+            "out": "__evidence_id__"
+          }
         }
       }
     },
@@ -332,29 +340,41 @@
       "name": "nis2_art20_governance_end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.nis2_art20_governance@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "control_refs": [
-      "control.ict_risk_governance@v1",
-      "control.resource_allocation@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.api_activity@v1"
-    ],
-    "metric_refs": [],
-    "sources": [
-      "OASIS CACAO v2.0 specification — workflow step types (start, action, end), variable conventions, x_ extension namespace",
-      "NIS2 Directive (EU) 2022/2555, Article 20 — management-body approval of cybersecurity risk-management measures (20(1)) and cybersecurity training for management-body members (20(2))",
-      "NIS2 Directive (EU) 2022/2555, Article 21(2) — cybersecurity risk-management measures (a–j), the downstream obligation surface Article 20(1) anchors on",
-      "NIST SP 800-53 Rev. 5 — PM-2 (Information Security Program Leadership Role) and SA-2 (Allocation of Resources)",
-      "OCSF v1.3.0 — API Activity (class_uid 6003) event class"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.nis2_art20_governance@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "control_refs": [
+        "control.ict_risk_governance@v1",
+        "control.resource_allocation@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.api_activity@v1"
+      ],
+      "metric_refs": [],
+      "sources": [
+        "OASIS CACAO v2.0 specification — workflow step types (start, action, end), variable conventions, x_ extension namespace",
+        "NIS2 Directive (EU) 2022/2555, Article 20 — management-body approval of cybersecurity risk-management measures (20(1)) and cybersecurity training for management-body members (20(2))",
+        "NIS2 Directive (EU) 2022/2555, Article 21(2) — cybersecurity risk-management measures (a–j), the downstream obligation surface Article 20(1) anchors on",
+        "NIST SP 800-53 Rev. 5 — PM-2 (Information Security Program Leadership Role) and SA-2 (Allocation of Resources)",
+        "OCSF v1.3.0 — API Activity (class_uid 6003) event class"
+      ]
+    }
   }
 }

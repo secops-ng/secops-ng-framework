@@ -8,6 +8,16 @@
   "created": "2026-07-07T00:00:00Z",
   "created_by": "identity--5a509a09-5a50-45a5-85a5-095a509a509a",
   "description": "CACAO v2 playbook for the operator-side business continuity lifecycle a NIS2 essential or important entity runs when a business- continuity event (major outage, ransomware containment escalation, dependency failure, or facility loss) is declared against an in- scope service. Covers the three discipline surfaces NIS2 Art. 21(2)(c) names \u2014 backup management, disaster recovery, and crisis management \u2014 as a single continuity envelope. The lifecycle chains seven bound action steps: detect-and-declare-bcm-event \u2192 activate- bcm-plan \u2192 isolate-affected-systems \u2192 switch-to-backup \u2192 notify- competent-authority (the NIS2 Art. 23 path where the event crosses the significant-incident threshold; a locally-logged no-notification determination otherwise) \u2192 restore-and-verify \u2192 post-incident- review. Every action step binds a deterministic primitive under primitives/ (bound since the CORE-WIRE card; stable at content_version 1.0.0): the declaration anchors the Art. 23 clock on the supplied instant, a continuity event with no plan on file is reported as such rather than blocking (skips and non-engagement are data), recovery is verified against observed RTO / RPO rather than asserted, and each lifecycle milestone's OCSF record (API Activity 6003; Incident Finding 2005 at notification and review) is composed by the milestone composers at the telemetry seam, keyed to the event id. The plan register, the isolation and failover surfaces, the competent-authority delivery path and the evidence store are adapter-bound operator surfaces. The periodic non-destructive restore-drill discipline lives on the sibling backup_recovery playbook (both pin nis2:art-21-2-c \u2014 plan-lifecycle vs exercise- lifecycle). CACAO v2 + SecOps-NG content-model extensions.",
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "name": "SecOps-NG content model",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "type": "extension-definition",
+      "version": "1.0.0"
+    }
+  },
   "external_references": [
     {
       "description": "Workflow step types (start, action, end), variable conventions, x_ extension namespace.",
@@ -36,6 +46,33 @@
   ],
   "modified": "2026-07-07T00:00:00Z",
   "name": "Business Continuity \u2014 NIS2 Art.21(2)(c)",
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "content_version": "1.0.0",
+      "control_refs": [
+        "control.contingency_plan@v1",
+        "control.system_recovery_reconstitution@v1",
+        "control.incident_timeline_signals@v1"
+      ],
+      "maturity": "stable",
+      "metric_refs": [],
+      "sources": [
+        "OASIS CACAO v2.0 specification \u2014 workflow step types (start, action, end), variable conventions, x_ extension namespace",
+        "NIS2 Directive (EU) 2022/2555 \u2014 Article 21(2)(c) business continuity, backup management, disaster recovery, crisis management; Article 23 significant-incident reporting",
+        "OCSF v1.4.0 \u2014 API Activity (class_uid 6003) and Incident Finding (class_uid 2005) event classes emitted at lifecycle milestones (the house binding for workflow-emitted milestones, corrected from an invented availability class by #877)"
+      ],
+      "stable_id": "playbook.business_continuity@v1",
+      "telemetry_refs": [
+        "telemetry.ocsf.api_activity@v1",
+        "telemetry.ocsf.incident_finding@v1"
+      ]
+    }
+  },
   "playbook_types": [
     "notification",
     "investigation"
@@ -201,22 +238,24 @@
         "__event_id__",
         "__event_declared_ts__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.contingency_plan@v1"
-        ],
-        "core_body": {
-          "in": {
-            "raw_trigger": "__raw_trigger__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.contingency_plan@v1"
+          ],
+          "core_body": {
+            "in": {
+              "raw_trigger": "__raw_trigger__"
+            },
+            "out": "__bcm_event__",
+            "primitive": "content.playbooks.business_continuity.primitives.declaration.declare_bcm_event"
           },
-          "out": "__bcm_event__",
-          "primitive": "content.playbooks.business_continuity.primitives.declaration.declare_bcm_event"
-        },
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ]
-      }
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--b17c0072-0000-4000-8000-000000000003": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -240,24 +279,26 @@
         "__bcm_plan_ref__",
         "__significant_incident__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.contingency_plan@v1"
-        ],
-        "core_body": {
-          "in": {
-            "event": "__bcm_event__",
-            "plan_register": "__plan_register__",
-            "significance_policy": "__significance_policy__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.contingency_plan@v1"
+          ],
+          "core_body": {
+            "in": {
+              "event": "__bcm_event__",
+              "plan_register": "__plan_register__",
+              "significance_policy": "__significance_policy__"
+            },
+            "out": "__activation__",
+            "primitive": "content.playbooks.business_continuity.primitives.activation.activate_bcm_plan"
           },
-          "out": "__activation__",
-          "primitive": "content.playbooks.business_continuity.primitives.activation.activate_bcm_plan"
-        },
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ]
-      }
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--b17c0072-0000-4000-8000-000000000004": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -278,22 +319,24 @@
         "__isolation_result__",
         "__isolation_scope__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.contingency_plan@v1"
-        ],
-        "core_body": {
-          "in": {
-            "activation": "__activation__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.contingency_plan@v1"
+          ],
+          "core_body": {
+            "in": {
+              "activation": "__activation__"
+            },
+            "out": "__isolation_result__",
+            "primitive": "content.playbooks.business_continuity.primitives.isolation.resolve_isolation_scope"
           },
-          "out": "__isolation_result__",
-          "primitive": "content.playbooks.business_continuity.primitives.isolation.resolve_isolation_scope"
-        },
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ]
-      }
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--b17c0072-0000-4000-8000-000000000005": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -315,22 +358,24 @@
         "__failover_order__",
         "__failover_target__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.system_recovery_reconstitution@v1"
-        ],
-        "core_body": {
-          "in": {
-            "activation": "__activation__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.system_recovery_reconstitution@v1"
+          ],
+          "core_body": {
+            "in": {
+              "activation": "__activation__"
+            },
+            "out": "__failover_order__",
+            "primitive": "content.playbooks.business_continuity.primitives.failover.select_failover_target"
           },
-          "out": "__failover_order__",
-          "primitive": "content.playbooks.business_continuity.primitives.failover.select_failover_target"
-        },
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ]
-      }
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--b17c0072-0000-4000-8000-000000000006": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -356,27 +401,29 @@
         "__authority_record__",
         "__notification_ref__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.incident_timeline_signals@v1"
-        ],
-        "core_body": {
-          "in": {
-            "assessment": "__notification_assessment__",
-            "event_declared_ts": "__event_declared_ts__",
-            "event_id": "__event_id__",
-            "no_notification_rationale": "__no_notification_rationale__",
-            "phase": "__notification_phase__",
-            "significant_incident": "__significant_incident__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.incident_timeline_signals@v1"
+          ],
+          "core_body": {
+            "in": {
+              "assessment": "__notification_assessment__",
+              "event_declared_ts": "__event_declared_ts__",
+              "event_id": "__event_id__",
+              "no_notification_rationale": "__no_notification_rationale__",
+              "phase": "__notification_phase__",
+              "significant_incident": "__significant_incident__"
+            },
+            "out": "__authority_record__",
+            "primitive": "content.playbooks.business_continuity.primitives.notification.compose_authority_notification"
           },
-          "out": "__authority_record__",
-          "primitive": "content.playbooks.business_continuity.primitives.notification.compose_authority_notification"
-        },
-        "telemetry_refs": [
-          "telemetry.ocsf.incident_finding@v1"
-        ]
-      }
+          "telemetry_refs": [
+            "telemetry.ocsf.incident_finding@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--b17c0072-0000-4000-8000-000000000007": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -399,23 +446,25 @@
         "__recovery_record__",
         "__recovery_result__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.system_recovery_reconstitution@v1"
-        ],
-        "core_body": {
-          "in": {
-            "activation": "__activation__",
-            "observed": "__recovery_observations__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.system_recovery_reconstitution@v1"
+          ],
+          "core_body": {
+            "in": {
+              "activation": "__activation__",
+              "observed": "__recovery_observations__"
+            },
+            "out": "__recovery_record__",
+            "primitive": "content.playbooks.business_continuity.primitives.recovery.evaluate_recovery"
           },
-          "out": "__recovery_record__",
-          "primitive": "content.playbooks.business_continuity.primitives.recovery.evaluate_recovery"
-        },
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ]
-      }
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "action--b17c0072-0000-4000-8000-000000000008": {
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
@@ -441,27 +490,29 @@
         "__pir_record__",
         "__pir_ref__"
       ],
-      "type": "action",
-      "x_secops_ng": {
-        "control_refs": [
-          "control.contingency_plan@v1"
-        ],
-        "core_body": {
-          "in": {
-            "corrective_actions": "__pir_corrective_actions__",
-            "event_id": "__event_id__",
-            "lessons_learned": "__pir_lessons__",
-            "linked_refs": "__pir_linked_refs__",
-            "plan_on_file": "__activation__.plan_on_file",
-            "plan_revisions": "__pir_plan_revisions__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.contingency_plan@v1"
+          ],
+          "core_body": {
+            "in": {
+              "corrective_actions": "__pir_corrective_actions__",
+              "event_id": "__event_id__",
+              "lessons_learned": "__pir_lessons__",
+              "linked_refs": "__pir_linked_refs__",
+              "plan_on_file": "__activation__.plan_on_file",
+              "plan_revisions": "__pir_plan_revisions__"
+            },
+            "out": "__pir_record__",
+            "primitive": "content.playbooks.business_continuity.primitives.review.compose_pir_record"
           },
-          "out": "__pir_record__",
-          "primitive": "content.playbooks.business_continuity.primitives.review.compose_pir_record"
-        },
-        "telemetry_refs": [
-          "telemetry.ocsf.incident_finding@v1"
-        ]
-      }
+          "telemetry_refs": [
+            "telemetry.ocsf.incident_finding@v1"
+          ]
+        }
+      },
+      "type": "action"
     },
     "end--b17c0072-0000-4000-8000-00000000000a": {
       "name": "bcm_end",
@@ -473,30 +524,5 @@
       "type": "start"
     }
   },
-  "workflow_start": "start--b17c0072-0000-4000-8000-000000000001",
-  "x_secops_ng": {
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "content_version": "1.0.0",
-    "control_refs": [
-      "control.contingency_plan@v1",
-      "control.system_recovery_reconstitution@v1",
-      "control.incident_timeline_signals@v1"
-    ],
-    "maturity": "stable",
-    "metric_refs": [],
-    "sources": [
-      "OASIS CACAO v2.0 specification \u2014 workflow step types (start, action, end), variable conventions, x_ extension namespace",
-      "NIS2 Directive (EU) 2022/2555 \u2014 Article 21(2)(c) business continuity, backup management, disaster recovery, crisis management; Article 23 significant-incident reporting",
-      "OCSF v1.4.0 \u2014 API Activity (class_uid 6003) and Incident Finding (class_uid 2005) event classes emitted at lifecycle milestones (the house binding for workflow-emitted milestones, corrected from an invented availability class by #877)"
-    ],
-    "stable_id": "playbook.business_continuity@v1",
-    "telemetry_refs": [
-      "telemetry.ocsf.api_activity@v1",
-      "telemetry.ocsf.incident_finding@v1"
-    ]
-  }
+  "workflow_start": "start--b17c0072-0000-4000-8000-000000000001"
 }

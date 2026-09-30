@@ -6,12 +6,14 @@ fails when any document reports a different count: more errors is a
 regression, fewer errors is progress that has to be recorded by re-writing the
 baseline in the same change, so the floor only ever moves down.
 
-    python -m tools.cacao_conformance --baseline tests/content/cacao_conformance_baseline.json
-    python -m tools.cacao_conformance --write-baseline tests/content/cacao_conformance_baseline.json
+    python -m tools.cacao_conformance --dialect 2020-12 --baseline tests/content/cacao_conformance_baseline.json
+    python -m tools.cacao_conformance --dialect 2020-12 --write-baseline tests/content/cacao_conformance_baseline.json
 
-The schemas are vendored under ``schemas/vendor/cacao-2.0/`` and validated
-under the dialect they declare (Draft-07). See the tool's module docstring for
-the dialect discussion.
+The schemas are vendored under ``schemas/vendor/cacao-2.0/``. Since #1027 the
+gate is the strict 2020-12 reading, which enforces the schemas'
+``unevaluatedProperties`` — the reading CACAO Roaster's validator applies —
+and the Draft-07 reading the schemas declare must stay at zero as well. See
+the tool's module docstring for the dialect discussion.
 """
 from __future__ import annotations
 
@@ -26,9 +28,19 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 BASELINE = REPO_ROOT / "tests" / "content" / "cacao_conformance_baseline.json"
 
 
+def _gate_dialect() -> str:
+    """The dialect the ratchet gates on is the one the baseline records.
+
+    Since #1027 that is the strict 2020-12 reading, which enforces the
+    schemas' ``unevaluatedProperties`` — the reading CACAO Roaster's
+    validator applies, and the one the legacy root ``x_secops_ng`` failed.
+    """
+    return json.loads(BASELINE.read_text(encoding="utf-8"))["dialect"]
+
+
 @pytest.fixture(scope="module")
 def report() -> cacao_conformance.Report:
-    return cacao_conformance.run("declared", repo_root=REPO_ROOT)
+    return cacao_conformance.run(_gate_dialect(), repo_root=REPO_ROOT)
 
 
 def test_vendored_schema_set_is_complete() -> None:
@@ -56,14 +68,22 @@ def test_conformance_matches_recorded_baseline(report: cacao_conformance.Report)
         "official CACAO 2.0 schema conformance changed:\n  - "
         + "\n  - ".join(problems)
         + "\n\nIf intended, record the new floor:\n"
-        "  python -m tools.cacao_conformance --write-baseline tests/content/cacao_conformance_baseline.json"
+        f"  python -m tools.cacao_conformance --dialect {_gate_dialect()} "
+        "--write-baseline tests/content/cacao_conformance_baseline.json"
     )
 
 
+def test_the_declared_dialect_is_clean_too() -> None:
+    """The strict reading gates, but the schemas' own Draft-07 reading must
+    stay at zero as well: neither is allowed to regress behind the other."""
+    report = cacao_conformance.run("declared", repo_root=REPO_ROOT)
+    assert report.total_errors == 0, [d.path for d in report.documents if d.errors]
+
+
 def test_baseline_never_records_a_regression_against_itself() -> None:
-    """The baseline file must be self-consistent: declared dialect, integer counts."""
+    """The baseline file must be self-consistent: the strict dialect, integer counts."""
     baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
-    assert baseline["dialect"] == "declared"
+    assert baseline["dialect"] == "2020-12"
     assert baseline["documents"], "baseline lists no documents"
     assert all(isinstance(n, int) and n >= 0 for n in baseline["documents"].values())
 

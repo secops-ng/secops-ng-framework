@@ -21,6 +21,7 @@ from pathlib import Path
 
 import pytest
 from jsonschema import Draft202012Validator
+from compilers._shared.cacao_parser import secops_extension
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PB_DIR = REPO_ROOT / "content" / "playbooks" / "threat_intel_ingest"
@@ -65,7 +66,7 @@ def test_playbook_validates_against_schema(schema: dict, playbook: dict) -> None
 
 
 def test_stable_id_and_compile_targets(playbook: dict) -> None:
-    x = playbook["x_secops_ng"]
+    x = secops_extension(playbook)
     assert x["stable_id"] == "playbook.threat_intel_ingest@v1"
     assert set(x["compile_targets"]) == {"n8n", "temporal", "langgraph"}
 

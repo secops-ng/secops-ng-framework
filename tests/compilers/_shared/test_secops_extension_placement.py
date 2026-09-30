@@ -1,15 +1,14 @@
-"""SecOps-NG data in the legacy ``x_secops_ng`` object vs the CACAO 2.0
-extension slots (#1027, part 1).
+"""SecOps-NG data in the CACAO 2.0 extension slots vs the legacy
+``x_secops_ng`` object (#1027).
 
-The corpus is moving its SecOps-NG data from the private ``x_secops_ng`` key
-to ``playbook_extensions`` / ``step_extensions``, keyed by one extension
-definition, because CACAO tooling keeps extension data and discards unknown
-keys. For one release both placements are read. These tests prove the move
-is safe before any content moves: for every canonical playbook, the migrated
-form parses to the same model, compiles to the same bytes in all three
-emitters, and — the point of the exercise — passes the official OASIS
-schema under both dialects, including the one that enforces
-``unevaluatedProperties``, where the legacy form fails.
+The canonical corpus carries its SecOps-NG data in ``playbook_extensions`` /
+``step_extensions``, keyed by one extension definition, because CACAO
+tooling keeps extension data and discards unknown keys. For one release the
+parser still reads the legacy ``x_secops_ng`` placement. These tests pin
+both halves: every canonical playbook is fully migrated and officially
+conformant under both dialects, and its legacy form — rebuilt here — still
+parses to the same model and compiles to the same bytes in all three
+emitters.
 """
 from __future__ import annotations
 
@@ -58,14 +57,43 @@ def test_the_extension_id_is_reproducible_and_a_valid_identifier() -> None:
     assert EXTENSION_SCHEMA_URL.endswith("content-model/x-secops-ng.extension.schema.json")
 
 
-@pytest.mark.parametrize("path", DOCUMENTS, ids=IDS)
-def test_the_migrated_form_is_equivalent_and_officially_conformant(path: Path) -> None:
-    legacy = _load(path)
-    migrated = migrate_to_extensions(legacy)
-    assert "x_secops_ng" not in migrated
-    assert all("x_secops_ng" not in s for s in migrated["workflow"].values())
+def _to_legacy(doc: dict) -> dict:
+    """Rebuild the legacy x_secops_ng placement from a migrated document."""
+    legacy = copy.deepcopy(doc)
+    legacy["x_secops_ng"] = legacy.pop("playbook_extensions").pop(SECOPS_NG_EXTENSION_ID)
+    for step in legacy["workflow"].values():
+        slot = step.get("step_extensions", {})
+        if SECOPS_NG_EXTENSION_ID in slot:
+            step["x_secops_ng"] = slot.pop(SECOPS_NG_EXTENSION_ID)
+            if not slot:
+                del step["step_extensions"]
+    del legacy["extension_definitions"][SECOPS_NG_EXTENSION_ID]
+    if not legacy["extension_definitions"]:
+        del legacy["extension_definitions"]
+    return legacy
 
-    a, b = parse(copy.deepcopy(legacy)), parse(copy.deepcopy(migrated))
+
+@pytest.mark.parametrize("path", DOCUMENTS, ids=IDS)
+def test_every_canonical_playbook_is_migrated_and_officially_conformant(path: Path) -> None:
+    doc = _load(path)
+    assert migrate_to_extensions(doc) == doc, "not fully in the extension placement"
+    assert "x_secops_ng" not in doc
+    assert all("x_secops_ng" not in s for s in doc["workflow"].values())
+    assert doc["extension_definitions"][SECOPS_NG_EXTENSION_ID] == SECOPS_NG_EXTENSION_DEFINITION
+    for dialect in ("declared", "2020-12"):
+        errors = [e.message for e in build_validator(dialect).iter_errors(doc)]
+        assert not errors, f"{dialect}: {errors[:3]}"
+
+
+@pytest.mark.parametrize("path", DOCUMENTS, ids=IDS)
+def test_the_legacy_form_still_reads_identically(path: Path) -> None:
+    """The one-release compatibility promise: a document still written with
+    x_secops_ng parses to the same model and compiles to the same bytes."""
+    current = _load(path)
+    legacy = _to_legacy(current)
+    assert migrate_to_extensions(legacy) == current
+
+    a, b = parse(copy.deepcopy(legacy)), parse(copy.deepcopy(current))
     differing = [f.name for f in dataclasses.fields(a) if getattr(a, f.name) != getattr(b, f.name)]
     assert differing == ["extension_definitions"], differing
 
@@ -74,14 +102,10 @@ def test_the_migrated_form_is_equivalent_and_officially_conformant(path: Path) -
     assert langgraph_emit(b).to_dict() == langgraph_emit(a).to_dict()
     assert render_module(b) == render_module(a)
 
-    for dialect in ("declared", "2020-12"):
-        errors = [e.message for e in build_validator(dialect).iter_errors(migrated)]
-        assert not errors, f"{dialect}: {errors[:3]}"
-
 
 def test_the_legacy_form_is_what_the_strict_dialect_rejects() -> None:
-    """The baseline this moves away from: the root x_secops_ng alone."""
-    legacy = _load(DOCUMENTS[0])
+    """Why the corpus moved: the legacy root object fails the strict reading."""
+    legacy = _to_legacy(_load(DOCUMENTS[0]))
     messages = [e.message for e in build_validator("2020-12").iter_errors(legacy)]
     assert messages and all("x_secops_ng" in m for m in messages)
 
@@ -100,7 +124,7 @@ def _extension_validator() -> Draft202012Validator:
 
 @pytest.mark.parametrize("path", DOCUMENTS, ids=IDS)
 def test_every_payload_matches_the_published_extension_schema(path: Path) -> None:
-    migrated = migrate_to_extensions(_load(path))
+    migrated = _load(path)
     validator = _extension_validator()
     payloads = [migrated["playbook_extensions"][SECOPS_NG_EXTENSION_ID]] + [
         s["step_extensions"][SECOPS_NG_EXTENSION_ID]
@@ -114,7 +138,7 @@ def _phishing() -> dict:
 
 
 def test_migration_is_idempotent_and_keeps_other_tools_extensions() -> None:
-    doc = _phishing()
+    doc = _to_legacy(_phishing())
     first_step = next(iter(doc["workflow"]))
     roaster = "extension-definition--00000000-0000-4000-8000-000000000001"
     doc["workflow"][first_step]["step_extensions"] = {roaster: {"x": 1, "y": 2}}
@@ -128,7 +152,7 @@ def test_migration_is_idempotent_and_keeps_other_tools_extensions() -> None:
 
 
 def test_both_placements_on_one_object_are_rejected() -> None:
-    doc = migrate_to_extensions(_phishing())
+    doc = _phishing()
     with pytest.raises(ExtensionPlacementError):
         secops_extension({**doc, "x_secops_ng": doc["playbook_extensions"][SECOPS_NG_EXTENSION_ID]})
     both_root = {**doc, "x_secops_ng": doc["playbook_extensions"][SECOPS_NG_EXTENSION_ID]}
@@ -142,7 +166,7 @@ def test_both_placements_on_one_object_are_rejected() -> None:
 
 
 def test_a_payload_keyed_by_an_undeclared_extension_is_rejected() -> None:
-    doc = migrate_to_extensions(_phishing())
+    doc = _phishing()
     del doc["extension_definitions"][SECOPS_NG_EXTENSION_ID]
     with pytest.raises(CacaoSemanticError, match="does not declare it"):
         parse(doc)
@@ -150,6 +174,6 @@ def test_a_payload_keyed_by_an_undeclared_extension_is_rejected() -> None:
 
 def test_a_playbook_with_no_secops_ng_data_is_rejected() -> None:
     doc = _phishing()
-    del doc["x_secops_ng"]
+    del doc["playbook_extensions"][SECOPS_NG_EXTENSION_ID]
     with pytest.raises((CacaoSchemaError, CacaoSemanticError)):
         parse(doc)

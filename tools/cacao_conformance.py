@@ -12,9 +12,9 @@ Usage
 
     python -m tools.cacao_conformance                       # report
     python -m tools.cacao_conformance --show 5              # report + first 5 errors per document
-    python -m tools.cacao_conformance --baseline tests/content/cacao_conformance_baseline.json
-    python -m tools.cacao_conformance --write-baseline tests/content/cacao_conformance_baseline.json
-    python -m tools.cacao_conformance --dialect 2020-12     # stricter reading, see below
+    python -m tools.cacao_conformance --dialect 2020-12 --baseline tests/content/cacao_conformance_baseline.json
+    python -m tools.cacao_conformance --dialect 2020-12 --write-baseline tests/content/cacao_conformance_baseline.json
+    python -m tools.cacao_conformance --dialect 2020-12     # the strict reading the ratchet gates on
     python -m tools.cacao_conformance --json                # machine-readable report on stdout
 
 Dialects
@@ -23,12 +23,13 @@ Dialects
 The upstream schema files declare JSON Schema Draft-07 but also use the
 ``unevaluatedProperties`` keyword, which Draft-07 validators ignore. The
 default (``--dialect declared``) validates under Draft-07, which is what the
-files say they are and what downstream CACAO tooling applies. ``--dialect
-2020-12`` evaluates the root ``playbook.json`` under the newer dialect, so the
-root-level ``unevaluatedProperties: false`` is enforced and non-standard
-top-level properties are reported; the referenced files keep their declared
-dialect so step-type dispatch is unchanged. It reports a superset of the
-declared reading and is informational.
+files say they are. ``--dialect 2020-12`` evaluates the root
+``playbook.json`` under the newer dialect, so the root-level
+``unevaluatedProperties: false`` is enforced and non-standard top-level
+properties are reported; the referenced files keep their declared dialect
+so step-type dispatch is unchanged. It reports a superset of the declared
+reading, and it is what the ratchet gates on (#1027): CACAO Roaster's
+validator (Ajv2019) enforces ``unevaluatedProperties`` the same way.
 
 Exit codes
 ----------

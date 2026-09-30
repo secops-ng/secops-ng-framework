@@ -218,26 +218,28 @@
           "command": "content.playbooks.dora_tlpt_programme.primitives.scope.define_dort_scope"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.security_assessment@v1",
-          "control.control_effectiveness_test@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kpi.dora_resilience_test_coverage@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.dora_tlpt_programme.primitives.scope.define_dort_scope",
-          "in": {
-            "testing_window": "__testing_window__",
-            "critical_functions": "__critical_functions__",
-            "asset_register": "__asset_register__",
-            "third_party_register": "__third_party_register__"
-          },
-          "out": "__dort_scope_catalogue__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.security_assessment@v1",
+            "control.control_effectiveness_test@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kpi.dora_resilience_test_coverage@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.dora_tlpt_programme.primitives.scope.define_dort_scope",
+            "in": {
+              "testing_window": "__testing_window__",
+              "critical_functions": "__critical_functions__",
+              "asset_register": "__asset_register__",
+              "third_party_register": "__third_party_register__"
+            },
+            "out": "__dort_scope_catalogue__"
+          }
         }
       }
     },
@@ -266,27 +268,29 @@
           "command": "content.playbooks.dora_tlpt_programme.primitives.trigger.evaluate_tlpt_trigger"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.security_assessment@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [],
-        "core_body": {
-          "primitive": "content.playbooks.dora_tlpt_programme.primitives.trigger.evaluate_tlpt_trigger",
-          "in": {
-            "dort_scope": "__dort_scope_catalogue__",
-            "entity_significance_tier": "__entity_significance_tier__",
-            "tlpt_identified": "__tlpt_identified__",
-            "threat_intelligence_source": "__threat_intelligence_source__",
-            "tester_posture": "__tester_posture__",
-            "authority_notification_ref": "__authority_notification_ref__",
-            "last_tlpt_completed_on": "__last_tlpt_completed_on__",
-            "declared_cadence_months": "__declared_cadence_months__"
-          },
-          "out": "__tlpt_trigger_decision__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.security_assessment@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [],
+          "core_body": {
+            "primitive": "content.playbooks.dora_tlpt_programme.primitives.trigger.evaluate_tlpt_trigger",
+            "in": {
+              "dort_scope": "__dort_scope_catalogue__",
+              "entity_significance_tier": "__entity_significance_tier__",
+              "tlpt_identified": "__tlpt_identified__",
+              "threat_intelligence_source": "__threat_intelligence_source__",
+              "tester_posture": "__tester_posture__",
+              "authority_notification_ref": "__authority_notification_ref__",
+              "last_tlpt_completed_on": "__last_tlpt_completed_on__",
+              "declared_cadence_months": "__declared_cadence_months__"
+            },
+            "out": "__tlpt_trigger_decision__"
+          }
         }
       }
     },
@@ -314,26 +318,28 @@
           "command": "content.playbooks.dora_tlpt_programme.primitives.scoping.approve_red_team_scoping"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.security_assessment@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [],
-        "core_body": {
-          "primitive": "content.playbooks.dora_tlpt_programme.primitives.scoping.approve_red_team_scoping",
-          "in": {
-            "dort_scope": "__dort_scope_catalogue__",
-            "tlpt_trigger": "__tlpt_trigger_decision__",
-            "tester_ref": "__tester_ref__",
-            "outcome": "__scoping_outcome__",
-            "tester_certification_ref": "__tester_certification_ref__",
-            "tester_independence_attestation_ref": "__tester_independence_attestation_ref__",
-            "third_party_carve_outs": "__third_party_carve_outs__"
-          },
-          "out": "__red_team_scoping_id__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.security_assessment@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [],
+          "core_body": {
+            "primitive": "content.playbooks.dora_tlpt_programme.primitives.scoping.approve_red_team_scoping",
+            "in": {
+              "dort_scope": "__dort_scope_catalogue__",
+              "tlpt_trigger": "__tlpt_trigger_decision__",
+              "tester_ref": "__tester_ref__",
+              "outcome": "__scoping_outcome__",
+              "tester_certification_ref": "__tester_certification_ref__",
+              "tester_independence_attestation_ref": "__tester_independence_attestation_ref__",
+              "third_party_carve_outs": "__third_party_carve_outs__"
+            },
+            "out": "__red_team_scoping_id__"
+          }
         }
       }
     },
@@ -361,29 +367,31 @@
           "command": "content.playbooks.dora_tlpt_programme.primitives.remediation.track_remediation"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.security_assessment@v1",
-          "control.control_effectiveness_test@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kri.tlpt_remediation_overdue@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.dora_tlpt_programme.primitives.remediation.track_remediation",
-          "in": {
-            "dort_scope": "__dort_scope_catalogue__",
-            "red_team_scoping": "__red_team_scoping_id__",
-            "findings": "__engagement_findings__",
-            "severity_rubric": "__severity_rubric__",
-            "workflow_id": "__workflow_id__",
-            "execution_id": "__execution_id__",
-            "captured_at": "__captured_at__"
-          },
-          "out": "__remediation_attestation_id__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.security_assessment@v1",
+            "control.control_effectiveness_test@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kri.tlpt_remediation_overdue@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.dora_tlpt_programme.primitives.remediation.track_remediation",
+            "in": {
+              "dort_scope": "__dort_scope_catalogue__",
+              "red_team_scoping": "__red_team_scoping_id__",
+              "findings": "__engagement_findings__",
+              "severity_rubric": "__severity_rubric__",
+              "workflow_id": "__workflow_id__",
+              "execution_id": "__execution_id__",
+              "captured_at": "__captured_at__"
+            },
+            "out": "__remediation_attestation_id__"
+          }
         }
       }
     },
@@ -392,33 +400,45 @@
       "name": "dora_tlpt_programme_end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.dora_tlpt_programme@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "control_refs": [
-      "control.security_assessment@v1",
-      "control.control_effectiveness_test@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.api_activity@v1"
-    ],
-    "metric_refs": [
-      "kpi.dora_resilience_test_coverage@v1",
-      "kri.tlpt_remediation_overdue@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
-      "DORA — Regulation (EU) 2022/2554, Article 24 — General requirements for the testing of digital operational resilience",
-      "DORA — Regulation (EU) 2022/2554, Article 26 — Advanced testing of ICT tools, systems and processes based on TLPT",
-      "ESAs Joint Committee — Joint Guidelines on TLPT identification criteria (JC 2022 03)",
-      "Commission Delegated Regulation (EU) 2024/1774 — JC RTS on ICT risk-management framework (Arts. 25–26 testing scope)",
-      "ECB — TIBER-EU framework (threat-intelligence-based ethical red teaming)"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.dora_tlpt_programme@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "control_refs": [
+        "control.security_assessment@v1",
+        "control.control_effectiveness_test@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.api_activity@v1"
+      ],
+      "metric_refs": [
+        "kpi.dora_resilience_test_coverage@v1",
+        "kri.tlpt_remediation_overdue@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
+        "DORA — Regulation (EU) 2022/2554, Article 24 — General requirements for the testing of digital operational resilience",
+        "DORA — Regulation (EU) 2022/2554, Article 26 — Advanced testing of ICT tools, systems and processes based on TLPT",
+        "ESAs Joint Committee — Joint Guidelines on TLPT identification criteria (JC 2022 03)",
+        "Commission Delegated Regulation (EU) 2024/1774 — JC RTS on ICT risk-management framework (Arts. 25–26 testing scope)",
+        "ECB — TIBER-EU framework (threat-intelligence-based ethical red teaming)"
+      ]
+    }
   }
 }

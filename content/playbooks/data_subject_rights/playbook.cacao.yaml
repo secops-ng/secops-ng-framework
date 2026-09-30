@@ -391,17 +391,18 @@ workflow:
     commands:
       - type: secops-ng-primitive
         command: content.playbooks.data_subject_rights.primitives.intake.open_dsr_case
-    x_secops_ng:
-      control_refs:
-        - control.account_management@v1
-      telemetry_refs:
-        - telemetry.ocsf.compliance_finding@v1
-      core_body:
-        primitive: content.playbooks.data_subject_rights.primitives.intake.open_dsr_case
-        in:
-          raw_request: __raw_request__
-          intake_channel: __intake_channel__
-        out: __dsr_case__
+    step_extensions:
+      extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+        control_refs:
+          - control.account_management@v1
+        telemetry_refs:
+          - telemetry.ocsf.compliance_finding@v1
+        core_body:
+          primitive: content.playbooks.data_subject_rights.primitives.intake.open_dsr_case
+          in:
+            raw_request: __raw_request__
+            intake_channel: __intake_channel__
+          out: __dsr_case__
   action--d5b17a15-0000-4000-8000-000000000003:
     type: action
     name: verify_identity
@@ -437,20 +438,21 @@ workflow:
     commands:
       - type: secops-ng-primitive
         command: content.playbooks.data_subject_rights.primitives.verification.record_identity_verification
-    x_secops_ng:
-      control_refs:
-        - control.access_enforcement@v1
-        - control.service_identification_authentication@v1
-      telemetry_refs:
-        - telemetry.ocsf.compliance_finding@v1
-      core_body:
-        primitive: content.playbooks.data_subject_rights.primitives.verification.record_identity_verification
-        in:
-          case_id: __case_id__
-          verification_method: __verification_method__
-          identity_verified: __verification_result__
-          evidence_ref: __verification_evidence_ref__
-        out: __verification_record__
+    step_extensions:
+      extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+        control_refs:
+          - control.access_enforcement@v1
+          - control.service_identification_authentication@v1
+        telemetry_refs:
+          - telemetry.ocsf.compliance_finding@v1
+        core_body:
+          primitive: content.playbooks.data_subject_rights.primitives.verification.record_identity_verification
+          in:
+            case_id: __case_id__
+            verification_method: __verification_method__
+            identity_verified: __verification_result__
+            evidence_ref: __verification_evidence_ref__
+          out: __verification_record__
   action--d5b17a15-0000-4000-8000-000000000004:
     type: action
     name: classify_request
@@ -489,18 +491,19 @@ workflow:
     commands:
       - type: secops-ng-primitive
         command: content.playbooks.data_subject_rights.primitives.classification.classify_request
-    x_secops_ng:
-      control_refs:
-        - control.account_management@v1
-      telemetry_refs:
-        - telemetry.ocsf.compliance_finding@v1
-      core_body:
-        primitive: content.playbooks.data_subject_rights.primitives.classification.classify_request
-        in:
-          request_type: __classified_request_type__
-          request_received_ts: __request_received_ts__
-          extension: __extension_decision__
-        out: __classification__
+    step_extensions:
+      extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+        control_refs:
+          - control.account_management@v1
+        telemetry_refs:
+          - telemetry.ocsf.compliance_finding@v1
+        core_body:
+          primitive: content.playbooks.data_subject_rights.primitives.classification.classify_request
+          in:
+            request_type: __classified_request_type__
+            request_received_ts: __request_received_ts__
+            extension: __extension_decision__
+          out: __classification__
   if-condition--d5b17a15-0000-4000-8000-000000000009:
     type: if-condition
     name: identity verified?
@@ -551,18 +554,19 @@ workflow:
     commands:
       - type: secops-ng-primitive
         command: content.playbooks.data_subject_rights.primitives.routing.resolve_data_owner_manifest
-    x_secops_ng:
-      control_refs:
-        - control.account_management@v1
-      telemetry_refs:
-        - telemetry.ocsf.compliance_finding@v1
-      core_body:
-        primitive: content.playbooks.data_subject_rights.primitives.routing.resolve_data_owner_manifest
-        in:
-          case_id: __case_id__
-          request_type: __request_type__
-          owner_rows: __owner_rows__
-        out: __owner_manifest__
+    step_extensions:
+      extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+        control_refs:
+          - control.account_management@v1
+        telemetry_refs:
+          - telemetry.ocsf.compliance_finding@v1
+        core_body:
+          primitive: content.playbooks.data_subject_rights.primitives.routing.resolve_data_owner_manifest
+          in:
+            case_id: __case_id__
+            request_type: __request_type__
+            owner_rows: __owner_rows__
+          out: __owner_manifest__
   action--d5b17a15-0000-4000-8000-000000000006:
     type: action
     name: compile_fulfilment_evidence
@@ -596,17 +600,18 @@ workflow:
     commands:
       - type: secops-ng-primitive
         command: content.playbooks.data_subject_rights.primitives.fulfilment.compile_fulfilment_pack
-    x_secops_ng:
-      control_refs:
-        - control.incident_timeline_signals@v1
-      telemetry_refs:
-        - telemetry.ocsf.compliance_finding@v1
-      core_body:
-        primitive: content.playbooks.data_subject_rights.primitives.fulfilment.compile_fulfilment_pack
-        in:
-          manifest: __owner_manifest__
-          owner_returns: __owner_returns__
-        out: __fulfilment_pack__
+    step_extensions:
+      extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+        control_refs:
+          - control.incident_timeline_signals@v1
+        telemetry_refs:
+          - telemetry.ocsf.compliance_finding@v1
+        core_body:
+          primitive: content.playbooks.data_subject_rights.primitives.fulfilment.compile_fulfilment_pack
+          in:
+            manifest: __owner_manifest__
+            owner_returns: __owner_returns__
+          out: __fulfilment_pack__
   action--d5b17a15-0000-4000-8000-000000000007:
     type: action
     name: send_controller_response
@@ -646,24 +651,25 @@ workflow:
     commands:
       - type: secops-ng-primitive
         command: content.playbooks.data_subject_rights.primitives.response.compose_controller_response
-    x_secops_ng:
-      control_refs:
-        - control.incident_timeline_signals@v1
-      telemetry_refs:
-        - telemetry.ocsf.compliance_finding@v1
-      core_body:
-        primitive: content.playbooks.data_subject_rights.primitives.response.compose_controller_response
-        in:
-          case_id: __case_id__
-          request_type: __request_type__
-          subject_contact: __subject_contact__
-          response_deadline: __response_deadline__
-          dispatch_ts: __dispatch_ts__
-          fulfilment_pack_ref: __fulfilment_pack_ref__
-          refusal: __refusal_decision__
-          extension: __extension_decision__
-          additional_information_request: __identity_followup__
-        out: __controller_response__
+    step_extensions:
+      extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+        control_refs:
+          - control.incident_timeline_signals@v1
+        telemetry_refs:
+          - telemetry.ocsf.compliance_finding@v1
+        core_body:
+          primitive: content.playbooks.data_subject_rights.primitives.response.compose_controller_response
+          in:
+            case_id: __case_id__
+            request_type: __request_type__
+            subject_contact: __subject_contact__
+            response_deadline: __response_deadline__
+            dispatch_ts: __dispatch_ts__
+            fulfilment_pack_ref: __fulfilment_pack_ref__
+            refusal: __refusal_decision__
+            extension: __extension_decision__
+            additional_information_request: __identity_followup__
+          out: __controller_response__
   action--d5b17a15-0000-4000-8000-000000000008:
     type: action
     name: record_outcome
@@ -699,53 +705,63 @@ workflow:
     commands:
       - type: secops-ng-primitive
         command: content.playbooks.data_subject_rights.primitives.outcome.record_case_outcome
-    x_secops_ng:
-      control_refs:
-        - control.incident_timeline_signals@v1
-      telemetry_refs:
-        - telemetry.ocsf.compliance_finding@v1
-      core_body:
-        primitive: content.playbooks.data_subject_rights.primitives.outcome.record_case_outcome
-        in:
-          case_id: __case_id__
-          outcome_code: __outcome_decision__
-          response_dispatch_ts: __controller_response__.dispatch_ts
-          response_deadline: __response_deadline__
-          fulfilment_pack_ref: __fulfilment_pack_ref__
-        out: __outcome_record__
+    step_extensions:
+      extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+        control_refs:
+          - control.incident_timeline_signals@v1
+        telemetry_refs:
+          - telemetry.ocsf.compliance_finding@v1
+        core_body:
+          primitive: content.playbooks.data_subject_rights.primitives.outcome.record_case_outcome
+          in:
+            case_id: __case_id__
+            outcome_code: __outcome_decision__
+            response_dispatch_ts: __controller_response__.dispatch_ts
+            response_deadline: __response_deadline__
+            fulfilment_pack_ref: __fulfilment_pack_ref__
+          out: __outcome_record__
   end--d5b17a15-0000-4000-8000-00000000000a:
     type: end
     name: dsr_end
-x_secops_ng:
-  stable_id: playbook.data_subject_rights@v1
-  content_version: 1.0.0
-  maturity: stable
-  compile_targets:
-    - n8n
-    - temporal
-    - langgraph
-  control_refs:
-    - control.access_enforcement@v1
-    - control.account_management@v1
-    - control.service_identification_authentication@v1
-    - control.incident_timeline_signals@v1
-  telemetry_refs:
-    - telemetry.ocsf.compliance_finding@v1
-  metric_refs: []
-  sources:
-    - >-
-      OASIS CACAO v2.0 specification — workflow step types
-      (start, action, end), variable conventions, x_ extension
-      namespace
-    - >-
-      General Data Protection Regulation (EU) 2016/679 —
-      Chapter III, Articles 15-22 (rights of the data subject)
-      and Article 12 (modalities, response window, refusal
-      grounds)
-    - >-
-      EDPB Guidelines 01/2022 on data subject rights — right of
-      access
-    - >-
-      OCSF v1.3.0 — Compliance Finding (class_uid 2003) event
-      class emitted per lifecycle milestone for the operator's
-      Article 5(2) accountability posture
+extension_definitions:
+  extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+    type: "extension-definition"
+    name: "SecOps-NG content model"
+    description: "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level."
+    created_by: "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c"
+    schema: "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json"
+    version: "1.0.0"
+playbook_extensions:
+  extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a:
+    stable_id: playbook.data_subject_rights@v1
+    content_version: 1.0.0
+    maturity: stable
+    compile_targets:
+      - n8n
+      - temporal
+      - langgraph
+    control_refs:
+      - control.access_enforcement@v1
+      - control.account_management@v1
+      - control.service_identification_authentication@v1
+      - control.incident_timeline_signals@v1
+    telemetry_refs:
+      - telemetry.ocsf.compliance_finding@v1
+    metric_refs: []
+    sources:
+      - >-
+        OASIS CACAO v2.0 specification — workflow step types
+        (start, action, end), variable conventions, x_ extension
+        namespace
+      - >-
+        General Data Protection Regulation (EU) 2016/679 —
+        Chapter III, Articles 15-22 (rights of the data subject)
+        and Article 12 (modalities, response window, refusal
+        grounds)
+      - >-
+        EDPB Guidelines 01/2022 on data subject rights — right of
+        access
+      - >-
+        OCSF v1.3.0 — Compliance Finding (class_uid 2003) event
+        class emitted per lifecycle milestone for the operator's
+        Article 5(2) accountability posture

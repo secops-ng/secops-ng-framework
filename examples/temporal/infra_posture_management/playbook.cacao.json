@@ -127,25 +127,27 @@
           "command": "content.playbooks.infra_posture_management.primitives.collect.collect_posture_state"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.cspm_baseline@v1",
-          "control.asset_inventory_delta@v1",
-          "control.cloud_identity_least_privilege@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kpi.cloud_posture_coverage@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.infra_posture_management.primitives.collect.collect_posture_state",
-          "in": {
-            "raw_posture": "__raw_posture__",
-            "scope_ref": "__scope_ref__"
-          },
-          "out": "__posture_state_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.cspm_baseline@v1",
+            "control.asset_inventory_delta@v1",
+            "control.cloud_identity_least_privilege@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kpi.cloud_posture_coverage@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.infra_posture_management.primitives.collect.collect_posture_state",
+            "in": {
+              "raw_posture": "__raw_posture__",
+              "scope_ref": "__scope_ref__"
+            },
+            "out": "__posture_state_ref__"
+          }
         }
       }
     },
@@ -168,25 +170,27 @@
           "command": "content.playbooks.infra_posture_management.primitives.controls.evaluate_controls"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.cspm_baseline@v1",
-          "control.risk_management_policy@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kpi.cloud_posture_coverage@v1",
-          "kri.control_effectiveness@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.infra_posture_management.primitives.controls.evaluate_controls",
-          "in": {
-            "posture_state": "__posture_state_ref__",
-            "posture_policy": "__posture_policy__"
-          },
-          "out": "__control_evaluation_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.cspm_baseline@v1",
+            "control.risk_management_policy@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kpi.cloud_posture_coverage@v1",
+            "kri.control_effectiveness@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.infra_posture_management.primitives.controls.evaluate_controls",
+            "in": {
+              "posture_state": "__posture_state_ref__",
+              "posture_policy": "__posture_policy__"
+            },
+            "out": "__control_evaluation_ref__"
+          }
         }
       }
     },
@@ -218,34 +222,36 @@
           "command": "content.playbooks.infra_posture_management.primitives.artifact.build_posture_artifact"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.cspm_baseline@v1",
-          "control.risk_management_policy@v1",
-          "control.asset_inventory_delta@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kpi.cloud_posture_coverage@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.infra_posture_management.primitives.artifact.build_posture_artifact",
-          "in": {
-            "workflow_id": "__workflow_id__",
-            "execution_id": "__execution_id__",
-            "compile_target": "__compile_target__",
-            "regulation_refs": "__regulation_refs__",
-            "control_refs": "__control_refs__",
-            "policy_version": "__policy_version__",
-            "posture_state": "__posture_state_ref__",
-            "control_evaluation": "__control_evaluation_ref__",
-            "evaluated_at": "__evaluated_at__",
-            "captured_at": "__captured_at__",
-            "source_url": "__source_url__"
-          },
-          "out": "__posture_artifact_ref__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.cspm_baseline@v1",
+            "control.risk_management_policy@v1",
+            "control.asset_inventory_delta@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kpi.cloud_posture_coverage@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.infra_posture_management.primitives.artifact.build_posture_artifact",
+            "in": {
+              "workflow_id": "__workflow_id__",
+              "execution_id": "__execution_id__",
+              "compile_target": "__compile_target__",
+              "regulation_refs": "__regulation_refs__",
+              "control_refs": "__control_refs__",
+              "policy_version": "__policy_version__",
+              "posture_state": "__posture_state_ref__",
+              "control_evaluation": "__control_evaluation_ref__",
+              "evaluated_at": "__evaluated_at__",
+              "captured_at": "__captured_at__",
+              "source_url": "__source_url__"
+            },
+            "out": "__posture_artifact_ref__"
+          }
         }
       }
     },
@@ -254,28 +260,40 @@
       "name": "infra-posture-management-end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.infra_posture_management@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": ["n8n", "temporal", "langgraph"],
-    "control_refs": [
-      "control.cspm_baseline@v1",
-      "control.risk_management_policy@v1",
-      "control.asset_inventory_delta@v1",
-      "control.cloud_identity_least_privilege@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.api_activity@v1"
-    ],
-    "metric_refs": [
-      "kpi.cloud_posture_coverage@v1",
-      "kri.control_effectiveness@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification",
-      "NIS2 Directive (EU) 2022/2555 — Article 21(2)(a)",
-      "SecOps-NG posture evidence stream — schemas/evidence/posture.schema.json"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.infra_posture_management@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": ["n8n", "temporal", "langgraph"],
+      "control_refs": [
+        "control.cspm_baseline@v1",
+        "control.risk_management_policy@v1",
+        "control.asset_inventory_delta@v1",
+        "control.cloud_identity_least_privilege@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.api_activity@v1"
+      ],
+      "metric_refs": [
+        "kpi.cloud_posture_coverage@v1",
+        "kri.control_effectiveness@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification",
+        "NIS2 Directive (EU) 2022/2555 — Article 21(2)(a)",
+        "SecOps-NG posture evidence stream — schemas/evidence/posture.schema.json"
+      ]
+    }
   }
 }

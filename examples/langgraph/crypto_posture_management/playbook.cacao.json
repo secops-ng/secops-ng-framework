@@ -159,22 +159,24 @@
           "command": "content.playbooks.crypto_posture_management.primitives.policy.inventory_crypto_policy"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.crypto_policy_inventory@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.crypto_posture_management.primitives.policy.inventory_crypto_policy",
-          "in": {
-            "posture_window": "__posture_window__",
-            "crypto_scope": "__crypto_scope__",
-            "policy_clauses": "__policy_clauses__",
-            "scoped_assets": "__scoped_assets__"
-          },
-          "out": "__policy_inventory_id__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.crypto_policy_inventory@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.crypto_posture_management.primitives.policy.inventory_crypto_policy",
+            "in": {
+              "posture_window": "__posture_window__",
+              "crypto_scope": "__crypto_scope__",
+              "policy_clauses": "__policy_clauses__",
+              "scoped_assets": "__scoped_assets__"
+            },
+            "out": "__policy_inventory_id__"
+          }
         }
       }
     },
@@ -199,25 +201,27 @@
           "command": "content.playbooks.crypto_posture_management.primitives.certificates.probe_cert_posture"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.cert_posture_scan@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kri.expiring_tls_certs@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.crypto_posture_management.primitives.certificates.probe_cert_posture",
-          "in": {
-            "crypto_scope": "__crypto_scope__",
-            "policy_inventory": "__policy_inventory_id__",
-            "certificate_observations": "__certificate_observations__",
-            "accepted_cipher_suites": "__accepted_cipher_suites__"
-          },
-          "out": "__cert_posture_id__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.cert_posture_scan@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kri.expiring_tls_certs@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.crypto_posture_management.primitives.certificates.probe_cert_posture",
+            "in": {
+              "crypto_scope": "__crypto_scope__",
+              "policy_inventory": "__policy_inventory_id__",
+              "certificate_observations": "__certificate_observations__",
+              "accepted_cipher_suites": "__accepted_cipher_suites__"
+            },
+            "out": "__cert_posture_id__"
+          }
         }
       }
     },
@@ -241,24 +245,26 @@
           "command": "content.playbooks.crypto_posture_management.primitives.rotation.check_key_rotation"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.key_rotation_evidence@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "metric_refs": [
-          "kri.overdue_key_rotations@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.crypto_posture_management.primitives.rotation.check_key_rotation",
-          "in": {
-            "crypto_scope": "__crypto_scope__",
-            "policy_inventory": "__policy_inventory_id__",
-            "key_records": "__key_records__"
-          },
-          "out": "__rotation_status__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.key_rotation_evidence@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "metric_refs": [
+            "kri.overdue_key_rotations@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.crypto_posture_management.primitives.rotation.check_key_rotation",
+            "in": {
+              "crypto_scope": "__crypto_scope__",
+              "policy_inventory": "__policy_inventory_id__",
+              "key_records": "__key_records__"
+            },
+            "out": "__rotation_status__"
+          }
         }
       }
     },
@@ -287,28 +293,30 @@
           "command": "content.playbooks.crypto_posture_management.primitives.evidence.capture_crypto_evidence"
         }
       ],
-      "x_secops_ng": {
-        "control_refs": [
-          "control.crypto_policy_inventory@v1",
-          "control.cert_posture_scan@v1",
-          "control.key_rotation_evidence@v1"
-        ],
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.crypto_posture_management.primitives.evidence.capture_crypto_evidence",
-          "in": {
-            "policy_inventory": "__policy_inventory_id__",
-            "cert_posture": "__cert_posture_id__",
-            "rotation_status": "__rotation_status__",
-            "posture_window": "__posture_window__",
-            "owner_role": "__crypto_owner_role__",
-            "workflow_id": "__workflow_id__",
-            "execution_id": "__execution_id__",
-            "captured_at": "__captured_at__"
-          },
-          "out": "__attestation_id__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "control_refs": [
+            "control.crypto_policy_inventory@v1",
+            "control.cert_posture_scan@v1",
+            "control.key_rotation_evidence@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.crypto_posture_management.primitives.evidence.capture_crypto_evidence",
+            "in": {
+              "policy_inventory": "__policy_inventory_id__",
+              "cert_posture": "__cert_posture_id__",
+              "rotation_status": "__rotation_status__",
+              "posture_window": "__posture_window__",
+              "owner_role": "__crypto_owner_role__",
+              "workflow_id": "__workflow_id__",
+              "execution_id": "__execution_id__",
+              "captured_at": "__captured_at__"
+            },
+            "out": "__attestation_id__"
+          }
         }
       }
     },
@@ -330,19 +338,21 @@
           "command": "content.playbooks.crypto_posture_management.primitives.notify.plan_crypto_owner_notification"
         }
       ],
-      "x_secops_ng": {
-        "telemetry_refs": [
-          "telemetry.ocsf.api_activity@v1"
-        ],
-        "core_body": {
-          "primitive": "content.playbooks.crypto_posture_management.primitives.notify.plan_crypto_owner_notification",
-          "in": {
-            "attestation": "__attestation_id__",
-            "crypto_scope": "__crypto_scope__",
-            "owner_role": "__crypto_owner_role__",
-            "channel_ref": "__notification_channel_ref__"
-          },
-          "out": "__notification_plan__"
+      "step_extensions": {
+        "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+          "telemetry_refs": [
+            "telemetry.ocsf.api_activity@v1"
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.crypto_posture_management.primitives.notify.plan_crypto_owner_notification",
+            "in": {
+              "attestation": "__attestation_id__",
+              "crypto_scope": "__crypto_scope__",
+              "owner_role": "__crypto_owner_role__",
+              "channel_ref": "__notification_channel_ref__"
+            },
+            "out": "__notification_plan__"
+          }
         }
       },
       "out_args": [
@@ -354,32 +364,44 @@
       "name": "crypto_posture_management_end"
     }
   },
-  "x_secops_ng": {
-    "stable_id": "playbook.crypto_posture_management@v1",
-    "content_version": "1.0.0",
-    "maturity": "stable",
-    "compile_targets": [
-      "n8n",
-      "temporal",
-      "langgraph"
-    ],
-    "control_refs": [
-      "control.crypto_policy_inventory@v1",
-      "control.cert_posture_scan@v1",
-      "control.key_rotation_evidence@v1"
-    ],
-    "telemetry_refs": [
-      "telemetry.ocsf.api_activity@v1"
-    ],
-    "metric_refs": [
-      "kri.expiring_tls_certs@v1",
-      "kri.overdue_key_rotations@v1"
-    ],
-    "sources": [
-      "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
-      "NIS2 Directive (EU) 2022/2555, Article 21(2)(h) — policies and procedures regarding the use of cryptography and, where appropriate, encryption",
-      "ENISA — Algorithms, key size and parameters report; post-quantum cryptography readiness",
-      "OCSF — API Activity (6003) event class"
-    ]
+  "extension_definitions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "type": "extension-definition",
+      "name": "SecOps-NG content model",
+      "description": "Joins a CACAO playbook and its steps to the SecOps-NG content model: stable identifiers, maturity and compile targets at playbook level; detection, control, telemetry and metric references and deterministic primitive bindings at step level.",
+      "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
+      "schema": "https://raw.githubusercontent.com/secops-ng/secops-ng-framework/main/content-model/x-secops-ng.extension.schema.json",
+      "version": "1.0.0"
+    }
+  },
+  "playbook_extensions": {
+    "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
+      "stable_id": "playbook.crypto_posture_management@v1",
+      "content_version": "1.0.0",
+      "maturity": "stable",
+      "compile_targets": [
+        "n8n",
+        "temporal",
+        "langgraph"
+      ],
+      "control_refs": [
+        "control.crypto_policy_inventory@v1",
+        "control.cert_posture_scan@v1",
+        "control.key_rotation_evidence@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.api_activity@v1"
+      ],
+      "metric_refs": [
+        "kri.expiring_tls_certs@v1",
+        "kri.overdue_key_rotations@v1"
+      ],
+      "sources": [
+        "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",
+        "NIS2 Directive (EU) 2022/2555, Article 21(2)(h) — policies and procedures regarding the use of cryptography and, where appropriate, encryption",
+        "ENISA — Algorithms, key size and parameters report; post-quantum cryptography readiness",
+        "OCSF — API Activity (6003) event class"
+      ]
+    }
   }
 }
