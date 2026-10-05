@@ -186,12 +186,14 @@ the official OASIS CACAO 2.0 schemas with zero errors under both the
 Draft-07 reading the schemas declare and the strict 2020-12 reading,
 which enforces their `unevaluatedProperties`; the ratchet
 (`python -m tools.cacao_conformance --dialect 2020-12`) gates on the strict
-one. CACAO Roaster rebuilds a playbook through a model that keeps standard
-CACAO fields and CACAO extensions and nothing else. The SecOps-NG data
-now sits in extension slots, so by Roaster's source it survives import
-and export; a live load-save-reload check is still owed (#1027). Until it
-has run, review the diff of any playbook saved from Roaster before
-committing it.
+one. CACAO Roaster is a viewer for these playbooks, not an editor
+(checked live against the hosted instance, #1035). All 49 load as
+valid, with every step and connection drawn. Its export still drops
+`playbook_extensions`, every step's SecOps-NG payload, and the `command`
+of each `secops-ng-primitive` command (the `manual` commands keep
+theirs). That happens even when nothing was edited, and even though the
+data now sits in extension slots. Never commit a playbook saved from
+Roaster; edit the source file.
 
 `content/playbooks/cra_cvd/playbook.cacao.json` is a full worked
 example.

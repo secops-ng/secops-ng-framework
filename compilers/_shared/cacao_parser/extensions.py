@@ -7,9 +7,10 @@ that data sat under a private ``x_secops_ng`` key. CACAO 2.0 defines a
 mechanism for exactly this (§10.10): an ``extension_definitions`` entry
 naming the extension, and its payload under that entry's id in
 ``playbook_extensions`` (playbook level) and ``step_extensions`` (step
-level). CACAO tooling keeps extension data and discards unknown keys —
-CACAO Roaster drops ``x_secops_ng`` on import (#1027) — so the corpus is
-moving to the extension slots.
+level), and the official schemas reject a private top-level key under
+their strict reading, so the corpus moved to the extension slots (#1027).
+Tools are not required to keep extension data they do not define; CACAO
+Roaster drops it on export (#1035).
 
 For one release both placements are read:
 
