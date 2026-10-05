@@ -80,6 +80,12 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **NIS2 incident-handling rulebooks crosswalk.** `content/mappings/nis2/incident-handling-rulebooks.yaml`
+  maps the Luxembourg NIS2 authorities' *Operational guidance for incident
+  handling* (Rulebooks 0–8, CC BY 4.0, pinned by revision) to the
+  playbooks that exercise each section, with explicit gaps; walkthrough in
+  `incident-handling-rulebooks.md`, guarded by
+  `tests/content/test_nis2_rulebooks_crosswalk.py`.
 - **SecOps-NG data can live in CACAO 2.0 extension slots.** Besides the
   legacy `x_secops_ng` object, the parser now reads the payload from
   `playbook_extensions` and `step_extensions`, keyed by the SecOps-NG
