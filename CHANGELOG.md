@@ -80,6 +80,13 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **n8n playbook card, name and tags.** Every compiled n8n workflow ends with
+  a sticky-note *playbook card* (identity, maturity, description, regulatory
+  sources, expected inputs, Code-node bindings, operator steps, source URL,
+  regenerate command), is named `SecOps-NG: <playbook name>`, and carries
+  n8n tag objects for the project, maturity, cited regimes and CACAO labels.
+  All derived from the document, so mirrors compile identically; the card is
+  the last node and has no connections. Goldens regenerated.
 - **NIS2 incident-handling rulebooks crosswalk.** `content/mappings/nis2/incident-handling-rulebooks.yaml`
   maps the Luxembourg NIS2 authorities' *Operational guidance for incident
   handling* (Rulebooks 0–8, CC BY 4.0, pinned by revision) to the

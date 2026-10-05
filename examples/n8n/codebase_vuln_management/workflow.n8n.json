@@ -1,5 +1,5 @@
 {
-  "name": "Codebase vulnerability management",
+  "name": "SecOps-NG: Codebase vulnerability management",
   "nodes": [
     {
       "id": "start--01a17a07-0000-4000-8000-000000000001",
@@ -191,6 +191,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -296
+      ],
+      "parameters": {
+        "content": "## Codebase vulnerability management\n`playbook.codebase_vuln_management@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nSBOM-driven codebase vulnerability management playbook for operators that build or distribute software under NIS2 Art. 21(2)(e) and CRA Annex I \u00a72. Ingest a freshly produced or refreshed SBOM, walk its declared top-level dependencies against a vulnerability database using the operator's locally-runnable scanner CLI (default installable from an EU-hosted package index \u2014 no hosted scanner SaaS), score each finding against the operator's coordinated-vulnerability-disclosure (CV\u2026\n\n**Controls:** 2 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__sbom_ref__`, `__sbom_bytes__`, `__sbom_format__`, `__raw_findings__`, `__awareness_at__`, `__cvd_policy__`, `__ref_viz__`, `__source_data__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - ingest-sbom \u2192 `content.playbooks.codebase_vuln_management.primitives.sbom.pin_sbom_content_hash`\n  - review-deps \u2192 `content.playbooks.codebase_vuln_management.primitives.sbom.normalise_findings`\n  - assess-disclosure \u2192 `content.playbooks.codebase_vuln_management.primitives.disclosure_window.resolve_disclosure_window`\n  - track-timeline \u2192 `content.playbooks.codebase_vuln_management.primitives.timeline.build_disclosure_timeline_stub`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/codebase_vuln_management\nRegenerate with `python -m tools.compile content/playbooks/codebase_vuln_management/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 476,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -256,11 +272,27 @@
   },
   "staticData": null,
   "tags": [
-    "nis2",
-    "cra",
-    "sbom",
-    "codebase",
-    "vuln-disclosure"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "nis2"
+    },
+    {
+      "name": "cra"
+    },
+    {
+      "name": "sbom"
+    },
+    {
+      "name": "codebase"
+    },
+    {
+      "name": "vuln-disclosure"
+    }
   ],
   "pinData": {},
   "meta": {

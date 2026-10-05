@@ -1,5 +1,5 @@
 {
-  "name": "Cloud misconfiguration remediation",
+  "name": "SecOps-NG: Cloud misconfiguration remediation",
   "nodes": [
     {
       "id": "start--30000000-0000-4000-8000-000000000001",
@@ -496,6 +496,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -340
+      ],
+      "parameters": {
+        "content": "## Cloud misconfiguration remediation\n`playbook.cloud_misconfiguration@v1` \u00b7 content v0.1.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nRespond to a cloud-posture (CSPM) finding that flags a sensitive misconfiguration: public storage exposure, over-permissive identity, missing encryption, or a deviating baseline. The playbook enriches the finding with resource ownership, notifies the responsible owner via the operator's pre-bound channel, guides the remediation through an attested change, and re-scans to verify the fix. Failed re-scans escalate so a recurring misconfiguration cannot quietly persist. CACAO v2\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(e) \u2014 security in network and information systems acquisition, development and maintenance, including vulnerability handling and disclosure\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(i) \u2014 human-resources security, access-control and asset-management policies\n- DORA Regulation (EU) 2022/2554, Article 9 \u2014 ICT risk-management framework (protection and prevention)\n- DORA Regulation (EU) 2022/2554, Article 19 \u2014 reporting of major ICT-related incidents (escalation path when a posture exception becomes incident-grade)\n\n**Controls:** 3 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__finding_id__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: ingest finding, enrich resource and owner, suppress and close, notify owner, guided remediation, re-scan, escalate\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/cloud_misconfiguration\nRegenerate with `python -m tools.compile content/playbooks/cloud_misconfiguration/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 520,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -630,12 +646,36 @@
   },
   "staticData": null,
   "tags": [
-    "cloud_misconfiguration",
-    "cspm",
-    "posture",
-    "guided-remediation",
-    "nis2",
-    "dora"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:experimental"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "regime:dora"
+    },
+    {
+      "name": "cloud_misconfiguration"
+    },
+    {
+      "name": "cspm"
+    },
+    {
+      "name": "posture"
+    },
+    {
+      "name": "guided-remediation"
+    },
+    {
+      "name": "nis2"
+    },
+    {
+      "name": "dora"
+    }
   ],
   "pinData": {},
   "meta": {

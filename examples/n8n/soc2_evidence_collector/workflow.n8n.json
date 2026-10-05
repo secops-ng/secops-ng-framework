@@ -1,5 +1,5 @@
 {
-  "name": "SOC 2 evidence collector",
+  "name": "SecOps-NG: SOC 2 evidence collector",
   "nodes": [
     {
       "id": "start--b7c2e5a1-0000-4000-8000-000000000001",
@@ -161,6 +161,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -362
+      ],
+      "parameters": {
+        "content": "## SOC 2 evidence collector\n`playbook.soc2_evidence_collector@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nAggregates the evidence the operator's other playbooks already emit into a dated SOC 2 readiness attestation. Reads the Trust Services Criteria crosswalk under content/mappings/soc2/, maps each available evidence reference onto the criteria it supports, scores per-criterion coverage, and reports one attestation naming what is covered, what is uncovered, and what rests on draft mappings. It collects no new telemetry and asserts no audit opinion \u2014 SOC 2 attestation is a licens\u2026\n\n**Regulatory anchors**\n- docs/cookbook/soc2_crosswalk.md \u2014 SOC 2 is not an EU statutory instrument; the EU mappings remain the authoritative statutory pointer\n\n**Controls:** 1 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__assessment_window__`, `__evidence_refs__`, `__workflow_id__`, `__execution_id__`, `__captured_at__`, `__owner_role__`, `__crosswalk_entries__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - collect criteria atoms \u2192 `content.playbooks.soc2_evidence_collector.primitives.criteria.collect_criteria_atoms`\n  - map evidence to criteria \u2192 `content.playbooks.soc2_evidence_collector.primitives.mapping.map_evidence_to_criteria`\n  - score per-criterion coverage \u2192 `content.playbooks.soc2_evidence_collector.primitives.scoring.score_criterion_coverage`\n  - report readiness attestation \u2192 `content.playbooks.soc2_evidence_collector.primitives.attestation.build_readiness_attestation`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/soc2_evidence_collector\nRegenerate with `python -m tools.compile content/playbooks/soc2_evidence_collector/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 542,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -226,12 +242,33 @@
   },
   "staticData": null,
   "tags": [
-    "soc2",
-    "trust-services-criteria",
-    "attestation",
-    "evidence-aggregation",
-    "operator-reporting",
-    "source-artifact"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:soc2"
+    },
+    {
+      "name": "soc2"
+    },
+    {
+      "name": "trust-services-criteria"
+    },
+    {
+      "name": "attestation"
+    },
+    {
+      "name": "evidence-aggregation"
+    },
+    {
+      "name": "operator-reporting"
+    },
+    {
+      "name": "source-artifact"
+    }
   ],
   "pinData": {},
   "meta": {

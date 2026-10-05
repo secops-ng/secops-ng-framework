@@ -1,5 +1,5 @@
 {
-  "name": "Authentication and secured-communications posture",
+  "name": "SecOps-NG: Authentication and secured-communications posture",
   "nodes": [
     {
       "id": "start--52000000-0000-4000-8000-000000000001",
@@ -207,6 +207,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -384
+      ],
+      "parameters": {
+        "content": "## Authentication and secured-communications posture\n`playbook.mfa_secured_comms@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nOperate the multi-factor / continuous-authentication and secured-communications posture surface required by NIS2 Art.21(2)(j) and DORA Art.9(4)(b): probe the identity-provider surface to confirm MFA coverage across in-scope principals, assess whether continuous-authentication signals are observed on long-lived sessions, verify the out-of-band emergency communications channel is reachable independently of the primary information-system path, capture a dated posture-attestatio\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(j) \u2014 use of multi-factor or continuous authentication, secured voice/video/text communications, and secured emergency communications systems\n\n**Controls:** 2 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__workflow_id__`, `__execution_id__`, `__regulation_refs__`, `__control_refs__`, `__posture_window__`, `__auth_scope__`, `__principals__`, `__sessions__`, `__channels__`, `__captured_at__`, `__source_url__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - probe mfa coverage \u2192 `content.playbooks.mfa_secured_comms.primitives.probe.probe_mfa_coverage`\n  - assess continuous auth \u2192 `content.playbooks.mfa_secured_comms.primitives.assess.assess_continuous_auth`\n  - verify oob channels \u2192 `content.playbooks.mfa_secured_comms.primitives.verify.verify_oob_channel`\n  - evidence capture \u2192 `content.playbooks.mfa_secured_comms.primitives.artifact.build_mfa_posture_attestation_artifact`\n  - notify authentication owner \u2192 `content.playbooks.mfa_secured_comms.primitives.notify.compose_owner_notification`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/mfa_secured_comms\nRegenerate with `python -m tools.compile content/playbooks/mfa_secured_comms/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 564,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -283,13 +299,36 @@
   },
   "staticData": null,
   "tags": [
-    "authentication",
-    "mfa",
-    "continuous-authentication",
-    "secured-communications",
-    "out-of-band",
-    "posture",
-    "attestation"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "authentication"
+    },
+    {
+      "name": "mfa"
+    },
+    {
+      "name": "continuous-authentication"
+    },
+    {
+      "name": "secured-communications"
+    },
+    {
+      "name": "out-of-band"
+    },
+    {
+      "name": "posture"
+    },
+    {
+      "name": "attestation"
+    }
   ],
   "pinData": {},
   "meta": {

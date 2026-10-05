@@ -1,5 +1,5 @@
 {
-  "name": "EU AI Act Article 14 human-oversight operating loop",
+  "name": "SecOps-NG: EU AI Act Article 14 human-oversight operating loop",
   "nodes": [
     {
       "id": "start--e14a5100-0000-4000-8000-000000000001",
@@ -390,6 +390,22 @@
       "parameters": {},
       "notes": "Terminal state. The cycle closes on the dated evidence artifact; the next oversight window re-enters at the start step.",
       "notesInFlow": true
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -208
+      ],
+      "parameters": {
+        "content": "## EU AI Act Article 14 human-oversight operating loop\n`playbook.ai_human_oversight@v1` \u00b7 content v0.1.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nSKELETON \u2014 CACAO v2 scaffold for the deployer-side EU AI Act (Regulation (EU) 2024/1689) Article 14 human-oversight loop: the cycle an oversight function actually runs once oversight of a high-risk AI system has been assigned. Article 14 straddles the provider/deployer line \u2014 Art. 14(1) and 14(3)(a) require the provider to design the system so it can be effectively overseen and to build in what it can, while Art. 14(3)(b) and 14(4) reach the deployer, who implements the meas\u2026\n\n**Controls:** 2 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__deployment_id__`, `__oversight_cycle__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: establish_oversight_roster, brief_oversight_personnel, review_flagged_decisions, record_intervention, emit_oversight_evidence\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/ai_human_oversight\nRegenerate with `python -m tools.compile content/playbooks/ai_human_oversight/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 388,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -466,12 +482,30 @@
   },
   "staticData": null,
   "tags": [
-    "eu-ai-act",
-    "article-14",
-    "human-oversight",
-    "automation-bias",
-    "high-risk-ai",
-    "deployer"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:experimental"
+    },
+    {
+      "name": "eu-ai-act"
+    },
+    {
+      "name": "article-14"
+    },
+    {
+      "name": "human-oversight"
+    },
+    {
+      "name": "automation-bias"
+    },
+    {
+      "name": "high-risk-ai"
+    },
+    {
+      "name": "deployer"
+    }
   ],
   "pinData": {},
   "meta": {

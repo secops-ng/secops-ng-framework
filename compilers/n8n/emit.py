@@ -75,6 +75,7 @@ _SWITCH = "n8n-nodes-base.switch"
 _MERGE = "n8n-nodes-base.merge"
 _SET = "n8n-nodes-base.set"
 _CODE = "n8n-nodes-base.code"
+_STICKY = "n8n-nodes-base.stickyNote"
 
 # typeVersion pinned to the versions stable since n8n 1.0. Emitter ships
 # importable JSON across n8n 1.x; users on older lines can re-pin if needed.
@@ -91,6 +92,37 @@ _TV_SET = 3.4
 # Code node typeVersion 2 added the language switch (python/javascript); the
 # CORE branch uses Python so the primitive body matches the Temporal emitter.
 _TV_CODE = 2
+_TV_STICKY = 1
+
+# The playbook card: one sticky note per workflow, appended after the step
+# nodes, carrying what an operator who opens the workflow cold needs to
+# know — identity, anchors, inputs, bindings, source. Built from the parsed
+# document alone so a canonical source and its examples/ mirror compile to
+# the same bytes.
+_CARD_ID = "secops-ng-playbook-card"
+_CARD_NAME = "Playbook card"
+_CARD_WIDTH = 620
+_CARD_COLOR = 4
+_CARD_LINE_HEIGHT = 22
+_CARD_MIN_HEIGHT = 260
+_CARD_MAX_HEIGHT = 1400
+_CARD_DESCRIPTION_CHARS = 480
+_SOURCE_TREE_URL = "https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/"
+
+# Regimes named in a playbook's provenance `sources` lines, used for tags and
+# the workflow name. Keyword matching on the document's own text keeps the
+# derivation deterministic and free of any sibling file.
+_REGIME_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("nis2", (r"\bNIS2\b",)),
+    ("dora", (r"\bDORA\b",)),
+    ("cra", (r"\bCRA\b", r"Cyber Resilience Act")),
+    ("gdpr", (r"\bGDPR\b",)),
+    ("eu_ai_act", (r"\bAI Act\b",)),
+    ("iso27001", (r"ISO/IEC 27001", r"\bISO 27001\b")),
+    ("soc2", (r"\bSOC 2\b",)),
+    ("nist_csf", (r"\bNIST CSF\b", r"Cybersecurity Framework")),
+    ("eidas2", (r"\beIDAS\b",)),
+)
 
 # x_secops_ng ref categories surfaced as Set-node assignment rows for action
 # steps without commands. Order is fixed so emitted JSON is deterministic.
@@ -213,6 +245,10 @@ class _WorkflowBuilder:
             nodes.append(self._emit_node(step_id, step, position))
             self._emit_connections(step_id, step, connections)
 
+        # The card goes last so every step node keeps the index its CACAO
+        # position gives it; sticky notes carry no connections.
+        nodes.append(self._emit_playbook_card())
+
         meta = {
             "secops_ng": {
                 "stable_id": self.playbook.x_secops_ng.stable_id,
@@ -224,7 +260,7 @@ class _WorkflowBuilder:
         }
 
         return {
-            "name": self.playbook.name,
+            "name": self._workflow_name(),
             "nodes": nodes,
             "connections": connections,
             "active": False,
@@ -232,9 +268,148 @@ class _WorkflowBuilder:
                 "executionOrder": "v1",
             },
             "staticData": None,
-            "tags": list(self.playbook.labels),
+            "tags": self._tags(),
             "pinData": {},
             "meta": meta,
+        }
+
+    # -- identity, tags, card ---------------------------------------------- #
+
+    def _slug(self) -> str:
+        """``playbook.<slug>@v<n>`` → ``<slug>``; falls back to the CACAO id."""
+        stable_id = self.playbook.x_secops_ng.stable_id or ""
+        m = re.match(r"^playbook\.([a-z0-9_.]+)@v", stable_id)
+        return m.group(1) if m else self.playbook.id
+
+    def _regimes(self) -> list[str]:
+        """Regimes named in the document's provenance sources, in catalogue order."""
+        text = "\n".join(self.playbook.x_secops_ng.sources)
+        return [
+            regime
+            for regime, patterns in _REGIME_KEYWORDS
+            if any(re.search(pat, text) for pat in patterns)
+        ]
+
+    def _workflow_name(self) -> str:
+        """Deterministic, library-searchable name: the project, then the playbook."""
+        return f"SecOps-NG: {self.playbook.name}"
+
+    def _tags(self) -> list[dict[str, str]]:
+        """n8n tag objects: project, maturity, regimes from the sources, CACAO labels."""
+        names: list[str] = ["secops-ng", f"maturity:{self.playbook.x_secops_ng.maturity}"]
+        names.extend(f"regime:{r}" for r in self._regimes())
+        names.extend(self.playbook.labels)
+        seen: set[str] = set()
+        out: list[dict[str, str]] = []
+        for n in names:
+            if n and n not in seen:
+                seen.add(n)
+                out.append({"name": n})
+        return out
+
+    def _card_name(self) -> str:
+        used = set(self._node_names.values())
+        candidate = _CARD_NAME
+        n = 1
+        while candidate in used:
+            n += 1
+            candidate = f"{_CARD_NAME} ({n})"
+        return candidate
+
+    def _card_content(self) -> str:
+        x = self.playbook.x_secops_ng
+        slug = self._slug()
+        lines: list[str] = []
+        lines.append(f"## {self.playbook.name}")
+        lines.append(
+            f"`{x.stable_id}` · content v{x.content_version} · maturity: {x.maturity} · "
+            "compiled from a CACAO 2.0 playbook by SecOps-NG"
+        )
+        description = (self.playbook.description or "").strip()
+        if description:
+            first = description.split("\n\n", 1)[0].strip()
+            if len(first) > _CARD_DESCRIPTION_CHARS:
+                first = first[: _CARD_DESCRIPTION_CHARS - 1].rstrip() + "…"
+            lines.append("")
+            lines.append(first)
+
+        anchors = [
+            src for src in x.sources
+            if any(re.search(pat, src) for _, pats in _REGIME_KEYWORDS for pat in pats)
+        ]
+        if anchors:
+            lines.append("")
+            lines.append("**Regulatory anchors**")
+            lines.extend(f"- {src}" for src in anchors[:6])
+        if x.control_refs:
+            lines.append("")
+            lines.append(
+                f"**Controls:** {len(x.control_refs)} control reference(s) in the "
+                "canonical source, mapped under `content/mappings/`."
+            )
+
+        lines.append("")
+        lines.append("**Before you run it**")
+        external = [
+            name for name, var in self.playbook.playbook_variables.items() if var.external
+        ]
+        if external:
+            lines.append(
+                "- Inputs the trigger expects from you: "
+                + ", ".join(f"`{n}`" for n in external)
+            )
+        bound = [
+            (self._name_of(sid), step.x_secops_ng.core_body.primitive)
+            for sid, step in self.playbook.workflow.items()
+            if step.type is StepType.ACTION and step.x_secops_ng.core_body is not None
+        ]
+        operator = [
+            self._name_of(sid)
+            for sid, step in self.playbook.workflow.items()
+            if step.type is StepType.ACTION
+            and step.x_secops_ng.core_body is None
+            and (not step.commands or _manual_only(step.commands))
+        ]
+        if bound:
+            lines.append(
+                "- Code nodes name the deterministic primitive each step runs; bind "
+                "them to where your primitives execute, or replace the body:"
+            )
+            lines.extend(f"  - {name} → `{primitive}`" for name, primitive in bound)
+        if operator:
+            lines.append(
+                "- Operator steps, emitted as Set nodes carrying the step's I/O "
+                "contract; fill the values in n8n: "
+                + ", ".join(operator)
+            )
+        lines.append("- This file carries no credentials; connectors and secrets are yours to attach.")
+        lines.append("")
+        lines.append(f"**Source** {_SOURCE_TREE_URL}{slug}")
+        lines.append(
+            "Regenerate with `python -m tools.compile content/playbooks/"
+            f"{slug}/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. "
+            "Apache-2.0."
+        )
+        return "\n".join(lines)
+
+    def _emit_playbook_card(self) -> dict[str, Any]:
+        content = self._card_content()
+        height = min(
+            _CARD_MAX_HEIGHT,
+            max(_CARD_MIN_HEIGHT, _CARD_LINE_HEIGHT * (content.count("\n") + 1) + 80),
+        )
+        return {
+            "id": _CARD_ID,
+            "name": self._card_name(),
+            "type": _STICKY,
+            "typeVersion": _TV_STICKY,
+            "position": [_X_ORIGIN - 40, _Y_ORIGIN - height - 60],
+            "parameters": {
+                "content": content,
+                "height": height,
+                "width": _CARD_WIDTH,
+                "color": _CARD_COLOR,
+            },
         }
 
     # -- naming ------------------------------------------------------------- #

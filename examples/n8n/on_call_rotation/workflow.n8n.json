@@ -1,5 +1,5 @@
 {
-  "name": "On-call rotation handoff",
+  "name": "SecOps-NG: On-call rotation handoff",
   "nodes": [
     {
       "id": "start--30000000-0000-4000-8000-000000000001",
@@ -297,6 +297,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -296
+      ],
+      "parameters": {
+        "content": "## On-call rotation handoff\n`playbook.on_call_rotation@v1` \u00b7 content v0.1.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nOperate the on-call rotation: load the current rotation roster, bind the escalation tiers (primary / secondary / manager) the operator's paging system will fan out through, and when the workflow runs inside a shift-handoff window, compose a structured handoff brief from open incidents and recent alerts and deliver it to the incoming on-call. The playbook is reentrant and side-effect-free outside the handoff window; the only durable change in steady state is the bound escalat\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(b) \u2014 incident-handling capability (responder readiness)\n- DORA Regulation (EU) 2022/2554, Article 6 \u2014 ICT risk management framework (governance roles, on-call responsibility)\n\n**Controls:** 1 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__shift_window__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: load rotation roster, bind escalation tiers, generate handoff brief, notify incoming on-call\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/on_call_rotation\nRegenerate with `python -m tools.compile content/playbooks/on_call_rotation/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 476,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -380,11 +396,33 @@
   },
   "staticData": null,
   "tags": [
-    "on-call",
-    "rotation",
-    "handoff",
-    "escalation",
-    "operational-readiness"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:experimental"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "regime:dora"
+    },
+    {
+      "name": "on-call"
+    },
+    {
+      "name": "rotation"
+    },
+    {
+      "name": "handoff"
+    },
+    {
+      "name": "escalation"
+    },
+    {
+      "name": "operational-readiness"
+    }
   ],
   "pinData": {},
   "meta": {

@@ -1,5 +1,5 @@
 {
-  "name": "Incident management",
+  "name": "SecOps-NG: Incident management",
   "nodes": [
     {
       "id": "start--50000000-0000-4000-8000-000000000001",
@@ -325,6 +325,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -450
+      ],
+      "parameters": {
+        "content": "## Incident management\n`playbook.incident_management@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nManage a significant security incident through the NIS2 Article 23 three-stage regulator timeline: intake the originating signal, classify significance and cross-border scope, open a deterministic incident timeline, submit the 24-hour early warning, submit the 72-hour notification, submit the one-month final report (free-text fields scoped to narrative, root cause, and applied mitigations only), and close the timeline so the regulator-shaped JSON artefact is persisted. CACAO\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 23 \u2014 three-stage incident reporting obligations (24h early warning, 72h notification, 1 month final report) and cross-border scope\n- DORA Regulation (EU) 2022/2554, Article 19 \u2014 reporting of major ICT-related incidents\n\n**Controls:** 3 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__signal_id__`, `__notification_destinations__`, `__intake_signals__`, `__timeline_opened_at__`, `__notification_submitted_at__`, `__timeline_closed_at__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - intake significant-incident signal \u2192 `content.playbooks.incident_management.primitives.intake.derive_incident_id`\n  - classify significance and cross-border scope \u2192 `content.playbooks.incident_management.primitives.classification.classify_significance`\n  - open incident timeline \u2192 `content.playbooks.incident_management.primitives.timeline_binding.open_timeline`\n  - submit 24-hour early warning \u2192 `content.playbooks.incident_management.primitives.regulator_submission.resolve_destination`\n  - submit 72-hour notification \u2192 `content.playbooks.incident_management.primitives.stage_clock.verdict_for_submission`\n  - submit 1-month final report \u2192 `content.playbooks.incident_management.primitives.regulator_submission.resolve_destination`\n  - close incident timeline \u2192 `content.playbooks.incident_management.primitives.timeline_binding.close_timeline`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/incident_management\nRegenerate with `python -m tools.compile content/playbooks/incident_management/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 630,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -459,13 +475,39 @@
   },
   "staticData": null,
   "tags": [
-    "incident_management",
-    "incident-timeline",
-    "regulator-notification",
-    "nis2",
-    "nis2-article-23",
-    "dora",
-    "three-stage-timeline"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "regime:dora"
+    },
+    {
+      "name": "incident_management"
+    },
+    {
+      "name": "incident-timeline"
+    },
+    {
+      "name": "regulator-notification"
+    },
+    {
+      "name": "nis2"
+    },
+    {
+      "name": "nis2-article-23"
+    },
+    {
+      "name": "dora"
+    },
+    {
+      "name": "three-stage-timeline"
+    }
   ],
   "pinData": {},
   "meta": {

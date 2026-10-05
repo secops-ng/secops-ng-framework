@@ -1,5 +1,5 @@
 {
-  "name": "Asset and configuration inventory delta capture",
+  "name": "SecOps-NG: Asset and configuration inventory delta capture",
   "nodes": [
     {
       "id": "start--80000000-0000-4000-8000-000000000001",
@@ -289,6 +289,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -406
+      ],
+      "parameters": {
+        "content": "## Asset and configuration inventory delta capture\n`playbook.asset_management@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nOperationalise the asset and configuration management capability against the operator's own deployed estate: ingest the documented asset-inventory sources (CMDB, declarative infrastructure-as-code records, cloud-provider asset APIs, endpoint-management agents) on a scheduled cadence, reconcile them into the operator-authoritative snapshot for the current window, compute the per-asset delta against the previous documented snapshot, classify each delta against the operator's d\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(i) \u2014 human resources security, access-control policies, and asset management\n\n**Controls:** 1 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__snapshot_window__`, `__raw_inventory_sources__`, `__source_precedence__`, `__previous_snapshot_assets__`, `__ownership_declarations__`, `__decommissioning_records__`, `__reconciliation_deadline_missed__`, `__unmanaged_threshold__`, `__owner_channel__`, `__workflow_id__`, `__execution_id__`, `__regulation_refs__`, `__control_refs__`, `__captured_at__`, `__source_url__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - ingest inventory sources \u2192 `content.playbooks.asset_management.primitives.ingest.resolve_inventory_source_set`\n  - reconcile authoritative inventory \u2192 `content.playbooks.asset_management.primitives.reconcile.reconcile_inventory_snapshot`\n  - compute delta against previous snapshot \u2192 `content.playbooks.asset_management.primitives.delta.compute_inventory_delta`\n  - classify delta \u2192 `content.playbooks.asset_management.primitives.classify.classify_inventory_delta`\n  - capture evidence \u2192 `content.playbooks.asset_management.primitives.artifact.build_asset_inventory_delta_evidence_artifact`\n  - notify inventory owner \u2192 `content.playbooks.asset_management.primitives.notify.compose_owner_notification`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/asset_management\nRegenerate with `python -m tools.compile content/playbooks/asset_management/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 586,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -376,12 +392,33 @@
   },
   "staticData": null,
   "tags": [
-    "asset-management",
-    "configuration-management",
-    "inventory",
-    "delta-capture",
-    "drift-detection",
-    "cmdb"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "asset-management"
+    },
+    {
+      "name": "configuration-management"
+    },
+    {
+      "name": "inventory"
+    },
+    {
+      "name": "delta-capture"
+    },
+    {
+      "name": "drift-detection"
+    },
+    {
+      "name": "cmdb"
+    }
   ],
   "pinData": {},
   "meta": {

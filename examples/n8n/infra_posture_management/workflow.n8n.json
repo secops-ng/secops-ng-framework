@@ -1,5 +1,5 @@
 {
-  "name": "Infrastructure posture management",
+  "name": "SecOps-NG: Infrastructure posture management",
   "nodes": [
     {
       "id": "start--06f06f06-0000-4000-8000-000000000001",
@@ -169,6 +169,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -340
+      ],
+      "parameters": {
+        "content": "## Infrastructure posture management\n`playbook.infra_posture_management@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nContinuous infrastructure-posture-management workflow. On each scheduled re-execution, collect the current posture state of the in-scope infrastructure (cloud accounts, identity boundaries, network baseline), evaluate each declared control against that state, then emit one posture-evidence artifact shaped against schemas/evidence/posture.schema.json so a regulator-facing reviewer can re-derive what the posture was at evaluation time. CORE: the three action bodies bind to det\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555 \u2014 Article 21(2)(a)\n\n**Controls:** 4 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__execution_id__`, `__workflow_id__`, `__compile_target__`, `__scope_ref__`, `__raw_posture__`, `__posture_policy__`, `__regulation_refs__`, `__control_refs__`, `__policy_version__`, `__evaluated_at__`, `__captured_at__`, `__source_url__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - collect-posture \u2192 `content.playbooks.infra_posture_management.primitives.collect.collect_posture_state`\n  - evaluate-controls \u2192 `content.playbooks.infra_posture_management.primitives.controls.evaluate_controls`\n  - emit-posture-evidence \u2192 `content.playbooks.infra_posture_management.primitives.artifact.build_posture_artifact`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/infra_posture_management\nRegenerate with `python -m tools.compile content/playbooks/infra_posture_management/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 520,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -223,11 +239,30 @@
   },
   "staticData": null,
   "tags": [
-    "posture",
-    "infrastructure",
-    "continuous",
-    "posture-evidence",
-    "nis2"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "posture"
+    },
+    {
+      "name": "infrastructure"
+    },
+    {
+      "name": "continuous"
+    },
+    {
+      "name": "posture-evidence"
+    },
+    {
+      "name": "nis2"
+    }
   ],
   "pinData": {},
   "meta": {

@@ -1,5 +1,5 @@
 {
-  "name": "NIS2 Article 20 management-body cybersecurity governance",
+  "name": "SecOps-NG: NIS2 Article 20 management-body cybersecurity governance",
   "nodes": [
     {
       "id": "start--a2000000-0000-4000-8000-000000000001",
@@ -197,6 +197,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -384
+      ],
+      "parameters": {
+        "content": "## NIS2 Article 20 management-body cybersecurity governance\n`playbook.nis2_art20_governance@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nSKELETON \u2014 CACAO v2 scaffold for the operator-side NIS2 Directive (EU) 2022/2555, Article 20 management-body cybersecurity governance lifecycle. Article 20(1) requires the management bodies of essential and important entities to approve the cybersecurity risk-management measures taken by those entities to comply with Article 21, oversee their implementation, and be held liable for infringements; Article 20(2) requires the members of the management body to follow training and\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 20 \u2014 management-body approval of cybersecurity risk-management measures (20(1)) and cybersecurity training for management-body members (20(2))\n- NIS2 Directive (EU) 2022/2555, Article 21(2) \u2014 cybersecurity risk-management measures (a\u2013j), the downstream obligation surface Article 20(1) anchors on\n\n**Controls:** 2 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__governance_cycle__`, `__captured_at__`, `__workflow_id__`, `__execution_id__`, `__compile_target__`, `__trigger__`, `__clauses__`, `__open_exceptions__`, `__training_completion__`, `__measures__`, `__signatories__`, `__approved_at_iso__`, `__review_outcome__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - schedule_management_review \u2192 `content.playbooks.nis2_art20_governance.primitives.cycle.resolve_governance_cycle`\n  - present_risk_posture \u2192 `content.playbooks.nis2_art20_governance.primitives.review.conduct_art20_review`\n  - approve_risk_measures \u2192 `content.playbooks.nis2_art20_governance.primitives.approval.record_management_approval`\n  - log_governance_evidence \u2192 `content.playbooks.nis2_art20_governance.primitives.evidence.emit_governance_evidence`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/nis2_art20_governance\nRegenerate with `python -m tools.compile content/playbooks/nis2_art20_governance/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 564,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -262,13 +278,36 @@
   },
   "staticData": null,
   "tags": [
-    "nis2",
-    "article-20",
-    "management-body",
-    "governance",
-    "approval",
-    "training",
-    "attestation"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "nis2"
+    },
+    {
+      "name": "article-20"
+    },
+    {
+      "name": "management-body"
+    },
+    {
+      "name": "governance"
+    },
+    {
+      "name": "approval"
+    },
+    {
+      "name": "training"
+    },
+    {
+      "name": "attestation"
+    }
   ],
   "pinData": {},
   "meta": {

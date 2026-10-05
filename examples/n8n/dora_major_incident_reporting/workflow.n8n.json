@@ -1,5 +1,5 @@
 {
-  "name": "DORA Art. 19 major-ICT-related incident reporting lifecycle",
+  "name": "SecOps-NG: DORA Art. 19 major-ICT-related incident reporting lifecycle",
   "nodes": [
     {
       "id": "start--71000000-0000-4000-8000-000000000001",
@@ -306,6 +306,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -340
+      ],
+      "parameters": {
+        "content": "## DORA Art. 19 major-ICT-related incident reporting lifecycle\n`playbook.dora_major_incident_reporting@v1` \u00b7 content v0.1.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nSKELETON \u2014 CACAO v2 scaffold for the DORA Chapter III major-ICT-related incident reporting lifecycle a financial entity discharges to its competent authority per DORA Regulation (EU) 2022/2554 Article 19. Composes the operator-side notification cycle keyed on the three DORA-specific milestones (initial notification within 4h of major classification / no later than 24h from awareness per Art. 19(4)(a); intermediate report within 72h of major classification per Art. 19(4)(b);\u2026\n\n**Regulatory anchors**\n- DORA \u2014 Regulation (EU) 2022/2554, Article 19 \u2014 Reporting of major ICT-related incidents and voluntary notification of significant cyber threats\n- DORA \u2014 Regulation (EU) 2022/2554, Article 18 \u2014 Classification of ICT-related incidents and cyber threats\n- NIS2 Directive (EU) 2022/2555, Article 23 \u2014 Reporting obligations (cross-regime parallel notification)\n- GDPR Regulation (EU) 2016/679, Articles 33-34 \u2014 Notification of a personal data breach\n\n**Controls:** 3 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__incident_id__`, `__reporting_window__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: detect and classify, notify authority initial, notify authority intermediate, notify authority final, close and archive\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/dora_major_incident_reporting\nRegenerate with `python -m tools.compile content/playbooks/dora_major_incident_reporting/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 520,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -382,12 +398,39 @@
   },
   "staticData": null,
   "tags": [
-    "dora",
-    "chapter-iii",
-    "major-ict-related-incident",
-    "incident-reporting",
-    "article-19",
-    "regulatory-notification"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:experimental"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "regime:dora"
+    },
+    {
+      "name": "regime:gdpr"
+    },
+    {
+      "name": "dora"
+    },
+    {
+      "name": "chapter-iii"
+    },
+    {
+      "name": "major-ict-related-incident"
+    },
+    {
+      "name": "incident-reporting"
+    },
+    {
+      "name": "article-19"
+    },
+    {
+      "name": "regulatory-notification"
+    }
   ],
   "pinData": {},
   "meta": {

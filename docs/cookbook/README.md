@@ -68,6 +68,18 @@ under `content/mappings/<axis>/` rather than a workflow under
 | SOC 2 (TSC) | [`soc2_crosswalk.md`](soc2_crosswalk.md) | `content/mappings/soc2/` |
 | EU AI Act Art. 73 (serious-incident reporting) | [`eu_ai_act_art73_serious_incident_reporting.md`](eu_ai_act_art73_serious_incident_reporting.md) | `content/mappings/eu_ai_act/article-73-serious-incident-reporting.yaml` |
 
+## Importing a compiled workflow into n8n
+
+Every `examples/n8n/<workflow>/workflow.n8n.json` imports into a clean n8n
+instance as it is: open *Workflows → Import from File*, pick the file, and
+the canvas shows the step nodes plus a **playbook card** (a sticky note)
+that says what the workflow is, which inputs the trigger expects, which
+primitive each Code node binds to and which steps are operator steps. The
+file carries no credentials, so n8n asks for none; connectors and secrets
+are yours to attach afterwards. The card's last line is the command that
+regenerates the file from the canonical CACAO source; edit the source and
+recompile rather than editing the workflow in place.
+
 ## Structure of an entry
 
 Each entry follows the same outline so a reader can scan across

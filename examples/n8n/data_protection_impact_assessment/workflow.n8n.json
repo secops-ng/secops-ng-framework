@@ -1,5 +1,5 @@
 {
-  "name": "GDPR Article 35 data protection impact assessment (DPIA) lifecycle",
+  "name": "SecOps-NG: GDPR Article 35 data protection impact assessment (DPIA) lifecycle",
   "nodes": [
     {
       "id": "action--d91a35c0-0000-4000-8000-000000000002",
@@ -623,6 +623,22 @@
       },
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -208
+      ],
+      "parameters": {
+        "content": "## GDPR Article 35 data protection impact assessment (DPIA) lifecycle\n`playbook.data_protection_impact_assessment@v1` \u00b7 content v0.1.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nSKELETON \u2014 CACAO v2 scaffold for the operator-side data protection impact assessment (DPIA) lifecycle a controller runs before deploying processing that is likely to result in a high risk to the rights and freedoms of natural persons under GDPR Article 35. Distinct from the after-the-fact breach-notification lane (Articles 33-34) and from the subject-initiated rights lifecycle (Articles 15-22): this is the proactive ex-ante assessment lane that runs before the processing is\u2026\n\n**Controls:** 2 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__processing_ref__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: screen_dpia_triggers, classify_processing_type, gather_processing_description, assess_necessity_and_proportionality, identify_and_assess_risks, identify_and_document_mitigations, dpo_consultation, determine_article_36_gate, produce_dpia_document, schedule_review_cadence\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/data_protection_impact_assessment\nRegenerate with `python -m tools.compile content/playbooks/data_protection_impact_assessment/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 388,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -754,12 +770,30 @@
   },
   "staticData": null,
   "tags": [
-    "gdpr",
-    "article-35",
-    "article-36",
-    "dpia",
-    "data-protection-impact-assessment",
-    "accountability"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:experimental"
+    },
+    {
+      "name": "gdpr"
+    },
+    {
+      "name": "article-35"
+    },
+    {
+      "name": "article-36"
+    },
+    {
+      "name": "dpia"
+    },
+    {
+      "name": "data-protection-impact-assessment"
+    },
+    {
+      "name": "accountability"
+    }
   ],
   "pinData": {},
   "meta": {

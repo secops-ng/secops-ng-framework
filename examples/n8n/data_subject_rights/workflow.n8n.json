@@ -1,5 +1,5 @@
 {
-  "name": "GDPR Article 15-22 data subject rights (DSR) intake and fulfilment",
+  "name": "SecOps-NG: GDPR Article 15-22 data subject rights (DSR) intake and fulfilment",
   "nodes": [
     {
       "id": "action--d5b17a15-0000-4000-8000-000000000002",
@@ -351,6 +351,22 @@
       },
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -362
+      ],
+      "parameters": {
+        "content": "## GDPR Article 15-22 data subject rights (DSR) intake and fulfilment\n`playbook.data_subject_rights@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nCACAO v2 playbook for the operator-side data subject rights (DSR) intake and fulfilment lifecycle a controller runs when a data subject exercises one of the GDPR Chapter III rights against personal data the controller holds. Covers Article 15 (access), Article 16 (rectification), Article 17 (erasure), Article 18 (restriction), Article 20 (portability) and Article 21 (objection); Article 22 (automated individual decision-making) is an in-scope classifier axis routed to the co\u2026\n\n**Controls:** 4 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__classified_request_type__`, `__dispatch_ts__`, `__extension_decision__`, `__identity_followup__`, `__intake_channel__`, `__outcome_decision__`, `__owner_returns__`, `__owner_rows__`, `__raw_request__`, `__refusal_decision__`, `__subject_contact__`, `__verification_evidence_ref__`, `__verification_method__`, `__verification_result__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - receive_request \u2192 `content.playbooks.data_subject_rights.primitives.intake.open_dsr_case`\n  - verify_identity \u2192 `content.playbooks.data_subject_rights.primitives.verification.record_identity_verification`\n  - classify_request \u2192 `content.playbooks.data_subject_rights.primitives.classification.classify_request`\n  - route_to_data_owners \u2192 `content.playbooks.data_subject_rights.primitives.routing.resolve_data_owner_manifest`\n  - compile_fulfilment_evidence \u2192 `content.playbooks.data_subject_rights.primitives.fulfilment.compile_fulfilment_pack`\n  - send_controller_response \u2192 `content.playbooks.data_subject_rights.primitives.response.compose_controller_response`\n  - record_outcome \u2192 `content.playbooks.data_subject_rights.primitives.outcome.record_case_outcome`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/data_subject_rights\nRegenerate with `python -m tools.compile content/playbooks/data_subject_rights/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 542,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -467,16 +483,42 @@
   },
   "staticData": null,
   "tags": [
-    "gdpr",
-    "article-15",
-    "article-16",
-    "article-17",
-    "article-18",
-    "article-20",
-    "article-21",
-    "article-22",
-    "data-subject-rights",
-    "dsr"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "gdpr"
+    },
+    {
+      "name": "article-15"
+    },
+    {
+      "name": "article-16"
+    },
+    {
+      "name": "article-17"
+    },
+    {
+      "name": "article-18"
+    },
+    {
+      "name": "article-20"
+    },
+    {
+      "name": "article-21"
+    },
+    {
+      "name": "article-22"
+    },
+    {
+      "name": "data-subject-rights"
+    },
+    {
+      "name": "dsr"
+    }
   ],
   "pinData": {},
   "meta": {

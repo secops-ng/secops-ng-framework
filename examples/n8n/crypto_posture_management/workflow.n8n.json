@@ -1,5 +1,5 @@
 {
-  "name": "Cryptography and encryption posture management",
+  "name": "SecOps-NG: Cryptography and encryption posture management",
   "nodes": [
     {
       "id": "start--51000000-0000-4000-8000-000000000001",
@@ -213,6 +213,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -384
+      ],
+      "parameters": {
+        "content": "## Cryptography and encryption posture management\n`playbook.crypto_posture_management@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nOperate the cryptography & encryption posture surface required by NIS2 Art.21(2)(h): inventory the operator's declared cryptography policy and the assets in its scope, probe the certificate posture of declared TLS endpoints, check key-rotation cadence against the documented rotation schedule, capture a dated posture-attestation artifact, and notify the cryptography owner. The playbook is the operationalisation of a documented cryptography policy; it does not author the polic\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(h) \u2014 policies and procedures regarding the use of cryptography and, where appropriate, encryption\n\n**Controls:** 3 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__posture_window__`, `__crypto_scope__`, `__policy_clauses__`, `__scoped_assets__`, `__certificate_observations__`, `__accepted_cipher_suites__`, `__key_records__`, `__crypto_owner_role__`, `__notification_channel_ref__`, `__notification_plan__`, `__workflow_id__`, `__execution_id__`, `__captured_at__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - inventory crypto policy \u2192 `content.playbooks.crypto_posture_management.primitives.policy.inventory_crypto_policy`\n  - probe cert posture \u2192 `content.playbooks.crypto_posture_management.primitives.certificates.probe_cert_posture`\n  - check key rotation \u2192 `content.playbooks.crypto_posture_management.primitives.rotation.check_key_rotation`\n  - evidence capture \u2192 `content.playbooks.crypto_posture_management.primitives.evidence.capture_crypto_evidence`\n  - notify crypto owner \u2192 `content.playbooks.crypto_posture_management.primitives.notify.plan_crypto_owner_notification`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/crypto_posture_management\nRegenerate with `python -m tools.compile content/playbooks/crypto_posture_management/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 564,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -289,12 +305,33 @@
   },
   "staticData": null,
   "tags": [
-    "cryptography",
-    "encryption",
-    "tls",
-    "key-rotation",
-    "posture",
-    "attestation"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "cryptography"
+    },
+    {
+      "name": "encryption"
+    },
+    {
+      "name": "tls"
+    },
+    {
+      "name": "key-rotation"
+    },
+    {
+      "name": "posture"
+    },
+    {
+      "name": "attestation"
+    }
   ],
   "pinData": {},
   "meta": {
