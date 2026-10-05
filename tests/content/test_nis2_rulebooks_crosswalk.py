@@ -15,6 +15,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from compilers._shared.cacao_parser import secops_extension
 from tools.cacao_conformance import discover_playbooks
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -35,10 +36,9 @@ def stable_ids() -> set[str]:
     for path in discover_playbooks():
         text = path.read_text(encoding="utf-8")
         data = json.loads(text) if path.suffix == ".json" else yaml.safe_load(text)
-        ext = data.get("playbook_extensions") or {}
-        ext = next(iter(ext.values()), {}) if ext else (data.get("x_secops_ng") or {})
-        if ext.get("stable_id"):
-            ids.add(ext["stable_id"])
+        stable_id = (secops_extension(data, where=str(path)) or {}).get("stable_id")
+        if stable_id:
+            ids.add(stable_id)
     assert ids, "no playbook stable ids found"
     return ids
 
