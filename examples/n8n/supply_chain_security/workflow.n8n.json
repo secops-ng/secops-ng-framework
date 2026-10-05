@@ -1,5 +1,5 @@
 {
-  "name": "Supply-chain security",
+  "name": "SecOps-NG: Supply-chain security",
   "nodes": [
     {
       "id": "start--5c5c5c5c-0000-4000-8000-000000000001",
@@ -177,6 +177,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -318
+      ],
+      "parameters": {
+        "content": "## Supply-chain security\n`playbook.supply_chain_security@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nSupply-chain-security playbook (NIS2 Directive (EU) 2022/2555, Article 21(2)(d)). Detects and responds to supply-chain compromises that reach the operator through a direct supplier, service provider, or upstream software component. Two canonical action steps: assess-supplier-signal canonicalises the operator-supplied raw signal (signal-source ingestion, SBOM correlation result, supplier-attestation lookup result, scoring verdict) into the closed assessment block (verdict in\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555 \u2014 Article 21(2)(d)\n\n**Controls:** 1 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__workflow_id__`, `__execution_id__`, `__signal_class__`, `__signal_verdict__`, `__signal_supplier_handle__`, `__signal_component_set__`, `__signal_received_at__`, `__signal_id__`, `__signal_scoring_notes__`, `__dependencies__`, `__aggregates__`, `__regulation_refs__`, `__control_refs__`, `__owner_role__`, `__owner_assigned_at__`, `__captured_at__`, `__source_url__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - assess-supplier-signal \u2192 `content.playbooks.supply_chain_security.primitives.assess.assess_supplier_signal`\n  - emit-supply-chain-evidence \u2192 `content.playbooks.supply_chain_security.primitives.artifact.build_supply_chain_evidence_artifact`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/supply_chain_security\nRegenerate with `python -m tools.compile content/playbooks/supply_chain_security/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 498,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -220,10 +236,27 @@
   },
   "staticData": null,
   "tags": [
-    "supply-chain",
-    "supplier",
-    "nis2",
-    "core-prim"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "supply-chain"
+    },
+    {
+      "name": "supplier"
+    },
+    {
+      "name": "nis2"
+    },
+    {
+      "name": "core-prim"
+    }
   ],
   "pinData": {},
   "meta": {

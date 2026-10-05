@@ -1,5 +1,5 @@
 {
-  "name": "Identity compromise response",
+  "name": "SecOps-NG: Identity compromise response",
   "nodes": [
     {
       "id": "start--30000000-0000-4000-8000-000000000001",
@@ -341,6 +341,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -208
+      ],
+      "parameters": {
+        "content": "## Identity compromise response\n`playbook.identity_compromise@v1` \u00b7 content v0.1.0 \u00b7 maturity: draft \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nRespond to a detected account compromise (credential theft, MFA bypass, anomalous sign-in, suspicious OAuth grant, or impossible-travel signal). The playbook drives the operator through MFA reset, session revocation across IdP / SaaS, a lateral-movement hunt scoped to the compromised principal's blast radius, and a final IAM audit to remove residual persistence (rogue OAuth grants, app passwords, conditional-access exceptions). CACAO v2 + SecOps-NG content-model extensions;\u2026\n\n**Controls:** 4 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__principal_id__`, `__signal_id__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: triage identity signal, reset MFA factors, revoke active sessions, lateral-movement hunt, IAM audit and persistence removal\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/identity_compromise\nRegenerate with `python -m tools.compile content/playbooks/identity_compromise/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 388,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -435,11 +451,27 @@
   },
   "staticData": null,
   "tags": [
-    "identity_compromise",
-    "account-takeover",
-    "iam",
-    "session-revocation",
-    "lateral-movement"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:draft"
+    },
+    {
+      "name": "identity_compromise"
+    },
+    {
+      "name": "account-takeover"
+    },
+    {
+      "name": "iam"
+    },
+    {
+      "name": "session-revocation"
+    },
+    {
+      "name": "lateral-movement"
+    }
   ],
   "pinData": {},
   "meta": {

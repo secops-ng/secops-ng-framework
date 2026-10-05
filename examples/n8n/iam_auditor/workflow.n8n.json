@@ -1,5 +1,5 @@
 {
-  "name": "IAM auditor \u2014 capability inventory",
+  "name": "SecOps-NG: IAM auditor \u2014 capability inventory",
   "nodes": [
     {
       "id": "start--08aa0d10-0000-4000-8000-000000000001",
@@ -163,6 +163,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -340
+      ],
+      "parameters": {
+        "content": "## IAM auditor \u2014 capability inventory\n`playbook.iam_auditor@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nPer-execution capability-inventory workflow. On every run, enumerate the caller identity that invoked the compiled workflow and the closed capability list that identity held at execution time, then emit one access-evidence artifact shaped against schemas/evidence/access.schema.json. The artifact feeds the F-CP-07 access evidence stream and anchors NIS2 Article 21(2)(i) human-resources security, access-control policies, and asset management. CORE: the three action bodies bind\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555 \u2014 Article 21(2)(i)\n\n**Controls:** 4 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__execution_id__`, `__workflow_id__`, `__compile_target__`, `__principal_type__`, `__principal_id__`, `__identity_provider__`, `__capabilities_raw__`, `__regulation_refs__`, `__control_refs__`, `__captured_at__`, `__source_url__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - enumerate-identities \u2192 `content.playbooks.iam_auditor.primitives.identity.resolve_caller_identity`\n  - enumerate-capabilities \u2192 `content.playbooks.iam_auditor.primitives.capabilities.build_capability_list`\n  - emit-access-evidence \u2192 `content.playbooks.iam_auditor.primitives.artifact.build_access_artifact`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/iam_auditor\nRegenerate with `python -m tools.compile content/playbooks/iam_auditor/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 520,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -217,11 +233,30 @@
   },
   "staticData": null,
   "tags": [
-    "iam",
-    "iam-audit",
-    "capability-inventory",
-    "access-evidence",
-    "nis2"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "iam"
+    },
+    {
+      "name": "iam-audit"
+    },
+    {
+      "name": "capability-inventory"
+    },
+    {
+      "name": "access-evidence"
+    },
+    {
+      "name": "nis2"
+    }
   ],
   "pinData": {},
   "meta": {

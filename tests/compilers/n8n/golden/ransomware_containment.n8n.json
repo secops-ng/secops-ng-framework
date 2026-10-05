@@ -1,5 +1,5 @@
 {
-  "name": "Ransomware containment",
+  "name": "SecOps-NG: Ransomware containment",
   "nodes": [
     {
       "id": "start--30000000-0000-4000-8000-000000000001",
@@ -465,6 +465,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -296
+      ],
+      "parameters": {
+        "content": "## Ransomware containment\n`playbook.ransomware_containment@v1` \u00b7 content v0.1.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nContain an in-progress or just-detected ransomware event on an endpoint or identity. Triage the originating signal; if confirmed, isolate the affected host (EDR primary, network ACL fallback), revoke the implicated identity and its active sessions, verify the latest known-good backup snapshot, and drive a notification step that pages the IR lead, the comms officer, and drafts the NIS2 Article 23 early-warning pre-notification within the 24-hour clock. CACAO v2 + SecOps-NG co\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 23 \u2014 incident reporting obligations and 24-hour early-warning clock\n- DORA Regulation (EU) 2022/2554, Article 19 \u2014 reporting of major ICT-related incidents\n\n**Controls:** 6 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__signal_id__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: triage signal, endpoint isolation \u2014 EDR isolate, endpoint isolation \u2014 network ACL deny (fallback), identity revocation, backup verification, comms plan\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/ransomware_containment\nRegenerate with `python -m tools.compile content/playbooks/ransomware_containment/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 476,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -588,13 +604,39 @@
   },
   "staticData": null,
   "tags": [
-    "ransomware",
-    "containment",
-    "edr",
-    "identity-revocation",
-    "backup-verification",
-    "nis2",
-    "dora"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:experimental"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "regime:dora"
+    },
+    {
+      "name": "ransomware"
+    },
+    {
+      "name": "containment"
+    },
+    {
+      "name": "edr"
+    },
+    {
+      "name": "identity-revocation"
+    },
+    {
+      "name": "backup-verification"
+    },
+    {
+      "name": "nis2"
+    },
+    {
+      "name": "dora"
+    }
   ],
   "pinData": {},
   "meta": {

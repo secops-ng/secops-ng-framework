@@ -1,5 +1,5 @@
 {
-  "name": "Threat intelligence ingest",
+  "name": "SecOps-NG: Threat intelligence ingest",
   "nodes": [
     {
       "id": "start--10000000-0000-4000-8000-000000000001",
@@ -267,6 +267,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -208
+      ],
+      "parameters": {
+        "content": "## Threat intelligence ingest\n`playbook.threat_intel_ingest@v1` \u00b7 content v0.1.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nPortable response for ingesting external cyber threat intelligence. Pulls an upstream feed (STIX 2.1 / TAXII or OCSF Threat Intelligence), normalises indicators against the OCSF Threat Intelligence Inference event class, and propagates the result to detection (Sigma rule activation in the operator's SIEM) and blocking (perimeter / DNS / EDR blocklist) controls. CACAO v2 portable artifact; runtime is the operator's choice \u2014 n8n, Temporal, or LangGraph.\n\n**Controls:** 4 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__feed_url__`, `__feed_id__`, `__confidence_threshold__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: pull upstream feed, normalise STIX to OCSF, propagate to blocklist, activate detection rule\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/threat_intel_ingest\nRegenerate with `python -m tools.compile content/playbooks/threat_intel_ingest/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 388,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -350,11 +366,27 @@
   },
   "staticData": null,
   "tags": [
-    "threat-intelligence",
-    "ioc",
-    "ingest",
-    "stix",
-    "ocsf"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:experimental"
+    },
+    {
+      "name": "threat-intelligence"
+    },
+    {
+      "name": "ioc"
+    },
+    {
+      "name": "ingest"
+    },
+    {
+      "name": "stix"
+    },
+    {
+      "name": "ocsf"
+    }
   ],
   "pinData": {},
   "meta": {

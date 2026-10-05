@@ -1,5 +1,5 @@
 {
-  "name": "Cyber-hygiene and security-training posture",
+  "name": "SecOps-NG: Cyber-hygiene and security-training posture",
   "nodes": [
     {
       "id": "start--53000000-0000-4000-8000-000000000001",
@@ -379,6 +379,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -274
+      ],
+      "parameters": {
+        "content": "## Cyber-hygiene and security-training posture\n`playbook.cyber_hygiene_training@v1` \u00b7 content v0.1.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nOperate the basic cyber-hygiene and staff cybersecurity-training posture surface required by NIS2 Art.21(2)(g): inventory the in-scope training roster against the declared training scope, schedule the per-cycle awareness and role-based training assignments, run the cycle's phishing-simulation exercise, track completion of mandatory training and report-rate on the simulation, capture a dated training-attestation artifact, and notify the training owner of any gaps. The playboo\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(g) \u2014 basic cyber-hygiene practices and cybersecurity training\n\n**Controls:** 2 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__training_window__`, `__training_scope__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: inventory training roster, schedule training cycle, run phishing simulation, track completion, evidence capture, notify gaps\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/cyber_hygiene_training\nRegenerate with `python -m tools.compile content/playbooks/cyber_hygiene_training/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 454,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -466,12 +482,33 @@
   },
   "staticData": null,
   "tags": [
-    "cyber-hygiene",
-    "training",
-    "awareness",
-    "phishing-simulation",
-    "attestation",
-    "posture"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:experimental"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "cyber-hygiene"
+    },
+    {
+      "name": "training"
+    },
+    {
+      "name": "awareness"
+    },
+    {
+      "name": "phishing-simulation"
+    },
+    {
+      "name": "attestation"
+    },
+    {
+      "name": "posture"
+    }
   ],
   "pinData": {},
   "meta": {

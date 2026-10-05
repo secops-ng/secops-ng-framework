@@ -1,5 +1,5 @@
 {
-  "name": "Coordinated patch / update rollout",
+  "name": "SecOps-NG: Coordinated patch / update rollout",
   "nodes": [
     {
       "id": "start--70000000-0000-4000-8000-000000000001",
@@ -311,6 +311,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -428
+      ],
+      "parameters": {
+        "content": "## Coordinated patch / update rollout\n`playbook.patch_management@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nOperationalise the patch / update maintenance capability against the operator's own deployed estate: detect that a security update is available against a tracked package / image / firmware line, classify the update against the operator's documented patch-criticality taxonomy (security-critical, security-routine, feature-only), stage the rollout against the operator's documented deployment-ring topology (test \u2192 canary \u2192 broad), validate the canary ring against the documented\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(e) \u2014 security in acquisition, development and maintenance\n\n**Controls:** 1 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__update_subject__`, `__update_reference__`, `__workflow_id__`, `__execution_id__`, `__captured_at__`, `__regulation_refs__`, `__control_refs__`, `__source_url__`, `__advisory_kind__`, `__tracked_inventory__`, `__severity_band__`, `__exploit_observed__`, `__is_feature_only__`, `__ring_topology__`, `__broad_rings__`, `__functional_probe__`, `__error_rate_within_threshold__`, `__latency_within_threshold__`, `__rollback_ready__`, `__health_observations__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - detect patch availability \u2192 `content.playbooks.patch_management.primitives.detect.detect_patch_availability`\n  - classify patch criticality \u2192 `content.playbooks.patch_management.primitives.classify.classify_patch_criticality`\n  - stage rollout to canary ring \u2192 `content.playbooks.patch_management.primitives.stage.stage_rollout_to_canary_ring`\n  - validate canary \u2192 `content.playbooks.patch_management.primitives.validate.validate_canary`\n  - fan out to broad rings \u2192 `content.playbooks.patch_management.primitives.fanout.fan_out_to_broad_rings`\n  - evidence capture \u2192 `content.playbooks.patch_management.primitives.artifact.build_patch_application_evidence_artifact`\n  - notify maintenance owner \u2192 `content.playbooks.patch_management.primitives.notify.compose_maintenance_notification`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/patch_management\nRegenerate with `python -m tools.compile content/playbooks/patch_management/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 608,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -409,12 +425,33 @@
   },
   "staticData": null,
   "tags": [
-    "maintenance",
-    "patch-management",
-    "software-update",
-    "rollout",
-    "canary",
-    "ring-deployment"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "maintenance"
+    },
+    {
+      "name": "patch-management"
+    },
+    {
+      "name": "software-update"
+    },
+    {
+      "name": "rollout"
+    },
+    {
+      "name": "canary"
+    },
+    {
+      "name": "ring-deployment"
+    }
   ],
   "pinData": {},
   "meta": {

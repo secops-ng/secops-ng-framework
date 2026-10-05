@@ -1,5 +1,5 @@
 {
-  "name": "EU AI Act Art.9 risk-management system",
+  "name": "SecOps-NG: EU AI Act Art.9 risk-management system",
   "nodes": [
     {
       "id": "start--40000000-0000-4000-8000-000000000001",
@@ -197,6 +197,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -362
+      ],
+      "parameters": {
+        "content": "## EU AI Act Art.9 risk-management system\n`playbook.eu_ai_act_risk_management@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nCACAO v2 scaffold for the risk-management system Article 9 of the EU AI Act (Regulation (EU) 2024/1689) requires providers of high-risk AI systems to establish, implement, document and maintain. The playbook inventories a high-risk AI system against Annex III, iterates the Art. 9(2) identify / analyse / evaluate cycle, generates the technical documentation Art. 11 and Annex IV pin, and closes the loop with the post-market monitoring feedback Art. 9(2)(c) reads together with\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(a) \u2014 policies on risk analysis and information system security\n\n**Controls:** 3 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__ai_system_id__`, `__classification_basis__`, `__annex_iii_area__`, `__union_harmonisation_ref__`, `__derogation_ground__`, `__derogation_assessment_ref__`, `__iteration_id__`, `__identified_risks__`, `__acceptability_thresholds__`, `__annex_iv_sections__`, `__technical_doc_committed_at__`, `__instructions_committed_at__`, `__post_market_observation__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - identify high-risk AI system \u2192 `content.playbooks.eu_ai_act_risk_management.primitives.classification.classify_high_risk_system`\n  - assess risk under Art. 9(2) \u2192 `content.playbooks.eu_ai_act_risk_management.primitives.assessment.assess_art9_risks`\n  - assemble technical documentation \u2192 `content.playbooks.eu_ai_act_risk_management.primitives.documentation.assemble_technical_documentation`\n  - monitor post-market signals \u2192 `content.playbooks.eu_ai_act_risk_management.primitives.post_market.record_post_market_signal`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/eu_ai_act_risk_management\nRegenerate with `python -m tools.compile content/playbooks/eu_ai_act_risk_management/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 542,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -262,11 +278,30 @@
   },
   "staticData": null,
   "tags": [
-    "eu-ai-act",
-    "risk-management",
-    "high-risk-ai-system",
-    "annex-iii",
-    "technical-documentation"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "eu-ai-act"
+    },
+    {
+      "name": "risk-management"
+    },
+    {
+      "name": "high-risk-ai-system"
+    },
+    {
+      "name": "annex-iii"
+    },
+    {
+      "name": "technical-documentation"
+    }
   ],
   "pinData": {},
   "meta": {

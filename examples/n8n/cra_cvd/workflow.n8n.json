@@ -1,5 +1,5 @@
 {
-  "name": "CRA Article 14 coordinated vulnerability disclosure (CVD)",
+  "name": "SecOps-NG: CRA Article 14 coordinated vulnerability disclosure (CVD)",
   "nodes": [
     {
       "id": "start--c7d51014-0000-4000-8000-000000000001",
@@ -335,6 +335,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -428
+      ],
+      "parameters": {
+        "content": "## CRA Article 14 coordinated vulnerability disclosure (CVD)\n`playbook.cra_cvd@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nSKELETON \u2014 CACAO v2 scaffold for the operator-side coordinated vulnerability disclosure (CVD) lifecycle a manufacturer of a product with digital elements runs when a reporter (finder / security researcher / downstream operator) submits a vulnerability report against a shipped product. Distinct from playbook.cra_srp_notify@v1: the SRP notification chain covers the regulator-facing 24h / 72h / 14d-or-1-month timer cascade under CRA Article 14 \u00a71\u2013\u00a73; this playbook covers the tr\u2026\n\n**Regulatory anchors**\n- Cyber Resilience Act (EU) 2024/2847, Article 14 \u2014 manufacturer coordinated vulnerability disclosure policy (\u00a71) and acknowledgement to reporter (\u00a76)\n\n**Controls:** 1 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__reporter_contact__`, `__captured_at__`, `__operator_display__`, `__operator_namespace__`, `__cvd_policy_url__`, `__smtp_endpoint__`, `__next_update_after__`, `__advisory_title__`, `__advisory_summary__`, `__advisory_impact__`, `__affected_products__`, `__severity_cvss_v4__`, `__severity_score__`, `__severity_label__`, `__raw_report__`, `__intake_channel__`, `__triage_observations__`, `__fix_candidate__`, `__validation_evidence__`, `__disclosure_agreement__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - intake \u2192 `content.playbooks.cra_cvd.primitives.intake.open_cvd_case`\n  - ack_to_reporter \u2192 `content.playbooks.cra_cvd.primitives.reporter.send_acknowledgement`\n  - triage \u2192 `content.playbooks.cra_cvd.primitives.triage.triage_case`\n  - develop_fix \u2192 `content.playbooks.cra_cvd.primitives.fix.record_fix_candidate`\n  - validate_fix \u2192 `content.playbooks.cra_cvd.primitives.validation.confirm_fix_validation`\n  - coordinate_disclosure \u2192 `content.playbooks.cra_cvd.primitives.coordination.record_disclosure_coordination`\n  - publish_advisory \u2192 `content.playbooks.cra_cvd.primitives.disclosure.build_advisory_artifact`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/cra_cvd\nRegenerate with `python -m tools.compile content/playbooks/cra_cvd/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 608,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -433,11 +449,30 @@
   },
   "staticData": null,
   "tags": [
-    "cra",
-    "article-14",
-    "cvd",
-    "coordinated-disclosure",
-    "vulnerability-handling"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:cra"
+    },
+    {
+      "name": "cra"
+    },
+    {
+      "name": "article-14"
+    },
+    {
+      "name": "cvd"
+    },
+    {
+      "name": "coordinated-disclosure"
+    },
+    {
+      "name": "vulnerability-handling"
+    }
   ],
   "pinData": {},
   "meta": {

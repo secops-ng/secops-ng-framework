@@ -46,6 +46,22 @@ values and references inside command bodies (`__finding_id__`) are
 rewritten to n8n expressions (`{{$workflow.variables.finding_id}}`) so the
 operator can edit them from the n8n UI without re-importing.
 
+## Playbook card, name and tags
+
+Every compiled workflow ends with one sticky note (`n8n-nodes-base.stickyNote`),
+the **playbook card**: the playbook's name and stable id, maturity, the first
+paragraph of its description, the regulatory sources it cites, the inputs
+the trigger expects (`external: true` variables), which primitive each Code
+node binds to, which steps are operator steps, the canonical source URL and
+the regenerate command. It is built from the parsed document alone, so a
+canonical source and its `examples/` mirror compile to the same bytes. The
+card is the last node, carries no connections, and is named `Playbook card`.
+
+The workflow `name` is `SecOps-NG: <playbook name>` and `tags` are n8n tag
+objects: `secops-ng`, `maturity:<maturity>`, one `regime:<key>` per regime
+named in the playbook's `sources`, then the CACAO `labels`. Nothing in the
+emitted file references a credential; connectors are the operator's.
+
 ## Determinism
 
 Same AST in → byte-identical JSON out (serialised with `json.dumps(..., indent=2)`,

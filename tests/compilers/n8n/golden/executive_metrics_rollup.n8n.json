@@ -1,5 +1,5 @@
 {
-  "name": "Executive metrics rollup",
+  "name": "SecOps-NG: Executive metrics rollup",
   "nodes": [
     {
       "id": "start--e0000000-0000-4000-8000-000000000001",
@@ -328,6 +328,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -296
+      ],
+      "parameters": {
+        "content": "## Executive metrics rollup\n`playbook.executive_metrics_rollup@v1` \u00b7 content v0.1.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nRecurring monthly rollup of the operator's KPI/KRI catalog into a board-ready summary plus a control-effectiveness score. Aggregates KPI / KRI bodies from the SecOps-NG content-model metrics layer, evaluates each against its target and thresholds, joins those evaluations to the control catalog by stable_id, and emits a structured summary artifact the operator can route to their board pack pipeline. CACAO v2 + SecOps-NG content-model extensions. Anchors NIS2 Article 21(2)(f)\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(f) \u2014 policies and procedures to assess the effectiveness of cybersecurity risk-management measures\n- DORA Regulation (EU) 2022/2554, Article 6 \u2014 ICT risk-management framework, periodic review\n\n**Controls:** 2 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__rollup_window__`, `__catalog_ref__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: resolve KPI/KRI catalog, evaluate metrics over window, score control effectiveness, raise board-attention flag, emit board summary\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/executive_metrics_rollup\nRegenerate with `python -m tools.compile content/playbooks/executive_metrics_rollup/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 476,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -422,12 +438,36 @@
   },
   "staticData": null,
   "tags": [
-    "executive-reporting",
-    "metrics-rollup",
-    "control-effectiveness",
-    "nis2",
-    "dora",
-    "board-summary"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:experimental"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "regime:dora"
+    },
+    {
+      "name": "executive-reporting"
+    },
+    {
+      "name": "metrics-rollup"
+    },
+    {
+      "name": "control-effectiveness"
+    },
+    {
+      "name": "nis2"
+    },
+    {
+      "name": "dora"
+    },
+    {
+      "name": "board-summary"
+    }
   ],
   "pinData": {},
   "meta": {

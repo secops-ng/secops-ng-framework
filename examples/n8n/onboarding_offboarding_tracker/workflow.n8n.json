@@ -1,5 +1,5 @@
 {
-  "name": "On-boarding / off-boarding tracker",
+  "name": "SecOps-NG: On-boarding / off-boarding tracker",
   "nodes": [
     {
       "id": "start--20212021-0000-4000-8000-000000000001",
@@ -213,6 +213,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -384
+      ],
+      "parameters": {
+        "content": "## On-boarding / off-boarding tracker\n`playbook.onboarding_offboarding_tracker@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nIdentity-lifecycle grant/revoke-confirmation workflow under NIS2 Article 21(2)(i) \u2014 human-resources security, access-control policies, and asset management. On each execution, ingest one operator-supplied lifecycle event (joiner, mover, or leaver) for a role-shaped runtime principal (service-account, workflow-runtime principal, or automation role), resolve that principal against the operator's identity source, apply the declared capability delta (grant on join, adjust on mov\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555 \u2014 Article 21(2)(i)\n\n**Controls:** 3 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__workflow_id__`, `__execution_id__`, `__compile_target__`, `__lifecycle_event_ref__`, `__raw_event__`, `__observed_capabilities__`, `__regulation_refs__`, `__control_refs__`, `__owner_role__`, `__owner_assigned_at__`, `__captured_at__`, `__source_url__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - ingest-lifecycle-event \u2192 `content.playbooks.onboarding_offboarding_tracker.primitives.ingest.ingest_lifecycle_event`\n  - resolve-identity \u2192 `content.playbooks.onboarding_offboarding_tracker.primitives.identity.resolve_identity`\n  - apply-capability-delta \u2192 `content.playbooks.onboarding_offboarding_tracker.primitives.delta.apply_capability_delta`\n  - confirm-grant-revoke \u2192 `content.playbooks.onboarding_offboarding_tracker.primitives.confirmation.confirm_grant_revoke`\n  - emit-access-evidence \u2192 `content.playbooks.onboarding_offboarding_tracker.primitives.artifact.build_access_artifact`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/onboarding_offboarding_tracker\nRegenerate with `python -m tools.compile content/playbooks/onboarding_offboarding_tracker/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 564,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -289,11 +305,30 @@
   },
   "staticData": null,
   "tags": [
-    "iam",
-    "identity-lifecycle",
-    "joiner-mover-leaver",
-    "access-evidence",
-    "nis2"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "iam"
+    },
+    {
+      "name": "identity-lifecycle"
+    },
+    {
+      "name": "joiner-mover-leaver"
+    },
+    {
+      "name": "access-evidence"
+    },
+    {
+      "name": "nis2"
+    }
   ],
   "pinData": {},
   "meta": {

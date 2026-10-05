@@ -1,5 +1,5 @@
 {
-  "name": "Vulnerability intake (parser fixture)",
+  "name": "SecOps-NG: Vulnerability intake (parser fixture)",
   "nodes": [
     {
       "id": "start--11111111-1111-4111-8111-111111111111",
@@ -164,6 +164,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -208
+      ],
+      "parameters": {
+        "content": "## Vulnerability intake (parser fixture)\n`playbook.vuln_intake@v1` \u00b7 content v0.1.0 \u00b7 maturity: draft \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nCACAO playbook used by the shared parser tests. Triages an incoming vulnerability advisory, branches on critical severity, then opens a remediation ticket. Authoring of the canonical vuln_intake playbook under content/ is tracked on a separate card; this copy is a parser fixture only.\n\n**Controls:** 1 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__finding_id__`, `__severity__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: enrich finding, open critical ticket, queue routine ticket\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/vuln_intake\nRegenerate with `python -m tools.compile content/playbooks/vuln_intake/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 388,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -236,8 +252,18 @@
   },
   "staticData": null,
   "tags": [
-    "vulnerability-management",
-    "intake"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:draft"
+    },
+    {
+      "name": "vulnerability-management"
+    },
+    {
+      "name": "intake"
+    }
   ],
   "pinData": {},
   "meta": {

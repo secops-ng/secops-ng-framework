@@ -185,7 +185,10 @@ def test_n8n_carries_every_cacao_step_id() -> None:
     """CACAO step ids <-> n8n node ids parity."""
     cacao_step_ids = set(_cacao_workflow().keys())
     workflow = json.loads(N8N_GOLDEN.read_text(encoding="utf-8"))
-    node_ids = {node["id"] for node in workflow["nodes"]}
+    node_ids = {
+        node["id"] for node in workflow["nodes"]
+        if node["type"] != "n8n-nodes-base.stickyNote"  # the playbook card is not a step
+    }
     assert cacao_step_ids == node_ids, (
         f"n8n node id set != CACAO step id set: "
         f"missing={sorted(cacao_step_ids - node_ids)}, "

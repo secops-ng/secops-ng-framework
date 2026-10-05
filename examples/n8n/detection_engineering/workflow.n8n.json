@@ -1,5 +1,5 @@
 {
-  "name": "Detection engineering \u2014 rule lifecycle",
+  "name": "SecOps-NG: Detection engineering \u2014 rule lifecycle",
   "nodes": [
     {
       "id": "start--f0e4f404-0000-4000-8000-000000000001",
@@ -263,6 +263,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -274
+      ],
+      "parameters": {
+        "content": "## Detection engineering \u2014 rule lifecycle\n`playbook.detection_engineering@v1` \u00b7 content v0.1.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nSource playbook for the detection_engineering rule lifecycle. Moves a rule version deterministically through four states: propose (intake the candidate rule and its rationale), review (peer review against the operator's review checklist), ship (promote to production status in the operator's detection store), and measure (emit a per-rule-version effectiveness-metric snapshot the operator's chosen metric sink consumes). Action bodies are operator-wired placeholders carrying th\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(f) \u2014 effectiveness assessment of cybersecurity risk-management measures.\n\n**Controls:** 1 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__rule_id__`, `__rule_version__`, `__proposal_rationale__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: propose-rule-version, review-rule-version, ship-rule-version, measure-rule-version\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/detection_engineering\nRegenerate with `python -m tools.compile content/playbooks/detection_engineering/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 454,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -328,9 +344,24 @@
   },
   "staticData": null,
   "tags": [
-    "detection_engineering",
-    "rule-lifecycle",
-    "source-artifact"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:experimental"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "detection_engineering"
+    },
+    {
+      "name": "rule-lifecycle"
+    },
+    {
+      "name": "source-artifact"
+    }
   ],
   "pinData": {},
   "meta": {

@@ -1,5 +1,5 @@
 {
-  "name": "Alert triage",
+  "name": "SecOps-NG: Alert triage",
   "nodes": [
     {
       "id": "action--a1e47431-0000-4000-8000-000000000002",
@@ -431,6 +431,22 @@
       },
       "notes": "Route to the response branch keyed on the deterministic priority. Each branch is a single response-routing action that hands off to the appropriate downstream playbook or owner queue. Bodies of downstream playbooks are out of scope here.",
       "notesInFlow": true
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -472
+      ],
+      "parameters": {
+        "content": "## Alert triage\n`playbook.alert_triage@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nSOC alert_triage source playbook. Ingests typed alert payloads from at least two source shapes (push from detection pipeline, pull from a shared alert store), enriches with telemetry context, suppresses already-seen or known-benign hits inside a configurable window, applies a deterministic prioritisation policy (free-text fields may be routed through a DSPy module, the priority decision itself stays in code), and routes the case onto a response branch keyed on the dispositio\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(b) \u2014 incident handling capability\n- DORA Regulation (EU) 2022/2554, Article 17 \u2014 ICT-related incident management process\n\n**Controls:** 3 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__alert_id__`, `__alert_source_shape__`, `__raw_payload__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - ingest typed alert payload \u2192 `content.playbooks.alert_triage.primitives.payloads.validate_alert_payload`\n  - enrich with telemetry context \u2192 `content.playbooks.alert_triage.primitives.suppression.canonical_seen_key`\n  - suppress and close \u2192 `content.playbooks.alert_triage.primitives.suppression.canonical_seen_key`\n  - classify and prioritise (deterministic policy) \u2192 `content.playbooks.alert_triage.primitives.prioritisation.prioritise`\n  - response: p1 severe \u2014 page and escalate \u2192 `content.playbooks.alert_triage.primitives.response.escalation_route`\n  - response: p2 high \u2014 queue for primary analyst \u2192 `content.playbooks.alert_triage.primitives.response.notify_on_call`\n  - response: p3 routine \u2014 queue for review \u2192 `content.playbooks.alert_triage.primitives.response.route_to_review_queue`\n  - response: p4 informational \u2014 log and close \u2192 `content.playbooks.alert_triage.primitives.response.log_and_close`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/alert_triage\nRegenerate with `python -m tools.compile content/playbooks/alert_triage/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 652,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -590,8 +606,24 @@
   },
   "staticData": null,
   "tags": [
-    "alert_triage",
-    "source-artifact"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "regime:dora"
+    },
+    {
+      "name": "alert_triage"
+    },
+    {
+      "name": "source-artifact"
+    }
   ],
   "pinData": {},
   "meta": {

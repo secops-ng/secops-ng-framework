@@ -162,7 +162,10 @@ def test_node_ids_mirror_cacao_step_ids_across_targets() -> None:
 
     # n8n: nodes carry `id` matching CACAO step ids.
     n8n_workflow = json.loads(N8N_GOLDEN.read_text(encoding="utf-8"))
-    n8n_node_ids = {node["id"] for node in n8n_workflow["nodes"]}
+    n8n_node_ids = {
+        node["id"] for node in n8n_workflow["nodes"]
+        if node["type"] != "n8n-nodes-base.stickyNote"  # the playbook card is not a step
+    }
     assert n8n_node_ids == cacao_step_ids, (
         f"n8n node ids != CACAO step ids: "
         f"missing={sorted(cacao_step_ids - n8n_node_ids)} "

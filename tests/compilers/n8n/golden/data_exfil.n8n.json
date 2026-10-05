@@ -1,5 +1,5 @@
 {
-  "name": "Data exfiltration response",
+  "name": "SecOps-NG: Data exfiltration response",
   "nodes": [
     {
       "id": "start--20000000-0000-4000-8000-000000000001",
@@ -380,6 +380,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -296
+      ],
+      "parameters": {
+        "content": "## Data exfiltration response\n`playbook.data_exfil@v1` \u00b7 content v0.1.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nRespond to a DLP / egress signal that indicates possible exfiltration of sensitive data. The playbook triages the signal, assesses scope and data classification, contains confirmed exfiltration, and gates regulator / affected-party notification on the affected-subjects threshold so EU operators can meet NIS2 Article 23 and DORA Article 19 reporting obligations. CACAO v2 + SecOps-NG content-model extensions.\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 23 \u2014 incident reporting obligations\n- DORA Regulation (EU) 2022/2554, Article 19 \u2014 reporting of major ICT-related incidents\n\n**Controls:** 3 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__signal_id__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: triage signal, scope assessment, containment, notify regulator, notify affected party\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/data_exfil\nRegenerate with `python -m tools.compile content/playbooks/data_exfil/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 476,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -492,11 +508,33 @@
   },
   "staticData": null,
   "tags": [
-    "data-exfiltration",
-    "dlp",
-    "nis2",
-    "dora",
-    "notification-gate"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:experimental"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "regime:dora"
+    },
+    {
+      "name": "data-exfiltration"
+    },
+    {
+      "name": "dlp"
+    },
+    {
+      "name": "nis2"
+    },
+    {
+      "name": "dora"
+    },
+    {
+      "name": "notification-gate"
+    }
   ],
   "pinData": {},
   "meta": {

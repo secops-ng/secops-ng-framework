@@ -1,5 +1,5 @@
 {
-  "name": "Cryptographic controls and key lifecycle",
+  "name": "SecOps-NG: Cryptographic controls and key lifecycle",
   "nodes": [
     {
       "id": "start--52000000-0000-4000-8000-000000000001",
@@ -440,6 +440,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -450
+      ],
+      "parameters": {
+        "content": "## Cryptographic controls and key lifecycle\n`playbook.cryptographic_controls@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nOperator-side lifecycle of the cryptographic-controls surface an essential or important entity operates against its documented cryptography policy. Covers the three lifecycle disciplines the policy has to discharge in production: (a) symmetric- and asymmetric-key lifecycle \u2014 generation of new keys against the declared algorithm and key-size floor, rotation of keys against the declared per-key-class cadence, and revocation of keys on compromise or scope exit; (b) an encryptio\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(h) \u2014 policies and procedures regarding the use of cryptography and, where appropriate, encryption\n- DORA \u2014 Regulation (EU) 2022/2554, Article 9 \u2014 protection and prevention (cryptography and encryption slice)\n- CRA \u2014 Regulation (EU) 2024/2847, Annex I \u00a71 \u2014 essential cybersecurity requirements (confidentiality / encryption / access-control lanes)\n\n**Controls:** 4 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__lifecycle_event__`, `__crypto_scope__`, `__declared_policy__`, `__key_record__`, `__certificate_record__`, `__workload_ref__`, `__observed_at__`, `__at_rest_condition__`, `__in_transit_condition__`, `__event_ts__`, `__owner_channel__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - resolve policy inventory \u2192 `content.playbooks.cryptographic_controls.primitives.policy.resolve_policy_inventory`\n  - key lifecycle \u2192 `content.playbooks.cryptographic_controls.primitives.keys.record_key_lifecycle`\n  - enforce encryption \u2192 `content.playbooks.cryptographic_controls.primitives.enforcement.decide_enforcement_gate`\n  - certificate lifecycle \u2192 `content.playbooks.cryptographic_controls.primitives.certificates.record_certificate_lifecycle`\n  - record lifecycle evidence \u2192 `content.playbooks.cryptographic_controls.primitives.attestation.compose_lifecycle_attestation`\n  - notify crypto owner \u2192 `content.playbooks.cryptographic_controls.primitives.notify.compose_owner_notification`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/cryptographic_controls\nRegenerate with `python -m tools.compile content/playbooks/cryptographic_controls/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 630,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -580,14 +596,45 @@
   },
   "staticData": null,
   "tags": [
-    "nis2",
-    "article-21-2-h",
-    "cryptography",
-    "encryption",
-    "key-lifecycle",
-    "key-rotation",
-    "key-revocation",
-    "certificate-lifecycle"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "regime:dora"
+    },
+    {
+      "name": "regime:cra"
+    },
+    {
+      "name": "nis2"
+    },
+    {
+      "name": "article-21-2-h"
+    },
+    {
+      "name": "cryptography"
+    },
+    {
+      "name": "encryption"
+    },
+    {
+      "name": "key-lifecycle"
+    },
+    {
+      "name": "key-rotation"
+    },
+    {
+      "name": "key-revocation"
+    },
+    {
+      "name": "certificate-lifecycle"
+    }
   ],
   "pinData": {},
   "meta": {

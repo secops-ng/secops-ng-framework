@@ -1,5 +1,5 @@
 {
-  "name": "Phishing triage",
+  "name": "SecOps-NG: Phishing triage",
   "nodes": [
     {
       "id": "start--c0a17a01-0000-4000-8000-000000000001",
@@ -551,6 +551,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -362
+      ],
+      "parameters": {
+        "content": "## Phishing triage\n`playbook.phishing_triage@v1` \u00b7 content v0.2.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nInbound suspicious-email triage. Ingests a user-reported or mailbox-sweep email, enriches headers / URLs / attachments against upstream Sigma references and OCSF Email/URL/File activity classes, suppresses already-seen or known-benign reports, classifies the intent of the remaining cases, and routes the case to a response branch keyed on intent. Portable CACAO v2 + SecOps-NG content-model extensions so operators compile to the orchestrator they already run (n8n, Temporal, La\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(b) \u2014 incident handling capability\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(g) \u2014 basic cyber-hygiene practices and training\n- DORA Regulation (EU) 2022/2554, Article 18 \u2014 classification of ICT-related incidents\n- DORA Regulation (EU) 2022/2554, Article 19 \u2014 reporting of major ICT-related incidents\n- DORA Regulation (EU) 2022/2554, Article 17 \u2014 ICT-related incident management process (detect, manage, notify); clock signals captured via control.incident_timeline_signals@v1\n\n**Controls:** 5 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__email_id__`, `__report_source__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: ingest report, enrich headers, URLs, attachments, suppress and close, classify intent, response: phishing, response: credential harvest, response: malware attached, response: business email compromise, response: manual review\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/phishing_triage\nRegenerate with `python -m tools.compile content/playbooks/phishing_triage/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 542,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -728,10 +744,30 @@
   },
   "staticData": null,
   "tags": [
-    "phishing",
-    "email-security",
-    "triage",
-    "intent-routing"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:experimental"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "regime:dora"
+    },
+    {
+      "name": "phishing"
+    },
+    {
+      "name": "email-security"
+    },
+    {
+      "name": "triage"
+    },
+    {
+      "name": "intent-routing"
+    }
   ],
   "pinData": {},
   "meta": {

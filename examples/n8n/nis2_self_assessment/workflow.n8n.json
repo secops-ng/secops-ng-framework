@@ -1,5 +1,5 @@
 {
-  "name": "NIS2 Article 21 operator self-assessment report",
+  "name": "SecOps-NG: NIS2 Article 21 operator self-assessment report",
   "nodes": [
     {
       "id": "start--91000000-0000-4000-8000-000000000001",
@@ -305,6 +305,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -318
+      ],
+      "parameters": {
+        "content": "## NIS2 Article 21 operator self-assessment report\n`playbook.nis2_self_assessment@v1` \u00b7 content v0.1.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nSKELETON \u2014 CACAO v2 scaffold for the NIS2 Article 21(2) operator-side self-assessment report. Aggregates the per-clause evidence the ten Art. 21(2)(a\u2013j) obligations produce across the operator's shipped playbook set into a single dated attestation artifact so an operator can demonstrate coverage of the whole Article 21 control surface in one coherent output rather than as ten disjoint per-clause reads. Distinct from the per-clause playbooks that discharge each obligation on\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 21(2) \u2014 cybersecurity risk-management measures (a\u2013j)\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(f) \u2014 effectiveness assessment\n- ENISA \u2014 technical implementation guidance for NIS2 Art. 21\n\n**Controls:** 2 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__assessment_window__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: collect clause evidence, map evidence to clauses, score per-clause coverage, report attestation\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/nis2_self_assessment\nRegenerate with `python -m tools.compile content/playbooks/nis2_self_assessment/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 498,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -370,12 +386,33 @@
   },
   "staticData": null,
   "tags": [
-    "nis2",
-    "article-21",
-    "self-assessment",
-    "attestation",
-    "operator-reporting",
-    "effectiveness-assessment"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:experimental"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "nis2"
+    },
+    {
+      "name": "article-21"
+    },
+    {
+      "name": "self-assessment"
+    },
+    {
+      "name": "attestation"
+    },
+    {
+      "name": "operator-reporting"
+    },
+    {
+      "name": "effectiveness-assessment"
+    }
   ],
   "pinData": {},
   "meta": {

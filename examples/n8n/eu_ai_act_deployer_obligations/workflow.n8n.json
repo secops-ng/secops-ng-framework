@@ -1,5 +1,5 @@
 {
-  "name": "EU AI Act Article 26 deployer obligations with Article 27 fundamental-rights impact assessment",
+  "name": "SecOps-NG: EU AI Act Article 26 deployer obligations with Article 27 fundamental-rights impact assessment",
   "nodes": [
     {
       "id": "start--e26d1a00-0000-4000-8000-000000000001",
@@ -354,6 +354,22 @@
       "parameters": {},
       "notes": "Terminal state. The cycle closes on the dated evidence artifact; the next monitoring window re-enters at the start step.",
       "notesInFlow": true
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -208
+      ],
+      "parameters": {
+        "content": "## EU AI Act Article 26 deployer obligations with Article 27 fundamental-rights impact assessment\n`playbook.eu_ai_act_deployer_obligations@v1` \u00b7 content v0.1.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nCACAO v2 playbook for the operator-side EU AI Act (Regulation (EU) 2024/1689) Article 26 deployer-obligation lifecycle, gated by the Article 27 fundamental-rights impact assessment. Every other EU AI Act surface in this catalogue anchors on the provider \u2014 Art. 9 risk management, Art. 11 technical documentation, Art. 13 transparency, Art. 15 robustness, Art. 72 post-market monitoring, Art. 73 serious-incident reporting. This playbook is the first on the deployer side: the ope\u2026\n\n**Controls:** 3 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__deployment_id__`, `__system_reference__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: confirm_intended_use, assign_human_oversight, monitor_operation, assess_fundamental_rights_impact, retain_logs_and_evidence\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/eu_ai_act_deployer_obligations\nRegenerate with `python -m tools.compile content/playbooks/eu_ai_act_deployer_obligations/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 388,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -430,13 +446,33 @@
   },
   "staticData": null,
   "tags": [
-    "eu-ai-act",
-    "article-26",
-    "article-27",
-    "deployer",
-    "fria",
-    "high-risk-ai",
-    "human-oversight"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:experimental"
+    },
+    {
+      "name": "eu-ai-act"
+    },
+    {
+      "name": "article-26"
+    },
+    {
+      "name": "article-27"
+    },
+    {
+      "name": "deployer"
+    },
+    {
+      "name": "fria"
+    },
+    {
+      "name": "high-risk-ai"
+    },
+    {
+      "name": "human-oversight"
+    }
   ],
   "pinData": {},
   "meta": {

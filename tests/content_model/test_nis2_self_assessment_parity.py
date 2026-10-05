@@ -156,6 +156,7 @@ def test_step_ids_are_shared_across_targets() -> None:
     n8n_ids = {
         node["id"]
         for node in json.loads(N8N_GOLDEN.read_text(encoding="utf-8"))["nodes"]
+        if node["type"] != "n8n-nodes-base.stickyNote"  # the playbook card is not a step
     }
     assert n8n_ids == canonical, (
         f"n8n node ids drift from CACAO step ids. "
