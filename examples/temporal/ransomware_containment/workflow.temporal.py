@@ -20,165 +20,141 @@ _TRACER = trace.get_tracer(__name__)
 from ._audit_mirror import AuditRecord, AuditTrail
 
 @activity.defn
-async def triage_signal(signal_id: str) -> dict[str, object]:
-    """Receive the originating detection signal and hydrate it with host, identity, and process context. Decide whether the signal is a confirmed ransomware event or a benign / out-of-scope alert. Produces __affected_host__, __affected_identity__, and __ransomware_confirmed__.
+async def triage_signal(signal_id: str, hydrated_signal: dict[str, object], edr_status: dict[str, object], analyst_verdict: str) -> dict[str, object]:
+    """Decide whether the hydrated signal confirms ransomware, by an explicit evidence rule: a decisive artifact, mass file-extension rename with a corroborating indicator, or shadow copies and the backup catalogue deleted together. An analyst verdict decides when present, and a disagreement is recorded as an override. Also decides whether EDR can isolate. Produces __triage_record__, from which __affected_host__, __affected_identity__, __ransomware_confirmed__ and __edr_available__ are extracted.
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000002
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'triage signal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'triage_signal'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'triage signal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'triage_signal'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'triage signal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'triage_signal'})
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'triage signal', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'triage_signal'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000002'"
-        )
+        from content.playbooks.ransomware_containment.primitives.triage import triage_ransomware_signal
+        __triage_record__ = triage_ransomware_signal(signal=__hydrated_signal__, edr_status=__edr_status__, analyst_verdict=__analyst_verdict__)
 
 TRIAGE_SIGNAL_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def endpoint_isolation_edr_isolate(affected_host: str) -> None:
-    """Issue the EDR-vendor isolate action against __affected_host__ via the operator's pre-bound EDR agent. Bounded by the operator-supplied authorisation policy. Primary path.
+async def endpoint_isolation_edr_isolate(triage_record: dict[str, object], authorisation_policy: dict[str, object], requested_at: str) -> dict[str, object]:
+    """Compose the EDR isolate directive for __affected_host__: cut the host off everywhere except the EDR management channel, so responders can keep investigating it. Re-checks both gates behind it; a protected host, or a policy without auto-isolation, waits for approval. Primary path. Produces __edr_isolation_directive__.
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000005
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'endpoint isolation — EDR isolate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'endpoint_isolation_edr_isolate'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'endpoint isolation — EDR isolate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'endpoint_isolation_edr_isolate'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'endpoint isolation — EDR isolate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'endpoint_isolation_edr_isolate'})
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'endpoint isolation — EDR isolate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'endpoint_isolation_edr_isolate'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000005'"
-        )
+        from content.playbooks.ransomware_containment.primitives.isolation import compose_edr_isolation
+        __edr_isolation_directive__ = compose_edr_isolation(triage=__triage_record__, authorisation_policy=__authorisation_policy__, requested_at=__requested_at__)
 
 ENDPOINT_ISOLATION_EDR_ISOLATE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def endpoint_isolation_network_acl_deny_fallback(affected_host: str) -> None:
-    """EDR fallback: deny all ingress/egress for __affected_host__ at the operator's network chokepoint (firewall rule, switchport disable, or SDN policy). Used when the EDR agent is unreachable or absent.
+async def endpoint_isolation_network_acl_deny_fallback(triage_record: dict[str, object], authorisation_policy: dict[str, object], chokepoint_ref: str, requested_at: str) -> dict[str, object]:
+    """EDR fallback: compose a deny-all directive for __affected_host__ at __chokepoint_ref__, ingress and egress (firewall rule, switchport disable, or SDN policy). Used when the EDR agent is unreachable or cannot isolate. Re-checks both gates behind it and applies the same approval policy. Produces __network_isolation_directive__.
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000006
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000006',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'endpoint isolation — network ACL deny (fallback)', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'endpoint_isolation_network_acl_deny_fallback'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'endpoint isolation — network ACL deny (fallback)', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'endpoint_isolation_network_acl_deny_fallback'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'endpoint isolation — network ACL deny (fallback)', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'endpoint_isolation_network_acl_deny_fallback'})
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'endpoint isolation — network ACL deny (fallback)', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'endpoint_isolation_network_acl_deny_fallback'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000006'"
-        )
+        from content.playbooks.ransomware_containment.primitives.isolation import compose_network_isolation
+        __network_isolation_directive__ = compose_network_isolation(triage=__triage_record__, authorisation_policy=__authorisation_policy__, chokepoint_ref=__chokepoint_ref__, requested_at=__requested_at__)
 
 ENDPOINT_ISOLATION_NETWORK_ACL_DENY_FALLBACK_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def identity_revocation(affected_identity: str) -> None:
-    """Disable the implicated user account, revoke active sessions, and invalidate refresh/access tokens at the operator's IdP. Includes Kerberos TGT invalidation where supported. Targets __affected_identity__.
+async def identity_revocation(triage_record: dict[str, object], idp_capabilities: dict[str, object], protected_identities: str, requested_at: str) -> dict[str, object]:
+    """Compose the revocation directive for __affected_identity__: disable the account and revoke its sessions, plus token revocation and Kerberos ticket invalidation where the IdP supports them; what it cannot revoke is listed, not claimed. A protected principal waits for approval; with no principal implicated the directive is empty. Produces __identity_revocation_directive__.
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000007
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000007',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'identity revocation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'identity_revocation'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'identity revocation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'identity_revocation'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000007', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'identity revocation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'identity_revocation'})
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000007', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000007', 'secops_ng.step.name': 'identity revocation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'identity_revocation'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000007'"
-        )
+        from content.playbooks.ransomware_containment.primitives.identity import compose_identity_revocation
+        __identity_revocation_directive__ = compose_identity_revocation(triage=__triage_record__, idp_capabilities=__idp_capabilities__, protected_identities=__protected_identities__, requested_at=__requested_at__)
 
 IDENTITY_REVOCATION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def backup_verification() -> dict[str, object]:
-    """Locate the most recent known-good backup snapshot that pre-dates the event window and verify its integrity hash against the backup-catalogue record. Produces __latest_known_good_snapshot__ and __snapshot_integrity_ok__. Does NOT restore — restore is a separate, out-of-scope recovery playbook.
+async def backup_verification(snapshots: str, backup_catalogue: dict[str, object], compromise_window_start: str) -> dict[str, object]:
+    """Select the newest snapshot taken before __compromise_window_start__ whose digest matches the backup-catalogue record, listing the newer candidates it rejected and why. Produces __backup_selection__, from which __latest_known_good_snapshot__ and __snapshot_integrity_ok__ are extracted. Does NOT restore; restore is a separate, out-of-scope recovery playbook.
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000008
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000008',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'backup verification', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'backup_verification'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'backup verification', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'backup_verification'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000008', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'backup verification', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'backup_verification'})
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000008', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000008', 'secops_ng.step.name': 'backup verification', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'backup_verification'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000008'"
-        )
+        from content.playbooks.ransomware_containment.primitives.backup import select_known_good_snapshot
+        __backup_selection__ = select_known_good_snapshot(snapshots=__snapshots__, catalogue=__backup_catalogue__, compromise_window_start=__compromise_window_start__)
 
 BACKUP_VERIFICATION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def comms_plan(affected_host: str, affected_identity: str, latest_known_good_snapshot: str, snapshot_integrity_ok: bool) -> None:
-    """Notify the IR lead and comms officer along the operator's pre-bound channels, and draft the regulator early-warning pre-notification per NIS2 Article 23 within the 24-hour clock from initial detection. The drafted notification is staged for human sign-off, not auto-sent. Because this step is the handoff point that closes the incident timeline and trips the statutory reporting clocks, it stamps the timeline-completeness KPI alongside the notification-SLA KPI and the regulator-notification-overrun KRI.
+async def comms_plan(triage_record: dict[str, object], backup_selection: dict[str, object], comms_channels: dict[str, object], drafted_at: str) -> dict[str, object]:
+    """Compose the notifications to the IR lead and comms officer along __comms_channels__, and stage the regulator early warning per NIS2 Article 23(4)(a), due 24 hours from detection, for human sign-off; it is never auto-sent. Because this step is the handoff point that closes the incident timeline and trips the statutory reporting clocks, it stamps the timeline-completeness KPI alongside the notification-SLA KPI and the regulator-notification-overrun KRI. Produces __comms_plan__.
 
     CACAO step_id: action--30000000-0000-4000-8000-000000000009
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--30000000-0000-4000-8000-000000000009',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000009', 'secops_ng.step.name': 'comms plan', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'comms_plan'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000009', 'secops_ng.step.name': 'comms plan', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'comms_plan'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000009', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000009', 'secops_ng.step.name': 'comms plan', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'comms_plan'})
+            AuditRecord(span_name='activity.action--30000000-0000-4000-8000-000000000009', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--30000000-0000-4000-8000-000000000009', 'secops_ng.step.name': 'comms plan', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'comms_plan'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--30000000-0000-4000-8000-000000000009'"
-        )
+        from content.playbooks.ransomware_containment.primitives.comms import compose_comms_plan
+        __comms_plan__ = compose_comms_plan(triage=__triage_record__, backup_selection=__backup_selection__, channels=__comms_channels__, drafted_at=__drafted_at__)
 
 COMMS_PLAN_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @workflow.defn
@@ -187,134 +163,20 @@ class PlaybookRansomwareContainmentV1Workflow:
 
     CACAO playbook id : playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8
     stable_id         : playbook.ransomware_containment@v1
-    content_version   : 0.1.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--30000000-0000-4000-8000-000000000001
     activities        : triage_signal, endpoint_isolation_edr_isolate, endpoint_isolation_network_acl_deny_fallback, identity_revocation, backup_verification, comms_plan
     """
-
-    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000002.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_triage_signal_decision is not None` before continuing.
-    _triage_signal_decision: bool | None = None
-    _triage_signal_reason: str | None = None
-
-    @workflow.signal
-    def triage_signal_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._triage_signal_decision = decision
-        self._triage_signal_reason = reason
-
-    @workflow.query
-    def triage_signal_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._triage_signal_decision is None:
-            return "pending"
-        return "approved" if self._triage_signal_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000005.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_endpoint_isolation_edr_isolate_decision is not None` before continuing.
-    _endpoint_isolation_edr_isolate_decision: bool | None = None
-    _endpoint_isolation_edr_isolate_reason: str | None = None
-
-    @workflow.signal
-    def endpoint_isolation_edr_isolate_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._endpoint_isolation_edr_isolate_decision = decision
-        self._endpoint_isolation_edr_isolate_reason = reason
-
-    @workflow.query
-    def endpoint_isolation_edr_isolate_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._endpoint_isolation_edr_isolate_decision is None:
-            return "pending"
-        return "approved" if self._endpoint_isolation_edr_isolate_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000006.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_endpoint_isolation_network_acl_deny_fallback_decision is not None` before continuing.
-    _endpoint_isolation_network_acl_deny_fallback_decision: bool | None = None
-    _endpoint_isolation_network_acl_deny_fallback_reason: str | None = None
-
-    @workflow.signal
-    def endpoint_isolation_network_acl_deny_fallback_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._endpoint_isolation_network_acl_deny_fallback_decision = decision
-        self._endpoint_isolation_network_acl_deny_fallback_reason = reason
-
-    @workflow.query
-    def endpoint_isolation_network_acl_deny_fallback_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._endpoint_isolation_network_acl_deny_fallback_decision is None:
-            return "pending"
-        return "approved" if self._endpoint_isolation_network_acl_deny_fallback_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000007.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_identity_revocation_decision is not None` before continuing.
-    _identity_revocation_decision: bool | None = None
-    _identity_revocation_reason: str | None = None
-
-    @workflow.signal
-    def identity_revocation_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._identity_revocation_decision = decision
-        self._identity_revocation_reason = reason
-
-    @workflow.query
-    def identity_revocation_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._identity_revocation_decision is None:
-            return "pending"
-        return "approved" if self._identity_revocation_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000008.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_backup_verification_decision is not None` before continuing.
-    _backup_verification_decision: bool | None = None
-    _backup_verification_reason: str | None = None
-
-    @workflow.signal
-    def backup_verification_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._backup_verification_decision = decision
-        self._backup_verification_reason = reason
-
-    @workflow.query
-    def backup_verification_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._backup_verification_decision is None:
-            return "pending"
-        return "approved" if self._backup_verification_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--30000000-0000-4000-8000-000000000009.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_comms_plan_decision is not None` before continuing.
-    _comms_plan_decision: bool | None = None
-    _comms_plan_reason: str | None = None
-
-    @workflow.signal
-    def comms_plan_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._comms_plan_decision = decision
-        self._comms_plan_reason = reason
-
-    @workflow.query
-    def comms_plan_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._comms_plan_decision is None:
-            return "pending"
-        return "approved" if self._comms_plan_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.ransomware_containment@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.ransomware_containment@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '0.1.0'})
+                AuditRecord(span_name='workflow.playbook.ransomware_containment@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.ransomware_containment@v1'"

@@ -149,12 +149,12 @@ Per-case metric accounting into the MTTD / MTTC / backup-integrity /
 notification-SLA / timeline-completeness catalogue entries is
 unambiguous.
 
-> The playbook maturity is `experimental` on the workflow-local
-> content marker. The overlay pins the control, detection, telemetry,
-> and metric surface; the n8n reference emitter ships a committed
-> `workflow.n8n.json` today, and the Temporal / LangGraph siblings
-> ship deterministic emitter output with `NotImplementedError`
-> activity / tool bodies pending the per-target CORE cards.
+> The playbook maturity is `stable` (`content_version` 1.0.0). Every
+> action step binds a deterministic primitive under
+> `content/playbooks/ransomware_containment/primitives/`, and all three
+> reference emitters compile those bindings into primitive calls. The
+> EDR, chokepoint, IdP, backup-platform and paging adapters around them
+> stay operator-bound.
 > Cross-target byte-parity goldens live under
 > `tests/examples/ransomware_containment/`.
 
@@ -446,45 +446,50 @@ outbound overlay records the emission for closure.
 
 ## 5. Per-target hand-off
 
-### 5.1 n8n — operator-edited Set rows over the ransomware topology
+### 5.1 n8n — primitive calls over the ransomware topology
 
 `examples/n8n/ransomware_containment/workflow.n8n.json` carries the
-CACAO topology as ten n8n nodes (`manualTrigger`, six `set` nodes,
-two `if`, two `noOp` terminals), with node ids preserving the CACAO
-step ids verbatim. The six action steps emit `n8n-nodes-base.set`
-nodes carrying the CACAO I/O contract as editable assignment rows
-plus the `x_secops_ng` reference bundles (detection, control,
-telemetry, metric). The two `if-condition` nodes emit
+CACAO topology as ten n8n nodes (`manualTrigger`, six `code` nodes,
+two `if`, one `noOp` terminal), with node ids preserving the CACAO
+step ids verbatim. Each of the six action steps emits an
+`n8n-nodes-base.code` node that imports its primitive and binds the
+step's output envelope to the call — `triage_ransomware_signal`,
+`compose_edr_isolation`, `compose_network_isolation`,
+`compose_identity_revocation`, `select_known_good_snapshot` and
+`compose_comms_plan`. The two `if-condition` nodes emit
 `n8n-nodes-base.if` with working conditions on
-`__ransomware_confirmed__` and `__edr_available__`, both set by the
-triage step (surfaced as `out.ransomware_confirmed` and
-`out.edr_available` on its Set row). The remaining lossy
-translations — one per unbound action — are recorded in
-`meta.secops_ng_notes` so the integrator sees exactly which seams
-need attention.
+`__ransomware_confirmed__` and `__edr_available__`, both extracted from
+the triage step's `__triage_record__` envelope. With every step bound
+and both conditions machine-readable, the workflow records no lossy
+translations in `meta.secops_ng_notes`.
 
-Operators bind the Set rows to their connectors:
+Operators bind the adapters that feed each primitive's inputs:
 
-- `triage signal` → the operator's malicious-code-protection / EDR
-  layer's signal-fetch API against the affected host, joined with
-  process-creation, file-system, and authentication audit reads
-  around the encryption window; writes `__ransomware_confirmed__`,
-  `__affected_host__`, `__affected_identity__`, and
-  `__edr_available__`.
+- `triage signal` → the operator's EDR / malicious-code-protection
+  layer and the hydration that assembles `__hydrated_signal__` (host,
+  principal and indicator names around the encryption window) and
+  `__edr_status__` (agent reachable, isolate capable); an analyst
+  ruling, when one exists, arrives as `__analyst_verdict__`.
 - `endpoint isolation — EDR isolate` → the operator's EDR vendor's
   isolate action (CrowdStrike, SentinelOne, Microsoft Defender for
-  Endpoint, Sophos, or any other agent the operator runs).
+  Endpoint, Sophos, or any other agent the operator runs), executing
+  `__edr_isolation_directive__` under `__authorisation_policy__`.
 - `endpoint isolation — network ACL deny (fallback)` → the
-  operator's network chokepoint (firewall rule, switchport disable,
-  SDN policy) — used when the EDR agent is unreachable or absent.
+  operator's network chokepoint named by `__chokepoint_ref__`
+  (firewall rule, switchport disable, SDN policy) — used when the EDR
+  agent is unreachable or cannot isolate.
 - `identity revocation` → the operator's IdP disable / session-
-  invalidation / token-revocation surface and — where supported —
-  Kerberos TGT invalidation.
-- `backup verification` → the operator's backup catalogue and
-  offline / immutable backup tier (snapshot locate + hash verify).
-- `comms plan` → the operator's paging channel (IR lead / comms
-  officer) and the drafted-notification staging path for the NIS2
-  Art. 23 24-hour early warning (human sign-off, not auto-send).
+  invalidation / token-revocation surface and — where
+  `__idp_capabilities__` says it is supported — Kerberos TGT
+  invalidation; principals in `__protected_identities__` wait for
+  approval.
+- `backup verification` → the operator's backup platform and catalogue
+  (`__snapshots__`, `__backup_catalogue__`), plus the hydration or
+  forensic-timeline adapter that supplies `__compromise_window_start__`
+  from the earliest indicator.
+- `comms plan` → the operator's paging channels (`__comms_channels__`)
+  and the staging path for the drafted NIS2 Art. 23 24-hour early
+  warning (human sign-off, never auto-sent).
 
 To regenerate the compiled workflow artifact from the repo root:
 
@@ -495,23 +500,20 @@ To regenerate the compiled workflow artifact from the repo root:
 To import into an n8n instance: open the workflows list, choose
 **Import from File**, and select
 `examples/n8n/ransomware_containment/workflow.n8n.json`. The workflow
-is inactive by default — review and bind the Set rows to your own
-connectors before activating. The emitted workflow is a *snapshot
+is inactive by default — review and bind the adapter inputs to your
+own connectors before activating. The emitted workflow is a *snapshot
 of intent*, not a runnable playbook.
 
-### 5.2 Temporal — `@activity.defn` bodies (SKELETON stub)
+### 5.2 Temporal — `@activity.defn` bodies calling the primitives
 
 `examples/temporal/ransomware_containment/workflow.temporal.py` is a
 standard Temporal worker module: one `@workflow.defn` class and one
-`@activity.defn` function per CACAO action, with the six action
-activities documenting their operator-bound seam (triage / EDR
-isolate / network-ACL fallback / identity revocation / backup
-verification / comms plan). The committed stub raises
-`NotImplementedError` in the activity bodies pending the
-CORE-TEMPORAL sibling card that wires the deterministic activity
-implementations into the Temporal target; operators can drop the
-module next to their worker today to see the topology and the
-activity signatures.
+`@activity.defn` function per CACAO action. Each of the six activity
+bodies imports and calls its bound primitive. The workflow's `run`
+method still raises `NotImplementedError`: the Temporal emitter does
+not lower CACAO control flow into workflow code for any playbook, so
+sequencing the activities through the confirmed and EDR-available
+gates is the integrator's.
 
 Temporal is a natural fit for the ransomware-containment discipline:
 each case becomes one workflow run; the confirmed-branch and
@@ -520,10 +522,10 @@ transient failures on the EDR agent, the network chokepoint, the
 IdP, the backup catalogue, or the paging channel get first-class
 Temporal semantics (activity retry policy per seam); replay against
 the same Temporal event history re-derives the same containment
-record and the same backup-verification verdict once the activity
-bodies are wired.
+record and the same backup-verification verdict, because every
+activity body is a pure primitive call.
 
-### 5.3 LangGraph — `@tool` wrappers + agentic-extension hook (SKELETON stub)
+### 5.3 LangGraph — `@tool` wrappers calling the primitives + agentic-extension hook
 
 `examples/langgraph/ransomware_containment/state_bindings.py`
 carries the `TypedDict` state and the `@tool`-decorated action
@@ -533,12 +535,10 @@ wrappers. `graph_spec.json` carries the target-neutral topology
 backup verification, and comms plan to the terminal end, and the
 direct edge from the false-branch to the terminal end);
 `assemble.py` is the hand-written reference assembly that wires
-the GraphSpec + bindings into a `langgraph.graph.StateGraph`. The
-committed `state_bindings.py` is a generated stub: each tool's
-docstring names the operator-bound seam it discharges and the body
-raises `NotImplementedError` until the CORE-LANGGRAPH sibling card
-wires the deterministic tool implementations into the LangGraph
-target.
+the GraphSpec + bindings into a `langgraph.graph.StateGraph`. Each
+generated tool body imports and calls its bound primitive; the only
+body that still raises `NotImplementedError` is the agentic-extension
+hook, which is a placeholder by design.
 
 LangGraph is the agentic target — an operator who wants to layer an
 LM-driven classifier on top of the `triage signal` step (reading
@@ -557,10 +557,8 @@ All three reference targets are present in the tree today
 (`examples/n8n/ransomware_containment/`,
 `examples/temporal/ransomware_containment/`,
 `examples/langgraph/ransomware_containment/`). The n8n target ships
-a committed workflow artifact; the Temporal and LangGraph targets
-ship deterministic emitter output with `NotImplementedError`
-activity / tool bodies pending the per-target CORE cards. Cross-
-target byte-parity goldens land under
+a committed workflow artifact, and all three compile the same six
+primitive bindings. Cross-target byte-parity goldens live under
 `tests/examples/ransomware_containment/` — the same cross-target
 byte-parity property the framework relies on for the rest of the
 playbook set.
@@ -568,8 +566,8 @@ playbook set.
 ## 6. Observability — OTel + AuditTrail in every target
 
 Every emitted action opens an OpenTelemetry span and appends an
-`AuditRecord` to a context-local `AuditTrail` *before* the operator-
-bound seam call or the (pending) primitive body. The mirror runs
+`AuditRecord` to a context-local `AuditTrail` *before* the primitive
+call. The mirror runs
 unconditionally, ahead of any OTLP exporter, so the audit property
 holds even when the operator has not configured a collector —
 typical for disconnected, sovereign, or air-gapped deployments.
@@ -753,9 +751,9 @@ exercises is the operator's. The customisation seams:
 
 ## 10. Replay and audit story
 
-The byte-parity drift guards land with the CORE-TEMPORAL /
-CORE-LANGGRAPH sibling cards under
-`tests/examples/ransomware_containment/`. Each per-target golden
+The byte-parity drift guards live under
+`tests/examples/ransomware_containment/` and the per-target
+`tests/examples/{n8n,temporal,langgraph}/ransomware_containment/`. Each per-target golden
 pins the committed worked-example artifact to a fresh emitter run
 from the canonical CACAO source; if the compiler or the playbook
 changes, regenerate via the per-target `regenerate.sh` and commit
