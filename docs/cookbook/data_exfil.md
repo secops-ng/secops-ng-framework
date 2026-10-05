@@ -119,9 +119,9 @@ The playbook ships nine steps: one `start`, five `action`, two
 into `containment`, `on_false` (in-line prevention or false
 positive) short-circuits to `end`. The second `if-condition` fires
 on `__regulator_required__`; `on_true` (threshold crossed) routes
-into `notify regulator` then falls through to `notify customer`;
-`on_false` routes directly to `notify customer`. Both branches
-converge on the notify-customer step so the affected-subjects
+into `notify regulator` then falls through to `notify affected
+party`; `on_false` routes directly to `notify affected party`. Both
+branches converge on the notify-affected-party step so the affected-subjects
 notification path is reached whenever exfiltration is confirmed —
 the regulator submission is the *conditional* leg, not the
 affected-subject communication.
@@ -135,7 +135,7 @@ affected-subject communication.
 | `…000005`   | containment                                         | egress-policy tightening on the destination(s) named in the signal (deny / rate-limit at the egress chokepoint), session-token revocation and account disable on the originating principal, forced credential rotation                  | operator-bound |
 | `…000006`   | regulator notification threshold met?               | `if-condition` — branches on `__regulator_required__` against affected-subjects count + data classification per the operator's routing policy (NIS2 Art. 23 / DORA Art. 19 / GDPR Art. 33)                                              | n/a            |
 | `…000007`   | notify regulator                                    | compose the structured incident-finding envelope from scope-assessment outputs and hand off along the pre-bound regulator channel; feeds `playbook.incident_management@v1` as the downstream submission engine                          | operator-bound |
-| `…000008`   | notify customer                                     | compose and dispatch the data-subject / customer-facing notification from scope-assessment outputs along the pre-bound channel; tracked separately from the regulator submission so the notification-SLA KPI reports two timelines      | operator-bound |
+| `…000008`   | notify affected party                               | compose the data-subject notification determination from the scope assessment and, when GDPR Art. 34 requires it, the notice along the pre-bound channel; tracked separately from the regulator submission so the notification-SLA KPI reports two timelines | operator-bound |
 | `…000009`   | exfil-end                                           | edge wiring only — no body                                                                                                                                                                                                              | n/a            |
 
 All five action steps carry the CACAO I/O contract (`in_args` /
@@ -151,12 +151,12 @@ accounting into the MTTD / containment-MTTR / notification-SLA /
 regulator-notification-overrun catalogue entries is therefore
 unambiguous.
 
-> The playbook maturity is `experimental` on the workflow-local
-> content marker. The overlay pins the control, detection, telemetry,
-> and metric surface; the n8n reference emitter ships a committed
-> `workflow.n8n.json` today, and the Temporal / LangGraph siblings
-> ship deterministic emitter output with `NotImplementedError`
-> activity / tool bodies pending the per-target CORE cards.
+> The playbook maturity is `stable` (`content_version` 1.0.0). Every
+> action step binds a deterministic primitive under
+> `content/playbooks/data_exfil/primitives/`, and all three reference
+> emitters compile those bindings into primitive calls. The DLP,
+> egress, identity and notification adapters around them stay
+> operator-bound.
 > Cross-target byte-parity goldens live under
 > `tests/examples/data_exfil/`.
 
@@ -244,8 +244,8 @@ outside the operator's own identity surface.
     against `__affected_subjects_count__` and
     `__data_classification__` per the operator's regulator-routing
     policy. `on_true` (threshold crossed) routes into `notify
-    regulator` and then falls through to `notify customer`;
-    `on_false` routes directly to `notify customer`. The
+    regulator` and then falls through to `notify affected party`;
+    `on_false` routes directly to `notify affected party`. The
     threshold policy itself is operator-owned — the framework binds
     the gate and the routing surface, not the numeric cut-off. The
     routing key is the joint NIS2 Art. 23 / DORA Art. 19 / GDPR
@@ -254,13 +254,13 @@ outside the operator's own identity surface.
     envelope on `playbook.incident_management@v1`.
 
 **notify regulator** (`…000007`)
-:   Regulator-notification emitter. Composes the structured
-    incident-finding envelope from the scope-assessment outputs
-    (data classification, affected-subjects count, containment
-    outcome) and hands it off along the operator's pre-bound
-    regulator channel — the national CSIRT for NIS2, the competent
-    authority for DORA, the supervisory authority for GDPR, the
-    market-surveillance authority for CRA. This step is the
+:   Regulator-notification emitter. Composes one notification per
+    applicable regime from the scope assessment, each with its own
+    deadline running from the instant the operator became aware, and
+    hands them off along the operator's pre-bound authority channels
+    — the national CSIRT or competent authority for NIS2, the
+    competent authority for DORA, the supervisory authority for
+    GDPR. This step is the
     **upstream emitter** into `playbook.incident_management@v1`;
     the 24-hour / 72-hour / one-month per-stage submissions are
     rendered by that downstream engine from the envelope emitted
@@ -273,12 +273,12 @@ outside the operator's own identity surface.
     `kpi.notification_sla_compliance@v1` and
     `kri.regulator_notification_overrun@v1`.
 
-**notify customer** (`…000008`)
-:   Customer-notification emitter. Composes the data-subject /
-    customer-facing notification payload from the scope-assessment
-    outputs (data classification, affected-subjects count) and
-    hands it off along the operator's pre-bound customer-comms
-    channel. Tracked separately from the regulator submission so
+**notify affected party** (`…000008`)
+:   Data-subject notification emitter. Determines from the scope
+    assessment whether GDPR Art. 34 requires telling data subjects —
+    always recording the basis — and, when it does, composes the
+    notice and hands it off along the operator's pre-bound
+    data-subject channel. Tracked separately from the regulator submission so
     the notification-SLA KPI reports the two timelines
     independently — GDPR Art. 34 in particular has a distinct
     "communicate to the data subject without undue delay" clock
@@ -291,7 +291,7 @@ outside the operator's own identity surface.
 The five action steps are operator-bound runtime seams: the
 framework ships neither the DLP platform, the egress chokepoint,
 the IdP-side session-revocation surface, the pre-bound regulator
-channel, nor the notify-customer gateway. The playbook is
+channel, nor the data-subject notification gateway. The playbook is
 the portable description of *what* the operator's stack should do
 per case; binding those seams to real endpoints is the operator's
 job.
@@ -405,7 +405,7 @@ High-Risk Individuals — anchors the identity cut-out leg of
 containment).
 
 **MITRE D3FEND v1.0.0** — `D3-IRA` (Incident Response Analysis)
-at `triage signal`, `notify regulator`, and `notify customer`;
+at `triage signal`, `notify regulator`, and `notify affected party`;
 `D3-FA` (Forensic Analysis) at `scope assessment`; `D3-NTF`
 (Network Traffic Filtering), `D3-ACI` (Authentication Cache
 Invalidation), and `D3-AL` (Account Locking) at `containment`.
@@ -444,41 +444,47 @@ notification-overrun KRI can audit on-time delivery.
 
 ## 5. Per-target hand-off
 
-### 5.1 n8n — operator-edited Set rows over the exfil topology
+### 5.1 n8n — primitive calls over the exfil topology
 
 `examples/n8n/data_exfil/workflow.n8n.json` carries the CACAO
-topology as nine n8n nodes (`manualTrigger`, five `set` nodes, two
+topology as nine n8n nodes (`manualTrigger`, five `code` nodes, two
 `if` nodes, one `noOp`), with node ids preserving the CACAO step
-ids verbatim. The five action steps emit `n8n-nodes-base.set` nodes
-carrying the CACAO I/O contract as editable assignment rows plus
-the `x_secops_ng` reference bundles (detection, control, telemetry,
-metric). The two `if-condition` nodes emit `n8n-nodes-base.if` with
-working conditions on `__exfil_confirmed__` and
-`__regulator_required__`, both set by the scope-assessment step
-(surfaced on its Set node as `out.exfil_confirmed` and
-`out.regulator_required`). The remaining lossy translations — one per
-unbound action — are recorded in `meta.secops_ng_notes` so the
-integrator sees exactly which seams need attention.
+ids verbatim. Each of the five action steps emits an
+`n8n-nodes-base.code` node that imports its primitive and binds the
+step's output envelope to the call — `triage_egress_signal`,
+`assess_exfil_scope`, `compose_exfil_containment`,
+`compose_regulator_notification` and `compose_subject_notification`.
+The two `if-condition` nodes emit `n8n-nodes-base.if` with working
+conditions on `__exfil_confirmed__` and `__regulator_required__`,
+both extracted from the scope step's `__scope_assessment__` envelope.
+With every step bound and both conditions machine-readable, the
+workflow records no lossy translations in `meta.secops_ng_notes`.
 
-Operators bind the Set rows to their connectors:
+Operators bind the adapters that feed each primitive's inputs:
 
-- `triage signal` → the operator's DLP / egress-monitoring layer's
-  signal-fetch API against `__signal_id__`.
-- `scope assessment` → the operator's data-classification service,
-  IAM subject-count query, and egress-flow correlator; writes
-  `__data_classification__`, `__affected_subjects_count__`,
-  `__exfil_confirmed__`.
-- `containment` → the operator's egress chokepoint (deny / rate-
-  limit binding on the named destination), IdP session-invalidation
-  and account-disable API, and credential-rotation surface.
-- `notify regulator` → the operator's pre-bound regulator channel
-  (national CSIRT for NIS2, competent authority for DORA,
-  supervisory authority for GDPR, market-surveillance authority
-  for CRA); the downstream `playbook.incident_management@v1`
-  engine consumes the emitted envelope.
-- `notify customer` → the operator's pre-bound customer-comms
-  channel (in-app notification, email, postal — per the operator's
-  GDPR Art. 34 procedure).
+- `triage signal` → the operator's DLP / egress-monitoring layer and
+  the hydration that assembles `__hydrated_signal__` for
+  `__signal_id__`, plus the known-benign egress list
+  (`__benign_patterns__`).
+- `scope assessment` → the operator's content-inspection service
+  (`__dlp_findings__`), the in-line control's verdict
+  (`__in_line_control__`) and the regulator-routing policy
+  (`__routing_policy__`).
+- `containment` → the operator's egress chokepoint, IdP
+  session-invalidation and account-disable API, credential-rotation
+  surface and host isolation, executing `__containment_directive__`
+  under `__authorisation_policy__`.
+- `notify regulator` → the operator's pre-bound authority channels
+  (`__authority_channels__`: supervisory authority for GDPR, CSIRT or
+  competent authority for NIS2, competent authority for DORA); the
+  downstream `playbook.incident_management@v1` engine consumes the
+  emitted envelope.
+- `notify affected party` → the operator's pre-bound data-subject
+  channel (`__subject_channel__`: in-app notification, email, postal —
+  per the operator's GDPR Art. 34 procedure and `__high_risk_policy__`).
+
+Both notification clocks run from `__aware_at__`, the instant the
+operator became aware of the breach, not from detection.
 
 To regenerate the compiled workflow artifact from the repo root:
 
@@ -489,23 +495,20 @@ To regenerate the compiled workflow artifact from the repo root:
 To import into an n8n instance: open the workflows list, choose
 **Import from File**, and select
 `examples/n8n/data_exfil/workflow.n8n.json`. The workflow is
-inactive by default — review and bind the Set rows to your own
-connectors before activating. The emitted workflow is a *snapshot
+inactive by default — review and bind the adapter inputs to your
+own connectors before activating. The emitted workflow is a *snapshot
 of intent*, not a runnable playbook.
 
-### 5.2 Temporal — `@activity.defn` bodies (SKELETON stub)
+### 5.2 Temporal — `@activity.defn` bodies calling the primitives
 
 `examples/temporal/data_exfil/workflow.temporal.py` is a standard
 Temporal worker module: one `@workflow.defn` class and one
-`@activity.defn` function per CACAO action, with the five action
-activities documenting their operator-bound seam (signal fetch,
-scope assessment, containment cut-out, regulator envelope
-composition, customer notification). The committed stub raises
-`NotImplementedError` in the activity bodies pending the
-CORE-TEMPORAL sibling card that wires the deterministic activity
-implementations into the Temporal target; operators can drop the
-module next to their worker today to see the topology and the
-activity signatures.
+`@activity.defn` function per CACAO action. Each of the five activity
+bodies imports and calls its bound primitive. The workflow's `run`
+method still raises `NotImplementedError`: the Temporal emitter does
+not lower CACAO control flow into workflow code for any playbook, so
+sequencing the activities through the exfil-confirmed and
+regulator-threshold gates is the integrator's.
 
 Temporal is a natural fit for the exfil-response discipline: each
 case becomes one workflow run; the exfil-confirmed branch and the
@@ -514,10 +517,10 @@ against transient failures on the DLP platform, the egress
 chokepoint, or the pre-bound regulator channel get first-class
 Temporal semantics (activity retry policy per seam); replay against
 the same Temporal event history re-derives the same containment
-record and the same notification envelope once the activity bodies
-are wired.
+record and the same notification envelope, because every activity
+body is a pure primitive call.
 
-### 5.3 LangGraph — `@tool` wrappers + agentic-extension hook (SKELETON stub)
+### 5.3 LangGraph — `@tool` wrappers calling the primitives + agentic-extension hook
 
 `examples/langgraph/data_exfil/state_bindings.py` carries the
 `TypedDict` state and the `@tool`-decorated action wrappers.
@@ -526,11 +529,10 @@ conditional edge on `__exfil_confirmed__`, conditional edge on
 `__regulator_required__`, linear edges through the notification
 steps to `end`); `assemble.py` is the hand-written reference
 assembly that wires the GraphSpec + bindings into a
-`langgraph.graph.StateGraph`. The committed `state_bindings.py` is
-a generated stub: each tool's docstring names the operator-bound
-seam it discharges and the body raises `NotImplementedError` until
-the CORE-LANGGRAPH sibling card wires the deterministic tool
-implementations into the LangGraph target.
+`langgraph.graph.StateGraph`. Each generated tool body imports and
+calls its bound primitive; the only body that still raises
+`NotImplementedError` is the agentic-extension hook, which is a
+placeholder by design.
 
 LangGraph is the agentic target — an operator who wants to layer
 an LM-driven scope-assessment classifier on top of the raw
@@ -548,18 +550,16 @@ The compiler never embeds an LLM SDK.
 All three reference targets are present in the tree today
 (`examples/n8n/data_exfil/`, `examples/temporal/data_exfil/`,
 `examples/langgraph/data_exfil/`). The n8n target ships a committed
-workflow artifact; the Temporal and LangGraph targets ship
-deterministic emitter output with `NotImplementedError` activity /
-tool bodies pending the per-target CORE cards. Cross-target byte-
-parity goldens land under `tests/examples/data_exfil/` — the same
+workflow artifact, and all three compile the same five primitive
+bindings. Cross-target byte-parity goldens live under `tests/examples/data_exfil/` — the same
 cross-target byte-parity property the framework relies on for the
 rest of the playbook set.
 
 ## 6. Observability — OTel + AuditTrail in every target
 
 Every emitted action opens an OpenTelemetry span and appends an
-`AuditRecord` to a context-local `AuditTrail` *before* the operator-
-bound seam call or the (pending) primitive body. The mirror runs
+`AuditRecord` to a context-local `AuditTrail` *before* the primitive
+call. The mirror runs
 unconditionally, ahead of any OTLP exporter, so the audit property
 holds even when the operator has not configured a collector —
 typical for disconnected, sovereign, or air-gapped deployments.
@@ -693,11 +693,10 @@ exercises is the operator's. The customisation seams:
   hands off along the operator's pre-bound regulator channel. Which
   authority receives which regime's submission (national CSIRT
   under NIS2, competent authority under DORA, supervisory
-  authority under GDPR, market-surveillance authority under CRA)
-  is per Member State and per sector, and is the operator's to
-  configure at the seam. The `notify customer` step reads the
-  operator's customer-comms channel and the affected-subjects list;
-  the framework binds neither.
+  authority under GDPR) is per Member State and per sector, and is
+  the operator's to configure at the seam. The `notify affected
+  party` step reads the operator's data-subject channel and
+  high-risk policy; the framework binds neither.
 - **Affected-subjects count threshold for GDPR Art. 33 trigger.**
   The `regulator notification threshold met?` gate evaluates
   `__regulator_required__` against `__affected_subjects_count__`
@@ -726,8 +725,8 @@ exercises is the operator's. The customisation seams:
 
 ## 10. Replay and audit story
 
-The byte-parity drift guards land with the CORE-TEMPORAL /
-CORE-LANGGRAPH sibling cards under `tests/examples/data_exfil/`.
+The byte-parity drift guards live under `tests/examples/data_exfil/`
+and the per-target `tests/examples/{n8n,temporal,langgraph}/data_exfil/`.
 Each per-target golden pins the committed worked-example artifact
 to a fresh emitter run from the canonical CACAO source; if the
 compiler or the playbook changes, regenerate via the per-target
