@@ -35,6 +35,12 @@ subpoints (a)–(j) plus Article 23 incident-notification milestones).
   communications.
 - `article-23.yaml` — Art. 23(4) incident-notification timeline
   (early-warning at 24h, notification at 72h, final report at one month).
+- `incident-handling-rulebooks.yaml` — crosswalk to the Luxembourg NIS2
+  authorities' *Operational guidance for incident handling* (Rulebooks
+  0–8), one sub-entry per rulebook section; walkthrough in
+  `incident-handling-rulebooks.md`. Companion guidance, not a clause of
+  the directive, so its ids are `nis2:rulebook-<n>-<slug>` and it is not
+  part of the OSCAL component-definition.
 
 ## Citation policy
 

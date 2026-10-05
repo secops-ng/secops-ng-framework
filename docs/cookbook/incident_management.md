@@ -24,6 +24,11 @@ context-local `AuditTrail` mirror live in each.
 > source compiles into all of them. Operators run whichever target
 > already lives in their stack.
 
+The Luxembourg NIS2 authorities' operational incident-handling
+rulebooks are crosswalked to this and the other incident-shaped
+playbooks in
+[`content/mappings/nis2/incident-handling-rulebooks.md`](../../content/mappings/nis2/incident-handling-rulebooks.md).
+
 ## 1. Source of truth
 
 ```
