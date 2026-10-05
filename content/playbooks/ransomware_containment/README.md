@@ -11,8 +11,8 @@ officer + NIS2 Article 23 24-hour early-warning draft).
   (`playbook.ransomware_containment@v1`).
 - `mappings.yaml` — outbound overlay: Sigma, OSCAL, OCSF and regulatory
   references.
-- `primitives/` — the deterministic primitives the six action steps bind
-  at CORE-WIRE; see Status.
+- `primitives/` — the deterministic primitives the six action steps
+  bind; see Status.
 
 ## Sigma references
 
@@ -39,9 +39,10 @@ rule IDs:
 emitted artifacts ship under
 `examples/{n8n,temporal,langgraph}/ransomware_containment/`, with the
 practitioner walkthrough at `docs/cookbook/ransomware_containment.md`.
-They are regenerated from the canonical source, which is not yet bound,
-so the action bodies are still operator placeholders rather than
-primitive calls.
+Every action body calls its primitive: six n8n Code nodes, and
+Temporal activity and LangGraph tool bodies that import and call it. The
+Temporal target still leaves workflow control flow to the integrator, as
+it does for every playbook.
 
 ## Worked example
 
@@ -51,9 +52,13 @@ metrics artifacts that bind to this playbook — lives under
 
 ## Status
 
-`maturity: experimental`, CORE-PRIM complete. Each of the six action
-steps has a deterministic primitive under `primitives/`, executed
-directly by `tests/playbooks/ransomware_containment/test_primitives.py`:
+`maturity: stable`, `content_version` 1.0.0. All six action steps bind
+a deterministic primitive under `primitives/` through
+`x_secops_ng.core_body`, each executed directly by
+`tests/playbooks/ransomware_containment/test_primitives.py`, and the
+three reference targets emit those calls. The graduation checklist
+recomputes green: tier A, 6 of 6 real bindings, zero placeholder bodies,
+zero blank predicates, zero schema errors, three-target goldens.
 
 | Step | Primitive |
 |---|---|
@@ -89,10 +94,28 @@ Decisions the primitives fix, because they start containment:
 - Every containment step re-checks the gates behind it, so a mis-wired
   branch fails loud instead of acting on an unconfirmed signal.
 
-**Owed: the wire.** The CACAO steps do not yet carry
-`x_secops_ng.core_body`, so `catalog.py` reports 0 of 6 bound. Binding
-the six steps, declaring the variables they need, regenerating the
-examples and recomputing the Maturity ladder is the CORE-WIRE card.
+Contract choices settled at the wire. The contract grows from 7 to 26
+variables: the adapter inputs each primitive reads, one envelope per
+step, and six of the seven existing names, now fields extracted from
+those envelopes at the adapter seam (`__signal_id__` stays the trigger
+input).
+
+- **The gates read extracted fields.** `__ransomware_confirmed__` and
+  `__edr_available__` come from `__triage_record__`, and stay real
+  booleans because both gates compare them to `true`.
+- **The compromise window is an adapter input.**
+  `__compromise_window_start__` is the earliest indicator, not
+  detection, because dwell time precedes detection. Triage sees
+  indicator names but not their timestamps, so the hydration or
+  forensic-timeline adapter that has them supplies it.
+- **An unset analyst verdict is empty.** The n8n trigger surfaces an
+  unset variable as `""`, and triage treats it as no ruling.
+- **Lists ride as strings.** CACAO variables have no list type, so
+  `__snapshots__` and `__protected_identities__` carry JSON-native lists
+  that the target's adapter seam marshals.
+- **No principal is a valid answer.** `__affected_identity__` is null
+  when the signal implicates no identity, and the identity step then
+  emits an empty directive rather than failing.
 
 ## Sources
 

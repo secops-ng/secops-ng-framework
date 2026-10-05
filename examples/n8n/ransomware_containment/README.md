@@ -34,12 +34,11 @@ inspection, and the regeneration script.
    connectors before activating.
 
 The emitted workflow is a *snapshot of intent*, not a runnable
-playbook. The Set nodes carry the CACAO I/O contract as editable
-assignments; binding those rows to real connectors (EDR isolation API,
-network ACL / SDN fallback, IdP session and token revocation,
-backup-verification system, ticketing / paging channel, and the NIS2
-Article 23 24-hour early-warning reporting channel) is the operator's
-job.
+playbook. The Code nodes call the bound primitives; binding the
+adapter inputs they read to real connectors (EDR status and isolation
+API, network ACL / SDN fallback, IdP session and token revocation,
+backup platform and catalogue, paging channels, and the NIS2 Article 23
+24-hour early-warning staging path) is the operator's job.
 
 ## How to regenerate
 
@@ -72,8 +71,8 @@ linear containment chain. Ten n8n nodes, one per CACAO step:
 
 1. `ransomware-start` (`manualTrigger`) — entry point; matches the
    CACAO `start` step.
-2. `triage signal` (`set`) — collect ransomware indicators from the
-   EDR, SIEM, and any anomaly-detection feed the operator already runs.
+2. `triage signal` (`code`) — decide confirmation and EDR availability
+   from the hydrated signal.
 3. `ransomware confirmed?` (`if`) — branch on the triage outcome.
    `true` routes to the EDR-capability check; `false` routes to the end
    sentinel.
@@ -81,46 +80,36 @@ linear containment chain. Ten n8n nodes, one per CACAO step:
    availability. `true` routes to the EDR isolation node; `false`
    routes to the network ACL fallback so the playbook still completes
    when the EDR is unavailable.
-5. `endpoint isolation — EDR isolate` (`set`) — preferred isolation
+5. `endpoint isolation — EDR isolate` (`code`) — preferred isolation
    path.
-6. `endpoint isolation — network ACL deny (fallback)` (`set`) —
+6. `endpoint isolation — network ACL deny (fallback)` (`code`) —
    fallback isolation path.
 7. Both isolation branches converge on the linear chain:
-   `identity revocation` (`set`) → `backup verification` (`set`) →
-   `comms plan` (`set`) → `ransomware-end` (`noOp`).
+   `identity revocation` (`code`) → `backup verification` (`code`) →
+   `comms plan` (`code`) → `ransomware-end` (`noOp`).
 
-## CACAO contract surfaces on Set nodes
+## Primitive calls
 
-Every `action`-without-commands step in the CACAO source emits an n8n
-`set` node whose **assignments** carry the CACAO contract one row per
-field:
+Every action step binds a deterministic primitive through
+`x_secops_ng.core_body`, and emits an n8n `code` node that imports it
+and binds the step's output envelope to the call. The module prefix is
+`content.playbooks.ransomware_containment.primitives`:
 
-- `in.<name>` rows for each entry in the step's `in_args`.
-- `out.<name>` rows for each entry in the step's `out_args`.
-- `x_secops_ng.<key>` rows for each key under the step's
-  `x_secops_ng` block (`detection_refs`, `control_refs`,
-  `telemetry_refs`, `metric_refs`, and any KPI hooks).
-
-The values are left blank (or pre-seeded with the reference-id list,
-for `x_secops_ng` rows) so the integrator can wire them to expressions
-that pull from upstream nodes, n8n variables, or operator-bound
-connectors. Concretely on this playbook:
-
-| Set node | `in.` rows | `out.` rows | `x_secops_ng.` rows |
-|----------|------------|-------------|---------------------|
-| `triage signal` | `signal_id` | `affected_host`, `affected_identity`, `ransomware_confirmed`, `edr_available` | `detection_refs`, `telemetry_refs`, `metric_refs` |
-| `endpoint isolation — EDR isolate` | `affected_host` | — | `detection_refs`, `control_refs`, `telemetry_refs`, `metric_refs` |
-| `endpoint isolation — network ACL deny (fallback)` | `affected_host` | — | `control_refs`, `telemetry_refs`, `metric_refs` |
-| `identity revocation` | `affected_identity` | — | `detection_refs`, `control_refs`, `telemetry_refs`, `metric_refs` |
-| `backup verification` | — | `latest_known_good_snapshot`, `snapshot_integrity_ok` | `detection_refs`, `control_refs`, `telemetry_refs`, `metric_refs` |
-| `comms plan` | `affected_host`, `affected_identity`, `latest_known_good_snapshot`, `snapshot_integrity_ok` | — | `control_refs`, `telemetry_refs`, `metric_refs` |
+| Code node | Primitive | Reads | Writes |
+|-----------|-----------|-------|--------|
+| `triage signal` | `triage.triage_ransomware_signal` | `__hydrated_signal__`, `__edr_status__`, `__analyst_verdict__` | `__triage_record__` |
+| `endpoint isolation — EDR isolate` | `isolation.compose_edr_isolation` | `__triage_record__`, `__authorisation_policy__`, `__requested_at__` | `__edr_isolation_directive__` |
+| `endpoint isolation — network ACL deny (fallback)` | `isolation.compose_network_isolation` | `__triage_record__`, `__authorisation_policy__`, `__chokepoint_ref__`, `__requested_at__` | `__network_isolation_directive__` |
+| `identity revocation` | `identity.compose_identity_revocation` | `__triage_record__`, `__idp_capabilities__`, `__protected_identities__`, `__requested_at__` | `__identity_revocation_directive__` |
+| `backup verification` | `backup.select_known_good_snapshot` | `__snapshots__`, `__backup_catalogue__`, `__compromise_window_start__` | `__backup_selection__` |
+| `comms plan` | `comms.compose_comms_plan` | `__triage_record__`, `__backup_selection__`, `__comms_channels__`, `__drafted_at__` | `__comms_plan__` |
 
 The two `if-condition` nodes (`ransomware confirmed?`,
 `EDR available?`) emit n8n `if` nodes whose conditions read
-`__ransomware_confirmed__` and `__edr_available__`, the variables the
-triage step sets. The remaining lossy translations — one per unbound
-action — are recorded in `meta.secops_ng_notes` so the integrator
-sees exactly which seams need attention.
+`__ransomware_confirmed__` and `__edr_available__`, fields extracted
+from `__triage_record__` at the adapter seam. With every step bound and
+both conditions machine-readable, `meta.secops_ng_notes` records no
+lossy translations.
 
 ## Mirroring policy
 
@@ -130,7 +119,8 @@ for every worked example in this directory:
 | CACAO step type    | n8n node type                        |
 |--------------------|--------------------------------------|
 | `start`            | `n8n-nodes-base.manualTrigger`       |
-| `action` (no commands) | `n8n-nodes-base.set` (CACAO I/O contract as assignments) |
+| `action` (bound)   | `n8n-nodes-base.code` (imports and calls `core_body`) |
+| `action` (unbound) | `n8n-nodes-base.set` (CACAO I/O contract as assignments) |
 | `if-condition`     | `n8n-nodes-base.if`                  |
 | `switch-condition` | `n8n-nodes-base.switch`              |
 | `end`              | `n8n-nodes-base.noOp`                |
@@ -142,22 +132,23 @@ becomes n8n `connections` edges.
 
 ## What this example deliberately doesn't do
 
-- It does not execute the workflow. The Set nodes carry the CACAO I/O
-  contract but the right-hand values are blank — the integrator wires
-  them to their own EDR, IdP, backup, ticketing, comms, and reporting
-  endpoints.
+- It does not execute the workflow. The Code nodes call the
+  primitives, but the inputs they read come from adapters the
+  integrator wires to their own EDR, IdP, backup, paging, and reporting
+  endpoints, and the directives they emit are executed there.
 - It does not ship operator credentials, secrets, or environment-
   specific endpoints. Secrets stay with the operator.
-- It does not encode confirmation thresholds, isolation-fallback
-  decision rules, or the NIS2 Article 23 24-hour early-warning report
-  wording — these are intent-bearing values the operator sets when
-  binding the workflow to their environment.
+- It does not encode the operator's policy: which hosts and principals
+  are protected, whether isolation is automatic, which channels page
+  whom. Those arrive as adapter inputs. The confirmation rule and the
+  24-hour early-warning clock are fixed in the primitives and pinned by
+  their tests.
 - It does not ship Sigma detection rules (shadow-copy deletion,
   ransomware file rename, overpass-the-hash, etc.). Those are
   referenced from the canonical playbook's `external_references` and
-  live upstream at SigmaHQ; the emitter only surfaces the rule
-  references on the `x_secops_ng.detection_refs` assignment row of the
-  step that acts on a Sigma hit.
+  live upstream at SigmaHQ. The per-step `detection_refs` stay on the
+  canonical playbook; a bound step's Code node carries the primitive
+  call, not the reference bundles.
 
 ## Sovereignty note
 

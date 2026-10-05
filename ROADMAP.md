@@ -2362,6 +2362,20 @@ one playbook's provenance.
     principal is contained on one uncleared detection, and persistence
     created inside the compromise window without a change record is
     removed).
+  - CORE-PRIM — #1033 (`dora_major_incident_reporting`: primitives for
+    all five action steps, from none; classification encodes the
+    Art. 8(1) combination rule of Delegated Regulation (EU) 2024/1772,
+    including recurring-incident aggregation, and the initial,
+    intermediate and final reports chain through one renderer, each
+    carrying its own deadline).
+  - CORE-WIRE + GRADUATE — #1037, closing #1022 (`ransomware_containment`:
+    all six action steps bound through `core_body`, each carrying its
+    `secops-ng-primitive` command in place of the manual one; the two
+    gate booleans are extracted from the triage envelope, and the
+    compromise-window start is an adapter input because triage sees
+    indicator names but not their timestamps; three targets
+    regenerated; `experimental` → `stable`, `content_version` 1.0.0 on
+    a recomputed checklist).
 
 ### F-WF-CORE-WAVE-2 — CORE wave 2: bind the remaining worthy playbooks; record the parked five
 

@@ -17,43 +17,157 @@
               "name": "__signal_id__",
               "type": "string",
               "value": "",
-              "description": "Identifier of the originating detection signal (EDR alert, Sigma match, or SOC-raised ticket)."
+              "description": "Identifier of the originating detection signal (EDR alert, Sigma match, or SOC-raised ticket). The hydration adapter assembles __hydrated_signal__ for it."
+            },
+            {
+              "name": "__hydrated_signal__",
+              "type": "object",
+              "value": "",
+              "description": "The signal the hydration adapter assembled for __signal_id__: exactly signal_id, source (edr, sigma or soc_ticket), detected_at (Zulu), host_ref, identity_ref (a reference, or null) and indicators (names from the triage vocabulary; an unknown name fails loud)."
+            },
+            {
+              "name": "__edr_status__",
+              "type": "object",
+              "value": "",
+              "description": "What the EDR adapter reports for the affected host: exactly agent_reachable and isolate_capable, both real booleans. EDR is available only when both hold."
+            },
+            {
+              "name": "__analyst_verdict__",
+              "type": "string",
+              "value": "",
+              "description": "An analyst ruling when one exists: confirmed or benign. It decides over the evidence rule, and a disagreement is recorded as an override. Empty when no analyst has ruled (the n8n trigger supplies an empty string for an unset variable)."
+            },
+            {
+              "name": "__authorisation_policy__",
+              "type": "object",
+              "value": "",
+              "description": "The operator's isolation policy: exactly auto_isolate (a real boolean) and protected_hosts (host references that always wait for approval)."
+            },
+            {
+              "name": "__requested_at__",
+              "type": "string",
+              "value": "",
+              "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the containment directives are requested at; the isolation and identity steps stamp it."
+            },
+            {
+              "name": "__chokepoint_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Reference of the network chokepoint (firewall, switchport or SDN policy) the fallback deny-all is applied at."
+            },
+            {
+              "name": "__idp_capabilities__",
+              "type": "object",
+              "value": "",
+              "description": "What the operator's IdP can revoke: exactly token_revocation and kerberos, real booleans. Anything it cannot revoke is listed as unsupported rather than claimed."
+            },
+            {
+              "name": "__protected_identities__",
+              "type": "string",
+              "value": "",
+              "description": "Principals that are never disabled automatically. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it."
+            },
+            {
+              "name": "__snapshots__",
+              "type": "string",
+              "value": "",
+              "description": "Snapshots the backup platform listed, each exactly snapshot_id, taken_at (Zulu) and sha256 (the observed digest). CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it."
+            },
+            {
+              "name": "__backup_catalogue__",
+              "type": "object",
+              "value": "",
+              "description": "The backup catalogue's recorded SHA-256 digest per snapshot_id."
+            },
+            {
+              "name": "__compromise_window_start__",
+              "type": "string",
+              "value": "",
+              "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the compromise window opens: the earliest indicator, not detection, because dwell time precedes detection. An adapter input, because triage sees indicator names but not their timestamps; the hydration or forensic-timeline adapter that has them supplies it."
+            },
+            {
+              "name": "__comms_channels__",
+              "type": "object",
+              "value": "",
+              "description": "The operator's pre-bound paging channels: exactly ir_lead and comms_officer channel references."
+            },
+            {
+              "name": "__drafted_at__",
+              "type": "string",
+              "value": "",
+              "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the early-warning draft is prepared; a time before detection is inconsistent input and fails loud."
             },
             {
               "name": "__affected_host__",
               "type": "string",
               "value": "",
-              "description": "Host identifier (hostname or asset id) implicated by the signal; consumed by isolation."
+              "description": "Host reference implicated by the signal. Extracted at the compile target's adapter seam from __triage_record__.host_ref."
             },
             {
               "name": "__affected_identity__",
               "type": "string",
               "value": "",
-              "description": "Identity principal (user or service account) implicated by the signal; consumed by identity revocation."
+              "description": "Identity principal (user or service account) implicated by the signal, or null when none is (encryption running as SYSTEM, say). Extracted at the compile target's adapter seam from __triage_record__.identity_ref."
             },
             {
               "name": "__ransomware_confirmed__",
               "type": "boolean",
               "value": "",
-              "description": "Whether triage promoted the signal to a confirmed ransomware event. False routes to close-out without containment."
+              "description": "Whether triage confirmed a ransomware event; false routes to close-out without containment. Extracted at the compile target's adapter seam from __triage_record__.ransomware_confirmed. A real boolean: the gate compares it to true, and the string 'false' is truthy in most runtimes."
             },
             {
               "name": "__edr_available__",
               "type": "boolean",
               "value": "",
-              "description": "Whether the EDR agent on the affected host is reachable and capable of issuing an isolate action. False triggers the network-ACL fallback."
+              "description": "Whether the EDR agent on the affected host is reachable and able to isolate; false takes the network fallback. Extracted at the compile target's adapter seam from __triage_record__.edr_available. A real boolean, for the same reason as __ransomware_confirmed__."
             },
             {
               "name": "__latest_known_good_snapshot__",
               "type": "string",
               "value": "",
-              "description": "Identifier of the most recent backup snapshot that pre-dates the event window. Produced by the backup-verification step."
+              "description": "Identifier of the newest snapshot taken before the compromise window whose digest matches the catalogue, or null when none qualifies. Extracted at the compile target's adapter seam from __backup_selection__.latest_known_good_snapshot."
             },
             {
               "name": "__snapshot_integrity_ok__",
               "type": "boolean",
               "value": "",
-              "description": "Whether the located snapshot's integrity hash matches the value recorded in the backup catalogue."
+              "description": "Whether a known-good snapshot was found. Extracted at the compile target's adapter seam from __backup_selection__.snapshot_integrity_ok."
+            },
+            {
+              "name": "__triage_record__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the triage step emits: the sorted indicators, ransomware_confirmed and edr_available as real booleans, confirmation_basis, and overridden_by_analyst."
+            },
+            {
+              "name": "__edr_isolation_directive__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the EDR isolation step emits: the isolate directive that keeps the EDR management channel open, and whether it waits for approval."
+            },
+            {
+              "name": "__network_isolation_directive__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the network fallback step emits: the deny-all directive at the chokepoint, and whether it waits for approval."
+            },
+            {
+              "name": "__identity_revocation_directive__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the identity step emits: the revocation actions, what the IdP cannot revoke, and whether a protected principal waits for approval."
+            },
+            {
+              "name": "__backup_selection__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the backup step emits: the selected snapshot, the rejected newer candidates with their reasons, the count inside the compromise window, and restored: false."
+            },
+            {
+              "name": "__comms_plan__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the comms step emits: the two notifications and the NIS2 Art. 23(4)(a) early warning, staged for human sign-off and never auto-sent."
             }
           ]
         }
@@ -64,68 +178,17 @@
     {
       "id": "action--30000000-0000-4000-8000-000000000002",
       "name": "triage signal",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         500,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.signal_id",
-              "name": "in.signal_id",
-              "value": "={{$workflow.variables.signal_id}}",
-              "type": "string"
-            },
-            {
-              "id": "out.affected_host",
-              "name": "out.affected_host",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "out.affected_identity",
-              "name": "out.affected_identity",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "out.ransomware_confirmed",
-              "name": "out.ransomware_confirmed",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "out.edr_available",
-              "name": "out.edr_available",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.detection_refs",
-              "name": "x_secops_ng.detection_refs",
-              "value": "detection.sigma.shadow_copies_deletion@v1, detection.sigma.shadow_copy_deletion_wmi_powershell@v1, detection.sigma.ransomware_file_extension_rename@v1, detection.sigma.wbadmin_backup_deletion@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.process_activity@v1, telemetry.ocsf.file_activity@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.mttd_ransomware@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.ransomware_containment.primitives.triage import triage_ransomware_signal\n__triage_record__ = triage_ransomware_signal(signal=__hydrated_signal__, edr_status=__edr_status__, analyst_verdict=__analyst_verdict__)"
       },
-      "notes": "Receive the originating detection signal and hydrate it with host, identity, and process context. Decide whether the signal is a confirmed ransomware event or a benign / out-of-scope alert. Produces __affected_host__, __affected_identity__, and __ransomware_confirmed__.",
+      "notes": "Decide whether the hydrated signal confirms ransomware, by an explicit evidence rule: a decisive artifact, mass file-extension rename with a corroborating indicator, or shadow copies and the backup catalogue deleted together. An analyst verdict decides when present, and a disagreement is recorded as an override. Also decides whether EDR can isolate. Produces __triage_record__, from which __affected_host__, __affected_identity__, __ransomware_confirmed__ and __edr_available__ are extracted.",
       "notesInFlow": true
     },
     {
@@ -199,258 +262,81 @@
     {
       "id": "action--30000000-0000-4000-8000-000000000005",
       "name": "endpoint isolation \u2014 EDR isolate",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1280,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.affected_host",
-              "name": "in.affected_host",
-              "value": "={{$workflow.variables.affected_host}}",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.detection_refs",
-              "name": "x_secops_ng.detection_refs",
-              "value": "detection.sigma.shadow_copies_deletion@v1, detection.sigma.ransomware_file_extension_rename@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.endpoint_isolation@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.process_activity@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.mttr_containment@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.ransomware_containment.primitives.isolation import compose_edr_isolation\n__edr_isolation_directive__ = compose_edr_isolation(triage=__triage_record__, authorisation_policy=__authorisation_policy__, requested_at=__requested_at__)"
       },
-      "notes": "Issue the EDR-vendor isolate action against __affected_host__ via the operator's pre-bound EDR agent. Bounded by the operator-supplied authorisation policy. Primary path.",
+      "notes": "Compose the EDR isolate directive for __affected_host__: cut the host off everywhere except the EDR management channel, so responders can keep investigating it. Re-checks both gates behind it; a protected host, or a policy without auto-isolation, waits for approval. Primary path. Produces __edr_isolation_directive__.",
       "notesInFlow": true
     },
     {
       "id": "action--30000000-0000-4000-8000-000000000006",
       "name": "endpoint isolation \u2014 network ACL deny (fallback)",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1540,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.affected_host",
-              "name": "in.affected_host",
-              "value": "={{$workflow.variables.affected_host}}",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.network_egress_filtering@v1, control.endpoint_isolation@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.network_activity@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.mttr_containment@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.ransomware_containment.primitives.isolation import compose_network_isolation\n__network_isolation_directive__ = compose_network_isolation(triage=__triage_record__, authorisation_policy=__authorisation_policy__, chokepoint_ref=__chokepoint_ref__, requested_at=__requested_at__)"
       },
-      "notes": "EDR fallback: deny all ingress/egress for __affected_host__ at the operator's network chokepoint (firewall rule, switchport disable, or SDN policy). Used when the EDR agent is unreachable or absent.",
+      "notes": "EDR fallback: compose a deny-all directive for __affected_host__ at __chokepoint_ref__, ingress and egress (firewall rule, switchport disable, or SDN policy). Used when the EDR agent is unreachable or cannot isolate. Re-checks both gates behind it and applies the same approval policy. Produces __network_isolation_directive__.",
       "notesInFlow": true
     },
     {
       "id": "action--30000000-0000-4000-8000-000000000007",
       "name": "identity revocation",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1800,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.affected_identity",
-              "name": "in.affected_identity",
-              "value": "={{$workflow.variables.affected_identity}}",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.detection_refs",
-              "name": "x_secops_ng.detection_refs",
-              "value": "detection.sigma.overpass_the_hash@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.identity_revocation@v1, control.session_token_revocation@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.authentication@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.mttr_containment@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.ransomware_containment.primitives.identity import compose_identity_revocation\n__identity_revocation_directive__ = compose_identity_revocation(triage=__triage_record__, idp_capabilities=__idp_capabilities__, protected_identities=__protected_identities__, requested_at=__requested_at__)"
       },
-      "notes": "Disable the implicated user account, revoke active sessions, and invalidate refresh/access tokens at the operator's IdP. Includes Kerberos TGT invalidation where supported. Targets __affected_identity__.",
+      "notes": "Compose the revocation directive for __affected_identity__: disable the account and revoke its sessions, plus token revocation and Kerberos ticket invalidation where the IdP supports them; what it cannot revoke is listed, not claimed. A protected principal waits for approval; with no principal implicated the directive is empty. Produces __identity_revocation_directive__.",
       "notesInFlow": true
     },
     {
       "id": "action--30000000-0000-4000-8000-000000000008",
       "name": "backup verification",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         2060,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "out.latest_known_good_snapshot",
-              "name": "out.latest_known_good_snapshot",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "out.snapshot_integrity_ok",
-              "name": "out.snapshot_integrity_ok",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.detection_refs",
-              "name": "x_secops_ng.detection_refs",
-              "value": "detection.sigma.wbadmin_backup_deletion@v1, detection.sigma.shadow_copies_deletion@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.backup_integrity_verification@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.file_activity@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.backup_integrity_pass_rate@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.ransomware_containment.primitives.backup import select_known_good_snapshot\n__backup_selection__ = select_known_good_snapshot(snapshots=__snapshots__, catalogue=__backup_catalogue__, compromise_window_start=__compromise_window_start__)"
       },
-      "notes": "Locate the most recent known-good backup snapshot that pre-dates the event window and verify its integrity hash against the backup-catalogue record. Produces __latest_known_good_snapshot__ and __snapshot_integrity_ok__. Does NOT restore \u2014 restore is a separate, out-of-scope recovery playbook.",
+      "notes": "Select the newest snapshot taken before __compromise_window_start__ whose digest matches the backup-catalogue record, listing the newer candidates it rejected and why. Produces __backup_selection__, from which __latest_known_good_snapshot__ and __snapshot_integrity_ok__ are extracted. Does NOT restore; restore is a separate, out-of-scope recovery playbook.",
       "notesInFlow": true
     },
     {
       "id": "action--30000000-0000-4000-8000-000000000009",
       "name": "comms plan",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         2320,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.affected_host",
-              "name": "in.affected_host",
-              "value": "={{$workflow.variables.affected_host}}",
-              "type": "string"
-            },
-            {
-              "id": "in.affected_identity",
-              "name": "in.affected_identity",
-              "value": "={{$workflow.variables.affected_identity}}",
-              "type": "string"
-            },
-            {
-              "id": "in.latest_known_good_snapshot",
-              "name": "in.latest_known_good_snapshot",
-              "value": "={{$workflow.variables.latest_known_good_snapshot}}",
-              "type": "string"
-            },
-            {
-              "id": "in.snapshot_integrity_ok",
-              "name": "in.snapshot_integrity_ok",
-              "value": "={{$workflow.variables.snapshot_integrity_ok}}",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.incident_notification@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.incident_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.notification_sla_compliance@v1, kpi.timeline_completeness@v1, kri.regulator_notification_overrun@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.ransomware_containment.primitives.comms import compose_comms_plan\n__comms_plan__ = compose_comms_plan(triage=__triage_record__, backup_selection=__backup_selection__, channels=__comms_channels__, drafted_at=__drafted_at__)"
       },
-      "notes": "Notify the IR lead and comms officer along the operator's pre-bound channels, and draft the regulator early-warning pre-notification per NIS2 Article 23 within the 24-hour clock from initial detection. The drafted notification is staged for human sign-off, not auto-sent. Because this step is the handoff point that closes the incident timeline and trips the statutory reporting clocks, it stamps the timeline-completeness KPI alongside the notification-SLA KPI and the regulator-notification-overrun KRI.",
+      "notes": "Compose the notifications to the IR lead and comms officer along __comms_channels__, and stage the regulator early warning per NIS2 Article 23(4)(a), due 24 hours from detection, for human sign-off; it is never auto-sent. Because this step is the handoff point that closes the incident timeline and trips the statutory reporting clocks, it stamps the timeline-completeness KPI alongside the notification-SLA KPI and the regulator-notification-overrun KRI. Produces __comms_plan__.",
       "notesInFlow": true
     },
     {
@@ -600,17 +486,10 @@
   "meta": {
     "secops_ng": {
       "stable_id": "playbook.ransomware_containment@v1",
-      "content_version": "0.1.0",
-      "maturity": "experimental",
+      "content_version": "1.0.0",
+      "maturity": "stable",
       "source_playbook_id": "playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8"
     },
-    "secops_ng_notes": [
-      "step 'action--30000000-0000-4000-8000-000000000002': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n.",
-      "step 'action--30000000-0000-4000-8000-000000000005': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n.",
-      "step 'action--30000000-0000-4000-8000-000000000006': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n.",
-      "step 'action--30000000-0000-4000-8000-000000000007': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n.",
-      "step 'action--30000000-0000-4000-8000-000000000008': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n.",
-      "step 'action--30000000-0000-4000-8000-000000000009': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n."
-    ]
+    "secops_ng_notes": []
   }
 }

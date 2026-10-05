@@ -3,11 +3,14 @@
 Worked example: the `playbook.ransomware_containment@v1` CACAO v2
 playbook compiled by the Temporal reference compiler. Operators who
 already run Temporal can import `workflow.temporal.py` into their
-worker module to see the topology the emitter produces; binding the
-activity bodies to real connectors (EDR isolation API, network ACL /
-SDN fallback, IdP session and token revocation, backup-verification
-system, ticketing / paging, and the NIS2 Article 23 24-hour
-early-warning reporting channel) is the operator's job.
+worker module to see the topology the emitter produces. Each of the
+six activity bodies imports and calls its bound primitive. Sequencing
+the activities through the two gates (the workflow's `run` method still
+raises `NotImplementedError`, as it does for every playbook) and binding
+the inputs the primitives read to real connectors (EDR status and
+isolation API, network ACL / SDN fallback, IdP session and token
+revocation, backup platform and catalogue, paging, and the NIS2
+Article 23 24-hour early-warning staging path) is the operator's job.
 
 ## Source
 
