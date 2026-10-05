@@ -11,12 +11,12 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 - **SecOps-NG data moves into CACAO 2.0 extension slots.** Every
   canonical playbook, and the `_template`, now declares the SecOps-NG
   extension in `extension_definitions` and carries its SecOps-NG payload
-  under that id in `playbook_extensions` and each step's `step_extensions`,
-  instead of under a private `x_secops_ng` key. CACAO tooling keeps
-  extension data and discards unknown keys — CACAO Roaster drops
-  `x_secops_ng` on import — so this is what lets the bindings survive a
-  round trip through standard CACAO tools. The payload is unchanged; only
-  its location moved, and every compiled artifact is byte-identical (only
+  under that id in `playbook_extensions` and each step's `step_extensions`
+  (the slots CACAO defines for such data) instead of under a private
+  `x_secops_ng` key. This does not make the bindings survive CACAO
+  Roaster: a live check found that its export drops extension data it does
+  not define as well, so Roaster stays a viewer, not an editor (#1035).
+  The payload is unchanged; only its location moved, and every compiled artifact is byte-identical (only
   the CACAO mirrors change). All 49 documents now pass the official schema
   with zero errors under the strict 2020-12 reading too, and the
   conformance ratchet gates on that reading; the Draft-07 reading must stay
