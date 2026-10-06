@@ -2376,6 +2376,15 @@ one playbook's provenance.
     indicator names but not their timestamps; three targets
     regenerated; `experimental` → `stable`, `content_version` 1.0.0 on
     a recomputed checklist).
+  - CORE-WIRE + GRADUATE — #1042, closing #1026 (`identity_compromise`:
+    all five action steps bound through `core_body`, each carrying its
+    `secops-ng-primitive` command in place of the manual one; the gate
+    boolean and the two containment counts are extracted from their
+    step envelopes, and the compromise-window start is an adapter input
+    because triage sees detections but not when the compromise began;
+    three targets regenerated; promoted `draft` → `stable`,
+    `content_version` 1.0.0 on a recomputed checklist, leaving the
+    catalogue with no draft).
 
 ### F-WF-CORE-WAVE-2 — CORE wave 2: bind the remaining worthy playbooks; record the parked five
 
