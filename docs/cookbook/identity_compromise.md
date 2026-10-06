@@ -148,12 +148,12 @@ lateral-movement hunt → IAM audit) exactly once. Per-case metric
 accounting into the MTTD / MTTC / lateral-hunt-coverage catalogue
 entries is unambiguous.
 
-> The playbook maturity is `experimental` on the workflow-local
-> content marker. The overlay pins the control, detection, telemetry,
-> and metric surface; the n8n reference emitter ships a committed
-> `workflow.n8n.json` today, and the Temporal / LangGraph siblings
-> ship deterministic emitter output with `NotImplementedError`
-> activity / tool bodies pending the per-target CORE cards.
+> The playbook maturity is `stable` (`content_version` 1.0.0), promoted
+> from `draft` at the wire. Every action step binds a deterministic
+> primitive under `content/playbooks/identity_compromise/primitives/`,
+> and all three reference emitters compile those bindings into
+> primitive calls. The IdP, MFA, tenant, hunt and IAM adapters around
+> them stay operator-bound.
 > Cross-target byte-parity goldens live under
 > `tests/examples/identity_compromise/`.
 
@@ -414,36 +414,43 @@ though the emission itself lives downstream.
 
 ## 5. Per-target hand-off
 
-### 5.1 n8n — operator-edited Set rows over the identity-compromise topology
+### 5.1 n8n — primitive calls over the identity-compromise topology
 
 `examples/n8n/identity_compromise/workflow.n8n.json` carries the
-CACAO topology as nine n8n nodes (`manualTrigger`, five `set` nodes,
-one `if`, two `noOp` terminals), with node ids preserving the CACAO
-step ids verbatim. The five action steps emit `n8n-nodes-base.set`
-nodes carrying the CACAO I/O contract as editable assignment rows
-plus the `x_secops_ng` reference bundles (detection, control,
-telemetry, metric). The `if-condition` node (`compromise confirmed?`)
-emits an `n8n-nodes-base.if` whose condition reads
-`__compromise_confirmed__`, the variable the triage step sets
-(surfaced on its Set node as `out.compromise_confirmed`). The
-remaining lossy translations — one per unbound action — are recorded in `meta.secops_ng_notes` so the
-integrator sees exactly which seams need attention.
+CACAO topology as ten n8n nodes (`manualTrigger`, five `code` nodes,
+one `if`, two `noOp` terminals, and the playbook card as a sticky
+note), with node ids preserving the CACAO step ids verbatim. Each of
+the five action steps emits an `n8n-nodes-base.code` node that
+imports its primitive and binds the step's output envelope to the
+call — `triage_identity_signal`, `compose_mfa_reset`,
+`compose_session_revocation`, `summarise_lateral_hunt` and
+`plan_persistence_removal`. The `if-condition` node (`compromise
+confirmed?`) emits an `n8n-nodes-base.if` whose condition reads
+`__compromise_confirmed__`, extracted from the triage step's
+`__triage_record__` envelope. With every step bound and the condition
+machine-readable, the workflow records no lossy translations in
+`meta.secops_ng_notes`.
 
-Operators bind the Set rows to their connectors:
+Operators bind the adapters that feed each primitive's inputs:
 
 - `triage identity signal` → the operator's IdP / identity-protection
-  layer's signal-fetch and sign-in-history APIs against the principal
-  identifier; writes `__compromise_confirmed__`.
-- `reset MFA factors` → the operator's MFA-provider surface (TOTP /
-  WebAuthn revoke + re-enrol; app-password invalidation).
-- `revoke active sessions` → the operator's IdP session-invalidation
-  API and downstream SaaS session-revocation surface.
-- `lateral-movement hunt` → the operator's API-audit source
-  (CloudTrail / Azure Activity Log / GCP Audit Logs), IdP sign-in
-  logs, and OAuth-grant catalogue.
+  layer and the hydration that assembles `__hydrated_signal__` and
+  `__principal_context__` for the principal, plus the benign-pattern
+  list (`__benign_patterns__`); an analyst ruling, when one exists,
+  arrives as `__analyst_verdict__`.
+- `reset MFA factors` → the operator's MFA-provider surface
+  (`__registered_factors__`; TOTP / WebAuthn revoke and re-enrol,
+  app-password invalidation).
+- `revoke active sessions` → the IdP and SaaS tenant adapters that
+  return `__live_sessions__`, and the inventory of
+  `__reachable_tenants__` and `__enumerated_tenants__`.
+- `lateral-movement hunt` → the operator's API-audit sources
+  (CloudTrail / Azure Activity Log / GCP Audit Logs), IdP sign-in logs
+  and OAuth-grant catalogue, which return `__hunt_findings__` and
+  `__hunted_surfaces__` over `__lookback_hours__`.
 - `IAM audit and persistence removal` → the operator's IAM control
-  plane (role / policy / third-party-app-grant / conditional-access-
-  exception surface).
+  plane (`__iam_items__`), plus the sign-in history or forensic
+  timeline that supplies `__compromise_window_start__`.
 
 To regenerate the compiled workflow artifact from the repo root:
 
@@ -454,22 +461,20 @@ To regenerate the compiled workflow artifact from the repo root:
 To import into an n8n instance: open the workflows list, choose
 **Import from File**, and select
 `examples/n8n/identity_compromise/workflow.n8n.json`. The workflow
-is inactive by default — review and bind the Set rows to your own
-connectors before activating. The emitted workflow is a *snapshot of
+is inactive by default — review and bind the adapter inputs to your
+own connectors before activating. The emitted workflow is a *snapshot of
 intent*, not a runnable playbook.
 
-### 5.2 Temporal — `@activity.defn` bodies (SKELETON stub)
+### 5.2 Temporal — `@activity.defn` bodies calling the primitives
 
 `examples/temporal/identity_compromise/workflow.temporal.py` is a
 standard Temporal worker module: one `@workflow.defn` class and one
-`@activity.defn` function per CACAO action, with the five action
-activities documenting their operator-bound seam (triage / MFA reset
-/ session revocation / hunt / IAM audit). The committed stub raises
-`NotImplementedError` in the activity bodies pending the CORE-
-TEMPORAL sibling card that wires the deterministic activity
-implementations into the Temporal target; operators can drop the
-module next to their worker today to see the topology and the
-activity signatures.
+`@activity.defn` function per CACAO action. Each of the five activity
+bodies imports and calls its bound primitive. The workflow's `run`
+method still raises `NotImplementedError`: the Temporal emitter does
+not lower CACAO control flow into workflow code for any playbook, so
+sequencing the activities through the confirmed-branch gate is the
+integrator's.
 
 Temporal is a natural fit for the identity-compromise discipline:
 each case becomes one workflow run; the confirmed-branch gate
@@ -477,10 +482,10 @@ becomes a Temporal conditional; retries against transient failures
 on the IdP / MFA provider / SaaS session API / API-audit source get
 first-class Temporal semantics (activity retry policy per seam);
 replay against the same Temporal event history re-derives the same
-containment record and the same IAM-audit residue once the activity
-bodies are wired.
+containment record and the same IAM-audit residue, because every
+activity body is a pure primitive call.
 
-### 5.3 LangGraph — `@tool` wrappers + agentic-extension hook (SKELETON stub)
+### 5.3 LangGraph — `@tool` wrappers calling the primitives + agentic-extension hook
 
 `examples/langgraph/identity_compromise/state_bindings.py` carries
 the `TypedDict` state and the `@tool`-decorated action wrappers.
@@ -489,11 +494,10 @@ conditional edge on `__compromise_confirmed__`, linear edges through
 the four containment steps to the terminal end, and the direct edge
 from the false-branch to the false-positive end); `assemble.py` is
 the hand-written reference assembly that wires the GraphSpec +
-bindings into a `langgraph.graph.StateGraph`. The committed
-`state_bindings.py` is a generated stub: each tool's docstring names
-the operator-bound seam it discharges and the body raises
-`NotImplementedError` until the CORE-LANGGRAPH sibling card wires
-the deterministic tool implementations into the LangGraph target.
+bindings into a `langgraph.graph.StateGraph`. Each generated tool
+body imports and calls its bound primitive; the only body that still
+raises `NotImplementedError` is the agentic-extension hook, which is a
+placeholder by design.
 
 LangGraph is the agentic target — an operator who wants to layer an
 LM-driven behavioural classifier on top of the `triage identity
@@ -512,10 +516,8 @@ All three reference targets are present in the tree today
 (`examples/n8n/identity_compromise/`,
 `examples/temporal/identity_compromise/`,
 `examples/langgraph/identity_compromise/`). The n8n target ships a
-committed workflow artifact; the Temporal and LangGraph targets
-ship deterministic emitter output with `NotImplementedError`
-activity / tool bodies pending the per-target CORE cards. Cross-
-target byte-parity goldens land under
+committed workflow artifact, and all three compile the same five
+primitive bindings. Cross-target byte-parity goldens live under
 `tests/examples/identity_compromise/` — the same cross-target byte-
 parity property the framework relies on for the rest of the
 playbook set.
@@ -523,8 +525,8 @@ playbook set.
 ## 6. Observability — OTel + AuditTrail in every target
 
 Every emitted action opens an OpenTelemetry span and appends an
-`AuditRecord` to a context-local `AuditTrail` *before* the operator-
-bound seam call or the (pending) primitive body. The mirror runs
+`AuditRecord` to a context-local `AuditTrail` *before* the primitive
+call. The mirror runs
 unconditionally, ahead of any OTLP exporter, so the audit property
 holds even when the operator has not configured a collector —
 typical for disconnected, sovereign, or air-gapped deployments.
@@ -681,9 +683,9 @@ it exercises is the operator's. The customisation seams:
 
 ## 10. Replay and audit story
 
-The byte-parity drift guards land with the CORE-TEMPORAL /
-CORE-LANGGRAPH sibling cards under
-`tests/examples/identity_compromise/`. Each per-target golden pins
+The byte-parity drift guards live under
+`tests/examples/identity_compromise/` and the per-target
+`tests/examples/{n8n,temporal,langgraph}/identity_compromise/`. Each per-target golden pins
 the committed worked-example artifact to a fresh emitter run from
 the canonical CACAO source; if the compiler or the playbook changes,
 regenerate via the per-target `regenerate.sh` and commit the diff

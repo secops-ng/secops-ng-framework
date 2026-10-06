@@ -10,7 +10,7 @@ SigmaHQ; the playbook references the rule IDs.
 
 Stable ID: `playbook.identity_compromise@v1`
 Compile targets: `n8n`, `temporal`, `langgraph`
-Maturity: `draft`
+Maturity: `stable`
 
 ## Contents
 
@@ -18,22 +18,28 @@ Maturity: `draft`
 - `mappings.yaml` — outbound overlay: Sigma, OSCAL, OCSF and regulatory
   references.
 - `primitives/` — the deterministic primitives the five action steps
-  bind at CORE-WIRE; see Status.
+  bind; see Status.
 
 The emitted artifacts ship under
 `examples/{n8n,temporal,langgraph}/identity_compromise/`, the
 practitioner walkthrough is `docs/cookbook/identity_compromise.md`, and
 the cross-layer worked example lives under
-`../../../content-model/examples/identity_compromise/`. The examples are
-regenerated from the canonical source, which is not yet bound, so the
-action bodies are still operator placeholders.
+`../../../content-model/examples/identity_compromise/`. Every action
+body calls its primitive: five n8n Code nodes, and Temporal activity
+and LangGraph tool bodies that import and call them. The Temporal
+target still leaves workflow control flow to the integrator, as it does
+for every playbook.
 
 ## Status
 
-`maturity: draft` — the catalogue's only one — with CORE-PRIM complete.
-Each of the five action steps has a deterministic primitive under
-`primitives/`, executed directly by
-`tests/playbooks/identity_compromise/test_primitives.py`:
+`maturity: stable`, `content_version` 1.0.0, promoted straight from
+`draft` — the catalogue's last one — as the F-WF-CORE-WAVE-1 card
+committed. All five action steps bind a deterministic primitive under
+`primitives/` through `x_secops_ng.core_body`, each executed directly by
+`tests/playbooks/identity_compromise/test_primitives.py`, and the three
+reference targets emit those calls. The graduation checklist recomputes
+green: tier A, 5 of 5 real bindings, zero placeholder bodies, zero blank
+predicates, zero schema errors, three-target goldens.
 
 | Step | Primitive |
 |---|---|
@@ -68,10 +74,30 @@ Decisions the primitives fix:
 - Every containment step re-checks the confirmed-branch gate, so a
   mis-wired branch fails loud.
 
-**Owed: the wire.** The CACAO steps do not yet carry
-`x_secops_ng.core_body`, so `catalog.py` reports 0 of 5 bound. The
-F-WF-CORE-WAVE-1 card commits to binding this playbook and promoting it
-out of `draft` on a recomputed checklist; that is the CORE-WIRE card.
+Contract choices settled at the wire. The contract grows from 5 to 24
+variables: 14 adapter inputs, one envelope per step, and three of the
+five existing names, now fields extracted from those envelopes at the
+adapter seam (`__principal_id__` and `__signal_id__` stay the trigger
+inputs).
+
+- **The gate reads an extracted field.** `__compromise_confirmed__`
+  comes from `__triage_record__` and stays a real boolean, because the
+  gate compares it to `true`. `__sessions_revoked_count__` and
+  `__lateral_findings_count__` come from the session and hunt
+  envelopes.
+- **The compromise window is an adapter input.**
+  `__compromise_window_start__` is when the compromise began, and the
+  window closes at detection. Triage sees detection names and the
+  detection time but not the start, so the sign-in history or
+  forensic-timeline adapter that has it supplies it.
+- **An unset analyst verdict is empty.** The n8n trigger surfaces an
+  unset variable as `""`, and triage treats it as no ruling. No other
+  input is optional.
+- **Lists ride as strings.** CACAO variables have no list type, so the
+  eight list inputs (benign patterns, registered factors, live
+  sessions, reachable and enumerated tenants, hunt findings, hunted
+  surfaces, IAM items) carry JSON-native lists that the target's
+  adapter seam marshals.
 
 ## Sources
 

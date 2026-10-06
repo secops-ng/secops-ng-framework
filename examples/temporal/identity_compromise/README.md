@@ -3,10 +3,14 @@
 Worked example: the `playbook.identity_compromise@v1` CACAO v2 playbook
 compiled by the Temporal reference compiler. Operators who already run
 Temporal can import `workflow.temporal.py` into their worker module to
-see the topology the emitter produces; binding the activity bodies to
-real connectors (identity-protection signal source, IdP MFA / session
-management API, SaaS session revocation, lateral-movement hunt query
-backend, IAM inventory / OAuth-grant audit) is the operator's job.
+see the topology the emitter produces. Each of the five activity
+bodies imports and calls its bound primitive. Sequencing the activities
+through the confirmed-branch gate (the workflow's `run` method still
+raises `NotImplementedError`, as it does for every playbook) and binding
+the inputs the primitives read to real connectors (identity-protection
+signal source, IdP MFA / session management API, SaaS tenant session
+inventories, lateral-movement hunt query backend, IAM inventory /
+OAuth-grant audit) is the operator's job.
 
 ## Source
 

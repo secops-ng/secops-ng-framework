@@ -11,7 +11,7 @@
   ],
   "created_by": "identity--5ec075c0-5ec0-475c-85ec-075c05ec075c",
   "created": "2026-05-29T00:00:00Z",
-  "modified": "2026-05-29T00:00:00Z",
+  "modified": "2026-10-06T00:00:00Z",
   "labels": [
     "identity_compromise",
     "account-takeover",
@@ -80,27 +80,122 @@
   "playbook_variables": {
     "__principal_id__": {
       "type": "string",
-      "description": "Identity provider subject of the suspected-compromised principal (user, service principal, or workload identity).",
+      "description": "Identity provider subject of the suspected-compromised principal (user, service principal, or workload identity). The trigger input; the hydration adapter assembles __hydrated_signal__ and __principal_context__ for it.",
       "external": true
     },
     "__signal_id__": {
       "type": "string",
-      "description": "Identifier of the originating identity-protection / sign-in signal (e.g. Azure AD Identity Protection risk event, Okta ThreatInsight finding).",
+      "description": "Identifier of the originating identity-protection / sign-in signal (an Azure AD Identity Protection risk event, an Okta ThreatInsight event, or a SOC-raised ticket).",
+      "external": true
+    },
+    "__hydrated_signal__": {
+      "type": "dictionary",
+      "description": "The signal the hydration adapter assembled for __signal_id__: exactly signal_id, source, detected_at (Zulu), principal_id and detections (names from the triage vocabulary; an unknown name fails loud).",
+      "external": true
+    },
+    "__principal_context__": {
+      "type": "dictionary",
+      "description": "What the IdP says about the principal: exactly principal_type (user, service principal or workload identity) and privileged (a real boolean). A privileged principal is contained on one uncleared detection.",
+      "external": true
+    },
+    "__benign_patterns__": {
+      "type": "string",
+      "description": "The operator's benign patterns, each exactly principal_id, kind (planned_travel or sanctioned_automation), valid_from and valid_until (Zulu). They clear impossible travel and nothing else. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__analyst_verdict__": {
+      "type": "string",
+      "description": "An analyst ruling when one exists: confirmed or benign. It decides over the rule, and a disagreement is recorded as an override. Empty when no analyst has ruled (the n8n trigger supplies an empty string for an unset variable).",
+      "external": true
+    },
+    "__registered_factors__": {
+      "type": "string",
+      "description": "The MFA factors the IdP lists for the principal, each exactly factor_id and kind. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__requested_at__": {
+      "type": "string",
+      "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the containment directives are requested at; the MFA and session steps stamp it.",
+      "external": true
+    },
+    "__live_sessions__": {
+      "type": "string",
+      "description": "The live sessions, refresh tokens and device grants the tenant adapters returned, each exactly session_ref, tenant_ref and kind. A session in a tenant that was not enumerated fails loud. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__reachable_tenants__": {
+      "type": "string",
+      "description": "The tenants the principal can reach. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__enumerated_tenants__": {
+      "type": "string",
+      "description": "The tenants whose adapters returned a session inventory; the difference from __reachable_tenants__ is reported as the coverage gap. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__hunt_findings__": {
+      "type": "string",
+      "description": "What the hunt queries found, each exactly surface, resource_ref and observed_at (Zulu). A finding on a surface that was not hunted fails loud. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__hunted_surfaces__": {
+      "type": "string",
+      "description": "The hunt surfaces whose queries actually ran. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__lookback_hours__": {
+      "type": "integer",
+      "description": "The operator's hunt lookback window, in hours before detection, as a positive integer.",
+      "external": true
+    },
+    "__iam_items__": {
+      "type": "string",
+      "description": "The principal's IAM surface, each exactly item_ref, kind, created_at (Zulu) and change_ref (the authorising change record, or null). CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__compromise_window_start__": {
+      "type": "string",
+      "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the compromise window opens; it closes at detection. An adapter input, because triage sees detection names and the detection time but not when the compromise began; the sign-in history or forensic-timeline adapter that has it supplies it. A start after detection fails loud.",
       "external": true
     },
     "__compromise_confirmed__": {
       "type": "boolean",
-      "description": "Set by initial triage. False signals branch to a false-positive close-out path; true signals proceed to containment.",
+      "description": "Whether triage confirmed the compromise; false closes out as a false positive. Extracted at the compile target's adapter seam from __triage_record__.compromise_confirmed. A real boolean: the gate compares it to true, and the string 'false' is truthy in most runtimes.",
       "external": false
     },
     "__sessions_revoked_count__": {
       "type": "integer",
-      "description": "Number of active sessions revoked across IdP / SaaS tenants for the principal. Feeds the containment KPI.",
+      "description": "Number of distinct live sessions, refresh tokens and device grants revoked across the enumerated tenants. Feeds the containment KPI. Extracted at the compile target's adapter seam from __session_revocation_directive__.sessions_revoked_count.",
       "external": false
     },
     "__lateral_findings_count__": {
       "type": "integer",
-      "description": "Distinct downstream resources or principals the compromised identity touched within the hunt window.",
+      "description": "Distinct downstream resources the principal touched inside the hunt window. Extracted at the compile target's adapter seam from __hunt_summary__.lateral_findings_count.",
+      "external": false
+    },
+    "__triage_record__": {
+      "type": "dictionary",
+      "description": "Envelope the triage step emits: the principal type and privilege, the detections and those a benign pattern cleared, compromise_confirmed as a real boolean with its basis, and overridden_by_analyst.",
+      "external": false
+    },
+    "__mfa_reset_directive__": {
+      "type": "dictionary",
+      "description": "Envelope the MFA step emits: the factors before and after, one action per factor, and the re-enrolment requirement; not applicable to principals that cannot hold factors.",
+      "external": false
+    },
+    "__session_revocation_directive__": {
+      "type": "dictionary",
+      "description": "Envelope the session step emits: one revocation per distinct session, the counts by kind, and the tenants that could not be enumerated.",
+      "external": false
+    },
+    "__hunt_summary__": {
+      "type": "dictionary",
+      "description": "Envelope the hunt step emits: the window, the touched resources and their surfaces, findings outside the window, and hunt coverage as hunted and unhunted surfaces.",
+      "external": false
+    },
+    "__persistence_removal_plan__": {
+      "type": "dictionary",
+      "description": "Envelope the persistence step emits: each IAM item removed or kept, with the reason it was kept.",
       "external": false
     }
   },
@@ -120,20 +215,25 @@
     "action--30000000-0000-4000-8000-000000000002": {
       "type": "action",
       "name": "triage identity signal",
-      "description": "Hydrate the originating identity-protection signal with principal context (role, group memberships, recent sign-ins, conditional-access posture). Decide whether the signal warrants containment or is a known benign pattern (planned travel, sanctioned automation).",
+      "description": "Decide whether the hydrated identity signal confirms a compromise, by an explicit rule: a decisive detection (MFA bypass, MFA disabled, AssumeRole misuse), two corroborating detections, or any detection on a privileged principal. Benign patterns (planned travel, sanctioned automation) clear impossible travel and nothing else. An analyst verdict decides when present, and a disagreement is recorded as an override. Produces __triage_record__, from which __compromise_confirmed__ is extracted.",
       "on_completion": "if-condition--30000000-0000-4000-8000-000000000003",
       "in_args": [
         "__signal_id__",
-        "__principal_id__"
+        "__principal_id__",
+        "__hydrated_signal__",
+        "__principal_context__",
+        "__benign_patterns__",
+        "__analyst_verdict__"
       ],
       "out_args": [
+        "__triage_record__",
         "__compromise_confirmed__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "commands": [
         {
-          "type": "manual",
-          "command": "Hydrate the originating identity-protection signal with principal context (role, group memberships, recent sign-ins, conditional-access posture). Decide whether the signal warrants containment or is a known benign pattern (planned travel, sanctioned automation)."
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.identity_compromise.primitives.triage.triage_identity_signal"
         }
       ],
       "step_extensions": {
@@ -154,7 +254,17 @@
           ],
           "metric_refs": [
             "kpi.mttd_identity_compromise@v1"
-          ]
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.identity_compromise.primitives.triage.triage_identity_signal",
+            "in": {
+              "signal": "__hydrated_signal__",
+              "principal_context": "__principal_context__",
+              "benign_patterns": "__benign_patterns__",
+              "analyst_verdict": "__analyst_verdict__"
+            },
+            "out": "__triage_record__"
+          }
         }
       }
     },
@@ -169,16 +279,21 @@
     "action--30000000-0000-4000-8000-000000000004": {
       "type": "action",
       "name": "reset MFA factors",
-      "description": "Force re-enrollment of MFA factors for the principal: revoke existing TOTP / WebAuthn registrations, invalidate app passwords, and require step-up at next sign-in. Document factor list pre / post reset.",
+      "description": "Compose the factor reset for the principal: revoke every registered factor, invalidate app passwords, and require re-enrolment with step-up at the next sign-in, recording the factor list before and after. A service principal or workload identity holds no factors, so the reset is recorded as not applicable. Produces __mfa_reset_directive__.",
       "on_completion": "action--30000000-0000-4000-8000-000000000005",
       "in_args": [
-        "__principal_id__"
+        "__triage_record__",
+        "__registered_factors__",
+        "__requested_at__"
+      ],
+      "out_args": [
+        "__mfa_reset_directive__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "commands": [
         {
-          "type": "manual",
-          "command": "Force re-enrollment of MFA factors for the principal: revoke existing TOTP / WebAuthn registrations, invalidate app passwords, and require step-up at next sign-in. Document factor list pre / post reset."
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.identity_compromise.primitives.mfa.compose_mfa_reset"
         }
       ],
       "step_extensions": {
@@ -189,26 +304,40 @@
           ],
           "metric_refs": [
             "kpi.mttc_identity_compromise@v1"
-          ]
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.identity_compromise.primitives.mfa.compose_mfa_reset",
+            "in": {
+              "triage": "__triage_record__",
+              "registered_factors": "__registered_factors__",
+              "requested_at": "__requested_at__"
+            },
+            "out": "__mfa_reset_directive__"
+          }
         }
       }
     },
     "action--30000000-0000-4000-8000-000000000005": {
       "type": "action",
       "name": "revoke active sessions",
-      "description": "Revoke all live sessions, refresh tokens, and persistent device grants for the principal across the IdP and downstream SaaS tenants. Produces __sessions_revoked_count__ for the containment KPI.",
+      "description": "Compose the revocation of every live session, refresh token and persistent device grant the principal holds across the enumerated tenants, and report the reachable tenants that could not be enumerated as a coverage gap. Produces __session_revocation_directive__, from which __sessions_revoked_count__ is extracted for the containment KPI.",
       "on_completion": "action--30000000-0000-4000-8000-000000000006",
       "in_args": [
-        "__principal_id__"
+        "__triage_record__",
+        "__live_sessions__",
+        "__reachable_tenants__",
+        "__enumerated_tenants__",
+        "__requested_at__"
       ],
       "out_args": [
+        "__session_revocation_directive__",
         "__sessions_revoked_count__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "commands": [
         {
-          "type": "manual",
-          "command": "Revoke all live sessions, refresh tokens, and persistent device grants for the principal across the IdP and downstream SaaS tenants. Produces __sessions_revoked_count__ for the containment KPI."
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.identity_compromise.primitives.sessions.compose_session_revocation"
         }
       ],
       "step_extensions": {
@@ -222,26 +351,41 @@
           ],
           "metric_refs": [
             "kpi.mttc_identity_compromise@v1"
-          ]
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.identity_compromise.primitives.sessions.compose_session_revocation",
+            "in": {
+              "triage": "__triage_record__",
+              "live_sessions": "__live_sessions__",
+              "reachable_tenants": "__reachable_tenants__",
+              "enumerated_tenants": "__enumerated_tenants__",
+              "requested_at": "__requested_at__"
+            },
+            "out": "__session_revocation_directive__"
+          }
         }
       }
     },
     "action--30000000-0000-4000-8000-000000000006": {
       "type": "action",
       "name": "lateral-movement hunt",
-      "description": "Hunt for downstream activity attributable to the compromised principal within the configured lookback window: STS / AssumeRole chains, cross-tenant access, API-token reuse, OAuth-grant escalation, host logons. Produces __lateral_findings_count__.",
+      "description": "Summarise the downstream activity attributable to the principal inside the lookback window (STS / AssumeRole chains, cross-tenant access, API-token reuse, OAuth-grant escalation, host logons): the distinct resources touched, findings outside the window, and how much of the hunt surface was actually queried. Produces __hunt_summary__, from which __lateral_findings_count__ is extracted.",
       "on_completion": "action--30000000-0000-4000-8000-000000000007",
       "in_args": [
-        "__principal_id__"
+        "__triage_record__",
+        "__hunt_findings__",
+        "__hunted_surfaces__",
+        "__lookback_hours__"
       ],
       "out_args": [
+        "__hunt_summary__",
         "__lateral_findings_count__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "commands": [
         {
-          "type": "manual",
-          "command": "Hunt for downstream activity attributable to the compromised principal within the configured lookback window: STS / AssumeRole chains, cross-tenant access, API-token reuse, OAuth-grant escalation, host logons. Produces __lateral_findings_count__."
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.identity_compromise.primitives.hunt.summarise_lateral_hunt"
         }
       ],
       "step_extensions": {
@@ -259,23 +403,38 @@
           ],
           "metric_refs": [
             "kpi.lateral_hunt_coverage@v1"
-          ]
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.identity_compromise.primitives.hunt.summarise_lateral_hunt",
+            "in": {
+              "triage": "__triage_record__",
+              "hunt_findings": "__hunt_findings__",
+              "hunted_surfaces": "__hunted_surfaces__",
+              "lookback_hours": "__lookback_hours__"
+            },
+            "out": "__hunt_summary__"
+          }
         }
       }
     },
     "action--30000000-0000-4000-8000-000000000007": {
       "type": "action",
       "name": "IAM audit and persistence removal",
-      "description": "Audit the principal's IAM surface for residual persistence: rogue OAuth consents, third-party app grants, conditional-access exceptions, inbox rules, new device registrations, and standing-privilege role assignments. Remove anything the principal could not authorise legitimately during the compromise window.",
+      "description": "Audit the principal's IAM surface (OAuth consents, third-party app grants, conditional-access exceptions, inbox rules, device registrations, role assignments) and plan the removal of every item created inside the compromise window without an authorising change record; items that predate the window or carry a change record are kept, with the reason. Produces __persistence_removal_plan__.",
       "on_completion": "end--30000000-0000-4000-8000-000000000008",
       "in_args": [
-        "__principal_id__"
+        "__triage_record__",
+        "__iam_items__",
+        "__compromise_window_start__"
+      ],
+      "out_args": [
+        "__persistence_removal_plan__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "commands": [
         {
-          "type": "manual",
-          "command": "Audit the principal's IAM surface for residual persistence: rogue OAuth consents, third-party app grants, conditional-access exceptions, inbox rules, new device registrations, and standing-privilege role assignments. Remove anything the principal could not authorise legitimately during the compromise window."
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.identity_compromise.primitives.persistence.plan_persistence_removal"
         }
       ],
       "step_extensions": {
@@ -290,7 +449,16 @@
           ],
           "telemetry_refs": [
             "telemetry.ocsf.account_change@v1"
-          ]
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.identity_compromise.primitives.persistence.plan_persistence_removal",
+            "in": {
+              "triage": "__triage_record__",
+              "iam_items": "__iam_items__",
+              "compromise_window_start": "__compromise_window_start__"
+            },
+            "out": "__persistence_removal_plan__"
+          }
         }
       }
     },
@@ -316,8 +484,8 @@
   "playbook_extensions": {
     "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
       "stable_id": "playbook.identity_compromise@v1",
-      "content_version": "0.1.0",
-      "maturity": "draft",
+      "content_version": "1.0.0",
+      "maturity": "stable",
       "compile_targets": ["n8n", "temporal", "langgraph"],
       "detection_refs": [
         "detection.sigma.azure_identity_protection_impossible_travel@v1",
