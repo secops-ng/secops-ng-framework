@@ -1,5 +1,5 @@
 {
-  "name": "Security-awareness training programme lifecycle",
+  "name": "SecOps-NG: Security-awareness training programme lifecycle",
   "nodes": [
     {
       "id": "start--54000000-0000-4000-8000-000000000001",
@@ -385,6 +385,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -318
+      ],
+      "parameters": {
+        "content": "## Security-awareness training programme lifecycle\n`playbook.security_awareness_training@v1` \u00b7 content v0.1.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nSKELETON scaffold for the structured security-awareness training programme lifecycle required by NIS2 Art. 21(2)(g). The playbook operates the recurring training-programme cycle upstream of the reactive phishing and hygiene disciplines: schedule the training-needs assessment, design or update the training content against identified gaps, deliver the training to the in-scope staff cohorts, record per-staff completion, report the residual gap set to the training owner, and clo\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(g) \u2014 basic cyber-hygiene practices and cybersecurity training\n- GDPR Regulation (EU) 2016/679, Article 32(1)(b) \u2014 security of processing (staff-training obligation)\n- ISO/IEC 27001:2022, Annex A.6.3 \u2014 information security awareness, education and training\n\n**Controls:** 4 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__training_window__`, `__training_scope__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: schedule assessment, design content, deliver training, record completion, report gaps, review cycle\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/security_awareness_training\nRegenerate with `python -m tools.compile content/playbooks/security_awareness_training/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 498,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -472,11 +488,36 @@
   },
   "staticData": null,
   "tags": [
-    "security-awareness",
-    "training",
-    "programme-lifecycle",
-    "governance",
-    "posture"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:experimental"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "regime:gdpr"
+    },
+    {
+      "name": "regime:iso27001"
+    },
+    {
+      "name": "security-awareness"
+    },
+    {
+      "name": "training"
+    },
+    {
+      "name": "programme-lifecycle"
+    },
+    {
+      "name": "governance"
+    },
+    {
+      "name": "posture"
+    }
   ],
   "pinData": {},
   "meta": {

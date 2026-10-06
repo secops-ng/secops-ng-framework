@@ -58,7 +58,10 @@ def test_node_ids_mirror_cacao_action_ids() -> None:
     cacao_step_ids = set(playbook_raw["workflow"].keys())
 
     workflow = json.loads(WORKED_EXAMPLE.read_text(encoding="utf-8"))
-    node_ids = {node["id"] for node in workflow["nodes"]}
+    node_ids = {
+        node["id"] for node in workflow["nodes"]
+        if node["type"] != "n8n-nodes-base.stickyNote"  # the playbook card is not a step
+    }
 
     missing_nodes = cacao_step_ids - node_ids
     assert not missing_nodes, (
@@ -68,7 +71,7 @@ def test_node_ids_mirror_cacao_action_ids() -> None:
     assert not extra_nodes, (
         f"n8n node ids without a matching CACAO step id: {sorted(extra_nodes)}"
     )
-    assert len(workflow["nodes"]) == len(cacao_step_ids), (
+    assert len([n for n in workflow["nodes"] if n["type"] != "n8n-nodes-base.stickyNote"]) == len(cacao_step_ids), (
         "duplicate node ids in n8n workflow"
     )
 
@@ -83,6 +86,8 @@ def test_node_labels_mirror_cacao_action_names() -> None:
 
     workflow = json.loads(WORKED_EXAMPLE.read_text(encoding="utf-8"))
     for node in workflow["nodes"]:
+        if node["type"] == "n8n-nodes-base.stickyNote":
+            continue  # the playbook card is not a step
         expected = cacao_names[node["id"]]
         assert node["name"] == expected, (
             f"n8n node {node['id']} label {node['name']!r} does not "

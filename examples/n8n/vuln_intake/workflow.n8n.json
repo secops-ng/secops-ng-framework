@@ -1,5 +1,5 @@
 {
-  "name": "Vulnerability intake",
+  "name": "SecOps-NG: Vulnerability intake",
   "nodes": [
     {
       "id": "start--01a17a01-0000-4000-8000-000000000001",
@@ -466,6 +466,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -516
+      ],
+      "parameters": {
+        "content": "## Vulnerability intake\n`playbook.vuln_intake@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nCoordinated vulnerability disclosure (CVD) intake playbook for CRA-aligned operators. Receives an inbound disclosure (researcher report, vendor advisory, CVE feed hit, or internal scan finding), acknowledges the reporter against the CRA single-point-of-contact obligation, correlates the affected component against the operator's SBOM and asset inventory, scores the case with CVSS / EPSS, assesses whether the disclosure trips the CRA Article 14 actively-exploited or severe-inc\u2026\n\n**Regulatory anchors**\n- Cyber Resilience Act (EU) 2024/2847, Annex I \u00a72 \u2014 coordinated vulnerability disclosure policy, SBOM, and security-update obligations\n- Cyber Resilience Act (EU) 2024/2847, Article 14 \u2014 early-warning (24h), notification (72h), final report (14d), severe-incident reporting\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(e) \u2014 vulnerability handling and disclosure\n- DORA Regulation (EU) 2022/2554, Article 9 \u2014 ICT risk management framework (vulnerability management)\n\n**Controls:** 5 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__cve_id__`, `__report_source__`, `__awareness_at__`, `__exploitation_evidence__`, `__remedy_available_at__`, `__notification_destinations__`, `__triaged_at__`, `__cvd_sla_days__`, `__risk_accepted_by__`, `__risk_review_after_days__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - intake disclosure \u2192 `content.playbooks.vuln_intake.primitives.dedup.canonicalize_case_field`\n  - triage and asset correlation \u2192 `content.playbooks.vuln_intake.primitives.severity.severity_policy`\n  - assess CRA reporting trigger \u2192 `content.playbooks.vuln_intake.primitives.cra_trigger.assess_cra_reporting_trigger`\n  - regulator-notification chain (CRA Art. 14) \u2192 `content.playbooks.vuln_intake.primitives.cra_trigger.build_notification_chain`\n  - response: critical \u2014 patch and advisory \u2192 `content.playbooks.vuln_intake.primitives.remediation.patch_and_advisory_critical`\n  - response: high \u2014 patch and advisory \u2192 `content.playbooks.vuln_intake.primitives.remediation.patch_and_advisory_high`\n  - response: scheduled remediation \u2192 `content.playbooks.vuln_intake.primitives.remediation.schedule_remediation`\n  - response: accept risk \u2192 `content.playbooks.vuln_intake.primitives.remediation.accept_risk`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/vuln_intake\nRegenerate with `python -m tools.compile content/playbooks/vuln_intake/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 696,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -632,10 +648,33 @@
   },
   "staticData": null,
   "tags": [
-    "cra",
-    "vuln-disclosure",
-    "cvd",
-    "sbom"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "regime:dora"
+    },
+    {
+      "name": "regime:cra"
+    },
+    {
+      "name": "cra"
+    },
+    {
+      "name": "vuln-disclosure"
+    },
+    {
+      "name": "cvd"
+    },
+    {
+      "name": "sbom"
+    }
   ],
   "pinData": {},
   "meta": {

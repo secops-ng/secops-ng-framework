@@ -1,5 +1,5 @@
 {
-  "name": "Network security and segmentation posture",
+  "name": "SecOps-NG: Network security and segmentation posture",
   "nodes": [
     {
       "id": "start--7e750001-0000-4000-8000-000000000001",
@@ -318,6 +318,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -296
+      ],
+      "parameters": {
+        "content": "## Network security and segmentation posture\n`playbook.network_security@v1` \u00b7 content v0.2.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nCACAO v2 playbook operationalising the per-window reconciliation of a declared segmentation policy against the observed network-boundary state on the operator's own deployed estate. Anchored to NIS2 Article 21(2)(e) (security in network and information systems) and to DORA Article 9 read against the JC RTS on ICT risk management framework (Commission Delegated Regulation (EU) 2024/1774) network- security articles. The lifecycle enumerates documented network segments from the\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555 \u2014 Article 21(2)(e) security in network and information systems\n- DORA Regulation (EU) 2022/2554 \u2014 Article 9 protection and prevention, ICT network controls\n\n**Controls:** 1 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__reconciliation_window__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: inventory_network_segments, evaluate_segmentation_policy, detect_policy_violations, enforce_remediation, generate_posture_evidence_artifact\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/network_security\nRegenerate with `python -m tools.compile content/playbooks/network_security/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 476,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -394,15 +410,45 @@
   },
   "staticData": null,
   "tags": [
-    "nis2",
-    "article-21-2-e",
-    "dora",
-    "article-9",
-    "network-security",
-    "segmentation",
-    "boundary-protection",
-    "zone-transit",
-    "posture-management"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:experimental"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "regime:dora"
+    },
+    {
+      "name": "nis2"
+    },
+    {
+      "name": "article-21-2-e"
+    },
+    {
+      "name": "dora"
+    },
+    {
+      "name": "article-9"
+    },
+    {
+      "name": "network-security"
+    },
+    {
+      "name": "segmentation"
+    },
+    {
+      "name": "boundary-protection"
+    },
+    {
+      "name": "zone-transit"
+    },
+    {
+      "name": "posture-management"
+    }
   ],
   "pinData": {},
   "meta": {

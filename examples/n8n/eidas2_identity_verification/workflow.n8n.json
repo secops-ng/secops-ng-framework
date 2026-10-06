@@ -1,5 +1,5 @@
 {
-  "name": "eIDAS 2.0 EUDIW identity verification (NIS2 Art.21(2)(i), DORA Art.5)",
+  "name": "SecOps-NG: eIDAS 2.0 EUDIW identity verification (NIS2 Art.21(2)(i), DORA Art.5)",
   "nodes": [
     {
       "id": "start--e1d5a520-0000-4000-8000-000000000001",
@@ -225,6 +225,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -428
+      ],
+      "parameters": {
+        "content": "## eIDAS 2.0 EUDIW identity verification (NIS2 Art.21(2)(i), DORA Art.5)\n`playbook.eidas2_identity_verification@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nSKELETON \u2014 CACAO v2 scaffold for the operator-side EU Digital Identity Wallet (EUDIW) identity-verification lifecycle a regulated operator runs when onboarding an EUDIW-enabled principal to a protected access surface under NIS2 Article 21(2)(i) access management and DORA Article 5 digital-identity governance. Covers the request-to-provisioning chain: request an EUDIW presentation from the principal (eIDAS 2.0 Art. 5c presentation request), cryptographically verify the PID (p\u2026\n\n**Regulatory anchors**\n- eIDAS 2.0 \u2014 Regulation (EU) 2024/1183 amending Regulation (EU) No 910/2014 (European Digital Identity Framework)\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(i) \u2014 human resources security, access-control policies, and asset management\n- DORA Regulation (EU) 2022/2554, Article 5 \u2014 governance and organisation, digital-identity governance surface\n\n**Controls:** 1 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__principal_id__`, `__auth_scope__`, `__captured_at__`, `__required_credentials__`, `__requested_at__`, `__verification_report__`, `__returned_loa__`, `__assurance_tier_table__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - request_eudiw_presentation \u2192 `content.playbooks.eidas2_identity_verification.primitives.presentation.compose_presentation_request`\n  - verify_pid_credential \u2192 `content.playbooks.eidas2_identity_verification.primitives.verification.record_pid_verification`\n  - assess_assurance_level \u2192 `content.playbooks.eidas2_identity_verification.primitives.assurance.assess_assurance_level`\n  - emit_identity_audit_evidence \u2192 `content.playbooks.eidas2_identity_verification.primitives.evidence.compose_identity_evidence_record`\n  - trigger_access_provisioning \u2192 `content.playbooks.eidas2_identity_verification.primitives.provisioning.compose_provisioning_handoff`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/eidas2_identity_verification\nRegenerate with `python -m tools.compile content/playbooks/eidas2_identity_verification/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 608,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -301,15 +317,48 @@
   },
   "staticData": null,
   "tags": [
-    "nis2",
-    "article-21-2-i",
-    "dora",
-    "article-5",
-    "eidas2",
-    "eudiw",
-    "identity-verification",
-    "digital-identity",
-    "access-management"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "regime:dora"
+    },
+    {
+      "name": "regime:eidas2"
+    },
+    {
+      "name": "nis2"
+    },
+    {
+      "name": "article-21-2-i"
+    },
+    {
+      "name": "dora"
+    },
+    {
+      "name": "article-5"
+    },
+    {
+      "name": "eidas2"
+    },
+    {
+      "name": "eudiw"
+    },
+    {
+      "name": "identity-verification"
+    },
+    {
+      "name": "digital-identity"
+    },
+    {
+      "name": "access-management"
+    }
   ],
   "pinData": {},
   "meta": {

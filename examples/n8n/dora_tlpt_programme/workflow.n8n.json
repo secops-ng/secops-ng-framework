@@ -1,5 +1,5 @@
 {
-  "name": "DORA digital operational resilience testing / TLPT programme",
+  "name": "SecOps-NG: DORA digital operational resilience testing / TLPT programme",
   "nodes": [
     {
       "id": "start--55000000-0000-4000-8000-000000000001",
@@ -251,6 +251,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -384
+      ],
+      "parameters": {
+        "content": "## DORA digital operational resilience testing / TLPT programme\n`playbook.dora_tlpt_programme@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nSKELETON \u2014 CACAO v2 scaffold for the DORA Chapter IV digital operational resilience testing (DORT) programme a financial entity operates against its ICT risk-management framework. Composes the operator-side lifecycle of Article 24 (general requirements for the testing of digital operational resilience \u2014 scope, coverage, cadence, coverage-review) and Article 26 (advanced testing of ICT tools, systems and processes based on threat-led penetration testing, the operator-side TLP\u2026\n\n**Regulatory anchors**\n- DORA \u2014 Regulation (EU) 2022/2554, Article 24 \u2014 General requirements for the testing of digital operational resilience\n- DORA \u2014 Regulation (EU) 2022/2554, Article 26 \u2014 Advanced testing of ICT tools, systems and processes based on TLPT\n\n**Controls:** 2 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__testing_window__`, `__entity_significance_tier__`, `__critical_functions__`, `__asset_register__`, `__third_party_register__`, `__tlpt_identified__`, `__threat_intelligence_source__`, `__tester_posture__`, `__authority_notification_ref__`, `__last_tlpt_completed_on__`, `__declared_cadence_months__`, `__tester_ref__`, `__scoping_outcome__`, `__tester_certification_ref__`, `__tester_independence_attestation_ref__`, `__third_party_carve_outs__`, `__engagement_findings__`, `__severity_rubric__`, `__workflow_id__`, `__execution_id__`, `__captured_at__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - define DORT scope \u2192 `content.playbooks.dora_tlpt_programme.primitives.scope.define_dort_scope`\n  - TLPT trigger and planning gate \u2192 `content.playbooks.dora_tlpt_programme.primitives.trigger.evaluate_tlpt_trigger`\n  - red-team scoping approval \u2192 `content.playbooks.dora_tlpt_programme.primitives.scoping.approve_red_team_scoping`\n  - remediation tracking \u2192 `content.playbooks.dora_tlpt_programme.primitives.remediation.track_remediation`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/dora_tlpt_programme\nRegenerate with `python -m tools.compile content/playbooks/dora_tlpt_programme/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 564,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -316,14 +332,39 @@
   },
   "staticData": null,
   "tags": [
-    "dora",
-    "chapter-iv",
-    "digital-operational-resilience-testing",
-    "tlpt",
-    "threat-led-penetration-testing",
-    "tiber-eu",
-    "article-24",
-    "article-26"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:dora"
+    },
+    {
+      "name": "dora"
+    },
+    {
+      "name": "chapter-iv"
+    },
+    {
+      "name": "digital-operational-resilience-testing"
+    },
+    {
+      "name": "tlpt"
+    },
+    {
+      "name": "threat-led-penetration-testing"
+    },
+    {
+      "name": "tiber-eu"
+    },
+    {
+      "name": "article-24"
+    },
+    {
+      "name": "article-26"
+    }
   ],
   "pinData": {},
   "meta": {

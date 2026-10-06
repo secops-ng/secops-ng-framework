@@ -1,5 +1,5 @@
 {
-  "name": "Backup and restore-drill exercise",
+  "name": "SecOps-NG: Backup and restore-drill exercise",
   "nodes": [
     {
       "id": "start--50000000-0000-4000-8000-000000000001",
@@ -229,6 +229,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -406
+      ],
+      "parameters": {
+        "content": "## Backup and restore-drill exercise\n`playbook.backup_recovery@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nExercise the business-continuity surface: on a scheduled or operator-triggered restore-drill window, validate the integrity of the most recent in-scope backup, execute a non-destructive restore drill against an isolated target, capture the dated attestation and drill evidence, and notify the continuity owner. The playbook is the operationalisation of a documented backup policy and recovery procedure; it does not author the policy itself. CORE layer: every action step carries\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(c) \u2014 business continuity, backup management, disaster recovery, crisis management\n- DORA Regulation (EU) 2022/2554, Article 12 \u2014 backup policies and procedures, restoration and recovery procedures and methods\n\n**Controls:** 2 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__drill_window__`, `__backup_scope__`, `__backup_inventory__`, `__integrity_observation__`, `__drill_observation__`, `__owner_binding__`, `__workflow_id__`, `__execution_id__`, `__captured_at__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - detect restore-drill trigger \u2192 `content.playbooks.backup_recovery.primitives.detect.resolve_drill_trigger`\n  - validate backup integrity \u2192 `content.playbooks.backup_recovery.primitives.integrity.evaluate_backup_integrity`\n  - execute restore drill \u2192 `content.playbooks.backup_recovery.primitives.drill.evaluate_restore_drill`\n  - evidence capture \u2192 `content.playbooks.backup_recovery.primitives.attestation.build_drill_attestation`\n  - notify continuity owner \u2192 `content.playbooks.backup_recovery.primitives.notify.compose_continuity_notification`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/backup_recovery\nRegenerate with `python -m tools.compile content/playbooks/backup_recovery/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 586,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -323,11 +339,33 @@
   },
   "staticData": null,
   "tags": [
-    "business-continuity",
-    "backup",
-    "restore",
-    "disaster-recovery",
-    "attestation"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "regime:dora"
+    },
+    {
+      "name": "business-continuity"
+    },
+    {
+      "name": "backup"
+    },
+    {
+      "name": "restore"
+    },
+    {
+      "name": "disaster-recovery"
+    },
+    {
+      "name": "attestation"
+    }
   ],
   "pinData": {},
   "meta": {

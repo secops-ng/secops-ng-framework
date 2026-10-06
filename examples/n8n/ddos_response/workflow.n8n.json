@@ -1,5 +1,5 @@
 {
-  "name": "DDoS / availability-incident response",
+  "name": "SecOps-NG: DDoS / availability-incident response",
   "nodes": [
     {
       "id": "start--60000000-0000-4000-8000-000000000001",
@@ -229,6 +229,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -406
+      ],
+      "parameters": {
+        "content": "## DDoS / availability-incident response\n`playbook.ddos_response@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nOperationalise the incident-handling capability for the availability/denial-of-service attack dimension: detect an availability anomaly on a monitored service, classify the attack vector (volumetric, protocol, application-layer), engage the appropriate mitigation discipline against the operator's pre-bound response surface (upstream scrubbing, rate-limit / WAF posture change, failover to a documented standby), validate that the protected service has been restored against doc\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(b) \u2014 incident handling capability\n\n**Controls:** 1 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__protected_service__`, `__anomaly_window__`, `__service_inventory__`, `__vector_signals__`, `__deadline_exceeded__`, `__validation_observations__`, `__owner_channel__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - detect availability anomaly \u2192 `content.playbooks.ddos_response.primitives.detect.resolve_availability_trigger`\n  - classify attack vector \u2192 `content.playbooks.ddos_response.primitives.classify.classify_attack_vector`\n  - engage mitigation \u2192 `content.playbooks.ddos_response.primitives.mitigation.select_mitigation_engagement`\n  - validate service restoration \u2192 `content.playbooks.ddos_response.primitives.restoration.evaluate_service_restoration`\n  - evidence capture \u2192 `content.playbooks.ddos_response.primitives.evidence.compose_incident_evidence_record`\n  - notify incident-management owner \u2192 `content.playbooks.ddos_response.primitives.notify.compose_owner_notification`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/ddos_response\nRegenerate with `python -m tools.compile content/playbooks/ddos_response/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 586,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -316,12 +332,33 @@
   },
   "staticData": null,
   "tags": [
-    "incident-handling",
-    "availability",
-    "ddos",
-    "denial-of-service",
-    "mitigation",
-    "service-restoration"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "incident-handling"
+    },
+    {
+      "name": "availability"
+    },
+    {
+      "name": "ddos"
+    },
+    {
+      "name": "denial-of-service"
+    },
+    {
+      "name": "mitigation"
+    },
+    {
+      "name": "service-restoration"
+    }
   ],
   "pinData": {},
   "meta": {

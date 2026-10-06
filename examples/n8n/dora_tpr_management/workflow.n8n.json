@@ -1,5 +1,5 @@
 {
-  "name": "DORA ICT third-party risk management",
+  "name": "SecOps-NG: DORA ICT third-party risk management",
   "nodes": [
     {
       "id": "start--d07a7970-0000-4000-8000-000000000001",
@@ -426,6 +426,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -318
+      ],
+      "parameters": {
+        "content": "## DORA ICT third-party risk management\n`playbook.dora_tpr_management@v1` \u00b7 content v0.1.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nSKELETON \u2014 CACAO v2 scaffold for the DORA Chapter V ICT third-party risk management workflow an EU financial entity operates against every ICT third-party service provider it contracts with. Anchored on DORA Regulation (EU) 2022/2554 Article 28 (general principles for the use of ICT third-party service providers \u2014 the third-party register, pre-contractual risk assessment, criticality determination, sub-outsourcing surface, and concentration-risk discipline) and Article 30 (k\u2026\n\n**Regulatory anchors**\n- DORA \u2014 Regulation (EU) 2022/2554, Chapter V (Articles 28\u201344) ICT third-party risk management\n- DORA \u2014 Regulation (EU) 2022/2554, Article 28 general principles for the use of ICT third-party service providers\n- DORA \u2014 Regulation (EU) 2022/2554, Article 30 key contractual provisions\n\n**Controls:** 2 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__provider_handle__`, `__function_supported__`, `__contract_ref__`, `__review_window__`, `__runtime_supply_chain_evidence_ref__`, `__exit_trigger__`, `__captured_at__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: onboarding risk assessment, contractual provisions check, register entry, periodic review, exit assessment\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/dora_tpr_management\nRegenerate with `python -m tools.compile content/playbooks/dora_tpr_management/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 498,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -502,12 +518,33 @@
   },
   "staticData": null,
   "tags": [
-    "dora",
-    "chapter-v",
-    "third-party-risk",
-    "ict-third-party-service-providers",
-    "register-of-information",
-    "contractual-provisions"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:experimental"
+    },
+    {
+      "name": "regime:dora"
+    },
+    {
+      "name": "dora"
+    },
+    {
+      "name": "chapter-v"
+    },
+    {
+      "name": "third-party-risk"
+    },
+    {
+      "name": "ict-third-party-service-providers"
+    },
+    {
+      "name": "register-of-information"
+    },
+    {
+      "name": "contractual-provisions"
+    }
   ],
   "pinData": {},
   "meta": {

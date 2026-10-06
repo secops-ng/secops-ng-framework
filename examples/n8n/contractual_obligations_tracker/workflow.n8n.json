@@ -1,5 +1,5 @@
 {
-  "name": "Contractual obligations tracker",
+  "name": "SecOps-NG: Contractual obligations tracker",
   "nodes": [
     {
       "id": "start--10101010-0000-4000-8000-000000000001",
@@ -191,6 +191,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -362
+      ],
+      "parameters": {
+        "content": "## Contractual obligations tracker\n`playbook.contractual_obligations_tracker@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nSupplier-contract obligation tracking workflow under NIS2 Article 21(2)(d) supply-chain security. On each execution, ingest a supplier contract reference, extract the per-clause obligations the operator has accepted from that contract, schedule the next review date for each obligation against the operator's review-cadence policy, and emit one obligation-evidence artifact pinning the contract id, the extracted obligation set, the per-obligation review-state, and the provenanc\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555 \u2014 Article 21(2)(d)\n\n**Controls:** 2 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__workflow_id__`, `__execution_id__`, `__contract_ref__`, `__raw_contract__`, `__raw_obligations__`, `__review_policy__`, `__regulation_refs__`, `__control_refs__`, `__owner_role__`, `__owner_assigned_at__`, `__captured_at__`, `__source_url__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - ingest-contract \u2192 `content.playbooks.contractual_obligations_tracker.primitives.ingest.ingest_contract`\n  - extract-obligations \u2192 `content.playbooks.contractual_obligations_tracker.primitives.obligations.extract_obligations`\n  - schedule-review \u2192 `content.playbooks.contractual_obligations_tracker.primitives.schedule.schedule_reviews`\n  - emit-obligation-evidence \u2192 `content.playbooks.contractual_obligations_tracker.primitives.artifact.build_obligation_artifact`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/contractual_obligations_tracker\nRegenerate with `python -m tools.compile content/playbooks/contractual_obligations_tracker/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 542,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -256,11 +272,30 @@
   },
   "staticData": null,
   "tags": [
-    "supply-chain",
-    "contracts",
-    "obligations",
-    "obligation-evidence",
-    "nis2"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "supply-chain"
+    },
+    {
+      "name": "contracts"
+    },
+    {
+      "name": "obligations"
+    },
+    {
+      "name": "obligation-evidence"
+    },
+    {
+      "name": "nis2"
+    }
   ],
   "pinData": {},
   "meta": {

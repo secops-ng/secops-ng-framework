@@ -100,6 +100,17 @@ Every compiled workflow carries content provenance on `meta.secops_ng`:
 This is how a downstream registry or KPI dashboard knows which content
 version a running workflow came from.
 
+The same provenance is written for a human on the **playbook card**, a
+sticky note appended as the last node of every workflow: identity and
+maturity, the description's first paragraph, the regulatory sources the
+playbook cites, the inputs the trigger expects, the primitive each Code
+node binds to, the operator steps, the canonical source URL and the
+regenerate command. The workflow `name` is `SecOps-NG: <playbook name>`;
+`tags` carry `secops-ng`, `maturity:<maturity>`, one `regime:<key>` per
+regime named in the sources, then the CACAO labels. All of it is derived
+from the document, so mirrors compile identically and the file is ready
+to share as a template without a second edit.
+
 ### Determinism
 
 Same AST in → byte-identical JSON out. The output is serialised with

@@ -1,5 +1,5 @@
 {
-  "name": "Agentic-threat detection and response",
+  "name": "SecOps-NG: Agentic-threat detection and response",
   "nodes": [
     {
       "id": "start--30000000-0000-4000-8000-000000000001",
@@ -189,6 +189,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -428
+      ],
+      "parameters": {
+        "content": "## Agentic-threat detection and response\n`playbook.agentic_threat_response@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nCACAO v2 playbook for detecting and initially responding to fully-agentic adversary activity (autonomous LLM-driven credential harvest, lateral movement, and encryption chains observed at machine-speed decision cadence). The playbook ingests an agentic-threat indicator, isolates the affected credential set, contains the lateral-movement path, hands off the case envelope to the incident-management engine for the regulator-notification chain, and preserves evidence for the NIS\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(b) \u2014 incident-handling capability\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(e) \u2014 security in acquisition, development and maintenance (agentic-tool supply-chain surface)\n- NIS2 Directive (EU) 2022/2555, Article 23 \u2014 significant-incident notification obligations\n\n**Controls:** 7 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__indicator_id__`, `__raw_indicator__`, `__containment_window__`, `__authorisation_policy__`, `__evidence_artifacts__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - ingest agentic-threat indicator \u2192 `content.playbooks.agentic_threat_response.primitives.intake.hydrate_indicator`\n  - isolate affected credential set \u2192 `content.playbooks.agentic_threat_response.primitives.isolation.plan_credential_isolation`\n  - contain lateral-movement path \u2192 `content.playbooks.agentic_threat_response.primitives.segmentation.derive_segmentation_rules`\n  - escalate to incident-management \u2192 `content.playbooks.agentic_threat_response.primitives.escalation.compose_escalation_envelope`\n  - preserve evidence for notification chain \u2192 `content.playbooks.agentic_threat_response.primitives.evidence.seal_evidence_bundle`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/agentic_threat_response\nRegenerate with `python -m tools.compile content/playbooks/agentic_threat_response/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 608,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -265,11 +281,30 @@
   },
   "staticData": null,
   "tags": [
-    "agentic-threat",
-    "machine-speed",
-    "credential-harvest",
-    "lateral-movement",
-    "nis2"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "agentic-threat"
+    },
+    {
+      "name": "machine-speed"
+    },
+    {
+      "name": "credential-harvest"
+    },
+    {
+      "name": "lateral-movement"
+    },
+    {
+      "name": "nis2"
+    }
   ],
   "pinData": {},
   "meta": {

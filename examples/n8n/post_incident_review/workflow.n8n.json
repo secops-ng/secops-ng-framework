@@ -1,5 +1,5 @@
 {
-  "name": "Post-incident review",
+  "name": "SecOps-NG: Post-incident review",
   "nodes": [
     {
       "id": "start--40000000-0000-4000-8000-000000000001",
@@ -232,6 +232,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -208
+      ],
+      "parameters": {
+        "content": "## Post-incident review\n`playbook.post_incident_review@v1` \u00b7 content v0.1.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nRun the post-incident review after an incident has been closed or contained: collate the timeline from the artifacts the responders left behind, walk a blameless review template that separates contributing factors from individual error, and emit a corrective-action register that downstream tracking can consume. The playbook does not re-litigate the incident \u2014 it formalises learning into auditable, restartable state. CACAO v2 + SecOps-NG content-model extensions. Forward-publ\u2026\n\n**Controls:** 2 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__incident_id__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: timeline collation, blameless review template, corrective-action tracking\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/post_incident_review\nRegenerate with `python -m tools.compile content/playbooks/post_incident_review/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 388,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -286,11 +302,27 @@
   },
   "staticData": null,
   "tags": [
-    "post_incident_review",
-    "blameless",
-    "timeline",
-    "corrective-actions",
-    "lessons-learned"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:experimental"
+    },
+    {
+      "name": "post_incident_review"
+    },
+    {
+      "name": "blameless"
+    },
+    {
+      "name": "timeline"
+    },
+    {
+      "name": "corrective-actions"
+    },
+    {
+      "name": "lessons-learned"
+    }
   ],
   "pinData": {},
   "meta": {

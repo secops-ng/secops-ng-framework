@@ -1,5 +1,5 @@
 {
-  "name": "CRA Article 14 SRP notification",
+  "name": "SecOps-NG: CRA Article 14 SRP notification",
   "nodes": [
     {
       "id": "start--5a509a09-0000-4000-8000-000000000001",
@@ -322,6 +322,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -296
+      ],
+      "parameters": {
+        "content": "## CRA Article 14 SRP notification\n`playbook.cra_srp_notify@v1` \u00b7 content v0.1.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nSKELETON \u2014 durable-state scaffold for the CRA Article 14 notification workflow that will address the Single Reporting Platform (SRP) once its schema is published. Expresses the 24h / 72h / 14d-or-30d timer cascade as first-class CACAO steps so any of the three reference compile targets (n8n, Temporal, LangGraph) can carry the clocks as durable state. Fired by a sibling incident-handling or vulnerability-intake playbook when the operator's incident-classification step trips t\u2026\n\n**Regulatory anchors**\n- Cyber Resilience Act (EU) 2024/2847, Article 14 \u2014 manufacturer reporting: early warning (24h), notification (72h), final report (14 days for actively-exploited vulnerabilities), severe-incident reporting (1 month)\n- European Commission \u2014 CRA reporting obligations page, Single Reporting Platform applicable 11 September 2026 (SRP schema pending; pre-go-live testing period expected)\n\n**Controls:** 2 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__case_id__`, `__clock_kind__`, `__awareness_ts__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: early_warning, wait until 72h deadline, full_notification, wait until final-report deadline, final_report\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/cra_srp_notify\nRegenerate with `python -m tools.compile content/playbooks/cra_srp_notify/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 476,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -419,11 +435,30 @@
   },
   "staticData": null,
   "tags": [
-    "cra",
-    "article-14",
-    "srp",
-    "notification",
-    "regulator-reporting"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:experimental"
+    },
+    {
+      "name": "regime:cra"
+    },
+    {
+      "name": "cra"
+    },
+    {
+      "name": "article-14"
+    },
+    {
+      "name": "srp"
+    },
+    {
+      "name": "notification"
+    },
+    {
+      "name": "regulator-reporting"
+    }
   ],
   "pinData": {},
   "meta": {

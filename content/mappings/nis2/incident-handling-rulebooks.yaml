@@ -1,0 +1,534 @@
+# Crosswalk: NIS2 operational incident-handling rulebooks -> SecOps-NG playbooks
+#
+# Source: "Operational guidance for incident handling", version 1.0
+# (28 September 2026), published by the Luxembourg NIS2 competent
+# authorities and CSIRTs (ANSSI, CSSF, CIRCL, GOVCERT.LU, HCPN, ILR) at
+# https://github.com/nis2-rulebooks/nis2-rulebooks under CC BY 4.0.
+# Pinned revision: 879b88197c0b48099c74ec9bf9bb36677c793a81
+# The `obligation` and `outcome` fields paraphrase the rulebook sections;
+# they are structural pointers, not legal interpretation, and not a
+# substitute for the cited text. Refresh the pin when the upstream
+# document changes and re-check every row.
+#
+# One entry per rulebook (0-8). Each entry's subcategory_entries are the
+# rulebook's seven action sections; a section either names the playbooks
+# that exercise it or carries a gap_note naming what is missing.
+regime: nis2
+entries:
+  - id: nis2:rulebook-0-triage-routing
+    regulation:
+      name: NIS2 incident-handling rulebooks
+      instrument: "Operational guidance for incident handling, v1.0 (28 September 2026), published by the Luxembourg NIS2 competent authorities and CSIRTs"
+      article: "Rulebook 0 – Triage & Routing"
+      url: https://github.com/nis2-rulebooks/nis2-rulebooks/blob/879b88197c0b48099c74ec9bf9bb36677c793a81/rulebooks/operational-guidance-incident-handling.md
+    obligation: "Receive an incident signal, assign roles, open a case log with chain of custody, classify the event, identify impacted assets and parties, and route the case to the rulebook(s) that fit the collected indicators; re-classify as evidence changes."
+    status: live
+    playbook_refs:
+      - playbook.alert_triage@v1
+      - playbook.phishing_triage@v1
+      - playbook.incident_management@v1
+      - playbook.vuln_intake@v1
+      - playbook.post_incident_review@v1
+      - playbook.backup_recovery@v1
+    notes: "Triage and routing is the entry point every other rulebook assumes. The catalogue splits it across alert triage (signal validation, suppression, prioritisation and routing), phishing triage (intent-based routing) and incident management (case timeline and NIS2 Article 23 stages). Role assignment, analyst rotation and psychological support are organisational measures the operator owns."
+    subcategory_entries:
+      - id: rulebook-0.detection
+        outcome: "Observe the artefacts that trigger a specific rulebook; indicators are indicative, several rulebooks may apply to one incident."
+        playbook_refs:
+          - playbook.alert_triage@v1
+          - playbook.phishing_triage@v1
+      - id: rulebook-0.containment
+        outcome: "Assign incident roles, classify the event from monitoring and logs, identify impacted assets, systems, users and third parties, open a case log with chain of custody and hash every artefact."
+        playbook_refs:
+          - playbook.incident_management@v1
+          - playbook.alert_triage@v1
+      - id: rulebook-0.investigation
+        outcome: "Preserve evidence, onboard experts, track hypotheses, reassess the classification continuously and invoke the rulebooks the indicators point at."
+        playbook_refs:
+          - playbook.alert_triage@v1
+          - playbook.phishing_triage@v1
+          - playbook.incident_management@v1
+      - id: rulebook-0.remediation
+        outcome: "Route the case with the classification table to the rulebook(s) that apply."
+        playbook_refs:
+          - playbook.alert_triage@v1
+          - playbook.phishing_triage@v1
+          - playbook.vuln_intake@v1
+      - id: rulebook-0.evidence
+        outcome: "Maintain a timeline from detection to recovery and record every decision with its rationale."
+        playbook_refs:
+          - playbook.incident_management@v1
+          - playbook.post_incident_review@v1
+      - id: rulebook-0.post-incident
+        outcome: "Confirm backups are intact and isolated before any restoration; update internal procedures from lessons learnt."
+        playbook_refs:
+          - playbook.backup_recovery@v1
+          - playbook.post_incident_review@v1
+      - id: rulebook-0.communication
+        outcome: "Keep communications factual, short and legally reviewed; engage the external CSIRT and insurer early where contracts require it."
+        playbook_refs:
+          - playbook.incident_management@v1
+  - id: nis2:rulebook-1-dos-ddos
+    regulation:
+      name: NIS2 incident-handling rulebooks
+      instrument: "Operational guidance for incident handling, v1.0 (28 September 2026), published by the Luxembourg NIS2 competent authorities and CSIRTs"
+      article: "Rulebook 1 – Denial of Service (DoS) & Distributed Denial of Service (DDoS)"
+      url: https://github.com/nis2-rulebooks/nis2-rulebooks/blob/879b88197c0b48099c74ec9bf9bb36677c793a81/rulebooks/operational-guidance-incident-handling.md
+    obligation: "Handle a denial-of-service incident: detect the availability anomaly, notify business continuity, classify the attack vector, contain with upstream filtering, rate limits and traffic diversion, investigate for a multi-vector campaign, keep network evidence, and harden the architecture afterwards."
+    status: live
+    playbook_refs:
+      - playbook.ddos_response@v1
+      - playbook.business_continuity@v1
+      - playbook.data_exfil@v1
+      - playbook.patch_management@v1
+      - playbook.detection_engineering@v1
+      - playbook.post_incident_review@v1
+      - playbook.incident_management@v1
+    notes: "The DDoS playbook carries detection, vector classification, mitigation, restoration validation and evidence capture. A simultaneous exfiltration check is the data-exfiltration playbook's scope assessment. Provider-side filtering is engaged by the operator through its ISP or scrubbing contract."
+    subcategory_entries:
+      - id: rulebook-1.detection
+        outcome: "Sudden or sustained unavailability or latency, saturated links and timeouts, traffic anomalies, firewall, load-balancer or ISP alerts, backend load spikes."
+        playbook_refs:
+          - playbook.ddos_response@v1
+      - id: rulebook-1.containment
+        outcome: "Notify business continuity and the affected owners, identify the attack type, engage ISP filtering and anti-DDoS services, block or rate-limit sources, protect the backend, divert through a CDN, open the crisis line."
+        playbook_refs:
+          - playbook.ddos_response@v1
+          - playbook.business_continuity@v1
+      - id: rulebook-1.investigation
+        outcome: "Analyse origin and nature of the traffic, collect indicators, check whether the attack masks a multi-vector campaign or concurrent exfiltration, identify bottleneck devices."
+        playbook_refs:
+          - playbook.ddos_response@v1
+          - playbook.data_exfil@v1
+      - id: rulebook-1.remediation
+        outcome: "Tune WAF rules, geo- and reputation-based blocking, rate limits, challenge-response and caching; remove temporary blocks gradually while validating recovery."
+        playbook_refs:
+          - playbook.ddos_response@v1
+      - id: rulebook-1.evidence
+        outcome: "NetFlow and short packet captures, logs from application servers, firewall, IDS/IPS, CDN, load balancer and WAF, timeline and decisions in the case log."
+        playbook_refs:
+          - playbook.ddos_response@v1
+      - id: rulebook-1.post-incident
+        outcome: "Patch services open to amplification, review architecture for resiliency (Anycast CDN, load balancing, multi-region), map dependencies, review alert thresholds, update continuity and recovery plans."
+        playbook_refs:
+          - playbook.patch_management@v1
+          - playbook.business_continuity@v1
+          - playbook.detection_engineering@v1
+          - playbook.post_incident_review@v1
+      - id: rulebook-1.communication
+        outcome: "Coordinate with the ISP and hosting provider; inform customers and partners."
+        playbook_refs:
+          - playbook.ddos_response@v1
+          - playbook.incident_management@v1
+  - id: nis2:rulebook-2-malware
+    regulation:
+      name: NIS2 incident-handling rulebooks
+      instrument: "Operational guidance for incident handling, v1.0 (28 September 2026), published by the Luxembourg NIS2 competent authorities and CSIRTs"
+      article: "Rulebook 2 – Malware"
+      url: https://github.com/nis2-rulebooks/nis2-rulebooks/blob/879b88197c0b48099c74ec9bf9bb36677c793a81/rulebooks/operational-guidance-incident-handling.md
+    obligation: "Handle a malware or ransomware incident: isolate affected systems, protect backups, block indicators and rotate exposed credentials, investigate the infection vector, scope and persistence, restore from trusted sources without paying, and harden endpoints and identities afterwards."
+    status: live
+    playbook_refs:
+      - playbook.ransomware_containment@v1
+      - playbook.alert_triage@v1
+      - playbook.business_continuity@v1
+      - playbook.threat_intel_ingest@v1
+      - playbook.data_exfil@v1
+      - playbook.identity_compromise@v1
+      - playbook.backup_recovery@v1
+      - playbook.patch_management@v1
+      - playbook.incident_management@v1
+      - playbook.post_incident_review@v1
+      - playbook.mfa_secured_comms@v1
+      - playbook.security_awareness_training@v1
+      - playbook.detection_engineering@v1
+    notes: "Ransomware containment carries triage, EDR or network isolation, identity revocation, backup verification and the communications plan. Double-extortion checks are the data-exfiltration playbook; lateral-movement hunting and persistence removal are the identity-compromise playbook; restoration is backup recovery."
+    subcategory_entries:
+      - id: rulebook-2.detection
+        outcome: "Unusual file extensions or renaming, AV/EDR alerts, suspicious processes, beaconing to known command-and-control, persistence artefacts, inaccessible files, ransom notes, locked screens."
+        playbook_refs:
+          - playbook.ransomware_containment@v1
+          - playbook.alert_triage@v1
+      - id: rulebook-2.containment
+        outcome: "Decide power-on or power-off for forensics, isolate at network, switch, NAC or hypervisor level, notify business continuity, block domains and IPs, change credentials used on infected devices, disable administrative shares and remote tooling, disconnect and verify backups."
+        playbook_refs:
+          - playbook.ransomware_containment@v1
+          - playbook.business_continuity@v1
+          - playbook.threat_intel_ingest@v1
+      - id: rulebook-2.investigation
+        outcome: "Acquire forensic copies, identify the initial vector, determine encryption scope and strain, review logs for exfiltration, lateral movement and persistence, use threat intelligence for known indicators."
+        playbook_refs:
+          - playbook.ransomware_containment@v1
+          - playbook.data_exfil@v1
+          - playbook.identity_compromise@v1
+          - playbook.threat_intel_ingest@v1
+      - id: rulebook-2.remediation
+        outcome: "Do not pay; patch and scan before restoring, restore from clean backups or gold images, invalidate cached tokens, remove persistence, reconnect gradually under monitoring."
+        playbook_refs:
+          - playbook.backup_recovery@v1
+          - playbook.patch_management@v1
+          - playbook.identity_compromise@v1
+      - id: rulebook-2.evidence
+        outcome: "Keep the ransom note, encrypted and malware samples, disk images before wiping, event, Sysmon, EDR and network logs, memory dumps where feasible, the case timeline."
+        playbook_refs:
+          - playbook.incident_management@v1
+          - playbook.post_incident_review@v1
+      - id: rulebook-2.post-incident
+        outcome: "Patch exploited vectors, reset credentials in tiers, harden endpoints and remote management, enforce MFA for administrators and remote access, segment the network, raise awareness, deploy allow-listing and EDR rules."
+        playbook_refs:
+          - playbook.patch_management@v1
+          - playbook.mfa_secured_comms@v1
+          - playbook.security_awareness_training@v1
+          - playbook.detection_engineering@v1
+      - id: rulebook-2.communication
+        outcome: "Alert IT and the SOC immediately; inform affected users."
+        playbook_refs:
+          - playbook.ransomware_containment@v1
+          - playbook.incident_management@v1
+  - id: nis2:rulebook-3-communication-channels
+    regulation:
+      name: NIS2 incident-handling rulebooks
+      instrument: "Operational guidance for incident handling, v1.0 (28 September 2026), published by the Luxembourg NIS2 competent authorities and CSIRTs"
+      article: "Rulebook 3 – Exploitation of communication channels to gain access"
+      url: https://github.com/nis2-rulebooks/nis2-rulebooks/blob/879b88197c0b48099c74ec9bf9bb36677c793a81/rulebooks/operational-guidance-incident-handling.md
+    obligation: "Handle phishing, smishing and similar channel abuse: block the malicious domains and purge the messages, reset credentials and sessions of affected users, investigate headers, payloads and user interactions, and strengthen mail security and awareness afterwards."
+    status: live
+    playbook_refs:
+      - playbook.phishing_triage@v1
+      - playbook.alert_triage@v1
+      - playbook.identity_compromise@v1
+      - playbook.threat_intel_ingest@v1
+      - playbook.mfa_secured_comms@v1
+      - playbook.security_awareness_training@v1
+      - playbook.cyber_hygiene_training@v1
+      - playbook.detection_engineering@v1
+      - playbook.incident_management@v1
+    notes: "Phishing triage carries intake, enrichment, suppression, intent classification and the per-intent response branches. Credential and session resets are the identity-compromise playbook; blocklist propagation is threat-intel ingest; mail-authentication hardening and awareness are their own playbooks."
+    subcategory_entries:
+      - id: rulebook-3.detection
+        outcome: "User reports of suspicious email or SMS, anomalous mail activity such as auto-forwarding, credential re-use alerts, CERT or threat-intelligence reports, gateway and SIEM detections, reported look-alike portals."
+        playbook_refs:
+          - playbook.phishing_triage@v1
+          - playbook.alert_triage@v1
+      - id: rulebook-3.containment
+        outcome: "Block malicious domains and URLs at proxy and gateway, purge the message from all mailboxes, reset credentials and invalidate sessions and OAuth tokens, remove forwarding rules, scan endpoints, block spoofed internal domains, preserve originals, notify SOC and management on large campaigns."
+        playbook_refs:
+          - playbook.phishing_triage@v1
+          - playbook.identity_compromise@v1
+          - playbook.threat_intel_ingest@v1
+      - id: rulebook-3.investigation
+        outcome: "Analyse headers and message path, inspect payloads and URLs in a sandbox, identify user interactions and impact, correlate indicators, examine the phishing page and kit."
+        playbook_refs:
+          - playbook.phishing_triage@v1
+      - id: rulebook-3.remediation
+        outcome: "Block related campaigns, verify SPF, DKIM and DMARC, rotate credentials and tokens of confirmed victims, monitor account activity for at least 72 hours, check for downloads, macros and fileless payloads."
+        playbook_refs:
+          - playbook.phishing_triage@v1
+          - playbook.identity_compromise@v1
+          - playbook.mfa_secured_comms@v1
+      - id: rulebook-3.evidence
+        outcome: "Original messages with headers, mail-server logs, mailbox exports, sandboxed screenshots of the phishing page."
+        playbook_refs:
+          - playbook.phishing_triage@v1
+      - id: rulebook-3.post-incident
+        outcome: "Improve awareness and reporting, strengthen gateway rules, access conditions, MFA, OAuth flows and sandboxing, run a phishing exercise, verify TLS inspection and request logging on the proxy, evaluate SPF."
+        playbook_refs:
+          - playbook.security_awareness_training@v1
+          - playbook.cyber_hygiene_training@v1
+          - playbook.mfa_secured_comms@v1
+          - playbook.detection_engineering@v1
+      - id: rulebook-3.communication
+        outcome: "Notify impacted users promptly with the steps required, escalate to top management when several users are targeted, warn all staff about the campaign."
+        playbook_refs:
+          - playbook.phishing_triage@v1
+          - playbook.incident_management@v1
+  - id: nis2:rulebook-4-credential-theft
+    regulation:
+      name: NIS2 incident-handling rulebooks
+      instrument: "Operational guidance for incident handling, v1.0 (28 September 2026), published by the Luxembourg NIS2 competent authorities and CSIRTs"
+      article: "Rulebook 4 – Credential theft & account compromise"
+      url: https://github.com/nis2-rulebooks/nis2-rulebooks/blob/879b88197c0b48099c74ec9bf9bb36677c793a81/rulebooks/operational-guidance-incident-handling.md
+    obligation: "Handle a compromised account: force logoff and reset, terminate sessions and revoke tokens, investigate the entry vector, lateral movement and persistence such as new MFA devices or OAuth consents, then enforce conditional access, MFA and role hygiene."
+    status: live
+    playbook_refs:
+      - playbook.identity_compromise@v1
+      - playbook.iam_auditor@v1
+      - playbook.alert_triage@v1
+      - playbook.phishing_triage@v1
+      - playbook.mfa_secured_comms@v1
+      - playbook.detection_engineering@v1
+      - playbook.patch_management@v1
+      - playbook.security_awareness_training@v1
+      - playbook.incident_management@v1
+      - playbook.data_exfil@v1
+    notes: "Identity compromise carries the triage, MFA reset, session revocation, lateral-movement hunt and IAM audit with persistence removal; the IAM auditor enumerates identities and capabilities and emits the access evidence. Token-based persistence survives a password reset, which is why session revocation is a separate step."
+    subcategory_entries:
+      - id: rulebook-4.detection
+        outcome: "Unusual login activity and impossible travel, MFA bypass, privilege-escalation alerts, unusual mailbox or cloud activity, CERT or threat-intelligence alerts, OAuth or API tokens used outside corporate ranges."
+        playbook_refs:
+          - playbook.identity_compromise@v1
+          - playbook.iam_auditor@v1
+          - playbook.alert_triage@v1
+      - id: rulebook-4.containment
+        outcome: "Force logoff and password reset, terminate sessions and revoke tokens, notify the SOC and IAM team, watch for re-authentication and spraying attempts."
+        playbook_refs:
+          - playbook.identity_compromise@v1
+      - id: rulebook-4.investigation
+        outcome: "Identify the entry vector, review access logs, establish how MFA was bypassed, hunt lateral movement, privilege escalation and persistence (new MFA devices, accounts, long-lived tokens, OAuth consents, mail rules), look for credential-dumping tools."
+        playbook_refs:
+          - playbook.identity_compromise@v1
+          - playbook.phishing_triage@v1
+      - id: rulebook-4.remediation
+        outcome: "Reset passwords, keys and tokens to the scale of impact, enforce conditional access and MFA for sensitive, administrative and remote access, review directory roles, patch affected components, add detections for renewed activity, remove malicious consents and rules."
+        playbook_refs:
+          - playbook.identity_compromise@v1
+          - playbook.mfa_secured_comms@v1
+          - playbook.iam_auditor@v1
+          - playbook.detection_engineering@v1
+          - playbook.patch_management@v1
+      - id: rulebook-4.evidence
+        outcome: "Authentication logs from the directory, identity provider and VPN, EDR logs."
+        playbook_refs:
+          - playbook.iam_auditor@v1
+      - id: rulebook-4.post-incident
+        outcome: "Harden the password policy and enforce MFA broadly, review service accounts and API keys, improve IAM policies and permissions, raise credential-hygiene awareness, introduce behavioural analytics and risk-based access."
+        playbook_refs:
+          - playbook.mfa_secured_comms@v1
+          - playbook.iam_auditor@v1
+          - playbook.security_awareness_training@v1
+      - id: rulebook-4.communication
+        outcome: "Notify impacted users and advise checks on other accounts, inform SOC and IT, inform management, legal and compliance when sensitive data was accessed, altered or exfiltrated."
+        playbook_refs:
+          - playbook.incident_management@v1
+          - playbook.data_exfil@v1
+  - id: nis2:rulebook-5-vulnerability-exploitation
+    regulation:
+      name: NIS2 incident-handling rulebooks
+      instrument: "Operational guidance for incident handling, v1.0 (28 September 2026), published by the Luxembourg NIS2 competent authorities and CSIRTs"
+      article: "Rulebook 5 – Vulnerability exploitation"
+      url: https://github.com/nis2-rulebooks/nis2-rulebooks/blob/879b88197c0b48099c74ec9bf9bb36677c793a81/rulebooks/operational-guidance-incident-handling.md
+    obligation: "Handle an exploited vulnerability: isolate the affected application, close the exploited path, keep logs and snapshots before patching, investigate for web shells, persistence and data access, patch or disable, rotate secrets, rebuild where needed, and harden the delivery pipeline."
+    status: live
+    playbook_refs:
+      - playbook.alert_triage@v1
+      - playbook.vuln_intake@v1
+      - playbook.business_continuity@v1
+      - playbook.identity_compromise@v1
+      - playbook.codebase_vuln_management@v1
+      - playbook.data_exfil@v1
+      - playbook.patch_management@v1
+      - playbook.vulnerability_management@v1
+      - playbook.incident_management@v1
+    notes: "Vulnerability intake carries disclosure intake, triage, the CRA reporting trigger and severity routing; vulnerability and patch management carry scanning, remediation decisions, verification and rollout; codebase vulnerability management covers source-level findings. Isolating a running application and killing the exploited path are runtime actions the operator performs in its own stack."
+    subcategory_entries:
+      - id: rulebook-5.detection
+        outcome: "Unusual application behaviour, errors or defacement, unusual API calls or data access, spikes in WAF or SIEM alerts, suspected reverse or web shells, abnormal page volumetry, anomalies in access logs."
+        playbook_refs:
+          - playbook.alert_triage@v1
+          - playbook.vuln_intake@v1
+      - id: rulebook-5.containment
+        outcome: "Isolate affected systems, kill-switch the vulnerable path, disable exposed endpoints, deploy blocking WAF rules, notify business continuity, keep logs and snapshots before patching, watch for lateral movement into internal networks."
+        playbook_refs:
+          - playbook.vuln_intake@v1
+          - playbook.business_continuity@v1
+          - playbook.identity_compromise@v1
+      - id: rulebook-5.investigation
+        outcome: "Review web, API, system and reverse-proxy logs, check recent changes and source diffs, hunt web shells, inspect connections and processes, verify file integrity against baseline, look for persistence, analyse memory, determine whether data was accessed or exfiltrated."
+        playbook_refs:
+          - playbook.vuln_intake@v1
+          - playbook.codebase_vuln_management@v1
+          - playbook.data_exfil@v1
+      - id: rulebook-5.remediation
+        outcome: "Patch or disable the component, rotate secrets, remove shells and implants, rebuild the hosting stack where compromised, run a full scan, re-enable services progressively."
+        playbook_refs:
+          - playbook.patch_management@v1
+          - playbook.vulnerability_management@v1
+          - playbook.vuln_intake@v1
+          - playbook.identity_compromise@v1
+      - id: rulebook-5.evidence
+        outcome: "Full HTTP, access and error logs, WAF alerts, system and application logs, images of the hosting stack, source diffs."
+        playbook_refs:
+          - playbook.vulnerability_management@v1
+      - id: rulebook-5.post-incident
+        outcome: "Harden the deployment pipeline and development lifecycle, improve API authentication and rate limits, review custom code, strengthen input validation, guard against SSRF and deserialisation flaws, keep testing and scanning."
+        playbook_refs:
+          - playbook.codebase_vuln_management@v1
+          - playbook.vulnerability_management@v1
+      - id: rulebook-5.communication
+        outcome: "Alert development and infrastructure teams to the vector, notify business owners of impact, inform management, legal and compliance when sensitive data is affected; report where regulation requires it."
+        playbook_refs:
+          - playbook.vuln_intake@v1
+          - playbook.incident_management@v1
+  - id: nis2:rulebook-6-insider-threat
+    regulation:
+      name: NIS2 incident-handling rulebooks
+      instrument: "Operational guidance for incident handling, v1.0 (28 September 2026), published by the Luxembourg NIS2 competent authorities and CSIRTs"
+      article: "Rulebook 6 – Insider threat"
+      url: https://github.com/nis2-rulebooks/nis2-rulebooks/blob/879b88197c0b48099c74ec9bf9bb36677c793a81/rulebooks/operational-guidance-incident-handling.md
+    obligation: "Handle a suspected insider: restrict access on need-to-know and least privilege, monitor with approved tools, involve HR and legal, investigate access history and intent, suspend or limit access when confirmed, protect investigative data, and strengthen screening, behaviour analytics and DLP afterwards."
+    status: draft
+    playbook_refs:
+      - playbook.data_exfil@v1
+      - playbook.iam_auditor@v1
+      - playbook.identity_compromise@v1
+      - playbook.security_awareness_training@v1
+    notes: "No playbook covers this rulebook yet; the gap is tracked as the insider_threat playbook request (#1009). The detection, containment, evidence and post-incident rows name the existing playbooks that cover part of the ground; the HR, legal and intent dimensions are the missing core."
+    subcategory_entries:
+      - id: rulebook-6.detection
+        outcome: "Unusual access to sensitive data, large or out-of-hours outbound traffic, HR complaints or warnings, unauthorised use of administrative tools or privilege-escalation attempts."
+        playbook_refs:
+          - playbook.data_exfil@v1
+          - playbook.iam_auditor@v1
+        gap_note: "Technical signals overlap the data-exfiltration and IAM-auditor playbooks; the HR-sourced signal and the correlation of both is the insider_threat playbook request (#1009)."
+      - id: rulebook-6.containment
+        outcome: "Restrict access on need-to-know and least privilege, monitor activities with approved procedures, notify HR, legal and affected third parties, suspend access when theft or sabotage is suspected."
+        playbook_refs:
+          - playbook.identity_compromise@v1
+        gap_note: "Session revocation and access reduction exist in identity compromise; the least-disruptive-first ordering and the HR and legal notifications are the insider_threat playbook request (#1009)."
+      - id: rulebook-6.investigation
+        outcome: "Collect access history, behavioural anomalies and recent role changes, keep evidence per law and policy, use secure channels, analyse intent, use threat intelligence."
+        gap_note: "Intent analysis and lawful handling of personal data about an employee are the core of the insider_threat playbook request (#1009); no shipped playbook performs them."
+      - id: rulebook-6.remediation
+        outcome: "Suspend or limit access once confirmed, offer psychological support, change shared passwords and rotate keys the insider could reach."
+        playbook_refs:
+          - playbook.identity_compromise@v1
+        gap_note: "Shared-secret rotation is covered; the proportionality decision belongs to the insider_threat playbook request (#1009)."
+      - id: rulebook-6.evidence
+        outcome: "End-user logs within what the law allows, HR, legal and management communications, role history, strict access control on the investigative data."
+        playbook_refs:
+          - playbook.iam_auditor@v1
+        gap_note: "Role history is the IAM auditor's access evidence; lawful collection of end-user logs and protection of the investigative record are part of the insider_threat playbook request (#1009)."
+      - id: rulebook-6.post-incident
+        outcome: "Consider enhanced screening, deploy user-behaviour analytics, review DLP policy, enforce segmentation and role-based access."
+        playbook_refs:
+          - playbook.iam_auditor@v1
+          - playbook.security_awareness_training@v1
+      - id: rulebook-6.communication
+        outcome: "Communicate continuously with legal, compliance, HR and management; share only with those who strictly need to know."
+        gap_note: "Restricted-circle communication is a governance measure the operator owns; it is in scope of the insider_threat playbook request (#1009)."
+  - id: nis2:rulebook-7-data-exfiltration
+    regulation:
+      name: NIS2 incident-handling rulebooks
+      instrument: "Operational guidance for incident handling, v1.0 (28 September 2026), published by the Luxembourg NIS2 competent authorities and CSIRTs"
+      article: "Rulebook 7 – Data exfiltration"
+      url: https://github.com/nis2-rulebooks/nis2-rulebooks/blob/879b88197c0b48099c74ec9bf9bb36677c793a81/rulebooks/operational-guidance-incident-handling.md
+    obligation: "Handle data exfiltration: decide between blocking and monitoring, isolate suspected systems while preserving forensic integrity, cut exfiltration channels and remote access, investigate scope, dwell time and staging, remove persistence, reset credentials, and notify management, legal, compliance and the data-protection officer."
+    status: live
+    playbook_refs:
+      - playbook.data_exfil@v1
+      - playbook.alert_triage@v1
+      - playbook.identity_compromise@v1
+      - playbook.threat_intel_ingest@v1
+      - playbook.backup_recovery@v1
+      - playbook.incident_management@v1
+      - playbook.post_incident_review@v1
+      - playbook.patch_management@v1
+      - playbook.detection_engineering@v1
+    notes: "The data-exfiltration playbook carries triage, scope assessment, containment, the regulator-notification threshold and the notifications; lateral-movement hunting and persistence removal are the identity-compromise playbook; blocklist propagation is threat-intel ingest."
+    subcategory_entries:
+      - id: rulebook-7.detection
+        outcome: "Unusual access to sensitive data, large, obfuscated or out-of-hours outbound traffic, EDR or threat-intelligence alerts, sudden large transfers, long dwell time, DLP or proxy alerts, data found outside normal channels."
+        playbook_refs:
+          - playbook.data_exfil@v1
+          - playbook.alert_triage@v1
+      - id: rulebook-7.containment
+        outcome: "Choose block or monitor by sensitivity, isolate suspected systems and preserve forensic integrity, block exfiltration channels, disable remote access on suspect accounts and machines, watch for command-and-control traffic, acquire full disks."
+        playbook_refs:
+          - playbook.data_exfil@v1
+          - playbook.identity_compromise@v1
+          - playbook.threat_intel_ingest@v1
+      - id: rulebook-7.investigation
+        outcome: "Hunt persistence, identify the exfiltrated data and volume, build the timeline, determine dwell time and entry point, locate staging areas, check channels used for lateral communication."
+        playbook_refs:
+          - playbook.data_exfil@v1
+          - playbook.identity_compromise@v1
+      - id: rulebook-7.remediation
+        outcome: "Remove persistence, restore the compromised portion of the infrastructure, reset credentials and tokens in tiers, review DLP, segment access on zero-trust and least-privilege lines."
+        playbook_refs:
+          - playbook.identity_compromise@v1
+          - playbook.backup_recovery@v1
+          - playbook.data_exfil@v1
+      - id: rulebook-7.evidence
+        outcome: "Network captures, proxy logs, system images, logs of the staged attack across collaboration tools, DLP and CASB alerts."
+        playbook_refs:
+          - playbook.incident_management@v1
+          - playbook.post_incident_review@v1
+      - id: rulebook-7.post-incident
+        outcome: "Patch entry vectors, establish threat hunting, deploy detections for living-off-the-land and unusual outbound traffic."
+        playbook_refs:
+          - playbook.patch_management@v1
+          - playbook.detection_engineering@v1
+          - playbook.threat_intel_ingest@v1
+      - id: rulebook-7.communication
+        outcome: "Escalate to top management, legal and compliance; coordinate with the data-protection officer when personal data was exfiltrated."
+        playbook_refs:
+          - playbook.data_exfil@v1
+          - playbook.incident_management@v1
+  - id: nis2:rulebook-8-supply-chain
+    regulation:
+      name: NIS2 incident-handling rulebooks
+      instrument: "Operational guidance for incident handling, v1.0 (28 September 2026), published by the Luxembourg NIS2 competent authorities and CSIRTs"
+      article: "Rulebook 8 – Package compromission & supply chain attack"
+      url: https://github.com/nis2-rulebooks/nis2-rulebooks/blob/879b88197c0b48099c74ec9bf9bb36677c793a81/rulebooks/operational-guidance-incident-handling.md
+    obligation: "Handle a compromised package or supplier: freeze deployments and auto-updates, quarantine affected hosts and build agents, block indicators and restrict update endpoints, rotate secrets, investigate components, signatures, build logs and SBOMs, rebuild from trusted sources, and harden sourcing, registries and the delivery pipeline."
+    status: live
+    playbook_refs:
+      - playbook.supply_chain_security@v1
+      - playbook.alert_triage@v1
+      - playbook.patch_management@v1
+      - playbook.identity_compromise@v1
+      - playbook.threat_intel_ingest@v1
+      - playbook.business_continuity@v1
+      - playbook.asset_management@v1
+      - playbook.codebase_vuln_management@v1
+      - playbook.data_exfil@v1
+      - playbook.backup_recovery@v1
+      - playbook.contractual_obligations_tracker@v1
+      - playbook.dora_tpr_management@v1
+      - playbook.detection_engineering@v1
+      - playbook.incident_management@v1
+    notes: "Supply-chain security carries the supplier-signal assessment and the supply-chain evidence; patch management carries staged rollout and the canary ring the rulebook's freeze and controlled redeployment rely on; asset management scopes the affected estate; the contractual-obligations tracker and third-party risk management carry the vendor-side follow-up."
+    subcategory_entries:
+      - id: rulebook-8.detection
+        outcome: "Alerts after updates or third-party integrations, hash or signature failures, outbound traffic to abnormal domains, EDR alerts on updated binaries, unexpected OAuth or SSO consents, unusual third-party requests, behaviour drifting from the SBOM."
+        playbook_refs:
+          - playbook.supply_chain_security@v1
+          - playbook.alert_triage@v1
+      - id: rulebook-8.containment
+        outcome: "Freeze deployments and auto-updates, quarantine hosts, containers and build agents, block indicators, restrict outbound traffic to trusted update endpoints, rotate secrets, disable suspicious integrations, re-authenticate administrators, inform SOC and business continuity, seek vendor advice."
+        playbook_refs:
+          - playbook.patch_management@v1
+          - playbook.identity_compromise@v1
+          - playbook.threat_intel_ingest@v1
+          - playbook.business_continuity@v1
+      - id: rulebook-8.investigation
+        outcome: "Identify compromised components and versions, list assets at risk, verify signatures, hashes and certificate chains, trace process descendants, review CI/CD logs, artefact records and SBOMs, audit token abuse, hunt persistence, lateral movement and exfiltration, verify the update channel."
+        playbook_refs:
+          - playbook.supply_chain_security@v1
+          - playbook.asset_management@v1
+          - playbook.codebase_vuln_management@v1
+          - playbook.data_exfil@v1
+      - id: rulebook-8.remediation
+        outcome: "Blocklist and purge compromised packages, patch or roll back to clean versions, rebuild from trusted sources, recreate impacted systems, rotate secrets, keys and certificates, remove persistence, run integrity checks and sandboxes, raise monitoring."
+        playbook_refs:
+          - playbook.patch_management@v1
+          - playbook.backup_recovery@v1
+          - playbook.identity_compromise@v1
+          - playbook.supply_chain_security@v1
+      - id: rulebook-8.evidence
+        outcome: "Snapshots and memory captures, copies of malicious components, build instructions, CI/CD, endpoint, registry, proxy and access logs, network captures, the vendor communication trail."
+        playbook_refs:
+          - playbook.supply_chain_security@v1
+      - id: rulebook-8.post-incident
+        outcome: "Enforce verified SBOMs and attestations, private registries and update proxies, tiered rotation and short-lived third-party tokens, CI/CD hardening, canary and staged rollouts with rollback, ongoing component controls, stronger vendor risk review and contract clauses, tunnelling detection."
+        playbook_refs:
+          - playbook.supply_chain_security@v1
+          - playbook.patch_management@v1
+          - playbook.contractual_obligations_tracker@v1
+          - playbook.dora_tpr_management@v1
+          - playbook.detection_engineering@v1
+      - id: rulebook-8.communication
+        outcome: "Coordinate with SOC and IT, contact vendors and maintainers for indicators, patches and root cause, inform business owners and clients where appropriate."
+        playbook_refs:
+          - playbook.supply_chain_security@v1
+          - playbook.incident_management@v1

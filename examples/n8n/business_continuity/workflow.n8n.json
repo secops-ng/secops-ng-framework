@@ -1,5 +1,5 @@
 {
-  "name": "Business Continuity \u2014 NIS2 Art.21(2)(c)",
+  "name": "SecOps-NG: Business Continuity \u2014 NIS2 Art.21(2)(c)",
   "nodes": [
     {
       "id": "action--b17c0072-0000-4000-8000-000000000002",
@@ -305,6 +305,22 @@
       },
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -428
+      ],
+      "parameters": {
+        "content": "## Business Continuity \u2014 NIS2 Art.21(2)(c)\n`playbook.business_continuity@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nCACAO v2 playbook for the operator-side business continuity lifecycle a NIS2 essential or important entity runs when a business- continuity event (major outage, ransomware containment escalation, dependency failure, or facility loss) is declared against an in- scope service. Covers the three discipline surfaces NIS2 Art. 21(2)(c) names \u2014 backup management, disaster recovery, and crisis management \u2014 as a single continuity envelope. The lifecycle chains seven bound action step\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555 \u2014 Article 21(2)(c) business continuity, backup management, disaster recovery, crisis management; Article 23 significant-incident reporting\n\n**Controls:** 3 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__no_notification_rationale__`, `__notification_assessment__`, `__notification_phase__`, `__pir_corrective_actions__`, `__pir_lessons__`, `__pir_linked_refs__`, `__pir_plan_revisions__`, `__plan_register__`, `__raw_trigger__`, `__recovery_observations__`, `__significance_policy__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - detect_and_declare_bcm_event \u2192 `content.playbooks.business_continuity.primitives.declaration.declare_bcm_event`\n  - activate_bcm_plan \u2192 `content.playbooks.business_continuity.primitives.activation.activate_bcm_plan`\n  - isolate_affected_systems \u2192 `content.playbooks.business_continuity.primitives.isolation.resolve_isolation_scope`\n  - switch_to_backup \u2192 `content.playbooks.business_continuity.primitives.failover.select_failover_target`\n  - notify_competent_authority \u2192 `content.playbooks.business_continuity.primitives.notification.compose_authority_notification`\n  - restore_and_verify \u2192 `content.playbooks.business_continuity.primitives.recovery.evaluate_recovery`\n  - post_incident_review \u2192 `content.playbooks.business_continuity.primitives.review.compose_pir_record`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/business_continuity\nRegenerate with `python -m tools.compile content/playbooks/business_continuity/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 608,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -403,12 +419,33 @@
   },
   "staticData": null,
   "tags": [
-    "nis2",
-    "article-21-2-c",
-    "business-continuity",
-    "disaster-recovery",
-    "crisis-management",
-    "backup-management"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "nis2"
+    },
+    {
+      "name": "article-21-2-c"
+    },
+    {
+      "name": "business-continuity"
+    },
+    {
+      "name": "disaster-recovery"
+    },
+    {
+      "name": "crisis-management"
+    },
+    {
+      "name": "backup-management"
+    }
   ],
   "pinData": {},
   "meta": {

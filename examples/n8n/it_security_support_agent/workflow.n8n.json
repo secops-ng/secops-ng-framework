@@ -1,5 +1,5 @@
 {
-  "name": "IT and security support agent",
+  "name": "SecOps-NG: IT and security support agent",
   "nodes": [
     {
       "id": "start--20122012-0000-4000-8000-000000000001",
@@ -231,6 +231,22 @@
       "parameters": {},
       "notes": "",
       "notesInFlow": false
+    },
+    {
+      "id": "secops-ng-playbook-card",
+      "name": "Playbook card",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -384
+      ],
+      "parameters": {
+        "content": "## IT and security support agent\n`playbook.it_security_support_agent@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nTicket-shaped interaction workflow that ingests one operator-supplied support request, classifies it (informational / actionable / incident-shaped), attempts an automated resolution against the declared self-service surface, escalates to a human responder when automated resolution does not close the request, and emits one interaction-evidence artifact pinning the request, the classification, the automated-resolution outcome, and the human-handoff envelope when one fires. The\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555 \u2014 Article 21(2)(b)\n\n**Controls:** 1 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__workflow_id__`, `__execution_id__`, `__compile_target__`, `__support_request_ref__`, `__raw_support_request__`, `__classification_verdict_input__`, `__automated_resolution_observation__`, `__handoff_inputs__`, `__regulation_refs__`, `__control_refs__`, `__owner_role__`, `__owner_assigned_at__`, `__captured_at__`, `__source_url__`, `__cross_border__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - ingest-support-request \u2192 `content.playbooks.it_security_support_agent.primitives.ingest.ingest_support_request`\n  - classify-request \u2192 `content.playbooks.it_security_support_agent.primitives.classify.classify_request`\n  - attempt-automated-resolution \u2192 `content.playbooks.it_security_support_agent.primitives.resolution.attempt_automated_resolution`\n  - escalate-with-human-handoff \u2192 `content.playbooks.it_security_support_agent.primitives.handoff.escalate_with_human_handoff`\n  - emit-interaction-evidence \u2192 `content.playbooks.it_security_support_agent.primitives.artifact.build_interaction_artifact`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/it_security_support_agent\nRegenerate with `python -m tools.compile content/playbooks/it_security_support_agent/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 564,
+        "width": 620,
+        "color": 4
+      }
     }
   ],
   "connections": {
@@ -307,11 +323,30 @@
   },
   "staticData": null,
   "tags": [
-    "support",
-    "ticket",
-    "interaction",
-    "human-handoff",
-    "nis2"
+    {
+      "name": "secops-ng"
+    },
+    {
+      "name": "maturity:stable"
+    },
+    {
+      "name": "regime:nis2"
+    },
+    {
+      "name": "support"
+    },
+    {
+      "name": "ticket"
+    },
+    {
+      "name": "interaction"
+    },
+    {
+      "name": "human-handoff"
+    },
+    {
+      "name": "nis2"
+    }
   ],
   "pinData": {},
   "meta": {
