@@ -67,9 +67,11 @@ identity_compromise; see `assemble.py` for the ~10-line wiring.
 
 ## What this example deliberately doesn't do
 
-- It does not execute the graph. The `@tool` bodies raise
-  `NotImplementedError`; integrators wire them to their own runtime
-  (EDR, DLP, ticketing, SIEM, regulatory-notification channel).
+- It does not execute the graph. Each `@tool` body calls its bound
+  primitive, but the inputs those calls read come from adapters the
+  integrator wires to their own runtime (DLP, egress gateway, IdP,
+  authority and data-subject notification channels), and the
+  directives they return are executed there.
 - It does not ship operator credentials, endpoints, or environment.
   Secrets stay with the operator.
 - It does not pick an LLM provider for the agentic-extension hook.

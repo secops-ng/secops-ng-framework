@@ -2376,6 +2376,15 @@ one playbook's provenance.
     indicator names but not their timestamps; three targets
     regenerated; `experimental` → `stable`, `content_version` 1.0.0 on
     a recomputed checklist).
+  - CORE-WIRE + GRADUATE — #1039, closing #1024 (`data_exfil`: all five
+    action steps bound through `core_body`, each carrying its
+    `secops-ng-primitive` command in place of the manual one; triage now
+    emits an envelope that scope assessment reads, the two gate booleans
+    are extracted from the scope envelope, and both notification clocks
+    run from an adapter-supplied awareness instant; three targets
+    regenerated, with the legacy-form compiler fixture and its goldens
+    kept in step; `experimental` → `stable`, `content_version` 1.0.0 on
+    a recomputed checklist).
 
 ### F-WF-CORE-WAVE-2 — CORE wave 2: bind the remaining worthy playbooks; record the parked five
 
