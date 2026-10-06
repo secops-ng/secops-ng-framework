@@ -24,15 +24,20 @@ there for the cross-reference graph and per-artifact stable IDs.
 `compile_targets` declares `["n8n", "temporal", "langgraph"]`. The
 emitted artifacts ship under `examples/{n8n,temporal,langgraph}/data_exfil/`,
 with the practitioner walkthrough at `docs/cookbook/data_exfil.md`. They
-are regenerated from the canonical source, which is not yet bound, so
-the action bodies are still operator placeholders rather than primitive
-calls.
+call the bound primitives: five n8n Code nodes, and Temporal activity
+and LangGraph tool bodies that import and call them. The Temporal target
+still leaves workflow control flow to the integrator, as it does for
+every playbook.
 
 ## Status
 
-`maturity: experimental`, CORE-PRIM complete. Each of the five action
-steps has a deterministic primitive under `primitives/`, executed
-directly by `tests/playbooks/data_exfil/test_primitives.py`:
+`maturity: stable`, `content_version` 1.0.0. All five action steps bind
+a deterministic primitive under `primitives/` through
+`x_secops_ng.core_body`, each executed directly by
+`tests/playbooks/data_exfil/test_primitives.py`, and the three reference
+targets emit those calls. The graduation checklist recomputes green:
+tier A, 5 of 5 real bindings, zero placeholder bodies, zero blank
+predicates, zero schema errors, three-target goldens.
 
 | Step | Primitive |
 |---|---|
@@ -66,10 +71,23 @@ Decisions the primitives fix:
 - **The data-subject determination always carries its basis** under
   GDPR Art. 34 — an unjustified non-notification is not representable.
 
-**Owed: the wire.** The CACAO steps do not yet carry
-`x_secops_ng.core_body`, so `catalog.py` reports 0 of 5 bound. Binding
-the five steps, declaring the variables they need, regenerating the
-examples and recomputing the Maturity ladder is the CORE-WIRE card.
+Contract choices settled at the wire. The contract grows from 5 to 21
+variables: 11 adapter inputs, one envelope per step, and four of the
+five existing names, now fields extracted from the scope envelope at the
+adapter seam (`__signal_id__` stays the trigger input).
+
+- **The gates read extracted fields.** `__exfil_confirmed__` and
+  `__regulator_required__` come from `__scope_assessment__`, and stay
+  real booleans because both gates compare them to `true`.
+- **The clocks run from awareness.** `__aware_at__` is an adapter input:
+  the instant the operator became aware of the breach, which both
+  notification steps read. A value before detection fails loud.
+- **Lists ride as strings.** CACAO variables have no list type, so
+  `__benign_patterns__` and `__dlp_findings__` carry JSON-native lists
+  that the target's adapter seam marshals.
+- **Nothing is optional.** No input has an unset meaning, so an empty
+  string from the n8n trigger fails loud rather than being read as a
+  default.
 
 ## Sources
 

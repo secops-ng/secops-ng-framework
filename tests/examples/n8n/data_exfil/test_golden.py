@@ -23,6 +23,7 @@ from pathlib import Path
 
 from compilers._shared.cacao_parser import parse_file
 from compilers.n8n.emit import emit
+from compilers._shared.cacao_parser import secops_extension
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 SOURCE = REPO_ROOT / "content" / "playbooks" / "data_exfil" / "playbook.cacao.json"
@@ -146,6 +147,16 @@ def test_worked_example_has_valid_n8n_shape() -> None:
 
 
 def _action_without_commands_steps() -> dict[str, dict]:
+    """Unbound action steps: no commands, or only ``manual`` ones.
+
+    Since the CORE-WIRE change all five action steps are bound — each
+    carries ``core_body`` and a ``secops-ng-primitive`` command — so this
+    returns ``{}`` and the Set-node tests that consume it are vacuous here.
+    They are kept rather than deleted: they are the contract that catches a
+    step being unbound again, and they start asserting the moment one is.
+    The live check for the bound steps is
+    :func:`test_core_body_steps_emit_code_nodes`.
+    """
     raw = json.loads(SOURCE.read_text(encoding="utf-8"))
     return {
         step_id: step
@@ -157,6 +168,29 @@ def _action_without_commands_steps() -> dict[str, dict]:
 def _nodes_by_id() -> dict[str, dict]:
     workflow = json.loads(WORKED_EXAMPLE.read_text(encoding="utf-8"))
     return {node["id"]: node for node in workflow["nodes"]}
+
+
+def test_core_body_steps_emit_code_nodes() -> None:
+    """Every bound step compiles to an n8n Code node that imports its
+    primitive and binds the declared ``out`` variable to the call.
+
+    Catches an emitter regression — a Set node, or a Code node that imports
+    the primitive without calling it — which byte-parity alone misses once a
+    careless regenerate bakes it into the golden. It does not catch
+    deliberate de-binding, which is a reviewable diff in both files.
+    """
+    raw = json.loads(SOURCE.read_text(encoding="utf-8"))
+    nodes_by_id = _nodes_by_id()
+    bound = {sid: s for sid, s in raw["workflow"].items()
+             if (secops_extension(s) or {}).get("core_body")}
+    assert len(bound) == 5, f"expected all five action steps bound, found {len(bound)}"
+    for step_id, step in bound.items():
+        node = nodes_by_id[step_id]
+        assert node["type"] == "n8n-nodes-base.code", f"{step_id}: {node['type']}"
+        body = node["parameters"].get("pythonCode", "")
+        module, _, fn = secops_extension(step)["core_body"]["primitive"].rpartition(".")
+        assert f"from {module} import {fn}" in body, f"{step_id}: primitive not imported"
+        assert f"{secops_extension(step)['core_body']['out']} = {fn}(" in body, f"{step_id}: call not bound"
 
 
 def test_action_without_commands_steps_emit_set_nodes() -> None:
@@ -198,7 +232,7 @@ def test_set_nodes_surface_x_secops_ng_refs() -> None:
     """Every `x_secops_ng.<key>` bundle on the CACAO step appears as a Set row."""
     nodes_by_id = _nodes_by_id()
     for step_id, step in _action_without_commands_steps().items():
-        x = step.get("x_secops_ng") or {}
+        x = secops_extension(step) or {}
         if not x:
             continue
         node = nodes_by_id[step_id]

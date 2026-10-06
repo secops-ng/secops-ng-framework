@@ -17,31 +17,127 @@
               "name": "__signal_id__",
               "type": "string",
               "value": "",
-              "description": "Identifier of the originating DLP / egress signal supplied by the detection layer."
+              "description": "Identifier of the originating DLP / egress signal supplied by the detection layer. The hydration adapter assembles __hydrated_signal__ for it."
+            },
+            {
+              "name": "__hydrated_signal__",
+              "type": "object",
+              "value": "",
+              "description": "The signal the hydration adapter assembled for __signal_id__: exactly signal_id, source, detected_at (Zulu), actor_ref, asset_ref, destination, channel, bytes_out (an integer) and indicators (names from the triage vocabulary; an unknown name fails loud)."
+            },
+            {
+              "name": "__benign_patterns__",
+              "type": "string",
+              "value": "",
+              "description": "The operator's known-benign egress: each names a destination and optionally narrows it to an actor_ref and a channel. A match is never honoured for a signal that also saw a staging archive created. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it."
+            },
+            {
+              "name": "__dlp_findings__",
+              "type": "string",
+              "value": "",
+              "description": "What content inspection found in the transfer: each exactly classification (a class, or unknown where the content could not be classified) and subject_refs (pseudonymous subject identifiers). CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it."
+            },
+            {
+              "name": "__in_line_control__",
+              "type": "string",
+              "value": "",
+              "description": "What the in-line control did to the transfer: blocked, partial or allowed."
+            },
+            {
+              "name": "__routing_policy__",
+              "type": "object",
+              "value": "",
+              "description": "The operator's regulator-routing policy: exactly regulator_classifications (classes that always require a regulator notification) and subject_threshold (a positive integer)."
+            },
+            {
+              "name": "__authorisation_policy__",
+              "type": "object",
+              "value": "",
+              "description": "The operator's containment policy: exactly protected_hosts, protected_identities (references that wait for approval) and isolation_subject_threshold (a positive integer)."
+            },
+            {
+              "name": "__requested_at__",
+              "type": "string",
+              "value": "",
+              "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the containment directive is requested at."
+            },
+            {
+              "name": "__authority_channels__",
+              "type": "object",
+              "value": "",
+              "description": "Authority channel reference per regime the operator is subject to: a non-empty subset of gdpr, nis2 and dora. A required notification no configured channel can carry fails loud."
+            },
+            {
+              "name": "__aware_at__",
+              "type": "string",
+              "value": "",
+              "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the operator became aware of the breach. Every notification clock runs from it, not from detection; a time before detection is inconsistent input and fails loud."
+            },
+            {
+              "name": "__high_risk_policy__",
+              "type": "object",
+              "value": "",
+              "description": "The operator's GDPR Art. 34(1) policy: exactly high_risk_classifications, the classes treated as likely high risk to data subjects."
+            },
+            {
+              "name": "__subject_channel__",
+              "type": "string",
+              "value": "",
+              "description": "Reference of the pre-bound channel data-subject notices are sent on."
             },
             {
               "name": "__data_classification__",
               "type": "string",
               "value": "",
-              "description": "Resolved data classification of the affected payload (e.g. public, internal, confidential, restricted, special-category). Drives both containment and notification routing."
+              "description": "The most sensitive class the content inspection saw (public, internal, confidential, restricted, special-category), or unknown when nothing could be classified. Extracted at the compile target's adapter seam from __scope_assessment__.data_classification."
             },
             {
               "name": "__affected_subjects_count__",
               "type": "number",
               "value": "",
-              "description": "Estimated count of data subjects whose data is in scope after assessment. Feeds the regulator-threshold gate."
+              "description": "Count of distinct data subjects across the findings; a lower bound when content could not be inspected. Extracted at the compile target's adapter seam from __scope_assessment__.affected_subjects_count."
             },
             {
               "name": "__exfil_confirmed__",
               "type": "boolean",
               "value": "",
-              "description": "Whether scope assessment confirmed actual exfiltration. False signals trigger close-out, not containment."
+              "description": "Whether data actually left: not a known-benign pattern, not blocked in line, and a non-zero volume. False closes out without containment. Extracted at the compile target's adapter seam from __scope_assessment__.exfil_confirmed. A real boolean: the gate compares it to true, and the string 'false' is truthy in most runtimes."
             },
             {
               "name": "__regulator_required__",
               "type": "boolean",
               "value": "",
-              "description": "Whether the affected-subjects count and data classification together cross the regulator-notification threshold (NIS2 Art. 23 / DORA Art. 19 / GDPR Art. 33 routing)."
+              "description": "Whether the operator's routing policy owes a regulator notification (NIS2 Art. 23 / DORA Art. 19 / GDPR Art. 33 routing): a listed classification, uninspected content, or a subject count at or above the threshold. Extracted at the compile target's adapter seam from __scope_assessment__.regulator_required. A real boolean, for the same reason as __exfil_confirmed__."
+            },
+            {
+              "name": "__triage_record__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the triage step emits: the normalised signal, known_benign as a real boolean, the matched pattern, and benign_refused naming why a match was not honoured."
+            },
+            {
+              "name": "__scope_assessment__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the scope step emits: exfil_confirmed with its basis, the classification, whether content went uninspected, the distinct subject count, and regulator_required with its reasons."
+            },
+            {
+              "name": "__containment_directive__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the containment step emits: the ordered containment actions, proportionate to classification and scope, and which of them wait for approval."
+            },
+            {
+              "name": "__regulator_notification__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the regulator step emits: one notification per applicable regime, each with its own deadline from __aware_at__, and the regimes recorded as skipped with their reason."
+            },
+            {
+              "name": "__subject_notification__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the data-subject step emits: whether notice is required, always with its basis, and the notice itself only when it is."
             }
           ]
         }
@@ -52,111 +148,33 @@
     {
       "id": "action--20000000-0000-4000-8000-000000000002",
       "name": "triage signal",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         500,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.signal_id",
-              "name": "in.signal_id",
-              "value": "={{$workflow.variables.signal_id}}",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.detection_refs",
-              "name": "x_secops_ng.detection_refs",
-              "value": "detection.sigma.dlp_egress_alert@v1, detection.sigma.data_staging_archive_created@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.data_security_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.mttd_exfil@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.data_exfil.primitives.triage import triage_egress_signal\n__triage_record__ = triage_egress_signal(signal=__hydrated_signal__, benign_patterns=__benign_patterns__)"
       },
-      "notes": "Receive the DLP / egress signal, hydrate it with originating user / asset / destination context, and decide whether the signal warrants scope assessment or is a known benign egress pattern.",
+      "notes": "Decide whether the hydrated egress signal matches one of the operator's known-benign patterns; a signal that also saw a staging archive created is never cleared, and a refused match is recorded with its reason. Produces __triage_record__, which scope assessment reads.",
       "notesInFlow": true
     },
     {
       "id": "action--20000000-0000-4000-8000-000000000003",
       "name": "scope assessment",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         760,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.signal_id",
-              "name": "in.signal_id",
-              "value": "={{$workflow.variables.signal_id}}",
-              "type": "string"
-            },
-            {
-              "id": "out.data_classification",
-              "name": "out.data_classification",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "out.affected_subjects_count",
-              "name": "out.affected_subjects_count",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "out.exfil_confirmed",
-              "name": "out.exfil_confirmed",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "out.regulator_required",
-              "name": "out.regulator_required",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.data_classification_baseline@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.data_security_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.mttd_exfil@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.data_exfil.primitives.scope import assess_exfil_scope\n__scope_assessment__ = assess_exfil_scope(triage=__triage_record__, dlp_findings=__dlp_findings__, in_line_control=__in_line_control__, routing_policy=__routing_policy__)"
       },
-      "notes": "Determine the volume and classification of data observed leaving the boundary, the count of distinct data subjects affected, and whether actual exfiltration occurred or was prevented by an in-line control. Produces __data_classification__, __affected_subjects_count__, __exfil_confirmed__, and __regulator_required__ \u2014 whether the classification and the subject count together cross the operator's regulator-notification threshold, which the notification branch reads after containment.",
+      "notes": "Resolve what left the boundary: confirm exfiltration (not known-benign, not blocked in line, a non-zero volume), take the most sensitive class the findings saw, count distinct data subjects, and apply the operator's routing policy. Content that could not be inspected routes as the worst case. Produces __scope_assessment__, from which __data_classification__, __affected_subjects_count__, __exfil_confirmed__ and __regulator_required__ are extracted.",
       "notesInFlow": true
     },
     {
@@ -196,50 +214,17 @@
     {
       "id": "action--20000000-0000-4000-8000-000000000005",
       "name": "containment",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1280,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.data_classification",
-              "name": "in.data_classification",
-              "value": "={{$workflow.variables.data_classification}}",
-              "type": "string"
-            },
-            {
-              "id": "in.affected_subjects_count",
-              "name": "in.affected_subjects_count",
-              "value": "={{$workflow.variables.affected_subjects_count}}",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.network_egress_filtering@v1, control.dlp_enforcement@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.data_security_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.mttr_containment@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.data_exfil.primitives.containment import compose_exfil_containment\n__containment_directive__ = compose_exfil_containment(triage=__triage_record__, scope=__scope_assessment__, authorisation_policy=__authorisation_policy__, requested_at=__requested_at__)"
       },
-      "notes": "Apply containment proportionate to data classification and scope: revoke session tokens, isolate the originating identity / host, force a credential rotation, and tighten the egress policy on the destination(s) named in the signal. Bounded by the operator-supplied authorisation policy.",
+      "notes": "Compose containment proportionate to classification and scope: block the egress destination, revoke the originating identity's sessions, and escalate to credential rotation and host isolation as the class and subject count rise. Protected hosts and identities wait for approval, and the step re-checks the confirmed gate. Produces __containment_directive__.",
       "notesInFlow": true
     },
     {
@@ -279,93 +264,33 @@
     {
       "id": "action--20000000-0000-4000-8000-000000000007",
       "name": "notify regulator",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1800,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.data_classification",
-              "name": "in.data_classification",
-              "value": "={{$workflow.variables.data_classification}}",
-              "type": "string"
-            },
-            {
-              "id": "in.affected_subjects_count",
-              "name": "in.affected_subjects_count",
-              "value": "={{$workflow.variables.affected_subjects_count}}",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.dlp_enforcement@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.incident_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.notification_sla_compliance@v1, kri.regulator_notification_overrun@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.data_exfil.primitives.notification import compose_regulator_notification\n__regulator_notification__ = compose_regulator_notification(triage=__triage_record__, scope=__scope_assessment__, authority_channels=__authority_channels__, aware_at=__aware_at__)"
       },
-      "notes": "Compose and send the regulator notification along the operator's pre-bound channel (national CSIRT for NIS2, competent authority for DORA, supervisory authority for GDPR). The notification payload is a structured incident finding sourced from the scope-assessment outputs.",
+      "notes": "Compose one regulator notification per applicable regime the operator has a channel for (GDPR Art. 33 supervisory authority within 72 hours, NIS2 Art. 23 early warning and DORA Art. 19 initial notification within 24 hours), each clock running from __aware_at__, not detection. With no affected subjects GDPR is recorded as skipped, not dropped. Produces __regulator_notification__.",
       "notesInFlow": true
     },
     {
       "id": "action--20000000-0000-4000-8000-000000000008",
       "name": "notify affected party",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         2060,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.data_classification",
-              "name": "in.data_classification",
-              "value": "={{$workflow.variables.data_classification}}",
-              "type": "string"
-            },
-            {
-              "id": "in.affected_subjects_count",
-              "name": "in.affected_subjects_count",
-              "value": "={{$workflow.variables.affected_subjects_count}}",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.incident_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.notification_sla_compliance@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.data_exfil.primitives.notification import compose_subject_notification\n__subject_notification__ = compose_subject_notification(triage=__triage_record__, scope=__scope_assessment__, high_risk_policy=__high_risk_policy__, subject_channel=__subject_channel__, aware_at=__aware_at__)"
       },
-      "notes": "Notify affected data subjects via the operator's pre-bound channel. Tracked separately from regulator notification so the notification timelines can be reported independently.",
+      "notes": "Determine whether data subjects must be told under GDPR Art. 34: the operator's high-risk classes and uninspected content meet the bar. The determination always carries its basis, and the notice is composed only when required. Reached on both branches of the regulator gate, and tracked separately so the two timelines report independently. Produces __subject_notification__.",
       "notesInFlow": true
     },
     {
@@ -388,11 +313,11 @@
       "typeVersion": 1,
       "position": [
         200,
-        -296
+        -406
       ],
       "parameters": {
-        "content": "## Data exfiltration response\n`playbook.data_exfil@v1` \u00b7 content v0.1.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nRespond to a DLP / egress signal that indicates possible exfiltration of sensitive data. The playbook triages the signal, assesses scope and data classification, contains confirmed exfiltration, and gates regulator / affected-party notification on the affected-subjects threshold so EU operators can meet NIS2 Article 23 and DORA Article 19 reporting obligations. CACAO v2 + SecOps-NG content-model extensions.\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 23 \u2014 incident reporting obligations\n- DORA Regulation (EU) 2022/2554, Article 19 \u2014 reporting of major ICT-related incidents\n\n**Controls:** 3 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__signal_id__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: triage signal, scope assessment, containment, notify regulator, notify affected party\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/data_exfil\nRegenerate with `python -m tools.compile content/playbooks/data_exfil/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
-        "height": 476,
+        "content": "## Data exfiltration response\n`playbook.data_exfil@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nRespond to a DLP / egress signal that indicates possible exfiltration of sensitive data. The playbook triages the signal, assesses scope and data classification, contains confirmed exfiltration, and gates regulator / affected-party notification on the affected-subjects threshold so EU operators can meet NIS2 Article 23 and DORA Article 19 reporting obligations. CACAO v2 + SecOps-NG content-model extensions.\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 23 \u2014 incident reporting obligations\n- DORA Regulation (EU) 2022/2554, Article 19 \u2014 reporting of major ICT-related incidents\n\n**Controls:** 3 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__signal_id__`, `__hydrated_signal__`, `__benign_patterns__`, `__dlp_findings__`, `__in_line_control__`, `__routing_policy__`, `__authorisation_policy__`, `__requested_at__`, `__authority_channels__`, `__aware_at__`, `__high_risk_policy__`, `__subject_channel__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - triage signal \u2192 `content.playbooks.data_exfil.primitives.triage.triage_egress_signal`\n  - scope assessment \u2192 `content.playbooks.data_exfil.primitives.scope.assess_exfil_scope`\n  - containment \u2192 `content.playbooks.data_exfil.primitives.containment.compose_exfil_containment`\n  - notify regulator \u2192 `content.playbooks.data_exfil.primitives.notification.compose_regulator_notification`\n  - notify affected party \u2192 `content.playbooks.data_exfil.primitives.notification.compose_subject_notification`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/data_exfil\nRegenerate with `python -m tools.compile content/playbooks/data_exfil/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 586,
         "width": 620,
         "color": 4
       }
@@ -512,7 +437,7 @@
       "name": "secops-ng"
     },
     {
-      "name": "maturity:experimental"
+      "name": "maturity:stable"
     },
     {
       "name": "regime:nis2"
@@ -540,16 +465,10 @@
   "meta": {
     "secops_ng": {
       "stable_id": "playbook.data_exfil@v1",
-      "content_version": "0.1.0",
-      "maturity": "experimental",
+      "content_version": "1.0.0",
+      "maturity": "stable",
       "source_playbook_id": "playbook--20a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b7"
     },
-    "secops_ng_notes": [
-      "step 'action--20000000-0000-4000-8000-000000000002': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n.",
-      "step 'action--20000000-0000-4000-8000-000000000003': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n.",
-      "step 'action--20000000-0000-4000-8000-000000000005': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n.",
-      "step 'action--20000000-0000-4000-8000-000000000007': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n.",
-      "step 'action--20000000-0000-4000-8000-000000000008': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n."
-    ]
+    "secops_ng_notes": []
   }
 }
