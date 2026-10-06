@@ -60,9 +60,11 @@ The conditional-edge router pattern is identical to vuln_intake; see
 
 ## What this example deliberately doesn't do
 
-- It does not execute the graph. The `@tool` bodies raise
-  `NotImplementedError`; integrators wire them to their own runtime
-  (IdP, EDR, ticketing, SIEM).
+- It does not execute the graph. Each `@tool` body calls its bound
+  primitive, but the inputs those calls read come from adapters the
+  integrator wires to their own runtime (IdP, MFA provider, SaaS
+  tenants, API-audit sources, IAM control plane), and the directives
+  they return are executed there.
 - It does not ship operator credentials, endpoints, or environment.
   Secrets stay with the operator.
 - It does not pick an LLM provider for the agentic-extension hook.
