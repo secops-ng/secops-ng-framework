@@ -93,6 +93,64 @@ Committed worked examples, each with its own README and a
 Byte-parity between the committed examples and the emitter output is
 pinned by `tests/examples/eu_ai_act_deployer_obligations/test_golden.py`.
 
+## Status
+
+`maturity: experimental`, CORE-PRIM complete. Each of the five action
+steps has a deterministic primitive under `primitives/`, executed
+directly by `tests/playbooks/eu_ai_act_deployer_obligations/test_primitives.py`.
+Every rule below was checked against the text of Regulation (EU)
+2024/1689 on EUR-Lex.
+
+| Step | Primitive |
+|---|---|
+| confirm_intended_use | `intended_use.determine_intended_use` |
+| assign_human_oversight | `oversight.compose_oversight_assignment` |
+| monitor_operation | `monitoring.classify_monitoring_window` |
+| assess_fundamental_rights_impact | `fria.assess_fundamental_rights_impact` |
+| retain_logs_and_evidence | `retention.compose_retention_evidence` |
+
+Decisions the primitives fix:
+
+- **The negative case stops the cycle.** A declared context outside the
+  provider's permitted contexts (Art. 26(1)), or a workplace deployment
+  by an employer without a complete Art. 26(7) notice dated before the
+  determination, sets `proceed` to false with the reasons named, and
+  every later primitive refuses that determination.
+- **Oversight has four limbs per person.** Art. 26(2): every assignee
+  must be a natural person with evidence for competence, training,
+  authority and support. One missing limb leaves the assignment
+  incomplete, which is what `kpi.eu_ai_act_deployer_oversight_coverage@v1`
+  counts.
+- **The three escalation triggers stay apart.** Routine findings feed
+  the provider's Art. 72 loop; an Art. 79(1) risk obliges informing the
+  provider or distributor and the market-surveillance authority and
+  suspending use, without undue delay, with the latency recorded and an
+  unrecorded suspension reported as outstanding; a serious incident
+  (Art. 3(49)) obliges immediate notification, provider first, on the
+  severity-classed Art. 73 clock — 2 days for a widespread infringement
+  or a critical-infrastructure disruption, 10 days for a death, 15
+  otherwise, the shortest governing. If the provider cannot be reached,
+  the deployer reports under Art. 73 itself (Art. 26(5)).
+- **The FRIA scope is the Art. 27(1) text:** Annex III systems except
+  point 2, for bodies governed by public law and private entities
+  providing public services, and every deployer of a point 5(b) or 5(c)
+  system. In scope, the six elements are a checklist complementing a
+  DPIA (Art. 27(4)); an incomplete assessment blocks the notification
+  and sets `blocks_deployment`, because Art. 27(1) requires it before
+  deploying.
+- **Log retention follows Art. 26(6) both ways.** Logs outside the
+  deployer's control carry no period. Under control, the period is at
+  least six months unless applicable law provides otherwise, and a
+  shorter period needs the reference to that law.
+
+**Owed: the wire.** The CACAO steps do not yet carry `core_body`, so
+`catalog.py` reports 0 of 5 bound. The CORE-WIRE card binds them, and
+it also has to settle two topology points the primitives expose: a gate
+on the intended-use determination (the step promises that no
+downstream step fires on the negative case, but the workflow is
+linear), and the position of the FRIA step, which runs after monitoring
+although Art. 27(1) requires it before deploying.
+
 ## Operator customisation
 
 CACAO variables the playbook exposes:
@@ -127,12 +185,15 @@ contract and ships none of them:
 - **Notification channels** — provider, importer or distributor, and the
   Member State market-surveillance authority.
 - **FRIA record store and notification channel** — the Art. 27(5)
-  template is unpublished by the AI Office, so the step declares the
-  submission contract and emits a dated record rather than binding a
-  guessed template shape.
+  template is the AI Office's to publish. The step takes the template
+  reference the operator holds and, without one, records the
+  notification duty with a dated record rather than binding a guessed
+  template shape.
 - **Log store and evidence store** — the Art. 26(6) retention period is
-  applied here. Six months is a floor, not a target; sector law may
-  require longer.
+  applied here: appropriate to the intended purpose and at least six
+  months, unless applicable Union or national law (in particular
+  personal-data protection law) provides otherwise, which can mean a
+  different period in either direction.
 
 Three things to get right when wiring this:
 
