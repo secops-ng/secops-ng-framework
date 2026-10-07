@@ -4,27 +4,34 @@ CACAO v2 playbook for the DORA Chapter III major-ICT-related
 incident reporting lifecycle a financial entity discharges to its
 competent authority per DORA Regulation (EU) 2022/2554 Article 19. The
 playbook operates the three-milestone reporting cycle upstream anchored
-on the Art. 18 classification decision: detect-and-classify (Art. 18
-classifier gate) → notify-authority-initial (Art. 19(4)(a), 4h / 24h)
-→ notify-authority-intermediate (Art. 19(4)(b), 72h) →
-notify-authority-final (Art. 19(4)(c), one month after intermediate) →
-close-and-archive.
+on the Art. 18 classification decision: detect-and-classify →
+major incident? (not major → close-and-archive) →
+notify-authority-initial (Art. 19(4)(a), 4h / 24h) →
+notify-authority-intermediate (Art. 19(4)(b), 72h after the initial
+notification) → notify-authority-final (Art. 19(4)(c), one month after
+the intermediate report) → close-and-archive.
 
 ## Timeline
 
-DORA Art. 19 imposes a distinct three-milestone reporting cycle. All
-clocks start from the point the incident is classified as **major**
-under Art. 18 (which is itself operationalised by Commission Delegated
-Regulation (EU) 2024/1772):
+DORA Art. 19 imposes a distinct three-milestone reporting cycle on an
+incident classified as **major** under Art. 18 (operationalised by
+Commission Delegated Regulation (EU) 2024/1772). The time limits are
+set by Art. 5 of Commission Delegated Regulation (EU) 2025/301, and
+each milestone's clock runs from the one before it:
 
-1. **Initial notification** — as soon as possible, within **4 hours**
+1. **Initial notification** — as early as possible, within **4 hours**
    of classification as major, and no later than **24 hours** from
-   awareness. ITS content shape per Commission Implementing Regulation
-   (EU) 2024/2956.
-2. **Intermediate report** — within **72 hours** of classification as
-   major, or earlier if regular activities have recovered.
+   awareness (Art. 5(1)(a)); when the incident is classified as major
+   more than 24 hours after awareness, within 4 hours of classification
+   (Art. 5(2)). ITS content shape per Commission Implementing
+   Regulation (EU) 2024/2956.
+2. **Intermediate report** — within **72 hours** of the *submission of
+   the initial notification* (Art. 5(1)(b)), not of classification; an
+   updated intermediate report follows when regular activities have
+   recovered.
 3. **Final report** — no later than **one month** after the
-   intermediate report.
+   intermediate report, or after the latest updated intermediate report
+   (Art. 5(1)(c)).
 
 ## Authority chain
 
@@ -77,12 +84,15 @@ They share no runtime touchpoint.
 
 ## Status
 
-`maturity: experimental`, CORE-PRIM complete. The compiled examples
-ship under `examples/{n8n,temporal,langgraph}/dora_major_incident_reporting/`
-with byte-parity goldens under `tests/examples/`, and the walkthrough is
-`docs/cookbook/dora_major_incident_reporting.md`. Each of the five action
-steps now has a deterministic primitive under `primitives/`, executed
-directly by `tests/playbooks/dora_major_incident_reporting/test_primitives.py`:
+`maturity: stable`, `content_version` 1.0.0. All five action steps bind
+a deterministic primitive under `primitives/` through
+`x_secops_ng.core_body`, each executed directly by
+`tests/playbooks/dora_major_incident_reporting/test_primitives.py`, and
+the three reference targets emit those calls; the walkthrough is
+`docs/cookbook/dora_major_incident_reporting.md`. The graduation
+checklist recomputes green: tier A, 5 of 5 real bindings, zero
+placeholder bodies, zero blank predicates, zero schema errors,
+three-target goldens.
 
 | Step | Primitive |
 |---|---|
@@ -112,47 +122,63 @@ Decisions the primitives fix:
   from its predecessor's output, so none can be skipped or reordered),
   each milestone's `due_at` and `within_deadline`, and the gate that a
   non-major incident is never reported.
-- **Deadlines:** initial — the earlier of 4 hours after classification
-  and 24 hours after awareness; intermediate — 72 hours after
-  classification, as the step text anchors it (a reading that anchors
-  the 72 hours on the initial notification gives a later deadline, so
-  this one is never missed under either); final — one calendar month
-  after the intermediate report, with the end-of-month clamp.
+- **Deadlines follow Delegated Regulation (EU) 2025/301 Art. 5:**
+  initial — the earlier of 4 hours after classification and 24 hours
+  after awareness, or 4 hours after a classification made more than
+  24 hours after awareness; intermediate — 72 hours after the initial
+  notification was submitted; final — one calendar month after the
+  intermediate report, with the end-of-month clamp. The optional
+  Art. 5(4) weekend and bank-holiday extension is not applied, so the
+  deadline is the strict one every entity can rely on.
 - **The archive** is always emitted. It refuses a major incident without
   its complete, linked chain and a non-major incident with any report
   attached, and records each milestone's deadline outcome.
 
-**Owed: the wire, and one topology fix.** The CACAO steps do not yet
-carry `x_secops_ng.core_body`, so `catalog.py` reports 0 of 5 bound.
-The detect-and-classify step also promises a not-major branch that the
-topology does not have — the workflow runs straight into the initial
-notification — so the CORE-WIRE card adds an `if-condition` on the
-classification's `major` flag, routing a non-major incident to
-close-and-archive. The notification primitives already refuse a
-non-major incident, so a missing gate fails loud rather than filing a
-report. Submission-adapter and authority-channel bindings, and the
-per-cycle KPIs, remain EXTEND work.
+Choices settled at the wire:
+
+- **The not-major gate exists.** The detect-and-classify step promised a
+  branch the topology did not have; an `if-condition` on
+  `__incident_major__`, extracted from `__classification__`, now routes
+  a non-major incident straight to close-and-archive. The notification
+  primitives still refuse a non-major incident, so the gate and the
+  primitives agree.
+- **Two deadlines were corrected against the regulation text.** The
+  intermediate report had been timed from classification, and the
+  initial notification ignored Art. 5(2); both now follow Art. 5, so an
+  on-time report is never recorded as overrun.
+- **The archive takes the three reports as separate inputs**, each unset
+  on the not-major branch (the n8n trigger supplies `""`), rather than
+  a list the topology could not assemble.
+- **The contract grows from 7 to 34 variables:** 21 adapter inputs
+  (the classification criteria and instant, per-milestone submission
+  instants, impact, mitigation and acknowledgement references, the
+  awareness instant, the run URL, cross-regime references and the run
+  context), one envelope per step, the gate boolean, and the five
+  existing identifiers, now extracted from the envelopes.
+
+Submission-adapter and authority-channel bindings, and the per-cycle
+KPIs, remain EXTEND work.
 
 ## Steps
 
 1. **detect-and-classify** — evaluate the incident against the Art. 18
    classification criteria (Commission Delegated Regulation (EU)
-   2024/1772). Emit the classification-decision record. On the
-   not-major branch, short-circuit the notification chain but still
-   emit the dated decision so the audit-evident chain is closed.
-2. **notify-authority-initial** — package the initial notification
+   2024/1772) and emit the classification-decision record.
+2. **major incident?** — the gate: a major incident files the three
+   reports; a non-major one goes straight to close-and-archive, so the
+   dated decision still closes the audit-evident chain.
+3. **notify-authority-initial** — package the initial notification
    against the ITS content shape (Commission Implementing Regulation
-   (EU) 2024/2956) and dispatch to the competent authority. Fires
-   within 4 hours of classification / 24 hours from awareness.
-3. **notify-authority-intermediate** — package the intermediate report
-   against the ITS content shape and dispatch. Fires within 72 hours
-   of classification (or earlier if regular activities have
-   recovered).
-4. **notify-authority-final** — package the final report (root-cause
+   (EU) 2024/2956) and dispatch to the competent authority. Due within
+   4 hours of classification / 24 hours from awareness.
+4. **notify-authority-intermediate** — package the intermediate report
+   against the ITS content shape and dispatch. Due within 72 hours of
+   the initial notification's submission.
+5. **notify-authority-final** — package the final report (root-cause
    analysis, final impact figures, remediation, lessons learned,
    action plan, residual-risk statement) and dispatch. Fires no later
    than one month after the intermediate report.
-5. **close-and-archive** — compose the dated cycle-archival record
+6. **close-and-archive** — compose the dated cycle-archival record
    referencing the classification decision, the three submissions,
    the authority acknowledgements, and any cross-regime notification
    chains (NIS2 Art. 23, GDPR Art. 33-34). The archival record is
@@ -166,7 +192,7 @@ per-cycle KPIs, remain EXTEND work.
   OCSF stub, DORA Art. 19 primary, NIS2 Art. 23 cross-regime sibling,
   GDPR Art. 33-34 cross-regime sibling).
 - `primitives/` — the deterministic primitives the five action steps
-  bind at CORE-WIRE; see Status.
+  bind; see Status.
 
 ## Goal links
 

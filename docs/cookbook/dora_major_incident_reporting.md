@@ -79,9 +79,11 @@ obligation atoms this playbook operates against are:
   from awareness of the incident, the financial entity submits the
   initial notification to the competent authority on the ITS content
   shape (Commission Implementing Regulation (EU) 2024/2956).
-- **Art. 19(4)(b)** — intermediate report. Within 72 hours of
-  classification as major (or earlier if regular activities have
-  recovered), the financial entity submits the intermediate report —
+- **Art. 19(4)(b)** — intermediate report. Within 72 hours of the
+  submission of the initial notification (Commission Delegated
+  Regulation (EU) 2025/301, Art. 5(1)(b); an updated report follows
+  when regular activities have recovered), the financial entity
+  submits the intermediate report —
   updated timestamps, affected functions and clients, indicators of
   compromise, and mitigation actions in flight — against the ITS
   intermediate-report template.
@@ -118,9 +120,10 @@ different clocks and different operator triggers.
   financial counterparts and transactions affected; reputational
   impact; duration and service downtime; geographical spread;
   data-losses; criticality of services affected; economic impact)
-  and emits the classification-decision record. On the not-major
-  branch the notification chain short-circuits; the dated decision
-  is still emitted so the audit-evident chain closes at the gate.
+  and emits the classification-decision record. A **not-major**
+  decision takes the gate's false branch straight to close-and-archive,
+  so no report is filed and the dated decision still closes the
+  audit-evident chain.
 - **Notify-authority-initial.** Fires on the major-classification
   edge. Within 4 hours of classification (and no later than 24 hours
   from awareness), the step packages the initial notification against
@@ -128,9 +131,10 @@ different clocks and different operator triggers.
   The dispatch is durable — a worker restart mid-dispatch replays
   against the same submission-body bytes and the same authority
   reference without redispatching a duplicate to the authority.
-- **Notify-authority-intermediate.** Fires no later than 72 hours
-  post-classification, or earlier on the operator's early-recovery
-  edge. The step reads the incident register for the current
+- **Notify-authority-intermediate.** Due no later than 72 hours after
+  the initial notification was submitted (Commission Delegated Regulation (EU) 2025/301, Art. 5(1)(b)) — not
+  72 hours after classification — or earlier on the operator's
+  early-recovery edge. The step reads the incident register for the current
   timestamp, affected-functions, indicators-of-compromise, and
   mitigation-actions state, packages the intermediate report against
   the ITS intermediate-report template, and dispatches. The 72-hour
@@ -194,7 +198,7 @@ on the content axis.
 
 ## 4. CACAO topology
 
-The workflow is a linear five-step lifecycle. Each action step
+The workflow is a five-step lifecycle with one gate. Each action step
 carries the CACAO I/O contract (`in_args` / `out_args`) plus
 `x_secops_ng` reference bundles pinning the OSCAL control anchors
 (IR-8 Incident Response Plan on classification, IR-6 Incident
@@ -206,21 +210,21 @@ submission) and the OCSF telemetry class each step reads or emits.
 |-------------|-------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|
 | `…000001`   | dora_major_incident_reporting_start | edge wiring only — no body                                                                                                                                                                                                                                          | n/a            |
 | `…000002`   | detect_and_classify                 | evaluate the incident register entry against the Commission Delegated Regulation (EU) 2024/1772 major-ICT-related-incident classification criteria; emit the dated classification-decision record; set `__classification_decision_id__`                              | adapter-bound  |
+| `…000008`   | major_incident_gate                 | `if-condition` on `__incident_major__`, extracted from the classification envelope: true files the three reports, false goes straight to `close_and_archive`                                                                                                         | n/a            |
 | `…000003`   | notify_authority_initial            | package the Art. 19(4)(a) initial notification against the ITS content shape (Commission Implementing Regulation (EU) 2024/2956) and dispatch to the competent authority within 4h of classification / 24h from awareness; set `__initial_notification_id__`         | adapter-bound  |
-| `…000004`   | notify_authority_intermediate       | package the Art. 19(4)(b) intermediate report against the ITS intermediate-report template and dispatch within 72h of classification (or earlier on early-recovery edge); set `__intermediate_report_id__`                                                            | adapter-bound  |
+| `…000004`   | notify_authority_intermediate       | package the Art. 19(4)(b) intermediate report against the ITS intermediate-report template and dispatch within 72h of the initial notification's submission (or earlier on early-recovery edge); set `__intermediate_report_id__`                                                            | adapter-bound  |
 | `…000005`   | notify_authority_final              | package the Art. 19(4)(c) final report (root-cause, final impact, remediation, lessons learned, action plan, residual-risk statement) against the ITS final-report template and dispatch no later than one month after the intermediate report; set `__final_report_id__` | adapter-bound  |
 | `…000006`   | close_and_archive                   | compose the dated cycle-archival record referencing the classification decision, the three submissions, the authority acknowledgements, and any cross-regime parallel-notification chains; set `__cycle_archive_id__`                                                   | adapter-bound  |
 | `…000007`   | dora_major_incident_reporting_end   | edge wiring only — no body                                                                                                                                                                                                                                          | n/a            |
 
-Sequencing is `on_completion` end-to-end — the playbook is linear at
-the workflow layer with no conditional branching. A **not-major**
-classification at `detect_and_classify` does not branch the workflow
-into a separate sub-flow: the dated classification decision is still
-emitted, the notification steps short-circuit (each becomes a no-op
-that records a dated *skipped* record referencing the not-major
-decision), and `close_and_archive` still composes the archival record
-against a classification-only cycle. The audit-evident chain remains
-closed for below-threshold incidents.
+Sequencing is `on_completion` between the action steps, with one
+branch: the `major_incident_gate` `if-condition` after
+`detect_and_classify`. A **not-major** classification takes the false
+branch straight to `close_and_archive`, which composes the archival
+record against a classification-only cycle, so no Art. 19 report is
+filed and the audit-evident chain still closes for below-threshold
+incidents. The notification primitives also refuse a non-major
+classification, so the gate and the primitives agree.
 
 Early-recovery on the intermediate-report step likewise does not
 branch: the intermediate report is submitted early, the final-report
@@ -229,25 +233,33 @@ record captures the early-recovery edge.
 
 ## 5. Playbook variables
 
-The playbook operates on a small set of workflow-scope variables.
-`__incident_id__` and `__reporting_window__` are external — supplied
-by the operator's incident register and cadence surfaces at lifecycle
-entry. The remainder are set by downstream steps as the run progresses.
+The bound contract has 34 workflow-scope variables; the playbook's
+`playbook_variables` block is the reference. Twenty-three are external
+adapter inputs: `__incident_id__` and `__reporting_window__` from the
+operator's incident register and cadence surfaces, plus the
+classification criteria and instant, the awareness instant, each
+milestone's submission instant, impact, mitigation and acknowledgement
+reference, the run URL, cross-regime references and the run context.
+Each step emits one envelope (`__classification__`,
+`__initial_notification__`, `__intermediate_report__`,
+`__final_report__`, `__cycle_archive__`), and the gate reads
+`__incident_major__`, extracted from the classification. The
+identifiers below are extracted from those envelopes:
 
 | Variable                        | External? | Set by                            | Purpose                                                                                                                                                          |
 |---------------------------------|-----------|-----------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `__incident_id__`               | yes       | operator-supplied                 | stable operator-side incident identifier that joins the incident register, the classification decision, the three submissions, and the archival record on one key |
 | `__reporting_window__`          | yes       | operator-supplied                 | reference to the awareness window the Art. 18 gate evaluates against (RFC 3339 interval); joins the classification decision to the operator's incident-register slice |
-| `__classification_decision_id__`| no        | `detect_and_classify`             | opaque content-addressed identifier of the emitted classification-decision record; derives from `SHA-256(workflow_id|execution_id|captured_at)` and is target-agnostic (§ 9) |
-| `__initial_notification_id__`   | no        | `notify_authority_initial`        | opaque content-addressed identifier of the emitted Art. 19(4)(a) initial-notification record; target-agnostic derivation                                          |
-| `__intermediate_report_id__`    | no        | `notify_authority_intermediate`   | opaque content-addressed identifier of the emitted Art. 19(4)(b) intermediate-report record; target-agnostic derivation                                           |
-| `__final_report_id__`           | no        | `notify_authority_final`          | opaque content-addressed identifier of the emitted Art. 19(4)(c) final-report record; target-agnostic derivation                                                  |
-| `__cycle_archive_id__`          | no        | `close_and_archive`               | opaque content-addressed identifier of the emitted cycle-archival record; target-agnostic derivation                                                              |
+| `__classification_decision_id__`| no        | `detect_and_classify`             | opaque content-addressed identifier of the emitted classification-decision record; derives from `SHA-256(workflow_id|execution_id| extracted from `__classification__.classification_id`, SHA-256 of the incident id and the classification instant |
+| `__initial_notification_id__`   | no        | `notify_authority_initial`        | extracted from `__initial_notification__.report.report_id` |
+| `__intermediate_report_id__`    | no        | `notify_authority_intermediate`   | extracted from `__intermediate_report__.report.report_id` |
+| `__final_report_id__`           | no        | `notify_authority_final`          | extracted from `__final_report__.report.report_id` |
+| `__cycle_archive_id__`          | no        | `close_and_archive`               | extracted from `__cycle_archive__.artifact_id`, SHA-256 of the workflow id, execution id and capture instant |
 
 The classification decision is a first-class artifact, not a boolean
-predicate: the record carries the per-criterion evaluation, the
-materiality-threshold arithmetic, the recurring-incident rule
-disposition (Art. 18(2)), and the dated classifier version so a
+predicate: the record carries the basis, the materiality thresholds
+met, the rule ids and reasons that fired, the recurring-incident
+aggregation when there is one, and the classification instant, so a
 supervisory reviewer can reconstruct the decision without re-running
 the classifier. That is what makes the not-major branch audit-safe:
 the operator can show a below-threshold incident *was* evaluated on
@@ -435,50 +447,44 @@ navigate the parallel-notification graph.
 ## 8. Per-target hand-off
 
 The step outline above is the portable description all three
-compilers read against. n8n compiles it into a linear seven-node
-workflow (`manualTrigger` + five `set` nodes + `noOp`); Temporal
-compiles it into a workflow with five activity invocations chained
-by `await`; LangGraph compiles it into a `StateGraph` with seven
-nodes and unconditional-edge topology.
+compilers read against. n8n compiles it into a nine-node workflow
+(`manualTrigger`, five `code` nodes, one `if`, one `noOp`, and the
+playbook card as a sticky note); Temporal compiles it into one
+activity per action step, each calling its primitive; LangGraph
+compiles it into a GraphSpec with the five action steps, the gate as
+a condition node, and one conditional edge.
 
-### 8.1 n8n — Set nodes over the five-step lifecycle
+### 8.1 n8n — primitive calls over the gated lifecycle
 
 `examples/n8n/dora_major_incident_reporting/workflow.n8n.json`
-carries the CACAO topology as n8n nodes (one `manualTrigger`, five
-`set` nodes, one `noOp` terminal). Node ids preserve the CACAO step
-ids verbatim. Each action node emits a `n8n-nodes-base.set` carrying
-the CACAO I/O contract as editable assignment rows plus the
-`x_secops_ng` reference bundles.
+carries the CACAO topology as n8n nodes. Node ids preserve the CACAO
+step ids verbatim. Each action step emits an `n8n-nodes-base.code`
+node that imports its primitive and binds the step's output envelope
+to the call — `classify_major_incident`,
+`compose_initial_notification`, `compose_intermediate_report`,
+`compose_final_report` and `compose_cycle_archive` — and the gate
+emits an `n8n-nodes-base.if` on `__incident_major__`. With every step
+bound and the condition machine-readable, the workflow records no
+lossy translations in `meta.secops_ng_notes`.
 
-Operators bind the Set rows to their connectors:
+Operators bind the adapters that feed each primitive's inputs:
 
-- `detect_and_classify` → the incident-register reader plus the
-  Art. 18 classifier (HTTP Request / Postgres node against the
-  register, followed by a Function node applying the RTS 2024/1772
-  criteria over the operator's declared threshold set). Writes
-  `__classification_decision_id__`.
-- `notify_authority_initial` → the ITS initial-notification composer
-  plus the competent-authority dispatch (Function node materialising
-  the ITS initial-notification body per Commission Implementing
-  Regulation (EU) 2024/2956, followed by an HTTP Request node
-  against the operator's NCA submission surface, with the
-  acknowledgement reference threaded onto the submission record).
-  Writes `__initial_notification_id__`.
-- `notify_authority_intermediate` → the ITS intermediate-report
-  composer plus the dispatch (same shape as the initial step; reads
-  the current incident-register state for updated timestamps,
-  affected functions and clients, indicators of compromise, and
-  mitigation actions in flight). Writes `__intermediate_report_id__`.
-- `notify_authority_final` → the ITS final-report composer plus the
-  dispatch (same shape; reads the closed root-cause analysis, final
-  impact figures, completed remediation, lessons learned, action
-  plan, and residual-risk statement). Writes `__final_report_id__`.
-- `close_and_archive` → the cycle-archival composer and evidence-
-  store sink (Function node materialising the archival record over
-  the classification decision, the three submissions, the authority
-  acknowledgements, and any cross-regime notification chains,
-  followed by a Postgres / HTTP / S3 write node against the evidence
-  store). Writes `__cycle_archive_id__`.
+- `detect_and_classify` → the incident-register reader and the
+  operator's classification policy, which supply
+  `__classification_criteria__` (one determination per RTS 2024/1772
+  criterion), `__classified_at__` and, for recurring incidents,
+  `__aggregation__`.
+- `notify_authority_initial` / `notify_authority_intermediate` /
+  `notify_authority_final` → the incident-register state each report
+  carries (`__initial_impact__`, `__initial_mitigation__` and their
+  intermediate and final counterparts), the submission instants, and
+  the competent-authority channel that dispatches the composed report
+  and returns the acknowledgement reference
+  (`__initial_submission_ref__` and so on).
+- `close_and_archive` → the evidence-store sink, plus the run context
+  (`__workflow_id__`, `__execution_id__`, `__captured_at__`) and the
+  references to notifications filed under other regimes
+  (`__cross_regime_refs__`).
 
 To regenerate the compiled workflow artifact from the repo root:
 
@@ -499,7 +505,7 @@ The byte-parity golden test under
 `tests/examples/n8n/dora_major_incident_reporting/test_golden.py`
 reruns the same pipeline and fails if the committed artifact drifts.
 
-### 8.2 Temporal — activities over the five-step lifecycle
+### 8.2 Temporal — activities calling the primitives
 
 `examples/temporal/dora_major_incident_reporting/workflow.temporal.py`
 carries the CACAO topology as a Temporal workflow with one activity
@@ -511,27 +517,13 @@ argument scope against Temporal's event-history replay contract, so
 a re-emission of any of the five step artifacts produces byte-
 identical id bytes.
 
-Operators bind the activity bodies to real connectors:
-
-- `detect_and_classify` — the classifier-application activity. The
-  reference binding reads the operator's incident register, applies
-  the Commission Delegated Regulation (EU) 2024/1772 criteria over
-  the operator's declared thresholds, stamps the per-criterion
-  evaluation, and closes the classification-decision record
-  referenced by `__classification_decision_id__`.
-- `notify_authority_initial` — the initial-notification dispatch
-  activity. Composes the ITS initial-notification body, dispatches
-  to the competent-authority channel, folds the acknowledgement
-  reference onto the submission record, and closes the record.
-- `notify_authority_intermediate` — the intermediate-report dispatch
-  activity. Same shape as the initial dispatch; reads the current
-  incident-register state for the updated fields.
-- `notify_authority_final` — the final-report dispatch activity.
-  Same shape; reads the closed root-cause block.
-- `close_and_archive` — the cycle-archival-composition activity.
-  The `__cycle_archive_id__` derivation happens at the primitive
-  layer — the activity computes the hash and writes the archival
-  record to the operator's evidence store.
+Each of the five activity bodies imports and calls its bound
+primitive. The workflow's `run` method still raises
+`NotImplementedError`: the Temporal emitter does not lower CACAO
+control flow into workflow code for any playbook, so sequencing the
+activities through the major-incident gate is the integrator's, as is
+binding the inputs the primitives read to the incident register, the
+classification policy, the authority channel and the evidence store.
 
 To regenerate the compiled artifact from the repo root:
 
@@ -542,22 +534,23 @@ To regenerate the compiled artifact from the repo root:
 The byte-parity golden test under
 `tests/examples/temporal/dora_major_incident_reporting/test_golden.py`
 reruns the emitter and fails if the committed artifact drifts.
-Activity bodies remain `NotImplementedError` stubs by design in the
-shipped example; the operator supplies the bindings.
+Activity bodies call the primitives; the operator supplies the
+adapters and the workflow control flow.
 
-### 8.3 LangGraph — nodes and state over the five-step lifecycle
+### 8.3 LangGraph — nodes and state over the gated lifecycle
 
 `examples/langgraph/dora_major_incident_reporting/graph_spec.json`
 carries the CACAO topology as a target-neutral GraphSpec (nodes,
-edges, conditional edges — the last being empty for this linear
-playbook); `state_bindings.py` emits the `TypedDict` state and the
-`@tool`-decorated action wrappers plus the agentic-extension hook.
+edges, and one conditional edge, on the major-incident gate);
+`state_bindings.py` emits the `TypedDict` state and the
+`@tool`-decorated action wrappers, each calling its bound primitive,
+plus the agentic-extension hook.
 `__incident_id__` and `__reporting_window__` are expressed as state
 fields threaded through node bodies, so a checkpoint reload
 re-hydrates the same argument scope.
 
-The GraphSpec `nodes` array carries only the five intermediate
-action step ids; start and end sentinels are pinned structurally
+The GraphSpec `nodes` array carries the five action step ids and the
+gate's condition node; start and end sentinels are pinned structurally
 via `entry` and `end_sentinel` (this is the LangGraph projection
 contract the cross-target parity test asserts against — the same
 canonical CACAO step space is present, in a different structural

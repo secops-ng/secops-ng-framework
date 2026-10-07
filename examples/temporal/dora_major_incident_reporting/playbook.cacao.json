@@ -9,7 +9,7 @@
   ],
   "created_by": "identity--55e05575-0000-4000-8000-000000000002",
   "created": "2026-07-09T00:00:00Z",
-  "modified": "2026-07-09T00:00:00Z",
+  "modified": "2026-10-07T00:00:00Z",
   "valid_from": "2026-07-09T00:00:00Z",
   "labels": [
     "dora",
@@ -63,29 +63,164 @@
       "description": "Identifier of the DORA Art. 19 reporting cycle window this run discharges — names which incident-cycle cohort the run reports against. Wall-clock timestamps live on each emitted submission artifact.",
       "external": true
     },
+    "__classification_criteria__": {
+      "type": "dictionary",
+      "description": "The operator's per-criterion determinations under Delegated Regulation (EU) 2024/1772: exactly critical_services_affected and malicious_unauthorised_access (real booleans) and materiality, one real boolean per materiality criterion saying whether the operator's policy found its threshold met. The threshold rules themselves stay with the operator's classification policy.",
+      "external": true
+    },
+    "__classified_at__": {
+      "type": "string",
+      "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) of the classification; the reporting clocks start here.",
+      "external": true
+    },
+    "__aggregation__": {
+      "type": "dictionary",
+      "description": "The recurring-incident block when the criteria describe recurring incidents' collective impact: incident_refs (two or more), same_apparent_root_cause, first_occurred_at and last_occurred_at. Empty for a single incident (the n8n trigger supplies an empty string for an unset variable).",
+      "external": true
+    },
+    "__aware_at__": {
+      "type": "string",
+      "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the operator became aware of the incident; the initial notification's 24-hour limit runs from it.",
+      "external": true
+    },
+    "__source_url__": {
+      "type": "string",
+      "description": "URL of the workflow run that produces the reports, recorded in each report's provenance.",
+      "external": true
+    },
+    "__initial_submitted_at__": {
+      "type": "string",
+      "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the initial notification is submitted at.",
+      "external": true
+    },
+    "__initial_impact__": {
+      "type": "dictionary",
+      "description": "The impact figures the initial notification reports: any of affected_functions, affected_clients_count, duration_minutes, geographic_scope, data_loss_indicator and indicators_of_compromise.",
+      "external": true
+    },
+    "__initial_mitigation__": {
+      "type": "dictionary",
+      "description": "The mitigation status the initial notification reports: state, and any of actions_in_flight, completed_actions, root_cause and residual_risk.",
+      "external": true
+    },
+    "__initial_submission_ref__": {
+      "type": "string",
+      "description": "The authority's acknowledgement reference for the initial notification, when the adapter has one; empty otherwise (the n8n trigger supplies an empty string for an unset variable), and then omitted from the report.",
+      "external": true
+    },
+    "__intermediate_submitted_at__": {
+      "type": "string",
+      "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the intermediate report is submitted at.",
+      "external": true
+    },
+    "__intermediate_impact__": {
+      "type": "dictionary",
+      "description": "The impact figures the intermediate report reports: any of affected_functions, affected_clients_count, duration_minutes, geographic_scope, data_loss_indicator and indicators_of_compromise.",
+      "external": true
+    },
+    "__intermediate_mitigation__": {
+      "type": "dictionary",
+      "description": "The mitigation status the intermediate report reports: state, and any of actions_in_flight, completed_actions, root_cause and residual_risk.",
+      "external": true
+    },
+    "__intermediate_submission_ref__": {
+      "type": "string",
+      "description": "The authority's acknowledgement reference for the intermediate report, when the adapter has one; empty otherwise (the n8n trigger supplies an empty string for an unset variable), and then omitted from the report.",
+      "external": true
+    },
+    "__final_submitted_at__": {
+      "type": "string",
+      "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the final report is submitted at.",
+      "external": true
+    },
+    "__final_impact__": {
+      "type": "dictionary",
+      "description": "The impact figures the final report reports: any of affected_functions, affected_clients_count, duration_minutes, geographic_scope, data_loss_indicator and indicators_of_compromise.",
+      "external": true
+    },
+    "__final_mitigation__": {
+      "type": "dictionary",
+      "description": "The mitigation status the final report reports: state, and any of actions_in_flight, completed_actions, root_cause and residual_risk.",
+      "external": true
+    },
+    "__final_submission_ref__": {
+      "type": "string",
+      "description": "The authority's acknowledgement reference for the final report, when the adapter has one; empty otherwise (the n8n trigger supplies an empty string for an unset variable), and then omitted from the report.",
+      "external": true
+    },
+    "__cross_regime_refs__": {
+      "type": "string",
+      "description": "References to notifications filed under other regimes for the same incident (the NIS2 Art. 23 early warning, the GDPR Art. 33 notification). CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.",
+      "external": true
+    },
+    "__workflow_id__": {
+      "type": "string",
+      "description": "Identifier of the workflow, folded into the archive's artifact_id.",
+      "external": true
+    },
+    "__execution_id__": {
+      "type": "string",
+      "description": "Identifier of this execution, folded into the archive's artifact_id.",
+      "external": true
+    },
+    "__captured_at__": {
+      "type": "string",
+      "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the archive is captured at, folded into its artifact_id.",
+      "external": true
+    },
     "__classification_decision_id__": {
       "type": "string",
-      "description": "Identifier of the Art. 18 classification-decision record composed at the detect-and-classify step: whether the incident is classified as MAJOR against Commission Delegated Regulation (EU) 2024/1772 criteria (seven primary criteria plus materiality thresholds; recurring-incident rule per Art. 18(2)). On the not-major branch the primitive still emits a dated decision record so the audit-evident chain is closed rather than silently short-circuiting.",
+      "description": "Identifier of the Art. 18 classification decision. Extracted at the compile target's adapter seam from __classification__.classification_id.",
       "external": false
     },
     "__initial_notification_id__": {
       "type": "string",
-      "description": "Identifier of the initial notification submission composed for the competent authority at the notify-authority-initial step per DORA Art. 19(4)(a): submitted as soon as possible, within 4 hours of classification as major, and no later than 24 hours from awareness. Content shape follows Commission Implementing Regulation (EU) 2024/2956 (ITS). Populated with the authority acknowledgement reference once the submission response is bound.",
+      "description": "Identifier of the Art. 19(4)(a) initial notification. Extracted at the compile target's adapter seam from __initial_notification__.report.report_id.",
       "external": false
     },
     "__intermediate_report_id__": {
       "type": "string",
-      "description": "Identifier of the intermediate report submission composed at the notify-authority-intermediate step per DORA Art. 19(4)(b): submitted within 72 hours of classification of the incident as major (or earlier if regular activities have recovered). Updates the timestamps, affected functions and clients, indicators of compromise, and mitigation actions in flight against the ITS content shape.",
+      "description": "Identifier of the Art. 19(4)(b) intermediate report. Extracted at the compile target's adapter seam from __intermediate_report__.report.report_id.",
       "external": false
     },
     "__final_report_id__": {
       "type": "string",
-      "description": "Identifier of the final report submission composed at the notify-authority-final step per DORA Art. 19(4)(c): submitted no later than one month after the submission of the intermediate report. Carries the root-cause analysis, final impact figures, completed remediation actions, lessons learned, action plan, and residual-risk statement.",
+      "description": "Identifier of the Art. 19(4)(c) final report. Extracted at the compile target's adapter seam from __final_report__.report.report_id.",
       "external": false
     },
     "__cycle_archive_id__": {
       "type": "string",
-      "description": "Identifier of the dated cycle-archival record composed at the close-and-archive step: references the classification decision, the three submission artifacts, the authority acknowledgement references, and the cross-regime notification-chain outputs (NIS2 Art. 23, GDPR Art. 33-34 where applicable) so the audit-evident chain is closed at the primitive boundary rather than trailing across unlinked artifacts.",
+      "description": "Identifier of the cycle-archival record. Extracted at the compile target's adapter seam from __cycle_archive__.artifact_id.",
+      "external": false
+    },
+    "__classification__": {
+      "type": "dictionary",
+      "description": "Envelope the classify step emits: major as a real boolean, its basis, the materiality thresholds met, the rule ids and reasons, and the recurring-incident aggregation when there is one.",
+      "external": false
+    },
+    "__incident_major__": {
+      "type": "boolean",
+      "description": "Whether the incident is classified as major; false skips the three reports and goes straight to the archive. Extracted at the compile target's adapter seam from __classification__.major. A real boolean: the gate compares it to true, and the string 'false' is truthy in most runtimes.",
+      "external": false
+    },
+    "__initial_notification__": {
+      "type": "dictionary",
+      "description": "Envelope the initial-notification step emits: the schema-conforming Art. 19 report, due_at, within_deadline and the deadline basis.",
+      "external": false
+    },
+    "__intermediate_report__": {
+      "type": "dictionary",
+      "description": "Envelope the intermediate-report step emits, in the same shape, linked to the initial notification.",
+      "external": false
+    },
+    "__final_report__": {
+      "type": "dictionary",
+      "description": "Envelope the final-report step emits, in the same shape, linked to the intermediate report.",
+      "external": false
+    },
+    "__cycle_archive__": {
+      "type": "dictionary",
+      "description": "Envelope the archive step emits: the classification, each milestone with its deadline outcome, whether every deadline was met, and the cross-regime references.",
       "external": false
     }
   },
@@ -105,47 +240,76 @@
     "action--71000000-0000-4000-8000-000000000002": {
       "type": "action",
       "name": "detect and classify",
-      "description": "TODO (CORE): Art. 18 classification-decision primitive. The action body reads the incident-register entry bound to __incident_id__ and evaluates whether the incident meets the major-ICT-related-incident threshold against the criteria the Commission Delegated Regulation (EU) 2024/1772 RTS names (seven primary criteria — clients affected, reputational impact, data-loss impact, service duration, geographical spread, economic impact, criticality of services affected — plus the materiality thresholds and the Art. 18(2) recurring-incident rule). Sets __classification_decision_id__ to a durable identifier of the classification record. On the not-major branch the primitive emits a dated decision record naming the criteria evaluated and short-circuits the downstream notification chain; on the major branch it opens the reporting window and hands off to notify-authority-initial. DORA Art. 19 anchor: this step is the entry gate to Art. 19's three-milestone reporting cycle, per Art. 19(1) which conditions the reporting obligation on the Art. 18(1) classification outcome. SKELETON pins the topology, the ID, and the regulatory anchor refs; the deterministic per-criterion evaluation is owned by CORE-PRIM and reuses the existing content.dora_major_classifier@v1 primitive.",
-      "on_completion": "action--71000000-0000-4000-8000-000000000003",
+      "description": "Apply the Art. 8(1) combination rule of Delegated Regulation (EU) 2024/1772 to the operator's per-criterion determinations: an incident is major when a critical service is affected and either malicious unauthorised access that may result in data losses was identified, or at least two materiality thresholds are met. Recurring incidents with the same apparent root cause are classified on their collective impact. Produces __classification__, from which __classification_decision_id__ and __incident_major__ are extracted; the not-major gate reads the latter.",
+      "on_completion": "if-condition--71000000-0000-4000-8000-000000000008",
       "in_args": [
         "__incident_id__",
-        "__reporting_window__"
+        "__classification_criteria__",
+        "__classified_at__",
+        "__aggregation__"
       ],
       "out_args": [
-        "__classification_decision_id__"
+        "__classification__",
+        "__classification_decision_id__",
+        "__incident_major__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "commands": [
         {
-          "type": "manual",
-          "command": "TODO (CORE): Art. 18 classification-decision primitive. The action body reads the incident-register entry bound to __incident_id__ and evaluates whether the incident meets the major-ICT-related-incident threshold against the criteria the Commission Delegated Regulation (EU) 2024/1772 RTS names (seven primary criteria — clients affected, reputational impact, data-loss impact, service duration, geographical spread, economic impact, criticality of services affected — plus the materiality thresholds and the Art. 18(2) recurring-incident rule). Sets __classification_decision_id__ to a durable identifier of the classification record. On the not-major branch the primitive emits a dated decision record naming the criteria evaluated and short-circuits the downstream notification chain; on the major branch it opens the reporting window and hands off to notify-authority-initial. DORA Art. 19 anchor: this step is the entry gate to Art. 19's three-milestone reporting cycle, per Art. 19(1) which conditions the reporting obligation on the Art. 18(1) classification outcome. SKELETON pins the topology, the ID, and the regulatory anchor refs; the deterministic per-criterion evaluation is owned by CORE-PRIM and reuses the existing content.dora_major_classifier@v1 primitive."
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.dora_major_incident_reporting.primitives.classification.classify_major_incident"
         }
       ],
       "step_extensions": {
         "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
           "control_refs": [
             "control.dora_major_classifier@v1"
-          ]
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.dora_major_incident_reporting.primitives.classification.classify_major_incident",
+            "in": {
+              "incident_id": "__incident_id__",
+              "criteria": "__classification_criteria__",
+              "classified_at": "__classified_at__",
+              "aggregation": "__aggregation__"
+            },
+            "out": "__classification__"
+          }
         }
       }
+    },
+    "if-condition--71000000-0000-4000-8000-000000000008": {
+      "type": "if-condition",
+      "name": "major incident?",
+      "description": "Branch on __incident_major__, extracted from the classification. True files the three Art. 19 reports in order; false skips them, because a non-major incident is not reported under Art. 19, and goes straight to the archive, which closes the cycle on both branches.",
+      "condition": "__incident_major__",
+      "on_true": "action--71000000-0000-4000-8000-000000000003",
+      "on_false": "action--71000000-0000-4000-8000-000000000006"
     },
     "action--71000000-0000-4000-8000-000000000003": {
       "type": "action",
       "name": "notify authority initial",
-      "description": "TODO (CORE): initial-notification submission primitive per DORA Art. 19(4)(a). The action body packages the initial notification against the Commission Implementing Regulation (EU) 2024/2956 ITS content shape (initial-notification template): incident identifier, classification-decision reference, awareness timestamp, classification timestamp, affected critical or important functions, impact assessment at the initial stage, and where available a first-cut indicators-of-compromise block. The submission is dispatched to the competent authority (ESA sectoral supervisor / NCA per the operator's designated authority chain) against the adapter binding declared under patterns.dora_major_incident_reporting (owned by the sibling EXTEND card). The step MUST fire as soon as possible and within 4 hours of classification as major, and no later than 24 hours from awareness of the incident. Sets __initial_notification_id__; populated with the authority acknowledgement reference once the response is bound. DORA Art. 19 anchor: Art. 19(4)(a) initial-notification milestone.",
+      "description": "Compose the Art. 19(4)(a) initial notification as a schema-conforming report, due within four hours of classification and no later than 24 hours after awareness, or four hours after a classification made more than 24 hours after awareness (Delegated Regulation (EU) 2025/301, Art. 5(1)(a) and 5(2)). Submission to the competent authority is the adapter's. Produces __initial_notification__, from which __initial_notification_id__ is extracted.",
       "on_completion": "action--71000000-0000-4000-8000-000000000004",
       "in_args": [
-        "__incident_id__",
-        "__classification_decision_id__"
+        "__classification__",
+        "__reporting_window__",
+        "__aware_at__",
+        "__initial_submitted_at__",
+        "__initial_impact__",
+        "__initial_mitigation__",
+        "__source_url__",
+        "__initial_submission_ref__"
       ],
       "out_args": [
+        "__initial_notification__",
         "__initial_notification_id__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "commands": [
         {
-          "type": "manual",
-          "command": "TODO (CORE): initial-notification submission primitive per DORA Art. 19(4)(a). The action body packages the initial notification against the Commission Implementing Regulation (EU) 2024/2956 ITS content shape (initial-notification template): incident identifier, classification-decision reference, awareness timestamp, classification timestamp, affected critical or important functions, impact assessment at the initial stage, and where available a first-cut indicators-of-compromise block. The submission is dispatched to the competent authority (ESA sectoral supervisor / NCA per the operator's designated authority chain) against the adapter binding declared under patterns.dora_major_incident_reporting (owned by the sibling EXTEND card). The step MUST fire as soon as possible and within 4 hours of classification as major, and no later than 24 hours from awareness of the incident. Sets __initial_notification_id__; populated with the authority acknowledgement reference once the response is bound. DORA Art. 19 anchor: Art. 19(4)(a) initial-notification milestone."
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.dora_major_incident_reporting.primitives.notification.compose_initial_notification"
         }
       ],
       "step_extensions": {
@@ -153,27 +317,49 @@
           "control_refs": [
             "control.dora_submission_templates@v1",
             "control.incident_timeline_signals@v1"
-          ]
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.dora_major_incident_reporting.primitives.notification.compose_initial_notification",
+            "in": {
+              "classification": "__classification__",
+              "reporting_window": "__reporting_window__",
+              "aware_at": "__aware_at__",
+              "submitted_at": "__initial_submitted_at__",
+              "impact": "__initial_impact__",
+              "mitigation": "__initial_mitigation__",
+              "source_url": "__source_url__",
+              "submission_ref": "__initial_submission_ref__"
+            },
+            "out": "__initial_notification__"
+          }
         }
       }
     },
     "action--71000000-0000-4000-8000-000000000004": {
       "type": "action",
       "name": "notify authority intermediate",
-      "description": "TODO (CORE): intermediate-report submission primitive per DORA Art. 19(4)(b). The action body packages the intermediate report against the ITS content shape (intermediate-report template): updated timestamps, refreshed affected-functions and affected-clients figures, indicators of compromise, mitigation actions in flight, and any preliminary root-cause hypothesis. The step MUST fire within 72 hours of classification of the incident as major, or earlier if regular activities have recovered in the interim. Sets __intermediate_report_id__; populated with the authority acknowledgement reference once the response is bound. The primitive reads the notification-adapter binding declared under patterns.dora_major_incident_reporting so the submission channel is consistent across the three milestones on the same reporting-cycle window. DORA Art. 19 anchor: Art. 19(4)(b) intermediate-report milestone.",
+      "description": "Compose the Art. 19(4)(b) intermediate report, linked to the initial notification, due within 72 hours of the submission of the initial notification (Delegated Regulation (EU) 2025/301, Art. 5(1)(b)), not of classification. An updated intermediate report is owed when regular activities have recovered. Produces __intermediate_report__, from which __intermediate_report_id__ is extracted.",
       "on_completion": "action--71000000-0000-4000-8000-000000000005",
       "in_args": [
-        "__incident_id__",
-        "__initial_notification_id__"
+        "__classification__",
+        "__initial_notification__",
+        "__reporting_window__",
+        "__aware_at__",
+        "__intermediate_submitted_at__",
+        "__intermediate_impact__",
+        "__intermediate_mitigation__",
+        "__source_url__",
+        "__intermediate_submission_ref__"
       ],
       "out_args": [
+        "__intermediate_report__",
         "__intermediate_report_id__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "commands": [
         {
-          "type": "manual",
-          "command": "TODO (CORE): intermediate-report submission primitive per DORA Art. 19(4)(b). The action body packages the intermediate report against the ITS content shape (intermediate-report template): updated timestamps, refreshed affected-functions and affected-clients figures, indicators of compromise, mitigation actions in flight, and any preliminary root-cause hypothesis. The step MUST fire within 72 hours of classification of the incident as major, or earlier if regular activities have recovered in the interim. Sets __intermediate_report_id__; populated with the authority acknowledgement reference once the response is bound. The primitive reads the notification-adapter binding declared under patterns.dora_major_incident_reporting so the submission channel is consistent across the three milestones on the same reporting-cycle window. DORA Art. 19 anchor: Art. 19(4)(b) intermediate-report milestone."
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.dora_major_incident_reporting.primitives.notification.compose_intermediate_report"
         }
       ],
       "step_extensions": {
@@ -181,27 +367,50 @@
           "control_refs": [
             "control.dora_submission_templates@v1",
             "control.incident_timeline_signals@v1"
-          ]
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.dora_major_incident_reporting.primitives.notification.compose_intermediate_report",
+            "in": {
+              "classification": "__classification__",
+              "initial": "__initial_notification__",
+              "reporting_window": "__reporting_window__",
+              "aware_at": "__aware_at__",
+              "submitted_at": "__intermediate_submitted_at__",
+              "impact": "__intermediate_impact__",
+              "mitigation": "__intermediate_mitigation__",
+              "source_url": "__source_url__",
+              "submission_ref": "__intermediate_submission_ref__"
+            },
+            "out": "__intermediate_report__"
+          }
         }
       }
     },
     "action--71000000-0000-4000-8000-000000000005": {
       "type": "action",
       "name": "notify authority final",
-      "description": "TODO (CORE): final-report submission primitive per DORA Art. 19(4)(c). The action body packages the final report against the ITS content shape (final-report template): full root-cause analysis, final impact figures on the affected critical or important functions and clients, completed remediation actions, lessons-learned narrative, action plan for the residual and structural gaps, and the operator's residual-risk statement. The step MUST fire no later than one month after the submission of the intermediate report. Sets __final_report_id__; populated with the authority acknowledgement reference once the response is bound. Consumes __intermediate_report_id__ to carry the reporting-cycle chain forward and to guarantee the ITS timeline field ordering is coherent across the three milestones. DORA Art. 19 anchor: Art. 19(4)(c) final-report milestone.",
+      "description": "Compose the Art. 19(4)(c) final report, linked to the intermediate report, due no later than one month after the intermediate report was submitted (Delegated Regulation (EU) 2025/301, Art. 5(1)(c)). Produces __final_report__, from which __final_report_id__ is extracted.",
       "on_completion": "action--71000000-0000-4000-8000-000000000006",
       "in_args": [
-        "__incident_id__",
-        "__intermediate_report_id__"
+        "__classification__",
+        "__intermediate_report__",
+        "__reporting_window__",
+        "__aware_at__",
+        "__final_submitted_at__",
+        "__final_impact__",
+        "__final_mitigation__",
+        "__source_url__",
+        "__final_submission_ref__"
       ],
       "out_args": [
+        "__final_report__",
         "__final_report_id__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "commands": [
         {
-          "type": "manual",
-          "command": "TODO (CORE): final-report submission primitive per DORA Art. 19(4)(c). The action body packages the final report against the ITS content shape (final-report template): full root-cause analysis, final impact figures on the affected critical or important functions and clients, completed remediation actions, lessons-learned narrative, action plan for the residual and structural gaps, and the operator's residual-risk statement. The step MUST fire no later than one month after the submission of the intermediate report. Sets __final_report_id__; populated with the authority acknowledgement reference once the response is bound. Consumes __intermediate_report_id__ to carry the reporting-cycle chain forward and to guarantee the ITS timeline field ordering is coherent across the three milestones. DORA Art. 19 anchor: Art. 19(4)(c) final-report milestone."
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.dora_major_incident_reporting.primitives.notification.compose_final_report"
         }
       ],
       "step_extensions": {
@@ -209,37 +418,70 @@
           "control_refs": [
             "control.dora_submission_templates@v1",
             "control.incident_timeline_signals@v1"
-          ]
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.dora_major_incident_reporting.primitives.notification.compose_final_report",
+            "in": {
+              "classification": "__classification__",
+              "intermediate": "__intermediate_report__",
+              "reporting_window": "__reporting_window__",
+              "aware_at": "__aware_at__",
+              "submitted_at": "__final_submitted_at__",
+              "impact": "__final_impact__",
+              "mitigation": "__final_mitigation__",
+              "source_url": "__source_url__",
+              "submission_ref": "__final_submission_ref__"
+            },
+            "out": "__final_report__"
+          }
         }
       }
     },
     "action--71000000-0000-4000-8000-000000000006": {
       "type": "action",
       "name": "close and archive",
-      "description": "TODO (CORE): cycle-archival primitive. The action body composes the dated cycle-archival record referencing __classification_decision_id__, the three submission artifacts (__initial_notification_id__, __intermediate_report_id__, __final_report_id__), the authority acknowledgement references, and any cross-regime notification-chain outputs (the NIS2 Art. 23 notification submitted in parallel where the operator is also in scope of NIS2 as an essential or important entity; the GDPR Art. 33 personal-data-breach notification where the incident involves personal data; the GDPR Art. 34 data-subject communication where the high-risk threshold is met). The archival record is published to the operator's evidence store; the artifact_id is SHA-256(workflow_id|execution_id|captured_at) so compile_target does not enter the identifier and the three reference compilers re-derive byte-identical bytes from the same primitive output. Sets __cycle_archive_id__. Always emitted so the audit-evident chain is closed even on the not-major branch. DORA Art. 19 anchor: Art. 19(3) which requires the operator to keep the reporting chain evidence-bound across the three milestones.",
+      "description": "Compose the dated cycle-archival record on both branches: the classification, the three reports with their deadline outcomes for a major incident, none for a non-major one, and references to the notifications filed under other regimes (NIS2 Art. 23, GDPR Art. 33). A major cycle without its complete chain, or a non-major one with a report attached, fails loud. Produces __cycle_archive__, from which __cycle_archive_id__ is extracted.",
       "on_completion": "end--71000000-0000-4000-8000-000000000007",
       "in_args": [
-        "__incident_id__",
-        "__classification_decision_id__",
-        "__initial_notification_id__",
-        "__intermediate_report_id__",
-        "__final_report_id__"
+        "__classification__",
+        "__initial_notification__",
+        "__intermediate_report__",
+        "__final_report__",
+        "__cross_regime_refs__",
+        "__workflow_id__",
+        "__execution_id__",
+        "__captured_at__"
       ],
       "out_args": [
+        "__cycle_archive__",
         "__cycle_archive_id__"
       ],
       "agent": "group--9479ad47-df96-5a3c-831a-f668158e5b9e",
       "commands": [
         {
-          "type": "manual",
-          "command": "TODO (CORE): cycle-archival primitive. The action body composes the dated cycle-archival record referencing __classification_decision_id__, the three submission artifacts (__initial_notification_id__, __intermediate_report_id__, __final_report_id__), the authority acknowledgement references, and any cross-regime notification-chain outputs (the NIS2 Art. 23 notification submitted in parallel where the operator is also in scope of NIS2 as an essential or important entity; the GDPR Art. 33 personal-data-breach notification where the incident involves personal data; the GDPR Art. 34 data-subject communication where the high-risk threshold is met). The archival record is published to the operator's evidence store; the artifact_id is SHA-256(workflow_id|execution_id|captured_at) so compile_target does not enter the identifier and the three reference compilers re-derive byte-identical bytes from the same primitive output. Sets __cycle_archive_id__. Always emitted so the audit-evident chain is closed even on the not-major branch. DORA Art. 19 anchor: Art. 19(3) which requires the operator to keep the reporting chain evidence-bound across the three milestones."
+          "type": "secops-ng-primitive",
+          "command": "content.playbooks.dora_major_incident_reporting.primitives.archive.compose_cycle_archive"
         }
       ],
       "step_extensions": {
         "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
           "control_refs": [
             "control.incident_timeline_signals@v1"
-          ]
+          ],
+          "core_body": {
+            "primitive": "content.playbooks.dora_major_incident_reporting.primitives.archive.compose_cycle_archive",
+            "in": {
+              "classification": "__classification__",
+              "initial": "__initial_notification__",
+              "intermediate": "__intermediate_report__",
+              "final": "__final_report__",
+              "cross_regime_refs": "__cross_regime_refs__",
+              "workflow_id": "__workflow_id__",
+              "execution_id": "__execution_id__",
+              "captured_at": "__captured_at__"
+            },
+            "out": "__cycle_archive__"
+          }
         }
       }
     },
@@ -261,8 +503,8 @@
   "playbook_extensions": {
     "extension-definition--4f4cc5db-ab05-5939-b7af-58a7082d081a": {
       "stable_id": "playbook.dora_major_incident_reporting@v1",
-      "content_version": "0.1.0",
-      "maturity": "experimental",
+      "content_version": "1.0.0",
+      "maturity": "stable",
       "compile_targets": [
         "n8n",
         "temporal",

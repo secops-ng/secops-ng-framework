@@ -24,6 +24,7 @@ from pathlib import Path
 
 from compilers._shared.cacao_parser import parse_file
 from compilers.n8n.emit import emit
+from compilers._shared.cacao_parser import secops_extension
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 SOURCE = REPO_ROOT / "content" / "playbooks" / "dora_major_incident_reporting" / "playbook.cacao.json"
@@ -147,11 +148,15 @@ def test_worked_example_has_valid_n8n_shape() -> None:
 
 
 def _action_without_commands_steps() -> dict[str, dict]:
-    """Action steps without ``commands`` AND without a CORE primitive binding.
+    """Unbound action steps: no commands, or only ``manual`` ones.
 
-    Steps that carry ``x_secops_ng.core_body`` would compile to an n8n Code
-    node rendering the primitive call (CORE-MECH-EMIT-N8N) rather than the
-    Set-node uplift, so they are excluded from the Set-node contract checks.
+    Since the CORE-WIRE change all five action steps are bound — each
+    carries ``core_body`` and a ``secops-ng-primitive`` command — so this
+    returns ``{}`` and the Set-node tests that consume it are vacuous here.
+    They are kept rather than deleted: they are the contract that catches a
+    step being unbound again, and they start asserting the moment one is.
+    The live check for the bound steps is
+    :func:`test_core_body_steps_emit_code_nodes`.
     """
     raw = json.loads(SOURCE.read_text(encoding="utf-8"))
     return {
@@ -159,13 +164,50 @@ def _action_without_commands_steps() -> dict[str, dict]:
         for step_id, step in raw["workflow"].items()
         if step.get("type") == "action"
         and all(c.get("type") == "manual" for c in step.get("commands") or ())
-        and not (step.get("x_secops_ng") or {}).get("core_body")
+        and not (secops_extension(step) or {}).get("core_body")
     }
 
 
 def _nodes_by_id() -> dict[str, dict]:
     workflow = json.loads(WORKED_EXAMPLE.read_text(encoding="utf-8"))
     return {node["id"]: node for node in workflow["nodes"]}
+
+
+def test_core_body_steps_emit_code_nodes() -> None:
+    """Every bound step compiles to an n8n Code node that imports its
+    primitive and binds the declared ``out`` variable to the call.
+
+    Catches an emitter regression — a Set node, or a Code node that imports
+    the primitive without calling it — which byte-parity alone misses once a
+    careless regenerate bakes it into the golden. It does not catch
+    deliberate de-binding, which is a reviewable diff in both files.
+    """
+    raw = json.loads(SOURCE.read_text(encoding="utf-8"))
+    nodes_by_id = _nodes_by_id()
+    bound = {sid: s for sid, s in raw["workflow"].items()
+             if (secops_extension(s) or {}).get("core_body")}
+    assert len(bound) == 5, f"expected all five action steps bound, found {len(bound)}"
+    for step_id, step in bound.items():
+        node = nodes_by_id[step_id]
+        assert node["type"] == "n8n-nodes-base.code", f"{step_id}: {node['type']}"
+        body = node["parameters"].get("pythonCode", "")
+        module, _, fn = secops_extension(step)["core_body"]["primitive"].rpartition(".")
+        assert f"from {module} import {fn}" in body, f"{step_id}: primitive not imported"
+        assert f"{secops_extension(step)['core_body']['out']} = {fn}(" in body, f"{step_id}: call not bound"
+
+
+def test_the_not_major_gate_short_circuits_to_the_archive() -> None:
+    """The gate added at the wire: a non-major incident skips the three
+    Art. 19 reports and goes straight to close-and-archive, in the source
+    and in the compiled IF node's two outputs."""
+    raw = json.loads(SOURCE.read_text(encoding="utf-8"))
+    gate = raw["workflow"]["if-condition--71000000-0000-4000-8000-000000000008"]
+    assert gate["condition"] == "__incident_major__"
+    assert gate["on_true"] == "action--71000000-0000-4000-8000-000000000003"
+    assert gate["on_false"] == "action--71000000-0000-4000-8000-000000000006"
+    assert raw["workflow"]["action--71000000-0000-4000-8000-000000000002"]["on_completion"] == \
+        "if-condition--71000000-0000-4000-8000-000000000008"
+    assert _nodes_by_id()["if-condition--71000000-0000-4000-8000-000000000008"]["type"] == "n8n-nodes-base.if"
 
 
 def test_action_without_commands_steps_emit_set_nodes() -> None:
@@ -207,7 +249,7 @@ def test_set_nodes_surface_x_secops_ng_refs() -> None:
     """Every `x_secops_ng.<key>` bundle on the CACAO step appears as a Set row."""
     nodes_by_id = _nodes_by_id()
     for step_id, step in _action_without_commands_steps().items():
-        x = step.get("x_secops_ng") or {}
+        x = secops_extension(step) or {}
         if not x:
             continue
         node = nodes_by_id[step_id]
