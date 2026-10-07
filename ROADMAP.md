@@ -2268,7 +2268,7 @@ one playbook's provenance.
 
 ### F-WF-CORE-WAVE-1 — CORE-WIRE wave 1: bind the highest-payoff unbound playbooks
 
-- **Status:** Proposed
+- **Status:** In Progress
 - **Priority:** P2
 - **Goal:** G-01 (content coverage — `stable` under the Maturity ladder
   is the catalogue's deployment-ready designation, and every playbook on
@@ -2403,6 +2403,14 @@ one playbook's provenance.
     (EU) 2025/301 Art. 5, with the same anchor corrected in the DORA
     mappings; three targets regenerated; `experimental` → `stable`,
     `content_version` 1.0.0 on a recomputed checklist).
+  - CORE-PRIM — #1045 (`eu_ai_act_deployer_obligations`: primitives for
+    all five action steps, from none, each rule checked against the
+    Regulation's text; the intended-use negative case stops the cycle,
+    oversight needs all four Art. 26(2) limbs per natural person, the
+    three Art. 26(5) escalation triggers stay apart with the
+    severity-classed Art. 73 clock, the FRIA follows the Art. 27(1)
+    scope and blocks deployment while incomplete, and log retention
+    follows Art. 26(6) in both directions).
 
 ### F-WF-CORE-WAVE-2 — CORE wave 2: bind the remaining worthy playbooks; record the parked five
 
