@@ -36,21 +36,102 @@ class PlaybookDoraMajorIncidentReportingV1State(TypedDict, total=False):
     # playbook_variable: __reporting_window__
     # Identifier of the DORA Art. 19 reporting cycle window this run discharges — names which incident-cycle cohort the run reports against. Wall-clock timestamps live on each emitted submission artifact.
     reporting_window: str
+    # playbook_variable: __classification_criteria__
+    # The operator's per-criterion determinations under Delegated Regulation (EU) 2024/1772: exactly critical_services_affected and malicious_unauthorised_access (real booleans) and materiality, one real boolean per materiality criterion saying whether the operator's policy found its threshold met. The threshold rules themselves stay with the operator's classification policy.
+    classification_criteria: dict[str, object]
+    # playbook_variable: __classified_at__
+    # Zulu instant (YYYY-MM-DDTHH:MM:SSZ) of the classification; the reporting clocks start here.
+    classified_at: str
+    # playbook_variable: __aggregation__
+    # The recurring-incident block when the criteria describe recurring incidents' collective impact: incident_refs (two or more), same_apparent_root_cause, first_occurred_at and last_occurred_at. Empty for a single incident (the n8n trigger supplies an empty string for an unset variable).
+    aggregation: dict[str, object]
+    # playbook_variable: __aware_at__
+    # Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the operator became aware of the incident; the initial notification's 24-hour limit runs from it.
+    aware_at: str
+    # playbook_variable: __source_url__
+    # URL of the workflow run that produces the reports, recorded in each report's provenance.
+    source_url: str
+    # playbook_variable: __initial_submitted_at__
+    # Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the initial notification is submitted at.
+    initial_submitted_at: str
+    # playbook_variable: __initial_impact__
+    # The impact figures the initial notification reports: any of affected_functions, affected_clients_count, duration_minutes, geographic_scope, data_loss_indicator and indicators_of_compromise.
+    initial_impact: dict[str, object]
+    # playbook_variable: __initial_mitigation__
+    # The mitigation status the initial notification reports: state, and any of actions_in_flight, completed_actions, root_cause and residual_risk.
+    initial_mitigation: dict[str, object]
+    # playbook_variable: __initial_submission_ref__
+    # The authority's acknowledgement reference for the initial notification, when the adapter has one; empty otherwise (the n8n trigger supplies an empty string for an unset variable), and then omitted from the report.
+    initial_submission_ref: str
+    # playbook_variable: __intermediate_submitted_at__
+    # Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the intermediate report is submitted at.
+    intermediate_submitted_at: str
+    # playbook_variable: __intermediate_impact__
+    # The impact figures the intermediate report reports: any of affected_functions, affected_clients_count, duration_minutes, geographic_scope, data_loss_indicator and indicators_of_compromise.
+    intermediate_impact: dict[str, object]
+    # playbook_variable: __intermediate_mitigation__
+    # The mitigation status the intermediate report reports: state, and any of actions_in_flight, completed_actions, root_cause and residual_risk.
+    intermediate_mitigation: dict[str, object]
+    # playbook_variable: __intermediate_submission_ref__
+    # The authority's acknowledgement reference for the intermediate report, when the adapter has one; empty otherwise (the n8n trigger supplies an empty string for an unset variable), and then omitted from the report.
+    intermediate_submission_ref: str
+    # playbook_variable: __final_submitted_at__
+    # Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the final report is submitted at.
+    final_submitted_at: str
+    # playbook_variable: __final_impact__
+    # The impact figures the final report reports: any of affected_functions, affected_clients_count, duration_minutes, geographic_scope, data_loss_indicator and indicators_of_compromise.
+    final_impact: dict[str, object]
+    # playbook_variable: __final_mitigation__
+    # The mitigation status the final report reports: state, and any of actions_in_flight, completed_actions, root_cause and residual_risk.
+    final_mitigation: dict[str, object]
+    # playbook_variable: __final_submission_ref__
+    # The authority's acknowledgement reference for the final report, when the adapter has one; empty otherwise (the n8n trigger supplies an empty string for an unset variable), and then omitted from the report.
+    final_submission_ref: str
+    # playbook_variable: __cross_regime_refs__
+    # References to notifications filed under other regimes for the same incident (the NIS2 Art. 23 early warning, the GDPR Art. 33 notification). CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it.
+    cross_regime_refs: str
+    # playbook_variable: __workflow_id__
+    # Identifier of the workflow, folded into the archive's artifact_id.
+    workflow_id: str
+    # playbook_variable: __execution_id__
+    # Identifier of this execution, folded into the archive's artifact_id.
+    execution_id: str
+    # playbook_variable: __captured_at__
+    # Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the archive is captured at, folded into its artifact_id.
+    captured_at: str
     # playbook_variable: __classification_decision_id__
-    # Identifier of the Art. 18 classification-decision record composed at the detect-and-classify step: whether the incident is classified as MAJOR against Commission Delegated Regulation (EU) 2024/1772 criteria (seven primary criteria plus materiality thresholds; recurring-incident rule per Art. 18(2)). On the not-major branch the primitive still emits a dated decision record so the audit-evident chain is closed rather than silently short-circuiting.
+    # Identifier of the Art. 18 classification decision. Extracted at the compile target's adapter seam from __classification__.classification_id.
     classification_decision_id: str
     # playbook_variable: __initial_notification_id__
-    # Identifier of the initial notification submission composed for the competent authority at the notify-authority-initial step per DORA Art. 19(4)(a): submitted as soon as possible, within 4 hours of classification as major, and no later than 24 hours from awareness. Content shape follows Commission Implementing Regulation (EU) 2024/2956 (ITS). Populated with the authority acknowledgement reference once the submission response is bound.
+    # Identifier of the Art. 19(4)(a) initial notification. Extracted at the compile target's adapter seam from __initial_notification__.report.report_id.
     initial_notification_id: str
     # playbook_variable: __intermediate_report_id__
-    # Identifier of the intermediate report submission composed at the notify-authority-intermediate step per DORA Art. 19(4)(b): submitted within 72 hours of classification of the incident as major (or earlier if regular activities have recovered). Updates the timestamps, affected functions and clients, indicators of compromise, and mitigation actions in flight against the ITS content shape.
+    # Identifier of the Art. 19(4)(b) intermediate report. Extracted at the compile target's adapter seam from __intermediate_report__.report.report_id.
     intermediate_report_id: str
     # playbook_variable: __final_report_id__
-    # Identifier of the final report submission composed at the notify-authority-final step per DORA Art. 19(4)(c): submitted no later than one month after the submission of the intermediate report. Carries the root-cause analysis, final impact figures, completed remediation actions, lessons learned, action plan, and residual-risk statement.
+    # Identifier of the Art. 19(4)(c) final report. Extracted at the compile target's adapter seam from __final_report__.report.report_id.
     final_report_id: str
     # playbook_variable: __cycle_archive_id__
-    # Identifier of the dated cycle-archival record composed at the close-and-archive step: references the classification decision, the three submission artifacts, the authority acknowledgement references, and the cross-regime notification-chain outputs (NIS2 Art. 23, GDPR Art. 33-34 where applicable) so the audit-evident chain is closed at the primitive boundary rather than trailing across unlinked artifacts.
+    # Identifier of the cycle-archival record. Extracted at the compile target's adapter seam from __cycle_archive__.artifact_id.
     cycle_archive_id: str
+    # playbook_variable: __classification__
+    # Envelope the classify step emits: major as a real boolean, its basis, the materiality thresholds met, the rule ids and reasons, and the recurring-incident aggregation when there is one.
+    classification: dict[str, object]
+    # playbook_variable: __incident_major__
+    # Whether the incident is classified as major; false skips the three reports and goes straight to the archive. Extracted at the compile target's adapter seam from __classification__.major. A real boolean: the gate compares it to true, and the string 'false' is truthy in most runtimes.
+    incident_major: bool
+    # playbook_variable: __initial_notification__
+    # Envelope the initial-notification step emits: the schema-conforming Art. 19 report, due_at, within_deadline and the deadline basis.
+    initial_notification: dict[str, object]
+    # playbook_variable: __intermediate_report__
+    # Envelope the intermediate-report step emits, in the same shape, linked to the initial notification.
+    intermediate_report: dict[str, object]
+    # playbook_variable: __final_report__
+    # Envelope the final-report step emits, in the same shape, linked to the intermediate report.
+    final_report: dict[str, object]
+    # playbook_variable: __cycle_archive__
+    # Envelope the archive step emits: the classification, each milestone with its deadline outcome, whether every deadline was met, and the cross-regime references.
+    cycle_archive: dict[str, object]
     # bookkeeping
     # Per-step status map keyed by CACAO step_id. Conventional values: 'pending', 'running', 'ok', 'failed', 'awaiting-human'. The graph builder writes here; conditional-edge routers read it.
     step_status: dict[str, str]
@@ -62,8 +143,8 @@ class PlaybookDoraMajorIncidentReportingV1State(TypedDict, total=False):
     messages: Annotated[list[AnyMessage], add_messages]
 
 @tool
-async def detect_and_classify(incident_id: str, reporting_window: str) -> str:
-    """TODO (CORE): Art. 18 classification-decision primitive. The action body reads the incident-register entry bound to __incident_id__ and evaluates whether the incident meets the major-ICT-related-incident threshold against the criteria the Commission Delegated Regulation (EU) 2024/1772 RTS names (seven primary criteria — clients affected, reputational impact, data-loss impact, service duration, geographical spread, economic impact, criticality of services affected — plus the materiality thresholds and the Art. 18(2) recurring-incident rule). Sets __classification_decision_id__ to a durable identifier of the classification record. On the not-major branch the primitive emits a dated decision record naming the criteria evaluated and short-circuits the downstream notification chain; on the major branch it opens the reporting window and hands off to notify-authority-initial. DORA Art. 19 anchor: this step is the entry gate to Art. 19's three-milestone reporting cycle, per Art. 19(1) which conditions the reporting obligation on the Art. 18(1) classification outcome. SKELETON pins the topology, the ID, and the regulatory anchor refs; the deterministic per-criterion evaluation is owned by CORE-PRIM and reuses the existing content.dora_major_classifier@v1 primitive.
+async def detect_and_classify(incident_id: str, classification_criteria: dict[str, object], classified_at: str, aggregation: dict[str, object]) -> dict[str, object]:
+    """Apply the Art. 8(1) combination rule of Delegated Regulation (EU) 2024/1772 to the operator's per-criterion determinations: an incident is major when a critical service is affected and either malicious unauthorised access that may result in data losses was identified, or at least two materiality thresholds are met. Recurring incidents with the same apparent root cause are classified on their collective impact. Produces __classification__, from which __classification_decision_id__ and __incident_major__ are extracted; the not-major gate reads the latter.
 
     CACAO step_id : action--71000000-0000-4000-8000-000000000002
     CACAO type    : action
@@ -75,13 +156,12 @@ async def detect_and_classify(incident_id: str, reporting_window: str) -> str:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--71000000-0000-4000-8000-000000000002', attributes={'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'detect and classify', 'secops_ng.tool.name': 'detect_and_classify', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--71000000-0000-4000-8000-000000000002'"
-        )
+        from content.playbooks.dora_major_incident_reporting.primitives.classification import classify_major_incident
+        __classification__ = classify_major_incident(incident_id=__incident_id__, criteria=__classification_criteria__, classified_at=__classified_at__, aggregation=__aggregation__)
 
 @tool
-async def notify_authority_initial(incident_id: str, classification_decision_id: str) -> str:
-    """TODO (CORE): initial-notification submission primitive per DORA Art. 19(4)(a). The action body packages the initial notification against the Commission Implementing Regulation (EU) 2024/2956 ITS content shape (initial-notification template): incident identifier, classification-decision reference, awareness timestamp, classification timestamp, affected critical or important functions, impact assessment at the initial stage, and where available a first-cut indicators-of-compromise block. The submission is dispatched to the competent authority (ESA sectoral supervisor / NCA per the operator's designated authority chain) against the adapter binding declared under patterns.dora_major_incident_reporting (owned by the sibling EXTEND card). The step MUST fire as soon as possible and within 4 hours of classification as major, and no later than 24 hours from awareness of the incident. Sets __initial_notification_id__; populated with the authority acknowledgement reference once the response is bound. DORA Art. 19 anchor: Art. 19(4)(a) initial-notification milestone.
+async def notify_authority_initial(classification: dict[str, object], reporting_window: str, aware_at: str, initial_submitted_at: str, initial_impact: dict[str, object], initial_mitigation: dict[str, object], source_url: str, initial_submission_ref: str) -> dict[str, object]:
+    """Compose the Art. 19(4)(a) initial notification as a schema-conforming report, due within four hours of classification and no later than 24 hours after awareness, or four hours after a classification made more than 24 hours after awareness (Delegated Regulation (EU) 2025/301, Art. 5(1)(a) and 5(2)). Submission to the competent authority is the adapter's. Produces __initial_notification__, from which __initial_notification_id__ is extracted.
 
     CACAO step_id : action--71000000-0000-4000-8000-000000000003
     CACAO type    : action
@@ -93,13 +173,12 @@ async def notify_authority_initial(incident_id: str, classification_decision_id:
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--71000000-0000-4000-8000-000000000003', attributes={'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'notify authority initial', 'secops_ng.tool.name': 'notify_authority_initial', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--71000000-0000-4000-8000-000000000003'"
-        )
+        from content.playbooks.dora_major_incident_reporting.primitives.notification import compose_initial_notification
+        __initial_notification__ = compose_initial_notification(classification=__classification__, reporting_window=__reporting_window__, aware_at=__aware_at__, submitted_at=__initial_submitted_at__, impact=__initial_impact__, mitigation=__initial_mitigation__, source_url=__source_url__, submission_ref=__initial_submission_ref__)
 
 @tool
-async def notify_authority_intermediate(incident_id: str, initial_notification_id: str) -> str:
-    """TODO (CORE): intermediate-report submission primitive per DORA Art. 19(4)(b). The action body packages the intermediate report against the ITS content shape (intermediate-report template): updated timestamps, refreshed affected-functions and affected-clients figures, indicators of compromise, mitigation actions in flight, and any preliminary root-cause hypothesis. The step MUST fire within 72 hours of classification of the incident as major, or earlier if regular activities have recovered in the interim. Sets __intermediate_report_id__; populated with the authority acknowledgement reference once the response is bound. The primitive reads the notification-adapter binding declared under patterns.dora_major_incident_reporting so the submission channel is consistent across the three milestones on the same reporting-cycle window. DORA Art. 19 anchor: Art. 19(4)(b) intermediate-report milestone.
+async def notify_authority_intermediate(classification: dict[str, object], initial_notification: dict[str, object], reporting_window: str, aware_at: str, intermediate_submitted_at: str, intermediate_impact: dict[str, object], intermediate_mitigation: dict[str, object], source_url: str, intermediate_submission_ref: str) -> dict[str, object]:
+    """Compose the Art. 19(4)(b) intermediate report, linked to the initial notification, due within 72 hours of the submission of the initial notification (Delegated Regulation (EU) 2025/301, Art. 5(1)(b)), not of classification. An updated intermediate report is owed when regular activities have recovered. Produces __intermediate_report__, from which __intermediate_report_id__ is extracted.
 
     CACAO step_id : action--71000000-0000-4000-8000-000000000004
     CACAO type    : action
@@ -111,13 +190,12 @@ async def notify_authority_intermediate(incident_id: str, initial_notification_i
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--71000000-0000-4000-8000-000000000004', attributes={'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'notify authority intermediate', 'secops_ng.tool.name': 'notify_authority_intermediate', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--71000000-0000-4000-8000-000000000004'"
-        )
+        from content.playbooks.dora_major_incident_reporting.primitives.notification import compose_intermediate_report
+        __intermediate_report__ = compose_intermediate_report(classification=__classification__, initial=__initial_notification__, reporting_window=__reporting_window__, aware_at=__aware_at__, submitted_at=__intermediate_submitted_at__, impact=__intermediate_impact__, mitigation=__intermediate_mitigation__, source_url=__source_url__, submission_ref=__intermediate_submission_ref__)
 
 @tool
-async def notify_authority_final(incident_id: str, intermediate_report_id: str) -> str:
-    """TODO (CORE): final-report submission primitive per DORA Art. 19(4)(c). The action body packages the final report against the ITS content shape (final-report template): full root-cause analysis, final impact figures on the affected critical or important functions and clients, completed remediation actions, lessons-learned narrative, action plan for the residual and structural gaps, and the operator's residual-risk statement. The step MUST fire no later than one month after the submission of the intermediate report. Sets __final_report_id__; populated with the authority acknowledgement reference once the response is bound. Consumes __intermediate_report_id__ to carry the reporting-cycle chain forward and to guarantee the ITS timeline field ordering is coherent across the three milestones. DORA Art. 19 anchor: Art. 19(4)(c) final-report milestone.
+async def notify_authority_final(classification: dict[str, object], intermediate_report: dict[str, object], reporting_window: str, aware_at: str, final_submitted_at: str, final_impact: dict[str, object], final_mitigation: dict[str, object], source_url: str, final_submission_ref: str) -> dict[str, object]:
+    """Compose the Art. 19(4)(c) final report, linked to the intermediate report, due no later than one month after the intermediate report was submitted (Delegated Regulation (EU) 2025/301, Art. 5(1)(c)). Produces __final_report__, from which __final_report_id__ is extracted.
 
     CACAO step_id : action--71000000-0000-4000-8000-000000000005
     CACAO type    : action
@@ -129,13 +207,12 @@ async def notify_authority_final(incident_id: str, intermediate_report_id: str) 
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--71000000-0000-4000-8000-000000000005', attributes={'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'notify authority final', 'secops_ng.tool.name': 'notify_authority_final', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--71000000-0000-4000-8000-000000000005'"
-        )
+        from content.playbooks.dora_major_incident_reporting.primitives.notification import compose_final_report
+        __final_report__ = compose_final_report(classification=__classification__, intermediate=__intermediate_report__, reporting_window=__reporting_window__, aware_at=__aware_at__, submitted_at=__final_submitted_at__, impact=__final_impact__, mitigation=__final_mitigation__, source_url=__source_url__, submission_ref=__final_submission_ref__)
 
 @tool
-async def close_and_archive(incident_id: str, classification_decision_id: str, initial_notification_id: str, intermediate_report_id: str, final_report_id: str) -> str:
-    """TODO (CORE): cycle-archival primitive. The action body composes the dated cycle-archival record referencing __classification_decision_id__, the three submission artifacts (__initial_notification_id__, __intermediate_report_id__, __final_report_id__), the authority acknowledgement references, and any cross-regime notification-chain outputs (the NIS2 Art. 23 notification submitted in parallel where the operator is also in scope of NIS2 as an essential or important entity; the GDPR Art. 33 personal-data-breach notification where the incident involves personal data; the GDPR Art. 34 data-subject communication where the high-risk threshold is met). The archival record is published to the operator's evidence store; the artifact_id is SHA-256(workflow_id|execution_id|captured_at) so compile_target does not enter the identifier and the three reference compilers re-derive byte-identical bytes from the same primitive output. Sets __cycle_archive_id__. Always emitted so the audit-evident chain is closed even on the not-major branch. DORA Art. 19 anchor: Art. 19(3) which requires the operator to keep the reporting chain evidence-bound across the three milestones.
+async def close_and_archive(classification: dict[str, object], initial_notification: dict[str, object], intermediate_report: dict[str, object], final_report: dict[str, object], cross_regime_refs: str, workflow_id: str, execution_id: str, captured_at: str) -> dict[str, object]:
+    """Compose the dated cycle-archival record on both branches: the classification, the three reports with their deadline outcomes for a major incident, none for a non-major one, and references to the notifications filed under other regimes (NIS2 Art. 23, GDPR Art. 33). A major cycle without its complete chain, or a non-major one with a report attached, fails loud. Produces __cycle_archive__, from which __cycle_archive_id__ is extracted.
 
     CACAO step_id : action--71000000-0000-4000-8000-000000000006
     CACAO type    : action
@@ -147,9 +224,8 @@ async def close_and_archive(incident_id: str, classification_decision_id: str, i
         AuditTrail.current().append(
             AuditRecord(span_name='tool.action--71000000-0000-4000-8000-000000000006', attributes={'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'close and archive', 'secops_ng.tool.name': 'close_and_archive', 'secops_ng.workflow.run_id': ''})
         )
-        raise NotImplementedError(
-            f"CACAO action tool not implemented: step_id='action--71000000-0000-4000-8000-000000000006'"
-        )
+        from content.playbooks.dora_major_incident_reporting.primitives.archive import compose_cycle_archive
+        __cycle_archive__ = compose_cycle_archive(classification=__classification__, initial=__initial_notification__, intermediate=__intermediate_report__, final=__final_report__, cross_regime_refs=__cross_regime_refs__, workflow_id=__workflow_id__, execution_id=__execution_id__, captured_at=__captured_at__)
 
 async def llm_step(state: PlaybookDoraMajorIncidentReportingV1State) -> dict:
     """Agentic-extension hook.

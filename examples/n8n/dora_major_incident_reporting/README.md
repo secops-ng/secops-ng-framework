@@ -3,10 +3,12 @@
 Worked example: the `playbook.dora_major_incident_reporting@v1` CACAO
 v2 playbook compiled by the n8n reference compiler. Operators can
 import `workflow.n8n.json` directly into an n8n instance to see the
-topology the emitter produces; binding the placeholder Set-node steps
-to real connectors (incident register, Art. 18 classification-decision
-store, ITS submission channel to the competent authority, and the
-evidence-archival store) is the operator's job.
+topology the emitter produces. Every action step is a Code node
+calling its deterministic primitive, and the major-incident gate is an
+IF node; binding the inputs those calls read to real connectors
+(incident register, classification policy, ITS submission channel to
+the competent authority, and the evidence-archival store) is the
+operator's job.
 
 ## Source
 
@@ -41,10 +43,8 @@ the regeneration script.
    review and bind it to your own connectors before activating.
 
 The emitted workflow is a *snapshot of intent*, not a runnable
-playbook. The Set nodes carry the CACAO I/O contract (`in_args` /
-`out_args`) plus the `x_secops_ng` reference bundles (control,
-detection, telemetry, metric) as editable assignments; binding those
-rows to real connectors is the operator's job.
+playbook. The Code nodes call the bound primitives; binding the
+adapter inputs they read to real connectors is the operator's job.
 
 ## Regeneration
 

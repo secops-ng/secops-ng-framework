@@ -1,9 +1,18 @@
 {
-  "conditional_edges": [],
+  "conditional_edges": [
+    {
+      "branches": {
+        "failure": "action--71000000-0000-4000-8000-000000000006",
+        "success": "action--71000000-0000-4000-8000-000000000003"
+      },
+      "default": null,
+      "src": "if-condition--71000000-0000-4000-8000-000000000008"
+    }
+  ],
   "edges": [
     {
       "cacao_edge": "on_completion",
-      "dst": "action--71000000-0000-4000-8000-000000000003",
+      "dst": "if-condition--71000000-0000-4000-8000-000000000008",
       "src": "action--71000000-0000-4000-8000-000000000002"
     },
     {
@@ -37,6 +46,13 @@
       "label": "detect and classify",
       "name": "action--71000000-0000-4000-8000-000000000002",
       "step_id": "action--71000000-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_type": "if-condition",
+      "kind": "condition",
+      "label": "major incident?",
+      "name": "if-condition--71000000-0000-4000-8000-000000000008",
+      "step_id": "if-condition--71000000-0000-4000-8000-000000000008"
     },
     {
       "cacao_type": "action",

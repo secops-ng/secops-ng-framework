@@ -20,138 +20,118 @@ _TRACER = trace.get_tracer(__name__)
 from ._audit_mirror import AuditRecord, AuditTrail
 
 @activity.defn
-async def detect_and_classify(incident_id: str, reporting_window: str) -> str:
-    """TODO (CORE): Art. 18 classification-decision primitive. The action body reads the incident-register entry bound to __incident_id__ and evaluates whether the incident meets the major-ICT-related-incident threshold against the criteria the Commission Delegated Regulation (EU) 2024/1772 RTS names (seven primary criteria — clients affected, reputational impact, data-loss impact, service duration, geographical spread, economic impact, criticality of services affected — plus the materiality thresholds and the Art. 18(2) recurring-incident rule). Sets __classification_decision_id__ to a durable identifier of the classification record. On the not-major branch the primitive emits a dated decision record naming the criteria evaluated and short-circuits the downstream notification chain; on the major branch it opens the reporting window and hands off to notify-authority-initial. DORA Art. 19 anchor: this step is the entry gate to Art. 19's three-milestone reporting cycle, per Art. 19(1) which conditions the reporting obligation on the Art. 18(1) classification outcome. SKELETON pins the topology, the ID, and the regulatory anchor refs; the deterministic per-criterion evaluation is owned by CORE-PRIM and reuses the existing content.dora_major_classifier@v1 primitive.
+async def detect_and_classify(incident_id: str, classification_criteria: dict[str, object], classified_at: str, aggregation: dict[str, object]) -> dict[str, object]:
+    """Apply the Art. 8(1) combination rule of Delegated Regulation (EU) 2024/1772 to the operator's per-criterion determinations: an incident is major when a critical service is affected and either malicious unauthorised access that may result in data losses was identified, or at least two materiality thresholds are met. Recurring incidents with the same apparent root cause are classified on their collective impact. Produces __classification__, from which __classification_decision_id__ and __incident_major__ are extracted; the not-major gate reads the latter.
 
     CACAO step_id: action--71000000-0000-4000-8000-000000000002
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--71000000-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'detect and classify', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_and_classify'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'detect and classify', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_and_classify'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--71000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'detect and classify', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_and_classify'})
+            AuditRecord(span_name='activity.action--71000000-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000002', 'secops_ng.step.name': 'detect and classify', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_and_classify'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--71000000-0000-4000-8000-000000000002'"
-        )
+        from content.playbooks.dora_major_incident_reporting.primitives.classification import classify_major_incident
+        __classification__ = classify_major_incident(incident_id=__incident_id__, criteria=__classification_criteria__, classified_at=__classified_at__, aggregation=__aggregation__)
 
 DETECT_AND_CLASSIFY_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def notify_authority_initial(incident_id: str, classification_decision_id: str) -> str:
-    """TODO (CORE): initial-notification submission primitive per DORA Art. 19(4)(a). The action body packages the initial notification against the Commission Implementing Regulation (EU) 2024/2956 ITS content shape (initial-notification template): incident identifier, classification-decision reference, awareness timestamp, classification timestamp, affected critical or important functions, impact assessment at the initial stage, and where available a first-cut indicators-of-compromise block. The submission is dispatched to the competent authority (ESA sectoral supervisor / NCA per the operator's designated authority chain) against the adapter binding declared under patterns.dora_major_incident_reporting (owned by the sibling EXTEND card). The step MUST fire as soon as possible and within 4 hours of classification as major, and no later than 24 hours from awareness of the incident. Sets __initial_notification_id__; populated with the authority acknowledgement reference once the response is bound. DORA Art. 19 anchor: Art. 19(4)(a) initial-notification milestone.
+async def notify_authority_initial(classification: dict[str, object], reporting_window: str, aware_at: str, initial_submitted_at: str, initial_impact: dict[str, object], initial_mitigation: dict[str, object], source_url: str, initial_submission_ref: str) -> dict[str, object]:
+    """Compose the Art. 19(4)(a) initial notification as a schema-conforming report, due within four hours of classification and no later than 24 hours after awareness, or four hours after a classification made more than 24 hours after awareness (Delegated Regulation (EU) 2025/301, Art. 5(1)(a) and 5(2)). Submission to the competent authority is the adapter's. Produces __initial_notification__, from which __initial_notification_id__ is extracted.
 
     CACAO step_id: action--71000000-0000-4000-8000-000000000003
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--71000000-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'notify authority initial', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_authority_initial'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'notify authority initial', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_authority_initial'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--71000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'notify authority initial', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_authority_initial'})
+            AuditRecord(span_name='activity.action--71000000-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000003', 'secops_ng.step.name': 'notify authority initial', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_authority_initial'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--71000000-0000-4000-8000-000000000003'"
-        )
+        from content.playbooks.dora_major_incident_reporting.primitives.notification import compose_initial_notification
+        __initial_notification__ = compose_initial_notification(classification=__classification__, reporting_window=__reporting_window__, aware_at=__aware_at__, submitted_at=__initial_submitted_at__, impact=__initial_impact__, mitigation=__initial_mitigation__, source_url=__source_url__, submission_ref=__initial_submission_ref__)
 
 NOTIFY_AUTHORITY_INITIAL_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def notify_authority_intermediate(incident_id: str, initial_notification_id: str) -> str:
-    """TODO (CORE): intermediate-report submission primitive per DORA Art. 19(4)(b). The action body packages the intermediate report against the ITS content shape (intermediate-report template): updated timestamps, refreshed affected-functions and affected-clients figures, indicators of compromise, mitigation actions in flight, and any preliminary root-cause hypothesis. The step MUST fire within 72 hours of classification of the incident as major, or earlier if regular activities have recovered in the interim. Sets __intermediate_report_id__; populated with the authority acknowledgement reference once the response is bound. The primitive reads the notification-adapter binding declared under patterns.dora_major_incident_reporting so the submission channel is consistent across the three milestones on the same reporting-cycle window. DORA Art. 19 anchor: Art. 19(4)(b) intermediate-report milestone.
+async def notify_authority_intermediate(classification: dict[str, object], initial_notification: dict[str, object], reporting_window: str, aware_at: str, intermediate_submitted_at: str, intermediate_impact: dict[str, object], intermediate_mitigation: dict[str, object], source_url: str, intermediate_submission_ref: str) -> dict[str, object]:
+    """Compose the Art. 19(4)(b) intermediate report, linked to the initial notification, due within 72 hours of the submission of the initial notification (Delegated Regulation (EU) 2025/301, Art. 5(1)(b)), not of classification. An updated intermediate report is owed when regular activities have recovered. Produces __intermediate_report__, from which __intermediate_report_id__ is extracted.
 
     CACAO step_id: action--71000000-0000-4000-8000-000000000004
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--71000000-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'notify authority intermediate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_authority_intermediate'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'notify authority intermediate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_authority_intermediate'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--71000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'notify authority intermediate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_authority_intermediate'})
+            AuditRecord(span_name='activity.action--71000000-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000004', 'secops_ng.step.name': 'notify authority intermediate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_authority_intermediate'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--71000000-0000-4000-8000-000000000004'"
-        )
+        from content.playbooks.dora_major_incident_reporting.primitives.notification import compose_intermediate_report
+        __intermediate_report__ = compose_intermediate_report(classification=__classification__, initial=__initial_notification__, reporting_window=__reporting_window__, aware_at=__aware_at__, submitted_at=__intermediate_submitted_at__, impact=__intermediate_impact__, mitigation=__intermediate_mitigation__, source_url=__source_url__, submission_ref=__intermediate_submission_ref__)
 
 NOTIFY_AUTHORITY_INTERMEDIATE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def notify_authority_final(incident_id: str, intermediate_report_id: str) -> str:
-    """TODO (CORE): final-report submission primitive per DORA Art. 19(4)(c). The action body packages the final report against the ITS content shape (final-report template): full root-cause analysis, final impact figures on the affected critical or important functions and clients, completed remediation actions, lessons-learned narrative, action plan for the residual and structural gaps, and the operator's residual-risk statement. The step MUST fire no later than one month after the submission of the intermediate report. Sets __final_report_id__; populated with the authority acknowledgement reference once the response is bound. Consumes __intermediate_report_id__ to carry the reporting-cycle chain forward and to guarantee the ITS timeline field ordering is coherent across the three milestones. DORA Art. 19 anchor: Art. 19(4)(c) final-report milestone.
+async def notify_authority_final(classification: dict[str, object], intermediate_report: dict[str, object], reporting_window: str, aware_at: str, final_submitted_at: str, final_impact: dict[str, object], final_mitigation: dict[str, object], source_url: str, final_submission_ref: str) -> dict[str, object]:
+    """Compose the Art. 19(4)(c) final report, linked to the intermediate report, due no later than one month after the intermediate report was submitted (Delegated Regulation (EU) 2025/301, Art. 5(1)(c)). Produces __final_report__, from which __final_report_id__ is extracted.
 
     CACAO step_id: action--71000000-0000-4000-8000-000000000005
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--71000000-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'notify authority final', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_authority_final'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'notify authority final', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_authority_final'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--71000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'notify authority final', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_authority_final'})
+            AuditRecord(span_name='activity.action--71000000-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000005', 'secops_ng.step.name': 'notify authority final', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'notify_authority_final'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--71000000-0000-4000-8000-000000000005'"
-        )
+        from content.playbooks.dora_major_incident_reporting.primitives.notification import compose_final_report
+        __final_report__ = compose_final_report(classification=__classification__, intermediate=__intermediate_report__, reporting_window=__reporting_window__, aware_at=__aware_at__, submitted_at=__final_submitted_at__, impact=__final_impact__, mitigation=__final_mitigation__, source_url=__source_url__, submission_ref=__final_submission_ref__)
 
 NOTIFY_AUTHORITY_FINAL_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def close_and_archive(incident_id: str, classification_decision_id: str, initial_notification_id: str, intermediate_report_id: str, final_report_id: str) -> str:
-    """TODO (CORE): cycle-archival primitive. The action body composes the dated cycle-archival record referencing __classification_decision_id__, the three submission artifacts (__initial_notification_id__, __intermediate_report_id__, __final_report_id__), the authority acknowledgement references, and any cross-regime notification-chain outputs (the NIS2 Art. 23 notification submitted in parallel where the operator is also in scope of NIS2 as an essential or important entity; the GDPR Art. 33 personal-data-breach notification where the incident involves personal data; the GDPR Art. 34 data-subject communication where the high-risk threshold is met). The archival record is published to the operator's evidence store; the artifact_id is SHA-256(workflow_id|execution_id|captured_at) so compile_target does not enter the identifier and the three reference compilers re-derive byte-identical bytes from the same primitive output. Sets __cycle_archive_id__. Always emitted so the audit-evident chain is closed even on the not-major branch. DORA Art. 19 anchor: Art. 19(3) which requires the operator to keep the reporting chain evidence-bound across the three milestones.
+async def close_and_archive(classification: dict[str, object], initial_notification: dict[str, object], intermediate_report: dict[str, object], final_report: dict[str, object], cross_regime_refs: str, workflow_id: str, execution_id: str, captured_at: str) -> dict[str, object]:
+    """Compose the dated cycle-archival record on both branches: the classification, the three reports with their deadline outcomes for a major incident, none for a non-major one, and references to the notifications filed under other regimes (NIS2 Art. 23, GDPR Art. 33). A major cycle without its complete chain, or a non-major one with a report attached, fails loud. Produces __cycle_archive__, from which __cycle_archive_id__ is extracted.
 
     CACAO step_id: action--71000000-0000-4000-8000-000000000006
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--71000000-0000-4000-8000-000000000006',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'close and archive', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'close_and_archive'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'close and archive', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'close_and_archive'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--71000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'close and archive', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'close_and_archive'})
+            AuditRecord(span_name='activity.action--71000000-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--71000000-0000-4000-8000-000000000006', 'secops_ng.step.name': 'close and archive', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'close_and_archive'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--71000000-0000-4000-8000-000000000006'"
-        )
+        from content.playbooks.dora_major_incident_reporting.primitives.archive import compose_cycle_archive
+        __cycle_archive__ = compose_cycle_archive(classification=__classification__, initial=__initial_notification__, intermediate=__intermediate_report__, final=__final_report__, cross_regime_refs=__cross_regime_refs__, workflow_id=__workflow_id__, execution_id=__execution_id__, captured_at=__captured_at__)
 
 CLOSE_AND_ARCHIVE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @workflow.defn
@@ -160,115 +140,20 @@ class PlaybookDoraMajorIncidentReportingV1Workflow:
 
     CACAO playbook id : playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d
     stable_id         : playbook.dora_major_incident_reporting@v1
-    content_version   : 0.1.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--71000000-0000-4000-8000-000000000001
     activities        : detect_and_classify, notify_authority_initial, notify_authority_intermediate, notify_authority_final, close_and_archive
     """
-
-    # Human-in-the-loop scaffold for CACAO step action--71000000-0000-4000-8000-000000000002.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_detect_and_classify_decision is not None` before continuing.
-    _detect_and_classify_decision: bool | None = None
-    _detect_and_classify_reason: str | None = None
-
-    @workflow.signal
-    def detect_and_classify_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._detect_and_classify_decision = decision
-        self._detect_and_classify_reason = reason
-
-    @workflow.query
-    def detect_and_classify_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._detect_and_classify_decision is None:
-            return "pending"
-        return "approved" if self._detect_and_classify_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--71000000-0000-4000-8000-000000000003.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_notify_authority_initial_decision is not None` before continuing.
-    _notify_authority_initial_decision: bool | None = None
-    _notify_authority_initial_reason: str | None = None
-
-    @workflow.signal
-    def notify_authority_initial_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._notify_authority_initial_decision = decision
-        self._notify_authority_initial_reason = reason
-
-    @workflow.query
-    def notify_authority_initial_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._notify_authority_initial_decision is None:
-            return "pending"
-        return "approved" if self._notify_authority_initial_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--71000000-0000-4000-8000-000000000004.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_notify_authority_intermediate_decision is not None` before continuing.
-    _notify_authority_intermediate_decision: bool | None = None
-    _notify_authority_intermediate_reason: str | None = None
-
-    @workflow.signal
-    def notify_authority_intermediate_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._notify_authority_intermediate_decision = decision
-        self._notify_authority_intermediate_reason = reason
-
-    @workflow.query
-    def notify_authority_intermediate_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._notify_authority_intermediate_decision is None:
-            return "pending"
-        return "approved" if self._notify_authority_intermediate_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--71000000-0000-4000-8000-000000000005.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_notify_authority_final_decision is not None` before continuing.
-    _notify_authority_final_decision: bool | None = None
-    _notify_authority_final_reason: str | None = None
-
-    @workflow.signal
-    def notify_authority_final_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._notify_authority_final_decision = decision
-        self._notify_authority_final_reason = reason
-
-    @workflow.query
-    def notify_authority_final_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._notify_authority_final_decision is None:
-            return "pending"
-        return "approved" if self._notify_authority_final_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--71000000-0000-4000-8000-000000000006.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_close_and_archive_decision is not None` before continuing.
-    _close_and_archive_decision: bool | None = None
-    _close_and_archive_reason: str | None = None
-
-    @workflow.signal
-    def close_and_archive_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._close_and_archive_decision = decision
-        self._close_and_archive_reason = reason
-
-    @workflow.query
-    def close_and_archive_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._close_and_archive_decision is None:
-            return "pending"
-        return "approved" if self._close_and_archive_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.dora_major_incident_reporting@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '0.1.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.dora_major_incident_reporting@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '0.1.0'})
+                AuditRecord(span_name='workflow.playbook.dora_major_incident_reporting@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7a1b4c9d-2e3f-4a5b-8c6d-9e0f1a2b3c4d', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.dora_major_incident_reporting@v1'"

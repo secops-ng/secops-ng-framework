@@ -2394,6 +2394,15 @@ one playbook's provenance.
     three targets regenerated; promoted `draft` → `stable`,
     `content_version` 1.0.0 on a recomputed checklist, leaving the
     catalogue with no draft).
+  - CORE-WIRE + GRADUATE — #1043, closing #1034
+    (`dora_major_incident_reporting`: all five action steps bound
+    through `core_body`; the not-major gate the classify step promised
+    now exists, routing a non-major incident straight to the archive;
+    the intermediate-report deadline runs from the initial notification
+    and the late-classification rule applies, per Delegated Regulation
+    (EU) 2025/301 Art. 5, with the same anchor corrected in the DORA
+    mappings; three targets regenerated; `experimental` → `stable`,
+    `content_version` 1.0.0 on a recomputed checklist).
 
 ### F-WF-CORE-WAVE-2 — CORE wave 2: bind the remaining worthy playbooks; record the parked five
 

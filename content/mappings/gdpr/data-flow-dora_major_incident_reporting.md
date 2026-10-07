@@ -25,8 +25,9 @@ The workflow exists to drive the DORA Regulation (EU) 2022/2554
 Article 19 major-ICT-related-incident reporting chain for a financial
 entity: submit the initial notification within 4 hours of the Article
 18 major classification (and no later than 24 hours from awareness),
-submit the intermediate report within 72 hours of classification (or
-earlier if regular activities have recovered), and submit the final
+submit the intermediate report within 72 hours of the initial
+notification's submission (Commission Delegated Regulation (EU)
+2025/301, Art. 5(1)(b)), and submit the final
 report no later than one month after the intermediate report. The
 purpose is bounded to that three-milestone regulator-notification
 cycle and the four durable artifacts it produces — the Art. 18

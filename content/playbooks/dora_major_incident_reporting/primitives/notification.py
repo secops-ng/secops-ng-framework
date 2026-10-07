@@ -17,16 +17,25 @@ leaves to its caller:
   the final before the intermediate. Stage event ids are derived
   deterministically from the incident and the milestone.
 * **The deadline.** Each milestone carries ``due_at`` and
-  ``within_deadline``:
+  ``within_deadline``, following Art. 5 of Commission Delegated
+  Regulation (EU) 2025/301 (time limits for the Art. 19(4) reports):
 
-  - initial: within 4 hours of classification as major, and no later than
-    24 hours after awareness — whichever is earlier;
-  - intermediate: within 72 hours of classification, as the step text
-    anchors it. Where a reading anchors the 72 hours on the initial
-    notification instead, that deadline is later, so this one is never
-    missed under either;
-  - final: no later than one calendar month after the intermediate report
-    was submitted, with the end-of-month clamp.
+  - initial (Art. 5(1)(a)): within 4 hours of classification as major,
+    and no later than 24 hours after awareness — whichever is earlier;
+    but when the incident is classified as major more than 24 hours after
+    awareness, 4 hours after classification (Art. 5(2));
+  - intermediate (Art. 5(1)(b)): within 72 hours of the *submission of
+    the initial notification*, not of classification;
+  - final (Art. 5(1)(c)): no later than one calendar month after the
+    intermediate report was submitted, with the end-of-month clamp. The
+    chain carries one intermediate report; an updated intermediate
+    report would move this anchor.
+
+  The Art. 5(4) extension to noon of the next working day for a deadline
+  on a weekend or bank holiday is not applied: it is optional, and
+  Art. 5(5) withholds it from credit institutions, central
+  counterparties, trading venues and NIS2 essential or important
+  entities, so the strict deadline is the one that holds for everyone.
 
 * **The gate.** A non-major incident is not reported under Art. 19; every
   primitive here refuses a classification whose ``major`` is not ``True``.
@@ -160,32 +169,37 @@ def _compose(variant: str, classification: dict, reporting_window: str, aware_at
 def compose_initial_notification(classification: dict, reporting_window: str, aware_at: str, submitted_at: str,
                                  impact: dict, mitigation: dict, source_url: str,
                                  submission_ref: str | None = None) -> dict:
-    """Art. 19(4)(a) initial notification: due 4 h after classification, and at most 24 h after awareness."""
+    """Art. 19(4)(a) initial notification, timed per Delegated Regulation (EU) 2025/301 Art. 5(1)(a) and 5(2)."""
     c = _major(classification)
     classified = zulu(c["classified_at"], "classification.classified_at", InvalidReportingError)
     aware = zulu(aware_at, "aware_at", InvalidReportingError)
-    due = min(classified + hours(4), aware + hours(24))
+    if classified > aware + hours(24):
+        due, basis = classified + hours(4), "4h after a classification made more than 24h after awareness (Art. 5(2))"
+    else:
+        due, basis = (min(classified + hours(4), aware + hours(24)),
+                      "4h after classification, at most 24h after awareness (Art. 5(1)(a))")
     return _compose("initial_4h", c, reporting_window, aware_at, submitted_at, impact, mitigation, source_url,
-                    submission_ref, None, due, "4h after classification, at most 24h after awareness")
+                    submission_ref, None, due, basis)
 
 
 def compose_intermediate_report(classification: dict, initial: dict, reporting_window: str, aware_at: str,
                                 submitted_at: str, impact: dict, mitigation: dict, source_url: str,
                                 submission_ref: str | None = None) -> dict:
-    """Art. 19(4)(b) intermediate report: due 72 h after classification."""
+    """Art. 19(4)(b) intermediate report: due 72 h after the initial notification was submitted (Art. 5(1)(b))."""
     c = _major(classification)
     prev = _previous(initial, "initial_4h", c["incident_id"])
-    due = zulu(c["classified_at"], "classification.classified_at", InvalidReportingError) + hours(72)
+    due = zulu(prev["submitted_at"], "initial.submitted_at", InvalidReportingError) + hours(72)
     return _compose("intermediate_72h", c, reporting_window, aware_at, submitted_at, impact, mitigation,
-                    source_url, submission_ref, prev, due, "72h after classification")
+                    source_url, submission_ref, prev, due,
+                    "72h after the initial notification was submitted (Art. 5(1)(b))")
 
 
 def compose_final_report(classification: dict, intermediate: dict, reporting_window: str, aware_at: str,
                          submitted_at: str, impact: dict, mitigation: dict, source_url: str,
                          submission_ref: str | None = None) -> dict:
-    """Art. 19(4)(c) final report: due one calendar month after the intermediate report."""
+    """Art. 19(4)(c) final report: due one calendar month after the intermediate report (Art. 5(1)(c))."""
     c = _major(classification)
     prev = _previous(intermediate, "intermediate_72h", c["incident_id"])
     due = add_months(zulu(prev["submitted_at"], "intermediate.submitted_at", InvalidReportingError), 1)
     return _compose("final_1mo", c, reporting_window, aware_at, submitted_at, impact, mitigation, source_url,
-                    submission_ref, prev, due, "one calendar month after the intermediate report")
+                    submission_ref, prev, due, "one calendar month after the intermediate report (Art. 5(1)(c))")

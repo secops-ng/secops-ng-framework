@@ -150,6 +150,7 @@ def test_milestones_chain_to_their_predecessor() -> None:
 
 
 def test_initial_deadline_is_the_earlier_of_4h_after_classification_and_24h_after_awareness() -> None:
+    """Delegated Regulation (EU) 2025/301 Art. 5(1)(a)."""
     assert initial()["due_at"] == "2026-09-30T12:00:00Z"                                  # 4h after classification binds
     late_class = classify_major_incident(INCIDENT, criteria(malicious=True), "2026-10-01T04:00:00Z")
     assert initial(late_class, submitted="2026-10-01T05:00:00Z")["due_at"] == "2026-10-01T06:00:00Z"   # 24h after awareness binds
@@ -157,9 +158,22 @@ def test_initial_deadline_is_the_earlier_of_4h_after_classification_and_24h_afte
     assert initial(submitted="2026-09-30T12:00:01Z")["within_deadline"] is False
 
 
+def test_a_classification_later_than_24h_after_awareness_gets_4h_from_classification() -> None:
+    """Art. 5(2): the 24h-from-awareness limit cannot fall before the classification it follows."""
+    later = classify_major_incident(INCIDENT, criteria(malicious=True), "2026-10-01T09:00:00Z")  # 27h after awareness
+    out = initial(later, submitted="2026-10-01T12:00:00Z")
+    assert out["due_at"] == "2026-10-01T13:00:00Z" and out["within_deadline"] is True
+    assert "Art. 5(2)" in out["deadline_basis"]
+
+
 def test_intermediate_and_final_deadlines() -> None:
+    """Art. 5(1)(b): the intermediate report's 72h run from the initial notification's submission,
+    not from classification; Art. 5(1)(c): the final report's month runs from the intermediate report."""
     c = major()
-    assert intermediate(c)["due_at"] == "2026-10-03T08:00:00Z"
+    assert intermediate(c)["due_at"] == "2026-10-03T10:00:00Z"            # initial submitted 2026-09-30T10:00Z
+    # 73h after classification but 71h after the initial notification: on time.
+    assert intermediate(c, submitted="2026-10-03T09:00:00Z")["within_deadline"] is True
+    assert intermediate(c, submitted="2026-10-03T10:00:01Z")["within_deadline"] is False
     jan = compose_intermediate_report(
         classify_major_incident(INCIDENT, criteria(malicious=True), "2027-01-29T08:00:00Z"),
         compose_initial_notification(classify_major_incident(INCIDENT, criteria(malicious=True), "2027-01-29T08:00:00Z"),
@@ -209,11 +223,11 @@ def test_an_empty_submission_ref_is_omitted() -> None:
 def test_a_major_cycle_archives_its_complete_chain() -> None:
     c = major()
     i = initial(c); m = intermediate(c, i); f = final(c, m)
-    a = compose_cycle_archive(c, [i, m, f], ["nis2:early-warning:77", "gdpr:art33:12"], "wf:dora", "exec:1",
+    a = compose_cycle_archive(c, i, m, f, ["nis2:early-warning:77", "gdpr:art33:12"], "wf:dora", "exec:1",
                               "2026-10-20T09:00:00Z")
     assert [s["report_variant"] for s in a["milestones"]] == ["initial_4h", "intermediate_72h", "final_1mo"]
     assert a["all_deadlines_met"] is True and a["cross_regime_refs"] == ["gdpr:art33:12", "nis2:early-warning:77"]
-    assert a == compose_cycle_archive(c, [i, m, f], ["gdpr:art33:12", "nis2:early-warning:77"], "wf:dora",
+    assert a == compose_cycle_archive(c, i, m, f, ["gdpr:art33:12", "nis2:early-warning:77"], "wf:dora",
                                       "exec:1", "2026-10-20T09:00:00Z")
 
 
@@ -221,19 +235,23 @@ def test_the_archive_refuses_states_that_should_not_exist() -> None:
     c = major()
     i = initial(c); m = intermediate(c, i)
     with pytest.raises(InvalidArchiveError, match="closes with"):
-        compose_cycle_archive(c, [i, m], [], "wf:dora", "exec:1", "2026-10-20T09:00:00Z")
+        compose_cycle_archive(c, i, m, None, [], "wf:dora", "exec:1", "2026-10-20T09:00:00Z")
+    with pytest.raises(InvalidArchiveError, match="closes with"):
+        compose_cycle_archive(c, m, i, final(c, m), [], "wf:dora", "exec:1", "2026-10-20T09:00:00Z")
     not_major = classify_major_incident(INCIDENT, criteria(critical=False), CLASSIFIED)
     with pytest.raises(InvalidArchiveError, match="not reported"):
-        compose_cycle_archive(not_major, [i], [], "wf:dora", "exec:1", "2026-10-20T09:00:00Z")
-    closed = compose_cycle_archive(not_major, [], [], "wf:dora", "exec:1", "2026-10-20T09:00:00Z")
+        compose_cycle_archive(not_major, i, None, None, [], "wf:dora", "exec:1", "2026-10-20T09:00:00Z")
+    closed = compose_cycle_archive(not_major, None, None, None, [], "wf:dora", "exec:1", "2026-10-20T09:00:00Z")
     assert closed["major"] is False and closed["milestones"] == [] and closed["all_deadlines_met"] is True
+    # On the not-major branch n8n surfaces the three unset reports as "".
+    assert compose_cycle_archive(not_major, "", "", "", [], "wf:dora", "exec:1", "2026-10-20T09:00:00Z") == closed
 
 
 def test_a_late_milestone_is_on_the_record() -> None:
     c = major()
     i = initial(c, submitted="2026-09-30T13:00:00Z")          # past the 4h deadline
     m = intermediate(c, i); f = final(c, m)
-    a = compose_cycle_archive(c, [i, m, f], [], "wf:dora", "exec:1", "2026-10-20T09:00:00Z")
+    a = compose_cycle_archive(c, i, m, f, [], "wf:dora", "exec:1", "2026-10-20T09:00:00Z")
     assert a["all_deadlines_met"] is False and a["milestones"][0]["within_deadline"] is False
 
 
@@ -243,5 +261,5 @@ def test_a_late_milestone_is_on_the_record() -> None:
 def test_outputs_are_json_native() -> None:
     c = major()
     i = initial(c); m = intermediate(c, i); f = final(c, m)
-    for out in (c, i, m, f, compose_cycle_archive(c, [i, m, f], [], "wf:dora", "exec:1", "2026-10-20T09:00:00Z")):
+    for out in (c, i, m, f, compose_cycle_archive(c, i, m, f, [], "wf:dora", "exec:1", "2026-10-20T09:00:00Z")):
         assert json.loads(json.dumps(out)) == out

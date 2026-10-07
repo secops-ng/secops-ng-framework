@@ -36,7 +36,8 @@ class InvalidArchiveError(ValueError):
     """Inputs are malformed, or the cycle is in a state that should not exist."""
 
 
-def compose_cycle_archive(classification: dict, milestones: list, cross_regime_refs: list,
+def compose_cycle_archive(classification: dict, initial: dict | str | None, intermediate: dict | str | None,
+                          final: dict | str | None, cross_regime_refs: list,
                           workflow_id: str, execution_id: str, captured_at: str) -> dict:
     """Compose the cycle-archival record.
 
@@ -44,9 +45,10 @@ def compose_cycle_archive(classification: dict, milestones: list, cross_regime_r
     ----------
     classification
         The classify-step output.
-    milestones
-        The notification outputs in submission order: all three for a
-        major incident, none for a non-major one.
+    initial / intermediate / final
+        The three notification outputs: all three for a major incident.
+        On the not-major branch no report is composed, so each is unset —
+        ``None``, or ``""`` as the n8n trigger supplies an unset variable.
     cross_regime_refs
         References to notifications filed under other regimes for the same
         incident.
@@ -66,8 +68,7 @@ def compose_cycle_archive(classification: dict, milestones: list, cross_regime_r
         raise InvalidArchiveError("cross_regime_refs must be a list")
     refs = sorted({pointer(r, f"cross_regime_refs[{i}]", InvalidArchiveError)
                    for i, r in enumerate(cross_regime_refs)})
-    if not isinstance(milestones, list):
-        raise InvalidArchiveError("milestones must be a list")
+    milestones = [m for m in (initial, intermediate, final) if m not in (None, "")]
 
     reports = [m.get("report") if isinstance(m, dict) else None for m in milestones]
     if not major:
