@@ -2268,7 +2268,7 @@ one playbook's provenance.
 
 ### F-WF-CORE-WAVE-1 — CORE-WIRE wave 1: bind the highest-payoff unbound playbooks
 
-- **Status:** Proposed
+- **Status:** In Progress
 - **Priority:** P2
 - **Goal:** G-01 (content coverage — `stable` under the Maturity ladder
   is the catalogue's deployment-ready designation, and every playbook on
@@ -2403,6 +2403,13 @@ one playbook's provenance.
     (EU) 2025/301 Art. 5, with the same anchor corrected in the DORA
     mappings; three targets regenerated; `experimental` → `stable`,
     `content_version` 1.0.0 on a recomputed checklist).
+  - CORE-PRIM — #1046 (`ai_human_oversight`, the card's last playbook:
+    primitives for all five action steps, from none, each rule checked
+    against Art. 14; an overseer counts as empowered only with all four
+    Art. 14(4)(d)-(e) powers, briefings are per system and per
+    instructions, only a qualified overseer's review counts, the
+    Art. 14(5) two-person rule counts distinct qualified verifiers, and
+    the evidence separates oversight assigned from oversight exercised).
 
 ### F-WF-CORE-WAVE-2 — CORE wave 2: bind the remaining worthy playbooks; record the parked five
 
