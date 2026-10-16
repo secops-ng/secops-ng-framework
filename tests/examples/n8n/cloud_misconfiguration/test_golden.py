@@ -23,6 +23,7 @@ from pathlib import Path
 
 from compilers._shared.cacao_parser import parse_file
 from compilers.n8n.emit import emit
+from compilers._shared.cacao_parser import secops_extension
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 SOURCE = REPO_ROOT / "content" / "playbooks" / "cloud_misconfiguration" / "playbook.cacao.json"
@@ -198,7 +199,7 @@ def test_set_nodes_surface_x_secops_ng_refs() -> None:
     """Every `x_secops_ng.<key>` bundle on the CACAO step appears as a Set row."""
     nodes_by_id = _nodes_by_id()
     for step_id, step in _action_without_commands_steps().items():
-        x = step.get("x_secops_ng") or {}
+        x = secops_extension(step) or {}
         if not x:
             continue
         node = nodes_by_id[step_id]

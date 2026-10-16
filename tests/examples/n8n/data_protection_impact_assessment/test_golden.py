@@ -36,6 +36,7 @@ import yaml
 
 from compilers._shared.cacao_parser import parse_file
 from compilers.n8n.emit import emit
+from compilers._shared.cacao_parser import secops_extension
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 CANON_YAML = (
@@ -189,7 +190,7 @@ def _action_without_commands_steps() -> dict[str, dict]:
         for step_id, step in raw["workflow"].items()
         if step.get("type") == "action"
         and all(c.get("type") == "manual" for c in step.get("commands") or ())
-        and not (step.get("x_secops_ng") or {}).get("core_body")
+        and not (secops_extension(step) or {}).get("core_body")
     }
 
 
@@ -198,7 +199,7 @@ def _core_body_steps() -> dict[str, dict]:
     return {
         step_id: step
         for step_id, step in raw["workflow"].items()
-        if (step.get("x_secops_ng") or {}).get("core_body")
+        if (secops_extension(step) or {}).get("core_body")
     }
 
 
@@ -212,10 +213,13 @@ def test_core_body_steps_emit_code_nodes() -> None:
     rendering the primitive call (per CORE-MECH-EMIT-N8N)."""
     nodes_by_id = _nodes_by_id()
     core_steps = _core_body_steps()
-    if not core_steps:
-        # Not every playbook uses CORE primitives; assert nothing when the
-        # source carries none.
-        return
+    # Unbound today: its CORE-WIRE is a F-WF-CORE-WAVE-2 item. The count is
+    # asserted rather than returning early on an empty selection, so the
+    # wire has to update it deliberately and a broken selector cannot pass
+    # vacuously (#1038).
+    assert len(core_steps) == 0, (
+        f"{len(core_steps)} bound steps found: update this count when the playbook is wired"
+    )
     for step_id, step in core_steps.items():
         node = nodes_by_id[step_id]
         assert node["type"] == "n8n-nodes-base.code", (
@@ -223,13 +227,13 @@ def test_core_body_steps_emit_code_nodes() -> None:
             f"not {node['type']!r}"
         )
         body = node["parameters"].get("pythonCode", "")
-        primitive = step["x_secops_ng"]["core_body"]["primitive"]
+        primitive = secops_extension(step)["core_body"]["primitive"]
         module, _, callable_name = primitive.rpartition(".")
         assert f"from {module} import {callable_name}" in body, (
             f"step {step_id!r}: Code node missing primitive import "
             f"`from {module} import {callable_name}`"
         )
-        out_var = step["x_secops_ng"]["core_body"]["out"]
+        out_var = secops_extension(step)["core_body"]["out"]
         assert f"{out_var} = {callable_name}(" in body, (
             f"step {step_id!r}: Code node missing primitive call binding "
             f"`{out_var} = {callable_name}(...)`"
@@ -275,7 +279,7 @@ def test_set_nodes_surface_x_secops_ng_refs() -> None:
     """Every `x_secops_ng.<key>` bundle on the CACAO step appears as a Set row."""
     nodes_by_id = _nodes_by_id()
     for step_id, step in _action_without_commands_steps().items():
-        x = step.get("x_secops_ng") or {}
+        x = secops_extension(step) or {}
         if not x:
             continue
         node = nodes_by_id[step_id]
