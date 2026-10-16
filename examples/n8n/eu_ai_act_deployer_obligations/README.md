@@ -3,11 +3,13 @@
 Worked example: the `playbook.eu_ai_act_deployer_obligations@v1` CACAO
 v2 playbook compiled by the n8n reference compiler. Operators can
 import `workflow.n8n.json` directly into an n8n instance to see the
-topology the emitter produces; binding the placeholder Set-node steps
-to real connectors (deployment register, provider instructions-for-use
-store, oversight-assignment record, input-data control surface,
-monitoring signal source, FRIA record store, and the automatically
-generated log store) is the operator's job.
+topology the emitter produces. Every action step is a Code node calling
+its deterministic primitive, and the two gates are IF nodes; binding the
+inputs those calls read to real connectors (deployment register,
+provider instructions-for-use store, oversight-assignment record,
+input-data control surface, monitoring signal source, FRIA record
+store, and the automatically generated log store) is the operator's
+job.
 
 This is the deployer-side counterpart to the provider-side
 `eu_ai_act_risk_management` example: it models the operator who *runs*
@@ -44,15 +46,14 @@ for easy diff inspection, and the regeneration script.
    review and bind it to your own connectors before activating.
 
 The emitted workflow is a *snapshot of intent*, not a runnable
-playbook. The Set nodes carry the CACAO I/O contract (`in_args` /
-`out_args`) plus the `x_secops_ng` reference bundles (control,
-detection, telemetry, metric) as editable assignments; binding those
-rows to real connectors is the operator's job.
+playbook. The Code nodes call the bound primitives; binding the
+adapter inputs they read to real connectors is the operator's job.
 
 ## Two properties worth preserving when you bind it
 
-The compiled topology is linear, but two of the assignments carry legal
-weight that a naive connector binding will flatten:
+The compiled topology has two gates — `deployment may proceed?` and
+`assessment blocks deployment?` — and two of the values the workflow
+carries have legal weight that a naive connector binding will flatten:
 
 - **`__escalation_trigger_class__` is separate from
   `__monitoring_observation_id__` on purpose.** Its three values have

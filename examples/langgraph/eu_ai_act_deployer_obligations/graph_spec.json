@@ -1,10 +1,32 @@
 {
-  "conditional_edges": [],
+  "conditional_edges": [
+    {
+      "branches": {
+        "failure": "__END__",
+        "success": "action--e26d1a00-0000-4000-8000-000000000005"
+      },
+      "default": null,
+      "src": "if-condition--e26d1a00-0000-4000-8000-000000000008"
+    },
+    {
+      "branches": {
+        "failure": "action--e26d1a00-0000-4000-8000-000000000003",
+        "success": "__END__"
+      },
+      "default": null,
+      "src": "if-condition--e26d1a00-0000-4000-8000-000000000009"
+    }
+  ],
   "edges": [
     {
       "cacao_edge": "on_completion",
-      "dst": "action--e26d1a00-0000-4000-8000-000000000003",
+      "dst": "if-condition--e26d1a00-0000-4000-8000-000000000008",
       "src": "action--e26d1a00-0000-4000-8000-000000000002"
+    },
+    {
+      "cacao_edge": "on_completion",
+      "dst": "if-condition--e26d1a00-0000-4000-8000-000000000009",
+      "src": "action--e26d1a00-0000-4000-8000-000000000005"
     },
     {
       "cacao_edge": "on_completion",
@@ -13,13 +35,8 @@
     },
     {
       "cacao_edge": "on_completion",
-      "dst": "action--e26d1a00-0000-4000-8000-000000000005",
-      "src": "action--e26d1a00-0000-4000-8000-000000000004"
-    },
-    {
-      "cacao_edge": "on_completion",
       "dst": "action--e26d1a00-0000-4000-8000-000000000006",
-      "src": "action--e26d1a00-0000-4000-8000-000000000005"
+      "src": "action--e26d1a00-0000-4000-8000-000000000004"
     },
     {
       "cacao_edge": "on_completion",
@@ -39,6 +56,27 @@
       "step_id": "action--e26d1a00-0000-4000-8000-000000000002"
     },
     {
+      "cacao_type": "if-condition",
+      "kind": "condition",
+      "label": "deployment may proceed?",
+      "name": "if-condition--e26d1a00-0000-4000-8000-000000000008",
+      "step_id": "if-condition--e26d1a00-0000-4000-8000-000000000008"
+    },
+    {
+      "cacao_type": "action",
+      "kind": "action",
+      "label": "assess_fundamental_rights_impact",
+      "name": "action--e26d1a00-0000-4000-8000-000000000005",
+      "step_id": "action--e26d1a00-0000-4000-8000-000000000005"
+    },
+    {
+      "cacao_type": "if-condition",
+      "kind": "condition",
+      "label": "assessment blocks deployment?",
+      "name": "if-condition--e26d1a00-0000-4000-8000-000000000009",
+      "step_id": "if-condition--e26d1a00-0000-4000-8000-000000000009"
+    },
+    {
       "cacao_type": "action",
       "kind": "action",
       "label": "assign_human_oversight",
@@ -51,13 +89,6 @@
       "label": "monitor_operation",
       "name": "action--e26d1a00-0000-4000-8000-000000000004",
       "step_id": "action--e26d1a00-0000-4000-8000-000000000004"
-    },
-    {
-      "cacao_type": "action",
-      "kind": "action",
-      "label": "assess_fundamental_rights_impact",
-      "name": "action--e26d1a00-0000-4000-8000-000000000005",
-      "step_id": "action--e26d1a00-0000-4000-8000-000000000005"
     },
     {
       "cacao_type": "action",

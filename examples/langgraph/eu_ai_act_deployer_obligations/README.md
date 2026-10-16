@@ -25,13 +25,13 @@ placing a system on the market.
 
 ## Graph shape
 
-The lifecycle is a **linear five-node chain** with no conditional
-edges: confirm-intended-use → assign-human-oversight →
-monitor-operation → assess-fundamental-rights-impact →
-retain-logs-and-evidence. The conditional-edge router machinery in
-`assemble.py` is therefore inert here; it is retained so the file stays
-consistent with the other LangGraph examples and so an integrator who
-adds a branch does not have to reintroduce it.
+The lifecycle is five action nodes and two gates: confirm-intended-use
+→ *deployment may proceed?* → assess-fundamental-rights-impact →
+*assessment blocks deployment?* → assign-human-oversight →
+monitor-operation → retain-logs-and-evidence. Each gate is a condition
+node with one conditional edge to the end sentinel, which the
+conditional-edge router in `assemble.py` resolves. Each tool body calls
+its bound primitive.
 
 The branching that the *regulation* contains is carried in state rather
 than in topology, which is a deliberate modelling choice worth
