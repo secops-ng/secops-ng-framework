@@ -2403,6 +2403,14 @@ one playbook's provenance.
     (EU) 2025/301 Art. 5, with the same anchor corrected in the DORA
     mappings; three targets regenerated; `experimental` → `stable`,
     `content_version` 1.0.0 on a recomputed checklist).
+  - CORE-PRIM — #1045 (`eu_ai_act_deployer_obligations`: primitives for
+    all five action steps, from none, each rule checked against the
+    Regulation's text; the intended-use negative case stops the cycle,
+    oversight needs all four Art. 26(2) limbs per natural person, the
+    three Art. 26(5) escalation triggers stay apart with the
+    severity-classed Art. 73 clock, the FRIA follows the Art. 27(1)
+    scope and blocks deployment while incomplete, and log retention
+    follows Art. 26(6) in both directions).
   - CORE-PRIM — #1046 (`ai_human_oversight`, the card's last playbook:
     primitives for all five action steps, from none, each rule checked
     against Art. 14; an overseer counts as empowered only with all four

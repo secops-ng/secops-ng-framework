@@ -33,6 +33,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from compilers._shared.cacao_parser import secops_extension
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CONTROLS_DIR = REPO_ROOT / "content" / "controls"
 MAPPINGS_DIR = REPO_ROOT / "content" / "mappings"
@@ -135,8 +137,8 @@ def test_artifact_control_refs_counted_but_unenforced() -> None:
         def _walk(node: object) -> None:
             nonlocal unresolved
             if isinstance(node, dict):
-                x = node.get("x_secops_ng")
-                if isinstance(x, dict):
+                x = secops_extension(node)
+                if x:
                     for ref in x.get("control_refs") or []:
                         if isinstance(ref, str) and not _control_file_exists(ref):
                             unresolved += 1

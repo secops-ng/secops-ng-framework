@@ -14,6 +14,8 @@ from typing import Any
 import pytest
 import yaml
 
+from compilers._shared.cacao_parser import secops_extension
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PLAYBOOK_DIR = REPO_ROOT / "content" / "playbooks"
 IDENTITY_FIELDS = ("stable_id", "content_version", "maturity")
@@ -50,8 +52,8 @@ def test_dual_layout_playbook_identity_fields_match() -> None:
     for slug, source_path, mirror_path in pairs:
         source_document = _load_document(source_path)
         mirror_document = _load_document(mirror_path)
-        source_metadata = source_document.get("x_secops_ng", {})
-        mirror_metadata = mirror_document.get("x_secops_ng", {})
+        source_metadata = secops_extension(source_document, str(source_path)) or {}
+        mirror_metadata = secops_extension(mirror_document, str(mirror_path)) or {}
         for field in IDENTITY_FIELDS:
             source_value = source_metadata.get(field)
             mirror_value = mirror_metadata.get(field)
