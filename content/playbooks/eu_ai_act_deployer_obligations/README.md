@@ -22,11 +22,14 @@ monitoring, Art. 73 serious-incident reporting. This is the first on the
 system rather than placing one on the market. Most organisations reading
 this framework are deployers, not providers.
 
-The five action steps are `confirm_intended_use` (Art. 26(1), gated on
-the Art. 26(7) worker notice), `assign_human_oversight` (Art. 26(2)),
+The five action steps, in order, are `confirm_intended_use` (Art. 26(1),
+gated on the Art. 26(7) worker notice), `assess_fundamental_rights_impact`
+(Art. 27, before deploying), `assign_human_oversight` (Art. 26(2)),
 `monitor_operation` (Art. 26(4) and 26(5), carrying the lifecycle's only
-escalation edge), `assess_fundamental_rights_impact` (Art. 27), and
-`retain_logs_and_evidence` (Art. 26(6)).
+escalation edge), and `retain_logs_and_evidence` (Art. 26(6)). Two gates
+end the cycle early: after the intended-use determination when the
+deployment may not proceed, and after the assessment when an in-scope
+assessment is incomplete.
 
 ## Regulatory anchors
 
@@ -95,18 +98,22 @@ pinned by `tests/examples/eu_ai_act_deployer_obligations/test_golden.py`.
 
 ## Status
 
-`maturity: experimental`, CORE-PRIM complete. Each of the five action
-steps has a deterministic primitive under `primitives/`, executed
-directly by `tests/playbooks/eu_ai_act_deployer_obligations/test_primitives.py`.
-Every rule below was checked against the text of Regulation (EU)
-2024/1689 on EUR-Lex.
+`maturity: stable`, `content_version` 1.0.0. All five action steps bind
+a deterministic primitive under `primitives/` through
+`x_secops_ng.core_body`, each executed directly by
+`tests/playbooks/eu_ai_act_deployer_obligations/test_primitives.py`, and
+the three reference targets emit those calls. The graduation checklist
+recomputes green: tier A, 5 of 5 real bindings, zero placeholder bodies,
+zero blank predicates, zero schema errors, three-target goldens. Every
+rule below was checked against the text of Regulation (EU) 2024/1689 on
+EUR-Lex.
 
 | Step | Primitive |
 |---|---|
 | confirm_intended_use | `intended_use.determine_intended_use` |
+| assess_fundamental_rights_impact | `fria.assess_fundamental_rights_impact` |
 | assign_human_oversight | `oversight.compose_oversight_assignment` |
 | monitor_operation | `monitoring.classify_monitoring_window` |
-| assess_fundamental_rights_impact | `fria.assess_fundamental_rights_impact` |
 | retain_logs_and_evidence | `retention.compose_retention_evidence` |
 
 Decisions the primitives fix:
@@ -143,13 +150,25 @@ Decisions the primitives fix:
   least six months unless applicable law provides otherwise, and a
   shorter period needs the reference to that law.
 
-**Owed: the wire.** The CACAO steps do not yet carry `core_body`, so
-`catalog.py` reports 0 of 5 bound. The CORE-WIRE card binds them, and
-it also has to settle two topology points the primitives expose: a gate
-on the intended-use determination (the step promises that no
-downstream step fires on the negative case, but the workflow is
-linear), and the position of the FRIA step, which runs after monitoring
-although Art. 27(1) requires it before deploying.
+Choices settled at the wire:
+
+- **Two gates.** `deployment may proceed?` reads `__deployment_may_proceed__`
+  from the intended-use determination and ends the cycle on the negative
+  case, so no downstream step fires. `assessment blocks deployment?`
+  reads `__fria_blocks_deployment__` and ends the cycle on an incomplete
+  in-scope assessment.
+- **The fundamental-rights assessment runs before oversight and
+  monitoring.** It used to run after monitoring, although Art. 27(1)
+  requires it *prior to deploying*. On later monitoring cycles for a
+  system in service the step re-records the assessment the operator
+  supplies, which Art. 27(2) allows it to rely on.
+- **The contract grows from 8 to 36 variables:** 21 adapter inputs, one
+  envelope per step, the two gate booleans, and the five existing
+  identifiers and the escalation class, now extracted from the
+  envelopes; `__deployment_id__` and `__system_reference__` stay the
+  trigger inputs. The two lists (assignees, findings) ride as JSON
+  strings, and the optional inputs (workforce notice, DPIA, template
+  reference) accept the empty string n8n sends for an unset variable.
 
 ## Operator customisation
 

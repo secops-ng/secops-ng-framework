@@ -81,26 +81,36 @@ The CACAO playbook is canonical. The three example directories are
 byte-deterministic regenerations of it, pinned by
 `tests/examples/eu_ai_act_deployer_obligations/test_golden.py`.
 
-## 3. The lifecycle — five steps and one variable chain
+## 3. The lifecycle — five steps and two gates
 
 ```
 confirm_intended_use
-    → assign_human_oversight
-        → monitor_operation
-            → assess_fundamental_rights_impact
-                → retain_logs_and_evidence
+    → deployment may proceed?            (no → end)
+        → assess_fundamental_rights_impact
+            → assessment blocks deployment?   (yes → end)
+                → assign_human_oversight
+                    → monitor_operation
+                        → retain_logs_and_evidence
 ```
 
-Linear, with no conditional edges. The branching the *regulation*
-contains lives in state rather than topology — see § 5.
+Two gates stop a deployment that may not go ahead. The first reads the
+intended-use determination's `proceed`; the second reads the
+fundamental-rights record's `blocks_deployment`. The assessment runs
+before oversight and monitoring because Art. 27(1) requires it *prior to
+deploying*. The branching inside Art. 26(5) lives in the monitoring
+step's output rather than the topology — see § 5.
 
-| step | article | consumes | produces |
+Every step binds a deterministic primitive under
+`content/playbooks/eu_ai_act_deployer_obligations/primitives/`, and its
+output envelope is what the next step reads:
+
+| step | article | primitive | produces |
 |---|---|---|---|
-| `confirm_intended_use` | 26(1), 26(7) | `__deployment_id__`, `__system_reference__` | `__intended_use_determination_id__` |
-| `assign_human_oversight` | 26(2) | the determination | `__oversight_assignment_id__` |
-| `monitor_operation` | 26(4), 26(5) | the assignment | `__monitoring_observation_id__`, `__escalation_trigger_class__` |
-| `assess_fundamental_rights_impact` | 27 | the determination | `__fria_determination_id__` |
-| `retain_logs_and_evidence` | 26(6) | all four above | `__retention_evidence_id__` |
+| `confirm_intended_use` | 26(1), 26(7) | `intended_use.determine_intended_use` | `__intended_use_determination__` (and `__deployment_may_proceed__`) |
+| `assess_fundamental_rights_impact` | 27 | `fria.assess_fundamental_rights_impact` | `__fria_record__` (and `__fria_blocks_deployment__`) |
+| `assign_human_oversight` | 26(2) | `oversight.compose_oversight_assignment` | `__oversight_assignment__` |
+| `monitor_operation` | 26(4), 26(5) | `monitoring.classify_monitoring_window` | `__monitoring_observation__` (and `__escalation_trigger_class__`) |
+| `retain_logs_and_evidence` | 26(6) | `retention.compose_retention_evidence` | `__retention_evidence__` |
 
 ### Negative outcomes are values, not gaps
 
@@ -108,14 +118,18 @@ Three steps can legitimately conclude "nothing further is owed", and in
 every case the playbook emits a dated record rather than nothing:
 
 - **Art. 26(1)** — the declared deployment context exceeds the intended
-  purpose. The determination records that the deployment *must not
-  proceed on this system*. That is the most consequential output the
-  playbook can produce and it is a first-class value.
+  purpose, or a workplace deployment lacks its Art. 26(7) notice. The
+  determination records that the deployment *must not proceed on this
+  system*, and the first gate ends the cycle there. That is the most
+  consequential output the playbook can produce and it is a first-class
+  value.
 - **Art. 26(4)** — the deployer does not control the input data. The
   dated determination of non-control is itself the evidence; no
   representativeness assessment is owed.
 - **Art. 27** — the deployer is out of scope. A dated out-of-scope
-  determination, not an empty assessment.
+  determination, not an empty assessment, and the cycle continues. (An
+  *in-scope* assessment that is incomplete is the opposite case: it
+  blocks deployment, and the second gate ends the cycle.)
 
 This matters when you bind connectors. A connector that writes `null`
 on "not applicable" converts discharged obligations into apparent
@@ -172,8 +186,10 @@ system it has paid for and built process around.
 
 **On the serious-incident branch**, the deployer's notification is an
 *input* to the provider's Art. 73 chain, never a substitute for it. The
-statutory clocks in Art. 73(2)-(4) run against the provider. Do not
-read a discharged deployer notification as a discharged Art. 73 report.
+statutory clocks in Art. 73(2)-(4) run against the provider — unless the
+deployer cannot reach the provider, when Art. 26(5) applies Art. 73 to
+the deployer itself on the same clock. Do not read a discharged deployer
+notification as a discharged Art. 73 report.
 
 ## 6. Art. 27 and the DPIA relationship
 
@@ -191,17 +207,20 @@ partial coverage is the normal case:
 3. the categories of natural persons and groups likely to be affected;
 4. the specific risks of harm to those categories, informed by the
    Art. 13 information the provider supplied;
-5. the implementation of human-oversight measures — which is where this
-   step reads back the § 4 assignment;
+5. the implementation of human-oversight measures according to the
+   instructions for use — the measures the § 4 assignment then puts in
+   place, since the assessment now precedes it;
 6. the measures on risk materialisation, including internal governance
    and complaint mechanisms.
 
-The step closes by notifying the market-surveillance authority of the
-result. **The Art. 27(5) template is not yet published by the AI
-Office**, so the playbook declares the notification contract and emits
-a dated notification record rather than inventing a template shape
-that would have to be thrown away. This is a deliberate gap, recorded
-as such.
+The step closes by recording the notification of the result to the
+market-surveillance authority (Art. 27(3)), unless the Art. 46(1)
+derogation exempts it. The notification uses the AI Office's Art. 27(5)
+template where you hold a reference to one; without one, the record
+says the notification is due and the template unavailable, rather than
+inventing a template shape that would have to be thrown away. An
+incomplete in-scope assessment blocks the notification and the
+deployment both.
 
 ## 7. Metrics — what the lifecycle exposes
 
@@ -268,7 +287,8 @@ README and a `regenerate.sh`:
   the monitoring duty is standing, so expect the seams to outlive any
   single workflow execution.
 - [LangGraph](../../examples/langgraph/eu_ai_act_deployer_obligations/) —
-  a linear five-node graph with zero conditional edges.
+  five action nodes, the two gates as condition nodes, and two
+  conditional edges.
 
 ## 9. Operator customisation points
 
@@ -287,9 +307,11 @@ and never ships:
   is authority-neutral; the compile target resolves the concrete
   destination.
 - **FRIA record store.**
-- **Log store** — the Art. 26(6) retention surface. Six months is the
-  floor, not the target: "a period appropriate to the intended purpose"
-  governs and sector law may require longer. **The framework never
+- **Log store** — the Art. 26(6) retention surface. "A period
+  appropriate to the intended purpose", of at least six months, unless
+  applicable Union or national law — in particular personal-data
+  protection law — provides otherwise, which can mean a different period
+  in either direction. **The framework never
   ships a log store**, and no non-EU default endpoint participates in
   the monitoring or notification chain.
 

@@ -20,138 +20,118 @@ _TRACER = trace.get_tracer(__name__)
 from ._audit_mirror import AuditRecord, AuditTrail
 
 @activity.defn
-async def confirm_intended_use(deployment_id: str, system_reference: str) -> str:
-    """reconcile the operator's declared deployment context against the intended purpose stated in the provider's instructions for use, per Art. 26(1), and record the conformance determination against __deployment_id__. The negative case is a first-class outcome: where the declared context exceeds the intended-purpose boundary the determination records that the deployment must not proceed on this system, and no downstream step fires. Where the deployer is an employer and the deployment is at the workplace, this step also gates on the Art. 26(7) duty to inform workers' representatives and affected workers BEFORE putting the system into service — the dated notice record is a precondition of the determination, not a parallel task, because a deployment that proceeds without it cannot be remediated after the fact. Read-only against the operator's deployment register and the provider-supplied instructions; the register is an adapter-bound surface this playbook does not author.
+async def confirm_intended_use(deployment_id: str, system_reference: str, deployment_record: dict[str, object], instructions_for_use: dict[str, object], workforce_notice: dict[str, object], determined_at: str) -> dict[str, object]:
+    """Reconcile the deployment's declared contexts against the contexts the provider's instructions for use permit, per Art. 26(1), and record the determination against __deployment_id__. Where the deployer is an employer deploying at the workplace, the Art. 26(7) notice to workers' representatives and affected workers is a precondition, dated before the determination, because a deployment that proceeds without it cannot be remediated after the fact. The negative case is a first-class outcome: proceed is false, the blocking reasons are named, and the gate that follows ends the cycle, so no downstream step fires. Produces __intended_use_determination__, from which __intended_use_determination_id__ and __deployment_may_proceed__ are extracted.
 
     CACAO step_id: action--e26d1a00-0000-4000-8000-000000000002
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e26d1a00-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000002', 'secops_ng.step.name': 'confirm_intended_use', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'confirm_intended_use'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000002', 'secops_ng.step.name': 'confirm_intended_use', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'confirm_intended_use'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--e26d1a00-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000002', 'secops_ng.step.name': 'confirm_intended_use', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'confirm_intended_use'})
+            AuditRecord(span_name='activity.action--e26d1a00-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000002', 'secops_ng.step.name': 'confirm_intended_use', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'confirm_intended_use'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--e26d1a00-0000-4000-8000-000000000002'"
-        )
+        from content.playbooks.eu_ai_act_deployer_obligations.primitives.intended_use import determine_intended_use
+        __intended_use_determination__ = determine_intended_use(deployment=__deployment_record__, instructions=__instructions_for_use__, workforce_notice=__workforce_notice__, determined_at=__determined_at__)
 
 CONFIRM_INTENDED_USE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def assign_human_oversight(deployment_id: str, intended_use_determination_id: str) -> str:
-    """assign human oversight of the deployment to natural persons per Art. 26(2) and record the assignment against __deployment_id__. The obligation has four independently checkable limbs and the record names the assignee against each rather than asserting oversight generically: competence, training, authority, and the necessary support. Competence and training bind to the operator's training-attestation surface; authority is a delegation record the operator's governance surface owns. The capability set an oversight assignee must be able to exercise — understand the system's capacity and limits, remain aware of automation bias, correctly interpret output, decide not to use the system or disregard its output, and intervene or halt — is fixed by Art. 14(4) and is mapped by a sibling card; on its merge this step's reference bundle gains the Art. 14 anchor.
-
-    CACAO step_id: action--e26d1a00-0000-4000-8000-000000000003
-    """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
-    with _TRACER.start_as_current_span(
-        name='activity.action--e26d1a00-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000003', 'secops_ng.step.name': 'assign_human_oversight', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assign_human_oversight'},
-    ):
-        AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--e26d1a00-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000003', 'secops_ng.step.name': 'assign_human_oversight', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assign_human_oversight'})
-        )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--e26d1a00-0000-4000-8000-000000000003'"
-        )
-
-ASSIGN_HUMAN_OVERSIGHT_RETRY_POLICY = RetryPolicy(
-    initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
-)
-
-@activity.defn
-async def monitor_operation(deployment_id: str, system_reference: str, oversight_assignment_id: str) -> dict[str, object]:
-    """monitor operation of the high-risk AI system on the basis of the instructions for use, per Art. 26(5), and record the per-window monitoring observation against __deployment_id__. Where the deployer exercises control over the input data, the same window records the Art. 26(4) determination that input data is relevant and sufficiently representative in view of the intended purpose; where it does not exercise that control, the dated determination of non-control is itself the evidence and no representativeness assessment is owed. This step carries the lifecycle's only escalation edge, and its three triggers have different consequences that must not be collapsed: routine observations feed the provider's Art. 72 post-market loop; a determination that use in accordance with the instructions may present a risk within the meaning of Art. 79(1) compels informing the provider or distributor and the market-surveillance authority AND suspending use, without undue delay; and identification of a serious incident compels immediate sequenced notification — provider first, then importer or distributor, then the market-surveillance authorities. The serious-incident branch hands off to the provider-side Art. 73 reporting chain; the deployer's notification is an input to that chain, never a substitute for it.
-
-    CACAO step_id: action--e26d1a00-0000-4000-8000-000000000004
-    """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
-    with _TRACER.start_as_current_span(
-        name='activity.action--e26d1a00-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000004', 'secops_ng.step.name': 'monitor_operation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'monitor_operation'},
-    ):
-        AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--e26d1a00-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000004', 'secops_ng.step.name': 'monitor_operation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'monitor_operation'})
-        )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--e26d1a00-0000-4000-8000-000000000004'"
-        )
-
-MONITOR_OPERATION_RETRY_POLICY = RetryPolicy(
-    initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
-)
-
-@activity.defn
-async def assess_fundamental_rights_impact(deployment_id: str, intended_use_determination_id: str) -> str:
-    """perform the Art. 27 fundamental-rights impact assessment prior to deploying, and record it against __deployment_id__. The step applies only to deployers in scope of Art. 27: bodies governed by public law, private entities providing public services, and deployers of the Annex III(5)(b)-(c) creditworthiness and life-and-health-insurance risk-assessment systems — so the first recorded output is the in-scope determination, and an out-of-scope determination closes the step with a dated record rather than an empty assessment. In scope, the emitted assessment satisfies the six Art. 27(1)(a)-(f) elements as a checklist: the processes the system will be used in, the period and frequency of intended use, the categories of natural persons and groups likely to be affected, the specific risks of harm to those categories informed by the Art. 13 provider information, the implementation of human-oversight measures, and the measures on risk materialisation including internal governance and complaint mechanisms. Per Art. 27(4) the assessment complements rather than duplicates an existing GDPR Art. 35 DPIA: where the operator holds a DPIA for the same processing, the step reads it and records which Art. 27(1) elements it already satisfies, assessing only the remainder. The step closes by notifying the market-surveillance authority of the results; the Art. 27(5) template is not yet published by the AI Office, so the notification contract is declared and the dated notification record emitted, rather than a template shape being invented.
+async def assess_fundamental_rights_impact(intended_use_determination: dict[str, object], system_profile: dict[str, object], deployer_profile: dict[str, object], fria_assessment: dict[str, object], dpia_record: dict[str, object], art_46_1_exemption: bool, fria_template_ref: str, assessed_at: str) -> dict[str, object]:
+    """Perform the Art. 27 fundamental-rights impact assessment before deploying, and record it against __deployment_id__. The first output is the scope determination: Annex III systems other than point 2, for bodies governed by public law and private entities providing public services, and every deployer of a point 5(b) or 5(c) system; out of scope the step closes with a dated record. In scope, the six Art. 27(1)(a)-(f) elements are a checklist, and per Art. 27(4) an element an existing GDPR Art. 35 DPIA already satisfies is recorded as such and not reassessed. The notification of the results to the market-surveillance authority (Art. 27(3)) uses the AI Office's Art. 27(5) template where the operator holds one, and is otherwise recorded as due rather than bound to a guessed shape. An incomplete in-scope assessment blocks deployment, and the gate that follows ends the cycle. Produces __fria_record__, from which __fria_determination_id__ and __fria_blocks_deployment__ are extracted.
 
     CACAO step_id: action--e26d1a00-0000-4000-8000-000000000005
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e26d1a00-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000005', 'secops_ng.step.name': 'assess_fundamental_rights_impact', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_fundamental_rights_impact'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000005', 'secops_ng.step.name': 'assess_fundamental_rights_impact', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_fundamental_rights_impact'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--e26d1a00-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000005', 'secops_ng.step.name': 'assess_fundamental_rights_impact', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_fundamental_rights_impact'})
+            AuditRecord(span_name='activity.action--e26d1a00-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000005', 'secops_ng.step.name': 'assess_fundamental_rights_impact', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_fundamental_rights_impact'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--e26d1a00-0000-4000-8000-000000000005'"
-        )
+        from content.playbooks.eu_ai_act_deployer_obligations.primitives.fria import assess_fundamental_rights_impact
+        __fria_record__ = assess_fundamental_rights_impact(intended_use=__intended_use_determination__, system_profile=__system_profile__, deployer_profile=__deployer_profile__, assessment=__fria_assessment__, dpia=__dpia_record__, art_46_1_exemption=__art_46_1_exemption__, notification_template_ref=__fria_template_ref__, assessed_at=__assessed_at__)
 
 ASSESS_FUNDAMENTAL_RIGHTS_IMPACT_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def retain_logs_and_evidence(deployment_id: str, oversight_assignment_id: str, monitoring_observation_id: str, fria_determination_id: str) -> str:
-    """record the retention disposition for the logs the high-risk AI system generates automatically, per Art. 26(6), and emit the dated cycle-evidence artifact joining the intended-use determination, the oversight assignment, the monitoring observations, and the fundamental-rights assessment against __deployment_id__. The obligation binds only to the extent those logs are under the deployer's control, so the record states the control determination alongside the retention period applied. Six months is the floor, not the target: the governing standard is a period appropriate to the intended purpose of the system, and applicable Union or national law may require longer. The log store is an operator-owned adapter-bound surface — this step declares and evidences the retention contract and never ships a store. The content those logs must carry is fixed by Art. 12; a sibling card lands that mapping and this step's reference bundle gains the anchor on its merge.
+async def assign_human_oversight(intended_use_determination: dict[str, object], oversight_assignees: str, assigned_at: str) -> dict[str, object]:
+    """Assign human oversight of the deployment to natural persons per Art. 26(2), and record the assignment against __deployment_id__. The obligation has four independently checkable limbs and the record names each assignee against each: competence, training, authority, and the necessary support; an assignee missing any limb, or not a natural person, is uncovered and leaves the assignment incomplete. The capability set an overseer must be able to exercise is fixed by Art. 14(4) and evidenced by the ai_human_oversight playbook. Produces __oversight_assignment__, from which __oversight_assignment_id__ is extracted.
+
+    CACAO step_id: action--e26d1a00-0000-4000-8000-000000000003
+    """
+    with _TRACER.start_as_current_span(
+        name='activity.action--e26d1a00-0000-4000-8000-000000000003',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000003', 'secops_ng.step.name': 'assign_human_oversight', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assign_human_oversight'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--e26d1a00-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000003', 'secops_ng.step.name': 'assign_human_oversight', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assign_human_oversight'})
+        )
+        from content.playbooks.eu_ai_act_deployer_obligations.primitives.oversight import compose_oversight_assignment
+        __oversight_assignment__ = compose_oversight_assignment(intended_use=__intended_use_determination__, assignees=__oversight_assignees__, assigned_at=__assigned_at__)
+
+ASSIGN_HUMAN_OVERSIGHT_RETRY_POLICY = RetryPolicy(
+    initial_interval=timedelta(seconds=1),
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
+)
+
+@activity.defn
+async def monitor_operation(intended_use_determination: dict[str, object], oversight_assignment: dict[str, object], monitoring_window: dict[str, object], input_data: dict[str, object], monitoring_findings: str, evaluated_at: str) -> dict[str, object]:
+    """Monitor operation on the basis of the instructions for use per Art. 26(5), and record the window against __deployment_id__, with the Art. 26(4) determination that input data the deployer controls is relevant and sufficiently representative, or the dated determination of non-control. The three escalation triggers are kept apart: routine findings feed the provider's Art. 72 loop; an Art. 79(1) risk obliges informing the provider or distributor and the market-surveillance authority and suspending use, without undue delay; and a serious incident obliges immediate sequenced notification, provider first, on the severity-classed Art. 73 clock, with the deployer reporting itself if the provider cannot be reached. Produces __monitoring_observation__, from which __monitoring_observation_id__ and __escalation_trigger_class__ are extracted.
+
+    CACAO step_id: action--e26d1a00-0000-4000-8000-000000000004
+    """
+    with _TRACER.start_as_current_span(
+        name='activity.action--e26d1a00-0000-4000-8000-000000000004',
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000004', 'secops_ng.step.name': 'monitor_operation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'monitor_operation'},
+    ):
+        AuditTrail.current().append(
+            AuditRecord(span_name='activity.action--e26d1a00-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000004', 'secops_ng.step.name': 'monitor_operation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'monitor_operation'})
+        )
+        from content.playbooks.eu_ai_act_deployer_obligations.primitives.monitoring import classify_monitoring_window
+        __monitoring_observation__ = classify_monitoring_window(intended_use=__intended_use_determination__, oversight=__oversight_assignment__, window=__monitoring_window__, input_data=__input_data__, findings=__monitoring_findings__, evaluated_at=__evaluated_at__)
+
+MONITOR_OPERATION_RETRY_POLICY = RetryPolicy(
+    initial_interval=timedelta(seconds=1),
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
+)
+
+@activity.defn
+async def retain_logs_and_evidence(intended_use_determination: dict[str, object], oversight_assignment: dict[str, object], monitoring_observation: dict[str, object], fria_record: dict[str, object], log_retention: dict[str, object], workflow_id: str, execution_id: str, captured_at: str) -> dict[str, object]:
+    """Record the retention disposition for the logs the system generates automatically, per Art. 26(6), and emit the dated cycle-evidence artifact joining the intended-use determination, the fundamental-rights record, the oversight assignment and the monitoring observation against __deployment_id__. The obligation binds only to logs under the deployer's control; for those the period is appropriate to the intended purpose and at least six months, unless applicable Union or national law provides otherwise, in either direction, which the record cites. The log store is an operator-owned surface. Produces __retention_evidence__, from which __retention_evidence_id__ is extracted.
 
     CACAO step_id: action--e26d1a00-0000-4000-8000-000000000006
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e26d1a00-0000-4000-8000-000000000006',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000006', 'secops_ng.step.name': 'retain_logs_and_evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'retain_logs_and_evidence'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000006', 'secops_ng.step.name': 'retain_logs_and_evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'retain_logs_and_evidence'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--e26d1a00-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000006', 'secops_ng.step.name': 'retain_logs_and_evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'retain_logs_and_evidence'})
+            AuditRecord(span_name='activity.action--e26d1a00-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e26d1a00-0000-4000-8000-000000000006', 'secops_ng.step.name': 'retain_logs_and_evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'retain_logs_and_evidence'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--e26d1a00-0000-4000-8000-000000000006'"
-        )
+        from content.playbooks.eu_ai_act_deployer_obligations.primitives.retention import compose_retention_evidence
+        __retention_evidence__ = compose_retention_evidence(intended_use=__intended_use_determination__, oversight=__oversight_assignment__, observation=__monitoring_observation__, fria=__fria_record__, log_retention=__log_retention__, workflow_id=__workflow_id__, execution_id=__execution_id__, captured_at=__captured_at__)
 
 RETAIN_LOGS_AND_EVIDENCE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @workflow.defn
@@ -160,120 +140,25 @@ class PlaybookEuAiActDeployerObligationsV1Workflow:
 
     CACAO playbook id : playbook--e26d1a00-0000-4000-8000-000000000001
     stable_id         : playbook.eu_ai_act_deployer_obligations@v1
-    content_version   : 0.1.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--e26d1a00-0000-4000-8000-000000000001
-    activities        : confirm_intended_use, assign_human_oversight, monitor_operation, assess_fundamental_rights_impact, retain_logs_and_evidence
+    activities        : confirm_intended_use, assess_fundamental_rights_impact, assign_human_oversight, monitor_operation, retain_logs_and_evidence
     """
-
-    # Human-in-the-loop scaffold for CACAO step action--e26d1a00-0000-4000-8000-000000000002.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_confirm_intended_use_decision is not None` before continuing.
-    _confirm_intended_use_decision: bool | None = None
-    _confirm_intended_use_reason: str | None = None
-
-    @workflow.signal
-    def confirm_intended_use_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._confirm_intended_use_decision = decision
-        self._confirm_intended_use_reason = reason
-
-    @workflow.query
-    def confirm_intended_use_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._confirm_intended_use_decision is None:
-            return "pending"
-        return "approved" if self._confirm_intended_use_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--e26d1a00-0000-4000-8000-000000000003.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_assign_human_oversight_decision is not None` before continuing.
-    _assign_human_oversight_decision: bool | None = None
-    _assign_human_oversight_reason: str | None = None
-
-    @workflow.signal
-    def assign_human_oversight_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._assign_human_oversight_decision = decision
-        self._assign_human_oversight_reason = reason
-
-    @workflow.query
-    def assign_human_oversight_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._assign_human_oversight_decision is None:
-            return "pending"
-        return "approved" if self._assign_human_oversight_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--e26d1a00-0000-4000-8000-000000000004.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_monitor_operation_decision is not None` before continuing.
-    _monitor_operation_decision: bool | None = None
-    _monitor_operation_reason: str | None = None
-
-    @workflow.signal
-    def monitor_operation_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._monitor_operation_decision = decision
-        self._monitor_operation_reason = reason
-
-    @workflow.query
-    def monitor_operation_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._monitor_operation_decision is None:
-            return "pending"
-        return "approved" if self._monitor_operation_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--e26d1a00-0000-4000-8000-000000000005.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_assess_fundamental_rights_impact_decision is not None` before continuing.
-    _assess_fundamental_rights_impact_decision: bool | None = None
-    _assess_fundamental_rights_impact_reason: str | None = None
-
-    @workflow.signal
-    def assess_fundamental_rights_impact_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._assess_fundamental_rights_impact_decision = decision
-        self._assess_fundamental_rights_impact_reason = reason
-
-    @workflow.query
-    def assess_fundamental_rights_impact_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._assess_fundamental_rights_impact_decision is None:
-            return "pending"
-        return "approved" if self._assess_fundamental_rights_impact_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--e26d1a00-0000-4000-8000-000000000006.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_retain_logs_and_evidence_decision is not None` before continuing.
-    _retain_logs_and_evidence_decision: bool | None = None
-    _retain_logs_and_evidence_reason: str | None = None
-
-    @workflow.signal
-    def retain_logs_and_evidence_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._retain_logs_and_evidence_decision = decision
-        self._retain_logs_and_evidence_reason = reason
-
-    @workflow.query
-    def retain_logs_and_evidence_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._retain_logs_and_evidence_decision is None:
-            return "pending"
-        return "approved" if self._retain_logs_and_evidence_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.eu_ai_act_deployer_obligations@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.eu_ai_act_deployer_obligations@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0'})
+                AuditRecord(span_name='workflow.playbook.eu_ai_act_deployer_obligations@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e26d1a00-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.eu_ai_act_deployer_obligations@v1'"
             )
 
 WORKFLOW = PlaybookEuAiActDeployerObligationsV1Workflow
-ACTIVITIES = (confirm_intended_use, assign_human_oversight, monitor_operation, assess_fundamental_rights_impact, retain_logs_and_evidence,)
-RETRY_POLICIES = (CONFIRM_INTENDED_USE_RETRY_POLICY, ASSIGN_HUMAN_OVERSIGHT_RETRY_POLICY, MONITOR_OPERATION_RETRY_POLICY, ASSESS_FUNDAMENTAL_RIGHTS_IMPACT_RETRY_POLICY, RETAIN_LOGS_AND_EVIDENCE_RETRY_POLICY,)
+ACTIVITIES = (confirm_intended_use, assess_fundamental_rights_impact, assign_human_oversight, monitor_operation, retain_logs_and_evidence,)
+RETRY_POLICIES = (CONFIRM_INTENDED_USE_RETRY_POLICY, ASSESS_FUNDAMENTAL_RIGHTS_IMPACT_RETRY_POLICY, ASSIGN_HUMAN_OVERSIGHT_RETRY_POLICY, MONITOR_OPERATION_RETRY_POLICY, RETAIN_LOGS_AND_EVIDENCE_RETRY_POLICY,)
