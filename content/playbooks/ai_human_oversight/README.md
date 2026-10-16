@@ -86,6 +86,56 @@ Committed worked examples, each with its own README and a
 Byte-parity between the committed examples and the emitter output is
 pinned by `tests/examples/ai_human_oversight/test_golden.py`.
 
+## Status
+
+`maturity: experimental`, CORE-PRIM complete. Each of the five action
+steps has a deterministic primitive under `primitives/`, executed
+directly by `tests/playbooks/ai_human_oversight/test_primitives.py`.
+Every rule below was checked against Art. 14 of Regulation (EU)
+2024/1689 on EUR-Lex.
+
+| Step | Primitive |
+|---|---|
+| establish_oversight_roster | `roster.resolve_oversight_roster` |
+| brief_oversight_personnel | `briefing.compose_briefing_record` |
+| review_flagged_decisions | `review.review_flagged_decisions` |
+| record_intervention | `intervention.record_interventions` |
+| emit_oversight_evidence | `evidence.compose_oversight_evidence` |
+
+Decisions the primitives fix:
+
+- **Empowered means all four powers.** A roster entry counts only as a
+  natural person with a delegation record and all four Art. 14(4)(d)-(e)
+  powers; the roster is effective only when one such person on watch is
+  reachable.
+- **Briefings are per system and per instructions.** Each empowered
+  overseer needs a current briefing covering Art. 14(4)(a), (b) and (c)
+  for this deployment against the current instructions for use; a
+  briefing for another deployment or superseded instructions is kept on
+  the record as rejected.
+- **Only a qualified review counts.** A review by anyone who is not an
+  empowered, briefed overseer is recorded as not counting, and the
+  decision stays unreviewed.
+- **Art. 14(5) counts distinct, qualified verifiers.** For an Annex III
+  point 1(a) system, an upheld identification without two separate
+  qualified verifiers is marked as not permitting action; relying on
+  the exemption requires the reference to the law that considers the
+  requirement disproportionate.
+- **Interventions agree with the review.** Every decision dispositioned
+  as an intervention has exactly one record naming which of the four
+  exercises occurred, by the overseer who reviewed it, with the latency
+  from the flag and the system output passed on as a monitoring signal;
+  a window without one closes with a dated nil record.
+- **The evidence separates assigned from exercised.** Oversight counts
+  as exercised only when the roster was effective, every empowered
+  overseer was briefed, and every flagged decision was dispositioned.
+
+**Owed: the wire.** The CACAO steps do not yet carry `core_body`, so
+`catalog.py` reports 0 of 5 bound. The CORE-WIRE card binds them,
+declares the adapter inputs (the roster entries, briefings, flagged
+decisions, reviews, the Art. 14(5) record and the interventions), and
+regenerates the three targets.
+
 ## Operator customisation
 
 CACAO variables the playbook exposes:

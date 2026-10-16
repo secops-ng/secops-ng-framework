@@ -2411,6 +2411,13 @@ one playbook's provenance.
     severity-classed Art. 73 clock, the FRIA follows the Art. 27(1)
     scope and blocks deployment while incomplete, and log retention
     follows Art. 26(6) in both directions).
+  - CORE-PRIM — #1046 (`ai_human_oversight`, the card's last playbook:
+    primitives for all five action steps, from none, each rule checked
+    against Art. 14; an overseer counts as empowered only with all four
+    Art. 14(4)(d)-(e) powers, briefings are per system and per
+    instructions, only a qualified overseer's review counts, the
+    Art. 14(5) two-person rule counts distinct qualified verifiers, and
+    the evidence separates oversight assigned from oversight exercised).
 
 ### F-WF-CORE-WAVE-2 — CORE wave 2: bind the remaining worthy playbooks; record the parked five
 
