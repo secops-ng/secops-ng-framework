@@ -23,49 +23,163 @@
               "name": "__oversight_cycle__",
               "type": "string",
               "value": "",
-              "description": "Reference to the review window this cycle runs against (RFC 3339 interval). Supplied by the operator's oversight cadence."
+              "description": "The review window this cycle runs against, as an RFC 3339 interval of two Zulu instants (<start>/<end>). Supplied by the operator's oversight cadence; every step reads it as it is."
+            },
+            {
+              "name": "__roster_entries__",
+              "type": "string",
+              "value": "",
+              "description": "The watch for the window, each exactly person_ref, natural_person, on_watch and reachable (real booleans), powers (the delegated Art. 14(4)(d)-(e) powers) and authority_ref (the delegation record, or null). CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it."
+            },
+            {
+              "name": "__roster_resolved_at__",
+              "type": "string",
+              "value": "",
+              "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the roster is resolved at."
+            },
+            {
+              "name": "__instructions_ref__",
+              "type": "string",
+              "value": "",
+              "description": "Reference of the current version of the provider's Art. 13 instructions for use; a briefing against any other version does not count."
+            },
+            {
+              "name": "__briefings__",
+              "type": "string",
+              "value": "",
+              "description": "Briefing records, each exactly person_ref, deployment_id, instructions_ref, briefed_at (Zulu) and one real boolean per Art. 14(4)(a)-(c) limb: capacities_and_limitations, automation_bias_awareness and output_interpretation. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it."
+            },
+            {
+              "name": "__briefing_recorded_at__",
+              "type": "string",
+              "value": "",
+              "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the briefing record is composed at."
+            },
+            {
+              "name": "__flagged_decisions__",
+              "type": "string",
+              "value": "",
+              "description": "The outputs and decisions flagged for oversight in the window, each exactly decision_ref, flagged_at (Zulu, inside the window) and output_ref. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it."
+            },
+            {
+              "name": "__reviews__",
+              "type": "string",
+              "value": "",
+              "description": "At most one review per flagged decision, each exactly decision_ref, reviewer_ref, reviewed_at (Zulu) and disposition (upheld or intervened). CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it."
+            },
+            {
+              "name": "__biometric_record__",
+              "type": "object",
+              "value": "",
+              "description": "Exactly annex_iii_point_1a (a real boolean), exemption_legal_basis_ref (the Union or national law relied on for the Art. 14(5) exemption, or null) and verifications (each exactly decision_ref and verifier_refs)."
+            },
+            {
+              "name": "__reviewed_at__",
+              "type": "string",
+              "value": "",
+              "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the review pass closes."
+            },
+            {
+              "name": "__interventions__",
+              "type": "string",
+              "value": "",
+              "description": "One per decision dispositioned intervened, each exactly decision_ref, intervention_type, intervened_by (its reviewer), basis (text) and intervened_at (Zulu). An empty list closes the window with a nil record. CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it."
+            },
+            {
+              "name": "__intervention_recorded_at__",
+              "type": "string",
+              "value": "",
+              "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the intervention record is composed at."
+            },
+            {
+              "name": "__workflow_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of the workflow, folded into the evidence artifact_id."
+            },
+            {
+              "name": "__execution_id__",
+              "type": "string",
+              "value": "",
+              "description": "Identifier of this execution, folded into the evidence artifact_id."
+            },
+            {
+              "name": "__captured_at__",
+              "type": "string",
+              "value": "",
+              "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the evidence is captured at, folded into its artifact_id."
             },
             {
               "name": "__oversight_roster_id__",
               "type": "string",
               "value": "",
-              "description": "Identifier of the roster record resolved for the window: which named persons or roles hold oversight of this deployment, and what each is empowered to do. The authority limb is the load-bearing part \u2014 Art. 14(4)(d)-(e) require the overseer to be able to decline use, disregard or override output, and interrupt operation, so a roster entry without recorded delegated authority names someone who cannot lawfully oversee. Consumed by the briefing, review and evidence steps."
+              "description": "Identifier of the roster resolved for the window. Extracted at the compile target's adapter seam from __oversight_roster__.roster_id."
             },
             {
               "name": "__briefing_record_id__",
               "type": "string",
               "value": "",
-              "description": "Identifier of the per-deployment briefing record discharging the Art. 14(4)(a)-(c) competence limbs against the provider's Art. 13 instructions for use: understanding of capacities and limitations, awareness of automation bias, and correct interpretation of output. Distinct from a generic training attestation because the competence required is specific to this system."
+              "description": "Identifier of the Art. 14(4)(a)-(c) briefing record. Extracted at the compile target's adapter seam from __briefing_record__.briefing_id."
             },
             {
               "name": "__review_disposition_id__",
               "type": "string",
               "value": "",
-              "description": "Identifier of the review record for the window, carrying the disposition of each output or decision flagged for oversight. A review that found nothing is evidence of oversight exercised and is recorded, not omitted \u2014 most cycles produce reviews and no interventions, and an empty intervention set with no review record is indistinguishable from no oversight at all."
+              "description": "Identifier of the window's review record, emitted even when the review found nothing. Extracted at the compile target's adapter seam from __review_disposition__.disposition_id."
             },
             {
               "name": "__biometric_two_person_verification__",
-              "type": "string",
+              "type": "object",
               "value": "",
-              "description": "Art. 14(5) record, populated only where the deployment is an Annex III point 1(a) remote biometric identification system. Holds either the two separate natural persons who independently verified the identification, or the Union or national legal basis relied on for the law-enforcement exemption. Kept as its own value rather than folded into the review disposition because two properties are easy to lose: the verification requires two SEPARATE persons, so one overseer confirming twice does not satisfy it, and the exemption requires recording the legal basis actually relied on rather than merely that it was taken. Empty on any deployment outside Annex III(1)(a)."
+              "description": "The Art. 14(5) record, present only for an Annex III point 1(a) remote biometric identification system and null otherwise: the decisions verified by two separate qualified natural persons, those that were not and so permit no action, or the legal basis of the exemption relied on. Extracted at the compile target's adapter seam from __review_disposition__.biometric_two_person_verification."
             },
             {
               "name": "__intervention_record_id__",
               "type": "string",
               "value": "",
-              "description": "Identifier of the intervention record, or the nil record where the window produced no exercise of Art. 14(4)(d)-(e). Captures who intervened, on what basis, and which system output was acted on."
+              "description": "Identifier of the intervention record, or of the dated nil record when the window produced none. Extracted at the compile target's adapter seam from __intervention_record__.intervention_record_id."
             },
             {
               "name": "__intervention_type__",
               "type": "string",
               "value": "",
-              "description": "Which of the four Art. 14(4)(d)-(e) exercises occurred, kept separate from the intervention record because they carry different weight on later review: a decision not to use the system in the particular situation; a decision to disregard its output; an override or reversal of that output; and an interruption of operation through a stop button or equivalent. A halt and a disregard are not the same evidence, and an aggregate intervention count that collapses them tells a reviewer nothing about severity. CORE: string; EXTEND tightens to an enum once the four are exercised end to end."
+              "description": "Which Art. 14(4)(d)-(e) exercise occurred: none, decline_use, disregard_output, override_or_reverse_output, interrupt_operation, or multiple. Kept separate from the record because the exercises carry different weight on later review. Extracted at the compile target's adapter seam from __intervention_record__.intervention_type."
             },
             {
               "name": "__oversight_evidence_id__",
               "type": "string",
               "value": "",
-              "description": "Identifier of the dated cycle-evidence artifact joining the roster, the briefings, the review dispositions and any interventions for the deployment over the window. This is what an auditor or market-surveillance authority reads to establish that oversight was exercised and not merely assigned \u2014 the distinction Art. 14 turns on."
+              "description": "Identifier of the dated cycle-evidence artifact. Extracted at the compile target's adapter seam from __oversight_evidence__.artifact_id."
+            },
+            {
+              "name": "__oversight_roster__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the roster step emits: each entry with its powers and missing powers, the empowered and reachable overseers, and whether the roster is effective."
+            },
+            {
+              "name": "__briefing_record__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the briefing step emits: each empowered overseer's briefing and missing limbs, the rejected briefings with their reason, and whether everyone is briefed."
+            },
+            {
+              "name": "__review_disposition__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the review step emits: every flagged decision's disposition, the reviewed and intervened counts, the reviews that did not count, and the Art. 14(5) record."
+            },
+            {
+              "name": "__intervention_record__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the intervention step emits: each exercise with its type, basis, latency and the system output, the monitoring signals, or the nil record."
+            },
+            {
+              "name": "__oversight_evidence__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the evidence step emits: the four joined records and whether oversight was exercised, not merely assigned."
             }
           ]
         }
@@ -76,306 +190,81 @@
     {
       "id": "action--e14a5100-0000-4000-8000-000000000002",
       "name": "establish_oversight_roster",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         500,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.deployment_id",
-              "name": "in.deployment_id",
-              "value": "={{$workflow.variables.deployment_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.oversight_cycle",
-              "name": "in.oversight_cycle",
-              "value": "={{$workflow.variables.oversight_cycle}}",
-              "type": "string"
-            },
-            {
-              "id": "out.oversight_roster_id",
-              "name": "out.oversight_roster_id",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.ict_risk_governance@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.compliance_finding@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.ai_human_oversight.primitives.roster import resolve_oversight_roster\n__oversight_roster__ = resolve_oversight_roster(deployment_id=__deployment_id__, oversight_cycle=__oversight_cycle__, entries=__roster_entries__, resolved_at=__roster_resolved_at__)"
       },
-      "notes": "resolve who holds human oversight of __deployment_id__ for __oversight_cycle__ and with what authority, and record the roster. Art. 26(2) makes the assignment; this step makes it operational for the window: which named persons or roles are on watch, what each is empowered to do, and who is reachable when an intervention is needed. The authority limb matters more than it looks \u2014 Art. 14(4)(d) and (e) require the overseer to be able to decide not to use the system, disregard or override its output, and interrupt operation, and a roster entry naming someone without that delegated power produces an overseer who cannot lawfully oversee. Read-only against the operator's governance and rota surfaces; this step records the resolved watch, it does not author the operator's delegation model.",
+      "notes": "Resolve who holds human oversight of __deployment_id__ for __oversight_cycle__ and with what authority, and record the roster. Art. 26(2) makes the assignment; this step makes it operational for the window: who is on watch, what each is empowered to do, and who is reachable. The authority limb matters most: Art. 14(4)(d) and (e) require the overseer to be able to decline to use the system, disregard, override or reverse its output, and intervene in or interrupt its operation, so an entry counts as empowered only as a natural person with a delegation record and all four powers, and the roster is effective only when one such person on watch is reachable. Produces __oversight_roster__, from which __oversight_roster_id__ is extracted.",
       "notesInFlow": true
     },
     {
       "id": "action--e14a5100-0000-4000-8000-000000000003",
       "name": "brief_oversight_personnel",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         760,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.deployment_id",
-              "name": "in.deployment_id",
-              "value": "={{$workflow.variables.deployment_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.oversight_roster_id",
-              "name": "in.oversight_roster_id",
-              "value": "={{$workflow.variables.oversight_roster_id}}",
-              "type": "string"
-            },
-            {
-              "id": "out.briefing_record_id",
-              "name": "out.briefing_record_id",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.training_attestation@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.compliance_finding@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.ai_human_oversight.primitives.briefing import compose_briefing_record\n__briefing_record__ = compose_briefing_record(roster=__oversight_roster__, instructions_ref=__instructions_ref__, briefings=__briefings__, recorded_at=__briefing_recorded_at__)"
       },
-      "notes": "brief the rostered overseers against the provider's Art. 13 instructions for use and record the briefing, discharging the competence limbs of Art. 14(4). Three capabilities are evidenced here: that the overseer understands the system's relevant capacities and limitations and can monitor operation well enough to detect anomalies, dysfunctions and unexpected performance (14(4)(a)); that they remain aware of the tendency to automatically rely or over-rely on the system's output, which the Regulation names explicitly as automation bias and which is a briefing subject rather than a personal failing (14(4)(b)); and that they can correctly interpret the output, which depends on the interpretation aids the provider supplied (14(4)(c)). The briefing is per-system, not generic security-awareness training: an overseer briefed on a different deployment has not been briefed on this one.",
+      "notes": "Check that every empowered overseer holds a current briefing against the provider's Art. 13 instructions for use, discharging the competence limbs of Art. 14(4): understanding the system's capacities and limitations well enough to detect anomalies (14(4)(a)), awareness of automation bias (14(4)(b)), and correct interpretation of the output (14(4)(c)). The briefing is per system and per instructions: one recorded for another deployment or a superseded version does not count, and is kept on the record as rejected. Produces __briefing_record__, from which __briefing_record_id__ is extracted.",
       "notesInFlow": true
     },
     {
       "id": "action--e14a5100-0000-4000-8000-000000000004",
       "name": "review_flagged_decisions",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1020,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.deployment_id",
-              "name": "in.deployment_id",
-              "value": "={{$workflow.variables.deployment_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.oversight_cycle",
-              "name": "in.oversight_cycle",
-              "value": "={{$workflow.variables.oversight_cycle}}",
-              "type": "string"
-            },
-            {
-              "id": "in.oversight_roster_id",
-              "name": "in.oversight_roster_id",
-              "value": "={{$workflow.variables.oversight_roster_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.briefing_record_id",
-              "name": "in.briefing_record_id",
-              "value": "={{$workflow.variables.briefing_record_id}}",
-              "type": "string"
-            },
-            {
-              "id": "out.review_disposition_id",
-              "name": "out.review_disposition_id",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "out.biometric_two_person_verification",
-              "name": "out.biometric_two_person_verification",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.ict_risk_governance@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.compliance_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.eu_ai_act_oversight_intervention_rate@v1, kri.eu_ai_act_oversight_intervention_latency_hours@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.ai_human_oversight.primitives.review import review_flagged_decisions\n__review_disposition__ = review_flagged_decisions(roster=__oversight_roster__, briefing=__briefing_record__, oversight_cycle=__oversight_cycle__, flagged=__flagged_decisions__, reviews=__reviews__, biometric=__biometric_record__, reviewed_at=__reviewed_at__)"
       },
-      "notes": "run the standing review pass over the outputs and decisions flagged for oversight in __oversight_cycle__, and record the disposition of each. This is the routine body of the loop: most cycles produce reviews and no interventions, and the dated record of a review that found nothing is as much evidence of oversight as an intervention is. Carries the Art. 14(5) conditional branch: where the deployment is an Annex III point 1(a) remote biometric identification system, no action or decision may be taken on the basis of an identification unless that identification has been separately verified and confirmed by at least two natural persons who each carry the necessary competence, training and authority. The branch records both verifiers separately \u2014 one person confirming twice does not satisfy it. Where the operator relies on the narrow law-enforcement, migration, border-control or asylum exemption, the step records the Union or national legal basis relied on, not merely that the exemption was taken.",
+      "notes": "Run the standing review pass over the outputs and decisions flagged for oversight in __oversight_cycle__, and record the disposition of each: upheld, intervened, or unreviewed. Only an empowered, briefed overseer's review counts. A review that found nothing is as much evidence of oversight as an intervention. Carries the Art. 14(5) branch: for an Annex III point 1(a) remote biometric identification system, no action may be taken on an identification unless two separate qualified natural persons verified it, so an upheld identification without two permits no action, and one person confirming twice does not count. Where the law-enforcement, migration, border-control or asylum exemption is relied on, the record names the law relied on. Produces __review_disposition__, from which __review_disposition_id__ and __biometric_two_person_verification__ are extracted.",
       "notesInFlow": true
     },
     {
       "id": "action--e14a5100-0000-4000-8000-000000000005",
       "name": "record_intervention",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1280,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.deployment_id",
-              "name": "in.deployment_id",
-              "value": "={{$workflow.variables.deployment_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.review_disposition_id",
-              "name": "in.review_disposition_id",
-              "value": "={{$workflow.variables.review_disposition_id}}",
-              "type": "string"
-            },
-            {
-              "id": "out.intervention_record_id",
-              "name": "out.intervention_record_id",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "out.intervention_type",
-              "name": "out.intervention_type",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.ict_risk_governance@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.compliance_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.eu_ai_act_oversight_intervention_rate@v1, kri.eu_ai_act_oversight_intervention_latency_hours@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.ai_human_oversight.primitives.intervention import record_interventions\n__intervention_record__ = record_interventions(disposition=__review_disposition__, interventions=__interventions__, recorded_at=__intervention_recorded_at__)"
       },
-      "notes": "where the review produced an exercise of Art. 14(4)(d) or (e), record the intervention against __deployment_id__. Four distinct exercises fall here and the record names which occurred, because they carry different weight on later review: a decision not to use the system in the particular situation; a decision to disregard its output; an override or reversal of that output; and an interruption of operation through a stop button or similar procedure. The record captures who intervened, on what basis, and what the system had produced \u2014 the last of these matters because an intervention is also a signal about the system, and it is the raw material the Art. 26(5) monitoring duty and the provider's Art. 72 post-market loop consume. A cycle with no intervention closes this step with a dated nil record rather than skipping it.",
+      "notes": "Record each exercise of Art. 14(4)(d) or (e) the review produced, naming which of the four occurred: declining to use the system, disregarding its output, overriding or reversing it, or interrupting its operation. Each record captures who intervened, on what basis, the latency from the flag, and what the system had produced, because an intervention is also a signal the Art. 26(5) monitoring duty and the provider's Art. 72 loop consume. The records must agree with the review, and a window with no intervention closes with a dated nil record. Produces __intervention_record__, from which __intervention_record_id__ and __intervention_type__ are extracted.",
       "notesInFlow": true
     },
     {
       "id": "action--e14a5100-0000-4000-8000-000000000006",
       "name": "emit_oversight_evidence",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1540,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.deployment_id",
-              "name": "in.deployment_id",
-              "value": "={{$workflow.variables.deployment_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.oversight_cycle",
-              "name": "in.oversight_cycle",
-              "value": "={{$workflow.variables.oversight_cycle}}",
-              "type": "string"
-            },
-            {
-              "id": "in.oversight_roster_id",
-              "name": "in.oversight_roster_id",
-              "value": "={{$workflow.variables.oversight_roster_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.briefing_record_id",
-              "name": "in.briefing_record_id",
-              "value": "={{$workflow.variables.briefing_record_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.review_disposition_id",
-              "name": "in.review_disposition_id",
-              "value": "={{$workflow.variables.review_disposition_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.intervention_record_id",
-              "name": "in.intervention_record_id",
-              "value": "={{$workflow.variables.intervention_record_id}}",
-              "type": "string"
-            },
-            {
-              "id": "out.oversight_evidence_id",
-              "name": "out.oversight_evidence_id",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.ict_risk_governance@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.compliance_finding@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.ai_human_oversight.primitives.evidence import compose_oversight_evidence\n__oversight_evidence__ = compose_oversight_evidence(roster=__oversight_roster__, briefing=__briefing_record__, disposition=__review_disposition__, intervention=__intervention_record__, workflow_id=__workflow_id__, execution_id=__execution_id__, captured_at=__captured_at__)"
       },
-      "notes": "compose the dated cycle-evidence artifact joining the roster, the briefings, the review dispositions and any interventions for __deployment_id__ over __oversight_cycle__, and write it to the operator's evidence store. This is what an auditor or market-surveillance authority reads to establish that oversight was not merely assigned but exercised \u2014 the distinction Art. 14 turns on, since a named overseer who never reviewed anything satisfies Art. 26(2) on paper and Art. 14 not at all. The evidence store is an operator-owned adapter-bound surface; the playbook declares the record shape and ships no store.",
+      "notes": "Compose the dated cycle-evidence artifact joining the roster, the briefings, the review dispositions and the interventions for __deployment_id__ over __oversight_cycle__. This is what an auditor or market-surveillance authority reads to establish that oversight was exercised, not merely assigned: a named overseer who never reviewed anything satisfies Art. 26(2) on paper and Art. 14 not at all, so oversight counts as exercised only with an effective roster, everyone briefed, and every flagged decision dispositioned. The evidence store is an operator-owned surface. Produces __oversight_evidence__, from which __oversight_evidence_id__ is extracted.",
       "notesInFlow": true
     },
     {
@@ -398,11 +287,11 @@
       "typeVersion": 1,
       "position": [
         200,
-        -208
+        -318
       ],
       "parameters": {
-        "content": "## EU AI Act Article 14 human-oversight operating loop\n`playbook.ai_human_oversight@v1` \u00b7 content v0.1.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nSKELETON \u2014 CACAO v2 scaffold for the deployer-side EU AI Act (Regulation (EU) 2024/1689) Article 14 human-oversight loop: the cycle an oversight function actually runs once oversight of a high-risk AI system has been assigned. Article 14 straddles the provider/deployer line \u2014 Art. 14(1) and 14(3)(a) require the provider to design the system so it can be effectively overseen and to build in what it can, while Art. 14(3)(b) and 14(4) reach the deployer, who implements the meas\u2026\n\n**Controls:** 2 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__deployment_id__`, `__oversight_cycle__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: establish_oversight_roster, brief_oversight_personnel, review_flagged_decisions, record_intervention, emit_oversight_evidence\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/ai_human_oversight\nRegenerate with `python -m tools.compile content/playbooks/ai_human_oversight/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
-        "height": 388,
+        "content": "## EU AI Act Article 14 human-oversight operating loop\n`playbook.ai_human_oversight@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nSKELETON \u2014 CACAO v2 scaffold for the deployer-side EU AI Act (Regulation (EU) 2024/1689) Article 14 human-oversight loop: the cycle an oversight function actually runs once oversight of a high-risk AI system has been assigned. Article 14 straddles the provider/deployer line \u2014 Art. 14(1) and 14(3)(a) require the provider to design the system so it can be effectively overseen and to build in what it can, while Art. 14(3)(b) and 14(4) reach the deployer, who implements the meas\u2026\n\n**Controls:** 2 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__deployment_id__`, `__oversight_cycle__`, `__roster_entries__`, `__roster_resolved_at__`, `__instructions_ref__`, `__briefings__`, `__briefing_recorded_at__`, `__flagged_decisions__`, `__reviews__`, `__biometric_record__`, `__reviewed_at__`, `__interventions__`, `__intervention_recorded_at__`, `__workflow_id__`, `__execution_id__`, `__captured_at__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - establish_oversight_roster \u2192 `content.playbooks.ai_human_oversight.primitives.roster.resolve_oversight_roster`\n  - brief_oversight_personnel \u2192 `content.playbooks.ai_human_oversight.primitives.briefing.compose_briefing_record`\n  - review_flagged_decisions \u2192 `content.playbooks.ai_human_oversight.primitives.review.review_flagged_decisions`\n  - record_intervention \u2192 `content.playbooks.ai_human_oversight.primitives.intervention.record_interventions`\n  - emit_oversight_evidence \u2192 `content.playbooks.ai_human_oversight.primitives.evidence.compose_oversight_evidence`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/ai_human_oversight\nRegenerate with `python -m tools.compile content/playbooks/ai_human_oversight/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 498,
         "width": 620,
         "color": 4
       }
@@ -486,7 +375,7 @@
       "name": "secops-ng"
     },
     {
-      "name": "maturity:experimental"
+      "name": "maturity:stable"
     },
     {
       "name": "eu-ai-act"
@@ -511,16 +400,10 @@
   "meta": {
     "secops_ng": {
       "stable_id": "playbook.ai_human_oversight@v1",
-      "content_version": "0.1.0",
-      "maturity": "experimental",
+      "content_version": "1.0.0",
+      "maturity": "stable",
       "source_playbook_id": "playbook--e14a5100-0000-4000-8000-000000000001"
     },
-    "secops_ng_notes": [
-      "step 'action--e14a5100-0000-4000-8000-000000000002': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n.",
-      "step 'action--e14a5100-0000-4000-8000-000000000003': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n.",
-      "step 'action--e14a5100-0000-4000-8000-000000000004': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n.",
-      "step 'action--e14a5100-0000-4000-8000-000000000005': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n.",
-      "step 'action--e14a5100-0000-4000-8000-000000000006': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n."
-    ]
+    "secops_ng_notes": []
   }
 }
