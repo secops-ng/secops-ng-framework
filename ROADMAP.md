@@ -2418,6 +2418,12 @@ one playbook's provenance.
     instructions, only a qualified overseer's review counts, the
     Art. 14(5) two-person rule counts distinct qualified verifiers, and
     the evidence separates oversight assigned from oversight exercised).
+  - CORE-WIRE + GRADUATE — #1051, closing #1049 (`ai_human_oversight`,
+    the card's last playbook: all five action steps bound through
+    `core_body`; the loop stays linear because a non-effective roster is
+    the finding the evidence records; the Art. 14(5) record is
+    re-declared an object; three targets regenerated; `experimental` →
+    `stable`, `content_version` 1.0.0 on a recomputed checklist).
 
 ### F-WF-CORE-WAVE-2 — CORE wave 2: bind the remaining worthy playbooks; record the parked five
 
