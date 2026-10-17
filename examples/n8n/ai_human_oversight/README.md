@@ -3,8 +3,9 @@
 Worked example: the `playbook.ai_human_oversight@v1` CACAO v2 playbook
 compiled by the n8n reference compiler. Operators can import
 `workflow.n8n.json` directly into an n8n instance to see the topology
-the emitter produces; binding the placeholder Set-node steps to real
-connectors (oversight roster, briefing record, the flagged-decision
+the emitter produces. Every action step is a Code node calling its
+deterministic primitive; binding the inputs those calls read to real
+connectors (oversight roster, briefing records, the flagged-decision
 queue, the intervention log and the evidence store) is the operator's
 job.
 
@@ -43,10 +44,8 @@ diff inspection, and the regeneration script.
    review and bind it to your own connectors before activating.
 
 The emitted workflow is a *snapshot of intent*, not a runnable
-playbook. The Set nodes carry the CACAO I/O contract (`in_args` /
-`out_args`) plus the `x_secops_ng` reference bundles (control,
-detection, telemetry, metric) as editable assignments; binding those
-rows to real connectors is the operator's job.
+playbook. The Code nodes call the bound primitives; binding the
+adapter inputs they read to real connectors is the operator's job.
 
 ## Three things a connector binding tends to destroy
 
