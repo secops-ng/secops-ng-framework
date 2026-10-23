@@ -1,0 +1,71 @@
+name: pytest
+
+# The whole test suite, on every pull request, every push to main and
+# nightly. Every other workflow runs a targeted slice behind a path
+# filter, so before this lane a change to compilers/, tools/ or
+# content-model/ could merge without CI ever running the tests that
+# cover it (#1030).
+#
+# No path filter on purpose: the suite is the only check that sees the
+# couplings between content, compilers and generated examples, and a
+# filter would have to predict them.
+#
+# The nightly run exists for tests that depend on the calendar rather
+# than the diff (grace windows measured from a playbook's finalization
+# date). Those go red when a date passes, not when someone pushes, so a
+# scheduled run on main is what tells a contributor whether a red PR is
+# their change or the calendar.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    # Nightly, 03:41 UTC. Off the top of the hour, and clear of the
+    # orphan-ci (02:23) and used-by-link-check (06:17) crons.
+    - cron: "41 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    name: full test suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install the dev extra and the orchestrator runtimes
+        # `.[dev]` is the documented contributor install. It deliberately
+        # leaves out the runtimes the emitted artifacts import (see
+        # docs/contributing/first-contribution.md), so the tests that
+        # execute emitted source skip under it. This lane installs them so
+        # those tests run here instead of skipping. `pydantic` is imported
+        # by shipped primitives but not yet declared (#1052).
+        #
+        # Installing into setup-python's interpreter rather than a venv
+        # keeps it first on PATH, which matters: the per-example
+        # regenerate.sh scripts that some tests drive call bare `python`.
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+          python -m pip install pydantic temporalio langgraph langchain-core \
+            opentelemetry-api opentelemetry-sdk
+
+      - name: Run the suite
+        # -rs prints each skip with its reason, so a runtime that failed
+        # to install shows up as a list of skips rather than a quiet green.
+        run: python -m pytest -q -rs
