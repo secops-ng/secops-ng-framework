@@ -3,11 +3,14 @@
 Worked example: the `playbook.eu_ai_act_deployer_obligations@v1` CACAO
 v2 playbook compiled by the Temporal reference compiler. Operators who
 already run Temporal can import `workflow.temporal.py` into their
-worker module to see the topology the emitter produces; binding the
-activity bodies to real connectors (deployment register, provider
-instructions-for-use store, oversight-assignment record, input-data
-control surface, monitoring signal source, FRIA record store,
-automatically generated log store) is the operator's job.
+worker module to see the topology the emitter produces. Each of the
+five activity bodies imports and calls its bound primitive. Sequencing
+the activities through the two gates (the workflow's `run` method still
+raises `NotImplementedError`, as it does for every playbook) and binding
+the inputs the primitives read to real connectors (deployment register,
+provider instructions-for-use store, oversight-assignment record,
+input-data control surface, monitoring signal source, FRIA record
+store, automatically generated log store) is the operator's job.
 
 This is the deployer-side counterpart to the provider-side
 `eu_ai_act_risk_management` example.
@@ -35,7 +38,7 @@ regeneration command.
 
 The Art. 26(6) retention obligation runs for **at least six months**,
 and the Art. 26(5) monitoring duty is a standing per-window activity
-rather than a one-shot. The compiled workflow is a linear activity
+rather than a one-shot. The compiled workflow is a short gated activity
 chain, but the lifecycle it models is long-running and re-entrant: the
 terminal state closes on a dated evidence artifact and the next
 monitoring window re-enters at the start step. Operators binding this

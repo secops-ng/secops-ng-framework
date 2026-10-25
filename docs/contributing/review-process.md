@@ -47,8 +47,18 @@ it is the cheapest time to do it.
 ### 1.2 The test suite
 
 `python -m pytest` from the repo root runs unit, integration, and
-per-example byte-parity golden tests. Green locally is the baseline; the
-CI lane runs the same set and any red job blocks merge.
+per-example byte-parity golden tests. Green locally is the baseline;
+`.github/workflows/pytest.yml` runs the same suite on every pull request,
+with no path filter, and any red job blocks merge. That lane also
+installs the orchestrator runtimes (`temporalio`, `langgraph`,
+`opentelemetry`), so tests that skip on a plain `.[dev]` install run
+there. A skip you see locally may therefore be a failure in CI.
+
+The lane also runs nightly on `main`. A few tests depend on the date
+rather than the diff: the orphan checks give a new playbook a seven-day
+grace window. If your PR fails tests it cannot plausibly affect, check
+the latest nightly run first. If `main` is red too, the calendar did it,
+not your change.
 
 Compiler changes almost always cascade into per-example golden updates
 under `tests/examples/` — expect that, regenerate the affected examples

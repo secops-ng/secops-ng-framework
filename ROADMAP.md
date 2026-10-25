@@ -2268,7 +2268,7 @@ one playbook's provenance.
 
 ### F-WF-CORE-WAVE-1 — CORE-WIRE wave 1: bind the highest-payoff unbound playbooks
 
-- **Status:** In Progress
+- **Status:** Shipped
 - **Priority:** P2
 - **Goal:** G-01 (content coverage — `stable` under the Maturity ladder
   is the catalogue's deployment-ready designation, and every playbook on
@@ -2418,12 +2418,22 @@ one playbook's provenance.
     instructions, only a qualified overseer's review counts, the
     Art. 14(5) two-person rule counts distinct qualified verifiers, and
     the evidence separates oversight assigned from oversight exercised).
+  - CORE-WIRE + GRADUATE — #1050, closing #1048
+    (`eu_ai_act_deployer_obligations`: all five action steps bound
+    through `core_body`; a gate ends the cycle when the deployment may
+    not proceed, the fundamental-rights assessment moves before
+    deploying as Art. 27(1) requires and a second gate ends the cycle on
+    an incomplete in-scope assessment; three targets regenerated;
+    `experimental` → `stable`, `content_version` 1.0.0 on a recomputed
+    checklist).
   - CORE-WIRE + GRADUATE — #1051, closing #1049 (`ai_human_oversight`,
     the card's last playbook: all five action steps bound through
     `core_body`; the loop stays linear because a non-effective roster is
     the finding the evidence records; the Art. 14(5) record is
     re-declared an object; three targets regenerated; `experimental` →
-    `stable`, `content_version` 1.0.0 on a recomputed checklist).
+    `stable`, `content_version` 1.0.0 on a recomputed checklist). With
+    this landing all eight playbooks are `stable` and the card is
+    Shipped.
 
 ### F-WF-CORE-WAVE-2 — CORE wave 2: bind the remaining worthy playbooks; record the parked five
 
