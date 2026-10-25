@@ -2418,6 +2418,14 @@ one playbook's provenance.
     instructions, only a qualified overseer's review counts, the
     Art. 14(5) two-person rule counts distinct qualified verifiers, and
     the evidence separates oversight assigned from oversight exercised).
+  - CORE-WIRE + GRADUATE — #1050, closing #1048
+    (`eu_ai_act_deployer_obligations`: all five action steps bound
+    through `core_body`; a gate ends the cycle when the deployment may
+    not proceed, the fundamental-rights assessment moves before
+    deploying as Art. 27(1) requires and a second gate ends the cycle on
+    an incomplete in-scope assessment; three targets regenerated;
+    `experimental` → `stable`, `content_version` 1.0.0 on a recomputed
+    checklist).
 
 ### F-WF-CORE-WAVE-2 — CORE wave 2: bind the remaining worthy playbooks; record the parked five
 
