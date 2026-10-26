@@ -2437,7 +2437,7 @@ one playbook's provenance.
 
 ### F-WF-CORE-WAVE-2 — CORE wave 2: bind the remaining worthy playbooks; record the parked five
 
-- **Status:** Proposed
+- **Status:** In Progress
 - **Priority:** P3
 - **Goal:** G-01 (content coverage — completes the deployability story
   for the corpus: with wave 1 this card ends at every finalized
@@ -2473,6 +2473,15 @@ one playbook's provenance.
 - **Source:** #921; Director decision 2026-09-04.
 - **Shipped via:**
   - PARK notes — (docs PR, filed alongside this card)
+  - CORE-PRIM part 1 — #1055 (`data_protection_impact_assessment`:
+    primitives for the first five of its ten action steps, each rule
+    checked against the GDPR and, where it leaves the method open,
+    WP248 rev.01; screening runs Art. 35(10), similar-assessment
+    coverage, Art. 35(3)-(5) and the two-criteria rule in that order,
+    the DPIA is the controller's, lawfulness gaps and description gaps
+    are recorded, a sufficient less intrusive alternative defeats
+    necessity, and every risk names its sources, threats and impacts
+    with all three reference events covered).
 
 ## Epic PT — Pattern Library
 
