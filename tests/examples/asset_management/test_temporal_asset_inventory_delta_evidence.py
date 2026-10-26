@@ -30,9 +30,8 @@ import importlib.util
 import json
 from pathlib import Path
 
-from compilers.temporal.evidence import (
-    emit_asset_inventory_delta_artifact_activity,
-)
+import pytest
+
 
 REPO = Path(__file__).resolve().parents[3]
 EXAMPLE = REPO / "examples" / "temporal" / "asset_management"
@@ -57,6 +56,9 @@ def test_example_snapshot_is_committed() -> None:
 
 
 def test_example_snapshot_matches_temporal_adapter(tmp_path: Path) -> None:
+    pytest.importorskip("temporalio")
+    from compilers.temporal.evidence import emit_asset_inventory_delta_artifact_activity
+
     payload = _load_payload()
     written_str = asyncio.run(
         emit_asset_inventory_delta_artifact_activity(payload, tmp_path)
@@ -130,6 +132,9 @@ def test_temporal_replay_matches_committed_n8n_sibling() -> None:
 
 def test_temporal_activity_artifact_id_is_deterministic(tmp_path: Path) -> None:
     """Same payload → same artifact_id → byte-identical re-emission."""
+    pytest.importorskip("temporalio")
+    from compilers.temporal.evidence import emit_asset_inventory_delta_artifact_activity
+
     payload = _load_payload()
     first = Path(
         asyncio.run(

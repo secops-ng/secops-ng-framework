@@ -40,6 +40,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
+import pytest
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
 
@@ -51,7 +52,6 @@ from compilers._shared.evidence import (
     SupplyChainContext,
     derive_supply_chain_artifact_id,
 )
-from compilers.temporal.evidence import emit_supply_chain_artifact_activity
 
 REPO = Path(__file__).resolve().parents[6]
 SCHEMAS = REPO / "schemas"
@@ -199,6 +199,9 @@ def _replay(output_dir: Path) -> Path:
     worker uses. The activity returns the absolute artifact path as a
     string.
     """
+    pytest.importorskip("temporalio")
+    from compilers.temporal.evidence import emit_supply_chain_artifact_activity
+
     written_str = asyncio.run(
         emit_supply_chain_artifact_activity(CTX, output_dir)
     )

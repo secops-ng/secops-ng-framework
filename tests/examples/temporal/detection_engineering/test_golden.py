@@ -27,7 +27,8 @@ import importlib.util
 import json
 from pathlib import Path
 
-from compilers.temporal.evidence import emit_rule_effectiveness_snapshot_activity
+import pytest
+
 
 REPO = Path(__file__).resolve().parents[4]
 EXAMPLE = REPO / "examples" / "temporal" / "detection_engineering"
@@ -52,6 +53,9 @@ def test_example_snapshot_is_committed() -> None:
 
 
 def test_example_snapshot_matches_temporal_adapter(tmp_path: Path) -> None:
+    pytest.importorskip("temporalio")
+    from compilers.temporal.evidence import emit_rule_effectiveness_snapshot_activity
+
     ctx = _load_ctx()
     written_str = asyncio.run(
         emit_rule_effectiveness_snapshot_activity(ctx, tmp_path)
@@ -97,6 +101,9 @@ def test_temporal_replay_matches_committed_n8n_sibling() -> None:
 
 
 def test_artifact_path_matches_snapshot_id_in_record(tmp_path: Path) -> None:
+    pytest.importorskip("temporalio")
+    from compilers.temporal.evidence import emit_rule_effectiveness_snapshot_activity
+
     ctx = _load_ctx()
     written_str = asyncio.run(
         emit_rule_effectiveness_snapshot_activity(ctx, tmp_path)

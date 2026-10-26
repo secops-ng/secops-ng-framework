@@ -54,7 +54,6 @@ from compilers._shared.evidence import (
     MitigationStatus,
     TimelineRefs,
 )
-from compilers.temporal.evidence import emit_dora_art19_report_activity
 
 HERE = Path(__file__).resolve().parent
 EVIDENCE_DIR = HERE / "evidence"
@@ -277,6 +276,10 @@ CONTEXTS: dict[str, DoraArt19ReportContext] = {
 
 
 def main() -> None:
+    # Imported here, not at module level, so tests can load the fixture
+    # data above without the Temporal runtime installed.
+    from compilers.temporal.evidence import emit_dora_art19_report_activity
+
     EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
     for variant, ctx in CONTEXTS.items():
         written_str = asyncio.run(

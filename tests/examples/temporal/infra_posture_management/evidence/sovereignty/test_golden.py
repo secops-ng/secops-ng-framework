@@ -30,12 +30,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from jsonschema import Draft202012Validator, RefResolver
+import pytest
 
 from compilers._shared.evidence import (
     Observation,
     SovereigntyContext,
     SOVEREIGNTY_REQUIRED_INDICATORS,
 )
+pytest.importorskip("temporalio")
 from compilers.temporal.evidence import emit_sovereignty_artifact_activity
 
 REPO_ROOT = Path(__file__).resolve().parents[6]
